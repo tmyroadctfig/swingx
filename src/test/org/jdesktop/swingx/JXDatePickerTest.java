@@ -813,12 +813,12 @@ public class JXDatePickerTest extends InteractiveTestCase {
     public void testLinkDateSetToday() {
         JXDatePicker picker = new JXDatePicker();
         Calendar cal = picker.getMonthView().getCalendar();
-        cal.setTimeInMillis(picker.getMonthView().getTodayInMillis());
+        cal.setTime(picker.getMonthView().getToday());
         cal.add(Calendar.MONTH, 1);
         CalendarUtils.endOfDay(cal);
         // NOTE: no public api, testing to guarantee the synch in all cases
-        picker.getMonthView().setTodayInMillis(cal.getTimeInMillis());
-        assertEquals(new Date(picker.getMonthView().getTodayInMillis()), 
+        picker.getMonthView().setToday(cal.getTime());
+        assertEquals(new Date(picker.getMonthView().getToday().getTime()), 
                 new Date(picker.getLinkDate()));
     }
 
@@ -829,7 +829,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      */
     public void testLinkDateInitial() {
         JXDatePicker picker = new JXDatePicker();
-        assertEquals(picker.getMonthView().getTodayInMillis(), picker.getLinkDate());
+        assertEquals(picker.getMonthView().getToday().getTime(), picker.getLinkDate());
     }
     
     /**

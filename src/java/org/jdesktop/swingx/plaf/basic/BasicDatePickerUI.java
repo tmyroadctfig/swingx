@@ -750,7 +750,7 @@ public class BasicDatePickerUI extends DatePickerUI {
      * Updates the picker's linkDate to be in synch with monthView's today.
      */
     protected void updateLinkDate() {
-        datePicker.setLinkDate(datePicker.getMonthView().getTodayInMillis());
+        datePicker.setLinkDate(datePicker.getMonthView().getToday().getTime());
     }
 
     /**

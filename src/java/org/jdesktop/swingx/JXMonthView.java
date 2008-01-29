@@ -147,29 +147,6 @@ public class JXMonthView extends JComponent {
     /*
      * moved from package calendar to swingx at version 1.51
      */
-//    public static enum SelectionMode {
-//        /**
-//         * Mode that disallows selection of days from the calendar.
-//         */
-//        NO_SELECTION,
-//        /**
-//         * Mode that allows for selection of a single day.
-//         */
-//        SINGLE_SELECTION,
-//        /**
-//         * Mode that allows for selecting of multiple consecutive days.
-//         */
-//        SINGLE_INTERVAL_SELECTION,
-//        /**
-//         * Mode that allows for selecting disjoint days.
-//         */
-//        MULTIPLE_INTERVAL_SELECTION,
-//        /**
-//         * Mode where selections consisting of more than 7 days will
-//         * snap to a full week.
-//         */
-//        WEEK_INTERVAL_SELECTION
-//    }
 
     /** action command used for commit actionEvent. */
     public static final String COMMIT_KEY = "monthViewCommit";
@@ -235,7 +212,7 @@ public class JXMonthView extends JComponent {
      * Start of the day which contains System.millis() in the current calendar.
      * Kept in synch via a timer started in addNotify.
      */
-    private long todayInMillis;
+    private Date today;
     /**
      * The timer used to keep today in synch with system time.
      */
@@ -282,7 +259,6 @@ public class JXMonthView extends JComponent {
     private boolean showWeekNumber;
     private boolean componentInputMapEnabled;
     private DateSelectionListener modelListener;
-    private Date today;
 
     /**
      * Create a new instance of the <code>JXMonthView</code> class using the
@@ -723,7 +699,7 @@ public class JXMonthView extends JComponent {
      * temporary widened access for testing.
      */
     protected void updateTodayFromCurrentTime() {
-        setTodayInMillis(System.currentTimeMillis());
+        setToday(new Date(System.currentTimeMillis()));
     }
 
     /**
@@ -733,9 +709,9 @@ public class JXMonthView extends JComponent {
      * temporary widened access for testing.
      */
     protected void incrementToday() {
-        cal.setTimeInMillis(getTodayInMillis());
+        cal.setTime(getToday());
         cal.add(Calendar.DAY_OF_MONTH, 1);
-        setTodayInMillis(cal.getTimeInMillis());
+        setToday(cal.getTime());
     }
 
     /**
@@ -746,31 +722,51 @@ public class JXMonthView extends JComponent {
      * 
      * @param millis the instance in millis which should be used as today.
      */
-    protected void setTodayInMillis(long millis) {
-        long oldToday = getTodayInMillis();
-        this.todayInMillis = startOfDay(millis);
-        today = new Date(todayInMillis);
-        firePropertyChange("todayInMillis", oldToday, getTodayInMillis());
+    protected void setToday(Date date) {
+        Date oldToday = getToday();
+        this.today = startOfDay(date);
+        // PENDING JW: need notification for millis property until we
+        // remove it!
+        firePropertyChange("todayInMillis", 
+                oldToday != null ? oldToday.getTime() : 0, getToday().getTime());
+        firePropertyChange("today", oldToday, getToday());
         repaint();
     }
-    
-    /**
-     * Returns the start of today in this monthviews calendar coordinates.
-     * 
-     * @return the start of today in millis.
-     */
-    public long getTodayInMillis() {
-        return todayInMillis;
-    }
-    
+
     /**
      * Returns the start of today in this monthviews calendar coordinates.
      * 
      * @return the start of today as Date.
      */
     public Date getToday() {
-        return today;
+        // null only happens in the very first time ... 
+        return today != null ? (Date) today.clone() : null;
     }
+
+    /**
+     * Sets the todayInMillis property to the start of the day which contains the
+     * given millis in this monthView's calendar coordinates.
+     *  
+     * temporary widened access for testing.
+     * 
+     * @param millis the instance in millis which should be used as today.
+     * @deprecated use {@link #setToday(Date)}
+     */
+    @Deprecated
+    protected void setTodayInMillis(long millis) {
+        setToday(new Date(millis));
+    }
+    /**
+     * Returns the start of today in this monthviews calendar coordinates.
+     * 
+     * @return the start of today in millis.
+     * 
+     * @deprecated use {@link #getToday()}
+     */
+    public long getTodayInMillis() {
+        return today.getTime();
+    }
+    
     
 //----   internal date manipulation ("cleanup" == start of day in monthView's calendar)
     
@@ -829,6 +825,19 @@ public class JXMonthView extends JComponent {
         return cal.getTimeInMillis();
     }
 
+    /**
+     * Returns the start of the day as Date.
+     * 
+     * @param date the Date.
+     * @return start of the given day as Date, relative to this
+     *    monthView's calendar.
+     *    
+     */
+    private Date startOfDay(Date date) {
+        cal.setTime(date);
+        CalendarUtils.startOfDay(cal);
+        return cal.getTime();
+    }
 
 //------------------- ui delegate    
     /**

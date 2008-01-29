@@ -131,7 +131,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
         }
         DateSelectionModel model = new DaySelectionModel(locale);
         model.setTimeZone(tz);
-        int modelMinimal = model.getMinimalDaysInFirstWeek();
+//        int modelMinimal = model.getMinimalDaysInFirstWeek();
         monthView.setSelectionModel(model);
         assertEquals("timeZone must be updated from model", tz, monthView.getTimeZone());
         assertEquals("Locale must be updated from model", locale, monthView.getLocale());
@@ -462,10 +462,10 @@ public class JXMonthViewTest extends MockObjectTestCase {
      * Issue 711-swingx: today is notify-only property.
      * Today is start of day.
      */
-    public void testTodayIntial() {
+    public void testTodayInitial() {
         JXMonthView monthView = new JXMonthView();
         CalendarUtils.startOfDay(calendar);
-        assertEquals(calendar.getTimeInMillis(), monthView.getTodayInMillis());
+        assertEquals(calendar.getTime(), monthView.getToday());
     }
     
     /**
@@ -477,14 +477,15 @@ public class JXMonthViewTest extends MockObjectTestCase {
         calendar.add(Calendar.DAY_OF_MONTH, 1);
         CalendarUtils.startOfDay(calendar);
         monthView.incrementToday();
-        assertEquals(calendar.getTimeInMillis(), monthView.getTodayInMillis());
+        assertEquals(calendar.getTime(), monthView.getToday());
     }
     
     /**
      * Issue 711-swingx: today is notify-only property.
-     * SetToday should 
+     *  
      */
-    public void testTodaySet() {
+    @SuppressWarnings("deprecation")
+    public void testTodayMillisSet() {
         JXMonthView monthView = new JXMonthView();
         // tomorrow
         calendar.add(Calendar.DAY_OF_MONTH, 1);
@@ -495,20 +496,67 @@ public class JXMonthViewTest extends MockObjectTestCase {
     
     /**
      * Issue 711-swingx: today is notify-only property.
-     * SetToday should 
+     * 
      */
-    public void testTodaySetNotification() {
+    @SuppressWarnings("deprecation")
+    public void testTodayMillisSetNotification() {
         JXMonthView monthView = new JXMonthView();
-        long today = monthView.getTodayInMillis();
+        long todayInMillis = monthView.getTodayInMillis();
         // tomorrow
         calendar.add(Calendar.DAY_OF_MONTH, 1);
         PropertyChangeReport report = new PropertyChangeReport();
         monthView.addPropertyChangeListener(report);
         monthView.setTodayInMillis(calendar.getTimeInMillis());
         CalendarUtils.startOfDay(calendar);
+        TestUtils.assertPropertyChangeEvent(report, "today", 
+                new Date(todayInMillis), calendar.getTime(), false);
         TestUtils.assertPropertyChangeEvent(report, "todayInMillis", 
-                today, calendar.getTimeInMillis());
+                todayInMillis, calendar.getTimeInMillis(), false);
     }
+    /**
+     * Issue 711-swingx: today is notify-only property.
+     * SetToday should 
+     */
+    public void testTodaySetNotification() {
+        JXMonthView monthView = new JXMonthView();
+        Date today = monthView.getToday();
+        // tomorrow
+        calendar.add(Calendar.DAY_OF_MONTH, 1);
+        PropertyChangeReport report = new PropertyChangeReport();
+        monthView.addPropertyChangeListener(report);
+        monthView.setToday(calendar.getTime());
+        CalendarUtils.startOfDay(calendar);
+        TestUtils.assertPropertyChangeEvent(report, "today", 
+                today, calendar.getTime(), false);
+        TestUtils.assertPropertyChangeEvent(report, "todayInMillis", 
+                today.getTime(), calendar.getTimeInMillis(), false);
+    }
+
+    
+    /**
+     * Issue 711-swingx: today is notify-only property.
+     * SetToday should 
+     */
+    public void testTodaySet() {
+        JXMonthView monthView = new JXMonthView();
+        // tomorrow
+        calendar.add(Calendar.DAY_OF_MONTH, 1);
+        monthView.setToday(calendar.getTime());
+        CalendarUtils.startOfDay(calendar);
+        assertEquals(calendar.getTime(), monthView.getToday());
+    }
+
+    /**
+     * For safety, getToday should return a clone.
+     */
+    public void testTodayCopy() {
+        JXMonthView monthView = new JXMonthView();
+        Date today = monthView.getToday();
+        Date other = monthView.getToday();
+        assertNotNull(today);
+        assertNotSame(today, other);
+    }
+    
     /**
      * Issue #708-swingx: updateUI changes state.
      * 
@@ -516,9 +564,9 @@ public class JXMonthViewTest extends MockObjectTestCase {
      */
     public void testUpdateUIToday() {
         JXMonthView monthView = new JXMonthView(0);
-        long first = monthView.getTodayInMillis();
+        Date first = monthView.getToday();
         monthView.updateUI();
-        assertEquals(first, monthView.getTodayInMillis());
+        assertEquals(first, monthView.getToday());
     };
 
     

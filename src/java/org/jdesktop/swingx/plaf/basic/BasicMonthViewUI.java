@@ -1546,9 +1546,12 @@ public class BasicMonthViewUI extends MonthViewUI {
     
     /**
      * @return the start of today.
+     * 
+     * @deprecated use {@link #getToday()}
      */
+    @Deprecated
     protected long getTodayInMillis() {
-        return monthView.getTodayInMillis();
+        return monthView.getToday().getTime();
     }
 
     /**
