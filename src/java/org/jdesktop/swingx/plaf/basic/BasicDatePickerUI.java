@@ -120,9 +120,6 @@ public class BasicDatePickerUI extends DatePickerUI {
     private PropertyChangeListener monthViewPropertyListener;
 
 
-
-
-
     @SuppressWarnings({"UnusedDeclaration"})
     public static ComponentUI createUI(JComponent c) {
         return new BasicDatePickerUI();
@@ -170,12 +167,6 @@ public class BasicDatePickerUI extends DatePickerUI {
             popupButton.putClientProperty("doNotCancelPopup", preventHide);
             datePicker.add(popupButton);
         }
-        // JW: the condition is hacking around #681-swingx: overlapping rows in JXMonthView
-        // in locales with first day of week monday if locale is set
-        // this way the current brittle behaviour is at least not detoriated
-        // (== default locales are okay)
-//        if ((datePicker.getLocale() != null) && 
-//                !datePicker.getLocale().equals(Locale.getDefault())) 
             updateChildLocale(datePicker.getLocale());
         
     }
@@ -569,8 +560,6 @@ public class BasicDatePickerUI extends DatePickerUI {
     public Date getSelectableDate(Date date) throws PropertyVetoException {
         Date cleaned = date == null ? null :
             datePicker.getMonthView().getSelectionModel().getNormalizedDate(date);
-//        Date cleaned = date != null ? cleanupDate(date) : null;
-//        Date cleaned = date; // != null ? cleanupDate(date) : null;
         if (equalsDate(cleaned, datePicker.getDate())) { 
             // one place to interrupt the update spiral
             throw new PropertyVetoException("date not selectable", null);
@@ -658,7 +647,6 @@ public class BasicDatePickerUI extends DatePickerUI {
         }
         datePicker.getMonthView().setComponentInputMapEnabled(true);
         updateTimeZone(oldTimeZone);
-//        updateFormatsFromTimeZone(datePicker.getTimeZone());
         updateEditorValue();
     }
 
@@ -762,35 +750,12 @@ public class BasicDatePickerUI extends DatePickerUI {
 
     private void updateFormatLocale(Locale locale) {
         if (locale != null) {
-            /*
-             * FIXME: PeS: It should probably use this
-             * 
-             * however that gets beyond my understanding of the inner workings.
-             * It reaches to UiManagerExt for date formats? Therefore I am using
-             * simply JRE defined formats
-             */
-            // JW: yes should do that - but only if we have no custom formats
-            // installed.
-            // PENDING: timezone?
+            // PENDING JW: timezone?
             if (getCustomFormats(datePicker.getEditor()) == null) {
                 datePicker.getEditor().setFormatterFactory(
                         new DefaultFormatterFactory(
                                 new DatePickerFormatterUIResource(locale)));
             }
-            // DateFormat[] formats = new DateFormat[3];
-            // SimpleDateFormat f =
-            // (SimpleDateFormat)DateFormat.getDateInstance(DateFormat.SHORT,
-            // locale);
-            // if (!f.toPattern().contains("E")) {
-            // f.applyPattern("EE " + f.toPattern());
-            // }
-            // formats[0] = f;
-            // formats[1] = DateFormat.getDateInstance(DateFormat.DEFAULT,
-            // locale);
-            // formats[2] = DateFormat.getDateInstance(DateFormat.MEDIUM,
-            // locale);
-            // datePicker.setFormats(formats);
-
         }
     }
 
@@ -814,13 +779,6 @@ public class BasicDatePickerUI extends DatePickerUI {
         if (popup != null) {
             popup.updateLinkPanel(oldLinkPanel);
         }
-        // PENDING JW: datepicker installs a new todayPanel if 
-        // any of the linkDate related properties changed.
-        // should be less-rude - can set properties on the 
-        // panel? Fire more atomic changes.
-        // JW: wrong assumption - the firstDisplayed is the first day of the 
-        // currently displayed month, linkDate is something like today
-//        datePicker.getMonthView().setFirstDisplayedDate(datePicker.getLinkDate());
     }
 
 
@@ -1211,7 +1169,6 @@ public class BasicDatePickerUI extends DatePickerUI {
             if ("selectionModel".equals(e.getPropertyName())) {
                 updateFromSelectionModelChanged((DateSelectionModel) e.getOldValue());
             } else if ("timeZone".equals(e.getPropertyName())) {
-//                updateFormatsFromTimeZone((TimeZone) e.getNewValue());
                 updateTimeZone((TimeZone) e.getOldValue());
             } else if ("todayInMillis".equals(e.getPropertyName())) {
                 updateLinkDate();
@@ -1432,22 +1389,6 @@ public class BasicDatePickerUI extends DatePickerUI {
 
     
 //------------ utility methods
-    // duplication!!
-//    private Date cleanupDate(Date date) {
-//        return date;
-////        return datePicker.getMonthView().getSelectionModel().getNormalizedDate(date);
-//        // only modify defensive copies
-////        return new Date(cleanupDate(date.getTime(), datePicker.getMonthView().getCalendar()));
-//    }
-
-    // duplication!!
-    // PENDING: move to CalendarUtils ?
-//    private long cleanupDate(long date, Calendar cal) {
-//        cal.setTimeInMillis(date);
-//        // We only want to compare the day, month and year
-//        CalendarUtils.startOfDay(cal);
-//        return cal.getTimeInMillis();
-//    }
 
     /**
      * Checks the given dates for being equal.
