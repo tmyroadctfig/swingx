@@ -506,16 +506,29 @@ public class JXDatePicker extends JComponent {
      * @param tz The <code>TimeZone</code>.
      */
     public void setTimeZone(TimeZone tz) {
-//        TimeZone old = getTimeZone();
         _monthView.setTimeZone(tz);
-//        firePropertyChange("timeZone", old, getTimeZone());
-
     }
 
+    /**
+     * Returns the date shown in the LinkPanel as millis.
+     * 
+     * @return
+     * 
+     * @deprecated use {@link #getLinkInMillis()}
+     */
     public long getLinkDate() {
         return _linkDate;
     }
 
+    /**
+     * Returns the date shown in the LinkPanel.
+     * 
+     * @return the date shown in the LinkPanel.
+     */
+    public Date getToday() {
+        return new Date(_linkDate);
+    }
+    
     /**
      * Set the date the link will use and the string defining a MessageFormat
      * to format the link.  If no valid date is in the editor when the popup
@@ -537,9 +550,19 @@ public class JXDatePicker extends JComponent {
     /**
      * PENDING JW ... quick api hack for testing.
      * @param linkDate
+     * 
+     * @deprecated use {@link #setToday(Date)
      */
     public void setLinkDate(long linkDate) {
-        this._linkDate = linkDate;
+        setToday(new Date(linkDate));
+    }
+    
+    /**
+     * PENDING JW ... quick api hack for testing.
+     * @param linkDate
+     */
+    public void setToday(Date today) {
+        this._linkDate = today.getTime();
         Format[] formats = getLinkFormat().getFormatsByArgumentIndex();
         for (Format format : formats) {
             if (format instanceof DateFormat) {
@@ -548,6 +571,7 @@ public class JXDatePicker extends JComponent {
         }
         setLinkPanel(new TodayPanel());
     }
+    
 
     /**
      * @param _linkFormat the _linkFormat to set
@@ -821,6 +845,7 @@ public class JXDatePicker extends JComponent {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public <T extends EventListener> T[] getListeners(Class<T> listenerType) {
         java.util.List<T> listeners = listenerMap.getListeners(listenerType);
         T[] result;

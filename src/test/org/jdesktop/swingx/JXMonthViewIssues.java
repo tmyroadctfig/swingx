@@ -169,6 +169,7 @@ public class JXMonthViewIssues extends InteractiveTestCase {
      * MultipleIntervalSelection where each interval is one or more weeks?
      * Here: does not snap start/end of week to start/end of day? 
      */
+    @SuppressWarnings("deprecation")
     public void testWeekInterval() {
         JXMonthView monthView = new JXMonthView();
         CalendarUtils.endOfWeek(calendar);
@@ -187,6 +188,7 @@ public class JXMonthViewIssues extends InteractiveTestCase {
      * MultipleIntervalSelection where each interval is one or more weeks?
      * Here: does nothing if single day selected?
      */
+    @SuppressWarnings("deprecation")
     public void testWeekIntervalOneDay() {
         JXMonthView monthView = new JXMonthView();
         monthView.cleanupWeekSelectionDates(today, today);
@@ -202,6 +204,7 @@ public class JXMonthViewIssues extends InteractiveTestCase {
      * MultipleIntervalSelection where each interval is one or more weeks?
      * Here: does nothing if two days interval?
      */
+    @SuppressWarnings("deprecation")
     public void testWeekIntervalTwoDays() {
         JXMonthView monthView = new JXMonthView();
         monthView.cleanupWeekSelectionDates(today, tomorrow);

@@ -47,7 +47,6 @@ import javax.swing.KeyStroke;
 
 import org.jdesktop.swingx.calendar.CalendarUtils;
 import org.jdesktop.swingx.calendar.DatePickerFormatter;
-import org.jdesktop.swingx.calendar.DateUtils;
 
 /**
  * Known issues of <code>JXDatePicker</code> and picker related 
@@ -216,7 +215,7 @@ public class JXDatePickerIssues extends InteractiveTestCase {
         Action nextDate = new AbstractAction("change linkdate") {
 
             public void actionPerformed(ActionEvent e) {
-                picker.setLinkDate(DateUtils.getNextMonth(picker.getLinkDate()));
+                setLinkDateNextMonth(picker);
                 
             }
             
@@ -225,6 +224,40 @@ public class JXDatePickerIssues extends InteractiveTestCase {
         frame.pack();
     }
     
+    /**
+     * Issue #572-swingx: monthView must show linkDate on empty selection.
+     *
+     * add month to linkDate, popup must show month containing link date.
+     * Note: client code using the link date for something different than today
+     * must take care to update the message format (PENDING: is that possible?)
+     */
+    public void interactiveLinkDate() {
+        final JXDatePicker picker = new JXDatePicker();
+        picker.setDate(null);
+        setLinkDateNextMonth(picker);
+        Action action = new AbstractAction("next linkdate month") {
+
+            public void actionPerformed(ActionEvent e) {
+                setLinkDateNextMonth(picker);
+            }
+            
+        };
+        JXFrame frame = wrapInFrame(picker, "show linkdate if unselected");
+        addAction(frame, action);
+        addMessage(frame, "incr linkDate and open popup: must show new linkMonth");
+        frame.pack();
+        frame.setVisible(true);
+    }
+
+
+    protected void setLinkDateNextMonth(final JXDatePicker picker) {
+        Date linkDate = picker.getToday();
+        // add a months and set as new link date
+        calendar.setTime(linkDate);
+        calendar.add(Calendar.MONTH, 1);
+        picker.setToday(calendar.getTime());
+    }
+
     /**
      * Issue #565-swingx: occasionally, the popup isn't closed. 
      * to reproduce: open the picker's popup then click into
@@ -330,21 +363,23 @@ public class JXDatePickerIssues extends InteractiveTestCase {
     public void testLinkDate() {
         JXDatePicker picker = new JXDatePicker();
         picker.setDate(null);
-        long linkDate = picker.getLinkDate();
-        long firstDisplayedDate = picker.getMonthView().getFirstDisplayedDate();
-        assertSameMonth(linkDate, firstDisplayedDate);
-        long nextDate = DateUtils.getNextMonth(DateUtils.getNextMonth(linkDate));
-        picker.setLinkDate(nextDate);
-        assertSameMonth(nextDate, picker.getMonthView().getFirstDisplayedDate());
+        Date today = picker.getToday();
+        Date firstDisplayedDate = new Date(picker.getMonthView().getFirstDisplayedDate());
+        assertSameMonth(today, firstDisplayedDate);
+        calendar.setTime(today);
+        calendar.add(Calendar.MONTH, 2);
+        picker.setToday(calendar.getTime());
+        assertSameMonth(calendar.getTime(), 
+                new Date(picker.getMonthView().getFirstDisplayedDate()));
     }
     /**
      * @param linkDate
      * @param firstDisplayedDate
      */
-    private void assertSameMonth(long linkDate, long firstDisplayedDate) {
-        calendar.setTimeInMillis(linkDate);
+    private void assertSameMonth(Date linkDate, Date firstDisplayedDate) {
+        calendar.setTime(linkDate);
         int linkMonth = calendar.get(Calendar.MONTH);
-        calendar.setTimeInMillis(firstDisplayedDate);
+        calendar.setTime(firstDisplayedDate);
         assertEquals(linkMonth, calendar.get(Calendar.MONTH));
         
     }
@@ -394,6 +429,7 @@ public class JXDatePickerIssues extends InteractiveTestCase {
     protected void setUp() throws Exception {
         calendar = Calendar.getInstance();
     }
+
     
     
 }

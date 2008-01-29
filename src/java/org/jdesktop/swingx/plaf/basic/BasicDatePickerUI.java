@@ -67,7 +67,6 @@ import javax.swing.text.View;
 
 import org.jdesktop.swingx.JXDatePicker;
 import org.jdesktop.swingx.JXMonthView;
-import org.jdesktop.swingx.calendar.CalendarUtils;
 import org.jdesktop.swingx.calendar.DatePickerFormatter;
 import org.jdesktop.swingx.calendar.DateSelectionModel;
 import org.jdesktop.swingx.calendar.DatePickerFormatter.DatePickerFormatterUIResource;
@@ -588,8 +587,8 @@ public class BasicDatePickerUI extends DatePickerUI {
      * Updates internals after picker's date property changed.
      */
     protected void updateFromDateChanged() {
-        long visibleHook = datePicker.getDate() != null ?
-                datePicker.getDate().getTime() : datePicker.getLinkDate();
+        Date visibleHook = datePicker.getDate() != null ?
+                datePicker.getDate() : datePicker.getToday();
         datePicker.getMonthView().ensureDateVisible(visibleHook);        
         datePicker.getEditor().setValue(datePicker.getDate());
     }
@@ -740,17 +739,13 @@ public class BasicDatePickerUI extends DatePickerUI {
     protected void updateTimeZone(TimeZone old) {
         updateFormatsFromTimeZone(datePicker.getTimeZone());
         updateLinkDate();
-        // JW: the fire isn't visible
-        // doing so is a bad idea anyway - but can't guard against 
-        // changes applied to the underlying monthView!
-//        datePicker.firePropertyChange("timeZone", old, datePicker.getTimeZone());
     }
 
     /**
      * Updates the picker's linkDate to be in synch with monthView's today.
      */
     protected void updateLinkDate() {
-        datePicker.setLinkDate(datePicker.getMonthView().getToday().getTime());
+        datePicker.setToday(datePicker.getMonthView().getToday());
     }
 
     /**
@@ -869,11 +864,11 @@ public class BasicDatePickerUI extends DatePickerUI {
     protected void home(boolean commit) {
         if (commit) {
             Calendar cal = datePicker.getMonthView().getCalendar();
-            cal.setTimeInMillis(datePicker.getLinkDate());
+            cal.setTime(datePicker.getToday());
             datePicker.getMonthView().setSelectedDate(cal.getTime());
             datePicker.getMonthView().commitSelection();
         } else {
-            datePicker.getMonthView().ensureDateVisible(datePicker.getLinkDate());
+            datePicker.getMonthView().ensureDateVisible(datePicker.getToday());
         }
     }
 

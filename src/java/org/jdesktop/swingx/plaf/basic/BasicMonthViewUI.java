@@ -2074,8 +2074,10 @@ public class BasicMonthViewUI extends MonthViewUI {
                     break;
             }
             if (newStartDate != selectionStart || newEndDate != selectionEnd) {
-                monthView.setSelectionInterval(new Date(newStartDate), new Date(newEndDate));
-                monthView.ensureDateVisible(isForward ? newEndDate : newStartDate);
+                Date nStart = new Date(newStartDate);
+                Date nEnd = new Date(newEndDate);
+                monthView.setSelectionInterval(nStart, nEnd);
+                monthView.ensureDateVisible(isForward ? nEnd  : nStart);
             }
 
         }
