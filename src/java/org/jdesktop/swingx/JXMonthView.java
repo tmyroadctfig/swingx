@@ -834,9 +834,7 @@ public class JXMonthView extends JComponent {
      *    
      */
     private Date startOfDay(Date date) {
-        cal.setTime(date);
-        CalendarUtils.startOfDay(cal);
-        return cal.getTime();
+        return CalendarUtils.startOfDay(cal, date);
     }
 
 //------------------- ui delegate    

@@ -1428,6 +1428,8 @@ public class BasicMonthViewUI extends MonthViewUI {
      * 
      * @param date the instant to normalize to the start of the day
      * @return the start of the day in millis.
+     * 
+     * @deprecated PENDING JW change internals to not use millis
      */
     private long startOfDay(long date) {
         Calendar cal = getCalendar(date);

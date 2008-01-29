@@ -246,17 +246,6 @@ public class SingleDaySelectionModel extends AbstractDateSelectionModel {
     }
 
     
-    /**
-     * Returns a boolean indicating whether the given dates are on the same day in
-     * the coordinates of the model's calendar.
-     * 
-     * @param selected one of the dates to check, must not be null.
-     * @param compare the other of the dates to check, must not be null.
-     * @return
-     */
-    public boolean isSameDay(Date selected, Date compare) {
-        return startOfDay(selected).equals(startOfDay(compare));
-    }
 
     /**
      * {@inheritDoc}<p>
@@ -267,17 +256,6 @@ public class SingleDaySelectionModel extends AbstractDateSelectionModel {
         return new Date(date.getTime());
     }
 
-    private Date startOfDay(Date date) {
-        calendar.setTime(date);
-        CalendarUtils.startOfDay(calendar);
-        return calendar.getTime();
-    }
-
-    private Date endOfDay(Date date) {
-        calendar.setTime(date);
-        CalendarUtils.endOfDay(calendar);
-        return calendar.getTime();
-    }
 
     /**
      * {@inheritDoc}

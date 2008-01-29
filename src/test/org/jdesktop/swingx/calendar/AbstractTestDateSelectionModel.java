@@ -398,9 +398,7 @@ public class AbstractTestDateSelectionModel extends TestCase {
      * @return
      */
     protected Date startOfDay(Date date) {
-        calendar.setTime(date);
-        CalendarUtils.startOfDay(calendar);
-        return calendar.getTime();
+        return CalendarUtils.startOfDay(calendar, date);
     }
 
     /**
@@ -410,9 +408,7 @@ public class AbstractTestDateSelectionModel extends TestCase {
      * @return
      */
     protected Date endOfDay(Date date) {
-        calendar.setTime(date);
-        CalendarUtils.endOfDay(calendar);
-        return calendar.getTime();
+        return CalendarUtils.endOfDay(calendar, date);
     }
 
     /**

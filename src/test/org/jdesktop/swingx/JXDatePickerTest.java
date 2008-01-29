@@ -1013,8 +1013,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
         picker.setDate(null);
         Date date = calendar.getTime();
         picker.setDate(date);
-        CalendarUtils.startOfDay(calendar);
-        assertEquals(calendar.getTime(), picker.getDate());
+        assertEquals(CalendarUtils.startOfDay(calendar, date), picker.getDate());
     }
 
     /**

@@ -67,6 +67,7 @@ import javax.swing.text.View;
 
 import org.jdesktop.swingx.JXDatePicker;
 import org.jdesktop.swingx.JXMonthView;
+import org.jdesktop.swingx.calendar.CalendarUtils;
 import org.jdesktop.swingx.calendar.DatePickerFormatter;
 import org.jdesktop.swingx.calendar.DateSelectionModel;
 import org.jdesktop.swingx.calendar.DatePickerFormatter.DatePickerFormatterUIResource;
@@ -560,7 +561,7 @@ public class BasicDatePickerUI extends DatePickerUI {
     public Date getSelectableDate(Date date) throws PropertyVetoException {
         Date cleaned = date == null ? null :
             datePicker.getMonthView().getSelectionModel().getNormalizedDate(date);
-        if (equalsDate(cleaned, datePicker.getDate())) { 
+        if (CalendarUtils.areEqual(cleaned, datePicker.getDate())) { 
             // one place to interrupt the update spiral
             throw new PropertyVetoException("date not selectable", null);
         }
@@ -596,7 +597,7 @@ public class BasicDatePickerUI extends DatePickerUI {
             return;
         }
         // the other place to interrupt the update spiral
-        if (!equalsDate(newDate, datePicker.getMonthView().getSelectedDate())) {
+        if (!CalendarUtils.areEqual(newDate, datePicker.getMonthView().getSelectedDate())) {
             datePicker.getMonthView().setSelectedDate(newDate);
         }
         datePicker.setDate(newDate);
@@ -1389,29 +1390,6 @@ public class BasicDatePickerUI extends DatePickerUI {
 
     
 //------------ utility methods
-
-    /**
-     * Checks the given dates for being equal.
-     * 
-     * PENDING: this should be a utility somewhere ... 
-     * 
-     * @param current one of the dates to compare
-     * @param date the otherr of the dates to compare
-     * @return true if the two given dates are equal, false otherwise.
-     */
-    private boolean equalsDate(Date current, Date date) {
-        if ((date == null) && (current == null)) {
-            return true;
-        }
-        if ((date != null) && (date.equals(current))) {
-           return true; 
-        }
-        return false;
-    }
-
-
-  
-
 
 
 }

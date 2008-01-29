@@ -22,6 +22,7 @@
 package org.jdesktop.swingx.calendar;
 
 import java.util.Calendar;
+import java.util.Date;
 
 /**
  * Calendar manipulation.
@@ -187,6 +188,38 @@ public class CalendarUtils {
 
 
     /**
+     * Adjust the given calendar to the first millisecond of the given date.
+     * that is all time fields cleared. The Date of the adjusted Calendar is
+     * returned. 
+     * 
+     * @param calendar calendar to adjust.
+     * @param date the Date to use.
+     * @return the start of the day of the given date
+     */
+    public static Date startOfDay(Calendar calendar, Date date) {
+        calendar.setTime(date);
+        startOfDay(calendar);
+        return calendar.getTime();
+    }
+
+
+    /**
+     * Adjust the given calendar to the last millisecond of the given date.
+     * that is all time fields cleared. The Date of the adjusted Calendar is
+     * returned. 
+     * 
+     * @param calendar calendar to adjust.
+     * @param date the Date to use.
+     * @return the end of the day of the given date
+     */
+    public static Date endOfDay(Calendar calendar, Date date) {
+        calendar.setTime(date);
+        endOfDay(calendar);
+        return calendar.getTime();
+    }
+
+
+    /**
      * Adjust the given calendar to the first millisecond of the current day.
      * that is all time fields cleared.
      * 
@@ -198,7 +231,6 @@ public class CalendarUtils {
         calendar.set(Calendar.SECOND, 0);
         calendar.set(Calendar.MINUTE, 0);
     }
-
     /**
      * Adjust the given calendar to the last millisecond of the specified date.
      * 
@@ -208,6 +240,42 @@ public class CalendarUtils {
         calendar.add(Calendar.DATE, 1);
         startOfDay(calendar);
         calendar.add(Calendar.MILLISECOND, -1);
+    }
+
+    /**
+     * Checks the given dates for being equal.
+     * 
+     * @param current one of the dates to compare
+     * @param date the otherr of the dates to compare
+     * @return true if the two given dates both are null or both are not null and equal, 
+     *  false otherwise.
+     */
+    public static boolean areEqual(Date current, Date date) {
+        if ((date == null) && (current == null)) {
+            return true;
+        }
+        if (date != null) {
+           return date.equals(current);
+        }
+        return false;
+    }
+
+    /**
+     * Returns a boolean indicating whether the given Date is the same day as
+     * the day in the calendar. Calendar and date are unchanged by the check.
+     *
+     * @param today the Calendar representing a date, must not be null.
+     * @param now the date to compare to, must not be null
+     * @return true if the calendar and date represent the same day in the
+     *   given calendar.
+     */
+    public static boolean isSameDay(Calendar today, Date now) {
+        Calendar temp = (Calendar) today.clone();
+        startOfDay(temp);
+        Date start = temp.getTime();
+        temp.setTime(now);
+        startOfDay(temp);
+        return start.equals(temp.getTime());
     }
 
 

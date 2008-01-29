@@ -176,10 +176,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
         monthView.setSelectedDate(new Date());
         Date selected = monthView.getSelectedDate();
         Calendar calendar = monthView.getCalendar();
-        calendar.setTime(selected);
-        CalendarUtils.startOfDay(calendar);
-        assertEquals(selected, calendar.getTime());
-        assertTrue(CalendarUtils.isStartOfDay(calendar));
+        assertEquals(selected, CalendarUtils.startOfDay(calendar, selected));
     }
     
 
@@ -1691,14 +1688,10 @@ public class JXMonthViewTest extends MockObjectTestCase {
     }
     
     private Date startOfDay(Date date) {
-        calendar.setTime(date);
-        CalendarUtils.startOfDay(calendar);
-        return calendar.getTime();
+        return CalendarUtils.startOfDay(calendar, date);
     }
  
     private Date endOfDay(Date date) {
-        calendar.setTime(date);
-        CalendarUtils.endOfDay(calendar);
-        return calendar.getTime();
+        return CalendarUtils.endOfDay(calendar, date);
     }
 }

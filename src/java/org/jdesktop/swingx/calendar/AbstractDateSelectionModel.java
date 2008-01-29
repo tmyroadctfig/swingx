@@ -174,6 +174,42 @@ public abstract class AbstractDateSelectionModel implements DateSelectionModel {
         fireValueChanged(EventType.CALENDAR_CHANGED);
     }
 
+//------------------- utility methods
+    
+    /**
+     * Returns the start of the day of the given date in this model's calendar.
+     * NOTE: the calendar is changed by this operation.
+     * 
+     * @param date the Date to get the start for.
+     * @return the Date representing the start of the day of the input date.
+     */
+    protected Date startOfDay(Date date) {
+        return CalendarUtils.startOfDay(calendar, date);
+    }
+
+    /**
+     * Returns the end of the day of the given date in this model's calendar.
+     * NOTE: the calendar is changed by this operation.
+     * 
+     * @param date the Date to get the start for.
+     * @return the Date representing the end of the day of the input date.
+     */
+    protected Date endOfDay(Date date) {
+        return CalendarUtils.endOfDay(calendar, date);
+    }
+
+    /**
+     * Returns a boolean indicating whether the given dates are on the same day in
+     * the coordinates of the model's calendar.
+     * 
+     * @param selected one of the dates to check, must not be null.
+     * @param compare the other of the dates to check, must not be null.
+     * @return true if both dates represent the same day in this model's calendar.
+     */
+    protected boolean isSameDay(Date selected, Date compare) {
+        return startOfDay(selected).equals(startOfDay(compare));
+    }
+
 //------------------- listeners
     
     /**

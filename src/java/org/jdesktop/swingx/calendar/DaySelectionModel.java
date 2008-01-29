@@ -311,11 +311,6 @@ public class DaySelectionModel extends AbstractDateSelectionModel {
         return hasAdded;
     }
 
-    private Date startOfDay(Date date) {
-        calendar.setTime(date);
-        CalendarUtils.startOfDay(calendar);
-        return calendar.getTime();
-    }
 
     /**
      * {@inheritDoc}

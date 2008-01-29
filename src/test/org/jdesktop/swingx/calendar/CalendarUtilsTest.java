@@ -46,6 +46,27 @@ public class CalendarUtilsTest extends InteractiveTestCase {
     private Calendar todayUS;
     private Calendar midJune;
 
+    
+    public void testSameDay() {
+        Date now = today.getTime();
+        CalendarUtils.endOfDay(today);
+        Date end = today.getTime();
+        assertTrue(CalendarUtils.isSameDay(today, now));
+        assertEquals(end, today.getTime());
+        today.add(Calendar.DAY_OF_MONTH, 1);
+        assertFalse(CalendarUtils.isSameDay(today, now));
+    }
+    
+    public void testAreEqual() {
+        assertTrue(CalendarUtils.areEqual(null, null));
+        Calendar calendar = Calendar.getInstance();
+        Date now = calendar.getTime();
+        assertFalse(CalendarUtils.areEqual(now, null));
+        assertFalse(CalendarUtils.areEqual(null, now));
+        assertTrue(CalendarUtils.areEqual(now, now));
+        calendar.add(Calendar.HOUR_OF_DAY, 1);
+        assertFalse(CalendarUtils.areEqual(now, calendar.getTime()));
+    }
     public void testIsStartOfWeek() {
         CalendarUtils.startOfWeek(midJune);
         assertTrue(CalendarUtils.isStartOfWeek(midJune));
@@ -179,6 +200,13 @@ public class CalendarUtilsTest extends InteractiveTestCase {
         assertEquals(day + 1, midJune.get(Calendar.DATE));
     }
 
+    public void testEndOfDayWithReturn() {
+        Date date = midJune.getTime();
+        Date start = CalendarUtils.endOfDay(midJune, date);
+        assertTrue(CalendarUtils.isEndOfDay(midJune));
+        assertEquals(start, midJune.getTime());
+    }
+    
     public void testStartOfDay() {
         // want to be in the middle of a month
         int day = midJune.get(Calendar.DAY_OF_MONTH);
@@ -188,6 +216,13 @@ public class CalendarUtilsTest extends InteractiveTestCase {
         assertEquals(day - 1, midJune.get(Calendar.DATE));
     }
 
+    public void testStartOfDayWithReturn() {
+        Date date = midJune.getTime();
+        Date start = CalendarUtils.startOfDay(midJune, date);
+        assertTrue(CalendarUtils.isStartOfDay(midJune));
+        assertEquals(start, midJune.getTime());
+    }
+    
     public void testStartOfDayUnique() {
         Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT+0"));
         CalendarUtils.startOfMonth(calendar);
