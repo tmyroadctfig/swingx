@@ -22,6 +22,7 @@
 package org.jdesktop.swingx;
 
 import java.awt.Component;
+import java.awt.Dimension;
 import java.lang.reflect.InvocationTargetException;
 import javax.swing.Icon;
 import javax.swing.JComponent;
@@ -34,6 +35,7 @@ import org.jdesktop.swingx.error.ErrorInfo;
 import org.jdesktop.swingx.plaf.ErrorPaneUI;
 import org.jdesktop.swingx.plaf.ErrorPaneAddon;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
+import org.jdesktop.swingx.plaf.basic.BasicErrorPaneUI;
 
 /**
  * <p>JXErrorPane is a common error component suitable for displaying errors,
@@ -215,6 +217,14 @@ public class JXErrorPane extends JComponent {
     public JXErrorPane() {
         super();
         updateUI();
+    }
+    
+    public Dimension getPreferredSize() {
+        if (super.isPreferredSizeSet()) {
+            return super.getPreferredSize();
+        } else {
+            return getUI().calculatePreferredSize();
+        }
     }
     
     //------------------------------------------------------------- UI Logic
@@ -648,4 +658,5 @@ public class JXErrorPane extends JComponent {
 //                window.setLocationRelativeTo(owner);
         return window;
     }
+    
 }

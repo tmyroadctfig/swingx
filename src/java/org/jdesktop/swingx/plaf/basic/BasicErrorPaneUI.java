@@ -453,10 +453,10 @@ public class BasicErrorPaneUI extends ErrorPaneUI {
         return layout;
     }
     
-    protected Dimension calculatePreferredDialogSize() {
+    public Dimension calculatePreferredSize() {
         //TODO returns a Dimension that is either X wide, or as wide as necessary
         //to show the title. It is Y high.
-        return new Dimension(458, 206);
+        return new Dimension(iconLabel.getPreferredSize().width + errorMessage.getPreferredSize().width, 206);
     }
     
     protected int getDetailsHeight() {
@@ -881,7 +881,7 @@ public class BasicErrorPaneUI extends ErrorPaneUI {
             setDefaultCloseOperation(JInternalFrame.DISPOSE_ON_CLOSE);
             KeyStroke ks = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
             getRootPane().registerKeyboardAction(closeAction, ks, JComponent.WHEN_IN_FOCUSED_WINDOW);
-            setPreferredSize(calculatePreferredDialogSize());
+            //setPreferredSize(calculatePreferredDialogSize());
         }
     }
 
@@ -931,8 +931,6 @@ public class BasicErrorPaneUI extends ErrorPaneUI {
                 exitIfFatal();
             }
         });
-        
-        w.setPreferredSize(calculatePreferredDialogSize());
         w.pack();
     }
     
