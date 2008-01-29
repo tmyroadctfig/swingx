@@ -28,16 +28,15 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.SortedSet;
 import java.util.TimeZone;
 import java.util.logging.Logger;
 
 import javax.swing.Action;
 
-import org.jdesktop.swingx.JXMonthView.SelectionMode;
 import org.jdesktop.swingx.calendar.CalendarUtils;
 import org.jdesktop.swingx.calendar.DateSelectionModel;
 import org.jdesktop.swingx.calendar.DaySelectionModel;
+import org.jdesktop.swingx.calendar.DateSelectionModel.SelectionMode;
 import org.jdesktop.swingx.event.DateSelectionEvent.EventType;
 import org.jdesktop.swingx.test.DateSelectionReport;
 import org.jdesktop.test.PropertyChangeReport;
@@ -67,8 +66,14 @@ public class JXMonthViewIssues extends InteractiveTestCase {
           e.printStackTrace();
       }
   }
+    // pre-defined dates - initialized in setUpCalendar
+    protected Date today;
+    protected Date tomorrow;
     @SuppressWarnings("unused")
-    private Calendar calendar;
+    protected Date afterTomorrow;
+    protected Date yesterday;
+    // the calendar to use, its date is initialized with the today-field in setUpCalendar
+    protected Calendar calendar;
 
     /**
      * Issue #567-swingx: JXDatepicker - clicking on unselectable date clears
@@ -160,6 +165,53 @@ public class JXMonthViewIssues extends InteractiveTestCase {
 //----------------------
 
     /**
+     * characterize what a weekinterval selection is meant to do.
+     * MultipleIntervalSelection where each interval is one or more weeks?
+     * Here: does not snap start/end of week to start/end of day? 
+     */
+    public void testWeekInterval() {
+        JXMonthView monthView = new JXMonthView();
+        CalendarUtils.endOfWeek(calendar);
+        calendar.add(Calendar.DAY_OF_MONTH, 1);
+        calendar.add(Calendar.HOUR_OF_DAY, - 3);
+        monthView.cleanupWeekSelectionDates(today, calendar.getTime());
+        calendar.setTime(monthView.modifiedEndDate);
+        LOG.info("start/end" + monthView.modifiedStartDate + "/" + monthView.modifiedEndDate);
+        assertTrue("interval last must be end of week", CalendarUtils.isEndOfWeek(calendar));
+        calendar.setTime(monthView.modifiedStartDate);
+        assertTrue("interval first must be start of week", CalendarUtils.isStartOfWeek(calendar));
+    }
+    
+    /**
+     * characterize what a weekinterval selection is meant to do.
+     * MultipleIntervalSelection where each interval is one or more weeks?
+     * Here: does nothing if single day selected?
+     */
+    public void testWeekIntervalOneDay() {
+        JXMonthView monthView = new JXMonthView();
+        monthView.cleanupWeekSelectionDates(today, today);
+        calendar.setTime(monthView.modifiedEndDate);
+        assertTrue("interval last must be end of week", CalendarUtils.isEndOfWeek(calendar));
+        calendar.setTime(monthView.modifiedStartDate);
+        assertTrue("interval first must be start of week", CalendarUtils.isStartOfWeek(calendar));
+        LOG.info("start/end" + monthView.modifiedStartDate + "/" + monthView.modifiedEndDate);
+    }
+    
+    /**
+     * characterize what a weekinterval selection is meant to do.
+     * MultipleIntervalSelection where each interval is one or more weeks?
+     * Here: does nothing if two days interval?
+     */
+    public void testWeekIntervalTwoDays() {
+        JXMonthView monthView = new JXMonthView();
+        monthView.cleanupWeekSelectionDates(today, tomorrow);
+        calendar.setTime(monthView.modifiedEndDate);
+        assertTrue("interval last must be end of week", CalendarUtils.isEndOfWeek(calendar));
+        calendar.setTime(monthView.modifiedStartDate);
+        assertTrue("interval first must be start of week", CalendarUtils.isStartOfWeek(calendar));
+        LOG.info("start/end" + monthView.modifiedStartDate + "/" + monthView.modifiedEndDate);
+    }
+    /**
      * Issue #736-swingx: model and monthView cal not synched.
      * 
      * Here: test that model settings are respected in constructor - minimaldays.
@@ -224,43 +276,85 @@ public class JXMonthViewIssues extends InteractiveTestCase {
         assertTrue(monthView.isSelectedDate(date));
         fail("test passes - but tells nothing");
     }
-    
+
+    public void testNoSelectionMode() {
+//        JXMonthView monthView = new JXMonthView();
+//        monthView.setSelectionMode(SelectionMode.NO_SELECTION);
+//
+//        Date date = new Date();
+//        monthView.setSelectionInterval(date, date);
+//        assertTrue(monthView.isSelectionEmpty());
+        fail("revisit: no selection mode");
+    }
+
     /**
      * temporarily removed weekinterval selection.
      * Need to review - why not in selectionModel?
      */
     public void testWeekIntervalSelection() {
-        // PENDING: simplify to use pre-defined dates
-        JXMonthView monthView = new JXMonthView(Locale.US);
-        monthView.setSelectionMode(JXMonthView.SelectionMode.WEEK_INTERVAL_SELECTION);
+//        // PENDING: simplify to use pre-defined dates
+//        JXMonthView monthView = new JXMonthView(Locale.US);
+//        monthView.setSelectionMode(JXMonthView.SelectionMode.WEEK_INTERVAL_SELECTION);
+//
+//        // Use a known date that falls on a Sunday, which just happens to be my birthday.
+//        calendar.set(Calendar.YEAR, 2006);
+//        calendar.set(Calendar.MONTH, Calendar.APRIL);
+//        calendar.set(Calendar.DAY_OF_MONTH, 9);
+//        CalendarUtils.startOfDay(calendar);
+//        Date startDate = calendar.getTime();
+////        Date startDate = cleanupDate(calendar);
+//
+//        Date endDate;
+//        calendar.set(Calendar.DAY_OF_MONTH, 13);
+//        endDate = calendar.getTime();
+//
+//        monthView.setSelectionInterval(startDate, endDate);
+//        SortedSet<Date> selection = monthView.getSelection();
+//        assertTrue(startDate.equals(selection.first()));
+//        assertTrue(endDate.equals(selection.last()));
+//
+//        calendar.set(Calendar.DAY_OF_MONTH, 20);
+//        endDate = calendar.getTime();
+//        monthView.setSelectionInterval(startDate, endDate);
+//
+//        calendar.set(Calendar.DAY_OF_MONTH, 22);
+//        endDate = calendar.getTime();
+//        selection = monthView.getSelection();
+//
+//        assertEquals(startDate, selection.first());
+//        assertTrue(endDate.equals((selection.last())));
+        fail("revisit: week selection");
+    }
 
-        // Use a known date that falls on a Sunday, which just happens to be my birthday.
-        calendar.set(Calendar.YEAR, 2006);
-        calendar.set(Calendar.MONTH, Calendar.APRIL);
-        calendar.set(Calendar.DAY_OF_MONTH, 9);
-        CalendarUtils.startOfDay(calendar);
-        Date startDate = calendar.getTime();
-//        Date startDate = cleanupDate(calendar);
+    public void testModelSelectionUpdate() {
+//        JXMonthView monthView = new JXMonthView();
+//
+//        // The JXMonthView uses an underlying model mode of single selection when it is in no selection mode.
+//        monthView.setSelectionMode(SelectionMode.NO_SELECTION);
+//        assertTrue(
+//                DateSelectionModel.SelectionMode.SINGLE_SELECTION == monthView.getSelectionModel().getSelectionMode());
+//
+//        monthView.setSelectionMode(SelectionMode.SINGLE_SELECTION);
+//        assertTrue(
+//                DateSelectionModel.SelectionMode.SINGLE_SELECTION == monthView.getSelectionModel().getSelectionMode());
+//
+//        monthView.setSelectionMode(SelectionMode.SINGLE_INTERVAL_SELECTION);
+//        assertTrue(
+//                DateSelectionModel.SelectionMode.SINGLE_INTERVAL_SELECTION ==
+//                        monthView.getSelectionModel().getSelectionMode());
+//
+//        // The JXMonthView uses an underlying model mode of single interval selection when it is in week selection mode.
+//        monthView.setSelectionMode(SelectionMode.WEEK_INTERVAL_SELECTION);
+//        assertTrue(
+//                DateSelectionModel.SelectionMode.SINGLE_INTERVAL_SELECTION ==
+//                        monthView.getSelectionModel().getSelectionMode());
+//
+//        monthView.setSelectionMode(SelectionMode.MULTIPLE_INTERVAL_SELECTION);
+//        assertTrue(
+//                DateSelectionModel.SelectionMode.MULTIPLE_INTERVAL_SELECTION ==
+//                        monthView.getSelectionModel().getSelectionMode());
+        fail("revisit: selection modes");
 
-        Date endDate;
-        calendar.set(Calendar.DAY_OF_MONTH, 13);
-        endDate = calendar.getTime();
-
-        monthView.setSelectionInterval(startDate, endDate);
-        SortedSet<Date> selection = monthView.getSelection();
-        assertTrue(startDate.equals(selection.first()));
-        assertTrue(endDate.equals(selection.last()));
-
-        calendar.set(Calendar.DAY_OF_MONTH, 20);
-        endDate = calendar.getTime();
-        monthView.setSelectionInterval(startDate, endDate);
-
-        calendar.set(Calendar.DAY_OF_MONTH, 22);
-        endDate = calendar.getTime();
-        selection = monthView.getSelection();
-
-        assertEquals(startDate, selection.first());
-        assertTrue(endDate.equals((selection.last())));
     }
 
     /**
@@ -375,7 +469,30 @@ public class JXMonthViewIssues extends InteractiveTestCase {
   
     @Override
     protected void setUp() throws Exception {
+        setUpCalendar();
+    }
+    /**
+     * Initializes the calendar to the default instance and the predefined dates
+     * in the coordinate system of the calendar. Note that the hour is set
+     * to "about" in all dates, to be reasonably well into the day. The time
+     * fields of all dates are the same, the calendar is pre-set with the
+     * today field.
+     */
+    protected void setUpCalendar() {
         calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, 5);
+        today = calendar.getTime();
+        
+        calendar.add(Calendar.DAY_OF_MONTH, -1);
+        yesterday = calendar.getTime();
+        
+        calendar.add(Calendar.DAY_OF_MONTH, 2);
+        tomorrow = calendar.getTime();
+        
+        calendar.add(Calendar.DAY_OF_MONTH, 1);
+        afterTomorrow = calendar.getTime();
+        
+        calendar.setTime(today);
     }
 
   

@@ -39,9 +39,9 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 
-import org.jdesktop.swingx.JXMonthView.SelectionMode;
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.calendar.CalendarUtils;
+import org.jdesktop.swingx.calendar.DateSelectionModel.SelectionMode;
 import org.jdesktop.swingx.event.DateSelectionEvent;
 import org.jdesktop.swingx.event.DateSelectionListener;
 import org.jdesktop.swingx.test.XTestUtils;
@@ -151,7 +151,7 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
     public void interactiveAutoScrollOnResize() {
         final JXMonthView us = new JXMonthView();
         us.setTraversable(true);
-        us.setSelectionMode(JXMonthView.SelectionMode.SINGLE_INTERVAL_SELECTION);
+        us.setSelectionMode(SelectionMode.SINGLE_INTERVAL_SELECTION);
         final Calendar today = Calendar.getInstance();
         CalendarUtils.endOfMonth(today);
         Date start = today.getTime();
@@ -186,7 +186,7 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
     public void interactiveAutoScrollOnSelectionSim() {
         final JXMonthView us = new JXMonthView();
         us.setTraversable(true);
-        us.setSelectionMode(JXMonthView.SelectionMode.SINGLE_INTERVAL_SELECTION);
+        us.setSelectionMode(SelectionMode.SINGLE_INTERVAL_SELECTION);
         final Calendar today = Calendar.getInstance();
         CalendarUtils.endOfMonth(today);
         Date start = today.getTime();

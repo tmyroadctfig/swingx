@@ -63,9 +63,9 @@ import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.UIResource;
 
 import org.jdesktop.swingx.JXMonthView;
-import org.jdesktop.swingx.JXMonthView.SelectionMode;
 import org.jdesktop.swingx.calendar.CalendarUtils;
 import org.jdesktop.swingx.calendar.DateSelectionModel;
+import org.jdesktop.swingx.calendar.DateSelectionModel.SelectionMode;
 import org.jdesktop.swingx.event.DateSelectionEvent;
 import org.jdesktop.swingx.event.DateSelectionListener;
 import org.jdesktop.swingx.plaf.MonthViewUI;
@@ -1551,6 +1551,9 @@ public class BasicMonthViewUI extends MonthViewUI {
     
 //------------------ Handler implementation 
 //     
+    private boolean canSelectByMode(SelectionMode mode) {
+        return true;
+    }
     
 
     private class Handler implements  
@@ -1584,7 +1587,7 @@ public class BasicMonthViewUI extends MonthViewUI {
             }
 
             SelectionMode selectionMode = monthView.getSelectionMode();
-            if (selectionMode == SelectionMode.NO_SELECTION) {
+            if (!canSelectByMode(selectionMode)) {
                 return;
             }
 
@@ -1598,7 +1601,7 @@ public class BasicMonthViewUI extends MonthViewUI {
             endDate = selected;
 
             if (selectionMode == SelectionMode.SINGLE_INTERVAL_SELECTION ||
-                    selectionMode == SelectionMode.WEEK_INTERVAL_SELECTION ||
+//                    selectionMode == SelectionMode.WEEK_INTERVAL_SELECTION ||
                     selectionMode == SelectionMode.MULTIPLE_INTERVAL_SELECTION) {
                 pivotDate = selected;
             }
@@ -1615,6 +1618,7 @@ public class BasicMonthViewUI extends MonthViewUI {
             armed = true;
         }
 
+        
         public void mouseReleased(MouseEvent e) {
             // If we were using the keyboard we aren't anymore.
             setUsingKeyboard(false);
@@ -1644,7 +1648,7 @@ public class BasicMonthViewUI extends MonthViewUI {
             setUsingKeyboard(false);
             SelectionMode selectionMode = monthView.getSelectionMode();
 
-            if (!monthView.isEnabled() || selectionMode == SelectionMode.NO_SELECTION) {
+            if (!monthView.isEnabled() || !canSelectByMode(selectionMode)) {
                 return;
             }
 
@@ -1906,7 +1910,7 @@ public class BasicMonthViewUI extends MonthViewUI {
 
         public void actionPerformed(ActionEvent ev) {
             SelectionMode selectionMode = monthView.getSelectionMode();
-            if (selectionMode != SelectionMode.NO_SELECTION) {
+            if (canSelectByMode(selectionMode)) {
                 if (!isUsingKeyboard()) {
                     originalDateSpan = monthView.getSelection();
                 }

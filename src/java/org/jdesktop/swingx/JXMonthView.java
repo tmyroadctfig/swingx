@@ -43,6 +43,7 @@ import javax.swing.UIManager;
 import org.jdesktop.swingx.calendar.CalendarUtils;
 import org.jdesktop.swingx.calendar.DateSelectionModel;
 import org.jdesktop.swingx.calendar.DaySelectionModel;
+import org.jdesktop.swingx.calendar.DateSelectionModel.SelectionMode;
 import org.jdesktop.swingx.event.DateSelectionEvent;
 import org.jdesktop.swingx.event.DateSelectionListener;
 import org.jdesktop.swingx.event.EventListenerMap;
@@ -146,29 +147,29 @@ public class JXMonthView extends JComponent {
     /*
      * moved from package calendar to swingx at version 1.51
      */
-    public static enum SelectionMode {
-        /**
-         * Mode that disallows selection of days from the calendar.
-         */
-        NO_SELECTION,
-        /**
-         * Mode that allows for selection of a single day.
-         */
-        SINGLE_SELECTION,
-        /**
-         * Mode that allows for selecting of multiple consecutive days.
-         */
-        SINGLE_INTERVAL_SELECTION,
-        /**
-         * Mode that allows for selecting disjoint days.
-         */
-        MULTIPLE_INTERVAL_SELECTION,
-        /**
-         * Mode where selections consisting of more than 7 days will
-         * snap to a full week.
-         */
-        WEEK_INTERVAL_SELECTION
-    }
+//    public static enum SelectionMode {
+//        /**
+//         * Mode that disallows selection of days from the calendar.
+//         */
+//        NO_SELECTION,
+//        /**
+//         * Mode that allows for selection of a single day.
+//         */
+//        SINGLE_SELECTION,
+//        /**
+//         * Mode that allows for selecting of multiple consecutive days.
+//         */
+//        SINGLE_INTERVAL_SELECTION,
+//        /**
+//         * Mode that allows for selecting disjoint days.
+//         */
+//        MULTIPLE_INTERVAL_SELECTION,
+//        /**
+//         * Mode where selections consisting of more than 7 days will
+//         * snap to a full week.
+//         */
+//        WEEK_INTERVAL_SELECTION
+//    }
 
     /** action command used for commit actionEvent. */
     public static final String COMMIT_KEY = "monthViewCommit";
@@ -242,14 +243,14 @@ public class JXMonthView extends JComponent {
     private TreeSet<Long> flaggedDates;
     //-------------- selection
     private DateSelectionModel model;
-    private SelectionMode selectionMode;
+//    private SelectionMode selectionMode;
     private EventListenerMap listenerMap;
     
     // PENDING JW: ??
     @SuppressWarnings({"FieldCanBeLocal"})
-    private Date modifiedStartDate;
+    protected Date modifiedStartDate;
     @SuppressWarnings({"FieldCanBeLocal"})
-    private Date modifiedEndDate;
+    protected Date modifiedEndDate;
     
     //------------- visuals
     
@@ -341,7 +342,7 @@ public class JXMonthView extends JComponent {
         antiAlias = false;
         traversable = false;
         listenerMap = new EventListenerMap();
-        selectionMode = SelectionMode.SINGLE_SELECTION;
+//        selectionMode = SelectionMode.SINGLE_SELECTION;
 
         initModel(model, locale);
         superSetLocale(locale);
@@ -763,7 +764,7 @@ public class JXMonthView extends JComponent {
 //----   internal date manipulation ("cleanup" == start of day in monthView's calendar)
     
     @Deprecated
-    private void cleanupWeekSelectionDates(Date startDate, Date endDate) {
+    protected void cleanupWeekSelectionDates(Date startDate, Date endDate) {
         int count = 1;
         cal.setTime(startDate);
         while (cal.getTimeInMillis() < endDate.getTime()) {
@@ -920,14 +921,7 @@ public class JXMonthView extends JComponent {
      * @param endDate End of date range to add to the selection
      */
     public void addSelectionInterval(Date startDate, Date endDate) {
-        if (selectionMode != SelectionMode.NO_SELECTION) {
-            modifiedStartDate = startDate;
-            modifiedEndDate = endDate;
-            if (selectionMode == SelectionMode.WEEK_INTERVAL_SELECTION) {
-                throw new UnsupportedOperationException("week interval selection not yet implemented");
-            }
-            getSelectionModel().addSelectionInterval(modifiedStartDate, modifiedEndDate);
-        }
+            getSelectionModel().addSelectionInterval(startDate, endDate);
     }
 
     /**
@@ -937,14 +931,7 @@ public class JXMonthView extends JComponent {
      * @param endDate End of date range to set the selection to
      */
     public void setSelectionInterval(final Date startDate, final Date endDate) {
-        if (selectionMode != SelectionMode.NO_SELECTION) {
-            modifiedStartDate = startDate;
-            modifiedEndDate = endDate;
-            if (selectionMode == SelectionMode.WEEK_INTERVAL_SELECTION) {
-                throw new UnsupportedOperationException("week interval selection not yet implemented");
-            }
-            getSelectionModel().setSelectionInterval(modifiedStartDate, modifiedEndDate);
-        }
+            getSelectionModel().setSelectionInterval(startDate, endDate);
     }
 
     /**
@@ -963,7 +950,7 @@ public class JXMonthView extends JComponent {
      * @return int Selection mode.
      */
     public SelectionMode getSelectionMode() {
-        return selectionMode;
+        return getSelectionModel().getSelectionMode();
     }
 
     /**
@@ -972,17 +959,18 @@ public class JXMonthView extends JComponent {
      * @param selectionMode The selection mode to use for this {@code JXMonthView}
      */
     public void setSelectionMode(final SelectionMode selectionMode) {
-        SelectionMode oldSelectionMode = this.selectionMode;
-        this.selectionMode = selectionMode;
-        if (selectionMode == SelectionMode.NO_SELECTION || selectionMode == SelectionMode.SINGLE_SELECTION) {
-            getSelectionModel().setSelectionMode(DateSelectionModel.SelectionMode.SINGLE_SELECTION);
-        } else if (selectionMode == SelectionMode.SINGLE_INTERVAL_SELECTION ||
-                selectionMode == SelectionMode.WEEK_INTERVAL_SELECTION) {
-            getSelectionModel().setSelectionMode(DateSelectionModel.SelectionMode.SINGLE_INTERVAL_SELECTION);
-        } else {
-            getSelectionModel().setSelectionMode(DateSelectionModel.SelectionMode.MULTIPLE_INTERVAL_SELECTION);
-        }
-        firePropertyChange("selectionMode", oldSelectionMode, this.selectionMode);
+        getSelectionModel().setSelectionMode(selectionMode);
+//        SelectionMode oldSelectionMode = this.selectionMode;
+//        this.selectionMode = selectionMode;
+//        if (selectionMode == SelectionMode.NO_SELECTION || selectionMode == SelectionMode.SINGLE_SELECTION) {
+//            getSelectionModel().setSelectionMode(DateSelectionModel.SelectionMode.SINGLE_SELECTION);
+//        } else if (selectionMode == SelectionMode.SINGLE_INTERVAL_SELECTION ||
+//                selectionMode == SelectionMode.WEEK_INTERVAL_SELECTION) {
+//            getSelectionModel().setSelectionMode(DateSelectionModel.SelectionMode.SINGLE_INTERVAL_SELECTION);
+//        } else {
+//            getSelectionModel().setSelectionMode(DateSelectionModel.SelectionMode.MULTIPLE_INTERVAL_SELECTION);
+//        }
+//        firePropertyChange("selectionMode", oldSelectionMode, this.selectionMode);
     }
 
    

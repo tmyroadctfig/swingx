@@ -46,7 +46,26 @@ public class CalendarUtilsTest extends InteractiveTestCase {
     private Calendar todayUS;
     private Calendar midJune;
 
-    
+    public void testIsStartOfWeek() {
+        CalendarUtils.startOfWeek(midJune);
+        assertTrue(CalendarUtils.isStartOfWeek(midJune));
+        midJune.add(Calendar.MILLISECOND, -1);
+        Date date = midJune.getTime();
+        assertFalse(CalendarUtils.isStartOfWeek(midJune));
+        assertEquals("calendar must be unchanged", date, midJune.getTime());
+    }
+ 
+    /**
+     */
+    public void testIsEndOfWeek() {
+        CalendarUtils.endOfWeek(midJune);
+        assertTrue(CalendarUtils.isEndOfWeek(midJune));
+        midJune.add(Calendar.MILLISECOND, 1);
+        Date date = midJune.getTime();
+        assertFalse(CalendarUtils.isEndOfWeek(midJune));
+        assertEquals("calendar must be unchanged", date, midJune.getTime());
+    }
+
     /**
      */
     public void testEndOfWeek() {
@@ -223,14 +242,6 @@ public class CalendarUtilsTest extends InteractiveTestCase {
             }
         }
     }
-    @Override
-    protected void setUp() throws Exception {
-        today = Calendar.getInstance(Locale.GERMAN);
-        todayUS = Calendar.getInstance(Locale.US);
-        midJune = Calendar.getInstance(Locale.GERMAN);
-        midJune.set(Calendar.DAY_OF_MONTH, 14);
-        midJune.set(Calendar.MONTH, Calendar.JUNE);
-    }
     
     public void testNextMonth() {
         today.set(Calendar.MONTH, Calendar.JANUARY);
@@ -246,5 +257,13 @@ public class CalendarUtilsTest extends InteractiveTestCase {
             }
         }
     }
-    
+    @Override
+    protected void setUp() throws Exception {
+        today = Calendar.getInstance(Locale.GERMAN);
+        todayUS = Calendar.getInstance(Locale.US);
+        midJune = Calendar.getInstance(Locale.GERMAN);
+        midJune.set(Calendar.DAY_OF_MONTH, 14);
+        midJune.set(Calendar.MONTH, Calendar.JUNE);
+    }
+   
 }

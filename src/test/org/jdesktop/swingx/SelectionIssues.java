@@ -35,6 +35,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.calendar.CalendarUtils;
+import org.jdesktop.swingx.calendar.DateSelectionModel.SelectionMode;
 import org.jdesktop.swingx.combobox.ListComboBoxModel;
 
 /**
@@ -74,7 +75,7 @@ public class SelectionIssues extends InteractiveTestCase {
      */
     public void interactiveAutoScrollOnSelectionMonthView() {
         final JXMonthView us = new JXMonthView();
-        us.setSelectionMode(JXMonthView.SelectionMode.SINGLE_INTERVAL_SELECTION);
+        us.setSelectionMode(SelectionMode.SINGLE_INTERVAL_SELECTION);
         final Calendar today = Calendar.getInstance();
         CalendarUtils.endOfMonth(today);
         today.add(Calendar.DAY_OF_MONTH, 1);
@@ -228,7 +229,7 @@ public class SelectionIssues extends InteractiveTestCase {
      */
     private SortedSet<Date> getDates() {
         JXMonthView source = new JXMonthView();
-        source.setSelectionMode(JXMonthView.SelectionMode.SINGLE_INTERVAL_SELECTION);
+        source.setSelectionMode(SelectionMode.SINGLE_INTERVAL_SELECTION);
         final Calendar today = Calendar.getInstance();
         Date start = today.getTime();
         today.add(Calendar.DAY_OF_MONTH, +40);

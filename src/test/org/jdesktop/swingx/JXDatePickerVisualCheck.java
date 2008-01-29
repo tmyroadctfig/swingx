@@ -48,10 +48,10 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.UIManager.LookAndFeelInfo;
 
-import org.jdesktop.swingx.JXMonthView.SelectionMode;
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.calendar.DateUtils;
 import org.jdesktop.swingx.calendar.SingleDaySelectionModel;
+import org.jdesktop.swingx.calendar.DateSelectionModel.SelectionMode;
 
 /**
  * Simple tests to ensure that the {@code JXDatePicker} can be instantiated and

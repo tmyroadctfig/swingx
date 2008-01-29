@@ -106,6 +106,38 @@ public class CalendarUtils {
     }
     
     /**
+     * Returns a boolean indicating if the given calendar represents the 
+     * start of a month (in the calendar's time zone). Returns true, if the time is 
+     * the start of the first day of the month, false otherwise. The calendar is unchanged.
+     * 
+     * @param calendar the calendar to check.
+     * 
+     * @return true if the calendar's time is the start of the first day of the month,
+     *   false otherwise.
+     */
+    public static boolean isStartOfWeek(Calendar calendar) {
+        Calendar temp = (Calendar) calendar.clone();
+        temp.add(Calendar.MILLISECOND, -1);
+        return temp.get(Calendar.WEEK_OF_YEAR) != calendar.get(Calendar.WEEK_OF_YEAR);
+    }
+    
+    /**
+     * Returns a boolean indicating if the given calendar represents the 
+     * end of a week (in the calendar's time zone). Returns true, if the time is 
+     * the end of the last day of the week, false otherwise. The calendar is unchanged.
+     * 
+     * @param calendar the calendar to check.
+     * 
+     * @return true if the calendar's time is the end of the last day of the week,
+     *   false otherwise.
+     */
+    public static boolean isEndOfWeek(Calendar calendar) {
+        Calendar temp = (Calendar) calendar.clone();
+        temp.add(Calendar.MILLISECOND, 1);
+        return temp.get(Calendar.WEEK_OF_YEAR) != calendar.get(Calendar.WEEK_OF_YEAR);
+    }
+    
+    /**
      * Adjusts the calendar to the start of the current week.
      * That is, first day of the week with all time fields cleared.
      * @param calendar the calendar to adjust.
@@ -125,6 +157,8 @@ public class CalendarUtils {
         calendar.add(Calendar.DATE, 7);
         calendar.add(Calendar.MILLISECOND, -1);
     }
+    
+    
     /**
      * Adjusts the calendar to the start of the current month.
      * That is, first day of the month with all time fields cleared.
