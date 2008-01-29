@@ -25,6 +25,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -63,8 +64,8 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
       JXMonthViewVisualCheck  test = new JXMonthViewVisualCheck();
       try {
 //          test.runInteractiveTests();
-//        test.runInteractiveTests(".*TimeZone.*");
-        test.runInteractiveTests(".*UpdateLocale.*");
+        test.runInteractiveTests(".*TimeZone.*");
+//        test.runInteractiveTests(".*UpdateLocale.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
@@ -364,8 +365,11 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
 
             public void actionPerformed(ActionEvent e) {
                 Calendar cal = monthView.getCalendar();
-                LOG.info("cal/firstDisplayed" + 
-                        cal.getTime() +"/" + new Date(monthView.getFirstDisplayedDate()));
+                DateFormat format = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL);
+                format.setTimeZone(monthView.getTimeZone());
+                LOG.info("cal/firstDisplayed " + 
+                        format.format(cal.getTime()) + " / " 
+                        +format.format(new Date(monthView.getFirstDisplayedDate())));
             }
             
         };

@@ -235,7 +235,7 @@ public class JXMonthView extends JComponent {
      * Start of the day which contains System.millis() in the current calendar.
      * Kept in synch via a timer started in addNotify.
      */
-    private long today;
+    private long todayInMillis;
     /**
      * The timer used to keep today in synch with system time.
      */
@@ -282,6 +282,7 @@ public class JXMonthView extends JComponent {
     private boolean showWeekNumber;
     private boolean componentInputMapEnabled;
     private DateSelectionListener modelListener;
+    private Date today;
 
     /**
      * Create a new instance of the <code>JXMonthView</code> class using the
@@ -747,7 +748,8 @@ public class JXMonthView extends JComponent {
      */
     protected void setTodayInMillis(long millis) {
         long oldToday = getTodayInMillis();
-        this.today = startOfDay(millis);
+        this.todayInMillis = startOfDay(millis);
+        today = new Date(todayInMillis);
         firePropertyChange("todayInMillis", oldToday, getTodayInMillis());
         repaint();
     }
@@ -758,6 +760,15 @@ public class JXMonthView extends JComponent {
      * @return the start of today in millis.
      */
     public long getTodayInMillis() {
+        return todayInMillis;
+    }
+    
+    /**
+     * Returns the start of today in this monthviews calendar coordinates.
+     * 
+     * @return the start of today as Date.
+     */
+    public Date getToday() {
         return today;
     }
     

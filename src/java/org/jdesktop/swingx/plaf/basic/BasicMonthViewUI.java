@@ -351,10 +351,6 @@ public class BasicMonthViewUI extends MonthViewUI {
         monthView.setDaysOfTheWeek(daysOfTheWeek);
         monthView.invalidate();
         monthView.validate();
-        // PENDING JW: why? invalidate cached state?
-        // has the side-effect that updateLocale must not be called before
-        // the derived font is installed .... Cleanup!
-//        getHandler().layoutContainer(null);
     }
 
 //---------------------- config
@@ -410,11 +406,25 @@ public class BasicMonthViewUI extends MonthViewUI {
      * 
      * @param date long representing the date you want to compare to today.
      * @return true if the date passed is the same as today.
+     * 
+     * @deprecated use {@link #isToday(Date)}
      */
+    @Deprecated
     protected boolean isToday(long date) {
-        return date == getToday();
+        return date == getTodayInMillis();
     }
 
+    /**
+     * Returns true if the date passed in is the same as today.
+     *
+     * PENDING JW: really want the exact test?
+     * 
+     * @param date long representing the date you want to compare to today.
+     * @return true if the date passed is the same as today.
+     */
+    protected boolean isToday(Date date) {
+        return date.equals(monthView.getToday());
+    }
     /**
      * {@inheritDoc}
      */
@@ -832,7 +842,7 @@ public class BasicMonthViewUI extends MonthViewUI {
         // use Date instead of millis
         int days = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
         Rectangle clip = g.getClipBounds();
-        long day;
+        Date day;
         int oldWeek = -1;
         int boxPaddingX = monthView.getBoxPaddingX();
         int boxPaddingY = monthView.getBoxPaddingY();
@@ -902,7 +912,7 @@ public class BasicMonthViewUI extends MonthViewUI {
                 for (int i = 0; i < dayOfWeekViewIndex; i++) {
                     // Paint a day
                     calculateBoundsForDay(bounds, LEADING_DAY_OFFSET, cal);
-                    day = cal.getTimeInMillis();
+                    day = cal.getTime(); //InMillis();
                     paintLeadingDayBackground(g, bounds.x, bounds.y,
                             bounds.width, bounds.height, cal);
                     paintLeadingDayForeground(g, bounds.x, bounds.y,
@@ -927,7 +937,7 @@ public class BasicMonthViewUI extends MonthViewUI {
             }
 
             if (bounds.intersects(clip)) {
-                day = cal.getTimeInMillis();
+                day = cal.getTime(); //InMillis();
 
                 // Paint bounding box around any date that falls within the
                 // selection.
@@ -980,7 +990,7 @@ public class BasicMonthViewUI extends MonthViewUI {
                 for (int i = 0; i < daysToPaint; i++) {
                     // Paint a day
                     calculateBoundsForDay(bounds, TRAILING_DAY_OFFSET, cal);
-                    day = cal.getTimeInMillis();
+                    day = cal.getTime(); //InMillis();
                     paintTrailingDayBackground(g, bounds.x, bounds.y,
                             bounds.width, bounds.height, cal);
                     paintTrailingDayForeground(g, bounds.x, bounds.y,
@@ -1141,7 +1151,7 @@ public class BasicMonthViewUI extends MonthViewUI {
      */
     protected void paintDayBackground(Graphics g, int x, int y, int width, int height,
                                       Calendar cal) {
-        long date = cal.getTimeInMillis();
+        Date date = cal.getTime(); //InMillis();
         
         if (monthView.isSelectedDate(date)) {
             g.setColor(monthView.getSelectedBackground());
@@ -1449,6 +1459,7 @@ public class BasicMonthViewUI extends MonthViewUI {
      * ui is responsible to keep the value in a reasonable state to query from
      * the outside. 
      */
+    @SuppressWarnings("deprecation")
     public long calculateLastDisplayedDate() {
         updateLastDisplayedDate(getFirstDisplayedDate());
         // NOTE JW: this is the only place (outside the getter/setter) 
@@ -1481,11 +1492,6 @@ public class BasicMonthViewUI extends MonthViewUI {
 
 
     /*-------------- refactored: encapsulate aliased fields
-     * Issue #712-swingx: in the longer run they should be removed where possible
-     * The delegate can ask instead of duplicating state.
-     * Maybe not - the accessors have the responsibility to check if the fields have
-     * been initialized.
-     * 
      */
 
     /**
@@ -1541,17 +1547,29 @@ public class BasicMonthViewUI extends MonthViewUI {
     /**
      * @return the start of today.
      */
-    protected long getToday() {
+    protected long getTodayInMillis() {
         return monthView.getTodayInMillis();
     }
 
+    /**
+     * @return the start of today.
+     */
+    protected Date getToday() {
+        return monthView.getToday();
+    }
+    
 
 //-----------------------end encapsulation
  
     
 //------------------ Handler implementation 
-//     
-    private boolean canSelectByMode(SelectionMode mode) {
+//  
+    /**
+     * temporary: removed SelectionMode.NO_SELECTION, replaced
+     * all access by this method to enable easy re-adding, if we want it.
+     * If not - remove.
+     */
+    private boolean canSelectByMode() {
         return true;
     }
     
@@ -1586,8 +1604,7 @@ public class BasicMonthViewUI extends MonthViewUI {
                 }
             }
 
-            SelectionMode selectionMode = monthView.getSelectionMode();
-            if (!canSelectByMode(selectionMode)) {
+            if (!canSelectByMode()) {
                 return;
             }
 
@@ -1600,15 +1617,15 @@ public class BasicMonthViewUI extends MonthViewUI {
             startDate = selected;
             endDate = selected;
 
-            if (selectionMode == SelectionMode.SINGLE_INTERVAL_SELECTION ||
+            if (monthView.getSelectionMode() == SelectionMode.SINGLE_INTERVAL_SELECTION ||
 //                    selectionMode == SelectionMode.WEEK_INTERVAL_SELECTION ||
-                    selectionMode == SelectionMode.MULTIPLE_INTERVAL_SELECTION) {
+                    monthView.getSelectionMode() == SelectionMode.MULTIPLE_INTERVAL_SELECTION) {
                 pivotDate = selected;
             }
 
             monthView.getSelectionModel().setAdjusting(true);
             
-            if (selectionMode == SelectionMode.MULTIPLE_INTERVAL_SELECTION && e.isControlDown()) {
+            if (monthView.getSelectionMode() == SelectionMode.MULTIPLE_INTERVAL_SELECTION && e.isControlDown()) {
                 monthView.addSelectionInterval(new Date(startDate), new Date(endDate));
             } else {
                 monthView.setSelectionInterval(new Date(startDate), new Date(endDate));
@@ -1630,8 +1647,6 @@ public class BasicMonthViewUI extends MonthViewUI {
             if (!monthView.hasFocus() && monthView.isFocusable()) {
                 monthView.requestFocusInWindow();
             }
-
-//            monthView.getSelectionModel().setAdjusting(false);
             
             if (armed) {
                 monthView.commitSelection();
@@ -1646,9 +1661,7 @@ public class BasicMonthViewUI extends MonthViewUI {
         public void mouseDragged(MouseEvent e) {
             // If we were using the keyboard we aren't anymore.
             setUsingKeyboard(false);
-            SelectionMode selectionMode = monthView.getSelectionMode();
-
-            if (!monthView.isEnabled() || !canSelectByMode(selectionMode)) {
+            if (!monthView.isEnabled() || !canSelectByMode()) {
                 return;
             }
 
@@ -1661,7 +1674,7 @@ public class BasicMonthViewUI extends MonthViewUI {
             long oldStart = startDate;
             long oldEnd = endDate;
 
-            if (selectionMode == SelectionMode.SINGLE_SELECTION) {
+            if (monthView.getSelectionMode() == SelectionMode.SINGLE_SELECTION) {
                 if (selected == oldStart) {
                     return;
                 }
@@ -1681,7 +1694,7 @@ public class BasicMonthViewUI extends MonthViewUI {
                 return;
             }
 
-            if (selectionMode == SelectionMode.MULTIPLE_INTERVAL_SELECTION && e.isControlDown()) {
+            if (monthView.getSelectionMode() == SelectionMode.MULTIPLE_INTERVAL_SELECTION && e.isControlDown()) {
                 monthView.addSelectionInterval(new Date(startDate), new Date(endDate));
             } else {
                 monthView.setSelectionInterval(new Date(startDate), new Date(endDate));
@@ -1829,18 +1842,6 @@ public class BasicMonthViewUI extends MonthViewUI {
             calculateNumDisplayedCals();
             calculateStartPosition();
 
-            // PENDING JW: remove - #705-swingx
-//            if (!monthView.isSelectionEmpty()) {
-//                long startDate = getSelection().first().getTime();
-//                LOG.info("startDate/end " + new Date(startDate) + "/" + new Date(getLastDisplayedDate()));
-//                if (startDate > getLastDisplayedDate() ||
-//                        startDate < getFirstDisplayedDate()) {
-//                    // Already does the recalculation for the dirty rect.
-//                    monthView.ensureDateVisible(startDate);
-//                } else {
-//                    calculateDirtyRectForSelection();
-//                }
-//            }
         }
 
 
@@ -1909,44 +1910,47 @@ public class BasicMonthViewUI extends MonthViewUI {
         }
 
         public void actionPerformed(ActionEvent ev) {
-            SelectionMode selectionMode = monthView.getSelectionMode();
-            if (canSelectByMode(selectionMode)) {
-                if (!isUsingKeyboard()) {
-                    originalDateSpan = monthView.getSelection();
-                }
-                // JW: removed the isUsingKeyboard from the condition
-                // need to fire always.
-                if (action >= ACCEPT_SELECTION && action <= CANCEL_SELECTION) { //&& isUsingKeyboard()) {
-                   // refactor the logic ... 
-                    if (action == CANCEL_SELECTION) {
-                        // Restore the original selection.
-                        if ((originalDateSpan != null) && !originalDateSpan.isEmpty()) {
-                            monthView.setSelectionInterval(originalDateSpan.first(), originalDateSpan.last());
-                        } else {
-                            monthView.clearSelection();
-                        }
-                        monthView.cancelSelection();
+            if (!canSelectByMode())
+                return;
+            if (!isUsingKeyboard()) {
+                originalDateSpan = monthView.getSelection();
+            }
+            // JW: removed the isUsingKeyboard from the condition
+            // need to fire always.
+            if (action >= ACCEPT_SELECTION && action <= CANCEL_SELECTION) { 
+                // refactor the logic ...
+                if (action == CANCEL_SELECTION) {
+                    // Restore the original selection.
+                    if ((originalDateSpan != null)
+                            && !originalDateSpan.isEmpty()) {
+                        monthView.setSelectionInterval(
+                                originalDateSpan.first(), originalDateSpan
+                                        .last());
                     } else {
-                        // Accept the keyboard selection.
-                        monthView.commitSelection();
+                        monthView.clearSelection();
                     }
-                    setUsingKeyboard(false);
-                } else if (action >= SELECT_PREVIOUS_DAY && action <= SELECT_DAY_NEXT_WEEK) {
-                    setUsingKeyboard(true);
-                    monthView.getSelectionModel().setAdjusting(true);
-                    pivotDate = -1;
-                    traverse(action);
-                } else if (selectionMode == SelectionMode.SINGLE_INTERVAL_SELECTION &&
-                        action >= ADJUST_SELECTION_PREVIOUS_DAY && action <= ADJUST_SELECTION_NEXT_WEEK) {
-                    setUsingKeyboard(true);
-                    monthView.getSelectionModel().setAdjusting(true);
-                    addToSelection(action);
+                    monthView.cancelSelection();
+                } else {
+                    // Accept the keyboard selection.
+                    monthView.commitSelection();
                 }
+                setUsingKeyboard(false);
+            } else if (action >= SELECT_PREVIOUS_DAY
+                    && action <= SELECT_DAY_NEXT_WEEK) {
+                setUsingKeyboard(true);
+                monthView.getSelectionModel().setAdjusting(true);
+                pivotDate = -1;
+                traverse(action);
+            } else if (monthView.getSelectionMode() == SelectionMode.SINGLE_INTERVAL_SELECTION
+                    && action >= ADJUST_SELECTION_PREVIOUS_DAY
+                    && action <= ADJUST_SELECTION_NEXT_WEEK) {
+                setUsingKeyboard(true);
+                monthView.getSelectionModel().setAdjusting(true);
+                addToSelection(action);
             }
         }
 
         private void traverse(int action) {
-//            long oldStart = getSelection().isEmpty() ? System.currentTimeMillis() : getSelection().first().getTime();
             long oldStart = monthView.isSelectionEmpty() ? System.currentTimeMillis() : getSelection().first().getTime();
             Calendar cal = getCalendar(oldStart);
             switch (action) {
@@ -1989,7 +1993,6 @@ public class BasicMonthViewUI extends MonthViewUI {
             long selectionStart;
             long selectionEnd;
             if (!monthView.isSelectionEmpty()) {
-//            if (!getSelection().isEmpty()) {
                 newStartDate = selectionStart = getSelection().first().getTime();
                 newEndDate = selectionEnd = getSelection().last().getTime();
             } else {

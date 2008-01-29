@@ -61,9 +61,9 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
      */
     public void testTodayUpdate() {
         JXMonthView monthView = new JXMonthView(0);
-        long first = ((BasicMonthViewUI) monthView.getUI()).getToday();
+        long first = ((BasicMonthViewUI) monthView.getUI()).getTodayInMillis();
         monthView.updateUI();
-        assertEquals(first, ((BasicMonthViewUI) monthView.getUI()).getToday());
+        assertEquals(first, ((BasicMonthViewUI) monthView.getUI()).getTodayInMillis());
     }
 
     /**
