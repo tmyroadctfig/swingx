@@ -27,6 +27,17 @@ public class JXListIssues extends JXListTest {
     }
 
     /**
+     * Issue #601-swingx: allow LAF to hook in LAF provided renderers.
+     * 
+     * Expected: plain ol' list does install UIResource (while tree doesn't)
+     */
+    public void testLAFRendererXList() {
+        JXList tree = new JXList();
+        assertNotNull("default renderer installed", tree.getCellRenderer());
+        assertTrue("expected UIResource, but was: " + tree.getCellRenderer().getClass(), 
+                tree.getCellRenderer() instanceof UIResource);
+    }
+    /**
      * Issue 377-swingx: list with filters enabled fires incorrect events.
      * 
      * needs a deeper fix: currently the wrapper fires an unspecified 

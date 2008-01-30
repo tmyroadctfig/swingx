@@ -57,13 +57,24 @@ public class JXTreeIssues extends JXTreeUnitTest {
      * 
      * Unexpected: plain ol' tree doesn't install UIResource?
      */
-    public void testLAFRenderer() {
+    public void testLAFRendererTree() {
         JTree tree = new JTree();
         assertNotNull("default renderer installed", tree.getCellRenderer());
         assertTrue("expected UIResource, but was: " + tree.getCellRenderer().getClass(), 
                 tree.getCellRenderer() instanceof UIResource);
     }
     
+    /**
+     * Issue #601-swingx: allow LAF to hook in LAF provided renderers.
+     * 
+     * Unexpected: plain ol' tree doesn't install UIResource?
+     */
+    public void testLAFRendererXTree() {
+        JXTree tree = new JXTree();
+        assertNotNull("default renderer installed", tree.getCellRenderer());
+        assertTrue("expected UIResource, but was: " + tree.getCellRenderer().getClass(), 
+                tree.getCellRenderer() instanceof UIResource);
+    }
     /**    
      * Issue #242: CCE when setting icons. Not reproducible? 
      * Another issue: icon setting does not repaint (with core default renderer)

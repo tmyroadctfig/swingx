@@ -48,7 +48,6 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 
-import org.jdesktop.swingx.AbstractSearchable.SearchResult;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.CompoundHighlighter;
 import org.jdesktop.swingx.decorator.DefaultSelectionMapper;
