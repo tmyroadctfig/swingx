@@ -134,27 +134,35 @@ public class BasicMonthViewUI extends MonthViewUI {
     protected Font derivedFont;
 
     protected boolean isLeftToRight;
-    private int arrowPaddingX = 3;
-    private int arrowPaddingY = 3;
-    private int fullMonthBoxHeight;
-    private int fullBoxWidth;
-    private int fullBoxHeight;
-    private int startX;
-    private int startY;
     protected Icon monthUpImage;
     protected Icon monthDownImage;
-    private Dimension dim = new Dimension();
-    private Rectangle dirtyRect = new Rectangle();
-    private Rectangle bounds = new Rectangle();
     private Color weekOfTheYearForeground;
     private Color unselectableDayForeground;
     private Color leadingDayForeground;
     private Color trailingDayForeground;
 
+    private int arrowPaddingX = 3;
+    private int arrowPaddingY = 3;
+    private Dimension dim = new Dimension();
+    private Rectangle dirtyRect = new Rectangle();
+    private Rectangle bounds = new Rectangle();
+    private int startX;
+    private int startY;
     private int calendarWidth;
+    // height of month header of the view, that is the name and the arrows
+    // initially, it's the same as the day-box-height, adjusted to arrow icon height
+    // and arrow padding if traversable
     private int monthBoxHeight;
+    // height of month header including the monthView's box padding
+    private int fullMonthBoxHeight;
+    // raw dimension of a "day" box calculated from fontMetrics and "widest" content
+    // this is the same for days-of-the-week, weeks-of-the-year and days
     private int boxWidth;
     private int boxHeight;
+    // dimension of a "day" box including the monthView's box padding
+    private int fullBoxWidth;
+    private int fullBoxHeight;
+    // this is the same for days-of-the-week, weeks-of-the-year and days
     private int calendarHeight;
     /** The number of calendars able to be displayed horizontally. */
     private int numCalRows = 1;
@@ -675,18 +683,24 @@ public class BasicMonthViewUI extends MonthViewUI {
     protected void calculateBoundsForDay(Rectangle bounds, int monthOffset, Calendar cal) {
         int year = cal.get(Calendar.YEAR);
         int month = cal.get(Calendar.MONTH);
+        // JW: this depends on both calendars minimalDaysInFirstWeek and firstDayOfWeek
+        // so might be 0!!
         int weekOfMonth = cal.get(Calendar.WEEK_OF_MONTH);
 
         // If we are calculating the bounds for a leading/trailing day we need to
         // adjust the month we are in to calculate the bounds correctly.
         month += monthOffset;
 
+//        if (weekOfMonth == 0) {
+//            weekOfMonth = 1;
+//        }
         // If we're showing leading days the week in month needs to be 1 to make the bounds
         // calculate correctly.
         if (LEADING_DAY_OFFSET == monthOffset) {
             weekOfMonth = 1;
         }
 
+        
         if (TRAILING_DAY_OFFSET == monthOffset) {
             // Find which week the last day in the month is.
             int day = cal.get(Calendar.DAY_OF_MONTH);
@@ -712,23 +726,19 @@ public class BasicMonthViewUI extends MonthViewUI {
         int calRowIndex = diffMonths / numCalCols;
         int calColIndex = diffMonths - (calRowIndex * numCalCols);
 
+
         // Modify the index relative to the first day of the week.
-        bounds.x = getDayOfWeekViewIndex(cal.get(Calendar.DAY_OF_WEEK));
-
-        // Offset for location of the day in the week.
-        int boxPaddingX = monthView.getBoxPaddingX();
-        int boxPaddingY = monthView.getBoxPaddingY();
-
+        int dayIndex = getDayOfWeekViewIndex(cal.get(Calendar.DAY_OF_WEEK));
         // If we're showing week numbers then increase the bounds.x
         // by one more boxPaddingX boxWidth boxPaddingX.
         if (monthView.isShowingWeekNumber()) {
-            bounds.x++;
+            dayIndex++;
         }
 
         // Calculate the x location.
         bounds.x = isLeftToRight ?
-                bounds.x * (boxPaddingX + boxWidth + boxPaddingX) :
-                (bounds.x + 1) * (boxPaddingX + boxWidth + boxPaddingX);
+                dayIndex * fullBoxWidth :
+                (dayIndex + 1) * fullBoxWidth;
 
         // Offset for the column the calendar is displayed in.
         bounds.x += calColIndex * (calendarWidth + CALENDAR_SPACING);
@@ -737,19 +747,20 @@ public class BasicMonthViewUI extends MonthViewUI {
         bounds.x = isLeftToRight ? startX + bounds.x : startX - bounds.x;
 
         // Initial offset for Month and Days of the Week display.
-        bounds.y = boxPaddingY + monthBoxHeight + boxPaddingY +
-            + boxPaddingY + boxHeight + boxPaddingY;
+        bounds.y = fullMonthBoxHeight + fullBoxHeight;
+//            boxPaddingY + monthBoxHeight + boxPaddingY +
+//            + boxPaddingY + boxHeight + boxPaddingY;
 
         // Offset for centering and row the calendar is displayed in.
         bounds.y += startY + calRowIndex *
                 (calendarHeight + CALENDAR_SPACING);
 
         // Offset for Week of the Month.
-        bounds.y += (weekOfMonth - 1) *
-                (boxPaddingY + boxHeight + boxPaddingY);
+        bounds.y += (weekOfMonth - 1) * fullBoxHeight;
+//                (boxPaddingY + boxHeight + boxPaddingY);
 
-        bounds.width = boxPaddingX + boxWidth + boxPaddingX;
-        bounds.height = boxPaddingY + boxHeight + boxPaddingY;
+        bounds.width = fullBoxWidth; //boxPaddingX + boxWidth + boxPaddingX;
+        bounds.height = fullBoxHeight; //boxPaddingY + boxHeight + boxPaddingY;
     }
 
 //-------------------- painting
@@ -844,15 +855,13 @@ public class BasicMonthViewUI extends MonthViewUI {
         Rectangle clip = g.getClipBounds();
         Date day;
         int oldWeek = -1;
-        int boxPaddingX = monthView.getBoxPaddingX();
-        int boxPaddingY = monthView.getBoxPaddingY();
 
         // Paint month name background.
         paintMonthStringBackground(g, x, y,
-                width, boxPaddingY + monthBoxHeight + boxPaddingY, cal);
+                width, fullMonthBoxHeight, cal);
 
         paintMonthStringForeground(g, x, y,
-                width, boxPaddingY + monthBoxHeight + boxPaddingY, cal);
+                width, fullMonthBoxHeight, cal);
 
         // Paint arrow buttons for traversing months if enabled.
         if (monthView.isTraversable()) {
@@ -877,18 +886,18 @@ public class BasicMonthViewUI extends MonthViewUI {
         String[] daysOfTheWeek = monthView.getDaysOfTheWeek();
         for (int i = 0; i < JXMonthView.DAYS_IN_WEEK; i++) {
             tmpX = isLeftToRight ?
-                    x + (i * fullBoxWidth) + boxPaddingX +
+                    x + (i * fullBoxWidth) + monthView.getBoxPaddingX() +
                             (boxWidth / 2) -
                             (fm.stringWidth(daysOfTheWeek[dayIndex]) /
                                     2) :
-                    x + width - (i * fullBoxWidth) - boxPaddingX -
+                    x + width - (i * fullBoxWidth) - monthView.getBoxPaddingX() -
                             (boxWidth / 2) -
                             (fm.stringWidth(daysOfTheWeek[dayIndex]) /
                                     2);
             if (showingWeekNumber) {
                 tmpX += isLeftToRight ? fullBoxWidth : -fullBoxWidth;
             }
-            tmpY = y + fullMonthBoxHeight + boxPaddingY + fm.getAscent();
+            tmpY = y + fullMonthBoxHeight + monthView.getBoxPaddingY() + fm.getAscent();
             g.drawString(daysOfTheWeek[dayIndex], tmpX, tmpY);
             dayIndex++;
             if (dayIndex == JXMonthView.DAYS_IN_WEEK) {
@@ -897,11 +906,7 @@ public class BasicMonthViewUI extends MonthViewUI {
         }
         g.setFont(oldFont);
 
-        if (showingWeekNumber) {
-            tmpX = isLeftToRight ? x : x + width - fullBoxWidth;
-            paintWeekOfYearBackground(g, tmpX, y + fullMonthBoxHeight + fullBoxHeight, fullBoxWidth,
-                    calendarHeight - (fullMonthBoxHeight + fullBoxHeight), cal);
-        }
+        paintWeeksOfYear(g, x, y, width, cal);
 
         if (monthView.isShowingLeadingDates()) {
             // Figure out how many days we need to move back for the leading days.
@@ -926,15 +931,15 @@ public class BasicMonthViewUI extends MonthViewUI {
         for (int i = 0; i < days; i++) {
             calculateBoundsForDay(bounds, NO_OFFSET, cal);
             // Paint the week numbers if we're displaying them.
-            if (showingWeekNumber && oldY != bounds.y) {
-                oldY = bounds.y;
-                int weekOfYear = cal.get(Calendar.WEEK_OF_YEAR);
-                if (weekOfYear != oldWeek) {
-                    tmpX = isLeftToRight ? x : x + width - fullBoxWidth;
-                    paintWeekOfYearForeground(g, tmpX, bounds.y, fullBoxWidth, fullBoxHeight, weekOfYear, cal);
-                    oldWeek = weekOfYear;
-                }
-            }
+//            if (showingWeekNumber && oldY != bounds.y) {
+//                oldY = bounds.y;
+//                int weekOfYear = cal.get(Calendar.WEEK_OF_YEAR);
+//                if (weekOfYear != oldWeek) {
+//                    tmpX = isLeftToRight ? x : x + width - fullBoxWidth;
+//                    paintWeekOfYearForeground(g, tmpX, bounds.y, fullBoxWidth, fullBoxHeight, weekOfYear, cal);
+//                    oldWeek = weekOfYear;
+//                }
+//            }
 
             if (bounds.intersects(clip)) {
                 day = cal.getTime(); //InMillis();
@@ -1001,6 +1006,55 @@ public class BasicMonthViewUI extends MonthViewUI {
             // Move the calendar back to the first of the month
             cal.set(Calendar.DAY_OF_MONTH, 1);
         }
+    }
+
+    /**
+     * Paints the weeks of year if the showingWeek property is true. Does nothing
+     * otherwise.
+     * 
+     * It is assumed the given calendar is already set to the
+     * first day of the month. The calendar is unchanged when leaving this method. 
+     *
+     * @param g Graphics object.
+     * @param x x location of month
+     * @param y y location of month
+     * @param width width of month
+     * @param height height of month
+     * @param calendar the calendar specifying the the first day of the month to paint, 
+     *  must not be null
+     */
+    protected void paintWeeksOfYear(Graphics g, int x, int y, int width,
+            Calendar cal) {
+        if (!monthView.isShowingWeekNumber()) return;
+        int tmpX = isLeftToRight ? x : x + width - fullBoxWidth;
+        int initialY = y + fullMonthBoxHeight + fullBoxHeight;
+        paintWeekOfYearBackground(g, tmpX, initialY, fullBoxWidth,
+                calendarHeight - (fullMonthBoxHeight + fullBoxHeight), cal);
+
+        Calendar cloned = (Calendar) cal.clone();
+        CalendarUtils.startOfWeek(cloned);
+        int firstWeek = cloned.get(Calendar.WEEK_OF_YEAR);
+        cloned.setTime(cal.getTime());
+        CalendarUtils.endOfMonth(cloned);
+        int lastWeek = cloned.get(Calendar.WEEK_OF_YEAR);
+        boolean crossedYearBoundary = false;
+        if (lastWeek < firstWeek) {
+            // we are at the end of a year
+            crossedYearBoundary = true;
+            lastWeek = cal.getActualMaximum(Calendar.WEEK_OF_YEAR);
+        }
+        
+        for (int weekOfYear = firstWeek; weekOfYear <= lastWeek; weekOfYear++) {
+             paintWeekOfYearForeground(g, tmpX, initialY, fullBoxWidth, fullBoxHeight, weekOfYear, cal);
+             initialY += fullBoxHeight;
+        }
+        
+        if (crossedYearBoundary) {
+            int weekOfYear = cloned.getActualMinimum(Calendar.WEEK_OF_YEAR);
+            paintWeekOfYearForeground(g, tmpX, initialY, fullBoxWidth, fullBoxHeight, 
+                    weekOfYear, cal);
+        }
+
     }
 
     protected void paintDayOfTheWeekBackground(Graphics g, int x, int y, int width, int height, Calendar cal) {

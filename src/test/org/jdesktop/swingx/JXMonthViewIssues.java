@@ -33,6 +33,7 @@ import java.util.logging.Logger;
 
 import javax.swing.Action;
 
+import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.calendar.CalendarUtils;
 import org.jdesktop.swingx.calendar.DateSelectionModel;
 import org.jdesktop.swingx.calendar.DaySelectionModel;
@@ -57,10 +58,10 @@ public class JXMonthViewIssues extends InteractiveTestCase {
       setSystemLF(true);
       JXMonthViewIssues  test = new JXMonthViewIssues();
       try {
-          test.runInteractiveTests();
+//          test.runInteractiveTests();
 //        test.runInteractiveTests("interactive.*Locale.*");
 //          test.runInteractiveTests("interactive.*AutoScroll.*");
-//        test.runInteractiveTests("interactive.*UpdateUI.*");
+        test.runInteractiveTests("interactive.*Minimal.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
@@ -75,6 +76,49 @@ public class JXMonthViewIssues extends InteractiveTestCase {
     // the calendar to use, its date is initialized with the today-field in setUpCalendar
     protected Calendar calendar;
 
+
+    /**
+     * Issue #736-swingx: monthView cannot cope with minimalDaysInFirstWeek.
+     * 
+     */
+    public void interactiveMinimalDaysInFirstWeek() {
+        final JXMonthView monthView = new JXMonthView();
+        monthView.setTraversable(true);
+        monthView.setShowingWeekNumber(true);
+        monthView.setShowLeadingDates(true);
+        monthView.setShowTrailingDates(true);
+        Action action = new AbstractActionExt("toggle minimal") {
+
+            public void actionPerformed(ActionEvent e) {
+                int minimal = monthView.getSelectionModel().getMinimalDaysInFirstWeek();
+                monthView.getSelectionModel().setMinimalDaysInFirstWeek(minimal > 1 ? 1 : 4);
+                Calendar cal = monthView.getCalendar();
+                cal.set(2008, Calendar.FEBRUARY, 1);
+                LOG.info("minimal/weekofMonth " + cal.getTime() + 
+                        " / " +  cal.getMinimalDaysInFirstWeek() + 
+                        " / " + cal.get(Calendar.WEEK_OF_MONTH) +
+                        " / " + cal.get(Calendar.WEEK_OF_YEAR));
+                cal.set(2010, Calendar.JANUARY, 1);
+                LOG.info("minimal/weekofmonth/weekofYear " + cal.getTime() + 
+                        " / " +  cal.getMinimalDaysInFirstWeek() + 
+                        " / " + cal.get(Calendar.WEEK_OF_MONTH) +
+                " / " + cal.get(Calendar.WEEK_OF_YEAR));
+                cal.add(Calendar.DAY_OF_MONTH, 7);
+                LOG.info("minimal/weekofmonth/weekofYear " + cal.getTime() + 
+                        " / " +  cal.getMinimalDaysInFirstWeek() + 
+                        " / " + cal.get(Calendar.WEEK_OF_MONTH) +
+                " / " + cal.get(Calendar.WEEK_OF_YEAR));
+            }
+            
+        };
+        JXFrame frame = wrapInFrame(monthView, "click unselectable fires ActionEvent");
+        addAction(frame, action);
+        frame.pack();
+        frame.setVisible(true);
+    }
+
+
+    
     /**
      * Issue #567-swingx: JXDatepicker - clicking on unselectable date clears
      * picker's selection.
