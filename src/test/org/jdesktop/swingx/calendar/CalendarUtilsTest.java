@@ -59,7 +59,8 @@ public class CalendarUtilsTest extends InteractiveTestCase {
         int weekOfYear = todayGerman.get(Calendar.WEEK_OF_YEAR);
         todayGerman.setTime(firstOfDecember);
         CalendarUtils.endOfMonth(todayGerman);
-        assertEquals(weekOfYear, todayGerman.get(Calendar.WEEK_OF_YEAR));
+        // we crossed the year boundary
+        assertEquals(1, todayGerman.get(Calendar.WEEK_OF_YEAR));
 //        CalendarUtils.startOfWeek(todayGerman);
 //        assertEquals(Calendar.JANUARY, todayGerman.get(Calendar.MONTH));
     }
