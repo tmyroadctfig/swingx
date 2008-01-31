@@ -59,6 +59,7 @@ import javax.swing.event.TreeWillExpandListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeSelectionModel;
@@ -2260,6 +2261,11 @@ public class JXTreeTable extends JXTable {
                 y = 0;
                 // It is not enough to set the height to treeTable.getHeight()
                 h = treeTable.getRowCount() * this.getRowHeight();
+//                int hierarchicalC = treeTable.getHierarchicalColumn();
+//                if (hierarchicalC >= 0) {
+//                    TableColumn column = treeTable.getColumn(hierarchicalC);
+//                    w = Math.min(w, column.getWidth());
+//                }
             }
             super.setBounds(x, y, w, h);
         }
