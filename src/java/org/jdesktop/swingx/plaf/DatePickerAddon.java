@@ -20,6 +20,7 @@ package org.jdesktop.swingx.plaf;
 
 import javax.swing.BorderFactory;
 import javax.swing.LookAndFeel;
+import javax.swing.UIManager;
 import javax.swing.border.LineBorder;
 import javax.swing.plaf.BorderUIResource;
 
@@ -46,7 +47,7 @@ public class DatePickerAddon extends AbstractComponentAddon {
         defaults.add("JXDatePicker.border",
                 new BorderUIResource(BorderFactory.createCompoundBorder(
                         LineBorder.createGrayLineBorder(),
-                        BorderFactory.createEmptyBorder(3, 3, 3, 3))));
+                        BorderFactory.createEmptyBorder(20, 3, 3, 3))));
         
         UIManagerExt.addResourceBundle(
                 "org.jdesktop.swingx.plaf.basic.resources.DatePicker");
@@ -58,7 +59,6 @@ public class DatePickerAddon extends AbstractComponentAddon {
     @Override
     protected void addWindowsDefaults(LookAndFeelAddons addon, DefaultsList defaults) {
         super.addWindowsDefaults(addon, defaults);
-        
         if (OS.isWindowsXP() && OS.isUsingWindowsVisualStyles()) {
             defaults.add("JXDatePicker.arrowIcon",
                     LookAndFeel.makeIcon(DatePickerAddon.class, "windows/resources/combo-xp.png"));
@@ -77,6 +77,23 @@ public class DatePickerAddon extends AbstractComponentAddon {
         
         defaults.add("JXDatePicker.arrowIcon",
                 LookAndFeel.makeIcon(DatePickerAddon.class, "linux/resources/combo-gtk.png"));
+        
+        if (isGTK()) {
+            // PENDING JW: going dirty: register an illegal value - not a border 
+            // results in uimanager.getBorder returning a null
+            // which prevents the datePickerUI to install a border on the editor.
+            // change to remove once we have api/implementation to remove something
+            // from the defaultsList.
+           defaults.add("JXDatePicker.border", "none"); 
+        }
+    }
+
+    /**
+     * 
+     * @return true if the LF is GTK.
+     */
+    private boolean isGTK() {
+        return "GTK".equals(UIManager.getLookAndFeel().getID());
     }
 
     /**
@@ -88,6 +105,9 @@ public class DatePickerAddon extends AbstractComponentAddon {
         
         defaults.add("JXDatePicker.arrowIcon",
                 LookAndFeel.makeIcon(DatePickerAddon.class, "macosx/resources/combo-osx.png"));
+
+        defaults.add("JXDatePicker.border", "none");
+
     }
 }
 

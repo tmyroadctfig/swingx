@@ -60,6 +60,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.JFormattedTextField.AbstractFormatter;
 import javax.swing.JFormattedTextField.AbstractFormatterFactory;
+import javax.swing.border.Border;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.UIResource;
 import javax.swing.text.DefaultFormatterFactory;
@@ -456,8 +457,10 @@ public class BasicDatePickerUI extends DatePickerUI {
         JFormattedTextField f = new DefaultEditor(new DatePickerFormatterUIResource(datePicker.getLocale()));
         f.setName("dateField");
         f.setColumns(UIManager.getInt("JXDatePicker.numColumns"));
-        f.setBorder(UIManager.getBorder("JXDatePicker.border"));
-
+        Border border = UIManager.getBorder("JXDatePicker.border");
+        if (border != null) {
+            f.setBorder(border);
+        }
         return f;
     }
 

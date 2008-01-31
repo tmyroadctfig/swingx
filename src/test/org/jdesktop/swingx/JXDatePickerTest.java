@@ -42,8 +42,10 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.UIManager;
+import javax.swing.border.Border;
 import javax.swing.text.DefaultFormatterFactory;
 
 import org.jdesktop.swingx.calendar.CalendarUtils;
@@ -72,6 +74,34 @@ public class JXDatePickerTest extends InteractiveTestCase {
     }
 
     public void tearDown() {
+    }
+
+    /**
+     * Issue #667-swingx: don't install the datepicker border for gtk.
+     * 
+     * Here we are testing that the BasicPickerUI doesn't touch the 
+     * editors border if it finds a null. 
+     * 
+     */
+    public void testPickerBorder() {
+        // force loading of addon
+        new JXDatePicker();
+        Border pickerBorder = UIManager.getBorder("JXDatePicker.border");
+        if (pickerBorder == null) {
+            LOG.info("cant run test - no pickerborder");
+            return;
+        } 
+        try {
+            UIManager.put("JXDatePicker.border", "none");
+            assertNull(UIManager.getBorder("JXDatePicker.border"));
+            JXDatePicker picker = new JXDatePicker();
+            JTextField field = new JFormattedTextField();
+            assertEquals(field.getBorder(), picker.getEditor().getBorder());
+        } finally {
+            // restore LAF border
+            UIManager.put("JXDatePicker.border", null);
+            assertEquals(pickerBorder, UIManager.getBorder("JXDatePicker.border"));
+        }
     }
 
     /**

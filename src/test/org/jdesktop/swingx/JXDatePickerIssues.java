@@ -351,7 +351,8 @@ public class JXDatePickerIssues extends InteractiveTestCase {
         frame.setVisible(true);
     }
 //-------------------- unit tests
- 
+
+    
 //    DateFormat longFormat = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL);
     /**
      * Issue #572-swingx: monthView must show linkDate on empty selection.
