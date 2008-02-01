@@ -46,6 +46,19 @@ public class CalendarUtilsTest extends InteractiveTestCase {
     private Calendar todayUS;
     private Calendar midJune;
 
+    public void testWeekOfYearInFeb() {
+        todayGerman.set(2008, Calendar.FEBRUARY, 1);
+        Date firstOfFeb = todayGerman.getTime();
+        CalendarUtils.startOfDay(todayGerman);
+        assertTrue(CalendarUtils.isSameDay(todayGerman, firstOfFeb));
+        assertTrue(CalendarUtils.isStartOfMonth(todayGerman));
+        Date startOfFirstOfFeb = todayGerman.getTime();
+        CalendarUtils.startOfWeek(todayGerman);
+//        assertEquals(startOfFirstOfFeb, todayGerman.getTime());
+        assertTrue("expected calendar before firstOfFeb " 
+                + todayGerman.getTime() + " / " + startOfFirstOfFeb , 
+                todayGerman.getTime().before(startOfFirstOfFeb));
+    }
     
     /**
      * test to characterize startofweek behaviour is we are in a 
@@ -56,13 +69,11 @@ public class CalendarUtilsTest extends InteractiveTestCase {
         todayGerman.set(2007, Calendar.DECEMBER, 1);
         Date firstOfDecember = todayGerman.getTime();
         CalendarUtils.startOfWeek(todayGerman);
-        int weekOfYear = todayGerman.get(Calendar.WEEK_OF_YEAR);
+//        int weekOfYear = todayGerman.get(Calendar.WEEK_OF_YEAR);
         todayGerman.setTime(firstOfDecember);
         CalendarUtils.endOfMonth(todayGerman);
         // we crossed the year boundary
         assertEquals(1, todayGerman.get(Calendar.WEEK_OF_YEAR));
-//        CalendarUtils.startOfWeek(todayGerman);
-//        assertEquals(Calendar.JANUARY, todayGerman.get(Calendar.MONTH));
     }
 
     /**

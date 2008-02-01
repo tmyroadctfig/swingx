@@ -144,7 +144,7 @@ public class BasicMonthViewUI extends MonthViewUI {
     private int arrowPaddingX = 3;
     private int arrowPaddingY = 3;
     private Dimension dim = new Dimension();
-    private Rectangle dirtyRect = new Rectangle();
+//    private Rectangle dirtyRect = new Rectangle();
     private Rectangle bounds = new Rectangle();
     private int startX;
     private int startY;
@@ -646,122 +646,30 @@ public class BasicMonthViewUI extends MonthViewUI {
      */
     private void calculateDirtyRectForSelection() {
         // PENDING JW: understand what we are doing here - (assumed?) performance optimization?
-        if (monthView.isSelectionEmpty()) {
-            dirtyRect.x = 0;
-            dirtyRect.y = 0;
-            dirtyRect.width = 0;
-            dirtyRect.height = 0;
-        } else {
-            Calendar cal = getCalendar(getSelection().first().getTime());
-            calculateBoundsForDay(dirtyRect, NO_OFFSET, cal);
-            cal.add(Calendar.DAY_OF_MONTH, 1);
-
-            Rectangle tmpRect;
-            while (cal.getTimeInMillis() <= getSelection().last().getTime()) {
-                calculateBoundsForDay(bounds, NO_OFFSET, cal);
-                tmpRect = dirtyRect.union(bounds);
-                dirtyRect.x = tmpRect.x;
-                dirtyRect.y = tmpRect.y;
-                dirtyRect.width = tmpRect.width;
-                dirtyRect.height = tmpRect.height;
-                cal.add(Calendar.DAY_OF_MONTH, 1);
-            }
-
-        }
-    }
-
-
-    /**
-     * Calculate the bounding box for drawing a date.  It is assumed that the
-     * given calendar is already set to the date you want to find the offset
-     * for.
-     *  
-     * @param bounds Bounds of the date to draw in.
-     * @param monthOffset Used to help calculate bounds for leading/trailing dates.
-     * @param cal the calendar specifying the day to use, must not be null
-     */
-    protected void calculateBoundsForDay(Rectangle bounds, int monthOffset, Calendar cal) {
-        int year = cal.get(Calendar.YEAR);
-        int month = cal.get(Calendar.MONTH);
-        // JW: this depends on both calendars minimalDaysInFirstWeek and firstDayOfWeek
-        // so might be 0!!
-        int weekOfMonth = cal.get(Calendar.WEEK_OF_MONTH);
-
-        // If we are calculating the bounds for a leading/trailing day we need to
-        // adjust the month we are in to calculate the bounds correctly.
-        month += monthOffset;
-
-//        if (weekOfMonth == 0) {
-//            weekOfMonth = 1;
+//        if (monthView.isSelectionEmpty()) {
+//            dirtyRect.x = 0;
+//            dirtyRect.y = 0;
+//            dirtyRect.width = 0;
+//            dirtyRect.height = 0;
+//        } else {
+//            Calendar cal = getCalendar(getSelection().first().getTime());
+//            calculateBoundsForDay(dirtyRect, NO_OFFSET, cal);
+//            cal.add(Calendar.DAY_OF_MONTH, 1);
+//
+//            Rectangle tmpRect;
+//            while (cal.getTimeInMillis() <= getSelection().last().getTime()) {
+//                calculateBoundsForDay(bounds, NO_OFFSET, cal);
+//                tmpRect = dirtyRect.union(bounds);
+//                dirtyRect.x = tmpRect.x;
+//                dirtyRect.y = tmpRect.y;
+//                dirtyRect.width = tmpRect.width;
+//                dirtyRect.height = tmpRect.height;
+//                cal.add(Calendar.DAY_OF_MONTH, 1);
+//            }
+//
 //        }
-        // If we're showing leading days the week in month needs to be 1 to make the bounds
-        // calculate correctly.
-        if (LEADING_DAY_OFFSET == monthOffset) {
-            weekOfMonth = 1;
-        }
-
-        
-        if (TRAILING_DAY_OFFSET == monthOffset) {
-            // Find which week the last day in the month is.
-            int day = cal.get(Calendar.DAY_OF_MONTH);
-            int weekOffset = cal.get(Calendar.WEEK_OF_MONTH) - 1;
-
-            cal.add(Calendar.DAY_OF_MONTH, -day);
-
-            int lastWeekOfMonth = cal.get(Calendar.WEEK_OF_MONTH);
-            int lastDay = getDayOfWeekViewIndex(cal.get(Calendar.DAY_OF_WEEK));
-            if (lastDay == (JXMonthView.DAYS_IN_WEEK - 1)) {
-                weekOffset++;
-            }
-
-            // Move back to our current day.
-            cal.add(Calendar.DAY_OF_MONTH, day);
-
-            weekOfMonth = lastWeekOfMonth + weekOffset;
-        }
-
-        // Determine what row/column we are in.
-        int diffMonths = month - getFirstDisplayedMonth() +
-                ((year - getFirstDisplayedYear()) * JXMonthView.MONTHS_IN_YEAR);
-        int calRowIndex = diffMonths / numCalCols;
-        int calColIndex = diffMonths - (calRowIndex * numCalCols);
-
-
-        // Modify the index relative to the first day of the week.
-        int dayIndex = getDayOfWeekViewIndex(cal.get(Calendar.DAY_OF_WEEK));
-        // If we're showing week numbers then increase the bounds.x
-        // by one more boxPaddingX boxWidth boxPaddingX.
-        if (monthView.isShowingWeekNumber()) {
-            dayIndex++;
-        }
-
-        // Calculate the x location.
-        bounds.x = isLeftToRight ?
-                dayIndex * fullBoxWidth :
-                (dayIndex + 1) * fullBoxWidth;
-
-        // Offset for the column the calendar is displayed in.
-        bounds.x += calColIndex * (calendarWidth + CALENDAR_SPACING);
-
-        // Adjust by centering value.
-        bounds.x = isLeftToRight ? startX + bounds.x : startX - bounds.x;
-
-        // Initial offset for Month and Days of the Week display.
-        bounds.y = fullMonthBoxHeight + fullBoxHeight;
-//            boxPaddingY + monthBoxHeight + boxPaddingY +
-//            + boxPaddingY + boxHeight + boxPaddingY;
-
-        // Offset for centering and row the calendar is displayed in.
-        bounds.y += startY + calRowIndex *
-                (calendarHeight + CALENDAR_SPACING);
-
-        // Offset for Week of the Month.
-        bounds.y += (weekOfMonth - 1) * fullBoxHeight;
-//                (boxPaddingY + boxHeight + boxPaddingY);
-
-        bounds.width = fullBoxWidth; //boxPaddingX + boxWidth + boxPaddingX;
-        bounds.height = fullBoxHeight; //boxPaddingY + boxHeight + boxPaddingY;
     }
+
 
 //-------------------- painting
 
@@ -823,9 +731,8 @@ public class BasicMonthViewUI extends MonthViewUI {
                 // was called.
                 if (bounds.intersects(clip)) {
                     paintMonth(g, bounds.x, bounds.y, bounds.width, bounds.height, cal);
-                } else {
-                    cal.add(Calendar.MONTH, 1);
                 }
+                    cal.add(Calendar.MONTH, 1);
             }
         }
 
@@ -851,10 +758,6 @@ public class BasicMonthViewUI extends MonthViewUI {
     protected void paintMonth(Graphics g, int x, int y, int width, int height, Calendar cal) {
         // PEINDING JW: remove usage of deprecated api
         // use Date instead of millis
-        int days = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
-        Rectangle clip = g.getClipBounds();
-        Date day;
-        int oldWeek = -1;
 
         // Paint month name background.
         paintMonthStringBackground(g, x, y,
@@ -906,106 +809,187 @@ public class BasicMonthViewUI extends MonthViewUI {
         }
         g.setFont(oldFont);
 
-        paintWeeksOfYear(g, x, y, width, cal);
+        // paint the column of week numbers
+        int yNew = y + fullMonthBoxHeight + fullBoxHeight;
+        paintWeeksOfYear(g, x, yNew, width, cal);
 
-        if (monthView.isShowingLeadingDates()) {
-            // Figure out how many days we need to move back for the leading days.
-            int dayOfWeekViewIndex = getDayOfWeekViewIndex(cal.get(Calendar.DAY_OF_WEEK));
-            if (dayOfWeekViewIndex != 0) {
-                // Move the calendar back and paint the leading days
-                cal.add(Calendar.DAY_OF_MONTH, -dayOfWeekViewIndex);
-                for (int i = 0; i < dayOfWeekViewIndex; i++) {
-                    // Paint a day
-                    calculateBoundsForDay(bounds, LEADING_DAY_OFFSET, cal);
-                    day = cal.getTime(); //InMillis();
-                    paintLeadingDayBackground(g, bounds.x, bounds.y,
-                            bounds.width, bounds.height, cal);
-                    paintLeadingDayForeground(g, bounds.x, bounds.y,
-                            bounds.width, bounds.height, cal);
-                    cal.add(Calendar.DAY_OF_MONTH, 1);
-                }
-            }
+        int xOffset = 0;
+        if (monthView.isShowingWeekNumber()) {
+            xOffset = fullBoxWidth;
+        }
+        if (isLeftToRight) {
+            paintDays(g, x + xOffset, yNew, width - xOffset, cal);
+        } else {
+            paintDays(g, x , yNew, width - xOffset, cal);
         }
 
-        int oldY = -1;
-        for (int i = 0; i < days; i++) {
-            calculateBoundsForDay(bounds, NO_OFFSET, cal);
-            // Paint the week numbers if we're displaying them.
-//            if (showingWeekNumber && oldY != bounds.y) {
-//                oldY = bounds.y;
-//                int weekOfYear = cal.get(Calendar.WEEK_OF_YEAR);
-//                if (weekOfYear != oldWeek) {
-//                    tmpX = isLeftToRight ? x : x + width - fullBoxWidth;
-//                    paintWeekOfYearForeground(g, tmpX, bounds.y, fullBoxWidth, fullBoxHeight, weekOfYear, cal);
-//                    oldWeek = weekOfYear;
-//                }
-//            }
-
-            if (bounds.intersects(clip)) {
-                day = cal.getTime(); //InMillis();
-
-                // Paint bounding box around any date that falls within the
-                // selection.
-                if (monthView.isSelectedDate(day)) {
-                    // Keep track of the rectangle for the currently
-                    // selected date so we don't have to recalculate it
-                    // later when it becomes unselected.  This is only
-                    // useful for SINGLE_SELECTION mode.
-                    if (monthView.getSelectionMode() == SelectionMode.SINGLE_SELECTION) {
-                        dirtyRect.x = bounds.x;
-                        dirtyRect.y = bounds.y;
-                        dirtyRect.width = bounds.width;
-                        dirtyRect.height = bounds.height;
-                    }
-                }
-
-                if (monthView.isUnselectableDate(day)) {
-                    paintUnselectableDayBackground(g, bounds.x, bounds.y,
-                            bounds.width, bounds.height, cal);
-                    paintUnselectableDayForeground(g, bounds.x, bounds.y,
-                            bounds.width, bounds.height, cal);
-                }
-                else if (monthView.isFlaggedDate(day)) {
-                    paintFlaggedDayBackground(g, bounds.x, bounds.y,
-                            bounds.width, bounds.height, cal);
-                    paintFlaggedDayForeground(g, bounds.x, bounds.y,
-                            bounds.width, bounds.height, cal);
+    }
+    /**
+     * 
+     * Paints all days in the days' grid, that is the month area below
+     * the daysOfWeek and to the right/left (depending on 
+     * the monthView's componentOrientation) of the weekOfYears. 
+     * The calendar
+     * represents the first day of the month to paint. <p>
+     * 
+     * Note: the calendar must not be changed.
+     * 
+     * @param g Graphics object.
+     * @param left the left boundary of the day grid.
+     * @param top the upper boundary of the day grid
+     * @param width the width of the day grid.
+     * @param calendar the calendar specifying the the first day of the month to paint, 
+     *   must not be null
+     */
+    protected void paintDays(Graphics g, int left, int top, int width, Calendar cal) {
+        
+        Calendar calendar = (Calendar) cal.clone();
+        CalendarUtils.startOfMonth(calendar);
+        Date startOfMonth = calendar.getTime();
+        CalendarUtils.endOfMonth(calendar);
+        Date endOfMonth = calendar.getTime();
+        // reset the clone
+        calendar.setTime(cal.getTime());
+        int weeks = getWeeks(calendar);
+        // adjust to start of week 
+        calendar.setTime(cal.getTime());
+        CalendarUtils.startOfWeek(calendar);
+        // painting a grid of day boxes, all with dimensions 
+        // width == fullBoxWidth and height = fullBoxHeight.
+        int topOfDay = top;
+        for (int week = 0; week <= weeks; week++) {
+            int leftOfDay = isLeftToRight ? left : left + width - fullBoxWidth;
+            
+            for (int day = 0; day < 7; day++) {
+                if (calendar.getTime().before(startOfMonth)) {
+                    // leading
+                    paintLeadingDay(g, leftOfDay, topOfDay, calendar);
+                   
+                } else if (calendar.getTime().after(endOfMonth)) {
+                    paintTrailingDay(g, leftOfDay, topOfDay, calendar);
+                    
                 } else {
-                    paintDayBackground(g, bounds.x, bounds.y,
-                            bounds.width, bounds.height, cal);
-                    paintDayForeground(g, bounds.x, bounds.y,
-                            bounds.width, bounds.height, cal);
+                    paintDay(g, leftOfDay, topOfDay, calendar);
                 }
+                leftOfDay = isLeftToRight ? leftOfDay + fullBoxWidth : leftOfDay - fullBoxWidth;
+                calendar.add(Calendar.DAY_OF_MONTH, 1);
             }
-            cal.add(Calendar.DAY_OF_MONTH, 1);
+            if (!CalendarUtils.isStartOfWeek(calendar)) {
+                throw new IllegalStateException("expected start of week");
+            }
+            topOfDay += fullBoxHeight;
         }
+    }
 
-        if (monthView.isShowingTrailingDates()) {
-            // Figure out how many days we need to paint for trailing days.
-            cal.add(Calendar.DAY_OF_MONTH, -1);
-            int weekOfMonth = cal.get(Calendar.WEEK_OF_MONTH);
-            if (JXMonthView.DAYS_IN_WEEK - 1 == getDayOfWeekViewIndex(cal.get(Calendar.DAY_OF_WEEK))) {
-                weekOfMonth++;
-            }
-            cal.add(Calendar.DAY_OF_MONTH, 1);
+    /**
+     * Paints a day the current month, represented by the calendar in a day-box
+     * located at left/top. The size of the day-box is defined by
+     * fullBoxWidth/Height. The appearance of the day depends on its state (like
+     * unselectable, flagged, selected)
+     * <p>
+     * 
+     * Note: the given calendar must not be changed.
+     * 
+     * @param g the Graphics to paint into.
+     * @param left the left boundary of the day-box to paint.
+     * @param top the upper boundary of the day-box to paint.
+     * @param calendar the calendar specifying the the day to paint, must not be
+     *        null
+     */
+    protected void paintDay(Graphics g, int left, int top, Calendar calendar) {
+        if (monthView.isUnselectableDate(calendar.getTime())) {
+            paintUnselectableDayBackground(g, left, top, fullBoxWidth, fullBoxHeight,
+                    calendar);
+            paintUnselectableDayForeground(g, left, top, fullBoxWidth, fullBoxHeight,
+                    calendar);
 
-            int daysToPaint = JXMonthView.DAYS_IN_WEEK * (WEEKS_IN_MONTH - weekOfMonth);
-            daysToPaint += JXMonthView.DAYS_IN_WEEK - getDayOfWeekViewIndex(cal.get(Calendar.DAY_OF_WEEK));
-            if (daysToPaint != 0) {
-                for (int i = 0; i < daysToPaint; i++) {
-                    // Paint a day
-                    calculateBoundsForDay(bounds, TRAILING_DAY_OFFSET, cal);
-                    day = cal.getTime(); //InMillis();
-                    paintTrailingDayBackground(g, bounds.x, bounds.y,
-                            bounds.width, bounds.height, cal);
-                    paintTrailingDayForeground(g, bounds.x, bounds.y,
-                            bounds.width, bounds.height, cal);
-                    cal.add(Calendar.DAY_OF_MONTH, 1);
-                }
-            }
-            // Move the calendar back to the first of the month
-            cal.set(Calendar.DAY_OF_MONTH, 1);
+        } else if (monthView.isFlaggedDate(calendar.getTime())) {
+            paintFlaggedDayBackground(g, left, top, fullBoxWidth, fullBoxHeight,
+                    calendar);
+            paintFlaggedDayForeground(g, left, top, fullBoxWidth, fullBoxHeight,
+                    calendar);
+
+        } else {
+            paintDayBackground(g, left, top, fullBoxWidth, fullBoxHeight,
+                    calendar);
+            paintDayForeground(g, left, top, fullBoxWidth, fullBoxHeight,
+                    calendar);
         }
+    }
+
+    /**
+     * Paints a trailing day of the current month, represented by the calendar,
+     * in a day-box located at left/top. The size of the day-box is defined by
+     * fullBoxWidth/Height. Does nothing if the monthView's
+     * isShowingTrailingDates is false.
+     * <p>
+     * 
+     * Note: the given calendar must not be changed.
+     * 
+     * @param g the Graphics to paint into.
+     * @param left the left boundary of the day-box to paint.
+     * @param top the upper boundary of the day-box to paint.
+     * @param calendar the calendar specifying the the day to paint, must not be
+     *        null
+     */
+    protected void paintTrailingDay(Graphics g, int left, int top,
+            Calendar calendar) {
+        if (!monthView.isShowingTrailingDates()) return;
+        paintTrailingDayBackground(g, left, top, fullBoxWidth,
+                    fullBoxHeight, calendar);
+        paintTrailingDayForeground(g, left, top, fullBoxWidth,
+                    fullBoxHeight, calendar);
+            
+        
+    }
+
+    /**
+     * Paints a leading day of the current month, represented by the calendar,
+     * in a day-box located at left/top. The size of the day-box is defined by
+     * fullBoxWidth/Height. Does nothing if the monthView's
+     * isShowingLeadingDates is false.
+     * <p>
+     * 
+     * Note: the given calendar must not be changed.
+     * 
+     * @param g the Graphics to paint into.
+     * @param left the left boundary of the day-box to paint.
+     * @param top the upper boundary of the day-box to paint.
+     * @param calendar the calendar specifying the the day to paint, must not be
+     *        null
+     */
+    protected void paintLeadingDay(Graphics g, int left, int top,
+            Calendar calendar) {
+        if (!monthView.isShowingLeadingDates()) return;
+        paintLeadingDayBackground(g, left, top, fullBoxWidth, fullBoxHeight,
+                calendar);
+        paintLeadingDayForeground(g, left, top, fullBoxWidth, fullBoxHeight,
+                calendar);
+
+    }
+
+    /**
+     * Returns the number of weeks to paint in the current month, as represented
+     * by the given calendar.
+     * 
+     * Note: the given calendar must not be changed.
+     * 
+     * @param month the calendar specifying the the first day of the month to
+     *        paint, must not be null
+     * @return the number of weeks of this month.
+     */
+    protected int getWeeks(Calendar month) {
+        Date old = month.getTime();
+        CalendarUtils.startOfWeek(month);
+        int firstWeek = month.get(Calendar.WEEK_OF_YEAR);
+        month.setTime(old);
+        CalendarUtils.endOfMonth(month);
+        int lastWeek = month.get(Calendar.WEEK_OF_YEAR);
+        if (lastWeek < firstWeek) {
+            lastWeek = month.getActualMaximum(Calendar.WEEK_OF_YEAR) + 1;
+        }
+        month.setTime(old);
+        return lastWeek - firstWeek;
     }
 
     /**
@@ -1014,6 +998,8 @@ public class BasicMonthViewUI extends MonthViewUI {
      * 
      * It is assumed the given calendar is already set to the
      * first day of the month. The calendar is unchanged when leaving this method. 
+     * 
+     * Note: the given calendar must not be changed.
      *
      * @param g Graphics object.
      * @param x x location of month
@@ -1023,38 +1009,21 @@ public class BasicMonthViewUI extends MonthViewUI {
      * @param calendar the calendar specifying the the first day of the month to paint, 
      *  must not be null
      */
-    protected void paintWeeksOfYear(Graphics g, int x, int y, int width,
+    protected void paintWeeksOfYear(Graphics g, int x, int initialY, int width,
             Calendar cal) {
         if (!monthView.isShowingWeekNumber()) return;
         int tmpX = isLeftToRight ? x : x + width - fullBoxWidth;
-        int initialY = y + fullMonthBoxHeight + fullBoxHeight;
         paintWeekOfYearBackground(g, tmpX, initialY, fullBoxWidth,
                 calendarHeight - (fullMonthBoxHeight + fullBoxHeight), cal);
 
-        Calendar cloned = (Calendar) cal.clone();
-        CalendarUtils.startOfWeek(cloned);
-        int firstWeek = cloned.get(Calendar.WEEK_OF_YEAR);
-        cloned.setTime(cal.getTime());
-        CalendarUtils.endOfMonth(cloned);
-        int lastWeek = cloned.get(Calendar.WEEK_OF_YEAR);
-        boolean crossedYearBoundary = false;
-        if (lastWeek < firstWeek) {
-            // we are at the end of a year
-            crossedYearBoundary = true;
-            lastWeek = cal.getActualMaximum(Calendar.WEEK_OF_YEAR);
-        }
-        
-        for (int weekOfYear = firstWeek; weekOfYear <= lastWeek; weekOfYear++) {
-             paintWeekOfYearForeground(g, tmpX, initialY, fullBoxWidth, fullBoxHeight, weekOfYear, cal);
+        Calendar calendar = (Calendar) cal.clone();
+        int weeks = getWeeks(calendar);
+        calendar.setTime(cal.getTime());
+         for (int weekOfYear = 0; weekOfYear <= weeks; weekOfYear++) {
+             paintWeekOfYearForeground(g, tmpX, initialY, fullBoxWidth, fullBoxHeight,  calendar);
              initialY += fullBoxHeight;
+             calendar.add(Calendar.WEEK_OF_YEAR, 1);
         }
-        
-        if (crossedYearBoundary) {
-            int weekOfYear = cloned.getActualMinimum(Calendar.WEEK_OF_YEAR);
-            paintWeekOfYearForeground(g, tmpX, initialY, fullBoxWidth, fullBoxHeight, 
-                    weekOfYear, cal);
-        }
-
     }
 
     protected void paintDayOfTheWeekBackground(Graphics g, int x, int y, int width, int height, Calendar cal) {
@@ -1079,8 +1048,10 @@ public class BasicMonthViewUI extends MonthViewUI {
      * @param weekOfYear week of the year
      */
     @SuppressWarnings({"UNUSED_SYMBOL", "UnusedDeclaration"})
-    protected void paintWeekOfYearForeground(Graphics g, int x, int y, int width, int height, int weekOfYear, Calendar cal) {
-        String str = Integer.toString(weekOfYear);
+    protected void paintWeekOfYearForeground(Graphics g, int x, int y, int width, int height, 
+//            int weekOfYear, 
+            Calendar cal) {
+        String str = Integer.toString(cal.get(Calendar.WEEK_OF_YEAR));
         FontMetrics fm;
 
         g.setColor(weekOfTheYearForeground);
@@ -1380,12 +1351,12 @@ public class BasicMonthViewUI extends MonthViewUI {
         int boxPaddingY = monthView.getBoxPaddingY();
 
         fm = g.getFontMetrics();
+        int ltorOffset = x + boxPaddingX +
+                boxWidth - fm.stringWidth(numericDay);
         g.drawString(numericDay,
                 isLeftToRight ?
-                        x + boxPaddingX +
-                                boxWidth - fm.stringWidth(numericDay) :
-                        x + boxPaddingX +
-                                boxWidth - fm.stringWidth(numericDay) - 1,
+                        ltorOffset :
+                        ltorOffset - 1,
                 y + boxPaddingY + fm.getAscent());
     }
 
@@ -1937,11 +1908,12 @@ public class BasicMonthViewUI extends MonthViewUI {
 
         public void valueChanged(DateSelectionEvent ev) {
             // repaint old dirty region
-            monthView.repaint(dirtyRect);
-            // calculate new dirty region based on selection
-            calculateDirtyRectForSelection();
-            // repaint new selection
-            monthView.repaint(dirtyRect);
+//            monthView.repaint(dirtyRect);
+//            // calculate new dirty region based on selection
+//            calculateDirtyRectForSelection();
+//            // repaint new selection
+//            monthView.repaint(dirtyRect);
+            monthView.repaint();
         }
 
 

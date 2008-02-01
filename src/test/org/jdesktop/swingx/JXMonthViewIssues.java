@@ -21,6 +21,7 @@
  */
 package org.jdesktop.swingx;
 
+import java.awt.ComponentOrientation;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -31,6 +32,7 @@ import java.util.Locale;
 import java.util.TimeZone;
 import java.util.logging.Logger;
 
+import javax.swing.AbstractAction;
 import javax.swing.Action;
 
 import org.jdesktop.swingx.action.AbstractActionExt;
@@ -92,31 +94,74 @@ public class JXMonthViewIssues extends InteractiveTestCase {
             public void actionPerformed(ActionEvent e) {
                 int minimal = monthView.getSelectionModel().getMinimalDaysInFirstWeek();
                 monthView.getSelectionModel().setMinimalDaysInFirstWeek(minimal > 1 ? 1 : 4);
-                Calendar cal = monthView.getCalendar();
-                cal.set(2008, Calendar.FEBRUARY, 1);
-                LOG.info("minimal/weekofMonth " + cal.getTime() + 
-                        " / " +  cal.getMinimalDaysInFirstWeek() + 
-                        " / " + cal.get(Calendar.WEEK_OF_MONTH) +
-                        " / " + cal.get(Calendar.WEEK_OF_YEAR));
-                cal.set(2010, Calendar.JANUARY, 1);
-                LOG.info("minimal/weekofmonth/weekofYear " + cal.getTime() + 
-                        " / " +  cal.getMinimalDaysInFirstWeek() + 
-                        " / " + cal.get(Calendar.WEEK_OF_MONTH) +
-                " / " + cal.get(Calendar.WEEK_OF_YEAR));
-                cal.add(Calendar.DAY_OF_MONTH, 7);
-                LOG.info("minimal/weekofmonth/weekofYear " + cal.getTime() + 
-                        " / " +  cal.getMinimalDaysInFirstWeek() + 
-                        " / " + cal.get(Calendar.WEEK_OF_MONTH) +
-                " / " + cal.get(Calendar.WEEK_OF_YEAR));
             }
             
         };
-        JXFrame frame = wrapInFrame(monthView, "click unselectable fires ActionEvent");
+        final JXFrame frame = wrapInFrame(monthView, "click unselectable fires ActionEvent");
         addAction(frame, action);
+        Action toggleComponentOrientation = new AbstractAction("toggle orientation") {
+
+            public void actionPerformed(ActionEvent e) {
+                ComponentOrientation current = frame.getComponentOrientation();
+                if (current == ComponentOrientation.LEFT_TO_RIGHT) {
+                    frame.applyComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+                } else {
+                    frame.applyComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+
+                }
+                frame.getRootPane().revalidate();
+                frame.invalidate();
+                frame.validate();
+                frame.repaint();
+            }
+
+        };
+        addAction(frame, toggleComponentOrientation);
         frame.pack();
         frame.setVisible(true);
     }
 
+    /**
+     * Issue #736-swingx: monthView cannot cope with minimalDaysInFirstWeek.
+     * 
+     */
+    public void interactiveMinimalDaysInFirstWeekPicker() {
+        JXDatePicker picker = new JXDatePicker();
+        final JXMonthView monthView = picker.getMonthView();
+        monthView.setShowingWeekNumber(true);
+        monthView.setShowLeadingDates(true);
+        monthView.setShowTrailingDates(true);
+        Action action = new AbstractActionExt("toggle minimal") {
+
+            public void actionPerformed(ActionEvent e) {
+                int minimal = monthView.getSelectionModel().getMinimalDaysInFirstWeek();
+                monthView.getSelectionModel().setMinimalDaysInFirstWeek(minimal > 1 ? 1 : 4);
+            }
+            
+        };
+        final JXFrame frame = wrapInFrame(picker, "click unselectable fires ActionEvent");
+        addAction(frame, action);
+        Action toggleComponentOrientation = new AbstractAction("toggle orientation") {
+
+            public void actionPerformed(ActionEvent e) {
+                ComponentOrientation current = frame.getComponentOrientation();
+                if (current == ComponentOrientation.LEFT_TO_RIGHT) {
+                    frame.applyComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+                } else {
+                    frame.applyComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+
+                }
+                frame.getRootPane().revalidate();
+                frame.invalidate();
+                frame.validate();
+                frame.repaint();
+            }
+
+        };
+        addAction(frame, toggleComponentOrientation);
+        frame.pack();
+        frame.setVisible(true);
+    }
 
     
     /**
