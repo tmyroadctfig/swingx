@@ -147,28 +147,60 @@ public class BasicMonthViewUI extends MonthViewUI {
     // selected day box ... removed for simplification
 //    private Rectangle dirtyRect = new Rectangle();
     private Rectangle bounds = new Rectangle();
+    
+    /**
+     * Horizontal edge of the first column of displayed months. The edge is 
+     * left/right depending on componentOrientation isLeftToRight or not.
+     * 
+     * PENDING: JW - really want to adjust here? Need to check in usage
+     *   anyway.
+     */
     private int startX;
+    /**
+     * Top of first row of displayed months. 
+     */
     private int startY;
-    private int calendarWidth;
-    // height of month header of the view, that is the name and the arrows
-    // initially, it's the same as the day-box-height, adjusted to arrow icon height
-    // and arrow padding if traversable
+
+    /** 
+     * height of month header of the view, that is the name and the arrows.
+     * initially, it's the same as the day-box-height, adjusted to arrow icon height
+     * and arrow padding if traversable
+     * 
+     */
     private int monthBoxHeight;
-    // height of month header including the monthView's box padding
+    /** height of month header including the monthView's box padding. */
     private int fullMonthBoxHeight;
-    // raw dimension of a "day" box calculated from fontMetrics and "widest" content
-    // this is the same for days-of-the-week, weeks-of-the-year and days
+    /** 
+     * raw witdth of a "day" box calculated from fontMetrics and "widest" content.
+     *  this is the same for days-of-the-week, weeks-of-the-year and days
+     * 
+     */
     private int boxWidth;
+    /** 
+     * raw height of a "day" box calculated from fontMetrics and "widest" content.
+     *  this is the same for days-of-the-week, weeks-of-the-year and days
+     * 
+     */
     private int boxHeight;
-    // dimension of a "day" box including the monthView's box padding
+    /** 
+     * width of a "day" box including the monthView's box padding
+     * this is the same for days-of-the-week, weeks-of-the-year and days
+     */
     private int fullBoxWidth;
+    /** 
+     * height of a "day" box including the monthView's box padding
+     * this is the same for days-of-the-week, weeks-of-the-year and days
+     */
     private int fullBoxHeight;
-    // this is the same for days-of-the-week, weeks-of-the-year and days
+    /** the width of a single month display. */
+    private int calendarWidth;
+    /** the height of a single month display. */
     private int calendarHeight;
-    /** The number of calendars able to be displayed horizontally. */
-    private int numCalRows = 1;
-    /** The number of calendars able to be displayed vertically. */
-    private int numCalCols = 1;
+    /** The number of calendars displayed vertically. */
+    private int calendarRowCount = 1;
+    /** The number of calendars displayed horizontally. */
+    private int calendarColumnCount = 1;
+    
     private Rectangle[] monthStringBounds = new Rectangle[12];
     private Rectangle[] yearStringBounds = new Rectangle[12];
 
@@ -434,6 +466,22 @@ public class BasicMonthViewUI extends MonthViewUI {
     protected boolean isToday(Date date) {
         return date.equals(monthView.getToday());
     }
+    
+    
+    /**
+     * Return a the date at the specified x/y position.
+     * The date represents a day in the calendar's coordinate system. 
+     *
+     * @param x X position
+     * @param y Y position
+     * @return The date at the given location or null if the the position
+     *   doesn't contain a Day.
+     */ 
+    public Date getDayAtLocation(int x, int y) {
+        long result = getDayAt(x, y);
+        return result != -1 ? new Date(result) : null;
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -443,7 +491,7 @@ public class BasicMonthViewUI extends MonthViewUI {
             return -1;
         }
 
-        if (rowCol.x > numCalRows - 1 || rowCol.y > numCalCols - 1) {
+        if (rowCol.x > calendarRowCount - 1 || rowCol.y > calendarColumnCount - 1) {
             return -1;
         }
 
@@ -483,7 +531,7 @@ public class BasicMonthViewUI extends MonthViewUI {
         // date of our click.
         // The week index of the first day will always be 0.
         Calendar cal = getCalendar(getFirstDisplayedDate());
-        cal.add(Calendar.MONTH, rowCol.y + (rowCol.x * numCalCols));
+        cal.add(Calendar.MONTH, rowCol.y + (rowCol.x * calendarColumnCount));
 
         int firstDayViewIndex = getDayOfWeekViewIndex(cal.get(Calendar.DAY_OF_WEEK));
         int daysToAdd = (row * JXMonthView.DAYS_IN_WEEK) + (col - firstDayViewIndex);
@@ -591,7 +639,7 @@ public class BasicMonthViewUI extends MonthViewUI {
 
         // Make sure the row and column of calendars calculated is being
         // managed.
-        if (result.x > numCalRows - 1 || result.y > numCalCols -1) {
+        if (result.x > calendarRowCount - 1 || result.y > calendarColumnCount -1) {
             result = NO_SUCH_CALENDAR;
         }
 
@@ -606,15 +654,15 @@ public class BasicMonthViewUI extends MonthViewUI {
     private void calculateStartPosition() {
         // Calculate offset in x-axis for centering calendars.
         int width = monthView.getWidth();
-        startX = (width - ((calendarWidth * numCalCols) +
-                (CALENDAR_SPACING * (numCalCols - 1)))) / 2;
+        startX = (width - ((calendarWidth * calendarColumnCount) +
+                (CALENDAR_SPACING * (calendarColumnCount - 1)))) / 2;
         if (!isLeftToRight) {
             startX = width - startX;
         }
 
         // Calculate offset in y-axis for centering calendars.
-        startY = (monthView.getHeight() - ((calendarHeight * numCalRows) +
-                (CALENDAR_SPACING * (numCalRows - 1 )))) / 2;
+        startY = (monthView.getHeight() - ((calendarHeight * calendarRowCount) +
+                (CALENDAR_SPACING * (calendarRowCount - 1 )))) / 2;
     }
 
     /**
@@ -624,21 +672,21 @@ public class BasicMonthViewUI extends MonthViewUI {
      * 
      */
     private void calculateNumDisplayedCals() {
-        int oldNumCalCols = numCalCols;
-        int oldNumCalRows = numCalRows;
+        int oldNumCalCols = calendarColumnCount;
+        int oldNumCalRows = calendarRowCount;
 
         // Determine how many columns of calendars we want to paint.
-        numCalCols = 1;
-        numCalCols += (monthView.getWidth() - calendarWidth) /
+        calendarColumnCount = 1;
+        calendarColumnCount += (monthView.getWidth() - calendarWidth) /
                 (calendarWidth + CALENDAR_SPACING);
 
         // Determine how many rows of calendars we want to paint.
-        numCalRows = 1;
-        numCalRows += (monthView.getHeight() - calendarHeight) /
+        calendarRowCount = 1;
+        calendarRowCount += (monthView.getHeight() - calendarHeight) /
                 (calendarHeight + CALENDAR_SPACING);
 
-        if (oldNumCalCols != numCalCols ||
-                oldNumCalRows != numCalRows) {
+        if (oldNumCalCols != calendarColumnCount ||
+                oldNumCalRows != calendarRowCount) {
             updateLastDisplayedDate(getFirstDisplayedDate());
         }
     }
@@ -702,7 +750,7 @@ public class BasicMonthViewUI extends MonthViewUI {
         Calendar cal = getCalendar(getFirstDisplayedDate());
 
         // Center the calendars horizontally/vertically in the available space.
-        for (int row = 0; row < numCalRows; row++) {
+        for (int row = 0; row < calendarRowCount; row++) {
             // Check if this row falls in the clip region.
             bounds.x = 0;
             bounds.y = startY +
@@ -711,11 +759,11 @@ public class BasicMonthViewUI extends MonthViewUI {
             bounds.height = calendarHeight;
 
             if (!bounds.intersects(clip)) {
-                cal.add(Calendar.MONTH, numCalCols);
+                cal.add(Calendar.MONTH, calendarColumnCount);
                 continue;
             }
 
-            for (int column = 0; column < numCalCols; column++) {
+            for (int column = 0; column < calendarColumnCount; column++) {
                 // Check if the month to paint falls in the clip.
                 bounds.x = startX +
                         (isLeftToRight ?
@@ -727,13 +775,12 @@ public class BasicMonthViewUI extends MonthViewUI {
                 bounds.width = calendarWidth;
                 bounds.height = calendarHeight;
 
-                // Paint the month if it intersects the clip.  If we don't move
-                // the calendar forward a month as it would have if paintMonth
-                // was called.
                 if (bounds.intersects(clip)) {
                     paintMonth(g, bounds.x, bounds.y, bounds.width, bounds.height, cal);
                 }
-                    cal.add(Calendar.MONTH, 1);
+                // JW: clarified contract for all paint methods:
+                // called methods must not change the calendar, its the responsibility
+                cal.add(Calendar.MONTH, 1);
             }
         }
 
@@ -1546,7 +1593,7 @@ public class BasicMonthViewUI extends MonthViewUI {
      */
     private void updateLastDisplayedDate(long first) {
         Calendar cal = getCalendar(first);
-        cal.add(Calendar.MONTH, ((numCalCols * numCalRows) - 1));
+        cal.add(Calendar.MONTH, ((calendarColumnCount * calendarRowCount) - 1));
         CalendarUtils.endOfMonth(cal);
         lastDisplayedDate = cal.getTimeInMillis();
     }

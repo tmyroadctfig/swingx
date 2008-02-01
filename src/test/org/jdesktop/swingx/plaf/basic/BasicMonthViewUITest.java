@@ -21,15 +21,20 @@
  */
 package org.jdesktop.swingx.plaf.basic;
 
+import java.awt.Dimension;
+import java.awt.GraphicsEnvironment;
 import java.text.DateFormatSymbols;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 import java.util.logging.Logger;
 
 import javax.swing.UIManager;
 
 import org.jdesktop.swingx.InteractiveTestCase;
+import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXMonthView;
+import org.jdesktop.swingx.calendar.CalendarUtils;
 
 /**
  * Tests to expose known issues of BasicMonthViewUI.
@@ -54,16 +59,44 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
   }
 
     /**
+     * cleanup date representation as long: new api getDayAtLocation. will
+     * replace getDayAt which is deprecated as a first step.
+     */
+    @SuppressWarnings("deprecation")
+    public void testGetDayAtLocation() {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.info("cannot run test - headless environment");
+            return;
+        }
+        JXMonthView monthView = new JXMonthView();
+        monthView.getSelectionModel().setMinimalDaysInFirstWeek(1);
+        JXFrame frame = new JXFrame();
+        frame.add(monthView);
+        frame.pack();
+        Dimension pref = monthView.getPreferredSize();
+        pref.width = pref.width / 2;
+        pref.height = pref.height / 2;
+        long dayLong = monthView.getDayAt(pref.width, pref.height);
+        assertTrue(dayLong > 0);
+        Date date = monthView.getDayAtLocation(pref.width, pref.height);
+        assertNotNull(date);
+        Calendar cal = monthView.getCalendar();
+        cal.setTimeInMillis(dayLong);
+        assertTrue(CalendarUtils.isSameDay(cal, date));
+        assertEquals(new Date(dayLong), date);
+    }
+
+    
+    /**
      * Issue 711-swingx: today notify-only property.
-     * 
-     * the delegate makes an educated guess (until it gets notified next time)
-     * of today. 
+     * Changed to read-only in monthView
      */
     public void testTodayUpdate() {
         JXMonthView monthView = new JXMonthView(0);
-        long first = ((BasicMonthViewUI) monthView.getUI()).getTodayInMillis();
+        Date first = ((BasicMonthViewUI) monthView.getUI()).getToday();
         monthView.updateUI();
-        assertEquals(first, ((BasicMonthViewUI) monthView.getUI()).getTodayInMillis());
+        assertEquals(first, ((BasicMonthViewUI) monthView.getUI()).getToday());
     }
 
     /**

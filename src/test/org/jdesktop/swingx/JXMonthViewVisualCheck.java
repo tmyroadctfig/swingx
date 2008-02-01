@@ -65,9 +65,9 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
 //      setSystemLF(true);
       JXMonthViewVisualCheck  test = new JXMonthViewVisualCheck();
       try {
-          test.runInteractiveTests();
+//          test.runInteractiveTests();
 //        test.runInteractiveTests(".*TimeZone.*");
-//        test.runInteractiveTests(".*UpdateLocale.*");
+        test.runInteractiveTests(".*Minimal.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
@@ -115,6 +115,20 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
 
         };
         addAction(frame, toggleComponentOrientation);
+        JXStatusBar bar = getStatusBar(frame);
+        final JComboBox dayOfWeekComboBox = new JComboBox(new String[]{"Sunday", "Monday", "Tuesday",
+                "Wednesday", "Thursday", "Friday", "Saturday"});
+        dayOfWeekComboBox.addActionListener(new ActionListener() {
+
+            public void actionPerformed(ActionEvent e) {
+                int selected = dayOfWeekComboBox.getSelectedIndex();
+                monthView.setFirstDayOfWeek(selected + Calendar.SUNDAY);
+                
+            }
+            
+        });
+        dayOfWeekComboBox.setSelectedIndex(monthView.getFirstDayOfWeek() - Calendar.SUNDAY);
+        bar.add(dayOfWeekComboBox);
         frame.pack();
         frame.setVisible(true);
     }

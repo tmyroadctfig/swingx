@@ -96,7 +96,12 @@ public class JXMonthViewTest extends MockObjectTestCase {
         JComponent.setDefaultLocale(componentLocale);
     }
 
-    
+    /**
+     * 
+     */
+    public void testGetDayAtLocation() {
+        
+    }
     /**
      * Issue #733-swingx: model and monthView cal not synched.
      * 

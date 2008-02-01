@@ -24,6 +24,8 @@ package org.jdesktop.swingx;
 import java.awt.ComponentOrientation;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -34,6 +36,7 @@ import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.JComboBox;
 
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.calendar.CalendarUtils;
@@ -61,7 +64,7 @@ public class JXMonthViewIssues extends InteractiveTestCase {
 //          test.runInteractiveTests();
 //        test.runInteractiveTests("interactive.*Locale.*");
 //          test.runInteractiveTests("interactive.*AutoScroll.*");
-        test.runInteractiveTests("interactive.*Minimal.*");
+        test.runInteractiveTests("interactive.*Day.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
@@ -76,6 +79,103 @@ public class JXMonthViewIssues extends InteractiveTestCase {
     // the calendar to use, its date is initialized with the today-field in setUpCalendar
     protected Calendar calendar;
 
+    
+    /**
+     * Issue #736-swingx: monthView cannot cope with minimalDaysInFirstWeek.
+     * 
+     */
+    public void interactiveDayAt() {
+        final JXMonthView monthView = new JXMonthView();
+        monthView.setTraversable(true);
+        monthView.setShowingWeekNumber(true);
+        monthView.setShowLeadingDates(true);
+        monthView.setShowTrailingDates(true);
+        monthView.addMouseListener(new MouseAdapter() {
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                LOG.info("dayAt " + e.getPoint() + ": "
+                        + new Date(monthView.getDayAt(e.getX(), e.getY()))
+                        + "\n" + monthView.getDayAtLocation(e.getX(), e.getY())
+                                );
+            }
+            
+        });
+        Action action = new AbstractActionExt("toggle minimal") {
+
+            public void actionPerformed(ActionEvent e) {
+                int minimal = monthView.getSelectionModel().getMinimalDaysInFirstWeek();
+                monthView.getSelectionModel().setMinimalDaysInFirstWeek(minimal > 1 ? 1 : 4);
+            }
+            
+        };
+        final JXFrame frame = wrapInFrame(monthView, "click day");
+        addAction(frame, action);
+        frame.pack();
+        frame.setVisible(true);
+    }
+
+    /**
+     * Issue #736-swingx: monthView cannot cope with minimalDaysInFirstWeek.
+     * 
+     * Here: look at impact of forcing the minimalDays to a value different
+     * from the calendar. Days must be displayed in starting from the 
+     * first row under the days-of-week.
+     * 
+     * Not yet completely fixed: for very late firstDayOfWeek, the Jan is incompletely
+     * painted for mininalDays > 1. Rare enough to ignore for now?
+     */
+    public void interactiveMinimalDaysInFirstWeek() {
+        final JXMonthView monthView = new JXMonthView();
+        monthView.setTraversable(true);
+        monthView.setShowingWeekNumber(true);
+        monthView.setShowLeadingDates(true);
+        monthView.setShowTrailingDates(true);
+        Action action = new AbstractActionExt("toggle minimal") {
+
+            public void actionPerformed(ActionEvent e) {
+                int minimal = monthView.getSelectionModel().getMinimalDaysInFirstWeek();
+                monthView.getSelectionModel().setMinimalDaysInFirstWeek(minimal > 1 ? 1 : 4);
+            }
+            
+        };
+        final JXFrame frame = wrapInFrame(monthView, "click unselectable fires ActionEvent");
+        addAction(frame, action);
+        Action toggleComponentOrientation = new AbstractAction("toggle orientation") {
+
+            public void actionPerformed(ActionEvent e) {
+                ComponentOrientation current = frame.getComponentOrientation();
+                if (current == ComponentOrientation.LEFT_TO_RIGHT) {
+                    frame.applyComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+                } else {
+                    frame.applyComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+
+                }
+                frame.getRootPane().revalidate();
+                frame.invalidate();
+                frame.validate();
+                frame.repaint();
+            }
+
+        };
+        addAction(frame, toggleComponentOrientation);
+        JXStatusBar bar = getStatusBar(frame);
+        final JComboBox dayOfWeekComboBox = new JComboBox(new String[]{"Sunday", "Monday", "Tuesday",
+                "Wednesday", "Thursday", "Friday", "Saturday"});
+        dayOfWeekComboBox.addActionListener(new ActionListener() {
+
+            public void actionPerformed(ActionEvent e) {
+                int selected = dayOfWeekComboBox.getSelectedIndex();
+                monthView.setFirstDayOfWeek(selected + Calendar.SUNDAY);
+                
+            }
+            
+        });
+        dayOfWeekComboBox.setSelectedIndex(monthView.getFirstDayOfWeek() - Calendar.SUNDAY);
+        bar.add(dayOfWeekComboBox);
+        frame.pack();
+        frame.setVisible(true);
+    }
 
     
     /**
