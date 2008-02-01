@@ -47,7 +47,7 @@ public class DatePickerAddon extends AbstractComponentAddon {
         defaults.add("JXDatePicker.border",
                 new BorderUIResource(BorderFactory.createCompoundBorder(
                         LineBorder.createGrayLineBorder(),
-                        BorderFactory.createEmptyBorder(20, 3, 3, 3))));
+                        BorderFactory.createEmptyBorder(3, 3, 3, 3))));
         
         UIManagerExt.addResourceBundle(
                 "org.jdesktop.swingx.plaf.basic.resources.DatePicker");
