@@ -21,6 +21,7 @@
  */
 package org.jdesktop.swingx;
 
+import java.awt.ComponentOrientation;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -32,6 +33,7 @@ import java.util.Locale;
 import java.util.TimeZone;
 import java.util.logging.Logger;
 
+import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.JButton;
@@ -72,6 +74,81 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
       }
   }
 
+    /**
+     * Issue #736-swingx: monthView cannot cope with minimalDaysInFirstWeek.
+     * 
+     * Here: look at impact of forcing the minimalDays to a value different
+     * from the calendar. Days must be displayed in starting from the 
+     * first row under the days-of-week.
+     */
+    public void interactiveMinimalDaysInFirstWeek() {
+        final JXMonthView monthView = new JXMonthView();
+        monthView.setTraversable(true);
+        monthView.setShowingWeekNumber(true);
+        monthView.setShowLeadingDates(true);
+        monthView.setShowTrailingDates(true);
+        Action action = new AbstractActionExt("toggle minimal") {
+
+            public void actionPerformed(ActionEvent e) {
+                int minimal = monthView.getSelectionModel().getMinimalDaysInFirstWeek();
+                monthView.getSelectionModel().setMinimalDaysInFirstWeek(minimal > 1 ? 1 : 4);
+            }
+            
+        };
+        final JXFrame frame = wrapInFrame(monthView, "click unselectable fires ActionEvent");
+        addAction(frame, action);
+        Action toggleComponentOrientation = new AbstractAction("toggle orientation") {
+
+            public void actionPerformed(ActionEvent e) {
+                ComponentOrientation current = frame.getComponentOrientation();
+                if (current == ComponentOrientation.LEFT_TO_RIGHT) {
+                    frame.applyComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+                } else {
+                    frame.applyComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+
+                }
+                frame.getRootPane().revalidate();
+                frame.invalidate();
+                frame.validate();
+                frame.repaint();
+            }
+
+        };
+        addAction(frame, toggleComponentOrientation);
+        frame.pack();
+        frame.setVisible(true);
+    }
+
+    /**
+     * Issue #736-swingx: monthView cannot cope with minimalDaysInFirstWeek.
+     * 
+     * Here: look at impact of forcing the minimalDays to a value different
+     * from the calendar. Days must be displayed in starting from the 
+     * first row under the days-of-week. Selection must be reflected in the 
+     * datepicker.
+     */
+    public void interactiveMinimalDaysInFirstWeekPicker() {
+        JXDatePicker picker = new JXDatePicker();
+        final JXMonthView monthView = picker.getMonthView();
+        monthView.setShowingWeekNumber(true);
+        monthView.setShowLeadingDates(true);
+        monthView.setShowTrailingDates(true);
+        Action action = new AbstractActionExt("toggle minimal") {
+
+            public void actionPerformed(ActionEvent e) {
+                int minimal = monthView.getSelectionModel().getMinimalDaysInFirstWeek();
+                monthView.getSelectionModel().setMinimalDaysInFirstWeek(minimal > 1 ? 1 : 4);
+            }
+            
+        };
+        final JXFrame frame = wrapInFrame(picker, "click unselectable fires ActionEvent");
+        addAction(frame, action);
+        frame.pack();
+        frame.setVisible(true);
+    }
+
+
+    
     /**
      * Issue #711-swingx: fake properties.
      * 
