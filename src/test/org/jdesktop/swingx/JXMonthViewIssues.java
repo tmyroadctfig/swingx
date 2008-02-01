@@ -37,8 +37,6 @@ import javax.swing.Action;
 
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.calendar.CalendarUtils;
-import org.jdesktop.swingx.calendar.DateSelectionModel;
-import org.jdesktop.swingx.calendar.DaySelectionModel;
 import org.jdesktop.swingx.calendar.DateSelectionModel.SelectionMode;
 import org.jdesktop.swingx.event.DateSelectionEvent.EventType;
 import org.jdesktop.swingx.test.DateSelectionReport;
@@ -261,15 +259,16 @@ public class JXMonthViewIssues extends InteractiveTestCase {
     @SuppressWarnings("deprecation")
     public void testWeekInterval() {
         JXMonthView monthView = new JXMonthView();
-        CalendarUtils.endOfWeek(calendar);
-        calendar.add(Calendar.DAY_OF_MONTH, 1);
-        calendar.add(Calendar.HOUR_OF_DAY, - 3);
+        CalendarUtils.startOfWeek(calendar);
+        calendar.add(Calendar.WEEK_OF_YEAR, 3);
+//        calendar.add(Calendar.HOUR_OF_DAY, - 3);
         monthView.cleanupWeekSelectionDates(today, calendar.getTime());
-        calendar.setTime(monthView.modifiedEndDate);
-        LOG.info("start/end" + monthView.modifiedStartDate + "/" + monthView.modifiedEndDate);
-        assertTrue("interval last must be end of week", CalendarUtils.isEndOfWeek(calendar));
+        assertNotNull("not doing anything?", monthView.modifiedEndDate);
         calendar.setTime(monthView.modifiedStartDate);
+        LOG.info("start/end" + monthView.modifiedStartDate + "/" + monthView.modifiedEndDate);
         assertTrue("interval first must be start of week", CalendarUtils.isStartOfWeek(calendar));
+        calendar.setTime(monthView.modifiedEndDate);
+        assertTrue("interval last must be end of week", CalendarUtils.isEndOfWeek(calendar));
     }
     
     /**
@@ -303,39 +302,6 @@ public class JXMonthViewIssues extends InteractiveTestCase {
         assertTrue("interval first must be start of week", CalendarUtils.isStartOfWeek(calendar));
         LOG.info("start/end" + monthView.modifiedStartDate + "/" + monthView.modifiedEndDate);
     }
-    /**
-     * Issue #736-swingx: model and monthView cal not synched.
-     * 
-     * Here: test that model settings are respected in constructor - minimaldays.
-     */
-    @SuppressWarnings("unused")
-    public void testCalendarsContructorUnchangedMinimalDaysOfModel() {
-        DateSelectionModel model = new DaySelectionModel();
-        int first = model.getMinimalDaysInFirstWeek() + 1;
-        model.setMinimalDaysInFirstWeek(first);
-        JXMonthView monthView = new JXMonthView(new Date().getTime(), model);
-        assertEquals("model's calendar properties must be unchanged: minimalDays", 
-                first, model.getMinimalDaysInFirstWeek());
-    }
-
-    /**
-     * Issue #736-swingx: model and monthView cal not synched.
-     * 
-     * Here: test that model settings are respected in setModel - minimaldays.
-     * 
-     * Model must not reset minimalDaysInfirstWeek, but Locales with values
-     * > 1 confuse the BasicDatePickerUI - need to track down and solve there.
-     */
-    public void testCalendarsSetModelUnchangedMinimalDaysInFirstWeek() {
-        JXMonthView monthView = new JXMonthView();
-        DateSelectionModel model = new DaySelectionModel();
-        int first = model.getMinimalDaysInFirstWeek() + 1;
-        model.setMinimalDaysInFirstWeek(first);
-        monthView.setSelectionModel(model);
-        assertEquals("model minimals must not be changed", 
-                first, model.getMinimalDaysInFirstWeek());
-    }
-    
     /**
      * Issue #733-swingx: TimeZone in model and monthView not synched.
      *  

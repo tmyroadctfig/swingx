@@ -131,7 +131,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
         }
         DateSelectionModel model = new DaySelectionModel(locale);
         model.setTimeZone(tz);
-//        int modelMinimal = model.getMinimalDaysInFirstWeek();
+        int modelMinimal = model.getMinimalDaysInFirstWeek();
         monthView.setSelectionModel(model);
         assertEquals("timeZone must be updated from model", tz, monthView.getTimeZone());
         assertEquals("Locale must be updated from model", locale, monthView.getLocale());
@@ -145,10 +145,44 @@ public class JXMonthViewTest extends MockObjectTestCase {
         // @KEEP - this is an open issue: monthView must not change the
         // model settings but minimalDaysInFirstWeek > 1 confuse the 
         // BasicMonthViewUI - remove if passing in xIssues
-//        assertEquals("model minimals must not be changed", 
-//                modelMinimal, model.getMinimalDaysInFirstWeek());
+        assertEquals("model minimals must not be changed", 
+                modelMinimal, model.getMinimalDaysInFirstWeek());
+    }
+
+    /**
+     * Issue #736-swingx: model and monthView cal not synched.
+     * 
+     * Here: test that model settings are respected in constructor - minimaldays.
+     */
+    @SuppressWarnings("unused")
+    public void testCalendarsContructorUnchangedMinimalDaysOfModel() {
+        DateSelectionModel model = new DaySelectionModel();
+        int first = model.getMinimalDaysInFirstWeek() + 1;
+        model.setMinimalDaysInFirstWeek(first);
+        JXMonthView monthView = new JXMonthView(new Date().getTime(), model);
+        assertEquals("model's calendar properties must be unchanged: minimalDays", 
+                first, model.getMinimalDaysInFirstWeek());
+    }
+
+    /**
+     * Issue #736-swingx: model and monthView cal not synched.
+     * 
+     * Here: test that model settings are respected in setModel - minimaldays.
+     * 
+     * Model must not reset minimalDaysInfirstWeek, but Locales with values
+     * > 1 confuse the BasicDatePickerUI - need to track down and solve there.
+     */
+    public void testCalendarsSetModelUnchangedMinimalDaysInFirstWeek() {
+        JXMonthView monthView = new JXMonthView();
+        DateSelectionModel model = new DaySelectionModel();
+        int first = model.getMinimalDaysInFirstWeek() + 1;
+        model.setMinimalDaysInFirstWeek(first);
+        monthView.setSelectionModel(model);
+        assertEquals("model minimals must not be changed", 
+                first, model.getMinimalDaysInFirstWeek());
     }
     
+
     /**
      * Issue #733-swingx: model and monthView cal not synched.
      * 

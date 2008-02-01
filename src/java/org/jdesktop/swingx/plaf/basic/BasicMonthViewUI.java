@@ -143,7 +143,8 @@ public class BasicMonthViewUI extends MonthViewUI {
 
     private int arrowPaddingX = 3;
     private int arrowPaddingY = 3;
-    private Dimension dim = new Dimension();
+    // PENDING JW: use again? this was used as marker of the single
+    // selected day box ... removed for simplification
 //    private Rectangle dirtyRect = new Rectangle();
     private Rectangle bounds = new Rectangle();
     private int startX;
@@ -744,7 +745,9 @@ public class BasicMonthViewUI extends MonthViewUI {
 
     /**
      * Paints a month.  It is assumed the given calendar is already set to the
-     * first day of the month to be painted.
+     * first day of the month to be painted.<p>
+     * 
+     * Note: the given calendar must not be changed.
      *
      * @param g Graphics object.
      * @param x x location of month
@@ -808,9 +811,9 @@ public class BasicMonthViewUI extends MonthViewUI {
             }
         }
         g.setFont(oldFont);
-
-        // paint the column of week numbers
+        // new top is below monthBox and daysOfWeek header
         int yNew = y + fullMonthBoxHeight + fullBoxHeight;
+        // paint the column of week numbers
         paintWeeksOfYear(g, x, yNew, width, cal);
 
         int xOffset = 0;
@@ -1038,18 +1041,20 @@ public class BasicMonthViewUI extends MonthViewUI {
     }
 
     /**
-     * Paints the week of the year
+     * Paints the week of the year of the week of the year represented by the
+     * given calendar.
+     * <p>
+     * 
+     * Note: the given calendar must not be changed.
      *
      * @param g Graphics object
      * @param x x-coordinate of upper left corner.
      * @param y y-coordinate of upper left corner.
      * @param width width of bounding box
      * @param height height of bounding box
-     * @param weekOfYear week of the year
      */
     @SuppressWarnings({"UNUSED_SYMBOL", "UnusedDeclaration"})
     protected void paintWeekOfYearForeground(Graphics g, int x, int y, int width, int height, 
-//            int weekOfYear, 
             Calendar cal) {
         String str = Integer.toString(cal.get(Calendar.WEEK_OF_YEAR));
         FontMetrics fm;
@@ -1075,8 +1080,7 @@ public class BasicMonthViewUI extends MonthViewUI {
      * setMonthStringInsets.  The color of the background can be set via
      * setMonthStringBackground.
      *
-     * PENDING JW: pass in calendar for api symmetry? Or remove from paintXXForeground
-     * (could pass month/year instead)
+     * Note: the given calendar must not be changed.
      *
      * @param g Graphics object to paint to.
      * @param x x-coordinate of upper left corner.
@@ -1101,6 +1105,7 @@ public class BasicMonthViewUI extends MonthViewUI {
     }
 
     /**
+     * Note: the given calendar must not be changed.
      * 
      * @param g Graphics object to paint to.
      * @param x x-coordinate of upper left corner.
@@ -1147,7 +1152,11 @@ public class BasicMonthViewUI extends MonthViewUI {
     }
 
     /**
-     * Paints only text for month and year. No calculations made. Used by custom LAFs.
+     * Paints only text for month and year. No calculations made. Used by custom LAFs. 
+     * <p>
+     * 
+     * Note: the given calendar must not be changed.
+     * 
      * @param g Graphics to paint into.
      * @param monthName Name of the month.
      * @param monthX Month string x coordinate.
@@ -1164,6 +1173,10 @@ public class BasicMonthViewUI extends MonthViewUI {
 
     /**
      * Paint the background for the day specified by the given calendar.
+     * <p>
+     * 
+     * Note: the given calendar must not be changed.
+     * 
      *
      * @param g Graphics object to paint to
      * @param x x-coordinate of upper left corner
@@ -1193,6 +1206,9 @@ public class BasicMonthViewUI extends MonthViewUI {
 
     /**
      * Paint the foreground for the specified day.
+     * <p>
+     * 
+     * Note: the given calendar must not be changed.
      *
      * @param g Graphics object to paint to
      * @param x x-coordinate of upper left corner
@@ -1215,6 +1231,9 @@ public class BasicMonthViewUI extends MonthViewUI {
 
     /**
      * Paints string of the day. No calculations made. Used by LAFs.
+     * <p>
+     * 
+     * Note: the given calendar must not be changed.
      * @param g Graphics to paint on.
      * @param numericDay Text representation of the day.
      * @param x X coordinate of the upper <b>right</b> corner.
@@ -1228,6 +1247,9 @@ public class BasicMonthViewUI extends MonthViewUI {
     /**
      * Paint the background for the specified flagged day. The default implementation just calls
      * <code>paintDayBackground</code>.
+     * <p>
+     * 
+     * Note: the given calendar must not be changed.
      * 
      * @param g Graphics object to paint to
      * @param x x-coordinate of upper left corner
@@ -1242,6 +1264,9 @@ public class BasicMonthViewUI extends MonthViewUI {
 
     /**
      * Paint the foreground for the specified flagged day.
+     * <p>
+     * 
+     * Note: the given calendar must not be changed.
      *
      * @param g Graphics object to paint to
      * @param x x-coordinate of upper left corner
@@ -1274,6 +1299,9 @@ public class BasicMonthViewUI extends MonthViewUI {
 
     /**
      * Paint the foreground for the specified unselectable day.
+     * <p>
+     * 
+     * Note: the given calendar must not be changed.
      *
      * @param g Graphics object to paint to
      * @param x x-coordinate of upper left corner
@@ -1288,6 +1316,9 @@ public class BasicMonthViewUI extends MonthViewUI {
 
     /**
      * Paint the foreground for the specified unselectable day.
+     * <p>
+     * 
+     * Note: the given calendar must not be changed.
      *
      * @param g Graphics object to paint to
      * @param x x-coordinate of upper left corner
@@ -1319,6 +1350,9 @@ public class BasicMonthViewUI extends MonthViewUI {
 
     /**
      * Paint the background for the specified leading day.
+     * <p>
+     * 
+     * Note: the given calendar must not be changed.
      *
      * @param g Graphics object to paint to
      * @param x x-coordinate of upper left corner
@@ -1333,6 +1367,9 @@ public class BasicMonthViewUI extends MonthViewUI {
 
     /**
      * Paint the foreground for the specified leading day.
+     * <p>
+     * 
+     * Note: the given calendar must not be changed.
      *
      * @param g Graphics object to paint to
      * @param x x-coordinate of upper left corner
@@ -1362,6 +1399,9 @@ public class BasicMonthViewUI extends MonthViewUI {
 
     /**
      * Paint the background for the specified trailing day.
+     * <p>
+     * 
+     * Note: the given calendar must not be changed.
      *
      * @param g Graphics object to paint to
      * @param x x-coordinate of upper left corner
@@ -1376,6 +1416,9 @@ public class BasicMonthViewUI extends MonthViewUI {
 
     /**
      * Paint the foreground for the specified trailing day.
+     * <p>
+     * 
+     * Note: the given calendar must not be changed.
      *
      * @param g Graphics object to paint to
      * @param x x-coordinate of upper left corner
@@ -1736,13 +1779,18 @@ public class BasicMonthViewUI extends MonthViewUI {
 
         public void mouseMoved(MouseEvent e) {}
 
+//------------------------ layout
+        
+        
+        private Dimension preferredSize = new Dimension();
+
         public void addLayoutComponent(String name, Component comp) {}
 
         public void removeLayoutComponent(Component comp) {}
 
         public Dimension preferredLayoutSize(Container parent) {
             layoutContainer(parent);
-            return new Dimension(dim);
+            return new Dimension(preferredSize);
         }
 
         public Dimension minimumLayoutSize(Container parent) {
@@ -1831,9 +1879,9 @@ public class BasicMonthViewUI extends MonthViewUI {
             // Modify boxWidth if month string is longer
             int boxPaddingX = monthView.getBoxPaddingX();
             int boxPaddingY = monthView.getBoxPaddingY();
-            dim.width = (boxWidth + (2 * boxPaddingX)) * JXMonthView.DAYS_IN_WEEK;
-            if (dim.width < longestMonthWidth) {
-                double diff = longestMonthWidth - dim.width;
+            preferredSize.width = (boxWidth + (2 * boxPaddingX)) * JXMonthView.DAYS_IN_WEEK;
+            if (preferredSize.width < longestMonthWidth) {
+                double diff = longestMonthWidth - preferredSize.width;
                 if (monthView.isTraversable()) {
                     diff += monthDownImage.getIconWidth() +
                             monthUpImage.getIconWidth() + (arrowPaddingX * 4);
@@ -1857,17 +1905,17 @@ public class BasicMonthViewUI extends MonthViewUI {
 
             // Calculate minimum width/height for the component.
             int prefRows = monthView.getPreferredRows();
-            dim.height = (calendarHeight * prefRows) +
+            preferredSize.height = (calendarHeight * prefRows) +
                     (CALENDAR_SPACING * (prefRows - 1));
 
             int prefCols = monthView.getPreferredCols();
-            dim.width = (calendarWidth * prefCols) +
+            preferredSize.width = (calendarWidth * prefCols) +
                     (CALENDAR_SPACING * (prefCols - 1));
 
             // Add insets to the dimensions.
             Insets insets = monthView.getInsets();
-            dim.width += insets.left + insets.right;
-            dim.height += insets.top + insets.bottom;
+            preferredSize.width += insets.left + insets.right;
+            preferredSize.height += insets.top + insets.bottom;
            
             calculateNumDisplayedCals();
             calculateStartPosition();

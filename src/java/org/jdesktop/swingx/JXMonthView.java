@@ -500,8 +500,8 @@ public class JXMonthView extends JComponent {
         // without, we get the "days overlapping in header" issue
         // for locales with min > 1
         // Keep until Issue #736-swingx is fixed.
-        cal.setMinimalDaysInFirstWeek(1);
-        model.setMinimalDaysInFirstWeek(1);
+//        cal.setMinimalDaysInFirstWeek(1);
+//        model.setMinimalDaysInFirstWeek(1);
         anchor = (Calendar) cal.clone();
     }
 
