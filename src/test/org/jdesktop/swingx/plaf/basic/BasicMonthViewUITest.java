@@ -21,19 +21,31 @@
  */
 package org.jdesktop.swingx.plaf.basic;
 
+import java.awt.ComponentOrientation;
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.text.DateFormatSymbols;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.logging.Logger;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.JComboBox;
 import javax.swing.UIManager;
 
 import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXMonthView;
+import org.jdesktop.swingx.JXStatusBar;
+import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.calendar.CalendarUtils;
 
 /**
@@ -46,6 +58,9 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
     private static final Logger LOG = Logger
             .getLogger(BasicMonthViewUITest.class.getName());
 
+    // duplicate hard-coded monthViewUI values
+    private static final int CALENDAR_SPACING = 10;
+    
     public static void main(String[] args) {
 //      setSystemLF(true);
       BasicMonthViewUITest  test = new BasicMonthViewUITest();
@@ -57,6 +72,242 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
           e.printStackTrace();
       }
   }
+
+    /**
+     * Issue #736-swingx: monthView cannot cope with minimalDaysInFirstWeek.
+     * 
+     */
+    public void interactiveDayAt() {
+        final JXMonthView monthView = new JXMonthView();
+        monthView.setTraversable(true);
+        monthView.setShowingWeekNumber(true);
+        monthView.setShowLeadingDates(true);
+        monthView.setShowTrailingDates(true);
+        monthView.addMouseListener(new MouseAdapter() {
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                LOG.info("dayAt " + e.getPoint() + ": "
+                        + new Date(monthView.getDayAt(e.getX(), e.getY()))
+                        + "\n" + monthView.getDayAtLocation(e.getX(), e.getY())
+                                );
+                LOG.info("month at " + 
+                        ((BasicMonthViewUI) monthView.getUI()).getMonthAtLocation(e.getX(), e.getY()).getTime());
+                
+                LOG.info("month at " + 
+                        ((BasicMonthViewUI) monthView.getUI()).getMonthBoundsAtLocation(e.getX(), e.getY()));
+            }
+            
+        });
+        Action action = new AbstractActionExt("toggle minimal") {
+
+            public void actionPerformed(ActionEvent e) {
+                int minimal = monthView.getSelectionModel().getMinimalDaysInFirstWeek();
+                monthView.getSelectionModel().setMinimalDaysInFirstWeek(minimal > 1 ? 1 : 4);
+            }
+            
+        };
+        final JXFrame frame = wrapInFrame(monthView, "click day");
+        addAction(frame, action);
+        Action toggleComponentOrientation = new AbstractAction("toggle orientation") {
+
+            public void actionPerformed(ActionEvent e) {
+                ComponentOrientation current = frame.getComponentOrientation();
+                if (current == ComponentOrientation.LEFT_TO_RIGHT) {
+                    frame.applyComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+                } else {
+                    frame.applyComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+
+                }
+                frame.getRootPane().revalidate();
+                frame.invalidate();
+                frame.validate();
+                frame.repaint();
+            }
+
+        };
+        addAction(frame, toggleComponentOrientation);
+        frame.pack();
+        frame.setVisible(true);
+    }
+
+    /**
+     * Issue #736-swingx: monthView cannot cope with minimalDaysInFirstWeek.
+     * 
+     * Here: look at impact of forcing the minimalDays to a value different
+     * from the calendar. Days must be displayed in starting from the 
+     * first row under the days-of-week.
+     * 
+     * Not yet completely fixed: for very late firstDayOfWeek, the Jan is incompletely
+     * painted for mininalDays > 1. Rare enough to ignore for now?
+     */
+    public void interactiveMinimalDaysInFirstWeek() {
+        final JXMonthView monthView = new JXMonthView();
+        monthView.setTraversable(true);
+        monthView.setShowingWeekNumber(true);
+        monthView.setShowLeadingDates(true);
+        monthView.setShowTrailingDates(true);
+        Action action = new AbstractActionExt("toggle minimal") {
+
+            public void actionPerformed(ActionEvent e) {
+                int minimal = monthView.getSelectionModel().getMinimalDaysInFirstWeek();
+                monthView.getSelectionModel().setMinimalDaysInFirstWeek(minimal > 1 ? 1 : 4);
+            }
+            
+        };
+        final JXFrame frame = wrapInFrame(monthView, "click unselectable fires ActionEvent");
+        addAction(frame, action);
+        Action toggleComponentOrientation = new AbstractAction("toggle orientation") {
+
+            public void actionPerformed(ActionEvent e) {
+                ComponentOrientation current = frame.getComponentOrientation();
+                if (current == ComponentOrientation.LEFT_TO_RIGHT) {
+                    frame.applyComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+                } else {
+                    frame.applyComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+
+                }
+                frame.getRootPane().revalidate();
+                frame.invalidate();
+                frame.validate();
+                frame.repaint();
+            }
+
+        };
+        addAction(frame, toggleComponentOrientation);
+        JXStatusBar bar = getStatusBar(frame);
+        final JComboBox dayOfWeekComboBox = new JComboBox(new String[]{"Sunday", "Monday", "Tuesday",
+                "Wednesday", "Thursday", "Friday", "Saturday"});
+        dayOfWeekComboBox.addActionListener(new ActionListener() {
+
+            public void actionPerformed(ActionEvent e) {
+                int selected = dayOfWeekComboBox.getSelectedIndex();
+                monthView.setFirstDayOfWeek(selected + Calendar.SUNDAY);
+                
+            }
+            
+        });
+        dayOfWeekComboBox.setSelectedIndex(monthView.getFirstDayOfWeek() - Calendar.SUNDAY);
+        bar.add(dayOfWeekComboBox);
+        frame.pack();
+        frame.setVisible(true);
+    }
+
+//------------------------------
+ 
+    /**
+     * coordinate mapping: get calendar from logical grid 
+     *   coordinates.
+     */
+    public void testMonthDateFromGridPosition() {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.info("cannot run test - headless environment");
+            return;
+        }
+        JXMonthView monthView = new JXMonthView();
+        monthView.setPreferredCols(monthView.getPreferredCols() * 2);
+        JXFrame frame = new JXFrame();
+        frame.add(monthView);
+        frame.pack();
+        BasicMonthViewUI ui = (BasicMonthViewUI) monthView.getUI();
+        Calendar month = ui.getMonth(0, 0);
+        Calendar first = monthView.getCalendar();
+        assertEquals(first.get(Calendar.MONTH), month.get(Calendar.MONTH));
+        // PENDING JW: assumption that we start with LToR is wrong!
+        frame.applyComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+        frame.pack();
+        Calendar monthRL = ui.getMonth(0, 0);
+        assertEquals("logical coordinates must be independent of orientation",
+                first.get(Calendar.MONTH), monthRL.get(Calendar.MONTH));
+    }
+
+    /**
+     * coordinate mapping: logical grid coordinates.
+     */
+    public void testMonthGridPosition() {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.info("cannot run test - headless environment");
+            return;
+        }
+        JXMonthView monthView = new JXMonthView();
+        monthView.setPreferredCols(monthView.getPreferredCols() * 2);
+        JXFrame frame = new JXFrame();
+        frame.add(monthView);
+        frame.pack();
+        BasicMonthViewUI ui = (BasicMonthViewUI) monthView.getUI();
+        Point gridPosition = ui.getMonthGridPositionAtLocation(20, 20);
+        assertEquals(0, gridPosition.x);
+        frame.applyComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+        Point gridPositionRL = ui.getMonthGridPositionAtLocation(20, 20);
+        assertEquals(1, gridPositionRL.x);
+    }
+    
+    
+    /**
+     * coordinate mapping: monthBounds in pixel
+     */
+    public void testMonthBounds() {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.info("cannot run test - headless environment");
+            return;
+        }
+        JXMonthView monthView = new JXMonthView();
+        JXFrame frame = new JXFrame();
+        frame.add(monthView);
+        frame.pack();
+        Dimension prefSize = monthView.getPreferredSize();
+        BasicMonthViewUI ui = (BasicMonthViewUI) monthView.getUI();
+        Rectangle monthBounds = ui.getMonthBoundsAtLocation(20, 20);
+        Rectangle bounds = new Rectangle(0, 0, 
+                prefSize.width, prefSize.height);
+        assertEquals(bounds, monthBounds);
+        monthView.setPreferredCols(monthView.getPreferredCols() * 2);
+        frame.pack();
+        Dimension prefSizeTwo = monthView.getPreferredSize();
+        Rectangle monthBoundsTwo = ui.getMonthBoundsAtLocation(
+                monthBounds.width + 20, 20);
+        Rectangle boundsTwo = new Rectangle(
+                monthBounds.width + CALENDAR_SPACING, 0, 
+                prefSize.width, prefSize.height);
+        assertEquals(boundsTwo, monthBoundsTwo);
+        
+    }
+
+    /**
+     * coordinate mapping: monthBounds in pixel.
+     * 
+     * ComponentOrientation has no effect on pure pixel bounds.
+     */
+    public void testMonthBoundsRToL() {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.info("cannot run test - headless environment");
+            return;
+        }
+        JXMonthView monthView = new JXMonthView();
+        JXFrame frame = new JXFrame();
+        frame.add(monthView);
+        frame.applyComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+        frame.pack();
+        Dimension prefSize = monthView.getPreferredSize();
+        BasicMonthViewUI ui = (BasicMonthViewUI) monthView.getUI();
+        Rectangle monthBounds = ui.getMonthBoundsAtLocation(20, 20);
+        Rectangle bounds = new Rectangle(0, 0, prefSize.width, prefSize.height);
+        // Calendar spacing not included if single month
+        assertEquals(bounds, monthBounds);
+        monthView.setPreferredCols(monthView.getPreferredCols() * 2);
+        frame.pack();
+        Dimension prefSizeTwo = monthView.getPreferredSize();
+        Rectangle monthBoundsTwo = ui.getMonthBoundsAtLocation(monthBounds.width + 20, 20);
+        Rectangle boundsTwo = new Rectangle(monthBounds.width + CALENDAR_SPACING, 0, 
+                prefSize.width, prefSize.height);
+        // Calendar spacing not included if single month
+        assertEquals(boundsTwo, monthBoundsTwo);
+        
+    }
 
     /**
      * cleanup date representation as long: new api getDayAtLocation. will

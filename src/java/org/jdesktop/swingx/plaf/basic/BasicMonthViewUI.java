@@ -201,8 +201,11 @@ public class BasicMonthViewUI extends MonthViewUI {
     /** The number of calendars displayed horizontally. */
     private int calendarColumnCount = 1;
     
+    private Rectangle calendarGrid = new Rectangle();
     private Rectangle[] monthStringBounds = new Rectangle[12];
     private Rectangle[] yearStringBounds = new Rectangle[12];
+    private int fullCalendarHeight;
+    private int fullCalendarWidth;
 
 
     @SuppressWarnings({"UnusedDeclaration"})
@@ -468,85 +471,6 @@ public class BasicMonthViewUI extends MonthViewUI {
     }
     
     
-    /**
-     * Return a the date at the specified x/y position.
-     * The date represents a day in the calendar's coordinate system. 
-     *
-     * @param x X position
-     * @param y Y position
-     * @return The date at the given location or null if the the position
-     *   doesn't contain a Day.
-     */ 
-    public Date getDayAtLocation(int x, int y) {
-        long result = getDayAt(x, y);
-        return result != -1 ? new Date(result) : null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public long getDayAt(int x, int y) {
-        Point rowCol = getCalRowColAt(x, y);
-        if (NO_SUCH_CALENDAR.equals(rowCol)) {
-            return -1;
-        }
-
-        if (rowCol.x > calendarRowCount - 1 || rowCol.y > calendarColumnCount - 1) {
-            return -1;
-        }
-
-        // Determine what row (week) in the selected month we're in.
-        int row = 1;
-        int boxPaddingX = monthView.getBoxPaddingX();
-        int boxPaddingY = monthView.getBoxPaddingY();
-        row += (((y - startY) -
-                (rowCol.x * (calendarHeight + CALENDAR_SPACING))) -
-                (boxPaddingY + monthBoxHeight + boxPaddingY)) /
-                (boxPaddingY + boxHeight + boxPaddingY);
-        // The first two lines in the calendar are the month and the days
-        // of the week.  Ignore them.
-        row -= 2;
-
-        if (row < 0 || row > 5) {
-            return -1;
-        }
-
-        // Determine which column in the selected month we're in.
-        int col = ((isLeftToRight ? (x - startX) : (startX - x)) -
-                (rowCol.y * (calendarWidth + CALENDAR_SPACING))) /
-                (boxPaddingX + boxWidth + boxPaddingX);
-
-        // If we're showing week numbers we need to reduce the selected
-        // col index by one.
-        if (monthView.isShowingWeekNumber()) {
-            col--;
-        }
-
-        // Make sure the selected column matches up with a day of the week.
-        if (col < 0 || col > JXMonthView.DAYS_IN_WEEK - 1) {
-            return -1;
-        }
-
-        // Use the first day of the month as a key point for determining the
-        // date of our click.
-        // The week index of the first day will always be 0.
-        Calendar cal = getCalendar(getFirstDisplayedDate());
-        cal.add(Calendar.MONTH, rowCol.y + (rowCol.x * calendarColumnCount));
-
-        int firstDayViewIndex = getDayOfWeekViewIndex(cal.get(Calendar.DAY_OF_WEEK));
-        int daysToAdd = (row * JXMonthView.DAYS_IN_WEEK) + (col - firstDayViewIndex);
-        if (daysToAdd < 0 || daysToAdd >
-                (cal.getActualMaximum(Calendar.DAY_OF_MONTH) - 1)) {
-            return -1;
-        }
-
-        cal.add(Calendar.DAY_OF_MONTH, daysToAdd);
-
-        long selected = cal.getTimeInMillis();
-
-        return selected;
-    }
-
 
     /**
      * Convenience method so subclasses can get the currently painted day's day of the
@@ -646,7 +570,303 @@ public class BasicMonthViewUI extends MonthViewUI {
         return result;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public long getDayAt(int x, int y) {
+        Point rowCol = getCalRowColAt(x, y);
+        if (NO_SUCH_CALENDAR.equals(rowCol)) {
+            return -1;
+        }
 
+        if (rowCol.x > calendarRowCount - 1 || rowCol.y > calendarColumnCount - 1) {
+            return -1;
+        }
+
+        // Determine what row (week) in the selected month we're in.
+        int row = 1;
+        int boxPaddingX = monthView.getBoxPaddingX();
+        int boxPaddingY = monthView.getBoxPaddingY();
+        row += (((y - startY) -
+                (rowCol.x * (calendarHeight + CALENDAR_SPACING))) -
+                (boxPaddingY + monthBoxHeight + boxPaddingY)) /
+                (boxPaddingY + boxHeight + boxPaddingY);
+        // The first two lines in the calendar are the month and the days
+        // of the week.  Ignore them.
+        row -= 2;
+
+        if (row < 0 || row > 5) {
+            return -1;
+        }
+
+        // Determine which column in the selected month we're in.
+        int col = ((isLeftToRight ? (x - startX) : (startX - x)) -
+                (rowCol.y * (calendarWidth + CALENDAR_SPACING))) /
+                (boxPaddingX + boxWidth + boxPaddingX);
+
+        // If we're showing week numbers we need to reduce the selected
+        // col index by one.
+        if (monthView.isShowingWeekNumber()) {
+            col--;
+        }
+
+        // Make sure the selected column matches up with a day of the week.
+        if (col < 0 || col > JXMonthView.DAYS_IN_WEEK - 1) {
+            return -1;
+        }
+
+        // Use the first day of the month as a key point for determining the
+        // date of our click.
+        // The week index of the first day will always be 0.
+        Calendar cal = getCalendar(getFirstDisplayedDate());
+        cal.add(Calendar.MONTH, rowCol.y + (rowCol.x * calendarColumnCount));
+
+        int firstDayViewIndex = getDayOfWeekViewIndex(cal.get(Calendar.DAY_OF_WEEK));
+        int daysToAdd = (row * JXMonthView.DAYS_IN_WEEK) + (col - firstDayViewIndex);
+        if (daysToAdd < 0 || daysToAdd >
+                (cal.getActualMaximum(Calendar.DAY_OF_MONTH) - 1)) {
+            return -1;
+        }
+
+        cal.add(Calendar.DAY_OF_MONTH, daysToAdd);
+
+        long selected = cal.getTimeInMillis();
+
+        return selected;
+    }
+
+
+//--------------------- mapping day coordinates
+
+
+//----------------------- mapping day coordinates
+
+    /**
+     * Mapping pixel to bounds.
+     * 
+     * @param x the x position of the location in pixel
+     * @param y the y position of the location in pixel
+     * @return the bounds of the month which contains the location, 
+     *   or null if outside
+     */
+    protected Rectangle getDayBoundsAtLocation(int x, int y) {
+        Rectangle days = getDaysBoundsAtLocation(x, y);
+        if (!days.contains(x, y)) return null;
+        int calendarRow = (y - days.y) / fullBoxHeight;
+        int calendarColumn = (x - days.x) / fullBoxWidth;
+        return new Rectangle( 
+                calendarColumn * fullBoxWidth,
+                calendarRow * fullBoxWidth,
+                fullBoxWidth, fullBoxHeight);
+    }
+    
+    /**
+     * 
+     * Maps the given pixel location into coordinates
+     * of a day in the grid of days. The x represents the 
+     * column of the day, a -1 is the header column if the 
+     * isShowingWeekDays. The y represents the row index
+     * of the day, a -1 is the header row.
+     * 
+     * Mapping pixel to logical grid coordinates.
+     * 
+     * @param x the x coordinate of the location to map 
+     * @param y the y coordintate of the location to map
+     * @return a point with x = day column index in grid, 
+     *    y = day row index in grid. Or null if outside 
+     */
+    protected Point getDayGridPositionAtLocation(int x, int y) {
+        Rectangle days = getDaysBoundsAtLocation(x, y);
+        if (!days.contains(x, y)) return null;
+        int calendarRow = (y - days.y) / fullBoxHeight;
+        int calendarColumn = (x - days.x) / fullBoxWidth;
+        if (!isLeftToRight) {
+            int start = days.x + days.width;
+            calendarColumn = (start - x) / fullBoxWidth;
+        }
+        if (monthView.isShowingWeekNumber()) {
+            calendarColumn -= 1;
+        }
+        return new Point(calendarColumn, calendarRow - 1);
+    }
+
+
+    /**
+     * Return a the date at the specified x/y position.
+     * The date represents a day in the calendar's coordinate system. 
+     *
+     * @param x X position
+     * @param y Y position
+     * @return The date at the given location or null if the the position
+     *   doesn't contain a Day.
+     */ 
+    public Date getDayAtLocation(int x, int y) {
+        long result = getDayAt(x, y);
+        return result != -1 ? new Date(result) : null;
+    }
+    
+    /**
+     * Returns the upper left corner of the days's rectangle which
+     * contains the given location in pixel or null if not in any days
+     * rect
+     * 
+     * @param x
+     * @param y
+     * @return the bounds of the details grid in the month at
+     *   location or null if outside.
+     */
+    private Rectangle getDaysBoundsAtLocation(int x, int y) {
+        Rectangle month = getMonthBoundsAtLocation(x, y);
+        if (month == null) return null;
+        int startOfDaysY = month.y + fullMonthBoxHeight + fullBoxHeight;
+        if (y < startOfDaysY) return null;
+        month.y = startOfDaysY;
+        month.height = month.height - startOfDaysY;
+        return month;
+    }
+
+    
+// ---------------------- mapping month coordinates    
+
+    /**
+     * Mapping pixel to bounds.
+     * 
+     * @param x the x position of the location in pixel
+     * @param y the y position of the location in pixel
+     * @return the bounds of the month which contains the location, 
+     *   or null if outside
+     */
+    protected Rectangle getMonthBoundsAtLocation(int x, int y) {
+        if (!calendarGrid.contains(x, y)) return null;
+        int calendarRow = (y - calendarGrid.y) / fullCalendarHeight;
+        int calendarColumn = (x - calendarGrid.x) / fullCalendarWidth;
+        return new Rectangle( 
+                calendarColumn * fullCalendarWidth,
+                calendarRow * fullCalendarHeight,
+                calendarWidth, calendarHeight);
+    }
+    
+    
+    /**
+     * 
+     * Maps the given pixel location into coordinates
+     * of a month in the grid of months.
+     * 
+     * Mapping pixel to logical grid coordinates.
+     * 
+     * @param x the x coordinate of the location to map 
+     * @param y the y coordintate of the location to map
+     * @return a point with x = month column index in grid, 
+     *    y = month row index in grid. Or null if outside 
+     */
+    protected Point getMonthGridPositionAtLocation(int x, int y) {
+        if (!calendarGrid.contains(x, y)) return null;
+        int calendarRow = (y - calendarGrid.y) / fullCalendarHeight;
+        int calendarColumn = (x - calendarGrid.x) / fullCalendarWidth;
+        if (!isLeftToRight) {
+            int start = calendarGrid.x + calendarGrid.width;
+            calendarColumn = (start - x) / fullCalendarWidth;
+              
+        }
+        return new Point(calendarColumn, calendarRow);
+    }
+
+    /**
+     * Returns a Calendar representing the month which contains
+     * the given pixel location. <p>
+     * 
+     * Mapping: pixel to Calendar.
+     * 
+     * @param x
+     * @param y
+     * @return a calendar representing the month which contains the 
+     *   given location. 
+     */
+    protected Calendar getMonthAtLocation(int x, int y) {
+        Point month = getMonthGridPositionAtLocation(x, y);
+        if (month ==  null) return null;
+        Calendar calendar = getCalendar(getFirstDisplayedDate());
+        calendar.add(Calendar.MONTH, 
+                month.y * calendarColumnCount + month.x);
+        return getMonth(month.y, month.x);
+    }
+    
+    /**
+     * Returns a Calendar representing the month at the given 
+     * row/column position in the grid of months. <p>
+     * 
+     * Mapping logical grid coordinates to Calendar.
+     * 
+     * @param row the rowIndex in the grid
+     * @param column the columnIndex in the grid
+     * @return a calendar representing the month at the given
+     *   grid position.
+     */
+    protected Calendar getMonth(int row, int column) {
+        Calendar calendar = getCalendar(getFirstDisplayedDate());
+        calendar.add(Calendar.MONTH, 
+                row * calendarColumnCount + column);
+        return calendar;
+        
+    }
+    
+    /**
+     * Returns the bounds of the month at the given 
+     * row/column position in the grid of months. <p>
+     * 
+     * Mapping logical grid coordinates to Calendar.
+     * 
+     * @param row the month rowIndex in the grid
+     * @param column the month columnIndex in the grid
+     * @return the bounds of the month which at the grid position.
+     */
+    protected Rectangle getMonthBounds(int row, int column) {
+        // TODO 
+        throw new UnsupportedOperationException("TODO: implement mapping " +
+        		"logical month grid to bounds");
+    }
+
+    
+    /**
+     * Returns the bounds of the month at the given 
+     * Calendar. <p>
+     * 
+     * Mapping Calendar to bounds.
+     * 
+     * @param calendar
+     * @param column the month columnIndex in the grid
+     * @return the bounds of the month represented by the given 
+     *    calendar. 
+     */
+    protected Rectangle getMonthBounds(Calendar calendar) {
+        // TODO 
+        throw new UnsupportedOperationException("TODO: implement mapping " +
+                        "logical month grid to bounds");
+    }
+
+    /**
+     * Returns the bounds of the month at the given 
+     * Calendar. <p>
+     * 
+     * Mapping Calendar to logical grid coordinates.
+     * 
+     * @param calendar the Calendar to map.
+     * @return The logical grid position of the month represented 
+     *  by the calendar or null if outside. 
+     */
+    protected Point getMonthGridPosition(Calendar calendar) {
+        // TODO 
+        throw new UnsupportedOperationException("TODO: implement mapping " +
+                        "logical month grid to bounds");
+    }
+    /**
+     * Called from layout: calculates properties
+     * of grid of months.
+     */
+    private void calculateCalendarLayoutProperties() {
+        calculateNumDisplayedCals();
+        calculateStartPosition();
+    }
     /**
      * Calculates the startX/startY position for centering the calendars
      * within the available space.
@@ -654,15 +874,35 @@ public class BasicMonthViewUI extends MonthViewUI {
     private void calculateStartPosition() {
         // Calculate offset in x-axis for centering calendars.
         int width = monthView.getWidth();
-        startX = (width - ((calendarWidth * calendarColumnCount) +
-                (CALENDAR_SPACING * (calendarColumnCount - 1)))) / 2;
+        startX = (width - calculateCalendarGridWidth()) / 2;
         if (!isLeftToRight) {
             startX = width - startX;
         }
 
         // Calculate offset in y-axis for centering calendars.
-        startY = (monthView.getHeight() - ((calendarHeight * calendarRowCount) +
-                (CALENDAR_SPACING * (calendarRowCount - 1 )))) / 2;
+        startY = calculateCalendarGridY();
+        calendarGrid.setBounds(calculateCalendarGridX(), 
+                calculateCalendarGridY(), 
+                calculateCalendarGridWidth(), 
+                calculateCalendarGridHeight());
+    }
+
+    private int calculateCalendarGridY() {
+        return (monthView.getHeight() - calculateCalendarGridHeight()) / 2;
+    }
+
+    private int calculateCalendarGridX() {
+        return (monthView.getWidth() - calculateCalendarGridWidth()) / 2; 
+    }
+    
+    private int calculateCalendarGridHeight() {
+        return ((calendarHeight * calendarRowCount) +
+                (CALENDAR_SPACING * (calendarRowCount - 1 )));
+    }
+
+    private int calculateCalendarGridWidth() {
+        return ((calendarWidth * calendarColumnCount) +
+                (CALENDAR_SPACING * (calendarColumnCount - 1)));
     }
 
     /**
@@ -1947,9 +2187,10 @@ public class BasicMonthViewUI extends MonthViewUI {
             if (showingWeekNumber) {
                 calendarWidth += fullBoxWidth;
             }
-
+            fullCalendarWidth = calendarWidth + CALENDAR_SPACING;
+            
             calendarHeight = (fullBoxHeight * 7) + fullMonthBoxHeight;
-
+            fullCalendarHeight = calendarHeight + CALENDAR_SPACING;
             // Calculate minimum width/height for the component.
             int prefRows = monthView.getPreferredRows();
             preferredSize.height = (calendarHeight * prefRows) +
@@ -1964,8 +2205,7 @@ public class BasicMonthViewUI extends MonthViewUI {
             preferredSize.width += insets.left + insets.right;
             preferredSize.height += insets.top + insets.bottom;
            
-            calculateNumDisplayedCals();
-            calculateStartPosition();
+            calculateCalendarLayoutProperties();
 
         }
 
@@ -1987,7 +2227,8 @@ public class BasicMonthViewUI extends MonthViewUI {
                 setFirstDisplayedDate(((Long) evt.getNewValue()));
             } else if (JXMonthView.BOX_PADDING_X.equals(property) || JXMonthView.BOX_PADDING_Y.equals(property) ||
                     JXMonthView.TRAVERSABLE.equals(property) || JXMonthView.DAYS_OF_THE_WEEK.equals(property) ||
-                    "border".equals(property) || JXMonthView.WEEK_NUMBER.equals(property)) {
+                    "border".equals(property) || JXMonthView.WEEK_NUMBER.equals(property))
+                    {
                 monthView.revalidate();
             } else if ("font".equals(property)) {
                 derivedFont = createDerivedFont();
