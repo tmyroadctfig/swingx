@@ -1,5 +1,6 @@
 package org.jdesktop.swingx.plaf;
 
+import java.util.Calendar;
 import java.util.Date;
 
 import javax.swing.plaf.ComponentUI;
@@ -28,7 +29,7 @@ public abstract class MonthViewUI extends ComponentUI {
      * @return The date at the given location or null if the the position
      *   doesn't contain a Day.
      */ 
-    public abstract Date getDayAtLocation(int x, int y);
+    public abstract Calendar getDayAtLocation(int x, int y);
 
     /**
      * Calculate the last possible date that can be displayed.

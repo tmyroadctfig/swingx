@@ -1738,7 +1738,7 @@ public class JXMonthView extends JComponent {
      * @return The date at the given location or null if the the position
      *   doesn't contain a Day.
      */ 
-    public Date getDayAtLocation(int x, int y) {
+    public Calendar getDayAtLocation(int x, int y) {
         return getUI().getDayAtLocation(x, y);
     }
     /**

@@ -651,7 +651,7 @@ public class BasicMonthViewUI extends MonthViewUI {
      */
     protected Rectangle getDayBoundsAtLocation(int x, int y) {
         Rectangle days = getDaysBoundsAtLocation(x, y);
-        if (!days.contains(x, y)) return null;
+        if ((days == null) ||(!days.contains(x, y))) return null;
         int calendarRow = (y - days.y) / fullBoxHeight;
         int calendarColumn = (x - days.x) / fullBoxWidth;
         return new Rectangle( 
@@ -677,7 +677,7 @@ public class BasicMonthViewUI extends MonthViewUI {
      */
     protected Point getDayGridPositionAtLocation(int x, int y) {
         Rectangle days = getDaysBoundsAtLocation(x, y);
-        if (!days.contains(x, y)) return null;
+        if ((days == null) ||(!days.contains(x, y))) return null;
         int calendarRow = (y - days.y) / fullBoxHeight;
         int calendarColumn = (x - days.x) / fullBoxWidth;
         if (!isLeftToRight) {
@@ -690,21 +690,44 @@ public class BasicMonthViewUI extends MonthViewUI {
         return new Point(calendarColumn, calendarRow - 1);
     }
 
-
     /**
-     * Return a the date at the specified x/y position.
-     * The date represents a day in the calendar's coordinate system. 
+     * Return a the day at the specified x/y position.
+     * 
+     * Mapping pixel to calendar day.
      *
      * @param x X position
      * @param y Y position
-     * @return The date at the given location or null if the the position
-     *   doesn't contain a Day.
+     * @return the day at the given location or null if the position
+     *   doesn't map to a day
      */ 
-    public Date getDayAtLocation(int x, int y) {
-        long result = getDayAt(x, y);
-        return result != -1 ? new Date(result) : null;
+    public Calendar getDayAtLocation(int x, int y) {
+        Point dayInGrid = getDayGridPositionAtLocation(x, y);
+        if ((dayInGrid == null) || (dayInGrid.x < 0) || (dayInGrid.y < 0)) return null;
+        Calendar month = getMonthAtLocation(x, y);
+        CalendarUtils.startOfWeek(month);
+        month.add(Calendar.DAY_OF_YEAR, 
+                dayInGrid.y * JXMonthView.DAYS_IN_WEEK + dayInGrid.x);
+        return month;
     }
     
+    /**
+     * NOTE: the month must not be changed.
+     * @param month a calendar representing the first day of the month, must not
+     *   be null.
+     * @param row the logical row index in the day grid of the month
+     * @param column the logical column index in the day grid of the month
+     * @return a Calendar representing the day at the logical grid coordinates,
+     *    must not b.
+     */
+    protected Calendar getDayInMonth(Calendar month, int row, int column) {
+        if (!CalendarUtils.isStartOfMonth(month))
+            throw new IllegalStateException("calendar must be start of month but was: " + month.getTime());
+        Calendar clone = (Calendar) month.clone();
+        CalendarUtils.startOfWeek(clone);
+        clone.add(Calendar.DAY_OF_YEAR, row * JXMonthView.DAYS_IN_WEEK + column);
+        return clone;
+        
+    }
     /**
      * Returns the upper left corner of the days's rectangle which
      * contains the given location in pixel or null if not in any days
@@ -718,14 +741,16 @@ public class BasicMonthViewUI extends MonthViewUI {
     private Rectangle getDaysBoundsAtLocation(int x, int y) {
         Rectangle month = getMonthBoundsAtLocation(x, y);
         if (month == null) return null;
-        int startOfDaysY = month.y + fullMonthBoxHeight + fullBoxHeight;
+        int startOfDaysY = month.y + getMonthHeaderHeight();
         if (y < startOfDaysY) return null;
         month.y = startOfDaysY;
         month.height = month.height - startOfDaysY;
         return month;
     }
 
-    
+    protected int getMonthHeaderHeight() {
+        return fullMonthBoxHeight;
+    }
 // ---------------------- mapping month coordinates    
 
     /**
@@ -785,9 +810,6 @@ public class BasicMonthViewUI extends MonthViewUI {
     protected Calendar getMonthAtLocation(int x, int y) {
         Point month = getMonthGridPositionAtLocation(x, y);
         if (month ==  null) return null;
-        Calendar calendar = getCalendar(getFirstDisplayedDate());
-        calendar.add(Calendar.MONTH, 
-                month.y * calendarColumnCount + month.x);
         return getMonth(month.y, month.x);
     }
     
@@ -1793,6 +1815,18 @@ public class BasicMonthViewUI extends MonthViewUI {
     }
     
     /**
+     * Returns the monthViews calendar configured to the firstDisplayedDate.
+     * 
+     * NOTE: it's safe to change the calendar state without resetting because
+     * it's JXMonthView's responsibility to protect itself.
+     * 
+     * @return the monthView's calendar, configured with the firstDisplayedDate.
+     */
+    protected Calendar getCalendar() {
+        return getCalendar(getFirstDisplayedDate());
+    }
+    
+    /**
      * Returns the monthViews calendar configured to the given time.
      * 
      * NOTE: it's safe to change the calendar state without resetting because
@@ -1806,7 +1840,6 @@ public class BasicMonthViewUI extends MonthViewUI {
         calendar.setTimeInMillis(millis);
         return calendar;
     }
-    
 
     
     /**
