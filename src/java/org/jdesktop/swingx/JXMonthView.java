@@ -217,7 +217,7 @@ public class JXMonthView extends JComponent {
      * The timer used to keep today in synch with system time.
      */
     private Timer todayTimer = null;
-    private TreeSet<Long> flaggedDates;
+//    private TreeSet<Long> flaggedDates;
     //-------------- selection
     private DateSelectionModel model;
 //    private SelectionMode selectionMode;
@@ -259,6 +259,7 @@ public class JXMonthView extends JComponent {
     private boolean showWeekNumber;
     private boolean componentInputMapEnabled;
     private DateSelectionListener modelListener;
+    private DaySelectionModel flaggedDates;
 
     /**
      * Create a new instance of the <code>JXMonthView</code> class using the
@@ -462,6 +463,10 @@ public class JXMonthView extends JComponent {
             model = new DaySelectionModel(locale);
         }
         this.model = model;
+        
+        this.flaggedDates = new DaySelectionModel(locale);
+        flaggedDates.setSelectionMode(SelectionMode.MULTIPLE_INTERVAL_SELECTION);
+        
         installCalendar();
         model.addDateSelectionListener(getDateSelectionListener());
     }
@@ -562,7 +567,7 @@ public class JXMonthView extends JComponent {
      * @param oldTimeZone the timezone before the change
      */
     protected void updateDatesAfterTimeZoneChange(TimeZone oldTimeZone) {
-        setFlaggedDates((Date[])null);
+        setFlaggedDates();
      }
     
     /**
@@ -819,12 +824,12 @@ public class JXMonthView extends JComponent {
      *    
      * @deprecated Model's task.   
      */
-    private long startOfDay(long millis) {
-        cal.setTimeInMillis(millis);
-        CalendarUtils.startOfDay(cal);
-        return cal.getTimeInMillis();
-    }
-
+//    private long startOfDay(long millis) {
+//        cal.setTimeInMillis(millis);
+//        CalendarUtils.startOfDay(cal);
+//        return cal.getTimeInMillis();
+//    }
+//
     /**
      * Returns the start of the day as Date.
      * 
@@ -1191,23 +1196,38 @@ public class JXMonthView extends JComponent {
      */
     public boolean isFlaggedDate(Date date) {
         if (date == null) return false;
-        return isFlaggedDate(date.getTime());
+        return flaggedDates.isSelected(date);
+//        return isFlaggedDate(date.getTime());
     }
     
     /**
-     * An array of longs defining days that should be flagged.
+     * An array of longs defining days that should be flagged. To reset,
+     * call this method without parameter.
+     * 
+     * NOTE: neither the given array nor any of its elements should be null.
+     * Currently, a null array will be tolerated to ease migration. 
      *
      * @param flaggedDates the dates to be flagged
      */
-    public void setFlaggedDates(Date[] flaggedDates) {
-        long[] flagged = null;
-        if (flaggedDates != null) {
-            flagged = new long[flaggedDates.length];
-            for (int i = 0; i < flaggedDates.length; i++) {
-                flagged[i] = flaggedDates[i].getTime();
+    public void setFlaggedDates(Date... flagged) {
+//        Contract.asNotNull(flagged, "must not be null");
+        SortedSet<Date> oldFlagged = flaggedDates.getSelection();
+        flaggedDates.clearSelection();
+        if (flagged != null) {
+            for (Date date : flagged) {
+                flaggedDates.addSelectionInterval(date, date);
             }
         }
-        setFlaggedDates(flagged);
+//        long[] flagged = null;
+//        if (flaggedDates != null) {
+//            flagged = new long[flaggedDates.length];
+//            for (int i = 0; i < flaggedDates.length; i++) {
+//                flagged[i] = flaggedDates[i].getTime();
+//            }
+//        }
+//        setFlaggedDates(flagged);
+        firePropertyChange("flaggedDates", oldFlagged, flaggedDates.getSelection());
+        repaint();
     }
     
 //--------------------- flagged dates (long) - deprecation pending!
@@ -1222,11 +1242,12 @@ public class JXMonthView extends JComponent {
      * @deprecated use {@link #isFlaggedDate(Date)}
      */
     public boolean isFlaggedDate(long date) {
-        boolean result = false;
-        if (flaggedDates != null) {
-            result = flaggedDates.contains(startOfDay(date));
-        }
-        return result;
+        return isFlaggedDate(new Date(date));
+//        boolean result = false;
+//        if (flaggedDates != null) {
+//            result = flaggedDates.contains(startOfDay(date));
+//        }
+//        return result;
     }
 
     /**
@@ -1237,19 +1258,27 @@ public class JXMonthView extends JComponent {
      * @deprecated use {@link #setFlaggedDates(Date[])}
      */
     public void setFlaggedDates(long[] flaggedDates) {
-        if (flaggedDates == null) {
-            this.flaggedDates = null;
-        } else {
-            this.flaggedDates = new TreeSet<Long>();
-            // Loop through the flaggedDates and clean them up so
-            // the hour, minute, seconds and milliseconds to 0 so
-            // we can compare times later.
-            for (long flaggedDate : flaggedDates) {
-                this.flaggedDates.add(startOfDay(flaggedDate));
+        Date[] flagged = null;
+        if (flaggedDates != null) {
+            flagged = new Date[flaggedDates.length];
+            for (int i = 0; i < flaggedDates.length; i++) {
+                flagged[i] = new Date(flaggedDates[i]);
             }
         }
-        firePropertyChange(FLAGGED_DATES, null, this.flaggedDates);
-        repaint();
+        setFlaggedDates(flagged);
+//        if (flaggedDates == null) {
+//            this.flaggedDates = null;
+//        } else {
+//            this.flaggedDates = new TreeSet<Long>();
+//            // Loop through the flaggedDates and clean them up so
+//            // the hour, minute, seconds and milliseconds to 0 so
+//            // we can compare times later.
+//            for (long flaggedDate : flaggedDates) {
+//                this.flaggedDates.add(startOfDay(flaggedDate));
+//            }
+//        }
+//        firePropertyChange(FLAGGED_DATES, null, this.flaggedDates);
+//        repaint();
     }
 
 //------------------- visual properties    
@@ -1261,7 +1290,8 @@ public class JXMonthView extends JComponent {
      * @return a boolean indicating if this monthView has flagged dates.
      */
     protected boolean hasFlaggedDates() {
-        return (flaggedDates != null) && (flaggedDates.size() > 0);
+        return !flaggedDates.isSelectionEmpty();
+//        return (flaggedDates != null) && (flaggedDates.size() > 0);
     }
     /**
      * Whether or not to show leading dates for a months displayed by this component.
@@ -1928,6 +1958,7 @@ public class JXMonthView extends JComponent {
     public boolean isComponentInputMapEnabled() {
         return componentInputMapEnabled;
     }
+
 
 
 }

@@ -30,7 +30,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import java.util.TimeZone;
 import java.util.logging.Logger;
 
@@ -456,33 +455,7 @@ public class JXMonthViewIssues extends InteractiveTestCase {
         fail("spurious failures - probably wrong assumption in Timezone math");
     }
    
-   /**
-    * characterize calendar: minimal days in first week
-    * Different for US (1) and Europe (4)
-    */
-   public void testCalendarMinimalDaysInFirstWeek() {
-       Calendar us = Calendar.getInstance(Locale.US);
-       assertEquals(1, us.getMinimalDaysInFirstWeek());
-       Calendar french = Calendar.getInstance(Locale.FRENCH);
-       assertEquals("french/european calendar", 4, french.getMinimalDaysInFirstWeek());
-       fail("Revisit: monthView should respect locale setting? (need to test)");
-   }
    
-   /**
-    * characterize calendar: first day of week 
-    * Can be set arbitrarily. Hmmm ... when is that useful?
-    */
-   public void testCalendarFirstDayOfWeek() {
-       Calendar french = Calendar.getInstance(Locale.FRENCH);
-       assertEquals(Calendar.MONDAY, french.getFirstDayOfWeek());
-       Calendar us = Calendar.getInstance(Locale.US);
-       assertEquals(Calendar.SUNDAY, us.getFirstDayOfWeek());
-       // JW: when would we want that?
-       us.setFirstDayOfWeek(Calendar.FRIDAY);
-       assertEquals(Calendar.FRIDAY, us.getFirstDayOfWeek());
-       fail("Revisit: why expose setting of firstDayOfWeek? Auto-set with locale");
-   }
-
    
    /**
     * BasicMonthViewUI: use adjusting api in keyboard actions.

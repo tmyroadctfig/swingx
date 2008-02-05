@@ -1687,6 +1687,8 @@ public class JXMonthViewTest extends MockObjectTestCase {
         assertFalse(monthView.isFlaggedDate(date));
         monthView.setFlaggedDates(new Date[]{date});
         assertTrue(monthView.isFlaggedDate(date));
+        monthView.setFlaggedDates();
+        assertFalse(monthView.isFlaggedDate(date));
     }
 
     public void testShowLeadingDates() {
