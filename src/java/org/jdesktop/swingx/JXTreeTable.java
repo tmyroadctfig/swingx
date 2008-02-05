@@ -59,7 +59,6 @@ import javax.swing.event.TreeWillExpandListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
-import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeSelectionModel;
@@ -764,49 +763,64 @@ public class JXTreeTable extends JXTable {
      */
     @Override
     public SelectionMapper getSelectionMapper() {
+        if (selectionMapper == null) {
+            selectionMapper = createSelectionMapper();
+        }
         // JW: don't want to change super assumption 
         // (mapper != null) - the selection mapping will change 
         // anyway in Mustang (using core functionality)
-        return NO_OP_SELECTION_MANAGER ;
+        return selectionMapper;
     }
 
-    private static final SelectionMapper NO_OP_SELECTION_MANAGER = new SelectionMapper() {
+    /**
+     * Fix for #745-swingx: remove static selectionMaper.
+     * 
+     * @return a SelectionMapper to use with this treeTable. Implemented
+     *   with a no-op.
+     */
+    protected SelectionMapper createSelectionMapper() {
 
-        private ListSelectionModel viewSelectionModel = new DefaultListSelectionModel();
+        SelectionMapper mapper = new SelectionMapper() {
 
-        public ListSelectionModel getViewSelectionModel() {
-            return viewSelectionModel;
+            private ListSelectionModel viewSelectionModel = new DefaultListSelectionModel();
+
+            public ListSelectionModel getViewSelectionModel() {
+                return viewSelectionModel;
             }
 
-        public void setViewSelectionModel(ListSelectionModel viewSelectionModel) {
-            this.viewSelectionModel = viewSelectionModel;
+            public void setViewSelectionModel(
+                    ListSelectionModel viewSelectionModel) {
+                this.viewSelectionModel = viewSelectionModel;
             }
 
-        public void setFilters(FilterPipeline pipeline) {
-            // do nothing
+            public void setFilters(FilterPipeline pipeline) {
+                // do nothing
             }
 
-        public void insertIndexInterval(int start, int length, boolean before) {
-            // do nothing
+            public void insertIndexInterval(int start, int length,
+                    boolean before) {
+                // do nothing
             }
 
-        public void removeIndexInterval(int start, int end) {
-            // do nothing
+            public void removeIndexInterval(int start, int end) {
+                // do nothing
             }
 
-        public void setEnabled(boolean enabled) {
-            // do nothing
+            public void setEnabled(boolean enabled) {
+                // do nothing
             }
 
-        public boolean isEnabled() {
-            return false;
+            public boolean isEnabled() {
+                return false;
             }
-            
-        public void clearModelSelection() {
-            // do nothing
+
+            public void clearModelSelection() {
+                // do nothing
+            }
+        };
+        return mapper;
     }
-    };
-
+    
     /**
      * Throws UnsupportedOperationException because variable height rows are
      * not supported.

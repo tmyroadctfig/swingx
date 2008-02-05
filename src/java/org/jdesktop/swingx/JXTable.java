@@ -306,8 +306,10 @@ public class JXTable extends JTable
     /** The ComponentAdapter for model data access. */
     protected ComponentAdapter dataAdapter;
 
-    /** The handler for mapping view/model coordinates of row selection. */
-    private SelectionMapper selectionMapper;
+    /** The handler for mapping view/model coordinates of row selection. 
+     *  Widened access to allow lazy instantiation in subclasses (#746-swingx).
+     */
+    protected SelectionMapper selectionMapper;
 
     /** flag to indicate if table is interactively sortable. */
     private boolean sortable;

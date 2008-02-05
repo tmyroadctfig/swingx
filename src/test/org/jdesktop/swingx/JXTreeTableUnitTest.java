@@ -28,6 +28,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Vector;
 import java.util.logging.Logger;
 
+import javax.swing.DefaultListSelectionModel;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -60,6 +61,34 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
     
     public JXTreeTableUnitTest() {
         super("JXTreeTable Unit Test");
+    }
+    
+    /**
+     * Issue 746-swingx: treetable selectionMapper must not be static.
+     * 
+     * Here: test that different treetables have different instances of mapper.
+     */
+    public void testSelectionMapperViewSelectionModel() {
+        JXTreeTable one = new JXTreeTable();
+        assertSame("mapper's viewselectionModel must be same as the treetable's", 
+                one.getSelectionModel(), one.getSelectionMapper().getViewSelectionModel());
+        DefaultListSelectionModel selectionModel = new DefaultListSelectionModel();
+        one.setSelectionModel(selectionModel);
+        assertSame("mapper's viewselectionModel must be reset to new", 
+                selectionModel, one.getSelectionMapper().getViewSelectionModel());
+    }
+    
+    
+    /**
+     * Issue 746-swingx: treetable selectionMapper must not be static.
+     * 
+     * Here: test that different treetables have different instances of mapper.
+     */
+    public void testSelectionMapper() {
+        JXTreeTable one = new JXTreeTable();
+        JXTreeTable two = new JXTreeTable();
+        assertNotSame("treetables must not share the selectionMapper", 
+                one.getSelectionMapper(), two.getSelectionMapper());
     }
     /**
      * #561-swingx: KeyEvent on hierarchical column doesn't start editing.
