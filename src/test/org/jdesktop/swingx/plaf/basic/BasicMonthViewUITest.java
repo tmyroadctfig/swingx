@@ -60,6 +60,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
             .getLogger(BasicMonthViewUITest.class.getName());
 
     // duplicate hard-coded monthViewUI values
+    @SuppressWarnings("unused")
     private static final int CALENDAR_SPACING = 10;
     
     public static void main(String[] args) {
@@ -73,6 +74,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
           e.printStackTrace();
       }
   }
+ 
 
     /**
      * Issue #736-swingx: monthView cannot cope with minimalDaysInFirstWeek.
@@ -85,22 +87,22 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
         monthView.setShowLeadingDates(true);
         monthView.setShowTrailingDates(true);
         monthView.setSelectionMode(SelectionMode.SINGLE_INTERVAL_SELECTION);
+        monthView.setPreferredCols(2);
+        monthView.setPreferredRows(2);
         final BasicMonthViewUI ui = ((BasicMonthViewUI) monthView.getUI());
         monthView.addMouseListener(new MouseAdapter() {
 
             @Override
             public void mouseReleased(MouseEvent e) {
-                LOG.info("calendar grid" + ui.calendarGrid + "/" + ui.startX + "/ " + ui.startY);
-//                LOG.info("dayAt " + e.getPoint() + ": "
-//                        + new Date(monthView.getDayAt(e.getX(), e.getY()))
-//                        + "\n" + monthView.getDayAtLocation(e.getX(), e.getY())
-//                                );
+                LOG.info("calendar grid" + ui.calendarGrid);
+                LOG.info("dayAt " + e.getPoint() + ": "
+                        + "\n" + monthView.getDayAtLocation(e.getX(), e.getY()));
                 Calendar monthAtLocation = ui.getMonthAtLocation(e.getX(), e.getY());
-//                LOG.info("month at " + 
-//                        (monthAtLocation != null ? monthAtLocation.getTime() : null));
-//                
-//                LOG.info("month at " + 
-//                        ((BasicMonthViewUI) monthView.getUI()).getMonthBoundsAtLocation(e.getX(), e.getY()));
+                LOG.info("month start " + 
+                        (monthAtLocation != null ? monthAtLocation.getTime() : null));
+                
+                LOG.info("month bounds " + 
+                        ui.getMonthBoundsAtLocation(e.getX(), e.getY()));
             }
             
         });
@@ -112,7 +114,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
             }
             
         };
-        final JXFrame frame = wrapInFrame(monthView, "click day");
+        final JXFrame frame = wrapInFrame(monthView, "test mapping: printed on mouse release");
         addAction(frame, action);
         Action toggleComponentOrientation = new AbstractAction("toggle orientation") {
 
@@ -201,14 +203,18 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
 
 //------------------------------
     
-    public void testname() {
+    /**
+     * Sanity test: inexpected pass if the realized frame isn't visible.
+     */
+    public void testFirstMonthLocation() {
         if (GraphicsEnvironment.isHeadless()) {
             LOG.info("cannot run test - headless environment");
             return;
         }
         BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.LEFT_TO_RIGHT);
         Rectangle monthBounds = ui.getMonthBoundsAtLocation(20, 20);
-        assertEquals(ui.startX, ui.calendarGrid.x);
+        assertEquals(monthBounds.getLocation(), ui.calendarGrid.getLocation());
+        assertNull("no hit - bounds must be null", ui.getMonthBoundsAtLocation(19, 20));
     }
     
     /**
@@ -503,8 +509,12 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
     }
 
     /**
-     * Returns the ui of a realized JXMonthView with 2 columns and the 
+     * Returns the ui of a realized JXMonthView with
      * given componentOrientation and showingWeekNumbers flag.
+     * It's prefColumns/Rows are set to 2.
+     * 
+     * The frame is packed and it's size extended by 40, 40 to
+     * give a slight off-position (!= 0) of the months shown. 
      * 
      * NOTE: this must not be used in a headless environment.
      * 
@@ -515,13 +525,14 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
             boolean isShowingWeekNumbers) {
         JXMonthView monthView = new JXMonthView();
         monthView.setPreferredCols(2);
+        monthView.setPreferredRows(2);
         monthView.setComponentOrientation(co);
         monthView.setShowingWeekNumber(isShowingWeekNumbers);
         JXFrame frame = new JXFrame();
         frame.add(monthView);
         frame.pack();
-        frame.setSize(450 , 220);
-        frame.getRootPane().revalidate();
+        frame.setSize(frame.getWidth() + 40, frame.getHeight() + 40);
+        frame.setVisible(true);
         BasicMonthViewUI ui = (BasicMonthViewUI) monthView.getUI();
         return ui;
     }
@@ -694,4 +705,5 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
         assertEquals(first, ((BasicMonthViewUI) monthView.getUI()).getFirstDisplayedMonth());
     };
     
+
 }

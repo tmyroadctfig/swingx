@@ -1,7 +1,6 @@
 package org.jdesktop.swingx.plaf;
 
 import java.util.Calendar;
-import java.util.Date;
 
 import javax.swing.plaf.ComponentUI;
 

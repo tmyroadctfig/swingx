@@ -154,14 +154,13 @@ public class BasicMonthViewUI extends MonthViewUI {
      * 
      * PENDING: JW - really want to adjust here? Need to check in usage
      *   anyway.
-     * protected for testing - don't use, will be removed 
+     *   
      */
-    protected int startX;
+    private int startX;
     /**
      * Top of first row of displayed months. 
-     * protected for testing - don't use, will be removed 
      */
-    protected int startY;
+    private int startY;
 
     /** 
      * height of month header of the view, that is the name and the arrows.
@@ -198,16 +197,21 @@ public class BasicMonthViewUI extends MonthViewUI {
     private int calendarWidth;
     /** the height of a single month display. */
     private int calendarHeight;
+    /** the height of a single month grid cell, including padding. */
+    private int fullCalendarHeight;
+    /** the width of a single month grid cell, including padding. */
+    private int fullCalendarWidth;
     /** The number of calendars displayed vertically. */
     private int calendarRowCount = 1;
     /** The number of calendars displayed horizontally. */
     private int calendarColumnCount = 1;
     
+    /**
+     * The bounding box of the grid of visible months. 
+     */
     protected Rectangle calendarGrid = new Rectangle();
     private Rectangle[] monthStringBounds = new Rectangle[12];
     private Rectangle[] yearStringBounds = new Rectangle[12];
-    private int fullCalendarHeight;
-    private int fullCalendarWidth;
 
 
     @SuppressWarnings({"UnusedDeclaration"})
@@ -445,198 +449,6 @@ public class BasicMonthViewUI extends MonthViewUI {
     }
 
 
-    /**
-     * Returns true if the date passed in is the same as today.
-     *
-     * PENDING JW: really want the exact test?
-     * 
-     * @param date long representing the date you want to compare to today.
-     * @return true if the date passed is the same as today.
-     * 
-     * @deprecated use {@link #isToday(Date)}
-     */
-    @Deprecated
-    protected boolean isToday(long date) {
-        return date == getTodayInMillis();
-    }
-
-    /**
-     * Returns true if the date passed in is the same as today.
-     *
-     * PENDING JW: really want the exact test?
-     * 
-     * @param date long representing the date you want to compare to today.
-     * @return true if the date passed is the same as today.
-     */
-    protected boolean isToday(Date date) {
-        return date.equals(monthView.getToday());
-    }
-    
-    
-
-    /**
-     * Convenience method so subclasses can get the currently painted day's day of the
-     * week. It is assumed the given calendar is already set to the correct day.
-     *
-     * PENDING: JW - really worth a method? How would subclasses use/modifiy this?
-     * 
-     * @see java.util.Calendar
-     * @return day of the week (Calendar.SATURDAY, Calendar.SUNDAY, ...)
-     */
-    protected int getDayOfTheWeek(Calendar cal) {
-        return cal.get(Calendar.DAY_OF_WEEK);
-    }
-
-    /**
-     * Get the view index for the specified day of the week.  This value will range
-     * from 0 to DAYS_IN_WEEK - 1.  For example if the first day of the week was set
-     * to Calendar.MONDAY and we requested the view index for Calendar.TUESDAY the result
-     * would be 1.
-     *
-     * @param dayOfWeek day of the week to calculate view index for, acceptable values are
-     * <code>Calendar.MONDAY</code> - <code>Calendar.SUNDAY</code>
-     * @return view index for the specified day of the week
-     */
-    private int getDayOfWeekViewIndex(int dayOfWeek) {
-        int result = dayOfWeek - monthView.getFirstDayOfWeek();
-        if (result < 0) {
-            result += JXMonthView.DAYS_IN_WEEK;
-        }
-        return result;
-    }
-    /**
-     * Returns an index defining which, if any, of the buttons for
-     * traversing the month was pressed.  This method should only be
-     * called when <code>setTraversable</code> is set to true.
-     *
-     * @param x x position of the pointer
-     * @param y y position of the pointer
-     * @return MONTH_UP, MONTH_DOWN or -1 when no button is selected.
-     */
-    protected int getTraversableButtonAt(int x, int y) {
-        Point rowCol = getCalRowColAt(x, y);
-        if (NO_SUCH_CALENDAR.equals(rowCol)) {
-            return -1;
-        }
-
-        // See if we're in the month string area.
-        y = ((y - startY) -
-            (rowCol.x * (calendarHeight + CALENDAR_SPACING))) - monthView.getBoxPaddingY();
-        if (y < arrowPaddingY || y > (monthBoxHeight - arrowPaddingY)) {
-            return -1;
-        }
-
-        x = ((isLeftToRight ? (x - startX) : (startX - x)) -
-            (rowCol.y * (calendarWidth + CALENDAR_SPACING)));
-
-        if (x > arrowPaddingX && x < (arrowPaddingX +
-                monthDownImage.getIconWidth() + arrowPaddingX)) {
-            return JXMonthView.MONTH_DOWN;
-        }
-
-        if (x > (calendarWidth - arrowPaddingX * 2 -
-                monthUpImage.getIconWidth()) &&
-                x < (calendarWidth - arrowPaddingX)) {
-            return JXMonthView.MONTH_UP;
-        }
-        return -1;
-    }
-
-    /**
-     * Get the row and column for the calendar at the specified coordinates
-     *
-     * @param x x location
-     * @param y y location
-     * @return a new <code>Point</code> object containing the row as the x value
-     * and column as the y value
-     */
-    protected Point getCalRowColAt(int x, int y) {
-        if (isLeftToRight ? (startX > x) : (startX < x) || startY > y) {
-            return NO_SUCH_CALENDAR;
-        }
-
-        Point result = new Point();
-        // Determine which row of calendars we're in.
-        result.x = (y - startY) / (calendarHeight + CALENDAR_SPACING);
-
-        // Determine which column of calendars we're in.
-        result.y = (isLeftToRight ? (x - startX) : (startX - x)) /
-                (calendarWidth + CALENDAR_SPACING);
-
-        // Make sure the row and column of calendars calculated is being
-        // managed.
-        if (result.x > calendarRowCount - 1 || result.y > calendarColumnCount -1) {
-            result = NO_SUCH_CALENDAR;
-        }
-
-        return result;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public long getDayAt(int x, int y) {
-        Point rowCol = getCalRowColAt(x, y);
-        if (NO_SUCH_CALENDAR.equals(rowCol)) {
-            return -1;
-        }
-
-        if (rowCol.x > calendarRowCount - 1 || rowCol.y > calendarColumnCount - 1) {
-            return -1;
-        }
-
-        // Determine what row (week) in the selected month we're in.
-        int row = 1;
-        int boxPaddingX = monthView.getBoxPaddingX();
-        int boxPaddingY = monthView.getBoxPaddingY();
-        row += (((y - startY) -
-                (rowCol.x * (calendarHeight + CALENDAR_SPACING))) -
-                (boxPaddingY + monthBoxHeight + boxPaddingY)) /
-                (boxPaddingY + boxHeight + boxPaddingY);
-        // The first two lines in the calendar are the month and the days
-        // of the week.  Ignore them.
-        row -= 2;
-
-        if (row < 0 || row > 5) {
-            return -1;
-        }
-
-        // Determine which column in the selected month we're in.
-        int col = ((isLeftToRight ? (x - startX) : (startX - x)) -
-                (rowCol.y * (calendarWidth + CALENDAR_SPACING))) /
-                (boxPaddingX + boxWidth + boxPaddingX);
-
-        // If we're showing week numbers we need to reduce the selected
-        // col index by one.
-        if (monthView.isShowingWeekNumber()) {
-            col--;
-        }
-
-        // Make sure the selected column matches up with a day of the week.
-        if (col < 0 || col > JXMonthView.DAYS_IN_WEEK - 1) {
-            return -1;
-        }
-
-        // Use the first day of the month as a key point for determining the
-        // date of our click.
-        // The week index of the first day will always be 0.
-        Calendar cal = getCalendar(getFirstDisplayedDate());
-        cal.add(Calendar.MONTH, rowCol.y + (rowCol.x * calendarColumnCount));
-
-        int firstDayViewIndex = getDayOfWeekViewIndex(cal.get(Calendar.DAY_OF_WEEK));
-        int daysToAdd = (row * JXMonthView.DAYS_IN_WEEK) + (col - firstDayViewIndex);
-        if (daysToAdd < 0 || daysToAdd >
-                (cal.getActualMaximum(Calendar.DAY_OF_MONTH) - 1)) {
-            return -1;
-        }
-
-        cal.add(Calendar.DAY_OF_MONTH, daysToAdd);
-
-        long selected = cal.getTimeInMillis();
-
-        return selected;
-    }
-
 
 //--------------------- mapping day coordinates
 
@@ -782,8 +594,11 @@ public class BasicMonthViewUI extends MonthViewUI {
 //    }
 
     /**
-     * Mapping pixel to bounds.
+     * Mapping pixel to bounds.<p>
      * 
+     * PENDING JW: define the "action grid". Currently this replaces the old
+     * version to remove all internal usage of deprecated methods.
+     *  
      * @param x the x position of the location in pixel
      * @param y the y position of the location in pixel
      * @return the bounds of the active header area in containing the location
@@ -853,10 +668,11 @@ public class BasicMonthViewUI extends MonthViewUI {
      * 
      * Mapping pixel to logical grid coordinates.
      * 
+     * 
      * @param x the x coordinate of the location to map 
      * @param y the y coordintate of the location to map
      * @return a point with x = month column index in grid, 
-     *    y = month row index in grid. Or null if outside 
+     *    y = month row index in grid, Or null if outside 
      */
     protected Point getMonthGridPositionAtLocation(int x, int y) {
         if (!calendarGrid.contains(x, y)) return null;
@@ -945,6 +761,7 @@ public class BasicMonthViewUI extends MonthViewUI {
      * Calendar. <p>
      * 
      * Mapping Calendar to logical grid coordinates.
+     * 
      * 
      * @param calendar the Calendar to map.
      * @return The logical grid position of the month represented 
@@ -1236,14 +1053,17 @@ public class BasicMonthViewUI extends MonthViewUI {
         Date endOfMonth = calendar.getTime();
         // reset the clone
         calendar.setTime(cal.getTime());
-        int weeks = getWeeks(calendar);
+        // alwaysfill the day grid in the month completely
+//        int weeks = getWeeks(calendar);
         // adjust to start of week 
         calendar.setTime(cal.getTime());
         CalendarUtils.startOfWeek(calendar);
         // painting a grid of day boxes, all with dimensions 
         // width == fullBoxWidth and height = fullBoxHeight.
         int topOfDay = top;
-        for (int week = 0; week <= weeks; week++) {
+        // 
+        for (int week = 0; week < WEEKS_IN_MONTH; week++) {
+//            for (int week = 0; week <= weeks; week++) {
             int leftOfDay = isLeftToRight ? left : left + width - fullBoxWidth;
             
             for (int day = 0; day < 7; day++) {
@@ -1603,7 +1423,7 @@ public class BasicMonthViewUI extends MonthViewUI {
     protected void paintDayForeground(Graphics g, int x, int y, int width, int height, Calendar cal) {
         String numericDay = dayOfMonthFormatter.format(cal.getTime());
 
-        g.setColor(monthView.getDayForeground(getDayOfTheWeek(cal)));
+        g.setColor(monthView.getDayForeground(cal.get(Calendar.DAY_OF_WEEK)));
 
         int boxPaddingX = monthView.getBoxPaddingX();
         int boxPaddingY = monthView.getBoxPaddingY();
@@ -1873,20 +1693,6 @@ public class BasicMonthViewUI extends MonthViewUI {
 
 //--------------------------- displayed dates, calendar
 
-    /**
-     * Returns the start of the day of the given date in the monthView's 
-     * current calendar.
-     * 
-     * @param date the instant to normalize to the start of the day
-     * @return the start of the day in millis.
-     * 
-     * @deprecated PENDING JW change internals to not use millis
-     */
-    private long startOfDay(long date) {
-        Calendar cal = getCalendar(date);
-        CalendarUtils.startOfDay(cal);
-        return cal.getTimeInMillis();
-    }
     
     /**
      * Returns the monthViews calendar configured to the firstDisplayedDate.
@@ -2010,19 +1816,21 @@ public class BasicMonthViewUI extends MonthViewUI {
     
     /**
      * @return the start of today.
-     * 
-     * @deprecated use {@link #getToday()}
-     */
-    @Deprecated
-    protected long getTodayInMillis() {
-        return monthView.getToday().getTime();
-    }
-
-    /**
-     * @return the start of today.
      */
     protected Date getToday() {
         return monthView.getToday();
+    }
+
+    /**
+     * Returns true if the date passed in is the same as today.
+     *
+     * PENDING JW: really want the exact test?
+     * 
+     * @param date long representing the date you want to compare to today.
+     * @return true if the date passed is the same as today.
+     */
+    protected boolean isToday(Date date) {
+        return date.equals(getToday());
     }
     
 
@@ -2553,7 +2361,132 @@ public class BasicMonthViewUI extends MonthViewUI {
             }
 
         }
+        
+        /**
+         * Returns the start of the day of the given date in the monthView's 
+         * current calendar.
+         * 
+         * @param date the instant to normalize to the start of the day
+         * @return the start of the day in millis.
+         * 
+         * @deprecated PENDING JW change internals to not use millis
+         */
+        private long startOfDay(long date) {
+            Calendar cal = getCalendar(date);
+            CalendarUtils.startOfDay(cal);
+            return cal.getTimeInMillis();
+        }
+
+    }
+
+// -- deprecated methods, no longer used internally, kept a short while
+    
+    
+
+    /**
+     * Get the view index for the specified day of the week.  This value will range
+     * from 0 to DAYS_IN_WEEK - 1.  For example if the first day of the week was set
+     * to Calendar.MONDAY and we requested the view index for Calendar.TUESDAY the result
+     * would be 1.
+     *
+     * @param dayOfWeek day of the week to calculate view index for, acceptable values are
+     * <code>Calendar.MONDAY</code> - <code>Calendar.SUNDAY</code>
+     * @return view index for the specified day of the week
+     * @deprecated with revised location/date mapping no longer needed, 
+     *     no longer used internally
+     */
+    private int getDayOfWeekViewIndex(int dayOfWeek) {
+        int result = dayOfWeek - monthView.getFirstDayOfWeek();
+        if (result < 0) {
+            result += JXMonthView.DAYS_IN_WEEK;
+        }
+        return result;
+    }
+    /**
+     * Returns an index defining which, if any, of the buttons for
+     * traversing the month was pressed.  This method should only be
+     * called when <code>setTraversable</code> is set to true.
+     *
+     * @param x x position of the pointer
+     * @param y y position of the pointer
+     * @return MONTH_UP, MONTH_DOWN or -1 when no button is selected.
+     * 
+     * @deprecated use {@link #getTraversableGridPositionAtLocation(int, int)}
+     */
+    protected int getTraversableButtonAt(int x, int y) {
+        return getTraversableGridPositionAtLocation(x, y);
+    }
+
+    /**
+     * Get the row and column for the calendar at the specified coordinates
+     *
+     * @param x x location
+     * @param y y location
+     * @return a new <code>Point</code> object containing the row as the x value
+     * and column as the y value
+     * @deprecated use {@link #getMonthGridPositionAtLocation(x, y)} - this method is
+     *   no longer used internally. Note that the coordinate mapping in the 
+     *   returned Point of new method is the other way round 
+     *   (p.x == column, p.y == row) as in this!
+     */
+    protected Point getCalRowColAt(int x, int y) {
+        if (isLeftToRight ? (startX > x) : (startX < x) || startY > y) {
+            return NO_SUCH_CALENDAR;
+        }
+
+        Point result = new Point();
+        // Determine which row of calendars we're in.
+        result.x = (y - startY) / (calendarHeight + CALENDAR_SPACING);
+
+        // Determine which column of calendars we're in.
+        result.y = (isLeftToRight ? (x - startX) : (startX - x)) /
+                (calendarWidth + CALENDAR_SPACING);
+
+        // Make sure the row and column of calendars calculated is being
+        // managed.
+        if (result.x > calendarRowCount - 1 || result.y > calendarColumnCount -1) {
+            result = NO_SUCH_CALENDAR;
+        }
+
+        return result;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @deprecated use {@link #getDayAtLocation(int, int)} This method is
+     * no longer used internally
+     */
+    public long getDayAt(int x, int y) {
+        Calendar cal = getDayAtLocation(x, y);
+        return cal != null ? cal.getTimeInMillis() : -1;
+    }
+
+    /**
+     * @return the start of today.
+     * 
+     * @deprecated use {@link #getToday()}
+     */
+    @Deprecated
+    protected long getTodayInMillis() {
+        return getToday().getTime();
     }
     
+    
+    /**
+     * Returns true if the date passed in is the same as today.
+     *
+     * PENDING JW: really want the exact test?
+     * 
+     * @param date long representing the date you want to compare to today.
+     * @return true if the date passed is the same as today.
+     * 
+     * @deprecated use {@link #isToday(Date)}
+     */
+    @Deprecated
+    protected boolean isToday(long date) {
+        return date == getToday().getTime();
+    }
+
     
 }
