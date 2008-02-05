@@ -181,6 +181,20 @@ public class DefaultDateSelectionModel extends AbstractDateSelectionModel {
     /**
      * {@inheritDoc}
      */
+    public Date getFirstSelectionDate() {
+        return isSelectionEmpty() ? null : selectedDates.first();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Date getLastSelectionDate() {
+        return isSelectionEmpty() ? null : selectedDates.last();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public boolean isSelected(final Date date) {
         return selectedDates.contains(date);
     }

@@ -39,7 +39,7 @@ public class DaySelectionModelTest extends AbstractTestDateSelectionModel {
      */
     public void testNormalizedDateContract() {
         model.setSelectionInterval(today, today);
-        assertEquals(model.getNormalizedDate(today), model.getSelection().first());
+        assertEquals(model.getNormalizedDate(today), model.getFirstSelectionDate());
     }
     
     /**
@@ -186,30 +186,26 @@ public class DaySelectionModelTest extends AbstractTestDateSelectionModel {
         model.setSelectionMode(SelectionMode.SINGLE_SELECTION);
 
         model.setSelectionInterval(today, today);
-        SortedSet<Date> selection = model.getSelection();
-        assertTrue(1 == selection.size());
-        assertEquals(startOfDay(today), selection.first());
+        assertTrue(1 == model.getSelection().size());
+        assertEquals(startOfDay(today), model.getFirstSelectionDate());
 
         model.setSelectionInterval(today, afterTomorrow);
-        selection = model.getSelection();
-        assertTrue(1 == selection.size());
-        assertEquals(startOfDay(today), selection.first());
+        assertTrue(1 == model.getSelection().size());
+        assertEquals(startOfDay(today), model.getFirstSelectionDate());
     }
     
     public void testSingleIntervalSelection() {
         model.setSelectionMode(SelectionMode.SINGLE_INTERVAL_SELECTION);
 
         model.setSelectionInterval(today, today);
-        SortedSet<Date> selection = model.getSelection();
-        assertTrue(1 == selection.size());
-        assertEquals(startOfDay(today), selection.first());
+        assertTrue(1 == model.getSelection().size());
+        assertEquals(startOfDay(today), model.getFirstSelectionDate());
 
         model.setSelectionInterval(today, tomorrow);
         
-        selection = model.getSelection();
-        assertEquals(2, selection.size());
-        assertEquals(startOfDay(today), selection.first());
-        assertEquals(startOfDay(tomorrow), selection.last());
+        assertEquals(2, model.getSelection().size());
+        assertEquals(startOfDay(today), model.getFirstSelectionDate());
+        assertEquals(startOfDay(tomorrow), model.getLastSelectionDate());
     }
 
     public void testWeekIntervalSelection() {
@@ -222,10 +218,10 @@ public class DaySelectionModelTest extends AbstractTestDateSelectionModel {
         model.setSelectionInterval(yesterday, yesterday);
         model.addSelectionInterval(afterTomorrow, afterTomorrow);
         
-        SortedSet<Date> selection = model.getSelection();
-        assertEquals(2, selection.size());
-        assertEquals(startOfDay(yesterday), selection.first());
-        assertEquals(startOfDay(afterTomorrow), selection.last());
+        assertEquals(2, model.getSelection().size());
+        assertEquals(startOfDay(yesterday), model.getFirstSelectionDate());
+        assertEquals(startOfDay(afterTomorrow), model.getLastSelectionDate());
+        
     }
 
     @Override

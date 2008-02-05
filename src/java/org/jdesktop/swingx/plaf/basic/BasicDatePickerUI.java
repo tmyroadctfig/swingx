@@ -600,8 +600,8 @@ public class BasicDatePickerUI extends DatePickerUI {
             return;
         }
         // the other place to interrupt the update spiral
-        if (!CalendarUtils.areEqual(newDate, datePicker.getMonthView().getSelectedDate())) {
-            datePicker.getMonthView().setSelectedDate(newDate);
+        if (!CalendarUtils.areEqual(newDate, datePicker.getMonthView().getSelectionDate())) {
+            datePicker.getMonthView().setSelectionDate(newDate);
         }
         datePicker.setDate(newDate);
     }
@@ -706,7 +706,7 @@ public class BasicDatePickerUI extends DatePickerUI {
      * Sets the editor value to the model's selectedDate.
      */
     private void updateEditorValue() {
-        datePicker.getEditor().setValue(datePicker.getMonthView().getSelectedDate());
+        datePicker.getEditor().setValue(datePicker.getMonthView().getSelectionDate());
     }
 
     //---------------------- updating other properties
@@ -827,7 +827,7 @@ public class BasicDatePickerUI extends DatePickerUI {
         if (commit) {
             Calendar cal = datePicker.getMonthView().getCalendar();
             cal.setTime(datePicker.getToday());
-            datePicker.getMonthView().setSelectedDate(cal.getTime());
+            datePicker.getMonthView().setSelectionDate(cal.getTime());
             datePicker.getMonthView().commitSelection();
         } else {
             datePicker.getMonthView().ensureDateVisible(datePicker.getToday());

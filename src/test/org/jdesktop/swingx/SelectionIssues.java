@@ -79,13 +79,13 @@ public class SelectionIssues extends InteractiveTestCase {
         final Calendar today = Calendar.getInstance();
         CalendarUtils.endOfMonth(today);
         today.add(Calendar.DAY_OF_MONTH, 1);
-        us.setSelectedDate(today.getTime());
+        us.setSelectionDate(today.getTime());
         JXFrame frame = wrapInFrame(us, "first day of next month");
         Action nextMonthInterval = new AbstractActionExt("next month interval") {
 
             public void actionPerformed(ActionEvent e) {
                 if (us.isSelectionEmpty()) return;
-                today.setTime(us.getSelectedDate());
+                today.setTime(us.getSelectionDate());
                 today.add(Calendar.DAY_OF_MONTH, -20);
                 Date start = today.getTime();
                 today.add(Calendar.DAY_OF_MONTH, +40);
@@ -107,7 +107,7 @@ public class SelectionIssues extends InteractiveTestCase {
                     
                 }
                 today.add(Calendar.DAY_OF_MONTH, 1);
-                us.setSelectedDate(today.getTime());
+                us.setSelectionDate(today.getTime());
                 LOG.info("firstDisplayed before: " + new Date(us.getFirstDisplayedDate()));
                 
                 // shouldn't effect scrolling state

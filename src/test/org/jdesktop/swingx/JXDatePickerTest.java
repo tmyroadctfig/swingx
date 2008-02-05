@@ -171,7 +171,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
         picker.getMonthView().setSelectionModel(selectionModel);
         Date date = new Date();
         selectionModel.setSelectionInterval(date, date);
-        Date first = selectionModel.getSelection().first();
+        Date first = selectionModel.getFirstSelectionDate();
         assertEquals("formats diff: " + (date.getTime() - first.getTime())
                 , date, first);
     }
@@ -1259,7 +1259,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
     private void assertSynchAll(JXDatePicker picker, Date date) {
         assertEquals(date, picker.getEditor().getValue());
         assertEquals(date, picker.getDate());
-        assertEquals(date, picker.getMonthView().getSelectedDate());
+        assertEquals(date, picker.getMonthView().getSelectionDate());
         // @KEEP JW - currently unused, not yet sure if it's the right place
         // for checking against ripples produced by fixing #705-swingx
         Calendar cal = picker.getMonthView().getCalendar();
@@ -1491,7 +1491,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
         // sanity
         assertNotNull(picker.getDate());
         JXMonthView monthView = new JXMonthView();
-        Date selectedDate = monthView.getSelectedDate();
+        Date selectedDate = monthView.getSelectionDate();
         assertNull(selectedDate);
         picker.setMonthView(monthView);
         assertSynchAll(picker, selectedDate);

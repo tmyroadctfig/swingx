@@ -2196,7 +2196,7 @@ public class BasicMonthViewUI extends MonthViewUI {
             if (!canSelectByMode())
                 return;
             if (!isUsingKeyboard()) {
-                originalDateSpan = monthView.getSelection();
+                originalDateSpan = getSelection();
             }
             // JW: removed the isUsingKeyboard from the condition
             // need to fire always.
@@ -2234,7 +2234,7 @@ public class BasicMonthViewUI extends MonthViewUI {
         }
 
         private void traverse(int action) {
-            long oldStart = monthView.isSelectionEmpty() ? System.currentTimeMillis() : getSelection().first().getTime();
+            long oldStart = monthView.isSelectionEmpty() ? System.currentTimeMillis() : monthView.getFirstSelectionDate().getTime();
             Calendar cal = getCalendar(oldStart);
             switch (action) {
                 case SELECT_PREVIOUS_DAY:
@@ -2276,8 +2276,8 @@ public class BasicMonthViewUI extends MonthViewUI {
             long selectionStart;
             long selectionEnd;
             if (!monthView.isSelectionEmpty()) {
-                newStartDate = selectionStart = getSelection().first().getTime();
-                newEndDate = selectionEnd = getSelection().last().getTime();
+                newStartDate = selectionStart = monthView.getFirstSelectionDate().getTime();
+                newEndDate = selectionEnd = monthView.getLastSelectionDate().getTime();
             } else {
                 newStartDate = selectionStart = startOfDay(System.currentTimeMillis());
                 newEndDate = selectionEnd = newStartDate;

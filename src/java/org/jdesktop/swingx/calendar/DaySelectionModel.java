@@ -195,6 +195,20 @@ public class DaySelectionModel extends AbstractDateSelectionModel {
     /**
      * {@inheritDoc}
      */
+    public Date getFirstSelectionDate() {
+        return isSelectionEmpty() ? null : selectedDates.first();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Date getLastSelectionDate() {
+        return isSelectionEmpty() ? null : selectedDates.last();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public boolean isSelected(Date date) {
         date = startOfDay(date);
         return selectedDates.contains(date);
@@ -325,4 +339,5 @@ public class DaySelectionModel extends AbstractDateSelectionModel {
         Contract.asNotNull(date, "date must not be null");
         return startOfDay(date);
     }
+
 }

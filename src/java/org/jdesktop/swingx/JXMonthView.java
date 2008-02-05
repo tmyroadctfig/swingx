@@ -978,27 +978,38 @@ public class JXMonthView extends JComponent {
      */
     public void setSelectionMode(final SelectionMode selectionMode) {
         getSelectionModel().setSelectionMode(selectionMode);
-//        SelectionMode oldSelectionMode = this.selectionMode;
-//        this.selectionMode = selectionMode;
-//        if (selectionMode == SelectionMode.NO_SELECTION || selectionMode == SelectionMode.SINGLE_SELECTION) {
-//            getSelectionModel().setSelectionMode(DateSelectionModel.SelectionMode.SINGLE_SELECTION);
-//        } else if (selectionMode == SelectionMode.SINGLE_INTERVAL_SELECTION ||
-//                selectionMode == SelectionMode.WEEK_INTERVAL_SELECTION) {
-//            getSelectionModel().setSelectionMode(DateSelectionModel.SelectionMode.SINGLE_INTERVAL_SELECTION);
-//        } else {
-//            getSelectionModel().setSelectionMode(DateSelectionModel.SelectionMode.MULTIPLE_INTERVAL_SELECTION);
-//        }
-//        firePropertyChange("selectionMode", oldSelectionMode, this.selectionMode);
     }
 
-   
     /**
-     * Returns the selected date. 
+     * Returns the earliest selected date. 
+     * 
+     *   
+     * @return the first Date in the selection or null if empty.
+     */
+    public Date getFirstSelectionDate() {
+        return getSelectionModel().getFirstSelectionDate();    
+     }
+   
+
+    /**
+     * Returns the earliest selected date. 
      * 
      * @return the first Date in the selection or null if empty.
      */
-    public Date getSelectedDate() {
-        return isSelectionEmpty() ? null : getSelection().first();    
+    public Date getLastSelectionDate() {
+        return getSelectionModel().getLastSelectionDate();    
+     }
+
+    /**
+     * Returns the earliest selected date. 
+     * 
+     * PENDING JW: keep this? it was introduced before the first/last 
+     *   in model. When delegating everything, we duplicate here.
+     *   
+     * @return the first Date in the selection or null if empty.
+     */
+    public Date getSelectionDate() {
+        return getFirstSelectionDate();    
     }
 
     /**
@@ -1007,12 +1018,37 @@ public class JXMonthView extends JComponent {
      * 
      * @param newDate the selection date to set
      */
-    public void setSelectedDate(Date newDate) {
+    public void setSelectionDate(Date newDate) {
         if (newDate == null) {
             clearSelection();
         } else {
             setSelectionInterval(newDate, newDate);
         }
+    }
+
+    /**
+     * Returns the selected date. 
+     * 
+     * @return the first Date in the selection or null if empty.
+     * 
+     * @deprecated use {@link #getSelectionDate()} name change to 
+     *   align with new DateSelectionModel api
+     */
+    public Date getSelectedDate() {
+        return getSelectionDate();    
+    }
+
+    /**
+     * Sets the model's selection to the given date or clears the selection if
+     * null.
+     * 
+     * @param newDate the selection date to set
+     * 
+     * @deprecated use {@link #setSelectionDate(Date)} - name change to 
+     *   align with new DateSelectionModel api
+     */
+    public void setSelectedDate(Date newDate) {
+        setSelectionDate(newDate);
     }
 
     /**
@@ -1109,7 +1145,7 @@ public class JXMonthView extends JComponent {
      * @param date The date to check
      * @return true if the date is selected, false otherwise
      * 
-     * @deprecated use {@link #setSelectedDate(Date)}
+     * @deprecated use {@link #setSelectionDate(Date)}
      */
     public boolean isSelectedDate(long date) {
         return getSelectionModel().isSelected(new Date(date));

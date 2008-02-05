@@ -346,7 +346,7 @@ public class JXMonthViewIssues extends InteractiveTestCase {
         TimeZone tz = TimeZone.getTimeZone("GMT+4");
         monthView.setTimeZone(tz);
         Date date = new Date();
-        monthView.setSelectedDate(date);
+        monthView.setSelectionDate(date);
         assertTrue(monthView.isSelectedDate(date));
         fail("test passes - but tells nothing");
     }

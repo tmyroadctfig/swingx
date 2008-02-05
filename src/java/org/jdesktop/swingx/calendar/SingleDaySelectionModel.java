@@ -163,6 +163,20 @@ public class SingleDaySelectionModel extends AbstractDateSelectionModel {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public Date getFirstSelectionDate() {
+        return isSelectionEmpty() ? null : selectedDates.first();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Date getLastSelectionDate() {
+        return isSelectionEmpty() ? null : selectedDates.last();
+    }
+
+    /**
      * Returns a boolean indicating whether the given date is selectable.
      * 
      * @param date the date to check for selectable, must not be null.

@@ -43,10 +43,10 @@ public class SingleDaySelectionModelTest extends AbstractTestDateSelectionModel 
      */
     public void testNormalizedDateContract() {
         model.setSelectionInterval(today, today);
-        assertEquals(model.getNormalizedDate(today), model.getSelection().first());
+        assertEquals(model.getNormalizedDate(today), model.getFirstSelectionDate());
         Date start = startOfDay(today);
         model.setSelectionInterval(start, start);
-        assertEquals(model.getNormalizedDate(start), model.getSelection().first());
+        assertEquals(model.getNormalizedDate(start), model.getFirstSelectionDate());
     }
 
     /**
@@ -398,7 +398,7 @@ public class SingleDaySelectionModelTest extends AbstractTestDateSelectionModel 
         model.setUpperBound(startOfDay(today));
         model.setSelectionInterval(today, today);
         assertEquals("selected bounds", today, 
-                model.getSelection().first());
+                model.getFirstSelectionDate());
     }
 
     /**
@@ -439,7 +439,7 @@ public class SingleDaySelectionModelTest extends AbstractTestDateSelectionModel 
         // the bound itself is allowed
         model.setSelectionInterval(today, today);
         assertEquals("selected upper bound", model.getLowerBound(), 
-                model.getSelection().first());
+                model.getFirstSelectionDate());
     }
     
     /**
@@ -488,7 +488,7 @@ public class SingleDaySelectionModelTest extends AbstractTestDateSelectionModel 
         // the bound itself is allowed
         model.setSelectionInterval(today, today);
         assertEquals("selected upper bound", model.getUpperBound(), 
-                model.getSelection().first());
+                model.getFirstSelectionDate());
     }
     
     /**
@@ -554,22 +554,19 @@ public class SingleDaySelectionModelTest extends AbstractTestDateSelectionModel 
      */
     public void testSingleSelection() {
         model.setSelectionInterval(today, today);
-        SortedSet<Date> selection = model.getSelection();
-        assertTrue(!selection.isEmpty());
-        assertTrue(1 == selection.size());
-        assertTrue(today.equals(selection.first()));
+        assertTrue(!model.isSelectionEmpty());
+        assertTrue(1 == model.getSelection().size());
+        assertTrue(today.equals(model.getFirstSelectionDate()));
 
         model.setSelectionInterval(today, tomorrow);
-        selection = model.getSelection();
-        assertTrue(!selection.isEmpty());
-        assertTrue(1 == selection.size());
-        assertTrue(today.equals(selection.first()));
+        assertTrue(!model.isSelectionEmpty());
+        assertTrue(1 == model.getSelection().size());
+        assertTrue(today.equals(model.getFirstSelectionDate()));
 
         model.addSelectionInterval(tomorrow, tomorrow);
-        selection = model.getSelection();
-        assertTrue(!selection.isEmpty());
-        assertTrue(1 == selection.size());
-        assertTrue(tomorrow.equals(selection.first()));
+        assertTrue(!model.isSelectionEmpty());
+        assertTrue(1 == model.getSelection().size());
+        assertTrue(tomorrow.equals(model.getFirstSelectionDate()));
     }
 
     

@@ -29,6 +29,7 @@ import java.util.TreeSet;
 
 import junit.framework.TestCase;
 
+import org.jdesktop.swingx.calendar.DateSelectionModel.SelectionMode;
 import org.jdesktop.swingx.event.DateSelectionEvent.EventType;
 import org.jdesktop.swingx.test.DateSelectionReport;
 
@@ -53,6 +54,47 @@ public class AbstractTestDateSelectionModel extends TestCase {
     protected Date yesterday;
     // the calendar to use, its date is initialized with the today-field in setUpCalendar
     protected Calendar calendar;
+
+    
+    /**
+     * Issue #713-Swingx: DateSelectionModel needs richer api.
+     * 
+     * Add api to access first/last.
+     */
+    public void testFirstSelectionDate() {
+        model.setSelectionMode(SelectionMode.SINGLE_INTERVAL_SELECTION);
+        model.setSelectionInterval(today, tomorrow);
+        assertEquals(model.getSelection().first(), model.getFirstSelectionDate());
+    }
+    
+    /**
+     * Issue #713-Swingx: DateSelectionModel needs richer api.
+     * 
+     * Add api to access first/last.
+     */
+    public void testLastSelectionDate() {
+        model.setSelectionMode(SelectionMode.SINGLE_INTERVAL_SELECTION);
+        model.setSelectionInterval(today, tomorrow);
+        assertEquals(model.getSelection().last(), model.getLastSelectionDate());
+    }
+
+    /**
+     * Issue ??-Swingx: DateSelectionModel needs richer api.
+     * 
+     * Add api to access first/last.
+     */
+    public void testFirstSelectionDateEmpty() {
+        assertEquals(null, model.getFirstSelectionDate());
+    }
+    
+    /**
+     * Issue ??-Swingx: DateSelectionModel needs richer api.
+     * 
+     * Add api to access first/last.
+     */
+    public void testLastSelectionDateEmpty() {
+        assertEquals(null, model.getLastSelectionDate());
+    }
 
     /**
      * Issue #618-swingx: JXMonthView displays problems with non-default

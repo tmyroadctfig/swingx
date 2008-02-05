@@ -210,6 +210,19 @@ public interface DateSelectionModel {
     public SortedSet<Date> getSelection();
 
     /**
+     * 
+     * @return the first earliest date in the selection, or null if isSelectionEmpty.
+     */
+    public Date getFirstSelectionDate();
+
+    /**
+     * 
+     * @return the first earliest date in the selection, or null if isSelectionEmpty.
+     */
+    public Date getLastSelectionDate();
+
+
+    /**
      * Return true if the date specified is selected, false otherwise. <p>
      * 
      * Note: it is up to implementations to define the exact notion of selected.

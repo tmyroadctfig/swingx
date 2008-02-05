@@ -212,7 +212,7 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
      */
     public void interactiveUpdateUIMonthViewCustomUI() {
         final JXMonthView monthView = new JXMonthView();
-        monthView.setSelectedDate(new Date());
+        monthView.setSelectionDate(new Date());
         final JXFrame frame = showInFrame(monthView, "MonthView custom ui (selection color)");
         Action action = new AbstractActionExt("toggleUI") {
             public void actionPerformed(ActionEvent e) {
@@ -289,9 +289,9 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
 
             public void actionPerformed(ActionEvent e) {
                 if (us.isSelectionEmpty()) return;
-                Date start = us.getSelectedDate();
+                Date start = us.getSelectionDate();
                 
-                today.setTime(us.getSelection().last());
+                today.setTime(us.getLastSelectionDate());
                 today.add(Calendar.DAY_OF_MONTH, 5);
                 us.addSelectionInterval(start, today.getTime());
                 // here we simulate an auto-scroll
@@ -351,7 +351,7 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
     public void interactiveFirstRowOfMonth() {
         JXMonthView monthView = new JXMonthView();
         calendar.set(2008, 0, 1);
-        monthView.setSelectedDate(calendar.getTime());
+        monthView.setSelectionDate(calendar.getTime());
         showInFrame(monthView, "first row");
     }
 
@@ -427,7 +427,7 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
         final JComboBox zoneSelector = new JComboBox(TimeZone.getAvailableIDs());
         final JXDatePicker picker = new JXDatePicker();
         final JXMonthView monthView = new JXMonthView();
-        monthView.setSelectedDate(picker.getDate());
+        monthView.setSelectionDate(picker.getDate());
         monthView.setLowerBound(XTestUtils.getStartOfToday(-10));
         monthView.setUpperBound(XTestUtils.getStartOfToday(10));
         monthView.setUnselectableDates(XTestUtils.getStartOfToday(2));

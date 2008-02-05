@@ -43,7 +43,7 @@ public class DefaultDateSelectionModelTest extends AbstractTestDateSelectionMode
      */
     public void testNormalizedDateContract() {
         model.setSelectionInterval(today, today);
-        assertEquals(model.getNormalizedDate(today), model.getSelection().first());
+        assertEquals(model.getNormalizedDate(today), model.getFirstSelectionDate());
     }
 
     /**
@@ -378,7 +378,7 @@ public class DefaultDateSelectionModelTest extends AbstractTestDateSelectionMode
         model.setUpperBound(today);
         model.setSelectionInterval(today, today);
         assertEquals("selected bounds", today, 
-                model.getSelection().first());
+                model.getFirstSelectionDate());
     }
 
     /**
@@ -425,7 +425,7 @@ public class DefaultDateSelectionModelTest extends AbstractTestDateSelectionMode
         // the bound itself is allowed
         model.setSelectionInterval(today, today);
         assertEquals("selected upper bound", model.getLowerBound(), 
-                model.getSelection().first());
+                model.getFirstSelectionDate());
     }
     /**
      *  respect upper bound - the day after is
@@ -466,7 +466,7 @@ public class DefaultDateSelectionModelTest extends AbstractTestDateSelectionMode
         // the bound itself is allowed
         model.setSelectionInterval(today, today);
         assertEquals("selected upper bound", model.getUpperBound(), 
-                model.getSelection().first());
+                model.getFirstSelectionDate());
     }
     
     /**
