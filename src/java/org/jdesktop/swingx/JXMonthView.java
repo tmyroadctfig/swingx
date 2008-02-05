@@ -463,7 +463,9 @@ public class JXMonthView extends JComponent {
             model = new DaySelectionModel(locale);
         }
         this.model = model;
-        
+        // PENDING JW: do better to synchronize Calendar related 
+        // properties of flaggedDates to those of the selection model.
+        // plus: should use the same normalization?
         this.flaggedDates = new DaySelectionModel(locale);
         flaggedDates.setSelectionMode(SelectionMode.MULTIPLE_INTERVAL_SELECTION);
         
@@ -1201,11 +1203,12 @@ public class JXMonthView extends JComponent {
     }
     
     /**
-     * An array of longs defining days that should be flagged. To reset,
-     * call this method without parameter.
+     * Replace all flags with the given dates.
      * 
      * NOTE: neither the given array nor any of its elements should be null.
-     * Currently, a null array will be tolerated to ease migration. 
+     * Currently, a null array will be tolerated to ease migration. A null
+     * has the same effect as clearFlaggedDates.
+     * 
      *
      * @param flaggedDates the dates to be flagged
      */
@@ -1218,18 +1221,78 @@ public class JXMonthView extends JComponent {
                 flaggedDates.addSelectionInterval(date, date);
             }
         }
-//        long[] flagged = null;
-//        if (flaggedDates != null) {
-//            flagged = new long[flaggedDates.length];
-//            for (int i = 0; i < flaggedDates.length; i++) {
-//                flagged[i] = flaggedDates[i].getTime();
-//            }
-//        }
-//        setFlaggedDates(flagged);
+        firePropertyChange("flaggedDates", oldFlagged, flaggedDates.getSelection());
+        repaint();
+    }
+    /**
+     * Adds the dates to the flags. 
+     * 
+     * NOTE: neither the given array nor any of its elements should be null.
+     * Currently, a null array will be tolerated to ease migration. A null
+     * does nothing.
+     *
+     * @param flaggedDates the dates to be flagged
+     */
+    public void addFlaggedDates(Date... flagged) {
+//        Contract.asNotNull(flagged, "must not be null");
+        SortedSet<Date> oldFlagged = flaggedDates.getSelection();
+        if (flagged != null) {
+            for (Date date : flagged) {
+                flaggedDates.addSelectionInterval(date, date);
+            }
+        }
         firePropertyChange("flaggedDates", oldFlagged, flaggedDates.getSelection());
         repaint();
     }
     
+    /**
+     * Unflags the given dates.
+     * 
+     * NOTE: neither the given array nor any of its elements should be null.
+     * Currently, a null array will be tolerated to ease migration. 
+     *
+     * @param flaggedDates the dates to be unflagged
+     */
+    public void removeFlaggedDates(Date... flagged) {
+//        Contract.asNotNull(flagged, "must not be null");
+        SortedSet<Date> oldFlagged = flaggedDates.getSelection();
+        if (flagged != null) {
+            for (Date date : flagged) {
+                flaggedDates.removeSelectionInterval(date, date);
+            }
+        }
+        firePropertyChange("flaggedDates", oldFlagged, flaggedDates.getSelection());
+        repaint();
+    }
+    /**
+     * Clears all flagged dates.
+     * 
+     */
+    public void clearFlaggedDates() {
+        SortedSet<Date> oldFlagged = flaggedDates.getSelection();
+        flaggedDates.clearSelection();
+        firePropertyChange("flaggedDates", oldFlagged, flaggedDates.getSelection());
+    }
+    
+    /**
+     * Returns a sorted set of flagged Dates. The returned set is guaranteed to
+     * be not null, but may be empty.
+     * 
+     * @return a sorted set of flagged dates.
+     */
+    public SortedSet<Date> getFlaggedDates() {
+        return flaggedDates.getSelection();
+    }
+
+    /**
+     * Returns a boolean indicating if this monthView has flagged dates.
+     * 
+     * @return a boolean indicating if this monthView has flagged dates.
+     */
+    public boolean hasFlaggedDates() {
+        return !flaggedDates.isSelectionEmpty();
+    }
+
 //--------------------- flagged dates (long) - deprecation pending!
 
     /**
@@ -1243,11 +1306,6 @@ public class JXMonthView extends JComponent {
      */
     public boolean isFlaggedDate(long date) {
         return isFlaggedDate(new Date(date));
-//        boolean result = false;
-//        if (flaggedDates != null) {
-//            result = flaggedDates.contains(startOfDay(date));
-//        }
-//        return result;
     }
 
     /**
@@ -1266,33 +1324,9 @@ public class JXMonthView extends JComponent {
             }
         }
         setFlaggedDates(flagged);
-//        if (flaggedDates == null) {
-//            this.flaggedDates = null;
-//        } else {
-//            this.flaggedDates = new TreeSet<Long>();
-//            // Loop through the flaggedDates and clean them up so
-//            // the hour, minute, seconds and milliseconds to 0 so
-//            // we can compare times later.
-//            for (long flaggedDate : flaggedDates) {
-//                this.flaggedDates.add(startOfDay(flaggedDate));
-//            }
-//        }
-//        firePropertyChange(FLAGGED_DATES, null, this.flaggedDates);
-//        repaint();
     }
 
 //------------------- visual properties    
-    /**
-     * Temporary api to allow testing of cleanup after setting TimeZone.
-     * 
-     * PENDING: need access to the set of flagged dates.
-     * 
-     * @return a boolean indicating if this monthView has flagged dates.
-     */
-    protected boolean hasFlaggedDates() {
-        return !flaggedDates.isSelectionEmpty();
-//        return (flaggedDates != null) && (flaggedDates.size() > 0);
-    }
     /**
      * Whether or not to show leading dates for a months displayed by this component.
      *

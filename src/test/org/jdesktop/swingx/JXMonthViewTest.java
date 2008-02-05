@@ -1680,17 +1680,120 @@ public class JXMonthViewTest extends MockObjectTestCase {
     /**
      * test setting/checking flagged dates (api with Date)
      */
-    public void testFlaggedDate() {
+    public void testFlaggedDateRemoveNotify() {
         JXMonthView monthView = new JXMonthView();
-        Date date = new Date();
-
-        assertFalse(monthView.isFlaggedDate(date));
-        monthView.setFlaggedDates(new Date[]{date});
-        assertTrue(monthView.isFlaggedDate(date));
-        monthView.setFlaggedDates();
-        assertFalse(monthView.isFlaggedDate(date));
+        
+        monthView.setFlaggedDates(tomorrow, yesterday);
+        SortedSet<Date> oldFlagged = monthView.getFlaggedDates();
+        PropertyChangeReport report = new PropertyChangeReport();
+        monthView.addPropertyChangeListener(report);
+        monthView.removeFlaggedDates(tomorrow);
+        TestUtils.assertPropertyChangeEvent(report, "flaggedDates", 
+                oldFlagged, monthView.getFlaggedDates());
     }
 
+    /**
+     * test setting/checking flagged dates (api with Date)
+     */
+    public void testFlaggedDateRemove() {
+        JXMonthView monthView = new JXMonthView();
+        
+        monthView.addFlaggedDates(tomorrow, yesterday);
+        assertEquals(2, monthView.getFlaggedDates().size());
+        monthView.removeFlaggedDates(tomorrow);
+        assertTrue(monthView.isFlaggedDate(yesterday));
+        assertFalse(monthView.isFlaggedDate(tomorrow));
+    }
+
+    
+    /**
+     * test setting/checking flagged dates (api with Date)
+     */
+    public void testFlaggedDateClear() {
+        JXMonthView monthView = new JXMonthView();
+        
+        monthView.addFlaggedDates(tomorrow, yesterday);
+        assertEquals(2, monthView.getFlaggedDates().size());
+        monthView.clearFlaggedDates();
+        assertFalse("flagged dates must be cleared", monthView.hasFlaggedDates());
+    }
+
+    /**
+     * test setting/checking flagged dates (api with Date)
+     */
+    public void testFlaggedDateClearNotify() {
+        JXMonthView monthView = new JXMonthView();
+        
+        monthView.setFlaggedDates(tomorrow, yesterday);
+        SortedSet<Date> oldFlagged = monthView.getFlaggedDates();
+        PropertyChangeReport report = new PropertyChangeReport();
+        monthView.addPropertyChangeListener(report);
+        monthView.clearFlaggedDates();
+        TestUtils.assertPropertyChangeEvent(report, "flaggedDates", 
+                oldFlagged, monthView.getFlaggedDates());
+    }
+
+    /**
+     * test setting/checking flagged dates (api with Date)
+     */
+    public void testFlaggedDateAdd() {
+        JXMonthView monthView = new JXMonthView();
+        
+        monthView.setFlaggedDates(yesterday);
+        monthView.addFlaggedDates(tomorrow);
+        assertEquals(2, monthView.getFlaggedDates().size());
+        assertTrue(monthView.isFlaggedDate(yesterday));
+        assertTrue(monthView.isFlaggedDate(tomorrow));
+    }
+    /**
+     * test setting/checking flagged dates (api with Date)
+     */
+    public void testFlaggedDateAddNotify() {
+        JXMonthView monthView = new JXMonthView();
+        
+        monthView.setFlaggedDates(yesterday);
+        SortedSet<Date> oldFlagged = monthView.getFlaggedDates();
+        PropertyChangeReport report = new PropertyChangeReport();
+        monthView.addPropertyChangeListener(report);
+        monthView.addFlaggedDates(tomorrow);
+        TestUtils.assertPropertyChangeEvent(report, "flaggedDates", 
+                oldFlagged, monthView.getFlaggedDates());
+    }
+    /**
+     * test setting/checking flagged dates (api with Date)
+     */
+    public void testFlaggedDateSet() {
+        JXMonthView monthView = new JXMonthView();
+        monthView.setFlaggedDates(today);
+        assertTrue(monthView.isFlaggedDate(today));
+        monthView.setFlaggedDates();
+        assertFalse(monthView.isFlaggedDate(today));
+    }
+    /**
+     * test setting/checking flagged dates (api with Date)
+     */
+    public void testFlaggedDateNotification() {
+        JXMonthView monthView = new JXMonthView();
+        SortedSet<Date> oldFlagged = monthView.getFlaggedDates();
+        PropertyChangeReport report = new PropertyChangeReport();
+        monthView.addPropertyChangeListener(report);
+        monthView.setFlaggedDates(today);
+        TestUtils.assertPropertyChangeEvent(report, "flaggedDates", 
+                oldFlagged, monthView.getFlaggedDates());
+    }
+
+    /**
+     * test setting/checking flagged dates (api with Date)
+     */
+    public void testFlaggedDateGet() {
+        JXMonthView monthView = new JXMonthView();
+        Date date = new Date();
+        SortedSet<Date> set = new TreeSet<Date>();
+        set.add(monthView.getSelectionModel().getNormalizedDate(date));
+        monthView.setFlaggedDates(date);
+        assertEquals(set, monthView.getFlaggedDates());
+    }
+   
     public void testShowLeadingDates() {
         JXMonthView monthView = new JXMonthView();
         assertFalse(monthView.isShowingLeadingDates());
