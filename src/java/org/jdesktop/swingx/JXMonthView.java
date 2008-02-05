@@ -1726,7 +1726,9 @@ public class JXMonthView extends JComponent {
      */
     @Deprecated
     public long getDayAt(int x, int y) {
-        return getUI().getDayAt(x, y);
+//        return getUI().getDayAt(x, y);
+        Date day = getDayAtLocation(x, y);
+        return day != null ? day.getTime() : -1;
     }
 
     /**
@@ -1738,8 +1740,9 @@ public class JXMonthView extends JComponent {
      * @return The date at the given location or null if the the position
      *   doesn't contain a Day.
      */ 
-    public Calendar getDayAtLocation(int x, int y) {
-        return getUI().getDayAtLocation(x, y);
+    public Date getDayAtLocation(int x, int y) {
+        Calendar cal = getUI().getDayAtLocation(x, y);
+        return cal != null ? cal.getTime() : null;
     }
     /**
      * Returns the string currently used to identiy fired ActionEvents.

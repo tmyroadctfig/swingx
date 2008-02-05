@@ -30,7 +30,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.lang.reflect.InvocationTargetException;
 import java.text.DateFormatSymbols;
 import java.util.Calendar;
 import java.util.Date;
@@ -40,7 +39,6 @@ import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JComboBox;
-import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
 import org.jdesktop.swingx.InteractiveTestCase;
@@ -49,6 +47,7 @@ import org.jdesktop.swingx.JXMonthView;
 import org.jdesktop.swingx.JXStatusBar;
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.calendar.CalendarUtils;
+import org.jdesktop.swingx.calendar.DateSelectionModel.SelectionMode;
 
 /**
  * Tests to expose known issues of BasicMonthViewUI.
@@ -85,19 +84,23 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
         monthView.setShowingWeekNumber(true);
         monthView.setShowLeadingDates(true);
         monthView.setShowTrailingDates(true);
+        monthView.setSelectionMode(SelectionMode.SINGLE_INTERVAL_SELECTION);
+        final BasicMonthViewUI ui = ((BasicMonthViewUI) monthView.getUI());
         monthView.addMouseListener(new MouseAdapter() {
 
             @Override
             public void mouseReleased(MouseEvent e) {
-                LOG.info("dayAt " + e.getPoint() + ": "
-                        + new Date(monthView.getDayAt(e.getX(), e.getY()))
-                        + "\n" + monthView.getDayAtLocation(e.getX(), e.getY())
-                                );
-                LOG.info("month at " + 
-                        ((BasicMonthViewUI) monthView.getUI()).getMonthAtLocation(e.getX(), e.getY()).getTime());
-                
-                LOG.info("month at " + 
-                        ((BasicMonthViewUI) monthView.getUI()).getMonthBoundsAtLocation(e.getX(), e.getY()));
+                LOG.info("calendar grid" + ui.calendarGrid + "/" + ui.startX + "/ " + ui.startY);
+//                LOG.info("dayAt " + e.getPoint() + ": "
+//                        + new Date(monthView.getDayAt(e.getX(), e.getY()))
+//                        + "\n" + monthView.getDayAtLocation(e.getX(), e.getY())
+//                                );
+                Calendar monthAtLocation = ui.getMonthAtLocation(e.getX(), e.getY());
+//                LOG.info("month at " + 
+//                        (monthAtLocation != null ? monthAtLocation.getTime() : null));
+//                
+//                LOG.info("month at " + 
+//                        ((BasicMonthViewUI) monthView.getUI()).getMonthBoundsAtLocation(e.getX(), e.getY()));
             }
             
         });
@@ -149,6 +152,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
         monthView.setShowingWeekNumber(true);
         monthView.setShowLeadingDates(true);
         monthView.setShowTrailingDates(true);
+        monthView.setSelectionMode(SelectionMode.SINGLE_INTERVAL_SELECTION);
         Action action = new AbstractActionExt("toggle minimal") {
 
             public void actionPerformed(ActionEvent e) {
@@ -196,7 +200,16 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
     }
 
 //------------------------------
- 
+    
+    public void testname() {
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.info("cannot run test - headless environment");
+            return;
+        }
+        BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.LEFT_TO_RIGHT);
+        Rectangle monthBounds = ui.getMonthBoundsAtLocation(20, 20);
+        assertEquals(ui.startX, ui.calendarGrid.x);
+    }
     
     /**
      * Test day at location
@@ -457,6 +470,26 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
     }
 
     /**
+     * coordinate mapping: monthBounds in pixel.
+     * 
+     */
+    public void testMonthHeaderBoundsAtLocation() {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.info("cannot run test - headless environment");
+            return;
+        }
+        JXMonthView monthView = new JXMonthView();
+        monthView.setTraversable(true);
+        JXFrame frame = new JXFrame();
+        frame.add(monthView);
+        frame.pack();
+        BasicMonthViewUI ui = (BasicMonthViewUI) monthView.getUI();
+        Rectangle monthBoundsLToR = ui.getMonthHeaderBoundsAtLocation(20, 20);
+        assertEquals("", ui.getMonthHeaderHeight(), monthBoundsLToR.height);
+    }
+
+    /**
      * Returns the ui of a realized JXMonthView with 2 columns and the 
      * given componentOrientation without showingWeekNumbers.
      * 
@@ -487,6 +520,8 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
         JXFrame frame = new JXFrame();
         frame.add(monthView);
         frame.pack();
+        frame.setSize(450 , 220);
+        frame.getRootPane().revalidate();
         BasicMonthViewUI ui = (BasicMonthViewUI) monthView.getUI();
         return ui;
     }
@@ -512,13 +547,13 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
         pref.height = pref.height / 2;
         long dayLong = monthView.getDayAt(pref.width, pref.height);
         assertTrue(dayLong > 0);
-        Calendar date = monthView.getDayAtLocation(pref.width, pref.height);
+        Date date = monthView.getDayAtLocation(pref.width, pref.height);
         assertNotNull(date);
         Calendar cal = monthView.getCalendar();
         cal.setTimeInMillis(dayLong);
-        assertEquals(cal.getTime(), date.getTime());
-        assertTrue(CalendarUtils.isSameDay(cal, date.getTime()));
-        assertEquals(new Date(dayLong), date.getTime());
+        assertEquals(cal.getTime(), date);
+        assertTrue(CalendarUtils.isSameDay(cal, date));
+        assertEquals(new Date(dayLong), date);
     }
 
     

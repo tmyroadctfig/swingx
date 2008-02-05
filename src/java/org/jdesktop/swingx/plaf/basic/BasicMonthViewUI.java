@@ -154,12 +154,14 @@ public class BasicMonthViewUI extends MonthViewUI {
      * 
      * PENDING: JW - really want to adjust here? Need to check in usage
      *   anyway.
+     * protected for testing - don't use, will be removed 
      */
-    private int startX;
+    protected int startX;
     /**
      * Top of first row of displayed months. 
+     * protected for testing - don't use, will be removed 
      */
-    private int startY;
+    protected int startY;
 
     /** 
      * height of month header of the view, that is the name and the arrows.
@@ -201,7 +203,7 @@ public class BasicMonthViewUI extends MonthViewUI {
     /** The number of calendars displayed horizontally. */
     private int calendarColumnCount = 1;
     
-    private Rectangle calendarGrid = new Rectangle();
+    protected Rectangle calendarGrid = new Rectangle();
     private Rectangle[] monthStringBounds = new Rectangle[12];
     private Rectangle[] yearStringBounds = new Rectangle[12];
     private int fullCalendarHeight;
@@ -704,13 +706,15 @@ public class BasicMonthViewUI extends MonthViewUI {
         Point dayInGrid = getDayGridPositionAtLocation(x, y);
         if ((dayInGrid == null) || (dayInGrid.x < 0) || (dayInGrid.y < 0)) return null;
         Calendar month = getMonthAtLocation(x, y);
-        CalendarUtils.startOfWeek(month);
-        month.add(Calendar.DAY_OF_YEAR, 
-                dayInGrid.y * JXMonthView.DAYS_IN_WEEK + dayInGrid.x);
-        return month;
+        return getDayInMonth(month, dayInGrid.y, dayInGrid.x);
     }
     
     /**
+     * Returns a Calendar representing the day defined by the logical 
+     * grid coordinates relative to the given month.
+     * 
+     * Mapping logical day grid coordinates to Calendar.
+     * 
      * NOTE: the month must not be changed.
      * @param month a calendar representing the first day of the month, must not
      *   be null.
@@ -724,7 +728,7 @@ public class BasicMonthViewUI extends MonthViewUI {
             throw new IllegalStateException("calendar must be start of month but was: " + month.getTime());
         Calendar clone = (Calendar) month.clone();
         CalendarUtils.startOfWeek(clone);
-        clone.add(Calendar.DAY_OF_YEAR, row * JXMonthView.DAYS_IN_WEEK + column);
+        clone.add(Calendar.DAY_OF_MONTH, row * JXMonthView.DAYS_IN_WEEK + column);
         return clone;
         
     }
@@ -744,14 +748,84 @@ public class BasicMonthViewUI extends MonthViewUI {
         int startOfDaysY = month.y + getMonthHeaderHeight();
         if (y < startOfDaysY) return null;
         month.y = startOfDaysY;
-        month.height = month.height - startOfDaysY;
+        month.height = month.height - getMonthHeaderHeight();
         return month;
     }
 
     protected int getMonthHeaderHeight() {
         return fullMonthBoxHeight;
     }
-// ---------------------- mapping month coordinates    
+
+    // ------------------- mapping month header 
+ 
+    /**
+     * Mapping pixel to bounds.
+     * 
+     * @param x the x position of the location in pixel
+     * @param y the y position of the location in pixel
+     * @return the bounds of the active header area in containing the location
+     *   or null if outside.
+     */
+//    protected Rectangle getTraversableBoundsAtLocation(int x, int y) {
+//        Rectangle headerBounds = getMonthHeaderBoundsAtLocation(x, y);
+//        if (headerBounds == null) return null;
+//        Rectangle leftArrow = new Rectangle(0, 0, monthUpImage.getIconWidth(), monthUpImage.getIconHeight());
+//        leftArrow.translate(headerBounds.x + arrowPaddingX, headerBounds.y + arrowPaddingY);
+//        Rectangle rightArrow = new Rectangle(leftArrow);
+//        rightArrow.translate(- 2 * arrowPaddingX - monthUpImage.getIconWidth(), 0);
+//        if (leftArrow.contains(x, y)) {
+//            return leftArrow;
+//        } else if (rightArrow.contains(x, y)) {
+//            return rightArrow;
+//        }
+//        return null;
+//    }
+
+    /**
+     * Mapping pixel to bounds.
+     * 
+     * @param x the x position of the location in pixel
+     * @param y the y position of the location in pixel
+     * @return the bounds of the active header area in containing the location
+     *   or null if outside.
+     */
+    protected int getTraversableGridPositionAtLocation(int x, int y) {
+        Rectangle headerBounds = getMonthHeaderBoundsAtLocation(x, y);
+        if (headerBounds == null) return -1;
+        if (y < headerBounds.y + arrowPaddingY) return -1;
+        if (y > headerBounds.y + headerBounds.height - arrowPaddingY) return -1;
+        headerBounds.setBounds(headerBounds.x + arrowPaddingX, y, 
+                headerBounds.width - 2 * arrowPaddingX, headerBounds.height);
+        if (!headerBounds.contains(x, y)) return -1;
+        Rectangle hitArea = new Rectangle(headerBounds.x, headerBounds.y, monthUpImage.getIconWidth(), monthUpImage.getIconHeight());
+        if (hitArea.contains(x, y)) {
+            return isLeftToRight ? JXMonthView.MONTH_DOWN : JXMonthView.MONTH_UP;
+        }
+        hitArea.translate(headerBounds.width - monthUpImage.getIconWidth(), 0);
+        if (hitArea.contains(x, y)) {
+            return isLeftToRight ? JXMonthView.MONTH_UP : JXMonthView.MONTH_DOWN;
+        } 
+        return -1;
+    }
+    
+    /**
+     * Mapping pixel to bounds.
+     * 
+     * @param x the x position of the location in pixel
+     * @param y the y position of the location in pixel
+     * @return the bounds of the month which contains the location, 
+     *   or null if outside
+     */
+    protected Rectangle getMonthHeaderBoundsAtLocation(int x, int y) {
+        Rectangle header = getMonthBoundsAtLocation(x, y);
+        if (header == null) return null;
+        header.height = getMonthHeaderHeight();
+        return header;
+    }
+    
+    
+    
+    // ---------------------- mapping month coordinates    
 
     /**
      * Mapping pixel to bounds.
@@ -766,8 +840,8 @@ public class BasicMonthViewUI extends MonthViewUI {
         int calendarRow = (y - calendarGrid.y) / fullCalendarHeight;
         int calendarColumn = (x - calendarGrid.x) / fullCalendarWidth;
         return new Rectangle( 
-                calendarColumn * fullCalendarWidth,
-                calendarRow * fullCalendarHeight,
+                calendarGrid.x + calendarColumn * fullCalendarWidth,
+                calendarGrid.y + calendarRow * fullCalendarHeight,
                 calendarWidth, calendarHeight);
     }
     
@@ -1990,7 +2064,8 @@ public class BasicMonthViewUI extends MonthViewUI {
 
             // Check if one of the month traverse buttons was pushed.
             if (monthView.isTraversable()) {
-                int arrowType = getTraversableButtonAt(e.getX(), e.getY());
+                int arrowType = getTraversableGridPositionAtLocation(e.getX(), e.getY());
+//                int arrowType = getTraversableButtonAt(e.getX(), e.getY());
                 if (arrowType != -1) {
                     traverseMonth(arrowType);
                     return;
