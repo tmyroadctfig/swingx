@@ -320,7 +320,6 @@ public class JXMonthView extends JComponent {
         antiAlias = false;
         traversable = false;
         listenerMap = new EventListenerMap();
-//        selectionMode = SelectionMode.SINGLE_SELECTION;
 
         initModel(model, locale);
         superSetLocale(locale);
@@ -500,15 +499,8 @@ public class JXMonthView extends JComponent {
      * 
      */
     private void installCalendar() {
-        // PENDING JW: respect current timezone!
         cal = model.getCalendar();
         firstDayOfWeek = cal.getFirstDayOfWeek();
-        // PENDING JW: why and who decides?
-        // without, we get the "days overlapping in header" issue
-        // for locales with min > 1
-        // Keep until Issue #736-swingx is fixed.
-//        cal.setMinimalDaysInFirstWeek(1);
-//        model.setMinimalDaysInFirstWeek(1);
         anchor = (Calendar) cal.clone();
     }
 
@@ -569,7 +561,9 @@ public class JXMonthView extends JComponent {
      * @param oldTimeZone the timezone before the change
      */
     protected void updateDatesAfterTimeZoneChange(TimeZone oldTimeZone) {
-        setFlaggedDates();
+        SortedSet<Date> flagged = getFlaggedDates();
+        flaggedDates.setTimeZone(getTimeZone());
+        firePropertyChange("flaggedDates", flagged, getFlaggedDates());
      }
     
     /**

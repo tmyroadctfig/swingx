@@ -209,8 +209,11 @@ public class JXMonthViewTest extends MockObjectTestCase {
      */
     public void testCalendarsTimeZoneNormalizedDate() {
         JXMonthView monthView = new JXMonthView();
-        // config with a known timezone and date
+        // config with a known timezone
         TimeZone tz = TimeZone.getTimeZone("GMT+4");
+        if (tz.equals(monthView.getTimeZone())) {
+            tz = TimeZone.getTimeZone("GMT+5");
+        }
         monthView.setTimeZone(tz);
         monthView.setSelectionDate(new Date());
         Date selected = monthView.getSelectionDate();
@@ -218,7 +221,65 @@ public class JXMonthViewTest extends MockObjectTestCase {
         assertEquals(selected, CalendarUtils.startOfDay(calendar, selected));
     }
     
-
+    /**
+     * Issue #733-swingx: model and monthView cal not synched.
+     * 
+     * Here: timezone of flagged dates not synched.
+     * This was introduced by moving the control of flagged dates into
+     * a internal model. Need to synch that model as well.
+     */
+    public void testFlaggedDatesTimeZone() {
+        JXMonthView monthView = new JXMonthView();
+        // config with a known timezone and date
+        TimeZone tz = TimeZone.getTimeZone("GMT+4");
+        if (tz.equals(monthView.getTimeZone())) {
+            tz = TimeZone.getTimeZone("GMT+5");
+        }
+        monthView.setTimeZone(tz);
+        monthView.setFlaggedDates(today);
+        Date flagged = monthView.getFlaggedDates().first();
+        assertEquals(flagged, CalendarUtils.startOfDay(monthView.getCalendar(), flagged));
+    }
+    
+    /**
+     * Issue #733-swingx: model and monthView cal not synched.
+     * 
+     * Here: setting the timezone clears the flagged dates, must notify of change.
+      */
+    public void testFlaggedDatesTimeZoneNotifyOnChange() {
+        JXMonthView monthView = new JXMonthView();
+        monthView.setFlaggedDates(today);
+        SortedSet<Date> flagged = monthView.getFlaggedDates();
+        // config with a known timezone and date
+        TimeZone tz = TimeZone.getTimeZone("GMT+4");
+        if (tz.equals(monthView.getTimeZone())) {
+            tz = TimeZone.getTimeZone("GMT+5");
+        }
+        PropertyChangeReport report = new PropertyChangeReport();
+        monthView.addPropertyChangeListener(report);
+        monthView.setTimeZone(tz);
+        TestUtils.assertPropertyChangeEvent(report, "flaggedDates", 
+                flagged, monthView.getFlaggedDates(), false);
+    }
+    
+    /**
+     * Issue #733-swingx: model and monthView cal not synched.
+     * 
+     * Here: setting the timezone clears the flagged dates, must notify of change.
+      */
+    public void testFlaggedDatesTimeZoneNotNotifyWithoutChange() {
+        JXMonthView monthView = new JXMonthView();
+        // config with a known timezone and date
+        TimeZone tz = TimeZone.getTimeZone("GMT+4");
+        if (tz.equals(monthView.getTimeZone())) {
+            tz = TimeZone.getTimeZone("GMT+5");
+        }
+        PropertyChangeReport report = new PropertyChangeReport();
+        monthView.addPropertyChangeListener(report);
+        monthView.setTimeZone(tz);
+        assertEquals("no change in flaggedDates must not fire", 0, report.getEventCount("flaggedDates"));
+    }
+    
     /**
      * Issue #733-swingx: model and monthView cal not synched.
      * 
