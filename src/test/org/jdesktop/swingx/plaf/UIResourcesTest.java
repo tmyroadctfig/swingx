@@ -20,8 +20,17 @@
  */
 package org.jdesktop.swingx.plaf;
 
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Insets;
+
+import javax.swing.BorderFactory;
+import javax.swing.plaf.UIResource;
+
 import junit.framework.TestCase;
 
+import org.jdesktop.swingx.icon.EmptyIcon;
 import org.jdesktop.swingx.plaf.basic.BasicLookAndFeelAddons;
 import org.jdesktop.swingx.plaf.linux.LinuxLookAndFeelAddons;
 import org.jdesktop.swingx.plaf.macosx.MacOSXLookAndFeelAddons;
@@ -136,5 +145,22 @@ public class UIResourcesTest extends TestCase {
      */
     public void testWindowsClassicLookAndFeelAddonsForUIResources() throws Exception {
         LookAndFeelAddons.setAddon(WindowsClassicLookAndFeelAddons.class);
+    }
+    
+    /**
+     * Ensure that the {@code getSafeXXX} methods always return {@code UIResource}.
+     */
+    public void testGetSafeMethodsReturnUIResource() {
+        assertTrue(UIManagerExt.getSafeBorder("", BorderFactory
+                .createEmptyBorder()) instanceof UIResource);
+        assertTrue(UIManagerExt.getSafeColor("", Color.RED) instanceof UIResource);
+        assertTrue(UIManagerExt.getSafeDimension("",
+                new Dimension()) instanceof UIResource);
+        assertTrue(UIManagerExt.getSafeFont("",
+               new Font("Dialog", Font.BOLD, 12)) instanceof UIResource);
+        assertTrue(UIManagerExt.getSafeIcon("",
+                new EmptyIcon()) instanceof UIResource);
+        assertTrue(UIManagerExt.getSafeInsets("",
+                new Insets(0, 0, 0, 0)) instanceof UIResource);
     }
 }

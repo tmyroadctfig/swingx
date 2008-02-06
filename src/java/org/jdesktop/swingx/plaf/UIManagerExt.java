@@ -24,6 +24,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Insets;
+import java.awt.Shape;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Locale;
@@ -36,6 +37,13 @@ import javax.swing.Icon;
 import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
+import javax.swing.plaf.BorderUIResource;
+import javax.swing.plaf.ColorUIResource;
+import javax.swing.plaf.DimensionUIResource;
+import javax.swing.plaf.FontUIResource;
+import javax.swing.plaf.IconUIResource;
+import javax.swing.plaf.InsetsUIResource;
+import javax.swing.plaf.UIResource;
 
 import org.jdesktop.swingx.painter.Painter;
 import org.jdesktop.swingx.util.Contract;
@@ -59,7 +67,8 @@ import org.jdesktop.swingx.util.Contract;
  * {@code LookAndFeelAddon}s. Any addon that attempts to obtain a property
  * defined in the defaults (available from {@code UIManager.get}) to set a
  * property that will be added to the defaults for the addon should use the
- * "safe" methods. The methods ensure that a valid value is always returned.
+ * "safe" methods. The methods ensure that a valid value is always returned and
+ * that value is a {@code UIResource}.
  * 
  * @author Karl George Schaefer
  * 
@@ -233,6 +242,41 @@ public class UIManagerExt {
     }
     
     /**
+     * Returns a shape from the defaults. If the value for {@code key} is not
+     * a {@code Shape}, {@code null} is returned.
+     * 
+     * @param key
+     *                an {@code Object} specifying the shape
+     * @return the {@code Shape} object
+     * @throws NullPointerException
+     *                 if {@code key} is {@code null}
+     */
+    public static Shape getShape(Object key) {
+        Object value = UIManager.getDefaults().get(key);
+        return (value instanceof Shape) ? (Shape) value : null;
+    }
+    
+    /**
+     * Returns a shape from the defaults that is appropriate for the given
+     * locale. If the value for {@code key} is not a {@code Shape},
+     * {@code null} is returned.
+     * 
+     * @param key
+     *                an {@code Object} specifying the shape
+     * @param l
+     *                the {@code Locale} for which the shape is desired; refer
+     *                to {@code UIDefaults} for details on how a {@code null}
+     *                {@code Locale} is handled
+     * @return the {@code Shape} object
+     * @throws NullPointerException
+     *                 if {@code key} is {@code null}
+     */
+    public static Shape getShape(Object key, Locale l) {
+        Object value = UIManager.getDefaults().get(key, l);
+        return (value instanceof Shape) ? (Shape) value : null;
+    }
+    
+    /**
      * Returns a painter from the defaults. If the value for {@code key} is not
      * a {@code Painter}, {@code null} is returned.
      * 
@@ -289,6 +333,10 @@ public class UIManagerExt {
             safeBorder = defaultBorder;
         }
         
+        if (!(safeBorder instanceof UIResource)) {
+            safeBorder = new BorderUIResource(safeBorder);
+        }
+        
         return safeBorder;
     }
     
@@ -312,6 +360,10 @@ public class UIManagerExt {
         
         if (safeColor == null) {
             safeColor = defaultColor;
+        }
+        
+        if (!(safeColor instanceof UIResource)) {
+            safeColor = new ColorUIResource(safeColor);
         }
         
         return safeColor;
@@ -339,6 +391,10 @@ public class UIManagerExt {
             safeDimension = defaultDimension;
         }
         
+        if (!(safeDimension instanceof UIResource)) {
+            safeDimension = new DimensionUIResource(safeDimension.width, safeDimension.height);
+        }
+        
         return safeDimension;
     }
     
@@ -362,6 +418,10 @@ public class UIManagerExt {
         
         if (safeFont == null) {
             safeFont = defaultFont;
+        }
+        
+        if (!(safeFont instanceof UIResource)) {
+            safeFont = new FontUIResource(safeFont);
         }
         
         return safeFont;
@@ -389,6 +449,10 @@ public class UIManagerExt {
             safeIcon = defaultIcon;
         }
         
+        if (!(safeIcon instanceof UIResource)) {
+            safeIcon = new IconUIResource(safeIcon);
+        }
+        
         return safeIcon;
     }
     
@@ -412,6 +476,11 @@ public class UIManagerExt {
         
         if (safeInsets == null) {
             safeInsets = defaultInsets;
+        }
+        
+        if (!(safeInsets instanceof UIResource)) {
+            safeInsets = new InsetsUIResource(safeInsets.top, safeInsets.left,
+                    safeInsets.bottom, safeInsets.right);
         }
         
         return safeInsets;
