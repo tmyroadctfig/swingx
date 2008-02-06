@@ -105,7 +105,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
                         ui.getMonthBoundsAtLocation(e.getX(), e.getY()));
 //                LOG.info("day bounds " + 
 //                        ui.getDayBoundsAtLocation(e.getX(), e.getY()));
-                LOG.info("day bounds " + 
+                LOG.info("day grid position " + 
                         ui.getDayGridPositionAtLocation(e.getX(), e.getY()));
             }
             

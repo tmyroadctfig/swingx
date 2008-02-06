@@ -123,7 +123,7 @@ public class BasicMonthViewUI extends MonthViewUI {
     /** flag indicating keyboard navigation. */
     private boolean usingKeyboard = false;
     /** For interval selections we need to record the date we pivot around. */
-    private long pivotDate = -1;
+    private Date pivotDate = null;
     /**
      * Date span used by the keyboard actions to track the original selection.
      */
@@ -1868,8 +1868,8 @@ public class BasicMonthViewUI extends MonthViewUI {
         MouseListener, MouseMotionListener, LayoutManager,
             PropertyChangeListener, DateSelectionListener {
         private boolean armed;
-        private long startDate;
-        private long endDate;
+        private Date startDate;
+        private Date endDate;
 
         public void mouseClicked(MouseEvent e) {}
 
@@ -1900,27 +1900,28 @@ public class BasicMonthViewUI extends MonthViewUI {
             }
 
             
-            long selected = monthView.getDayAt(e.getX(), e.getY());
-            if (selected == -1) {
+//            long selected = monthView.getDayAt(e.getX(), e.getY());
+            Calendar cal = getDayAtLocation(e.getX(), e.getY());
+            if (cal == null) {
                 return;
             }
 
             // Update the selected dates.
-            startDate = selected;
-            endDate = selected;
+            startDate = cal.getTime();
+            endDate = cal.getTime();
 
             if (monthView.getSelectionMode() == SelectionMode.SINGLE_INTERVAL_SELECTION ||
 //                    selectionMode == SelectionMode.WEEK_INTERVAL_SELECTION ||
                     monthView.getSelectionMode() == SelectionMode.MULTIPLE_INTERVAL_SELECTION) {
-                pivotDate = selected;
+                pivotDate = startDate;
             }
 
             monthView.getSelectionModel().setAdjusting(true);
             
             if (monthView.getSelectionMode() == SelectionMode.MULTIPLE_INTERVAL_SELECTION && e.isControlDown()) {
-                monthView.addSelectionInterval(new Date(startDate), new Date(endDate));
+                monthView.addSelectionInterval(startDate, endDate);
             } else {
-                monthView.setSelectionInterval(new Date(startDate), new Date(endDate));
+                monthView.setSelectionInterval(startDate, endDate);
             }
 
             // Arm so we fire action performed on mouse release.
@@ -1957,39 +1958,41 @@ public class BasicMonthViewUI extends MonthViewUI {
                 return;
             }
 
-            long selected = monthView.getDayAt(e.getX(), e.getY());
+//            long selected = monthView.getDayAt(e.getX(), e.getY());
 
-            if (selected == -1) {
+            Calendar cal = getDayAtLocation(e.getX(), e.getY());
+            if (cal == null) {
                 return;
             }
 
-            long oldStart = startDate;
-            long oldEnd = endDate;
+            Date selected = cal.getTime();
+            Date oldStart = startDate;
+            Date oldEnd = endDate;
 
             if (monthView.getSelectionMode() == SelectionMode.SINGLE_SELECTION) {
-                if (selected == oldStart) {
+                if (selected.equals(oldStart)) {
                     return;
                 }
                 startDate = selected;
                 endDate = selected;
             } else {
-                if (selected <= pivotDate) {
+                if (selected.before(pivotDate)) {
                     startDate = selected;
                     endDate = pivotDate;
-                } else if (selected > pivotDate) {
+                } else if (selected.after(pivotDate)) {
                     startDate = pivotDate;
                     endDate = selected;
                 }
             }
 
-            if (oldStart == startDate && oldEnd == endDate) {
+            if (startDate.equals(oldStart) && endDate.equals(oldEnd)) {
                 return;
             }
 
             if (monthView.getSelectionMode() == SelectionMode.MULTIPLE_INTERVAL_SELECTION && e.isControlDown()) {
-                monthView.addSelectionInterval(new Date(startDate), new Date(endDate));
+                monthView.addSelectionInterval(startDate, endDate);
             } else {
-                monthView.setSelectionInterval(new Date(startDate), new Date(endDate));
+                monthView.setSelectionInterval(startDate, endDate);
             }
 
             // Set trigger.
@@ -2238,7 +2241,7 @@ public class BasicMonthViewUI extends MonthViewUI {
                     && action <= SELECT_DAY_NEXT_WEEK) {
                 setUsingKeyboard(true);
                 monthView.getSelectionModel().setAdjusting(true);
-                pivotDate = -1;
+                pivotDate = null;
                 traverse(action);
             } else if (monthView.getSelectionMode() == SelectionMode.SINGLE_INTERVAL_SELECTION
                     && action >= ADJUST_SELECTION_PREVIOUS_DAY
@@ -2287,19 +2290,19 @@ public class BasicMonthViewUI extends MonthViewUI {
         private void addToSelection(int action) {
             // PENDING JW: remove use of deprecated
             // use Date always!
-            long newStartDate;
-            long newEndDate;
-            long selectionStart;
-            long selectionEnd;
+            Date newStartDate;
+            Date newEndDate;
+            Date selectionStart;
+            Date selectionEnd;
             if (!monthView.isSelectionEmpty()) {
-                newStartDate = selectionStart = monthView.getFirstSelectionDate().getTime();
-                newEndDate = selectionEnd = monthView.getLastSelectionDate().getTime();
+                newStartDate = selectionStart = monthView.getFirstSelectionDate();
+                newEndDate = selectionEnd = monthView.getLastSelectionDate();
             } else {
-                newStartDate = selectionStart = startOfDay(System.currentTimeMillis());
+                newStartDate = selectionStart = monthView.getToday();
                 newEndDate = selectionEnd = newStartDate;
             }
 
-            if (-1 == pivotDate) {
+            if (pivotDate == null) {
                 pivotDate = newStartDate;
             }
 
@@ -2309,89 +2312,73 @@ public class BasicMonthViewUI extends MonthViewUI {
             Calendar cal = getCalendar(getFirstDisplayedDate());
             switch (action) {
                 case ADJUST_SELECTION_PREVIOUS_DAY:
-                    if (newEndDate <= pivotDate) {
-                        cal.setTimeInMillis(newStartDate);
+                    if (!newEndDate.after(pivotDate)) {
+                        cal.setTime(newStartDate);
                         cal.add(Calendar.DAY_OF_MONTH, -1);
-                        newStartDate = cal.getTimeInMillis();
+                        newStartDate = cal.getTime();
                     } else {
-                        cal.setTimeInMillis(newEndDate);
+                        cal.setTime(newEndDate);
                         cal.add(Calendar.DAY_OF_MONTH, -1);
-                        newEndDate = cal.getTimeInMillis();
+                        newEndDate = cal.getTime();
                     }
                     isForward = false;
                     break;
                 case ADJUST_SELECTION_NEXT_DAY:
-                    if (newStartDate >= pivotDate) {
-                        cal.setTimeInMillis(newEndDate);
+                    if (!newStartDate.before(pivotDate)) {
+                        cal.setTime(newEndDate);
                         cal.add(Calendar.DAY_OF_MONTH, 1);
                         newStartDate = pivotDate;
-                        newEndDate = cal.getTimeInMillis();
+                        newEndDate = cal.getTime();
                     } else {
-                        cal.setTimeInMillis(newStartDate);
+                        cal.setTime(newStartDate);
                         cal.add(Calendar.DAY_OF_MONTH, 1);
-                        newStartDate = cal.getTimeInMillis();
+                        newStartDate = cal.getTime();
                     }
                     break;
                 case ADJUST_SELECTION_PREVIOUS_WEEK:
-                    if (newEndDate <= pivotDate) {
-                        cal.setTimeInMillis(newStartDate);
+                    if (!newEndDate.after(pivotDate)) {
+                        cal.setTime(newStartDate);
                         cal.add(Calendar.DAY_OF_MONTH, -JXMonthView.DAYS_IN_WEEK);
-                        newStartDate = cal.getTimeInMillis();
+                        newStartDate = cal.getTime();
                     } else {
-                        cal.setTimeInMillis(newEndDate);
+                        cal.setTime(newEndDate);
                         cal.add(Calendar.DAY_OF_MONTH, -JXMonthView.DAYS_IN_WEEK);
-                        long newTime = cal.getTimeInMillis();
-                        if (newTime <= pivotDate) {
+                        Date newTime = cal.getTime();
+                        if (!newTime.after(pivotDate)) {
                             newStartDate = newTime;
                             newEndDate = pivotDate;
                         } else {
-                            newEndDate = cal.getTimeInMillis();
+                            newEndDate = cal.getTime();
                         }
 
                     }
                     isForward = false;
                     break;
                 case ADJUST_SELECTION_NEXT_WEEK:
-                    if (newStartDate >= pivotDate) {
-                        cal.setTimeInMillis(newEndDate);
+                    if (!newStartDate.before(pivotDate)) {
+                        cal.setTime(newEndDate);
                         cal.add(Calendar.DAY_OF_MONTH, JXMonthView.DAYS_IN_WEEK);
-                        newEndDate = cal.getTimeInMillis();
+                        newEndDate = cal.getTime();
                     } else {
-                        cal.setTimeInMillis(newStartDate);
+                        cal.setTime(newStartDate);
                         cal.add(Calendar.DAY_OF_MONTH, JXMonthView.DAYS_IN_WEEK);
-                        long newTime = cal.getTimeInMillis();
-                        if (newTime >= pivotDate) {
+                        Date newTime = cal.getTime();
+                        if (!newTime.before(pivotDate)) {
                             newStartDate = pivotDate;
                             newEndDate = newTime;
                         } else {
-                            newStartDate = cal.getTimeInMillis();
+                            newStartDate = cal.getTime();
                         }
                     }
                     break;
             }
-            if (newStartDate != selectionStart || newEndDate != selectionEnd) {
-                Date nStart = new Date(newStartDate);
-                Date nEnd = new Date(newEndDate);
-                monthView.setSelectionInterval(nStart, nEnd);
-                monthView.ensureDateVisible(isForward ? nEnd  : nStart);
+            if (!newStartDate.equals(selectionStart) || !newEndDate.equals(selectionEnd)) {
+                monthView.setSelectionInterval(newStartDate, newEndDate);
+                monthView.ensureDateVisible(isForward ? newEndDate  : newStartDate);
             }
 
         }
         
-        /**
-         * Returns the start of the day of the given date in the monthView's 
-         * current calendar.
-         * 
-         * @param date the instant to normalize to the start of the day
-         * @return the start of the day in millis.
-         * 
-         * @deprecated PENDING JW change internals to not use millis
-         */
-        private long startOfDay(long date) {
-            Calendar cal = getCalendar(date);
-            CalendarUtils.startOfDay(cal);
-            return cal.getTimeInMillis();
-        }
 
     }
 
