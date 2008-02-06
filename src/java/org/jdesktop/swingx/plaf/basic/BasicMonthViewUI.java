@@ -456,6 +456,10 @@ public class BasicMonthViewUI extends MonthViewUI {
 //----------------------- mapping day coordinates
 
     /**
+     * Returns the bounds of the day  which contains the 
+     * given location. The bounds are in monthView coordinate system.
+     * 
+     * 
      * Mapping pixel to bounds.
      * 
      * @param x the x position of the location in pixel
@@ -464,20 +468,22 @@ public class BasicMonthViewUI extends MonthViewUI {
      *   or null if outside
      */
     protected Rectangle getDayBoundsAtLocation(int x, int y) {
-        Rectangle days = getDaysBoundsAtLocation(x, y);
-        if ((days == null) ||(!days.contains(x, y))) return null;
+        Rectangle days = getMonthDetailsBoundsAtLocation(x, y);
+         if ((days == null) ||(!days.contains(x, y))) return null;
         int calendarRow = (y - days.y) / fullBoxHeight;
         int calendarColumn = (x - days.x) / fullBoxWidth;
         return new Rectangle( 
-                calendarColumn * fullBoxWidth,
-                calendarRow * fullBoxWidth,
+                days.x + calendarColumn * fullBoxWidth,
+                days.y + calendarRow * fullBoxWidth,
                 fullBoxWidth, fullBoxHeight);
     }
     
     /**
      * 
-     * Maps the given pixel location into coordinates
-     * of a day in the grid of days. The x represents the 
+     * Maps the given pixel location into logical coordinates
+     * of a day in the grid of days. Each month has the same
+     * system, that is the coordinates are relative to the month.
+     * The x represents the 
      * column of the day, a -1 is the header column if the 
      * isShowingWeekDays. The y represents the row index
      * of the day, a -1 is the header row.
@@ -490,7 +496,7 @@ public class BasicMonthViewUI extends MonthViewUI {
      *    y = day row index in grid. Or null if outside 
      */
     protected Point getDayGridPositionAtLocation(int x, int y) {
-        Rectangle days = getDaysBoundsAtLocation(x, y);
+        Rectangle days = getMonthDetailsBoundsAtLocation(x, y);
         if ((days == null) ||(!days.contains(x, y))) return null;
         int calendarRow = (y - days.y) / fullBoxHeight;
         int calendarColumn = (x - days.x) / fullBoxWidth;
@@ -544,30 +550,6 @@ public class BasicMonthViewUI extends MonthViewUI {
         return clone;
         
     }
-    /**
-     * Returns the upper left corner of the days's rectangle which
-     * contains the given location in pixel or null if not in any days
-     * rect
-     * 
-     * @param x
-     * @param y
-     * @return the bounds of the details grid in the month at
-     *   location or null if outside.
-     */
-    private Rectangle getDaysBoundsAtLocation(int x, int y) {
-        Rectangle month = getMonthBoundsAtLocation(x, y);
-        if (month == null) return null;
-        int startOfDaysY = month.y + getMonthHeaderHeight();
-        if (y < startOfDaysY) return null;
-        month.y = startOfDaysY;
-        month.height = month.height - getMonthHeaderHeight();
-        return month;
-    }
-
-    protected int getMonthHeaderHeight() {
-        return fullMonthBoxHeight;
-    }
-
     // ------------------- mapping month header 
  
     /**
@@ -624,6 +606,11 @@ public class BasicMonthViewUI extends MonthViewUI {
     }
     
     /**
+     * Returns the bounds of the month header which contains the 
+     * given location. The bounds are in monthView coordinate system.
+     * 
+     * <p>
+     * 
      * Mapping pixel to bounds.
      * 
      * @param x the x position of the location in pixel
@@ -638,11 +625,39 @@ public class BasicMonthViewUI extends MonthViewUI {
         return header;
     }
     
+    /**
+     * Returns the bounds of the month details which contains the 
+     * given location. The bounds are in monthView coordinate system.
+     * 
+     * @param x
+     * @param y
+     * @return the bounds of the details grid in the month at
+     *   location or null if outside.
+     */
+    private Rectangle getMonthDetailsBoundsAtLocation(int x, int y) {
+        Rectangle month = getMonthBoundsAtLocation(x, y);
+        if (month == null) return null;
+        int startOfDaysY = month.y + getMonthHeaderHeight();
+        if (y < startOfDaysY) return null;
+        month.y = startOfDaysY;
+        month.height = month.height - getMonthHeaderHeight();
+        return month;
+    }
+
+    protected int getMonthHeaderHeight() {
+        return fullMonthBoxHeight;
+    }
+
     
     
     // ---------------------- mapping month coordinates    
 
     /**
+      * Returns the bounds of the month which contains the 
+     * given location. The bounds are in monthView coordinate system.
+     * 
+     * <p>
+     * 
      * Mapping pixel to bounds.
      * 
      * @param x the x position of the location in pixel
@@ -1884,6 +1899,7 @@ public class BasicMonthViewUI extends MonthViewUI {
                 return;
             }
 
+            
             long selected = monthView.getDayAt(e.getX(), e.getY());
             if (selected == -1) {
                 return;

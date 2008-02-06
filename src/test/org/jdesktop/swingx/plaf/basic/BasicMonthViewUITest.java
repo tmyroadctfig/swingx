@@ -94,15 +94,19 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
 
             @Override
             public void mouseReleased(MouseEvent e) {
-                LOG.info("calendar grid" + ui.calendarGrid);
+//                LOG.info("calendar grid" + ui.calendarGrid);
                 LOG.info("dayAt " + e.getPoint() + ": "
                         + "\n" + monthView.getDayAtLocation(e.getX(), e.getY()));
                 Calendar monthAtLocation = ui.getMonthAtLocation(e.getX(), e.getY());
-                LOG.info("month start " + 
-                        (monthAtLocation != null ? monthAtLocation.getTime() : null));
+//                LOG.info("month start " + 
+//                        (monthAtLocation != null ? monthAtLocation.getTime() : null));
                 
                 LOG.info("month bounds " + 
                         ui.getMonthBoundsAtLocation(e.getX(), e.getY()));
+//                LOG.info("day bounds " + 
+//                        ui.getDayBoundsAtLocation(e.getX(), e.getY()));
+                LOG.info("day bounds " + 
+                        ui.getDayGridPositionAtLocation(e.getX(), e.getY()));
             }
             
         });
@@ -296,14 +300,16 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
         Rectangle monthBounds = uiRToL.getMonthBoundsAtLocation(20, 20);
         assertNull("hit in header must return null bounds", 
                 uiRToL.getDayBoundsAtLocation(monthBounds.x + 2, monthBounds.y + 2));
-        // first column near bottom
+        // first column first row
         Rectangle dayBoundsRToL = uiRToL.getDayBoundsAtLocation(
-                monthBounds.x + 2, monthBounds.y + monthBounds.height - 20); 
+                monthBounds.x + 2, monthBounds.y + uiRToL.getMonthHeaderHeight()); 
         // same for LToR
         Rectangle dayBoundsLToR = uiLToR.getDayBoundsAtLocation(
-                monthBounds.x + 2, monthBounds.y + monthBounds.height - 20); 
+                monthBounds.x + 2, monthBounds.y + uiLToR.getMonthHeaderHeight()); 
         assertEquals("day bounds must be independent of orientation", 
                 dayBoundsLToR, dayBoundsRToL);
+        assertEquals(monthBounds.x, dayBoundsLToR.x);
+        assertEquals(monthBounds.y + uiLToR.getMonthHeaderHeight(), dayBoundsLToR.y);
     }
  
     /**
