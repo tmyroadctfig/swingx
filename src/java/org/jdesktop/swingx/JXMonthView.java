@@ -1320,7 +1320,7 @@ public class JXMonthView extends JComponent {
      *
      * @param value true if leading dates should be displayed, false otherwise.
      */
-    public void setShowLeadingDates(boolean value) {
+    public void setShowingLeadingDates(boolean value) {
         if (leadingDates == value) {
             return;
         }
@@ -1329,6 +1329,21 @@ public class JXMonthView extends JComponent {
         firePropertyChange(SHOW_LEADING_DATES, !leadingDates, leadingDates);
     }
 
+    /**
+     * Whether or not to show leading dates for a months displayed by this component.
+     *
+     * @param value true if leading dates should be displayed, false otherwise.
+     * @deprecated use {@link #setShowingLeadingDates(boolean)} - name change to
+     *    comply with property naming conventions.
+     */
+    public void setShowLeadingDates(boolean value) {
+        if (leadingDates == value) {
+            return;
+        }
+
+        leadingDates = value;
+        firePropertyChange(SHOW_LEADING_DATES, !leadingDates, leadingDates);
+    }
     /**
      * Whether or not we're showing leading dates.
      *
@@ -1342,6 +1357,22 @@ public class JXMonthView extends JComponent {
      * Whether or not to show trailing dates for the months displayed by this component.
      *
      * @param value true if trailing dates should be displayed, false otherwise.
+     */
+    public void setShowingTrailingDates(boolean value) {
+        if (trailingDates == value) {
+            return;
+        }
+
+        trailingDates = value;
+        firePropertyChange(SHOW_TRAILING_DATES, !trailingDates, trailingDates);
+    }
+
+    /**
+     * Whether or not to show trailing dates for the months displayed by this component.
+     *
+     * @param value true if trailing dates should be displayed, false otherwise.
+     * @deprecated use {@link #setShowingTrailingDates(boolean)} - name change to
+     *    comply with property naming conventions.
      */
     public void setShowTrailingDates(boolean value) {
         if (trailingDates == value) {

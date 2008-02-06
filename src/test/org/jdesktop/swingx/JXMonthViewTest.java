@@ -97,12 +97,6 @@ public class JXMonthViewTest extends MockObjectTestCase {
     }
 
     /**
-     * 
-     */
-    public void testGetDayAtLocation() {
-        
-    }
-    /**
      * Issue #733-swingx: model and monthView cal not synched.
      * 
      * Here: test that model settings are respected in constructor - minimaldays.
@@ -1858,14 +1852,14 @@ public class JXMonthViewTest extends MockObjectTestCase {
     public void testShowLeadingDates() {
         JXMonthView monthView = new JXMonthView();
         assertFalse(monthView.isShowingLeadingDates());
-        monthView.setShowLeadingDates(true);
+        monthView.setShowingLeadingDates(true);
         assertTrue(monthView.isShowingLeadingDates());
     }
 
     public void testShowTrailingDates() {
         JXMonthView monthView = new JXMonthView();
         assertFalse(monthView.isShowingTrailingDates());
-        monthView.setShowTrailingDates(true);
+        monthView.setShowingTrailingDates(true);
         assertTrue(monthView.isShowingTrailingDates());
     }
 

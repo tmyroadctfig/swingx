@@ -79,7 +79,7 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
         
         try {
 //            test.runInteractiveTests();
-            test.runInteractiveTests("interactive.*Locale.*");
+            test.runInteractiveTests("interactive.*Keep.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();

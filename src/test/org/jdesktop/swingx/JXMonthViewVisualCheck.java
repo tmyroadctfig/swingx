@@ -96,14 +96,14 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
         addAction(frame, action);
         Action trailing = new AbstractActionExt("toggle trailing") {
             public void actionPerformed(ActionEvent e) {
-                monthView.setShowTrailingDates(!monthView.isShowingTrailingDates());
+                monthView.setShowingTrailingDates(!monthView.isShowingTrailingDates());
             }
             
         };
         addAction(frame, trailing);
         Action leading = new AbstractActionExt("toggle leading") {
             public void actionPerformed(ActionEvent e) {
-                monthView.setShowLeadingDates(!monthView.isShowingLeadingDates());
+                monthView.setShowingLeadingDates(!monthView.isShowingLeadingDates());
             }
             
         };
@@ -136,8 +136,8 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
         final JXMonthView monthView = new JXMonthView();
         monthView.setTraversable(true);
         monthView.setShowingWeekNumber(true);
-        monthView.setShowLeadingDates(true);
-        monthView.setShowTrailingDates(true);
+        monthView.setShowingLeadingDates(true);
+        monthView.setShowingTrailingDates(true);
         Action action = new AbstractActionExt("toggle minimal") {
 
             public void actionPerformed(ActionEvent e) {
@@ -196,8 +196,8 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
         JXDatePicker picker = new JXDatePicker();
         final JXMonthView monthView = picker.getMonthView();
         monthView.setShowingWeekNumber(true);
-        monthView.setShowLeadingDates(true);
-        monthView.setShowTrailingDates(true);
+        monthView.setShowingLeadingDates(true);
+        monthView.setShowingTrailingDates(true);
         Action action = new AbstractActionExt("toggle minimal") {
 
             public void actionPerformed(ActionEvent e) {
