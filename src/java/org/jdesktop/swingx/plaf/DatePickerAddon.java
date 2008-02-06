@@ -79,12 +79,9 @@ public class DatePickerAddon extends AbstractComponentAddon {
                 LookAndFeel.makeIcon(DatePickerAddon.class, "linux/resources/combo-gtk.png"));
         
         if (isGTK()) {
-            // PENDING JW: going dirty: register an illegal value - not a border 
-            // results in uimanager.getBorder returning a null
-            // which prevents the datePickerUI to install a border on the editor.
-            // change to remove once we have api/implementation to remove something
-            // from the defaultsList.
-           defaults.add("JXDatePicker.border", "none"); 
+            // Issue #667-swingx: ugly border in GTK
+            // remove the border which was installed in addBasicDefaults
+           defaults.add("JXDatePicker.border", null); 
         }
     }
 
