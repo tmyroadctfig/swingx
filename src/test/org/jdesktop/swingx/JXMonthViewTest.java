@@ -398,7 +398,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
         calendar.set(Calendar.HOUR_OF_DAY, 5);
         Date date = calendar.getTime();
         monthView.setSelectionDate(date);
-        assertTrue(monthView.isSelectedDate(date));
+        assertTrue(monthView.isSelected(date));
         assertTrue(monthView.getSelectionModel().isSelected(date));
     }
     
@@ -481,7 +481,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
         Date date = calendar.getTime();
         monthView.getSelectionModel().setSelectionInterval(date, date);
         assertTrue(monthView.getSelectionModel().isSelected(date));
-        assertTrue(monthView.isSelectedDate(date));
+        assertTrue(monthView.isSelected(date));
     }
     
     /**
@@ -835,7 +835,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
       cal.setTime(first);
       cal.add(Calendar.DATE, 1);
       Date date = cal.getTime();
-      monthView.isSelectedDate(date);
+      monthView.isSelected(date);
       assertEquals("query selection must not change the calendar", 
               first, monthView.getCalendar().getTime());
    }
@@ -987,11 +987,11 @@ public class JXMonthViewTest extends MockObjectTestCase {
         Date date = new Date();
         monthView.setSelectionDate(date);
         // sanity
-        assertTrue(monthView.isSelectedDate(date));
+        assertTrue(monthView.isSelected(date));
         monthView.setTimeZone(getTimeZone(monthView.getTimeZone(), CalendarUtils.THREE_HOURS));
         // accidentally passes - because it is meaningful only in the timezone 
         // it was set ...
-        assertFalse(monthView.isSelectedDate(date));
+        assertFalse(monthView.isSelected(date));
         assertTrue("selection must have been cleared", monthView.isSelectionEmpty());
     }
     
@@ -1568,8 +1568,8 @@ public class JXMonthViewTest extends MockObjectTestCase {
     public void testIsSelectedDate() {
         JXMonthView monthView = new JXMonthView();
         monthView.setSelectionDate(today);
-        assertTrue(monthView.isSelectedDate(today));
-        assertTrue(monthView.isSelectedDate(startOfDay(today)));
+        assertTrue(monthView.isSelected(today));
+        assertTrue(monthView.isSelected(startOfDay(today)));
     }
     
     /**
@@ -1582,7 +1582,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
         Date copy = new Date(today.getTime());
         monthView.setSelectionDate(today);
         // use today
-        monthView.isSelectedDate(today);
+        monthView.isSelected(today);
         assertEquals("date must not be changed in isSelected", copy, today);
     }
    

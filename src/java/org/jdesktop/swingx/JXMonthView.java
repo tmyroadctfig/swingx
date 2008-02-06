@@ -549,7 +549,6 @@ public class JXMonthView extends JComponent {
         updateTodayFromCurrentTime();
         updateDatesAfterTimeZoneChange(old);
         firePropertyChange("timeZone", old, getTimeZone());
-        
     }
     
     /**
@@ -812,21 +811,6 @@ public class JXMonthView extends JComponent {
 
 
     /**
-     * Returns the start of the day of the given millis.
-     * 
-     * @param millis the time in millis.
-     * @return start of the given day in millis, relative to this
-     *    monthView's calendar.
-     *    
-     * @deprecated Model's task.   
-     */
-//    private long startOfDay(long millis) {
-//        cal.setTimeInMillis(millis);
-//        CalendarUtils.startOfDay(cal);
-//        return cal.getTimeInMillis();
-//    }
-//
-    /**
      * Returns the start of the day as Date.
      * 
      * @param date the Date.
@@ -1059,6 +1043,20 @@ public class JXMonthView extends JComponent {
      * @param date The date to check
      * @return true if the date is selected, false otherwise
      */
+    public boolean isSelected(Date date) {
+        return getSelectionModel().isSelected(date);
+    }
+
+    /**
+     * Returns true if the specified date falls within the _startSelectedDate
+     * and _endSelectedDate range.  
+     *
+     * @param date The date to check
+     * @return true if the date is selected, false otherwise
+     * 
+     * @deprecated use {@link #isSelected(Date)}  - name change to 
+     *   align with DateSelectionModel api
+     */
     public boolean isSelectedDate(Date date) {
         return getSelectionModel().isSelected(date);
     }
@@ -1193,7 +1191,6 @@ public class JXMonthView extends JComponent {
     public boolean isFlaggedDate(Date date) {
         if (date == null) return false;
         return flaggedDates.isSelected(date);
-//        return isFlaggedDate(date.getTime());
     }
     
     /**
@@ -1216,8 +1213,7 @@ public class JXMonthView extends JComponent {
             }
         }
         firePropertyChange("flaggedDates", oldFlagged, flaggedDates.getSelection());
-        repaint();
-    }
+   }
     /**
      * Adds the dates to the flags. 
      * 
@@ -1236,7 +1232,6 @@ public class JXMonthView extends JComponent {
             }
         }
         firePropertyChange("flaggedDates", oldFlagged, flaggedDates.getSelection());
-        repaint();
     }
     
     /**
@@ -1256,7 +1251,6 @@ public class JXMonthView extends JComponent {
             }
         }
         firePropertyChange("flaggedDates", oldFlagged, flaggedDates.getSelection());
-        repaint();
     }
     /**
      * Clears all flagged dates.
@@ -1433,7 +1427,6 @@ public class JXMonthView extends JComponent {
         if (traversable != this.traversable) {
             this.traversable = traversable;
             firePropertyChange(TRAVERSABLE, !this.traversable, this.traversable);
-            repaint();
         }
     }
 

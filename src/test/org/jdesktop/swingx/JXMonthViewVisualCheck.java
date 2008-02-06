@@ -65,15 +65,66 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
 //      setSystemLF(true);
       JXMonthViewVisualCheck  test = new JXMonthViewVisualCheck();
       try {
-          test.runInteractiveTests();
+//          test.runInteractiveTests();
 //        test.runInteractiveTests(".*TimeZone.*");
-//        test.runInteractiveTests(".*Minimal.*");
+        test.runInteractiveTests("interactive.*Flagged.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
       }
   }
 
+    /**
+     * Issue #749-swingx: enhanced flagged dates support (add/remove)
+     * 
+     * Visually check if the monthView is updated on toggling several properties.
+     */
+    public void interactiveToggleFlagged() {
+        final JXMonthView monthView = new JXMonthView(); 
+        monthView.setTraversable(true);
+        final JXFrame frame = showInFrame(monthView, "MonthView flagged today");
+        Action action = new AbstractActionExt("toggle today flag") {
+            public void actionPerformed(ActionEvent e) {
+                if (monthView.hasFlaggedDates()) {
+                    monthView.clearFlaggedDates();
+                } else {
+                    monthView.setFlaggedDates(monthView.getToday());
+                }
+            }
+            
+        };
+        addAction(frame, action);
+        Action trailing = new AbstractActionExt("toggle trailing") {
+            public void actionPerformed(ActionEvent e) {
+                monthView.setShowTrailingDates(!monthView.isShowingTrailingDates());
+            }
+            
+        };
+        addAction(frame, trailing);
+        Action leading = new AbstractActionExt("toggle leading") {
+            public void actionPerformed(ActionEvent e) {
+                monthView.setShowLeadingDates(!monthView.isShowingLeadingDates());
+            }
+            
+        };
+        addAction(frame, leading);
+        Action weekNumbers = new AbstractActionExt("toggle weekNumbers") {
+            public void actionPerformed(ActionEvent e) {
+                monthView.setShowingWeekNumber(!monthView.isShowingWeekNumber());
+            }
+            
+        };
+        addAction(frame, weekNumbers);
+        Action traversable = new AbstractActionExt("toggle traversable") {
+            public void actionPerformed(ActionEvent e) {
+                monthView.setTraversable(!monthView.isTraversable());
+            }
+            
+        };
+        addAction(frame, traversable);
+        frame.pack();
+    };
+    
     /**
      * Issue #736-swingx: monthView cannot cope with minimalDaysInFirstWeek.
      * 

@@ -1409,7 +1409,7 @@ public class BasicMonthViewUI extends MonthViewUI {
                                       Calendar cal) {
         Date date = cal.getTime(); //InMillis();
         
-        if (monthView.isSelectedDate(date)) {
+        if (monthView.isSelected(date)) {
             g.setColor(monthView.getSelectedBackground());
             g.fillRect(x, y, width, height);
         }
@@ -2160,11 +2160,16 @@ public class BasicMonthViewUI extends MonthViewUI {
                 selectionModel.addDateSelectionListener(getHandler());
             } else if (JXMonthView.FIRST_DISPLAYED_DATE.equals(property)) {
                 setFirstDisplayedDate(((Long) evt.getNewValue()));
-            } else if (JXMonthView.BOX_PADDING_X.equals(property) || JXMonthView.BOX_PADDING_Y.equals(property) ||
-                    JXMonthView.TRAVERSABLE.equals(property) || JXMonthView.DAYS_OF_THE_WEEK.equals(property) ||
-                    "border".equals(property) || JXMonthView.WEEK_NUMBER.equals(property))
-                    {
+            } else if (JXMonthView.BOX_PADDING_X.equals(property) 
+                    || JXMonthView.BOX_PADDING_Y.equals(property) 
+                    || JXMonthView.TRAVERSABLE.equals(property) 
+                    || JXMonthView.DAYS_OF_THE_WEEK.equals(property) 
+                    || "border".equals(property) 
+                    || JXMonthView.WEEK_NUMBER.equals(property)
+                    || "traversable".equals(property) 
+                    ) {
                 monthView.revalidate();
+                monthView.repaint();
             } else if ("font".equals(property)) {
                 derivedFont = createDerivedFont();
                 monthView.revalidate();
@@ -2174,6 +2179,11 @@ public class BasicMonthViewUI extends MonthViewUI {
                 updateLocale();
             } else if ("timeZone".equals(property)) {
                 dayOfMonthFormatter.setTimeZone((TimeZone) evt.getNewValue());
+            } else if ("flaggedDates".equals(property)
+                || JXMonthView.SHOW_LEADING_DATES.equals(property)
+                || JXMonthView.SHOW_TRAILING_DATES.equals(property)
+                ) {
+                monthView.repaint();
             }
         }
 

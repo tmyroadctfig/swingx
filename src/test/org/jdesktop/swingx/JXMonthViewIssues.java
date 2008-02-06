@@ -346,7 +346,7 @@ public class JXMonthViewIssues extends InteractiveTestCase {
         monthView.setTimeZone(tz);
         Date date = new Date();
         monthView.setSelectionDate(date);
-        assertTrue(monthView.isSelectedDate(date));
+        assertTrue(monthView.isSelected(date));
         fail("test passes - but tells nothing");
     }
 
