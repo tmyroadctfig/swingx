@@ -97,6 +97,31 @@ public class JXMonthViewTest extends MockObjectTestCase {
     }
 
     /**
+     * Issue #751-swingx: property naming violations
+     */
+    public void testTraversableNotification() {
+        JXMonthView monthView = new JXMonthView();
+        PropertyChangeReport report = new PropertyChangeReport();
+        monthView.addPropertyChangeListener(report);
+        boolean showing = monthView.isTraversable();
+        monthView.setTraversable(!showing);
+        TestUtils.assertPropertyChangeEvent(report, "traversable", showing, !showing);
+    }
+
+    /**
+     * Issue #751-swingx: property naming violations
+     */
+    public void testTraversableNoNotification() {
+        JXMonthView monthView = new JXMonthView();
+        PropertyChangeReport report = new PropertyChangeReport();
+        monthView.addPropertyChangeListener(report);
+        boolean showing = monthView.isTraversable();
+        monthView.setTraversable(showing);
+        assertEquals(0, report.getEventCount("traversable"));
+    }
+
+
+    /**
      * Issue #733-swingx: model and monthView cal not synched.
      * 
      * Here: test that model settings are respected in constructor - minimaldays.

@@ -743,72 +743,10 @@ public class JXMonthView extends JComponent {
         return today != null ? (Date) today.clone() : null;
     }
 
-    /**
-     * Sets the todayInMillis property to the start of the day which contains the
-     * given millis in this monthView's calendar coordinates.
-     *  
-     * temporary widened access for testing.
-     * 
-     * @param millis the instance in millis which should be used as today.
-     * @deprecated use {@link #setToday(Date)}
-     */
-    @Deprecated
-    protected void setTodayInMillis(long millis) {
-        setToday(new Date(millis));
-    }
-    /**
-     * Returns the start of today in this monthviews calendar coordinates.
-     * 
-     * @return the start of today in millis.
-     * 
-     * @deprecated use {@link #getToday()}
-     */
-    public long getTodayInMillis() {
-        return today.getTime();
-    }
     
     
 //----   internal date manipulation ("cleanup" == start of day in monthView's calendar)
     
-    @Deprecated
-    protected void cleanupWeekSelectionDates(Date startDate, Date endDate) {
-        int count = 1;
-        cal.setTime(startDate);
-        while (cal.getTimeInMillis() < endDate.getTime()) {
-            cal.add(Calendar.DAY_OF_MONTH, 1);
-            count++;
-        }
-
-        if (count > JXMonthView.DAYS_IN_WEEK) {
-            // Move the start date to the first day of the week.
-            cal.setTime(startDate);
-            int dayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
-            int firstDayOfWeek = getFirstDayOfWeek();
-            int daysFromStart = dayOfWeek - firstDayOfWeek;
-            if (daysFromStart < 0) {
-                daysFromStart += JXMonthView.DAYS_IN_WEEK;
-            }
-            cal.add(Calendar.DAY_OF_MONTH, -daysFromStart);
-
-            modifiedStartDate = cal.getTime();
-
-            // Move the end date to the last day of the week.
-            cal.setTime(endDate);
-            dayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
-            int lastDayOfWeek = firstDayOfWeek - 1;
-            if (lastDayOfWeek == 0) {
-                lastDayOfWeek = Calendar.SATURDAY;
-            }
-            int daysTillEnd = lastDayOfWeek - dayOfWeek;
-            if (daysTillEnd < 0) {
-                daysTillEnd += JXMonthView.DAYS_IN_WEEK;
-            }
-            cal.add(Calendar.DAY_OF_MONTH, daysTillEnd);
-            modifiedEndDate = cal.getTime();
-        }
-    }
-
-
 
     /**
      * Returns the start of the day as Date.
@@ -1012,31 +950,6 @@ public class JXMonthView extends JComponent {
     }
 
     /**
-     * Returns the selected date. 
-     * 
-     * @return the first Date in the selection or null if empty.
-     * 
-     * @deprecated use {@link #getSelectionDate()} name change to 
-     *   align with new DateSelectionModel api
-     */
-    public Date getSelectedDate() {
-        return getSelectionDate();    
-    }
-
-    /**
-     * Sets the model's selection to the given date or clears the selection if
-     * null.
-     * 
-     * @param newDate the selection date to set
-     * 
-     * @deprecated use {@link #setSelectionDate(Date)} - name change to 
-     *   align with new DateSelectionModel api
-     */
-    public void setSelectedDate(Date newDate) {
-        setSelectionDate(newDate);
-    }
-
-    /**
      * Returns true if the specified date falls within the _startSelectedDate
      * and _endSelectedDate range.  
      *
@@ -1047,19 +960,6 @@ public class JXMonthView extends JComponent {
         return getSelectionModel().isSelected(date);
     }
 
-    /**
-     * Returns true if the specified date falls within the _startSelectedDate
-     * and _endSelectedDate range.  
-     *
-     * @param date The date to check
-     * @return true if the date is selected, false otherwise
-     * 
-     * @deprecated use {@link #isSelected(Date)}  - name change to 
-     *   align with DateSelectionModel api
-     */
-    public boolean isSelectedDate(Date date) {
-        return getSelectionModel().isSelected(date);
-    }
 
     /**
      * Set the lower bound date that is allowed to be selected. <p>
@@ -1131,50 +1031,6 @@ public class JXMonthView extends JComponent {
         SortedSet<Date> unselectableSet = new TreeSet<Date>();
         for (Date unselectableDate : unselectableDates) {
             unselectableSet.add(unselectableDate);
-        }
-        getSelectionModel().setUnselectableDates(unselectableSet);
-        repaint();
-    }
-
-//---------------------- delegates to model: long param    
-    /**
-     * Returns true if the specified date falls within the _startSelectedDate
-     * and _endSelectedDate range.  
-     *
-     * @param date The date to check
-     * @return true if the date is selected, false otherwise
-     * 
-     * @deprecated use {@link #setSelectionDate(Date)}
-     */
-    public boolean isSelectedDate(long date) {
-        return getSelectionModel().isSelected(new Date(date));
-    }
-
-    /**
-     * Identifies whether or not the date passed is an unselectable date.  
-     * 
-     * @param date date which to test for unselectable status
-     * @return true if the date is unselectable, false otherwise
-     * 
-     * @deprecated use {@link #isUnselectableDate(Date)}
-     */
-    public boolean isUnselectableDate(long date) {
-        return getSelectionModel().isUnselectableDate(new Date(date));
-    }
-
-    /**
-     * An array of longs defining days that should be unselectable.  
-     *
-     * @param unselectableDates the dates that should be unselectable
-     * 
-     * @deprecated use {@link #setUnselectableDates(Date...)}
-     */
-    public void setUnselectableDates(long[] unselectableDates) {
-        SortedSet<Date> unselectableSet = new TreeSet<Date>();
-        if (unselectableDates != null) {
-            for (long unselectableDate : unselectableDates) {
-                unselectableSet.add(new Date(unselectableDate));
-            }
         }
         getSelectionModel().setUnselectableDates(unselectableSet);
         repaint();
@@ -1281,38 +1137,6 @@ public class JXMonthView extends JComponent {
         return !flaggedDates.isSelectionEmpty();
     }
 
-//--------------------- flagged dates (long) - deprecation pending!
-
-    /**
-     * Identifies whether or not the date passed is a flagged date.  <b>All dates are modified to remove their hour of
-     * day, minute, second, and millisecond before being added to the selection model</b>
-     *
-     * @param date date which to test for flagged status
-     * @return true if the date is flagged, false otherwise
-     * 
-     * @deprecated use {@link #isFlaggedDate(Date)}
-     */
-    public boolean isFlaggedDate(long date) {
-        return isFlaggedDate(new Date(date));
-    }
-
-    /**
-     * An array of longs defining days that should be flagged.
-     *
-     * @param flaggedDates the dates to be flagged
-     * 
-     * @deprecated use {@link #setFlaggedDates(Date[])}
-     */
-    public void setFlaggedDates(long[] flaggedDates) {
-        Date[] flagged = null;
-        if (flaggedDates != null) {
-            flagged = new Date[flaggedDates.length];
-            for (int i = 0; i < flaggedDates.length; i++) {
-                flagged[i] = new Date(flaggedDates[i]);
-            }
-        }
-        setFlaggedDates(flagged);
-    }
 
 //------------------- visual properties    
     /**
@@ -1330,21 +1154,6 @@ public class JXMonthView extends JComponent {
     }
 
     /**
-     * Whether or not to show leading dates for a months displayed by this component.
-     *
-     * @param value true if leading dates should be displayed, false otherwise.
-     * @deprecated use {@link #setShowingLeadingDates(boolean)} - name change to
-     *    comply with property naming conventions.
-     */
-    public void setShowLeadingDates(boolean value) {
-        if (leadingDates == value) {
-            return;
-        }
-
-        leadingDates = value;
-        firePropertyChange(SHOW_LEADING_DATES, !leadingDates, leadingDates);
-    }
-    /**
      * Whether or not we're showing leading dates.
      *
      * @return true if leading dates are shown, false otherwise.
@@ -1359,22 +1168,6 @@ public class JXMonthView extends JComponent {
      * @param value true if trailing dates should be displayed, false otherwise.
      */
     public void setShowingTrailingDates(boolean value) {
-        if (trailingDates == value) {
-            return;
-        }
-
-        trailingDates = value;
-        firePropertyChange(SHOW_TRAILING_DATES, !trailingDates, trailingDates);
-    }
-
-    /**
-     * Whether or not to show trailing dates for the months displayed by this component.
-     *
-     * @param value true if trailing dates should be displayed, false otherwise.
-     * @deprecated use {@link #setShowingTrailingDates(boolean)} - name change to
-     *    comply with property naming conventions.
-     */
-    public void setShowTrailingDates(boolean value) {
         if (trailingDates == value) {
             return;
         }
@@ -1448,17 +1241,17 @@ public class JXMonthView extends JComponent {
     }
 
     /**
-     * Set whether or not the month view will display buttons to allow the
-     * user to traverse to previous or next months.
-     *
-     * @param traversable set to true to enable month traversing,
-     *        false otherwise.
+     * Set whether or not the month view will display buttons to allow the user
+     * to traverse to previous or next months.
+     * 
+     * @param traversable set to true to enable month traversing, false
+     *        otherwise.
      */
     public void setTraversable(boolean traversable) {
-        if (traversable != this.traversable) {
-            this.traversable = traversable;
-            firePropertyChange(TRAVERSABLE, !this.traversable, this.traversable);
-        }
+        if (traversable == this.traversable)
+            return;
+        this.traversable = traversable;
+        firePropertyChange(TRAVERSABLE, !this.traversable, this.traversable);
     }
 
     /**
@@ -1479,11 +1272,10 @@ public class JXMonthView extends JComponent {
      *        false otherwise
      */
     public void setShowingWeekNumber(boolean showWeekNumber) {
-        if (this.showWeekNumber != showWeekNumber) {
+        if (this.showWeekNumber == showWeekNumber) return;
             this.showWeekNumber = showWeekNumber;
             firePropertyChange(WEEK_NUMBER, !this.showWeekNumber, showWeekNumber);
-            repaint();
-        }
+
     }
 
     /**
@@ -1832,22 +1624,6 @@ public class JXMonthView extends JComponent {
     }
 
 
-    /**
-     * Return a long representing the date at the specified x/y position.
-     * The date returned will have a valid day, month and year.  Other fields
-     * such as hour, minute, second and milli-second will be set to 0.
-     *
-     * @param x X position
-     * @param y Y position
-     * @return long The date, -1 if position does not contain a date.
-     * @deprecated use {@link #getDayAtLocation(int, int)}
-     */
-    @Deprecated
-    public long getDayAt(int x, int y) {
-//        return getUI().getDayAt(x, y);
-        Date day = getDayAtLocation(x, y);
-        return day != null ? day.getTime() : -1;
-    }
 
     /**
      * Return a the date at the specified x/y position.
@@ -1936,15 +1712,6 @@ public class JXMonthView extends JComponent {
         }
     }
 
-    /**
-     * TODO: remove after commit/cancel are installed.
-     *
-     * @deprecated use {@link #commitSelection()} or {@link #cancelSelection()}
-     */
-    public void postActionEvent() {
-        // PENDING: remove 
-        fireActionPerformed(getActionCommand());
-    }
 
     /**
      * Commits the current selection. <p>
@@ -2009,6 +1776,235 @@ public class JXMonthView extends JComponent {
      */
     public boolean isComponentInputMapEnabled() {
         return componentInputMapEnabled;
+    }
+
+//--- deprecated code - NOTE: these methods will be removed soon! 
+//--- they will definitely be removed in milestone 0.9.2!    
+
+    /**
+     * Returns the selected date. 
+     * 
+     * @return the first Date in the selection or null if empty.
+     * 
+     * @deprecated use {@link #getSelectionDate()} name change to 
+     *   align with new DateSelectionModel api
+     */
+    public Date getSelectedDate() {
+        return getSelectionDate();    
+    }
+
+    /**
+     * Sets the model's selection to the given date or clears the selection if
+     * null.
+     * 
+     * @param newDate the selection date to set
+     * 
+     * @deprecated use {@link #setSelectionDate(Date)} - name change to 
+     *   align with new DateSelectionModel api
+     */
+    public void setSelectedDate(Date newDate) {
+        setSelectionDate(newDate);
+    }
+
+    /**
+     * Returns true if the specified date falls within the _startSelectedDate
+     * and _endSelectedDate range.  
+     *
+     * @param date The date to check
+     * @return true if the date is selected, false otherwise
+     * 
+     * @deprecated use {@link #isSelected(Date)}  - name change to 
+     *   align with DateSelectionModel api
+     */
+    public boolean isSelectedDate(Date date) {
+        return getSelectionModel().isSelected(date);
+    }
+
+    /**
+     * Return a long representing the date at the specified x/y position.
+     * The date returned will have a valid day, month and year.  Other fields
+     * such as hour, minute, second and milli-second will be set to 0.
+     *
+     * @param x X position
+     * @param y Y position
+     * @return long The date, -1 if position does not contain a date.
+     * @deprecated use {@link #getDayAtLocation(int, int)}
+     */
+    @Deprecated
+    public long getDayAt(int x, int y) {
+        Date day = getDayAtLocation(x, y);
+        return day != null ? day.getTime() : -1;
+    }
+
+    /**
+     * Whether or not to show leading dates for a months displayed by this component.
+     *
+     * @param value true if leading dates should be displayed, false otherwise.
+     * @deprecated use {@link #setShowingLeadingDates(boolean)} - name change to
+     *    comply with property naming conventions.
+     */
+    public void setShowLeadingDates(boolean value) {
+        if (leadingDates == value) {
+            return;
+        }
+        
+        leadingDates = value;
+        firePropertyChange(SHOW_LEADING_DATES, !leadingDates, leadingDates);
+    }
+    /**
+     * Whether or not to show trailing dates for the months displayed by this component.
+     *
+     * @param value true if trailing dates should be displayed, false otherwise.
+     * @deprecated use {@link #setShowingTrailingDates(boolean)} - name change to
+     *    comply with property naming conventions.
+     */
+    public void setShowTrailingDates(boolean value) {
+        if (trailingDates == value) {
+            return;
+        }
+
+        trailingDates = value;
+        firePropertyChange(SHOW_TRAILING_DATES, !trailingDates, trailingDates);
+    }
+
+  //--------------------- flagged dates (long) - deprecation pending!
+
+    /**
+     * Identifies whether or not the date passed is a flagged date.  <b>All dates are modified to remove their hour of
+     * day, minute, second, and millisecond before being added to the selection model</b>
+     *
+     * @param date date which to test for flagged status
+     * @return true if the date is flagged, false otherwise
+     * 
+     * @deprecated use {@link #isFlaggedDate(Date)}
+     */
+    public boolean isFlaggedDate(long date) {
+        return isFlaggedDate(new Date(date));
+    }
+
+    /**
+     * An array of longs defining days that should be flagged.
+     *
+     * @param flaggedDates the dates to be flagged
+     * 
+     * @deprecated use {@link #setFlaggedDates(Date[])}
+     */
+    public void setFlaggedDates(long[] flaggedDates) {
+        Date[] flagged = null;
+        if (flaggedDates != null) {
+            flagged = new Date[flaggedDates.length];
+            for (int i = 0; i < flaggedDates.length; i++) {
+                flagged[i] = new Date(flaggedDates[i]);
+            }
+        }
+        setFlaggedDates(flagged);
+    }
+
+  //---------------------- delegates to model: long param    
+    /**
+     * Returns true if the specified date falls within the _startSelectedDate
+     * and _endSelectedDate range.  
+     *
+     * @param date The date to check
+     * @return true if the date is selected, false otherwise
+     * 
+     * @deprecated use {@link #setSelectionDate(Date)}
+     */
+    public boolean isSelectedDate(long date) {
+        return getSelectionModel().isSelected(new Date(date));
+    }
+
+    /**
+     * Identifies whether or not the date passed is an unselectable date.  
+     * 
+     * @param date date which to test for unselectable status
+     * @return true if the date is unselectable, false otherwise
+     * 
+     * @deprecated use {@link #isUnselectableDate(Date)}
+     */
+    public boolean isUnselectableDate(long date) {
+        return getSelectionModel().isUnselectableDate(new Date(date));
+    }
+
+    /**
+     * An array of longs defining days that should be unselectable.  
+     *
+     * @param unselectableDates the dates that should be unselectable
+     * 
+     * @deprecated use {@link #setUnselectableDates(Date...)}
+     */
+    public void setUnselectableDates(long[] unselectableDates) {
+        SortedSet<Date> unselectableSet = new TreeSet<Date>();
+        if (unselectableDates != null) {
+            for (long unselectableDate : unselectableDates) {
+                unselectableSet.add(new Date(unselectableDate));
+            }
+        }
+        getSelectionModel().setUnselectableDates(unselectableSet);
+        repaint();
+    }
+
+    /**
+     * Sets the todayInMillis property to the start of the day which contains the
+     * given millis in this monthView's calendar coordinates.
+     *  
+     * temporary widened access for testing.
+     * 
+     * @param millis the instance in millis which should be used as today.
+     * @deprecated use {@link #setToday(Date)}
+     */
+    @Deprecated
+    protected void setTodayInMillis(long millis) {
+        setToday(new Date(millis));
+    }
+
+    /**
+     * Returns the start of today in this monthviews calendar coordinates.
+     * 
+     * @return the start of today in millis.
+     * 
+     * @deprecated use {@link #getToday()}
+     */
+    public long getTodayInMillis() {
+        return today.getTime();
+    }
+
+    @Deprecated
+    protected void cleanupWeekSelectionDates(Date startDate, Date endDate) {
+        int count = 1;
+        cal.setTime(startDate);
+        while (cal.getTimeInMillis() < endDate.getTime()) {
+            cal.add(Calendar.DAY_OF_MONTH, 1);
+            count++;
+        }
+
+        if (count > JXMonthView.DAYS_IN_WEEK) {
+            // Move the start date to the first day of the week.
+            cal.setTime(startDate);
+            int dayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
+            int firstDayOfWeek = getFirstDayOfWeek();
+            int daysFromStart = dayOfWeek - firstDayOfWeek;
+            if (daysFromStart < 0) {
+                daysFromStart += JXMonthView.DAYS_IN_WEEK;
+            }
+            cal.add(Calendar.DAY_OF_MONTH, -daysFromStart);
+
+            modifiedStartDate = cal.getTime();
+
+            // Move the end date to the last day of the week.
+            cal.setTime(endDate);
+            dayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
+            int lastDayOfWeek = firstDayOfWeek - 1;
+            if (lastDayOfWeek == 0) {
+                lastDayOfWeek = Calendar.SATURDAY;
+            }
+            int daysTillEnd = lastDayOfWeek - dayOfWeek;
+            if (daysTillEnd < 0) {
+                daysTillEnd += JXMonthView.DAYS_IN_WEEK;
+            }
+            cal.add(Calendar.DAY_OF_MONTH, daysTillEnd);
+            modifiedEndDate = cal.getTime();
+        }
     }
 
 

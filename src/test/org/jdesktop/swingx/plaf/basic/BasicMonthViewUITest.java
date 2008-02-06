@@ -84,8 +84,8 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
         final JXMonthView monthView = new JXMonthView();
         monthView.setTraversable(true);
         monthView.setShowingWeekNumber(true);
-        monthView.setShowLeadingDates(true);
-        monthView.setShowTrailingDates(true);
+        monthView.setShowingLeadingDates(true);
+        monthView.setShowingTrailingDates(true);
         monthView.setSelectionMode(SelectionMode.SINGLE_INTERVAL_SELECTION);
         monthView.setPreferredCols(2);
         monthView.setPreferredRows(2);
@@ -156,8 +156,8 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
         final JXMonthView monthView = new JXMonthView();
         monthView.setTraversable(true);
         monthView.setShowingWeekNumber(true);
-        monthView.setShowLeadingDates(true);
-        monthView.setShowTrailingDates(true);
+        monthView.setShowingLeadingDates(true);
+        monthView.setShowingTrailingDates(true);
         monthView.setSelectionMode(SelectionMode.SINGLE_INTERVAL_SELECTION);
         Action action = new AbstractActionExt("toggle minimal") {
 
