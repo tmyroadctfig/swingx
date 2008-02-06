@@ -192,7 +192,7 @@ public class JXMonthView extends JComponent {
      * restore point for the calendar. This is normalized to the start of the
      * first day of the month given in setFirstDisplayedDate.
      */
-    private long firstDisplayedDate;
+    private Date firstDisplayedDate;
     /** 
      * the calendar to base all selections, flagging upon. 
      * NOTE: the time of this calendar is undefined - before using, internal
@@ -267,7 +267,7 @@ public class JXMonthView extends JComponent {
      * display.
      */
     public JXMonthView() {
-        this(System.currentTimeMillis(), null, null);
+        this(new Date(System.currentTimeMillis()), null, null);
     }
 
     /**
@@ -278,15 +278,88 @@ public class JXMonthView extends JComponent {
      * @param locale desired locale, if null the system default locale is used
      */
     public JXMonthView(final Locale locale) {
-        this(System.currentTimeMillis(), null, locale);
+        this(new Date(System.currentTimeMillis()), null, locale);
     }
-    
+
     /**
      * Create a new instance of the <code>JXMonthView</code> class using the
      * default Locale and the given time as the first date to 
      * display.
      *
      * @param firstDisplayedDate The first month to display.
+     */
+    public JXMonthView(Date firstDisplayedDate) {
+        this(firstDisplayedDate, null, null);
+    }
+
+    /**
+     * Create a new instance of the <code>JXMonthView</code> class using the
+     * default Locale, the given time as the first date to 
+     * display and the given selection model. 
+     * 
+     * @param firstDisplayedDate The first month to display.
+     * @param model the selection model to use, if null a <code>DefaultSelectionModel</code> is
+     *   created.
+     */
+    public JXMonthView(Date firstDisplayedDate, final DateSelectionModel model) {
+        this(firstDisplayedDate, model, null);
+    }
+
+
+    /**
+     * Create a new instance of the <code>JXMonthView</code> class using the
+     * given Locale, the given time as the first date to 
+     * display and the given selection model. 
+     * 
+     * @param firstDisplayedDate 
+     * @param model the selection model to use, if null a <code>DefaultSelectionModel</code> is
+     *   created.
+     * @param locale desired locale, if null the system default locale is used
+     */
+    public JXMonthView(Date firstDisplayedDay, final DateSelectionModel model, final Locale locale) {
+        super();
+        antiAlias = false;
+        traversable = false;
+        listenerMap = new EventListenerMap();
+
+        initModel(model, locale);
+        superSetLocale(locale);
+        setFirstDisplayedDay(firstDisplayedDay);
+        // Keep track of today
+        updateTodayFromCurrentTime();
+
+        // install the controller
+        updateUI();
+        
+
+        setFocusable(true);
+        todayBackgroundColor = getForeground();
+
+    }
+
+    /**
+     * Create a new instance of the <code>JXMonthView</code> class using the
+     * given Locale, the given time as the first date to 
+     * display and the given selection model. 
+     * 
+     * @param firstDisplayedDate 
+     * @param model the selection model to use, if null a <code>DefaultSelectionModel</code> is
+     *   created.
+     * @param locale desired locale, if null the system default locale is used
+     * 
+     * @deprecated use {@link #JXMonthView(Date, DateSelectionModel, Locale)}
+     */
+    public JXMonthView(long firstDisplayedDate, final DateSelectionModel model, final Locale locale) {
+        this(new Date(firstDisplayedDate), model, locale);
+    }
+
+    /**
+     * Create a new instance of the <code>JXMonthView</code> class using the
+     * default Locale and the given time as the first date to 
+     * display.
+     *
+     * @param firstDisplayedDate The first month to display.
+     * @deprecated use {@link #JXMonthView(Date)}(
      */
     public JXMonthView(long firstDisplayedDate) {
         this(firstDisplayedDate, null, null);
@@ -300,40 +373,11 @@ public class JXMonthView extends JComponent {
      * @param firstDisplayedDate The first month to display.
      * @param model the selection model to use, if null a <code>DefaultSelectionModel</code> is
      *   created.
+     *   
+     * @deprecated use {@link #JXMonthView(Date, DateSelectionModel)}  
      */
     public JXMonthView(long firstDisplayedDate, final DateSelectionModel model) {
         this(firstDisplayedDate, model, null);
-    }
-
-    /**
-     * Create a new instance of the <code>JXMonthView</code> class using the
-     * given Locale, the given time as the first date to 
-     * display and the given selection model. 
-     * 
-     * @param firstDisplayedDate 
-     * @param model the selection model to use, if null a <code>DefaultSelectionModel</code> is
-     *   created.
-     * @param locale desired locale, if null the system default locale is used
-     */
-    public JXMonthView(long firstDisplayedDate, final DateSelectionModel model, final Locale locale) {
-        super();
-        antiAlias = false;
-        traversable = false;
-        listenerMap = new EventListenerMap();
-
-        initModel(model, locale);
-        superSetLocale(locale);
-        setFirstDisplayedDate(firstDisplayedDate);
-        // Keep track of today
-        updateTodayFromCurrentTime();
-
-        // install the controller
-        updateUI();
-        
-
-        setFocusable(true);
-        todayBackgroundColor = getForeground();
-
     }
 
     
@@ -391,7 +435,7 @@ public class JXMonthView extends JComponent {
         if (cal == null) throw 
             new IllegalStateException("must not be called before instantiation is complete");
         Calendar calendar = (Calendar) cal.clone();
-        calendar.setTimeInMillis(firstDisplayedDate);
+        calendar.setTime(firstDisplayedDate);
         return calendar;
     }
 
@@ -575,9 +619,6 @@ public class JXMonthView extends JComponent {
         cal.setFirstDayOfWeek(firstDayOfWeek);
         anchor.setFirstDayOfWeek(firstDayOfWeek);
         firePropertyChange("firstDayOfWeek", oldFirstDayOfWeek, firstDayOfWeek);
-
-        repaint();
-        
     }
 
     /**
@@ -590,13 +631,23 @@ public class JXMonthView extends JComponent {
 
     
 //-------------------- scrolling
+    /**
+     * Returns the last date able to be displayed.  For example, if the last
+     * visible month was April the time returned would be April 30, 23:59:59.
+     *
+     * @return long The last displayed date.
+     */
+    public Date getLastDisplayedDay() {
+        return new Date(getUI().getLastDisplayedDate());
+    }
+
     
     /**
      * Returns the first displayed date.
      *
      * @return long The first displayed date.
      */
-    public long getFirstDisplayedDate() {
+    public Date getFirstDisplayedDay() {
         return firstDisplayedDate;
     }
 
@@ -609,29 +660,22 @@ public class JXMonthView extends JComponent {
      *
      * @param date The first displayed date.
      */
-    public void setFirstDisplayedDate(long date) {
-        anchor.setTimeInMillis(date);
-        
-        long oldFirstDisplayedDate = firstDisplayedDate;
+    public void setFirstDisplayedDay(Date date) {
+        anchor.setTime(date);
+        Date oldDate = getFirstDisplayedDay();
 
-        cal.setTimeInMillis(anchor.getTimeInMillis());
+        cal.setTime(anchor.getTime());
         CalendarUtils.startOfMonth(cal);
-        firstDisplayedDate = cal.getTimeInMillis();
+        firstDisplayedDate = cal.getTime();
 
-        firePropertyChange(FIRST_DISPLAYED_DATE, oldFirstDisplayedDate, firstDisplayedDate);
-        repaint();
+        firePropertyChange("firstDisplayedDay", oldDate, getFirstDisplayedDay() );
+        // JW: need to fire two events until the deprecated firstDisplayedDate is removed!
+        long oldFirstDisplayedDate = oldDate != null ? oldDate.getTime() : 0;
+        firePropertyChange(FIRST_DISPLAYED_DATE, 
+                oldFirstDisplayedDate, 
+                firstDisplayedDate.getTime());
     }
 
-    
-    /**
-     * Returns the last date able to be displayed.  For example, if the last
-     * visible month was April the time returned would be April 30, 23:59:59.
-     *
-     * @return long The last displayed date.
-     */
-    public long getLastDisplayedDate() {
-        return getUI().getLastDisplayedDate();
-    }
 
 
     /**
@@ -644,53 +688,34 @@ public class JXMonthView extends JComponent {
      * functionally equivalent method taking a long as parameter will most 
      * probably be deprecated.
      * 
-     * @param date Date to make visible.
+     * @param date Date to make visible, must not be null.
      * @see #ensureDateVisible(long)
      */
     public void ensureDateVisible(Date date) {
-        ensureDateVisible(date.getTime());
-    }
-    
-    /**
-     * Moves the <code>date</code> into the visible region of the calendar. If
-     * the date is greater than the last visible date it will become the last
-     * visible date. While if it is less than the first visible date it will
-     * become the first visible date. <p>
-     * 
-     * NOTE: this method will probably be deprecated, it's recommended
-     * to use the functionally equivalent method taking a Date parameter.
-     * 
-     * @param date millis representing the date to make visible.
-     * @see #ensureDateVisible(Date)
-     * 
-     * @deprecated use {@link #ensureDateVisible(Date)}
-     */
-    @Deprecated
-    public void ensureDateVisible(long date) {
-        if (date < firstDisplayedDate) {
-            setFirstDisplayedDate(date);
+        if (date.before(firstDisplayedDate)) {
+            setFirstDisplayedDay(date);
         } else {
-            long lastDisplayedDate = getLastDisplayedDate();
-            if (date > lastDisplayedDate) {
+            Date lastDisplayedDate = getLastDisplayedDay();
+            if (date.after(lastDisplayedDate)) {
 
-                cal.setTimeInMillis(date);
+                cal.setTime(date);
                 int month = cal.get(Calendar.MONTH);
                 int year = cal.get(Calendar.YEAR);
 
-                cal.setTimeInMillis(lastDisplayedDate);
+                cal.setTime(lastDisplayedDate);
                 int lastMonth = cal.get(Calendar.MONTH);
                 int lastYear = cal.get(Calendar.YEAR);
 
                 int diffMonths = month - lastMonth
                         + ((year - lastYear) * MONTHS_IN_YEAR);
 
-                cal.setTimeInMillis(firstDisplayedDate);
+                cal.setTime(firstDisplayedDate);
                 cal.add(Calendar.MONTH, diffMonths);
-                setFirstDisplayedDate(cal.getTimeInMillis());
+                setFirstDisplayedDay(cal.getTime());
             }
         }
     }
-
+    
 //------------------ today
     
     /**
@@ -1273,9 +1298,8 @@ public class JXMonthView extends JComponent {
      */
     public void setShowingWeekNumber(boolean showWeekNumber) {
         if (this.showWeekNumber == showWeekNumber) return;
-            this.showWeekNumber = showWeekNumber;
-            firePropertyChange(WEEK_NUMBER, !this.showWeekNumber, showWeekNumber);
-
+        this.showWeekNumber = showWeekNumber;
+        firePropertyChange(WEEK_NUMBER, !this.showWeekNumber, showWeekNumber);
     }
 
     /**
@@ -2005,6 +2029,95 @@ public class JXMonthView extends JComponent {
             cal.add(Calendar.DAY_OF_MONTH, daysTillEnd);
             modifiedEndDate = cal.getTime();
         }
+    }
+
+    /**
+     * Moves the <code>date</code> into the visible region of the calendar. If
+     * the date is greater than the last visible date it will become the last
+     * visible date. While if it is less than the first visible date it will
+     * become the first visible date. <p>
+     * 
+     * NOTE: this method will probably be deprecated, it's recommended
+     * to use the functionally equivalent method taking a Date parameter.
+     * 
+     * @param date millis representing the date to make visible.
+     * @see #ensureDateVisible(Date)
+     * 
+     * @deprecated use {@link #ensureDateVisible(Date)}
+     */
+    @Deprecated
+    public void ensureDateVisible(long date) {
+        if (date < firstDisplayedDate.getTime()) {
+            setFirstDisplayedDate(date);
+        } else {
+            long lastDisplayedDate = getLastDisplayedDate();
+            if (date > lastDisplayedDate) {
+
+                cal.setTimeInMillis(date);
+                int month = cal.get(Calendar.MONTH);
+                int year = cal.get(Calendar.YEAR);
+
+                cal.setTimeInMillis(lastDisplayedDate);
+                int lastMonth = cal.get(Calendar.MONTH);
+                int lastYear = cal.get(Calendar.YEAR);
+
+                int diffMonths = month - lastMonth
+                        + ((year - lastYear) * MONTHS_IN_YEAR);
+
+                cal.setTime(firstDisplayedDate);
+                cal.add(Calendar.MONTH, diffMonths);
+                setFirstDisplayedDate(cal.getTimeInMillis());
+            }
+        }
+    }
+
+
+    /**
+     * Returns the first displayed date.
+     *
+     * @return long The first displayed date.
+     * @deprecated use {@link #getFirstDisplayedDay()}
+     */
+    public long getFirstDisplayedDate() {
+        return firstDisplayedDate.getTime();
+    }
+
+    
+    /**
+     * Set the first displayed date.  We only use the month and year of
+     * this date.  The <code>Calendar.DAY_OF_MONTH</code> field is reset to
+     * 1 and all other fields, with exception of the year and month,
+     * are reset to 0.
+     *
+     * @param date The first displayed date.
+     * @deprecated use {@link #setFirstDisplayedDay(Date)}
+     */
+    public void setFirstDisplayedDate(long date) {
+        setFirstDisplayedDay(new Date(date));
+//        anchor.setTimeInMillis(date);
+//        
+//        long oldFirstDisplayedDate = firstDisplayedDate != null ? firstDisplayedDate.getTime() : 0;
+//
+//        cal.setTimeInMillis(anchor.getTimeInMillis());
+//        CalendarUtils.startOfMonth(cal);
+//        firstDisplayedDate = cal.getTime();
+//
+//        firePropertyChange(FIRST_DISPLAYED_DATE, 
+//                oldFirstDisplayedDate, 
+//                firstDisplayedDate.getTime());
+    }
+
+ 
+    
+    /**
+     * Returns the last date able to be displayed.  For example, if the last
+     * visible month was April the time returned would be April 30, 23:59:59.
+     *
+     * @return long The last displayed date.
+     * @deprecated use {@link #getLastDisplayedDay()} instead
+     */
+    public long getLastDisplayedDate() {
+        return getUI().getLastDisplayedDate();
     }
 
 

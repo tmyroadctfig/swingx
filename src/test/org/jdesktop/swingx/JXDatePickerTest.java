@@ -200,7 +200,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
         Action togglePopup = picker.getActionMap().get("TOGGLE_POPUP");
         togglePopup.actionPerformed(null);
         CalendarUtils.startOfMonth(calendar);
-        assertEquals(calendar.getTime(), new Date(picker.getMonthView().getFirstDisplayedDate()));
+        assertEquals(calendar.getTime(), picker.getMonthView().getFirstDisplayedDay());
         frame.dispose();
     }
 
@@ -225,7 +225,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
         Action togglePopup = picker.getActionMap().get("TOGGLE_POPUP");
         togglePopup.actionPerformed(null);
         CalendarUtils.startOfMonth(calendar);
-        assertEquals(calendar.getTime(), new Date(picker.getMonthView().getFirstDisplayedDate()));
+        assertEquals(calendar.getTime(), picker.getMonthView().getFirstDisplayedDay());
         frame.dispose();
     }
 
@@ -241,7 +241,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
         calendar.set(2008, Calendar.JULY, 15);
         JXDatePicker picker = new JXDatePicker(calendar.getTimeInMillis());
         CalendarUtils.startOfMonth(calendar);
-        assertEquals(calendar.getTime(), new Date(picker.getMonthView().getFirstDisplayedDate()));
+        assertEquals(calendar.getTime(), picker.getMonthView().getFirstDisplayedDay());
     }
     
     /**
@@ -257,7 +257,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
         calendar.set(2008, Calendar.JULY, 15);
         picker.setDate(calendar.getTime());
         CalendarUtils.startOfMonth(calendar);
-        assertEquals(calendar.getTime(), new Date(picker.getMonthView().getFirstDisplayedDate()));
+        assertEquals(calendar.getTime(), picker.getMonthView().getFirstDisplayedDay());
     }
     
 
@@ -1270,7 +1270,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
             cal.setTime(date);
             CalendarUtils.startOfMonth(cal);
         }
-        assertEquals(cal.getTime(), new Date(picker.getMonthView().getFirstDisplayedDate()));
+        assertEquals(cal.getTime(), picker.getMonthView().getFirstDisplayedDay());
     } 
 
 

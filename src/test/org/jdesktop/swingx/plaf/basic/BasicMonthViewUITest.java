@@ -579,7 +579,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
      * Changed to read-only in monthView
      */
     public void testTodayUpdate() {
-        JXMonthView monthView = new JXMonthView(0);
+        JXMonthView monthView = new JXMonthView();
         Date first = ((BasicMonthViewUI) monthView.getUI()).getToday();
         monthView.updateUI();
         assertEquals(first, ((BasicMonthViewUI) monthView.getUI()).getToday());
@@ -653,7 +653,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
      * bad marker in ui-delegate ... but looks okay? 
      */
     public void testZeroFirstDisplayedDate() {
-        JXMonthView monthView = new JXMonthView(0);
+        JXMonthView monthView = new JXMonthView();
         long first = monthView.getUI().getLastDisplayedDate();
         monthView.updateUI();
         assertEquals(first, monthView.getUI().getLastDisplayedDate());
@@ -705,7 +705,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
         Calendar cal = Calendar.getInstance();
         cal.set(Calendar.MONTH, 5);
         // need to instantiate with a month different from jan
-        final JXMonthView monthView = new JXMonthView(cal.getTimeInMillis());
+        final JXMonthView monthView = new JXMonthView(cal.getTime());
         long first = ((BasicMonthViewUI) monthView.getUI()).getFirstDisplayedMonth();
         monthView.updateUI();
         assertEquals(first, ((BasicMonthViewUI) monthView.getUI()).getFirstDisplayedMonth());

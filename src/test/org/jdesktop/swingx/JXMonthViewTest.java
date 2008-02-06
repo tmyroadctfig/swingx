@@ -130,7 +130,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
         DateSelectionModel model = new DaySelectionModel();
         int first = model.getFirstDayOfWeek() + 1;
         model.setFirstDayOfWeek(first);
-        JXMonthView monthView = new JXMonthView(new Date().getTime(), model);
+        JXMonthView monthView = new JXMonthView(new Date(), model);
         assertEquals("model's calendar properties must be unchanged: minimalDays", 
                 first, model.getFirstDayOfWeek());
         // sanity: taken in monthView
@@ -183,7 +183,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
         DateSelectionModel model = new DaySelectionModel();
         int first = model.getMinimalDaysInFirstWeek() + 1;
         model.setMinimalDaysInFirstWeek(first);
-        JXMonthView monthView = new JXMonthView(new Date().getTime(), model);
+        JXMonthView monthView = new JXMonthView(new Date(), model);
         assertEquals("model's calendar properties must be unchanged: minimalDays", 
                 first, model.getMinimalDaysInFirstWeek());
     }
@@ -535,10 +535,10 @@ public class JXMonthViewTest extends MockObjectTestCase {
         final Calendar today = Calendar.getInstance();
         CalendarUtils.endOfMonth(today);
         us.setSelectionDate(today.getTime());
-        long first = us.getFirstDisplayedDate();
+        Date first = us.getFirstDisplayedDay();
         today.add(Calendar.DAY_OF_MONTH, 2);
         us.setSelectionDate(today.getTime());
-        assertEquals(first, us.getFirstDisplayedDate());
+        assertEquals(first, us.getFirstDisplayedDay());
     }
 
     /**
@@ -558,7 +558,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
         us.setSelectionDate(today.getTime());
         final JXFrame frame = new JXFrame();
         frame.add(us);
-        final long first = us.getFirstDisplayedDate();
+        final Date first = us.getFirstDisplayedDay();
         today.add(Calendar.DAY_OF_MONTH, 2);
         us.setSelectionDate(today.getTime());
         SwingUtilities.invokeAndWait(new Runnable() {
@@ -567,8 +567,8 @@ public class JXMonthViewTest extends MockObjectTestCase {
                 // need to validate frame - why?
                 frame.validate();
                 assertEquals("firstDisplayed must not be changed on revalidate", 
-                        new Date(first), new Date(us.getFirstDisplayedDate()));
-                assertEquals(first, us.getFirstDisplayedDate());
+                        first, us.getFirstDisplayedDay());
+//                assertEquals(first, us.getFirstDisplayedDate());
 //                fail("weird (threading issue?): the firstDisplayed is changed in layoutContainer - not testable here");
             }
         });
@@ -679,7 +679,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
      * Here: test that today is unchanged.
      */
     public void testUpdateUIToday() {
-        JXMonthView monthView = new JXMonthView(0);
+        JXMonthView monthView = new JXMonthView();
         Date first = monthView.getToday();
         monthView.updateUI();
         assertEquals(first, monthView.getToday());
@@ -693,14 +693,17 @@ public class JXMonthViewTest extends MockObjectTestCase {
      */
     public void testEnsureVisibleDateNofication() {
         JXMonthView monthView = new JXMonthView();
-        long firstDisplayedDate = monthView.getFirstDisplayedDate();
+        Date firstDisplayedDate = monthView.getFirstDisplayedDay();
         // previous month
         calendar.add(Calendar.MONTH, -1);
         PropertyChangeReport report = new PropertyChangeReport();
         monthView.addPropertyChangeListener(report);
         monthView.ensureDateVisible(calendar.getTime());
         CalendarUtils.startOfMonth(calendar);
-        TestUtils.assertPropertyChangeEvent(report, "firstDisplayedDate", firstDisplayedDate, calendar.getTimeInMillis());
+        TestUtils.assertPropertyChangeEvent(report, "firstDisplayedDate", 
+                firstDisplayedDate.getTime(), calendar.getTimeInMillis(), false);
+        TestUtils.assertPropertyChangeEvent(report, "firstDisplayedDay", 
+                firstDisplayedDate, calendar.getTime(), false);
     }
 
     /**
@@ -710,15 +713,19 @@ public class JXMonthViewTest extends MockObjectTestCase {
      */
     public void testEnsureVisibleDateParamNofication() {
         JXMonthView monthView = new JXMonthView();
-        long firstDisplayedDate = monthView.getFirstDisplayedDate();
+        Date firstDisplayedDate = monthView.getFirstDisplayedDay();
         // previous month
         calendar.add(Calendar.MONTH, -1);
         PropertyChangeReport report = new PropertyChangeReport();
         monthView.addPropertyChangeListener(report);
         monthView.ensureDateVisible(calendar.getTime());
         CalendarUtils.startOfMonth(calendar);
-        TestUtils.assertPropertyChangeEvent(report, "firstDisplayedDate", firstDisplayedDate, calendar.getTimeInMillis());
+        TestUtils.assertPropertyChangeEvent(report, "firstDisplayedDate", 
+                firstDisplayedDate.getTime(), calendar.getTimeInMillis(), false);
+        TestUtils.assertPropertyChangeEvent(report, "firstDisplayedDay", 
+                firstDisplayedDate, calendar.getTime(), false);
     }
+    
     /**
      * Issue #711-swingx: remove fake property change notification.
      * 
@@ -726,14 +733,17 @@ public class JXMonthViewTest extends MockObjectTestCase {
      */
     public void testFirstDisplayedDateNofication() {
         JXMonthView monthView = new JXMonthView();
-        long firstDisplayedDate = monthView.getFirstDisplayedDate();
+        Date firstDisplayedDate = monthView.getFirstDisplayedDay();
         // previous month
         calendar.add(Calendar.MONTH, -1);
         PropertyChangeReport report = new PropertyChangeReport();
         monthView.addPropertyChangeListener(report);
-        monthView.setFirstDisplayedDate(calendar.getTimeInMillis());
+        monthView.setFirstDisplayedDay(calendar.getTime());
         CalendarUtils.startOfMonth(calendar);
-        TestUtils.assertPropertyChangeEvent(report, "firstDisplayedDate", firstDisplayedDate, calendar.getTimeInMillis());
+        TestUtils.assertPropertyChangeEvent(report, "firstDisplayedDate", 
+                firstDisplayedDate.getTime(), calendar.getTimeInMillis(), false);
+        TestUtils.assertPropertyChangeEvent(report, "firstDisplayedDay", 
+                firstDisplayedDate, calendar.getTime(), false);
     }
     
     /**
@@ -754,16 +764,16 @@ public class JXMonthViewTest extends MockObjectTestCase {
         JXFrame frame = new JXFrame();
         frame.add(monthView);
         frame.pack();
-        long last = monthView.getLastDisplayedDate();
+        Date last = monthView.getLastDisplayedDay();
         // set a size that should guarantee the same number of columns as the compare monthView
         frame.setSize(compare.getPreferredSize().width + 50, monthView.getPreferredSize().height + 50);
         frame.validate();
         // build a date corresponding to the expected end of next month
-        calendar.setTimeInMillis(last);
+        calendar.setTime(last);
         // next month
         calendar.add(Calendar.DAY_OF_MONTH, 1);
         CalendarUtils.endOfMonth(calendar);
-        assertEquals(calendar.getTime(), new Date(monthView.getLastDisplayedDate()));
+        assertEquals(calendar.getTime(), monthView.getLastDisplayedDay());
     }
 
     
@@ -774,9 +784,9 @@ public class JXMonthViewTest extends MockObjectTestCase {
      */
     public void testUpdateUIFirst() {
         final JXMonthView monthView = new JXMonthView();
-        long first = monthView.getFirstDisplayedDate();
+        Date first = monthView.getFirstDisplayedDay();
         monthView.updateUI();
-        assertEquals(first, monthView.getFirstDisplayedDate());
+        assertEquals(first, monthView.getFirstDisplayedDay());
     };
 
 
@@ -787,9 +797,9 @@ public class JXMonthViewTest extends MockObjectTestCase {
      */
     public void testUpdateUILast() {
         final JXMonthView monthView = new JXMonthView();
-        long first = monthView.getLastDisplayedDate();
+        Date first = monthView.getLastDisplayedDay();
         monthView.updateUI();
-        assertEquals(first, monthView.getLastDisplayedDate());
+        assertEquals(first, monthView.getLastDisplayedDay());
     };
 
 
@@ -820,7 +830,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
    public void testMonthViewCalendarInvariantOnSetSelection() {
       JXMonthView monthView = new JXMonthView();
       assertEquals(1, monthView.getCalendar().get(Calendar.DATE));
-      Date first = new Date(monthView.getFirstDisplayedDate());
+      Date first = monthView.getFirstDisplayedDay();
       assertEquals("monthViews calendar represents the first day of the month", 
               first, monthView.getCalendar().getTime());
       Calendar cal = Calendar.getInstance();
@@ -846,7 +856,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
    public void testMonthViewCalendarInvariantOnQuerySelectioon() {
       JXMonthView monthView = new JXMonthView();
       assertEquals(1, monthView.getCalendar().get(Calendar.DATE));
-      Date first = new Date(monthView.getFirstDisplayedDate());
+      Date first = monthView.getFirstDisplayedDay();
       assertEquals("monthViews calendar represents the first day of the month", 
               first, monthView.getCalendar().getTime());
       Calendar cal = Calendar.getInstance();
@@ -873,13 +883,13 @@ public class JXMonthViewTest extends MockObjectTestCase {
      */
     public void testMonthViewCalendarInvariantOnSetFirstDisplayedDate() {
       JXMonthView monthView = new JXMonthView();
-      Date first = new Date(monthView.getFirstDisplayedDate());
+      Date first = monthView.getFirstDisplayedDay();
       Calendar cal = Calendar.getInstance();
       // add one day, now we are on the second
       cal.setTime(first);
       cal.add(Calendar.MONTH, 1);
       Date next = cal.getTime();
-      monthView.setFirstDisplayedDate(next.getTime());
+      monthView.setFirstDisplayedDay(next);
       assertEquals("monthViews calendar represents the first day of the month", 
               next, monthView.getCalendar().getTime());
     }
@@ -892,14 +902,14 @@ public class JXMonthViewTest extends MockObjectTestCase {
         Calendar temp = (Calendar) calendar.clone();
         CalendarUtils.startOfMonth(temp);
         // sanity
-        assertEquals("sanity...", temp.getTimeInMillis(), monthView.getFirstDisplayedDate());
+        assertEquals("sanity...", temp.getTime(), monthView.getFirstDisplayedDay());
         calendar.add(Calendar.YEAR, 1);
         Date nextYear = calendar.getTime();
         temp = (Calendar) calendar.clone();
         CalendarUtils.startOfMonth(temp);
         monthView.ensureDateVisible(nextYear);
         assertEquals("must be scrolled to next year", 
-                temp.getTime(), new Date(monthView.getFirstDisplayedDate()));
+                temp.getTime(), monthView.getFirstDisplayedDay());
     }
     
     /**
@@ -909,14 +919,14 @@ public class JXMonthViewTest extends MockObjectTestCase {
         JXMonthView monthView = new JXMonthView();
         Calendar temp = (Calendar) calendar.clone();
         CalendarUtils.startOfMonth(temp);
-        assertEquals("sanity..", temp.getTimeInMillis(), monthView.getFirstDisplayedDate());
+        assertEquals("sanity..", temp.getTime(), monthView.getFirstDisplayedDay());
         calendar.add(Calendar.MONTH, 1);
         Date nextMonth = calendar.getTime();
         temp = (Calendar) calendar.clone();
         CalendarUtils.startOfMonth(temp);
         monthView.ensureDateVisible(nextMonth);
         assertEquals("must be scrolled to next month", 
-                temp.getTime(), new Date(monthView.getFirstDisplayedDate()));
+                temp.getTime(), monthView.getFirstDisplayedDay());
     }
 
     /**
@@ -926,13 +936,13 @@ public class JXMonthViewTest extends MockObjectTestCase {
         JXMonthView monthView = new JXMonthView();
         Calendar temp = (Calendar) calendar.clone();
         CalendarUtils.startOfMonth(temp);
-        long first = monthView.getFirstDisplayedDate();
-        assertEquals("sanity...", temp.getTimeInMillis(), first);
+        Date first = monthView.getFirstDisplayedDay();
+        assertEquals("sanity...", temp.getTime(), first);
         CalendarUtils.endOfMonth(calendar);
         Date thisMonth = calendar.getTime();
         monthView.ensureDateVisible(thisMonth);
         assertEquals("same month, nothing changed", 
-                first, monthView.getFirstDisplayedDate());
+                first, monthView.getFirstDisplayedDay());
     }
 
 
@@ -943,13 +953,13 @@ public class JXMonthViewTest extends MockObjectTestCase {
         JXMonthView monthView = new JXMonthView();
         Calendar temp = (Calendar) calendar.clone();
         CalendarUtils.startOfMonth(temp);
-        assertEquals("sanity...", temp.getTimeInMillis(), monthView.getFirstDisplayedDate());
+        assertEquals("sanity...", temp.getTime(), monthView.getFirstDisplayedDay());
         calendar.add(Calendar.YEAR, 1);
         Date nextYear = calendar.getTime();
         temp = (Calendar) calendar.clone();
         CalendarUtils.startOfMonth(temp);
         monthView.ensureDateVisible(nextYear);
-        assertEquals("must be scrolled to next year", temp.getTimeInMillis(), monthView.getFirstDisplayedDate());
+        assertEquals("must be scrolled to next year", temp.getTime(), monthView.getFirstDisplayedDay());
     }
     
     /**
@@ -959,13 +969,14 @@ public class JXMonthViewTest extends MockObjectTestCase {
         JXMonthView monthView = new JXMonthView();
         Calendar temp = (Calendar) calendar.clone();
         CalendarUtils.startOfMonth(temp);
-        assertEquals("sanity ...", temp.getTimeInMillis(), monthView.getFirstDisplayedDate());
+        assertEquals("sanity ...", temp.getTime(), monthView.getFirstDisplayedDay());
         calendar.add(Calendar.MONTH, 1);
         Date nextMonth = calendar.getTime();
         temp = (Calendar) calendar.clone();
         CalendarUtils.startOfMonth(temp);
         monthView.ensureDateVisible(nextMonth);
-        assertEquals("must be scrolled to next month", temp.getTimeInMillis(), monthView.getFirstDisplayedDate());
+        assertEquals("must be scrolled to next month", 
+                temp.getTime(), monthView.getFirstDisplayedDay());
     }
 
     /**
@@ -975,12 +986,12 @@ public class JXMonthViewTest extends MockObjectTestCase {
         JXMonthView monthView = new JXMonthView();
         Calendar temp = (Calendar) calendar.clone();
         CalendarUtils.startOfMonth(temp);
-        long first = monthView.getFirstDisplayedDate();
-        assertEquals("sanity ...", temp.getTimeInMillis(), first);
+        Date first = monthView.getFirstDisplayedDay();
+        assertEquals("sanity ...", temp.getTime(), first);
         CalendarUtils.endOfMonth(calendar);
         Date thisMonth = calendar.getTime();
         monthView.ensureDateVisible(thisMonth);
-        assertEquals("same month, nothing changed", first, monthView.getFirstDisplayedDate());
+        assertEquals("same month, nothing changed", first, monthView.getFirstDisplayedDay());
     }
 
     /**
@@ -988,9 +999,9 @@ public class JXMonthViewTest extends MockObjectTestCase {
      */
     public void testLastDisplayedDateInitial() {
         JXMonthView monthView = new JXMonthView();
-        calendar.setTimeInMillis(monthView.getFirstDisplayedDate());
+        calendar.setTime(monthView.getFirstDisplayedDay());
         CalendarUtils.endOfMonth(calendar);
-        assertEquals(calendar.getTime(), new Date(monthView.getLastDisplayedDate()));
+        assertEquals(calendar.getTime(), monthView.getLastDisplayedDay());
     }
     
     /**
@@ -1091,10 +1102,10 @@ public class JXMonthViewTest extends MockObjectTestCase {
         JXMonthView monthView = new JXMonthView();
         // sometime next month
         calendar.add(Calendar.MONTH, 1);
-        monthView.setFirstDisplayedDate(calendar.getTimeInMillis());
+        monthView.setFirstDisplayedDay(calendar.getTime());
         assertEquals(calendar.getTime(), monthView.getAnchorDate());
         CalendarUtils.startOfMonth(calendar);
-        assertEquals(calendar.getTimeInMillis(), monthView.getFirstDisplayedDate());
+        assertEquals(calendar.getTime(), monthView.getFirstDisplayedDay());
     }
 
     /**
@@ -1129,11 +1140,11 @@ public class JXMonthViewTest extends MockObjectTestCase {
         monthView.setTimeZone(tz);
         Calendar calendar = Calendar.getInstance(tz);
         Date today = calendar.getTime();
-        monthView.setFirstDisplayedDate(today.getTime());
+        monthView.setFirstDisplayedDay(today);
         Date anchor = monthView.getAnchorDate();
         assertEquals(today, anchor);
-        long firstDisplayed = monthView.getFirstDisplayedDate();
-        calendar.setTimeInMillis(firstDisplayed);
+        Date firstDisplayed = monthView.getFirstDisplayedDay();
+        calendar.setTime(firstDisplayed);
         assertTrue(CalendarUtils.isStartOfMonth(calendar));
         
         // get another timezone with known offset
@@ -1144,13 +1155,13 @@ public class JXMonthViewTest extends MockObjectTestCase {
         int realOffset = oldOffset - newOffset;
         monthView.setTimeZone(tzOther);
         Calendar otherCalendar = Calendar.getInstance(tzOther);
-        otherCalendar.setTimeInMillis(monthView.getFirstDisplayedDate());
+        otherCalendar.setTime(monthView.getFirstDisplayedDay());
         assertTrue(CalendarUtils.isStartOfMonth(otherCalendar));
         // PENDING JW: sure this is the correct direction of the shift?
         // yeah, think so: the anchor is fixed, moving the timezone results
         // in a shift into the opposite direction of the offset
         assertEquals("first displayed must be offset by real offset", 
-                realOffset,  monthView.getFirstDisplayedDate() - firstDisplayed);
+                realOffset,  monthView.getFirstDisplayedDay().getTime() - firstDisplayed.getTime());
     }
 
     /**
@@ -1169,11 +1180,11 @@ public class JXMonthViewTest extends MockObjectTestCase {
         monthView.setTimeZone(tz);
         Calendar calendar = Calendar.getInstance(tz);
         Date today = calendar.getTime();
-        monthView.setFirstDisplayedDate(today.getTime());
+        monthView.setFirstDisplayedDay(today);
         Date anchor = monthView.getAnchorDate();
         assertEquals(today, anchor);
-        long firstDisplayed = monthView.getFirstDisplayedDate();
-        calendar.setTimeInMillis(firstDisplayed);
+        Date firstDisplayed = monthView.getFirstDisplayedDay();
+        calendar.setTime(firstDisplayed);
         assertTrue(CalendarUtils.isStartOfMonth(calendar));
         
         // get another timezone with known offset
@@ -1184,13 +1195,13 @@ public class JXMonthViewTest extends MockObjectTestCase {
         int realOffset = oldOffset - newOffset;
         monthView.setTimeZone(tzOther);
         Calendar otherCalendar = Calendar.getInstance(tzOther);
-        otherCalendar.setTimeInMillis(monthView.getFirstDisplayedDate());
+        otherCalendar.setTime(monthView.getFirstDisplayedDay());
         assertTrue(CalendarUtils.isStartOfMonth(otherCalendar));
         // PENDING JW: sure this is the correct direction of the shift?
         // yeah, think so: the anchor is fixed, moving the timezone results
         // in a shift into the opposite direction of the offset
         assertEquals("first displayed must be offset by real offset", 
-                realOffset,  monthView.getFirstDisplayedDate() - firstDisplayed);
+                realOffset,  monthView.getFirstDisplayedDay().getTime() - firstDisplayed.getTime());
     }
     
     /**

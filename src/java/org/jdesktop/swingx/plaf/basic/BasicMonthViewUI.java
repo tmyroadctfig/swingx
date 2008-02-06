@@ -1690,7 +1690,7 @@ public class BasicMonthViewUI extends MonthViewUI {
                 || upperBound.getTime() > getLastDisplayedDate()) {
             Calendar cal = getCalendar(getFirstDisplayedDate());
             cal.add(Calendar.MONTH, 1);
-            monthView.setFirstDisplayedDate(cal.getTimeInMillis());
+            monthView.setFirstDisplayedDay(cal.getTime());
             calculateDirtyRectForSelection();
         }
     }
@@ -1701,7 +1701,7 @@ public class BasicMonthViewUI extends MonthViewUI {
                 || lowerBound.getTime() < getFirstDisplayedDate()) {
             Calendar cal = getCalendar(getFirstDisplayedDate());
             cal.add(Calendar.MONTH, -1);
-            monthView.setFirstDisplayedDate(cal.getTimeInMillis());
+            monthView.setFirstDisplayedDay(cal.getTime());
             calculateDirtyRectForSelection();
         }
     }

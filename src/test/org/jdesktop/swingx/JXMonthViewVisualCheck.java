@@ -122,6 +122,15 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
             
         };
         addAction(frame, traversable);
+        Action firstDay = new AbstractActionExt("toggle firstDay") {
+            public void actionPerformed(ActionEvent e) {
+                int firstDay = monthView.getFirstDayOfWeek();
+                monthView.setFirstDayOfWeek(firstDay == Calendar.SUNDAY ? 
+                        Calendar.MONDAY : Calendar.SUNDAY);
+            }
+            
+        };
+        addAction(frame, firstDay);
         frame.pack();
     };
     

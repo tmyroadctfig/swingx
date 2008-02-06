@@ -27,6 +27,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -265,6 +266,19 @@ public class JXMonthViewIssues extends InteractiveTestCase {
     
 //----------------------
 
+    /**
+     * Issue ??-swingx: custom daysOfWeek lost in updateUI
+     */
+    public void testDaysOfWeekUpdateUI() {
+        JXMonthView monthView = new JXMonthView();
+        String[] days = {"S", "M", "D", "M", "D", "F", "S"};
+        monthView.setDaysOfTheWeek(days);
+        List<String> daysSource = Arrays.asList(days);
+        assertEquals(daysSource, Arrays.asList(monthView.getDaysOfTheWeek()));
+        monthView.updateUI();
+        assertEquals(daysSource, Arrays.asList(monthView.getDaysOfTheWeek()));
+    }
+    
     /**
      * Issue #751-swingx: property naming violations
      */

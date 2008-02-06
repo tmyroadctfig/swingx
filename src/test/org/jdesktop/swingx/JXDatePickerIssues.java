@@ -340,7 +340,7 @@ public class JXDatePickerIssues extends InteractiveTestCase {
                 Action togglePopup = picker.getActionMap().get("TOGGLE_POPUP");
                 togglePopup.actionPerformed(null);
                 CalendarUtils.startOfMonth(calendar);
-                assertEquals(calendar.getTime(), new Date(picker.getMonthView().getFirstDisplayedDate()));
+                assertEquals(calendar.getTime(), picker.getMonthView().getFirstDisplayedDay());
 
                 
             }
@@ -365,13 +365,13 @@ public class JXDatePickerIssues extends InteractiveTestCase {
         JXDatePicker picker = new JXDatePicker();
         picker.setDate(null);
         Date today = picker.getToday();
-        Date firstDisplayedDate = new Date(picker.getMonthView().getFirstDisplayedDate());
+        Date firstDisplayedDate = picker.getMonthView().getFirstDisplayedDay();
         assertSameMonth(today, firstDisplayedDate);
         calendar.setTime(today);
         calendar.add(Calendar.MONTH, 2);
         picker.setToday(calendar.getTime());
         assertSameMonth(calendar.getTime(), 
-                new Date(picker.getMonthView().getFirstDisplayedDate()));
+                picker.getMonthView().getFirstDisplayedDay());
     }
     /**
      * @param linkDate
