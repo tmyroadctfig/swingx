@@ -75,7 +75,10 @@ public final class DefaultsList {
     }
 
     /**
-     * Adds a key/value pair to the defaults list.
+     * Adds a key/value pair to the defaults list. A pair with a {@code null}
+     * value is treated specially. A {@code null}-value pair is never added to
+     * the list and, furthermore, if a key/value pair exists in this list with
+     * the same key as the newly added one, it is removed.
      * 
      * @param key
      *                the key that will be used to query {@code UIDefaults}
@@ -97,8 +100,15 @@ public final class DefaultsList {
             asUIResource(value, value + " must be a UIResource");
         }
         
-        delegate.add(Contract.asNotNull(key, "key cannot be null"));
-        delegate.add(value);
+        if (value == null && delegate.contains(key)) {
+            int i = delegate.indexOf(key);
+            
+            delegate.remove(i + 1);
+            delegate.remove(i);
+        } else if (value != null) {
+            delegate.add(Contract.asNotNull(key, "key cannot be null"));
+            delegate.add(value);
+        }
     }
     
     //TODO move to Contract?
