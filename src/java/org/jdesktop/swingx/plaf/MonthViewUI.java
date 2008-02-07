@@ -6,6 +6,13 @@ import javax.swing.plaf.ComponentUI;
 
 public abstract class MonthViewUI extends ComponentUI {
 
+    /**
+     * Returns an array of String to use as names for the days of the week.
+     *  
+     * @return array of names for the days of the week.
+     */
+    public abstract String[] getDaysOfTheWeek();
+
     
     /**
      * Return a the date at the specified x/y position.
@@ -73,5 +80,8 @@ public abstract class MonthViewUI extends ComponentUI {
      * @deprecated use {@link #getLastDisplayedDay()}
      */
     public abstract long getLastDisplayedDate();
+
+
+
 
 }

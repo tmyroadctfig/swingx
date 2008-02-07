@@ -22,6 +22,7 @@ package org.jdesktop.swingx;
 
 import java.awt.GraphicsEnvironment;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -95,6 +96,64 @@ public class JXMonthViewTest extends MockObjectTestCase {
     public void tearDown() {
         JComponent.setDefaultLocale(componentLocale);
     }
+
+    
+    /**
+     * Issue #752-swingx: custom daysOfWeek lost in updateUI
+     */
+    public void testDaysOfWeekUpdateUI() {
+        JXMonthView monthView = new JXMonthView();
+        String[] days = {"S", "M", "D", "M", "D", "F", "S"};
+        monthView.setDaysOfTheWeek(days);
+        assertEquals(Arrays.asList(days), Arrays.asList(monthView.getDaysOfTheWeek()));
+        monthView.updateUI();
+        assertEquals(Arrays.asList(days), Arrays.asList(monthView.getDaysOfTheWeek()));
+    }
+    
+    /**
+     * Issue #752-swingx: custom daysOfWeek lost in updateUI
+     */
+    public void testDaysOfWeekUpdateUIAllowNull() {
+        JXMonthView monthView = new JXMonthView();
+        String[] days = null;
+        monthView.setDaysOfTheWeek(days);
+        assertNotNull("daysOfTheWeek must not be null", monthView.getDaysOfTheWeek());
+       
+   }
+
+    /**
+     * Issue #752-swingx: custom daysOfWeek lost in updateUI
+     */
+    public void testDaysOfWeekInitial() {
+        JXMonthView monthView = new JXMonthView();
+        assertNotNull("daysOfTheWeek must not be null", monthView.getDaysOfTheWeek());
+    }
+    
+    /**
+     * Issue #752-swingx: custom daysOfWeek lost in updateUI
+     */
+    public void testDaysOfWeekCopied() {
+        JXMonthView monthView = new JXMonthView();
+        assertNotSame(monthView.getDaysOfTheWeek(), monthView.getDaysOfTheWeek());
+    }
+    
+    /**
+     * Issue #752-swingx: custom daysOfWeek lost in updateUI
+     */
+    public void testDaysOfWeekReset() {
+        JXMonthView monthView = new JXMonthView();
+        // start off with ui-provided dates
+        String[] uiDays = monthView.getDaysOfTheWeek();
+        String[] days = {"S", "M", "D", "M", "D", "F", "S"};
+        // set the custom
+        monthView.setDaysOfTheWeek(days);
+        // sanity
+        assertEquals(Arrays.asList(days), Arrays.asList(monthView.getDaysOfTheWeek()));
+        monthView.setDaysOfTheWeek(null);
+        assertEquals("use ui-provided daysOfWeek after reset", 
+                Arrays.asList(uiDays), Arrays.asList(monthView.getDaysOfTheWeek()));
+    }
+
 
     /**
      * Issue #751-swingx: property naming violations

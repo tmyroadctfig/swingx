@@ -220,6 +220,7 @@ public class BasicMonthViewUI extends MonthViewUI {
     protected Rectangle calendarGrid = new Rectangle();
     private Rectangle[] monthStringBounds = new Rectangle[12];
     private Rectangle[] yearStringBounds = new Rectangle[12];
+    private String[] daysOfTheWeek;
 
 
     @SuppressWarnings({"UnusedDeclaration"})
@@ -394,7 +395,7 @@ public class BasicMonthViewUI extends MonthViewUI {
         // fixed JW: respect property in UIManager if available
         // PENDING JW: what to do if weekdays had been set 
         // with JXMonthView method? how to detect?
-        String[] daysOfTheWeek =
+        daysOfTheWeek =
           (String[])UIManager.get("JXMonthView.daysOfTheWeek");
         
         if (daysOfTheWeek == null) {
@@ -406,13 +407,21 @@ public class BasicMonthViewUI extends MonthViewUI {
                 daysOfTheWeek[i - 1] = dateFormatSymbols[i];
             }
         }
-        monthView.setDaysOfTheWeek(daysOfTheWeek);
+//        monthView.setDaysOfTheWeek(daysOfTheWeek);
         monthView.invalidate();
         monthView.validate();
     }
 
+   @Override
+   public String[] getDaysOfTheWeek() {
+       String[] days = new String[daysOfTheWeek.length];
+       System.arraycopy(daysOfTheWeek, 0, days, 0, days.length);
+       return days;
+   }
+   
 //---------------------- config
     
+
     /**
      * Create a derived font used to when painting various pieces of the
      * month view component.  This method will be called whenever
@@ -724,6 +733,21 @@ public class BasicMonthViewUI extends MonthViewUI {
     }
     
     /**
+     * Returns the bounds of the month at the given row/column position in the
+     * grid of months.
+     * 
+     * PENDING JW: this will be used in paint when looping through the grid. So
+     * keep here as a reminder to implement!
+     * 
+     * @param row the rowIndex in the grid
+     * @param column the columnIndex in the grid
+     * @return the bounds of the month at the given logical grid position.
+     */
+    protected Rectangle getMonthBounds(int row, int column) {
+        throw new UnsupportedOperationException(
+                "TBD - implement mapping from logical coordinates to screen bounds");
+    }
+    /**
      * Called from layout: calculates properties
      * of grid of months.
      */
@@ -830,7 +854,8 @@ public class BasicMonthViewUI extends MonthViewUI {
 
         // Get a calender set to the first displayed date
         Calendar cal = getCalendar();
-
+        // PENDING JW: implement getMonthBounds(row, column) and re-write 
+        // this to use the mapping 
         // Center the calendars horizontally/vertically in the available space.
         for (int row = 0; row < calendarRowCount; row++) {
             // Check if this row falls in the clip region.
@@ -2044,7 +2069,6 @@ public class BasicMonthViewUI extends MonthViewUI {
             if ("componentOrientation".equals(property)) {
                 isLeftToRight = monthView.getComponentOrientation().isLeftToRight();
                 monthView.revalidate();
-                calculateStartPosition();
             } else if (JXMonthView.SELECTION_MODEL.equals(property)) {
                 DateSelectionModel selectionModel = (DateSelectionModel) evt.getOldValue();
                 selectionModel.removeDateSelectionListener(getHandler());

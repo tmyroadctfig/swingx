@@ -1298,38 +1298,48 @@ public class JXMonthView extends JComponent {
     }
 
     /**
-     * Sets the single character representation for each day of the
-     * week.  For this method the first days of the week days[0] is assumed to
-     * be <code>Calendar.SUNDAY</code>.
-     *
+     * Sets the String representation for each day of the week as used
+     * in the header of the day's grid. For
+     * this method the first days of the week days[0] is assumed to be
+     * <code>Calendar.SUNDAY</code>. If null, the representation provided
+     * by the MonthViewUI is used.
+     * 
+     * The default value is the representation as 
+     * returned from the MonthViewUI.
+     * 
      * @param days Array of characters that represents each day
-     * @throws IllegalArgumentException if <code>days.length</code> != DAYS_IN_WEEK
-     * @throws NullPointerException if <code>days</code> == null
+     * @throws IllegalArgumentException if not null and <code>days.length</code> !=
+     *         DAYS_IN_WEEK
      */
-    public void setDaysOfTheWeek(String[] days)
-            throws IllegalArgumentException, NullPointerException {
-        if (days == null) {
-            throw new NullPointerException("Array of days is null.");
-        } else if (days.length != DAYS_IN_WEEK) {
+    public void setDaysOfTheWeek(String[] days) {
+        if ((days != null) && (days.length != DAYS_IN_WEEK)) {
             throw new IllegalArgumentException(
-                    "Array of days is not of length " + DAYS_IN_WEEK + " as expected.");
+                    "Array of days is not of length " + DAYS_IN_WEEK
+                            + " as expected.");
         }
 
-        String[] oldValue = _daysOfTheWeek;
+        String[] oldValue = getDaysOfTheWeek();
         _daysOfTheWeek = days;
-        firePropertyChange(DAYS_OF_THE_WEEK, oldValue, _daysOfTheWeek);
+        firePropertyChange(DAYS_OF_THE_WEEK, oldValue, days);
     }
 
     /**
-     * Returns the single character representation for each day of the
-     * week.
+     * Returns the String representation for each day of the
+     * week. 
      *
-     * @return Single character representation for the days of the week
+     * @return String representation for the days of the week, guaranteed to
+     *   never be null.
+     *   
+     * @see #setDaysOfTheWeek(String[])
+     * @see MonthViewUI  
      */
     public String[] getDaysOfTheWeek() {
-        String[] days = new String[DAYS_IN_WEEK];
-        System.arraycopy(_daysOfTheWeek, 0, days, 0, DAYS_IN_WEEK);
-        return days;
+        if (_daysOfTheWeek != null) {
+            String[] days = new String[DAYS_IN_WEEK];
+            System.arraycopy(_daysOfTheWeek, 0, days, 0, DAYS_IN_WEEK);
+            return days;
+        } 
+        return getUI().getDaysOfTheWeek();
     }
 
     /**

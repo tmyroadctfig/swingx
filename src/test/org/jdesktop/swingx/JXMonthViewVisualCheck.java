@@ -150,8 +150,7 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
             public void actionPerformed(ActionEvent e) {
                 String[] dof = monthView.getDaysOfTheWeek();
                 if (dof[0].equals(days[0])) {
-                    // PENDING - do something else to revert, this is exploiting bug #752
-                    monthView.updateUI();
+                    monthView.setDaysOfTheWeek(null);
                 } else {
                     monthView.setDaysOfTheWeek(days);
                 }    

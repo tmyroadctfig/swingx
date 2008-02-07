@@ -267,21 +267,6 @@ public class JXMonthViewIssues extends InteractiveTestCase {
 //----------------------
 
     /**
-     * Issue ??-swingx: custom daysOfWeek lost in updateUI
-     */
-    public void testDaysOfWeekUpdateUI() {
-        JXMonthView monthView = new JXMonthView();
-        String[] days = {"S", "M", "D", "M", "D", "F", "S"};
-        monthView.setDaysOfTheWeek(days);
-        List<String> daysSource = Arrays.asList(days);
-        assertEquals(daysSource, Arrays.asList(monthView.getDaysOfTheWeek()));
-        monthView.updateUI();
-        assertEquals(daysSource, Arrays.asList(monthView.getDaysOfTheWeek()));
-    }
-    
-
-
-    /**
      * characterize what a weekinterval selection is meant to do.
      * MultipleIntervalSelection where each interval is one or more weeks?
      * Here: does not snap start/end of week to start/end of day? 
