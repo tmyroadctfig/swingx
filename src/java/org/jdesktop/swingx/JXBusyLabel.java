@@ -61,12 +61,37 @@ import org.jdesktop.swingx.plaf.LookAndFeelAddons;
  * label.setPreferredSize(new Dimension(100,84));
  * label.setIcon(new EmptyIcon(100,84));
  * label.setBusyPainter(painter);
-
  *</code></pre>
  *
+ * Another example:
+ * <pre><code>
+ *     JXBusyLabel label = new MyBusyLabel(new Dimension(100, 84));
+ * </code></pre>
+ * 
+ * where MyBusyLabel is:<br>
+ * <pre><code>
+ * public class MyBusyLabel extends JXBusyLabel {
+ *     public MyBusyLabel(Dimension prefSize) {
+ *         super(prefSize);
+ *     }
+ *     
+ *     protected BusyLabel createBusyLabel(Dimension dim) {
+ *         BusyPainter painter = new BusyPainter(
+ *         new Rectangle2D.Float(0, 0,13.500001f,1),
+ *         new RoundRectangle2D.Float(12.5f,12.5f,59.0f,59.0f,10,10));
+ *         painter.setTrailLength(5);
+ *         painter.setPoints(31);
+ *         painter.setFrame(1);
+ *         
+ *         return painter;
+ *     }
+ * }
+ * </code></pre>
+ * 
  * @author rbair
  * @author joshy
  * @author rah003
+ * @author headw01
  */
 public class JXBusyLabel extends JLabel {
 
@@ -104,7 +129,7 @@ public class JXBusyLabel extends JLabel {
      */
     public void setDirection(Direction dir) {
         direction = dir;
-        busyPainter.setDirection(dir);
+        getBusyPainter().setDirection(dir);
     }
     
     private Direction direction;
@@ -116,6 +141,14 @@ public class JXBusyLabel extends JLabel {
         LookAndFeelAddons.contribute(new BusyLabelAddon());
     }
 
+    {
+        // Initialize the delay from the UI class.
+        BusyLabelUI ui = (BusyLabelUI)getUI();
+        if (ui != null) {
+            delay = ui.getDelay();
+        }
+    }
+    
     /** Creates a new instance of <code>JXBusyLabel</code> initialized to circular shape in bounds of 26 by 26 points.*/
     public JXBusyLabel() {
         this(null);
@@ -127,35 +160,55 @@ public class JXBusyLabel extends JLabel {
      */
     public JXBusyLabel(Dimension dim) {
         super();
-        createBusyPainter(dim);
+        this.setPreferredSize(dim);
+        
+        // Initialize the BusyPainter.
+        getBusyPainter();
     }
 
+    /**
+     * Initialize the BusyPainter and (this) JXBusyLabel with the given
+     * preferred size.  This method is called automatically when the
+     * BusyPainter is set/changed.
+     *
+     * @param dim The new Preferred Size for the BusyLabel.
+     *
+     * @see #getBusyPainter()
+     * @see #setBusyPainter(BusyPainter)
+     */
     protected void initPainter(Dimension dim) {
+        BusyPainter busyPainter = getBusyPainter();
+
+        // headw01
+        // TODO: Should we force the busyPainter to NOT be cached?
+        //       I think we probably should, otherwise the UI will never
+        //       be updated after the first paint.
+        if (null != busyPainter) {
+            busyPainter.setCacheable(false);
+        }
+
         PainterIcon icon = new PainterIcon(dim);
         icon.setPainter(busyPainter);
         this.setPreferredSize(dim);
         this.setIcon(icon);
     }
     /**
-     * Create and return an painter to use for the Label. This may be overridden
-     * to return any painter you like.
+     * Create and return a BusyPpainter to use for the Label. This may 
+     * be overridden to return any painter you like.  By default, this 
+     * method uses the UI (BusyLabelUI)to create a BusyPainter.
      * @param dim Painter size.
+     *
+     * @see #getUI()
      */
-    protected void createBusyPainter(Dimension dim) {
-        BusyLabelUI ui = getUI() == null ? null : (BusyLabelUI)getUI();
+    protected BusyPainter createBusyPainter(Dimension dim) {
+        BusyPainter busyPainter = null;
+        
+        BusyLabelUI ui = (BusyLabelUI)getUI();
         if (ui != null) {
             busyPainter = ui.getBusyPainter(dim);
-            delay = ui.getDelay();
         }
-        if (busyPainter != null) {
-            if (dim == null) {
-                Rectangle rt = busyPainter.getTrajectory().getBounds();
-                Rectangle rp = busyPainter.getPointShape().getBounds();
-                int max = Math.max(rp.width, rp.height);
-                dim = new Dimension(rt.width + max, rt.height + max);
-            }
-            initPainter(dim);
-        }
+        
+        return busyPainter;
     }
     
     /**
@@ -194,6 +247,7 @@ public class JXBusyLabel extends JLabel {
         }
         
         busy = new Timer(delay, new ActionListener() {
+            BusyPainter busyPainter = getBusyPainter();
             int frame = busyPainter.getPoints();
             public void actionPerformed(ActionEvent e) {
                 frame = (frame+1)%busyPainter.getPoints();
@@ -210,7 +264,7 @@ public class JXBusyLabel extends JLabel {
     private void stopAnimation() {
         if (busy != null) {
             busy.stop();
-            busyPainter.setFrame(-1);
+            getBusyPainter().setFrame(-1);
             repaint();
             busy = null;
         }
@@ -220,14 +274,14 @@ public class JXBusyLabel extends JLabel {
     public void removeNotify() {
         // fix for #698
         wasBusyOnNotify = isBusy();
-    	// fix for #626
-    	stopAnimation();
-    	super.removeNotify();
+        // fix for #626
+        stopAnimation();
+        super.removeNotify();
     }
     
     @Override
     public void addNotify() {
-    	super.addNotify();
+        super.addNotify();
         // fix for #698
         if (wasBusyOnNotify) {
             // fix for #626
@@ -240,9 +294,34 @@ public class JXBusyLabel extends JLabel {
     }
 
     /**
+     * Returns the current BusyPainter.  If no BusyPainter is currently
+     * set on this BusyLabel, the {@link #createBusyPainter(Dimension)} 
+     * method is called to create one.  Afterwards, 
+     * {@link #initPainter(Dimension)} is called to update the BusyLabel
+     * with the created BusyPainter.
+     *
      * @return the busyPainter
+     *
+     * @see #createBusyPainter(Dimension)
+     * @see #initPainter(Dimension)
      */
     public final BusyPainter getBusyPainter() {
+        if (null == busyPainter) {
+            Dimension prefSize = getPreferredSize();
+            
+            busyPainter = createBusyPainter(prefSize);
+            
+            if (null != busyPainter) {
+                if (null == prefSize) {
+                    Rectangle rt = busyPainter.getTrajectory().getBounds();
+                    Rectangle rp = busyPainter.getPointShape().getBounds();
+                    int max = Math.max(rp.width, rp.height);
+                    prefSize = new Dimension(rt.width + max, rt.height + max);
+                }
+            
+                initPainter(prefSize);
+            }
+        }
         return busyPainter;
     }
 
@@ -300,3 +379,4 @@ public class JXBusyLabel extends JLabel {
 
 
 }
+

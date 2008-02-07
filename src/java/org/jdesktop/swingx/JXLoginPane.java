@@ -21,6 +21,7 @@
 package org.jdesktop.swingx;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.ComponentOrientation;
 import java.awt.Container;
@@ -87,6 +88,7 @@ import org.jdesktop.swingx.auth.LoginService;
 import org.jdesktop.swingx.auth.PasswordStore;
 import org.jdesktop.swingx.auth.UserNameStore;
 import org.jdesktop.swingx.painter.MattePainter;
+import org.jdesktop.swingx.painter.Painter;
 import org.jdesktop.swingx.plaf.LoginPaneAddon;
 import org.jdesktop.swingx.plaf.LoginPaneUI;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
@@ -116,7 +118,7 @@ import org.jdesktop.swingx.util.WindowUtils;
  * @author Karl Schaefer
  * @author rah003
  */
-public class JXLoginPane extends JXImagePanel {
+public class JXLoginPane extends JXPanel {
     
 	/**
 	 * The Logger
@@ -543,6 +545,7 @@ public class JXLoginPane extends JXImagePanel {
      */
     private JXPanel createLoginPanel() {
         JXPanel loginPanel = new JXPanel();
+        loginPanel.setOpaque(false);
         
         //create the NameComponent
         if (saveMode == SaveMode.NONE) {
@@ -737,8 +740,10 @@ public class JXLoginPane extends JXImagePanel {
         add(contentPanel, BorderLayout.CENTER);
         
         initDone = true;
+        setBackground(Color.red);
+        setOpaque(true);
     }
-
+    
     /**
      * Create and return an image to use for the Banner. This may be overridden
      * to return any image you like
