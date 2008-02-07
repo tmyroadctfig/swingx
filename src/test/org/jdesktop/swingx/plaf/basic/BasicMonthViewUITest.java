@@ -284,7 +284,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
                 monthBounds.x + 2, 
                 monthBounds.y + uiRToL.getMonthHeaderHeight() + 2 * dayBounds.height + 2); 
         Date endOfWeek = CalendarUtils.endOfWeek(uiRToL.getCalendar(), calRToL);
-        Calendar uiCalendar = uiRToL.getMonthAtLocation(20, 20);
+        Calendar uiCalendar = uiRToL.getCalendar(uiRToL.getMonthAtLocation(20, 20));
         uiCalendar.add(Calendar.WEEK_OF_YEAR, 1);
         CalendarUtils.endOfWeek(uiCalendar);
         assertEquals("first day in first week", uiCalendar.getTime(), endOfWeek); 
@@ -429,12 +429,15 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
         }
         BasicMonthViewUI uiRToL = getRealizedMonthViewUI(ComponentOrientation.RIGHT_TO_LEFT);
         BasicMonthViewUI uiLToR = getRealizedMonthViewUI(ComponentOrientation.LEFT_TO_RIGHT);
-        Calendar month = uiLToR.getMonth(0, 0);
+        Date month = uiLToR.getMonth(0, 0);
         Calendar first = uiLToR.getCalendar();
-        assertEquals(first.get(Calendar.MONTH), month.get(Calendar.MONTH));
-        Calendar monthRL = uiRToL.getMonth(0, 0);
+        int monthField = first.get(Calendar.MONTH);
+        first.setTime(month);
+        assertEquals(monthField, first.get(Calendar.MONTH));
+        Date monthRL = uiRToL.getMonth(0, 0);
+        first.setTime(monthRL);
         assertEquals("logical coordinates must be independent of orientation",
-                first.get(Calendar.MONTH), monthRL.get(Calendar.MONTH));
+                monthField, first.get(Calendar.MONTH));
     }
 
     /**

@@ -524,7 +524,7 @@ public class BasicMonthViewUI extends MonthViewUI {
     public Date getDayAtLocation(int x, int y) {
         Point dayInGrid = getDayGridPositionAtLocation(x, y);
         if ((dayInGrid == null) || (dayInGrid.x < 0) || (dayInGrid.y < 0)) return null;
-        Calendar month = getMonthAtLocation(x, y);
+        Date month = getMonthAtLocation(x, y);
         return getDayInMonth(month, dayInGrid.y, dayInGrid.x);
     }
     
@@ -542,10 +542,10 @@ public class BasicMonthViewUI extends MonthViewUI {
      * @return a Calendar representing the day at the logical grid coordinates,
      *    must not b.
      */
-    protected Date getDayInMonth(Calendar month, int row, int column) {
-        if (!CalendarUtils.isStartOfMonth(month))
+    protected Date getDayInMonth(Date month, int row, int column) {
+        Calendar clone = getCalendar(month);
+        if (!CalendarUtils.isStartOfMonth(clone))
             throw new IllegalStateException("calendar must be start of month but was: " + month.getTime());
-        Calendar clone = (Calendar) month.clone();
         CalendarUtils.startOfWeek(clone);
         clone.add(Calendar.DAY_OF_MONTH, row * JXMonthView.DAYS_IN_WEEK + column);
         return clone.getTime();
@@ -691,7 +691,7 @@ public class BasicMonthViewUI extends MonthViewUI {
      * @return a calendar representing the month which contains the 
      *   given location. 
      */
-    protected Calendar getMonthAtLocation(int x, int y) {
+    protected Date getMonthAtLocation(int x, int y) {
         Point month = getMonthGridPositionAtLocation(x, y);
         if (month ==  null) return null;
         return getMonth(month.y, month.x);
@@ -708,64 +708,14 @@ public class BasicMonthViewUI extends MonthViewUI {
      * @return a calendar representing the month at the given
      *   grid position.
      */
-    protected Calendar getMonth(int row, int column) {
-        Calendar calendar = getCalendar(getFirstDisplayedDay());
+    protected Date getMonth(int row, int column) {
+        Calendar calendar = getCalendar();
         calendar.add(Calendar.MONTH, 
                 row * calendarColumnCount + column);
-        return calendar;
+        return calendar.getTime();
         
     }
     
-    /**
-     * Returns the bounds of the month at the given 
-     * row/column position in the grid of months. <p>
-     * 
-     * Mapping logical grid coordinates to Calendar.
-     * 
-     * @param row the month rowIndex in the grid
-     * @param column the month columnIndex in the grid
-     * @return the bounds of the month which at the grid position.
-     */
-    protected Rectangle getMonthBounds(int row, int column) {
-        // TODO 
-        throw new UnsupportedOperationException("TODO: implement mapping " +
-        		"logical month grid to bounds");
-    }
-
-    
-    /**
-     * Returns the bounds of the month at the given 
-     * Calendar. <p>
-     * 
-     * Mapping Calendar to bounds.
-     * 
-     * @param calendar
-     * @param column the month columnIndex in the grid
-     * @return the bounds of the month represented by the given 
-     *    calendar. 
-     */
-    protected Rectangle getMonthBounds(Calendar calendar) {
-        // TODO 
-        throw new UnsupportedOperationException("TODO: implement mapping " +
-                        "logical month grid to bounds");
-    }
-
-    /**
-     * Returns the bounds of the month at the given 
-     * Calendar. <p>
-     * 
-     * Mapping Calendar to logical grid coordinates.
-     * 
-     * 
-     * @param calendar the Calendar to map.
-     * @return The logical grid position of the month represented 
-     *  by the calendar or null if outside. 
-     */
-    protected Point getMonthGridPosition(Calendar calendar) {
-        // TODO 
-        throw new UnsupportedOperationException("TODO: implement mapping " +
-                        "logical month grid to bounds");
-    }
     /**
      * Called from layout: calculates properties
      * of grid of months.
@@ -774,9 +724,14 @@ public class BasicMonthViewUI extends MonthViewUI {
         calculateNumDisplayedCals();
         calculateStartPosition();
     }
+    
+//-------------------  layout    
     /**
      * Calculates the startX/startY position for centering the calendars
      * within the available space.
+     * 
+     * calendarRow/ColumnCount and calendarWidth/Height must be
+     * initialized before calling this. 
      */
     private void calculateStartPosition() {
         // Calculate offset in x-axis for centering calendars.
@@ -867,7 +822,7 @@ public class BasicMonthViewUI extends MonthViewUI {
         g.setColor(monthView.getForeground());
 
         // Get a calender set to the first displayed date
-        Calendar cal = getCalendar(getFirstDisplayedDay());
+        Calendar cal = getCalendar();
 
         // Center the calendars horizontally/vertically in the available space.
         for (int row = 0; row < calendarRowCount; row++) {
@@ -1640,7 +1595,7 @@ public class BasicMonthViewUI extends MonthViewUI {
         Date upperBound = monthView.getUpperBound();
         if (upperBound == null
                 || upperBound.after(getLastDisplayedDay()) ){
-            Calendar cal = getCalendar(getFirstDisplayedDay());
+            Calendar cal = getCalendar();
             cal.add(Calendar.MONTH, 1);
             monthView.setFirstDisplayedDay(cal.getTime());
         }
@@ -1650,7 +1605,7 @@ public class BasicMonthViewUI extends MonthViewUI {
         Date lowerBound = monthView.getLowerBound();
         if (lowerBound == null
                 || lowerBound.before(getFirstDisplayedDay())){
-            Calendar cal = getCalendar(getFirstDisplayedDay());
+            Calendar cal = getCalendar();
             cal.add(Calendar.MONTH, -1);
             monthView.setFirstDisplayedDay(cal.getTime());
         }
@@ -1820,7 +1775,6 @@ public class BasicMonthViewUI extends MonthViewUI {
             // Check if one of the month traverse buttons was pushed.
             if (monthView.isTraversable()) {
                 int arrowType = getTraversableGridPositionAtLocation(e.getX(), e.getY());
-//                int arrowType = getTraversableButtonAt(e.getX(), e.getY());
                 if (arrowType != -1) {
                     traverseMonth(arrowType);
                     return;
@@ -1967,7 +1921,7 @@ public class BasicMonthViewUI extends MonthViewUI {
             FontMetrics fm = monthView.getFontMetrics(derivedFont);
             // JW PENDING: relies on calendar being set at least to year?
             // No, just on the bare calendar - so don't care about actual time
-            Calendar cal = getCalendar(getFirstDisplayedDay());
+            Calendar cal = getCalendar();
             cal.set(Calendar.MONTH, cal.getMinimum(Calendar.MONTH));
             cal.set(Calendar.DAY_OF_MONTH,
                     cal.getActualMinimum(Calendar.DAY_OF_MONTH));
@@ -2250,7 +2204,7 @@ public class BasicMonthViewUI extends MonthViewUI {
             boolean isForward = true;
             // want a copy to play with - each branch sets and reads the time
             // actually don't care about the pre-set time.
-            Calendar cal = getCalendar(getFirstDisplayedDay());
+            Calendar cal = getCalendar();
             switch (action) {
                 case ADJUST_SELECTION_PREVIOUS_DAY:
                     if (!newEndDate.after(pivotDate)) {
@@ -2447,7 +2401,6 @@ public class BasicMonthViewUI extends MonthViewUI {
      * ui is responsible to keep the value in a reasonable state to query from
      * the outside. 
      */
-    @SuppressWarnings("deprecation")
     public long calculateLastDisplayedDate() {
         updateLastDisplayedDay(getFirstDisplayedDay());
         // NOTE JW: this is the only place (outside the getter/setter) 
