@@ -88,8 +88,8 @@ public class JXMonthViewIssues extends InteractiveTestCase {
         final JXMonthView monthView = new JXMonthView();
         monthView.setTraversable(true);
         monthView.setShowingWeekNumber(true);
-        monthView.setShowingLeadingDates(true);
-        monthView.setShowingTrailingDates(true);
+        monthView.setShowingLeadingDays(true);
+        monthView.setShowingTrailingDays(true);
         monthView.addMouseListener(new MouseAdapter() {
 
             @Override
@@ -128,8 +128,8 @@ public class JXMonthViewIssues extends InteractiveTestCase {
         final JXMonthView monthView = new JXMonthView();
         monthView.setTraversable(true);
         monthView.setShowingWeekNumber(true);
-        monthView.setShowingLeadingDates(true);
-        monthView.setShowingTrailingDates(true);
+        monthView.setShowingLeadingDays(true);
+        monthView.setShowingTrailingDays(true);
         Action action = new AbstractActionExt("toggle minimal") {
 
             public void actionPerformed(ActionEvent e) {
@@ -279,77 +279,6 @@ public class JXMonthViewIssues extends InteractiveTestCase {
         assertEquals(daysSource, Arrays.asList(monthView.getDaysOfTheWeek()));
     }
     
-    /**
-     * Issue #751-swingx: property naming violations
-     */
-    public void testShowingLeadingNotification() {
-        JXMonthView monthView = new JXMonthView();
-        PropertyChangeReport report = new PropertyChangeReport();
-        monthView.addPropertyChangeListener(report);
-        boolean showing = monthView.isShowingLeadingDates();
-        monthView.setShowingLeadingDates(!showing);
-        TestUtils.assertPropertyChangeEvent(report, "showingLeadingDates", showing, !showing);
-    }
-
-    /**
-     * Issue #751-swingx: property naming violations
-     */
-    public void testShowingLeadingNoNotification() {
-        JXMonthView monthView = new JXMonthView();
-        PropertyChangeReport report = new PropertyChangeReport();
-        monthView.addPropertyChangeListener(report);
-        boolean showing = monthView.isShowingLeadingDates();
-        monthView.setShowingLeadingDates(showing);
-        assertEquals(0, report.getEventCount("showingLeadingDates"));
-    }
-
-    /**
-     * Issue #751-swingx: property naming violations
-     */
-    public void testShowingTrailingNotification() {
-        JXMonthView monthView = new JXMonthView();
-        PropertyChangeReport report = new PropertyChangeReport();
-        monthView.addPropertyChangeListener(report);
-        boolean showing = monthView.isShowingTrailingDates();
-        monthView.setShowingTrailingDates(!showing);
-        TestUtils.assertPropertyChangeEvent(report, "showingTrailingDates", showing, !showing);
-    }
-
-    /**
-     * Issue #751-swingx: property naming violations
-     */
-    public void testShowingTrailingNoNotification() {
-        JXMonthView monthView = new JXMonthView();
-        PropertyChangeReport report = new PropertyChangeReport();
-        monthView.addPropertyChangeListener(report);
-        boolean showing = monthView.isShowingTrailingDates();
-        monthView.setShowingTrailingDates(showing);
-        assertEquals(0, report.getEventCount("showingTrailingDates"));
-    }
-
-    /**
-     * Issue #751-swingx: property naming violations
-     */
-    public void testShowingWeekNumbersNotification() {
-        JXMonthView monthView = new JXMonthView();
-        PropertyChangeReport report = new PropertyChangeReport();
-        monthView.addPropertyChangeListener(report);
-        boolean showing = monthView.isShowingWeekNumber();
-        monthView.setShowingWeekNumber(!showing);
-        TestUtils.assertPropertyChangeEvent(report, "showingWeekNumber", showing, !showing);
-    }
-
-    /**
-     * Issue #751-swingx: property naming violations
-     */
-    public void testShowingWeekNumbersNoNotification() {
-        JXMonthView monthView = new JXMonthView();
-        PropertyChangeReport report = new PropertyChangeReport();
-        monthView.addPropertyChangeListener(report);
-        boolean showing = monthView.isShowingWeekNumber();
-        monthView.setShowingWeekNumber(showing);
-        assertEquals(0, report.getEventCount("showingWeekNumber"));
-    }
 
 
     /**

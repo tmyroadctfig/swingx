@@ -86,9 +86,16 @@ public class BasicMonthViewUI extends MonthViewUI {
     protected static final int NO_OFFSET = 0;
     protected static final int TRAILING_DAY_OFFSET = -1;
 
+    
     private static final int WEEKS_IN_MONTH = 6;
     private static final int CALENDAR_SPACING = 10;
     private static final Point NO_SUCH_CALENDAR = new Point(-1, -1);
+
+    
+    /** Return value used to identify when the month down button is pressed. */
+    public static final int MONTH_DOWN = 1;
+    /** Return value used to identify when the month up button is pressed. */
+    public static final int MONTH_UP = 2;
 
     /** Formatter used to format the day of the week to a numerical value. */
     protected final SimpleDateFormat dayOfMonthFormatter = new SimpleDateFormat("d");
@@ -575,11 +582,11 @@ public class BasicMonthViewUI extends MonthViewUI {
         if (!headerBounds.contains(x, y)) return -1;
         Rectangle hitArea = new Rectangle(headerBounds.x, headerBounds.y, monthUpImage.getIconWidth(), monthUpImage.getIconHeight());
         if (hitArea.contains(x, y)) {
-            return isLeftToRight ? JXMonthView.MONTH_DOWN : JXMonthView.MONTH_UP;
+            return isLeftToRight ? MONTH_DOWN : MONTH_UP;
         }
         hitArea.translate(headerBounds.width - monthUpImage.getIconWidth(), 0);
         if (hitArea.contains(x, y)) {
-            return isLeftToRight ? JXMonthView.MONTH_UP : JXMonthView.MONTH_DOWN;
+            return isLeftToRight ? MONTH_UP : MONTH_DOWN;
         } 
         return -1;
     }
@@ -1062,7 +1069,7 @@ public class BasicMonthViewUI extends MonthViewUI {
      */
     protected void paintTrailingDay(Graphics g, int left, int top,
             Calendar calendar) {
-        if (!monthView.isShowingTrailingDates()) return;
+        if (!monthView.isShowingTrailingDays()) return;
         paintTrailingDayBackground(g, left, top, fullBoxWidth,
                     fullBoxHeight, calendar);
         paintTrailingDayForeground(g, left, top, fullBoxWidth,
@@ -1088,7 +1095,7 @@ public class BasicMonthViewUI extends MonthViewUI {
      */
     protected void paintLeadingDay(Graphics g, int left, int top,
             Calendar calendar) {
-        if (!monthView.isShowingLeadingDates()) return;
+        if (!monthView.isShowingLeadingDays()) return;
         paintLeadingDayBackground(g, left, top, fullBoxWidth, fullBoxHeight,
                 calendar);
         paintLeadingDayForeground(g, left, top, fullBoxWidth, fullBoxHeight,
@@ -1584,9 +1591,9 @@ public class BasicMonthViewUI extends MonthViewUI {
 //---------------------- navigation support    
     
     private void traverseMonth(int arrowType) {
-        if (arrowType == JXMonthView.MONTH_DOWN) {
+        if (arrowType == MONTH_DOWN) {
             previousMonth();
-        } else if (arrowType == JXMonthView.MONTH_UP) {
+        } else if (arrowType == MONTH_UP) {
             nextMonth();
         }
     }
@@ -2050,8 +2057,9 @@ public class BasicMonthViewUI extends MonthViewUI {
                     || JXMonthView.TRAVERSABLE.equals(property) 
                     || JXMonthView.DAYS_OF_THE_WEEK.equals(property) 
                     || "border".equals(property) 
-                    || JXMonthView.WEEK_NUMBER.equals(property)
+                    || "showingWeekNumber".equals(property)
                     || "traversable".equals(property) 
+                    
                     ) {
                 monthView.revalidate();
                 monthView.repaint();
@@ -2065,10 +2073,14 @@ public class BasicMonthViewUI extends MonthViewUI {
             } else if ("timeZone".equals(property)) {
                 dayOfMonthFormatter.setTimeZone((TimeZone) evt.getNewValue());
             } else if ("flaggedDates".equals(property)
-                || JXMonthView.SHOW_LEADING_DATES.equals(property)
-                || JXMonthView.SHOW_TRAILING_DATES.equals(property)
+                || "showingTrailingDays".equals(property)
+                || "showingLeadingDays".equals(property)
+                || "today".equals(property)
+                || "antialiased".equals(property)
                 ) {
                 monthView.repaint();
+            } else {
+//                LOG.info("got propertyChange:" + property);
             }
         }
 

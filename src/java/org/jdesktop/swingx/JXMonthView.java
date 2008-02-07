@@ -156,23 +156,26 @@ public class JXMonthView extends JComponent {
     public static final String BOX_PADDING_X = "boxPaddingX";
     public static final String BOX_PADDING_Y = "boxPaddingY";
     public static final String DAYS_OF_THE_WEEK = "daysOfTheWeek";
-    public static final String FIRST_DISPLAYED_DATE = "firstDisplayedDate";
     public static final String SELECTION_MODEL = "selectionModel";
-    public static final String SHOW_LEADING_DATES = "showLeadingDates";
-    public static final String SHOW_TRAILING_DATES = "showTrailingDates";
     public static final String TRAVERSABLE = "traversable";
-    public static final String WEEK_NUMBER = "weekNumber";
     public static final String FLAGGED_DATES = "flaggedDates";
 
-    /** Return value used to identify when the month down button is pressed. */
+    /** @deprecated use hardcoded property name - this violated naming convention #751.*/
+    public static final String SHOW_LEADING_DATES = "showLeadingDates";
+    /** @deprecated use hardcoded property name - this violated naming convention #751.*/
+    public static final String SHOW_TRAILING_DATES = "showTrailingDates";
+    /** @deprecated use hardcoded property name - this violated naming convention #751.*/
+    public static final String WEEK_NUMBER = "weekNumber";
+    /** @deprecated use hardcoded property name, changed to "firstDisplayedDay". */
+    public static final String FIRST_DISPLAYED_DATE = "firstDisplayedDate";
+    /** Return value used to identify when the month down button is pressed. 
+     * @deprecated moved to ui
+     */
     public static final int MONTH_DOWN = 1;
-    /** Return value used to identify when the month up button is pressed. */
+    /** Return value used to identify when the month up button is pressed. 
+     * @deprecated moved to ui
+     */
     public static final int MONTH_UP = 2;
-
-    @SuppressWarnings({"unused"})
-    private static final int MONTH_TRAVERSABLE = 1;
-    @SuppressWarnings({"unused"})
-    private static final int YEAR_TRAVERSABLE = 2;
 
     static {
         LookAndFeelAddons.contribute(new MonthViewAddon());
@@ -205,9 +208,6 @@ public class JXMonthView extends JComponent {
     private Calendar cal;
     /** calendar to store the real input of firstDisplayedDate. */
     private Calendar anchor;
-    // PENDING JW: why kept apart from cal? Why writable? - shouldn't the calendar have complete
-    // control?
-    private int firstDayOfWeek;
     /** 
      * Start of the day which contains System.millis() in the current calendar.
      * Kept in synch via a timer started in addNotify.
@@ -217,12 +217,37 @@ public class JXMonthView extends JComponent {
      * The timer used to keep today in synch with system time.
      */
     private Timer todayTimer = null;
-//    private TreeSet<Long> flaggedDates;
-    //-------------- selection
+    // PENDING JW: why kept apart from cal? Why writable? - shouldn't the calendar have complete
+    // control?
+    private int firstDayOfWeek;
+    //-------------- selection/flagging
+    /** 
+     * The DateSelectionModel driving this component. This model's calendar
+     * is the reference for all dates.
+     */
     private DateSelectionModel model;
-//    private SelectionMode selectionMode;
+    /**
+     * Listener registered with the current model to keep Calendar dependent
+     * state synched.
+     */
+    private DateSelectionListener modelListener;
+    /** 
+     * The manager of the flagged dates. Note
+     * that the type of this is an implementation detail.  
+     */
+    private DaySelectionModel flaggedDates;
+    /**
+     * Storage of actionListeners registered with the monthView.
+     */
     private EventListenerMap listenerMap;
     
+    private boolean traversable;
+    private boolean leadingDays;
+    private boolean trailingDays;
+    private boolean showWeekNumber;
+    private boolean componentInputMapEnabled;
+    
+    //-------------------
     // PENDING JW: ??
     @SuppressWarnings({"FieldCanBeLocal"})
     protected Date modifiedStartDate;
@@ -239,15 +264,12 @@ public class JXMonthView extends JComponent {
      * Insets used in determining the rectangle for the month string
      * background.
      */
+    private boolean antialiased;
     protected Insets _monthStringInsets = new Insets(0, 0, 0, 0);
     private int boxPaddingX;
     private int boxPaddingY;
     private int minCalCols = 1;
     private int minCalRows = 1;
-    private boolean antiAlias;
-    private boolean traversable;
-    private boolean leadingDates;
-    private boolean trailingDates;
     private Color todayBackgroundColor;
     private Color monthStringBackground;
     private Color monthStringForeground;
@@ -256,10 +278,6 @@ public class JXMonthView extends JComponent {
     private String actionCommand = "selectionChanged";
     private Hashtable<Integer, Color> dayToColorTable = new Hashtable<Integer, Color>();
     private Color flaggedDayForeground;
-    private boolean showWeekNumber;
-    private boolean componentInputMapEnabled;
-    private DateSelectionListener modelListener;
-    private DaySelectionModel flaggedDates;
 
     /**
      * Create a new instance of the <code>JXMonthView</code> class using the
@@ -318,7 +336,7 @@ public class JXMonthView extends JComponent {
      */
     public JXMonthView(Date firstDisplayedDay, final DateSelectionModel model, final Locale locale) {
         super();
-        antiAlias = false;
+        antialiased = false;
         traversable = false;
         listenerMap = new EventListenerMap();
 
@@ -586,6 +604,7 @@ public class JXMonthView extends JComponent {
         anchor.setMinimalDaysInFirstWeek(model.getMinimalDaysInFirstWeek());
     }
 
+
     
 //-------------------- scrolling
     /**
@@ -672,7 +691,21 @@ public class JXMonthView extends JComponent {
             }
         }
     }
-    
+
+
+    /**
+     * Return a the date at the specified x/y position.
+     * The date represents a day in the calendar's coordinate system. 
+     *
+     * @param x X position
+     * @param y Y position
+     * @return The date at the given location or null if the the position
+     *   doesn't contain a Day.
+     */ 
+    public Date getDayAtLocation(int x, int y) {
+        return getUI().getDayAtLocation(x, y);
+    }
+   
 //------------------ today
     
     /**
@@ -697,22 +730,23 @@ public class JXMonthView extends JComponent {
     }
 
     /**
-     * Sets the todayInMillis property to the start of the day which contains the
-     * given millis in this monthView's calendar coordinates.
+     * Sets the date which represents today. Internally 
+     * modified to the start of the day which contains the
+     * given date in this monthView's calendar coordinates.
      *  
      * temporary widened access for testing.
      * 
-     * @param millis the instance in millis which should be used as today.
+     * @param date the date which should be used as today.
      */
     protected void setToday(Date date) {
         Date oldToday = getToday();
+        // PENDING JW: do we really want the start of today? 
         this.today = startOfDay(date);
         // PENDING JW: need notification for millis property until we
         // remove it!
         firePropertyChange("todayInMillis", 
                 oldToday != null ? oldToday.getTime() : 0, getToday().getTime());
         firePropertyChange("today", oldToday, getToday());
-        repaint();
     }
 
     /**
@@ -1126,13 +1160,15 @@ public class JXMonthView extends JComponent {
      *
      * @param value true if leading dates should be displayed, false otherwise.
      */
-    public void setShowingLeadingDates(boolean value) {
-        if (leadingDates == value) {
+    public void setShowingLeadingDays(boolean value) {
+        if (leadingDays == value) {
             return;
         }
 
-        leadingDates = value;
-        firePropertyChange(SHOW_LEADING_DATES, !leadingDates, leadingDates);
+        leadingDays = value;
+        firePropertyChange("showingLeadingDays", !leadingDays, leadingDays);
+        // JW: fire the old event until the deprecated method is removed
+        firePropertyChange("showLeadingDates", !leadingDays, leadingDays);
     }
 
     /**
@@ -1140,8 +1176,8 @@ public class JXMonthView extends JComponent {
      *
      * @return true if leading dates are shown, false otherwise.
      */
-    public boolean isShowingLeadingDates() {
-        return leadingDates;
+    public boolean isShowingLeadingDays() {
+        return leadingDays;
     }
 
     /**
@@ -1149,13 +1185,15 @@ public class JXMonthView extends JComponent {
      *
      * @param value true if trailing dates should be displayed, false otherwise.
      */
-    public void setShowingTrailingDates(boolean value) {
-        if (trailingDates == value) {
+    public void setShowingTrailingDays(boolean value) {
+        if (trailingDays == value) {
             return;
         }
 
-        trailingDates = value;
-        firePropertyChange(SHOW_TRAILING_DATES, !trailingDates, trailingDates);
+        trailingDays = value;
+        firePropertyChange("showingTrailingDays", !trailingDays, trailingDays);
+        // JW: fire the old event until the deprecated method is removed
+        firePropertyChange("showTrailingDates", !trailingDays, trailingDays);
     }
 
     /**
@@ -1163,8 +1201,8 @@ public class JXMonthView extends JComponent {
      *
      * @return true if trailing dates are shown, false otherwise.
      */
-    public boolean isShowingTrailingDates() {
-        return trailingDates;
+    public boolean isShowingTrailingDays() {
+        return trailingDays;
     }
     
     /**
@@ -1256,7 +1294,7 @@ public class JXMonthView extends JComponent {
     public void setShowingWeekNumber(boolean showWeekNumber) {
         if (this.showWeekNumber == showWeekNumber) return;
         this.showWeekNumber = showWeekNumber;
-        firePropertyChange(WEEK_NUMBER, !this.showWeekNumber, showWeekNumber);
+        firePropertyChange("showingWeekNumber", !showWeekNumber, showWeekNumber);
     }
 
     /**
@@ -1280,7 +1318,6 @@ public class JXMonthView extends JComponent {
         String[] oldValue = _daysOfTheWeek;
         _daysOfTheWeek = days;
         firePropertyChange(DAYS_OF_THE_WEEK, oldValue, _daysOfTheWeek);
-        repaint();
     }
 
     /**
@@ -1303,7 +1340,7 @@ public class JXMonthView extends JComponent {
      * <code>false</code> otherwise.
      */
     public boolean isAntialiased() {
-        return antiAlias;
+        return antialiased;
     }
 
     /**
@@ -1313,12 +1350,11 @@ public class JXMonthView extends JComponent {
      * <code>false</code> to turn it off.
      */
     public void setAntialiased(boolean antiAlias) {
-        if (this.antiAlias == antiAlias) {
+        if (this.antialiased == antiAlias) {
             return;
         }
-        this.antiAlias = antiAlias;
-        firePropertyChange("antialiased", !this.antiAlias, this.antiAlias);
-        repaint();
+        this.antialiased = antiAlias;
+        firePropertyChange("antialiased", !this.antialiased, this.antialiased);
     }
 
     /**
@@ -1338,6 +1374,7 @@ public class JXMonthView extends JComponent {
      */
     public void setSelectedBackground(Color c) {
         selectedBackground = c;
+        repaint();
     }
 
     /**
@@ -1427,6 +1464,7 @@ public class JXMonthView extends JComponent {
      */
     public void setDayForeground(int dayOfWeek, Color c) {
         dayToColorTable.put(dayOfWeek, c);
+        repaint();
     }
 
     /**
@@ -1453,6 +1491,7 @@ public class JXMonthView extends JComponent {
      */
     public void setFlaggedDayForeground(Color c) {
         flaggedDayForeground = c;
+        repaint();
     }
 
     /**
@@ -1544,7 +1583,9 @@ public class JXMonthView extends JComponent {
     /**
      * Moves and resizes this component to conform to the new bounding
      * rectangle r. This component's new position is specified by r.x and
-     * r.y, and its new size is specified by r.width and r.height
+     * r.y, and its new size is specified by r.width and r.height <p>
+     * 
+     * PENDING JW: why ovrridden? super is identical
      *
      * @param r The new bounding rectangle for this component
      */
@@ -1556,6 +1597,8 @@ public class JXMonthView extends JComponent {
     /**
      * Sets the font of this component.
      *
+     * PENDING JW: why override?
+     *  
      * @param font The font to become this component's font; if this parameter
      *             is null then this component will inherit the font of its parent.
      */
@@ -1604,94 +1647,8 @@ public class JXMonthView extends JComponent {
         todayTimer.start();
     }
 
-
-
-    /**
-     * Return a the date at the specified x/y position.
-     * The date represents a day in the calendar's coordinate system. 
-     *
-     * @param x X position
-     * @param y Y position
-     * @return The date at the given location or null if the the position
-     *   doesn't contain a Day.
-     */ 
-    public Date getDayAtLocation(int x, int y) {
-        return getUI().getDayAtLocation(x, y);
-    }
-    /**
-     * Returns the string currently used to identiy fired ActionEvents.
-     *
-     * @return String The string used for identifying ActionEvents.
-     */
-    public String getActionCommand() {
-        return actionCommand;
-    }
-
-    /**
-     * Sets the string used to identify fired ActionEvents.
-     *
-     * @param actionCommand The string used for identifying ActionEvents.
-     */
-    public void setActionCommand(String actionCommand) {
-        this.actionCommand = actionCommand;
-    }
-
-    /**
-     * Adds an ActionListener.
-     * <p/>
-     * The ActionListener will receive an ActionEvent when a selection has
-     * been made.
-     *
-     * @param l The ActionListener that is to be notified
-     */
-    public void addActionListener(ActionListener l) {
-        listenerMap.add(ActionListener.class, l);
-    }
-
-    /**
-     * Removes an ActionListener.
-     *
-     * @param l The action listener to remove.
-     */
-    public void removeActionListener(ActionListener l) {
-        listenerMap.remove(ActionListener.class, l);
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public <T extends EventListener> T[] getListeners(Class<T> listenerType) {
-        java.util.List<T> listeners = listenerMap.getListeners(listenerType);
-        T[] result;
-        if (!listeners.isEmpty()) {
-            //noinspection unchecked
-            result = (T[]) java.lang.reflect.Array.newInstance(listenerType, listeners.size());
-            result = listeners.toArray(result);
-        } else {
-            result = super.getListeners(listenerType);
-        }
-        return result;
-    }
-
-    /**
-     * Creates and fires an ActionEvent with the given action 
-     * command to all listeners.
-     * 
-     * @param actionCommand the command for the created.
-     */
-    protected void fireActionPerformed(String actionCommand) {
-        ActionListener[] listeners = getListeners(ActionListener.class);
-        ActionEvent e = null;
-
-        for (ActionListener listener : listeners) {
-            if (e == null) {
-                e = new ActionEvent(JXMonthView.this,
-                        ActionEvent.ACTION_PERFORMED,
-                        actionCommand);
-            }
-            listener.actionPerformed(e);
-        }
-    }
-
+//-------------------- action and listener
+    
 
     /**
      * Commits the current selection. <p>
@@ -1758,6 +1715,63 @@ public class JXMonthView extends JComponent {
         return componentInputMapEnabled;
     }
 
+    /**
+     * Adds an ActionListener.
+     * <p/>
+     * The ActionListener will receive an ActionEvent when a selection has
+     * been made.
+     *
+     * @param l The ActionListener that is to be notified
+     */
+    public void addActionListener(ActionListener l) {
+        listenerMap.add(ActionListener.class, l);
+    }
+
+    /**
+     * Removes an ActionListener.
+     *
+     * @param l The action listener to remove.
+     */
+    public void removeActionListener(ActionListener l) {
+        listenerMap.remove(ActionListener.class, l);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T extends EventListener> T[] getListeners(Class<T> listenerType) {
+        java.util.List<T> listeners = listenerMap.getListeners(listenerType);
+        T[] result;
+        if (!listeners.isEmpty()) {
+            //noinspection unchecked
+            result = (T[]) java.lang.reflect.Array.newInstance(listenerType, listeners.size());
+            result = listeners.toArray(result);
+        } else {
+            result = super.getListeners(listenerType);
+        }
+        return result;
+    }
+
+    /**
+     * Creates and fires an ActionEvent with the given action 
+     * command to all listeners.
+     * 
+     * @param actionCommand the command for the created.
+     */
+    protected void fireActionPerformed(String actionCommand) {
+        ActionListener[] listeners = getListeners(ActionListener.class);
+        ActionEvent e = null;
+
+        for (ActionListener listener : listeners) {
+            if (e == null) {
+                e = new ActionEvent(JXMonthView.this,
+                        ActionEvent.ACTION_PERFORMED,
+                        actionCommand);
+            }
+            listener.actionPerformed(e);
+        }
+    }
+
+
 //--- deprecated code - NOTE: these methods will be removed soon! 
 //--- they will definitely be removed in milestone 0.9.2!    
 
@@ -1820,33 +1834,49 @@ public class JXMonthView extends JComponent {
      * Whether or not to show leading dates for a months displayed by this component.
      *
      * @param value true if leading dates should be displayed, false otherwise.
-     * @deprecated use {@link #setShowingLeadingDates(boolean)} - name change to
-     *    comply with property naming conventions.
+     * @deprecated use {@link #setShowingLeadingDays(boolean)} 
+     *  - name change to comply with property naming conventions and 
+     *  consistently using "Day" instead of "Date". 
      */
     public void setShowLeadingDates(boolean value) {
-        if (leadingDates == value) {
-            return;
-        }
-        
-        leadingDates = value;
-        firePropertyChange(SHOW_LEADING_DATES, !leadingDates, leadingDates);
+        setShowingLeadingDays(value);
     }
+    
+    /**
+     * Whether or not we're showing leading dates.
+     *
+     * @return true if leading dates are shown, false otherwise.
+     * 
+     * @deprecated use {@link #isShowingLeadingDays()}
+     *  - name change to comply with property naming conventions and 
+     *  consistently using "Day" instead of "Date". 
+     */
+    public boolean isShowingLeadingDates() {
+        return leadingDays;
+    }
+
     /**
      * Whether or not to show trailing dates for the months displayed by this component.
      *
      * @param value true if trailing dates should be displayed, false otherwise.
-     * @deprecated use {@link #setShowingTrailingDates(boolean)} - name change to
-     *    comply with property naming conventions.
+     * @deprecated use {@link #setShowingTrailingDays(boolean)} - 
+     *  - name change to comply with property naming conventions and 
+     *  consistently using "Day" instead of "Date". 
      */
     public void setShowTrailingDates(boolean value) {
-        if (trailingDates == value) {
-            return;
-        }
-
-        trailingDates = value;
-        firePropertyChange(SHOW_TRAILING_DATES, !trailingDates, trailingDates);
+        setShowingTrailingDays(value);
     }
 
+    /**
+     * 
+     * @return
+     * @deprecated use {@link #isShowingTrailingDays()} 
+     *  - name change to comply with property naming conventions and 
+     *  consistently using "Day" instead of "Date". 
+     */
+    public boolean isShowingTrailingDates() {
+        return isShowingTrailingDays();
+    }
   //--------------------- flagged dates (long) - deprecation pending!
 
     /**
@@ -2106,6 +2136,32 @@ public class JXMonthView extends JComponent {
      */
     public JXMonthView(long firstDisplayedDate, final DateSelectionModel model) {
         this(firstDisplayedDate, model, null);
+    }
+
+    /**
+     * Returns the string currently used to identiy fired ActionEvents.
+     *
+     * @return String The string used for identifying ActionEvents.
+     * 
+     * @deprecated no longer used. The command is internally determined and
+     * either monthViewCommit or monthViewCancel, depending on the user
+     * gesture which triggered the action.
+     */
+    public String getActionCommand() {
+        return actionCommand;
+    }
+
+    /**
+     * Sets the string used to identify fired ActionEvents.
+     *
+     * @param actionCommand The string used for identifying ActionEvents.
+     * 
+     * @deprecated no longer used. The command is internally determined and
+     * either monthViewCommit or monthViewCancel, depending on the user
+     * gesture which triggered the action.
+     */
+    public void setActionCommand(String actionCommand) {
+        this.actionCommand = actionCommand;
     }
 
 

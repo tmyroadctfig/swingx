@@ -62,12 +62,12 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
     private Calendar calendar;
 
     public static void main(String[] args) {
-//      setSystemLF(true);
+      setSystemLF(true);
       JXMonthViewVisualCheck  test = new JXMonthViewVisualCheck();
       try {
-          test.runInteractiveTests();
+//          test.runInteractiveTests();
 //        test.runInteractiveTests(".*TimeZone.*");
-//        test.runInteractiveTests("interactive.*Flagged.*");
+        test.runInteractiveTests("interactive.*Toggle.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
@@ -79,11 +79,11 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
      * 
      * Visually check if the monthView is updated on toggling several properties.
      */
-    public void interactiveToggleFlagged() {
+    public void interactiveToggleProperties() {
         final JXMonthView monthView = new JXMonthView(); 
         monthView.setTraversable(true);
-        final JXFrame frame = showInFrame(monthView, "MonthView flagged today");
-        Action action = new AbstractActionExt("toggle today flag") {
+        final JXFrame frame = showInFrame(monthView, "MonthView - click property and see the change");
+        Action action = new AbstractActionExt("today flag") {
             public void actionPerformed(ActionEvent e) {
                 if (monthView.hasFlaggedDates()) {
                     monthView.clearFlaggedDates();
@@ -94,35 +94,35 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
             
         };
         addAction(frame, action);
-        Action trailing = new AbstractActionExt("toggle trailing") {
+        Action trailing = new AbstractActionExt("trailing") {
             public void actionPerformed(ActionEvent e) {
-                monthView.setShowingTrailingDates(!monthView.isShowingTrailingDates());
+                monthView.setShowingTrailingDays(!monthView.isShowingTrailingDays());
             }
             
         };
         addAction(frame, trailing);
-        Action leading = new AbstractActionExt("toggle leading") {
+        Action leading = new AbstractActionExt("leading") {
             public void actionPerformed(ActionEvent e) {
-                monthView.setShowingLeadingDates(!monthView.isShowingLeadingDates());
+                monthView.setShowingLeadingDays(!monthView.isShowingLeadingDays());
             }
             
         };
         addAction(frame, leading);
-        Action weekNumbers = new AbstractActionExt("toggle weekNumbers") {
+        Action weekNumbers = new AbstractActionExt("weekNumbers") {
             public void actionPerformed(ActionEvent e) {
                 monthView.setShowingWeekNumber(!monthView.isShowingWeekNumber());
             }
             
         };
         addAction(frame, weekNumbers);
-        Action traversable = new AbstractActionExt("toggle traversable") {
+        Action traversable = new AbstractActionExt("traversable") {
             public void actionPerformed(ActionEvent e) {
                 monthView.setTraversable(!monthView.isTraversable());
             }
             
         };
         addAction(frame, traversable);
-        Action firstDay = new AbstractActionExt("toggle firstDay") {
+        Action firstDay = new AbstractActionExt("firstDay") {
             public void actionPerformed(ActionEvent e) {
                 int firstDay = monthView.getFirstDayOfWeek();
                 monthView.setFirstDayOfWeek(firstDay == Calendar.SUNDAY ? 
@@ -131,6 +131,34 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
             
         };
         addAction(frame, firstDay);
+        Action today = new AbstractActionExt("today") {
+            public void actionPerformed(ActionEvent e) {
+                monthView.incrementToday();
+            }
+            
+        };
+        addAction(frame, today);
+        Action antialiased = new AbstractActionExt("antialiased") {
+            public void actionPerformed(ActionEvent e) {
+                monthView.setAntialiased(!monthView.isAntialiased());
+            }
+            
+        };
+        addAction(frame, antialiased);
+        Action daysOfWeek = new AbstractActionExt("daysOfWeek") {
+            String[] days = {"S", "M", "D", "M", "D", "F", "S"};
+            public void actionPerformed(ActionEvent e) {
+                String[] dof = monthView.getDaysOfTheWeek();
+                if (dof[0].equals(days[0])) {
+                    // PENDING - do something else to revert, this is exploiting bug #752
+                    monthView.updateUI();
+                } else {
+                    monthView.setDaysOfTheWeek(days);
+                }    
+            }
+            
+        };
+        addAction(frame, daysOfWeek);
         frame.pack();
     };
     
@@ -145,8 +173,8 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
         final JXMonthView monthView = new JXMonthView();
         monthView.setTraversable(true);
         monthView.setShowingWeekNumber(true);
-        monthView.setShowingLeadingDates(true);
-        monthView.setShowingTrailingDates(true);
+        monthView.setShowingLeadingDays(true);
+        monthView.setShowingTrailingDays(true);
         Action action = new AbstractActionExt("toggle minimal") {
 
             public void actionPerformed(ActionEvent e) {
@@ -205,8 +233,8 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
         JXDatePicker picker = new JXDatePicker();
         final JXMonthView monthView = picker.getMonthView();
         monthView.setShowingWeekNumber(true);
-        monthView.setShowingLeadingDates(true);
-        monthView.setShowingTrailingDates(true);
+        monthView.setShowingLeadingDays(true);
+        monthView.setShowingTrailingDays(true);
         Action action = new AbstractActionExt("toggle minimal") {
 
             public void actionPerformed(ActionEvent e) {

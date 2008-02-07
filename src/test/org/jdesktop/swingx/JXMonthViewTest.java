@@ -99,6 +99,112 @@ public class JXMonthViewTest extends MockObjectTestCase {
     /**
      * Issue #751-swingx: property naming violations
      */
+    public void testAntialiasedNotification() {
+        JXMonthView monthView = new JXMonthView();
+        PropertyChangeReport report = new PropertyChangeReport();
+        monthView.addPropertyChangeListener(report);
+        boolean showing = monthView.isAntialiased();
+        monthView.setAntialiased(!showing);
+        TestUtils.assertPropertyChangeEvent(report, "antialiased", showing, !showing, false);
+        // JW: fire the old as well until the method is removed
+        TestUtils.assertPropertyChangeEvent(report, "antialiased", showing, !showing, false);
+    }
+
+    /**
+     * Issue #751-swingx: property naming violations
+     */
+    public void testAntialiasedNoNotification() {
+        JXMonthView monthView = new JXMonthView();
+        PropertyChangeReport report = new PropertyChangeReport();
+        monthView.addPropertyChangeListener(report);
+        boolean showing = monthView.isAntialiased();
+        monthView.setAntialiased(showing);
+        assertEquals(0, report.getEventCount("antialiased"));
+    }
+
+
+    /**
+     * Issue #751-swingx: property naming violations
+     */
+    public void testShowingLeadingNotification() {
+        JXMonthView monthView = new JXMonthView();
+        PropertyChangeReport report = new PropertyChangeReport();
+        monthView.addPropertyChangeListener(report);
+        boolean showing = monthView.isShowingLeadingDays();
+        monthView.setShowingLeadingDays(!showing);
+        TestUtils.assertPropertyChangeEvent(report, "showingLeadingDays", showing, !showing, false);
+        // JW: fire the old as well until the method is removed
+        TestUtils.assertPropertyChangeEvent(report, "showLeadingDates", showing, !showing, false);
+    }
+
+    /**
+     * Issue #751-swingx: property naming violations
+     */
+    public void testShowingLeadingNoNotification() {
+        JXMonthView monthView = new JXMonthView();
+        PropertyChangeReport report = new PropertyChangeReport();
+        monthView.addPropertyChangeListener(report);
+        boolean showing = monthView.isShowingLeadingDays();
+        monthView.setShowingLeadingDays(showing);
+        assertEquals(0, report.getEventCount("showingLeadingDates"));
+    }
+
+
+
+    /**
+     * Issue #751-swingx: property naming violations
+     */
+    public void testShowingTrailingNotification() {
+        JXMonthView monthView = new JXMonthView();
+        PropertyChangeReport report = new PropertyChangeReport();
+        monthView.addPropertyChangeListener(report);
+        boolean showing = monthView.isShowingTrailingDays();
+        monthView.setShowingTrailingDays(!showing);
+        TestUtils.assertPropertyChangeEvent(report, "showingTrailingDays", showing, !showing, false);
+        // JW: fire the old as well until the method is removed
+        TestUtils.assertPropertyChangeEvent(report, "showTrailingDates", showing, !showing, false);
+        
+    }
+
+    /**
+     * Issue #751-swingx: property naming violations
+     */
+    public void testShowingTrailingNoNotification() {
+        JXMonthView monthView = new JXMonthView();
+        PropertyChangeReport report = new PropertyChangeReport();
+        monthView.addPropertyChangeListener(report);
+        boolean showing = monthView.isShowingTrailingDays();
+        monthView.setShowingTrailingDays(showing);
+        assertEquals(0, report.getEventCount("showingTrailingDays"));
+    }
+
+    /**
+     * Issue #751-swingx: property naming violations
+     */
+    public void testShowingWeekNumbersNotification() {
+        JXMonthView monthView = new JXMonthView();
+        PropertyChangeReport report = new PropertyChangeReport();
+        monthView.addPropertyChangeListener(report);
+        boolean showing = monthView.isShowingWeekNumber();
+        monthView.setShowingWeekNumber(!showing);
+        TestUtils.assertPropertyChangeEvent(report, "showingWeekNumber", showing, !showing);
+    }
+
+    /**
+     * Issue #751-swingx: property naming violations
+     */
+    public void testShowingWeekNumbersNoNotification() {
+        JXMonthView monthView = new JXMonthView();
+        PropertyChangeReport report = new PropertyChangeReport();
+        monthView.addPropertyChangeListener(report);
+        boolean showing = monthView.isShowingWeekNumber();
+        monthView.setShowingWeekNumber(showing);
+        assertEquals(0, report.getEventCount("showingWeekNumber"));
+    }
+
+    /**
+     * Issue #751-swingx: property naming violations
+     */
     public void testTraversableNotification() {
         JXMonthView monthView = new JXMonthView();
         PropertyChangeReport report = new PropertyChangeReport();
@@ -1887,16 +1993,16 @@ public class JXMonthViewTest extends MockObjectTestCase {
    
     public void testShowLeadingDates() {
         JXMonthView monthView = new JXMonthView();
-        assertFalse(monthView.isShowingLeadingDates());
-        monthView.setShowingLeadingDates(true);
-        assertTrue(monthView.isShowingLeadingDates());
+        assertFalse(monthView.isShowingLeadingDays());
+        monthView.setShowingLeadingDays(true);
+        assertTrue(monthView.isShowingLeadingDays());
     }
 
     public void testShowTrailingDates() {
         JXMonthView monthView = new JXMonthView();
-        assertFalse(monthView.isShowingTrailingDates());
-        monthView.setShowingTrailingDates(true);
-        assertTrue(monthView.isShowingTrailingDates());
+        assertFalse(monthView.isShowingTrailingDays());
+        monthView.setShowingTrailingDays(true);
+        assertTrue(monthView.isShowingTrailingDays());
     }
 
     /**
