@@ -1,6 +1,7 @@
 package org.jdesktop.swingx.plaf;
 
 import java.util.Calendar;
+import java.util.Date;
 
 import javax.swing.plaf.ComponentUI;
 
@@ -52,6 +53,21 @@ public abstract class MonthViewUI extends ComponentUI {
      * the firstDisplayed as controlled by the JXMonthView.
      * 
      * @return long The date.
+     * 
+     * @deprecated use {@link #getLastDisplayedDay()}
      */
     public abstract long getLastDisplayedDate();
+
+
+    /**
+     * Returns the last possible date that can be displayed.
+     * This is implemented by the UI since it is in control of layout
+     * and may possibly yeild different results based on implementation. <p>
+     * 
+     * It's up to the UI to keep this property, based on internal state and
+     * the firstDisplayed as controlled by the JXMonthView.
+     * 
+     * @return Date The date.
+     */
+    public abstract Date getLastDisplayedDay();
 }

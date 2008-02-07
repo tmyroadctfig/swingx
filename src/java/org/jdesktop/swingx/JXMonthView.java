@@ -192,7 +192,7 @@ public class JXMonthView extends JComponent {
      * restore point for the calendar. This is normalized to the start of the
      * first day of the month given in setFirstDisplayedDate.
      */
-    private Date firstDisplayedDate;
+    private Date firstDisplayedDay;
     /** 
      * the calendar to base all selections, flagging upon. 
      * NOTE: the time of this calendar is undefined - before using, internal
@@ -311,7 +311,7 @@ public class JXMonthView extends JComponent {
      * given Locale, the given time as the first date to 
      * display and the given selection model. 
      * 
-     * @param firstDisplayedDate 
+     * @param firstDisplayedDay 
      * @param model the selection model to use, if null a <code>DefaultSelectionModel</code> is
      *   created.
      * @param locale desired locale, if null the system default locale is used
@@ -335,49 +335,6 @@ public class JXMonthView extends JComponent {
         setFocusable(true);
         todayBackgroundColor = getForeground();
 
-    }
-
-    /**
-     * Create a new instance of the <code>JXMonthView</code> class using the
-     * given Locale, the given time as the first date to 
-     * display and the given selection model. 
-     * 
-     * @param firstDisplayedDate 
-     * @param model the selection model to use, if null a <code>DefaultSelectionModel</code> is
-     *   created.
-     * @param locale desired locale, if null the system default locale is used
-     * 
-     * @deprecated use {@link #JXMonthView(Date, DateSelectionModel, Locale)}
-     */
-    public JXMonthView(long firstDisplayedDate, final DateSelectionModel model, final Locale locale) {
-        this(new Date(firstDisplayedDate), model, locale);
-    }
-
-    /**
-     * Create a new instance of the <code>JXMonthView</code> class using the
-     * default Locale and the given time as the first date to 
-     * display.
-     *
-     * @param firstDisplayedDate The first month to display.
-     * @deprecated use {@link #JXMonthView(Date)}(
-     */
-    public JXMonthView(long firstDisplayedDate) {
-        this(firstDisplayedDate, null, null);
-    }
-
-    /**
-     * Create a new instance of the <code>JXMonthView</code> class using the
-     * default Locale, the given time as the first date to 
-     * display and the given selection model. 
-     * 
-     * @param firstDisplayedDate The first month to display.
-     * @param model the selection model to use, if null a <code>DefaultSelectionModel</code> is
-     *   created.
-     *   
-     * @deprecated use {@link #JXMonthView(Date, DateSelectionModel)}  
-     */
-    public JXMonthView(long firstDisplayedDate, final DateSelectionModel model) {
-        this(firstDisplayedDate, model, null);
     }
 
     
@@ -435,7 +392,7 @@ public class JXMonthView extends JComponent {
         if (cal == null) throw 
             new IllegalStateException("must not be called before instantiation is complete");
         Calendar calendar = (Calendar) cal.clone();
-        calendar.setTime(firstDisplayedDate);
+        calendar.setTime(firstDisplayedDay);
         return calendar;
     }
 
@@ -589,7 +546,7 @@ public class JXMonthView extends JComponent {
         TimeZone tz = model.getTimeZone();
         cal.setTimeZone(tz);
         anchor.setTimeZone(tz);
-        setFirstDisplayedDate(anchor.getTimeInMillis());
+        setFirstDisplayedDay(anchor.getTime());
         updateTodayFromCurrentTime();
         updateDatesAfterTimeZoneChange(old);
         firePropertyChange("timeZone", old, getTimeZone());
@@ -648,7 +605,7 @@ public class JXMonthView extends JComponent {
      * @return long The first displayed date.
      */
     public Date getFirstDisplayedDay() {
-        return firstDisplayedDate;
+        return firstDisplayedDay;
     }
 
     
@@ -666,14 +623,14 @@ public class JXMonthView extends JComponent {
 
         cal.setTime(anchor.getTime());
         CalendarUtils.startOfMonth(cal);
-        firstDisplayedDate = cal.getTime();
+        firstDisplayedDay = cal.getTime();
 
         firePropertyChange("firstDisplayedDay", oldDate, getFirstDisplayedDay() );
         // JW: need to fire two events until the deprecated firstDisplayedDate is removed!
         long oldFirstDisplayedDate = oldDate != null ? oldDate.getTime() : 0;
         firePropertyChange(FIRST_DISPLAYED_DATE, 
                 oldFirstDisplayedDate, 
-                firstDisplayedDate.getTime());
+                firstDisplayedDay.getTime());
     }
 
 
@@ -692,7 +649,7 @@ public class JXMonthView extends JComponent {
      * @see #ensureDateVisible(long)
      */
     public void ensureDateVisible(Date date) {
-        if (date.before(firstDisplayedDate)) {
+        if (date.before(firstDisplayedDay)) {
             setFirstDisplayedDay(date);
         } else {
             Date lastDisplayedDate = getLastDisplayedDay();
@@ -709,7 +666,7 @@ public class JXMonthView extends JComponent {
                 int diffMonths = month - lastMonth
                         + ((year - lastYear) * MONTHS_IN_YEAR);
 
-                cal.setTime(firstDisplayedDate);
+                cal.setTime(firstDisplayedDay);
                 cal.add(Calendar.MONTH, diffMonths);
                 setFirstDisplayedDay(cal.getTime());
             }
@@ -2047,7 +2004,7 @@ public class JXMonthView extends JComponent {
      */
     @Deprecated
     public void ensureDateVisible(long date) {
-        if (date < firstDisplayedDate.getTime()) {
+        if (date < firstDisplayedDay.getTime()) {
             setFirstDisplayedDate(date);
         } else {
             long lastDisplayedDate = getLastDisplayedDate();
@@ -2064,7 +2021,7 @@ public class JXMonthView extends JComponent {
                 int diffMonths = month - lastMonth
                         + ((year - lastYear) * MONTHS_IN_YEAR);
 
-                cal.setTime(firstDisplayedDate);
+                cal.setTime(firstDisplayedDay);
                 cal.add(Calendar.MONTH, diffMonths);
                 setFirstDisplayedDate(cal.getTimeInMillis());
             }
@@ -2079,7 +2036,7 @@ public class JXMonthView extends JComponent {
      * @deprecated use {@link #getFirstDisplayedDay()}
      */
     public long getFirstDisplayedDate() {
-        return firstDisplayedDate.getTime();
+        return firstDisplayedDay.getTime();
     }
 
     
@@ -2118,6 +2075,49 @@ public class JXMonthView extends JComponent {
      */
     public long getLastDisplayedDate() {
         return getUI().getLastDisplayedDate();
+    }
+
+    /**
+     * Create a new instance of the <code>JXMonthView</code> class using the
+     * given Locale, the given time as the first date to 
+     * display and the given selection model. 
+     * 
+     * @param firstDisplayedDate 
+     * @param model the selection model to use, if null a <code>DefaultSelectionModel</code> is
+     *   created.
+     * @param locale desired locale, if null the system default locale is used
+     * 
+     * @deprecated use {@link #JXMonthView(Date, DateSelectionModel, Locale)}
+     */
+    public JXMonthView(long firstDisplayedDate, final DateSelectionModel model, final Locale locale) {
+        this(new Date(firstDisplayedDate), model, locale);
+    }
+
+    /**
+     * Create a new instance of the <code>JXMonthView</code> class using the
+     * default Locale and the given time as the first date to 
+     * display.
+     *
+     * @param firstDisplayedDate The first month to display.
+     * @deprecated use {@link #JXMonthView(Date)}(
+     */
+    public JXMonthView(long firstDisplayedDate) {
+        this(firstDisplayedDate, null, null);
+    }
+
+    /**
+     * Create a new instance of the <code>JXMonthView</code> class using the
+     * default Locale, the given time as the first date to 
+     * display and the given selection model. 
+     * 
+     * @param firstDisplayedDate The first month to display.
+     * @param model the selection model to use, if null a <code>DefaultSelectionModel</code> is
+     *   created.
+     *   
+     * @deprecated use {@link #JXMonthView(Date, DateSelectionModel)}  
+     */
+    public JXMonthView(long firstDisplayedDate, final DateSelectionModel model) {
+        this(firstDisplayedDate, model, null);
     }
 
 
