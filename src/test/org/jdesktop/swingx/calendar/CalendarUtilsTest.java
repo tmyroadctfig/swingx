@@ -151,6 +151,23 @@ public class CalendarUtilsTest extends InteractiveTestCase {
         assertEquals(week + 1 , midJune.get(Calendar.WEEK_OF_YEAR));
     }
 
+    /**
+     */
+    public void testEndOfWeekWithReturn() {
+        Date date = midJune.getTime();
+        Date start = CalendarUtils.endOfWeek(midJune, date);
+        assertTrue(CalendarUtils.isEndOfWeek(midJune));
+        assertEquals(start, midJune.getTime());
+    }
+    /**
+     */
+    public void testStartOfWeekWithReturn() {
+        Date date = midJune.getTime();
+        Date start = CalendarUtils.startOfWeek(midJune, date);
+        assertTrue(CalendarUtils.isStartOfWeek(midJune));
+        assertEquals(start, midJune.getTime());
+    }
+
     public void testStartOfWeekFromMiddle() {
         int day = Calendar.WEDNESDAY;
         todayGerman.set(Calendar.DAY_OF_WEEK, day);

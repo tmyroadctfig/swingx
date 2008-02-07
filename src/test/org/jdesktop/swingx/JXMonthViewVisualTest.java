@@ -24,6 +24,7 @@ package org.jdesktop.swingx;
 import java.awt.GraphicsEnvironment;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.logging.Logger;
 
 import javax.swing.SwingUtilities;
@@ -70,8 +71,8 @@ public class JXMonthViewVisualTest extends InteractiveTestCase {
         frame.setVisible(true);
         SwingUtilities.invokeAndWait(new Runnable() {
             public void run() {
-                long uiLast = monthView.getUI().getLastDisplayedDate();
-                long viewLast = monthView.getLastDisplayedDate();
+                Date uiLast = monthView.getUI().getLastDisplayedDay();
+                Date viewLast = monthView.getLastDisplayedDay();
                 assertEquals(uiLast, viewLast);
             }
         });
@@ -103,8 +104,8 @@ public class JXMonthViewVisualTest extends InteractiveTestCase {
         frame.validate();
         SwingUtilities.invokeAndWait(new Runnable() {
             public void run() {
-                long uiLast = monthView.getUI().getLastDisplayedDate();
-                long viewLast = monthView.getLastDisplayedDate();
+                Date uiLast = monthView.getUI().getLastDisplayedDay();
+                Date viewLast = monthView.getLastDisplayedDay();
                 assertEquals(uiLast, viewLast);
             }
         });
@@ -138,10 +139,10 @@ public class JXMonthViewVisualTest extends InteractiveTestCase {
         SwingUtilities.invokeAndWait(new Runnable() {
             public void run() {
                 Calendar calendar = Calendar.getInstance();
-                calendar.setTimeInMillis(monthView.getFirstDisplayedDate());
+                calendar.setTime(monthView.getFirstDisplayedDay());
                 int firstMonth = calendar.get(Calendar.MONTH);
-                long uiLast = monthView.getUI().getLastDisplayedDate();
-                calendar.setTimeInMillis(uiLast);
+                Date uiLast = monthView.getUI().getLastDisplayedDay();
+                calendar.setTime(uiLast);
                 int lastMonth = calendar.get(Calendar.MONTH);
                 // sanity: more than one month shown
                 assertFalse(firstMonth == lastMonth);
@@ -152,9 +153,9 @@ public class JXMonthViewVisualTest extends InteractiveTestCase {
                 assertFalse(lastMonth == newLastMonth);
                 monthView.ensureDateVisible(calendar.getTime());
                 CalendarUtils.endOfMonth(calendar);
-                long newUILast = monthView.getUI().getLastDisplayedDate();
-                assertEquals(newUILast, monthView.getLastDisplayedDate());
-                calendar.setTimeInMillis(newUILast);
+                Date newUILast = monthView.getUI().getLastDisplayedDay();
+                assertEquals(newUILast, monthView.getLastDisplayedDay());
+                calendar.setTime(newUILast);
 //                LOG.info("first/last: " + new Date(monthView.getFirstDisplayedDate()) + 
 //                        "/" + new Date(newUILast));
                 assertEquals(newLastMonth, calendar.get(Calendar.MONTH));

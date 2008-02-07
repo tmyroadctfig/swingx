@@ -65,9 +65,9 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
 //      setSystemLF(true);
       JXMonthViewVisualCheck  test = new JXMonthViewVisualCheck();
       try {
-//          test.runInteractiveTests();
+          test.runInteractiveTests();
 //        test.runInteractiveTests(".*TimeZone.*");
-        test.runInteractiveTests("interactive.*Flagged.*");
+//        test.runInteractiveTests("interactive.*Flagged.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
@@ -315,7 +315,7 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
 
             public void actionPerformed(ActionEvent e) {
                 
-                LOG.info("last updated?" + new Date(us.getLastDisplayedDate()));
+                LOG.info("last updated?" + us.getLastDisplayedDay());
             }
             
         };
@@ -520,7 +520,7 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
                 format.setTimeZone(monthView.getTimeZone());
                 LOG.info("cal/firstDisplayed " + 
                         format.format(cal.getTime()) + " / " 
-                        +format.format(new Date(monthView.getFirstDisplayedDate())));
+                        +format.format(monthView.getFirstDisplayedDay()));
             }
             
         };
@@ -540,9 +540,9 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
 
             public void actionPerformed(ActionEvent e) {
                 Calendar cal = Calendar.getInstance();
-                cal.setTimeInMillis(month.getLastDisplayedDate());
+                cal.setTime(month.getLastDisplayedDay());
                 Date viewLast = cal.getTime();
-                cal.setTimeInMillis(month.getUI().getLastDisplayedDate());
+                cal.setTime(month.getUI().getLastDisplayedDay());
                 Date uiLast = cal.getTime();
                 LOG.info("last(view/ui): " + viewLast + "/" + uiLast);
                 

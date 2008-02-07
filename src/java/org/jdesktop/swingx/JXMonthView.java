@@ -595,7 +595,7 @@ public class JXMonthView extends JComponent {
      * @return long The last displayed date.
      */
     public Date getLastDisplayedDay() {
-        return new Date(getUI().getLastDisplayedDate());
+        return getUI().getLastDisplayedDay();
     }
 
     
@@ -1616,8 +1616,7 @@ public class JXMonthView extends JComponent {
      *   doesn't contain a Day.
      */ 
     public Date getDayAtLocation(int x, int y) {
-        Calendar cal = getUI().getDayAtLocation(x, y);
-        return cal != null ? cal.getTime() : null;
+        return getUI().getDayAtLocation(x, y);
     }
     /**
      * Returns the string currently used to identiy fired ActionEvents.
@@ -2051,17 +2050,6 @@ public class JXMonthView extends JComponent {
      */
     public void setFirstDisplayedDate(long date) {
         setFirstDisplayedDay(new Date(date));
-//        anchor.setTimeInMillis(date);
-//        
-//        long oldFirstDisplayedDate = firstDisplayedDate != null ? firstDisplayedDate.getTime() : 0;
-//
-//        cal.setTimeInMillis(anchor.getTimeInMillis());
-//        CalendarUtils.startOfMonth(cal);
-//        firstDisplayedDate = cal.getTime();
-//
-//        firePropertyChange(FIRST_DISPLAYED_DATE, 
-//                oldFirstDisplayedDate, 
-//                firstDisplayedDate.getTime());
     }
 
  

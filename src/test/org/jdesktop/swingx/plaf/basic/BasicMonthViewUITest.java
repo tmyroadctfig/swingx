@@ -79,6 +79,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
     /**
      * Issue #736-swingx: monthView cannot cope with minimalDaysInFirstWeek.
      * 
+     * Debugging ...
      */
     public void interactiveDayAt() {
         final JXMonthView monthView = new JXMonthView();
@@ -97,7 +98,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
 //                LOG.info("calendar grid" + ui.calendarGrid);
                 LOG.info("dayAt " + e.getPoint() + ": "
                         + "\n" + monthView.getDayAtLocation(e.getX(), e.getY()));
-                Calendar monthAtLocation = ui.getMonthAtLocation(e.getX(), e.getY());
+//                Calendar monthAtLocation = ui.getMonthAtLocation(e.getX(), e.getY());
 //                LOG.info("month start " + 
 //                        (monthAtLocation != null ? monthAtLocation.getTime() : null));
                 
@@ -236,14 +237,14 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
                 monthBounds.x + 2, 
                 monthBounds.y + uiLToR.getMonthHeaderHeight() + 2); 
         // first column in second non-header row
-        Calendar calLToR = uiLToR.getDayAtLocation(
+        Date dayLToR = uiLToR.getDayAtLocation(
                 monthBounds.x + 2, 
                 monthBounds.y + uiLToR.getMonthHeaderHeight() + 2 * dayBounds.height + 2); 
-        CalendarUtils.startOfWeek(calLToR);
+        CalendarUtils.startOfWeek(uiLToR.getCalendar(dayLToR));
         Calendar uiCalendarL = uiLToR.getCalendar();
         uiCalendarL.add(Calendar.WEEK_OF_YEAR, 1);
         CalendarUtils.startOfWeek(uiCalendarL);
-        assertEquals("first logical column in LToR", uiCalendarL.getTime(), calLToR.getTime());
+        assertEquals("first logical column in LToR", uiCalendarL.getTime(), dayLToR);
      }
 
     /**
@@ -258,7 +259,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
         BasicMonthViewUI uiLToR = getRealizedMonthViewUI(ComponentOrientation.LEFT_TO_RIGHT);
         Rectangle monthBounds = uiLToR.getMonthBoundsAtLocation(20, 20);
         // same for LToR
-        Calendar calLToR = uiLToR.getDayAtLocation(
+        Date calLToR = uiLToR.getDayAtLocation(
                 monthBounds.x + 2, 
                 monthBounds.y + uiLToR.getMonthHeaderHeight() + 2); 
         assertNull("hitting days-of-week must return null calendar", calLToR);
@@ -279,14 +280,14 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
                 monthBounds.x + 2, 
                 monthBounds.y + uiRToL.getMonthHeaderHeight() + 2); 
         // first column in second non-header row
-        Calendar calRToL = uiRToL.getDayAtLocation(
+        Date calRToL = uiRToL.getDayAtLocation(
                 monthBounds.x + 2, 
                 monthBounds.y + uiRToL.getMonthHeaderHeight() + 2 * dayBounds.height + 2); 
-        CalendarUtils.endOfWeek(calRToL);
+        Date endOfWeek = CalendarUtils.endOfWeek(uiRToL.getCalendar(), calRToL);
         Calendar uiCalendar = uiRToL.getMonthAtLocation(20, 20);
         uiCalendar.add(Calendar.WEEK_OF_YEAR, 1);
         CalendarUtils.endOfWeek(uiCalendar);
-        assertEquals("first day in first week", uiCalendar.getTime(), calRToL.getTime()); 
+        assertEquals("first day in first week", uiCalendar.getTime(), endOfWeek); 
      }
 
     public void testDayBounds() {
@@ -654,9 +655,9 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
      */
     public void testZeroFirstDisplayedDate() {
         JXMonthView monthView = new JXMonthView();
-        long first = monthView.getUI().getLastDisplayedDate();
+        Date first = monthView.getUI().getLastDisplayedDay();
         monthView.updateUI();
-        assertEquals(first, monthView.getUI().getLastDisplayedDate());
+        assertEquals(first, monthView.getUI().getLastDisplayedDay());
     }
 
 
@@ -667,9 +668,9 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
      */
     public void testUpdateUILast() {
         final JXMonthView monthView = new JXMonthView();
-        long first = monthView.getUI().getLastDisplayedDate();
+        Date first = monthView.getUI().getLastDisplayedDay();
         monthView.updateUI();
-        assertEquals(first, monthView.getUI().getLastDisplayedDate());
+        assertEquals(first, monthView.getUI().getLastDisplayedDay());
     };
 
     /**
@@ -679,9 +680,9 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
      */
     public void testUpdateUIFirstDate() {
         final JXMonthView monthView = new JXMonthView();
-        long first = ((BasicMonthViewUI) monthView.getUI()).getFirstDisplayedDate();
+        Date first = ((BasicMonthViewUI) monthView.getUI()).getFirstDisplayedDay();
         monthView.updateUI();
-        assertEquals(first, ((BasicMonthViewUI) monthView.getUI()).getFirstDisplayedDate());
+        assertEquals(first, ((BasicMonthViewUI) monthView.getUI()).getFirstDisplayedDay());
     };
     
     /**

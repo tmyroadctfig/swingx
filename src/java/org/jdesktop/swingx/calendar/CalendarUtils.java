@@ -159,7 +159,38 @@ public class CalendarUtils {
         calendar.add(Calendar.MILLISECOND, -1);
     }
     
+    /**
+     * Adjusts the calendar to the end of the current week.
+     * That is, last day of the week with all time fields at max.
+     * The Date of the adjusted Calendar is
+     * returned. 
+     * 
+     * @param calendar calendar to adjust.
+     * @param date the Date to use.
+     * @return the end of the week of the given date
+     */
+    public static Date endOfWeek(Calendar calendar, Date date) {
+        calendar.setTime(date);
+        endOfWeek(calendar);
+        return calendar.getTime();
+    }
     
+    /**
+     * Adjusts the calendar to the start of the current week.
+     * That is, last day of the week with all time fields at max.
+     * The Date of the adjusted Calendar is
+     * returned. 
+     * 
+     * @param calendar calendar to adjust.
+     * @param date the Date to use.
+     * @return the start of the week of the given date
+     */
+    public static Date startOfWeek(Calendar calendar, Date date) {
+        calendar.setTime(date);
+        startOfWeek(calendar);
+        return calendar.getTime();
+    }
+
     /**
      * Adjusts the calendar to the start of the current month.
      * That is, first day of the month with all time fields cleared.

@@ -521,7 +521,7 @@ public class BasicMonthViewUI extends MonthViewUI {
      * @return the day at the given location or null if the position
      *   doesn't map to a day
      */ 
-    public Calendar getDayAtLocation(int x, int y) {
+    public Date getDayAtLocation(int x, int y) {
         Point dayInGrid = getDayGridPositionAtLocation(x, y);
         if ((dayInGrid == null) || (dayInGrid.x < 0) || (dayInGrid.y < 0)) return null;
         Calendar month = getMonthAtLocation(x, y);
@@ -542,39 +542,17 @@ public class BasicMonthViewUI extends MonthViewUI {
      * @return a Calendar representing the day at the logical grid coordinates,
      *    must not b.
      */
-    protected Calendar getDayInMonth(Calendar month, int row, int column) {
+    protected Date getDayInMonth(Calendar month, int row, int column) {
         if (!CalendarUtils.isStartOfMonth(month))
             throw new IllegalStateException("calendar must be start of month but was: " + month.getTime());
         Calendar clone = (Calendar) month.clone();
         CalendarUtils.startOfWeek(clone);
         clone.add(Calendar.DAY_OF_MONTH, row * JXMonthView.DAYS_IN_WEEK + column);
-        return clone;
+        return clone.getTime();
         
     }
     // ------------------- mapping month header 
  
-    /**
-     * Mapping pixel to bounds.
-     * 
-     * @param x the x position of the location in pixel
-     * @param y the y position of the location in pixel
-     * @return the bounds of the active header area in containing the location
-     *   or null if outside.
-     */
-//    protected Rectangle getTraversableBoundsAtLocation(int x, int y) {
-//        Rectangle headerBounds = getMonthHeaderBoundsAtLocation(x, y);
-//        if (headerBounds == null) return null;
-//        Rectangle leftArrow = new Rectangle(0, 0, monthUpImage.getIconWidth(), monthUpImage.getIconHeight());
-//        leftArrow.translate(headerBounds.x + arrowPaddingX, headerBounds.y + arrowPaddingY);
-//        Rectangle rightArrow = new Rectangle(leftArrow);
-//        rightArrow.translate(- 2 * arrowPaddingX - monthUpImage.getIconWidth(), 0);
-//        if (leftArrow.contains(x, y)) {
-//            return leftArrow;
-//        } else if (rightArrow.contains(x, y)) {
-//            return rightArrow;
-//        }
-//        return null;
-//    }
 
     /**
      * Mapping pixel to bounds.<p>
@@ -860,33 +838,6 @@ public class BasicMonthViewUI extends MonthViewUI {
         }
     }
 
-    /**
-     */
-    private void calculateDirtyRectForSelection() {
-        // PENDING JW: understand what we are doing here - (assumed?) performance optimization?
-//        if (monthView.isSelectionEmpty()) {
-//            dirtyRect.x = 0;
-//            dirtyRect.y = 0;
-//            dirtyRect.width = 0;
-//            dirtyRect.height = 0;
-//        } else {
-//            Calendar cal = getCalendar(getSelection().first().getTime());
-//            calculateBoundsForDay(dirtyRect, NO_OFFSET, cal);
-//            cal.add(Calendar.DAY_OF_MONTH, 1);
-//
-//            Rectangle tmpRect;
-//            while (cal.getTimeInMillis() <= getSelection().last().getTime()) {
-//                calculateBoundsForDay(bounds, NO_OFFSET, cal);
-//                tmpRect = dirtyRect.union(bounds);
-//                dirtyRect.x = tmpRect.x;
-//                dirtyRect.y = tmpRect.y;
-//                dirtyRect.width = tmpRect.width;
-//                dirtyRect.height = tmpRect.height;
-//                cal.add(Calendar.DAY_OF_MONTH, 1);
-//            }
-//
-//        }
-    }
 
 
 //-------------------- painting
@@ -1692,7 +1643,6 @@ public class BasicMonthViewUI extends MonthViewUI {
             Calendar cal = getCalendar(getFirstDisplayedDay());
             cal.add(Calendar.MONTH, 1);
             monthView.setFirstDisplayedDay(cal.getTime());
-            calculateDirtyRectForSelection();
         }
     }
 
@@ -1703,7 +1653,6 @@ public class BasicMonthViewUI extends MonthViewUI {
             Calendar cal = getCalendar(getFirstDisplayedDay());
             cal.add(Calendar.MONTH, -1);
             monthView.setFirstDisplayedDay(cal.getTime());
-            calculateDirtyRectForSelection();
         }
     }
 
@@ -1779,7 +1728,7 @@ public class BasicMonthViewUI extends MonthViewUI {
         this.firstDisplayedMonth = calendar.get(Calendar.MONTH);
         this.firstDisplayedYear = calendar.get(Calendar.YEAR);
         updateLastDisplayedDay(firstDisplayedDate);
-        calculateDirtyRectForSelection();
+        monthView.repaint();
     }
     /**
      * @return the firstDisplayedDate
@@ -1884,14 +1833,14 @@ public class BasicMonthViewUI extends MonthViewUI {
 
             
 //            long selected = monthView.getDayAt(e.getX(), e.getY());
-            Calendar cal = getDayAtLocation(e.getX(), e.getY());
+            Date cal = getDayAtLocation(e.getX(), e.getY());
             if (cal == null) {
                 return;
             }
 
             // Update the selected dates.
-            startDate = cal.getTime();
-            endDate = cal.getTime();
+            startDate = cal;
+            endDate = cal;
 
             if (monthView.getSelectionMode() == SelectionMode.SINGLE_INTERVAL_SELECTION ||
 //                    selectionMode == SelectionMode.WEEK_INTERVAL_SELECTION ||
@@ -1943,12 +1892,12 @@ public class BasicMonthViewUI extends MonthViewUI {
 
 //            long selected = monthView.getDayAt(e.getX(), e.getY());
 
-            Calendar cal = getDayAtLocation(e.getX(), e.getY());
+            Date cal = getDayAtLocation(e.getX(), e.getY());
             if (cal == null) {
                 return;
             }
 
-            Date selected = cal.getTime();
+            Date selected = cal;
             Date oldStart = startDate;
             Date oldEnd = endDate;
 
@@ -2135,14 +2084,13 @@ public class BasicMonthViewUI extends MonthViewUI {
                 isLeftToRight = monthView.getComponentOrientation().isLeftToRight();
                 monthView.revalidate();
                 calculateStartPosition();
-                calculateDirtyRectForSelection();
             } else if (JXMonthView.SELECTION_MODEL.equals(property)) {
                 DateSelectionModel selectionModel = (DateSelectionModel) evt.getOldValue();
                 selectionModel.removeDateSelectionListener(getHandler());
                 selectionModel = (DateSelectionModel) evt.getNewValue();
                 selectionModel.addDateSelectionListener(getHandler());
-            } else if (JXMonthView.FIRST_DISPLAYED_DATE.equals(property)) {
-                setFirstDisplayedDate(((Long) evt.getNewValue()));
+            } else if ("firstDisplayedDay".equals(property)) {
+                setFirstDisplayedDay(((Date) evt.getNewValue()));
             } else if (JXMonthView.BOX_PADDING_X.equals(property) 
                     || JXMonthView.BOX_PADDING_Y.equals(property) 
                     || JXMonthView.TRAVERSABLE.equals(property) 
@@ -2454,8 +2402,8 @@ public class BasicMonthViewUI extends MonthViewUI {
      * no longer used internally
      */
     public long getDayAt(int x, int y) {
-        Calendar cal = getDayAtLocation(x, y);
-        return cal != null ? cal.getTimeInMillis() : -1;
+        Date cal = getDayAtLocation(x, y);
+        return cal != null ? cal.getTime() : -1;
     }
 
     /**
