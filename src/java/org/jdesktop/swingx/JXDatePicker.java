@@ -140,7 +140,7 @@ public class JXDatePicker extends JComponent {
      * @see #getTimeZone
      */
     public JXDatePicker() {
-        this(System.currentTimeMillis(), null);
+        this(null, null);
     }
 
     
@@ -173,7 +173,7 @@ public class JXDatePicker extends JComponent {
      * @see #getTimeZone
      */
     public JXDatePicker(Locale locale) {
-        this(System.currentTimeMillis(), locale);
+        this(null, locale);
     }
 
     /**

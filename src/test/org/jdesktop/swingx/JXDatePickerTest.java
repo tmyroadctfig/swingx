@@ -758,7 +758,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      *
      */
     public void testCancelEditRevertsSilently() {
-        JXDatePicker picker = new JXDatePicker();
+        JXDatePicker picker = new JXDatePicker(new Date());
         String text = picker.getEditor().getText();
         // manipulate the text, not entirely safe ...
         String changed = text.replace('0', '1');
@@ -1107,7 +1107,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      *
      */
     public void testDatePropertyThroughCommit() throws ParseException {
-        JXDatePicker picker = new JXDatePicker();
+        JXDatePicker picker = new JXDatePicker(new Date());
         Date initialDate = picker.getDate();
         String text = picker.getEditor().getText();
         Format[] formats = picker.getFormats();
@@ -1136,7 +1136,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      *
      */
     public void testSynchAllAfterCommit() throws ParseException {
-        JXDatePicker picker = new JXDatePicker();
+        JXDatePicker picker = new JXDatePicker(new Date());
         String text = picker.getEditor().getText();
         Format[] formats = picker.getFormats();
         assertEquals(picker.getDate(), formats[0].parseObject(text));
@@ -1453,7 +1453,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      *
      */
     public void testSynchAllAfterSetSelectionModelEmpty() {
-        JXDatePicker picker = new JXDatePicker();
+        JXDatePicker picker = new JXDatePicker(new Date());
         assertNotNull(picker.getDate());
         DateSelectionModel model = new DefaultDateSelectionModel();
         assertTrue(model.isSelectionEmpty());
@@ -1487,7 +1487,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      *
      */
     public void testSynchAllSetMonthViewWithEmptySelection() {
-        JXDatePicker picker = new JXDatePicker();
+        JXDatePicker picker = new JXDatePicker(new Date());
         // sanity
         assertNotNull(picker.getDate());
         JXMonthView monthView = new JXMonthView();
@@ -1504,7 +1504,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      *
      */
     public void testPrefSizeEmptyEditor() {
-        JXDatePicker picker = new JXDatePicker();
+        JXDatePicker picker = new JXDatePicker(new Date());
         // sanity 
         assertNotNull(picker.getDate());
         Dimension filled = picker.getPreferredSize();
@@ -1516,10 +1516,12 @@ public class JXDatePickerTest extends InteractiveTestCase {
     @SuppressWarnings("deprecation")
     public void testDefaultConstructor() {
         JXDatePicker datePicker = new JXDatePicker();
-        calendar.setTimeInMillis(System.currentTimeMillis());
-        Date today = cleanupDate(calendar);
-        assertTrue(today.equals(datePicker.getDate()));
-        assertTrue(today.getTime() == datePicker.getDateInMillis());
+        assertNull(datePicker.getDate());
+        // changed default behaviour: unselected as of version 1.77
+//        calendar.setTimeInMillis(System.currentTimeMillis());
+//        Date today = cleanupDate(calendar);
+//        assertTrue(today.equals(datePicker.getDate()));
+//        assertTrue(today.getTime() == datePicker.getDateInMillis());
     }
 
     @SuppressWarnings("deprecation")

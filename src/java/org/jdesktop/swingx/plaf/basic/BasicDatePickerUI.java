@@ -524,7 +524,7 @@ public class BasicDatePickerUI extends DatePickerUI {
         if (datePicker.getDate() == null) {
             // the editor tends to collapsing for empty values
             // JW: better do this in a custom editor?
-            JXDatePicker picker = new JXDatePicker();
+            JXDatePicker picker = new JXDatePicker(new Date());
             picker.setFormats(datePicker.getFormats());
             dim.width = picker.getEditor().getPreferredSize().width;
         }
