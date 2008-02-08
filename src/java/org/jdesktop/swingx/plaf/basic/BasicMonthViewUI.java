@@ -162,11 +162,14 @@ public class BasicMonthViewUI extends MonthViewUI {
      * 
      * PENDING: JW - really want to adjust here? Need to check in usage
      *   anyway.
-     *   
+     *   @deprecated only read in deprecated methods (but calculation still triggered
+     *    in layout, because some of the deprecated are public/protected)
      */
     private int startX;
     /**
      * Top of first row of displayed months. 
+     *   @deprecated only read in deprecated methods (but calculation still triggered
+     *    in layout, because some of the deprecated are public/protected)
      */
     private int startY;
 
@@ -753,34 +756,28 @@ public class BasicMonthViewUI extends MonthViewUI {
      * Called from layout: calculates properties
      * of grid of months.
      */
-    private void calculateCalendarLayoutProperties() {
-        calculateNumDisplayedCals();
-        calculateStartPosition();
+    private void calculateMonthGridLayoutProperties() {
+        calculateMonthGridRowColumnCount();
+        calculateMonthGridBounds();
     }
     
 //-------------------  layout    
     /**
-     * Calculates the startX/startY position for centering the calendars
-     * within the available space.
+     * Calculates the bounds of the grid of months. 
      * 
-     * calendarRow/ColumnCount and calendarWidth/Height must be
+     * CalendarRow/ColumnCount and calendarWidth/Height must be
      * initialized before calling this. 
      */
-    private void calculateStartPosition() {
-        // Calculate offset in x-axis for centering calendars.
-        int width = monthView.getWidth();
-        startX = (width - calculateCalendarGridWidth()) / 2;
-        if (!isLeftToRight) {
-            startX = width - startX;
-        }
-
-        // Calculate offset in y-axis for centering calendars.
-        startY = calculateCalendarGridY();
+    private void calculateMonthGridBounds() {
+        // PENDING JW: this is the "old way" - keep until the deprecated
+        // methods are removed.
+        calculateStartPositionUnused();
         calendarGrid.setBounds(calculateCalendarGridX(), 
                 calculateCalendarGridY(), 
                 calculateCalendarGridWidth(), 
                 calculateCalendarGridHeight());
     }
+
 
     private int calculateCalendarGridY() {
         return (monthView.getHeight() - calculateCalendarGridHeight()) / 2;
@@ -806,7 +803,7 @@ public class BasicMonthViewUI extends MonthViewUI {
      * appropriate.
      * 
      */
-    private void calculateNumDisplayedCals() {
+    private void calculateMonthGridRowColumnCount() {
         int oldNumCalCols = calendarColumnCount;
         int oldNumCalRows = calendarRowCount;
 
@@ -856,34 +853,11 @@ public class BasicMonthViewUI extends MonthViewUI {
 
         // Get a calender set to the first displayed date
         Calendar cal = getCalendar();
-        // PENDING JW: implement getMonthBounds(row, column) and re-write 
-        // this to use the mapping 
         // Center the calendars horizontally/vertically in the available space.
         for (int row = 0; row < calendarRowCount; row++) {
             // Check if this row falls in the clip region.
-//            bounds.x = 0;
-//            bounds.y = startY +
-//                    row * (calendarHeight + CALENDAR_SPACING);
-//            bounds.width = monthView.getWidth();
-//            bounds.height = calendarHeight;
-//
-//            if (!bounds.intersects(clip)) {
-//                cal.add(Calendar.MONTH, calendarColumnCount);
-//                continue;
-//            }
 
             for (int column = 0; column < calendarColumnCount; column++) {
-//                // Check if the month to paint falls in the clip.
-//                bounds.x = startX +
-//                        (isLeftToRight ?
-//                            column * (calendarWidth + CALENDAR_SPACING) :
-//                            -(column * (calendarWidth + CALENDAR_SPACING) +
-//                                    calendarWidth));
-//                bounds.y = startY +
-//                        row * (calendarHeight + CALENDAR_SPACING);
-//                bounds.width = calendarWidth;
-//                bounds.height = calendarHeight;
-
                 bounds = getMonthBounds(row, column);
                 if (bounds.intersects(clip)) {
                     paintMonth(g, bounds.x, bounds.y, bounds.width, bounds.height, cal);
@@ -2061,7 +2035,7 @@ public class BasicMonthViewUI extends MonthViewUI {
             preferredSize.width += insets.left + insets.right;
             preferredSize.height += insets.top + insets.bottom;
            
-            calculateCalendarLayoutProperties();
+            calculateMonthGridLayoutProperties();
 
         }
 
@@ -2386,6 +2360,23 @@ public class BasicMonthViewUI extends MonthViewUI {
         }
 
         return result;
+    }
+    /**
+     * old way of calculating the position of the grid of months.
+     * This is no longer used in current code, only in deprecated.
+     * 
+     * @deprecated the result is no longer used except from deprecated methods.
+     */
+    private void calculateStartPositionUnused() {
+        // Calculate offset in x-axis for centering calendars.
+        int width = monthView.getWidth();
+        startX = (width - calculateCalendarGridWidth()) / 2;
+        if (!isLeftToRight) {
+            startX = width - startX;
+        }
+
+        // Calculate offset in y-axis for centering calendars.
+        startY = calculateCalendarGridY();
     }
 
     /**
