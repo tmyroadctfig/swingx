@@ -115,8 +115,9 @@ public class JXDatePicker extends JComponent {
      * traversing/selecting dates.
      */
     private JPanel _linkPanel;
-    private long _linkDate;
     private MessageFormat _linkFormat;
+    private Date linkDate;
+    
     private JXMonthView _monthView;
     private String _actionCommand = "selectionChanged";
     private boolean editable = true;
@@ -126,6 +127,7 @@ public class JXDatePicker extends JComponent {
     private Date date;
 
     private PropertyChangeListener monthViewListener;
+
 
     /**
      * Create a new date picker using the current date as the initial
@@ -141,6 +143,8 @@ public class JXDatePicker extends JComponent {
         this(System.currentTimeMillis(), null);
     }
 
+    
+
     /**
      * Create a new date picker using the specified time as the initial
      * selection and the default abstract formatter
@@ -148,14 +152,14 @@ public class JXDatePicker extends JComponent {
      * <p/>
      * The date picker is configured with the default time zone and locale
      *
-     * @param millis initial time in milliseconds
+     * @param selected the initially selected date
      * @see #setTimeZone
      * @see #getTimeZone
      */
-    public JXDatePicker(long millis) {
-        this(millis, null);
+    public JXDatePicker(Date selected) {
+        this(selected, null);
     }
-
+    
     /**
      * Create a new date picker using the current date as the initial
      * selection and the default abstract formatter
@@ -179,30 +183,20 @@ public class JXDatePicker extends JComponent {
      * <p/>
      * The date picker is configured with the default time zone and specified locale
      *
-     * @param millis initial time in milliseconds
+     * @param selection initially selected Date
      * @param locale initial Locale
      * @see #setTimeZone
      * @see #getTimeZone
      */
-    public JXDatePicker(long millis, Locale locale) {
+    public JXDatePicker(Date selection, Locale locale) {
         init();
-        // JW: set the locale before the ui has the format and rows correct
-        // but doesn't update the linkPanel/monthView (not surprisingly, 
-        // those are handled in the delegate
         if (locale != null) {
             setLocale(locale);
         }
         // install the controller before setting the date
         updateUI();
-        // JW: set the locale after the ui has the linkPanel/monthView correct
-        // but wrong editor format and overlapping rows
-//        if (locale != null) {
-//            setLocale(locale);
-//        }
-        
-        setDate(new Date(millis));
+        setDate(selection);
     }
-    
 
     /**
      * Sets the date property. <p>
@@ -246,18 +240,11 @@ public class JXDatePicker extends JComponent {
         long oldMillis = getDateInMillis();
         this.date = date;
         firePropertyChange("date", old, getDate());
+        // JW: remove when removing the deprecated method
         firePropertyChange("dateInMillis", oldMillis, getDateInMillis());
     }
 
  
-    /**
-     * Set the currently selected date.
-     *
-     * @param millis milliseconds
-     */
-    public void setDateInMillis(long millis) {
-        setDate(new Date(millis));
-    }
 
     /**
      * Returns the currently selected date.
@@ -267,21 +254,7 @@ public class JXDatePicker extends JComponent {
     public Date getDate() {
         return date; 
     }
-
-    /**
-     * Returns the currently selected date in milliseconds.
-     *
-     * @return the date in milliseconds, -1 if there is no selection.
-     */
-    public long getDateInMillis() {
-        long result = -1;
-        Date selection = getDate();
-        if (selection != null) {
-            result = selection.getTime();
-        }
-        return result;
-    }
-
+    
     /**
      * 
      */
@@ -290,7 +263,8 @@ public class JXDatePicker extends JComponent {
         initMonthView();
 
         updateLinkFormat();
-        _linkDate = System.currentTimeMillis();
+        linkDate = _monthView.getToday();
+//        _linkDate = System.currentTimeMillis();
         _linkPanel = new TodayPanel();
     }
 
@@ -509,26 +483,19 @@ public class JXDatePicker extends JComponent {
         _monthView.setTimeZone(tz);
     }
 
-    /**
-     * Returns the date shown in the LinkPanel as millis.
-     * 
-     * @return
-     * 
-     * @deprecated use {@link #getLinkInMillis()}
-     */
-    public long getLinkDate() {
-        return _linkDate;
-    }
 
     /**
      * Returns the date shown in the LinkPanel.
+     * <p>
+     * PENDING JW: the property should be named linkDate - but that's held by the 
+     * deprecated long returning method. Maybe revisit if we actually remove the other.
      * 
      * @return the date shown in the LinkPanel.
      */
-    public Date getToday() {
-        return new Date(_linkDate);
+    public Date getLinkDay() {
+        return linkDate;
     }
-    
+
     /**
      * Set the date the link will use and the string defining a MessageFormat
      * to format the link.  If no valid date is in the editor when the popup
@@ -537,32 +504,21 @@ public class JXDatePicker extends JComponent {
      * a new one with the requested date and format.
      * 
      * 
-     * @param linkDate         Date in milliseconds
+     * @param linkDay         Date in milliseconds
      * @param linkFormatString String used to format the link
      * @see java.text.MessageFormat
      */
-    public void setLinkDate(long linkDate, String linkFormatString) {
-        _linkDate = linkDate;
+    public void setLinkDay(Date linkDay, String linkFormatString) {
         setLinkFormat(new MessageFormat(linkFormatString));
-        setLinkPanel(new TodayPanel());
-    }
-    
-    /**
-     * PENDING JW ... quick api hack for testing.
-     * @param linkDate
-     * 
-     * @deprecated use {@link #setToday(Date)
-     */
-    public void setLinkDate(long linkDate) {
-        setToday(new Date(linkDate));
+        setLinkDay(linkDay);
     }
     
     /**
      * PENDING JW ... quick api hack for testing.
      * @param linkDate
      */
-    public void setToday(Date today) {
-        this._linkDate = today.getTime();
+    public void setLinkDay(Date linkDay) {
+        this.linkDate = linkDay;
         Format[] formats = getLinkFormat().getFormatsByArgumentIndex();
         for (Format format : formats) {
             if (format instanceof DateFormat) {
@@ -951,16 +907,16 @@ public class JXDatePicker extends JComponent {
              * and then delete following line
              */
             updateLinkFormat();
-            todayLink.setText(getLinkFormat().format(new Object[]{new Date(_linkDate)}));
+            todayLink.setText(getLinkFormat().format(new Object[]{getLinkDay()}));
 //            todayLink.setText(DateFormat.getDateInstance(DateFormat.MEDIUM, l).format(new Date(_linkDate)));
         }
         
         private final class TodayAction extends AbstractAction {
             boolean select;
             TodayAction() {
-                super(getLinkFormat().format(new Object[]{new Date(_linkDate)}));
+                super(getLinkFormat().format(new Object[]{getLinkDay()}));
                 Calendar cal = _monthView.getCalendar();
-                cal.setTimeInMillis(_linkDate);
+                cal.setTime(getLinkDay());
                 putValue(NAME, getLinkFormat().format(new Object[] {cal.getTime()}));
             }
 
@@ -982,6 +938,137 @@ public class JXDatePicker extends JComponent {
                 
             }
         }
+    }
+
+//----------------------- deprecated
+    
+    /**
+     * Set the currently selected date.
+     *
+     * @param millis milliseconds
+     * 
+     * @deprecated use {@link #setDate(Date)}
+     */
+    public void setDateInMillis(long millis) {
+        setDate(new Date(millis));
+    }
+
+    /**
+     * Returns the currently selected date in milliseconds.
+     *
+     * @return the date in milliseconds, -1 if there is no selection.
+     * 
+     * @deprecated use {@link #getDate()}
+     */
+    public long getDateInMillis() {
+        long result = -1;
+        Date selection = getDate();
+        if (selection != null) {
+            result = selection.getTime();
+        }
+        return result;
+    }
+
+    /**
+     * Returns the date shown in the LinkPanel as millis.
+     * 
+     * @return
+     * 
+     * @deprecated use {@link #getLinkInMillis()}
+     */
+    public long getLinkDate() {
+        return getLinkDay().getTime();
+    }
+
+    /**
+     * Set the date the link will use and the string defining a MessageFormat
+     * to format the link.  If no valid date is in the editor when the popup
+     * is displayed the popup will focus on the month the linkDate is in.  Calling
+     * this method will replace the currently installed linkPanel and install
+     * a new one with the requested date and format.
+     * 
+     * 
+     * @param linkDate         Date in milliseconds
+     * @param linkFormatString String used to format the link
+     * @see java.text.MessageFormat
+     * 
+     * @deprecated use
+     */
+    public void setLinkDate(long linkDate, String linkFormatString) {
+        setLinkDay(new Date(linkDate), linkFormatString);
+    }
+    
+    /**
+     * PENDING JW ... quick api hack for testing.
+     * @param linkDate
+     * 
+     * @deprecated use {@link #setLinkDay(Date)
+     */
+    public void setLinkDate(long linkDate) {
+        setLinkDay(new Date(linkDate));
+    }
+    /**
+     * Returns the date shown in the LinkPanel.
+     * 
+     * @return the date shown in the LinkPanel.
+     * 
+     * @deprecated use {@link #getLinkDay()}
+     */
+    public Date getToday() {
+        return getLinkDay();
+    }
+    
+    /**
+     * PENDING JW ... quick api hack for testing.
+     * 
+     * @param linkDate
+     * 
+     * @deprecated use {@link #setLinkDay(Date)}
+     */
+    public void setToday(Date linkDate) {
+        setLinkDay(linkDate);
+    }
+
+    /**
+     * Create a new date picker using the specified time as the initial
+     * selection and the default abstract formatter
+     * <code>JXDatePickerFormatter</code>.
+     * <p/>
+     * The date picker is configured with the default time zone and specified locale
+     *
+     * @param millis initial time in milliseconds
+     * @param locale initial Locale
+     * @see #setTimeZone
+     * @see #getTimeZone
+     * 
+     * @deprecated use {@link #JXDatePicker(Date, Locale)}
+     */
+    public JXDatePicker(long millis, Locale locale) {
+        this(new Date(millis), locale);
+//        init();
+//        if (locale != null) {
+//            setLocale(locale);
+//        }
+//        // install the controller before setting the date
+//        updateUI();
+//        setDate(new Date(millis));
+    }
+    
+    /**
+     * Create a new date picker using the specified time as the initial
+     * selection and the default abstract formatter
+     * <code>JXDatePickerFormatter</code>.
+     * <p/>
+     * The date picker is configured with the default time zone and locale
+     *
+     * @param millis initial time in milliseconds
+     * @see #setTimeZone
+     * @see #getTimeZone
+     * 
+     * @deprecated use {@link #JXDatePicker(Date)}
+     */
+    public JXDatePicker(long millis) {
+        this(millis, null);
     }
 
 }    

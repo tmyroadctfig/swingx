@@ -99,6 +99,7 @@ public class JXDatePickerIssues extends InteractiveTestCase {
      * Plus deprecate constructors with long - replace by Date parameters.
      * Deprecate other methods taking long.
      */
+    @SuppressWarnings("deprecation")
     public void interactiveNullDate() {
         JComponent comp = Box.createVerticalBox();
         comp.add(new JLabel("setDate(null)"));
@@ -251,11 +252,11 @@ public class JXDatePickerIssues extends InteractiveTestCase {
 
 
     protected void setLinkDateNextMonth(final JXDatePicker picker) {
-        Date linkDate = picker.getToday();
+        Date linkDate = picker.getLinkDay();
         // add a months and set as new link date
         calendar.setTime(linkDate);
         calendar.add(Calendar.MONTH, 1);
-        picker.setToday(calendar.getTime());
+        picker.setLinkDay(calendar.getTime());
     }
 
     /**
@@ -364,12 +365,12 @@ public class JXDatePickerIssues extends InteractiveTestCase {
     public void testLinkDate() {
         JXDatePicker picker = new JXDatePicker();
         picker.setDate(null);
-        Date today = picker.getToday();
+        Date today = picker.getLinkDay();
         Date firstDisplayedDate = picker.getMonthView().getFirstDisplayedDay();
         assertSameMonth(today, firstDisplayedDate);
         calendar.setTime(today);
         calendar.add(Calendar.MONTH, 2);
-        picker.setToday(calendar.getTime());
+        picker.setLinkDay(calendar.getTime());
         assertSameMonth(calendar.getTime(), 
                 picker.getMonthView().getFirstDisplayedDay());
     }

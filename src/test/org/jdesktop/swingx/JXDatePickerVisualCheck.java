@@ -78,8 +78,8 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
         JXDatePickerVisualCheck test = new JXDatePickerVisualCheck();
         
         try {
-//            test.runInteractiveTests();
-            test.runInteractiveTests("interactive.*Keep.*");
+            test.runInteractiveTests();
+//            test.runInteractiveTests("interactive.*Keep.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();

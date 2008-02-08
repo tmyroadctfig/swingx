@@ -218,7 +218,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
             return;
         }
         calendar.set(2008, Calendar.JULY, 15);
-        JXDatePicker picker = new JXDatePicker(calendar.getTimeInMillis());
+        JXDatePicker picker = new JXDatePicker(calendar.getTime());
         JXFrame frame = new JXFrame("showing", false);
         frame.add(picker);
         frame.setVisible(true);
@@ -239,7 +239,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      */
     public void testVisibleMonthContainsSelectionIinitial() {
         calendar.set(2008, Calendar.JULY, 15);
-        JXDatePicker picker = new JXDatePicker(calendar.getTimeInMillis());
+        JXDatePicker picker = new JXDatePicker(calendar.getTime());
         CalendarUtils.startOfMonth(calendar);
         assertEquals(calendar.getTime(), picker.getMonthView().getFirstDisplayedDay());
     }
@@ -848,7 +848,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
         CalendarUtils.endOfDay(cal);
         // NOTE: no public api, testing to guarantee the synch in all cases
         picker.getMonthView().setToday(cal.getTime());
-        assertEquals(picker.getMonthView().getToday(), picker.getToday());
+        assertEquals(picker.getMonthView().getToday(), picker.getLinkDay());
     }
 
     /**
@@ -858,7 +858,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      */
     public void testLinkDateInitial() {
         JXDatePicker picker = new JXDatePicker();
-        assertEquals(picker.getMonthView().getToday(), picker.getToday());
+        assertEquals(picker.getMonthView().getToday(), picker.getLinkDay());
     }
     
     /**
@@ -1163,7 +1163,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      */
     public void testSynchAllInitialDate() {
         Date date = XTestUtils.getStartOfToday(5);
-        JXDatePicker picker = new JXDatePicker(date.getTime());
+        JXDatePicker picker = new JXDatePicker(date);
         assertSynchAll(picker, date);
     } 
     
@@ -1264,7 +1264,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
         // for checking against ripples produced by fixing #705-swingx
         Calendar cal = picker.getMonthView().getCalendar();
         if (date == null) {
-            cal.setTime(picker.getToday());
+            cal.setTime(picker.getLinkDay());
             CalendarUtils.startOfMonth(cal);
         } else {
             cal.setTime(date);
@@ -1513,6 +1513,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
         assertEquals("pref width must be same for empty/filled", filled.width, empty.width);
     }
     
+    @SuppressWarnings("deprecation")
     public void testDefaultConstructor() {
         JXDatePicker datePicker = new JXDatePicker();
         calendar.setTimeInMillis(System.currentTimeMillis());
@@ -1521,15 +1522,17 @@ public class JXDatePickerTest extends InteractiveTestCase {
         assertTrue(today.getTime() == datePicker.getDateInMillis());
     }
 
+    @SuppressWarnings("deprecation")
     public void testConstructor() {
         calendar.setTimeInMillis(System.currentTimeMillis());
         calendar.add(Calendar.DAY_OF_MONTH, 5);
         Date expectedDate = cleanupDate(calendar);
-        JXDatePicker datePicker = new JXDatePicker(calendar.getTimeInMillis());
+        JXDatePicker datePicker = new JXDatePicker(calendar.getTime());
         assertTrue(expectedDate.equals(datePicker.getDate()));
         assertTrue(expectedDate.getTime() == datePicker.getDateInMillis());
     }
 
+    @SuppressWarnings("deprecation")
     public void testNullSelection() {
         JXDatePicker datePicker = new JXDatePicker();
         datePicker.setDate(null);

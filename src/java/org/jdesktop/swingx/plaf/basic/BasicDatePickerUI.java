@@ -581,7 +581,7 @@ public class BasicDatePickerUI extends DatePickerUI {
      */
     protected void updateFromDateChanged() {
         Date visibleHook = datePicker.getDate() != null ?
-                datePicker.getDate() : datePicker.getToday();
+                datePicker.getDate() : datePicker.getLinkDay();
         datePicker.getMonthView().ensureDateVisible(visibleHook);        
         datePicker.getEditor().setValue(datePicker.getDate());
     }
@@ -737,7 +737,7 @@ public class BasicDatePickerUI extends DatePickerUI {
      * Updates the picker's linkDate to be in synch with monthView's today.
      */
     protected void updateLinkDate() {
-        datePicker.setToday(datePicker.getMonthView().getToday());
+        datePicker.setLinkDay(datePicker.getMonthView().getToday());
     }
 
     /**
@@ -826,11 +826,11 @@ public class BasicDatePickerUI extends DatePickerUI {
     protected void home(boolean commit) {
         if (commit) {
             Calendar cal = datePicker.getMonthView().getCalendar();
-            cal.setTime(datePicker.getToday());
+            cal.setTime(datePicker.getLinkDay());
             datePicker.getMonthView().setSelectionDate(cal.getTime());
             datePicker.getMonthView().commitSelection();
         } else {
-            datePicker.getMonthView().ensureDateVisible(datePicker.getToday());
+            datePicker.getMonthView().ensureDateVisible(datePicker.getLinkDay());
         }
     }
 
