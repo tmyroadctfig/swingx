@@ -96,18 +96,22 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
             @Override
             public void mouseReleased(MouseEvent e) {
 //                LOG.info("calendar grid" + ui.calendarGrid);
-                LOG.info("dayAt " + e.getPoint() + ": "
-                        + "\n" + monthView.getDayAtLocation(e.getX(), e.getY()));
+//                LOG.info("dayAt " + e.getPoint() + ": "
+//                        + "\n" + monthView.getDayAtLocation(e.getX(), e.getY()));
 //                Calendar monthAtLocation = ui.getMonthAtLocation(e.getX(), e.getY());
 //                LOG.info("month start " + 
 //                        (monthAtLocation != null ? monthAtLocation.getTime() : null));
                 
-                LOG.info("month bounds " + 
+                LOG.info("month bounds at location" + 
                         ui.getMonthBoundsAtLocation(e.getX(), e.getY()));
+                Point p = ui.getMonthGridPositionAtLocation(e.getX(), e.getY());
+                LOG.info("month bounds from logical " + 
+                        p + " \n " +
+                        ui.getMonthBounds(p.y, p.x));
 //                LOG.info("day bounds " + 
 //                        ui.getDayBoundsAtLocation(e.getX(), e.getY()));
-                LOG.info("day grid position " + 
-                        ui.getDayGridPositionAtLocation(e.getX(), e.getY()));
+//                LOG.info("day grid position " + 
+//                        ui.getDayGridPositionAtLocation(e.getX(), e.getY()));
             }
             
         });
@@ -207,6 +211,42 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
     }
 
 //------------------------------
+ 
+    public void testMonthBoundsFromLogicalRToL() {
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.info("cannot run test - headless environment");
+            return;
+        }
+        BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.RIGHT_TO_LEFT);
+        Rectangle monthBounds = ui.getMonthBoundsAtLocation(20, 20);
+        // second row, first column in absolute coordinates
+        Rectangle monthBounds11 = ui.getMonthBoundsAtLocation(
+                20, 
+                monthBounds.y + 20 + monthBounds.height);
+//        assertEquals(monthBounds.getLocation(), ui.calendarGrid.getLocation());
+//        Point gridPosition = ui.getMonthGridPositionAtLocation(
+//                20  20);
+        // second row, second column in logical coordinates
+        assertEquals(monthBounds11, ui.getMonthBounds(1, 1));
+    }
+
+    public void testMonthBoundsFromLogicalLToR() {
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.info("cannot run test - headless environment");
+            return;
+        }
+        BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.LEFT_TO_RIGHT);
+        Rectangle monthBounds = ui.getMonthBoundsAtLocation(20, 20);
+        // second row, second column
+        Rectangle monthBounds11 = ui.getMonthBoundsAtLocation(
+                monthBounds.x + 20 + monthBounds.width, 
+                monthBounds.y + 20 + monthBounds.height);
+//        assertEquals(monthBounds.getLocation(), ui.calendarGrid.getLocation());
+//        Point gridPosition = ui.getMonthGridPositionAtLocation(
+//                20  20);
+        // second row, second column
+        assertEquals(monthBounds11, ui.getMonthBounds(1, 1));
+    }
     
     /**
      * Sanity test: inexpected pass if the realized frame isn't visible.

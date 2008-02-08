@@ -736,17 +736,19 @@ public class BasicMonthViewUI extends MonthViewUI {
      * Returns the bounds of the month at the given row/column position in the
      * grid of months.
      * 
-     * PENDING JW: this will be used in paint when looping through the grid. So
-     * keep here as a reminder to implement!
-     * 
      * @param row the rowIndex in the grid
      * @param column the columnIndex in the grid
      * @return the bounds of the month at the given logical grid position.
      */
     protected Rectangle getMonthBounds(int row, int column) {
-        throw new UnsupportedOperationException(
-                "TBD - implement mapping from logical coordinates to screen bounds");
+        int startY = calendarGrid.y + row * fullCalendarHeight;
+        int startX = calendarGrid.x + column * fullCalendarWidth;
+        if (!isLeftToRight) {
+            startX = calendarGrid.x + (calendarColumnCount - 1 - column) * fullCalendarWidth;
+        }
+        return new Rectangle(startX, startY, calendarWidth, calendarHeight);
     }
+    
     /**
      * Called from layout: calculates properties
      * of grid of months.
@@ -859,29 +861,30 @@ public class BasicMonthViewUI extends MonthViewUI {
         // Center the calendars horizontally/vertically in the available space.
         for (int row = 0; row < calendarRowCount; row++) {
             // Check if this row falls in the clip region.
-            bounds.x = 0;
-            bounds.y = startY +
-                    row * (calendarHeight + CALENDAR_SPACING);
-            bounds.width = monthView.getWidth();
-            bounds.height = calendarHeight;
-
-            if (!bounds.intersects(clip)) {
-                cal.add(Calendar.MONTH, calendarColumnCount);
-                continue;
-            }
+//            bounds.x = 0;
+//            bounds.y = startY +
+//                    row * (calendarHeight + CALENDAR_SPACING);
+//            bounds.width = monthView.getWidth();
+//            bounds.height = calendarHeight;
+//
+//            if (!bounds.intersects(clip)) {
+//                cal.add(Calendar.MONTH, calendarColumnCount);
+//                continue;
+//            }
 
             for (int column = 0; column < calendarColumnCount; column++) {
-                // Check if the month to paint falls in the clip.
-                bounds.x = startX +
-                        (isLeftToRight ?
-                            column * (calendarWidth + CALENDAR_SPACING) :
-                            -(column * (calendarWidth + CALENDAR_SPACING) +
-                                    calendarWidth));
-                bounds.y = startY +
-                        row * (calendarHeight + CALENDAR_SPACING);
-                bounds.width = calendarWidth;
-                bounds.height = calendarHeight;
+//                // Check if the month to paint falls in the clip.
+//                bounds.x = startX +
+//                        (isLeftToRight ?
+//                            column * (calendarWidth + CALENDAR_SPACING) :
+//                            -(column * (calendarWidth + CALENDAR_SPACING) +
+//                                    calendarWidth));
+//                bounds.y = startY +
+//                        row * (calendarHeight + CALENDAR_SPACING);
+//                bounds.width = calendarWidth;
+//                bounds.height = calendarHeight;
 
+                bounds = getMonthBounds(row, column);
                 if (bounds.intersects(clip)) {
                     paintMonth(g, bounds.x, bounds.y, bounds.width, bounds.height, cal);
                 }
