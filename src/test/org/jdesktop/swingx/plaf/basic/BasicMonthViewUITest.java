@@ -223,9 +223,6 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
         Rectangle monthBounds11 = ui.getMonthBoundsAtLocation(
                 20, 
                 monthBounds.y + 20 + monthBounds.height);
-//        assertEquals(monthBounds.getLocation(), ui.calendarGrid.getLocation());
-//        Point gridPosition = ui.getMonthGridPositionAtLocation(
-//                20  20);
         // second row, second column in logical coordinates
         assertEquals(monthBounds11, ui.getMonthBounds(1, 1));
     }
@@ -241,10 +238,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
         Rectangle monthBounds11 = ui.getMonthBoundsAtLocation(
                 monthBounds.x + 20 + monthBounds.width, 
                 monthBounds.y + 20 + monthBounds.height);
-//        assertEquals(monthBounds.getLocation(), ui.calendarGrid.getLocation());
-//        Point gridPosition = ui.getMonthGridPositionAtLocation(
-//                20  20);
-        // second row, second column
+        // second row, second column in logical coordinates
         assertEquals(monthBounds11, ui.getMonthBounds(1, 1));
     }
     
