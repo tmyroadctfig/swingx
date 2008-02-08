@@ -92,32 +92,25 @@ import org.jdesktop.swingx.util.Contract;
  * This component supports flagging days.  These flagged days are displayed
  * in a bold font.  This can be used to inform the user of such things as
  * scheduled appointment.
- * <pre>
+ * <pre><code>
  *    // Create some dates that we want to flag as being important.
  *    Calendar cal1 = Calendar.getInstance();
  *    cal1.set(2004, 1, 1);
  *    Calendar cal2 = Calendar.getInstance();
  *    cal2.set(2004, 1, 5);
  *
- *    long[] flaggedDates = new long[] {
- *        cal1.getTimeInMillis(),
- *        cal2.getTimeInMillis(),
- *        System.currentTimeMillis()
- *    };
- *
- *    monthView.setFlaggedDates(flaggedDates);
- * </pre>
+ *    monthView.setFlaggedDates(cal1.getTime(), cal2.getTime(), new Date());
+ * </code></pre>
  * Applications may have the need to allow users to select different ranges of
- * dates.  There are four modes of selection that are supported, single,
- * multiple, week and no selection.  Once a selection is made an action is
- * fired, with exception of the no selection mode, to inform listeners that
- * selection has changed.
+ * dates.  There are three modes of selection that are supported, single, single interval
+ * and multiple interval selection.  Once a selection is made an DateSelectionEvent is
+ * fired to inform listeners of the change.
  * <pre>
  *    // Change the selection mode to select full weeks.
- *    monthView.setSelectionMode(JXMonthView.WEEK_INTERVAL_SELECTION);
+ *    monthView.setSelectionMode(SelectionMode.SINGLE_INTERVAL_SELECTION);
  *
- *    // Add an action listener that will be notified when the user
- *    // changes selection via the mouse.
+ *    // Register a date selection listener to get notified about
+ *    // any changes in the date selection model.
  *    monthView.getSelectionModel().addDateSelectionListener(new DateSelectionListener {
  *        public void valueChanged(DateSelectionEvent e) {
  *            System.out.println(e.getSelection());
@@ -216,7 +209,7 @@ public class JXMonthView extends JComponent {
     /**
      * The timer used to keep today in synch with system time.
      */
-    private Timer todayTimer = null;
+    private Timer todayTimer;
     // PENDING JW: why kept apart from cal? Why writable? - shouldn't the calendar have complete
     // control?
     private int firstDayOfWeek;
@@ -336,8 +329,6 @@ public class JXMonthView extends JComponent {
      */
     public JXMonthView(Date firstDisplayedDay, final DateSelectionModel model, final Locale locale) {
         super();
-        antialiased = false;
-        traversable = false;
         listenerMap = new EventListenerMap();
 
         initModel(model, locale);
@@ -348,7 +339,6 @@ public class JXMonthView extends JComponent {
 
         // install the controller
         updateUI();
-        
 
         setFocusable(true);
         todayBackgroundColor = getForeground();
@@ -398,8 +388,7 @@ public class JXMonthView extends JComponent {
      * Returns a clone of the internal calendar, with it's time set to firstDisplayedDate.
      * 
      * PENDING: firstDisplayed useful as reference time? It's timezone dependent anyway. 
-     * Think: could return with monthView's today instead? The alternative might be to 
-     * expose the today property (needs to be re-visited anyway)
+     * Think: could return with monthView's today instead? 
      * 
      * @return a clone of internal calendar, configured to the current firstDisplayedDate
      * @throws IllegalStateException if called before instantitation is completed
@@ -1049,6 +1038,7 @@ public class JXMonthView extends JComponent {
             unselectableSet.add(unselectableDate);
         }
         getSelectionModel().setUnselectableDates(unselectableSet);
+        // PENDING JW: check that ui does the repaint!
         repaint();
     }
 
@@ -1206,52 +1196,6 @@ public class JXMonthView extends JComponent {
     }
     
     /**
-     * Returns the padding used between days in the calendar.
-     *
-     * @return Padding used between days in the calendar
-     */
-    public int getBoxPaddingX() {
-        return boxPaddingX;
-    }
-
-    /**
-     * Sets the number of pixels used to pad the left and right side of a day.
-     * The padding is applied to both sides of the days.  Therefore, if you
-     * used the padding value of 3, the number of pixels between any two days
-     * would be 6.
-     *
-     * @param boxPaddingX Number of pixels applied to both sides of a day
-     */
-    public void setBoxPaddingX(int boxPaddingX) {
-        int oldBoxPadding = this.boxPaddingX;
-        this.boxPaddingX = boxPaddingX;
-        firePropertyChange(BOX_PADDING_X, oldBoxPadding, this.boxPaddingX);
-    }
-
-    /**
-     * Returns the padding used above and below days in the calendar.
-     *
-     * @return Padding used between dats in the calendar
-     */
-    public int getBoxPaddingY() {
-        return boxPaddingY;
-    }
-
-    /**
-     * Sets the number of pixels used to pad the top and bottom of a day.
-     * The padding is applied to both the top and bottom of a day.  Therefore,
-     * if you used the padding value of 3, the number of pixels between any
-     * two days would be 6.
-     *
-     * @param boxPaddingY Number of pixels applied to top and bottom of a day
-     */
-    public void setBoxPaddingY(int boxPaddingY) {
-        int oldBoxPadding = this.boxPaddingY;
-        this.boxPaddingY = boxPaddingY;
-        firePropertyChange(BOX_PADDING_Y, oldBoxPadding, this.boxPaddingY);
-    }
-
-    /**
      * Returns whether or not the month view supports traversing months.
      *
      * @return <code>true</code> if month traversing is enabled.
@@ -1366,6 +1310,53 @@ public class JXMonthView extends JComponent {
         this.antialiased = antiAlias;
         firePropertyChange("antialiased", !this.antialiased, this.antialiased);
     }
+
+    /**
+     * Returns the padding used between days in the calendar.
+     *
+     * @return Padding used between days in the calendar
+     */
+    public int getBoxPaddingX() {
+        return boxPaddingX;
+    }
+
+    /**
+     * Sets the number of pixels used to pad the left and right side of a day.
+     * The padding is applied to both sides of the days.  Therefore, if you
+     * used the padding value of 3, the number of pixels between any two days
+     * would be 6.
+     *
+     * @param boxPaddingX Number of pixels applied to both sides of a day
+     */
+    public void setBoxPaddingX(int boxPaddingX) {
+        int oldBoxPadding = this.boxPaddingX;
+        this.boxPaddingX = boxPaddingX;
+        firePropertyChange(BOX_PADDING_X, oldBoxPadding, this.boxPaddingX);
+    }
+
+    /**
+     * Returns the padding used above and below days in the calendar.
+     *
+     * @return Padding used between dats in the calendar
+     */
+    public int getBoxPaddingY() {
+        return boxPaddingY;
+    }
+
+    /**
+     * Sets the number of pixels used to pad the top and bottom of a day.
+     * The padding is applied to both the top and bottom of a day.  Therefore,
+     * if you used the padding value of 3, the number of pixels between any
+     * two days would be 6.
+     *
+     * @param boxPaddingY Number of pixels applied to top and bottom of a day
+     */
+    public void setBoxPaddingY(int boxPaddingY) {
+        int oldBoxPadding = this.boxPaddingY;
+        this.boxPaddingY = boxPaddingY;
+        firePropertyChange(BOX_PADDING_Y, oldBoxPadding, this.boxPaddingY);
+    }
+
 
     /**
      * Returns the selected background color.
@@ -1544,8 +1535,9 @@ public class JXMonthView extends JComponent {
     }
 
     /**
-     * Returns the preferred number of columns to paint calendars in.
-     *
+     * Returns the preferred number of columns to paint calendars in. 
+     * <p>
+     * PENDING JW: rename to a "full" name preferredColumnCount
      * @return int Columns of calendars.
      */
     public int getPreferredCols() {
@@ -1554,7 +1546,9 @@ public class JXMonthView extends JComponent {
 
     /**
      * The preferred number of columns to paint calendars.
-     *
+     * <p>
+     * PENDING JW: rename to a "full" name preferredColumnCount
+     *   and make bound property
      * @param cols The number of columns of calendars.
      */
     public void setPreferredCols(int cols) {
@@ -1568,7 +1562,9 @@ public class JXMonthView extends JComponent {
 
     /**
      * Returns the preferred number of rows to paint calendars in.
-     *
+     * <p>
+     * PENDING JW: rename to a "full" name preferredRowCount
+     *  or maybe visibleRowCount to be consistent with JXTable/JXList 
      * @return int Rows of calendars.
      */
     public int getPreferredRows() {
@@ -1577,6 +1573,9 @@ public class JXMonthView extends JComponent {
 
     /**
      * Sets the preferred number of rows to paint calendars.
+     * <p>
+     * PENDING JW: rename to a "full" name preferredRowCount
+     *   and make bound property
      *
      * @param rows The number of rows of calendars.
      */
