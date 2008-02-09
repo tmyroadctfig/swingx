@@ -3,9 +3,6 @@
  */
 package org.jdesktop.swingx.autocomplete;
 
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 
@@ -35,19 +32,6 @@ public class AutoCompleteDecoratorVisualCheck extends InteractiveTestCase {
         });
         
         AutoCompleteDecorator.decorate(combo);
-        
-        combo.addItemListener(new ItemListener() {
-
-            public void itemStateChanged(ItemEvent e) {
-                System.err.println(e);
-                
-                JComboBox box = (JComboBox) e.getSource();
-                for (ItemListener l : box.getItemListeners()) {
-                    System.err.println(l);
-                }
-            }
-            
-        });
         
         JFrame frame = wrapInFrame(combo, "show combo ");
         frame.setSize(200, 200);

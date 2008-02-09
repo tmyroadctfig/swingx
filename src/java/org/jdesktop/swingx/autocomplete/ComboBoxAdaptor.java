@@ -20,16 +20,21 @@
  */
 package org.jdesktop.swingx.autocomplete;
 
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.accessibility.Accessible;
 import javax.swing.JComboBox;
+import javax.swing.JList;
+import javax.swing.plaf.basic.ComboPopup;
 import javax.swing.text.JTextComponent;
 
 /**
  * An implementation of the AbstractAutoCompleteAdaptor that is suitable for JComboBox.
  * 
  * @author Thomas Bierhance
+ * @author Karl Schaefer
  */
 public class ComboBoxAdaptor extends AbstractAutoCompleteAdaptor implements ActionListener {
     
@@ -64,6 +69,23 @@ public class ComboBoxAdaptor extends AbstractAutoCompleteAdaptor implements Acti
     }
     
     public void setSelectedItem(Object item) {
+        // kgs - back door our way to finding the JList that displays the data.
+        // then we ask the list to scroll until the last cell is visible. this
+        // will cause the selected item to appear closest to the top.
+        //
+        // it is unknown whether this functionality will work outside of Sun's
+        // implementation, but the code is safe and will "fail gracefully" on
+        // other systems
+        Accessible a = comboBox.getUI().getAccessibleChild(comboBox, 0);
+        
+        if (a instanceof ComboPopup) {
+            JList list = ((ComboPopup) a).getList();
+
+            Rectangle rect = list.getCellBounds(getItemCount() - 1, getItemCount() - 1);
+            list.scrollRectToVisible(rect);
+        }
+        
+        //setting the selected item should scroll it into the visible region
         comboBox.setSelectedItem(item);
     }
     
