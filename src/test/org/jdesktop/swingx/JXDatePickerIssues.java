@@ -64,7 +64,7 @@ public class JXDatePickerIssues extends InteractiveTestCase {
         try {
 //            test.runInteractiveTests();
 //          test.runInteractiveTests("interactive.*UpdateUI.*");
-          test.runInteractiveTests("interactive.*Time.*");
+          test.runInteractiveTests("interactive.*Focus.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
@@ -161,25 +161,31 @@ public class JXDatePickerIssues extends InteractiveTestCase {
     
     /**
      * Issue #577-swingx: JXDatePicker focus cleanup.
+     * Issue #757-swingx: JXDatePicker inconsistent focusLost firing.
      * 
      * PENDING JW: check if this is fixed!
      */
     public void interactiveFocusOnTogglePopup() {
         JXDatePicker picker = new JXDatePicker();
+        JComboBox box = new JComboBox(new String[] {"one", "twos"});
+        box.setEditable(true);
         FocusListener l = new FocusListener() {
 
             public void focusGained(FocusEvent e) {
-                // TODO Auto-generated method stub
-                
+                if (e.isTemporary()) return;
+                String source = e.getSource().getClass().getName();
+                LOG.info("focus gained from: " + source);
             }
 
             public void focusLost(FocusEvent e) {
                 if (e.isTemporary()) return;
-                LOG.info("focus lost from editor");
+                String source = e.getSource().getClass().getName();
+                LOG.info("focus lost from: " + source);
             }};
-        picker.getEditor().addFocusListener(l);    
-        JComboBox box = new JComboBox(new String[] {"one", "twos"});
-//        box.setEditable(true);
+        picker.getEditor().addFocusListener(l); 
+        picker.addFocusListener(l);
+        box.addFocusListener(l);
+        box.getEditor().getEditorComponent().addFocusListener(l);
         JComponent panel = new JPanel();
         panel.add(box);
         panel.add(picker);
