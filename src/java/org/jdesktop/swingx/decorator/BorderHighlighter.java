@@ -44,7 +44,6 @@ public class BorderHighlighter extends AbstractHighlighter {
     private boolean inner;
     private boolean compound;
 
-   
     /**
      * 
      * Instantiates a BorderHighlighter with no padding. The
@@ -86,6 +85,7 @@ public class BorderHighlighter extends AbstractHighlighter {
      * HighlightPredicate and default compound property. 
      * If the predicate is null, the highlighter
      * will be applied unconditionally.
+     * 
      * @param predicate the HighlightPredicate to use
      * @param paddingBorder the border to apply as visual decoration.
      * 
@@ -100,6 +100,7 @@ public class BorderHighlighter extends AbstractHighlighter {
      * HighlightPredicate, compound property and default inner property. 
      * If the predicate is null, the highlighter
      * will be applied unconditionally.
+     * 
      * @param predicate the HighlightPredicate to use
      * @param paddingBorder the border to apply as visual decoration.
      * @param compound the compound property.
@@ -115,6 +116,7 @@ public class BorderHighlighter extends AbstractHighlighter {
      * Instantiates a BorderHighlighter with the given padding, 
      * HighlightPredicate and compound property. If the predicate is null, the highlighter
      * will be applied unconditionally.
+     * 
      * @param predicate the HighlightPredicate to use
      * @param paddingBorder the border to apply as visual decoration.
      * @param compound the compound property

@@ -15,6 +15,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
+import javax.swing.border.CompoundBorder;
 
 import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.decorator.HighlighterFactory.UIColorHighlighter;
@@ -68,6 +69,8 @@ public class HighlighterTest extends InteractiveTestCase {
         allColored.setText("test");
         allColored.setForeground(foreground);
         allColored.setBackground(background);
+        allColored.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
+        
         
         emptyHighlighter = new ColorHighlighter();
         // make sure we have the same default for each test
@@ -163,15 +166,57 @@ public class HighlighterTest extends InteractiveTestCase {
 
 //-------------- BorderHighlighter
     
-    public void testBorderPadding() {
+    public void testBorderPaddingNull() {
         BorderHighlighter empty = new BorderHighlighter();
-        Border border = BorderFactory.createEmptyBorder(1, 1, 1, 1);
-        allColored.setBorder(border);
-        empty.highlight(allColored, createComponentAdapter(allColored, false));
+        Border border = allColored.getBorder();
+        empty.highlight(allColored, createComponentAdapter(allColored));
         assertEquals("borderHighlighter without padding must not change the component", 
                 border, allColored.getBorder());
     }
+
+    public void testBorderPaddingCompoundNotInner() {
+        Border padding = BorderFactory.createLineBorder(Color.RED, 3);
+        BorderHighlighter empty = new BorderHighlighter(padding);
+        empty.setInner(true);
+        Border border = allColored.getBorder();
+        empty.highlight(allColored, createComponentAdapter(allColored));
+        Border compound = allColored.getBorder();
+        assertTrue(compound instanceof CompoundBorder);
+        assertEquals("borderHighlighter with padding and outer compound must have outside", 
+                border, ((CompoundBorder) compound).getOutsideBorder());
+        assertEquals("borderHighlighter with padding and outer compound must have inside", 
+                padding, ((CompoundBorder) compound).getInsideBorder());
+    }
+
+    public void testBorderPaddingCompoundInner() {
+        Border padding = BorderFactory.createLineBorder(Color.RED, 3);
+        BorderHighlighter empty = new BorderHighlighter(padding);
+        Border border = allColored.getBorder();
+        empty.highlight(allColored, createComponentAdapter(allColored));
+        Border compound = allColored.getBorder();
+        assertTrue(compound instanceof CompoundBorder);
+        assertEquals("borderHighlighter with padding and outer compound must have outside", 
+                padding, ((CompoundBorder) compound).getOutsideBorder());
+        assertEquals("borderHighlighter with padding and outer compound must have inside", 
+                border, ((CompoundBorder) compound).getInsideBorder());
+    }
     
+    public void testBorderPaddingReplace() {
+        Border padding = BorderFactory.createLineBorder(Color.RED, 3);
+        BorderHighlighter empty = new BorderHighlighter(HighlightPredicate.ALWAYS, padding, false);
+        empty.highlight(allColored, createComponentAdapter(allColored));
+        assertEquals("borderHighlighter padding and not-compound must replace", 
+                padding, allColored.getBorder());
+    }
+    
+    public void testBorderPaddingSetBorderIfComponentBorderNull() {
+        Border padding = BorderFactory.createLineBorder(Color.RED, 3);
+        BorderHighlighter empty = new BorderHighlighter(padding);
+        allColored.setBorder(null);
+        empty.highlight(allColored, createComponentAdapter(allColored));
+        assertEquals("borderHighlighter padding and null component border must set", 
+                padding, allColored.getBorder());
+    }
     public void testBorderConstructors() {
         BorderHighlighter empty = new BorderHighlighter();
         assertBorderHLState(empty, HighlightPredicate.ALWAYS, null, true, false);
@@ -532,6 +577,19 @@ public class HighlighterTest extends InteractiveTestCase {
     }
  
     // --------------------- factory methods
+    
+    /**
+     * Creates and returns a ComponentAdapter on the given 
+     * label with the unselected state.
+     * 
+     * @param label
+     * @param selected
+     * @return
+     */
+    protected ComponentAdapter createComponentAdapter(final JLabel label) {
+        return createComponentAdapter(label, false);
+    }   
+    
     /**
      * Creates and returns a ComponentAdapter on the given 
      * label with the specified selection state.
