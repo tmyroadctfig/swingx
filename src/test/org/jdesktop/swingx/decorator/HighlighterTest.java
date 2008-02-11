@@ -203,7 +203,7 @@ public class HighlighterTest extends InteractiveTestCase {
     
     public void testBorderPaddingReplace() {
         Border padding = BorderFactory.createLineBorder(Color.RED, 3);
-        BorderHighlighter empty = new BorderHighlighter(HighlightPredicate.ALWAYS, padding, false);
+        BorderHighlighter empty = new BorderHighlighter(null, padding, false);
         empty.highlight(allColored, createComponentAdapter(allColored));
         assertEquals("borderHighlighter padding and not-compound must replace", 
                 padding, allColored.getBorder());

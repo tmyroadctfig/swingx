@@ -38,6 +38,7 @@ import java.util.regex.Pattern;
 import javax.swing.AbstractAction;
 import javax.swing.AbstractListModel;
 import javax.swing.Action;
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -94,19 +95,24 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
   }
 
     /**
-     * Multiple Highlighters (shown as example in Javapolis 2007).
+     * Show variants of border Highlighters.
      *
      */
-    public void interactiveTableBorderHighlighterJP() {
+    public void interactiveTableBorderHighlighter() {
         JXTable table = new JXTable(tableModel);
         table.setVisibleRowCount(table.getRowCount());
         table.setVisibleColumnCount(7);
         table.packAll();
         table.setColumnControlVisible(true);
         
-        BorderHighlighter bempty = new BorderHighlighter();
-        table.setHighlighters(bempty);
-        showWithScrollingInFrame(table, "Multiple Highlighters");
+        BorderHighlighter outer = new BorderHighlighter(new HighlightPredicate.ColumnHighlightPredicate(1),
+                BorderFactory.createLineBorder(Color.RED, 3));
+        BorderHighlighter inner = new BorderHighlighter(new HighlightPredicate.ColumnHighlightPredicate(2),
+                BorderFactory.createLineBorder(Color.RED, 3), true, true);
+        BorderHighlighter replace = new BorderHighlighter(new HighlightPredicate.ColumnHighlightPredicate(0),
+                BorderFactory.createLineBorder(Color.RED, 3), false, true);
+        table.setHighlighters(outer, inner, replace);
+        showWithScrollingInFrame(table, "Border Highlighters");
     }
 
     /**
