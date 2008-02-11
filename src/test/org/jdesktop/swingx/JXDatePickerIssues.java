@@ -24,8 +24,6 @@ package org.jdesktop.swingx;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.util.Calendar;
 import java.util.Date;
@@ -60,11 +58,14 @@ public class JXDatePickerIssues extends InteractiveTestCase {
             .getName());
     public static void main(String[] args) {
         setSystemLF(true);
+//        Trace14.keyboardFocusManager(true);
         JXDatePickerIssues  test = new JXDatePickerIssues();
         try {
 //            test.runInteractiveTests();
 //          test.runInteractiveTests("interactive.*UpdateUI.*");
           test.runInteractiveTests("interactive.*Focus.*");
+//          test.runInteractiveTests("interactive.*Visible.*");
+          
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
@@ -159,40 +160,6 @@ public class JXDatePickerIssues extends InteractiveTestCase {
         frame.setVisible(true);
     }
     
-    /**
-     * Issue #577-swingx: JXDatePicker focus cleanup.
-     * Issue #757-swingx: JXDatePicker inconsistent focusLost firing.
-     * 
-     * PENDING JW: check if this is fixed!
-     */
-    public void interactiveFocusOnTogglePopup() {
-        JXDatePicker picker = new JXDatePicker();
-        JComboBox box = new JComboBox(new String[] {"one", "twos"});
-        box.setEditable(true);
-        FocusListener l = new FocusListener() {
-
-            public void focusGained(FocusEvent e) {
-                if (e.isTemporary()) return;
-                String source = e.getSource().getClass().getName();
-                LOG.info("focus gained from: " + source);
-            }
-
-            public void focusLost(FocusEvent e) {
-                if (e.isTemporary()) return;
-                String source = e.getSource().getClass().getName();
-                LOG.info("focus lost from: " + source);
-            }};
-        picker.getEditor().addFocusListener(l); 
-        picker.addFocusListener(l);
-        box.addFocusListener(l);
-        box.getEditor().getEditorComponent().addFocusListener(l);
-        JComponent panel = new JPanel();
-        panel.add(box);
-        panel.add(picker);
-        JXFrame frame = showInFrame(panel, "FocusEvents on editor");
-        frame.pack();
-    }
-
 
     /**
      * Issue #725-swingx: review linkPanel/linkDate requirements.
@@ -335,9 +302,18 @@ public class JXDatePickerIssues extends InteractiveTestCase {
      * Sanity during fix #705-swingx: JXMonthView must not scroll in layoutContainer.
      * 
      * Here we have a selected date way into the future, to be sure it had to scroll.
+     * Open question: should the monthView be scrolled to the selected always on open or
+     *   remember the last month shown
+     *   
+     * To reproduce  
+     * - open popup with toolbar button 
+     * - click next month
+     * - close (without commit/cancel)
+     * - open popup again with toolbar button
+     * - ?? on old navigated or current picker date?
      */
     public void interactiveVisibleMonth() {
-        calendar.set(2008, Calendar.JULY, 15);
+        calendar.add(Calendar.YEAR, 1);
         final JXDatePicker picker = new JXDatePicker();
         picker.setDate(calendar.getTime());
         JXFrame frame = wrapInFrame(picker, "sanity - monthview shows selected");

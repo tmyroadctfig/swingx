@@ -945,7 +945,10 @@ public class BasicDatePickerUI extends DatePickerUI {
         if (popup.isVisible()) {
             popup.setVisible(false);
         } else {
-            datePicker.requestFocusInWindow();
+            // PENDING JW: Issue 757-swing - datePicker firing focusLost on opening
+            // not with following line - but need to run tests
+            datePicker.getEditor().requestFocusInWindow();
+//            datePicker.requestFocusInWindow();
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     popup.show(datePicker,
@@ -1272,6 +1275,7 @@ public class BasicDatePickerUI extends DatePickerUI {
         public void focusGained(FocusEvent e) {
             if (e.isTemporary()) return;
             if (e.getSource() == datePicker) {
+//                LOG.info("focusGained in ui " + e.getSource().getClass().getSimpleName() );
                datePicker.getEditor().requestFocusInWindow(); 
             }
         }

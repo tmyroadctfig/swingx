@@ -23,6 +23,8 @@ import java.awt.Container;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.text.DateFormat;
@@ -85,6 +87,64 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
             e.printStackTrace();
         }
     }
+
+    
+    /**
+     * Visually characterize focus behaviour.
+     * 
+     * Issue #577-swingx: JXDatePicker focus cleanup.
+     * After commit/cancel in popup: picker's editor should be focused.
+     * 
+     * 
+     * Issue #757-swingx: JXDatePicker inconsistent focusLost firing.
+     * 
+     * JXDatePicker must not fire focusLost, the picker's editor should.
+     * 
+     * New (?) problem: after closing focused popup by clicking into 
+     * another the focus is in the picker's editor and can't be moved
+     * with tab
+     * - open popup, 
+     * - focus popup (by clicking next month, no keyboard, nor commit/cancel)
+     * - click into textfield: popup closed, picker editor has focus
+     *  
+     * Independent of forcing focus into picker itself or its editor on open. 
+     * Looks dependent on heavyweight popup: okay on resizing the frame so 
+     * that the popup fits in.
+     * 
+     * 
+     */
+    public void interactiveFocusOnTogglePopup() {
+        JXDatePicker picker = new JXDatePicker();
+        final Action togglePopup = picker.getActionMap().get("TOGGLE_POPUP");
+        JComboBox box = new JComboBox(new String[] {"one", "twos"});
+        box.setEditable(true);
+        FocusListener l = new FocusListener() {
+
+            public void focusGained(FocusEvent e) {
+                if (e.isTemporary()) return;
+                String source = e.getSource().getClass().getSimpleName();
+                LOG.info("focus gained from: " + source);
+            }
+
+            public void focusLost(FocusEvent e) {
+                if (e.isTemporary()) return;
+                String source = e.getSource().getClass().getSimpleName();
+                LOG.info("focus lost from: " + source);
+            }};
+        picker.getEditor().addFocusListener(l); 
+        picker.addFocusListener(l);
+        box.addFocusListener(l);
+        box.getEditor().getEditorComponent().addFocusListener(l);
+        JComponent panel = new JPanel();
+        panel.add(box);
+        panel.add(picker);
+        panel.add(new JTextField("something to focus"));
+        JXFrame frame = showInFrame(panel, "E: FocusEvents on editor");
+        addAction(frame, togglePopup);
+        frame.pack();
+    }
+
+
 
     /**
      * Issue #568-swingx: DatePicker must not reset time fields.
@@ -243,31 +303,6 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
         return old;
     }
 
-
-    /**
-     * Issue #577-swingx: JXDatePicker focus cleanup.
-     * Before open: picker's editor should be focused.
-     * After commit/cancel in popup: picker's editor should be focused.
-     */
-    public void interactiveFocusOnTogglePopup() {
-        JXDatePicker picker = new JXDatePicker();
-        final Action togglePopup = picker.getActionMap().get("TOGGLE_POPUP");
-        Action toggle = new AbstractAction("togglePopup") {
-
-            public void actionPerformed(ActionEvent e) {
-                togglePopup.actionPerformed(null);
-            }
-            
-        };
-        JComboBox box = new JComboBox(new String[] {"one", "twos"});
-//        box.setEditable(true);
-        JComponent panel = new JPanel();
-        panel.add(box);
-        panel.add(picker);
-        JXFrame frame = showInFrame(panel, "Focus on editor");
-        addAction(frame, toggle);
-        frame.pack();
-    }
 
     /**
      * Issue #566-swingx: JXRootPane eats picker's popup esc.
