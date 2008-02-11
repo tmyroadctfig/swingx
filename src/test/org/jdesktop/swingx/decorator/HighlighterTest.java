@@ -11,8 +11,10 @@ import java.awt.Color;
 import java.awt.Component;
 import java.util.logging.Logger;
 
+import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.UIManager;
+import javax.swing.border.Border;
 
 import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.decorator.HighlighterFactory.UIColorHighlighter;
@@ -110,10 +112,6 @@ public class HighlighterTest extends InteractiveTestCase {
         assertEquals(mattePainter, allColored.getPainter());
     }
     
-    /**
-     * 
-     *
-     */
     public void testPainterHighlighterNotUseNullPainter() {
         ComponentAdapter adapter = createComponentAdapter(allColored, false);
         PainterHighlighter hl = new PainterHighlighter();
@@ -123,6 +121,14 @@ public class HighlighterTest extends InteractiveTestCase {
         // sanity 
         assertEquals(mattePainter, allColored.getPainter());
     }
+    
+    public void testPainterHighlighterIgnoreNotPainterAware() {
+        ComponentAdapter adapter = createComponentAdapter(foregroundNull, false);
+        MattePainter mattePainter = new MattePainter();
+        PainterHighlighter hl = new PainterHighlighter(mattePainter);
+        hl.highlight(foregroundNull, adapter);
+    }
+    
 //-------------------- factory
     
     /**
@@ -154,7 +160,41 @@ public class HighlighterTest extends InteractiveTestCase {
         // second color on second row
         assertEquals(selectedBackground, allColored.getBackground());
     }
+
+//-------------- BorderHighlighter
     
+    public void testBorderPadding() {
+        BorderHighlighter empty = new BorderHighlighter();
+        Border border = BorderFactory.createEmptyBorder(1, 1, 1, 1);
+        allColored.setBorder(border);
+        empty.highlight(allColored, createComponentAdapter(allColored, false));
+        assertEquals("borderHighlighter without padding must not change the component", 
+                border, allColored.getBorder());
+    }
+    
+    public void testBorderConstructors() {
+        BorderHighlighter empty = new BorderHighlighter();
+        assertBorderHLState(empty, HighlightPredicate.ALWAYS, null, true, false);
+        BorderHighlighter predicate = new BorderHighlighter(HighlightPredicate.NEVER);
+        assertBorderHLState(predicate, HighlightPredicate.NEVER, null, true, false);
+        Border padding = BorderFactory.createLineBorder(Color.RED, 3);
+        BorderHighlighter paddingOnly = new BorderHighlighter(padding);
+        assertBorderHLState(paddingOnly, HighlightPredicate.ALWAYS, padding, true, false);
+        BorderHighlighter paddingPred = new BorderHighlighter(HighlightPredicate.NEVER, padding);
+        assertBorderHLState(paddingPred, HighlightPredicate.NEVER, padding, true, false);
+        BorderHighlighter paddingPredCompound = new BorderHighlighter(HighlightPredicate.NEVER, padding, false);
+        assertBorderHLState(paddingPredCompound, HighlightPredicate.NEVER, padding, false, false);
+        BorderHighlighter all = new BorderHighlighter(HighlightPredicate.NEVER, padding, false, true);
+        assertBorderHLState(all, HighlightPredicate.NEVER, padding, false, true);
+    }
+    
+    private void assertBorderHLState(BorderHighlighter hl, HighlightPredicate predicate, 
+            Border border, boolean compound, boolean inner) {
+        assertEquals(predicate, hl.getHighlightPredicate());
+        assertEquals(border, hl.getBorder());
+        assertEquals(compound, hl.isCompound());
+        assertEquals(inner, hl.isInner());
+    }
 
 //------------------ ShadingColorHighlighter
     

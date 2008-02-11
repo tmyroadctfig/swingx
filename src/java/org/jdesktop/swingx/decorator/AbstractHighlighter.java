@@ -141,22 +141,41 @@ public abstract class AbstractHighlighter implements Highlighter {
 
     /**
      * {@inheritDoc}
-     * This implementation checks the HighlightPredicate and 
-     * calls doHighlight to apply the decoration. Returns the 
-     * undecorated component if false.
+     * 
+     * This calls doHighlight to apply the decoration if both HighlightPredicate
+     * isHighlighted and canHighlight return true. Returns the undecorated component otherwise.
      * 
      * @param component the cell renderer component that is to be decorated
      * @param adapter the ComponentAdapter for this decorate operation
      * 
+     * @see #canHighlight(Component, ComponentAdapter)
      * @see #doHighlight(Component, ComponentAdapter)
      * @see #getHighlightPredicate()
      */
     public Component highlight(Component component, ComponentAdapter adapter) {
-        if (getHighlightPredicate().isHighlighted(component, adapter)) {
+        if (canHighlight(component, adapter) && 
+                getHighlightPredicate().isHighlighted(component, adapter)) {
             component = doHighlight(component, adapter);
         }
         return component;
     }
+
+    /**
+     * Subclasses may override to further limit the highlighting based
+     * on Highlighter state, f.i. a PainterHighlighter can only be applied
+     * to PainterAware components. <p>
+     * 
+     * This implementation returns true always.
+     * 
+     * @param component
+     * @param adapter
+     * @return a boolean indication if the adapter can be highlighted based
+     *   general state. This implementation returns true always.
+     */
+    protected boolean canHighlight(Component component, ComponentAdapter adapter) {
+        return true;
+    }
+
 
     /**
      * Apply the highlights. 

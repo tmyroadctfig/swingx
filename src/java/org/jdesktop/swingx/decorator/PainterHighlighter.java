@@ -104,22 +104,6 @@ public class PainterHighlighter extends AbstractHighlighter {
     
     /**
      * {@inheritDoc}
-     * 
-     * Overridden to type check the component. Calls 
-     * super if the component is PainterAware, returns the
-     * undecorated component otherwise.
-     * 
-     */
-    @Override
-    public Component highlight(Component component, ComponentAdapter adapter) {
-        if (component instanceof PainterAware) {
-            component = super.highlight(component, adapter);
-        }
-        return component;
-    }
-
-    /**
-     * {@inheritDoc}
      * <p>
      * This implementation sets the painter if it is not null. Does nothing
      * otherwise.
@@ -127,12 +111,20 @@ public class PainterHighlighter extends AbstractHighlighter {
     @Override
     protected Component doHighlight(Component component,
             ComponentAdapter adapter) {
-        // Painter painter = getPainter(component)
-        if (painter != null) {
-            ((PainterAware) component).setPainter(painter);
-        }
+       ((PainterAware) component).setPainter(painter);
         return component;
     }
-    
 
+    /**
+     * {@inheritDoc} <p>
+     * 
+     * Overridden to return false if the Painter is null or the component is not
+     *   of type PainterAware.
+     */
+    @Override
+    protected boolean canHighlight(Component component, ComponentAdapter adapter) {
+        return getPainter() != null && (component instanceof PainterAware);
+    }
+    
+    
 }

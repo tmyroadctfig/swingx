@@ -47,13 +47,27 @@ public class BorderHighlighter extends AbstractHighlighter {
    
     /**
      * 
-     * Instantiates a BorderHighlighter no padding. The
+     * Instantiates a BorderHighlighter with no padding. The
      * Highlighter is applied unconditionally.
      * 
      */
     public BorderHighlighter() {
-        this(null);
+        this((HighlightPredicate) null, null);
     }
+    
+    /**
+     * 
+     * Instantiates a BorderHighlighter with no padding, using the 
+     * given predicate.
+     * 
+     * @param predicate the HighlightPredicate to use
+     * 
+     */
+    public BorderHighlighter(HighlightPredicate predicate) {
+        this(predicate, null);
+    }
+
+    
     /**
      * 
      * Instantiates a BorderHighlighter with the given padding. The
@@ -61,11 +75,59 @@ public class BorderHighlighter extends AbstractHighlighter {
      * 
      * @param paddingBorder the border to apply as visual decoration.
      * 
-     * @throws NullPointerException is the border is null.
      */
     public BorderHighlighter(Border paddingBorder) {
-        this(paddingBorder, null);
+        this(null, paddingBorder);
     }
+
+    /**
+     * 
+     * Instantiates a BorderHighlighter with the given padding, 
+     * HighlightPredicate and default compound property. 
+     * If the predicate is null, the highlighter
+     * will be applied unconditionally.
+     * @param predicate the HighlightPredicate to use
+     * @param paddingBorder the border to apply as visual decoration.
+     * 
+     */
+    public BorderHighlighter(HighlightPredicate predicate, Border paddingBorder) {
+        this(predicate, paddingBorder, true);
+    }
+
+    /**
+     * 
+     * Instantiates a BorderHighlighter with the given padding, 
+     * HighlightPredicate, compound property and default inner property. 
+     * If the predicate is null, the highlighter
+     * will be applied unconditionally.
+     * @param predicate the HighlightPredicate to use
+     * @param paddingBorder the border to apply as visual decoration.
+     * @param compound the compound property.
+     * 
+     */
+    public BorderHighlighter(HighlightPredicate predicate, 
+            Border paddingBorder, boolean compound) {
+        this(predicate, paddingBorder, compound, false);
+    }
+    
+    /**
+     * 
+     * Instantiates a BorderHighlighter with the given padding, 
+     * HighlightPredicate and compound property. If the predicate is null, the highlighter
+     * will be applied unconditionally.
+     * @param predicate the HighlightPredicate to use
+     * @param paddingBorder the border to apply as visual decoration.
+     * @param compound the compound property
+     * @param inner the inner property
+     */
+    public BorderHighlighter(HighlightPredicate predicate, 
+            Border paddingBorder, boolean compound, boolean inner) {
+        super(predicate);
+        this.paddingBorder = paddingBorder;
+        this.compound = compound;
+        this.inner = inner;
+    }
+
 
     /**
      * 
@@ -77,33 +139,13 @@ public class BorderHighlighter extends AbstractHighlighter {
      * @param paddingBorder the border to apply as visual decoration.
      * @param predicate the HighlightPredicate to use
      * 
-     * @throws NullPointerException is the border is null.
+     * @deprecated use {@link #BorderHighlighter(HighlightPredicate, Border)}
+     * 
      */
     public BorderHighlighter(Border paddingBorder, HighlightPredicate predicate) {
-        this(paddingBorder, predicate, true);
+        this(predicate, paddingBorder, true);
     }
 
-    /**
-     * 
-     * Instantiates a BorderHighlighter with the given padding, 
-     * HighlightPredicate, compound property and default inner property. 
-     * If the predicate is null, the highlighter
-     * will be applied unconditionally.
-     * 
-     * @param paddingBorder the border to apply as visual decoration.
-     * @param predicate the HighlightPredicate to use
-     * @param compound the compound property.
-     * @throws NullPointerException is the border is null.
-     */
-    public BorderHighlighter(Border paddingBorder, 
-            HighlightPredicate predicate, boolean compound) {
-        super(predicate);
-        if (paddingBorder == null)
-            throw new NullPointerException("border must not be null");
-        this.paddingBorder = paddingBorder;
-        this.compound = compound;
-    }
-    
     /**
      * 
      * Instantiates a BorderHighlighter with the given padding, 
@@ -114,27 +156,64 @@ public class BorderHighlighter extends AbstractHighlighter {
      * @param predicate the HighlightPredicate to use
      * @param compound the compound property
      * @param inner the inner property
-     * @throws NullPointerException is the border is null.
+     * 
+     * @deprecated use {@link #BorderHighlighter(HighlightPredicate, Border, boolean, boolean)}
+     *   - sig changed for consistency (predicate first always)
      */
     public BorderHighlighter(Border paddingBorder, 
             HighlightPredicate predicate, boolean compound, boolean inner) {
         super(predicate);
-        if (paddingBorder == null)
-            throw new NullPointerException("border must not be null");
         this.paddingBorder = paddingBorder;
         this.compound = compound;
         this.inner = inner;
     }
+
+
+    /**
+     * 
+     * Instantiates a BorderHighlighter with the given padding, 
+     * HighlightPredicate, compound property and default inner property. 
+     * If the predicate is null, the highlighter
+     * will be applied unconditionally.
+     * @param predicate the HighlightPredicate to use
+     * @param paddingBorder the border to apply as visual decoration.
+     * @param compound the compound property.
+     * 
+     * @deprecated use {@link #BorderHighlighter(HighlightPredicate, Border, boolean)}
+     *   - sig changed for consistency (predicate first always)
+     */
+    public BorderHighlighter(
+            Border paddingBorder, boolean compound, HighlightPredicate predicate) {
+        super(predicate);
+        this.paddingBorder = paddingBorder;
+        this.compound = compound;
+    }
+
+
     /**
      * {@inheritDoc}
      */
     @Override
     protected Component doHighlight(Component renderer, ComponentAdapter adapter) {
-        if (renderer instanceof JComponent) {
-            ((JComponent) renderer).setBorder(compoundBorder(
+          ((JComponent) renderer).setBorder(compoundBorder(
                     ((JComponent) renderer).getBorder()));
-        }
-        return renderer;
+         return renderer;
+    }
+
+    /**
+     * {@inheritDoc} <p>
+     * 
+     * Overridden to prevent highlighting if there's no padding available or
+     * the renderer is not of type JComponent.
+     * 
+     * @param component the cell renderer component that is to be decorated
+     * @param adapter the ComponentAdapter for this decorate operation
+     * @return true padding is available and the 
+     *   renderer is a JComponent. False otherwise.
+     */
+    @Override
+    protected boolean canHighlight(Component component, ComponentAdapter adapter) {
+        return (getBorder() !=  null) && (component instanceof JComponent); 
     }
 
     /**
@@ -202,6 +281,12 @@ public class BorderHighlighter extends AbstractHighlighter {
                         border);
             }
         }
+        return paddingBorder;
+    }
+    /**
+     * @return
+     */
+    public Border getBorder() {
         return paddingBorder;
     }
 

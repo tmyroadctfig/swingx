@@ -310,11 +310,16 @@ public class SimpleRendererDemo {
             @Override
             protected Component doHighlight(Component component,
                     ComponentAdapter adapter) {
-                if (component instanceof JLabel) {
-                    ((JLabel) component).setText("\u2022 " + ((JLabel) component).getText());
-                }
+               ((JLabel) component).setText("\u2022 " + ((JLabel) component).getText());
                 return component;
             }
+
+            @Override
+            protected boolean canHighlight(Component component,
+                    ComponentAdapter adapter) {
+                return component instanceof JLabel;
+            }
+            
             
         };
         list.addHighlighter(hl);

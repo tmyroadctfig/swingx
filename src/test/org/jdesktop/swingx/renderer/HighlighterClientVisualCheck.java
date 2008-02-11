@@ -54,6 +54,7 @@ import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.JXTreeTable;
 import org.jdesktop.swingx.RolloverProducer;
 import org.jdesktop.swingx.decorator.AbstractHighlighter;
+import org.jdesktop.swingx.decorator.BorderHighlighter;
 import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.CompoundHighlighter;
@@ -91,6 +92,22 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
           e.printStackTrace();
       }
   }
+
+    /**
+     * Multiple Highlighters (shown as example in Javapolis 2007).
+     *
+     */
+    public void interactiveTableBorderHighlighterJP() {
+        JXTable table = new JXTable(tableModel);
+        table.setVisibleRowCount(table.getRowCount());
+        table.setVisibleColumnCount(7);
+        table.packAll();
+        table.setColumnControlVisible(true);
+        
+        BorderHighlighter bempty = new BorderHighlighter();
+        table.setHighlighters(bempty);
+        showWithScrollingInFrame(table, "Multiple Highlighters");
+    }
 
     /**
      * Multiple Highlighters (shown as example in Javapolis 2007).
@@ -536,6 +553,11 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
                 String text = "low on luck: " + ((JLabel) component).getText();
                 ((JComponent) component).setToolTipText(text);
                 return component;
+            }
+            @Override
+            protected boolean canHighlight(Component component,
+                    ComponentAdapter adapter) {
+                return component instanceof JLabel;
             }
             
         };
