@@ -110,7 +110,7 @@ public class PainterVisualCheck extends InteractiveTestCase {
         // hmm.. how to make this stick to the trailing upper corner?
         painter.setHorizontalAlignment(HorizontalAlignment.RIGHT);
         painter.setVerticalAlignment(VerticalAlignment.TOP);
-        Highlighter hl = new PainterHighlighter(painter, new ColumnHighlightPredicate(3)); 
+        Highlighter hl = new PainterHighlighter(new ColumnHighlightPredicate(3), painter); 
         table.addHighlighter(hl);
         showWithScrollingInFrame(table, "Renderer with Triangle marker");
     }
@@ -125,7 +125,7 @@ public class PainterVisualCheck extends InteractiveTestCase {
         RelativePainter painter = new RelativePainter<JComponent>(matte);
         painter.setYFactor(0.2);
         painter.setVerticalAlignment(VerticalAlignment.BOTTOM);
-        Highlighter hl = new PainterHighlighter(painter, HighlightPredicate.ROLLOVER_ROW);
+        Highlighter hl = new PainterHighlighter(HighlightPredicate.ROLLOVER_ROW, painter);
         table.addHighlighter(hl);
         JXFrame frame = showWithScrollingInFrame(table, 
                 "painter-aware renderer rollover");
@@ -160,7 +160,7 @@ public class PainterVisualCheck extends InteractiveTestCase {
         MattePainter<JComponent> p =  new MattePainter<JComponent>(getTransparentColor(Color.BLUE, 125));
         RelativePainter relativePainter = new RelativePainter<JComponent>(p);
         relativePainter.setXFactor(.5);
-        Highlighter hl = new PainterHighlighter(relativePainter, createComponentTextBasedPredicate("y"));
+        Highlighter hl = new PainterHighlighter(createComponentTextBasedPredicate("y"), relativePainter);
         table.addHighlighter(hl);
         JXFrame frame = showWithScrollingInFrame(table, 
                 "painter-aware renderer with value-based highlighting");
@@ -260,7 +260,7 @@ public class PainterVisualCheck extends InteractiveTestCase {
         final ImagePainter imagePainter = new ImagePainter(ImageIO.read(JXPanel.class
                 .getResource("resources/images/kleopatra.jpg")));
         HighlightPredicate predicate = new ColumnHighlightPredicate(0);
-        Highlighter iconHighlighter = new PainterHighlighter(imagePainter, predicate );
+        Highlighter iconHighlighter = new PainterHighlighter(predicate, imagePainter );
         Highlighter alternateRowHighlighter = HighlighterFactory.createSimpleStriping();
         table.addHighlighter(alternateRowHighlighter);
         table.addHighlighter(iconHighlighter);

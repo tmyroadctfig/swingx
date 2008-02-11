@@ -77,7 +77,7 @@ public final class HighlighterFactory {
      * @return a Highlighter striping every second row background. 
      */
     public static Highlighter createSimpleStriping(Color stripeBackground) {
-        ColorHighlighter hl = new ColorHighlighter(stripeBackground, null, HighlightPredicate.ODD);
+        ColorHighlighter hl = new ColorHighlighter(HighlightPredicate.ODD, stripeBackground, null);
         return hl;
     }
     
@@ -94,8 +94,8 @@ public final class HighlighterFactory {
             int rowsPerGroup) {
         HighlightPredicate predicate = new RowGroupHighlightPredicate(
                 rowsPerGroup);
-        ColorHighlighter hl = new ColorHighlighter(stripeBackground, null,
-                predicate);
+        ColorHighlighter hl = new ColorHighlighter(predicate, stripeBackground,
+                null);
         return hl;
     }
 
@@ -107,7 +107,7 @@ public final class HighlighterFactory {
      * @return a Highlighter striping every second row background. 
      */
     public static Highlighter createAlternateStriping() {
-        ColorHighlighter first = new ColorHighlighter(Color.WHITE, null, HighlightPredicate.EVEN);
+        ColorHighlighter first = new ColorHighlighter(HighlightPredicate.EVEN, Color.WHITE, null);
         ColorHighlighter hl = new UIColorHighlighter(HighlightPredicate.ODD);
         return new CompoundHighlighter(first, hl);
     }
@@ -122,7 +122,7 @@ public final class HighlighterFactory {
      */
     public static Highlighter createAlternateStriping(int rowsPerGroup) {
         HighlightPredicate predicate = new RowGroupHighlightPredicate(rowsPerGroup);
-        ColorHighlighter first = new ColorHighlighter(Color.WHITE, null, new NotHighlightPredicate(predicate));
+        ColorHighlighter first = new ColorHighlighter(new NotHighlightPredicate(predicate), Color.WHITE, null);
         ColorHighlighter hl = new UIColorHighlighter(predicate);
         return new CompoundHighlighter(first, hl);
     }
@@ -136,8 +136,8 @@ public final class HighlighterFactory {
      * @return a Highlighter striping alternating background. 
      */
     public static Highlighter createAlternateStriping(Color baseBackground, Color alternateBackground) {
-        ColorHighlighter base = new ColorHighlighter(baseBackground, null, HighlightPredicate.EVEN);
-        ColorHighlighter alternate = new ColorHighlighter(alternateBackground, null, HighlightPredicate.ODD);
+        ColorHighlighter base = new ColorHighlighter(HighlightPredicate.EVEN, baseBackground, null);
+        ColorHighlighter alternate = new ColorHighlighter(HighlightPredicate.ODD, alternateBackground, null);
         return new CompoundHighlighter(base, alternate);
     }
 
@@ -152,8 +152,8 @@ public final class HighlighterFactory {
      */
     public static Highlighter createAlternateStriping(Color baseBackground, Color alternateBackground, int linesPerStripe) {
         HighlightPredicate predicate = new RowGroupHighlightPredicate(linesPerStripe);
-        ColorHighlighter base = new ColorHighlighter(baseBackground, null, new NotHighlightPredicate(predicate));
-        ColorHighlighter alternate = new ColorHighlighter(alternateBackground, null, predicate);
+        ColorHighlighter base = new ColorHighlighter(new NotHighlightPredicate(predicate), baseBackground, null);
+        ColorHighlighter alternate = new ColorHighlighter(predicate, alternateBackground, null);
         
         return new CompoundHighlighter(base, alternate);
     }
@@ -191,7 +191,7 @@ public final class HighlighterFactory {
      * @param odd the predicate to use
      */
     public UIColorHighlighter(HighlightPredicate odd) {
-        super(null, null, odd);
+        super(odd, null, null);
         updateUI();
     }
 

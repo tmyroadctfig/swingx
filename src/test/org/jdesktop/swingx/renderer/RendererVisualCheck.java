@@ -47,6 +47,7 @@ import java.util.Date;
 import java.util.List;
 
 import javax.swing.AbstractAction;
+import javax.swing.AbstractButton;
 import javax.swing.AbstractListModel;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
@@ -80,6 +81,7 @@ import javax.swing.tree.TreeModel;
 
 import org.jdesktop.swingx.EditorPaneLinkVisitor;
 import org.jdesktop.swingx.InteractiveTestCase;
+import org.jdesktop.swingx.JXButton;
 import org.jdesktop.swingx.JXEditorPaneTest;
 import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXHyperlink;
@@ -93,11 +95,14 @@ import org.jdesktop.swingx.LinkRenderer;
 import org.jdesktop.swingx.RolloverRenderer;
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.action.LinkModelAction;
+import org.jdesktop.swingx.border.DropShadowBorder;
 import org.jdesktop.swingx.decorator.AbstractHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
+import org.jdesktop.swingx.decorator.PainterHighlighter;
+import org.jdesktop.swingx.painter.MattePainter;
 import org.jdesktop.swingx.table.ColumnControlButton;
 import org.jdesktop.swingx.test.ComponentTreeTableModel;
 import org.jdesktop.swingx.test.XTestUtils;
@@ -119,13 +124,62 @@ public class RendererVisualCheck extends InteractiveTestCase {
 //          test.runInteractiveTests(".*Text.*");
 //          test.runInteractiveTests(".*XLabel.*");
 //          test.runInteractiveTests(".*Color.*");
-          test.runInteractiveTests("interactive.*Custom.*");
+          test.runInteractiveTests("interactive.*Fancy.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
         }
     }
     
+    public void interactiveTreeFancyButton() {
+        JXTree tree = new JXTree();
+        MattePainter painter = new MattePainter(Color.YELLOW);
+        Highlighter hl = new PainterHighlighter(HighlightPredicate.ROLLOVER_ROW, painter);
+        tree.addHighlighter(hl);
+        ComponentProvider provider = new NormalButtonProvider(StringValue.TO_STRING, JLabel.LEADING);
+        tree.setCellRenderer(new DefaultTreeRenderer(provider));
+        tree.setRolloverEnabled(true);
+        showWithScrollingInFrame(tree, "Fancy..");
+    }
+    
+    public void interactiveFancyButton() {
+        JXButton button = new JXButton("Dummy .... but lonnnnnnngg");
+        button.setBorder(BorderFactory.createCompoundBorder(new DropShadowBorder(), button.getBorder()));
+         showInFrame(button, "Fancy..");
+    }
+    public static class NormalButtonProvider extends ButtonProvider {
+
+        private Border border;
+
+        /**
+         * @param toString
+         * @param leading
+         */
+        public NormalButtonProvider(StringValue toString, int leading) {
+            super(toString, leading);
+            setBorderPainted(true);
+        }
+
+        
+        @Override
+        protected void configureState(CellContext context) {
+            super.configureState(context);
+            rendererComponent.setBorder(border);
+        }
+
+
+        @Override
+        protected AbstractButton createRendererComponent() {
+            JXButton button = new JXButton();
+            border = BorderFactory.createCompoundBorder(
+                    new DropShadowBorder(),
+                    button.getBorder());
+            return button;
+        }
+        
+        
+        
+    }
     /**
      * example to configure treeTable hierarchical column (same for tree) with
      * custom icon and content mapping.

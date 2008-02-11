@@ -21,7 +21,14 @@
  */
 package org.jdesktop.swingx.renderer;
 
+import java.awt.AlphaComposite;
+import java.awt.Color;
 import java.awt.Component;
+import java.awt.Graphics2D;
+import java.awt.KeyEventPostProcessor;
+import java.awt.KeyboardFocusManager;
+import java.awt.event.KeyEvent;
+import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,21 +36,43 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
+import java.util.logging.Logger;
 
+import javax.imageio.ImageIO;
 import javax.swing.AbstractListModel;
+import javax.swing.BorderFactory;
+import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
+import javax.swing.KeyStroke;
+import javax.swing.ListCellRenderer;
 import javax.swing.ListModel;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 
 import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXList;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.JXTree;
+import org.jdesktop.swingx.JXList.DelegatingRenderer;
+import org.jdesktop.swingx.decorator.AbstractHighlighter;
+import org.jdesktop.swingx.decorator.BorderHighlighter;
+import org.jdesktop.swingx.decorator.ColorHighlighter;
+import org.jdesktop.swingx.decorator.ComponentAdapter;
+import org.jdesktop.swingx.decorator.CompoundHighlighter;
+import org.jdesktop.swingx.decorator.HighlightPredicate;
+import org.jdesktop.swingx.decorator.Highlighter;
+import org.jdesktop.swingx.decorator.PainterHighlighter;
+import org.jdesktop.swingx.decorator.HighlightPredicate.TypeHighlightPredicate;
+import org.jdesktop.swingx.graphics.GraphicsUtilities;
+import org.jdesktop.swingx.painter.ImagePainter;
+import org.jdesktop.swingx.painter.AbstractLayoutPainter.HorizontalAlignment;
 import org.jdesktop.swingx.util.WindowUtils;
 
 /**
@@ -52,6 +81,9 @@ import org.jdesktop.swingx.util.WindowUtils;
  * @author Jeanette Winzenburg
  */
 public class SimpleRendererDemo {
+    @SuppressWarnings("unused")
+    private static final Logger LOG = Logger.getLogger(SimpleRendererDemo.class
+            .getName());
     private String dataSource = "resources/contributors.txt";
     private List<Contributor> contributors;
     private ListModel listModel;
@@ -64,6 +96,27 @@ public class SimpleRendererDemo {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        installKeyEventDispatcher();
+    }
+
+    /**
+     * 
+     */
+    private void installKeyEventDispatcher() {
+        KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
+        KeyEventPostProcessor processor = new KeyEventPostProcessor() {
+
+            public boolean postProcessKeyEvent(KeyEvent e) {
+                if (e.isConsumed()) return false;
+                KeyStroke stroke = KeyStroke.getKeyStrokeForEvent(e);
+                if (!KeyStroke.getKeyStroke("ESCAPE").equals(stroke)) return false;
+                LOG.info("got escape");
+                return false;
+            }
+            
+        };
+        manager.addKeyEventPostProcessor(processor);
+        
     }
 
     /**
@@ -85,7 +138,119 @@ public class SimpleRendererDemo {
         table.setDefaultRenderer(Contributor.class, new DefaultTableRenderer(stringValue));
         list.setCellRenderer(new DefaultListRenderer(stringValue));
         tree.setCellRenderer(new DefaultTreeRenderer(stringValue));
+        
     }
+
+    private void configureListHighlighting(JXTable table, JXList list, JXTree tree) {
+        CompoundHighlighter stars = new CompoundHighlighter(
+                new TypeHighlightPredicate(Contributor.class));
+        stars.addHighlighter(getMarginHighlighter());
+        stars.addHighlighter(getRangeHighlighter("silver-star.gif", 50, 80));
+        stars.addHighlighter(getRangeHighlighter("gold-star.gif", 80, 100));
+        list.addHighlighter(stars);
+//        stars.addHighlighter(getRangeHighlighter("bronze-star.gif", 10, 50));
+        tree.addHighlighter(stars);
+    }
+
+    /**
+     * @return
+     */
+    private Highlighter getMarginHighlighter() {
+        return new BorderHighlighter(BorderFactory.createEmptyBorder(0, 20, 0, 0));
+    }
+
+    private PainterHighlighter getRangeHighlighter(String gifName, int start,
+            int end) {
+        HighlightPredicate meritPredicate = getRangePredicate(start, end);
+        ImagePainter bronze = getImagePainter(gifName);
+        PainterHighlighter painterHighlighter = new PainterHighlighter(meritPredicate, bronze);
+        return painterHighlighter;
+    }
+
+    private HighlightPredicate getRangePredicate(final int start, final int end) {
+        HighlightPredicate meritPredicate = new HighlightPredicate() {
+
+            public boolean isHighlighted(Component renderer,
+                    ComponentAdapter adapter) {
+                int merit = ((Contributor) adapter.getValue()).merits;
+                return (merit >= start) && (merit < end);
+            }
+            
+        };
+        return meritPredicate;
+    }
+
+    /**
+     * @param string
+     * @return
+     */
+    private ImagePainter getImagePainter(String string) {
+        ImagePainter imagePainter = null;
+        BufferedImage image = null;
+        try {
+            image = ImageIO.read(getClass()
+                    .getResource("resources/" + string));
+            BufferedImage mod = 
+              GraphicsUtilities.createCompatibleTranslucentImage(
+                      image.getWidth(), 
+                      image.getHeight());
+            Graphics2D g = mod.createGraphics();
+            g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.8f));
+            g.drawImage(image, 0, 0, image.getWidth(), image.getHeight(), null);
+            g.dispose();
+            imagePainter = new ImagePainter(mod);
+            imagePainter.setHorizontalAlignment(HorizontalAlignment.LEFT);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return imagePainter;
+    }
+
+//    /**
+//     * A Highlighter that applies a border compound from the given marginBorder and
+//     * the renderer's defaultBorder.
+//     */
+//    public static class BorderHighlighter extends AbstractHighlighter {
+//
+//        private Border paddingBorder;
+//
+//        /**
+//         * 
+//         * PRE: marginBorder != null;
+//         * 
+//         * @param paddingBorder
+//         */
+//        public BorderHighlighter(Border paddingBorder) {
+//            if (paddingBorder == null)
+//                throw new NullPointerException("border must not be null");
+//            this.paddingBorder = paddingBorder;
+//        }
+//
+//
+//        @Override
+//        protected Component doHighlight(Component renderer, ComponentAdapter adapter) {
+//            if (renderer instanceof JComponent) {
+//                ((JComponent) renderer).setBorder(compoundBorder(
+//                        ((JComponent) renderer).getBorder()));
+//            }
+//            return renderer;
+//        }
+//
+//        /**
+//         * 
+//         * @param border
+//         * @return
+//         */
+//        private Border compoundBorder(Border border) {
+//            if (border != null) {
+//                return BorderFactory.createCompoundBorder(border, paddingBorder);
+//            }
+//            return paddingBorder;
+//        }
+//
+//    }
+//
 
     /**
      * @param table
@@ -93,6 +258,8 @@ public class SimpleRendererDemo {
     private void configureTable(JXTable table) {
         table.setColumnControlVisible(true);
         table.getColumnExt(1).setToolTipText("Randomly generated - run again if you are disatisfied");
+        // cheating a bit: if we had already intalled our custom renderer
+        // the first column would not get as much space as intended
         table.packColumn(0, -1);
     }
     
@@ -101,21 +268,58 @@ public class SimpleRendererDemo {
      * @return the component to show.
      */
     private Component createContent() {
-        JXTable table = new JXTable(tableModel);
-        configureTable(table);
-        JXList list = new JXList(listModel);
-        JXTree tree = new JXTree(rootNode);
+        // create
+        JXTable table = new JXTable();
+        JXList list = new JXList();
+        JXTree tree = new JXTree();
+        // add
+        configureRendering(table, list, tree);
+        configureListHighlighting(table, list, tree);
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.addTab("JXTable", new JScrollPane(table));
         JSplitPane splitPane = new JSplitPane();
         splitPane.setLeftComponent(new JScrollPane(list));
         splitPane.setRightComponent(new JScrollPane(tree));
+//        splitPane.setDividerLocation(250);
         tabbedPane.addTab("JXList/JXTree", splitPane);
-        configureRendering(table, list, tree);
+        // configure
+        table.setModel(tableModel);
+        configureTable(table);
+        list.setModel(listModel);
+        tree.setModel(new DefaultTreeModel(rootNode));
+        // testing black/white list with bullets (from java1_2007)
+        JXList bulletedList = new JXList(listModel);
+        configureList(bulletedList, ((DelegatingRenderer) list.getCellRenderer()).getDelegateRenderer());
+        tabbedPane.add("Black List", new JScrollPane(bulletedList));
         return tabbedPane;
     }
 
     
+    /**
+     * @param listCellRenderer 
+     * @param bulletedList
+     */
+    private void configureList(JXList list, ListCellRenderer renderer) {
+        list.setBackground(Color.BLACK);
+        list.setLayoutOrientation(JXList.HORIZONTAL_WRAP);
+        list.setVisibleRowCount(0);
+        list.setCellRenderer(renderer);
+        list.addHighlighter(new ColorHighlighter(null, Color.WHITE));
+        Highlighter hl = new AbstractHighlighter() {
+
+            @Override
+            protected Component doHighlight(Component component,
+                    ComponentAdapter adapter) {
+                if (component instanceof JLabel) {
+                    ((JLabel) component).setText("\u2022 " + ((JLabel) component).getText());
+                }
+                return component;
+            }
+            
+        };
+        list.addHighlighter(hl);
+    }
+
     /**
      * Create and fill a list of contributors from a resource and 
      * wrap view models around.
@@ -141,13 +345,6 @@ public class SimpleRendererDemo {
             }
             
         };
-        // generate a random number list
-        final List<Number> merits = new ArrayList<Number>();
-        // todo: following line produces a infinite loop - WHY?
-//        for (Iterator iter = contributors.iterator(); iter.hasNext();) {
-        for (int i = 0; i < contributors.size(); i++) {
-            merits.add(new Double(Math.random() * 100).intValue());
-        }
         // wrap a TableModel around
         tableModel = new AbstractTableModel() {
 
@@ -164,7 +361,7 @@ public class SimpleRendererDemo {
                 case 0:
                     return contributors.get(rowIndex);
                 case 1:
-                    return merits.get(rowIndex);
+                    return contributors.get(rowIndex).merits;
                 }
                 return null;
             }
@@ -190,6 +387,13 @@ public class SimpleRendererDemo {
                 }
                 return super.getColumnName(column);
             }
+
+            @Override
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return true;
+            }
+            
+            
         };
         // wrap a DefaultTreeNodes around 
         rootNode = new DefaultMutableTreeNode("Contributors");
@@ -226,9 +430,11 @@ public class SimpleRendererDemo {
         private String lastName;
         @SuppressWarnings("unused")
         private String userID;
+        private int merits;
         
         public Contributor(String rawData) {
             setData(rawData);
+            merits = new Double(Math.random() * 100).intValue();
         }
 
         /**
@@ -259,16 +465,39 @@ public class SimpleRendererDemo {
     //---------------------------Main
 
     public static void main(String[] args) {
+//        initLF();
         final JXFrame frame = new JXFrame("SwingX :: Simple Renderer Demo", true);
         frame.add(new SimpleRendererDemo().createContent());
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 frame.pack();
-                frame.setSize(400, 300);
+                frame.setSize(600, 400);
                 frame.setLocation(WindowUtils.getPointForCentering(frame));
                 frame.setVisible(true);
             }
         });        
+    }
+
+    /**
+     * 
+     */
+    private static void initLF() {
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (ClassNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (UnsupportedLookAndFeelException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        
     }
 
 }

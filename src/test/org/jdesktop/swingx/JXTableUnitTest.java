@@ -1998,8 +1998,8 @@ public class JXTableUnitTest extends InteractiveTestCase {
     public void testHighlighterHiddenTestColumn() {
         JXTable table = new JXTable(sortableTableModel);
         table.getColumnExt(0).setVisible(false);
-        Highlighter highlighter = new ColorHighlighter(null, Color.RED,
-                new PatternPredicate(Pattern.compile("a"), 0));
+        Highlighter highlighter = new ColorHighlighter(new PatternPredicate(Pattern.compile("a"), 0), null,
+                Color.RED);
         ComponentAdapter adapter = table.getComponentAdapter();
         adapter.row = 0;
         adapter.column = 0;

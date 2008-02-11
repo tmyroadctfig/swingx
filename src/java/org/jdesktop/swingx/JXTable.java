@@ -3131,9 +3131,9 @@ public class JXTable extends JTable
          * @return a highlighter used for matching
          */
         protected AbstractHighlighter createMatchHighlighter() {
-            return new ColorHighlighter(Color.YELLOW.brighter(), null, 
-                    Color.YELLOW.brighter(), null, 
-                    HighlightPredicate.NEVER);
+            return new ColorHighlighter(HighlightPredicate.NEVER, Color.YELLOW.brighter(), 
+                    null, Color.YELLOW.brighter(), 
+                    null);
         }
 
         

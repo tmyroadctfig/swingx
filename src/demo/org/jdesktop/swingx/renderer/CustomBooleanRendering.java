@@ -70,8 +70,8 @@ public class CustomBooleanRendering {
     private void configureFunRendering(JXTable table) {
         HighlightPredicate truePredicate = new EqualsHighlightPredicate(Boolean.TRUE);
         HighlightPredicate falsePredicate = new EqualsHighlightPredicate(Boolean.FALSE);
-        Highlighter yesHighlighter = new PainterHighlighter(getPainter("resources/green-orb.png"), truePredicate); 
-        Highlighter noHighlighter = new PainterHighlighter(getPainter("resources/exit.png"), falsePredicate);
+        Highlighter yesHighlighter = new PainterHighlighter(truePredicate, getPainter("resources/green-orb.png")); 
+        Highlighter noHighlighter = new PainterHighlighter(falsePredicate, getPainter("resources/exit.png"));
         table.setHighlighters(yesHighlighter, noHighlighter);
         
         table.setDefaultRenderer(Boolean.class, 

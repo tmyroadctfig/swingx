@@ -77,10 +77,11 @@ public class CompoundHighlighter extends AbstractHighlighter
     public CompoundHighlighter(HighlightPredicate predicate, Highlighter... inList) {
         super(predicate);
         highlighters = new ArrayList<Highlighter>();
-        for (int i = 0; i < inList.length; i++) {
-            addHighlighter(inList[i]);
+        for (Highlighter highlighter : inList) {
+            addHighlighter(highlighter);
         }
     }
+
     /**
      * Appends a highlighter to the pipeline.
      *

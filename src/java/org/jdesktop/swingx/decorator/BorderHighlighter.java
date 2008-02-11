@@ -44,6 +44,16 @@ public class BorderHighlighter extends AbstractHighlighter {
     private boolean inner;
     private boolean compound;
 
+   
+    /**
+     * 
+     * Instantiates a BorderHighlighter no padding. The
+     * Highlighter is applied unconditionally.
+     * 
+     */
+    public BorderHighlighter() {
+        this(null);
+    }
     /**
      * 
      * Instantiates a BorderHighlighter with the given padding. The

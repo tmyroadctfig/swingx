@@ -121,7 +121,7 @@ public class JXListTest extends InteractiveTestCase {
         ListCellRenderer renderer = list.getCellRenderer();
         renderer.getListCellRendererComponent(list, "dummy", -1, false, false);
         SearchPredicate predicate = new SearchPredicate(Pattern.compile("\\QNode\\E"));
-        Highlighter searchHighlighter = new ColorHighlighter(null, Color.RED, predicate);
+        Highlighter searchHighlighter = new ColorHighlighter(predicate, null, Color.RED);
         list.addHighlighter(searchHighlighter);
         renderer.getListCellRendererComponent(list, "dummy", -1, false, false);
     }
@@ -140,7 +140,7 @@ public class JXListTest extends InteractiveTestCase {
         ListCellRenderer renderer = list.getCellRenderer();
         renderer.getListCellRendererComponent(list, "dummy", list.getElementCount(), false, false);
         SearchPredicate predicate = new SearchPredicate(Pattern.compile("\\QNode\\E"));
-        Highlighter searchHighlighter = new ColorHighlighter(null, Color.RED, predicate);
+        Highlighter searchHighlighter = new ColorHighlighter(predicate, null, Color.RED);
         list.addHighlighter(searchHighlighter);
         renderer.getListCellRendererComponent(list, "dummy", list.getElementCount(), false, false);
     }

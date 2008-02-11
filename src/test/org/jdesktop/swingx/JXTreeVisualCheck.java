@@ -74,8 +74,8 @@ public class JXTreeVisualCheck extends JXTreeUnitTest {
     
     public void interactiveExpandWithHighlighters() {
         JXTree tree = new JXTree();
-        Highlighter searchHighlighter = new ColorHighlighter(null, Color.RED, 
-                new SearchPredicate(Pattern.compile("\\Qe\\E")));
+        Highlighter searchHighlighter = new ColorHighlighter(new SearchPredicate(Pattern.compile("\\Qe\\E")), null, 
+                Color.RED);
         tree.addHighlighter(searchHighlighter);
         showWithScrollingInFrame(tree, "NPE on tree expand with highlighter");
 
@@ -239,7 +239,7 @@ public class JXTreeVisualCheck extends JXTreeUnitTest {
     public void interactiveTestEditabilityHighlighter() {
         JXTree tree = new JXTree(treeTableModel);
         tree.setEditable(true);
-        tree.setHighlighters(new ColorHighlighter(Color.WHITE, Color.RED, HighlightPredicate.EDITABLE));
+        tree.setHighlighters(new ColorHighlighter(HighlightPredicate.EDITABLE, Color.WHITE, Color.RED));
         showWithScrollingInFrame(tree, "Editability highlighter" );
     }
     
@@ -259,16 +259,16 @@ public class JXTreeVisualCheck extends JXTreeUnitTest {
     private Highlighter createRolloverHighlighter(boolean useForeground) {
         Color color = new Color(0xF0, 0xF0, 0xE0); //LegacyHighlighter.ledgerBackground.getBackground();
         Highlighter highlighter = new ColorHighlighter(
-                useForeground ? null : color, useForeground ? color.darker() : null, 
-                        HighlightPredicate.ROLLOVER_ROW);
+                HighlightPredicate.ROLLOVER_ROW, useForeground ? null : color, 
+                        useForeground ? color.darker() : null);
         return highlighter;
     }
     
     private Highlighter[] createDepthHighlighters() {
         Highlighter[] highlighters = new Highlighter[2];
         
-        highlighters[0] = new ColorHighlighter(Color.WHITE, Color.RED, new DepthHighlightPredicate(1));
-        highlighters[1] = new ColorHighlighter(Color.WHITE, Color.BLUE, new DepthHighlightPredicate(2));
+        highlighters[0] = new ColorHighlighter(new DepthHighlightPredicate(1), Color.WHITE, Color.RED);
+        highlighters[1] = new ColorHighlighter(new DepthHighlightPredicate(2), Color.WHITE, Color.BLUE);
         
         return highlighters;
     }
@@ -280,8 +280,8 @@ public class JXTreeVisualCheck extends JXTreeUnitTest {
     public void interactiveTestHighlighters() {
         JXTree tree = new JXTree(treeTableModel);
         String pattern = "o";
-        tree.setHighlighters(new ColorHighlighter(null, Color.red, 
-                new PatternPredicate(Pattern.compile(pattern), 0)),
+        tree.setHighlighters(new ColorHighlighter(new PatternPredicate(Pattern.compile(pattern), 0), null, 
+                Color.red),
                 HighlighterFactory.createSimpleStriping(HighlighterFactory.LINE_PRINTER));
         showWithScrollingInFrame(tree, "Highlighters: " + pattern);
     }

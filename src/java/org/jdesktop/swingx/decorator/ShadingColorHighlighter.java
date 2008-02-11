@@ -33,7 +33,7 @@ import java.awt.Component;
 public class ShadingColorHighlighter extends ColorHighlighter {
 
     public ShadingColorHighlighter(HighlightPredicate predicate) {
-        super(null, null, predicate);
+        super(predicate, null, null);
     }
  
     

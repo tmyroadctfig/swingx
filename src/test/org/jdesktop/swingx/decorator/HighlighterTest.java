@@ -83,7 +83,10 @@ public class HighlighterTest extends InteractiveTestCase {
         PainterHighlighter withPainter = new PainterHighlighter(mattePainter);
         assertEquals(HighlightPredicate.ALWAYS, withPainter.getHighlightPredicate());
         assertEquals(mattePainter, withPainter.getPainter());
-        PainterHighlighter all = new PainterHighlighter(mattePainter, HighlightPredicate.NEVER);
+        PainterHighlighter all = new PainterHighlighter(HighlightPredicate.NEVER, mattePainter);
+        assertEquals(HighlightPredicate.NEVER, all.getHighlightPredicate());
+        assertEquals(mattePainter, all.getPainter());
+        PainterHighlighter allOld = new PainterHighlighter(mattePainter, HighlightPredicate.NEVER);
         assertEquals(HighlightPredicate.NEVER, all.getHighlightPredicate());
         assertEquals(mattePainter, all.getPainter());
     }
@@ -160,22 +163,24 @@ public class HighlighterTest extends InteractiveTestCase {
      */
     public void testConstructors() {
         ColorHighlighter empty = new ColorHighlighter();
-        assertColorsAndPredicate(empty, null, null, null, null, HighlightPredicate.ALWAYS);
+        assertColorsAndPredicate(empty, HighlightPredicate.ALWAYS, null, null, null, null);
+        ColorHighlighter predicateOnly = new ColorHighlighter(HighlightPredicate.NEVER);
+        assertColorsAndPredicate(predicateOnly, HighlightPredicate.NEVER, null, null, null, null);
         ColorHighlighter normal = new ColorHighlighter(background, foreground);
-        assertColorsAndPredicate(normal, background, foreground, null, null, HighlightPredicate.ALWAYS);
-        ColorHighlighter normalNever = new ColorHighlighter(background, foreground, 
-                HighlightPredicate.NEVER);
-        assertColorsAndPredicate(normalNever, background, foreground, null, null, HighlightPredicate.NEVER);
+        assertColorsAndPredicate(normal, HighlightPredicate.ALWAYS, background, foreground, null, null);
+        ColorHighlighter normalNever = new ColorHighlighter(HighlightPredicate.NEVER, background, 
+                foreground);
+        assertColorsAndPredicate(normalNever, HighlightPredicate.NEVER, background, foreground, null, null);
         ColorHighlighter full = new ColorHighlighter(background, foreground, 
                 selectedBackground , selectedForeground);
-        assertColorsAndPredicate(full, background, foreground, selectedBackground, selectedForeground, HighlightPredicate.ALWAYS);
-        ColorHighlighter fullNever = new ColorHighlighter(background, foreground, 
-                selectedBackground , selectedForeground, HighlightPredicate.NEVER);
-        assertColorsAndPredicate(fullNever, background, foreground, selectedBackground, selectedForeground, HighlightPredicate.NEVER);
+        assertColorsAndPredicate(full, HighlightPredicate.ALWAYS, background, foreground, selectedBackground, selectedForeground);
+        ColorHighlighter fullNever = new ColorHighlighter(HighlightPredicate.NEVER, background, 
+                foreground , selectedBackground, selectedForeground);
+        assertColorsAndPredicate(fullNever, HighlightPredicate.NEVER, background, foreground, selectedBackground, selectedForeground);
     }
     
-    private void assertColorsAndPredicate(ColorHighlighter highlighter, Color background, Color foreground,
-            Color  selectedBackground, Color selectedForeground, HighlightPredicate predicate) {
+    private void assertColorsAndPredicate(ColorHighlighter highlighter, HighlightPredicate predicate, Color background,
+            Color foreground, Color  selectedBackground, Color selectedForeground) {
         assertEquals("background", background, highlighter.getBackground());
         assertEquals("foreground", foreground, highlighter.getForeground());
         assertEquals("selectedbackground", selectedBackground, highlighter.getSelectedBackground());

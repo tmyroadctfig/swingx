@@ -181,10 +181,10 @@ public class RolloverTest extends InteractiveTestCase {
             
         };
         treeTableModel = new FileSystemModel();
-        foregroundHighlighter = new ColorHighlighter(null, Color.MAGENTA,
-                HighlightPredicate.ROLLOVER_ROW);
-        backgroundHighlighter = new ColorHighlighter(Color.YELLOW, null,
-                HighlightPredicate.ROLLOVER_ROW);
+        foregroundHighlighter = new ColorHighlighter(HighlightPredicate.ROLLOVER_ROW, null,
+                Color.MAGENTA);
+        backgroundHighlighter = new ColorHighlighter(HighlightPredicate.ROLLOVER_ROW, Color.YELLOW,
+                null);
      }
     
 

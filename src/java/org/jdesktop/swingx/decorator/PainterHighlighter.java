@@ -53,19 +53,31 @@ public class PainterHighlighter extends AbstractHighlighter {
      * @param painter the painter to use
      */
     public PainterHighlighter(Painter painter) {
-        this(painter, null);
+        this(null, painter);
     }
 
     /**
      * Instantiates a PainterHighlighter with the given painter and 
      * predicate.
-     * 
-     * @param painter
      * @param predicate
+     * @param painter
      */
-    public PainterHighlighter(Painter painter, HighlightPredicate predicate) {
+    public PainterHighlighter(HighlightPredicate predicate, Painter painter) {
         super(predicate);
         setPainter(painter);
+    }
+    
+    /**
+     * Instantiates a PainterHighlighter with the given painter and 
+     * predicate.
+     * @param predicate
+     * @param painter
+     * 
+     * @deprecated use {@link #PainterHighlighter(HighlightPredicate, Painter)}
+     *   changed method signature for consistency.
+     */
+    public PainterHighlighter(Painter painter, HighlightPredicate predicate) {
+        this(predicate, painter);
     }
     
 

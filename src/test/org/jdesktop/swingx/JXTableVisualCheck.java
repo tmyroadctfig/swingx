@@ -1563,8 +1563,8 @@ public class JXTableVisualCheck extends JXTableUnitTest {
 
     public void interactiveTestEditableHighlight() {
         JXTable table = new JXTable(tableModel);
-        table.addHighlighter(new ColorHighlighter(Color.RED, Color.WHITE,
-                HighlightPredicate.EDITABLE));
+        table.addHighlighter(new ColorHighlighter(HighlightPredicate.EDITABLE, Color.RED,
+                Color.WHITE));
         JFrame frame = wrapWithScrollingInFrame(table, "Editability Highlighter Test");
         frame.setVisible(true);
     }

@@ -952,8 +952,8 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
                 new ColumnHighlightPredicate(0));
 
         treeTable.addHighlighter(hl);
-        treeTable.addHighlighter(new ColorHighlighter(null, Color.red, 
-                new PatternPredicate(Pattern.compile("^s", Pattern.CASE_INSENSITIVE), 0)));
+        treeTable.addHighlighter(new ColorHighlighter(new PatternPredicate(Pattern.compile("^s", Pattern.CASE_INSENSITIVE), 0), null, 
+                Color.red));
         // alternative: set a pipeline containing the bunch of highlighters
 //        treeTable.setHighlighters(new CompoundHighlighter(new LegacyHighlighter[] {
 //                AlternateRowHighlighter.quickSilver,
@@ -1065,8 +1065,8 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
             }
             
         };
-        ColorHighlighter highlighter = new ColorHighlighter(new Color(247,246,239),
-                null, new AndHighlightPredicate(hierarchical, predicate));
+        ColorHighlighter highlighter = new ColorHighlighter(new AndHighlightPredicate(hierarchical, predicate),
+                new Color(247,246,239), null);
         treeTable.addHighlighter(highlighter);
         showWithScrollingInFrame(treeTable,
         "HierarchicalColumn And Conditional ");
@@ -1118,7 +1118,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
     
     public void interactiveTestDepthHighlighter() {
         JXTreeTable treeTable = new JXTreeTable(treeTableModel);
-        treeTable.addHighlighter(new ColorHighlighter(Color.MAGENTA, null, new DepthHighlightPredicate(1)));
+        treeTable.addHighlighter(new ColorHighlighter(new DepthHighlightPredicate(1), Color.MAGENTA, null));
         treeTable.setIntercellSpacing(new Dimension(15, 15));
         treeTable.setRowHeight(48);
         JFrame frame = wrapWithScrollingInFrame(treeTable,
@@ -1140,8 +1140,8 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         treeTable.setHighlighters(
                         new ColorHighlighter(Color.orange, null),
                         hl,
-                        new ColorHighlighter(null, Color.red,
-                                new PatternPredicate(Pattern.compile("D"), 0)));
+                        new ColorHighlighter(new PatternPredicate(Pattern.compile("D"), 0), null,
+                                Color.red));
 
         HighlightPredicate predicate = new HighlightPredicate() {
 
@@ -1151,8 +1151,8 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
             
         };
         // add the conditional highlighter laterb
-        treeTable.addHighlighter(new ColorHighlighter(Color.BLUE, Color.WHITE, 
-                new AndHighlightPredicate(predicate, new ColumnHighlightPredicate(0))));
+        treeTable.addHighlighter(new ColorHighlighter(new AndHighlightPredicate(predicate, new ColumnHighlightPredicate(0)), Color.BLUE, 
+                Color.WHITE));
         JFrame frame = wrapWithScrollingInFrame(treeTable, "Highlighters: conditional, orange, hierarchy, pattern D");
         frame.setVisible(true);
     }

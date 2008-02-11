@@ -91,21 +91,6 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
           e.printStackTrace();
       }
   }
-    /**
-     * ColorHighlighter with pattern predicate
-     *  PENDING JW: dummy doing nothing except give me a 
-     *  frame without the "close me" title - Remove again!
-     */
-    public void interactiveTablePatternHighlighterJPDummy() {
-        JXTable table = new JXTable(tableModel);
-        table.setColumnControlVisible(true);
-        table.addHighlighter(HighlighterFactory.createSimpleStriping());
-        Pattern pattern = Pattern.compile("^M", 0);
-        table.addHighlighter(new ColorHighlighter(null, Color.MAGENTA, 
-                new PatternPredicate(pattern, 1)));
-        table.addHighlighter(new ShadingColorHighlighter(new HighlightPredicate.ColumnHighlightPredicate(1)));
-        showWithScrollingInFrame(table, "Multiple Highlighters");
-    }
 
     /**
      * Multiple Highlighters (shown as example in Javapolis 2007).
@@ -122,8 +107,8 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
         Highlighter simpleStriping = HighlighterFactory.createSimpleStriping();
         Pattern pattern = Pattern.compile("^M", 0);
         PatternPredicate patternPredicate = new PatternPredicate(pattern, 1);
-        ColorHighlighter magenta = new ColorHighlighter(null, Color.MAGENTA,
-                null, Color.MAGENTA, patternPredicate);
+        ColorHighlighter magenta = new ColorHighlighter(patternPredicate, null,
+                Color.MAGENTA, null, Color.MAGENTA);
         FontHighlighter derivedFont = new FontHighlighter(font,
                 patternPredicate);
         Highlighter gradient = new ValueBasedGradientHighlighter();
@@ -154,8 +139,8 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
         Highlighter simpleStriping = HighlighterFactory.createSimpleStriping();
         Pattern pattern = Pattern.compile("^M", 0);
         PatternPredicate patternPredicate = new PatternPredicate(pattern, 0);
-        ColorHighlighter magenta = new ColorHighlighter(null, Color.MAGENTA,
-                null, Color.MAGENTA, patternPredicate);
+        ColorHighlighter magenta = new ColorHighlighter(patternPredicate, null,
+                Color.MAGENTA, null, Color.MAGENTA);
         FontHighlighter derivedFont = new FontHighlighter(font,
                 patternPredicate);
         Highlighter gradient = new ValueBasedGradientHighlighter(true);
@@ -259,8 +244,8 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
         }
            
        };
-       final ColorHighlighter highlighter = new ColorHighlighter(Color.YELLOW, null, 
-               HighlightPredicate.NEVER);
+       final ColorHighlighter highlighter = new ColorHighlighter(HighlightPredicate.NEVER, Color.YELLOW, 
+               null);
        JXTable table = new JXTable(model);
        table.addHighlighter(highlighter);
        PropertyChangeListener l = new PropertyChangeListener() {
@@ -309,7 +294,7 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
         // add to a compoundHighlighter
         CompoundHighlighter chl = new CompoundHighlighter();
         for (Color color : colors) {
-            chl.addHighlighter(new ColorHighlighter(color, null, map.get(color)));
+            chl.addHighlighter(new ColorHighlighter(map.get(color), color, null));
         }
         table.resetSortOrder();
         table.addHighlighter(chl);
@@ -382,8 +367,8 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
      */
     public void interactiveSearchPanel() {
         JXTable table = new JXTable(tableModel);
-        final ColorHighlighter cl = new ColorHighlighter(null, Color.RED,
-                new PatternPredicate(null, 0));
+        final ColorHighlighter cl = new ColorHighlighter(new PatternPredicate(null, 0), null,
+                Color.RED);
         table.addHighlighter(cl);
         JXSearchPanel searchPanel = new JXSearchPanel();
         PatternMatcher patternMatcher = new PatternMatcher() {
@@ -425,8 +410,8 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
                 break;
             }
         }
-        ColorHighlighter shader = new ColorHighlighter(Color.WHITE, null,
-                new ColumnHighlightPredicate(hierarchicalColumn)) {
+        ColorHighlighter shader = new ColorHighlighter(new ColumnHighlightPredicate(hierarchicalColumn), Color.WHITE,
+                null) {
 
             @Override
             protected void applyBackground(Component renderer,
@@ -473,7 +458,7 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
         table.setRowHeight(22);
         table.setHighlighters(
             HighlighterFactory.createSimpleStriping(HighlighterFactory.LINE_PRINTER),
-            new ColorHighlighter(Color.YELLOW, null, HighlightPredicate.ROLLOVER_ROW));
+            new ColorHighlighter(HighlightPredicate.ROLLOVER_ROW, Color.YELLOW, null));
         showWithScrollingInFrame(table, "LinePrinter plus yellow rollover");
     }
 
@@ -484,7 +469,7 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
     public void interactiveColumnForeground() {
         JXTable table = new JXTable(tableModel);
         HighlightPredicate predicate = new ColumnHighlightPredicate(1, 3);
-        table.addHighlighter(new ColorHighlighter(null, Color.BLUE, predicate));
+        table.addHighlighter(new ColorHighlighter(predicate, null, Color.BLUE));
         showWithScrollingInFrame(table, "Foreground highlight col 1 and 3");
     }
 
@@ -497,8 +482,8 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
         JXTable table = new JXTable(tableModel);
         table.setColumnControlVisible(true);
         Pattern pattern = Pattern.compile("^M", 0);
-        table.addHighlighter(new ColorHighlighter(null, Color.red, 
-                new PatternPredicate(pattern, 1)));
+        table.addHighlighter(new ColorHighlighter(new PatternPredicate(pattern, 1), null, 
+                Color.red));
         showWithScrollingInFrame(table, "Pattern: highlight row if ^M col 1");
     }
 
@@ -541,7 +526,7 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
             
         };
         ColorHighlighter hl = new ColorHighlighter(
-                null, Color.RED, null, Color.RED, predicate);
+                predicate, null, Color.RED, null, Color.RED);
         // THINK this is possible, but maybe not the correct place 
         // ... more on the what-side of "what vs. how" ?
         Highlighter tl = new AbstractHighlighter(predicate) {
@@ -580,7 +565,7 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
             
         };
         ColorHighlighter hl = new ColorHighlighter(
-                null, Color.RED, null, Color.RED, predicate);
+                predicate, null, Color.RED, null, Color.RED);
         table.setHighlighters(HighlighterFactory.createSimpleStriping(HighlighterFactory.GENERIC_GRAY),
                 hl); //, tl);
         // here: set's value based .. this duplicates logic of 
@@ -630,7 +615,7 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
             }
             
         };
-        ColorHighlighter hl = new ColorHighlighter(null, Color.RED, predicate);
+        ColorHighlighter hl = new ColorHighlighter(predicate, null, Color.RED);
         table.addHighlighter(HighlighterFactory.createSimpleStriping(HighlighterFactory.GENERIC_GRAY));
         table.addHighlighter(hl);
         showWithScrollingInFrame(table, 
@@ -647,7 +632,7 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
     public void interactiveRolloverHighlightCustomCursor() {
         JXTable table = new JXTable(tableModel);
         table.setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
-        table.addHighlighter(new ColorHighlighter(Color.YELLOW, null, HighlightPredicate.ROLLOVER_ROW));
+        table.addHighlighter(new ColorHighlighter(HighlightPredicate.ROLLOVER_ROW, Color.YELLOW, null));
         showWithScrollingInFrame(table, "rollover highlight, custom cursor");
     }
 
@@ -658,7 +643,7 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
      */
     public void interactiveRolloverHighlight() {
         final JXTable table = new JXTable(tableModel);
-        ColorHighlighter colorHighlighter = new ColorHighlighter(Color.YELLOW, null, HighlightPredicate.ROLLOVER_ROW);
+        ColorHighlighter colorHighlighter = new ColorHighlighter(HighlightPredicate.ROLLOVER_ROW, Color.YELLOW, null);
         table.addHighlighter(colorHighlighter);
         Action action = new AbstractAction("toggle table enabled") {
 

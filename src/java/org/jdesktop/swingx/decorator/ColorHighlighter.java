@@ -25,56 +25,65 @@ import java.awt.Color;
 import java.awt.Component;
 
 /**
- * TODO add type doc
+ * A Highlighter to modify component colors. 
  * 
  * @author Jeanette Winzenburg
  */
 public class ColorHighlighter extends AbstractHighlighter {
     
-    private Color background = null;
-    private Color foreground = null;
-    private Color selectedBackground = null;
-    private Color selectedForeground = null;
+    private Color background;
+    private Color foreground;
+    private Color selectedBackground;
+    private Color selectedForeground;
 
     /**
-     * Default constructor for mutable Highlighter.
-     * Initializes colors to null and uses the default predicate.
-     *
+     * Instantiates a ColorHighlighter with null colors and default
+     * HighlightPredicate.
      */
     public ColorHighlighter() {
-        this(null, null);
+        this(null);
     }
 
     /**
-     * Constructs a mutable <code>Highlighter</code> with the specified
-     * background and foreground colors, and null selectedBackground/-foreground.
+     * Instantiates a ColorHighlighter with null colors and uses the
+     * specified HighlightPredicate.
+     * 
+     * @param predicate the HighlightPredicate to use.
+     */
+    public ColorHighlighter(HighlightPredicate predicate) {
+        this(predicate, null, null);
+    }
+
+    /**
+     * Constructs a <code>ColorHighlighter</code> with the specified
+     * background and foreground colors and null section colors. Uses
+     * the default predicate.
      *
      * @param cellBackground background color for unselected cell state
      * @param cellForeground foreground color for unselected cell state
      */
     public ColorHighlighter(Color cellBackground, Color cellForeground) {
-        this(cellBackground, cellForeground, null, null, null);
+        this(null, cellBackground, cellForeground);
     }
 
     /**
-     * Constructs a mutable <code>Highlighter</code> with the specified
-     * unselected 
-     * background/foreground colors and HighlightPredicate. 
+     * Constructs a <code>ColorHighlighter</code> with the specified
+     * unselected colors and HighlightPredicate. 
      * Initializes selected colors to null.
-     *
+     * 
+     * @param predicate the HighlightPredicate to use.
      * @param cellBackground background color for unselected cell state
      * @param cellForeground foreground color for unselected cell state
-     * @param predicate the HighlightPredicate to use.
      */
-    public ColorHighlighter(Color cellBackground, Color cellForeground, 
-            HighlightPredicate predicate) {
-        this(cellBackground, cellForeground, null, null, predicate);
+    public ColorHighlighter(HighlightPredicate predicate, Color cellBackground, 
+            Color cellForeground) {
+        this(predicate, cellBackground, cellForeground, null, null);
     }
-
     
     /**
-     * Constructs a mutable <code>Highlighter</code> with the specified
+     * Constructs a <code>ColorHighlighter</code> with the specified
      * background and foreground colors for unselected and selected cells.
+     * Uses the default HighlightPredicate.
      *
      * @param cellBackground background color for unselected cell state
      * @param cellForeground foreground color for unselected cell state
@@ -83,28 +92,75 @@ public class ColorHighlighter extends AbstractHighlighter {
     */
     public ColorHighlighter(Color cellBackground, Color cellForeground, 
             Color selectedBackground, Color selectedForeground) {
-        this(cellBackground, cellForeground, selectedBackground, selectedForeground, null);
+        this(null, cellBackground, cellForeground, selectedBackground, selectedForeground);
     }
 
+
     /**
-     * Constructs a <code>Highlighter</code> with the specified
-     * background and foreground colors with mutability depending on
-     * given flag.
-     *
+     * Constructs a <code>ColorHighlighter</code> with the specified colors
+     * and HighlightPredicate.
+     * 
+     * @param predicate the HighlightPredicate to use.
      * @param cellBackground background color for unselected cell state
      * @param cellForeground foreground color for unselected cell state
      * @param selectedBackground background color for selected cell state
      * @param selectedForeground foreground color for selected cell state
      */
-    public ColorHighlighter(Color cellBackground, Color cellForeground, 
-            Color selectedBackground, Color selectedForeground, 
-            HighlightPredicate predicate) {
+    public ColorHighlighter(HighlightPredicate predicate, Color cellBackground,
+            Color cellForeground, Color selectedBackground,
+            Color selectedForeground) {
         super(predicate);
-        this.background = cellBackground; 
-        this.foreground = cellForeground; 
+        this.background = cellBackground;
+        this.foreground = cellForeground;
         this.selectedBackground = selectedBackground;
         this.selectedForeground = selectedForeground;
     }
+
+    
+    /**
+     * Constructs a <code>ColorHighlighter</code> with the specified
+     * unselected colors and HighlightPredicate. Initializes selected colors to
+     * null.
+     * 
+     * @param predicate the HighlightPredicate to use.
+     * @param cellBackground background color for unselected cell state
+     * @param cellForeground foreground color for unselected cell state
+     * 
+     * 
+     * @deprecated use
+     *             {@link #ColorHighlighter(HighlightPredicate, Color, Color)}
+     *             changed method signature for consistency.
+     * 
+     */
+    public ColorHighlighter(Color cellBackground, Color cellForeground,
+            HighlightPredicate predicate) {
+        this(predicate, cellBackground, cellForeground, null, null);
+    }
+
+    /**
+     * Constructs a <code>ColorHighlighter</code> with the specified colors
+     * and HighlightPredicate.
+     * 
+     * @param predicate the HighlightPredicate to use.
+     * @param cellBackground background color for unselected cell state
+     * @param cellForeground foreground color for unselected cell state
+     * @param selectedBackground background color for selected cell state
+     * @param selectedForeground foreground color for selected cell state
+     * @deprecated use
+     *             {@link #ColorHighlighter(HighlightPredicate, Color, Color, Color, Color)}
+     *             changed method signature for consistency.
+     * 
+     */
+    public ColorHighlighter(Color cellBackground, Color cellForeground,
+            Color selectedBackground, Color selectedForeground,
+            HighlightPredicate predicate) {
+        super(predicate);
+        this.background = cellBackground;
+        this.foreground = cellForeground;
+        this.selectedBackground = selectedBackground;
+        this.selectedForeground = selectedForeground;
+    }
+    
 
     /**
      * {@inheritDoc}
@@ -157,9 +213,9 @@ public class ColorHighlighter extends AbstractHighlighter {
 //---------------------- state
     
     /**
-     * Returns the background color of this <code>LegacyHighlighter</code>.
+     * Returns the background color of this <code>ColorHighlighter</code>.
      *
-     * @return the background color of this <code>LegacyHighlighter</code>,
+     * @return the background color of this <code>ColorHighlighter</code>,
      *          or null, if no background color has been set
      */
     public Color getBackground() {
@@ -167,23 +223,21 @@ public class ColorHighlighter extends AbstractHighlighter {
     }
 
     /**
-     * Sets the background color of this <code>LegacyHighlighter</code> and 
-     * notifies registered ChangeListeners if this
-     * is mutable. Does nothing if immutable.
+     * Sets the background color of this <code>ColorHighlighter</code> and 
+     * notifies registered ChangeListeners.
      *  
-     * @param color the background color of this <code>LegacyHighlighter</code>,
+     * @param color the background color of this <code>Highlighter</code>,
      *          or null, to clear any existing background color
      */
     public void setBackground(Color color) {
-//        if (isImmutable()) return;
         background = color;
         fireStateChanged();
     }
 
     /**
-     * Returns the foreground color of this <code>LegacyHighlighter</code>.
+     * Returns the foreground color of this <code>ColorHighlighter</code>.
      *
-     * @return the foreground color of this <code>LegacyHighlighter</code>,
+     * @return the foreground color of this <code>ColorHighlighter</code>,
      *          or null, if no foreground color has been set
      */
     public Color getForeground() {
@@ -191,23 +245,21 @@ public class ColorHighlighter extends AbstractHighlighter {
     }
 
     /**
-     * Sets the foreground color of this <code>LegacyHighlighter</code> and notifies
-     * registered ChangeListeners if this is mutable. Does nothing if 
-     * immutable.
+     * Sets the foreground color of this <code>ColorHighlighter</code> and notifies
+     * registered ChangeListeners.
      *
-     * @param color the foreground color of this <code>LegacyHighlighter</code>,
+     * @param color the foreground color of this <code>ColorHighlighter</code>,
      *          or null, to clear any existing foreground color
      */
     public void setForeground(Color color) {
-//        if (isImmutable()) return;
         foreground = color;
         fireStateChanged();
     }
 
     /**
-     * Returns the selected background color of this <code>LegacyHighlighter</code>.
+     * Returns the selected background color of this <code>ColorHighlighter</code>.
      *
-     * @return the selected background color of this <code>LegacyHighlighter</code>,
+     * @return the selected background color of this <code>ColorHighlighter</code>,
      *          or null, if no selected background color has been set
      */
     public Color getSelectedBackground() {
@@ -215,23 +267,21 @@ public class ColorHighlighter extends AbstractHighlighter {
     }
 
     /**
-     * Sets the selected background color of this <code>LegacyHighlighter</code>
-     * and notifies registered ChangeListeners if this is mutable. Does nothing
-     * if immutable.
+     * Sets the selected background color of this <code>ColorHighlighter</code>
+     * and notifies registered ChangeListeners.
      *
-     * @param color the selected background color of this <code>LegacyHighlighter</code>,
+     * @param color the selected background color of this <code>ColorHighlighter</code>,
      *          or null, to clear any existing selected background color
      */
     public void setSelectedBackground(Color color) {
-//        if (isImmutable()) return;
         selectedBackground = color;
         fireStateChanged();
     }
 
     /**
-     * Returns the selected foreground color of this <code>LegacyHighlighter</code>.
+     * Returns the selected foreground color of this <code>ColorHighlighter</code>.
      *
-     * @return the selected foreground color of this <code>LegacyHighlighter</code>,
+     * @return the selected foreground color of this <code>ColorHighlighter</code>,
      *          or null, if no selected foreground color has been set
      */
     public Color getSelectedForeground() {
@@ -239,15 +289,13 @@ public class ColorHighlighter extends AbstractHighlighter {
     }
 
     /**
-     * Sets the selected foreground color of this <code>LegacyHighlighter</code> and
-     * notifies registered ChangeListeners if this is mutable. Does nothing if
-     * immutable.
+     * Sets the selected foreground color of this <code>ColorHighlighter</code> and
+     * notifies registered ChangeListeners.
      *
-     * @param color the selected foreground color of this <code>LegacyHighlighter</code>,
+     * @param color the selected foreground color of this <code>ColorHighlighter</code>,
      *          or null, to clear any existing selected foreground color
      */
     public void setSelectedForeground(Color color) {
-//        if (isImmutable()) return;
         selectedForeground = color;
         fireStateChanged();
     }

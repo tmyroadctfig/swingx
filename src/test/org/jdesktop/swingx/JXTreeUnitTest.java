@@ -176,7 +176,7 @@ public class JXTreeUnitTest extends InteractiveTestCase {
         TreeCellRenderer renderer = tree.getCellRenderer();
         renderer.getTreeCellRendererComponent(tree, "dummy", false, false, false, -1, false);
         SearchPredicate predicate = new SearchPredicate(Pattern.compile("\\QNode\\E"));
-        Highlighter searchHighlighter = new ColorHighlighter(null, Color.RED, predicate);
+        Highlighter searchHighlighter = new ColorHighlighter(predicate, null, Color.RED);
         tree.addHighlighter(searchHighlighter);
         renderer.getTreeCellRendererComponent(tree, "dummy", false, false, false, -1, false);
     }
@@ -197,7 +197,7 @@ public class JXTreeUnitTest extends InteractiveTestCase {
         TreeCellRenderer renderer = tree.getCellRenderer();
         renderer.getTreeCellRendererComponent(tree, "dummy", false, false, false, tree.getRowCount(), false);
         SearchPredicate predicate = new SearchPredicate(Pattern.compile("\\QNode\\E"));
-        Highlighter searchHighlighter = new ColorHighlighter(null, Color.RED, predicate);
+        Highlighter searchHighlighter = new ColorHighlighter(predicate, null, Color.RED);
         tree.addHighlighter(searchHighlighter);
         renderer.getTreeCellRendererComponent(tree, "dummy", false, false, false, tree.getRowCount(), false);
     }

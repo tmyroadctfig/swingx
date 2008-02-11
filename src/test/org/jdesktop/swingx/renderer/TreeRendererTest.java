@@ -210,8 +210,8 @@ public class TreeRendererTest extends InteractiveTestCase {
         };
         tree.setCellRenderer(new DefaultTreeRenderer(converter));
         JXTree xtree = new JXTree(model);
-        xtree.setHighlighters(new ColorHighlighter(Color.RED, Color.YELLOW,
-                HighlightPredicate.ROLLOVER_ROW));
+        xtree.setHighlighters(new ColorHighlighter(HighlightPredicate.ROLLOVER_ROW, Color.RED,
+                Color.YELLOW));
         xtree.setRolloverEnabled(true);
         // share renderer
         xtree.setCellRenderer(tree.getCellRenderer());
