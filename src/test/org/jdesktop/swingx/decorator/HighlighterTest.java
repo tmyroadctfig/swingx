@@ -74,7 +74,7 @@ public class HighlighterTest extends InteractiveTestCase {
     }
 
 //-------------------PainterHighlighter
-    
+    @SuppressWarnings("deprecation")
     public void testPainterHighlighterConstructors() {
         PainterHighlighter hl = new PainterHighlighter();
         assertEquals(HighlightPredicate.ALWAYS, hl.getHighlightPredicate());
@@ -87,8 +87,8 @@ public class HighlighterTest extends InteractiveTestCase {
         assertEquals(HighlightPredicate.NEVER, all.getHighlightPredicate());
         assertEquals(mattePainter, all.getPainter());
         PainterHighlighter allOld = new PainterHighlighter(mattePainter, HighlightPredicate.NEVER);
-        assertEquals(HighlightPredicate.NEVER, all.getHighlightPredicate());
-        assertEquals(mattePainter, all.getPainter());
+        assertEquals(HighlightPredicate.NEVER, allOld.getHighlightPredicate());
+        assertEquals(mattePainter, allOld.getPainter());
     }
     
     public void testPainterHighlighterSetPainterAndNotificatioon() {
@@ -155,7 +155,19 @@ public class HighlighterTest extends InteractiveTestCase {
         assertEquals(selectedBackground, allColored.getBackground());
     }
     
+
+//------------------ ShadingColorHighlighter
     
+    public void testShadingConstructors() {
+        ShadingColorHighlighter shading = new ShadingColorHighlighter();
+        assertColorsAndPredicate(shading, HighlightPredicate.ALWAYS, null, null, null, null);
+        ShadingColorHighlighter never = new ShadingColorHighlighter(HighlightPredicate.NEVER);
+        assertColorsAndPredicate(never, HighlightPredicate.NEVER, null, null, null, null);
+    }
+    
+    public void testShadingEffect() {
+        
+    }
 //----------------------- Colorhighlighter constructors
  
     /**
