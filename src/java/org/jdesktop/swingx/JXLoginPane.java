@@ -94,11 +94,11 @@ import org.jdesktop.swingx.plaf.UIManagerExt;
 import org.jdesktop.swingx.util.WindowUtils;
 
 /**
- *  <p>JXLoginPane is a JPanel that implements a Login dialog with
+ *  <p>JXLoginPane is a specialized JPanel that implements a Login dialog with
  *  support for saving passwords supplied for future use in a secure
- *  manner. It is intended to work with <strong>LoginService</strong>
- *  and <strong>PasswordStore</strong> to implement the
- *  authentication.</p>
+ *  manner. <strong>LoginService</strong> is invoked to perform authentication
+ *  and optional <strong>PasswordStore</strong> can be provided to store the user 
+ *  login information.</p>
  *
  *  <p> In order to perform the authentication, <strong>JXLoginPane</strong>
  *  calls the <code>authenticate</code> method of the <strong>LoginService
@@ -109,7 +109,18 @@ import org.jdesktop.swingx.util.WindowUtils;
  *  is not saved. Similarly, if a <strong>PasswordStore</strong> is
  *  supplied and the password is null, then the <strong>PasswordStore</strong>
  *  will be queried for the password using the <code>get</code> method.
- *
+ *  
+ *  Example:
+ *  <code><pre>
+ *         final JXLoginPane panel = new JXLoginPane(new LoginService() {
+ *                      public boolean authenticate(String name, char[] password,
+ *                                      String server) throws Exception {
+ *                              // perform authentication and return true on success.
+ *                              return false;
+ *                      }});
+ *      final JFrame frame = JXLoginPane.showLoginFrame(panel);
+ * </pre></code>
+ * 
  * @author Bino George
  * @author Shai Almog
  * @author rbair
@@ -1047,7 +1058,9 @@ public class JXLoginPane extends JXImagePanel {
     /**
      * Initiates the login procedure. This method is called internally by
      * the LoginAction. This method handles cursor management, and actually
-     * calling the LoginService's startAuthentication method.
+     * calling the LoginService's startAuthentication method. Method will return 
+     * immediately if asynchronous login is enabled or will block until 
+     * authentication finishes if <code>getSynchronous()</code> returns true.
      */
     protected void startLogin() {
         oldCursor = getCursor();
@@ -1069,7 +1082,11 @@ public class JXLoginPane extends JXImagePanel {
     
     /**
      * Cancels the login procedure. Handles cursor management and interfacing
-     * with the LoginService's cancelAuthentication method
+     * with the LoginService's cancelAuthentication method. Calling this method 
+     * has an effect only when authentication is still in progress (i.e. after 
+     * previous call to <code>startAuthentications()</code> and only when 
+     * authentication is performed asynchronously (<code>getSynchronous()</code> 
+     * returns false).
      */
     protected void cancelLogin() {
         progressMessageLabel.setText(UIManagerExt.getString(CLASS_NAME + ".cancelWait", getLocale()));
