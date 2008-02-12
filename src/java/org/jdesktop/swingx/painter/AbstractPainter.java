@@ -38,7 +38,7 @@ import org.jdesktop.swingx.graphics.GraphicsUtilities;
  * toggle whether a subclass paints or not via the <code>visibility</code> property.</p>
  *
  * <p>Subclasses of <code>AbstractPainter</code> generally need only override the
- * {@link #doPaint(Graphics2D, Object, int, int)} method. If a subclass requires more control
+ * {@link doPaint(Graphics2D, T, int, int)} method. If a subclass requires more control
  * over whether cacheing is enabled, or for configuring the graphics state, then it
  * may override the appropriate protected methods to interpose its own behavior.</p>
  * 
@@ -87,6 +87,7 @@ public abstract class AbstractPainter<T> extends AbstractBean implements Painter
      * The cached image, if shouldUseCache() returns true
      */
     private transient SoftReference<BufferedImage> cachedImage;
+    private boolean cacheCleared = true;
     private boolean cacheable = false;
     private boolean dirty = false;
     private BufferedImageOp[] filters = new BufferedImageOp[0];
@@ -253,7 +254,10 @@ public abstract class AbstractPainter<T> extends AbstractBean implements Painter
         if (cache != null) {
             cache.flush();
         }
-        cachedImage = null;
+        cacheCleared = true;
+        if (!isCacheable()) {
+            cachedImage = null;
+        }
     }
 
     /**
@@ -261,8 +265,7 @@ public abstract class AbstractPainter<T> extends AbstractBean implements Painter
      * of this class! This is NOT a bound property
      */
     boolean isCacheCleared() {
-        BufferedImage cache = cachedImage == null ? null : cachedImage.get();
-        return cache == null;
+        return cacheCleared;
     }
 
     /**
@@ -323,7 +326,7 @@ public abstract class AbstractPainter<T> extends AbstractBean implements Painter
      * surface before any painting happens.</p>
      *
      * @param g the graphics surface to configure. This will never be null.
-     * @see #paint(Graphics2D, Object, int, int)
+     * @see #paint(Graphics2D, T, int, int)
      */
     protected void configureGraphics(Graphics2D g) {
         //configure antialiasing
@@ -367,11 +370,29 @@ public abstract class AbstractPainter<T> extends AbstractBean implements Painter
         if (shouldUseCache() || filters.length > 0) {
             validate(obj);
             BufferedImage cache = cachedImage == null ? null : cachedImage.get();
-            if (cache == null || cache.getWidth() != width || cache.getHeight() != height || isDirty()) {
+            boolean invalidCache = null == cache || 
+                                        cache.getWidth() != width || 
+                                        cache.getHeight() != height;
+
+            if (cacheCleared || invalidCache || isDirty()) {
                 //rebuild the cacheable. I do this both if a cacheable is needed, and if any
                 //filters exist. I only *save* the resulting image if caching is turned on
-                cache = GraphicsUtilities.createCompatibleTranslucentImage(width, height);
+                if (invalidCache) {
+                    cache = GraphicsUtilities.createCompatibleTranslucentImage(width, height);
+                }
                 Graphics2D gfx = cache.createGraphics();
+                gfx.setClip(0, 0, width, height);
+
+                if (!invalidCache) {
+                    // If we are doing a repaint, but we didn't have to
+                    // recreate the image, we need to clear it back
+                    // to a fully transparent background.
+                    Composite composite = gfx.getComposite();
+                    gfx.setComposite(AlphaComposite.Clear);
+                    gfx.fillRect(0, 0, width, height);
+                    gfx.setComposite(composite);
+                }
+
                 configureGraphics(gfx);
                 doPaint(gfx, obj, width, height);
                 gfx.dispose();
@@ -383,6 +404,7 @@ public abstract class AbstractPainter<T> extends AbstractBean implements Painter
                 //only save the temporary image as the cacheable if I'm caching
                 if (shouldUseCache()) {
                     cachedImage = new SoftReference<BufferedImage>(cache);
+                    cacheCleared = false;
                 }
             }
 
