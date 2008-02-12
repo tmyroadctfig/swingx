@@ -132,8 +132,8 @@ public class DefaultSelectionMapper implements SelectionMapper {
                 ((DefaultListSelectionModel) viewSelection).moveLeadSelectionIndex(lead);
             } else {
                 // PENDING: not tested, don't have a non-DefaultXX handy
-                viewSelection.removeSelectionInterval(lead, lead);
-                viewSelection.addSelectionInterval(lead, lead);
+//                viewSelection.removeSelectionInterval(lead, lead);
+//                viewSelection.addSelectionInterval(lead, lead);
             }
         } finally {
             setEnabled(true);
