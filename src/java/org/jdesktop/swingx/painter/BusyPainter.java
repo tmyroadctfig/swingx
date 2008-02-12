@@ -573,7 +573,7 @@ public class BusyPainter<T> extends AbstractPainter<T> {
         Direction old = getDirection();
         this.direction = dir;
         if (getDirection() != old && getDirection() != null
-                && !getTrajectory().equals(old)) {
+                && !getDirection().equals(old)) {
             firePropertyChange("direction", old, getDirection());
         }
     }
