@@ -22,6 +22,7 @@
 package org.jdesktop.swingx.plaf;
 
 import java.awt.Component;
+import java.awt.Dimension;
 
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -36,4 +37,5 @@ public abstract class ErrorPaneUI extends PanelUI {
     public abstract JFrame getErrorFrame(Component owner);
     public abstract JDialog getErrorDialog(Component owner);
     public abstract JInternalFrame getErrorInternalFrame(Component owner);
+    public abstract Dimension calculatePreferredSize();
 }
