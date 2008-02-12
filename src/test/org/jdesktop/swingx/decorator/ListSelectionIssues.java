@@ -129,16 +129,61 @@ public class ListSelectionIssues extends TestCase {
      */
     public void testLeadAnchorAfterRemove() {
         ListSelectionModel viewSelectionModel = new DefaultListSelectionModel();
-        int selected = 5;
+        assertLeadAnchorAfterRemoveAll(viewSelectionModel, 5, 5);
+    }
+
+    /**
+     * sanity: understand DefaultListSelectionModel behaviour.
+     * 
+     * behaviour for a single selected and removal of that single selected: 
+     * if "last" selected (==lead/anchor) and removed then the
+     * selection is empty but lead/anchor are on the new "last" row.
+     * 
+     * behaviour for single selected and removal of larger interval: 
+     * anchor/lead moved down by the amount of the range removed.
+     * 
+     * Here: select index 5, remove 0..5 -> lead == -1
+     */
+    public void testLeadAnchorAfterRemoveAll() {
+        ListSelectionModel viewSelectionModel = new DefaultListSelectionModel();
+        assertLeadAnchorAfterRemoveAll(viewSelectionModel, 5, 0);
+    }
+
+    /**
+     * Asserts lead/anchor after removeIndexInterval.
+     * The setup is to select selectedIndex and removes the index interval first..selected.
+     *  
+     * @param viewSelectionModel
+     * @param selected
+     * @param firstOfRemoveInterval
+     */
+    private void assertLeadAnchorAfterRemoveAll(
+            ListSelectionModel viewSelectionModel, int selected, int firstOfRemoveInterval) {
         viewSelectionModel.setSelectionInterval(selected, selected);
         assertEquals(selected, viewSelectionModel.getAnchorSelectionIndex());
         assertEquals(selected, viewSelectionModel.getLeadSelectionIndex());
-        viewSelectionModel.removeIndexInterval(5, 5);
-        int anchor = selected -1;
+        int length = selected - firstOfRemoveInterval + 1;
+        viewSelectionModel.removeIndexInterval(firstOfRemoveInterval, selected);
+        int anchor = selected - length;
         assertTrue(viewSelectionModel.isSelectionEmpty());
         assertEquals(anchor, viewSelectionModel.getAnchorSelectionIndex());
         assertEquals(anchor, viewSelectionModel.getLeadSelectionIndex());
-        
     }
-
+    
+    /**
+     * sanity: understand DefaultListSelectionModel behaviour.
+     * 
+     * behaviour for a single selected and removal of that single selected: 
+     * if "last" selected (==lead/anchor) and removed then the
+     * selection is empty but lead/anchor are on the new "last" row.
+     * 
+     * behaviour for single selected and removal of larger interval: 
+     * anchor/lead moved down by the amount of the range removed.
+     * 
+     * Here: select 0, remove 0..0 --> lead == 0 (expected -1)
+     */
+    public void testLeadAnchorAfterRemoveAll0() {
+        ListSelectionModel viewSelectionModel = new DefaultListSelectionModel();
+        assertLeadAnchorAfterRemoveAll(viewSelectionModel, 0, 0);
+    }
 }
