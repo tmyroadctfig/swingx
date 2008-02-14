@@ -30,6 +30,19 @@ public class SelectionMapperTest extends InteractiveTestCase {
     private TableModel ascendingModel;
     protected ComponentAdapter ascendingModelAdapter;
 
+    
+    public void testLeadRemoveAll() {
+        ListSelectionModel selectionModel = new DefaultListSelectionModel();
+        FilterPipeline pipeline = new FilterPipeline();
+        pipeline.assign(ascendingModelAdapter);
+        SelectionMapper selectionMapper = new DefaultSelectionMapper(pipeline,
+                selectionModel);
+        selectionModel.setSelectionInterval(5, 5);
+        assertEquals(5, selectionModel.getLeadSelectionIndex());
+        selectionMapper.removeIndexInterval(0, 5);
+        pipeline.flush();
+        assertEquals(-1, selectionModel.getLeadSelectionIndex());
+    }
     /**
      * Issue #405-swingx: AIOOB in certain conditions.
      * <p>
@@ -75,7 +88,6 @@ public class SelectionMapperTest extends InteractiveTestCase {
         viewSelectionModel.setValueIsAdjusting(false);
 //        pipeline.flush();
         assertAnchorLeadSynched(anchor, lead, viewSelectionModel, selectionMapper);
-        
     }
     
     public void testAnchorLeadSelection() {

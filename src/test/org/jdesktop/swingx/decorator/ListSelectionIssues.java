@@ -101,8 +101,12 @@ public class ListSelectionIssues extends TestCase {
     /**
      * sanity: understand DefaultListSelectionModel behaviour.
      * 
-     * behaviour: if any selected (==lead/anchor) and selection cleared then the
-     * selection is empty and lead/anchor still on old value.
+     * behaviour for a single selected and removal of that single selected: 
+     * if "last" selected (==lead/anchor) and removed then the
+     * selection is empty but lead/anchor are on the new "last" row.
+     * 
+     * behaviour for single selected and removal of larger interval: 
+     * anchor/lead moved down by the amount of the range removed.
      * 
      *
      */
@@ -123,8 +127,7 @@ public class ListSelectionIssues extends TestCase {
     /**
      * sanity: understand DefaultListSelectionModel behaviour.
      * 
-     * behaviour: if "last" selected (==lead/anchor) and removed then the
-     * selection is empty but lead/anchor are on the new "last" row.
+     * Here: select index 5, remove 5..5 -> lead == 4
      *
      */
     public void testLeadAnchorAfterRemove() {
@@ -135,18 +138,23 @@ public class ListSelectionIssues extends TestCase {
     /**
      * sanity: understand DefaultListSelectionModel behaviour.
      * 
-     * behaviour for a single selected and removal of that single selected: 
-     * if "last" selected (==lead/anchor) and removed then the
-     * selection is empty but lead/anchor are on the new "last" row.
-     * 
-     * behaviour for single selected and removal of larger interval: 
-     * anchor/lead moved down by the amount of the range removed.
      * 
      * Here: select index 5, remove 0..5 -> lead == -1
      */
     public void testLeadAnchorAfterRemoveAll() {
         ListSelectionModel viewSelectionModel = new DefaultListSelectionModel();
         assertLeadAnchorAfterRemoveAll(viewSelectionModel, 5, 0);
+    }
+
+    /**
+     * sanity: understand DefaultListSelectionModel behaviour.
+     * 
+     * 
+     * Here: select 0, remove 0..0 --> lead == 0 (expected -1)
+     */
+    public void testLeadAnchorAfterRemoveAll0() {
+        ListSelectionModel viewSelectionModel = new DefaultListSelectionModel();
+        assertLeadAnchorAfterRemoveAll(viewSelectionModel, 0, 0);
     }
 
     /**
@@ -170,20 +178,4 @@ public class ListSelectionIssues extends TestCase {
         assertEquals(anchor, viewSelectionModel.getLeadSelectionIndex());
     }
     
-    /**
-     * sanity: understand DefaultListSelectionModel behaviour.
-     * 
-     * behaviour for a single selected and removal of that single selected: 
-     * if "last" selected (==lead/anchor) and removed then the
-     * selection is empty but lead/anchor are on the new "last" row.
-     * 
-     * behaviour for single selected and removal of larger interval: 
-     * anchor/lead moved down by the amount of the range removed.
-     * 
-     * Here: select 0, remove 0..0 --> lead == 0 (expected -1)
-     */
-    public void testLeadAnchorAfterRemoveAll0() {
-        ListSelectionModel viewSelectionModel = new DefaultListSelectionModel();
-        assertLeadAnchorAfterRemoveAll(viewSelectionModel, 0, 0);
-    }
 }
