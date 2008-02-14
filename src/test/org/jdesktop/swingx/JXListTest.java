@@ -36,6 +36,7 @@ import org.jdesktop.swingx.decorator.SelectionMapper;
 import org.jdesktop.swingx.decorator.SortKey;
 import org.jdesktop.swingx.decorator.SortOrder;
 import org.jdesktop.swingx.renderer.DefaultListRenderer;
+import org.jdesktop.test.ListDataReport;
 import org.jdesktop.test.PropertyChangeReport;
 
 /**
@@ -48,6 +49,151 @@ public class JXListTest extends InteractiveTestCase {
     protected ListModel listModel;
     protected DefaultListModel ascendingListModel;
 
+    /**
+     * Issue 377-swingx: list with filters enabled fires incorrect events.
+     * 
+     * Here: test single item remove fires interval removed
+     */
+    public void testListDataEventRemove() {
+        JXList list = new JXList(ascendingListModel, true);
+        ListDataReport report = new ListDataReport();
+        list.getModel().addListDataListener(report);
+        // remove row 
+        ascendingListModel.remove(0);
+        assertEquals("list must have fired event", 1, report.getEventCount());
+        assertEquals("list must have fired event of type removed", 
+                1, report.getRemovedEventCount());
+        assertEquals("the index of removed item  ", 0, report.getLastEvent().getIndex0());
+        
+    }
+    
+    /**
+     * Issue 377-swingx: list with filters enabled fires incorrect events.
+     * 
+     * Here: test that a single item removal of a filtered element doesn't fire.
+     */
+    public void testListDataEventRemoveSingleFiltered() {
+        JXList list = new JXList(ascendingListModel, true);
+        assertEquals(20, list.getElementCount());
+        // filter out the first 10
+        list.setFilters(new FilterPipeline(createNumberFilter(10, 100, true)));
+        assertEquals(10, list.getElementCount());
+        ListDataReport report = new ListDataReport();
+        list.getModel().addListDataListener(report);
+        // remove a row which had been filtered 
+        ascendingListModel.remove(0);
+        assertEquals("list must not have fired event for filtered remove", 
+                0, report.getEventCount());
+    }
+    /**
+     * Issue 377-swingx: list with filters enabled fires incorrect events.
+     * 
+     * Here: test that a removing a interval which is partly filtered maps
+     *   correctly to the visible interval.
+     *   
+     */
+    public void testListDataEventRemoveCutIntervalFiltered() {
+        JXList list = new JXList(ascendingListModel, true);
+        assertEquals(20, list.getElementCount());
+        // filter out the first 10
+        list.setFilters(new FilterPipeline(createNumberFilter(10, 100, true)));
+        assertEquals(10, list.getElementCount());
+        assertEquals(10, list.getElementAt(0));
+        ListDataReport report = new ListDataReport();
+        list.getModel().addListDataListener(report);
+        // remove a row which had been filtered 
+        ascendingListModel.removeRange(8, 12);
+        assertEquals(7, ascendingListModel.get(7));
+        assertEquals(13, ascendingListModel.get(8));
+        assertEquals("list must have fired event", 1, report.getEventCount());
+        assertEquals("list must have fired event of type removed", 
+                1, report.getRemovedEventCount());
+        assertEquals("first removed index ", 0, report.getLastRemovedEvent().getIndex0());
+        assertEquals("last removed index", 2, report.getLastRemovedEvent().getIndex1());
+    }
+    
+    /**
+     * Issue 377-swingx: list with filters enabled fires incorrect events.
+     * 
+     * Here: a removing a interval including all unfiltered value
+     *   
+     */
+    public void testListDataEventRemoveIntervalFilteredAll() {
+        JXList list = new JXList(ascendingListModel, true);
+        assertEquals(20, list.getElementCount());
+        // filter out the first 7 and last 7
+        list.setFilters(new FilterPipeline(createNumberFilter(8, 12, true)));
+        assertEquals(5, list.getElementCount());
+        assertEquals(8, list.getElementAt(0));
+        ListDataReport report = new ListDataReport();
+        list.getModel().addListDataListener(report);
+        // remove a row which had been filtered 
+        ascendingListModel.removeRange(7, 12);
+        assertEquals(0, list.getElementCount());
+        assertEquals(14, ascendingListModel.getSize());
+        assertEquals("list must have fired event", 1, report.getEventCount());
+        assertEquals("list must have fired event of type removed", 
+                1, report.getRemovedEventCount());
+        assertEquals("first removed index ", 0, report.getLastRemovedEvent().getIndex0());
+        assertEquals("last removed index", 4, report.getLastRemovedEvent().getIndex1());
+    }
+    
+    /**
+     * Issue 377-swingx: list with filters enabled fires incorrect events.
+     * 
+     * set single item fires contentsChanged with single index.
+     */
+    public void testListDataEventSingleSet() {
+        JXList list = new JXList(ascendingListModel, true);
+        ListDataReport report = new ListDataReport();
+        list.getModel().addListDataListener(report);
+        // sanity
+        assertEquals(0, report.getEventCount());
+        // remove row 
+        ascendingListModel.setElementAt(-1, 0);
+        assertEquals("list must have fired event", 1, report.getEventCount());
+        assertEquals("list must have fired event of type changed", 
+                1, report.getChangedEventCount());
+        assertEquals("changed index ", 0, report.getLastEvent().getIndex1());
+        
+    }
+    
+    /**
+     * Issue 377-swingx: list with filters enabled fires incorrect events.
+     * 
+     * insert fires intervalAdded.
+     */
+    public void testListDataEventAdd() {
+        JXList list = new JXList(ascendingListModel, true);
+        ListDataReport report = new ListDataReport();
+        list.getModel().addListDataListener(report);
+        // remove row 
+        ascendingListModel.insertElementAt(-1, 0);
+        assertEquals("list must have fired event", 1, report.getEventCount());
+        assertEquals("list must have fired event of type added", 
+                1, report.getAddedEventCount());
+        
+    }
+
+
+    /**
+     * Issue 377-swingx: list with filters enabled fires incorrect events.
+     * 
+     * event source is the wrapping list model.
+     */
+    public void testListDataEventSource() {
+        JXList list = new JXList(ascendingListModel, true);
+        ListDataReport report = new ListDataReport();
+        list.getModel().addListDataListener(report);
+        // some change
+        ascendingListModel.insertElementAt(-1, 0);
+        assertEquals("list must have fired event", 1, report.getEventCount());
+        assertEquals("list must have fired event of type changed", 
+                list.getModel(), report.getLastEvent().getSource());
+        
+    }
+
+    
     /**
      * Issue #477-swingx: list with filter not updated after setModel.
      * 
@@ -561,6 +707,91 @@ public class JXListTest extends InteractiveTestCase {
         }
     }
 
+    
+    /**
+     * test if selection is kept after deleting a row above the
+     * selected.
+     * 
+     * This fails after quick fix for #370-swingx. 
+     *
+     */
+    public void testSelectionAfterAddAtFirst() {
+        JXList list = new JXList(ascendingListModel, true);
+        // selecte second row
+        list.setSelectedIndex(0);
+        Object oldFirst = list.getElementAt(0);
+        Object newFirst = new Integer(-1);
+        // add first 
+        ascendingListModel.insertElementAt(newFirst, 0);
+        // sanity
+        assertEquals(newFirst, list.getElementAt(0));
+        assertEquals(oldFirst, list.getElementAt(1));
+        assertEquals("first row must be selected inserting new first", 
+                0, list.getSelectedIndex());
+    }
+
+    /**
+     * sanity test: compare table with list behaviour (#377-swingx)
+     * 
+     */
+    public void testSelectionAfterAddAtFirstCompareTable() {
+        DefaultTableModel ascendingModel = new DefaultTableModel(20, 2);
+        JXTable table = new JXTable(ascendingModel);
+        // select second row
+        table.setRowSelectionInterval(0, 0);
+        // remove first
+        ascendingModel.addRow(new Object[]{"", ""});
+        assertEquals("second row must be selected after adding new first", 
+                0, table.getSelectedRow());
+        
+    }
+
+    /**
+     * test if selection is kept after deleting a row above the
+     * selected.
+     * 
+     * This fails after quick fix for #370-swingx. 
+     *
+     */
+    public void testSelectionAfterAddAbove() {
+        JXList list = new JXList(ascendingListModel, true);
+        // selecte second row
+        list.setSelectedIndex(1);
+        Object oldFirst = list.getElementAt(1);
+        Object newFirst = new Integer(-1);
+        // add first 
+        ascendingListModel.insertElementAt(newFirst, 0);
+        // sanity
+        assertEquals(newFirst, list.getElementAt(0));
+        assertEquals(oldFirst, list.getElementAt(2));
+        assertEquals("second row must be selected inserting new first", 
+                2, list.getSelectedIndex());
+    }
+
+    /**
+     * Issue #223
+     * test if selection is updated on add row above selection.
+     *
+     */
+    public void testAddRowAboveSelectionInvertedOrder() {
+        JXList table = new JXList(ascendingListModel, true);
+        // select the last row in view coordinates
+        int selectedRow = table.getElementCount() - 1;
+        table.setSelectedIndex(selectedRow);
+        // set a pipeline - ascending, no change
+        table.toggleSortOrder();
+        // revert order 
+        table.toggleSortOrder();
+        assertEquals("first row must be selected", 0, table.getSelectedIndex());
+        // remove row in model coordinates
+        // insert high value
+        Object row = new Integer(100);
+        ascendingListModel.addElement(row);
+        // selection must be moved one below
+        assertEquals("selection must be incremented by one ", 1, table.getSelectedIndex());
+        
+    }
+
     /**
      * test if selection is kept after deleting a row above the
      * selected.
@@ -578,7 +809,6 @@ public class JXListTest extends InteractiveTestCase {
                 0, list.getSelectedIndex());
         
     }
-    
     /**
      * sanity test: compare table with list behaviour (#370-swingx)
      * 
@@ -627,6 +857,32 @@ public class JXListTest extends InteractiveTestCase {
         return model;
     }
 
+    /**
+     * Creates and returns a number filter, passing values which are numbers and
+     * have int values inside or outside of the bounds (included), depending on the given 
+     * flag.
+     * 
+     * @param lowerBound
+     * @param upperBound
+     * @param inside 
+     * @return
+     */
+    protected Filter createNumberFilter(final int lowerBound, final int upperBound, final boolean inside) {
+        PatternFilter f = new PatternFilter() {
+
+            @Override
+            public boolean test(int row) {
+                Object value = getInputValue(row, getColumnIndex());
+                if (!(value instanceof Number)) return false;
+                boolean isInside = ((Number) value).intValue() >= lowerBound 
+                    && ((Number) value).intValue() <= upperBound;
+                return inside ? isInside : !isInside;
+            }
+            
+        };
+        return f;
+    }
+    
     protected void setUp() throws Exception {
         super.setUp();
         listModel = createListModel();

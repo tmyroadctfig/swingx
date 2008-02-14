@@ -26,6 +26,7 @@ import java.awt.Cursor;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -887,12 +888,15 @@ public class JXList extends JList {
         private ListModel delegate;
 
         private ListDataListener listDataListener;
+        private Point OUTSIDE = new Point(-1, -1);
+        protected boolean ignoreFilterContentChanged;
 
         public WrappingListModel(ListModel model) {
             setModel(model);
         }
 
         public void updateOnFilterContentChanged() {
+            if (ignoreFilterContentChanged) return;
             fireContentsChanged(this, -1, -1);
 
         }
@@ -922,25 +926,151 @@ public class JXList extends JList {
         private ListDataListener createListDataListener() {
             return new ListDataListener() {
                 public void intervalAdded(ListDataEvent e) {
-                    contentsChanged(e);
-                }
-
-                public void intervalRemoved(ListDataEvent e) {
-                    contentsChanged(e);
-                }
-
-                public void contentsChanged(ListDataEvent e) {
                     boolean wasEnabled = getSelectionMapper().isEnabled();
                     getSelectionMapper().setEnabled(false);
                     try {
-                    fireContentsChanged(this, -1, -1);
-                    updateSelection(e);
+                        updateSelection(e);
+                        refireIntervalAdded(e);
                     } finally {
                         getSelectionMapper().setEnabled(wasEnabled);
                     }
+                    ignoreFilterContentChanged = true;
                     getFilters().flush();
+                    ignoreFilterContentChanged = false;
+                }
+
+                public void intervalRemoved(ListDataEvent e) {
+                    boolean wasEnabled = getSelectionMapper().isEnabled();
+                    getSelectionMapper().setEnabled(false);
+                    try {
+                        updateSelection(e);
+                        refireIntervalRemoved(e);
+                    } finally {
+                        getSelectionMapper().setEnabled(wasEnabled);
+                    }
+                    ignoreFilterContentChanged = true;
+                    getFilters().flush();
+                    ignoreFilterContentChanged = false;
+                }
+
+                public void contentsChanged(ListDataEvent e) {
+                    updateInternals(e);
+                    refireContentsChanged(e);
                 }
             };
+        }
+
+        /**
+         * Refires the received event. Tries its best to map to the new
+         * coordinates. At this point, the internals (selection, filter) are
+         * updated, so it's safe to use the conversion methods.
+         * 
+         * @param e the ListDataEvent received from the wrapped model.
+         */
+        private void refireContentsChanged(ListDataEvent e) {
+            // quick check for single item removal
+            if ((e.getIndex0() >= 0) 
+                && (e.getIndex0() == e.getIndex1())) {
+                // single outside - no notification
+                int viewIndex = convertIndexToView(e.getIndex0());
+                if (viewIndex == -1) return;
+                fireContentsChanged(this, viewIndex, viewIndex);
+            } else if (e.getIndex0() >= 0) {
+                // PENDING JW: narrow the interval bounds
+                fireContentsChanged(this, 0, getSize());
+            } else {
+                fireContentsChanged(this, -1, -1);
+            }
+        }
+
+        /**
+         * Refires the received event. Tries its best to map to the new
+         * coordinates. 
+         * 
+         * @param e the ListDataEvent received from the wrapped model.
+         */
+        private void refireIntervalRemoved(ListDataEvent e) {
+            // quick check for single item removal
+            if ((e.getIndex0() != - 1) 
+                && (e.getIndex0() == e.getIndex1())) {
+                // single outside - no notification
+                int viewIndex = convertIndexToView(e.getIndex0());
+                if (viewIndex == -1) return;
+                fireIntervalRemoved(this, viewIndex, viewIndex);
+                return;
+            }
+            Point mappedRange = getContinousMappedRange(e);
+            if (mappedRange == null) {
+             // cant help - no support for discontiouns interval remove notification
+                fireContentsChanged(this, -1, -1); 
+            } else if (OUTSIDE == mappedRange) {
+                // do nothing, everything is outside
+            } else {
+                // we could map the continous range in model coordinates to
+                // a continous range in view coordinates
+                fireIntervalRemoved(this, mappedRange.x, mappedRange.y);
+            } 
+        }
+        
+        
+        protected Point getContinousMappedRange(ListDataEvent e) {
+            List<Integer> mapped = new ArrayList<Integer>();
+            for (int i = e.getIndex0(); i <= e.getIndex1(); i++) {
+                int viewIndex = convertIndexToView(i);
+                if (viewIndex >= 0) {
+                    mapped.add(viewIndex);
+                }
+            }
+            if (mapped.size() == 0) return OUTSIDE;
+            if (mapped.size() == 1) return new Point(mapped.get(0), mapped.get(0));
+            Collections.sort(mapped);
+            for (int i = 0; i < mapped.size() - 2; i++) {
+                if (mapped.get(i+1) - mapped.get(i) != 1) return null;
+            }
+            return new Point(mapped.get(0), mapped.get(mapped.size() - 1));
+        }
+
+        /**
+         * Refires the received event. Tries its best to map to the new
+         * coordinates. At this point, the internals (selection, filter) are
+         * updated, so it's safe to use the conversion methods.
+         * 
+         * @param e the ListDataEvent received from the wrapped model.
+         */
+        private void refireIntervalAdded(ListDataEvent e) {
+            // quick check for single item removal
+            if ((e.getIndex0() != - 1) 
+                && (e.getIndex0() == e.getIndex1())) {
+                // single outside - no notification
+                int viewIndex = convertIndexToView(e.getIndex0());
+                if (viewIndex == -1) return;
+                fireIntervalAdded(this, viewIndex, viewIndex);
+                return;
+            }
+            Point mappedRange = getContinousMappedRange(e);
+            if (mappedRange == null) {
+             // cant help - no support for discontiouns interval remove notification
+                fireContentsChanged(this, -1, -1); 
+            } else if (OUTSIDE == mappedRange) {
+                // do nothing, everything is outside
+            } else {
+                // we could map the continous range in model coordinates to
+                // a continous range in view coordinates
+                fireIntervalAdded(this, mappedRange.x, mappedRange.y);
+            } 
+        }
+        
+        private void updateInternals(ListDataEvent e) {
+            boolean wasEnabled = getSelectionMapper().isEnabled();
+            getSelectionMapper().setEnabled(false);
+            try {
+                updateSelection(e);
+            } finally {
+                getSelectionMapper().setEnabled(wasEnabled);
+            }
+            ignoreFilterContentChanged = true;
+            getFilters().flush();
+            ignoreFilterContentChanged = false;
         }
 
         protected void updateSelection(ListDataEvent e) {
@@ -953,7 +1083,7 @@ public class JXList extends JList {
                 int maxIndex = Math.max(e.getIndex0(), e.getIndex1());
                 int length = maxIndex - minIndex + 1;
                 getSelectionMapper().insertIndexInterval(minIndex, length, true);
-            } else {
+            } else if (e.getIndex0() == -1) {
                 getSelectionMapper().clearModelSelection();
             }
 
@@ -970,6 +1100,8 @@ public class JXList extends JList {
         public Object getElementAt(int index) {
             return getFilters().getValueAt(index, 0);
         }
+
+
 
     }
 

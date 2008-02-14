@@ -37,26 +37,7 @@ public class JXListIssues extends JXListTest {
         assertTrue("expected UIResource, but was: " + tree.getCellRenderer().getClass(), 
                 tree.getCellRenderer() instanceof UIResource);
     }
-    /**
-     * Issue 377-swingx: list with filters enabled fires incorrect events.
-     * 
-     * needs a deeper fix: currently the wrapper fires an unspecified 
-     * contentsChange on all events received. What's required is to
-     * map the event indices ... with the usual caveats (not always
-     * possible because continous intervals might map to discontinous).
-     */
-    public void testListDataEvents() {
-        JXList list = new JXList(ascendingListModel, true);
-        ListDataReport report = new ListDataReport();
-        list.getModel().addListDataListener(report);
-        // remove row 
-        ascendingListModel.remove(0);
-        assertEquals("list must have fired event", 1, report.getEventCount());
-        assertEquals("list must have fired event of type removed", 
-                1, report.getRemovedEventCount());
-        
-    }
-    
+
     public void testConvertToViewPreconditions() {
         final JXList list = new JXList(ascendingListModel);
         // a side-effect of setFilterEnabled is to clear the selection!
