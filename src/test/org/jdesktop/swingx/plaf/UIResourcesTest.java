@@ -173,6 +173,25 @@ public class UIResourcesTest extends TestCase {
     }
     
     /**
+     * test that the getInt doesn't choke on non-numbers
+     */
+    public void testGetIntLenientWithUnparseable() {
+        String key = "JXDatePicker.linkFormat";
+        Locale locale = JComponent.getDefaultLocale();
+        String columnString = UIManagerExt.getString(key, locale);
+        if (columnString == null) {
+            LOG.info("cant run test - no resource found for key: "  + key);
+            return;
+        }
+        try {
+            Integer.decode(columnString);
+            LOG.info("cant run test - valid integer: " + columnString);
+        } catch (Exception ex) {
+            // must not bark
+            UIManagerExt.getInt(key, locale);
+        }
+    }
+    /**
      * test that we get an int from the localized resource.
      */
     public void testGetIntFromResource() {

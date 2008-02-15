@@ -259,7 +259,12 @@ public class UIManagerExt {
         }
         Object text = uiDefaultsExt.getFromResourceBundle(key, l);
         if (text instanceof String) {
-            return Integer.decode((String) text);
+            try {
+                return Integer.decode((String) text);
+            } catch (NumberFormatException e) {
+                // ignore - the entry was not parseable, can't do anything
+                // JW: should we log it?
+            }
         }
         return 0;
     }
