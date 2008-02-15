@@ -24,8 +24,12 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Insets;
+import java.util.Locale;
+import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
+import javax.swing.JComponent;
+import javax.swing.UIManager;
 import javax.swing.plaf.UIResource;
 
 import junit.framework.TestCase;
@@ -46,6 +50,10 @@ import org.jdesktop.swingx.plaf.windows.WindowsLookAndFeelAddons;
  * @author Karl George Schaefer
  */
 public class UIResourcesTest extends TestCase {
+    @SuppressWarnings("unused")
+    private static final Logger LOG = Logger.getLogger(UIResourcesTest.class
+            .getName());
+    
     /**
      * {@inheritDoc}
      */
@@ -162,5 +170,45 @@ public class UIResourcesTest extends TestCase {
                 new EmptyIcon()) instanceof UIResource);
         assertTrue(UIManagerExt.getSafeInsets("",
                 new Insets(0, 0, 0, 0)) instanceof UIResource);
+    }
+    
+    /**
+     * test that we get an int from the localized resource.
+     */
+    public void testGetIntFromResource() {
+        String key = "JXDatePicker.numColumns";
+        Locale locale = JComponent.getDefaultLocale();
+        String columnString = UIManagerExt.getString(key, locale);
+        if (columnString == null) {
+            LOG.info("cant run test - no resource found for key: "  + key);
+            return;
+        }
+        Object value = UIManagerExt.getInt(key, locale);
+        assertNotNull(value);
+        assertEquals(Integer.decode(columnString), value);
+    }
+    
+    /**
+     * test that a value in the UIManager is not overwritten.
+     */
+    public void testGetIntUIManagerFirst() {
+        String key = "JXDatePicker.numColumns";
+        Locale locale = JComponent.getDefaultLocale();
+        String columnString = UIManagerExt.getString(key, locale);
+        if (columnString == null) {
+            LOG.info("cant run test - no resource found for key: "  + key);
+            return;
+        }
+        Integer uiInt = UIManager.getInt(key, locale);
+        try {
+            Integer temp = 150;
+            UIManager.put(key, temp);
+            Object value = UIManagerExt.getInt(key, locale);
+            assertNotNull(value);
+            assertEquals(temp, value);
+        } finally  {
+            // restore uimanager
+            UIManager.put(key, uiInt);
+        }
     }
 }

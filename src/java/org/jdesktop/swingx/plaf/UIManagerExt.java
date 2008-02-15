@@ -242,14 +242,35 @@ public class UIManagerExt {
     }
     
     /**
-     * Returns a shape from the defaults. If the value for {@code key} is not
-     * a {@code Shape}, {@code null} is returned.
+     * Returns a int from the defaults. If the value for {@code key} is not a
+     * {@code int}, {@code 0} is returned.
      * 
-     * @param key
-     *                an {@code Object} specifying the shape
+     * @param key an {@code Object} specifying the int
+     * @param l the {@code Locale} for which the int is desired; refer to
+     *        {@code UIDefaults} for details on how a {@code null}
+     *        {@code Locale} is handled
+     * @return the {@code int} object
+     * @throws NullPointerException if {@code key} is {@code null}
+     */
+    public static int getInt(Object key, Locale l) {
+        Object value = UIManager.get(key, l);
+        if (value instanceof Integer) {
+            return (Integer) value;
+        }
+        Object text = uiDefaultsExt.getFromResourceBundle(key, l);
+        if (text instanceof String) {
+            return Integer.decode((String) text);
+        }
+        return 0;
+    }
+    
+    /**
+     * Returns a shape from the defaults. If the value for {@code key} is not a
+     * {@code Shape}, {@code null} is returned.
+     * 
+     * @param key an {@code Object} specifying the shape
      * @return the {@code Shape} object
-     * @throws NullPointerException
-     *                 if {@code key} is {@code null}
+     * @throws NullPointerException if {@code key} is {@code null}
      */
     public static Shape getShape(Object key) {
         Object value = UIManager.getDefaults().get(key);

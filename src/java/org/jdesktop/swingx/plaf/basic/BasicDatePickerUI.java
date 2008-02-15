@@ -76,6 +76,7 @@ import org.jdesktop.swingx.event.DateSelectionEvent;
 import org.jdesktop.swingx.event.DateSelectionListener;
 import org.jdesktop.swingx.event.DateSelectionEvent.EventType;
 import org.jdesktop.swingx.plaf.DatePickerUI;
+import org.jdesktop.swingx.plaf.UIManagerExt;
 
 /**
  * The basic implementation of a <code>DatePickerUI</code>.
@@ -467,7 +468,13 @@ public class BasicDatePickerUI extends DatePickerUI {
     protected JFormattedTextField createEditor(DatePickerFormatter formatter) {
         JFormattedTextField f = new DefaultEditor(formatter);
         f.setName("dateField");
-        f.setColumns(UIManager.getInt("JXDatePicker.numColumns"));
+        // this produces a fixed pref widths, looking a bit funny
+//        int columns = UIManagerExt.getInt("JXDatePicker.numColumns", null);
+//        if (columns > 0) {
+//            f.setColumns(columns);
+//        }
+        // that's always 0 as it comes from the resourcebundle
+//        f.setColumns(UIManager.getInt("JXDatePicker.numColumns"));
         Border border = UIManager.getBorder("JXDatePicker.border");
         if (border != null) {
             f.setBorder(border);
