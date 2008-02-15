@@ -174,6 +174,7 @@ public class JXDialog extends JDialog {
      * PENDING: doesn't make sense - the content is immutable and guaranteed
      * to be not null.
      */
+    @Override
     public void setVisible(boolean visible) {
         if (content == null) throw 
             new IllegalStateException("content must be built before showing the dialog");
@@ -263,6 +264,7 @@ public class JXDialog extends JDialog {
         // PENDING: this is a hack until we have a dedicated ButtonPanel!
         JPanel panel = new JPanel(new BasicOptionPaneUI.ButtonAreaLayout(true, 6))
         {
+            @Override
             public Dimension getMaximumSize() {
                 return getPreferredSize();
             }

@@ -488,6 +488,7 @@ public class ColumnControlButtonTest extends InteractiveTestCase {
         super("ColumnControlButtonTest");
     }
     
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
          sortableTableModel = new AncientSwingTeam();

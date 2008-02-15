@@ -265,6 +265,7 @@ public class LinkModel implements Comparable {
         return text.compareTo(((LinkModel) obj).text);
     }
 
+    @Override
     public boolean equals(Object obj) {
         if (this == obj) {
             return true;

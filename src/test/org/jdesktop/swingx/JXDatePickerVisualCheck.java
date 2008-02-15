@@ -549,6 +549,7 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
         return bar;
     }
     
+    @Override
     public JXFrame wrapInFrame(JComponent component, String title) {
         JXFrame frame = super.wrapInFrame(component, title);
         if (showMenu) {

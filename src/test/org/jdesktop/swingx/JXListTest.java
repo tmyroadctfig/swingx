@@ -883,6 +883,7 @@ public class JXListTest extends InteractiveTestCase {
         return f;
     }
     
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
         listModel = createListModel();

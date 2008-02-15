@@ -424,6 +424,7 @@ public abstract class AbstractPatternPanel extends JXPanel {
     protected void initComponents() {
         searchLabel = new JLabel();
         searchField = new JTextField(getSearchFieldWidth()) {
+            @Override
             public Dimension getMaximumSize() {
                 Dimension superMax = super.getMaximumSize();
                 superMax.height = getPreferredSize().height;

@@ -256,6 +256,7 @@ public abstract class AbstractMutableTreeTableNode implements
      * 
      * @see #getUserObject
      */
+    @Override
     public String toString() {
         if (userObject == null) {
             return null;

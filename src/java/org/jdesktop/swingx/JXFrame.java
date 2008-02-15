@@ -300,6 +300,7 @@ public class JXFrame extends JFrame {
     /**
      * Overloaded to create a JXRootPane.
      */
+    @Override
     protected JRootPane createRootPane() {
         return new JXRootPane();
     }
@@ -307,6 +308,7 @@ public class JXFrame extends JFrame {
     /**
      * Overloaded to make this public.
      */
+    @Override
     public void setRootPane(JRootPane root) {
         super.setRootPane(root);
     }

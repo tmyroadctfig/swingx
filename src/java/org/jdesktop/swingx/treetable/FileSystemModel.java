@@ -119,6 +119,7 @@ public class FileSystemModel extends AbstractTreeTableModel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Class<?> getColumnClass(int column) {
         switch (column) {
         case 0:
@@ -138,6 +139,7 @@ public class FileSystemModel extends AbstractTreeTableModel {
         return 4;
     }
 
+    @Override
     public String getColumnName(int column) {
         switch (column) {
         case 0:
@@ -194,6 +196,7 @@ public class FileSystemModel extends AbstractTreeTableModel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public File getRoot() {
         return (File) root;
     }
@@ -214,6 +217,7 @@ public class FileSystemModel extends AbstractTreeTableModel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isLeaf(Object node) {
         if (node instanceof File) {
             //do not use isFile(); some system files return false

@@ -44,13 +44,15 @@ public class WindowsHyperlinkUI extends BasicHyperlinkUI {
   /**
    * {@inheritDoc}
    */
-  protected void paintButtonPressed(Graphics g, AbstractButton b) {
+  @Override
+protected void paintButtonPressed(Graphics g, AbstractButton b) {
     setTextShiftOffset();
   }
   
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void installDefaults(AbstractButton b) {
         super.installDefaults(b);
         if (b.getBorder() == null || b.getBorder() instanceof UIResource) {

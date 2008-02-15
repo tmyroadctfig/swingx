@@ -408,10 +408,12 @@ public class PatternModel {
      */
     public static class AnchoredSearchMode extends RegexCreator {
         
+        @Override
         public boolean isAutoDetect() {
             return true;
         }
         
+        @Override
         public String createRegEx(String searchExp) {
           if (isAutoDetect()) {
               StringBuffer buf = new StringBuffer(searchExp.length() + 4);

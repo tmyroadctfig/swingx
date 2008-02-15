@@ -532,11 +532,13 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
         columnNames.add("A");
         
         TreeTableModel model = new DefaultTreeTableModel(root, columnNames) {
+            @Override
             public boolean isCellEditable(Object obj,int col) {
                 return true;
               }
                                                                                       
-              public void setValueAt(Object value,Object node,int col) {
+              @Override
+            public void setValueAt(Object value,Object node,int col) {
                   MutableTreeTableNode treeNode = (MutableTreeTableNode) node;
                  treeNode.setUserObject(value);
                  MutableTreeTableNode parent = (MutableTreeTableNode) treeNode.getParent();
@@ -545,7 +547,8 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
                         treeNode);
               }
                                                                                       
-              public Object getValueAt(Object node,int col) {
+              @Override
+            public Object getValueAt(Object node,int col) {
                   return ((DefaultMutableTreeTableNode) node).getUserObject();
               }
             };
@@ -879,6 +882,7 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
         }
 
 
+        @Override
         public int getColumnCount() {
             return 2;
         }
@@ -1125,6 +1129,7 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
     }
 
     // ------------------ init
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
         simpleTreeTableModel = getDefaultTreeTableModel();

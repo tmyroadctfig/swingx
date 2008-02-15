@@ -69,10 +69,12 @@ public class JXDatePickerTest extends InteractiveTestCase {
     
     private Calendar calendar;
 
+    @Override
     public void setUp() {
         calendar = Calendar.getInstance();
     }
 
+    @Override
     public void tearDown() {
     }
 

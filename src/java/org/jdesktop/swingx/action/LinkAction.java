@@ -108,6 +108,7 @@ public abstract class LinkAction<T> extends AbstractActionExt {
         
     }
     
+    @Override
     public void itemStateChanged(ItemEvent e) {
         // do nothing
     }

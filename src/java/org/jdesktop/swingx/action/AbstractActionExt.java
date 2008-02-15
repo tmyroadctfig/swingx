@@ -398,6 +398,7 @@ public abstract class AbstractActionExt extends AbstractAction
         }
     }
 
+    @Override
     public String toString() {
         StringBuffer buffer = new StringBuffer("[");
         // RG: Fix for J2SE 5.0; Can't cascade append() calls because

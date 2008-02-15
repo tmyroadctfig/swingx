@@ -291,6 +291,7 @@ public class JXHyperlinkVisualCheck extends InteractiveTestCase {
                 
             }
             
+            @Override
             protected void installTarget() {
                 setName(getTarget() != null ? getTarget().name : "");
             }

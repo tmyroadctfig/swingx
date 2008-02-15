@@ -256,6 +256,7 @@ public class ColumnHeaderRenderer extends JComponent
         return antiAliasedText;
     }
 
+    @Override
     public void setBackground(Color background) {
         // this is called somewhere along initialization of super?
         if (label != null) {
@@ -263,12 +264,14 @@ public class ColumnHeaderRenderer extends JComponent
         }
     }
 
+    @Override
     public void setForeground(Color foreground) {
          if (label != null) {
             label.setForeground(foreground);
         }
     }
 
+    @Override
     public void setFont(Font font) {
         if (label != null) {
             label.setFont(font);
@@ -346,6 +349,7 @@ public class ColumnHeaderRenderer extends JComponent
         return delegateRenderer;
     }
 
+    @Override
     public void updateUI() {
         super.updateUI();
         initDelegate();

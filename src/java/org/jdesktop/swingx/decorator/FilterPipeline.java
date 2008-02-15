@@ -622,22 +622,27 @@ public class FilterPipeline {
 
     public class IdentityFilter extends Filter {
 
+        @Override
         protected void init() {
 
         }
 
+        @Override
         protected void reset() {
 
         }
 
+        @Override
         protected void filter() {
 
         }
 
+        @Override
         public int getSize() {
             return getInputSize();
         }
 
+        @Override
         protected int mapTowardModel(int row) {
             return row;
         }

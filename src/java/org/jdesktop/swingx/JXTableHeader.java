@@ -258,6 +258,7 @@ public class JXTableHeader extends JTableHeader
      * @see #postUpdateRendererUI(TableCellRenderer)
      * @see ColumnHeaderRenderer
      */
+    @Override
     public void updateUI() {
         TableCellRenderer oldRenderer = preUpdateRendererUI();
         super.updateUI();

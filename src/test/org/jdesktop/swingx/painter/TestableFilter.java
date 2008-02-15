@@ -31,6 +31,7 @@ import java.awt.image.BufferedImage;
  */
 public class TestableFilter extends AbstractFilter {
     boolean filtered = false;
+    @Override
     public BufferedImage filter(BufferedImage src, BufferedImage dest) {
         filtered = true;
         return src;

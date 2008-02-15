@@ -55,6 +55,7 @@ public class AbstractTreeTableModelUnitTest extends TestCase {
             return 0;
         }
 
+        @Override
         public boolean isLeaf(Object node) {
             return false;
         }

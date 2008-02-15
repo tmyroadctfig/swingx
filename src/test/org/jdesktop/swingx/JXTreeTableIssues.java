@@ -595,22 +595,27 @@ public class JXTreeTableIssues extends InteractiveTestCase {
             super(root);
         }
 
+        @Override
         public int getColumnCount() {
             return 1;
         }
 
+        @Override
         public String getColumnName(int column) {
             return "User Object";
         }
 
+        @Override
         public Object getValueAt(Object node, int column) {
             return ((DefaultMutableTreeNode) node).getUserObject();
         }
 
+        @Override
         public boolean isCellEditable(Object node, int column) {
             return true;
         }
 
+        @Override
         public void setValueAt(Object value, Object node, int column) {
             ((MutableTreeTableNode) node).setUserObject(value);
             modelSupport.firePathChanged(new TreePath(getPathToRoot((TreeTableNode) node)));

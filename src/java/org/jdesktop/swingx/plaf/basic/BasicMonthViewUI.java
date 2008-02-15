@@ -231,6 +231,7 @@ public class BasicMonthViewUI extends MonthViewUI {
         return new BasicMonthViewUI();
     }
 
+    @Override
     public void installUI(JComponent c) {
         monthView = (JXMonthView)c;
         monthView.setLayout(createLayoutManager());
@@ -243,6 +244,7 @@ public class BasicMonthViewUI extends MonthViewUI {
         installListeners();
     }
 
+    @Override
     public void uninstallUI(JComponent c) {
         uninstallListeners();
         uninstallKeyboardActions();
@@ -540,6 +542,7 @@ public class BasicMonthViewUI extends MonthViewUI {
      * @return the day at the given location or null if the position
      *   doesn't map to a day
      */ 
+    @Override
     public Date getDayAtLocation(int x, int y) {
         Point dayInGrid = getDayGridPositionAtLocation(x, y);
         if ((dayInGrid == null) || (dayInGrid.x < 0) || (dayInGrid.y < 0)) return null;
@@ -2385,6 +2388,7 @@ public class BasicMonthViewUI extends MonthViewUI {
      * @deprecated use {@link #getDayAtLocation(int, int)} This method is
      * no longer used internally
      */
+    @Override
     public long getDayAt(int x, int y) {
         Date cal = getDayAtLocation(x, y);
         return cal != null ? cal.getTime() : -1;
@@ -2431,6 +2435,7 @@ public class BasicMonthViewUI extends MonthViewUI {
      * ui is responsible to keep the value in a reasonable state to query from
      * the outside. 
      */
+    @Override
     public long calculateLastDisplayedDate() {
         updateLastDisplayedDay(getFirstDisplayedDay());
         // NOTE JW: this is the only place (outside the getter/setter) 

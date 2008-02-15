@@ -113,6 +113,7 @@ public class AncientSwingTeam extends AbstractTableModel {
     }
 
     /** everything is editable. */
+    @Override
     public boolean isCellEditable(int row, int col) {
         return true;
     }
@@ -153,6 +154,7 @@ public class AncientSwingTeam extends AbstractTableModel {
                 return Color.white;
             }
         }
+        @Override
         public String toString() {
             return name;
         }

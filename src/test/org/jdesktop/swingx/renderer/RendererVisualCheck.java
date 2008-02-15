@@ -451,6 +451,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
     @SuppressWarnings("deprecation")
     public void interactiveTableCompareFocusedCellBackground() {
         TableModel model = new AncientSwingTeam() {
+            @Override
             public boolean isCellEditable(int row, int column) {
                 return column != 0;
             }
@@ -987,6 +988,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
         
         Highlighter highlighter = new AbstractHighlighter(predicate) {
 
+            @Override
             public Component doHighlight(Component renderer, ComponentAdapter adapter) {
                 return delegate.highlight(renderer, adapter);
             }

@@ -644,6 +644,7 @@ public class FilterTest extends InteractiveTestCase {
         table.setFilters(pipeline);
     }
     
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
         tableModel = new AncientSwingTeam();

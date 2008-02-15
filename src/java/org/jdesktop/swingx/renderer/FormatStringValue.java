@@ -57,6 +57,7 @@ public class FormatStringValue implements StringValue {
         /**
          * {@inheritDoc}
          */
+        @Override
         public String getString(Object value) {
             if (format == null) {
                 format = DateFormat.getDateInstance();
@@ -75,6 +76,7 @@ public class FormatStringValue implements StringValue {
         /**
          * {@inheritDoc}
          */
+        @Override
         public String getString(Object value) {
             if (format == null) {
                 format = NumberFormat.getNumberInstance();

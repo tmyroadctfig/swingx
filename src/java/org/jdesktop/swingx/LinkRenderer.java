@@ -138,6 +138,7 @@ public class LinkRenderer extends AbstractCellEditor implements
      * 
      * @param linkAction
      */
+    @SuppressWarnings("unchecked")
     public void setLinkAction(LinkAction linkAction, Class targetClass) {
         if (linkAction == null) {
             linkAction = createDefaultLinkAction();

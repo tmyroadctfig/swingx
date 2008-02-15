@@ -152,6 +152,7 @@ public class DefaultTreeTableModel extends AbstractTreeTableModel {
      * @see AbstractTreeTableModel#root
      * @see #setRoot(TreeTableNode)
      */
+    @Override
     public TreeTableNode getRoot() {
         return (TreeTableNode) root;
     }
@@ -223,6 +224,7 @@ public class DefaultTreeTableModel extends AbstractTreeTableModel {
      * {@inheritDoc}
      */
     // Can we make getColumnClass final and avoid the complex DTM copy? -- kgs
+    @Override
     public String getColumnName(int column) {
         // Copied from DefaultTableModel.
         Object id = null;
@@ -303,6 +305,7 @@ public class DefaultTreeTableModel extends AbstractTreeTableModel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isLeaf(Object node) {
         if (!isValidTreeTableNode(node)) {
             throw new IllegalArgumentException(

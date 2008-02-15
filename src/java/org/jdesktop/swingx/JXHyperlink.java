@@ -241,6 +241,7 @@ public class JXHyperlink extends JButton {
      * Create listener that will watch the changes of the provided <code>Action</code>
      * and will update JXHyperlink's properties accordingly.
      */
+    @Override
     protected PropertyChangeListener createActionPropertyChangeListener(
             final Action a) {
         final PropertyChangeListener superListener = super
@@ -288,6 +289,7 @@ public class JXHyperlink extends JButton {
      * Returns a string that specifies the name of the L&F class
      * that renders this component.
      */
+    @Override
     public String getUIClassID() {
         return uiClassID;
     }

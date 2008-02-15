@@ -69,6 +69,7 @@ public class PipelineEvent extends EventObject
      *
      * @return  a string representation of this event.
      */
+    @Override
     public String toString() {
         return getClass().getName() + "[type=" + type + "]";
     }

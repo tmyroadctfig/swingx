@@ -78,6 +78,7 @@ public class JRendererLabel extends JLabel implements PainterAware {
      * PENDING: Think about Painters and opaqueness?
      * 
      */
+    @Override
     public boolean isOpaque() { 
         Color back = getBackground();
         Component p = getParent(); 
@@ -187,6 +188,7 @@ public class JRendererLabel extends JLabel implements PainterAware {
      *
      * @since 1.5
      */
+    @Override
     public void invalidate() {}
 
     /**
@@ -194,6 +196,7 @@ public class JRendererLabel extends JLabel implements PainterAware {
      * See the <a href="#override">Implementation Note</a> 
      * for more information.
      */
+    @Override
     public void validate() {}
 
     /**
@@ -201,6 +204,7 @@ public class JRendererLabel extends JLabel implements PainterAware {
      * See the <a href="#override">Implementation Note</a> 
      * for more information.
      */
+    @Override
     public void revalidate() {}
 
     /**
@@ -208,6 +212,7 @@ public class JRendererLabel extends JLabel implements PainterAware {
      * See the <a href="#override">Implementation Note</a> 
      * for more information.
      */
+    @Override
     public void repaint(long tm, int x, int y, int width, int height) {}
 
     /**
@@ -215,6 +220,7 @@ public class JRendererLabel extends JLabel implements PainterAware {
      * See the <a href="#override">Implementation Note</a> 
      * for more information.
      */
+    @Override
     public void repaint(Rectangle r) { }
 
     /**
@@ -224,6 +230,7 @@ public class JRendererLabel extends JLabel implements PainterAware {
      *
      * @since 1.5
      */
+    @Override
     public void repaint() {
     }
 
@@ -232,6 +239,7 @@ public class JRendererLabel extends JLabel implements PainterAware {
      * See the <a href="#override">Implementation Note</a> 
      * for more information.
      */
+    @Override
     protected void firePropertyChange(String propertyName, Object oldValue, Object newValue) {  
         // Strings get interned...
         if ("text".equals(propertyName)) {
@@ -244,6 +252,7 @@ public class JRendererLabel extends JLabel implements PainterAware {
      * See the <a href="#override">Implementation Note</a> 
      * for more information.
      */
+    @Override
     public void firePropertyChange(String propertyName, boolean oldValue, boolean newValue) { }
 
 

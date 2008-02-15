@@ -44,6 +44,7 @@ public class ShuttleSorter extends Sorter {
         super(col, ascending, comparator);
     }
     
+    @Override
     protected void init() {
         // JW: ?? called from super, so toPrevious is still null after running
         // this method??
@@ -54,6 +55,7 @@ public class ShuttleSorter extends Sorter {
     /**
      * Resets the internal row mappings from this filter to the previous filter.
      */
+    @Override
     protected void reset() {
         int inputSize = getInputSize();
         toPrevious = new int[inputSize];
@@ -69,6 +71,7 @@ public class ShuttleSorter extends Sorter {
      *  
      *  @see #canFilter()
      */
+    @Override
     protected void filter() {
         if (canFilter() ) {
             sort(toPrevious.clone(), toPrevious, 0, toPrevious.length);
@@ -93,10 +96,12 @@ public class ShuttleSorter extends Sorter {
         return adapter != null && (getColumnIndex() < adapter.getColumnCount());
     }
 
+    @Override
     public int getSize() {
         return toPrevious.length;
     }
 
+    @Override
     protected int mapTowardModel(int row) {
         return toPrevious[row];
     }

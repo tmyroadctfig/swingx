@@ -66,6 +66,7 @@ public class ComponentTreeTableModel extends AbstractTreeTableModel {
         return -1;
     }
     
+    @Override
     public boolean isLeaf(Object node) {
         return getChildCount(node) == 0;
     }
@@ -95,6 +96,7 @@ public class ComponentTreeTableModel extends AbstractTreeTableModel {
 
 //------------------ TreeTableModel    
 
+    @Override
     public Class<?> getColumnClass(int column) {
         switch (column) {
         case 0:
@@ -112,6 +114,7 @@ public class ComponentTreeTableModel extends AbstractTreeTableModel {
         return 3;
     }
     
+    @Override
     public String getColumnName(int column) {
         switch (column) {
         case 0:
@@ -151,6 +154,7 @@ public class ComponentTreeTableModel extends AbstractTreeTableModel {
         return column == 0;
     }
 
+    @Override
     public void setValueAt(Object value, Object node, int column) {
         if (!isCellEditable(node, column)) return;
         Component comp = (Component) node;

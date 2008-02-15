@@ -242,6 +242,7 @@ public class JXRootPane extends JRootPane {
              * Although the reference BorderLayout also does this, some VMs
              * throw an IllegalArgumentException.
              */
+            @Override
             public void addLayoutComponent(Component comp, Object constraints) {
                 if (constraints == null) {
                     constraints = BorderLayout.CENTER;
@@ -255,6 +256,7 @@ public class JXRootPane extends JRootPane {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected LayoutManager createRootLayout() {
         return new XRootLayout();
     } 
@@ -285,6 +287,7 @@ public class JXRootPane extends JRootPane {
              * 
              * 
              */
+            @Override
             public boolean isEnabled() {
                 return (cancelButton != null) && (cancelButton.isEnabled());
             }
@@ -437,6 +440,7 @@ public class JXRootPane extends JRootPane {
      *            the menu bar to register
      * @see MouseMessagingHandler
      */
+    @Override
     public void setJMenuBar(JMenuBar menuBar) {
         JMenuBar oldMenuBar = this.menuBar;
 

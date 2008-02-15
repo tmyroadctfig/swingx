@@ -2096,6 +2096,7 @@ public class JXTreeTable extends JXTable {
          * - keyboard triggered click unreliable (triggers the treetable)
          * ...
          */
+        @SuppressWarnings("unused")
         private void bindRollover() {
             setRolloverEnabled(treeTable.isRolloverEnabled());
             treeTable.addPropertyChangeListener(getRolloverListener());
@@ -2152,7 +2153,7 @@ public class JXTreeTable extends JXTable {
                     }
                    return false;
                 }
-
+                @SuppressWarnings("unused")
                 Point rollover = new Point(-1, -1);
             };
             return l;
@@ -2348,6 +2349,7 @@ public class JXTreeTable extends JXTable {
         }
 
         private class ClippedTreeCellRenderer extends DefaultTreeCellRenderer {
+            @SuppressWarnings("unused")
             private boolean inpainting;
             private String shortText;
             @Override

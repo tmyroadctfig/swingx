@@ -37,12 +37,14 @@ public class DatePickerFormatterIssues extends TestCase {
     @SuppressWarnings("unused")
     private Calendar cal;
 
+    @Override
     public void setUp() {
         cal = Calendar.getInstance();
         // force loading of resources
         new JXDatePicker();
     }
 
+    @Override
     public void tearDown() {
     }
     

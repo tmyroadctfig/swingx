@@ -21,15 +21,18 @@
 
 package org.jdesktop.swingx;
 
-import org.jdesktop.swingx.decorator.PatternFilter;
-import org.jdesktop.swingx.decorator.PatternHighlighter;
-import org.jdesktop.swingx.decorator.PatternMatcher;
-
-import javax.swing.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
+
+import javax.swing.ComboBoxModel;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JComboBox;
+
+import org.jdesktop.swingx.decorator.PatternFilter;
+import org.jdesktop.swingx.decorator.PatternHighlighter;
+import org.jdesktop.swingx.decorator.PatternMatcher;
 
 /**
  * Rudimentary search panel.
@@ -93,6 +96,7 @@ public class JXSearchPanel extends AbstractPatternPanel {
      * sets the PatternHighlighter control.
      * 
      * PENDING: change to do a addPatternMatcher to enable multiple control.
+     * PENDING: remove dependency on deprecated highlighter.
      * 
      */
     public void setPatternHighlighter(PatternHighlighter highlighter) {
@@ -149,6 +153,7 @@ public class JXSearchPanel extends AbstractPatternPanel {
     /**
      * 
      */
+    @Override
     public void match() {
         for (Iterator<PatternMatcher> iter = getPatternMatchers().iterator(); iter.hasNext();) {
             iter.next().setPattern(getPattern());

@@ -313,6 +313,7 @@ public class JXTreeUnitTest extends InteractiveTestCase {
     }
 
     
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
         treeTableModel = new FileSystemModel();

@@ -49,6 +49,7 @@ public class RootPaneTest extends TestCase {
     private static final int ARMS = 2;
     private static final int LEGS = 3;
 
+    @Override
     protected void setUp() {
 	actions =  new Action[4];
 	actions[0] = new TestAction("New", 'N', "Create a new item");
@@ -63,6 +64,7 @@ public class RootPaneTest extends TestCase {
 	comps[3] = new TestComponent("Legs");
     }
 
+    @Override
     protected void tearDown() {
 	for (int i = 0; i < actions.length; i++) {
 	    actions[i] = null;
@@ -332,7 +334,8 @@ public class RootPaneTest extends TestCase {
 	    super();
 	}
 
-	protected void initUI() {
+	@Override
+    protected void initUI() {
 	    setBorder(BorderFactory.createTitledBorder("Progress Messages"));
 	    start = new JButton("Start");
 	    start.addActionListener(this);
@@ -373,7 +376,8 @@ public class RootPaneTest extends TestCase {
 
 	    TimerTask task = new TimerTask() {
 		    int progress = start;
-		    public void run() {
+		    @Override
+            public void run() {
 			progress += 10;
 			if (progress > stop) {
 			    support.fireProgressEnded();
@@ -452,7 +456,8 @@ public class RootPaneTest extends TestCase {
 	}
 
 	private class MouseHandler extends MouseAdapter {
-	    public void mouseEntered(MouseEvent evt) {
+	    @Override
+        public void mouseEntered(MouseEvent evt) {
 		sendMessage();
 	    }
 	}

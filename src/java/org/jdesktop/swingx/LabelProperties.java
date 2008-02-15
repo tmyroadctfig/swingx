@@ -149,14 +149,17 @@ public class LabelProperties extends JLabel {
         setText(text);
     }
 
+    @Override
     public boolean isBackgroundSet() {
         return (setFlags & BACKGROUND_SET) > 0;
     }
 
+    @Override
     public boolean isForegroundSet() {
         return (setFlags & FOREGROUND_SET) > 0;
     }
 
+    @Override
     public boolean isFontSet() {
         return (setFlags & FONT_SET) > 0;
     }

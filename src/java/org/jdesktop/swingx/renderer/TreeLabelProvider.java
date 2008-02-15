@@ -154,7 +154,8 @@ public class TreeLabelProvider extends LabelProvider {
         /**
          * Paints the value.  The background is filled based on selected.
          */
-       public void paint(Graphics g) {
+       @Override
+    public void paint(Graphics g) {
             Color bColor = getBackground();
            
 //            if(selected) {
@@ -234,7 +235,8 @@ public class TreeLabelProvider extends LabelProvider {
         * Overrides <code>JComponent.getPreferredSize</code> to
         * return slightly wider preferred size value.
         */
-       public Dimension getPreferredSize() {
+       @Override
+    public Dimension getPreferredSize() {
             Dimension        retDimension = super.getPreferredSize();
 
             if(retDimension != null)

@@ -94,6 +94,7 @@ public class JXFindPanel extends AbstractPatternPanel {
      * When this method is invoked, the chain of parent components is
      * set up with <code>KeyboardAction</code> event listeners.
      */
+    @Override
     public void addNotify() {
         init();
         super.addNotify();
@@ -149,6 +150,7 @@ public class JXFindPanel extends AbstractPatternPanel {
      * Find next/previous match using current setting of direction flag.
      * 
      */
+    @Override
     public void match() {
         doFind();
     }
@@ -261,6 +263,7 @@ public class JXFindPanel extends AbstractPatternPanel {
     /** 
      * Create and initialize components.
      */
+    @Override
     protected void initComponents() {
         super.initComponents();
         wrapCheck = new JCheckBox();

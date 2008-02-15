@@ -127,6 +127,7 @@ public class DatePickerFormatter extends
     /**
      * {@inheritDoc}
      */
+    @Override
     public Object stringToValue(String text) throws ParseException {
         Object result = null;
         ParseException pex = null;
@@ -158,6 +159,7 @@ public class DatePickerFormatter extends
     /**
      * {@inheritDoc}
      */
+    @Override
     public String valueToString(Object value) throws ParseException {
          if ((value != null) && (_formats.length > 0)){
             return _formats[0].format(value);

@@ -513,6 +513,7 @@ public class LegacyHighlighterTest extends InteractiveTestCase {
                 return selected;
             }
 
+            @Override
             public String getColumnName(int columnIndex) {
                 return null;
             }

@@ -413,6 +413,7 @@ public class JXTree extends JTree {
      */
     public class TreeSearchable extends AbstractSearchable {
 
+        @Override
         protected void findMatchAndUpdateState(Pattern pattern, int startRow,
                 boolean backwards) {
             SearchResult searchResult = null;
@@ -430,6 +431,7 @@ public class JXTree extends JTree {
 
         }
 
+        @Override
         protected SearchResult findExtendedMatch(Pattern pattern, int row) {
             return findMatchAt(pattern, row);
         }
@@ -461,6 +463,7 @@ public class JXTree extends JTree {
             return null;
         }
 
+        @Override
         protected int getSize() {
             return getRowCount();
         }
@@ -475,6 +478,7 @@ public class JXTree extends JTree {
         }
         
 
+        @Override
         protected void moveMatchMarker() {
             // the common behaviour (JXList, JXTable) is to not
             // move the selection if not found
@@ -734,6 +738,7 @@ public class JXTree extends JTree {
                       e.getClickCount(), e.isPopupTrigger(), e.getButton()));
             }
 
+            @Override
             protected void updateRolloverPoint(JComponent component,
                     Point mousePoint) {
                 JXTree tree = (JXTree) component;
@@ -781,6 +786,7 @@ public class JXTree extends JTree {
         
 //    -------------------------------------JTree rollover
         
+        @Override
         protected void rollover(Point oldLocation, Point newLocation) {
             // JW: conditional repaint not working?
 //            component.repaint();
@@ -821,6 +827,7 @@ public class JXTree extends JTree {
         }
 
 
+        @Override
         protected RolloverRenderer getRolloverRenderer(Point location, boolean prepare) {
             TreeCellRenderer renderer = component.getCellRenderer();
             RolloverRenderer rollover = renderer instanceof RolloverRenderer 
@@ -839,6 +846,7 @@ public class JXTree extends JTree {
         }
 
 
+        @Override
         protected Point getFocusedCell() {
             // TODO Auto-generated method stub
             return null;
@@ -858,10 +866,23 @@ public class JXTree extends JTree {
     }
 
 
+    /**
+     * {@inheritDoc} <p>
+     * 
+     * Overridden to return the DelegateRenderer which
+     * is wrapped around the actual renderer. 
+     */
+    @Override
     public TreeCellRenderer getCellRenderer() {
         return getDelegatingRenderer();
     }
 
+    /**
+     * {@inheritDoc} <p>
+     * 
+     * Overridden to wrap the given renderer in a DelegateRenderer.
+     */
+    @Override
     public void setCellRenderer(TreeCellRenderer renderer) {
         // PENDING: do something against recursive setting
         // == multiple delegation...

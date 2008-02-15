@@ -164,6 +164,7 @@ public class ButtonProvider extends ComponentProvider<AbstractButton> {
      * Here: set's the buttons horizontal alignment and borderpainted properties
      * to this controller's properties.
      */
+    @Override
     protected void configureState(CellContext context) {
         rendererComponent.setBorderPainted(isBorderPainted());
         rendererComponent.setHorizontalAlignment(getHorizontalAlignment());

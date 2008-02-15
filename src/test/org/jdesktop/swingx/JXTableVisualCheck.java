@@ -849,6 +849,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         public int compareTo(Car o) {
             return speed < o.speed ? -1 : speed > o.speed ? 1 : 0;
         }
+        @Override
         public String toString() {
             return "Car - " + speed;
         }
@@ -860,12 +861,14 @@ public class JXTableVisualCheck extends JXTableUnitTest {
             this(speed); 
             hasBridgeStone = bridgeStone;
         }
+        @Override
         public int compareTo(Car o) {
             if (o instanceof Porsche) {
                 return ((Porsche) o).hasBridgeStone ? 0 : 1; 
             }
             return super.compareTo(o);
         }
+        @Override
         public String toString() {
             return "Porsche - " + speed + (hasBridgeStone ? "+" : "");
         }
@@ -877,6 +880,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         public int compareTo(Tractor o) {
             return speed < o.speed ? -1 : speed > o.speed ? 1 : 0;
         }
+        @Override
         public String toString() {
             return "Tractor - " + speed;
         }
@@ -1254,6 +1258,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         JXTable table = new JXTable(sortableTableModel);
         TableColumn column = table.getColumn("No.");
         TableCellRenderer renderer = new DefaultTableCellRenderer() {
+            @Override
             public Component getTableCellRendererComponent(JTable table, Object value,
                     boolean isSelected, boolean hasFocus, int row, int col) {
                 value = "# " + value ;
@@ -1409,6 +1414,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
     @SuppressWarnings("deprecation")
     public void interactiveTestFocusedCellBackground() {
         TableModel model = new AncientSwingTeam() {
+            @Override
             public boolean isCellEditable(int row, int column) {
                 return column != 0;
             }

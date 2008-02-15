@@ -166,6 +166,7 @@ public class RolloverTest extends InteractiveTestCase {
         frame.setVisible(true);
     }
 
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
         sortableTableModel = new AncientSwingTeam();

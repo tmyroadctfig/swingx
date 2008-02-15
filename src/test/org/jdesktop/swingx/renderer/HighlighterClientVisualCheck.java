@@ -739,6 +739,7 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
     }
 
     
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
          tableModel = new AncientSwingTeam();

@@ -47,6 +47,7 @@ public class CompoundPainterTest extends TestCase {
 
     private TestableCompoundPainter onlyCachedPainters;
     
+    @Override
     public void setUp() {
         img = new BufferedImage(10, 10, BufferedImage.TYPE_INT_ARGB);
         g = img.createGraphics();
@@ -72,6 +73,7 @@ public class CompoundPainterTest extends TestCase {
         onlyCachedPainters.setFilters(f1);
     }
 
+    @Override
     public void tearDown() {
         g.dispose();
         img.flush();
@@ -251,6 +253,7 @@ public class CompoundPainterTest extends TestCase {
     private static final class TestableCompoundPainter extends CompoundPainter {
         boolean painted = false;
         
+        @Override
         protected void doPaint(Graphics2D g, Object obj, int width, int height) {
             painted = true;
             super.doPaint(g, obj, width, height);

@@ -70,6 +70,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
     // calendar default instance init with today
     private Calendar calendar;
 
+    @Override
     public void setUp() {
         calendar = Calendar.getInstance();
         calendar.set(Calendar.HOUR_OF_DAY, 5);
@@ -93,6 +94,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
 //        JComponent.setDefaultLocale(Locale.US);
     }
 
+    @Override
     public void tearDown() {
         JComponent.setDefaultLocale(componentLocale);
     }

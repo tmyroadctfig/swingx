@@ -45,6 +45,7 @@ public final class SortOrder {
         return this == ASCENDING;
     }
     
+    @Override
     public String toString() {
         return name;
     }

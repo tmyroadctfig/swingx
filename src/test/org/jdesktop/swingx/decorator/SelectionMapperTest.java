@@ -179,6 +179,7 @@ public class SelectionMapperTest extends InteractiveTestCase {
 
     
     
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
         ascendingModel = createAscendingModel(0, 20);
@@ -196,6 +197,7 @@ public class SelectionMapperTest extends InteractiveTestCase {
      */
     private DefaultTableModel createAscendingModel(int startRow, int count) {
         DefaultTableModel model = new DefaultTableModel(count, 5) {
+            @Override
             public Class<?> getColumnClass(int column) {
                 return column == 0 ? Integer.class : super.getColumnClass(column);
             }

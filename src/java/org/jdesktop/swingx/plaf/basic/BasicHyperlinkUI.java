@@ -103,6 +103,7 @@ public class BasicHyperlinkUI extends BasicButtonUI {
 			ulv = null;
 		}};
 
+    @Override
     protected void installDefaults(AbstractButton b) {
         super.installDefaults(b);
 
@@ -122,12 +123,14 @@ public class BasicHyperlinkUI extends BasicButtonUI {
         b.setHorizontalAlignment(AbstractButton.LEADING);
     }
 
+    @Override
     protected void installListeners(AbstractButton b) {
         super.installListeners(b);
         b.addMouseListener(handCursorListener);
         b.addPropertyChangeListener(pcListener);
     }
 
+    @Override
     protected void uninstallListeners(AbstractButton b) {
         super.uninstallListeners(b);
         b.removeMouseListener(handCursorListener);
@@ -138,6 +141,7 @@ public class BasicHyperlinkUI extends BasicButtonUI {
         return focusColor;
     }
 
+    @Override
     public void paint(Graphics g, JComponent c) {
         AbstractButton b = (AbstractButton) c;
         ButtonModel model = b.getModel();
@@ -254,6 +258,7 @@ public class BasicHyperlinkUI extends BasicButtonUI {
           (rect.y + rect.height) - descent + 1 + getTextShiftOffset());
     }
 
+    @Override
     protected void paintFocus(Graphics g, AbstractButton b, Rectangle viewRect,
             Rectangle textRect, Rectangle iconRect) {
         if (b.getParent() instanceof JToolBar) {
@@ -269,16 +274,19 @@ public class BasicHyperlinkUI extends BasicButtonUI {
                 width - dashedRectGapWidth, height - dashedRectGapHeight);
     }
 
+    @Override
     protected void paintButtonPressed(Graphics g, AbstractButton b) {
         // setTextShiftOffset();
     }
 
     static class HandCursor extends MouseAdapter {
+        @Override
         public void mouseEntered(MouseEvent e) {
             e.getComponent().setCursor(
                     Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         }
 
+        @Override
         public void mouseExited(MouseEvent e) {
             e.getComponent().setCursor(null);
         }
@@ -340,7 +348,8 @@ public class BasicHyperlinkUI extends BasicButtonUI {
     	/**
     	 * Overriden to return our own slimmed down style sheet.
     	 */
-    	public StyleSheet getStyleSheet() {
+    	@Override
+        public StyleSheet getStyleSheet() {
     	    if (defaultStyles == null) {
     		defaultStyles = new StyleSheet();
     		StringReader r = new StringReader(styleChanges);
@@ -375,6 +384,7 @@ public class BasicHyperlinkUI extends BasicButtonUI {
              * Returns the ViewFactory that is used to make sure the Views don't
              * load in the background.
              */
+            @Override
             public ViewFactory getViewFactory() {
                 return basicHTMLViewFactory;
             }
@@ -386,6 +396,7 @@ public class BasicHyperlinkUI extends BasicButtonUI {
          * synchronously.
          */
         static class BasicHTMLViewFactory extends HTMLEditorKit.HTMLFactory {
+            @Override
             public View create(Element elem) {
                 View view = super.create(elem);
 
@@ -478,6 +489,7 @@ public class BasicHyperlinkUI extends BasicButtonUI {
     	 * level there are no attributes.  If an attribute is resolved
     	 * up the view hierarchy this is the end of the line.
     	 */
+            @Override
             public AttributeSet getAttributes() {
     	    return null;
     	}
@@ -491,6 +503,7 @@ public class BasicHyperlinkUI extends BasicButtonUI {
              *         that is returned, although there is no guarantee.
              *         The parent may choose to resize or break the view.
              */
+            @Override
             public float getPreferredSpan(int axis) {
     	    if (axis == X_AXIS) {
     		// width currently laid out to
@@ -508,6 +521,7 @@ public class BasicHyperlinkUI extends BasicButtonUI {
              *         that is returned, although there is no guarantee.
              *         The parent may choose to resize or break the view.
              */
+            @Override
             public float getMinimumSpan(int axis) {
     	    return view.getMinimumSpan(axis);
             }
@@ -521,6 +535,7 @@ public class BasicHyperlinkUI extends BasicButtonUI {
              *         that is returned, although there is no guarantee.
              *         The parent may choose to resize or break the view.
              */
+            @Override
             public float getMaximumSpan(int axis) {
     	    return Integer.MAX_VALUE;
             }
@@ -543,6 +558,7 @@ public class BasicHyperlinkUI extends BasicButtonUI {
              * @param width true if the width preference has changed
              * @param height true if the height preference has changed
              */ 
+            @Override
             public void preferenceChanged(View child, boolean width, boolean height) {
                 host.revalidate();
     	    host.repaint();
@@ -555,6 +571,7 @@ public class BasicHyperlinkUI extends BasicButtonUI {
              * @return the desired alignment, where 0.0 indicates the origin
              *     and 1.0 the full span away from the origin
              */
+            @Override
             public float getAlignment(int axis) {
     	    return view.getAlignment(axis);
             }
@@ -565,6 +582,7 @@ public class BasicHyperlinkUI extends BasicButtonUI {
              * @param g the graphics context
              * @param allocation the region to render into
              */
+            @Override
             public void paint(Graphics g, Shape allocation) {
     	    Rectangle alloc = allocation.getBounds();
     	    view.setSize(alloc.width, alloc.height);
@@ -576,6 +594,7 @@ public class BasicHyperlinkUI extends BasicButtonUI {
              *
              * @param parent the parent view
              */
+            @Override
             public void setParent(View parent) {
                 throw new Error("Can't set parent on root view");
             }
@@ -588,6 +607,7 @@ public class BasicHyperlinkUI extends BasicButtonUI {
              * @return the number of views
              * @see #getView
              */
+            @Override
             public int getViewCount() {
                 return 1;
             }
@@ -598,6 +618,7 @@ public class BasicHyperlinkUI extends BasicButtonUI {
              * @param n the number of the view to get
              * @return the view
              */
+            @Override
             public View getView(int n) {
                 return view;
             }
@@ -610,6 +631,7 @@ public class BasicHyperlinkUI extends BasicButtonUI {
              * @param a the allocated region to render into
              * @return the bounding box of the given position
              */
+            @Override
             public Shape modelToView(int pos, Shape a, Position.Bias b) throws BadLocationException {
     	    return view.modelToView(pos, a, b);
             }
@@ -633,7 +655,8 @@ public class BasicHyperlinkUI extends BasicButtonUI {
     	 * @exception IllegalArgumentException for an invalid bias argument
     	 * @see View#viewToModel
     	 */
-    	public Shape modelToView(int p0, Position.Bias b0, int p1, 
+    	@Override
+        public Shape modelToView(int p0, Position.Bias b0, int p1, 
     				 Position.Bias b1, Shape a) throws BadLocationException {
     	    return view.modelToView(p0, b0, p1, b1, a);
     	}
@@ -648,6 +671,7 @@ public class BasicHyperlinkUI extends BasicButtonUI {
              * @return the location within the model that best represents the
              *    given point in the view
              */
+            @Override
             public int viewToModel(float x, float y, Shape a, Position.Bias[] bias) {
     	    return view.viewToModel(x, y, a, bias);
             }
@@ -657,6 +681,7 @@ public class BasicHyperlinkUI extends BasicButtonUI {
              *
              * @return the model
              */
+            @Override
             public Document getDocument() {
                 return view.getDocument();
             }
@@ -666,6 +691,7 @@ public class BasicHyperlinkUI extends BasicButtonUI {
              *
              * @return the starting offset
              */
+            @Override
             public int getStartOffset() {
     	    return view.getStartOffset();
             }
@@ -675,6 +701,7 @@ public class BasicHyperlinkUI extends BasicButtonUI {
              *
              * @return the ending offset
              */
+            @Override
             public int getEndOffset() {
     	    return view.getEndOffset();
             }
@@ -684,6 +711,7 @@ public class BasicHyperlinkUI extends BasicButtonUI {
              *
              * @return the view
              */
+            @Override
             public Element getElement() {
     	    return view.getElement();
             }
@@ -694,6 +722,7 @@ public class BasicHyperlinkUI extends BasicButtonUI {
              * @param width the width
              * @param height the height
              */
+            @Override
             public void setSize(float width, float height) {
     	    this.width = (int) width;
     	    view.setSize(width, height);
@@ -707,6 +736,7 @@ public class BasicHyperlinkUI extends BasicButtonUI {
              *
              * @return the container
              */
+            @Override
             public Container getContainer() {
                 return host;
             }
@@ -721,6 +751,7 @@ public class BasicHyperlinkUI extends BasicButtonUI {
              *
              * @return the factory
              */
+            @Override
             public ViewFactory getViewFactory() {
     	    return factory;
             }
