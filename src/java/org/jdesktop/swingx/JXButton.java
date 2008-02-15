@@ -73,10 +73,18 @@ public class JXButton extends JButton {
 
     /** Creates a new instance of JXButton */
     public JXButton() {}
-    public JXButton(String text) { super(text); }
-    public JXButton(Action a) { super(a); }
+    public JXButton(String text) { 
+        super(text); 
+        this.text = text;
+    }
+    public JXButton(Action a) { 
+        super(a); 
+    }
     public JXButton(Icon icon) { super(icon); }
-    public JXButton(String text, Icon icon) { super(text, icon); }
+    public JXButton(String text, Icon icon) { 
+        super(text, icon);
+        this.text = text;
+    }
 
     @Override
     protected void init(String text, Icon icon) {
@@ -141,6 +149,7 @@ public class JXButton extends JButton {
     
     private boolean paintBorderInsets = true;
     private boolean painting;
+    private boolean opaque = true;
     
     /**
      * Returns true if the background painter should paint where the border is
@@ -165,6 +174,11 @@ public class JXButton extends JButton {
         boolean old = this.isPaintBorderInsets();
         this.paintBorderInsets = paintBorderInsets;
         firePropertyChange("paintBorderInsets", old, isPaintBorderInsets());
+    }
+    
+    @Override
+    public boolean isOpaque() {
+        return painting ? opaque : super.isOpaque();
     }
     
     protected void paintComponent(Graphics g) {
@@ -200,10 +214,14 @@ public class JXButton extends JButton {
     // paint anything but text and icon
     private static final class DefaultBackgroundPainter extends AbstractPainter<JXButton> {
         protected void doPaint(Graphics2D g, JXButton b, int width, int height) {
+            boolean op = b.opaque;
+            // have to read this before setting painting == true !!!
+            b.opaque = b.isOpaque();
             b.setPainting(true);
             String tmp = b.text;
             b.text = "";
             b.paint(g);
+            b.opaque = op;
             b.text = tmp;
             b.setPainting(false);
         }
@@ -221,9 +239,12 @@ public class JXButton extends JButton {
             b.setPainting(true);
             boolean t1 = b.isBorderPainted();
             boolean t2 = b.isContentAreaFilled();
+            boolean op = b.opaque;
             b.borderPainted = false;
             b.contentAreaFilled = false;
+            b.opaque = false;
             b.paint(g);
+            b.opaque = op;
             b.borderPainted = t1;
             b.contentAreaFilled = t2;
             b.setPainting(false);
