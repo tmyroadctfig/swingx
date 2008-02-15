@@ -448,13 +448,24 @@ public class BasicDatePickerUI extends DatePickerUI {
 
 //---------------- component creation    
     /**
-     * Creates the editor used to edit the date selection.  Subclasses should
-     * override this method if they want to substitute in their own editor.
+     * Creates the editor used to edit the date selection. The editor is 
+     * configured with the default DatePickerFormatter marked as UIResource.
      *
      * @return an instance of a JFormattedTextField
      */
     protected JFormattedTextField createEditor() {
-        JFormattedTextField f = new DefaultEditor(new DatePickerFormatterUIResource(datePicker.getLocale()));
+        return createEditor(new DatePickerFormatterUIResource(datePicker.getLocale()));
+    }
+
+    /**
+     * Creates the editor used to edit the date selection with the 
+     * given Formatter.  Subclasses should
+     * override this method if they want to substitute in their own editor.
+     *
+     * @return an instance of a JFormattedTextField
+     */
+    protected JFormattedTextField createEditor(DatePickerFormatter formatter) {
+        JFormattedTextField f = new DefaultEditor(formatter);
         f.setName("dateField");
         f.setColumns(UIManager.getInt("JXDatePicker.numColumns"));
         Border border = UIManager.getBorder("JXDatePicker.border");
@@ -514,19 +525,31 @@ public class BasicDatePickerUI extends DatePickerUI {
      * is null, returns a reasonable minimal width. <p>
      * 
      * PENDING: how to find the "reasonable" width is open to discussion.
-     * This implementation creates another datePicker, feeds it with 
-     * the formats and asks its prefWidth.
+     * This implementation creates another datepicker, feeds it with 
+     * the formats and asks its prefWidth. <p>
+     * 
+     * That hack blows in some contexts (see Issue #763) - as a very quick
+     * replacement create a editor only.
+     * 
+     * PENDING: there's a resource property JXDatePicker.numColumns - why 
+     *   don't we use it?
      * 
      * @return the editor's preferred size
      */
     private Dimension getEditorPreferredSize() {
         Dimension dim = datePicker.getEditor().getPreferredSize();
         if (datePicker.getDate() == null) {
+            JFormattedTextField field = createEditor(new DatePickerFormatterUIResource(
+                            datePicker.getFormats(), 
+                            datePicker.getLocale()));
+            field.setValue(new Date());
+            dim.width = Math.max(field.getPreferredSize().width, dim.width);
             // the editor tends to collapsing for empty values
             // JW: better do this in a custom editor?
-            JXDatePicker picker = new JXDatePicker(new Date());
-            picker.setFormats(datePicker.getFormats());
-            dim.width = picker.getEditor().getPreferredSize().width;
+            // seems to produce #763
+//            JXDatePicker picker = new JXDatePicker(new Date());
+//            picker.setFormats(datePicker.getFormats());
+//            dim.width = picker.getEditor().getPreferredSize().width;
         }
         return dim;
     }

@@ -226,6 +226,9 @@ public class DatePickerFormatter extends
         public DatePickerFormatterUIResource() {
             this(null);
         }
-        
+     
+        public DatePickerFormatterUIResource(DateFormat[] formats, Locale locale) {
+            super(formats, locale);
+        }
     }
 }
