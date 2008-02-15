@@ -79,12 +79,6 @@ public class JXDatePickerTest extends InteractiveTestCase {
     }
 
 
-    public void testEditorColumns() {
-        // for loading of resources
-        JXDatePicker picker = new JXDatePicker();
-//        Object colums = UIManagerExt.get("JXDatePicker.numColumns", JComponent.getDefaultLocale());
-        assertEquals(1, UIManagerExt.getString("JXDatePicker.numColumns") );
-    }
     /**
      * Issue #667-swingx: don't install the datepicker border for gtk.
      * 
