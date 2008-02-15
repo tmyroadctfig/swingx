@@ -89,7 +89,7 @@ public class PatternPredicate implements HighlightPredicate {
     private boolean test(Component renderer, ComponentAdapter adapter) {
         if (!adapter.isTestable(testColumn))
             return false;
-        Object value = adapter.getFilteredValueAt(adapter.row, testColumn);
+        Object value = adapter.getValue(testColumn);
 
         if (value == null) {
             return false;

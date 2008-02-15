@@ -98,6 +98,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
         super("JXTable unit test");
     }
 
+    @Override
     protected void setUp() throws Exception {
        super.setUp();
         // set loader priority to normal
@@ -869,6 +870,8 @@ public class JXTableUnitTest extends InteractiveTestCase {
         adapter.column = 0;
         assertEquals("adapter.getValue must return value at adapter coordinates", 
                 table.getValueAt(0, 0), adapter.getValue());
+        assertEquals("adapter.getValue must return value at adapter coordinates", 
+                table.getValueAt(0, 0), adapter.getValue(0));
     }
 
     /**
@@ -3175,6 +3178,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
             }
         }
 
+        @Override
         public boolean isCellEditable(int row, int col) {
             return getRowObject(row).isEditable();
         }
@@ -3422,6 +3426,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
             this.columnSamples = columnSamples;
         }
 
+        @Override
         public Class<?> getColumnClass(int column) {
             return columnSamples[column].getClass();
         }
@@ -3446,10 +3451,12 @@ public class JXTableUnitTest extends InteractiveTestCase {
                 column == 3 ? new Boolean(row % 2 == 0) : value;
         }
 
+        @Override
         public boolean isCellEditable(int row, int column) {
             return (column == 1);
         }
 
+        @Override
         public void setValueAt(Object aValue, int row, int column) {
             if (column == 1) {
                 if (row % 3 == 0) {

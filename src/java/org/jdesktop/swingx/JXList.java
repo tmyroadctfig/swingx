@@ -391,6 +391,7 @@ public class JXList extends JList {
      */
     protected RolloverProducer createRolloverProducer() {
         return new RolloverProducer() {
+            @Override
             protected void updateRolloverPoint(JComponent component,
                     Point mousePoint) {
                 JList list = (JList) component;
@@ -432,6 +433,7 @@ public class JXList extends JList {
 
         // --------------------------------- JList rollover
 
+        @Override
         protected void rollover(Point oldLocation, Point newLocation) {
             // PENDING JW - track down the -1 in location.y
             if (oldLocation != null) {
@@ -479,6 +481,7 @@ public class JXList extends JList {
 
         }
 
+        @Override
         protected RolloverRenderer getRolloverRenderer(Point location,
                 boolean prepare) {
             ListCellRenderer renderer = component.getCellRenderer();
@@ -1131,15 +1134,17 @@ public class JXList extends JList {
         return adapter;
     }
     
+    /**
+     * A component adapter targeted at a JXList.
+     */
     protected static class ListAdapter extends ComponentAdapter {
         private final JXList list;
 
         /**
-         * Constructs a <code>ListDataAdapter</code> for the specified target
-         * component.
+         * Constructs a <code>ListAdapter</code> for the specified target
+         * JXList.
          * 
-         * @param component
-         *            the target component
+         * @param component  the target list.
          */
         public ListAdapter(JXList component) {
             super(component);
@@ -1158,11 +1163,15 @@ public class JXList extends JList {
         /**
          * {@inheritDoc}
          */
+        @Override
         public boolean hasFocus() {
             /** TODO: Think through printing implications */
             return list.isFocusOwner() && (row == list.getLeadSelectionIndex());
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public int getRowCount() {
             return list.getWrappedModel().getSize();
@@ -1180,23 +1189,39 @@ public class JXList extends JList {
         /**
          * {@inheritDoc}
          */
+        @Override
         public Object getValueAt(int row, int column) {
             return list.getWrappedModel().getElementAt(row);
         }
 
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public Object getFilteredValueAt(int row, int column) {
             return list.getElementAt(row);
         }
 
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public void setValueAt(Object aValue, int row, int column) {
             throw new UnsupportedOperationException(
-                    "Method getFilteredValueAt() not yet implemented.");
+                    "The model is immutable.");
         }
 
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public boolean isCellEditable(int row, int column) {
             return false;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public boolean isEditable() {
             return false;
@@ -1205,15 +1230,24 @@ public class JXList extends JList {
         /**
          * {@inheritDoc}
          */
+        @Override
         public boolean isSelected() {
             /** TODO: Think through printing implications */
             return list.isSelectedIndex(row);
         }
 
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public String getColumnName(int columnIndex) {
             return "Column_" + columnIndex;
         }
 
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public String getColumnIdentifier(int columnIndex) {
             return null;
         }

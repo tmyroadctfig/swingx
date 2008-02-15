@@ -21,11 +21,7 @@
  */
 package org.jdesktop.swingx.decorator;
 
-import javax.swing.table.DefaultTableModel;
-
 import junit.framework.TestCase;
-
-import org.jdesktop.swingx.JXTable;
 
 /**
  * Test to exposed known issues of <code>ComponentAdapter</code>.
@@ -39,99 +35,8 @@ import org.jdesktop.swingx.JXTable;
  */
 public class ComponentAdapterIssues extends TestCase {
 
-    /**
-     * Issue #??- ComponentAdapter's default implementation does not
-     *    return the value at the adapter's view state.
-     * 
-     * PENDING: update doc, make abstract
-     *
-     */
-    public void testComponentAdapterCoordinates() {
-        final JXTable table = new JXTable(createAscendingModel(0, 10));
-        Object originalFirstRowValue = table.getValueAt(0,0);
-        Object originalLastRowValue = table.getValueAt(table.getRowCount() - 1, 0);
-        assertEquals("view row coordinate equals model row coordinate", 
-                table.getModel().getValueAt(0, 0), originalFirstRowValue);
-        // sort first column - actually does not change anything order 
-        table.toggleSortOrder(0);
-        // sanity asssert
-        assertEquals("view order must be unchanged ", 
-                table.getValueAt(0, 0), originalFirstRowValue);
-        // invert sort
-        table.toggleSortOrder(0);
-        // sanity assert
-        assertEquals("view order must be reversed changed ", 
-                table.getValueAt(0, 0), originalLastRowValue);
-        ComponentAdapter adapter = new ComponentAdapter(table) {
-
-            @Override
-            public String getColumnIdentifier(int columnIndex) {
-                return null;
-            }
-
-            @Override
-            public String getColumnName(int columnIndex) {
-                return null;
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            public Object getFilteredValueAt(int row, int column) {
-                return getValueAt(table.convertRowIndexToModel(row), column);
-//                return table.getValueAt(row, modelToView(column)); // in view coordinates
-            }
-
-
-            @Override
-            public Object getValueAt(int row, int column) {
-                return table.getModel().getValueAt(row, column);
-            }
-
-            @Override
-            public boolean hasFocus() {
-                return false;
-            }
-
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return false;
-            }
-
-            @Override
-            public boolean isEditable() {
-                return false;
-            }
-            
-            @Override
-            public boolean isSelected() {
-                return false;
-            }
-
-            @Override
-            public void setValueAt(Object aValue, int row, int column) {
-              
-            }
-            
-        };
-        assertEquals("adapter filteredValue expects row view coordinates", 
-                table.getValueAt(0, 0), adapter.getFilteredValueAt(0, 0));
-        // adapter coordinates are view coordinates
-        adapter.row = 0;
-        adapter.column = 0;
-        assertEquals("adapter.getValue must return value at adapter coordinates", 
-                table.getValueAt(0, 0), adapter.getValue());
+    public void testDummy() {
         
-        
-    }
-
-    private DefaultTableModel createAscendingModel(int startRow, int count) {
-        DefaultTableModel model = new DefaultTableModel(count, 5);
-        for (int i = 0; i < model.getRowCount(); i++) {
-            model.setValueAt(new Integer(startRow++), i, 0);
-        }
-        return model;
     }
 
 }

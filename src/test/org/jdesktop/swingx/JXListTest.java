@@ -339,8 +339,8 @@ public class JXListTest extends InteractiveTestCase {
         adapter.column = 0;
         assertEquals("adapter.getValue must return value at adapter coordinates", 
                 list.getElementAt(0), adapter.getValue());
-        
-        
+        assertEquals("adapter.getValue must return value at adapter coordinates", 
+                list.getElementAt(0), adapter.getValue(0));
     }
     
 

@@ -2182,6 +2182,7 @@ public class JXTreeTable extends JXTable {
                         super.updateRollover(e, property);
                     }
                 }
+                @Override
                 protected void updateRolloverPoint(JComponent component,
                         Point mousePoint) {
                     JXTree tree = (JXTree) component;
@@ -2349,6 +2350,7 @@ public class JXTreeTable extends JXTable {
         private class ClippedTreeCellRenderer extends DefaultTreeCellRenderer {
             private boolean inpainting;
             private String shortText;
+            @Override
             public void paint(Graphics g) {
                 String fullText = super.getText();
                 // getText() calls tree.convertValueToText();

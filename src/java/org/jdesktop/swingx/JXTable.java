@@ -3275,7 +3275,6 @@ public class JXTable extends JTable
         @Override
         public Object getFilteredValueAt(int row, int column) {
             return getValueAt(table.convertRowIndexToModel(row), column);
-//            return table.getValueAt(row, modelToView(column)); // in view coordinates
         }
 
         /**

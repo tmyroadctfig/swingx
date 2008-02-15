@@ -339,7 +339,7 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
             this.testColumn = testColumn;
         }
         public boolean isHighlighted(Component renderer, ComponentAdapter adapter) {
-            return values.contains(adapter.getFilteredValueAt(adapter.row, testColumn));
+            return values.contains(adapter.getValue(testColumn));
         }
         
     }
@@ -372,8 +372,7 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
             @Override
             protected void applyBackground(Component renderer, ComponentAdapter adapter) {
                 if (adapter.isSelected()) return;
-                Color background = lookup.get(adapter.getFilteredValueAt(adapter.row,
-                        numberColumn));
+                Color background = lookup.get(adapter.getValue(numberColumn));
                 if (background != null) {
                     renderer.setBackground(background);
                 }

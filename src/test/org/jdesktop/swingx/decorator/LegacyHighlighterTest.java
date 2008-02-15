@@ -484,6 +484,12 @@ public class LegacyHighlighterTest extends InteractiveTestCase {
                 return getValueAt(row, column);
             }
 
+            
+            @Override
+            public Object getValue() {
+                return getValueAt(row, column);
+            }
+
             public void setValueAt(Object aValue, int row, int column) {
                 // TODO Auto-generated method stub
                 

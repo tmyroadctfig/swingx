@@ -1333,24 +1333,55 @@ public class JXTree extends JTree {
             super(component);
             tree = component;
         }
+        
         public JXTree getTree() {
             return tree;
         }
 
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public boolean hasFocus() {
             return tree.isFocusOwner() && (tree.getLeadSelectionRow() == row);
         }
 
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public Object getValueAt(int row, int column) {
             TreePath path = tree.getPathForRow(row);
             return path.getLastPathComponent();
         }
 
+        /**
+         * {@inheritDoc} <p>
+         * 
+         * JXTree doesn't support filtering/sorting. This implies that
+         * model and view coordinates are the same. So this method is
+         * implemented to call getValueAt(row, column).
+         * 
+         */
+        @Override
         public Object getFilteredValueAt(int row, int column) {
             /** TODO: Implement filtering */
             return getValueAt(row, column);
         }
-
+        
+        
+        /**
+         * {@inheritDoc} <p>
+         * 
+         * JXTree doesn't support filtering/sorting. This implies that
+         * model and view coordinates are the same. So this method is
+         * implemented to call getValueAt(row, column).
+         * 
+         */
+        @Override
+        public Object getValue() {
+            return getValueAt(row, column);
+        }
         /**
          * {@inheritDoc}
          */
@@ -1360,37 +1391,66 @@ public class JXTree extends JTree {
             return tree.isPathEditable(tree.getPathForRow(row));
         }
         
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public boolean isSelected() {
             return tree.isRowSelected(row);
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public boolean isExpanded() {
             return tree.isExpanded(row);
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public int getDepth() {
             return tree.getPathForRow(row).getPathCount() - 1;
         }
         
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public boolean isLeaf() {
             return tree.getModel().isLeaf(getValue());
         }
 
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public boolean isCellEditable(int row, int column) {
             return false;	/** TODO:  */
         }
 
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public void setValueAt(Object aValue, int row, int column) {
             /** TODO:  */
         }
         
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public String getColumnName(int columnIndex) {
             return "Column_" + columnIndex;
         }
         
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public String getColumnIdentifier(int columnIndex) {
             return null;
         }

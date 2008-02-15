@@ -50,6 +50,7 @@ public class HighlightPredicateTest extends InteractiveTestCase {
     
     protected ColorHighlighter emptyHighlighter;
 
+    @Override
     protected void setUp() {
         backgroundNull = new JLabel("test");
         backgroundNull.setForeground(foreground);
@@ -532,41 +533,56 @@ public class HighlightPredicateTest extends InteractiveTestCase {
             final boolean selected, final boolean editable) {
         ComponentAdapter adapter = new ComponentAdapter(label) {
 
+            @Override
             public Object getValueAt(int row, int column) {
                 return label.getText();
             }
 
+            @Override
             public Object getFilteredValueAt(int row, int column) {
                 return getValueAt(row, column);
             }
 
+            
+            @Override
+            public Object getValue() {
+                return getValueAt(row, column);
+            }
+
+            @Override
             public void setValueAt(Object aValue, int row, int column) {
                 // TODO Auto-generated method stub
                 
             }
 
+            @Override
             public boolean isCellEditable(int row, int column) {
                 // TODO Auto-generated method stub
                 return false;
             }
 
+            @Override
             public boolean hasFocus() {
                 // TODO Auto-generated method stub
                 return false;
             }
             
+            @Override
             public boolean isEditable() {
                 return editable;
             }
 
+            @Override
             public boolean isSelected() {
                 return selected;
             }
 
+            @Override
             public String getColumnName(int columnIndex) {
                 return null;
             }
 
+            @Override
             public String getColumnIdentifier(int columnIndex) {
                 return null;
             }
@@ -585,41 +601,55 @@ public class HighlightPredicateTest extends InteractiveTestCase {
     protected ComponentAdapter createBigDecimalComponentAdapter(final JLabel label) {
         ComponentAdapter adapter = new ComponentAdapter(label) {
 
+            @Override
             public Object getValueAt(int row, int column) {
                 return new BigDecimal(label.getText());
             }
 
+            @Override
             public Object getFilteredValueAt(int row, int column) {
                 return getValueAt(row, column);
             }
 
+            @Override
+            public Object getValue() {
+                return getValueAt(row, column);
+            }
+
+            @Override
             public void setValueAt(Object aValue, int row, int column) {
                 // TODO Auto-generated method stub
                 
             }
 
+            @Override
             public boolean isCellEditable(int row, int column) {
                 // TODO Auto-generated method stub
                 return false;
             }
 
+            @Override
             public boolean hasFocus() {
                 // TODO Auto-generated method stub
                 return false;
             }
             
+            @Override
             public boolean isEditable() {
                 return false;
             }
 
+            @Override
             public boolean isSelected() {
                 return false;
             }
 
+            @Override
             public String getColumnName(int columnIndex) {
                 return null;
             }
 
+            @Override
             public String getColumnIdentifier(int columnIndex) {
                 return null;
             }

@@ -663,49 +663,67 @@ public class FilterTest extends InteractiveTestCase {
             this.tableModel = tableModel;
         }
 
+        @Override
         public int getColumnCount() {
             return tableModel.getColumnCount();
         }
+        @Override
         public int getRowCount() {
             return tableModel.getRowCount();
         }
+        @Override
         public String getColumnName(int columnIndex) {
             return tableModel.getColumnName(columnIndex);
         }
 
+        @Override
         public String getColumnIdentifier(int columnIndex) {
             return getColumnName(columnIndex);
         }
 
+        @Override
         public Object getValueAt(int row, int column) {
             return tableModel.getValueAt(row, column);
         }
 
-        public Object getFilteredValueAt(int row, int column) {
-            return null;
-        }
-
+        @Override
         public void setValueAt(Object aValue, int row, int column) {
             tableModel.setValueAt(aValue, row, column);
 
         }
 
+        @Override
         public boolean isCellEditable(int row, int column) {
             return tableModel.isCellEditable(row, column);
         }
 
+        @Override
+        public Object getFilteredValueAt(int row, int column) {
+            return getValueAt(row, column);
+        }
+        
+        
+        @Override
+        public Object getValue() {
+            return getValueAt(row, column);
+        }
+        
+        @Override
         public boolean hasFocus() {
             return false;
         }
 
+        @Override
         public boolean isEditable() {
             return tableModel.isCellEditable(row, column);
         }
         
+        @Override
         public boolean isSelected() {
             return false;
         }
 
+        @Override
         public void refresh() {
             // do nothing
          }

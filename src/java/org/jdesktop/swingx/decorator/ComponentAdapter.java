@@ -24,25 +24,51 @@ package org.jdesktop.swingx.decorator;
 import javax.swing.JComponent;
 
 /**
- * Abstract base class for all component data adapter classes.
- * A <code>ComponentAdapter</code> allows a {@link Filter}, {@link Sorter},
- * or {@link Highlighter} to interact with a {@link #target} component through a
+ * Abstract base class for all component data adapter classes. A
+ * <code>ComponentAdapter</code> allows a {@link Filter}, {@link Sorter}, or
+ * {@link Highlighter} to interact with a {@link #target} component through a
  * common API.
  * 
  * It has two aspects:
  * <ul>
- * <li> interact with the data of the component. The methods for this are those 
- * taking row/column indices as parameters. The coordinates
- * are in model coordinate system. Typical clients of are Filters.
- * <li> interact with the view state for a given data element. The row/cloumn fields and the
- * parameterless methods service this aspect. The coordinates are in view coordinate system.
- * Typical clients are the highlighting part of Highlighters.
+ * <li> interact with the view state for a given data element. The row/cloumn
+ * fields and the parameterless methods service this aspect. The coordinates are
+ * in view coordinate system. Typical clients of this service are
+ * HighlightPredicates and Highlighters.
+ * <li> interact with the data of the component. The methods for this are those
+ * taking row/column indices as parameters. The coordinates are in model
+ * coordinate system. Typical clients of this service are Filters.
  * </ul>
  * 
- * The adapter is responsible for mapping column coordinates. 
+ * Typically, application code is interested in the first aspect. An example is
+ * highlighting the background of a row in a JXTable based on the value of a
+ * cell in a specific column. The solution is to implement a custom
+ * HighlightPredicate which decides if a given cell should be highlighted and
+ * configure a ColorHighlighter with the predicate and an appropriate background
+ * color.
  * 
- * All input column 
- * indices are in model coordinates with exactly two exceptions:
+ * <pre><code>
+ * HighlightPredicate feverWarning = new HighlightPredicate() {
+ *     int temperatureColumn = 10;
+ * 
+ *     public boolean isHighlighted(Component component, ComponentAdapter adapter) {
+ *         return hasFever(adapter.getValue(temperatureColumn));
+ *     }
+ * 
+ *     private boolean hasFever(Object value) {
+ *         if (!value instanceof Number)
+ *             return false;
+ *         return ((Number) value).intValue() &gt; 37;
+ *     }
+ * };
+ * 
+ * Highlighter hl = new ColorHighlighter(feverWarning, Color.RED, null);
+ * </code></pre>
+ * 
+ * The adapter is responsible for mapping column coordinates.
+ * 
+ * All input column indices are in model coordinates with exactly two
+ * exceptions:
  * <ul>
  * <li> {@link #column} in column view coordinates
  * <li> the mapping method {@link #viewToModel(int)} in view coordinates
@@ -51,13 +77,20 @@ import javax.swing.JComponent;
  * All input row indices are in model coordinates with exactly two exceptions:
  * <ul>
  * <li> {@link #row} in row view coordinates
- * <li> the getter for the filtered value {@link #getFilteredValueAt(int, int)} 
+ * <li> the getter for the filtered value {@link #getFilteredValueAt(int, int)}
  * takes the row in view coordinates.
  * </ul>
- *  
+ * 
+ * 
+ * 
+ * PENDING JW: anything to gain by generics here?
  * 
  * @author Ramesh Gupta
  * @author Karl Schaefer
+ * 
+ * @see org.jdesktop.swingx.decorator.HighlightPredicate
+ * @see org.jdesktop.swingx.decorator.Highlighter
+ * @see org.jdesktop.swingx.decorator.Filter
  */
 public abstract class ComponentAdapter {
     /** current row in view coordinates. */
@@ -76,6 +109,11 @@ public abstract class ComponentAdapter {
         target = component;
     }
 
+    /**
+     * Returns the component which is this adapter's target.
+     * 
+     * @return the component which is this adapter's target.
+     */
     public JComponent getComponent() {
         return target;
     }
@@ -83,10 +121,11 @@ public abstract class ComponentAdapter {
 //---------------------------- accessing the target's model
     
     /**
-     * returns the column's label (= headerValue).
+     * Returns the column's display name (= headerValue) of the column
+     * at columnIndex in model coordinates.
      * 
      * Used f.i. in SearchPanel to fill the field with the 
-     * column name.
+     * column name.<p>
      * 
      * Note: it's up to the implementation to decide for which
      * columns it returns a name - most will do so for the
@@ -98,10 +137,8 @@ public abstract class ComponentAdapter {
     public abstract String getColumnName(int columnIndex);
 
     /**
-     * returns the logical name (== identifier) of the column at 
+     * Returns the columns logical name (== identifier) of the column at 
      * columnIndex in model coordinates.
-     * 
-     * Used f.i. JNTable to store and apply column properties by identifier.
      * 
      * Note: it's up to the implementation to decide for which
      * columns it returns a name - most will do so for the
@@ -138,71 +175,98 @@ public abstract class ComponentAdapter {
      * @param row in model coordinates
      * @param column in model coordinates
      * @return the value of the target component's cell identified by the
-     * specified row and column
+     *          specified row and column
      */
     public abstract Object getValueAt(int row, int column);
+    
+    /**
+     * Sets the value of the target component's cell identified by the
+     * specified row and column in model coordinates.
+     * 
+     * @param aValue the value to set
+     * @param row in model coordinates
+     * @param column in model coordinates
+     */
     public abstract void setValueAt(Object aValue, int row, int column);
 
     /**
-	 * Determines whether this cell is editable.
-	 * <p>
-	 * This method is for use with {@code Filter}s.
-	 * 
-	 * @param row
-	 *            the row to query
-	 * @param column
-	 *            the column to query
-	 * @return <code>true</code> if the cell is editable, <code>false</code>
-	 *         otherwise
-	 */
+     * Determines whether this cell is editable.
+     * 
+     * @param row the row to query in model coordinates
+     * @param column the column to query in model coordinates
+     * @return <code>true</code> if the cell is editable, <code>false</code>
+     *         otherwise
+     */
     public abstract boolean isCellEditable(int row, int column);
 
     /**
-     * returns true if the column should be included in testing.
-     * Here: returns true if visible (that is modelToView gives a valid
-     * view column coordinate).
+     * Returns true if the column should be included in testing.<p>
      * 
-     * @param column in model coordinates
+     * Here: returns true if visible (that is modelToView gives a valid
+     * view column coordinate). 
+     * 
+     * @param column the column index in model coordinates
      * @return true if the column should be included in testing
      */
-    public  boolean isTestable(int column) {
+    public boolean isTestable(int column) {
         return modelToView(column) >= 0;
     }
     
 //----------------------- accessing the target's view state
     
     /**
-     * Returns the value of the cell identified by this adapter by invoking
-     * {@link #getValueAt(int, int)}, passing in the {@link #row} and
-     * {@link #column} values of this adapter. For target components that don't
-     * support multiple columns, the value of <code>column</code> is always zero.
-     *
-     * PENDING: needs clarification/cleanup - getValueAt(row, column) expects 
-     * model coordinates!.
+     * Returns the value of the cell identified by this adapter. That is,
+     * for the at position (adapter.row, adapter.column) in view coordinates.<p>
+     * 
+     * NOTE: this implementation assumes that view coordinates == model 
+     * coordinates, that is simply calls getValueAt(this.row, this.column). It is
+     * up to subclasses to override appropriately is they support model/view
+     * coordinate transformation.
      * 
      * @return the value of the cell identified by this adapter
+     * @see #getValueAt(int, int)
+     * @see #getFilteredValueAt(int, int)
+     * @see #getValue(int)
      */
     public Object getValue() {
         return getValueAt(row, column);
     }
 
+    
     /**
-     * returns the filtered value of the cell identified by the row
+     * Returns the value of the cell identified by the current 
+     * adapter row and the given column index in model coordinates.<p>
+     * 
+     * @param modelColumnIndex the column index in model coordinates 
+     * @return the value of the cell identified by this adapter
+     * @see #getValueAt(int, int)
+     * @see #getFilteredValueAt(int, int)
+     * @see #getValue(int)
+     */
+    public Object getValue(int modelColumnIndex) {
+        return getFilteredValueAt(row, modelColumnIndex);
+    }
+    
+    /**
+     * Returns the filtered value of the cell identified by the row
      * in view coordinate and the column in model coordinates.
      * 
      * Note: the asymetry of the coordinates is intentional - clients like
      * Highlighters are interested in view values but might need to access
-     * non-visible columns for testing.
+     * non-visible columns for testing. While it is possible to access 
+     * row coordinates different from the current (that is this.row) it is not
+     * safe to do so for row > this.row because the adapter doesn't allow to
+     * query the count of visible rows.
      * 
-     * @param row
-     * @param column
+     * @param row the row of the cell in view coordinates
+     * @param column the column of the cell in model coordinates.
      * @return the filtered value of the cell identified by the row
      * in view coordinate and the column in model coordiantes
      */
     public abstract Object getFilteredValueAt(int row, int column);
 
     /**
-     * Returns true if the cell identified by this adapter currently has focus;
+     * Returns true if the cell identified by this adapter currently has focus.
      * Otherwise, it returns false.
      *
      * @return true if the cell identified by this adapter currently has focus;
@@ -211,7 +275,7 @@ public abstract class ComponentAdapter {
     public abstract boolean hasFocus();
 
     /**
-     * Returns true if the cell identified by this adapter is currently selected;
+     * Returns true if the cell identified by this adapter is currently selected.
      * Otherwise, it returns false.
      *
      * @return true if the cell identified by this adapter is currently selected;
@@ -228,7 +292,7 @@ public abstract class ComponentAdapter {
     public abstract boolean isEditable();
     
     /**
-     * Returns true if the cell identified by this adapter is currently expanded;
+     * Returns true if the cell identified by this adapter is currently expanded.
      * Otherwise, it returns false. For components that do not support
      * hierarchical data, this method always returns true because the cells in
      * such components can never be collapsed.
@@ -241,7 +305,7 @@ public abstract class ComponentAdapter {
     }
 
     /**
-     * Returns true if the cell identified by this adapter is a leaf node;
+     * Returns true if the cell identified by this adapter is a leaf node.
      * Otherwise, it returns false. For components that do not support
      * hierarchical data, this method always returns true because the cells in
      * such components can never have children.
@@ -254,7 +318,7 @@ public abstract class ComponentAdapter {
     }
 
     /**
-     * Returns true if the cell identified by this adapter displays the hierarchical node;
+     * Returns true if the cell identified by this adapter displays the hierarchical node.
      * Otherwise, it returns false. For components that do not support
      * hierarchical data, this method always returns false because the cells in
      * such components can never have children.
@@ -267,11 +331,11 @@ public abstract class ComponentAdapter {
     }
 
     /**
-	 * Returns the depth of this row in the hierarchy where the root is 0. For
-	 * components that do not contain hierarchical data, this method returns 1.
-	 * 
-	 * @return the depth for this adapter
-	 */
+     * Returns the depth of this row in the hierarchy where the root is 0. For
+     * components that do not contain hierarchical data, this method returns 1.
+     * 
+     * @return the depth for this adapter
+     */
     public int getDepth() {
         return 1; // sensible default for JList and JTable
     }
@@ -291,12 +355,12 @@ public abstract class ComponentAdapter {
     }
 
    /**
-     * For target components that support multiple columns in their model,
-     * along with column reordering in the view, this method transforms the
-     * specified columnIndex from view coordinates to model coordinates. For all
-     * other types of target components, this method returns the columnIndex
+     * For target components that support multiple columns in their model, along
+     * with column reordering in the view, this method transforms the specified
+     * columnIndex from view coordinates to model coordinates. For all other
+     * types of target components, this method returns the columnIndex
      * unchanged.
-     *
+     * 
      * @param columnIndex index of a column in view coordinates
      * @return index of the specified column in model coordinates
      */
@@ -304,6 +368,10 @@ public abstract class ComponentAdapter {
         return columnIndex; // sensible default for JList and JTree
     }
 
+    /**
+     * Updates the target component on screen. This implementation revalidates and
+     * repaints. 
+     */
     public void refresh() {
         target.revalidate();
         target.repaint();
