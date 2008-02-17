@@ -24,34 +24,47 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.ComponentOrientation;
 import java.awt.Cursor;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JTree;
-import javax.swing.LookAndFeel;
 import javax.swing.ToolTipManager;
+import javax.swing.plaf.basic.BasicTreeUI;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellEditor;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeCellRenderer;
+import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 
+import org.jdesktop.swingx.action.AbstractActionExt;
+import org.jdesktop.swingx.decorator.AbstractHighlighter;
 import org.jdesktop.swingx.decorator.ColorHighlighter;
+import org.jdesktop.swingx.decorator.ComponentAdapter;
+import org.jdesktop.swingx.decorator.CompoundHighlighter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
 import org.jdesktop.swingx.decorator.PatternPredicate;
 import org.jdesktop.swingx.decorator.SearchPredicate;
 import org.jdesktop.swingx.decorator.HighlightPredicate.DepthHighlightPredicate;
+import org.jdesktop.swingx.decorator.HighlightPredicate.NotHighlightPredicate;
+import org.jdesktop.swingx.renderer.CellContext;
 import org.jdesktop.swingx.renderer.DefaultTreeRenderer;
+import org.jdesktop.swingx.renderer.StringValue;
+import org.jdesktop.swingx.renderer.WrappingProvider;
+import org.jdesktop.swingx.test.ActionMapTreeTableModel;
 import org.jdesktop.swingx.tree.DefaultXTreeCellEditor;
+import org.jdesktop.swingx.treetable.TreeTableNode;
 
 public class JXTreeVisualCheck extends JXTreeUnitTest {
     @SuppressWarnings("all")
@@ -64,13 +77,191 @@ public class JXTreeVisualCheck extends JXTreeUnitTest {
       try {
 //          test.runInteractiveTests();
 //          test.runInteractiveTests("interactive.*RToL.*");
-//          test.runInteractiveTests("interactive.*Edit.*");
-          test.runInteractiveTests("interactiveRootExpansionTest");
+          test.runInteractiveTests("interactive.*Revalidate.*");
+//          test.runInteractiveTests("interactiveRootExpansionTest");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
       }
   }
+
+    /**
+     * Requirements: 
+     * - no icons 
+     * - don't unwrap user object
+     */
+    public void interactiveRevalidateAction() {
+        TreeModel model = new ActionMapTreeTableModel(new JXTable());
+        JXTree tree = new JXTree(model);
+        StringValue sv = new StringValue() {
+
+            public String getString(Object value) {
+                if ((value instanceof TreeTableNode) 
+                        && ((TreeTableNode) value).getColumnCount() > 0) {
+                    value = ((TreeTableNode) value).getValueAt(0);
+                }
+                return TO_STRING.getString(value);
+            }
+            
+        };
+        WrappingProvider provider = new WrappingProvider(sv) {
+
+            @Override
+            protected Icon getValueAsIcon(CellContext context) {
+                return null;
+            }
+
+            @Override
+            protected Object adjustContextValue(CellContext context) {
+                return context.getValue();
+            }
+            
+            
+        };
+        tree.setCellRenderer(new DefaultTreeRenderer(provider));
+        JXFrame frame = wrapWithScrollingInFrame(tree, "WrappingProvider: no icons, no unwrapped userObject");
+        frame.pack();
+        frame.setSize(400, 200);
+        frame.setVisible(true);
+    }
+
+
+    /**
+     * 
+     * Requirements:
+     * - striping effect on leaf, extend to full width of tree
+     * - striping relative to parent (not absolute position of row)
+     * 
+     * Trick (from forum): set the rendering component's pref width
+     *   in the renderer.
+     *   
+     * Applied to SwingX: 
+     * - use a highlighter for the pref width setting
+     * - use a predicate to decide which striping to turn on
+     *   
+     * Problem: difficult to get rid off size cache of BasicTreeUI.
+     * 
+     * The sizing of the nodes is cached before the actual expansion.
+     * That is the row index is invalid at the time of messaging the
+     * renderer, so decoration which effects the size (like setting pref
+     * f.i.) is ignored. Except for largeModel and fixed row height.
+     * 
+     * Note: as is, it cannot cope with RToL component orientation.
+     */
+    public void interactiveRevalidate() {
+        final JXTree tree = new JXTree();
+        tree.setCellRenderer(new DefaultTreeRenderer());
+        tree.expandRow(3);
+        tree.setRowHeight(20);
+        tree.setLargeModel(true);
+        tree.setRootVisible(false);
+        tree.setShowsRootHandles(true);
+        int indent = ((BasicTreeUI) tree.getUI()).getLeftChildIndent()
+           + ((BasicTreeUI) tree.getUI()).getRightChildIndent();
+        int depthOffset = getDepthOffset(tree);
+        HighlightPredicate evenChild = new HighlightPredicate() {
+
+            public boolean isHighlighted(Component renderer,
+                    ComponentAdapter adapter) {
+                if (!(adapter.getComponent() instanceof JTree)) return false;
+                TreePath path = ((JTree) adapter.getComponent()).getPathForRow(adapter.row);
+                return path == null ? false : 
+                    (adapter.row - ((JTree) adapter.getComponent()).getRowForPath(path.getParentPath())) % 2 == 0;
+            }
+            
+        };
+        HighlightPredicate oddChild = new HighlightPredicate() {
+
+            public boolean isHighlighted(Component renderer,
+                    ComponentAdapter adapter) {
+                if (!(adapter.getComponent() instanceof JTree)) return false;
+                TreePath path = ((JTree) adapter.getComponent()).getPathForRow(adapter.row);
+                return path == null ? false : 
+                    (adapter.row - ((JTree) adapter.getComponent()).getRowForPath(path.getParentPath())) % 2 == 1;
+            }
+            
+        };
+        final ExtendToWidthHighlighter extendToWidthHighlighter = new ExtendToWidthHighlighter(null, indent, depthOffset);
+        CompoundHighlighter hl = new CompoundHighlighter(
+                HighlightPredicate.IS_LEAF,
+                extendToWidthHighlighter,
+                new ColorHighlighter(evenChild, HighlighterFactory.BEIGE, null),
+                new ColorHighlighter(oddChild, HighlighterFactory.LINE_PRINTER, null)
+                );
+        tree.setHighlighters(
+            hl,
+            new ColorHighlighter(new NotHighlightPredicate(HighlightPredicate.IS_LEAF), null, Color.RED)
+            );
+        
+        final JXFrame frame = wrapWithScrollingInFrame(tree, "tree-wide cell renderer");
+        Action rootVisible = new AbstractActionExt("toggle root visible") {
+
+            public void actionPerformed(ActionEvent e) {
+                tree.setRootVisible(!tree.isRootVisible());
+                extendToWidthHighlighter.setDepthOffset(getDepthOffset(tree));
+            }
+            
+        };
+        addAction(frame, rootVisible);
+        Action handleVisible = new AbstractActionExt("toggle handles") {
+
+            public void actionPerformed(ActionEvent e) {
+                tree.setShowsRootHandles(!tree.getShowsRootHandles());
+                extendToWidthHighlighter.setDepthOffset(getDepthOffset(tree));
+            }
+            
+        };
+        addAction(frame, handleVisible);
+        frame.pack();
+        frame.setSize(400, 200);
+        frame.setVisible(true);
+    }
+
+    /**
+     * C&p from BasicTreeUI: adjust the depth to root/handle visibility.
+     * @param tree
+     * @return
+     */
+    protected int getDepthOffset(JTree tree) {
+        if(tree.isRootVisible()) {
+            if(tree.getShowsRootHandles()) {
+                return 1;
+            } 
+        } else if(!tree.getShowsRootHandles()) {
+            return -1;
+        } 
+        return 0;
+    }
+
+    public static class ExtendToWidthHighlighter extends AbstractHighlighter {
+        
+        private int indent;
+        private int depthOffset;
+        public ExtendToWidthHighlighter(HighlightPredicate predicate, int indent, int depthOffset) {
+            super(predicate);
+            this.indent = indent;
+            this.depthOffset = depthOffset;
+        }
+        
+        public void setDepthOffset(int offset) {
+            if (offset == this.depthOffset) return;
+            this.depthOffset = offset;
+            fireStateChanged();
+        }
+        
+        @Override
+        protected Component doHighlight(Component component,
+                ComponentAdapter adapter) {
+            Dimension dim = component.getPreferredSize();
+            int width = adapter.getComponent().getWidth() 
+                - (adapter.getDepth() + depthOffset) * indent ;
+            dim.width = Math.max(dim.width, width);
+            component.setPreferredSize(dim);
+            return component;
+        }
+        
+    }
+
     
     public void interactiveExpandWithHighlighters() {
         JXTree tree = new JXTree();
@@ -86,7 +277,6 @@ public class JXTreeVisualCheck extends JXTreeUnitTest {
      *
      */
     public void interactiveToggleEditProperties() {
-        LookAndFeel lf;
         final JXTree table = new JXTree();
         table.setEditable(true);
         DefaultTreeCellEditor editor = new DefaultTreeCellEditor(null, null) {
