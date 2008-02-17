@@ -21,6 +21,7 @@
  */
 package org.jdesktop.swingx.renderer;
 
+import java.awt.Dimension;
 import java.text.DateFormat;
 import java.util.logging.Logger;
 
@@ -48,6 +49,17 @@ public class RenderingTest extends TestCase {
     private static final Logger LOG = Logger.getLogger(RenderingTest.class
             .getName());
 
+    public void testResetPreferredSize() {
+        DefaultVisuals<JComponent> visuals = new DefaultVisuals<JComponent>();
+        JComponent label = new  JLabel("somevalue");
+        visuals.configureVisuals(label, new TableCellContext());
+        Dimension prefSize = label.getPreferredSize();
+        Dimension newPrefSize = new Dimension(prefSize.width + 100, prefSize.height + 100);
+        label.setPreferredSize(newPrefSize);
+        visuals.configureVisuals(label, new TableCellContext());
+        assertEquals("default visual config must reset prefSize", prefSize, label.getPreferredSize());
+    }
+    
     /**
      * Test provider respect converter. 
      * 
@@ -381,7 +393,7 @@ public class RenderingTest extends TestCase {
      * test that default visual config clears the tooltip.
      *
      */
-    public void testTooltipReset() {
+    public void testResetTooltip() {
         DefaultVisuals<JComponent> visuals = new DefaultVisuals<JComponent>();
         JComponent label = new  JLabel("somevalue");
         label.setToolTipText("tooltip");

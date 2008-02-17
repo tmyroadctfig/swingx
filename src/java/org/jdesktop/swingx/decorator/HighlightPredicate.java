@@ -65,6 +65,11 @@ public interface HighlightPredicate {
      */
     public static final HighlightPredicate ALWAYS = new HighlightPredicate() {
 
+        /**
+         * {@inheritDoc} <p>
+         * 
+         * Implemented to return true always.
+         */
         public boolean isHighlighted(Component renderer, ComponentAdapter adapter) {
             return true;
         }
@@ -76,6 +81,11 @@ public interface HighlightPredicate {
      */
     public static final HighlightPredicate NEVER = new HighlightPredicate() {
 
+        /**
+         * {@inheritDoc} <p>
+         * 
+         * Implemented to return false always.
+         */
         public boolean isHighlighted(Component renderer, ComponentAdapter adapter) {
             return false;
         }
@@ -111,6 +121,11 @@ public interface HighlightPredicate {
      * Is editable.
      */
     public static final HighlightPredicate EDITABLE = new HighlightPredicate() {
+        /**
+         * {@inheritDoc} <p>
+         * 
+         * Implemented to return true is the given adapter isEditable, false otherwise.
+         */
         public boolean isHighlighted(Component renderer, ComponentAdapter adapter) {
             return adapter.isEditable();
         }
@@ -120,8 +135,27 @@ public interface HighlightPredicate {
      * Convenience for read-only (same as !editable).
      */
     public static final HighlightPredicate READ_ONLY = new HighlightPredicate() {
+        /**
+         * {@inheritDoc} <p>
+         * 
+         * Implemented to return false is the given adapter isEditable, true otherwise.
+         */
         public boolean isHighlighted(Component renderer, ComponentAdapter adapter) {
             return !adapter.isEditable();
+        }
+    };
+    
+    /**
+     * Leaf predicate.
+     */
+    public static final HighlightPredicate IS_LEAF = new HighlightPredicate() {
+        /**
+         * {@inheritDoc} <p>
+         * 
+         * Implemented to return true is the given adapter isLeaf, false otherwise.
+         */
+        public boolean isHighlighted(Component renderer, ComponentAdapter adapter) {
+            return adapter.isLeaf();
         }
     };
     

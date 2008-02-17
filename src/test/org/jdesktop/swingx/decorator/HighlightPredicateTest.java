@@ -74,6 +74,24 @@ public class HighlightPredicateTest extends InteractiveTestCase {
     // ---------------- predefined predicate
     
     /**
+     * test the IS_LEAF predicate.
+     *
+     */
+    public void testLeaf() {
+        ComponentAdapter adapter = createComponentAdapter(allColored, false);
+        assertFalse(HighlightPredicate.IS_LEAF.isHighlighted(allColored, adapter));
+    }
+    
+    /**
+     * test the IS_LEAF predicate.
+     *
+     */
+    public void testNotLeaf() {
+        ComponentAdapter adapter = createComponentAdapter(allColored, true);
+        assertTrue(HighlightPredicate.IS_LEAF.isHighlighted(allColored, adapter));
+    }
+    
+    /**
      * Can't really test the unconditional predicates.
      *
      */
@@ -92,7 +110,7 @@ public class HighlightPredicateTest extends InteractiveTestCase {
     }
     
     /**
-     * test the NOT predicate.
+     * test the Editable predicate.
      *
      */
     public void testEditable() {
@@ -102,7 +120,7 @@ public class HighlightPredicateTest extends InteractiveTestCase {
     }
 
     /**
-     * test the NOT predicate.
+     * test the ReadOnly predicate.
      *
      */
     public void testNotEditable() {
@@ -522,7 +540,8 @@ public class HighlightPredicateTest extends InteractiveTestCase {
 
     /**
      * Creates and returns a ComponentAdapter on the given 
-     * label with the specified selection and editable state.
+     * label with the specified selection and editable state. IsLeaf returns
+     * the same value as selected.
      * 
      * @param label
      * @param selected
@@ -551,19 +570,17 @@ public class HighlightPredicateTest extends InteractiveTestCase {
 
             @Override
             public void setValueAt(Object aValue, int row, int column) {
-                // TODO Auto-generated method stub
+                // not implemented
                 
             }
 
             @Override
             public boolean isCellEditable(int row, int column) {
-                // TODO Auto-generated method stub
-                return false;
+                return isEditable();
             }
 
             @Override
             public boolean hasFocus() {
-                // TODO Auto-generated method stub
                 return false;
             }
             
@@ -575,6 +592,12 @@ public class HighlightPredicateTest extends InteractiveTestCase {
             @Override
             public boolean isSelected() {
                 return selected;
+            }
+
+            
+            @Override
+            public boolean isLeaf() {
+                return isSelected();
             }
 
             @Override

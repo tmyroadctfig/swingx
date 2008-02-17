@@ -45,6 +45,7 @@ import javax.swing.JComponent;
  * <li> enabled
  * <li> componentOrientation
  * <li> toolTipText
+ * <li> minimum-, maximum-, preferredSize
  * </ul>
  * 
  * Client code will rarely need to be aware of this class. It's the single
@@ -130,17 +131,19 @@ public class DefaultVisuals<T extends JComponent> implements Serializable {
      * 
      * Here: synch <code>Font</code>, <code>ComponentOrientation</code> and
      * <code>enabled</code> to context's component. Resets toolTipText to null.
+     * Calls configureSizes to reset xxSize if appropriate.
      * <p>
      * 
      * PENDING: not fully defined - "divers" means everything that's not 
      * <code>Color</code>s
      * nor <code>Border</code> nor <code>Painter</code>.
-     *      * 
+     *      
      * @param renderingComponent the component to configure, must not be null
      * @param context the cell context to configure from, must not be null
      */
     protected void configureState(T renderingComponent, CellContext context) {
         renderingComponent.setToolTipText(null);
+        configureSizes(renderingComponent, context);
         if (context.getComponent() == null) {
             // what to do?
             // we guarantee to cleanup completely - what are the defaults?
@@ -151,6 +154,20 @@ public class DefaultVisuals<T extends JComponent> implements Serializable {
             renderingComponent.applyComponentOrientation(context.getComponent()
                     .getComponentOrientation());
         }
+    }
+
+    /**
+     * Configures min-, max, preferredSize properties of the renderingComponent.
+     * 
+     * Here: set all to null.
+     * 
+     * @param renderingComponent the component to configure, must not be null
+     * @param context the cell context to configure from, must not be null
+     */
+    protected void configureSizes(T renderingComponent, CellContext context) {
+        renderingComponent.setPreferredSize(null);
+        renderingComponent.setMinimumSize(null);
+        renderingComponent.setMaximumSize(null);
     }
 
     /**

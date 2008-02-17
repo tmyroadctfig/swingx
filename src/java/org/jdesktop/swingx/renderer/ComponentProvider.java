@@ -92,11 +92,12 @@ import javax.swing.JLabel;
  * <li> enabled
  * <li> componentOrientation
  * <li> tooltipText
+ * <li> minimum-, maximum-, preferredSize
  * <li> horizontal alignment (if applicable)
  * </ul>
  * 
  * As this internally delegates default visual configuration to a
- * <code>DefaultVisuals</code> (which handles the first seven items)
+ * <code>DefaultVisuals</code> (which handles the first eight items)
  * subclasses have to guarantee the alignment only.
  * <p>
  * 
