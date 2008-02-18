@@ -823,20 +823,6 @@ public class JXDatePickerTest extends InteractiveTestCase {
         assertNotNull(picker.getActionMap().get(JXDatePicker.COMMIT_KEY));
     }
     
-    /**
-     * for now keep the old postAction.
-     *
-     */
-    @SuppressWarnings("deprecation")
-    public void testCommitCancelPreserveOld() {
-        JXDatePicker picker = new JXDatePicker();
-        ActionReport report = new ActionReport();
-        picker.addActionListener(report);
-        picker.postActionEvent();
-        assertEquals(picker.getActionCommand(), report.getLastActionCommand());
-    }
-
-    
 
     /**
      * Issue #658-swingx: timezone in linkformat updated.

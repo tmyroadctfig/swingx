@@ -1538,20 +1538,6 @@ public class JXMonthViewTest extends MockObjectTestCase {
     }
 
     /**
-     * for now keep the old postAction.
-     *
-     */
-    @SuppressWarnings("deprecation")
-    public void testCommitCancelPreserveOld() {
-        JXDatePicker picker = new JXDatePicker();
-        ActionReport report = new ActionReport();
-        picker.addActionListener(report);
-        picker.postActionEvent();
-        assertEquals(picker.getActionCommand(), report.getLastActionCommand());
-    }
-
-    
-    /**
      * BasicMonthViewUI: use adjusting api in keyboard actions.
      * Here: test reset in cancel action.
      */

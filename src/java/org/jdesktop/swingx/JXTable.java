@@ -37,8 +37,6 @@ import java.awt.print.PrinterException;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.lang.reflect.Field;
-import java.text.DateFormat;
-import java.text.NumberFormat;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
@@ -76,15 +74,12 @@ import javax.swing.SizeSequence;
 import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
 import javax.swing.UIManager;
-import javax.swing.border.Border;
-import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.TableColumnModelEvent;
 import javax.swing.event.TableModelEvent;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
@@ -3724,150 +3719,6 @@ public class JXTable extends JTable
         setLazyValue(defaultEditorsByColumnClass, c, s);
     }
 
-    /*
-     * Default Type-based Renderers: JTable's default table cell renderer
-     * classes are private and JTable:getDefaultRenderer() returns a *shared*
-     * cell renderer instance, thus there is no way for us to instantiate a new
-     * instance of one of its default renderers. So, we must replicate the
-     * default renderer classes here so that we can instantiate them when we
-     * need to create renderers to be set on specific columns.
-     */
-    
-    /**
-     * The default renderer for <code>Number</code> types. Aligns to
-     * <code>RIGHT</code>.
-     * @deprecated instead use a org.jdesktop.swingx.renderer.DefaultTableRenderer 
-     *    configured with a org.jdesktop.swingx.renderer.FormatStringValue 
-     */
-    public static class NumberRenderer extends DefaultTableCellRenderer {
-        public NumberRenderer() {
-            super();
-            // JW: RIGHT is the correct thing to do for bidi-compliance
-            // numbers are right aligned even if text is LToR
-            setHorizontalAlignment(JLabel.RIGHT);
-        }
-    }
-
-    /**
-     * Default renderer for <code>Float</code> and <code>Double</code>
-     * types. Uses a <code>NumberFormat</code> to renderer. The format can be
-     * provided by client code, if null the general-purpose number format for
-     * the current locale is used.
-     * @deprecated instead use a org.jdesktop.swingx.renderer.DefaultTableRenderer 
-     *    configured with a org.jdesktop.swingx.renderer.FormatStringValue 
-     * 
-     */
-    public static class DoubleRenderer extends NumberRenderer {
-        private final NumberFormat formatter;
-
-        public DoubleRenderer() {
-            this(null);
-        }
-
-        public DoubleRenderer(NumberFormat formatter) {
-            if (formatter == null) {
-                formatter = NumberFormat.getInstance();
-            }
-            this.formatter = formatter;
-        }
-
-        @Override
-        public void setValue(Object value) {
-            setText((value == null) ? "" : formatter.format(value));
-        }
-    }
-
-    /**
-     * The default renderer for <code>Date</code> types. Uses a
-     * <code>DateFormat</code> to render. The format can be provided by client
-     * code, if null the general-purpose date format for the current locale is
-     * used.
-     * @deprecated instead use a org.jdesktop.swingx.renderer.DefaultTableRenderer 
-     *    configured with a org.jdesktop.swingx.renderer.FormatStringValue 
-     */
-    public static class DateRenderer extends DefaultTableCellRenderer {
-        private final DateFormat formatter;
-
-        public DateRenderer() {
-            this(null);
-        }
-
-        public DateRenderer(DateFormat formatter) {
-            if (formatter == null) {
-                formatter = DateFormat.getDateInstance();
-            }
-            this.formatter = formatter;
-        }
-
-        @Override
-        public void setValue(Object value) {
-            setText((value == null) ? "" : formatter.format(value));
-        }
-    }
-
-    /**
-     * The default renderer for <code>Icon</code> and <code>ImageIcon</code> types.<p>
-     * 
-     * Note: it's registered for both the interface and a concrete class because
-     * <code>JTable</code> class-based lookup doesn't cope well with interfaces.
-     * 
-     * @deprecated instead use a org.jdesktop.swingx.renderer.DefaultTableRenderer 
-     *    configured with a org.jdesktop.swingx.renderer.IconValue 
-     * 
-     */
-    public static class IconRenderer extends DefaultTableCellRenderer {
-        public IconRenderer() {
-            super();
-            setHorizontalAlignment(JLabel.CENTER);
-        }
-
-        @Override
-        public void setValue(Object value) {
-            setIcon((value instanceof Icon) ? (Icon) value : null);
-        }
-    }
-
-    /*
-     * re- c&p'd from 1.5 JTable. 
-     */
-    /**
-     * The default renderer for <code>Boolean</code> types.
-     * @deprecated instead use a org.jdesktop.swingx.renderer.DefaultTableRenderer 
-     *    configured with a org.jdesktop.swingx.renderer.ButtonProvider 
-     */
-    public static class BooleanRenderer extends JCheckBox implements // , UIResource
-            TableCellRenderer     {
-        private static final Border noFocusBorder = new EmptyBorder(1, 1, 1, 1);
-
-        public BooleanRenderer() {
-            super();
-            setHorizontalAlignment(JLabel.CENTER);
-            setBorderPainted(true);
-        }
-
-        public Component getTableCellRendererComponent(JTable table,
-                Object value, boolean isSelected, boolean hasFocus, int row,
-                int column) {
-            if (isSelected) {
-                setForeground(table.getSelectionForeground());
-                super.setBackground(table.getSelectionBackground());
-            } else {
-                setForeground(table.getForeground());
-                setBackground(table.getBackground());
-            }
-            setSelected((value != null && ((Boolean) value).booleanValue()));
-
-            if (hasFocus) {
-                setBorder(UIManager.getBorder("Table.focusCellHighlightBorder"));
-            } else {
-                setBorder(noFocusBorder);
-            }
-
-            return this;
-        }
-    }
-
-
     /**
      * Creates default cell editors for objects, numbers, and boolean values.
      * <p>
@@ -4431,23 +4282,6 @@ public class JXTable extends JTable
             setRowHeight(Math.max(fontBasedHeight, magicMinimum));
         }
         isXTableRowHeightSet = false;
-    }
-
-    /**
-     * Convenience to set both grid line visibility and default margin for
-     * horizontal/vertical lines. The margin defaults to 1 or 0 if the grid
-     * lines are drawn or not drawn.
-     * <p>
-     * @param showHorizontalLines boolean to decide whether to draw horizontal
-     *        grid lines.
-     * @param showVerticalLines boolean to decide whether to draw vertical grid
-     *        lines.
-     * @deprecated replaced by {@link #setShowGrid(boolean, boolean)}.
-     * 
-     */
-    public void setDefaultMargins(boolean showHorizontalLines,
-            boolean showVerticalLines) {
-        setShowGrid(showHorizontalLines, showVerticalLines);
     }
 
     /**

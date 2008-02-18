@@ -276,38 +276,6 @@ public abstract class Filter {
     }
 
     /**
-     * Returns the row in this filter that maps to the specified row in the
-     * previous filter. If there is no previous filter in the pipeline, this returns
-     * the row in this filter that maps to the specified row in the data model.
-     * This method is called from
-     * {@link org.jdesktop.swingx.decorator.Filter#convertRowIndexToView(int) convertRowIndexToView}
-     *
-     * @param row a row index in the previous filter's "view" of the data model
-     * @return the row in this filter that maps to the specified row in
-     * the previous filter
-     */
-    @Deprecated /** TODO: remove this deprecated method; use mapTowardView() instead */
-    protected int translateFromPreviousFilter(int row) {
-        return mapTowardView(row);
-    }
-
-    /**
-     * Returns the row in the previous filter that maps to the specified row in
-     * this filter. If there is no previous filter in the pipeline, this returns
-     * the row in the data model that maps to the specified row in this filter.
-     * This method is called from
-     * {@link org.jdesktop.swingx.decorator.Filter#convertRowIndexToModel(int) convertRowIndexToModel}
-     *
-     * @param row a row index in this filter's "view" of the data model
-     * @return the row in the previous filter that maps to the specified row in
-     * this filter
-     */
-    @Deprecated /** TODO: remove this deprecated method; use mapTowardModel() instead */
-    protected int translateToPreviousFilter(int row) {
-        return mapTowardModel(row);
-    }
-
-    /**
      * Returns the filter to use for accessing input.
      * That's the previous (model is first) filter if this is 
      * part of a pipeline or null if this is standalone or the first

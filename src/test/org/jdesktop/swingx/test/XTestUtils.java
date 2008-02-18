@@ -112,36 +112,6 @@ public class XTestUtils {
         return cal.getTime();
     }
 
-    /**
-     * 
-     * @param days
-     * @return the current day offset by days with all time elements 
-     *   set to 0
-     * @deprecated use getStartOfToday(int)
-     */
-    public static Date getCleanedToday(int days) {
-        return getStartOfToday(days);
-    }
-    /**
-     * 
-     * @return the current date with all time elements set to 0
-     * @deprecated use getStartOfToday()
-     */
-    public static Date getCleanedToday() {
-        return getStartOfToday();
-    }
-    
-    /**
-     * Cleans the calendars time elements and returns its date.
-     * 
-     * @param cal the calendar to clean
-     * @return the calendar's date with all time elements set to 0
-     * @deprecated use getStartOfDay
-     */
-    public static Date getCleanedDate(Calendar cal) {
-        CalendarUtils.startOfDay(cal);
-        return cal.getTime();
-    }
 
 
 }

@@ -846,15 +846,7 @@ public class JXDatePicker extends JComponent {
         _monthView.setLocale(l);
     }*/
     
-    /**
-     * 
-     *  @deprecated use {@link #cancelEdit()} and {@link #commitEdit()} instead
-     */
-    @Deprecated 
-    public void postActionEvent() {
-        fireActionPerformed();
-    }
-
+ 
     /**
      * Pes: added setLocale method to refresh link text on locale changes
      */

@@ -79,19 +79,6 @@ public final class TreeModelSupport {
     }
 
     /**
-     * Call when everything but the root has changed. Only may be called when
-     * the root is not null. Otherwise there isn't a structure to have changed.
-     * 
-     * PENDING JW: remove? This is redundant with fireNewRoot, only less ...
-     * because this has a precondition.
-     * 
-     * @deprecated use {@link #fireNewRoot()} 
-     */
-    public void fireStructureChanged() {
-        fireTreeStructureChanged(new TreePath(treeModel.getRoot()));
-    }
-
-    /**
      * Call when a node has changed its leaf state.<p>
      * 
      * PENDING: rename? Do we need it?
