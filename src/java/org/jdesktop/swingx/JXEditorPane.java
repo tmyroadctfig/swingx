@@ -176,6 +176,7 @@ public class JXEditorPane extends JEditorPane implements /*Searchable, */Targeta
     /**
      * Overidden to perform document initialization based on type.
      */
+    @Override
     public void setEditorKit(EditorKit kit) {
         super.setEditorKit(kit);
 
@@ -390,6 +391,7 @@ public class JXEditorPane extends JEditorPane implements /*Searchable, */Targeta
                 setOpaque(true);
             }
 
+            @Override
             public Component getListCellRendererComponent(JList list,
                                                           Object value,
                                                           int index,
@@ -432,6 +434,7 @@ public class JXEditorPane extends JEditorPane implements /*Searchable, */Targeta
      * The paste method has been overloaded to strip off the <html><body> tags
      * This doesn't really work.
      */
+    @Override
     public void paste() {
         Clipboard clipboard = getToolkit().getSystemClipboard();
         Transferable content = clipboard.getContents(this);
@@ -740,6 +743,7 @@ public class JXEditorPane extends JEditorPane implements /*Searchable, */Targeta
      * @author rbair
      */
     private static final class SloppyHTMLEditorKit extends HTMLEditorKit {
+        @Override
         public void read(Reader in, Document doc, int pos) throws IOException, BadLocationException {
             //read the reader into a String
             StringBuffer buffer = new StringBuffer();

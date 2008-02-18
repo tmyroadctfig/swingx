@@ -149,7 +149,7 @@ public class WrappingProvider extends
         if (context != null) {
             rendererComponent.setComponent(wrappee.rendererComponent);
             Object oldValue = adjustContextValue(context);
-            WrappingIconPanel panel = super.getRendererComponent(context);
+            super.getRendererComponent(context);
             wrappee.getRendererComponent(context);
             restoreContextValue(context, oldValue);
             return rendererComponent;

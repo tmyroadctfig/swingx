@@ -76,7 +76,6 @@ import org.jdesktop.swingx.event.DateSelectionEvent;
 import org.jdesktop.swingx.event.DateSelectionListener;
 import org.jdesktop.swingx.event.DateSelectionEvent.EventType;
 import org.jdesktop.swingx.plaf.DatePickerUI;
-import org.jdesktop.swingx.plaf.UIManagerExt;
 
 /**
  * The basic implementation of a <code>DatePickerUI</code>.

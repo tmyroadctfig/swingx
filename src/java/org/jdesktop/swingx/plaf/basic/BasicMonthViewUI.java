@@ -2312,6 +2312,7 @@ public class BasicMonthViewUI extends MonthViewUI {
      *     no longer used internally
      */
     @Deprecated
+    @SuppressWarnings("unused")
     private int getDayOfWeekViewIndex(int dayOfWeek) {
         int result = dayOfWeek - monthView.getFirstDayOfWeek();
         if (result < 0) {
