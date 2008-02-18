@@ -4,11 +4,9 @@
  */
 package org.jdesktop.swingx;
 
-import java.awt.ComponentOrientation;
 import java.awt.event.ActionEvent;
 import java.util.logging.Logger;
 
-import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BoxLayout;
 import javax.swing.Icon;
@@ -135,28 +133,9 @@ public class JXStatusBarVisualCheck extends InteractiveTestCase {
         addMessage(frame, "leading");
         JXStatusBar statusBar = getStatusBar(frame);
         statusBar.add(new JLabel("trailing"));
-        Action toggleComponentOrientation = new AbstractAction("toggle orientation") {
-
-            public void actionPerformed(ActionEvent e) {
-                ComponentOrientation current = frame.getComponentOrientation();
-                if (current == ComponentOrientation.LEFT_TO_RIGHT) {
-                    frame.applyComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
-                } else {
-                    frame.applyComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
-
-                }
-                // needed to make the change show 
-                // looks like a problem somewhere along the container hierarchy...
-                frame.getRootPaneExt().revalidate();
-                // this is to make the borders take up the new orientation
-                frame.repaint();
-            }
-
-        };
-        addAction(frame, toggleComponentOrientation);
+        addComponentOrientationToggle(frame);
         frame.setSize(200, 400);
         frame.setVisible(true);
-        
     }
     
     /**

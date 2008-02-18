@@ -23,7 +23,6 @@ package org.jdesktop.swingx;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.lang.reflect.InvocationTargetException;
@@ -35,7 +34,6 @@ import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.CellEditor;
 import javax.swing.JFrame;
-import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
@@ -45,7 +43,6 @@ import javax.swing.border.Border;
 import javax.swing.event.CellEditorListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.TableModelEvent;
-import javax.swing.plaf.basic.BasicLookAndFeel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
@@ -145,7 +142,6 @@ public class JXTreeTableIssues extends InteractiveTestCase {
         JXFrame frame = wrapWithScrollingInFrame(xTable, "#730-swingx: click sometimes cancels");
         frame.add(field, BorderLayout.SOUTH);
         frame.setVisible(true);
-        BasicLookAndFeel f;
     }
 
     

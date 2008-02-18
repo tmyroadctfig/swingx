@@ -5,14 +5,10 @@
 package org.jdesktop.swingx;
 
 import java.awt.Color;
-import java.awt.ComponentOrientation;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.event.ActionEvent;
 import java.util.logging.Logger;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.JComponent;
@@ -115,28 +111,7 @@ public class JXTitledSeparatorTest extends InteractiveTestCase {
         box.add(right);
         
         final JXFrame frame = wrapInFrame(box, "Bidi-compliance");
-        Action toggleComponentOrientation = new AbstractAction("toggle orientation") {
-
-            public void actionPerformed(ActionEvent e) {
-                ComponentOrientation current = frame.getComponentOrientation();
-                if (current == ComponentOrientation.LEFT_TO_RIGHT) {
-                    frame.applyComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
-                } else {
-                    frame.applyComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
-
-                }
-                
-                // needed to make the change show 
-                // looks like a problem somewhere along the container hierarchy...
-                frame.getRootPaneExt().revalidate();
-                // this is to make the borders take up the new orientation
-                frame.repaint();
-//                frame.getRootPaneExt().repaint();
-//                frame.setSize(frame.getSize());
-            }
-
-        };
-        addAction(frame, toggleComponentOrientation);
+        addComponentOrientationToggle(frame);
         // titledSeparator freaks with prefSize, need to set fixed
         frame.setSize(200, 400);
         frame.setVisible(true);

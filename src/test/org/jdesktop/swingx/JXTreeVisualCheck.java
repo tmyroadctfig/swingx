@@ -22,7 +22,6 @@ package org.jdesktop.swingx;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.ComponentOrientation;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -57,7 +56,6 @@ import org.jdesktop.swingx.decorator.HighlighterFactory;
 import org.jdesktop.swingx.decorator.PatternPredicate;
 import org.jdesktop.swingx.decorator.SearchPredicate;
 import org.jdesktop.swingx.decorator.HighlightPredicate.DepthHighlightPredicate;
-import org.jdesktop.swingx.decorator.HighlightPredicate.NotHighlightPredicate;
 import org.jdesktop.swingx.renderer.CellContext;
 import org.jdesktop.swingx.renderer.DefaultTreeRenderer;
 import org.jdesktop.swingx.renderer.StringValue;
@@ -317,21 +315,7 @@ public class JXTreeVisualCheck extends JXTreeUnitTest {
         JXTree xTree = new JXTree();
         xTree.setEditable(true);
         final JXFrame frame = wrapWithScrollingInFrame(tree, xTree, "standard Editing: compare tree and xtree");
-        Action toggleComponentOrientation = new AbstractAction("toggle orientation") {
-
-            public void actionPerformed(ActionEvent e) {
-                ComponentOrientation current = frame.getComponentOrientation();
-                if (current == ComponentOrientation.LEFT_TO_RIGHT) {
-                    frame.applyComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
-                } else {
-                    frame.applyComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
-
-                }
-
-            }
-
-        };
-        addAction(frame, toggleComponentOrientation);
+        addComponentOrientationToggle(frame);
         frame.setVisible(true);
         
     }
@@ -360,21 +344,7 @@ public class JXTreeVisualCheck extends JXTreeUnitTest {
 //            }   
 //        }
         final JXFrame frame = wrapWithScrollingInFrame(tree, xTree, "XEditing: compare tree and xtree");
-        Action toggleComponentOrientation = new AbstractAction("toggle orientation") {
-
-            public void actionPerformed(ActionEvent e) {
-                ComponentOrientation current = frame.getComponentOrientation();
-                if (current == ComponentOrientation.LEFT_TO_RIGHT) {
-                    frame.applyComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
-                } else {
-                    frame.applyComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
-
-                }
-
-            }
-
-        };
-        addAction(frame, toggleComponentOrientation);
+        addComponentOrientationToggle(frame);
         frame.setVisible(true);
         
     }

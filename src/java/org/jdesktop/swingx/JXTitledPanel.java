@@ -219,6 +219,7 @@ public class JXTitledPanel extends JXPanel {
      * Adds the given JComponent as a decoration on the right of the title
      * 
      * @param decoration
+     * @deprecated use {@link #setRightDecoration(JComponent)}
      */
     @Deprecated
     public void addRightDecoration(JComponent decoration) {
@@ -227,8 +228,9 @@ public class JXTitledPanel extends JXPanel {
 
     /**
      * Adds the given JComponent as a decoration on the left of the title
-     * 
-     * @param decoration
+     *  
+     * @param decoration 
+     * @deprecated use {@link #setLeftDecoration(JComponent)}
      */
     @Deprecated
     public void addLeftDecoration(JComponent decoration) {

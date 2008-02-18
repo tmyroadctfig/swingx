@@ -23,6 +23,7 @@ public class JXTitledPanelTest extends InteractiveTestCase {
     // flag used in setup to explicitly choose LF
     private boolean defaultToSystemLF;
 
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
         // make sure we have the same default for each test
@@ -122,8 +123,8 @@ public class JXTitledPanelTest extends InteractiveTestCase {
     public  void interactiveRToL() {
         String title = "starting title";
         JXTitledPanel titledPane = new JXTitledPanel(title);
-        titledPane.addLeftDecoration(new JLabel("Leading"));
-        titledPane.addRightDecoration(new JLabel("Trailing"));
+        titledPane.setLeftDecoration(new JLabel("Leading"));
+        titledPane.setRightDecoration(new JLabel("Trailing"));
 //        panel.getContentContainer().setLayout(new BoxLayout(panel.getContentContainer(), BoxLayout.PAGE_AXIS));
         Icon icon = new ImageIcon(getClass().getResource("resources/images/wellBottom.gif"));
         final JLabel label = new JLabel(title);
@@ -139,13 +140,9 @@ public class JXTitledPanelTest extends InteractiveTestCase {
                     ComponentOrientation current = panel.getComponentOrientation();
                     if (current == ComponentOrientation.LEFT_TO_RIGHT) {
                         panel.applyComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
-//                        panel.revalidate();
-//                        panel.repaint();
                         label.setText("RightToLeft");
                     } else {
                         panel.applyComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
-//                      panel.revalidate();
-//                      panel.repaint();
                         label.setText("LeftToRight");
 
                     }
@@ -165,7 +162,7 @@ public class JXTitledPanelTest extends InteractiveTestCase {
         String title = "<html><u>starting title </u></html>";
         final JXTitledPanel panel = new JXTitledPanel(title);
         Icon icon = new ImageIcon(getClass().getResource("resources/images/wellBottom.gif"));
-        panel.addLeftDecoration(new JLabel(icon));
+        panel.setLeftDecoration(new JLabel(icon));
         panel.getContentContainer().setLayout(new BoxLayout(panel.getContentContainer(), BoxLayout.Y_AXIS));
         panel.getContentContainer().add(new JLabel(title));
         JXFrame frame = wrapInFrame(panel, "toggle Title");

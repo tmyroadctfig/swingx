@@ -31,7 +31,6 @@ import java.util.logging.Logger;
 
 import javax.swing.Action;
 import javax.swing.JComponent;
-import javax.swing.UIManager;
 
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;

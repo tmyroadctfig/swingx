@@ -10,7 +10,6 @@ package org.jdesktop.swingx;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.ComponentOrientation;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -721,21 +720,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
 //        table.setColumnControlVisible(true);
 //        pane.applyComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
         final JXFrame frame = wrapInFrame(pane, "RToLScrollPane");
-        Action toggleComponentOrientation = new AbstractAction("toggle orientation") {
-
-            public void actionPerformed(ActionEvent e) {
-                ComponentOrientation current = frame.getComponentOrientation();
-                if (current == ComponentOrientation.LEFT_TO_RIGHT) {
-                    frame.applyComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
-                } else {
-                    frame.applyComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
-
-                }
-
-            }
-
-        };
-        addAction(frame, toggleComponentOrientation);
+        addComponentOrientationToggle(frame);
         Action toggleColumnControl = new AbstractAction("toggle column control") {
 
             public void actionPerformed(ActionEvent e) {

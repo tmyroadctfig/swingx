@@ -7,6 +7,7 @@
 package org.jdesktop.swingx;
 
 import java.awt.BorderLayout;
+import java.awt.ComponentOrientation;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.lang.reflect.Method;
@@ -210,6 +211,31 @@ public abstract class InteractiveTestCase extends junit.framework.TestCase {
         }
     }
 
+    /**
+     * Creates and adds a button toggling the frame's componentOrientation.
+     * @param frame
+     */
+    public void addComponentOrientationToggle(final JXFrame frame) {
+        Action toggleComponentOrientation = new AbstractAction("toggle orientation") {
+
+            public void actionPerformed(ActionEvent e) {
+                ComponentOrientation current = frame.getComponentOrientation();
+                if (current == ComponentOrientation.LEFT_TO_RIGHT) {
+                    frame.applyComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+                } else {
+                    frame.applyComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+
+                }
+                frame.getRootPane().revalidate();
+                frame.invalidate();
+                frame.validate();
+                frame.repaint();
+            }
+
+        };
+        addAction(frame, toggleComponentOrientation);
+    }
+    
     public void addMessage(JXFrame frame, String message) {
         JXStatusBar statusBar = getStatusBar(frame);
         statusBar.add(new JLabel(message), JXStatusBar.Constraint.ResizeBehavior.FILL);

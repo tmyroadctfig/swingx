@@ -23,7 +23,6 @@ package org.jdesktop.swingx;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.ComponentOrientation;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -151,21 +150,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
     public void interactiveHierarchicalSelectionAndRToL() {
         final JXTreeTable table = new JXTreeTable(treeTableModel);
         final JXFrame frame = wrapWithScrollingInFrame(table, "Selection/Expansion Hacks and Bidi Compliance");
-        Action toggleComponentOrientation = new AbstractAction("toggle orientation") {
-
-            public void actionPerformed(ActionEvent e) {
-                ComponentOrientation current = frame.getComponentOrientation();
-                if (current == ComponentOrientation.LEFT_TO_RIGHT) {
-                    frame.applyComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
-                } else {
-                    frame.applyComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
-
-                }
-
-            }
-
-        };
-        addAction(frame, toggleComponentOrientation);
+        addComponentOrientationToggle(frame);
         frame.setVisible(true);
     }
 
@@ -357,21 +342,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         };
         tree.setEditable(true);
         final JXFrame frame = wrapWithScrollingInFrame(table, tree, "Editing: compare treetable and tree");
-        Action toggleComponentOrientation = new AbstractAction("toggle orientation") {
-
-            public void actionPerformed(ActionEvent e) {
-                ComponentOrientation current = frame.getComponentOrientation();
-                if (current == ComponentOrientation.LEFT_TO_RIGHT) {
-                    frame.applyComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
-                } else {
-                    frame.applyComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
-
-                }
-
-            }
-
-        };
-        addAction(frame, toggleComponentOrientation);
+        addComponentOrientationToggle(frame);
         frame.setVisible(true);
         
     }
@@ -636,21 +607,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         final TreeTableModel model = createMutableVisualizeModel();
         final JXTreeTable table = new JXTreeTable(model);
         final JXFrame frame = wrapWithScrollingInFrame(table, "Editor: position follows Component orientation");
-        Action toggleComponentOrientation = new AbstractAction("toggle orientation") {
-
-            public void actionPerformed(ActionEvent e) {
-                ComponentOrientation current = frame.getComponentOrientation();
-                if (current == ComponentOrientation.LEFT_TO_RIGHT) {
-                    frame.applyComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
-                } else {
-                    frame.applyComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
-
-                }
-
-            }
-
-        };
-        addAction(frame, toggleComponentOrientation);
+        addComponentOrientationToggle(frame);
         frame.setVisible(true);
     }
 

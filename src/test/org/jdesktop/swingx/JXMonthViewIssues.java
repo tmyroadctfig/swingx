@@ -21,7 +21,6 @@
  */
 package org.jdesktop.swingx;
 
-import java.awt.ComponentOrientation;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -33,7 +32,6 @@ import java.util.List;
 import java.util.TimeZone;
 import java.util.logging.Logger;
 
-import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JComboBox;
 
@@ -63,7 +61,7 @@ public class JXMonthViewIssues extends InteractiveTestCase {
 //          test.runInteractiveTests();
 //        test.runInteractiveTests("interactive.*Locale.*");
 //          test.runInteractiveTests("interactive.*AutoScroll.*");
-        test.runInteractiveTests("interactive.*Day.*");
+        test.runInteractiveTests("interactive.*First.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
@@ -139,24 +137,7 @@ public class JXMonthViewIssues extends InteractiveTestCase {
         };
         final JXFrame frame = wrapInFrame(monthView, "click unselectable fires ActionEvent");
         addAction(frame, action);
-        Action toggleComponentOrientation = new AbstractAction("toggle orientation") {
-
-            public void actionPerformed(ActionEvent e) {
-                ComponentOrientation current = frame.getComponentOrientation();
-                if (current == ComponentOrientation.LEFT_TO_RIGHT) {
-                    frame.applyComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
-                } else {
-                    frame.applyComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
-
-                }
-                frame.getRootPane().revalidate();
-                frame.invalidate();
-                frame.validate();
-                frame.repaint();
-            }
-
-        };
-        addAction(frame, toggleComponentOrientation);
+        addComponentOrientationToggle(frame);
         JXStatusBar bar = getStatusBar(frame);
         final JComboBox dayOfWeekComboBox = new JComboBox(new String[]{"Sunday", "Monday", "Tuesday",
                 "Wednesday", "Thursday", "Friday", "Saturday"});

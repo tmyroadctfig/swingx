@@ -27,7 +27,6 @@ import java.awt.GraphicsEnvironment;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.text.Collator;
 import java.util.ArrayList;
@@ -48,21 +47,18 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.event.CellEditorListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.TableModelEvent;
-import javax.swing.plaf.basic.BasicLookAndFeel;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 
-import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.action.BoundAction;
 import org.jdesktop.swingx.decorator.FilterPipeline;
 import org.jdesktop.swingx.decorator.PatternFilter;
@@ -138,7 +134,6 @@ public class JXTableIssues extends InteractiveTestCase {
         JXFrame frame = wrapWithScrollingInFrame(xTable, table, "#610-swingx: escape doesn't fire editing canceled");
         frame.add(field, BorderLayout.SOUTH);
         frame.setVisible(true);
-        BasicLookAndFeel f;
     }
     /**
      * row index conversion goes nuts if not re-sorted on update.
