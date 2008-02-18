@@ -74,7 +74,7 @@ public class HighlightPredicateTest extends InteractiveTestCase {
     // ---------------- predefined predicate
  
     /**
-     * test the IS_LEAF predicate.
+     * test the IS_FOLDER predicate.
      *
      */
     public void testFolder() {
@@ -83,7 +83,7 @@ public class HighlightPredicateTest extends InteractiveTestCase {
     }
     
     /**
-     * test the IS_LEAF predicate.
+     * test the IS_FOLDER predicate.
      *
      */
     public void testNotFolder() {

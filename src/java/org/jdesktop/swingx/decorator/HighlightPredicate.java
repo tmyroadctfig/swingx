@@ -152,7 +152,7 @@ public interface HighlightPredicate {
         /**
          * {@inheritDoc} <p>
          * 
-         * Implemented to return true is the given adapter isLeaf, false otherwise.
+         * Implemented to return true if the given adapter isLeaf, false otherwise.
          */
         public boolean isHighlighted(Component renderer, ComponentAdapter adapter) {
             return adapter.isLeaf();
@@ -166,7 +166,7 @@ public interface HighlightPredicate {
         /**
          * {@inheritDoc} <p>
          * 
-         * Implemented to return true is the given adapter isLeaf, false otherwise.
+         * Implemented to return false if the given adapter isLeaf, true otherwise.
          */
         public boolean isHighlighted(Component renderer, ComponentAdapter adapter) {
             return !adapter.isLeaf();
