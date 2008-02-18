@@ -20,7 +20,6 @@
  */
 package org.jdesktop.swingx;
 
-import org.jdesktop.swingx.editors.HighlighterPropertyEditor;
 
 /**
  *
@@ -35,6 +34,6 @@ public class JXListBeanInfo extends BeanInfoSupport {
 
     protected void initialize() {
         setPreferred(true, "highlighters");
-        setPropertyEditor(HighlighterPropertyEditor.class, "highlighters");
+//        setPropertyEditor(HighlighterPropertyEditor.class, "highlighters");
     }
 }

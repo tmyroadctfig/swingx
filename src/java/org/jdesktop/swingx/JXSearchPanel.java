@@ -31,7 +31,6 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 
 import org.jdesktop.swingx.decorator.PatternFilter;
-import org.jdesktop.swingx.decorator.PatternHighlighter;
 import org.jdesktop.swingx.decorator.PatternMatcher;
 
 /**
@@ -39,16 +38,36 @@ import org.jdesktop.swingx.decorator.PatternMatcher;
  * 
  * Updates PatternMatchers from user input.
  * 
- * Supports 
+ * Supports
  * 
  * <ol>
  * <li> text input to match
- * <li> match rules like contains/equals/... 
+ * <li> match rules like contains/equals/...
  * <li> toggle case sensitive match
  * </ol>
  * 
- * TODO: allow custom PatternModel and/or access 
- * to configuration of bound PatternModel. 
+ * NOTE: the method setPatternHighlighter(PatternHighlighter) has been removed
+ * without having been marked deprecated (has been an oversight on my part ;-).
+ * To replace, implement a custom PatternMatcher which has a Highlighter, takes
+ * a pattern and configures the Highlighter with the appropriate
+ * PatternPredicate.
+ * 
+ * <pre><code>
+ * public class PatternHandler implements PatternMatcher {
+ * 
+ *     private Highlighter highlighter;
+ *     private Pattern pattern;
+ * 
+ *     public void setPattern(Pattern pattern) {
+ *         this.pattern = pattern;
+ *         highlighter.setHighlightPredicate(new PatternPredicate(pattern));
+ *     }
+ * 
+ * }
+ * </code></pre>
+ * 
+ * TODO: allow custom PatternModel and/or access to configuration of bound
+ * PatternModel.
  * 
  * TODO: fully support control of multiple PatternMatchers.
  * 
@@ -91,19 +110,6 @@ public class JXSearchPanel extends AbstractPatternPanel {
         getPatternMatchers().add(filter);
         updateFieldName(filter);
     }
-
-    /**
-     * sets the PatternHighlighter control.
-     * 
-     * PENDING: change to do a addPatternMatcher to enable multiple control.
-     * PENDING: remove dependency on deprecated highlighter.
-     * 
-     */
-    public void setPatternHighlighter(PatternHighlighter highlighter) {
-        getPatternMatchers().add(highlighter);
-        updateFieldName(highlighter);
-    }
-
 
 
     /**

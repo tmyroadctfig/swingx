@@ -29,7 +29,6 @@ import java.util.List;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import org.jdesktop.swingx.decorator.LegacyHighlighter.UIHighlighter;
 import org.jdesktop.swingx.util.Contract;
 
 /**
@@ -43,8 +42,7 @@ import org.jdesktop.swingx.util.Contract;
  */
 @SuppressWarnings("deprecation")
 public class CompoundHighlighter extends AbstractHighlighter 
-    // its the same api - the old will be removed
-    implements UIDependent, UIHighlighter {
+    implements UIDependent {
     public static final Highlighter[] EMPTY_HIGHLIGHTERS = new Highlighter[0];
 
     protected List<Highlighter> highlighters;
@@ -179,23 +177,9 @@ public class CompoundHighlighter extends AbstractHighlighter
     private void updateUI(Highlighter hl) {
         if (hl instanceof UIDependent) {
             ((UIDependent) hl).updateUI();
-        } else if (hl instanceof UIHighlighter) { // this will be remove
-            ((UIHighlighter) hl).updateUI();
-        }
+        } 
     }
 
-
-    /**
-     * Applies all contained highlighters to the components.
-     * 
-     * @throws NullPointerException if either stamp or adapter is null.
-     * @deprecated use highlight 
-     * 
-     * @see #highlight(Component, ComponentAdapter)
-     */
-    public Component apply(Component stamp, ComponentAdapter adapter) {
-        return highlight(stamp, adapter);
-    }
 
 //------------------- implement Highlighter    
 
