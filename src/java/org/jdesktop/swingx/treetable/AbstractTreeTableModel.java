@@ -51,12 +51,6 @@ import org.jdesktop.swingx.tree.TreeModelSupport;
  * @author Karl Schaefer
  */
 public abstract class AbstractTreeTableModel implements TreeTableModel {
-    /**
-     * Value returned by {@link org.jdesktop.swingx.treetable.TreeTableModel#getColumnClass(int) getColumnClass}
-     * for the {@link org.jdesktop.swingx.JXTreeTable#isHierarchical(int) hierarchical} column.
-     */
-    @Deprecated
-    public final static Class<TreeTableModel> hierarchicalColumnClass = TreeTableModel.class;
 
     /**
      * Root node of the model
