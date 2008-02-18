@@ -159,6 +159,19 @@ public interface HighlightPredicate {
         }
     };
     
+    /**
+     * Folder predicate - convenience: same as !IS_LEAF.
+     */
+    public static final HighlightPredicate IS_FOLDER = new HighlightPredicate() {
+        /**
+         * {@inheritDoc} <p>
+         * 
+         * Implemented to return true is the given adapter isLeaf, false otherwise.
+         */
+        public boolean isHighlighted(Component renderer, ComponentAdapter adapter) {
+            return !adapter.isLeaf();
+        }
+    };
     
     /**
      * Even rows.

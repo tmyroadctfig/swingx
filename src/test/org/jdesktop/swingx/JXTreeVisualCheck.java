@@ -168,7 +168,7 @@ public class JXTreeVisualCheck extends JXTreeUnitTest {
                 return path == null ? false : 
                     (adapter.row - ((JTree) adapter.getComponent()).getRowForPath(path.getParentPath())) % 2 == 0;
             }
-            
+
         };
         HighlightPredicate oddChild = new HighlightPredicate() {
 
@@ -182,16 +182,14 @@ public class JXTreeVisualCheck extends JXTreeUnitTest {
             
         };
         final ExtendToWidthHighlighter extendToWidthHighlighter = new ExtendToWidthHighlighter(null, indent, depthOffset);
-        CompoundHighlighter hl = new CompoundHighlighter(
-                HighlightPredicate.IS_LEAF,
-                extendToWidthHighlighter,
-                new ColorHighlighter(evenChild, HighlighterFactory.BEIGE, null),
-                new ColorHighlighter(oddChild, HighlighterFactory.LINE_PRINTER, null)
-                );
         tree.setHighlighters(
-            hl,
-            new ColorHighlighter(new NotHighlightPredicate(HighlightPredicate.IS_LEAF), null, Color.RED)
-            );
+                new CompoundHighlighter(
+                        HighlightPredicate.IS_LEAF,
+                        extendToWidthHighlighter,
+                        new ColorHighlighter(evenChild, HighlighterFactory.BEIGE, null),
+                        new ColorHighlighter(oddChild, HighlighterFactory.LINE_PRINTER, null)),
+                        new ColorHighlighter(HighlightPredicate.IS_FOLDER, null, Color.RED)
+        );
         
         final JXFrame frame = wrapWithScrollingInFrame(tree, "tree-wide cell renderer");
         Action rootVisible = new AbstractActionExt("toggle root visible") {
@@ -213,7 +211,7 @@ public class JXTreeVisualCheck extends JXTreeUnitTest {
         };
         addAction(frame, handleVisible);
         frame.pack();
-        frame.setSize(400, 200);
+        frame.setSize(400, 400);
         frame.setVisible(true);
     }
 
@@ -254,7 +252,7 @@ public class JXTreeVisualCheck extends JXTreeUnitTest {
                 ComponentAdapter adapter) {
             Dimension dim = component.getPreferredSize();
             int width = adapter.getComponent().getWidth() 
-                - (adapter.getDepth() + depthOffset) * indent ;
+            - (adapter.getDepth() + depthOffset) * indent ;
             dim.width = Math.max(dim.width, width);
             component.setPreferredSize(dim);
             return component;

@@ -72,7 +72,25 @@ public class HighlightPredicateTest extends InteractiveTestCase {
     }
 
     // ---------------- predefined predicate
+ 
+    /**
+     * test the IS_LEAF predicate.
+     *
+     */
+    public void testFolder() {
+        ComponentAdapter adapter = createComponentAdapter(allColored, false);
+        assertTrue(HighlightPredicate.IS_FOLDER.isHighlighted(allColored, adapter));
+    }
     
+    /**
+     * test the IS_LEAF predicate.
+     *
+     */
+    public void testNotFolder() {
+        ComponentAdapter adapter = createComponentAdapter(allColored, true);
+        assertFalse(HighlightPredicate.IS_FOLDER.isHighlighted(allColored, adapter));
+    }
+
     /**
      * test the IS_LEAF predicate.
      *
