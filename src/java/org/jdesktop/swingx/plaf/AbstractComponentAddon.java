@@ -75,6 +75,8 @@ public abstract class AbstractComponentAddon implements ComponentAddon {
    * 
    * @param addon
    * @param defaults
+   * 
+   * @deprecated use {@link #addBasicDefaults(LookAndFeelAddons, DefaultsList)}
    */
   @Deprecated
   protected void addBasicDefaults(LookAndFeelAddons addon, List<Object> defaults) {
@@ -95,6 +97,8 @@ public abstract class AbstractComponentAddon implements ComponentAddon {
    * 
    * @param addon
    * @param defaults
+   * 
+   * @deprecated use {@link #addMacDefaults(LookAndFeelAddons, DefaultsList)}
    */
   @Deprecated
   protected void addMacDefaults(LookAndFeelAddons addon, List<Object> defaults) {
@@ -116,6 +120,8 @@ public abstract class AbstractComponentAddon implements ComponentAddon {
    * 
    * @param addon
    * @param defaults
+   * 
+   * @deprecated use {@link #addMetalDefaults(LookAndFeelAddons, DefaultsList)}
    */
   @Deprecated
   protected void addMetalDefaults(LookAndFeelAddons addon, List<Object> defaults) {
@@ -137,6 +143,8 @@ public abstract class AbstractComponentAddon implements ComponentAddon {
    * 
    * @param addon
    * @param defaults
+   * 
+   * @deprecated use {@link #addMotifDefaults(LookAndFeelAddons, DefaultsList)}
    */
   @Deprecated
   protected void addMotifDefaults(LookAndFeelAddons addon, List<Object> defaults) {
@@ -158,6 +166,8 @@ public abstract class AbstractComponentAddon implements ComponentAddon {
    * 
    * @param addon
    * @param defaults
+   * 
+   * @deprecated use {@link #addWindowsDefaults(LookAndFeelAddons, DefaultsList)}
    */
   @Deprecated
   protected void addWindowsDefaults(LookAndFeelAddons addon, List<Object> defaults) {
@@ -179,6 +189,8 @@ public abstract class AbstractComponentAddon implements ComponentAddon {
     * 
     * @param addon
     * @param defaults
+    * 
+    * @deprecated use {@link #addLinuxDefaults(LookAndFeelAddons, DefaultsList)}
     */
    @Deprecated
    protected void addLinuxDefaults(LookAndFeelAddons addon, List<Object> defaults) {
@@ -200,6 +212,8 @@ public abstract class AbstractComponentAddon implements ComponentAddon {
     * 
     * @param addon
     * @param defaults
+    * 
+    * @deprecated use {@link #addNimbusDefaults(LookAndFeelAddons, DefaultsList)}
     */
    @Deprecated
    protected void addNimbusDefaults(LookAndFeelAddons addon, List<Object> defaults) {
@@ -272,6 +286,8 @@ public abstract class AbstractComponentAddon implements ComponentAddon {
    *   "five", new Integer(5)
    * };
    * </pre>
+   * 
+   * @deprecated use {@link #getDefaults(LookAndFeelAddons)}
    */
   @Deprecated
   private Object[] getOldDefaults(LookAndFeelAddons addon) {
