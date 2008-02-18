@@ -941,6 +941,7 @@ public class JXDatePicker extends JComponent {
      * 
      * @deprecated use {@link #setDate(Date)}
      */
+    @Deprecated
     public void setDateInMillis(long millis) {
         setDate(new Date(millis));
     }
@@ -952,6 +953,7 @@ public class JXDatePicker extends JComponent {
      * 
      * @deprecated use {@link #getDate()}
      */
+    @Deprecated
     public long getDateInMillis() {
         long result = -1;
         Date selection = getDate();
@@ -968,6 +970,7 @@ public class JXDatePicker extends JComponent {
      * 
      * @deprecated use {@link #getLinkInMillis()}
      */
+    @Deprecated
     public long getLinkDate() {
         return getLinkDay().getTime();
     }
@@ -986,6 +989,7 @@ public class JXDatePicker extends JComponent {
      * 
      * @deprecated use
      */
+    @Deprecated
     public void setLinkDate(long linkDate, String linkFormatString) {
         setLinkDay(new Date(linkDate), linkFormatString);
     }
@@ -996,6 +1000,7 @@ public class JXDatePicker extends JComponent {
      * 
      * @deprecated use {@link #setLinkDay(Date)
      */
+    @Deprecated
     public void setLinkDate(long linkDate) {
         setLinkDay(new Date(linkDate));
     }
@@ -1006,6 +1011,7 @@ public class JXDatePicker extends JComponent {
      * 
      * @deprecated use {@link #getLinkDay()}
      */
+    @Deprecated
     public Date getToday() {
         return getLinkDay();
     }
@@ -1017,6 +1023,7 @@ public class JXDatePicker extends JComponent {
      * 
      * @deprecated use {@link #setLinkDay(Date)}
      */
+    @Deprecated
     public void setToday(Date linkDate) {
         setLinkDay(linkDate);
     }
@@ -1035,6 +1042,7 @@ public class JXDatePicker extends JComponent {
      * 
      * @deprecated use {@link #JXDatePicker(Date, Locale)}
      */
+    @Deprecated
     public JXDatePicker(long millis, Locale locale) {
         this(new Date(millis), locale);
 //        init();
@@ -1059,6 +1067,7 @@ public class JXDatePicker extends JComponent {
      * 
      * @deprecated use {@link #JXDatePicker(Date)}
      */
+    @Deprecated
     public JXDatePicker(long millis) {
         this(millis, null);
     }

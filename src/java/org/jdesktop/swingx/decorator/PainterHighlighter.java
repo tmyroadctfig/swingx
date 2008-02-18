@@ -76,6 +76,7 @@ public class PainterHighlighter extends AbstractHighlighter {
      * @deprecated use {@link #PainterHighlighter(HighlightPredicate, Painter)}
      *   changed method signature for consistency.
      */
+    @Deprecated
     public PainterHighlighter(Painter painter, HighlightPredicate predicate) {
         this(predicate, painter);
     }

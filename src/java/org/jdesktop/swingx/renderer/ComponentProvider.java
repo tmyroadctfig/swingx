@@ -241,6 +241,7 @@ public abstract class ComponentProvider<T extends JComponent>
      * @return a appropriate string representation of the cell's content.
      * @deprecated use ??
      */
+    @Deprecated
     public String getStringValue(CellContext context) {
         Object value = null;
         if (context != null) {

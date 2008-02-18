@@ -69,6 +69,7 @@ public class Utilities {
     public static final int OS_TRU64 = OS_SUNOS << 1;
 
     /** @deprecated please use OS_TRU64 instead */
+    @Deprecated
     private static final int OS_DEC = OS_TRU64 << 1;
 
     /** Operating system is OS/2. */

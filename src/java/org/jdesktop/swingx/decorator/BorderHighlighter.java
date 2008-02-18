@@ -144,6 +144,7 @@ public class BorderHighlighter extends AbstractHighlighter {
      * @deprecated use {@link #BorderHighlighter(HighlightPredicate, Border)}
      * 
      */
+    @Deprecated
     public BorderHighlighter(Border paddingBorder, HighlightPredicate predicate) {
         this(predicate, paddingBorder, true);
     }
@@ -162,6 +163,7 @@ public class BorderHighlighter extends AbstractHighlighter {
      * @deprecated use {@link #BorderHighlighter(HighlightPredicate, Border, boolean, boolean)}
      *   - sig changed for consistency (predicate first always)
      */
+    @Deprecated
     public BorderHighlighter(Border paddingBorder, 
             HighlightPredicate predicate, boolean compound, boolean inner) {
         super(predicate);
@@ -184,6 +186,7 @@ public class BorderHighlighter extends AbstractHighlighter {
      * @deprecated use {@link #BorderHighlighter(HighlightPredicate, Border, boolean)}
      *   - sig changed for consistency (predicate first always)
      */
+    @Deprecated
     public BorderHighlighter(
             Border paddingBorder, boolean compound, HighlightPredicate predicate) {
         super(predicate);

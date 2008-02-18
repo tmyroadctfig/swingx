@@ -165,12 +165,14 @@ public class BasicMonthViewUI extends MonthViewUI {
      *   @deprecated only read in deprecated methods (but calculation still triggered
      *    in layout, because some of the deprecated are public/protected)
      */
+    @Deprecated
     private int startX;
     /**
      * Top of first row of displayed months. 
      *   @deprecated only read in deprecated methods (but calculation still triggered
      *    in layout, because some of the deprecated are public/protected)
      */
+    @Deprecated
     private int startY;
 
     /** 
@@ -2309,6 +2311,7 @@ public class BasicMonthViewUI extends MonthViewUI {
      * @deprecated with revised location/date mapping no longer needed, 
      *     no longer used internally
      */
+    @Deprecated
     private int getDayOfWeekViewIndex(int dayOfWeek) {
         int result = dayOfWeek - monthView.getFirstDayOfWeek();
         if (result < 0) {
@@ -2327,6 +2330,7 @@ public class BasicMonthViewUI extends MonthViewUI {
      * 
      * @deprecated use {@link #getTraversableGridPositionAtLocation(int, int)}
      */
+    @Deprecated
     protected int getTraversableButtonAt(int x, int y) {
         return getTraversableGridPositionAtLocation(x, y);
     }
@@ -2343,6 +2347,7 @@ public class BasicMonthViewUI extends MonthViewUI {
      *   returned Point of new method is the other way round 
      *   (p.x == column, p.y == row) as in this!
      */
+    @Deprecated
     protected Point getCalRowColAt(int x, int y) {
         if (isLeftToRight ? (startX > x) : (startX < x) || startY > y) {
             return NO_SUCH_CALENDAR;
@@ -2370,6 +2375,7 @@ public class BasicMonthViewUI extends MonthViewUI {
      * 
      * @deprecated the result is no longer used except from deprecated methods.
      */
+    @Deprecated
     private void calculateStartPositionUnused() {
         // Calculate offset in x-axis for centering calendars.
         int width = monthView.getWidth();
@@ -2388,6 +2394,7 @@ public class BasicMonthViewUI extends MonthViewUI {
      * @deprecated use {@link #getDayAtLocation(int, int)} This method is
      * no longer used internally
      */
+    @Deprecated
     @Override
     public long getDayAt(int x, int y) {
         Date cal = getDayAtLocation(x, y);
@@ -2455,6 +2462,7 @@ public class BasicMonthViewUI extends MonthViewUI {
      * 
      * @deprecated use {@link #setFirstDisplayedDay(Date)}
      */
+    @Deprecated
     protected void setFirstDisplayedDate(long firstDisplayedDate) {
         setFirstDisplayedDay(new Date(firstDisplayedDate));
     }
@@ -2463,6 +2471,7 @@ public class BasicMonthViewUI extends MonthViewUI {
      * 
      * @deprecated use {@link #getFirstDisplayedDay()}
      */
+    @Deprecated
     protected long getFirstDisplayedDate() {
         return firstDisplayedDate.getTime();
     }
@@ -2477,6 +2486,7 @@ public class BasicMonthViewUI extends MonthViewUI {
      * @return the monthView's calendar, configured with the given date.
      * @deprecated use {@link #getCalendar(Date)}
      */
+    @Deprecated
     protected Calendar getCalendar(long millis) {
         Calendar calendar = monthView.getCalendar();
         calendar.setTimeInMillis(millis);

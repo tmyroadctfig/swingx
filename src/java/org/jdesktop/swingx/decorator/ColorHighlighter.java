@@ -132,6 +132,7 @@ public class ColorHighlighter extends AbstractHighlighter {
      *             changed method signature for consistency.
      * 
      */
+    @Deprecated
     public ColorHighlighter(Color cellBackground, Color cellForeground,
             HighlightPredicate predicate) {
         this(predicate, cellBackground, cellForeground, null, null);
@@ -151,6 +152,7 @@ public class ColorHighlighter extends AbstractHighlighter {
      *             changed method signature for consistency.
      * 
      */
+    @Deprecated
     public ColorHighlighter(Color cellBackground, Color cellForeground,
             Color selectedBackground, Color selectedForeground,
             HighlightPredicate predicate) {

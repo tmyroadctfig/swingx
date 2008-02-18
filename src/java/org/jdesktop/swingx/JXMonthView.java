@@ -154,20 +154,26 @@ public class JXMonthView extends JComponent {
     public static final String FLAGGED_DATES = "flaggedDates";
 
     /** @deprecated use hardcoded property name - this violated naming convention #751.*/
+    @Deprecated
     public static final String SHOW_LEADING_DATES = "showLeadingDates";
     /** @deprecated use hardcoded property name - this violated naming convention #751.*/
+    @Deprecated
     public static final String SHOW_TRAILING_DATES = "showTrailingDates";
     /** @deprecated use hardcoded property name - this violated naming convention #751.*/
+    @Deprecated
     public static final String WEEK_NUMBER = "weekNumber";
     /** @deprecated use hardcoded property name, changed to "firstDisplayedDay". */
+    @Deprecated
     public static final String FIRST_DISPLAYED_DATE = "firstDisplayedDate";
     /** Return value used to identify when the month down button is pressed. 
      * @deprecated moved to ui
      */
+    @Deprecated
     public static final int MONTH_DOWN = 1;
     /** Return value used to identify when the month up button is pressed. 
      * @deprecated moved to ui
      */
+    @Deprecated
     public static final int MONTH_UP = 2;
 
     static {
@@ -1792,6 +1798,7 @@ public class JXMonthView extends JComponent {
      * @deprecated use {@link #getSelectionDate()} name change to 
      *   align with new DateSelectionModel api
      */
+    @Deprecated
     public Date getSelectedDate() {
         return getSelectionDate();    
     }
@@ -1805,6 +1812,7 @@ public class JXMonthView extends JComponent {
      * @deprecated use {@link #setSelectionDate(Date)} - name change to 
      *   align with new DateSelectionModel api
      */
+    @Deprecated
     public void setSelectedDate(Date newDate) {
         setSelectionDate(newDate);
     }
@@ -1819,6 +1827,7 @@ public class JXMonthView extends JComponent {
      * @deprecated use {@link #isSelected(Date)}  - name change to 
      *   align with DateSelectionModel api
      */
+    @Deprecated
     public boolean isSelectedDate(Date date) {
         return getSelectionModel().isSelected(date);
     }
@@ -1847,6 +1856,7 @@ public class JXMonthView extends JComponent {
      *  - name change to comply with property naming conventions and 
      *  consistently using "Day" instead of "Date". 
      */
+    @Deprecated
     public void setShowLeadingDates(boolean value) {
         setShowingLeadingDays(value);
     }
@@ -1860,6 +1870,7 @@ public class JXMonthView extends JComponent {
      *  - name change to comply with property naming conventions and 
      *  consistently using "Day" instead of "Date". 
      */
+    @Deprecated
     public boolean isShowingLeadingDates() {
         return leadingDays;
     }
@@ -1872,6 +1883,7 @@ public class JXMonthView extends JComponent {
      *  - name change to comply with property naming conventions and 
      *  consistently using "Day" instead of "Date". 
      */
+    @Deprecated
     public void setShowTrailingDates(boolean value) {
         setShowingTrailingDays(value);
     }
@@ -1883,6 +1895,7 @@ public class JXMonthView extends JComponent {
      *  - name change to comply with property naming conventions and 
      *  consistently using "Day" instead of "Date". 
      */
+    @Deprecated
     public boolean isShowingTrailingDates() {
         return isShowingTrailingDays();
     }
@@ -1897,6 +1910,7 @@ public class JXMonthView extends JComponent {
      * 
      * @deprecated use {@link #isFlaggedDate(Date)}
      */
+    @Deprecated
     public boolean isFlaggedDate(long date) {
         return isFlaggedDate(new Date(date));
     }
@@ -1908,6 +1922,7 @@ public class JXMonthView extends JComponent {
      * 
      * @deprecated use {@link #setFlaggedDates(Date[])}
      */
+    @Deprecated
     public void setFlaggedDates(long[] flaggedDates) {
         Date[] flagged = null;
         if (flaggedDates != null) {
@@ -1929,6 +1944,7 @@ public class JXMonthView extends JComponent {
      * 
      * @deprecated use {@link #setSelectionDate(Date)}
      */
+    @Deprecated
     public boolean isSelectedDate(long date) {
         return getSelectionModel().isSelected(new Date(date));
     }
@@ -1941,6 +1957,7 @@ public class JXMonthView extends JComponent {
      * 
      * @deprecated use {@link #isUnselectableDate(Date)}
      */
+    @Deprecated
     public boolean isUnselectableDate(long date) {
         return getSelectionModel().isUnselectableDate(new Date(date));
     }
@@ -1952,6 +1969,7 @@ public class JXMonthView extends JComponent {
      * 
      * @deprecated use {@link #setUnselectableDates(Date...)}
      */
+    @Deprecated
     public void setUnselectableDates(long[] unselectableDates) {
         SortedSet<Date> unselectableSet = new TreeSet<Date>();
         if (unselectableDates != null) {
@@ -1984,6 +2002,7 @@ public class JXMonthView extends JComponent {
      * 
      * @deprecated use {@link #getToday()}
      */
+    @Deprecated
     public long getTodayInMillis() {
         return today.getTime();
     }
@@ -2073,6 +2092,7 @@ public class JXMonthView extends JComponent {
      * @return long The first displayed date.
      * @deprecated use {@link #getFirstDisplayedDay()}
      */
+    @Deprecated
     public long getFirstDisplayedDate() {
         return firstDisplayedDay.getTime();
     }
@@ -2087,6 +2107,7 @@ public class JXMonthView extends JComponent {
      * @param date The first displayed date.
      * @deprecated use {@link #setFirstDisplayedDay(Date)}
      */
+    @Deprecated
     public void setFirstDisplayedDate(long date) {
         setFirstDisplayedDay(new Date(date));
     }
@@ -2100,6 +2121,7 @@ public class JXMonthView extends JComponent {
      * @return long The last displayed date.
      * @deprecated use {@link #getLastDisplayedDay()} instead
      */
+    @Deprecated
     public long getLastDisplayedDate() {
         return getUI().getLastDisplayedDate();
     }
@@ -2116,6 +2138,7 @@ public class JXMonthView extends JComponent {
      * 
      * @deprecated use {@link #JXMonthView(Date, DateSelectionModel, Locale)}
      */
+    @Deprecated
     public JXMonthView(long firstDisplayedDate, final DateSelectionModel model, final Locale locale) {
         this(new Date(firstDisplayedDate), model, locale);
     }
@@ -2128,6 +2151,7 @@ public class JXMonthView extends JComponent {
      * @param firstDisplayedDate The first month to display.
      * @deprecated use {@link #JXMonthView(Date)}(
      */
+    @Deprecated
     public JXMonthView(long firstDisplayedDate) {
         this(firstDisplayedDate, null, null);
     }
@@ -2143,6 +2167,7 @@ public class JXMonthView extends JComponent {
      *   
      * @deprecated use {@link #JXMonthView(Date, DateSelectionModel)}  
      */
+    @Deprecated
     public JXMonthView(long firstDisplayedDate, final DateSelectionModel model) {
         this(firstDisplayedDate, model, null);
     }
@@ -2156,6 +2181,7 @@ public class JXMonthView extends JComponent {
      * either monthViewCommit or monthViewCancel, depending on the user
      * gesture which triggered the action.
      */
+    @Deprecated
     public String getActionCommand() {
         return actionCommand;
     }
@@ -2169,6 +2195,7 @@ public class JXMonthView extends JComponent {
      * either monthViewCommit or monthViewCancel, depending on the user
      * gesture which triggered the action.
      */
+    @Deprecated
     public void setActionCommand(String actionCommand) {
         this.actionCommand = actionCommand;
     }

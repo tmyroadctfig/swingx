@@ -61,6 +61,7 @@ import java.awt.event.ActionListener;
  *    use the SwingX DefaultXXRenderer configured with a 
  *    {@link org.jdesktop.swingx.renderer.HyperlinkProvider} instead
  */
+@Deprecated
 public class LinkRenderer extends AbstractCellEditor implements
         TableCellRenderer, TableCellEditor, ListCellRenderer, 
         TreeCellRenderer, RolloverRenderer {

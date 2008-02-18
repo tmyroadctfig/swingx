@@ -441,6 +441,7 @@ public class SearchFactory {
      *   location.
      * @deprecated use {@link #hideSharedFindPanel(boolean)} instead  
      */
+    @Deprecated
     protected Point hideSharedFindPanel() {
         return hideSharedFindPanel(true);
     }
