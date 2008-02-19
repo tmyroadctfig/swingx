@@ -1000,6 +1000,8 @@ public class JXTreeTable extends JXTable {
      * Sets the specified icon as the icon to use for rendering collapsed nodes.
      *
      * @param icon to use for rendering collapsed nodes
+     * 
+     * @see JXTree#setCollapsedIcon(Icon)
      */
     public void setCollapsedIcon(Icon icon) {
         renderer.setCollapsedIcon(icon);
@@ -1009,6 +1011,8 @@ public class JXTreeTable extends JXTable {
      * Sets the specified icon as the icon to use for rendering expanded nodes.
      *
      * @param icon to use for rendering expanded nodes
+     * 
+     * @see JXTree#setExpandedIcon(Icon)
      */
     public void setExpandedIcon(Icon icon) {
         renderer.setExpandedIcon(icon);
@@ -1018,6 +1022,8 @@ public class JXTreeTable extends JXTable {
      * Sets the specified icon as the icon to use for rendering open container nodes.
      *
      * @param icon to use for rendering open nodes
+     * 
+     * @see JXTree#setOpenIcon(Icon)
      */
     public void setOpenIcon(Icon icon) {
         renderer.setOpenIcon(icon);
@@ -1027,6 +1033,8 @@ public class JXTreeTable extends JXTable {
      * Sets the specified icon as the icon to use for rendering closed container nodes.
      *
      * @param icon to use for rendering closed nodes
+     * 
+     * @see JXTree#setClosedIcon(Icon)
      */
     public void setClosedIcon(Icon icon) {
         renderer.setClosedIcon(icon);
@@ -1036,11 +1044,51 @@ public class JXTreeTable extends JXTable {
      * Sets the specified icon as the icon to use for rendering leaf nodes.
      *
      * @param icon to use for rendering leaf nodes
+     * 
+     * @see JXTree#setLeafIcon(Icon)
      */
     public void setLeafIcon(Icon icon) {
         renderer.setLeafIcon(icon);
     }
 
+    /**
+     * Property to control whether per-tree icons should be 
+     * copied to the renderer on setTreeCellRenderer. <p>
+     * 
+     * The default value is false.
+     * 
+     * @param overwrite a boolean to indicate if the per-tree Icons should
+     *   be copied to the new renderer on setTreeCellRenderer.
+     * 
+     * @see #isOverwriteRendererIcons()  
+     * @see #setLeafIcon(Icon)
+     * @see #setOpenIcon(Icon)
+     * @see #setClosedIcon(Icon) 
+     * @see JXTree#setOverwriteRendererIcons(boolean) 
+     */
+    public void setOverwriteRendererIcons(boolean overwrite) {
+        renderer.setOverwriteRendererIcons(overwrite);
+    }
+
+
+    /**
+     * Returns a boolean indicating whether the per-tree icons should be 
+     * copied to the renderer on setTreeCellRenderer.
+     * 
+     * @return true if a TreeCellRenderer's icons will be overwritten with the
+     *   tree's Icons, false if the renderer's icons will be unchanged.
+     *   
+     * @see #setOverwriteRendererIcons(boolean)
+     * @see #setLeafIcon(Icon)
+     * @see #setOpenIcon(Icon)
+     * @see #setClosedIcon(Icon)  
+     * @see JXTree#isOverwriteRendererIcons()
+     *     
+     */
+    public boolean isOverwriteRendererIcons() {
+        return renderer.isOverwriteRendererIcons();
+    }
+    
     /**
      * Overridden to ensure that private renderer state is kept in sync with the
      * state of the component. Calls the inherited version after performing the
@@ -2006,7 +2054,8 @@ public class JXTreeTable extends JXTable {
                  * TODO: Support truncated text directly in
                  * DefaultTreeCellRenderer.
                  */
-            setOverwriteRendererIcons(true);
+            // removed as fix for #769-swingx: defaults for treetable should be same as tree
+//            setOverwriteRendererIcons(true);
 // setCellRenderer(new DefaultTreeRenderer());
             setCellRenderer(new ClippedTreeCellRenderer());
         }

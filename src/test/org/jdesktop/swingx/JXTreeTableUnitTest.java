@@ -36,6 +36,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.table.TableModel;
+import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
@@ -62,7 +63,84 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
     public JXTreeTableUnitTest() {
         super("JXTreeTable Unit Test");
     }
+
+    /**
+     * Issue #769-swingx: setXXIcon on renderer vs setXXIcon on Tree/Table.
+     * Characterize treeTable behaviour.
+     * 
+     * Here: icon on renderer must be respected if overwrite is false.
+     */
+    public void testIconSetOnRendererFalseOverwrite() {
+        JXTreeTable treeTable = new JXTreeTable();
+        DefaultTreeCellRenderer renderer = new DefaultTreeCellRenderer();
+        renderer.setLeafIcon(null);
+        treeTable.setTreeCellRenderer(renderer);
+        assertEquals("renderer must have null leaf icon", null, renderer.getLeafIcon());
+    }
+
+    /**
+     * Issue #769-swingx: setXXIcon on renderer vs setXXIcon on Tree/Table.
+     * Characterize treeTable behaviour.
+     * 
+     * Here: icon on renderer must be overwritten if overwrite is true.
+     */
+    public void testIconSetOnRendererTrueOverwrite() {
+        JXTreeTable treeTable = new JXTreeTable();
+        treeTable.setLeafIcon(null);
+        treeTable.setOverwriteRendererIcons(true);
+        // PENDING: incomplete api - no getter
+//        Icon leaf = treeTable.getLeafIcon();
+        DefaultTreeCellRenderer renderer = new DefaultTreeCellRenderer();
+        assertNotNull("sanity - the renderer has a leafIcon ", renderer.getLeafIcon());
+        treeTable.setTreeCellRenderer(renderer);
+        assertEquals("renderer leaf icon must be overwritten by treeTable's leaf icon", 
+                null, renderer.getLeafIcon());
+    }
+
+    /**
+     * Issue #769-swingx: setXXIcon on renderer vs setXXIcon on Tree/Table.
+     * Characterize treeTable behaviour.
+     * 
+     * Here: set icon on treeTable is passed on to renderer always.
+     */
+    public void testIconSetOnTreeTableFalseOverwrite() {
+        JXTreeTable treeTable = new JXTreeTable();
+        DefaultTreeCellRenderer renderer = new DefaultTreeCellRenderer();
+        assertNotNull(renderer.getLeafIcon());
+        treeTable.setTreeCellRenderer(renderer);
+        treeTable.setLeafIcon(null);
+        assertEquals("renderer must have null leaf icon", null, renderer.getLeafIcon());
+    }
+
+    /**
+     * Issue #769-swingx: setXXIcon on renderer vs setXXIcon on Tree/Table.
+     * Characterize treeTable behaviour.
+     * 
+     * Here: set icon on treeTable is passed on to renderer always.
+     */
+    public void testIconSetOnTreeTableTrueOverwrite() {
+        JXTreeTable treeTable = new JXTreeTable();
+        treeTable.setOverwriteRendererIcons(true);
+        DefaultTreeCellRenderer renderer = new DefaultTreeCellRenderer();
+        assertNotNull(renderer.getLeafIcon());
+        treeTable.setTreeCellRenderer(renderer);
+        treeTable.setLeafIcon(null);
+        assertEquals("renderer must have null leaf icon", null, renderer.getLeafIcon());
+    }
     
+    /**
+     * Issue #769-swingx: setXXIcon on renderer vs setXXIcon on Tree/Table.
+     * Characterize treeTable behaviour.
+     * 
+     * Here: default overwriteOnRenderer is false.
+     */
+    public void testIconOverwriteInitial() {
+        JXTreeTable treeTable = new JXTreeTable();
+        assertFalse("initial overwriteRendererIcons must be false", 
+                treeTable.isOverwriteRendererIcons());
+    }
+    
+
     /**
      * Issue 746-swingx: treetable selectionMapper must not be static.
      * 

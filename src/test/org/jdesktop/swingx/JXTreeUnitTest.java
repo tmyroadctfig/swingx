@@ -11,9 +11,11 @@ import java.util.Hashtable;
 import java.util.Vector;
 import java.util.regex.Pattern;
 
+import javax.swing.Icon;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellEditor;
+import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreePath;
@@ -42,6 +44,82 @@ public class JXTreeUnitTest extends InteractiveTestCase {
         super("JXTree Test");
     }
 
+    /**
+     * Issue #769-swingx: setXXIcon on renderer vs setXXIcon on Tree/Table.
+     * Characterize tree behaviour.
+     * 
+     * Here: icon on renderer must be respected if overwrite is false.
+     */
+    public void testIconSetOnRendererFalseOverwrite() {
+        JXTree tree = new JXTree();
+        DefaultTreeCellRenderer renderer = new DefaultTreeCellRenderer();
+        renderer.setLeafIcon(null);
+        tree.setCellRenderer(renderer);
+        assertEquals("renderer must have null leaf icon", null, renderer.getLeafIcon());
+    }
+
+    /**
+     * Issue #769-swingx: setXXIcon on renderer vs setXXIcon on Tree/Table.
+     * Characterize tree behaviour.
+     * 
+     * Here: icon on renderer must be overwritten if overwrite is true.
+     */
+    public void testIconSetOnRendererTrueOverwrite() {
+        JXTree tree = new JXTree();
+        tree.setLeafIcon(null);
+        tree.setOverwriteRendererIcons(true);
+        // PENDING: incomplete api - no getter
+//        Icon leaf = tree.getLeafIcon();
+        DefaultTreeCellRenderer renderer = new DefaultTreeCellRenderer();
+        assertNotNull("sanity - the renderer has a leafIcon ", renderer.getLeafIcon());
+        tree.setCellRenderer(renderer);
+        assertEquals("renderer leaf icon must be overwritten by tree's leaf icon", 
+                null, renderer.getLeafIcon());
+    }
+
+    /**
+     * Issue #769-swingx: setXXIcon on renderer vs setXXIcon on Tree/Table.
+     * Characterize tree behaviour.
+     * 
+     * Here: set icon on tree is passed on to renderer always.
+     */
+    public void testIconSetOnTreeFalseOverwrite() {
+        JXTree tree = new JXTree();
+        DefaultTreeCellRenderer renderer = new DefaultTreeCellRenderer();
+        assertNotNull(renderer.getLeafIcon());
+        tree.setCellRenderer(renderer);
+        tree.setLeafIcon(null);
+        assertEquals("renderer must have null leaf icon", null, renderer.getLeafIcon());
+    }
+
+    /**
+     * Issue #769-swingx: setXXIcon on renderer vs setXXIcon on Tree/Table.
+     * Characterize tree behaviour.
+     * 
+     * Here: set icon on tree is passed on to renderer always.
+     */
+    public void testIconSetOnTreeTrueOverwrite() {
+        JXTree tree = new JXTree();
+        tree.setOverwriteRendererIcons(true);
+        DefaultTreeCellRenderer renderer = new DefaultTreeCellRenderer();
+        assertNotNull(renderer.getLeafIcon());
+        tree.setCellRenderer(renderer);
+        tree.setLeafIcon(null);
+        assertEquals("renderer must have null leaf icon", null, renderer.getLeafIcon());
+    }
+    
+    /**
+     * Issue #769-swingx: setXXIcon on renderer vs setXXIcon on Tree/Table.
+     * Characterize tree behaviour.
+     * 
+     * Here: default overwriteOnRenderer is false.
+     */
+    public void testIconOverwriteInitial() {
+        JXTree tree = new JXTree();
+        assertFalse("initial overwriteRendererIcons must be false", tree.isOverwriteRendererIcons());
+    }
+    
+    
     /**
      * focus issues with popup in editors: tweak with 
      * custom cellEditorListener.

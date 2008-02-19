@@ -891,65 +891,78 @@ public class JXTree extends JTree {
     }
 
     /**
-     * sets the icon for the handle of an expanded node.
+     * Sets the Icon to use for the handle of an expanded node.<p>
      * 
      * Note: this will only succeed if the current ui delegate is
-     * a BasicTreeUI otherwise it will do nothing.
+     * a BasicTreeUI otherwise it will do nothing.<p>
      * 
-     * @param expanded
+     * PENDING JW: incomplete api (no getter) and not a bound property.
+     * 
+     * @param expandedIcon the Icon to use for the handle of an expanded node.
      */
-    public void setExpandedIcon(Icon expanded) {
+    public void setExpandedIcon(Icon expandedIcon) {
         if (getUI() instanceof BasicTreeUI) {
-            ((BasicTreeUI) getUI()).setExpandedIcon(expanded);
+            ((BasicTreeUI) getUI()).setExpandedIcon(expandedIcon);
         }
     }
     
     /**
-     * sets the icon for the handel of a collapsed node.
+     * Sets the Icon to use for the handle of a collapsed node.
      * 
      * Note: this will only succeed if the current ui delegate is
      * a BasicTreeUI otherwise it will do nothing.
      *  
-     * @param collapsed
+     * PENDING JW: incomplete api (no getter) and not a bound property.
+     * 
+     * @param collapsedIcon the Icon to use for the handle of a collapsed node.
      */
-    public void setCollapsedIcon(Icon collapsed) {
+    public void setCollapsedIcon(Icon collapsedIcon) {
         if (getUI() instanceof BasicTreeUI) {
-            ((BasicTreeUI) getUI()).setCollapsedIcon(collapsed);
+            ((BasicTreeUI) getUI()).setCollapsedIcon(collapsedIcon);
         }
     }
     
     /**
-     * set the icon for a leaf node.
+     * Sets the Icon to use for a leaf node.<p>
      * 
      * Note: this will only succeed if current renderer is a 
-     * DefaultTreeCellRenderer.
+     * DefaultTreeCellRenderer.<p>
      * 
-     * @param leafIcon
+     * PENDING JW: this (all setXXIcon) is old api pulled up from the JXTreeTable. 
+     * Need to review if we really want it - problematic if sharing the same
+     * renderer instance across different trees.
+     * 
+     * PENDING JW: incomplete api (no getter) and not a bound property.<p>
+     * 
+     * @param leafIcon the Icon to use for a leaf node.
      */
     public void setLeafIcon(Icon leafIcon) {
         getDelegatingRenderer().setLeafIcon(leafIcon);
-        
     }
     
     /**
-     * set the icon for a open non-leaf node.
+     * Sets the Icon to use for an open folder node.
      * 
      * Note: this will only succeed if current renderer is a 
      * DefaultTreeCellRenderer.
      * 
-     * @param openIcon
+     * PENDING JW: incomplete api (no getter) and not a bound property.
+     * 
+     * @param openIcon the Icon to use for an open folder node.
      */
     public void setOpenIcon(Icon openIcon) {
         getDelegatingRenderer().setOpenIcon(openIcon);
     }
     
     /**
-     * set the icon for a closed non-leaf node.
+     * Sets the Icon to use for a closed folder node.
      * 
      * Note: this will only succeed if current renderer is a 
      * DefaultTreeCellRenderer.
      * 
-     * @param closedIcon
+     * PENDING JW: incomplete api (no getter) and not a bound property.
+     * 
+     * @param closedIcon the Icon to use for a closed folder node.
      */
     public void setClosedIcon(Icon closedIcon) {
         getDelegatingRenderer().setClosedIcon(closedIcon);
@@ -957,14 +970,20 @@ public class JXTree extends JTree {
     
     /**
      * Property to control whether per-tree icons should be 
-     * copied to the renderer on setCellRenderer.
+     * copied to the renderer on setCellRenderer. <p>
      * 
-     * the default is false for backward compatibility.
+     * The default value is false.
      * 
      * PENDING: should update the current renderer's icons when 
      * setting to true?
      * 
-     * @param overwrite
+     * @param overwrite a boolean to indicate if the per-tree Icons should
+     *   be copied to the new renderer on setCellRenderer.
+     * 
+     * @see #isOverwriteRendererIcons()  
+     * @see #setLeafIcon(Icon)
+     * @see #setOpenIcon(Icon)
+     * @see #setClosedIcon(Icon)  
      */
     public void setOverwriteRendererIcons(boolean overwrite) {
         if (overwriteIcons == overwrite) return;
@@ -973,6 +992,19 @@ public class JXTree extends JTree {
         firePropertyChange("overwriteRendererIcons", old, overwrite);
     }
 
+    /**
+     * Returns a boolean indicating whether the per-tree icons should be 
+     * copied to the renderer on setCellRenderer.
+     * 
+     * @return true if a TreeCellRenderer's icons will be overwritten with the
+     *   tree's Icons, false if the renderer's icons will be unchanged.
+     *   
+     * @see #setOverwriteRendererIcons(boolean)
+     * @see #setLeafIcon(Icon)
+     * @see #setOpenIcon(Icon)
+     * @see #setClosedIcon(Icon)  
+     *     
+     */
     public boolean isOverwriteRendererIcons() {
         return overwriteIcons;
     }

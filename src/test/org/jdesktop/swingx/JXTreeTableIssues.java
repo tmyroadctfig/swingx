@@ -50,6 +50,7 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreePath;
 
+import org.jdesktop.swingx.JXTree.DelegatingRenderer;
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.action.LinkAction;
 import org.jdesktop.swingx.decorator.Highlighter;
@@ -101,7 +102,7 @@ public class JXTreeTableIssues extends InteractiveTestCase {
 //            test.runInteractiveTests(".*Text.*");
 //            test.runInteractiveTests(".*TreeExpand.*");
 //            test.runInteractiveTests("interactive.*ClipIssueD.*");
-          test.runInteractiveTests("interactive.*Editing.*");
+          test.runInteractiveTests("interactive.*Icon.*");
               
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
@@ -109,6 +110,27 @@ public class JXTreeTableIssues extends InteractiveTestCase {
         }
     }
 
+    public void interactiveNullTreeTableTreeIcons() {
+        JXTreeTable xTable = new JXTreeTable(new ComponentTreeTableModel(new JXFrame()));
+        xTable.expandAll();
+        xTable.setVisibleColumnCount(10);
+        DefaultTreeCellRenderer renderer =  new DefaultTreeCellRenderer();
+        xTable.setTreeCellRenderer(renderer);
+        renderer.setOpenIcon(null);
+        renderer.setClosedIcon(null);
+        renderer.setLeafIcon(null);
+        assertSame(renderer, ((DelegatingRenderer) xTable.getTreeCellRenderer()).getDelegateRenderer());
+        JXTree xTree = new JXTree(xTable.getTreeTableModel());
+        renderer =  new DefaultTreeCellRenderer();
+        renderer.setOpenIcon(null);
+        renderer.setClosedIcon(null);
+        renderer.setLeafIcon(null);
+        xTree.setCellRenderer(renderer);
+        JXFrame frame = wrapWithScrollingInFrame(xTable, xTree, "TreeTable: null icons?");
+        frame.setVisible(true);
+    }
+
+    
     /**
      * Issue #730-swingx: editor's stop not always called.
      * 
