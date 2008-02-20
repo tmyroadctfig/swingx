@@ -149,7 +149,7 @@ public interface DateSelectionModel {
     
     /**
      * Returns the Locale of this model's calendar.
-     * @return
+     * @return the Locale of this model's calendar.
      */
     public Locale getLocale();
 
