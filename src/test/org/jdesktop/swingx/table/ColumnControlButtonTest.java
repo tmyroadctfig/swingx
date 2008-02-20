@@ -48,7 +48,44 @@ public class ColumnControlButtonTest extends InteractiveTestCase {
             .getLogger(ColumnControlButtonTest.class.getName());
     
     protected TableModel sortableTableModel;
+    
+    /**
+     * Issue #404-swingx: load column control margin from ui.
+     * Test that column control configures itself with the icon from the ui.
+     */
+    public void testColumnControlInitialUpdateInsetsUIResource() {
+      ColumnControlButton control = new ColumnControlButton(new JXTable());
+      // PENDING JW: why not same? insets can be shared - or not?
+      // probably setMargin interferes - is doing some things ... 
+      assertEquals("columnControl must have margin from ui", 
+                UIManager.getInsets(ColumnControlButton.COLUMN_CONTROL_BUTTON_MARGIN_KEY),
+                control.getMargin());
+    }
 
+    /**
+     * Issue #404-swingx: load column control margin from ui.
+     * Test that column control loads the margin.
+     */
+    @SuppressWarnings("unused")
+    public void testColumnControlLoadsMargin() {
+        // force loading by instantiating a column control
+      ColumnControlButton control = new ColumnControlButton(new JXTable());
+        assertNotNull("columnControl must load lf-specific icon", 
+                UIManager.getInsets(ColumnControlButton.COLUMN_CONTROL_BUTTON_MARGIN_KEY));
+    }
+
+    /**
+     * Issue #404-swingx: load column control margin from ui.
+     * Test that addon loads the margin.
+     */
+    public void testColumnControlAddonLoadsMargin() {
+        // direct loading of addon
+        LookAndFeelAddons.contribute(new ColumnControlButtonAddon());
+        assertNotNull("addon must load lf-specific icon", 
+                UIManager.getInsets(ColumnControlButton.COLUMN_CONTROL_BUTTON_MARGIN_KEY));
+    }
+    
+    
     /**
      * Issue #404-swingx: load column control icon from ui.
      * Test that table instantiates the column control with ui icon.

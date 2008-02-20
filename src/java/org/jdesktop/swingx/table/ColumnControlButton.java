@@ -93,6 +93,8 @@ public class ColumnControlButton extends JButton {
     /** the key for looking up the control's icon in the UIManager. Typically, it's LAF dependent. */
     public static final String COLUMN_CONTROL_BUTTON_ICON_KEY = "ColumnControlButton.actionIcon";
     
+    /** the key for looking up the control's margin in the UIManager. Typically, it's LAF dependent. */
+    public static final String COLUMN_CONTROL_BUTTON_MARGIN_KEY = "ColumnControlButton.margin";
     static {
         LookAndFeelAddons.contribute(new ColumnControlButtonAddon());
     }
@@ -133,6 +135,7 @@ public class ColumnControlButton extends JButton {
         // JW: icon LF dependent?
         setAction(createControlAction(icon));
         updateActionUI();
+        updateButtonUI();
         installTable(table);
     }
 
@@ -142,8 +145,20 @@ public class ColumnControlButton extends JButton {
         super.updateUI();
         // JW: icon may be LF dependent
         updateActionUI();
-        setMargin(new Insets(1, 2, 2, 1)); // Make this LAF-independent
+        updateButtonUI();
         getColumnControlPopup().updateUI();
+    }
+
+    /**
+     * Updates this button's properties provided by the LAF.
+     * Here: overwrites the action's small_icon with the icon from the ui if the current
+     *   icon is null or a UIResource.
+     */
+    protected void updateButtonUI() {
+        if ((getMargin() == null) || (getMargin() instanceof UIResource)) {
+            Insets insets = UIManager.getInsets(COLUMN_CONTROL_BUTTON_MARGIN_KEY);
+            setMargin(insets); 
+        }
     }
     
     /**

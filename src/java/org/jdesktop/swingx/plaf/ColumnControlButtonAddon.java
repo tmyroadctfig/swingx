@@ -21,6 +21,10 @@
  */
 package org.jdesktop.swingx.plaf;
 
+import java.awt.Insets;
+
+import javax.swing.plaf.InsetsUIResource;
+
 import org.jdesktop.swingx.icon.ColumnControlIcon;
 
 /**
@@ -42,6 +46,7 @@ public class ColumnControlButtonAddon extends AbstractComponentAddon {
             DefaultsList defaults) {
         super.addBasicDefaults(addon, defaults);
         defaults.add("ColumnControlButton.actionIcon", new ColumnControlIcon());
+        defaults.add("ColumnControlButton.margin", new InsetsUIResource(1, 2, 2, 1)); 
     }
 
     
