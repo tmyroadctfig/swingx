@@ -23,12 +23,16 @@ package org.jdesktop.swingx.renderer;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.util.logging.Logger;
 
+import javax.swing.Icon;
 import javax.swing.JTree;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
 import org.jdesktop.swingx.InteractiveTestCase;
+import org.jdesktop.swingx.JXTree;
 
 /**
  * Known/open issues with tree renderer.
@@ -36,9 +40,17 @@ import org.jdesktop.swingx.InteractiveTestCase;
  * @author Jeanette Winzenburg
  */
 public class TreeRendererIssues extends InteractiveTestCase {
+    
+    @SuppressWarnings("unused")
+    private static final Logger LOG = Logger.getLogger(TreeRendererIssues.class
+            .getName());
+    
     private JTree tree;
     private DefaultTreeCellRenderer coreTreeRenderer;
     private DefaultTreeRenderer xTreeRenderer;
+
+    // flag used in setup to explicitly choose LF
+    private boolean defaultToSystemLF;
 
     @Override
     protected void setUp() throws Exception {
@@ -46,6 +58,9 @@ public class TreeRendererIssues extends InteractiveTestCase {
 //        LOG.info("LF: " + UIManager.getLookAndFeel());
 //        LOG.info("Theme: " + ((MetalLookAndFeel) UIManager.getLookAndFeel()).getCurrentTheme());
 //        UIManager.put("Tree.drawsFocusBorderAroundIcon", Boolean.TRUE);
+        // make sure we have the same default for each test
+        defaultToSystemLF = false;
+        setSystemLF(defaultToSystemLF);
         tree = new JTree();
         coreTreeRenderer = new DefaultTreeCellRenderer();
         xTreeRenderer = new DefaultTreeRenderer();
@@ -60,6 +75,30 @@ public class TreeRendererIssues extends InteractiveTestCase {
         }
     }
 
+    /**
+     * Sanity: icons updated on LF change.
+     */
+    public void testTreeIconsUpdateUI() {
+        JXTree tree = new JXTree();
+        DefaultTreeRenderer renderer = new DefaultTreeRenderer();
+        tree.setCellRenderer(renderer);
+        WrappingIconPanel before = (WrappingIconPanel) renderer.getTreeCellRendererComponent(tree, "", false, false, true, -1, false);
+        Icon leaf = before.getIcon();
+        assertNotNull("sanity", leaf);
+        assertEquals("sanity", UIManager.getIcon("Tree.leafIcon"), leaf);
+        String lf = UIManager.getLookAndFeel().getName();
+        setSystemLF(!defaultToSystemLF);
+        if (lf.equals(UIManager.getLookAndFeel().getName())) {
+            LOG.info("cannot run test - equal LF" + lf);
+            return;
+        }
+        SwingUtilities.updateComponentTreeUI(tree);
+        WrappingIconPanel after = (WrappingIconPanel) renderer.getTreeCellRendererComponent(tree, "", false, false, true, -1, false);
+        Icon leafAfter = after.getIcon();
+        assertNotNull("sanity", leafAfter);
+        assertFalse("sanity", leaf.equals(leafAfter));
+        assertEquals("icon must be updated", UIManager.getIcon("Tree.leafIcon"), leafAfter);
+    }
     
     /**
      * base interaction with list: renderer uses list's unselected  colors

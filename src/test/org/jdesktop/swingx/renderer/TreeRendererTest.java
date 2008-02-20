@@ -99,19 +99,6 @@ public class TreeRendererTest extends InteractiveTestCase {
     
 
     /**
-     * Issue #769-swingx: support null icons.
-     * 
-     * enhance WrappingProvider to allow real null values. 
-     * 
-     */
-    public void testWrappingProviderNullIcon() {
-       CellContext context = new TreeCellContext();
-       WrappingProvider provider = new WrappingProvider(IconValue.NONE);
-       WrappingIconPanel comp = provider.getRendererComponent(context);
-       assertEquals(null, comp.getIcon());
-    }
-    
-    /**
      * Wrapping provider: hyperlink foreground must be preserved.
      *
      */
@@ -186,6 +173,30 @@ public class TreeRendererTest extends InteractiveTestCase {
     }
 
 //---------------------- interactive methods
+ 
+    /**
+     * Example for using no node icons in the tree.
+     * 
+     */
+    public void interactiveCustomIconPerNodeType() {
+        JTree tree = new JTree();
+        tree.setCellRenderer(new DefaultTreeRenderer(IconValue.NONE));
+        final JXFrame frame = wrapWithScrollingInFrame(tree, "tree - no icons");
+        frame.setVisible(true);
+    }
+    
+
+    /**
+     * Sanity check: icons updated on LF change
+     * 
+     */
+    public void interactiveDefaultIconsToggleLF() {
+        JTree tree = new JTree();
+        tree.setCellRenderer(new DefaultTreeRenderer());
+        final JXFrame frame = wrapInFrame(tree, "tree - toggle lf", true);
+        frame.setSize(400, 400);
+        frame.setVisible(true);
+    }
     
     /**
      * Example for using no node icons in the tree.

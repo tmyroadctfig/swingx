@@ -49,6 +49,23 @@ public class RenderingTest extends TestCase {
     private static final Logger LOG = Logger.getLogger(RenderingTest.class
             .getName());
 
+
+    
+    
+    /**
+     * Issue #769-swingx: support null icons.
+     * 
+     * enhance WrappingProvider to allow real null values. 
+     * 
+     */
+    public void testWrappingProviderNullIcon() {
+       CellContext context = new TreeCellContext();
+       WrappingProvider provider = new WrappingProvider(IconValue.NONE);
+       WrappingIconPanel comp = provider.getRendererComponent(context);
+       assertEquals(null, comp.getIcon());
+    }
+    
+
     public void testResetPreferredSize() {
         DefaultVisuals<JComponent> visuals = new DefaultVisuals<JComponent>();
         JComponent label = new  JLabel("somevalue");

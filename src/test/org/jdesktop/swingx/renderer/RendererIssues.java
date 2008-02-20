@@ -25,11 +25,13 @@ import java.awt.Component;
 import java.awt.Font;
 import java.util.logging.Logger;
 
+import javax.swing.Icon;
 import javax.swing.SwingUtilities;
 import javax.swing.table.TableCellRenderer;
 
 import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXTable;
+import org.jdesktop.swingx.test.XTestUtils;
 
 /**
  * Test around known issues of SwingX renderers. <p>
@@ -43,6 +45,29 @@ import org.jdesktop.swingx.JXTable;
 public class RendererIssues extends InteractiveTestCase {
     private static final Logger LOG = Logger.getLogger(RendererIssues.class
             .getName());
+
+    /**
+     * Issue #774-swingx: support per node-type icons.
+     * 
+     * postponed to 0.9.x - will break all interface implementors.
+     * 
+     */
+    public void testNodeTypeIcons() {
+       CellContext context = new TreeCellContext();
+       context.installContext(null, "dummy", -1, -1, false, false, false, true);
+       final Icon custom = XTestUtils.loadDefaultIcon();
+       IconValue iv = new IconValue() {
+
+        public Icon getIcon(Object value) {
+            // TODO Auto-generated method stub
+            return custom;
+        }
+           
+       };
+       WrappingProvider provider = new WrappingProvider(iv);
+       WrappingIconPanel comp = provider.getRendererComponent(context);
+       assertEquals(custom, comp.getIcon());
+    }
 
 
     /**
