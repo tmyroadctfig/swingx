@@ -528,7 +528,7 @@ public class PainterVisualCheck extends InteractiveTestCase {
     private void configureList(final JXList list, final JXTable table, boolean useRollover) {
         final List<Action> actions = new ArrayList<Action>();
         @SuppressWarnings("all")
-        ColumnControlButton columnControl = new ColumnControlButton(table, null) {
+        ColumnControlButton columnControl = new ColumnControlButton(table) {
 
             @Override
             protected void addVisibilityActionItems() {

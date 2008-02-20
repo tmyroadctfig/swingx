@@ -21,18 +21,9 @@
 
 package org.jdesktop.swingx.table;
 
-import org.jdesktop.swingx.JXTable;
-import org.jdesktop.swingx.action.AbstractActionExt;
-import org.jdesktop.swingx.action.ActionContainerFactory;
-
-import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.TableColumnModelEvent;
-import javax.swing.event.TableColumnModelListener;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableColumnModel;
-import java.awt.*;
+import java.awt.ComponentOrientation;
+import java.awt.Dimension;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.beans.PropertyChangeEvent;
@@ -40,6 +31,30 @@ import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.Icon;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.TableColumnModelEvent;
+import javax.swing.event.TableColumnModelListener;
+import javax.swing.plaf.UIResource;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
+
+import org.jdesktop.swingx.JXTable;
+import org.jdesktop.swingx.action.AbstractActionExt;
+import org.jdesktop.swingx.action.ActionContainerFactory;
+import org.jdesktop.swingx.plaf.ColumnControlButtonAddon;
+import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 
 /**
  * A component to allow interactive customization of <code>JXTable</code>'s
@@ -70,9 +85,18 @@ import java.util.List;
  * 
  */
 public class ColumnControlButton extends JButton {
+    
     // JW: really want to extend? for builders?
     /** Marker to auto-recognize actions which should be added to the popup. */
     public static final String COLUMN_CONTROL_MARKER = "column.";
+    
+    /** the key for looking up the control's icon in the UIManager. Typically, it's LAF dependent. */
+    public static final String COLUMN_CONTROL_BUTTON_ICON_KEY = "ColumnControlButton.actionIcon";
+    
+    static {
+        LookAndFeelAddons.contribute(new ColumnControlButtonAddon());
+    }
+
     /** exposed for testing. */
     protected ColumnControlPopup popup;
     // TODO: the table reference is a potential leak?
@@ -85,6 +109,18 @@ public class ColumnControlButton extends JButton {
     /** the list of actions for column menuitems.*/
     private List<ColumnVisibilityAction> columnVisibilityActions;
 
+    
+    /**
+     * Creates a column control button for the table. Uses the default
+     * icon as provided by the addon.
+     * 
+     * @param table  the <code>JXTable</code> controlled by this component
+     * @param icon the <code>Icon</code> to show
+     */
+    public ColumnControlButton(JXTable table) {
+        this(table, null);
+    }
+
     /**
      * Creates a column control button for the table. The button
      * uses the given icon and has no text.
@@ -96,6 +132,7 @@ public class ColumnControlButton extends JButton {
         init();
         // JW: icon LF dependent?
         setAction(createControlAction(icon));
+        updateActionUI();
         installTable(table);
     }
 
@@ -103,9 +140,24 @@ public class ColumnControlButton extends JButton {
     @Override
     public void updateUI() {
         super.updateUI();
-        // JW: icon LF dependent?
+        // JW: icon may be LF dependent
+        updateActionUI();
         setMargin(new Insets(1, 2, 2, 1)); // Make this LAF-independent
         getColumnControlPopup().updateUI();
+    }
+    
+    /**
+     * Updates the action properties provided by the LAF.
+     * Here: overwrites the action's small_icon with the icon from the ui if the current
+     *   icon is null or a UIResource.
+     */
+    protected void updateActionUI() {
+        if (getAction() == null) return;
+        Icon icon = (Icon) getAction().getValue(Action.SMALL_ICON);
+        if ((icon == null) || (icon instanceof UIResource)) {
+            icon = UIManager.getIcon(COLUMN_CONTROL_BUTTON_ICON_KEY);
+            getAction().putValue(Action.SMALL_ICON, icon);
+        }
     }
 
     /** 
@@ -728,11 +780,13 @@ public class ColumnControlButton extends JButton {
 
     /** 
      * Creates and returns the default action for this button.
+     * @param icon 
      * 
      * @param icon the Icon to use in the action.
      * @return the default action.
      */
     private Action createControlAction(Icon icon) {
+        
         Action control = new AbstractAction() {
 
             public void actionPerformed(ActionEvent e) {

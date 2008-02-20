@@ -124,7 +124,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
 //          test.runInteractiveTests(".*Text.*");
 //          test.runInteractiveTests(".*XLabel.*");
 //          test.runInteractiveTests(".*Color.*");
-          test.runInteractiveTests("interactive.*Fancy.*");
+          test.runInteractiveTests("interactive.*ColumnControl.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
@@ -830,7 +830,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
         final List<Action> actions = new ArrayList<Action>();
         // quick and dirty access to column visibility actions
         @SuppressWarnings("all")
-        ColumnControlButton columnControl = new ColumnControlButton(table, null) {
+        ColumnControlButton columnControl = new ColumnControlButton(table) {
 
             @Override
             protected void addVisibilityActionItems() {

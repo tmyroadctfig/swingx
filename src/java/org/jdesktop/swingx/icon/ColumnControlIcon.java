@@ -29,6 +29,7 @@ import java.awt.Graphics;
 import javax.swing.Icon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.plaf.UIResource;
 
 /**
  * Icon class for rendering icon which indicates user control of
@@ -36,7 +37,7 @@ import javax.swing.JLabel;
  * @author Amy Fowler
  * @version 1.0
  */
-public class ColumnControlIcon implements Icon {
+public class ColumnControlIcon implements Icon, UIResource {
     private int width = 10;
     private int height = 10;
 

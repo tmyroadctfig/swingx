@@ -14,12 +14,15 @@ import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
 import javax.swing.Action;
+import javax.swing.Icon;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JMenuItem;
 import javax.swing.JToggleButton;
 import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
@@ -30,7 +33,9 @@ import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.action.ActionContainerFactory;
-import org.jdesktop.swingx.icon.ColumnControlIcon;
+import org.jdesktop.swingx.icon.EmptyIcon;
+import org.jdesktop.swingx.plaf.ColumnControlButtonAddon;
+import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 import org.jdesktop.swingx.table.ColumnControlButton.ColumnVisibilityAction;
 import org.jdesktop.swingx.table.ColumnControlButton.DefaultColumnControlPopup;
 import org.jdesktop.test.AncientSwingTeam;
@@ -44,6 +49,90 @@ public class ColumnControlButtonTest extends InteractiveTestCase {
     
     protected TableModel sortableTableModel;
 
+    /**
+     * Issue #404-swingx: load column control icon from ui.
+     * Test that table instantiates the column control with ui icon.
+     */
+    public void testColumnControlInXTable() {
+      JXTable table = new JXTable();
+      ColumnControlButton control = (ColumnControlButton) table.getColumnControl();
+      assertSame("columnControl must have icon from ui", 
+                UIManager.getIcon(ColumnControlButton.COLUMN_CONTROL_BUTTON_ICON_KEY),
+                control.getIcon());
+    }
+    
+    /**
+     * Issue #404-swingx: load column control icon from ui.
+     * Test that icon is not updated on updateUI if not uiResource
+     */
+    public void testColumnControlIconNotUpdateNonActionUIResource() {
+        ColumnControlButton control = new ColumnControlButton(new JXTable(), new EmptyIcon());
+        Icon icon = control.getIcon();
+        String lf = UIManager.getLookAndFeel().getName();
+        setSystemLF(!defaultToSystemLF);
+        if (lf.equals(UIManager.getLookAndFeel().getName())) {
+            LOG.info("cannot run layoutOnLFChange - equal LF" + lf);
+            return;
+        }
+        SwingUtilities.updateComponentTreeUI(control);
+        assertSame("icon must not be updated on LF change if not UIResource: ", 
+                icon, control.getIcon());
+    }
+
+    /**
+     * Issue #404-swingx: load column control icon from ui.
+     * Test that is updated on updateUI
+     */
+    public void testColumnControlIconUpdateActionUIResource() {
+        ColumnControlButton control = new ColumnControlButton(new JXTable());
+        Icon icon = control.getIcon();
+        String lf = UIManager.getLookAndFeel().getName();
+        setSystemLF(!defaultToSystemLF);
+        if (lf.equals(UIManager.getLookAndFeel().getName())) {
+            LOG.info("cannot run layoutOnLFChange - equal LF" + lf);
+            return;
+        }
+        SwingUtilities.updateComponentTreeUI(control);
+        assertNotSame("sanity: ui did reload icon: ", icon, 
+                UIManager.getIcon(ColumnControlButton.COLUMN_CONTROL_BUTTON_ICON_KEY));
+
+        assertNotSame("icon must be updated on LF change: ", icon, control.getIcon());
+
+    }
+    /**
+     * Issue #404-swingx: load column control icon from ui.
+     * Test that column control configures itself with the icon from the ui.
+     */
+    public void testColumnControlInitialUpdateActionUIResource() {
+      ColumnControlButton control = new ColumnControlButton(new JXTable());
+      assertSame("columnControl must have icon from ui", 
+                UIManager.getIcon(ColumnControlButton.COLUMN_CONTROL_BUTTON_ICON_KEY),
+                control.getIcon());
+    }
+
+    /**
+     * Issue #404-swingx: load column control icon from ui.
+     * Test that column control loads the icon.
+     */
+    @SuppressWarnings("unused")
+    public void testColumnControlLoadsIcon() {
+        // force loading by instantiating a column control
+      ColumnControlButton control = new ColumnControlButton(new JXTable());
+        assertNotNull("columnControl must load lf-specific icon", 
+                UIManager.getIcon(ColumnControlButton.COLUMN_CONTROL_BUTTON_ICON_KEY));
+    }
+
+    /**
+     * Issue #404-swingx: load column control icon from ui.
+     * Test that addon loads the icon.
+     */
+    public void testColumnControlAddonLoadsIcon() {
+        // direct loading of addon
+        LookAndFeelAddons.contribute(new ColumnControlButtonAddon());
+        assertNotNull("addon must load lf-specific icon", 
+                UIManager.getIcon(ColumnControlButton.COLUMN_CONTROL_BUTTON_ICON_KEY));
+    }
+    
     /**
      * Issue #429-swingx: ClassCastException if column identifiers are not
      * String type.
@@ -69,8 +158,7 @@ public class ColumnControlButtonTest extends InteractiveTestCase {
      */
     public void testNullVisibilityAction() {
         JXTable table = new JXTable();
-        ColumnControlButton columnControl = new ColumnControlButton(
-                table, new ColumnControlIcon()) {
+        ColumnControlButton columnControl = new ColumnControlButton(table) {
 
                     @Override
                     protected ColumnVisibilityAction createColumnVisibilityAction(TableColumn column) {
@@ -318,8 +406,7 @@ public class ColumnControlButtonTest extends InteractiveTestCase {
     */
    public void interactiveNullVisibilityAction() {
        JXTable table = new JXTable();
-       ColumnControlButton columnControl = new ColumnControlButton(
-               table, new ColumnControlIcon()) {
+       ColumnControlButton columnControl = new ColumnControlButton(table) {
 
                    @Override
                    protected ColumnVisibilityAction createColumnVisibilityAction(TableColumn column) {
@@ -487,10 +574,16 @@ public class ColumnControlButtonTest extends InteractiveTestCase {
     public ColumnControlButtonTest() {
         super("ColumnControlButtonTest");
     }
+    // flag used in setup to explicitly choose LF
+    private boolean defaultToSystemLF;
+
     
     @Override
     protected void setUp() throws Exception {
         super.setUp();
+        // make sure we have the same default for each test
+        defaultToSystemLF = false;
+        setSystemLF(defaultToSystemLF);
          sortableTableModel = new AncientSwingTeam();
      }
 

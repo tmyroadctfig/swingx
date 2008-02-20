@@ -746,7 +746,7 @@ public class JXTable extends JTable
      * @see org.jdesktop.swingx.icon.ColumnControlIcon
      */
     protected JComponent createDefaultColumnControl() {
-        return new ColumnControlButton(this, new ColumnControlIcon());
+        return new ColumnControlButton(this);
     }
 
  
