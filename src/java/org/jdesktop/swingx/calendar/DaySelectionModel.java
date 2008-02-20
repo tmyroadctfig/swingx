@@ -46,14 +46,14 @@ public class DaySelectionModel extends AbstractDateSelectionModel {
     private Date lowerBound;
 
     /**
-     * {@inheritDoc}
+     * 
      */
     public DaySelectionModel() {
         this(null);
     }
 
     /**
-     * {@inheritDoc}
+     * 
      */
     public DaySelectionModel(Locale locale) {
         super(locale);
@@ -64,14 +64,14 @@ public class DaySelectionModel extends AbstractDateSelectionModel {
         
     }
     /**
-     * {@inheritDoc}
+     * 
      */
     public SelectionMode getSelectionMode() {
         return selectionMode;
     }
 
     /**
-     * {@inheritDoc}
+     * 
      */
     public void setSelectionMode(final SelectionMode selectionMode) {
         this.selectionMode = selectionMode;

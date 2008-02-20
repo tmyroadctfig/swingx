@@ -39,14 +39,14 @@ public class DefaultDateSelectionModel extends AbstractDateSelectionModel {
     private Date lowerBound;
 
     /**
-     * {@inheritDoc}
+     * 
      */
     public DefaultDateSelectionModel() {
         this(null);
     }
 
     /**
-     * {@inheritDoc} <p>
+     * <p>
      * 
      * The selection mode defaults to SINGLE_SELECTION.
      */

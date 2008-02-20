@@ -894,16 +894,16 @@ public class BasicMonthViewUI extends MonthViewUI {
      *  must not be null
      */
     @SuppressWarnings({"UnusedDeclaration"})
-    protected void paintMonth(Graphics g, int x, int y, int width, int height, Calendar cal) {
+    protected void paintMonth(Graphics g, int x, int y, int width, int height, Calendar calendar) {
         // PEINDING JW: remove usage of deprecated api
         // use Date instead of millis
 
         // Paint month name background.
         paintMonthStringBackground(g, x, y,
-                width, fullMonthBoxHeight, cal);
+                width, fullMonthBoxHeight, calendar);
 
         paintMonthStringForeground(g, x, y,
-                width, fullMonthBoxHeight, cal);
+                width, fullMonthBoxHeight, calendar);
 
         // Paint arrow buttons for traversing months if enabled.
         if (monthView.isTraversable()) {
@@ -917,7 +917,7 @@ public class BasicMonthViewUI extends MonthViewUI {
         int tmpX = isLeftToRight ? x + (showingWeekNumber ? fullBoxWidth : 0) : x;
         int tmpY = y + fullMonthBoxHeight;
         int tmpWidth = width - (showingWeekNumber ? fullBoxWidth : 0);
-        paintDayOfTheWeekBackground(g, tmpX, tmpY, tmpWidth, fullBoxHeight, cal);
+        paintDayOfTheWeekBackground(g, tmpX, tmpY, tmpWidth, fullBoxHeight, calendar);
 
         // Paint short representation of day of the week.
         int dayIndex = monthView.getFirstDayOfWeek() - 1;
@@ -950,16 +950,16 @@ public class BasicMonthViewUI extends MonthViewUI {
         // new top is below monthBox and daysOfWeek header
         int yNew = y + fullMonthBoxHeight + fullBoxHeight;
         // paint the column of week numbers
-        paintWeeksOfYear(g, x, yNew, width, cal);
+        paintWeeksOfYear(g, x, yNew, width, calendar);
 
         int xOffset = 0;
         if (monthView.isShowingWeekNumber()) {
             xOffset = fullBoxWidth;
         }
         if (isLeftToRight) {
-            paintDays(g, x + xOffset, yNew, width - xOffset, cal);
+            paintDays(g, x + xOffset, yNew, width - xOffset, calendar);
         } else {
-            paintDays(g, x , yNew, width - xOffset, cal);
+            paintDays(g, x , yNew, width - xOffset, calendar);
         }
 
     }
@@ -977,7 +977,7 @@ public class BasicMonthViewUI extends MonthViewUI {
      * @param left the left boundary of the day grid.
      * @param top the upper boundary of the day grid
      * @param width the width of the day grid.
-     * @param calendar the calendar specifying the the first day of the month to paint, 
+     * @param cal the calendar specifying the the first day of the month to paint, 
      *   must not be null
      */
     protected void paintDays(Graphics g, int left, int top, int width, Calendar cal) {
@@ -1142,13 +1142,15 @@ public class BasicMonthViewUI extends MonthViewUI {
      * first day of the month. The calendar is unchanged when leaving this method. 
      * 
      * Note: the given calendar must not be changed.
+     * 
+     * PENDING JW: this implementation doesn't need the height - should it be given 
+     *   anyway for symetry in case subclasses need it?
      *
      * @param g Graphics object.
      * @param x x location of month
-     * @param y y location of month
+     * @param initialY y the upper bound of the "weekNumbers-box"
      * @param width width of month
-     * @param height height of month
-     * @param calendar the calendar specifying the the first day of the month to paint, 
+     * @param cal the calendar specifying the the first day of the month to paint, 
      *  must not be null
      */
     protected void paintWeeksOfYear(Graphics g, int x, int initialY, int width,
@@ -2343,7 +2345,7 @@ public class BasicMonthViewUI extends MonthViewUI {
      * @param y y location
      * @return a new <code>Point</code> object containing the row as the x value
      * and column as the y value
-     * @deprecated use {@link #getMonthGridPositionAtLocation(x, y)} - this method is
+     * @deprecated use {@link #getMonthGridPositionAtLocation(int, int)} - this method is
      *   no longer used internally. Note that the coordinate mapping in the 
      *   returned Point of new method is the other way round 
      *   (p.x == column, p.y == row) as in this!

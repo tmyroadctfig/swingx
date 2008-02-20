@@ -1062,14 +1062,14 @@ public class JXMonthView extends JComponent {
     }
     
     /**
-     * Replace all flags with the given dates.
+     * Replace all flags with the given dates.<p>
      * 
      * NOTE: neither the given array nor any of its elements should be null.
      * Currently, a null array will be tolerated to ease migration. A null
      * has the same effect as clearFlaggedDates.
      * 
      *
-     * @param flaggedDates the dates to be flagged
+     * @param flagged the dates to be flagged
      */
     public void setFlaggedDates(Date... flagged) {
 //        Contract.asNotNull(flagged, "must not be null");
@@ -1089,7 +1089,7 @@ public class JXMonthView extends JComponent {
      * Currently, a null array will be tolerated to ease migration. A null
      * does nothing.
      *
-     * @param flaggedDates the dates to be flagged
+     * @param flagged the dates to be flagged
      */
     public void addFlaggedDates(Date... flagged) {
 //        Contract.asNotNull(flagged, "must not be null");
@@ -1108,7 +1108,7 @@ public class JXMonthView extends JComponent {
      * NOTE: neither the given array nor any of its elements should be null.
      * Currently, a null array will be tolerated to ease migration. 
      *
-     * @param flaggedDates the dates to be unflagged
+     * @param flagged the dates to be unflagged
      */
     public void removeFlaggedDates(Date... flagged) {
 //        Contract.asNotNull(flagged, "must not be null");
@@ -1890,7 +1890,8 @@ public class JXMonthView extends JComponent {
 
     /**
      * 
-     * @return
+     * @return true if the trailing dates in of a month are showing, false otherwise.
+     * 
      * @deprecated use {@link #isShowingTrailingDays()} 
      *  - name change to comply with property naming conventions and 
      *  consistently using "Day" instead of "Date". 

@@ -514,8 +514,12 @@ public class JXDatePicker extends JComponent {
     }
     
     /**
-     * PENDING JW ... quick api hack for testing.
-     * @param linkDate
+     * Sets the date shown in the TodayPanel. 
+     * 
+     * PENDING JW ... quick api hack for testing. Don't recreate the panel if
+     * it had been used 
+     * 
+     * @param linkDay the date used in the TodayPanel
      */
     public void setLinkDay(Date linkDay) {
         this.linkDate = linkDay;
@@ -966,9 +970,9 @@ public class JXDatePicker extends JComponent {
     /**
      * Returns the date shown in the LinkPanel as millis.
      * 
-     * @return
+     * @return the date shown in the TodayPanel in millis
      * 
-     * @deprecated use {@link #getLinkInMillis()}
+     * @deprecated use {@link #getLinkDay()}
      */
     @Deprecated
     public long getLinkDate() {
@@ -976,18 +980,18 @@ public class JXDatePicker extends JComponent {
     }
 
     /**
-     * Set the date the link will use and the string defining a MessageFormat
-     * to format the link.  If no valid date is in the editor when the popup
-     * is displayed the popup will focus on the month the linkDate is in.  Calling
-     * this method will replace the currently installed linkPanel and install
-     * a new one with the requested date and format.
+     * Set the date the link will use and the string defining a MessageFormat to
+     * format the link. If no valid date is in the editor when the popup is
+     * displayed the popup will focus on the month the linkDate is in. Calling
+     * this method will replace the currently installed linkPanel and install a
+     * new one with the requested date and format.
      * 
      * 
-     * @param linkDate         Date in milliseconds
+     * @param linkDate Date in milliseconds
      * @param linkFormatString String used to format the link
      * @see java.text.MessageFormat
      * 
-     * @deprecated use
+     * @deprecated use {@link #setLinkDay(Date, String)}
      */
     @Deprecated
     public void setLinkDate(long linkDate, String linkFormatString) {
@@ -995,10 +999,13 @@ public class JXDatePicker extends JComponent {
     }
     
     /**
-     * PENDING JW ... quick api hack for testing.
-     * @param linkDate
+     * Sets the date used in the TodayPanel.<p>
      * 
-     * @deprecated use {@link #setLinkDay(Date)
+     * PENDING JW ... quick api hack for testing.
+     * 
+     * @param linkDate the date in millis to use in the TodayPanel.
+     * 
+     * @deprecated use {@link #setLinkDay(Date)}
      */
     @Deprecated
     public void setLinkDate(long linkDate) {

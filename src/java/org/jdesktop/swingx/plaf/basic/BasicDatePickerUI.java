@@ -955,7 +955,9 @@ public class BasicDatePickerUI extends DatePickerUI {
     }
 
     /**
-     * @return
+     * Creates and returns the action which toggles the visibility of the popup.
+     * 
+     * @return the action which toggles the visibility of the popup.
      */
     protected TogglePopupAction createTogglePopupAction() {
         return new TogglePopupAction();

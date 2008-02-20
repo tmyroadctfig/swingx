@@ -42,14 +42,14 @@ public class SingleDaySelectionModel extends AbstractDateSelectionModel {
     private Date lowerBound;
 
     /**
-     * {@inheritDoc}
+     * 
      */
     public SingleDaySelectionModel() {
         this(null);
     }
 
     /**
-     * {@inheritDoc}
+     * 
      */
     public SingleDaySelectionModel(Locale locale) {
         super(locale);

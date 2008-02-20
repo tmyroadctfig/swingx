@@ -301,7 +301,8 @@ public class ColumnFactory {
      * 
      * @param table the table which provides the renderer
      * @param columnExt the TableColumn to configure
-     * @return
+     * 
+     * @return returns a cell renderer for measuring.
      */
     protected TableCellRenderer getCellRenderer(JXTable table, TableColumnExt columnExt) {
         int viewIndex = table.convertColumnIndexToView(columnExt

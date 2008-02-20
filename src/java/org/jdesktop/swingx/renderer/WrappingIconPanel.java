@@ -100,7 +100,9 @@ public class WrappingIconPanel extends JXPanel {
 
 
     /**
-     * @return
+     * Returns the icon used in this panel, may be null.
+     * 
+     * @return the icon used in this panel, may be null.
      */
     public Icon getIcon() {
         return iconLabel.getIcon();
@@ -109,7 +111,12 @@ public class WrappingIconPanel extends JXPanel {
 
 
     /**
-     * @return
+     * 
+     * Returns the bounds of the delegate component or null if the delegate is null.
+     * 
+     * PENDING JW: where do we use it? Maybe it was for testing only?
+     * 
+     * @return the bounds of the delegate, or null if the delegate is null.
      */
     public Rectangle getDelegateBounds() {
         if (delegate == null) return null;

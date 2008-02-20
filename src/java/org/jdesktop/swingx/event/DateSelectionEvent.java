@@ -59,16 +59,31 @@ public class DateSelectionEvent extends EventObject {
         this.adjusting = adjusting;
     }
 
+    /**
+     * Returns the selection of the source dateSelectionModel.<p>
+     * 
+     * PENDING JW: that's the "live" selection, that is the source is re-queried on every call
+     * to this method. Bug or feature?
+     * 
+     * @return the selection of the source.
+     */
     public SortedSet<Date> getSelection() {
         return ((DateSelectionModel)source).getSelection();
     }
 
+    /**
+     * Returns the type of this event.
+     * 
+     * @return the type of event.
+     */
     public final EventType getEventType() {
         return eventType;
     }
 
     /**
-     * @return
+     * Returns a boolean indicating whether the event source is in adjusting state.
+     * 
+     * @return true if the event is fired while the model is in adjusting state.
      */
     public boolean isAdjusting() {
         return adjusting;

@@ -289,7 +289,11 @@ public class BorderHighlighter extends AbstractHighlighter {
         return paddingBorder;
     }
     /**
-     * @return
+     * Returns the border used for highlighing.<p>
+     * 
+     * PENDING JW: missing setter
+     * 
+     * @return the border used to highlight.
      */
     public Border getBorder() {
         return paddingBorder;

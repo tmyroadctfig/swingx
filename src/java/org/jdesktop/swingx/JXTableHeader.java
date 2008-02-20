@@ -80,12 +80,12 @@ public class JXTableHeader extends JTableHeader
     }
 
     /**
-     *  Constructs a <code>JTableHeader</code> which is initialized with
-     *  <code>cm</code> as the column model.  If <code>cm</code> is
-     *  <code>null</code> this method will initialize the table header
-     *  with a default <code>TableColumnModel</code>.
-     *
-     * @param cm        the column model for the table
+     * Constructs a <code>JTableHeader</code> which is initialized with
+     * <code>cm</code> as the column model. If <code>cm</code> is
+     * <code>null</code> this method will initialize the table header with a
+     * default <code>TableColumnModel</code>.
+     * 
+     * @param columnModel the column model for the table
      * @see #createDefaultColumnModel
      */
     public JXTableHeader(TableColumnModel columnModel) {
@@ -319,7 +319,7 @@ public class JXTableHeader extends JTableHeader
     }
     
     /**
-     * {@inheritedDoc} <p>
+     * {@inheritDoc} <p>
      * 
      * Overridden to scroll the table to keep the dragged column visible.
      * This side-effect is enabled only if the header's autoscroll property is

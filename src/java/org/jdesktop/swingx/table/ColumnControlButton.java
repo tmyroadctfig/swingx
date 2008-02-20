@@ -117,7 +117,6 @@ public class ColumnControlButton extends JButton {
      * icon as provided by the addon.
      * 
      * @param table  the <code>JXTable</code> controlled by this component
-     * @param icon the <code>Icon</code> to show
      */
     public ColumnControlButton(JXTable table) {
         this(table, null);
