@@ -141,6 +141,19 @@ public class WrappingProvider extends
         return wrappee;
     }
     
+    
+    /**
+     * {@inheritDoc} <p>
+     * 
+     * Overridden to comply to contract: returns the string representation as 
+     * provided by the wrappee (as this level has no string rep).
+     * 
+     */
+    @Override
+    public String getString(Object value) {
+        return wrappee.getString(value);
+    }
+
     /**
      * {@inheritDoc}
      */

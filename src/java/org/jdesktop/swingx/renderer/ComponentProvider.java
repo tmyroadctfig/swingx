@@ -239,7 +239,7 @@ public abstract class ComponentProvider<T extends JComponent>
      * 
      * @param context the cell context.
      * @return a appropriate string representation of the cell's content.
-     * @deprecated use ??
+     * @deprecated use {@link #getString(Object)}
      */
     @Deprecated
     public String getStringValue(CellContext context) {
@@ -250,6 +250,37 @@ public abstract class ComponentProvider<T extends JComponent>
         return formatter.getString(value);
     }
 
+    /**
+     * Returns a string representation of the content.
+     * <p>
+     * 
+     * This method guarantees to return the same string representation as would
+     * appear in the renderer, given that the corresponding cellContext has the
+     * same value as the parameter passed-in here. That is (assuming that the
+     * rendering component has a getText())
+     * 
+     * <pre><code>
+     * if (equals(value, context.getValue()) {
+     *     assertEquals(provider.getString(value), provider.getRenderingComponent(context).getText());
+     * }
+     * </code></pre>
+     * 
+     * This implementation simply delegates to its StringValue. Subclasses might
+     * need to override to comply.
+     * <p>
+     * 
+     * This is a second attempt - the driving force is the need for a consistent
+     * string representation across all (new and old) themes: rendering,
+     * (pattern) filtering/highlighting, searching, auto-complete ...
+     * <p>
+     * 
+     * @param value the object to represent as string.
+     * @return a appropriate string representation of the cell's content.
+     */
+    public String getString(Object value) {
+        return formatter.getString(value);
+    }
+    
     /**
      * Returns a String representation of the content.<p>
      * 

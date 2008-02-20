@@ -50,7 +50,78 @@ public class RenderingTest extends TestCase {
             .getName());
 
 
+    /**
+     * Issue #768-swingx: cleanup access to string representation of provider.
+     * 
+     */
+    public void testLabelProviderGetString() {
+        StringValue sv = new StringValue() {
+
+            public String getString(Object value) {
+                return "funnyconstant ... haha";
+            }
+            
+        };
+        CellContext context =  new TableCellContext();
+        ComponentProvider<JLabel> provider = new LabelProvider(sv);
+        JLabel label = provider.getRendererComponent(context);
+        assertEquals(sv.getString(context.getValue()), label.getText());
+        assertEquals(sv.getString(context.getValue()), provider.getString(context.getValue()));
+    }
     
+    /**
+     * Issue #768-swingx: cleanup access to string representation of provider.
+     * 
+     */
+    public void testButtonProviderGetString() {
+        StringValue sv = new StringValue() {
+
+            public String getString(Object value) {
+                return "funnyconstant ... haha";
+            }
+            
+        };
+        CellContext context =  new TableCellContext();
+        ComponentProvider<AbstractButton> provider = new ButtonProvider(sv);
+        AbstractButton label = provider.getRendererComponent(context);
+        assertEquals(sv.getString(context.getValue()), label.getText());
+        assertEquals(sv.getString(context.getValue()), provider.getString(context.getValue()));
+    }
+    
+    /**
+     * Issue #768-swingx: cleanup access to string representation of provider.
+     * 
+     */
+    public void testWrappingProviderGetString() {
+        StringValue sv = new StringValue() {
+
+            public String getString(Object value) {
+                return "funnyconstant ... haha";
+            }
+            
+        };
+        CellContext context =  new TableCellContext();
+        ComponentProvider<WrappingIconPanel> provider = new WrappingProvider(sv);
+        assertEquals(sv.getString(context.getValue()), provider.getString(context.getValue()));
+    }
+    
+    /**
+     * Issue #768-swingx: cleanup access to string representation of provider.
+     * 
+     */
+    public void testWrappingProviderGetStringNotNullValue() {
+        StringValue sv = new StringValue() {
+
+            public String getString(Object value) {
+                return String.valueOf(value) + "added ... ";
+            }
+            
+        };
+        CellContext context =  new TableCellContext();
+        context.value = "dummy";
+        ComponentProvider<WrappingIconPanel> provider = new WrappingProvider(sv);
+        assertEquals(sv.getString(context.getValue()), provider.getString(context.getValue()));
+    }
     
     /**
      * Issue #769-swingx: support null icons.
@@ -66,6 +137,10 @@ public class RenderingTest extends TestCase {
     }
     
 
+    /**
+     * Added pref/min/max size to list of properties which 
+     * must be reset by the DefaultVisuals.
+     */
     public void testResetPreferredSize() {
         DefaultVisuals<JComponent> visuals = new DefaultVisuals<JComponent>();
         JComponent label = new  JLabel("somevalue");
