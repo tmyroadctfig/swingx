@@ -50,6 +50,31 @@ public class JXTableHeaderIssues extends JXTableHeaderTest {
             e.printStackTrace();
         } 
     }
+    
+    
+    /**
+     * Issue #683-swingx: autoscroll if columns are dragged outside.
+     * 
+     * Enabled if autoscroll property is true. Changed default to true.
+     * Temporarily disabled - clashes with table's horizontalScrollEnabled.
+     */
+    public void testAutoscrollsDefaultEmptyConstructor() {
+        JXTableHeader header = new JXTableHeader();
+        assertTrue(header.getAutoscrolls());
+    }
+    
+    /**
+     * Issue #683-swingx: autoscroll if columns are dragged outside.
+     * 
+     * Enabled if autoscroll property is true. Changed default to true.
+     * Temporarily disabled - clashes with table's horizontalScrollEnabled.
+     */
+    public void testAutoscrollsDefaultColumnModelConstructor() {
+        JXTableHeader header = new JXTableHeader(new DefaultTableColumnModelExt());
+        assertTrue(header.getAutoscrolls());
+    }
+
+    
     /**
      * Quick proof-of-concept: JXTableHeader can go dirty and
      * suppress moving of "docked" column.
