@@ -151,6 +151,7 @@ public class CustomBooleanRendering {
             return columnNames[column];
         }
 
+        @Override
         public Class<?> getColumnClass(int column) {
             return columnClasses[column];
         }

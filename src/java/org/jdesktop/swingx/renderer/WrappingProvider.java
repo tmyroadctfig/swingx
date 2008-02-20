@@ -220,9 +220,6 @@ public class WrappingProvider extends
      * 
      * Overridden to fallback to the default icons supplied by the 
      * context if super returns null.
-     * 
-     * PENDING: make fallback configurable - null icons might be
-     *   valid.
      *   
      */
     @Override
@@ -231,7 +228,7 @@ public class WrappingProvider extends
         if (icon == null) {
             return context.getIcon();
         }
-        return icon;
+        return IconValue.NULL_ICON == icon ? null : icon;
     }
     
     //----------------- implement RolloverController

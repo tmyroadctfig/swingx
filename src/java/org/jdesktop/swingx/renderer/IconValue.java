@@ -25,6 +25,8 @@ import java.io.Serializable;
 
 import javax.swing.Icon;
 
+import org.jdesktop.swingx.icon.EmptyIcon;
+
 /**
  * A simple converter to return a Icon representation of an Object.<p>
  * 
@@ -38,7 +40,12 @@ import javax.swing.Icon;
  * @author Jeanette Winzenburg
  */
 public interface IconValue extends Serializable {
-
+    /**
+     * A marker icon used to indicate a null. 
+     * 
+     */
+    public final static Icon NULL_ICON = new EmptyIcon();
+    
     /**
      * Returns the value as Icon if possible or null.
      */
@@ -54,8 +61,11 @@ public interface IconValue extends Serializable {
     };
     
     /**
-     * Always null.
+     * Always null. 
+     * 
+     * @deprecated use {@link #NONE} 
      */
+    @Deprecated
     public static final IconValue EMPTY = new IconValue() {
 
         public Icon getIcon(Object value) {
@@ -63,6 +73,20 @@ public interface IconValue extends Serializable {
         }
         
     };
+    
+    
+    /**
+     * Always NULL_ICON. This is useful to indicate that we really want
+     * no icon instead of f.i. a default provided by the CellContext. 
+     */
+    public static final IconValue NONE = new IconValue() {
+
+        public Icon getIcon(Object value) {
+            return NULL_ICON;
+        }
+        
+    };
+    
     /**
      * Returns a icon representation of the given value.
      * 

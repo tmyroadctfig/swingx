@@ -49,7 +49,7 @@ public class DefaultTreeRenderer
     
     /**
      * Instantiates a default tree renderer with the default component
-     * controller. 
+     * provider. 
      * 
      */
     public DefaultTreeRenderer() {
@@ -58,24 +58,37 @@ public class DefaultTreeRenderer
 
 
     /**
-     * Instantiates a default tree renderer with the given componentController.
+     * Instantiates a default tree renderer with the given component provider.
      * If the controller is null, creates and uses a default. The default
      * controller is of type <code>WrappingProvider</code>.
      * 
-     * @param componentController the provider of the configured component to
+     * @param componentProvider the provider of the configured component to
      *        use for cell rendering
      */
-    public DefaultTreeRenderer(ComponentProvider componentController) {
-        if (componentController == null) {
-            componentController = new WrappingProvider();
+    public DefaultTreeRenderer(ComponentProvider componentProvider) {
+        if (componentProvider == null) {
+            componentProvider = new WrappingProvider();
         }
-        this.componentController = componentController;
+        this.componentController = componentProvider;
         this.cellContext = new TreeCellContext();
     }
 
     /**
+     * Instantiates a default tree renderer with the default
+     * wrapping provider, using the given IconValue for 
+     * customizing the icons.
+     * 
+     * @param iv the IconValue to use for mapping a custom icon 
+     *    for a given value
+     *   
+     */
+    public DefaultTreeRenderer(IconValue iv) {
+        this(new WrappingProvider(iv));
+    }
+
+    /**
      * Instantiates a default tree renderer with a default component
-     * controller using the given converter. 
+     * provider using the given converter. 
      * 
      * @param sv the converter to use for mapping the
      *   content value to a String representation.
@@ -84,6 +97,7 @@ public class DefaultTreeRenderer
     public DefaultTreeRenderer(StringValue sv) {
         this(new WrappingProvider(sv));
     }
+
 
     /**
      * Instantiates a default tree renderer with the default

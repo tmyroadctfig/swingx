@@ -30,7 +30,6 @@ import java.util.regex.Pattern;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -58,6 +57,7 @@ import org.jdesktop.swingx.decorator.SearchPredicate;
 import org.jdesktop.swingx.decorator.HighlightPredicate.DepthHighlightPredicate;
 import org.jdesktop.swingx.renderer.CellContext;
 import org.jdesktop.swingx.renderer.DefaultTreeRenderer;
+import org.jdesktop.swingx.renderer.IconValue;
 import org.jdesktop.swingx.renderer.StringValue;
 import org.jdesktop.swingx.renderer.WrappingProvider;
 import org.jdesktop.swingx.test.ActionMapTreeTableModel;
@@ -84,11 +84,11 @@ public class JXTreeVisualCheck extends JXTreeUnitTest {
   }
 
     /**
-     * Requirements: 
-     * - no icons 
+     * Requirements
+     * - no icons, use IconValue.NONE
      * - don't unwrap user object
      */
-    public void interactiveRevalidateAction() {
+    public void interactiveNoIconsNoUnwrap() {
         TreeModel model = new ActionMapTreeTableModel(new JXTable());
         JXTree tree = new JXTree(model);
         StringValue sv = new StringValue() {
@@ -102,12 +102,8 @@ public class JXTreeVisualCheck extends JXTreeUnitTest {
             }
             
         };
-        WrappingProvider provider = new WrappingProvider(sv) {
-
-            @Override
-            protected Icon getValueAsIcon(CellContext context) {
-                return null;
-            }
+        
+        WrappingProvider provider = new WrappingProvider(IconValue.NONE,  sv) {
 
             @Override
             protected Object adjustContextValue(CellContext context) {

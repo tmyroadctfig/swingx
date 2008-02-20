@@ -11,7 +11,6 @@ import java.util.Hashtable;
 import java.util.Vector;
 import java.util.regex.Pattern;
 
-import javax.swing.Icon;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellEditor;
