@@ -38,6 +38,7 @@ import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
+import javax.swing.TransferHandler;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.event.CellEditorListener;
@@ -50,7 +51,6 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreePath;
 
-import org.jdesktop.swingx.JXTree.DelegatingRenderer;
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.action.LinkAction;
 import org.jdesktop.swingx.decorator.Highlighter;
@@ -102,7 +102,7 @@ public class JXTreeTableIssues extends InteractiveTestCase {
 //            test.runInteractiveTests(".*Text.*");
 //            test.runInteractiveTests(".*TreeExpand.*");
 //            test.runInteractiveTests("interactive.*ClipIssueD.*");
-          test.runInteractiveTests("interactive.*Icon.*");
+          test.runInteractiveTests("interactive.*Blinks.*");
               
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
@@ -110,23 +110,38 @@ public class JXTreeTableIssues extends InteractiveTestCase {
         }
     }
 
-    public void interactiveNullTreeTableTreeIcons() {
+    /**
+     * Issue #766-swingx: drop image is blinking over hierarchical column.
+     * 
+     * Not sure how to enable in 1.5 (TransferSupport is 1.6 api). But looks 
+     * terrible in 1.6. Probably related to our mouse tricksery? Any ideas anybody?
+     * 
+     */
+    public void interactiveDropOnHierachicalColumnBlinks() {
         JXTreeTable xTable = new JXTreeTable(new ComponentTreeTableModel(new JXFrame()));
+        
+        TransferHandler tableTransfer = new TransferHandler() {
+
+//            @Override
+//            public boolean canImport (TransferSupport support) {
+//                    return true;
+//            }
+//
+//            @Override
+//            public boolean importData (TransferSupport support) {
+//                    return super.importData(support);
+//            }
+
+    };
+
+       xTable.setTransferHandler(tableTransfer);
         xTable.expandAll();
         xTable.setVisibleColumnCount(10);
-        DefaultTreeCellRenderer renderer =  new DefaultTreeCellRenderer();
-        xTable.setTreeCellRenderer(renderer);
-        renderer.setOpenIcon(null);
-        renderer.setClosedIcon(null);
-        renderer.setLeafIcon(null);
-        assertSame(renderer, ((DelegatingRenderer) xTable.getTreeCellRenderer()).getDelegateRenderer());
-        JXTree xTree = new JXTree(xTable.getTreeTableModel());
-        renderer =  new DefaultTreeCellRenderer();
-        renderer.setOpenIcon(null);
-        renderer.setClosedIcon(null);
-        renderer.setLeafIcon(null);
-        xTree.setCellRenderer(renderer);
-        JXFrame frame = wrapWithScrollingInFrame(xTable, xTree, "TreeTable: null icons?");
+        JXFrame frame = wrapWithScrollingInFrame(xTable, "TreeTable: null icons?");
+        JXStatusBar bar = getStatusBar(frame);
+        JTextField textField = new JTextField("drag");
+        textField.setDragEnabled(true);
+        bar.add(textField);
         frame.setVisible(true);
     }
 
