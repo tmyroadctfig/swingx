@@ -25,6 +25,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JScrollPane;
 import javax.swing.JToolBar;
+import javax.swing.LookAndFeel;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.UIManager.LookAndFeelInfo;
@@ -55,7 +56,8 @@ public abstract class InteractiveTestCase extends junit.framework.TestCase {
     private static final Logger LOG = Logger
             .getLogger(InteractiveTestCase.class.getName());
     protected Point frameLocation = new Point(0,0);
-
+    protected boolean systemLF;
+    
     public InteractiveTestCase() {
         super();
         String className = getClass().getName();
@@ -266,24 +268,42 @@ public abstract class InteractiveTestCase extends junit.framework.TestCase {
     }
 
     /**
-     * PENDING: JW - this is about toggling the LF, does nothing to
-     * update the UI. Check all tests using this method to see if they 
-     * make sense! 
-     *
+     * PENDING: JW - this is about toggling the LF, does nothing to update the
+     * UI. Check all tests using this method to see if they make sense!
+     * 
      * 
      * @param system
      */
     public static void setSystemLF(boolean system) {
-        String lfName = system ? UIManager.getSystemLookAndFeelClassName() :
-            UIManager.getCrossPlatformLookAndFeelClassName();
+        String lfName = system ? UIManager.getSystemLookAndFeelClassName()
+                : UIManager.getCrossPlatformLookAndFeelClassName();
         try {
-          UIManager.setLookAndFeel(lfName);
-       } catch (Exception e1) { 
-           LOG.info("exception when setting LF to " + lfName);
-           LOG.log(Level.FINE, "caused by ", e1);
-      }
+            UIManager.setLookAndFeel(lfName);
+//            systemLF = system;
+        } catch (Exception e1) {
+            LOG.info("exception when setting LF to " + lfName);
+            LOG.log(Level.FINE, "caused by ", e1);
+        }
     }
 
+    /**
+     * Returns whether the current lf is the system lf. It assumes that the
+     * lf is either cross-platform or system. Not really safe 
+     */
+    public static boolean isSystemLF() {
+        LookAndFeel lf = UIManager.getLookAndFeel();
+        return UIManager.getSystemLookAndFeelClassName().equals(lf.getClass().getName());
+    }
+
+    /**
+     * Returns whether the current lf is the cross-platform lf. It assumes that the
+     * lf is either cross-platform or system. Not really safe 
+     */
+    public static boolean isCrossPlatformLF() {
+        LookAndFeel lf = UIManager.getLookAndFeel();
+        return UIManager.getCrossPlatformLookAndFeelClassName().equals(lf.getClass().getName());
+    }
+    
     /**
      * Action to toggle plaf and update all toplevel windows of the
      * current application. Used to setup the plaf-menu.
@@ -357,6 +377,7 @@ public abstract class InteractiveTestCase extends junit.framework.TestCase {
         frame.pack();
         return frame;
     }
+
     
 
 }

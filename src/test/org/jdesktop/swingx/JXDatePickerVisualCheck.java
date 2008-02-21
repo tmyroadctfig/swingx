@@ -20,6 +20,7 @@ package org.jdesktop.swingx;
 
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.LayoutManager;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -28,6 +29,7 @@ import java.awt.event.FocusListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -53,6 +55,7 @@ import javax.swing.UIManager.LookAndFeelInfo;
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.calendar.SingleDaySelectionModel;
 import org.jdesktop.swingx.calendar.DateSelectionModel.SelectionMode;
+import org.jdesktop.test.VerticalLayoutPref;
 
 /**
  * Simple tests to ensure that the {@code JXDatePicker} can be instantiated and
@@ -80,8 +83,8 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
         JXDatePickerVisualCheck test = new JXDatePickerVisualCheck();
         
         try {
-            test.runInteractiveTests();
-//            test.runInteractiveTests("interactive.*Keep.*");
+//            test.runInteractiveTests();
+            test.runInteractiveTests("interactive.*Locale.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
@@ -219,49 +222,174 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
     
     
     /**
-     * Issue #665-swingx: make JXDatePicker Locale-aware.
+     * Issue #764-swingx: JXDatePicker sizing.
      * 
-     * Here: instantiate the picker with a non-default locale. The 
-     * LinkPanel is okay, if the UK locale is used _before_
-     * the US locale (on a machine with default German). The other way 
-     * round the messageFormat for the 
-     * US linkPanel is German.
+     * Compare pref size with/-out date initially. 
+     * - null date is slightly narrower than not null
+     * - formats using the day of week are cut a bit (for "long" day names like wed)
+     * - a formatted text field is slightly off, by the width of the caret
      */
-    public void interactiveLocaleSet() {
-        JComponent comp = new JPanel();
-        comp.add(new JXDatePicker());
-        addDatePickerWithLocaleSet(comp, Locale.US);
-        addDatePickerWithLocaleSet(comp, Locale.UK);
-        addDatePickerWithLocaleSet(comp, Locale.GERMAN);
-        addDatePickerWithLocaleSet(comp, Locale.ITALIAN);
-        showInFrame(comp, "Localized DatePicker: setLocale");
+    public void interactiveLocalePrefSize() {
+        // wednesday - has width problems
+        calendar.set(2008, Calendar.FEBRUARY, 20);
+        Date date = calendar.getTime();
+        String formatString = "EEE MM/dd/yyyy";
+        LayoutManager layout = new VerticalLayoutPref();
+        JComponent fieldsNull = new JPanel(layout);
+        addFormattedTextField(fieldsNull, Locale.US, null, formatString);
+        addFormattedTextField(fieldsNull, Locale.UK, null, formatString);
+        addFormattedTextField(fieldsNull, Locale.GERMAN, null, formatString);
+        addFormattedTextField(fieldsNull, Locale.ITALIAN, null, formatString);
+        JComponent fields = new JPanel(layout);
+        addFormattedTextField(fields, Locale.US, date, formatString);
+        addFormattedTextField(fields, Locale.UK, date, formatString);
+        addFormattedTextField(fields, Locale.GERMAN, date, formatString);
+        addFormattedTextField(fields, Locale.ITALIAN, date, formatString);
+        JComponent other = new JPanel(layout);
+        addDatePickerWithLocaleSet(other, Locale.US, date, formatString);
+        addDatePickerWithLocaleSet(other, Locale.UK, date, formatString);
+        addDatePickerWithLocaleSet(other, Locale.GERMAN, date, formatString);
+        addDatePickerWithLocaleSet(other, Locale.ITALIAN, date, formatString);
+        JComponent comp = new JPanel(layout);
+        addDatePickerWithLocaleSet(comp, Locale.US, null, formatString);
+        addDatePickerWithLocaleSet(comp, Locale.UK, null, formatString);
+        addDatePickerWithLocaleSet(comp, Locale.GERMAN, null, formatString);
+        addDatePickerWithLocaleSet(comp, Locale.ITALIAN, null, formatString);
+        JComponent outer = Box.createHorizontalBox();
+        outer.add(other);
+        outer.add(comp);
+        outer.add(fields);
+        outer.add(fieldsNull);
+        JXFrame frame = wrapInFrame(outer, "Sizing DatePicker");
+        addMessage(frame, "rows: locales, columns: picker/formatted field");
+        frame.pack();
+        frame.setVisible(true);
+    }
+    
+    /**
+     * Issue #764-swingx: JXDatePicker sizing.
+     * 
+     * Compare pref size with/-out date initially. 
+     * - null date is slightly narrower than not null
+     * - formats using the day of week are cut a bit (for "long" day names like wed)
+     * - a formatted text field is slightly off, by the width of the caret
+     */
+    public void interactiveLocalePrefSize2() {
+        // wednesday - has width problems
+        calendar.set(2008, Calendar.FEBRUARY, 20);
+        Date date = calendar.getTime();
+        String formatString = "EEE MM/dd/yyyy";
+        LayoutManager layout = new VerticalLayoutPref();
+        
+        JComponent german = new JPanel(layout);
+        addFormattedTextField(german, Locale.GERMAN, date, formatString);
+        addDatePickerWithLocaleSet(german, Locale.GERMAN, date, formatString);
+        addDatePickerWithLocaleSet(german, Locale.GERMAN, null, formatString);
+        addFormattedTextField(german, Locale.GERMAN, null, formatString);
+        
+        JComponent italian = new JPanel(layout);
+        addFormattedTextField(italian, Locale.ITALIAN, date, formatString);
+        addDatePickerWithLocaleSet(italian, Locale.ITALIAN, date, formatString);
+        addDatePickerWithLocaleSet(italian, Locale.ITALIAN, null, formatString);
+        addFormattedTextField(italian, Locale.ITALIAN, null, formatString);
+        
+        JComponent uk = new JPanel(layout);
+        addFormattedTextField(uk, Locale.UK, date, formatString);
+        addDatePickerWithLocaleSet(uk, Locale.UK, date, formatString);
+        addDatePickerWithLocaleSet(uk, Locale.UK, null, formatString);
+        addFormattedTextField(uk, Locale.UK, null, formatString);
+        
+        JComponent us = new JPanel(layout);
+        addFormattedTextField(us, Locale.US, date, formatString);
+        addDatePickerWithLocaleSet(us, Locale.US, date, formatString);
+        addDatePickerWithLocaleSet(us, Locale.US, null, formatString);
+        addFormattedTextField(us, Locale.US, null, formatString);
+        
+        JComponent outer = Box.createHorizontalBox();
+        outer.add(german);
+        outer.add(italian);
+        outer.add(uk);
+        outer.add(us);
+        JXFrame frame = wrapInFrame(outer, "Sizing DatePicker: system LF");
+        addMessage(frame, "rows: picker/formatted field, columns: locales");
+        frame.pack();
+        frame.setVisible(true);
     }
 
-    private void addDatePickerWithLocaleSet(JComponent comp, Locale uk) {
-        JXDatePicker datePicker = new JXDatePicker();
+    
+    
+
+    /**
+     * Instantiates a datePicker using the default constructor, set
+     * its locale to the given and adds it to the comp.
+     * @param comp the container to add the picker to
+     * @param uk the locale to use.
+     */
+    private void addDatePickerWithLocaleSet(JComponent comp, Locale uk, Date date, String formatString) {
+        JXDatePicker datePicker = new JXDatePicker(date);
         datePicker.setLocale(uk);
-        comp.add(new JLabel(uk.getDisplayName()));
+        if (formatString != null) {
+            DateFormat format = new SimpleDateFormat(formatString, uk);
+            datePicker.setFormats(format);
+        }
         comp.add(datePicker);
     }
 
+    /**
+     * Instantiates a datePicker using the default constructor, set
+     * its locale to the given and adds it to the comp.
+     * @param comp the container to add the picker to
+     * @param uk the locale to use.
+     */
+    private void addFormattedTextField(JComponent comp, Locale uk, Date date, String formatString) {
+        JFormattedTextField datePicker;
+        if (formatString != null) {
+            DateFormat format = new SimpleDateFormat(formatString, uk);
+            datePicker = new JFormattedTextField(format);
+        } else {
+            datePicker = new JFormattedTextField();
+        }
+        datePicker.setValue(date);
+        comp.add(datePicker);
+    }
 
 
     /**
      * Issue #665-swingx: make JXDatePicker Locale-aware.
      * 
      * Here: instantiate the picker with a non-default locale. 
+     * Check that the dates in LinkPanel and editor 
+     * are formatted as appropriate for the Locale 
      */
     public void interactiveLocaleConstructor() {
+        JComponent other = new JPanel();
+        // wednesday - has width problems
+        calendar.set(2008, Calendar.FEBRUARY, 20);
+        Date date = calendar.getTime();
+        addDatePickerWithLocaleConstructor(other, Locale.US, date);
+        addDatePickerWithLocaleConstructor(other, Locale.UK, date);
+        addDatePickerWithLocaleConstructor(other, Locale.GERMAN, date);
+        addDatePickerWithLocaleConstructor(other, Locale.ITALIAN, date);
         JComponent comp = new JPanel();
-        addDatePickerWithLocaleConstructor(comp, Locale.US);
-        addDatePickerWithLocaleConstructor(comp, Locale.UK);
-        addDatePickerWithLocaleConstructor(comp, Locale.GERMAN);
-        addDatePickerWithLocaleConstructor(comp, Locale.ITALIAN);
-        showInFrame(comp, "Localized DatePicker: constructor");
+        addDatePickerWithLocaleConstructor(comp, Locale.US, null);
+        addDatePickerWithLocaleConstructor(comp, Locale.UK, null);
+        addDatePickerWithLocaleConstructor(comp, Locale.GERMAN, null);
+        addDatePickerWithLocaleConstructor(comp, Locale.ITALIAN, null);
+        JComponent outer = Box.createVerticalBox();
+        outer.add(other);
+        outer.add(comp);
+        showInFrame(outer, "Localized DatePicker: constructor");
     }
 
-    private void addDatePickerWithLocaleConstructor(JComponent comp, Locale uk) {
+    /**
+     * Instantiates a datePicker using the constructor with the given locale and
+     * adds it to the comp.
+     * @param comp the container to add the picker to
+     * @param uk the locale to use.
+     */
+    private void addDatePickerWithLocaleConstructor(JComponent comp, Locale uk, Date date) {
         JXDatePicker datePicker = new JXDatePicker(uk);
+        datePicker.setDate(date);
         comp.add(new JLabel(uk.getDisplayName()));
         comp.add(datePicker);
     }
@@ -272,22 +400,30 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
      * Tests reaction to default locales set via both JComponent.setDefault and
      * Locale.setDefault. Going that way, catches the locales fine.
      * 
-     * PENDING: Issue #681-swingx - the first row of days in the monthview
+     * Also Issue #681-swingx - the first row of days in the monthview
      * overlaps with the day names for locales which have the monday as the 
-     * first day of week. Here is okay, happens only if Locale is given in 
-     * constructor.
+     * first day of week. 
      */
     public void interactiveLocaleDefault() {
         JComponent comp = new JPanel();
-        Locale old = addDatePickerWithLocale(comp, Locale.UK);
-        addDatePickerWithLocale(comp, Locale.FRANCE);
-        addDatePickerWithLocale(comp, Locale.US);
+        Locale old = addDatePickerWithLocale(comp, Locale.US);
+        addDatePickerWithLocale(comp, Locale.UK);
         addDatePickerWithLocale(comp, Locale.GERMAN);
         addDatePickerWithLocale(comp, Locale.ITALIAN);
         showInFrame(comp, "DatePicker takes default Locale");
         setLocale(old);
     }
 
+    /**
+     * Sets the default Locale to the given, instantiates a JXDatePicker with
+     * default Locale and adds it to the given component. Returns the previous 
+     * default Locale.
+     *  
+     * @param comp the container to add the picker to
+     * @param uk the new default Locale
+     *  
+     * @return the previous default Locale
+     */
     private Locale addDatePickerWithLocale(JComponent comp, Locale uk) {
         Locale old = setLocale(uk);
         JXDatePicker datePicker = new JXDatePicker();
@@ -296,6 +432,13 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
         return old;
     }
 
+    /**
+     * Sets default Locale (on Locale and JComponent) to the given Locale and
+     * returns the previous default.
+     * 
+     * @param locale the default Locale to set.
+     * @return the previous default.
+     */
     private Locale setLocale(Locale locale) {
         Locale old = JComponent.getDefaultLocale();
         JComponent.setDefaultLocale(locale);
