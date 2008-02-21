@@ -500,4 +500,44 @@ public interface HighlightPredicate {
         }
         
     }
+
+    /**
+     * Predicate testing the componentAdapter column type against a given
+     * Clazz. Would be nice-to-have - but can't because the ComponentAdapter doesn't
+     * expose the columnClass. Should it?
+     */
+    // @KEEP
+//    public static class ColumnTypeHighlightPredicate implements HighlightPredicate {
+//
+//        private Class clazz;
+//        
+//        /**
+//         * Instantitates a predicate with Object.clazz. This is essentially the
+//         * same as testing against null.
+//         *
+//         */
+//        public ColumnTypeHighlightPredicate() {
+//            this(Object.class);
+//        }
+//        /**
+//         * Instantitates a predicate with the given compare class.
+//         * @param compareValue the fixed class to compare the 
+//         *   adapter value against.
+//         */
+//        public ColumnTypeHighlightPredicate(Class compareValue) {
+//            this.clazz = compareValue;
+//        }
+//        
+//        /**
+//         * @inheritDoc
+//         * 
+//         * Implemented to return true if the adapter value is an instance
+//         * of this predicate's class type.
+//         */
+//        public boolean isHighlighted(Component renderer, ComponentAdapter adapter) {
+//            int modelColumn = adapter.viewToModel(columnIndex)
+//            return clazz.isAssignableFrom(adapter.getColumnClass(columnIndex));
+//        }
+//        
+//    }
 }

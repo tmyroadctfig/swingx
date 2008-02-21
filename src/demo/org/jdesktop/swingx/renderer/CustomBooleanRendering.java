@@ -22,7 +22,11 @@ import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.PainterHighlighter;
+import org.jdesktop.swingx.decorator.HighlightPredicate.AndHighlightPredicate;
+import org.jdesktop.swingx.decorator.HighlightPredicate.ColumnHighlightPredicate;
 import org.jdesktop.swingx.decorator.HighlightPredicate.EqualsHighlightPredicate;
+import org.jdesktop.swingx.decorator.HighlightPredicate.NotHighlightPredicate;
+import org.jdesktop.swingx.decorator.HighlightPredicate.OrHighlightPredicate;
 import org.jdesktop.swingx.painter.ImagePainter;
 import org.jdesktop.swingx.painter.Painter;
 import org.jdesktop.swingx.util.WindowUtils;
@@ -43,6 +47,7 @@ public class CustomBooleanRendering {
     private void configureRendering(JXTable table) {
         final Icon yesIcon = getIcon("resources/green-orb.png");
         final Icon noIcon = getIcon("resources/exit.png");
+        final Icon undecided = getIcon("resources/silver-star.gif");
         IconValue iv = new IconValue() {
 
             public Icon getIcon(Object value) {
@@ -51,7 +56,7 @@ public class CustomBooleanRendering {
                 } else if (Boolean.FALSE.equals(value)) {
                     return noIcon;
                 } 
-                return null;
+                return undecided;
             }
             
         };
@@ -67,12 +72,17 @@ public class CustomBooleanRendering {
      * @see org.javadesktop.swingx.decorator.Highlighter
      * @see org.javadesktop.swingx.decorator.HighlightPredicate
      */
-    private void configureFunRendering(JXTable table) {
+    private void configureFunRendering(JXTable table, int... booleanColumns) {
         HighlightPredicate truePredicate = new EqualsHighlightPredicate(Boolean.TRUE);
         HighlightPredicate falsePredicate = new EqualsHighlightPredicate(Boolean.FALSE);
+        HighlightPredicate undecidedPredicate = new AndHighlightPredicate(
+            new ColumnHighlightPredicate(booleanColumns),
+            new NotHighlightPredicate(
+                new OrHighlightPredicate(truePredicate, falsePredicate)));
         Highlighter yesHighlighter = new PainterHighlighter(truePredicate, getPainter("resources/green-orb.png")); 
         Highlighter noHighlighter = new PainterHighlighter(falsePredicate, getPainter("resources/exit.png"));
-        table.setHighlighters(yesHighlighter, noHighlighter);
+        Highlighter undecidedHighlighter = new PainterHighlighter(undecidedPredicate, getPainter("resources/silver-star.gif"));
+        table.setHighlighters(yesHighlighter, noHighlighter, undecidedHighlighter);
         
         table.setDefaultRenderer(Boolean.class, 
                 new DefaultTableRenderer(StringValue.EMPTY));
@@ -88,7 +98,7 @@ public class CustomBooleanRendering {
         configureRendering(table);
         JXTable fun = new JXTable(new DemoTableModel());
         configureTable(fun);
-        configureFunRendering(fun);
+        configureFunRendering(fun, fun.getColumnCount() - 1);
         JTabbedPane pane = new JTabbedPane();
         pane.addTab("Custom Content Mapping", new JScrollPane(table));
         pane.addTab("Boolean Highlighter", new JScrollPane(fun));
@@ -143,7 +153,7 @@ public class CustomBooleanRendering {
                 { "Sharon", "Zakhour", "Speed reading", new Integer(20),
                         new Boolean(true) },
                 { "Philip", "Milne", "Pool", new Integer(10),
-                        new Boolean(false) } };
+                        null } };
 
         
         @Override
