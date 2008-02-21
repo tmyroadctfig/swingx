@@ -502,17 +502,19 @@ public class BasicDatePickerUI extends DatePickerUI {
         @Override
         public Dimension getPreferredSize() {
             Dimension preferredSize = super.getPreferredSize();
-            if (getValue() == null) {
-                if (prefSizeCache != null) {
-                    preferredSize.width = prefSizeCache.width;
-                    preferredSize.height = prefSizeCache.height;
+            if (getColumns() <= 0) {
+                if (getValue() == null) {
+                    if (prefSizeCache != null) {
+                        preferredSize.width = prefSizeCache.width;
+                        preferredSize.height = prefSizeCache.height;
+                    } else {
+                        prefEmptyInset = preferredSize.width;
+                        preferredSize.width = prefEmptyInset + getNullWidth();
+                    }
                 } else {
-                    prefEmptyInset = preferredSize.width;
-                    preferredSize.width = prefEmptyInset + getNullWidth();
+                    preferredSize.width += Math.max(prefEmptyInset, 4);
+                    prefSizeCache = new Dimension(preferredSize);
                 }
-            } else {
-                preferredSize.width += Math.max(prefEmptyInset, 4);
-                prefSizeCache = new Dimension(preferredSize);
             }
             return preferredSize;
         }

@@ -77,6 +77,35 @@ public class JXDatePickerTest extends InteractiveTestCase {
     @Override
     public void tearDown() {
     }
+    
+    /**
+     * Issue #764-swingx: JXDatePicker sizing 
+     * 
+     * editor must respect columns.
+     */
+    public void testDatePickerColumns50() {
+        JXDatePicker picker = new JXDatePicker();
+        picker.getEditor().setColumns(50);
+        JXDatePicker other = new JXDatePicker(new Date());
+        other.getEditor().setColumns(50);
+        assertEquals(other.getEditor().getPreferredSize(), picker.getEditor().getPreferredSize());
+        
+    }
+
+    /**
+     * Issue #764-swingx: JXDatePicker sizing 
+     * 
+     * editor must respect columns.
+     */
+    public void testDatePickerColumns5() {
+        JXDatePicker picker = new JXDatePicker();
+        picker.getEditor().setColumns(5);
+        JXDatePicker other = new JXDatePicker(new Date());
+        other.getEditor().setColumns(5);
+        assertEquals(other.getEditor().getPreferredSize(), picker.getEditor().getPreferredSize());
+        
+    }
+
     /**
      * Issue #667-swingx: don't install the datepicker border for gtk.
      * 
