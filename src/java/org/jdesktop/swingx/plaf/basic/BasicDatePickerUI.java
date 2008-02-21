@@ -62,7 +62,9 @@ import javax.swing.JFormattedTextField.AbstractFormatter;
 import javax.swing.JFormattedTextField.AbstractFormatterFactory;
 import javax.swing.border.Border;
 import javax.swing.plaf.ComponentUI;
+import javax.swing.plaf.InsetsUIResource;
 import javax.swing.plaf.UIResource;
+import javax.swing.text.DefaultCaret;
 import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.View;
 
@@ -446,34 +448,24 @@ public class BasicDatePickerUI extends DatePickerUI {
     }
 
 
-//---------------- component creation    
+    // ---------------- component creation
     /**
-     * Creates the editor used to edit the date selection. The editor is 
+     * Creates the editor used to edit the date selection. The editor is
      * configured with the default DatePickerFormatter marked as UIResource.
-     *
+     * 
      * @return an instance of a JFormattedTextField
      */
     protected JFormattedTextField createEditor() {
-        return createEditor(new DatePickerFormatterUIResource(datePicker.getLocale()));
-    }
-
-    /**
-     * Creates the editor used to edit the date selection with the 
-     * given Formatter.  Subclasses should
-     * override this method if they want to substitute in their own editor.
-     *
-     * @return an instance of a JFormattedTextField
-     */
-    protected JFormattedTextField createEditor(DatePickerFormatter formatter) {
-        JFormattedTextField f = new DefaultEditor(formatter);
+        JFormattedTextField f = new DefaultEditor(
+                new DatePickerFormatterUIResource(datePicker.getLocale()));
         f.setName("dateField");
         // this produces a fixed pref widths, looking a bit funny
-//        int columns = UIManagerExt.getInt("JXDatePicker.numColumns", null);
-//        if (columns > 0) {
-//            f.setColumns(columns);
-//        }
+        // int columns = UIManagerExt.getInt("JXDatePicker.numColumns", null);
+        // if (columns > 0) {
+        // f.setColumns(columns);
+        // }
         // that's always 0 as it comes from the resourcebundle
-//        f.setColumns(UIManager.getInt("JXDatePicker.numColumns"));
+        // f.setColumns(UIManager.getInt("JXDatePicker.numColumns"));
         Border border = UIManager.getBorder("JXDatePicker.border");
         if (border != null) {
             f.setBorder(border);
@@ -497,9 +489,48 @@ public class BasicDatePickerUI extends DatePickerUI {
     }
 
     private class DefaultEditor extends JFormattedTextField implements UIResource {
+
+        private Dimension prefSizeCache;
+        private int prefEmptyInset;
+
+
         public DefaultEditor(AbstractFormatter formatter) {
             super(formatter);
         }
+
+
+        @Override
+        public Dimension getPreferredSize() {
+            Dimension preferredSize = super.getPreferredSize();
+            if (getValue() == null) {
+                if (prefSizeCache != null) {
+                    preferredSize.width = prefSizeCache.width;
+                    preferredSize.height = prefSizeCache.height;
+                } else {
+                    prefEmptyInset = preferredSize.width;
+                    preferredSize.width = prefEmptyInset + getNullWidth();
+                }
+            } else {
+                preferredSize.width += Math.max(prefEmptyInset, 4);
+                prefSizeCache = new Dimension(preferredSize);
+            }
+            return preferredSize;
+        }
+
+
+        /**
+         * @return
+         */
+        private int getNullWidth() {
+            JFormattedTextField field = new JFormattedTextField(getFormatter());
+            field.setMargin(getMargin());
+            field.setBorder(getBorder());
+            field.setFont(getFont());
+            field.setValue(new Date());
+            return field.getPreferredSize().width;
+        }
+        
+        
     }
 
 // ---------------- Layout    
@@ -545,11 +576,11 @@ public class BasicDatePickerUI extends DatePickerUI {
     private Dimension getEditorPreferredSize() {
         Dimension dim = datePicker.getEditor().getPreferredSize();
         if (datePicker.getDate() == null) {
-            JFormattedTextField field = createEditor(new DatePickerFormatterUIResource(
-                            datePicker.getFormats(), 
-                            datePicker.getLocale()));
-            field.setValue(new Date());
-            dim.width = Math.max(field.getPreferredSize().width, dim.width);
+//            JFormattedTextField field = createEditor(new DatePickerFormatterUIResource(
+//                            datePicker.getFormats(), 
+//                            datePicker.getLocale()));
+//            field.setValue(new Date());
+//            dim.width = Math.max(field.getPreferredSize().width, dim.width);
             // the editor tends to collapsing for empty values
             // JW: better do this in a custom editor?
             // seems to produce #763

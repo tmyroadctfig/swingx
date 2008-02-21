@@ -27,6 +27,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 import java.util.TimeZone;
 import java.util.logging.Logger;
 
@@ -334,6 +335,39 @@ public class JXDatePickerIssues extends InteractiveTestCase {
         frame.setVisible(true);
     }
 //-------------------- unit tests
+    /**
+     * Issue #764-swingx: picker prefsize too narrow
+     */
+    public void testPrefSizeGerman() {
+        // wednesday - has width problems
+        calendar.set(2008, Calendar.FEBRUARY, 20);
+        JXDatePicker nullDate = new JXDatePicker(Locale.GERMAN);
+        JXDatePicker notNull = new JXDatePicker(calendar.getTime(), Locale.GERMAN);
+        assertEquals(notNull.getPreferredSize(), nullDate.getPreferredSize());
+    }
+
+
+    /**
+     * Issue #764-swingx: picker prefsize too narrow
+     */
+    public void testPrefSizeUS() {
+        // wednesday - has width problems
+        calendar.set(2008, Calendar.FEBRUARY, 20);
+         JXDatePicker nullDate = new JXDatePicker(Locale.US);
+        JXDatePicker notNull = new JXDatePicker(calendar.getTime(), Locale.US);
+        assertEquals(notNull.getPreferredSize(), nullDate.getPreferredSize());
+    }
+    
+    /**
+     * Issue #764-swingx: picker prefsize too narrow
+     */
+    public void testPrefSizeUSEditor() {
+        // wednesday - has width problems
+        calendar.set(2008, Calendar.FEBRUARY, 20);
+         JXDatePicker nullDate = new JXDatePicker(Locale.US);
+        JXDatePicker notNull = new JXDatePicker(calendar.getTime(), Locale.US);
+        assertEquals(notNull.getEditor().getPreferredSize(), nullDate.getEditor().getPreferredSize());
+    }
 
     
 //    DateFormat longFormat = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL);

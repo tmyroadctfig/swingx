@@ -83,8 +83,9 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
         JXDatePickerVisualCheck test = new JXDatePickerVisualCheck();
         
         try {
-//            test.runInteractiveTests();
-            test.runInteractiveTests("interactive.*Locale.*");
+            test.runInteractiveTests();
+//            test.runInteractiveTests("interactive.*PrefSize.*");
+//            test.runInteractiveTests("interactive.*Keep.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
@@ -230,6 +231,7 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
      * - a formatted text field is slightly off, by the width of the caret
      */
     public void interactiveLocalePrefSize() {
+        JComboBox box;
         // wednesday - has width problems
         calendar.set(2008, Calendar.FEBRUARY, 20);
         Date date = calendar.getTime();
@@ -306,11 +308,11 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
         addFormattedTextField(us, Locale.US, null, formatString);
         
         JComponent outer = Box.createHorizontalBox();
+        outer.add(us);
+        outer.add(uk);
         outer.add(german);
         outer.add(italian);
-        outer.add(uk);
-        outer.add(us);
-        JXFrame frame = wrapInFrame(outer, "Sizing DatePicker: system LF");
+        JXFrame frame = wrapInFrame(outer, "Sizing DatePicker");
         addMessage(frame, "rows: picker/formatted field, columns: locales");
         frame.pack();
         frame.setVisible(true);

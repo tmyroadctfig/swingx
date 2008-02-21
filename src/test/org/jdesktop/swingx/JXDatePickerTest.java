@@ -77,8 +77,6 @@ public class JXDatePickerTest extends InteractiveTestCase {
     @Override
     public void tearDown() {
     }
-
-
     /**
      * Issue #667-swingx: don't install the datepicker border for gtk.
      * 
