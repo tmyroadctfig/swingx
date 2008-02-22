@@ -56,27 +56,6 @@ public class BasicMonthViewUIIssues extends InteractiveTestCase {
       }
   }
 
-    /**
-     * Test full circle: getDayBounds(Date)
-     */
-    public void testDayBoundsFromDate() {
-        // This test will not work in a headless configuration.
-        if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run test - headless environment");
-            return;
-        }
-        BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.LEFT_TO_RIGHT);
-        Rectangle bounds = ui.getMonthBoundsAtLocation(20, 20);
-        Dimension daySize = ui.getDaySize();
-        // first day column
-        int locationX = bounds.x + 2;
-        // second non-header row
-        int locationY = bounds.y + ui.getMonthHeaderHeight() + 2 * daySize.height + 2;
-        Rectangle dayBounds = ui.getDayBoundsAtLocation(locationX, locationY);
-        Date date = ui.getDayAtLocation(locationX, locationY); 
-        assertEquals(dayBounds, ui.getDayBounds(date));
-     }
-
 
     /**
      * Returns the ui of a realized JXMonthView with 2 columns and the 

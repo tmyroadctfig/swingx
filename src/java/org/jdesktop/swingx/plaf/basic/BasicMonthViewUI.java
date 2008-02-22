@@ -504,7 +504,7 @@ public class BasicMonthViewUI extends MonthViewUI {
         int calendarColumn = (x - days.x) / fullBoxWidth;
         return new Rectangle( 
                 days.x + calendarColumn * fullBoxWidth,
-                days.y + calendarRow * fullBoxWidth,
+                days.y + calendarRow * fullBoxHeight,
                 fullBoxWidth, fullBoxHeight);
     }
     

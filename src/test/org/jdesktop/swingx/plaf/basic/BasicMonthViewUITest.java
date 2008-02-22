@@ -107,12 +107,12 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
             public void actionPerformed(ActionEvent e) {
                 if (e.getActionCommand().equals(JXDatePicker.CANCEL_KEY)) return;
                 if (picker.getDate() == null) return;
-                LOG.info("logical monthPosition " + 
-                        ui.getMonthGridPosition(picker.getDate()) 
-                        + "\n  bounds " + ui.getMonthBounds(picker.getDate()));
-//                LOG.info("logical dayPosition " + 
-//                        ui.getDayGridPosition(picker.getDate()) 
-//                        + "\n  bounds " + ui.getDayBounds(picker.getDate()));
+//                LOG.info("logical monthPosition " + 
+//                        ui.getMonthGridPosition(picker.getDate()) 
+//                        + "\n  bounds " + ui.getMonthBounds(picker.getDate()));
+                LOG.info("logical dayPosition " + 
+                        ui.getDayGridPosition(picker.getDate()) 
+                        + "\n  bounds " + ui.getDayBounds(picker.getDate()));
 
             }
             
@@ -149,16 +149,16 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
 //                LOG.info("month start " + 
 //                        (monthAtLocation != null ? monthAtLocation.getTime() : null));
                 
-                Point p = ui.getMonthGridPositionAtLocation(e.getX(), e.getY());
-                LOG.info("month bounds from logical " + 
-                        p + " \n " +
-                        ui.getMonthBounds(p.y, p.x));
-                LOG.info("month bounds at location" + 
-                        ui.getMonthBoundsAtLocation(e.getX(), e.getY()));
-//                LOG.info("day grid position " + 
-//                        ui.getDayGridPositionAtLocation(e.getX(), e.getY()) 
-//                      + "\nday bounds " + 
-//                        ui.getDayBoundsAtLocation(e.getX(), e.getY()));
+//                Point p = ui.getMonthGridPositionAtLocation(e.getX(), e.getY());
+//                LOG.info("month bounds from logical " + 
+//                        p + " \n " +
+//                        ui.getMonthBounds(p.y, p.x));
+//                LOG.info("month bounds at location" + 
+//                        ui.getMonthBoundsAtLocation(e.getX(), e.getY()));
+                LOG.info("day grid position " + 
+                        ui.getDayGridPositionAtLocation(e.getX(), e.getY()) 
+                      + "\nday bounds " + 
+                        ui.getDayBoundsAtLocation(e.getX(), e.getY()));
             }
             
         });
@@ -224,6 +224,28 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
     }
 
 //------------------------------
+
+    /**
+     * Test full circle: getDayBounds(Date)
+     */
+    public void testDayBoundsFromDate() {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.info("cannot run test - headless environment");
+            return;
+        }
+        BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.LEFT_TO_RIGHT);
+        Rectangle bounds = ui.getMonthBoundsAtLocation(20, 20);
+        Dimension daySize = ui.getDaySize();
+        // first day column
+        int locationX = bounds.x + 2;
+        // second non-header row
+        int locationY = bounds.y + ui.getMonthHeaderHeight() + 2 * daySize.height + 2;
+        Rectangle dayBounds = ui.getDayBoundsAtLocation(locationX, locationY);
+        Date date = ui.getDayAtLocation(locationX, locationY); 
+        assertEquals(dayBounds, ui.getDayBounds(date));
+     }
+
 
     /**
      * Test full circle: getDayBounds(Date) - wrong grid?
