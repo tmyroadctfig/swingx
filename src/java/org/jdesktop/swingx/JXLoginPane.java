@@ -127,7 +127,7 @@ import org.jdesktop.swingx.util.WindowUtils;
  * @author Karl Schaefer
  * @author rah003
  */
-public class JXLoginPane extends JXImagePanel {
+public class JXLoginPane extends JXPanel {
     
 	/**
 	 * The Logger
@@ -304,7 +304,6 @@ public class JXLoginPane extends JXImagePanel {
 	 * focus changes.
 	 */
 	private CapsOnWinListener capsOnWinListener = new CapsOnWinListener(capsOnTest);
-	private boolean initDone;
     
     /**
      * Creates a default JXLoginPane instance
@@ -447,11 +446,10 @@ public class JXLoginPane extends JXImagePanel {
             saveMode = SaveMode.NONE;
         }
 
-        updateUI();
-        if (!initDone) {
+//        if (!initDone) {
         	initComponents();
-        }
-        updateUI();
+//        }
+//        updateUI();
     }
     
     /**
@@ -506,7 +504,15 @@ public class JXLoginPane extends JXImagePanel {
      * @see javax.swing.UIDefaults#getUI
      */
     public void setUI(LoginPaneUI ui) {
+        // initialized here due to implicit updateUI call from JPanel
+        if (banner == null) {
+            banner = new JXImagePanel();
+        }
+        if (errorMessageLabel == null) {
+            errorMessageLabel = new JXLabel(UIManagerExt.getString(CLASS_NAME + ".errorMessage", getLocale())); 
+        }
         super.setUI(ui);
+        banner.setImage(createLoginBanner());
     }
     
     /**
@@ -517,10 +523,6 @@ public class JXLoginPane extends JXImagePanel {
      * @see javax.swing.JComponent#updateUI
      */
     public void updateUI() {
-    	if (!initDone) {
-    		// called by jpanel <init> when components are not ready yet.
-    		return;
-    	}
         setUI((LoginPaneUI) LookAndFeelAddons.getUI(this, LoginPaneUI.class));
     }
 
@@ -700,7 +702,6 @@ public class JXLoginPane extends JXImagePanel {
      */
     private void initComponents() {
         //create the default banner
-        banner = new JXImagePanel();
         banner.setImage(createLoginBanner());
 
         //create the default label
@@ -712,7 +713,6 @@ public class JXLoginPane extends JXImagePanel {
         loginPanel = createLoginPanel();
         
         //create the message and hyperlink and hide them
-        errorMessageLabel = new JXLabel(UIManagerExt.getString(CLASS_NAME + ".errorMessage", getLocale())); 
         errorMessageLabel.setIcon(UIManager.getIcon(CLASS_NAME + ".errorIcon", getLocale()));
         errorMessageLabel.setVerticalTextPosition(SwingConstants.TOP);
         errorMessageLabel.setLineWrap(true);
@@ -747,7 +747,6 @@ public class JXLoginPane extends JXImagePanel {
         add(banner, BorderLayout.NORTH);
         add(contentPanel, BorderLayout.CENTER);
         
-        initDone = true;
     }
 
     /**
@@ -991,7 +990,7 @@ public class JXLoginPane extends JXImagePanel {
             String oldText = this.bannerText;
             this.bannerText = text;
             //fix the login banner
-            banner.setImage(createLoginBanner());
+            this.banner.setImage(createLoginBanner());
             firePropertyChange("bannerText", oldText, text);
         }
     }

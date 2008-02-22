@@ -18,10 +18,14 @@
  */
 package org.jdesktop.swingx;
 
+import java.awt.AlphaComposite;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
+import java.awt.image.BufferedImage;
 import java.util.Locale;
 
 import javax.swing.AbstractAction;
@@ -38,9 +42,14 @@ import javax.swing.UIManager.LookAndFeelInfo;
 
 import org.jdesktop.swingx.JXLoginPane.SaveMode;
 import org.jdesktop.swingx.auth.LoginService;
+import org.jdesktop.swingx.editors.PainterUtil;
+import org.jdesktop.swingx.graphics.GraphicsUtilities;
+import org.jdesktop.swingx.painter.MattePainter;
+import org.jdesktop.swingx.plaf.basic.BasicLoginPaneUI;
+import org.jdesktop.swingx.util.PaintUtils;
 
 /**
- * Simple tests to ensure that the {@code JXDatePicker} can be instantiated and
+ * Simple tests to ensure that the {@code JXLoginPane} can be instantiated and
  * displayed.
  * 
  * @author Karl Schaefer
@@ -142,7 +151,23 @@ public class JXLoginPaneVisualCheck extends InteractiveTestCase {
 
         panel.setSaveMode(SaveMode.BOTH);
         
-//        JFrame frame = wrapInFrame(panel, "show login panel");
+        frame.pack();
+        frame.setVisible(true);
+    }
+
+    /**
+     * Issue #777-swingx Custom banner not picked up due to double updateUI() call
+     *
+     */
+    public void interactiveCustomBannerDisplay() {
+        sun.awt.AppContext.getAppContext().put("JComponent.defaultLocale", Locale.FRANCE);
+        JXLoginPane panel = new JXLoginPane();
+        panel.setUI(new DummyLoginPaneUI(panel));
+        JFrame frame = JXLoginPane.showLoginFrame(panel);
+        frame.setJMenuBar(createMenuBar(panel));
+
+        panel.setSaveMode(SaveMode.BOTH);
+        
         frame.pack();
         frame.setVisible(true);
     }
@@ -170,7 +195,6 @@ public class JXLoginPaneVisualCheck extends InteractiveTestCase {
 
         panel.setSaveMode(SaveMode.BOTH);
         
-//        JFrame frame = wrapInFrame(panel, "show login panel");
         frame.pack();
         frame.setVisible(true);
         SwingUtilities.invokeLater(new Runnable() {
@@ -199,7 +223,6 @@ public class JXLoginPaneVisualCheck extends InteractiveTestCase {
 
         panel.setSaveMode(SaveMode.BOTH);
         
-//        JFrame frame = wrapInFrame(panel, "show login panel");
         frame.pack();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
@@ -233,6 +256,25 @@ public class JXLoginPaneVisualCheck extends InteractiveTestCase {
      */
     public void testDummy() {
         
+    }
+    
+    public class DummyLoginPaneUI extends BasicLoginPaneUI {
+
+        public DummyLoginPaneUI(JXLoginPane dlg) {
+            super(dlg);
+            // TODO Auto-generated constructor stub
+        }
+        
+        @Override
+        public Image getBanner() {
+            Image banner = super.getBanner();
+            BufferedImage im = GraphicsUtilities.createCompatibleTranslucentImage(banner.getWidth(null), banner.getHeight(null));
+            Graphics2D g = im.createGraphics();
+            g.setComposite(AlphaComposite.Src);
+            g.drawImage(banner, 0, 0, 100, 100, null);
+            g.dispose();
+            return im;
+        }
     }
 
 }
