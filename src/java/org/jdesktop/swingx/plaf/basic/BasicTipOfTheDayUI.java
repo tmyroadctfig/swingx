@@ -35,6 +35,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Locale;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
@@ -95,8 +96,9 @@ public class BasicTipOfTheDayUI extends TipOfTheDayUI {
   
   protected JDialog createDialog(Component parentComponent,
     final ShowOnStartupChoice choice,
-    boolean showPreviousButton) {    
-    String title = UIManagerExt.getString("TipOfTheDay.dialogTitle", parentComponent.getLocale());
+    boolean showPreviousButton) {
+    Locale locale = parentComponent==null ? null : parentComponent.getLocale();
+    String title = UIManagerExt.getString("TipOfTheDay.dialogTitle", locale);
 
     final JDialog dialog;
 
@@ -127,7 +129,7 @@ public class BasicTipOfTheDayUI extends TipOfTheDayUI {
 
     if (choice != null) {
       showOnStartupBox = new JCheckBox(UIManagerExt
-        .getString("TipOfTheDay.showOnStartupText", parentComponent.getLocale()), choice
+        .getString("TipOfTheDay.showOnStartupText", locale), choice
         .isShowingOnStartup());
       controls.add(showOnStartupBox, BorderLayout.CENTER);
     } else {
@@ -140,18 +142,18 @@ public class BasicTipOfTheDayUI extends TipOfTheDayUI {
     
     if (showPreviousButton) {
       JButton previousTipButton = new JButton(UIManagerExt
-        .getString("TipOfTheDay.previousTipText", parentComponent.getLocale()));
+        .getString("TipOfTheDay.previousTipText", locale));
       buttons.add(previousTipButton);
       previousTipButton.addActionListener(getActionMap().get("previousTip"));
     }
     
     JButton nextTipButton = new JButton(UIManagerExt
-      .getString("TipOfTheDay.nextTipText", parentComponent.getLocale()));
+      .getString("TipOfTheDay.nextTipText", locale));
     buttons.add(nextTipButton);
     nextTipButton.addActionListener(getActionMap().get("nextTip"));
     
     JButton closeButton = new JButton(UIManagerExt
-      .getString("TipOfTheDay.closeText", parentComponent.getLocale()));
+      .getString("TipOfTheDay.closeText", locale));
     buttons.add(closeButton);
     
     final ActionListener saveChoice = new ActionListener() {
