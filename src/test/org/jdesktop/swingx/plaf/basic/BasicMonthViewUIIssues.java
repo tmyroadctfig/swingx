@@ -21,9 +21,18 @@
  */
 package org.jdesktop.swingx.plaf.basic;
 
+import java.awt.ComponentOrientation;
+import java.awt.Dimension;
+import java.awt.GraphicsEnvironment;
+import java.awt.Rectangle;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.logging.Logger;
 
 import org.jdesktop.swingx.InteractiveTestCase;
+import org.jdesktop.swingx.JXFrame;
+import org.jdesktop.swingx.JXMonthView;
+import org.jdesktop.swingx.calendar.CalendarUtils;
 
 /**
  * Tests to expose known issues of BasicMonthViewUI.
@@ -46,6 +55,76 @@ public class BasicMonthViewUIIssues extends InteractiveTestCase {
           e.printStackTrace();
       }
   }
+
+    /**
+     * Test full circle: getDayBounds(Date)
+     */
+    public void testDayBoundsFromDate() {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.info("cannot run test - headless environment");
+            return;
+        }
+        BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.LEFT_TO_RIGHT);
+        Rectangle bounds = ui.getMonthBoundsAtLocation(20, 20);
+        Dimension daySize = ui.getDaySize();
+        // first day column
+        int locationX = bounds.x + 2;
+        // second non-header row
+        int locationY = bounds.y + ui.getMonthHeaderHeight() + 2 * daySize.height + 2;
+        Rectangle dayBounds = ui.getDayBoundsAtLocation(locationX, locationY);
+        Date date = ui.getDayAtLocation(locationX, locationY); 
+        assertEquals(dayBounds, ui.getDayBounds(date));
+     }
+
+
+    /**
+     * Returns the ui of a realized JXMonthView with 2 columns and the 
+     * given componentOrientation without showingWeekNumbers.
+     * 
+     * NOTE: this must not be used in a headless environment.
+     * 
+     * @param co
+     * @return
+     */
+    private BasicMonthViewUI getRealizedMonthViewUI(ComponentOrientation co) {
+        return getRealizedMonthViewUI(co, false);
+    }
+
+    /**
+     * Returns the ui of a realized JXMonthView with
+     * given componentOrientation and showingWeekNumbers flag.
+     * It's prefColumns/Rows are set to 2. The first displayedDate is 
+     * 20. Feb. 2008 (to have fixed leading/trailing dates)
+     * 
+     * The frame is packed and it's size extended by 40, 40 to
+     * give a slight off-position (!= 0) of the months shown. 
+     * 
+     * 
+     * 
+     * NOTE: this must not be used in a headless environment.
+     * 
+     * @param co the componentOrientation to use
+     * @return
+     */
+    private BasicMonthViewUI getRealizedMonthViewUI(ComponentOrientation co,
+            boolean isShowingWeekNumbers) {
+        JXMonthView monthView = new JXMonthView();
+        monthView.setPreferredCols(2);
+        monthView.setPreferredRows(2);
+        monthView.setComponentOrientation(co);
+        monthView.setShowingWeekNumber(isShowingWeekNumbers);
+        Calendar calendar = monthView.getCalendar();
+        calendar.set(2008, Calendar.FEBRUARY, 20);
+        monthView.setFirstDisplayedDay(calendar.getTime());
+        JXFrame frame = new JXFrame();
+        frame.add(monthView);
+        frame.pack();
+        frame.setSize(frame.getWidth() + 40, frame.getHeight() + 40);
+        frame.setVisible(true);
+        BasicMonthViewUI ui = (BasicMonthViewUI) monthView.getUI();
+        return ui;
+    }
 
     
     /**

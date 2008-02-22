@@ -82,8 +82,14 @@ public class BasicMonthViewUI extends MonthViewUI {
     @SuppressWarnings("all")
     private static final Logger LOG = Logger.getLogger(BasicMonthViewUI.class
             .getName());
+    /** @deprecated no longer used, no replacement. */
+    @Deprecated
     protected static final int LEADING_DAY_OFFSET = 1;
+    /** @deprecated no longer used, no replacement. */
+    @Deprecated
     protected static final int NO_OFFSET = 0;
+    /** @deprecated no longer used, no replacement. */
+    @Deprecated
     protected static final int TRAILING_DAY_OFFSET = -1;
 
     
@@ -535,6 +541,36 @@ public class BasicMonthViewUI extends MonthViewUI {
     }
 
     /**
+     * Returns the given date's position in the grid of the month it is contained.
+     * 
+     * @param date
+     * @return
+     */
+    protected Point getDayGridPosition(Date date) {
+        if (!isVisible(date)) return null;
+        Calendar calendar = getCalendar(date);
+        Date startOfDay = CalendarUtils.startOfDay(calendar, date);
+        // there must be a less ugly way?
+        // columns
+        CalendarUtils.startOfWeek(calendar);
+        int column = 0;
+        while (calendar.getTime().before(startOfDay)) {
+            column++;
+            calendar.add(Calendar.DAY_OF_MONTH, 1);
+        }
+        
+        Date startOfWeek = CalendarUtils.startOfWeek(calendar, date);
+        calendar.setTime(date);
+        CalendarUtils.startOfMonth(calendar);
+        int row = 0;
+        while (calendar.getTime().before(startOfWeek)) {
+            row++;
+            calendar.add(Calendar.WEEK_OF_YEAR, 1);
+        }
+        return new Point(column, row);
+    }
+    
+    /**
      * Return a the day at the specified x/y position.
      * 
      * Mapping pixel to calendar day.
@@ -552,6 +588,50 @@ public class BasicMonthViewUI extends MonthViewUI {
         return getDayInMonth(month, dayInGrid.y, dayInGrid.x);
     }
     
+    /**
+     * Returns the bounds of the given day.
+     * The bounds are in monthView coordinate system.<p>
+     * 
+     * PENDING: Beware - the y is not yet quite correct ... of by a single pixels
+     *   proportional to the row. Boundary problem somewhere? 
+     * 
+     * PENDING JW: this most probably should be public as it is the logical
+     * reverse of getDayAtLocation <p>
+     * 
+     * @param date the Date to return the bounds for. Must not be null.
+     * @return the bounds of the given date or null if not visible.
+     */
+    protected Rectangle getDayBounds(Date date) {
+        if (!isVisible(date)) return null;
+        Point position = getDayGridPosition(date);
+        Rectangle monthBounds = getMonthBounds(date);
+        monthBounds.y += getMonthHeaderHeight() + (position.y + 1) * fullBoxHeight;
+        if (monthView.isShowingWeekNumber()) {
+            position.x++;
+        }
+        if (isLeftToRight) {
+           monthBounds.x += position.x * fullBoxWidth; 
+        } else {
+            int start = monthBounds.x + monthBounds.width - fullBoxWidth; 
+            monthBounds.x = start - position.x * fullBoxWidth;
+        }
+        monthBounds.width = fullBoxWidth;
+        monthBounds.height = fullBoxHeight;
+        return monthBounds;
+    }
+    
+    /**
+     * Returns a boolean indicating if the given Date is visible. Trailing/leading
+     * dates of the last/first displayed month are considered to be invisible.
+     * 
+     * @param date the Date to check for visibility. Must not be null.
+     * @return true if the date is visible, false otherwise.
+     */
+    private boolean isVisible(Date date) {
+        if (getFirstDisplayedDay().after(date) || getLastDisplayedDay().before(date)) return false;
+        return true;
+    }
+
     /**
      * Returns a Calendar representing the day defined by the logical 
      * grid coordinates relative to the given month.
@@ -575,6 +655,8 @@ public class BasicMonthViewUI extends MonthViewUI {
         return clone.getTime();
         
     }
+    
+    
     // ------------------- mapping month header 
  
 
@@ -647,11 +729,6 @@ public class BasicMonthViewUI extends MonthViewUI {
         return month;
     }
 
-    protected int getMonthHeaderHeight() {
-        return fullMonthBoxHeight;
-    }
-
-    
     
     // ---------------------- mapping month coordinates    
 
@@ -739,10 +816,45 @@ public class BasicMonthViewUI extends MonthViewUI {
         return calendar.getTime();
         
     }
-    
+
+    /**
+     * Returns the logical grid position of the month containing the given date.
+     * The Point's x value is the column in the grid of months, the y value
+     * is the row in the grid of months.
+     * 
+     * Mapping Date to logical grid position, this is the reverse of getMonth(int, int).
+     * 
+     * @param date the Date to return the bounds for. Must not be null.
+     * @return the postion of the month that contains the given date or null if not visible.
+     * 
+     * @see #getMonth(int, int)
+     */
+    protected Point getMonthGridPosition(Date date) {
+        if (!isVisible(date)) return null;
+        // start of grid
+        Calendar calendar = getCalendar();
+        int firstMonth = calendar.get(Calendar.MONTH);
+        int firstYear = calendar.get(Calendar.YEAR);
+        
+        // 
+        calendar.setTime(date);
+        int month = calendar.get(Calendar.MONTH);
+        int year = calendar.get(Calendar.YEAR);
+        
+        int diffMonths = month - firstMonth
+            + ((year - firstYear) * JXMonthView.MONTHS_IN_YEAR);
+        
+        int row = diffMonths / calendarColumnCount;
+        int column = diffMonths % calendarColumnCount;
+
+        return new Point(column, row);
+    }
+
     /**
      * Returns the bounds of the month at the given row/column position in the
      * grid of months.
+     * 
+     * Mapping logical grip position to pixel.
      * 
      * @param row the rowIndex in the grid
      * @param column the columnIndex in the grid
@@ -756,6 +868,52 @@ public class BasicMonthViewUI extends MonthViewUI {
         }
         return new Rectangle(startX, startY, calendarWidth, calendarHeight);
     }
+
+    /**
+     * Returns the bounds of the month containing the given date.
+     * The bounds are in monthView coordinate system.<p>
+     * 
+     * Mapping Date to pixel.
+     * 
+     * @param date the Date to return the bounds for. Must not be null.
+     * @return the bounds of the month that contains the given date or null if not visible.
+     */
+    protected Rectangle getMonthBounds(Date date) {
+        Point position = getMonthGridPosition(date);
+        return position != null ? getMonthBounds(position.y, position.x) : null;
+    }
+    
+
+
+    //---------------- accessors for sizes
+    
+    /**
+     * Returns the size of a month.
+     * @return the size of a month.
+     */
+    protected Dimension getMonthSize() {
+        return new Dimension(calendarWidth, calendarHeight);
+    }
+    
+    /**
+     * Returns the size of a day including the padding.
+     * @return the size of a month.
+     */
+    protected Dimension getDaySize() {
+        return new Dimension(fullBoxWidth, fullBoxHeight);
+    }
+    /**
+     * Returns the height of the month header.
+     * 
+     * @return the height of the month header.
+     */
+    protected int getMonthHeaderHeight() {
+        return fullMonthBoxHeight;
+    }
+
+    
+
+    //-------------------  layout    
     
     /**
      * Called from layout: calculates properties
@@ -766,7 +924,6 @@ public class BasicMonthViewUI extends MonthViewUI {
         calculateMonthGridBounds();
     }
     
-//-------------------  layout    
     /**
      * Calculates the bounds of the grid of months. 
      * 

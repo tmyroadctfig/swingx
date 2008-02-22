@@ -668,7 +668,7 @@ public class JXMonthView extends JComponent {
         } else {
             Date lastDisplayedDate = getLastDisplayedDay();
             if (date.after(lastDisplayedDate)) {
-
+                // extract to CalendarUtils!
                 cal.setTime(date);
                 int month = cal.get(Calendar.MONTH);
                 int year = cal.get(Calendar.YEAR);

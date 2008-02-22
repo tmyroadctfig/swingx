@@ -259,6 +259,16 @@ public abstract class InteractiveTestCase extends junit.framework.TestCase {
     }
 
     /**
+     * Adds the component to the statusbar of the frame.  
+     * 
+     * @param frame
+     * @param component
+     */
+    public void addStatusComponent(JXFrame frame, JComponent component) {
+        getStatusBar(frame).add(component);
+    }
+    
+    /**
      * @param frame
      * @param string
      */
