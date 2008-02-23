@@ -267,13 +267,38 @@ public class JXLabel extends JLabel {
     @Override
     public Dimension getPreferredSize() {
         Dimension size = super.getPreferredSize();
-        if (this.textRotation != NORMAL && !isPreferredSizeSet()) {
+        if (isPreferredSizeSet()) {
+            return size;
+        } else if (this.textRotation != NORMAL) {
             // #swingx-680 change the preferred size when rotation is set ... ideally this would be solved in the LabelUI rather then here
             double theta = getTextRotation();
             size.setSize(rotateWidth(size, theta), rotateHeight(size,
             theta));
+        } else {
+            // #swingx-780 preferred size is not set properly when parent container doesn't enforce the width
+            View view = (View) getClientProperty(BasicHTML.propertyKey);
+            Rectangle b = super.getBounds();
+            Container tla = super.getTopLevelAncestor();
+            if (view == null || tla == null) {
+                return size;
+            }
+            Rectangle s = tla.getBounds();
+            view.setSize(Math.min(b.width, s.width) , Integer.MAX_VALUE);
+            if (b.width > 0) {
+                size.setSize(Math.min(b.width, s.width) - 10, Math.min(size.height, s.height) );
+            }
         }
         return size;
+    }
+
+    public int getMaxLineSpan() {
+        return maxLineSpan ;
+    }
+    
+    public void setMaxLineSpan(int maxLineSpan) {
+            int old = getMaxLineSpan();
+            this.maxLineSpan = maxLineSpan;
+            firePropertyChange("maxLineSpan", old, getMaxLineSpan());
     }
 
     private static int rotateWidth(Dimension size, double theta) {
@@ -863,7 +888,7 @@ public class JXLabel extends JLabel {
         
         @Override
         public float getPreferredSpan(int axis) {
-            if (axis == X_AXIS) {
+            if (axis == X_AXIS && width > 0) {
                 // width currently laid out to
                 return width;
                 }
@@ -1535,13 +1560,4 @@ public class JXLabel extends JLabel {
 
     }
 
-	public int getMaxLineSpan() {
-		return maxLineSpan ;
-	}
-	
-	public void setMaxLineSpan(int maxLineSpan) {
-		int old = getMaxLineSpan();
-		this.maxLineSpan = maxLineSpan;
-		firePropertyChange("maxLineSpan", old, getMaxLineSpan());
-	}
 }
