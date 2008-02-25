@@ -205,7 +205,6 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
         final JXFrame frame = wrapInFrame(monthView, "click unselectable fires ActionEvent");
         addAction(frame, action);
         addComponentOrientationToggle(frame);
-        JXStatusBar bar = getStatusBar(frame);
         final JComboBox dayOfWeekComboBox = new JComboBox(new String[]{"Sunday", "Monday", "Tuesday",
                 "Wednesday", "Thursday", "Friday", "Saturday"});
         dayOfWeekComboBox.addActionListener(new ActionListener() {
@@ -218,7 +217,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
             
         });
         dayOfWeekComboBox.setSelectedIndex(monthView.getFirstDayOfWeek() - Calendar.SUNDAY);
-        bar.add(dayOfWeekComboBox);
+        addStatusComponent(frame, dayOfWeekComboBox);
         frame.pack();
         frame.setVisible(true);
     }

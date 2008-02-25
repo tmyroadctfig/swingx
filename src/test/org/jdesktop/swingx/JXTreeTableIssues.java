@@ -138,10 +138,9 @@ public class JXTreeTableIssues extends InteractiveTestCase {
         xTable.expandAll();
         xTable.setVisibleColumnCount(10);
         JXFrame frame = wrapWithScrollingInFrame(xTable, "TreeTable: null icons?");
-        JXStatusBar bar = getStatusBar(frame);
         JTextField textField = new JTextField("drag");
         textField.setDragEnabled(true);
-        bar.add(textField);
+        addStatusComponent(frame, textField);
         frame.setVisible(true);
     }
 

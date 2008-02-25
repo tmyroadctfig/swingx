@@ -127,9 +127,10 @@ public class PainterVisualCheck extends InteractiveTestCase {
         painter.setVerticalAlignment(VerticalAlignment.BOTTOM);
         Highlighter hl = new PainterHighlighter(HighlightPredicate.ROLLOVER_ROW, painter);
         table.addHighlighter(hl);
-        JXFrame frame = showWithScrollingInFrame(table, 
+        JXFrame frame = wrapWithScrollingInFrame(table, 
                 "painter-aware renderer rollover");
-        getStatusBar(frame).add(new JLabel("gradient background of cells with value's containing 'y'"));
+        addStatusComponent(frame, new JLabel("gradient background of cells with value's containing 'y'"));
+        show(frame);
     }
 
     /**
@@ -162,9 +163,10 @@ public class PainterVisualCheck extends InteractiveTestCase {
         relativePainter.setXFactor(.5);
         Highlighter hl = new PainterHighlighter(createComponentTextBasedPredicate("y"), relativePainter);
         table.addHighlighter(hl);
-        JXFrame frame = showWithScrollingInFrame(table, 
+        JXFrame frame = wrapWithScrollingInFrame(table, 
                 "painter-aware renderer with value-based highlighting");
-        getStatusBar(frame).add(new JLabel("gradient background of cells with value's containing 'y'"));
+        addStatusComponent(frame, new JLabel("gradient background of cells with value's containing 'y'"));
+        show(frame);
     }
    
 
@@ -298,13 +300,13 @@ public class PainterVisualCheck extends InteractiveTestCase {
         list.addHighlighter(alternateRowHighlighter);
         list.addHighlighter(gradientHighlighter);
         list.toggleSortOrder();
-        final JXFrame frame = showWithScrollingInFrame(table, list,
+        final JXFrame frame = wrapWithScrollingInFrame(table, list,
                 "transparent value relative highlighting plus striping");
         addStatusMessage(frame,
                 "uses a PainterAwareLabel in renderer");
         // crude binding to play with options - the factory is incomplete...
-        getStatusBar(frame).add(createTransparencyToggle(gradientHighlighter));
-        frame.pack();
+        addStatusComponent(frame, createTransparencyToggle(gradientHighlighter));
+        show(frame);
     }
 
     /**
@@ -329,13 +331,13 @@ public class PainterVisualCheck extends InteractiveTestCase {
         list.setCellRenderer(new DefaultListRenderer(controller));
         list.addHighlighter(gradientHighlighter);
         list.toggleSortOrder();
-        JXFrame frame = showWithScrollingInFrame(table, list,
+        JXFrame frame = wrapWithScrollingInFrame(table, list,
                 "transparent value relative highlighting");
         addStatusMessage(frame,
                 "uses the default painter-aware label in renderer");
         // crude binding to play with options - the factory is incomplete...
-        getStatusBar(frame).add(createTransparencyToggle(gradientHighlighter));
-        frame.pack();
+        addStatusComponent(frame, createTransparencyToggle(gradientHighlighter));
+        show(frame);
     }
 
     //--------- hack around missing size proportional painters

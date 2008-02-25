@@ -464,8 +464,8 @@ public class RendererVisualCheck extends InteractiveTestCase {
         TableCellRenderer renderer = new DefaultTableRenderer();
         table.setDefaultRenderer(Object.class, renderer);
         JXFrame frame = wrapWithScrollingInFrame(xtable, table, "JTable: Unselected focused background: core/ext renderer");
-        getStatusBar(frame).add(new JLabel("background for unselected lead: first column is not-editable"));    
-        frame.setVisible(true);
+        addStatusComponent(frame, new JLabel("background for unselected lead: first column is not-editable"));    
+        show(frame);
     }
 
     /**

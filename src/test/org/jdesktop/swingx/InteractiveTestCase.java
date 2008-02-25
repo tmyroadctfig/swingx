@@ -113,7 +113,6 @@ public abstract class InteractiveTestCase extends junit.framework.TestCase {
         JToolBar toolbar = new JToolBar();
         frame.getRootPaneExt().setToolBar(toolbar);
         frame.getContentPane().add(BorderLayout.CENTER, component);
-//        frame.getContentPane().add(BorderLayout.NORTH, toolbar);
         frame.pack();
         frame.setLocation(frameLocation);
         if (frameLocation.x == 0) {
@@ -266,6 +265,7 @@ public abstract class InteractiveTestCase extends junit.framework.TestCase {
      */
     public void addStatusComponent(JXFrame frame, JComponent component) {
         getStatusBar(frame).add(component);
+        frame.pack();
     }
     
     /**
@@ -275,6 +275,7 @@ public abstract class InteractiveTestCase extends junit.framework.TestCase {
     public void addStatusMessage(JXFrame frame, String message) {
         JXStatusBar bar = getStatusBar(frame);
         bar.add(new JLabel(message));
+        frame.pack();
     }
 
     /**
@@ -388,6 +389,26 @@ public abstract class InteractiveTestCase extends junit.framework.TestCase {
         return frame;
     }
 
+    /**
+     * Packs and shows the frame.
+     * 
+     * @param frame
+     */
+    public void show(final JXFrame frame) {
+        frame.pack();
+        frame.setVisible(true);
+    }
+
+    /**
+     * Packs, sizes and shows the frame.
+     * 
+     * @param frame
+     */
+    public void show(final JXFrame frame, int width, int height) {
+        frame.pack();
+        frame.setSize(width, height);
+        frame.setVisible(true);
+    }
     
 
 }

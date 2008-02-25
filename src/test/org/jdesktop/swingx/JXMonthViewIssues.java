@@ -56,7 +56,7 @@ public class JXMonthViewIssues extends InteractiveTestCase {
 
     public static void main(String[] args) {
       setSystemLF(true);
-      JXMonthViewIssues  test = new JXMonthViewIssues();
+      InteractiveTestCase  test = new JXMonthViewIssues();
       try {
 //          test.runInteractiveTests();
 //        test.runInteractiveTests("interactive.*Locale.*");
@@ -107,8 +107,7 @@ public class JXMonthViewIssues extends InteractiveTestCase {
         };
         final JXFrame frame = wrapInFrame(monthView, "click day");
         addAction(frame, action);
-        frame.pack();
-        frame.setVisible(true);
+        show(frame);
     }
 
     /**
@@ -138,7 +137,6 @@ public class JXMonthViewIssues extends InteractiveTestCase {
         final JXFrame frame = wrapInFrame(monthView, "click unselectable fires ActionEvent");
         addAction(frame, action);
         addComponentOrientationToggle(frame);
-        JXStatusBar bar = getStatusBar(frame);
         final JComboBox dayOfWeekComboBox = new JComboBox(new String[]{"Sunday", "Monday", "Tuesday",
                 "Wednesday", "Thursday", "Friday", "Saturday"});
         dayOfWeekComboBox.addActionListener(new ActionListener() {
@@ -151,12 +149,10 @@ public class JXMonthViewIssues extends InteractiveTestCase {
             
         });
         dayOfWeekComboBox.setSelectedIndex(monthView.getFirstDayOfWeek() - Calendar.SUNDAY);
-        bar.add(dayOfWeekComboBox);
-        frame.pack();
-        frame.setVisible(true);
+        addStatusComponent(frame, dayOfWeekComboBox);
+        show(frame);
     }
 
-    
     /**
      * Issue #567-swingx: JXDatepicker - clicking on unselectable date clears
      * picker's selection.

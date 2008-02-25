@@ -412,8 +412,8 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
         searchPanel.addPatternMatcher(patternMatcher);
         JXFrame frame = wrapWithScrollingInFrame(table,
                 "Pattern highlighting col 0");
-        getStatusBar(frame).add(searchPanel);
-        frame.setVisible(true);
+        addStatusComponent(frame, searchPanel);
+        show(frame);
     }
     
 //----------------- custom PatternMatcher
