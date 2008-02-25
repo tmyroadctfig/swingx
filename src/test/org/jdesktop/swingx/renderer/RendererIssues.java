@@ -31,16 +31,22 @@ import java.util.logging.Logger;
 import javax.swing.AbstractListModel;
 import javax.swing.Icon;
 import javax.swing.JTree;
+import javax.swing.JViewport;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListModel;
 import javax.swing.SwingUtilities;
+import javax.swing.ToolTipManager;
+import javax.swing.plaf.basic.BasicTreeUI;
 import javax.swing.table.TableCellRenderer;
+import javax.swing.tree.TreeCellRenderer;
+import javax.swing.tree.TreePath;
 
 import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXList;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.JXTree;
+import org.jdesktop.swingx.JXTreeTable;
 import org.jdesktop.swingx.test.ComponentTreeTableModel;
 import org.jdesktop.swingx.test.XTestUtils;
 
@@ -119,9 +125,92 @@ public class RendererIssues extends InteractiveTestCase {
             
         };
         JXFrame frame = wrapWithScrollingInFrame(list, "list tooltip");
-        frame.setSize(300, 300);
-        frame.setVisible(true);
+        show(frame, 300, 300);
     }
+    
+    public void interactiveToolTip() {
+        JXTreeTable treeTable = new JXTreeTable(new ComponentTreeTableModel(new JXFrame()));
+        treeTable.expandAll();
+        JXTable table = new JXTable(treeTable.getModel()) {
+            @Override
+            public String getToolTipText(MouseEvent event) {
+                int column = columnAtPoint(event.getPoint());
+                int row = rowAtPoint(event.getPoint());
+                TableCellRenderer renderer = getCellRenderer(row, column);
+                Component comp = prepareRenderer(renderer, row, column);
+                if (comp.getPreferredSize().width <= getColumn(column).getWidth()) return null;
+                if (renderer instanceof StringValue) {
+                    return ((StringValue) renderer).getString(getValueAt(row, column));
+                }
+                return null;
+            }
+
+            @Override
+            public Point getToolTipLocation(MouseEvent event) {
+                int column = columnAtPoint(event.getPoint());
+                int row = rowAtPoint(event.getPoint());
+                return getCellRect(row, column, false).getLocation();
+            }
+            
+            
+            
+        };
+        table.setColumnControlVisible(true);
+        showWithScrollingInFrame(table, "tooltip");
+    }
+
+    public void interactiveToolTipTree() {
+        ComponentTreeTableModel model = new ComponentTreeTableModel(new JXFrame());
+        JXTree tree = new JXTree(model) {
+
+            @Override
+            public String getToolTipText(MouseEvent event) {
+                int row = getRowForLocation(event.getX(), event.getY());
+                if (row < 0) return null;
+                TreeCellRenderer renderer = getCellRenderer();
+                TreePath     path = getPathForRow(row);
+                Object       lastPath = path.getLastPathComponent();
+                Component comp = renderer.getTreeCellRendererComponent(this, 
+                        lastPath, isRowSelected(row), isExpanded(row), 
+                        getModel().isLeaf(lastPath), row, false);
+                int width = getVisibleWidth();
+                if (comp.getPreferredSize().width <= width ) return null;
+                if (renderer instanceof JXTree.DelegatingRenderer) {
+                    renderer = ((JXTree.DelegatingRenderer) renderer).getDelegateRenderer();
+                    if (renderer instanceof StringValue) {
+                        return ((StringValue) renderer).getString(lastPath);
+                    }
+                }
+                return null;
+            }
+
+            private int getVisibleWidth() {
+                int width = getWidth();
+                if (getParent() instanceof JViewport) {
+                    width = ((JViewport) getParent()).getWidth();
+                }
+                int indent =  (((BasicTreeUI)getUI()).getLeftChildIndent() + ((BasicTreeUI)getUI()).getRightChildIndent());
+                return width;
+            }
+
+            @Override
+            public Point getToolTipLocation(MouseEvent event) {
+                return null;
+            }
+            
+            
+            
+        };
+        
+        tree.expandAll();
+        tree.setCellRenderer(new DefaultTreeRenderer());
+        // I'm registered to do tool tips so we can draw tips for the renderers
+        ToolTipManager toolTipManager = ToolTipManager.sharedInstance();
+        toolTipManager.registerComponent(tree);
+        JXFrame frame = showWithScrollingInFrame(tree, "tooltip");
+        show(frame, 400, 400);
+    }
+
     /**
      * Issue #774-swingx: support per node-type icons.
      * 
