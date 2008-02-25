@@ -81,6 +81,7 @@ public class RendererIssues extends InteractiveTestCase {
     public void interactiveToolTipList() {
         final JXTree table = new JXTree(new ComponentTreeTableModel(new JXFrame()));
         table.expandAll();
+        // quick model for long values
         ListModel model = new AbstractListModel() {
 
             public Object getElementAt(int index) {
@@ -149,14 +150,23 @@ public class RendererIssues extends InteractiveTestCase {
             public Point getToolTipLocation(MouseEvent event) {
                 int column = columnAtPoint(event.getPoint());
                 int row = rowAtPoint(event.getPoint());
-                return getCellRect(row, column, false).getLocation();
+                Rectangle cellRect = getCellRect(row, column, false);
+                if (!getComponentOrientation().isLeftToRight()) {
+                    cellRect.translate(cellRect.width, 0);
+                }
+                // PENDING JW: otherwise we get a small (borders only) tooltip for null
+                // core issue?
+                return getValueAt(row, column) == null ? null : cellRect.getLocation();
+//                return null;
             }
             
             
             
         };
         table.setColumnControlVisible(true);
-        showWithScrollingInFrame(table, "tooltip");
+        JXFrame frame = wrapWithScrollingInFrame(table, "tooltip");
+        addComponentOrientationToggle(frame);
+        show(frame);
     }
 
     public void interactiveToolTipTree() {
@@ -173,7 +183,7 @@ public class RendererIssues extends InteractiveTestCase {
                 Component comp = renderer.getTreeCellRendererComponent(this, 
                         lastPath, isRowSelected(row), isExpanded(row), 
                         getModel().isLeaf(lastPath), row, false);
-                int width = getVisibleWidth();
+                int width = getVisibleRect().width;
                 if (comp.getPreferredSize().width <= width ) return null;
                 if (renderer instanceof JXTree.DelegatingRenderer) {
                     renderer = ((JXTree.DelegatingRenderer) renderer).getDelegateRenderer();
@@ -185,10 +195,7 @@ public class RendererIssues extends InteractiveTestCase {
             }
 
             private int getVisibleWidth() {
-                int width = getWidth();
-                if (getParent() instanceof JViewport) {
-                    width = ((JViewport) getParent()).getWidth();
-                }
+                int width = getVisibleRect().width;
                 int indent =  (((BasicTreeUI)getUI()).getLeftChildIndent() + ((BasicTreeUI)getUI()).getRightChildIndent());
                 return width;
             }

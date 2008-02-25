@@ -10,7 +10,9 @@ package org.jdesktop.swingx;
 import java.awt.Component;
 import java.awt.GraphicsEnvironment;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseEvent;
 import java.lang.reflect.InvocationTargetException;
 import java.util.logging.Logger;
 
@@ -27,8 +29,10 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellEditor;
+import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 
+import org.jdesktop.swingx.renderer.StringValue;
 import org.jdesktop.test.CellEditorReport;
 import org.jdesktop.test.ListSelectionReport;
 
@@ -51,6 +55,8 @@ public class JTableIssues extends InteractiveTestCase {
       }
   }
 
+    
+    
     /**
      * test that all transferFocus methods stop edits and 
      * fire one stopped event.
@@ -215,6 +221,48 @@ public class JTableIssues extends InteractiveTestCase {
         JTable table = new JTable(0, 0);
         table.addColumn(new TableColumn(1));
     }
+    
+//----------------------- interactive
+    
+    /**
+     * 
+     * 
+     * 
+     */
+    public void interactiveToolTipOverEmptyCell() {
+        final DefaultTableModel model = new DefaultTableModel(50, 2);
+        model.setValueAt("not empty", 0, 0);
+        final JTable table = new JTable(model) {
+            
+            @Override
+            public String getToolTipText(MouseEvent event) {
+                int column = columnAtPoint(event.getPoint());
+                if (column == 0) {
+                    return "first column";
+                }
+                return null;
+            }
+
+            @Override
+            public Point getToolTipLocation(MouseEvent event) {
+                int column = columnAtPoint(event.getPoint());
+                int row = rowAtPoint(event.getPoint());
+                Rectangle cellRect = getCellRect(row, column, false);
+                if (!getComponentOrientation().isLeftToRight()) {
+                    cellRect.translate(cellRect.width, 0);
+                }
+                // PENDING JW: otherwise we get a small (borders only) tooltip for null
+                // core issue? yeah ... probably
+//                return getValueAt(row, column) == null ? null : cellRect.getLocation();
+                return cellRect.getLocation();
+            }
+            
+
+        };
+        JXFrame frame = wrapWithScrollingInFrame(table, "Tooltip over empty");
+        show(frame);
+    }
+    
     /**
      * forum: table does not scroll after setRowSelectionInterval?
      * 
