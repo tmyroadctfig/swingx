@@ -155,7 +155,8 @@ public class RendererIssues extends InteractiveTestCase {
                     cellRect.translate(cellRect.width, 0);
                 }
                 // PENDING JW: otherwise we get a small (borders only) tooltip for null
-                // core issue?
+                // core issue? Yeh, the logic in tooltipManager is crooked.
+                // but this here is ehem ... rather arbitrary. 
                 return getValueAt(row, column) == null ? null : cellRect.getLocation();
 //                return null;
             }

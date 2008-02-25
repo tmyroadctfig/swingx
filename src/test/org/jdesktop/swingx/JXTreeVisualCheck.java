@@ -246,7 +246,7 @@ public class JXTreeVisualCheck extends JXTreeUnitTest {
                 ComponentAdapter adapter) {
             Dimension dim = component.getPreferredSize();
             int width = adapter.getComponent().getWidth() 
-            - (adapter.getDepth() + depthOffset) * indent ;
+                - (adapter.getDepth() + depthOffset) * indent ;
             dim.width = Math.max(dim.width, width);
             component.setPreferredSize(dim);
             return component;
