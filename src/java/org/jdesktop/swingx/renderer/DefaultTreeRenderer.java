@@ -42,7 +42,7 @@ import org.jdesktop.swingx.RolloverRenderer;
  * 
  */
 public class DefaultTreeRenderer 
-        implements TreeCellRenderer, RolloverRenderer, Serializable {
+        implements TreeCellRenderer, RolloverRenderer, StringValue, Serializable {
 
     protected ComponentProvider componentController;
     private CellContext<JTree> cellContext;
@@ -167,6 +167,15 @@ public class DefaultTreeRenderer
        public boolean isEnabled() {
            return (componentController instanceof RolloverRenderer) && 
               ((RolloverRenderer) componentController).isEnabled();
+       }
+
+// ------------ implement StringValue
+       
+       /**
+        * {@inheritDoc}
+        */
+       public String getString(Object value) {
+           return componentController.getString(value);
        }
 
 

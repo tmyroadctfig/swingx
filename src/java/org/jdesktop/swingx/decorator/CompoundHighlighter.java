@@ -40,7 +40,6 @@ import org.jdesktop.swingx.util.Contract;
  * @author Jeanette Winzenburg
  * 
  */
-@SuppressWarnings("deprecation")
 public class CompoundHighlighter extends AbstractHighlighter 
     implements UIDependent {
     public static final Highlighter[] EMPTY_HIGHLIGHTERS = new Highlighter[0];

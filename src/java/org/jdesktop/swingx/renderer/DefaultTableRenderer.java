@@ -70,7 +70,7 @@ import org.jdesktop.swingx.RolloverRenderer;
  * 
  */
 public class DefaultTableRenderer 
-        implements TableCellRenderer, RolloverRenderer, Serializable {
+        implements TableCellRenderer, RolloverRenderer, StringValue, Serializable {
 
     protected ComponentProvider componentController;
     private CellContext<JTable> cellContext;
@@ -182,6 +182,13 @@ public class DefaultTableRenderer
     public boolean isEnabled() {
         return (componentController instanceof RolloverRenderer) && 
            ((RolloverRenderer) componentController).isEnabled();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getString(Object value) {
+        return componentController.getString(value);
     }
 
 

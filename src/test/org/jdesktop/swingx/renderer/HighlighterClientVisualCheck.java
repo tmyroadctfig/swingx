@@ -432,6 +432,7 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
                 break;
             }
         }
+        // PENDING JW: replace by ShadingColorHighlighter?
         ColorHighlighter shader = new ColorHighlighter(new ColumnHighlightPredicate(hierarchicalColumn), Color.WHITE,
                 null) {
 

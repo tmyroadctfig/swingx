@@ -23,14 +23,25 @@ package org.jdesktop.swingx.renderer;
 
 import java.awt.Component;
 import java.awt.Font;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.event.MouseEvent;
 import java.util.logging.Logger;
 
+import javax.swing.AbstractListModel;
 import javax.swing.Icon;
+import javax.swing.JTree;
+import javax.swing.ListCellRenderer;
+import javax.swing.ListModel;
 import javax.swing.SwingUtilities;
 import javax.swing.table.TableCellRenderer;
 
 import org.jdesktop.swingx.InteractiveTestCase;
+import org.jdesktop.swingx.JXFrame;
+import org.jdesktop.swingx.JXList;
 import org.jdesktop.swingx.JXTable;
+import org.jdesktop.swingx.JXTree;
+import org.jdesktop.swingx.test.ComponentTreeTableModel;
 import org.jdesktop.swingx.test.XTestUtils;
 
 /**
@@ -46,6 +57,71 @@ public class RendererIssues extends InteractiveTestCase {
     private static final Logger LOG = Logger.getLogger(RendererIssues.class
             .getName());
 
+    public static void main(String[] args) {
+        setSystemLF(true);
+        RendererIssues test = new RendererIssues();
+        try {
+            test.runInteractiveTests();
+//          test.runInteractiveTests(".*Text.*");
+//          test.runInteractiveTests(".*XLabel.*");
+//          test.runInteractiveTests(".*Color.*");
+//          test.runInteractiveTests("interactive.*ColumnControl.*");
+        } catch (Exception e) {
+            System.err.println("exception when executing interactive tests:");
+            e.printStackTrace();
+        }
+    }
+
+    public void interactiveToolTipList() {
+        final JXTree table = new JXTree(new ComponentTreeTableModel(new JXFrame()));
+        table.expandAll();
+        ListModel model = new AbstractListModel() {
+
+            public Object getElementAt(int index) {
+                return table.getPathForRow(index).getLastPathComponent();
+            }
+
+            public int getSize() {
+                return table.getRowCount();
+            }
+            
+        };
+        JXList list = new JXList(model) {
+
+            @Override
+            public String getToolTipText(MouseEvent event) {
+                int row = locationToIndex(event.getPoint());
+                Rectangle r = getCellBounds(row, row);
+                if (r == null) 
+                    return super.getToolTipText(event);
+                ListCellRenderer renderer = getCellRenderer();
+                Component comp = renderer.getListCellRendererComponent(this, getElementAt(row), row, isSelectedIndex(row), false);
+                if (comp.getPreferredSize().width <= getVisibleRect().width) return null;
+                renderer = ((DelegatingRenderer) renderer).getDelegateRenderer();
+                if (renderer instanceof StringValue) {
+                    return ((StringValue) renderer).getString(getElementAt(row));
+                }
+                return null;
+                
+            }
+
+            @Override
+            public Point getToolTipLocation(MouseEvent event) {
+                int row = locationToIndex(event.getPoint());
+                Rectangle r = getCellBounds(row, row);
+                if (r != null) {
+                    return r.getLocation();
+                }
+                return super.getToolTipLocation(event);
+            }
+            
+            
+            
+        };
+        JXFrame frame = wrapWithScrollingInFrame(list, "list tooltip");
+        frame.setSize(300, 300);
+        frame.setVisible(true);
+    }
     /**
      * Issue #774-swingx: support per node-type icons.
      * 
@@ -53,7 +129,7 @@ public class RendererIssues extends InteractiveTestCase {
      * 
      */
     public void testNodeTypeIcons() {
-       CellContext context = new TreeCellContext();
+       CellContext<JTree> context = new TreeCellContext();
        context.installContext(null, "dummy", -1, -1, false, false, false, true);
        final Icon custom = XTestUtils.loadDefaultIcon();
        IconValue iv = new IconValue() {

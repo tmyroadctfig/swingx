@@ -107,7 +107,6 @@ import org.jdesktop.swingx.decorator.SortController;
 import org.jdesktop.swingx.decorator.SortKey;
 import org.jdesktop.swingx.decorator.SortOrder;
 import org.jdesktop.swingx.event.TableColumnModelExtListener;
-import org.jdesktop.swingx.icon.ColumnControlIcon;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 import org.jdesktop.swingx.plaf.UIManagerExt;
 import org.jdesktop.swingx.renderer.ButtonProvider;

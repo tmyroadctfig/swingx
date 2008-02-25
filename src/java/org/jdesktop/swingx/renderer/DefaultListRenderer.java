@@ -77,7 +77,8 @@ import org.jdesktop.swingx.RolloverRenderer;
  * 
  * 
  */
-public class DefaultListRenderer implements ListCellRenderer, RolloverRenderer,
+public class DefaultListRenderer 
+    implements ListCellRenderer, RolloverRenderer, StringValue,
         Serializable {
 
     protected ComponentProvider componentController;
@@ -221,6 +222,16 @@ public class DefaultListRenderer implements ListCellRenderer, RolloverRenderer,
         return (componentController instanceof RolloverRenderer)
                 && ((RolloverRenderer) componentController).isEnabled();
     }
+
+ // ------------ implement StringValue
+    
+    /**
+     * {@inheritDoc}
+     */
+    public String getString(Object value) {
+        return componentController.getString(value);
+    }
+
 
 }
 
