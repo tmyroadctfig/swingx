@@ -1182,6 +1182,7 @@ public class BasicMonthViewUI extends MonthViewUI {
         // adjust to start of week 
         calendar.setTime(cal.getTime());
         CalendarUtils.startOfWeek(calendar);
+        Date firstStartOfWeek = calendar.getTime();
         // painting a grid of day boxes, all with dimensions 
         // width == fullBoxWidth and height = fullBoxHeight.
         int topOfDay = top;
@@ -1205,7 +1206,8 @@ public class BasicMonthViewUI extends MonthViewUI {
                 calendar.add(Calendar.DAY_OF_MONTH, 1);
             }
             if (!CalendarUtils.isStartOfWeek(calendar)) {
-                throw new IllegalStateException("expected start of week instead of " + calendar.getTime());
+                throw new IllegalStateException("started painting at " + firstStartOfWeek + 
+                		" should still be on the start of a week instead of " + calendar.getTime());
             }
             topOfDay += fullBoxHeight;
         }
