@@ -20,21 +20,10 @@
  */
 package org.jdesktop.swingx.plaf;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Insets;
-import java.util.Locale;
 import java.util.logging.Logger;
-
-import javax.swing.BorderFactory;
-import javax.swing.JComponent;
-import javax.swing.UIManager;
-import javax.swing.plaf.UIResource;
 
 import junit.framework.TestCase;
 
-import org.jdesktop.swingx.icon.EmptyIcon;
 import org.jdesktop.swingx.plaf.basic.BasicLookAndFeelAddons;
 import org.jdesktop.swingx.plaf.linux.LinuxLookAndFeelAddons;
 import org.jdesktop.swingx.plaf.macosx.MacOSXLookAndFeelAddons;
@@ -59,6 +48,8 @@ public class UIResourcesTest extends TestCase {
      */
     protected void setUp() {
         System.setProperty("swingx.enableStrictResourceChecking", "true");
+        LookAndFeelAddons.contribute(new BusyLabelAddon());
+        LookAndFeelAddons.contribute(new ColumnControlButtonAddon());
         LookAndFeelAddons.contribute(new ColumnHeaderRendererAddon());
         LookAndFeelAddons.contribute(new DatePickerAddon());
         LookAndFeelAddons.contribute(new ErrorPaneAddon());
@@ -153,81 +144,5 @@ public class UIResourcesTest extends TestCase {
      */
     public void testWindowsClassicLookAndFeelAddonsForUIResources() throws Exception {
         LookAndFeelAddons.setAddon(WindowsClassicLookAndFeelAddons.class);
-    }
-    
-    /**
-     * Ensure that the {@code getSafeXXX} methods always return {@code UIResource}.
-     */
-    public void testGetSafeMethodsReturnUIResource() {
-        assertTrue(UIManagerExt.getSafeBorder("", BorderFactory
-                .createEmptyBorder()) instanceof UIResource);
-        assertTrue(UIManagerExt.getSafeColor("", Color.RED) instanceof UIResource);
-        assertTrue(UIManagerExt.getSafeDimension("",
-                new Dimension()) instanceof UIResource);
-        assertTrue(UIManagerExt.getSafeFont("",
-               new Font("Dialog", Font.BOLD, 12)) instanceof UIResource);
-        assertTrue(UIManagerExt.getSafeIcon("",
-                new EmptyIcon()) instanceof UIResource);
-        assertTrue(UIManagerExt.getSafeInsets("",
-                new Insets(0, 0, 0, 0)) instanceof UIResource);
-    }
-    
-    /**
-     * test that the getInt doesn't choke on non-numbers
-     */
-    public void testGetIntLenientWithUnparseable() {
-        String key = "JXDatePicker.linkFormat";
-        Locale locale = JComponent.getDefaultLocale();
-        String columnString = UIManagerExt.getString(key, locale);
-        if (columnString == null) {
-            LOG.info("cant run test - no resource found for key: "  + key);
-            return;
-        }
-        try {
-            Integer.decode(columnString);
-            LOG.info("cant run test - valid integer: " + columnString);
-        } catch (Exception ex) {
-            // must not bark
-            UIManagerExt.getInt(key, locale);
-        }
-    }
-    /**
-     * test that we get an int from the localized resource.
-     */
-    public void testGetIntFromResource() {
-        String key = "JXDatePicker.numColumns";
-        Locale locale = JComponent.getDefaultLocale();
-        String columnString = UIManagerExt.getString(key, locale);
-        if (columnString == null) {
-            LOG.info("cant run test - no resource found for key: "  + key);
-            return;
-        }
-        Object value = UIManagerExt.getInt(key, locale);
-        assertNotNull(value);
-        assertEquals(Integer.decode(columnString), value);
-    }
-    
-    /**
-     * test that a value in the UIManager is not overwritten.
-     */
-    public void testGetIntUIManagerFirst() {
-        String key = "JXDatePicker.numColumns";
-        Locale locale = JComponent.getDefaultLocale();
-        String columnString = UIManagerExt.getString(key, locale);
-        if (columnString == null) {
-            LOG.info("cant run test - no resource found for key: "  + key);
-            return;
-        }
-        Integer uiInt = UIManager.getInt(key, locale);
-        try {
-            Integer temp = 150;
-            UIManager.put(key, temp);
-            Object value = UIManagerExt.getInt(key, locale);
-            assertNotNull(value);
-            assertEquals(temp, value);
-        } finally  {
-            // restore uimanager
-            UIManager.put(key, uiInt);
-        }
     }
 }

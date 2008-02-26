@@ -51,17 +51,17 @@ import org.jdesktop.swingx.util.Contract;
 /**
  * A utility class for obtaining configuration properties from the
  * {@code UIDefaults}. This class handles SwingX-specific L&F needs, such as
- * the installation of painters.
- * <p>
- * SwingX supports dynamic localization updates and the {@code UIManagerExt}
- * class enables this. The {@linkplain UIDefaults#addResourceBundle(String)}
- * allows resource bundles to be added to the {@code UIDefaults}. There is a
- * bug with the class loader that prevents user added bundles from working
- * correctly when used via Web Start. Therefore, {@code UIManagerExt} defines
- * methods to add and remove resource bundles. These are the only methods that
- * SwingX classes should use when adding resource bundles to the defaults. Since
- * {@code UIManagerExt} is maintaining the bundles, any localized {@code String}s
- * <b>must</b> be retrieved from the {@code getString} methods in this class.
+ * the installation of painters and shapes. There are several categories of
+ * utility methods:
+ * <ul>
+ * <li>Support for the safe creation of {@code UIResource}s.</li>
+ * <li>Support for new {@code UIResource} types, such as
+ * {@code PainterUIResource}.</li>
+ * <li>Support for the dynamic localization of {@code UIDefaults}.</li>
+ * <li>Support for returning non-{@code String} localizations from
+ * {@code ResourceBundle}s.</li>
+ * </ul>
+ * <h3>Safe Methods</h3>
  * <p>
  * The {@code getSafeXXX} methods are designed for use with
  * {@code LookAndFeelAddon}s. Any addon that attempts to obtain a property
@@ -69,6 +69,36 @@ import org.jdesktop.swingx.util.Contract;
  * property that will be added to the defaults for the addon should use the
  * "safe" methods. The methods ensure that a valid value is always returned and
  * that value is a {@code UIResource}.
+ * </p>
+ * <h3>Support for New Types</h3>
+ * <p>
+ * {@code UIManagerExt} supports the retrieval of new {@code UIResource} types.
+ * There is a {@code getXXX} method for every {@code UIResource} subtype in the
+ * {@code org.jdesktop.swingx.plaf} package.
+ * </p>
+ * <h3>Support for Dynamic Localization</h3>
+ * <p>
+ * {@code UIManagerExt} enables dynamic localization by supporting
+ * {@code ResourceBundle}s. The
+ * {@linkplain UIDefaults#addResourceBundle(String)} allows resource bundles to
+ * be added to the {@code UIDefaults}. While there is support for this feature
+ * in core, there is a bug with the class loader that prevents user added
+ * bundles from working correctly when used via Web Start. Therefore,
+ * {@code UIManagerExt} defines methods to add and remove resource bundles.
+ * These are the only methods that SwingX classes should use when adding
+ * resource bundles to the defaults. Since {@code UIManagerExt} is maintaining
+ * the bundles, any localized {@code String}s <b>must</b> be retrieved from
+ * the {@code getString} methods in this class.
+ * </p>
+ * <h3>Support for Non-{@code String} Localization Values</h3>
+ * <p>
+ * All methods work by first determining if the value is present
+ * {@code UIDefaults}. If the value is not present, then the installed
+ * {@code ResourceBundle}s are queried. {@code UIManagerExt} will attempt to
+ * convert any returned value to the appropriate type. For instance,
+ * {@code getInt} uses {@code Integer.decode} to convert {@code String}s
+ * returned from the bundle into {@code int}s.
+ * </p>
  * 
  * @author Karl George Schaefer
  * 
@@ -96,6 +126,7 @@ public class UIManagerExt {
             resourceCache = new HashMap<Locale, Map<String,String>>();
         }
         
+        //should this just return String?
         private Object getFromResourceBundle(Object key, Locale l) {
 
             if( resourceBundles == null ||
@@ -232,42 +263,236 @@ public class UIManagerExt {
      *                 if {@code key} is {@code null}
      */
     public static String getString(Object key, Locale l) {
-        String value = UIManager.getString(key, l);
+        Object value = UIManager.get(key, l);
         
-        if (value == null) {
-            value = (String) uiDefaultsExt.getFromResourceBundle(key, l);
+        if (value instanceof String) {
+            return (String) value;
         }
         
-        return value;
+        //only return resource bundle if not in UIDefaults
+        if (value == null) {
+            value = uiDefaultsExt.getFromResourceBundle(key, l);
+            
+            if (value instanceof String) {
+                return (String) value;
+            }
+        }
+        
+        return null;
     }
     
     /**
-     * Returns a int from the defaults. If the value for {@code key} is not a
-     * {@code int}, {@code 0} is returned.
+     * Returns an integer from the defaults. If the value for {@code key} is not
+     * an {@code int}, {@code 0} is returned.
      * 
-     * @param key an {@code Object} specifying the int
-     * @param l the {@code Locale} for which the int is desired; refer to
-     *        {@code UIDefaults} for details on how a {@code null}
-     *        {@code Locale} is handled
-     * @return the {@code int} object
-     * @throws NullPointerException if {@code key} is {@code null}
+     * @param key
+     *                an {@code Object} specifying the integer
+     * @return the {@code int}
+     * @throws NullPointerException
+     *                 if {@code key} is {@code null}
+     */
+    public static int getInt(Object key) {
+        return getInt(key, null);
+    }
+    
+    /**
+     * Returns an integer from the defaults. If the value for {@code key} is not
+     * an {@code int}, {@code 0} is returned.
+     * 
+     * @param key
+     *                an {@code Object} specifying the integer
+     * @param l
+     *                the {@code Locale} for which the integer is desired; refer
+     *                to {@code UIDefaults} for details on how a {@code null}
+     *                {@code Locale} is handled
+     * @return the {@code int}
+     * @throws NullPointerException
+     *                 if {@code key} is {@code null}
      */
     public static int getInt(Object key, Locale l) {
         Object value = UIManager.get(key, l);
+        
         if (value instanceof Integer) {
             return (Integer) value;
         }
-        Object text = uiDefaultsExt.getFromResourceBundle(key, l);
-        if (text instanceof String) {
-            try {
-                return Integer.decode((String) text);
-            } catch (NumberFormatException e) {
-                // ignore - the entry was not parseable, can't do anything
-                // JW: should we log it?
+        
+        if (value == null) {
+            value = uiDefaultsExt.getFromResourceBundle(key, l);
+            
+            if (value instanceof Integer) {
+                return (Integer) value;
+            }
+            
+            if (value instanceof String) {
+                try {
+                    return Integer.decode((String) value);
+                } catch (NumberFormatException e) {
+                    // ignore - the entry was not parseable, can't do anything
+                    // JW: should we log it?
+                }
             }
         }
+        
         return 0;
     }
+    
+    /**
+     * Returns an Boolean from the defaults. If the value for {@code key} is not
+     * a {@code boolean}, {@code false} is returned.
+     * 
+     * @param key
+     *                an {@code Object} specifying the Boolean
+     * @return the {@code boolean}
+     * @throws NullPointerException
+     *                 if {@code key} is {@code null}
+     */
+    public static boolean getBoolean(Object key) {
+        return getBoolean(key, null);
+    }
+    
+    /**
+     * Returns an Boolean from the defaults. If the value for {@code key} is not
+     * a {@code boolean}, {@code false} is returned.
+     * 
+     * @param key
+     *                an {@code Object} specifying the Boolean
+     * @param l
+     *                the {@code Locale} for which the Boolean is desired; refer
+     *                to {@code UIDefaults} for details on how a {@code null}
+     *                {@code Locale} is handled
+     * @return the {@code boolean}
+     * @throws NullPointerException
+     *                 if {@code key} is {@code null}
+     */
+    public static boolean getBoolean(Object key, Locale l) {
+        Object value = UIManager.get(key, l);
+        
+        if (value instanceof Boolean) {
+            return (Boolean) value;
+        }
+        
+        //only return resource bundle if not in UIDefaults
+        if (value == null) {
+            value = uiDefaultsExt.getFromResourceBundle(key, l);
+            
+            if (value instanceof Boolean) {
+                return (Boolean) value;
+            }
+            
+            if (value instanceof String) {
+                return Boolean.valueOf((String) value);
+            }
+        }
+        
+        return false;
+    }
+    
+    /**
+     * Returns a color from the defaults. If the value for {@code key} is not
+     * a {@code Color}, {@code null} is returned.
+     * 
+     * @param key
+     *                an {@code Object} specifying the color
+     * @return the {@code Color} object
+     * @throws NullPointerException
+     *                 if {@code key} is {@code null}
+     */
+    public static Color getColor(Object key) {
+        return getColor(key, null);
+    }
+    
+    /**
+     * Returns a color from the defaults. If the value for {@code key} is not
+     * a {@code Color}, {@code null} is returned.
+     * 
+     * @param key
+     *                an {@code Object} specifying the color
+     * @param l
+     *                the {@code Locale} for which the color is desired; refer
+     *                to {@code UIDefaults} for details on how a {@code null}
+     *                {@code Locale} is handled
+     * @return the {@code Color} object
+     * @throws NullPointerException
+     *                 if {@code key} is {@code null}
+     */
+    public static Color getColor(Object key, Locale l) {
+        Object value = UIManager.get(key, l);
+        
+        if (value instanceof Color) {
+            return (Color) value;
+        }
+        
+        //only return resource bundle if not in UIDefaults
+        if (value == null) {
+            value = uiDefaultsExt.getFromResourceBundle(key, l);
+            
+            if (value instanceof Color) {
+                return (Color) value;
+            }
+            
+            if (value instanceof String) {
+                try {
+                    return Color.decode((String) value);
+                } catch (NumberFormatException e) {
+                    // incorrect format; does nothing
+                }
+            }
+        }
+        
+        return null;
+    }
+
+    //TODO: Font.decode always returns a valid font.  This is not acceptable for UIManager
+//    /**
+//     * Returns a font from the defaults. If the value for {@code key} is not
+//     * a {@code Font}, {@code null} is returned.
+//     * 
+//     * @param key
+//     *                an {@code Object} specifying the font
+//     * @return the {@code Font} object
+//     * @throws NullPointerException
+//     *                 if {@code key} is {@code null}
+//     */
+//    public static Font getFont(Object key) {
+//        return getFont(key, null);
+//    }
+//    
+//    /**
+//     * Returns a font from the defaults. If the value for {@code key} is not
+//     * a {@code Font}, {@code null} is returned.
+//     * 
+//     * @param key
+//     *                an {@code Object} specifying the font
+//     * @param l
+//     *                the {@code Locale} for which the font is desired; refer
+//     *                to {@code UIDefaults} for details on how a {@code null}
+//     *                {@code Locale} is handled
+//     * @return the {@code Font} object
+//     * @throws NullPointerException
+//     *                 if {@code key} is {@code null}
+//     */
+//    public static Font getFont(Object key, Locale l) {
+//        Object value = UIManager.get(key, l);
+//        
+//        if (value instanceof Font) {
+//            return (Font) value;
+//        }
+//        
+//        //only return resource bundle if not in UIDefaults
+//        if (value == null) {
+//            value = uiDefaultsExt.getFromResourceBundle(key, l);
+//            
+//            if (value instanceof Font) {
+//                return (Font) value;
+//            }
+//            
+//            if (value instanceof String) {
+//                return Font.decode((String) value);
+//            }
+//        }
+//        
+//        return null;
+//    }
     
     /**
      * Returns a shape from the defaults. If the value for {@code key} is not a
