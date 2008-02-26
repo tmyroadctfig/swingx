@@ -64,6 +64,7 @@ import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.CompoundHighlighter;
 import org.jdesktop.swingx.decorator.FilterPipeline;
 import org.jdesktop.swingx.decorator.Highlighter;
+import org.jdesktop.swingx.renderer.StringValue;
 import org.jdesktop.swingx.tree.DefaultXTreeCellEditor;
 
 
@@ -854,6 +855,32 @@ public class JXTree extends JTree {
 
     }
 
+    /**
+     * Returns the string representation of the cell value at the given position. 
+     * 
+     * @param row the row index of the cell in view coordinates
+     * @return the string representation of the cell value as it will appear in the 
+     *   table. 
+     */
+    public String getStringAt(int row) {
+        return getStringAt(getPathForRow(row));
+    }
+
+    /**
+     * Returns the string representation of the cell value at the given position. 
+     * 
+     * @param path the TreePath representing the node.
+     * @return the string representation of the cell value as it will appear in the 
+     *   table, or null if the path is not visible. 
+     */
+    public String getStringAt(TreePath path) {
+        if (path == null) return null;
+        TreeCellRenderer renderer = getDelegatingRenderer().getDelegateRenderer();
+        if (renderer instanceof StringValue) {
+            return ((StringValue) renderer).getString(path.getLastPathComponent());
+        }
+        return StringValue.TO_STRING.getString(path.getLastPathComponent());
+    }
 
     
     private DelegatingRenderer getDelegatingRenderer() {
@@ -1435,6 +1462,25 @@ public class JXTree extends JTree {
         public Object getValue() {
             return getValueAt(row, column);
         }
+        
+        
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String getFilteredStringAt(int row, int column) {
+            return tree.getStringAt(row);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String getString() {
+            // TODO Auto-generated method stub
+            return tree.getStringAt(row);
+        }
+
         /**
          * {@inheritDoc}
          */

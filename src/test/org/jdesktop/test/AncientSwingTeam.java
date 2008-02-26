@@ -2,7 +2,13 @@ package org.jdesktop.test;
 
 import java.awt.Color;
 
+import javax.swing.AbstractListModel;
+import javax.swing.ListModel;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableModel;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeModel;
 
 /**
  * Standard Table with class-Infos. Taken from some old
@@ -10,6 +16,42 @@ import javax.swing.table.AbstractTableModel;
  * Can remove/add rows.
  */
 public class AncientSwingTeam extends AbstractTableModel {
+
+    /**
+     * 
+     * Creates and returns a listModel with items of type NamedColor.
+     * @return a ListModel containing items of type NamedColor.
+     */
+    public static ListModel createNamedColorListModel() {
+        final TableModel wrappee = new AncientSwingTeam();
+        ListModel model = new AbstractListModel() {
+
+            public Object getElementAt(int index) {
+                return wrappee.getValueAt(index, 2);
+            }
+
+            public int getSize() {
+                return wrappee.getRowCount();
+            }
+            
+        };
+        return model;
+    };
+    
+    /**
+     * 
+     * Creates and returns a DefaultTreeModel with a String root and
+     * children of type NamedColor wrapped into DefaultMutableTreeNodes.
+     * @return a DefaultTreeModel containing items of type NamedColor.
+     */
+    public static DefaultTreeModel createNamedColorTreeModel() {
+        final TableModel wrappee = new AncientSwingTeam();
+        DefaultMutableTreeNode root = new DefaultMutableTreeNode("Named Colors");
+        for (int i = 0; i < wrappee.getRowCount(); i++) {
+            root.add(new DefaultMutableTreeNode(wrappee.getValueAt(i, 2)));
+        }
+        return new DefaultTreeModel(root);
+    };
 
     protected final String[] names = { "First Name", "Last Name", "Favorite Color",
             "No.", "Vegetarian" };

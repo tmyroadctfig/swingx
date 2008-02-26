@@ -124,6 +124,8 @@ public class FindVisualCheck extends InteractiveTestCase {
         showComponent(new JXTable(new TestTableModel()), "Search in XTable");
     }
 
+
+
     public void interactiveCompareFindStrategy() {
         final JXTable first = new JXTable(new TestTableModel());
         first.setColumnControlVisible(true);

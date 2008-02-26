@@ -167,7 +167,8 @@ import org.jdesktop.swingx.table.TableColumnModelExt;
  * One can automatically highlight certain rows in a JXTable by attaching
  * Highlighters with setHighlighters(Highlighter) method. An
  * example would be a Highlighter that colors alternate rows in the table for
- * readability; AlternateRowHighlighter does this. Again, like Filters,
+ * readability. The HighlighterFactory has several methods to return appropriate
+ * Highlighters for this use-case.s Again, like Filters,
  * Highlighters can be chained together in a CompoundHighlighter to achieve more
  * interesting effects.
  * 
@@ -2933,6 +2934,14 @@ public class JXTable extends JTable
                     return createSearchResult(matcher, row, column);
                 }
             }
+            // @KEEP JW replacement once we have a uniform string representatioon
+//            String text = getStringAt(row, column);
+//            if ((text != null) && (text.length() > 0 )) {
+//                Matcher matcher = pattern.matcher(text);
+//                if (matcher.find()) {
+//                    return createSearchResult(matcher, row, column);
+//                }
+//            }
             return null;
         }
 
@@ -3038,19 +3047,6 @@ public class JXTable extends JTable
             searchHL.setHighlightPredicate(predicate);
             return searchHL;
         }
-
-//        /**
-//         * @param result
-//         * @return
-//         */
-//        protected HighlightPredicate createHighlightPredicate(SearchResult result) {
-//            HighlightPredicate predicate = HighlightPredicate.NEVER;
-//            // no match
-//            if (hasMatch(result)) {
-//                predicate = new SearchPredicate(result.pattern, result.foundRow, convertColumnIndexToModel(result.foundColumn));
-//            }
-//            return predicate;
-//        }
 
         /**
          * @param result
@@ -3279,6 +3275,23 @@ public class JXTable extends JTable
             return table.getValueAt(row, column);
         }
 
+        
+        @Override
+        public String getFilteredStringAt(int row, int column) {
+            int viewColumn = modelToView(column);
+            if (viewColumn >= 0) {
+                return table.getStringAt(row, viewColumn);
+            }
+            // PENDING JW: how to get a String rep for invisible cells? 
+            // rows may be filtered, columns hidden.
+            return super.getFilteredStringAt(row, column);
+        }
+
+        @Override
+        public String getString() {
+            return table.getStringAt(row, column);
+        }
+
         /**
          * {@inheritDoc}
          */
@@ -3467,6 +3480,21 @@ public class JXTable extends JTable
         };
     }
 
+    /**
+     * Returns the string representation of the cell value at the given position. 
+     * 
+     * @param row the row index of the cell in view coordinates
+     * @param column the column index of the cell in view coordinates.
+     * @return the string representation of the cell value as it will appear in the 
+     *   table. 
+     */
+    public String getStringAt(int row, int column) {
+        TableCellRenderer renderer = getCellRenderer(row, column);
+        if (renderer instanceof StringValue) {
+            return ((StringValue) renderer).getString(getValueAt(row, column));
+        }
+        return StringValue.TO_STRING.getString(getValueAt(row, column));
+    }
     
     /**
      * {@inheritDoc}

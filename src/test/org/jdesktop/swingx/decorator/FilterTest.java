@@ -22,8 +22,6 @@ import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.action.AbstractActionExt;
-import org.jdesktop.swingx.renderer.DefaultTableRenderer;
-import org.jdesktop.swingx.renderer.StringValue;
 import org.jdesktop.swingx.test.PipelineReport;
 import org.jdesktop.test.AncientSwingTeam;
 
@@ -806,24 +804,6 @@ public class FilterTest extends InteractiveTestCase {
         PatternFilter filter = new PatternFilter(".*e.*", 0, 0);
         table.setFilters(new FilterPipeline(filter, other));
         assertEquals(otherTable.getValueAt(0, 0), table.getValueAt(0,0));
-    }
-
-    public void interactiveHiddenColumnFilterMatch() {
-        JXTable table = new JXTable(new AncientSwingTeam());
-        table.setColumnControlVisible(true);
-        StringValue sv = new StringValue() {
-
-            public String getString(Object arg0) {
-                return "x" + TO_STRING.getString(arg0);
-            }
-            
-        };
-        table.getColumnExt(0).setCellRenderer(new DefaultTableRenderer(sv));
-//        table.getColumnExt(0).setVisible(false);
-//        PatternFilter filter = new PatternFilter(".*x.*", 0, 0);
-//        table.setFilters(new FilterPipeline(filter));
-        JXFrame frame = wrapWithScrollingInFrame(table, "match and filters: all must be shown");
-        frame.setVisible(true);
     }
 
     /**

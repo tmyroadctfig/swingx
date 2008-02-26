@@ -146,11 +146,21 @@ public class WrappingProvider extends
      * {@inheritDoc} <p>
      * 
      * Overridden to comply to contract: returns the string representation as 
-     * provided by the wrappee (as this level has no string rep).
+     * provided by the wrappee (as this level has no string rep). Must do the
+     * same unwrapping magic as in configuring the rendering component. Here:
+     * unwraps userObject of DefaultMutableTreeNode and TreeTableNode.<p>
+     * 
+     * PENDING JW: factor the unwrapping into one place.
      * 
      */
     @Override
     public String getString(Object value) {
+        if (value instanceof DefaultMutableTreeNode) {
+            value = ((DefaultMutableTreeNode) value).getUserObject();
+        } else if (value instanceof TreeTableNode) {
+            TreeTableNode node = (TreeTableNode) value;
+            value = node.getUserObject();
+        }
         return wrappee.getString(value);
     }
 

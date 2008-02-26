@@ -8,11 +8,49 @@ package org.jdesktop.swingx.decorator;
 
 import java.text.Collator;
 
+import org.jdesktop.swingx.JXFrame;
+import org.jdesktop.swingx.JXTable;
+import org.jdesktop.swingx.renderer.DefaultTableRenderer;
+import org.jdesktop.swingx.renderer.StringValue;
+import org.jdesktop.test.AncientSwingTeam;
+
 
 /**
  * @author Jeanette Winzenburg
  */
 public class FilterIssues extends FilterTest {
+    public static void main(String args[]) {
+        setSystemLF(true);
+        FilterIssues test = new FilterIssues();
+        try {
+           test.runInteractiveTests();
+        } catch (Exception e) {
+            System.err.println("exception when executing interactive tests:");
+            e.printStackTrace();
+        }
+    }
+
+
+    /**
+     * Issue #767-swingx: PatternFilter must use string representation. 
+     */
+    public void interactiveHiddenColumnFilterMatch() {
+        JXTable table = new JXTable(new AncientSwingTeam());
+        table.setColumnControlVisible(true);
+        StringValue sv = new StringValue() {
+
+            public String getString(Object arg0) {
+                return "x" + TO_STRING.getString(arg0);
+            }
+            
+        };
+        table.getColumnExt(0).setCellRenderer(new DefaultTableRenderer(sv));
+        table.getColumnExt(0).setVisible(false);
+        PatternFilter filter = new PatternFilter(".*x.*", 0, 0);
+        table.setFilters(new FilterPipeline(filter));
+        JXFrame frame = wrapWithScrollingInFrame(table, "match and filters: all must be shown");
+        frame.setVisible(true);
+    }
 
 
     

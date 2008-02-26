@@ -21,11 +21,24 @@
  */
 package org.jdesktop.swingx.decorator;
 
-import javax.swing.table.DefaultTableModel;
+import java.awt.Color;
 
-import org.jdesktop.swingx.JXTable;
+import javax.swing.ListModel;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreeModel;
 
 import junit.framework.TestCase;
+
+import org.jdesktop.swingx.JXList;
+import org.jdesktop.swingx.JXTable;
+import org.jdesktop.swingx.JXTree;
+import org.jdesktop.swingx.renderer.DefaultListRenderer;
+import org.jdesktop.swingx.renderer.DefaultTableRenderer;
+import org.jdesktop.swingx.renderer.DefaultTreeRenderer;
+import org.jdesktop.swingx.renderer.StringValue;
+import org.jdesktop.test.AncientSwingTeam;
 
 /**
  * Test <code>ComponentAdapter</code>.
@@ -33,6 +46,277 @@ import junit.framework.TestCase;
  * @author Jeanette Winzenburg
  */
 public class ComponentAdapterTest extends TestCase {
+ 
+    /**
+     * Issue #767-swingx: consistent string representation.
+     * 
+     * Here: test api on ComponentAdapter.
+     */
+    public void testTreeGetString() {
+        JXTreeT list = new JXTreeT(AncientSwingTeam.createNamedColorTreeModel());
+        list.expandAll();
+        StringValue sv = new StringValue() {
+
+            public String getString(Object value) {
+                if (value instanceof Color) {
+                    Color color = (Color) value;
+                    return "R/G/B: " + color.getRGB();
+                }
+                return TO_STRING.getString(value);
+            }
+            
+        };
+        list.setCellRenderer(new DefaultTreeRenderer(sv));
+        String text = sv.getString(((DefaultMutableTreeNode) list.getPathForRow(2).getLastPathComponent()).getUserObject());
+        ComponentAdapter adapter = list.getComponentAdapter(2);
+        assertEquals(text, adapter.getString());
+    }
+
+    /**
+     * Issue #767-swingx: consistent string representation.
+     * 
+     * Here: test api on ComponentAdapter.
+     */
+    public void testTreeGetFilteredString() {
+        JXTreeT list = new JXTreeT(AncientSwingTeam.createNamedColorTreeModel());
+        list.expandAll();
+        StringValue sv = new StringValue() {
+
+            public String getString(Object value) {
+                if (value instanceof Color) {
+                    Color color = (Color) value;
+                    return "R/G/B: " + color.getRGB();
+                }
+                return TO_STRING.getString(value);
+            }
+            
+        };
+        list.setCellRenderer(new DefaultTreeRenderer(sv));
+        String text = sv.getString(((DefaultMutableTreeNode) list.getPathForRow(2).getLastPathComponent()).getUserObject());
+        ComponentAdapter adapter = list.getComponentAdapter(2);
+        assertEquals(text, adapter.getFilteredStringAt(2, 0));
+    }
+
+    /**
+     * Issue #767-swingx: consistent string representation.
+     * 
+     * Here: test api on ComponentAdapter.
+     */
+    public void testTreeGetStringColumn() {
+        JXTreeT list = new JXTreeT(AncientSwingTeam.createNamedColorTreeModel());
+        list.expandAll();
+        StringValue sv = new StringValue() {
+
+            public String getString(Object value) {
+                if (value instanceof Color) {
+                    Color color = (Color) value;
+                    return "R/G/B: " + color.getRGB();
+                }
+                return TO_STRING.getString(value);
+            }
+            
+        };
+        list.setCellRenderer(new DefaultTreeRenderer(sv));
+        String text = sv.getString(((DefaultMutableTreeNode) list.getPathForRow(2).getLastPathComponent()).getUserObject());
+        ComponentAdapter adapter = list.getComponentAdapter(2);
+        assertEquals(text, adapter.getString(0));
+    }
+
+    /**
+     * Subclass to access ComponentAdapter.
+     * @author Jeanette Winzenburg
+     */
+    public static class JXTreeT extends JXTree {
+
+        public JXTreeT(TreeModel model) {
+            super(model);
+        }
+
+        @Override
+        public ComponentAdapter getComponentAdapter(int row) {
+            return super.getComponentAdapter(row);
+        }
+
+    }
+
+    /**
+     * Issue #767-swingx: consistent string representation.
+     * 
+     * Here: test api on ComponentAdapter.
+     */
+    public void testListGetString() {
+        JXListT list = new JXListT(AncientSwingTeam.createNamedColorListModel());
+        StringValue sv = new StringValue() {
+
+            public String getString(Object value) {
+                if (value instanceof Color) {
+                    Color color = (Color) value;
+                    return "R/G/B: " + color.getRGB();
+                }
+                return TO_STRING.getString(value);
+            }
+            
+        };
+        list.setCellRenderer(new DefaultListRenderer(sv));
+        String text = sv.getString(list.getElementAt(2));
+        ComponentAdapter adapter = list.getComponentAdapter(2);
+        assertEquals(text, adapter.getString());
+    }
+
+    /**
+     * Issue #767-swingx: consistent string representation.
+     * 
+     * Here: test api on ComponentAdapter.
+     */
+    public void testListGetFilteredString() {
+        JXListT list = new JXListT(AncientSwingTeam.createNamedColorListModel());
+        StringValue sv = new StringValue() {
+
+            public String getString(Object value) {
+                if (value instanceof Color) {
+                    Color color = (Color) value;
+                    return "R/G/B: " + color.getRGB();
+                }
+                return TO_STRING.getString(value);
+            }
+            
+        };
+        list.setCellRenderer(new DefaultListRenderer(sv));
+        String text = sv.getString(list.getElementAt(2));
+        ComponentAdapter adapter = list.getComponentAdapter(2);
+        assertEquals(text, adapter.getFilteredStringAt(2, 0));
+    }
+
+    /**
+     * Issue #767-swingx: consistent string representation.
+     * 
+     * Here: test api on ComponentAdapter.
+     */
+    public void testListGetStringColumn() {
+        JXListT list = new JXListT(AncientSwingTeam.createNamedColorListModel());
+        StringValue sv = new StringValue() {
+
+            public String getString(Object value) {
+                if (value instanceof Color) {
+                    Color color = (Color) value;
+                    return "R/G/B: " + color.getRGB();
+                }
+                return TO_STRING.getString(value);
+            }
+            
+        };
+        list.setCellRenderer(new DefaultListRenderer(sv));
+        String text = sv.getString(list.getElementAt(2));
+        ComponentAdapter adapter = list.getComponentAdapter(2);
+        assertEquals(text, adapter.getString(0));
+    }
+
+    /**
+     * Subclass to access ComponentAdapter.
+     * @author Jeanette Winzenburg
+     */
+    public static class JXListT extends JXList {
+
+        public JXListT(ListModel model) {
+            super(model);
+        }
+
+        @Override
+        public ComponentAdapter getComponentAdapter(int row) {
+            return super.getComponentAdapter(row);
+        }
+
+    }
+    
+    /**
+     * Issue #767-swingx: consistent string representation.
+     * 
+     * Here: test api on ComponentAdapter.
+     */
+    public void testTableGetString() {
+        JXTableT table = new JXTableT(new AncientSwingTeam());
+        StringValue sv = new StringValue() {
+
+            public String getString(Object value) {
+                if (value instanceof Color) {
+                    Color color = (Color) value;
+                    return "R/G/B: " + color.getRGB();
+                }
+                return TO_STRING.getString(value);
+            }
+            
+        };
+        table.setDefaultRenderer(Color.class, new DefaultTableRenderer(sv));
+        String text = sv.getString(table.getValueAt(2, 2));
+        ComponentAdapter adapter = table.getComponentAdapter(2, 2);
+        assertEquals(text, adapter.getString());
+    }
+
+    /**
+     * Issue #767-swingx: consistent string representation.
+     * 
+     * Here: test api on ComponentAdapter.
+     */
+    public void testTableGetFilteredString() {
+        JXTableT table = new JXTableT(new AncientSwingTeam());
+        StringValue sv = new StringValue() {
+
+            public String getString(Object value) {
+                if (value instanceof Color) {
+                    Color color = (Color) value;
+                    return "R/G/B: " + color.getRGB();
+                }
+                return TO_STRING.getString(value);
+            }
+            
+        };
+        table.setDefaultRenderer(Color.class, new DefaultTableRenderer(sv));
+        String text = sv.getString(table.getValueAt(2, 2));
+        ComponentAdapter adapter = table.getComponentAdapter(2, 2);
+        assertEquals(text, adapter.getFilteredStringAt(2, 2));
+    }
+
+    /**
+     * Issue #767-swingx: consistent string representation.
+     * 
+     * Here: test api on ComponentAdapter.
+     */
+    public void testTableGetStringColumn() {
+        JXTableT table = new JXTableT(new AncientSwingTeam());
+        StringValue sv = new StringValue() {
+
+            public String getString(Object value) {
+                if (value instanceof Color) {
+                    Color color = (Color) value;
+                    return "R/G/B: " + color.getRGB();
+                }
+                return TO_STRING.getString(value);
+            }
+            
+        };
+        table.setDefaultRenderer(Color.class, new DefaultTableRenderer(sv));
+        String text = sv.getString(table.getValueAt(2, 2));
+        ComponentAdapter adapter = table.getComponentAdapter(2, 2);
+        assertEquals(text, adapter.getString(2));
+    }
+
+    /**
+     * Overridden to get access to componentAdapter.
+     * 
+     * @author Jeanette Winzenburg
+     */
+    public static class JXTableT extends JXTable {
+
+        public JXTableT(TableModel model) {
+            super(model);
+        }
+
+        @Override
+        public ComponentAdapter getComponentAdapter(int row, int column) {
+            return super.getComponentAdapter(row, column);
+        }
+        
+    }
     /**
      * Issue #??- ComponentAdapter's default implementation does not
      *    return the value at the adapter's view state.

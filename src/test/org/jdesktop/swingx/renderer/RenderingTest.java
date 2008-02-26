@@ -22,6 +22,7 @@
 package org.jdesktop.swingx.renderer;
 
 import java.awt.Dimension;
+import java.awt.Point;
 import java.text.DateFormat;
 import java.util.logging.Logger;
 
@@ -30,6 +31,7 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.tree.DefaultMutableTreeNode;
 
 import junit.framework.TestCase;
 
@@ -105,6 +107,31 @@ public class RenderingTest extends TestCase {
         assertEquals(sv.getString(context.getValue()), provider.getString(context.getValue()));
     }
     
+    
+    /**
+     * Issue #768-swingx: cleanup access to string representation of provider.
+     * 
+     * WrappingProvider must do the same "unwrapping" magic in getString as in 
+     * getRendereringComponent.
+     */
+    public void testWrappingProviderGetStringFromNode() {
+        StringValue sv = new StringValue() {
+
+            public String getString(Object value) {
+                if (value instanceof Point) {
+                    return "x of Point: " + ((Point) value).x;
+                }
+                return TO_STRING.getString(value);
+            }
+            
+        };
+        CellContext context =  new TableCellContext();
+        Point p = new Point(10, 20);
+        context.value = new DefaultMutableTreeNode(p);
+        WrappingProvider provider = new WrappingProvider(sv);
+        assertEquals(sv.getString(p), provider.getString(context.getValue()));
+    }
+
     /**
      * Issue #768-swingx: cleanup access to string representation of provider.
      * 

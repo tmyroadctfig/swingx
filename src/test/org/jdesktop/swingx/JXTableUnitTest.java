@@ -67,6 +67,8 @@ import org.jdesktop.swingx.decorator.ShuttleSorter;
 import org.jdesktop.swingx.decorator.SortKey;
 import org.jdesktop.swingx.decorator.SortOrder;
 import org.jdesktop.swingx.decorator.Sorter;
+import org.jdesktop.swingx.renderer.DefaultTableRenderer;
+import org.jdesktop.swingx.renderer.StringValue;
 import org.jdesktop.swingx.table.ColumnControlButton;
 import org.jdesktop.swingx.table.ColumnFactory;
 import org.jdesktop.swingx.table.NumberEditorExt;
@@ -118,6 +120,30 @@ public class JXTableUnitTest extends InteractiveTestCase {
         UIManager.put("JXTable.rowHeight", uiTableRowHeight);
         super.tearDown();
     }
+    
+    /**
+     * Issue #767-swingx: consistent string representation.
+     * 
+     * Here: test api on JXTable.
+     */
+    public void testGetString() {
+        JXTable table = new JXTable(new AncientSwingTeam());
+        StringValue sv = new StringValue() {
+
+            public String getString(Object value) {
+                if (value instanceof Color) {
+                    Color color = (Color) value;
+                    return "R/G/B: " + color.getRGB();
+                }
+                return TO_STRING.getString(value);
+            }
+            
+        };
+        table.setDefaultRenderer(Color.class, new DefaultTableRenderer(sv));
+        String text = table.getStringAt(0, 2);
+        assertEquals(sv.getString(table.getValueAt(0, 2)), text);
+    }
+    
     
     public void testCancelEditEnabled() {
         JXTable table = new JXTable(10, 3);

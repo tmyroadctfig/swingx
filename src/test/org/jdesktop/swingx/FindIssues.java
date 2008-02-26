@@ -7,14 +7,22 @@
 package org.jdesktop.swingx;
 
 import java.awt.Color;
+import java.awt.Component;
+import java.awt.event.ActionEvent;
 
+import javax.swing.AbstractAction;
 import javax.swing.AbstractListModel;
+import javax.swing.Action;
 
 import org.jdesktop.swingx.decorator.AbstractHighlighter;
 import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.CompoundHighlighter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
+import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.SearchPredicate;
+import org.jdesktop.swingx.renderer.DefaultTableRenderer;
+import org.jdesktop.swingx.renderer.StringValue;
+import org.jdesktop.test.AncientSwingTeam;
 
 
 /**
@@ -80,6 +88,91 @@ public class FindIssues extends FindTest {
 
     // -------------------- interactive tests
 
+    /**
+     * Issue #767-swingx: consistent string representation.
+     * 
+     * Here: test api on JXTable.
+     */
+    public void testGetStringUsedInSearch() {
+        JXTable table = new JXTable(new AncientSwingTeam());
+        StringValue sv = new StringValue() {
+
+            public String getString(Object value) {
+                if (value instanceof Color) {
+                    Color color = (Color) value;
+                    return "R/G/B: " + color.getRGB();
+                }
+                return TO_STRING.getString(value);
+            }
+            
+        };
+        table.setDefaultRenderer(Color.class, new DefaultTableRenderer(sv));
+        String text = sv.getString(table.getValueAt(2, 2));
+        int matchRow = table.getSearchable().search(text);
+        assertEquals(2, matchRow);
+    }
+
+    /**
+     * Issue #767-swingx: consistent string representation.
+     * 
+     * Here: test api on JXTable.
+     */
+    public void testGetStringUsedInSearchPredicate() {
+        JXTable table = new JXTable(new AncientSwingTeam());
+        StringValue sv = new StringValue() {
+
+            public String getString(Object value) {
+                if (value instanceof Color) {
+                    Color color = (Color) value;
+                    return "R/G/B: " + color.getRGB();
+                }
+                return TO_STRING.getString(value);
+            }
+            
+        };
+        table.setDefaultRenderer(Color.class, new DefaultTableRenderer(sv));
+        table.putClientProperty(AbstractSearchable.MATCH_HIGHLIGHTER, Boolean.TRUE);
+        String text = sv.getString(table.getValueAt(2, 2));
+        int matchRow = table.getSearchable().search(text);
+        Highlighter[] highlighters = table.getHighlighters();
+        ColorHighlighter last = (ColorHighlighter) highlighters[highlighters.length - 1];
+        assertEquals("sanity - found match", 2, matchRow);
+        assertTrue("sanity - use searchPredicate", last.getHighlightPredicate() instanceof SearchPredicate);
+        Component comp = table.prepareRenderer(table.getCellRenderer(2, 2), 2, 2);
+        assertEquals(last.getBackground(), comp.getBackground());
+    }
+    
+    public void interactiveGetStringUsedInFind() {
+        JXTable table = new JXTable(new AncientSwingTeam());
+        StringValue sv = new StringValue() {
+
+            public String getString(Object value) {
+                if (value instanceof Color) {
+                    Color color = (Color) value;
+                    return "R/G/B: " + color.getRGB();
+                }
+                return TO_STRING.getString(value);
+            }
+            
+        };
+        table.setDefaultRenderer(Color.class, new DefaultTableRenderer(sv));
+        table.setColumnControlVisible(true);
+        Action action = new AbstractAction("toggle batch/incremental"){
+            boolean useFindBar;
+            public void actionPerformed(ActionEvent e) {
+                useFindBar = !useFindBar;
+                SearchFactory.getInstance().setUseFindBar(useFindBar);
+            }
+            
+        };
+        
+        JXFrame frame = wrapWithScrollingInFrame(table, "Batch/Incremental Search");
+        addAction(frame, action);
+        addMessage(frame, "Press ctrl-F to open search widget");
+        show(frame);
+    }
+
+    
     public void interactiveTableMarkAllMatches() {
         JXTable table = new XXTable();
         table.setModel(new TestTableModel());

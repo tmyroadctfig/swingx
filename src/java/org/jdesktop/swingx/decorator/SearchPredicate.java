@@ -110,6 +110,7 @@ public class SearchPredicate implements HighlightPredicate {
      */
     private boolean test(Component renderer, ComponentAdapter adapter) {
          int  columnToTest = adapter.viewToModel(adapter.column);
+         // PENDING JW: change to adapter.getString to use uniform string rep
         Object  value = adapter.getValue(columnToTest);
         if (value == null) {
             return false;

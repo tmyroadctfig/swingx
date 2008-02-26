@@ -36,6 +36,8 @@ import org.jdesktop.swingx.decorator.SelectionMapper;
 import org.jdesktop.swingx.decorator.SortKey;
 import org.jdesktop.swingx.decorator.SortOrder;
 import org.jdesktop.swingx.renderer.DefaultListRenderer;
+import org.jdesktop.swingx.renderer.StringValue;
+import org.jdesktop.test.AncientSwingTeam;
 import org.jdesktop.test.ListDataReport;
 import org.jdesktop.test.PropertyChangeReport;
 
@@ -48,6 +50,30 @@ public class JXListTest extends InteractiveTestCase {
 
     protected ListModel listModel;
     protected DefaultListModel ascendingListModel;
+
+    /**
+     * Issue #767-swingx: consistent string representation.
+     * 
+     * Here: test api on JXTable.
+     */
+    public void testGetString() {
+        JXList list = new JXList(AncientSwingTeam.createNamedColorListModel());
+        StringValue sv = new StringValue() {
+
+            public String getString(Object value) {
+                if (value instanceof Color) {
+                    Color color = (Color) value;
+                    return "R/G/B: " + color.getRGB();
+                }
+                return TO_STRING.getString(value);
+            }
+            
+        };
+        list.setCellRenderer(new DefaultListRenderer(sv));
+        String text = list.getStringAt(0);
+        assertEquals(sv.getString(list.getElementAt(0)), text);
+    }
+    
 
     /**
      * Issue 377-swingx: list with filters enabled fires incorrect events.

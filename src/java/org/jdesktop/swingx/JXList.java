@@ -61,11 +61,12 @@ import org.jdesktop.swingx.decorator.SortController;
 import org.jdesktop.swingx.decorator.SortKey;
 import org.jdesktop.swingx.decorator.SortOrder;
 import org.jdesktop.swingx.renderer.DefaultListRenderer;
+import org.jdesktop.swingx.renderer.StringValue;
 
 /**
- * JXList
+ * JXList.
  * 
- * Enabled Rollover/LinkModel handling. Enabled LegacyHighlighter support.
+ * Enabled Rollover/LinkModel handling. Enabled Highlighter support.
  * 
  * Added experimental support for filtering/sorting. This feature is disabled by
  * default because it has side-effects which might break "normal" expectations
@@ -1202,6 +1203,23 @@ public class JXList extends JList {
             return list.getElementAt(row);
         }
 
+        
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String getFilteredStringAt(int row, int column) {
+            return list.getStringAt(row);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String getString() {
+            return list.getStringAt(row);
+        }
+
         /**
          * {@inheritDoc}
          */
@@ -1380,6 +1398,22 @@ public class JXList extends JList {
             };
         }
         return highlighterChangeListener;
+    }
+
+    
+    /**
+     * Returns the string representation of the cell value at the given position. 
+     * 
+     * @param row the row index of the cell in view coordinates
+     * @return the string representation of the cell value as it will appear in the 
+     *   table. 
+     */
+    public String getStringAt(int row) {
+        ListCellRenderer renderer = getDelegatingRenderer().getDelegateRenderer();
+        if (renderer instanceof StringValue) {
+            return ((StringValue) renderer).getString(getElementAt(row));
+        }
+        return StringValue.TO_STRING.getString(getElementAt(row));
     }
 
     private DelegatingRenderer getDelegatingRenderer() {

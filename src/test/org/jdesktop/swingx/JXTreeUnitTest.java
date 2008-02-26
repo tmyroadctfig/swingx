@@ -24,10 +24,13 @@ import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.SearchPredicate;
+import org.jdesktop.swingx.renderer.DefaultTreeRenderer;
+import org.jdesktop.swingx.renderer.StringValue;
 import org.jdesktop.swingx.tree.DefaultXTreeCellEditor;
 import org.jdesktop.swingx.treetable.DefaultMutableTreeTableNode;
 import org.jdesktop.swingx.treetable.FileSystemModel;
 import org.jdesktop.swingx.treetable.TreeTableModel;
+import org.jdesktop.test.AncientSwingTeam;
 
 
 /**
@@ -43,6 +46,56 @@ public class JXTreeUnitTest extends InteractiveTestCase {
         super("JXTree Test");
     }
 
+    
+    /**
+     * Issue #767-swingx: consistent string representation.
+     * 
+     * Here: test api on JXTable.
+     */
+    public void testGetStringForRow() {
+        JXTree tree = new JXTree(AncientSwingTeam.createNamedColorTreeModel());
+        tree.expandAll();
+        StringValue sv = new StringValue() {
+
+            public String getString(Object value) {
+                if (value instanceof Color) {
+                    Color color = (Color) value;
+                    return "R/G/B: " + color.getRGB();
+                }
+                return TO_STRING.getString(value);
+            }
+            
+        };
+        tree.setCellRenderer(new DefaultTreeRenderer(sv));
+        Object value =((DefaultMutableTreeNode) tree.getPathForRow(2).getLastPathComponent()).getUserObject();
+        String text = tree.getStringAt(2);
+        assertEquals(sv.getString(value), text);
+    }
+
+    /**
+     * Issue #767-swingx: consistent string representation.
+     * 
+     * Here: test api on JXTable.
+     */
+    public void testGetStringForPath() {
+        JXTree tree = new JXTree(AncientSwingTeam.createNamedColorTreeModel());
+        tree.expandAll();
+        StringValue sv = new StringValue() {
+
+            public String getString(Object value) {
+                if (value instanceof Color) {
+                    Color color = (Color) value;
+                    return "R/G/B: " + color.getRGB();
+                }
+                return TO_STRING.getString(value);
+            }
+            
+        };
+        tree.setCellRenderer(new DefaultTreeRenderer(sv));
+        Object value =((DefaultMutableTreeNode) tree.getPathForRow(2).getLastPathComponent()).getUserObject();
+        String text = tree.getStringAt(tree.getPathForRow(2));
+        assertEquals(sv.getString(value), text);
+    }
     /**
      * Issue #769-swingx: setXXIcon on renderer vs setXXIcon on Tree/Table.
      * Characterize tree behaviour.

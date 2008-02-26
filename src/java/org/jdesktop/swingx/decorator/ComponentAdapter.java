@@ -23,6 +23,8 @@ package org.jdesktop.swingx.decorator;
 
 import javax.swing.JComponent;
 
+import org.jdesktop.swingx.renderer.StringValue;
+
 /**
  * Abstract base class for all component data adapter classes. A
  * <code>ComponentAdapter</code> allows a {@link Filter}, {@link Sorter}, or
@@ -74,19 +76,22 @@ import javax.swing.JComponent;
  * <li> the mapping method {@link #viewToModel(int)} in view coordinates
  * </ul>
  * 
- * All input row indices are in model coordinates with exactly two exceptions:
+ * All input row indices are in model coordinates with exactly three exceptions:
  * <ul>
  * <li> {@link #row} in row view coordinates
  * <li> the getter for the filtered value {@link #getFilteredValueAt(int, int)}
  * takes the row in view coordinates.
- * </ul>
+  * <li> the getter for the filtered string representation {@link #getFilteredStringAt(int, int)}
+ * takes the row in view coordinates.
+* </ul>
  * 
  * 
- * 
- * PENDING JW: anything to gain by generics here?
+ * PENDING JW: add model-index based access to string rep. <p>
+ * PENDING JW: anything to gain by generics here?<p>
  * 
  * @author Ramesh Gupta
  * @author Karl Schaefer
+ * @author Jeanette Winzenburg
  * 
  * @see org.jdesktop.swingx.decorator.HighlightPredicate
  * @see org.jdesktop.swingx.decorator.Highlighter
@@ -212,7 +217,66 @@ public abstract class ComponentAdapter {
         return modelToView(column) >= 0;
     }
     
-//----------------------- accessing the target's view state
+
+    //----------------------- accessing the target's view state
+    
+    /**
+     * Returns the String representation of the value of the cell identified by this adapter. That is,
+     * for the at position (adapter.row, adapter.column) in view coordinates.<p>
+     * 
+     * NOTE: this implementation assumes that view coordinates == model 
+     * coordinates, that is simply calls getValueAt(this.row, this.column). It is
+     * up to subclasses to override appropriately is they support model/view
+     * coordinate transformation. <p>
+     * 
+     * This implementation messages the StringValue.TO_STRING with the getValue,
+     * subclasses should re-implement and use the api appropriate for the target component type.
+     * 
+     * @return the String representation of value of the cell identified by this adapter
+     * @see #getValueAt(int, int)
+     * @see #getFilteredValueAt(int, int)
+     * @see #getValue(int)
+     */
+    public String getString() {
+        return StringValue.TO_STRING.getString(getValue());
+    }
+
+    /**
+     * Returns the String representation of the value of the cell identified by the current 
+     * adapter row and the given column index in model coordinates.<p>
+     * 
+     * @param modelColumnIndex the column index in model coordinates 
+     * @return the String representation of the value of the cell identified by this adapter
+     * 
+     * @see #getFilteredStringAt(int, int)
+     * @see #getString()
+     */
+    public String getString(int modelColumnIndex) {
+        return getFilteredStringAt(row, modelColumnIndex);
+    }
+
+    /**
+     * Returns the String representation of the filtered value of the cell identified by the row
+     * in view coordinate and the column in model coordinates.<p>
+     * 
+     * Note: the asymetry of the coordinates is intentional - clients like
+     * Highlighters are interested in view values but might need to access
+     * non-visible columns for testing. While it is possible to access 
+     * row coordinates different from the current (that is this.row) it is not
+     * safe to do so for row > this.row because the adapter doesn't allow to
+     * query the count of visible rows.<p>
+     * 
+     * This implementation messages the StringValue.TO_STRING with the filteredValue,
+     * subclasses should re-implement and use the api appropriate for the target component type.
+     * 
+     * @param row the row of the cell in view coordinates
+     * @param column the column of the cell in model coordinates.
+     * @return the String representation of the filtered value of the cell identified by the row
+     * in view coordinate and the column in model coordiantes
+     */
+    public String getFilteredStringAt(int row, int column) {
+        return StringValue.TO_STRING.getString(getFilteredValueAt(row, column));
+    }
     
     /**
      * Returns the value of the cell identified by this adapter. That is,
