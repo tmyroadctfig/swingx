@@ -231,7 +231,6 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
      * - a formatted text field is slightly off, by the width of the caret
      */
     public void interactiveLocalePrefSize() {
-        JComboBox box;
         // wednesday - has width problems
         calendar.set(2008, Calendar.FEBRUARY, 20);
         Date date = calendar.getTime();

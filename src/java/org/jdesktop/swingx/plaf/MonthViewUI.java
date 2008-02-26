@@ -15,7 +15,7 @@ public abstract class MonthViewUI extends ComponentUI {
 
     
     /**
-     * Return a the date at the specified x/y position.
+     * Returns a the date at the specified x/y position.
      * The date represents a day in the calendar's coordinate system. 
      *
      * @param x X position

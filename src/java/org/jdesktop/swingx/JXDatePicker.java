@@ -67,14 +67,70 @@ import org.jdesktop.swingx.plaf.UIManagerExt;
 import org.jdesktop.swingx.util.Contract;
 
 /**
- * A component that combines a button, an editable field and a JXMonthView
- * component.  The user can select a date from the calendar component, which
- * appears when the button is pressed.  The selection from the calendar
- * component will be displayed in editable field.  Values may also be modified
- * manually by entering a date into the editable field using one of the
- * supported date formats.
- *
+ * A component for entering dates with a user interaction similar to a
+ * JComboBox. The dates can be typed into a text field or selected from a
+ * JXMonthView which opens in a JXPopupMenu on user's request.
+ * <p>
+ * 
+ * The date selection is controlled by the JXMonthView's DateSelectionModel.
+ * This allows the use of all its functionality in the JXDatePicker as well.
+ * F.i. restrict the selection to a date in the current or next week:
+ * <p>
+ * 
+ * <pre><code>
+ * Appointment appointment = new Appointment(director,
+ *         &quot;Be sure to have polished shoes!&quot;);
+ * JXDatePicker picker = new JXDatePicker();
+ * Calendar calendar = picker.getMonthView().getCalendar();
+ * // starting today if we are in a hurry
+ * calendar.setTime(new Date());
+ * picker.getMonthView().setLowerBound(calendar.getTime());
+ * // end of next week
+ * CalendarUtils.endOfWeek(calendar);
+ * calendar.add(Calendar.WEEK_OF_YEAR);
+ * picker.getMonthView().setUpperBound(calendar.getTime());
+ * </code></pre>
+ * 
+ * Similar to a JXMonthView, the JXDatePicker fire an ActionEvent when the user
+ * actively commits or cancels a selection. Interested client code can add a
+ * ActionListener to be notified by the user action.
+ * 
+ * <pre><code>
+ * JXDatePicker picker = new JXDatePicker(new Date());
+ * ActionListener l = new ActionListener() {
+ *     public void actionPerformed(ActionEvent e) {
+ *         if (JXDatePicker.COMMIT_KEY.equals(e.getActionCommand)) {
+ *             safeDate(picker.getDate());
+ *         }
+ *     }
+ * };
+ * picker.addActionListener(l);
+ * </code></pre>
+ * 
+ * <p>
+ * The DateFormats used in the JXDatePicker's are initialized to the default
+ * formats of the DatePickerFormatter, as defined by the picker's resourceBundle
+ * DatePicker.properties. Application code can overwrite the picker's default
+ * 
+ * <pre><code>
+ * picker.setDateFormats(myCustomFormat, myAlternativeCustomFormat);
+ * </code></pre>
+ * 
+ * PENDING JW: explain what the alternatives are for (after understanding it
+ * myself ;-)
+ * <p>
+ * 
+ * The selected Date is a bound property of the JXDatePicker. This allows easy
+ * binding to a property of a custom bean when using a binding framework.
+ * <p>
+ * 
  * @author Joshua Outwater
+ * @author Jeanette Winzenburg
+ * 
+ * @see JXMonthView
+ * @see DateSelectionModel
+ * @see DatePickerFormatter
+ * 
  */
 public class JXDatePicker extends JComponent {
     @SuppressWarnings("unused")
@@ -769,7 +825,12 @@ public class JXDatePicker extends JComponent {
      * Returns the string currently used to identiy fired ActionEvents.
      *
      * @return String The string used for identifying ActionEvents.
+     * 
+     * @deprecated no longer used. The command is internally determined and
+     * either datePickerCommit or datePickerCancel, depending on the user
+     * gesture which triggered the action.
      */
+    @Deprecated
     public String getActionCommand() {
         return _actionCommand;
     }
@@ -778,9 +839,27 @@ public class JXDatePicker extends JComponent {
      * Sets the string used to identify fired ActionEvents.
      *
      * @param actionCommand The string used for identifying ActionEvents.
+     * 
+     * @deprecated no longer used. The command is internally determined and
+     * either datePickerCommit or datePickerCancel, depending on the user
+     * gesture which triggered the action.
      */
+    @Deprecated
     public void setActionCommand(String actionCommand) {
         _actionCommand = actionCommand;
+    }
+
+    /**
+     * Fires an ActionEvent with this picker's actionCommand
+     * to all listeners.
+     * 
+     * @deprecated no longer used. The command is internally determined and
+     * either datePickerCommit or datePickerCancel, depending on the user
+     * gesture which triggered the action.
+     */
+    @Deprecated
+    protected void fireActionPerformed() {
+        fireActionPerformed(getActionCommand());
     }
 
     /**
@@ -819,13 +898,6 @@ public class JXDatePicker extends JComponent {
         return result;
     }
 
-    /**
-     * Fires an ActionEvent with this picker's actionCommand
-     * to all listeners.
-     */
-    protected void fireActionPerformed() {
-        fireActionPerformed(getActionCommand());
-    }
 
     /**
      * Fires an ActionEvent with the given actionCommand
