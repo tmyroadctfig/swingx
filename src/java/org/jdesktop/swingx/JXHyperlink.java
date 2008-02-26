@@ -126,6 +126,8 @@ public class JXHyperlink extends JButton {
     }
 
     /**
+     * Returns the foreground color for unvisited links.
+     * 
      * @return Color for the hyper link if it has not yet been clicked.
      */
     public Color getUnclickedColor() {
@@ -148,6 +150,8 @@ public class JXHyperlink extends JButton {
     }
 
     /**
+     * Returns the foreground color for visited links.
+     * 
      * @return Color for the hyper link if it has already been clicked.
      */
     public Color getClickedColor() {
@@ -170,35 +174,45 @@ public class JXHyperlink extends JButton {
     }
 
     /**
-     * Sets the clicked property and updates visual state depending
-     * on clicked.
-     * Here: the dependent visual state is the foreground color.
-     * NOTE: as with all  button's visual properties, this will not update 
-     * the backing action's "visited" state.
+     * Sets the clicked property and updates visual state depending on clicked.
+     * This implementation updated the foreground color.
+     * <p>
      * 
-     * @param clicked flag to indicate if the button should be regarded
-     *    as having been clicked or not.
+     * NOTE: as with all button's visual properties, this will not update the
+     * backing action's "visited" state.
+     * 
+     * @param clicked flag to indicate if the button should be regarded as
+     *        having been clicked or not.
+     * @see #isClicked()
      */
     public void setClicked(boolean clicked) {
         boolean old = isClicked();
         hasBeenVisited = clicked;
         setForeground(isClicked() ? getClickedColor() : getUnclickedColor());
         firePropertyChange("clicked", old, isClicked());
-   }
+    }
 
     /**
+     * Returns a boolean indicating if this link has already been visited.
+     * 
      * @return <code>true</code> if hyper link has already been clicked.
+     * @see #setClicked(boolean)
      */
     public boolean isClicked() {
         return hasBeenVisited;
     }
 
     /**
-     * Control auto-click property. 
+     * Sets the overrulesActionOnClick property. It controls whether this
+     * button should overrule the Action's visited property on actionPerformed. <p>
+     * 
+     * The default value is <code>false</code>.
      * 
      * @param overrule if true, fireActionPerformed will set clicked to true
      *   independent of action.
      * 
+     * @see #getOverrulesActionOnClick()
+     * @see #setClicked(boolean)
      */
     public void setOverrulesActionOnClick(boolean overrule) {
         boolean old = getOverrulesActionOnClick();
@@ -207,18 +221,23 @@ public class JXHyperlink extends JButton {
     }
     
     /**
-     * Returns whether the clicked property should be set always on clicked.
+     * Returns a boolean indicating whether the clicked property should be set
+     * always on clicked.
      * 
-     * Defaults to false.
+     * @return overrulesActionOnClick false if his button clicked property
+     *         respects the Action's visited property. True if the clicked
+     *         should be updated on every actionPerformed.
      * 
-     * @return overrulesActionOnClick 
+     * @see #setOverrulesActionOnClick(boolean)
+     * @see #setClicked(boolean)
      */
     public boolean getOverrulesActionOnClick() {
         return overrulesActionOnClick;
     }
 
     /**
-     * override to control auto-clicked. 
+     * {@inheritDoc} <p>
+     * Overriden to respect the overrulesActionOnClick property.
      */
     @Override
     protected void fireActionPerformed(ActionEvent event) {
@@ -229,7 +248,8 @@ public class JXHyperlink extends JButton {
     }
 
     /**
-     * Decides auto-setting of clicked property after firing action events.
+     * Returns a boolean indicating whether the clicked property should be set 
+     * after firing action events.
      * Here: true if no action or overrulesAction property is true.
      * @return true if fireActionEvent should force a clicked, false if not.
      */
@@ -238,8 +258,9 @@ public class JXHyperlink extends JButton {
     }
 
     /**
-     * Create listener that will watch the changes of the provided <code>Action</code>
-     * and will update JXHyperlink's properties accordingly.
+     * Creates and returns a listener that will watch the changes of the
+     * provided <code>Action</code> and will update JXHyperlink's properties
+     * accordingly.
      */
     @Override
     protected PropertyChangeListener createActionPropertyChangeListener(

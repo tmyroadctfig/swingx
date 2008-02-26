@@ -1205,7 +1205,7 @@ public class BasicMonthViewUI extends MonthViewUI {
                 calendar.add(Calendar.DAY_OF_MONTH, 1);
             }
             if (!CalendarUtils.isStartOfWeek(calendar)) {
-                throw new IllegalStateException("expected start of week");
+                throw new IllegalStateException("expected start of week instead of " + calendar.getTime());
             }
             topOfDay += fullBoxHeight;
         }
