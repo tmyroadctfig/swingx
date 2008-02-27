@@ -80,8 +80,9 @@ public class ComboBoxAdaptor extends AbstractAutoCompleteAdaptor implements Acti
         
         if (a instanceof ComboPopup) {
             JList list = ((ComboPopup) a).getList();
-
-            Rectangle rect = list.getCellBounds(getItemCount() - 1, getItemCount() - 1);
+            int lastIndex = list.getModel().getSize() - 1;
+            
+            Rectangle rect = list.getCellBounds(lastIndex, lastIndex);
             list.scrollRectToVisible(rect);
         }
         
@@ -94,7 +95,7 @@ public class ComboBoxAdaptor extends AbstractAutoCompleteAdaptor implements Acti
     }
     
     public JTextComponent getTextComponent() {
-        // returning the component of the combobox' editor
+        // returning the component of the combobox's editor
         return (JTextComponent) comboBox.getEditor().getEditorComponent();
     }
 }
