@@ -22,11 +22,10 @@
 package org.jdesktop.swingx.plaf.basic;
 
 import java.awt.ComponentOrientation;
-import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
-import java.awt.Rectangle;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.TimeZone;
 import java.util.logging.Logger;
 
 import org.jdesktop.swingx.InteractiveTestCase;
@@ -55,10 +54,93 @@ public class BasicMonthViewUIIssues extends InteractiveTestCase {
           e.printStackTrace();
       }
   }
+    
     /**
-     * Test  getDayBounds(Date) for leading dates are null.
-     * The assumption is wrong for a leading date in the second month - it's contained in the
-     * first! 
+     * Issue #786-swingx: IllegalStateException when paintDays of April 2008.
+     * 
+     * Set the default timezone and get the default calendar.
+     */
+    public void testTimeZoneDefaultCairoDSTCalendarUtils() {
+        TimeZone old = TimeZone.getDefault();
+        TimeZone cairo = TimeZone.getTimeZone("Africa/Cairo");
+        TimeZone.setDefault(cairo);
+        try {
+            Calendar calendar = Calendar.getInstance();
+            assertEquals(cairo, calendar.getTimeZone());
+            calendar.set(2008, Calendar.APRIL, 25);
+            CalendarUtils.startOfDay(calendar);
+            assertTrue(CalendarUtils.isStartOfDay(calendar));
+            calendar.add(Calendar.DATE, 1);
+            assertTrue("must be start of day " + calendar.getTime() 
+                    , CalendarUtils.isStartOfDay(calendar));
+        } finally {
+            TimeZone.setDefault(old);
+        }
+
+    }
+
+    /**
+     * Issue #786-swingx: IllegalStateException when paintDays of April 2008.
+     * 
+     * Set the default timezone and get the default calendar.
+     */
+    public void testTimeZoneDefaultCairoCalendarUtils() {
+        TimeZone old = TimeZone.getDefault();
+        TimeZone cairo = TimeZone.getTimeZone("Africa/Cairo");
+        TimeZone.setDefault(cairo);
+        try {
+            Calendar calendar = Calendar.getInstance();
+            assertEquals(cairo, calendar.getTimeZone());
+            calendar.set(2008, Calendar.MARCH, 31);
+            CalendarUtils.startOfMonth(calendar);
+            calendar.add(Calendar.MONTH, 1);
+            assertTrue(CalendarUtils.isStartOfMonth(calendar));
+            CalendarUtils.startOfWeek(calendar);
+            for (int week = 0; week < 6; week++) {
+                for (int day = 0; day < 7; day++) {
+                    calendar.add(Calendar.DAY_OF_YEAR, 1);
+                    assertTrue("must be start of day " + calendar.getTime() 
+                            , CalendarUtils.isStartOfDay(calendar));
+                }
+                assertTrue("must be start of week " + calendar.getTime() 
+                        , CalendarUtils.isStartOfWeek(calendar));
+            }    
+            
+        } finally {
+            TimeZone.setDefault(old);
+        }
+
+    }
+
+    /**
+     * Issue #786-swingx: IllegalStateException when paintDays of April 2008.
+     * 
+     * Set the default timezone and get the default calendar.
+     * 
+     */
+    public void testTimeZoneCairoCalendarUtils() {
+        TimeZone cairo = TimeZone.getTimeZone("Africa/Cairo");
+        Calendar calendar = Calendar.getInstance(cairo);
+        assertEquals(cairo, calendar.getTimeZone());
+        calendar.set(2008, Calendar.MARCH, 31);
+        CalendarUtils.startOfMonth(calendar);
+        calendar.add(Calendar.MONTH, 1);
+        assertTrue(CalendarUtils.isStartOfMonth(calendar));
+        CalendarUtils.startOfWeek(calendar);
+        for (int week = 0; week < 6; week++) {
+            for (int day = 0; day < 7; day++) {
+                calendar.add(Calendar.DAY_OF_MONTH, 1);
+                assertTrue("must be start of day " + calendar.getTime(),
+                        CalendarUtils.isStartOfDay(calendar));
+            }
+            assertTrue("must be start of week " + calendar.getTime(),
+                    CalendarUtils.isStartOfWeek(calendar));
+        }
+    }
+    /**
+     * Test getDayBounds(Date) for leading dates are null. The assumption is
+     * wrong for a leading date in the second month - it's contained in the
+     * first!
      */
     public void testDayBoundsLeadingDatesNull() {
         // This test will not work in a headless configuration.
