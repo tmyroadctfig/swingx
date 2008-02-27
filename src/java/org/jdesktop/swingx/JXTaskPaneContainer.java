@@ -20,11 +20,14 @@
  */
 package org.jdesktop.swingx;
 
+import java.awt.event.ContainerAdapter;
+import java.awt.event.ContainerEvent;
+
 import javax.swing.JViewport;
 import javax.swing.Scrollable;
 
-import org.jdesktop.swingx.plaf.TaskPaneContainerAddon;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
+import org.jdesktop.swingx.plaf.TaskPaneContainerAddon;
 import org.jdesktop.swingx.plaf.TaskPaneContainerUI;
 
 /**
@@ -36,7 +39,7 @@ import org.jdesktop.swingx.plaf.TaskPaneContainerUI;
  * container, the <code>JXTaskPaneContainer</code> will provide better
  * fidelity when it comes to matching the look and feel of the host operating
  * system than any other panel. As example, when using on a Windows platform,
- * the <code>JXTaskPaneContainer</code> will be painted with light gradient
+ * the <code>JXTaskPaneContainer</code> will be painted with a light gradient
  * background. Also <code>JXTaskPaneContainer</code> takes care of using the
  * right {@link java.awt.LayoutManager} (as required by
  * {@link org.jdesktop.swingx.JXCollapsiblePane}) so that
@@ -108,8 +111,21 @@ public class JXTaskPaneContainer extends JXPanel {
    */
   public JXTaskPaneContainer() {
     updateUI();
+    
+    addContainerListener(new ContainerAdapter() {
+        public void componentRemoved(ContainerEvent e) {
+            repaint();
+        }
+    });
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  public TaskPaneContainerUI getUI() {
+      return (TaskPaneContainerUI) super.getUI();
+  }
+  
   /**
    * Notification from the <code>UIManager</code> that the L&F has changed.
    * Replaces the current UI object with the latest version from the <code>UIManager</code>.
