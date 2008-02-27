@@ -55,6 +55,27 @@ public class BasicMonthViewUIIssues extends InteractiveTestCase {
           e.printStackTrace();
       }
   }
+    /**
+     * Test  getDayBounds(Date) for leading dates are null.
+     * The assumption is wrong for a leading date in the second month - it's contained in the
+     * first! 
+     */
+    public void testDayBoundsLeadingDatesNull() {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.info("cannot run test - headless environment");
+            return;
+        }
+        BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.LEFT_TO_RIGHT);
+        // the ui's calendar is configured to the first displayed day
+        Calendar calendar = ui.getCalendar();
+        calendar.add(Calendar.MONTH, 1);
+        int month = calendar.get(Calendar.MONTH);
+        CalendarUtils.startOfWeek(calendar);
+        assertFalse("sanity - we have leading dates in the month", month == calendar.get(Calendar.MONTH));
+        assertEquals("leading dates must return null bounds", null, 
+                ui.getDayBounds(calendar.getTime()));
+    }
 
 
     /**

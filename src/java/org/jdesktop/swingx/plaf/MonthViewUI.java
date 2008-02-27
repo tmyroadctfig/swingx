@@ -15,13 +15,16 @@ public abstract class MonthViewUI extends ComponentUI {
 
     
     /**
-     * Returns a the date at the specified x/y position.
-     * The date represents a day in the calendar's coordinate system. 
+     * Returns the Date at the given location. May be null if the
+     * coordinates don't map to a day in the month which contains the 
+     * coordinates. Specifically: hitting leading/trailing dates returns null.
+     * 
+     * Mapping pixel to calendar day.
      *
-     * @param x X position
-     * @param y Y position
-     * @return The date at the given location or null if the the position
-     *   doesn't contain a Day.
+     * @param x the x position of the location in pixel
+     * @param y the y position of the location in pixel
+     * @return the day at the given location or null if the location
+     *   doesn't map to a day in the month which contains the coordinates.
      */ 
     public abstract Date getDayAtLocation(int x, int y);
 

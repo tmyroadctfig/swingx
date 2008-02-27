@@ -44,7 +44,6 @@ import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXDatePicker;
 import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXMonthView;
-import org.jdesktop.swingx.JXStatusBar;
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.calendar.CalendarUtils;
 import org.jdesktop.swingx.calendar.DateSelectionModel.SelectionMode;
@@ -225,6 +224,146 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
 //------------------------------
 
     /**
+     * Test that day position in details day-of-week header returns null date
+     */
+    public void testDayInMonthForDayOfWeekHeader() {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.info("cannot run test - headless environment");
+            return;
+        }
+        BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.LEFT_TO_RIGHT);
+        // get a date in the first month
+        Date month = ui.getMonth(1, 0);
+        assertEquals("header grid position must return null date", null, ui.getDayInMonth(month, -1, 6));
+     }
+
+    /**
+     * Test that day position in details weekNumber header returns null date
+     */
+    public void testDayInMonthForWeekNumberHeader() {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.info("cannot run test - headless environment");
+            return;
+        }
+        BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.LEFT_TO_RIGHT, true);
+        // get a date in the first month
+        Date month = ui.getMonth(0, 0);
+        assertEquals("header grid position must return null date", null, ui.getDayInMonth(month, 3, -1));
+     }
+
+    /**
+     * Test contract of getDayInMonth: grid position of leading dates must be null.
+     * Here: first month in grid.
+     */
+    public void testDayInMonthLeadingFirstMonth() {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.info("cannot run test - headless environment");
+            return;
+        }
+        BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.LEFT_TO_RIGHT);
+        // get a date in the first month
+        Date month = ui.getMonth(0, 0);
+        assertEquals("leading date grid position must return null date", null, ui.getDayInMonth(month, 0, 0));
+     }
+    
+    /**
+     * Test contract of getDayInMonth: grid position of leading dates must be null.
+     * Here: second month in grid.
+     */
+    public void testDayInMonthLeadingSecondMonth() {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.info("cannot run test - headless environment");
+            return;
+        }
+        BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.LEFT_TO_RIGHT);
+        // get a date in the first month
+        Date month = ui.getMonth(1, 0);
+        // this fails because 
+        assertEquals("leading date grid position must return null date", null, ui.getDayInMonth(month, 0, 0));
+     }
+    
+    /**
+     * Issue #787-swingx: hit detection of leading/trailing days.
+     * Sanity: get day bounds for leading dates (here: second month) must succeed.
+     */
+    public void testDayBoundsAtLocationLeadingSecondMonth() {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.info("cannot run test - headless environment");
+            return;
+        }
+        BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.LEFT_TO_RIGHT);
+        // second month - Mar 2008 has leading dates
+        Rectangle monthBounds = ui.getMonthBoundsAtLocation(20 + ui.getMonthSize().width, 20);
+        int firstDay = monthBounds.y + ui.getMonthHeaderHeight() + ui.getDaySize().height + 2;
+        // second month should behave the same way as first 
+        // first is outside and returns null.
+        int row = ui.getDayGridPositionAtLocation(monthBounds.x + 2, firstDay).y;
+        assertEquals(0, row);
+        Rectangle dayBounds = ui.getDayBoundsAtLocation(monthBounds.x + 2, firstDay);
+        assertNotNull(dayBounds);
+    }
+
+    /**
+     * Issue #787-swingx: hit detection of leading/trailing days.
+     * Sanity: get day bounds for leading dates (here: first month) must succeed.
+     */
+    public void testDayBoundsAtLocationLeadingFirstMonth() {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.info("cannot run test - headless environment");
+            return;
+        }
+        BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.LEFT_TO_RIGHT);
+        // first month - Feb 2008 has leading dates
+        Rectangle monthBounds = ui.getMonthBoundsAtLocation(20, 20);
+        int firstDayY = monthBounds.y + ui.getMonthHeaderHeight() + ui.getDaySize().height + 2;
+        int row = ui.getDayGridPositionAtLocation(monthBounds.x + 2, firstDayY).y;
+        assertEquals(0, row);
+        Rectangle dayBounds = ui.getDayBoundsAtLocation(monthBounds.x + 2, firstDayY);
+        assertNotNull(dayBounds);
+    }
+    /**
+     * Issue #787-swingx: hit detection of leading/trailing days.
+     * Must be null (second month).
+     */
+    public void testDayAtLocationLeadingSecondMonth() {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.info("cannot run test - headless environment");
+            return;
+        }
+        BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.LEFT_TO_RIGHT);
+        // second month - Mar 2008 has leading dates
+        Rectangle monthBounds = ui.getMonthBoundsAtLocation(20 + ui.getMonthSize().width, 20);
+        int firstDay = monthBounds.y + ui.getMonthHeaderHeight() + ui.getDaySize().height + 2;
+        assertEquals("hit detection in leading date must return null", null, 
+                ui.getDayAtLocation(monthBounds.x + 2, firstDay));
+    }
+
+    /**
+     * Issue #787-swingx: hit detection of leading/trailing days.
+     * Must be null (first month).
+     */
+    public void testDayAtLocationLeadingFirstMonth() {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.info("cannot run test - headless environment");
+            return;
+        }
+        BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.LEFT_TO_RIGHT);
+        // first month - Feb 2008 has leading dates
+        Rectangle monthBounds = ui.getMonthBoundsAtLocation(20, 20);
+        int firstDayY = monthBounds.y + ui.getMonthHeaderHeight() + ui.getDaySize().height + 2;
+        assertEquals("hit detection in leading date must return null", null, 
+                ui.getDayAtLocation(monthBounds.x + 2, firstDayY));
+    }
+
+    /**
      * Test full circle: getDayBounds(Date)
      */
     public void testDayBoundsFromDate() {
@@ -247,9 +386,10 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
 
 
     /**
-     * Test full circle: getDayBounds(Date) - wrong grid?
+     * Test getDayGridPosition(Date) - 
+     * here: had been incorrect calculation of first row.
      */
-    public void testDayGridPositionFromDate6Apr2008() {
+    public void testDateToGridPosition6Apr2008() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
             LOG.info("cannot run test - headless environment");
@@ -265,9 +405,9 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
      }
 
     /**
-     * Test full circle: getDayGridPosition(Date)
-     */
-    public void testDayGridPositionFirstCompleteRowFromDate() {
+    * Test getDayGridPosition(Date) - first complete row
+    */
+    public void testDateToGridPositionNonLeading() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
             LOG.info("cannot run test - headless environment");
@@ -276,13 +416,14 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
         BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.LEFT_TO_RIGHT);
         // get a date in the first month
         Date month = ui.getMonth(0, 0);
+        // second row - cant be a leading date
         assertDateToDayGrid(ui, month, 1, 0);
      }
 
     /**
-     * Test full circle: getDayGridPosition(Date)
+    * Test getDayGridPosition(Date) - somewhere in the middle (being paranoid ;-)
      */
-    public void testDayGridPositionMiddleFromDate() {
+    public void testDateToGridPositionMiddle() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
             LOG.info("cannot run test - headless environment");
@@ -294,6 +435,17 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
         assertDateToDayGrid(ui, month, 2, 4);
      }
     
+    /**
+     * Full cylce: use getDayInMonth(...) to get the day from the logical 
+     * grid position and assert that the reverse getDayGridPosition returns the same
+     * logical coordinates. The given coordinates must map to a day contained in the
+     * month, that is >= 0 and not representing leading/trailing dates.
+     * 
+     * @param ui the ui to use (must be realized)
+     * @param month the month containing the grid to test
+     * @param dayRow the logical row coordinate of the day
+     * @param dayColumn the logical column coordinate of the day
+     */
     private void assertDateToDayGrid(BasicMonthViewUI ui, Date month,
             int dayRow, int dayColumn) {
         Date day = ui.getDayInMonth(month, dayRow, dayColumn);
@@ -319,9 +471,11 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
      }
 
     /**
-     * Test Date --> month grid transformation 
+     * Full cylce: use getMonth(...) to get the month from the logical 
+     * grid position and assert that the reverse getMonthGridPosition returns the same
+     * logical coordinates. 
      * 
-     * @param ui
+     * @param ui the ui to use (must be realized)
      * @param row the row index of the month
      * @param column the column index of the month
      */
@@ -335,7 +489,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
     /**
      * Test full circle: getMonthGridPosition(Date) - had problems with first row?
      */
-    public void testMonthGridPositionFirstRowColumnFromDate() {
+    public void testDateToMonthGridPositionFirst() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
             LOG.info("cannot run test - headless environment");
@@ -347,7 +501,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
     /**
      * Test full circle: getMonthGridPosition(Date) - had problems with first row?
      */
-    public void testMonthGridPositionFirstColumnFromDate() {
+    public void testDateToMonthGridPositionSecond() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
             LOG.info("cannot run test - headless environment");
@@ -360,7 +514,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
     /**
      * Test full circle: getMonthGridPosition(Date)
      */
-    public void testMonthGridPositionFromDate() {
+    public void testDateToMonthGridPositionLast() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
             LOG.info("cannot run test - headless environment");
@@ -373,7 +527,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
     /**
      * Test full circle: getMonthBounds(Date)
      */
-    public void testMonthBoundsFromDate() {
+    public void testDateToMonthBounds() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
             LOG.info("cannot run test - headless environment");
@@ -390,7 +544,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
     /**
      * Test  getMonthBounds(Date) for not visible dates are null.
      */
-    public void testMonthBoundsNotVisibleNull() {
+    public void testDateToMonthBoundsNotVisible() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
             LOG.info("cannot run test - headless environment");
@@ -402,11 +556,12 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
         int month = uiCalendar.get(Calendar.MONTH);
         CalendarUtils.startOfWeek(uiCalendar);
         assertFalse("sanity - we have leading dates in the month", month == uiCalendar.get(Calendar.MONTH));
-        assertNull("leading dates must return null bounds", ui.getMonthBounds(uiCalendar.getTime()));
+        assertEquals("leading dates must return null bounds", 
+                null, ui.getMonthBounds(uiCalendar.getTime()));
     }
 
     /**
-     * Test  getDayBounds(Date)  for null does?
+     * Test  getDayBounds(Date)  for null date must throw NPE.
      */
     public void testMonthBoundsNullDate() {
         // This test will not work in a headless configuration.
@@ -426,7 +581,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
     /**
      * Test  getDayBounds(Date) for leading dates are null.
      */
-    public void testDayBoundsLeadingDatesNull() {
+    public void testDateToDayBoundsLeadingDate() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
             LOG.info("cannot run test - headless environment");
@@ -438,11 +593,12 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
         int month = uiCalendar.get(Calendar.MONTH);
         CalendarUtils.startOfWeek(uiCalendar);
         assertFalse("sanity - we have leading dates in the month", month == uiCalendar.get(Calendar.MONTH));
-        assertNull("leading dates must return null bounds", ui.getDayBounds(uiCalendar.getTime()));
+        assertEquals("leading dates must return null bounds", 
+                null, ui.getDayBounds(uiCalendar.getTime()));
     }
 
     /**
-     * Test  getDayBounds(Date)  for null does?
+     * Test  getDayBounds(Date)  for null date must fire NPE.
      */
     public void testDayBoundsNullDate() {
         // This test will not work in a headless configuration.

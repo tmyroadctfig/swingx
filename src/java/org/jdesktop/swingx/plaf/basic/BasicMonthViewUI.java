@@ -511,43 +511,47 @@ public class BasicMonthViewUI extends MonthViewUI {
 
 
 
-//--------------------- mapping day coordinates
-
-
-//----------------------- mapping day coordinates
+    // ----------------------- mapping day coordinates
 
     /**
-     * Returns the bounds of the day  which contains the 
+     * Returns the bounds of the day in the grid of days which contains the
      * given location. The bounds are in monthView screen coordinate system.
+     * <p>
+     * 
+     * Note: this is a pure geometric mapping. The returned rectangle need not
+     * necessarily map to a date in the month which contains the location, it
+     * can represent a week-number/column header or a leading/trailing date.
      * 
      * @param x the x position of the location in pixel
      * @param y the y position of the location in pixel
-     * @return the bounds of the day which contains the location, 
-     *   or null if outside
+     * @return the bounds of the day which contains the location, or null if
+     *         outside
      */
     protected Rectangle getDayBoundsAtLocation(int x, int y) {
         Rectangle days = getMonthDetailsBoundsAtLocation(x, y);
-         if ((days == null) ||(!days.contains(x, y))) return null;
+        if ((days == null) || (!days.contains(x, y)))
+            return null;
         int calendarRow = (y - days.y) / fullBoxHeight;
         int calendarColumn = (x - days.x) / fullBoxWidth;
-        return new Rectangle( 
-                days.x + calendarColumn * fullBoxWidth,
-                days.y + calendarRow * fullBoxHeight,
-                fullBoxWidth, fullBoxHeight);
+        return new Rectangle(days.x + calendarColumn * fullBoxWidth, days.y
+                + calendarRow * fullBoxHeight, fullBoxWidth, fullBoxHeight);
     }
     
     /**
-     * Returns the logical coordinates of the day which contains
-     * the given location. The p.x of the returned value represents the day of week, the
-     * p.y represents the week of the month. The transformation takes
-     * care of ComponentOrientation. <p>
+     * Returns the logical coordinates of the day which contains the given
+     * location. The p.x of the returned value represents the day of week, the
+     * p.y represents the week of the month. The transformation takes care of
+     * ComponentOrientation.
+     * <p>
      * 
-     * Mapping pixel to logical grid coordinates.
+     * Note: this is a pure geometric mapping. The returned grid position need not
+     * necessarily map to a date in the month which contains the location, it
+     * can represent a week-number/column header or a leading/trailing date.
      * 
      * @param x the x position of the location in pixel
      * @param y the y position of the location in pixel
-     * @return the logical coordinates of the day in the grid of days in a
-     *   month or null if outside. 
+     * @return the logical coordinates of the day in the grid of days in a month
+     *         or null if outside.
      */
     protected Point getDayGridPositionAtLocation(int x, int y) {
         Rectangle days = getMonthDetailsBoundsAtLocation(x, y);
@@ -567,7 +571,7 @@ public class BasicMonthViewUI extends MonthViewUI {
     /**
      * Returns the given date's position in the grid of the month it is contained in.
      * 
-     * @param date the Date to get the logical position for
+     * @param date the Date to get the logical position for, must not be null.
      * @return the logical coordinates of the day in the grid of days in a
      *   month or null if the Date is not visible. 
      */
@@ -596,14 +600,16 @@ public class BasicMonthViewUI extends MonthViewUI {
     }
     
     /**
-     * Returns the Date at the given location.<p>
+     * Returns the Date at the given location. May be null if the
+     * coordinates don't map to a day in the month which contains the 
+     * coordinates. Specifically: hitting leading/trailing dates returns null.
      * 
      * Mapping pixel to calendar day.
      *
      * @param x the x position of the location in pixel
      * @param y the y position of the location in pixel
      * @return the day at the given location or null if the location
-     *   doesn't map to a day
+     *   doesn't map to a day in the month which contains the coordinates.
      */ 
     @Override
     public Date getDayAtLocation(int x, int y) {
@@ -656,7 +662,9 @@ public class BasicMonthViewUI extends MonthViewUI {
 
     /**
      * Returns the Date defined by the logical 
-     * grid coordinates relative to the given month. <p>
+     * grid coordinates relative to the given month. May be null if the
+     * logical coordinates represent a header in the day grid or is outside of the
+     * given month.
      * 
      * Mapping logical day grid coordinates to Date.<p>
      * 
@@ -666,17 +674,22 @@ public class BasicMonthViewUI extends MonthViewUI {
      *   be null.
      * @param row the logical row index in the day grid of the month
      * @param column the logical column index in the day grid of the month
-     * @return a Calendar representing the day at the logical grid coordinates,
-     *    must not b.
+     * @return the day at the logical grid coordinates in the given month or null
+     *    if the coordinates 
      * @throws IllegalStateException if the month is not the start of the month.   
      */
     protected Date getDayInMonth(Date month, int row, int column) {
+        if ((row < 0) || (column < 0)) return null;
         Calendar calendar = getCalendar(month);
+        int monthField = calendar.get(Calendar.MONTH);
         if (!CalendarUtils.isStartOfMonth(calendar))
             throw new IllegalStateException("calendar must be start of month but was: " + month.getTime());
         CalendarUtils.startOfWeek(calendar);
         calendar.add(Calendar.DAY_OF_MONTH, row * JXMonthView.DAYS_IN_WEEK + column);
-        return calendar.getTime();
+        if (calendar.get(Calendar.MONTH) == monthField) {
+            return calendar.getTime();
+        } 
+        return null;
         
     }
     
@@ -1188,6 +1201,9 @@ public class BasicMonthViewUI extends MonthViewUI {
         int topOfDay = top;
         // 
         for (int week = 0; week < WEEKS_IN_MONTH; week++) {
+            // PENDING JW: further simplify - now that we have the reverse mapping
+            // (from logical to bounds) - use it! That will keep the RToL logic
+            // out of here (which was the whole point of introducing logical coords).
 //            for (int week = 0; week <= weeks; week++) {
             int leftOfDay = isLeftToRight ? left : left + width - fullBoxWidth;
             
