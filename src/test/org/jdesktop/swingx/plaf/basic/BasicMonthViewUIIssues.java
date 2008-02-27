@@ -24,7 +24,6 @@ package org.jdesktop.swingx.plaf.basic;
 import java.awt.ComponentOrientation;
 import java.awt.GraphicsEnvironment;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.TimeZone;
 import java.util.logging.Logger;
 
@@ -54,62 +53,23 @@ public class BasicMonthViewUIIssues extends InteractiveTestCase {
           e.printStackTrace();
       }
   }
-    
-    /**
-     * Issue #786-swingx: IllegalStateException when paintDays of April 2008.
-     * 
-     * Set the default timezone and get the default calendar.
-     */
-    public void testTimeZoneDefaultCairoDSTCalendarUtils() {
-        TimeZone old = TimeZone.getDefault();
-        TimeZone cairo = TimeZone.getTimeZone("Africa/Cairo");
-        TimeZone.setDefault(cairo);
-        try {
-            Calendar calendar = Calendar.getInstance();
-            assertEquals(cairo, calendar.getTimeZone());
-            calendar.set(2008, Calendar.APRIL, 25);
-            CalendarUtils.startOfDay(calendar);
-            assertTrue(CalendarUtils.isStartOfDay(calendar));
-            calendar.add(Calendar.DATE, 1);
-            assertTrue("must be start of day " + calendar.getTime() 
-                    , CalendarUtils.isStartOfDay(calendar));
-        } finally {
-            TimeZone.setDefault(old);
-        }
-
-    }
 
     /**
      * Issue #786-swingx: IllegalStateException when paintDays of April 2008.
      * 
-     * Set the default timezone and get the default calendar.
+     * Assumption of staying at startOfWeek in paintDays is wrong if the month
+     * is the month of turning on the DST. Remove the check for now.
+     * 
      */
-    public void testTimeZoneDefaultCairoCalendarUtils() {
-        TimeZone old = TimeZone.getDefault();
+    public void interactiveDST() {
+        JXMonthView monthView = new JXMonthView();
+        monthView.setTraversable(true);
+        Calendar calendar = monthView.getCalendar();
+        calendar.set(2008, Calendar.MARCH, 31);
+        monthView.ensureDateVisible(calendar.getTime());
         TimeZone cairo = TimeZone.getTimeZone("Africa/Cairo");
-        TimeZone.setDefault(cairo);
-        try {
-            Calendar calendar = Calendar.getInstance();
-            assertEquals(cairo, calendar.getTimeZone());
-            calendar.set(2008, Calendar.MARCH, 31);
-            CalendarUtils.startOfMonth(calendar);
-            calendar.add(Calendar.MONTH, 1);
-            assertTrue(CalendarUtils.isStartOfMonth(calendar));
-            CalendarUtils.startOfWeek(calendar);
-            for (int week = 0; week < 6; week++) {
-                for (int day = 0; day < 7; day++) {
-                    calendar.add(Calendar.DAY_OF_YEAR, 1);
-                    assertTrue("must be start of day " + calendar.getTime() 
-                            , CalendarUtils.isStartOfDay(calendar));
-                }
-                assertTrue("must be start of week " + calendar.getTime() 
-                        , CalendarUtils.isStartOfWeek(calendar));
-            }    
-            
-        } finally {
-            TimeZone.setDefault(old);
-        }
-
+        monthView.setTimeZone(cairo);
+        showInFrame(monthView, "MonthView: DST");
     }
 
     /**
@@ -127,6 +87,7 @@ public class BasicMonthViewUIIssues extends InteractiveTestCase {
         calendar.add(Calendar.MONTH, 1);
         assertTrue(CalendarUtils.isStartOfMonth(calendar));
         CalendarUtils.startOfWeek(calendar);
+        // simulate the painting loop
         for (int week = 0; week < 6; week++) {
             for (int day = 0; day < 7; day++) {
                 calendar.add(Calendar.DAY_OF_MONTH, 1);
@@ -137,6 +98,7 @@ public class BasicMonthViewUIIssues extends InteractiveTestCase {
                     CalendarUtils.isStartOfWeek(calendar));
         }
     }
+    
     /**
      * Test getDayBounds(Date) for leading dates are null. The assumption is
      * wrong for a leading date in the second month - it's contained in the

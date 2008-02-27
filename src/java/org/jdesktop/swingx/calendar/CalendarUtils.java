@@ -43,7 +43,60 @@ public class CalendarUtils {
     public static final int THREE_HOURS = 3 * ONE_HOUR;
     @SuppressWarnings("unused")
     public static final int ONE_DAY    = 24*ONE_HOUR;
+    
+    /**
+     * Adjusts the Calendar to the end of the day of the last day in DST in the
+     * current year or unchanged if  not using DST. Returns the calendar's date or null, if not 
+     * using DST.<p>
+     * 
+     * 
+     * @param calendar the calendar to adjust
+     * @return the end of day of the last day in DST, or null if not using DST.
+     */
+    public static Date getEndOfDST(Calendar calendar) {
+        if (!calendar.getTimeZone().useDaylightTime()) return null;
+        long old = calendar.getTimeInMillis();
+        calendar.set(Calendar.MONTH, Calendar.DECEMBER);
+        endOfMonth(calendar);
+        startOfDay(calendar);
+        for (int i = 0; i < 366; i++) {
+           calendar.add(Calendar.DATE, -1);
+           if (calendar.getTimeZone().inDaylightTime(calendar.getTime())) {
+               endOfDay(calendar);
+               return calendar.getTime();
+           }
+        }
+        calendar.setTimeInMillis(old);
+        return null;
+    }
 
+    
+    /**
+     * Adjusts the Calendar to the end of the day of the first day in DST in the
+     * current year or unchanged if  not using DST. Returns the calendar's date or null, if not 
+     * using DST.<p>
+     * 
+     * Note: the start of the day of the first day in DST is ill-defined!
+     * 
+     * @param calendar the calendar to adjust
+     * @return the start of day of the first day in DST, or null if not using DST.
+     */
+    public static Date getStartOfDST(Calendar calendar) {
+        if (!calendar.getTimeZone().useDaylightTime()) return null;
+        long old = calendar.getTimeInMillis();
+        calendar.set(Calendar.MONTH, Calendar.JANUARY);
+        startOfMonth(calendar);
+        endOfDay(calendar);
+        for (int i = 0; i < 366; i++) {
+           calendar.add(Calendar.DATE, 1);
+           if (calendar.getTimeZone().inDaylightTime(calendar.getTime())) {
+               endOfDay(calendar);
+               return calendar.getTime();
+           }
+        }
+        calendar.setTimeInMillis(old);
+        return null;
+    }
     /**
      * Returns a boolean indicating if the given calendar represents the 
      * start of a day (in the calendar's time zone). The calendar is unchanged.
