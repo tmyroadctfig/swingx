@@ -35,10 +35,13 @@ import java.util.Map;
 
 /**
  * Implements a DropShadow for components. In general, the DropShadowBorder will
- * work with any rectangular components that do not have a default border installed
- * as part of the look and feel, or otherwise. For example, DropShadowBorder works
- * wonderfully with JPanel, but horribly with JComboBox.
- *
+ * work with any rectangular components that do not have a default border
+ * installed as part of the look and feel, or otherwise. For example,
+ * DropShadowBorder works wonderfully with JPanel, but horribly with JComboBox.
+ * <p>
+ * Note: {@code DropShadowBorder} should usually be added to non-opaque
+ * components, otherwise the background is likely to bleed through.
+ * 
  * @author rbair
  */
 public class DropShadowBorder implements Border, Serializable {
