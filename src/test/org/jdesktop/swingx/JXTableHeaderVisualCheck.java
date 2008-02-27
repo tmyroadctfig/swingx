@@ -28,8 +28,8 @@ public class JXTableHeaderVisualCheck extends InteractiveTestCase {
     public static void main(String args[]) {
         JXTableHeaderVisualCheck test = new JXTableHeaderVisualCheck();
         try {
-          test.runInteractiveTests();
-         //   test.runInteractiveTests("interactive.*Siz.*");
+//          test.runInteractiveTests();
+            test.runInteractiveTests("interactive.*AutoScroll.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();

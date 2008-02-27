@@ -20,11 +20,25 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 
+import org.jdesktop.swingx.table.DefaultTableColumnModelExt;
 import org.jdesktop.swingx.table.TableColumnExt;
 
 public class JXTableHeaderTest extends InteractiveTestCase {
     private static final Logger LOG = Logger.getLogger(JXTableHeaderTest.class
             .getName());
+
+    
+    /**
+     * Issue #683-swingx: autoscroll if columns are dragged outside.
+     * 
+     * Enabled if autoscroll property is true. Changed default to true.
+     * Temporarily disabled - clashes with table's horizontalScrollEnabled.
+     */
+    public void testAutoscrollsDefaultColumnModelConstructor() {
+        JXTableHeader header = new JXTableHeader(new DefaultTableColumnModelExt());
+        assertTrue(header.getAutoscrolls());
+    }
+
 
     /**
      * Issue #485-swingx: table header disappears if all header values are

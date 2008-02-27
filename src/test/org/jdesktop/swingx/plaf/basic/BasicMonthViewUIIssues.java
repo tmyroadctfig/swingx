@@ -57,24 +57,6 @@ public class BasicMonthViewUIIssues extends InteractiveTestCase {
     /**
      * Issue #786-swingx: IllegalStateException when paintDays of April 2008.
      * 
-     * Assumption of staying at startOfWeek in paintDays is wrong if the month
-     * is the month of turning on the DST. Remove the check for now.
-     * 
-     */
-    public void interactiveDST() {
-        JXMonthView monthView = new JXMonthView();
-        monthView.setTraversable(true);
-        Calendar calendar = monthView.getCalendar();
-        calendar.set(2008, Calendar.MARCH, 31);
-        monthView.ensureDateVisible(calendar.getTime());
-        TimeZone cairo = TimeZone.getTimeZone("Africa/Cairo");
-        monthView.setTimeZone(cairo);
-        showInFrame(monthView, "MonthView: DST");
-    }
-
-    /**
-     * Issue #786-swingx: IllegalStateException when paintDays of April 2008.
-     * 
      * Set the default timezone and get the default calendar.
      * 
      */

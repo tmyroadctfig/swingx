@@ -73,6 +73,28 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
   }
 
     /**
+     * Issue #786-swingx: IllegalStateException when paintDays of April 2008.
+     * 
+     * Problem was in that particular timezone - traversing to April 
+     * 
+     * Assumption of staying at startOfWeek in paintDays is wrong if the month
+     * is the month of turning on the DST. Remove the check for now.
+     * 
+     */
+    public void interactiveTimeZoneDST() {
+        JXMonthView monthView = new JXMonthView();
+        monthView.setTraversable(true);
+        Calendar calendar = monthView.getCalendar();
+        calendar.set(2008, Calendar.MARCH, 31);
+        monthView.ensureDateVisible(calendar.getTime());
+        TimeZone cairo = TimeZone.getTimeZone("Africa/Cairo");
+        monthView.setTimeZone(cairo);
+        JXFrame frame = showInFrame(monthView, "MonthView: DST");
+        addStatusMessage(frame, "IllegalState in April");
+    }
+
+
+    /**
      * Issue #749-swingx: enhanced flagged dates support (add/remove)
      * 
      * Visually check if the monthView is updated on toggling several properties.
