@@ -36,6 +36,7 @@ import javax.swing.AbstractAction;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JViewport;
+import javax.swing.Scrollable;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.border.Border;
@@ -234,7 +235,9 @@ public class JXCollapsiblePane extends JXPanel {
 
         this.orientation = orientation;
 
-        JPanel panel = new JPanel();
+        JXPanel panel = new JXPanel();
+        panel.setScrollableTracksViewportHeight(true);
+        panel.setScrollableTracksViewportWidth(true);
         if (orientation == Orientation.VERTICAL) {
             panel.setLayout(new VerticalLayout(2));
         } else {
@@ -288,11 +291,20 @@ public class JXCollapsiblePane extends JXPanel {
     }
 
     /**
-     * Sets the content pane of this JXCollapsiblePane.
-     *
+     * Sets the content pane of this JXCollapsiblePane. The {@code contentPanel}
+     * <i>should</i> implement {@code Scrollable} and return {@code true} from
+     * {@link Scrollable#getScrollableTracksViewportHeight()} and
+     * {@link Scrollable#getScrollableTracksViewportWidth()}. If the content
+     * pane fails to do so and a {@code JScrollPane} is added as a child, it is
+     * likely that the scroll pane will never correctly size. While it is not
+     * strictly necessary to implement {@code Scrollable} in this way, the
+     * default content pane does so.
+     * 
      * @param contentPanel
+     *                the container delegate used to hold all of the contents
+     *                for this collapsible pane
      * @throws IllegalArgumentException
-     *           if contentPanel is null
+     *                 if contentPanel is null
      */
     public void setContentPane(Container contentPanel) {
         if (contentPanel == null) {

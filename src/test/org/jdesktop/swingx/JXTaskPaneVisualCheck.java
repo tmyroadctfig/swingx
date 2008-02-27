@@ -27,20 +27,17 @@ import java.awt.event.ActionEvent;
 import java.util.Locale;
 
 import javax.swing.AbstractAction;
-import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.UIManager.LookAndFeelInfo;
-
-import org.jdesktop.swingx.JXLoginPane.SaveMode;
-import org.jdesktop.swingx.auth.LoginService;
 
 /**
  * Simple tests to ensure that the {@code JXTaskPane} can be instantiated and
@@ -58,7 +55,8 @@ public class JXTaskPaneVisualCheck extends InteractiveTestCase {
         JXTaskPaneVisualCheck test = new JXTaskPaneVisualCheck();
         
         try {
-            test.runInteractiveTests("interactiveDisplay");
+            test.runInteractiveTests();
+//            test.runInteractiveTests("interactiveDisplay");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
@@ -150,6 +148,18 @@ public class JXTaskPaneVisualCheck extends InteractiveTestCase {
         frame.setVisible(true);
     }
 
+    /**
+     * Ensure that resizing scroll pane's properly enables/disables scrollbars.
+     * <p>
+     * SwingX issue #740
+     */
+    public void interactiveJScrollPaneTest() {
+        JXTaskPane panel = new JXTaskPane();
+        JXTable table = new JXTable(10, 15);
+        table.setHorizontalScrollEnabled(true);
+        panel.add(new JScrollPane(table));
+        showInFrame(panel, "Ensure scrolling works");
+    }
 
     /**
      * Do nothing, make the test runner happy
