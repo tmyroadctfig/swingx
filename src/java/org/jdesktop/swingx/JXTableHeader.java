@@ -53,7 +53,9 @@ import org.jdesktop.swingx.table.TableColumnExt;
  * <li> uses ColumnHeaderRenderer which can show the sort icon
  * <li> triggers column pack (== auto-resize to exactly fit the contents)
  *  on double-click in resize region.
- *  <li> auto-scrolls if column is dragged outside visible rectangle.
+ *  <li> auto-scrolls if column is dragged outside visible rectangle. This feature
+ *  is enabled if the autoscrolls property is true. The default is false 
+ *  (because of Issue #788-swingx which still isn't fixed for jdk1.6).
  *  <li> listens to TableColumn propertyChanges to update itself accordingly.
  * </ul>
  * 
@@ -99,15 +101,17 @@ public class JXTableHeader extends JTableHeader
      * Overridden to initialize autoscrolls property to true.
      * <p>
      * 
+     * N
      * 
      * @see #setDraggedDistance(int)
      */
-    @Override
-    protected void initializeLocalVars() {
-        super.initializeLocalVars();
-        // enabled again - after fixe of #788-swingx
-        setAutoscrolls(true);
-    }
+//    @Override
+//    protected void initializeLocalVars() {
+//        super.initializeLocalVars();
+//        // enabled again - after fix of #788-swingx
+//        // no ... it's not fixed, something changed in 1.5
+//        setAutoscrolls(false);
+//    }
 
     /**
      * Sets the associated JTable. Enables enhanced header
