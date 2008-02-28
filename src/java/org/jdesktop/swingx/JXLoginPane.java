@@ -1615,11 +1615,13 @@ public class JXLoginPane extends JXPanel {
     }
     
     private class CapsOnTest {
+        
+        KeyEventDispatcher ked;
 
         public void runTest() {
             boolean success = false;
-        	// there's an issue with this - http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4414164
-        	// TODO: check the progress from time to time
+            // there's an issue with this - http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4414164
+            // TODO: check the progress from time to time
             //try {
             //     java.awt.Toolkit.getDefaultToolkit().getLockingKeyState(java.awt.event.KeyEvent.VK_CAPS_LOCK);
             //     System.out.println("GOTCHA");
@@ -1628,39 +1630,46 @@ public class JXLoginPane extends JXPanel {
             //success = false;
             //}
             if (!success) {
-	            try {
-	            	//Temporarily installed listener with auto-uninstall after test is finished.
-	            	KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(
-            			new KeyEventDispatcher() {
-	
-   						public boolean dispatchKeyEvent(KeyEvent e) {
-	                        if (e.getID() != KeyEvent.KEY_PRESSED) {
-	                            return true;
-	                        }
-	                        if (isTestingCaps && e.getKeyCode() > 64 && e.getKeyCode() < 91) {
-	                            setCapsLock (!e.isShiftDown() && Character.isUpperCase(e.getKeyChar()));
-	                        }
-	                        if (isTestingCaps && (e.getKeyCode() == KeyEvent.VK_BACK_SPACE)) {
-	                        	//uninstall
-	                        	isTestingCaps = false;
-	                        	KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(this);
-	                        }
-	                        return true;
-	                        
-	                    }});
-
-	                Robot r = new Robot();
-	                isTestingCaps = true;
-	                r.keyPress(65);
-	                r.keyRelease(65);
-	                r.keyPress(KeyEvent.VK_BACK_SPACE);
-	                r.keyRelease(KeyEvent.VK_BACK_SPACE);
-	            } catch (Exception e1) {
-	            	// this can happen for example due to security reasons in unsigned applets
-	                // when we can't test caps lock state programatically bail out silently
-	            }
+                try {
+                    KeyboardFocusManager kfm = KeyboardFocusManager.getCurrentKeyboardFocusManager();
+                    // #swingx-697
+                    // In some cases panel is not focused after the creation leaving bogus dispatcher in place. If found remove it.
+                    if (ked != null) {
+                        kfm.removeKeyEventDispatcher(ked);
+                    }
+                    // Temporarily installed listener with auto-uninstall after
+                    // test is finished.
+                    ked = new KeyEventDispatcher() {
+                        public boolean dispatchKeyEvent(KeyEvent e) {
+                            if (e.getID() != KeyEvent.KEY_PRESSED) {
+                                return true;
+                            }
+                            if (isTestingCaps && e.getKeyCode() > 64 && e.getKeyCode() < 91) {
+                                setCapsLock(!e.isShiftDown() && Character.isUpperCase(e.getKeyChar()));
+                            }
+                            if (isTestingCaps && (e.getKeyCode() == KeyEvent.VK_BACK_SPACE)) {
+                                // uninstall
+                                isTestingCaps = false;
+                                KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(this);
+                                if (ked == this) {
+                                    ked = null;
+                                }
+                            }
+                            return true;
+                        }
+                    };
+                    kfm.addKeyEventDispatcher(ked);
+                    Robot r = new Robot();
+                    isTestingCaps = true;
+                    r.keyPress(65);
+                    r.keyRelease(65);
+                    r.keyPress(KeyEvent.VK_BACK_SPACE);
+                    r.keyRelease(KeyEvent.VK_BACK_SPACE);
+                } catch (Exception e1) {
+                    // this can happen for example due to security reasons in unsigned applets
+                    // when we can't test caps lock state programatically bail out silently
+                }
             }
-
         }
     }
 
@@ -1682,6 +1691,7 @@ public class JXLoginPane extends JXPanel {
 		}
 
 		public void windowGainedFocus(WindowEvent e) {
+		    System.out.println("winFocusGained");
 			// repeat test only if more then 20ms passed between activation test and now.
 			if (stamp + 20 < System.currentTimeMillis()) {
 				cot.runTest();
