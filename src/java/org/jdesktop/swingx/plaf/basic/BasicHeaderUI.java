@@ -232,15 +232,15 @@ public class BasicHeaderUI extends HeaderUI {
     protected void uninstallDefaults(JXHeader h) {
     }
 
-    protected void installListeners(final JXHeader h) {
+    protected void installListeners(final JXHeader header) {
         propListener = new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
-                onPropertyChange(h, evt.getPropertyName(), evt.getOldValue(), evt.getNewValue());
+                onPropertyChange(header, evt.getPropertyName(), evt.getOldValue(), evt.getNewValue());
             }
         };
         boundsListener = new HierarchyBoundsAdapter() {
             public void ancestorResized(HierarchyEvent e) {
-                if (h == e.getComponent()) {
+                if (header == e.getComponent()) {
                     View v = (View) descriptionPane.getClientProperty(BasicHTML.propertyKey);
                     // view might get lost on LAF change ...
                     if (v == null) {
@@ -248,12 +248,17 @@ public class BasicHeaderUI extends HeaderUI {
                     	v = (View) descriptionPane.getClientProperty(BasicHTML.propertyKey);
                     }
                     if (v != null) {
-                    	v.setSize(h.getParent().getWidth() - h.getInsets().left - h.getInsets().right - descriptionPane.getInsets().left - descriptionPane.getInsets().right - descriptionPane.getBounds().x, descriptionPane.getHeight());
+                        int h = Math.max(descriptionPane.getHeight(), header.getTopLevelAncestor().getHeight());
+                        int w = Math.min(header.getTopLevelAncestor().getWidth(), header.getParent().getWidth());
+                        // 35 = description pane insets, TODO: obtain dynamically
+                        w -= 35 + header.getInsets().left + header.getInsets().right + descriptionPane.getInsets().left + descriptionPane.getInsets().right + imagePanel.getInsets().left + imagePanel.getInsets().right + imagePanel.getWidth() + descriptionPane.getBounds().x;
+                    	v.setSize(w, h);
+                    	descriptionPane.setSize(w, (int) Math.ceil(v.getPreferredSpan(View.Y_AXIS)));
                     }
                 }
             }};
-        h.addPropertyChangeListener(propListener);
-        h.addHierarchyBoundsListener(boundsListener);
+        header.addPropertyChangeListener(propListener);
+        header.addHierarchyBoundsListener(boundsListener);
     }
 
     protected void uninstallListeners(JXHeader h) {

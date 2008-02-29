@@ -263,7 +263,7 @@ public class JXLabel extends JLabel {
     public double getTextRotation() {
         return textRotation;
     }
-
+    
     @Override
     public Dimension getPreferredSize() {
         Dimension size = super.getPreferredSize();
@@ -283,9 +283,19 @@ public class JXLabel extends JLabel {
                 return size;
             }
             Rectangle s = tla.getBounds();
-            view.setSize(Math.min(b.width, s.width) , Integer.MAX_VALUE);
+            int newW = Math.min(b.width, s.width);
+            if (newW == 0) {
+                return size;
+            }
+            Icon i = getIcon();
+            if (i != null) {
+                newW -= i.getIconWidth() + getIconTextGap();
+                
+            }
             if (b.width > 0) {
-                size.setSize(Math.min(b.width, s.width) - 10, Math.min(size.height, s.height) );
+                size.setSize(newW - 10, view.getPreferredSpan(View.Y_AXIS) );
+            } else {
+                view.setSize(newW , Integer.MAX_VALUE);
             }
         }
         return size;
@@ -882,6 +892,9 @@ public class JXLabel extends JLabel {
          * @param height the height
          */
         public void setSize(float width, float height) {
+            if (width == this.width) {
+                return;
+            }
             this.width = (int) width;
             view.setSize(width, height);
         }
