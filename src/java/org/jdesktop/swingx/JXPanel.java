@@ -50,8 +50,8 @@ import org.jdesktop.swingx.painter.Painter;
  * @author rbair
  */
 public class JXPanel extends JPanel implements Scrollable {
-    private boolean scrollableTracksViewportHeight;
-    private boolean scrollableTracksViewportWidth;
+    private boolean scrollableTracksViewportHeight = true;
+    private boolean scrollableTracksViewportWidth = true;
     
     /**
      * The alpha level for this component.

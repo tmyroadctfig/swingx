@@ -236,8 +236,6 @@ public class JXCollapsiblePane extends JXPanel {
         this.orientation = orientation;
 
         JXPanel panel = new JXPanel();
-        panel.setScrollableTracksViewportHeight(true);
-        panel.setScrollableTracksViewportWidth(true);
         if (orientation == Orientation.VERTICAL) {
             panel.setLayout(new VerticalLayout(2));
         } else {
