@@ -76,7 +76,7 @@ import org.jdesktop.test.AncientSwingTeam;
  * 
  * Links
  * <ul>
- * <li> <a href="">Sneak preview II - Transparent LegacyHighlighter</a>
+ * <li> <a href="">Sneak preview II - Transparent Highlighter</a>
  * </ul>
  * 
  * 
@@ -90,8 +90,8 @@ public class PainterVisualCheck extends InteractiveTestCase {
 //      setSystemLF(true);
       PainterVisualCheck test = new PainterVisualCheck();
       try {
-        test.runInteractiveTests();
-//         test.runInteractiveTests(".*Label.*");
+//        test.runInteractiveTests();
+         test.runInteractiveTests("interactive.*Gradient.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
@@ -314,7 +314,6 @@ public class PainterVisualCheck extends InteractiveTestCase {
      * with SwingX extended default renderer. Shared by table and list with
      * background color.
      */
-    @SuppressWarnings("deprecation")
     public void interactiveNumberProportionalGradientHighlight() {
         TableModel model = new AncientSwingTeam();
         JXTable table = new JXTable(model);
@@ -348,6 +347,18 @@ public class PainterVisualCheck extends InteractiveTestCase {
         private double xFactor;
         private double yFactor;
 
+        public RelativePainter() {
+            this(null);
+        }
+        
+        public void setPainter(Painter<T> painter) {
+            this.painter = painter;
+        }
+        
+        public Painter<T> getPainter() {
+            return painter;
+        }
+        
         public RelativePainter(Painter<T> delegate) {
             this.painter = delegate;
         }
@@ -361,6 +372,7 @@ public class PainterVisualCheck extends InteractiveTestCase {
         }
         @Override
         protected void doPaint(Graphics2D g, T object, int width, int height) {
+            if (painter == null) return;
             // use epsilon
             if (xFactor != 0.0) {
                 width = (int) (xFactor * width);
@@ -392,24 +404,38 @@ public class PainterVisualCheck extends InteractiveTestCase {
             PainterHighlighter {
         float maxValue = 100;
 
-        private MattePainter<JComponent> painter;
-        private RelativePainter<JComponent> wrapper;
+//        private MattePainter<JComponent> painter;
+//        private RelativePainter<JComponent> wrapper;
         private boolean yellowTransparent;
 
         public ValueBasedGradientHighlighter() {
             this(false);
         }
         
-        
-        
         /**
          * @param b
          */
         public ValueBasedGradientHighlighter(boolean b) {
+            super(new RelativePainter<JComponent>());
             setYellowTransparent(b);
         }
 
+        
+        /**
+         * Overridden to do nothing if it's not a RelativePainter. We 
+         * roll our own.
+         */
+        @Override
+        public void setPainter(Painter painter) {
+            if (!(painter instanceof RelativePainter)) return; 
+            super.setPainter(painter);
+        }
 
+        
+        @Override
+        public RelativePainter getPainter() {
+            return (RelativePainter) super.getPainter();
+        }
 
         @Override
         protected Component doHighlight(Component renderer, ComponentAdapter adapter) {
@@ -431,12 +457,13 @@ public class PainterVisualCheck extends InteractiveTestCase {
         public void setYellowTransparent(boolean yellowTransparent) {
             if (this.yellowTransparent == yellowTransparent) return;
             this.yellowTransparent = yellowTransparent;
+            getPainter().setPainter(null);
             fireStateChanged();
         }
 
 
         private Painter getPainter(float end) {
-            if (painter == null) {
+            if (getPainter().getPainter() == null) {
                 Color startColor = getTransparentColor(Color.YELLOW,
                         yellowTransparent ? 125 : 254);
                 Color endColor = getTransparentColor(Color.WHITE, 0);
@@ -446,12 +473,12 @@ public class PainterVisualCheck extends InteractiveTestCase {
                 // 1f, 0f,
                 // new float[] {0,end}, new Color[] {startColor
                 // , endColor});
-                painter = new MattePainter<JComponent>(paint);
+                MattePainter painter = new MattePainter<JComponent>(paint);
                 painter.setPaintStretched(true);
-                wrapper = new RelativePainter<JComponent>(painter);
+                getPainter().setPainter(painter);
             } 
-            wrapper.setXFactor(end);
-            return wrapper;
+            getPainter().setXFactor(end);
+            return getPainter();
         }
 
         private Color getTransparentColor(Color base, int transparency) {
@@ -464,7 +491,7 @@ public class PainterVisualCheck extends InteractiveTestCase {
             return end;
         }
 
-
+        
     }
     /**
      * creates and returns a highlighter with a value-based transparent gradient

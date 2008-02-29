@@ -216,6 +216,18 @@ public interface HighlightPredicate {
         
     };
 
+    /**
+     * Negative Number.
+     */
+     public static final HighlightPredicate INTEGER_NEGATIVE = new HighlightPredicate() {
+
+        public boolean isHighlighted(Component renderer,
+                ComponentAdapter adapter) {
+            return (adapter.getValue() instanceof Number) 
+               && ((Number) adapter.getValue()).intValue() < 0;
+        }
+        
+    };
     
 //----------------- logical implementations amongst HighlightPredicates
     
