@@ -2076,6 +2076,7 @@ public class JXTreeTable extends JXTable {
          */
         private String getToolTipText(MouseEvent event, int row, int column) {
             if (row < 0) return null;
+            String toolTip = null;
             TreeCellRenderer renderer = getCellRenderer();
             TreePath     path = getPathForRow(row);
             Object       lastPath = path.getLastPathComponent();
@@ -2107,10 +2108,12 @@ public class JXTreeTable extends JXTable {
                       event.getClickCount(),
                       event.isPopupTrigger());
                 
-                return ((JComponent)rComponent).getToolTipText(newEvent);
+                toolTip = ((JComponent)rComponent).getToolTipText(newEvent);
             }
-
-            return null;
+            if (toolTip != null) {
+                return toolTip;
+            }
+            return getToolTipText();
         }
 
         /**

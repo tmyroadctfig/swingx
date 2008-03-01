@@ -51,6 +51,7 @@ import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreePath;
 
 import org.jdesktop.swingx.action.AbstractActionExt;
+import org.jdesktop.swingx.decorator.AbstractHighlighter;
 import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.Filter;
@@ -65,6 +66,7 @@ import org.jdesktop.swingx.decorator.ShuttleSorter;
 import org.jdesktop.swingx.decorator.HighlightPredicate.AndHighlightPredicate;
 import org.jdesktop.swingx.decorator.HighlightPredicate.ColumnHighlightPredicate;
 import org.jdesktop.swingx.decorator.HighlightPredicate.DepthHighlightPredicate;
+import org.jdesktop.swingx.renderer.StringValue;
 import org.jdesktop.swingx.test.ComponentTreeTableModel;
 import org.jdesktop.swingx.test.XTestUtils;
 import org.jdesktop.swingx.treetable.DefaultMutableTreeTableNode;
@@ -88,18 +90,42 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         try {
 //            test.runInteractiveTests();
 //            test.runInteractiveTests("interactive.*Hierarchical.*");
-//               test.runInteractiveTests("interactive.*ToolTip.*");
+               test.runInteractiveTests("interactive.*ToolTip.*");
 //           test.runInteractiveTests("interactive.*DnD.*");
 //             test.runInteractiveTests("interactive.*Compare.*");
 //             test.runInteractiveTests("interactive.*RowHeightCompare.*");
 //             test.runInteractiveTests("interactive.*RToL.*");
-             test.runInteractiveTests("interactive.*Insert.*");
+//             test.runInteractiveTests("interactive.*Insert.*");
 //             test.runInteractiveTests("interactive.*Edit.*");
         } catch (Exception ex) {
 
         }
     }
 
+    /**
+     * Issue #??-swingx: Tooltip by highlighter in hierarchical column
+     *
+     */
+    public void interactiveHierarchicalToolTip() {
+        final JXTreeTable table = new JXTreeTable(treeTableModel);
+        Highlighter toolTip = new AbstractHighlighter(
+                new AndHighlightPredicate(
+                new ColumnHighlightPredicate(0), HighlightPredicate.ROLLOVER_ROW)) {
+
+            @Override
+            protected Component doHighlight(Component component,
+                    ComponentAdapter adapter) {
+                ((JComponent) component).setToolTipText(StringValue.TO_STRING.getString(adapter.getValue()));
+                return component;
+            }
+            
+        };
+        table.addHighlighter(toolTip);
+        final JXFrame frame = wrapWithScrollingInFrame(table, "Selection/Expansion Hacks and Bidi Compliance");
+        addComponentOrientationToggle(frame);
+        frame.setVisible(true);
+    }
+  
     /**
      * Issue #544-swingx: problem with simple striping in JXTreeTable.
      * start with cross-platform == okay, bluish striping
