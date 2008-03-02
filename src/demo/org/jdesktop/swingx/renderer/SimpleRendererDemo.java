@@ -116,22 +116,15 @@ public class SimpleRendererDemo {
         
     }
 
-    private void configureListHighlighting(JXTable table, JXList list, JXTree tree) {
+    private void configureHighlighting(JXTable table, JXList list, JXTree tree) {
         CompoundHighlighter stars = new CompoundHighlighter(
                 new TypeHighlightPredicate(Contributor.class));
-        stars.addHighlighter(getMarginHighlighter());
+        stars.addHighlighter(new BorderHighlighter(BorderFactory.createEmptyBorder(0, 20, 0, 0)));
         stars.addHighlighter(getRangeHighlighter("silver-star.gif", 50, 80));
         stars.addHighlighter(getRangeHighlighter("gold-star.gif", 80, 100));
         list.addHighlighter(stars);
-        tree.addHighlighter(stars);
     }
 
-    /**
-     * @return
-     */
-    private Highlighter getMarginHighlighter() {
-        return new BorderHighlighter(BorderFactory.createEmptyBorder(0, 20, 0, 0));
-    }
 
     private PainterHighlighter getRangeHighlighter(String gifName, int start,
             int end) {
@@ -154,43 +147,18 @@ public class SimpleRendererDemo {
         return meritPredicate;
     }
 
-    /**
-     * @param string
-     * @return
-     */
-    private ImagePainter getImagePainter(String string) {
-        ImagePainter imagePainter = null;
-        BufferedImage image = null;
-        try {
-            image = ImageIO.read(getClass()
-                    .getResource("resources/" + string));
-            BufferedImage mod = 
-              GraphicsUtilities.createCompatibleTranslucentImage(
-                      image.getWidth(), 
-                      image.getHeight());
-            Graphics2D g = mod.createGraphics();
-            g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.8f));
-            g.drawImage(image, 0, 0, image.getWidth(), image.getHeight(), null);
-            g.dispose();
-            imagePainter = new ImagePainter(mod);
-            imagePainter.setHorizontalAlignment(HorizontalAlignment.LEFT);
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        return imagePainter;
-    }
-
 
     /**
+     * Configures the components after the meta-data are set. In this simple example,
+     * it's equivalent to having set the models.
+     * 
      * @param table
      */
-    private void configureTable(JXTable table) {
+    private void configureComponents(JXTable table, JXList list, JXTree tree) {
         table.setColumnControlVisible(true);
         table.getColumnExt(1).setToolTipText("Randomly generated - run again if you are disatisfied");
-        // cheating a bit: if we had already intalled our custom renderer
-        // the first column would not get as much space as intended
-        table.packColumn(0, -1);
+        table.packColumn(1, 10);
+        table.getColumnExt(1).setMaxWidth(table.getColumnExt(1).getPreferredWidth());
     }
     
 
@@ -203,8 +171,13 @@ public class SimpleRendererDemo {
         JXList list = new JXList();
         JXTree tree = new JXTree();
         // add
+        table.setModel(tableModel);
+        list.setModel(listModel);
+        tree.setModel(new DefaultTreeModel(rootNode));
+        // configure
         configureRendering(table, list, tree);
-        configureListHighlighting(table, list, tree);
+        configureHighlighting(table, list, tree);
+        configureComponents(table, list, tree);
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.addTab("JXTable", new JScrollPane(table));
         JSplitPane splitPane = new JSplitPane();
@@ -212,11 +185,6 @@ public class SimpleRendererDemo {
         splitPane.setRightComponent(new JScrollPane(tree));
 //        splitPane.setDividerLocation(250);
         tabbedPane.addTab("JXList/JXTree", splitPane);
-        // configure
-        table.setModel(tableModel);
-        configureTable(table);
-        list.setModel(listModel);
-        tree.setModel(new DefaultTreeModel(rootNode));
         // testing black/white list with bullets (from java1_2007)
         JXList bulletedList = new JXList(listModel);
         configureList(bulletedList, ((DelegatingRenderer) list.getCellRenderer()).getDelegateRenderer());
@@ -254,6 +222,34 @@ public class SimpleRendererDemo {
         };
         list.addHighlighter(hl);
     }
+
+    /**
+     * @param string
+     * @return
+     */
+    private ImagePainter getImagePainter(String string) {
+        ImagePainter imagePainter = null;
+        BufferedImage image = null;
+        try {
+            image = ImageIO.read(getClass()
+                    .getResource("resources/" + string));
+            BufferedImage mod = 
+              GraphicsUtilities.createCompatibleTranslucentImage(
+                      image.getWidth(), 
+                      image.getHeight());
+            Graphics2D g = mod.createGraphics();
+            g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.8f));
+            g.drawImage(image, 0, 0, image.getWidth(), image.getHeight(), null);
+            g.dispose();
+            imagePainter = new ImagePainter(mod);
+            imagePainter.setHorizontalAlignment(HorizontalAlignment.LEFT);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return imagePainter;
+    }
+
 
     /**
      * Create and fill a list of contributors from a resource and 
@@ -330,17 +326,10 @@ public class SimpleRendererDemo {
             
             
         };
-        // wrap a DefaultTreeNodes around 
+        // fill DefaultTreeNodes with the elements 
         rootNode = new DefaultMutableTreeNode("Contributors");
         for (int i = 0; i < contributors.size(); i++) {
-            DefaultMutableTreeNode node = new DefaultMutableTreeNode(i) {
-
-                @Override
-                public Object getUserObject() {
-                    return contributors.get((Integer) super.getUserObject());
-                }
-                
-            };
+            DefaultMutableTreeNode node = new DefaultMutableTreeNode(contributors.get(i));
             rootNode.add(node);
         }
         

@@ -23,14 +23,21 @@ package org.jdesktop.swingx.renderer;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractListModel;
 import javax.swing.Icon;
+import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
+import javax.swing.JTable;
+import javax.swing.JTree;
 import javax.swing.ListModel;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
@@ -43,11 +50,27 @@ import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXList;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.JXTree;
+import org.jdesktop.swingx.decorator.AbstractHighlighter;
+import org.jdesktop.swingx.decorator.ComponentAdapter;
+import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.util.WindowUtils;
 
 /**
- * A simple example about how to configure SwingX renderers.
+ * A unusual example about how to configure SwingX renderers.<p>
  * 
+ * The requirement is to visualize a numerical value by a bar with widthe relative 
+ * to the value and make the cell height zoomable to get a quick impression of the 
+ * distribution of the widths. The zooming is done traditionally, by adjusting
+ * the target components' rowHeight in a MouseWheelListener. <p>
+ * 
+ * What's new in SwingX is the easy way to setup the rendering, we need: 
+ * <ul>
+ * <li> a custom IconValue which configures the icon width as appropriate
+ * <li> a custom Highlighter which adjusts the font and the icon height to the target 
+ * component's actual rowHeight.
+ * </ul>
+ * 
+ *  
  * @author Jeanette Winzenburg
  */
 public class BarRendererDemo {
@@ -75,6 +98,8 @@ public class BarRendererDemo {
             double upperBound = 1000;
             public Icon getIcon(Object value) {
                 if (value instanceof Number) {
+                    // reset default height
+                    icon.setIconHeight(16);
                     icon.setValue(((Double) value).doubleValue() / upperBound);
                     return icon;
                 }
@@ -88,6 +113,94 @@ public class BarRendererDemo {
         tree.setCellRenderer(new DefaultTreeRenderer((StringValue) mv));
     }
 
+
+    private void configureHighlighting(JXTable table, JXList list, JXTree tree) {
+        final int defaultHeight = table.getRowHeight();
+        Highlighter zoomHighlighter = new AbstractHighlighter() {
+
+            @Override
+            protected Component doHighlight(Component component,
+                    ComponentAdapter adapter) {
+                int rowHeight = getRowHeight(adapter);
+                if (rowHeight != defaultHeight) {
+                    adjustFont(component, rowHeight);
+                    adjustIcon(component, rowHeight);
+                }
+                return component;
+            }
+
+            private void adjustIcon(Component component, int rowHeight) {
+                // PENDING: handle tree - the type is WrappingIconProvider
+                if (!(component instanceof JLabel)) return;
+                Icon icon = ((JLabel) component).getIcon();
+                if (icon instanceof BarIcon) {
+                    ((BarIcon) icon).setIconHeight(rowHeight - 2);
+                }
+            }
+
+            private void adjustFont(Component component, int rowHeight) {
+                Font font = component.getFont();
+                component.setFont(font.deriveFont((float) (rowHeight - 4)));
+            }
+
+            private int getRowHeight(ComponentAdapter adapter) {
+                if (adapter.getComponent() instanceof JXTable) {
+                    return ((JTable) adapter.getComponent()).getRowHeight();
+                }
+                if (adapter.getComponent() instanceof JXTree) {
+                    return ((JTree) adapter.getComponent()).getRowHeight();
+                }
+                if (adapter.getComponent() instanceof JXList) {
+                    return ((JList) adapter.getComponent()).getFixedCellHeight();
+                }
+                return defaultHeight;
+            }
+            
+        };
+        table.addHighlighter(zoomHighlighter);
+        list.addHighlighter(zoomHighlighter);
+        tree.addHighlighter(zoomHighlighter);
+    }
+
+    /**
+     * @param table
+     * @param list
+     * @param tree
+     */
+    private void installZoomControl(JXTable table, JXList list, JXTree tree) {
+        MouseWheelListener wheel = new MouseWheelListener() {
+
+            public void mouseWheelMoved(MouseWheelEvent e) {
+                if (!e.isControlDown()) return;
+                if (e.getComponent() instanceof JXTable) {
+                    JXTable table = (JXTable) e.getComponent();
+                    int height = table.getRowHeight() + e.getWheelRotation();
+                    if (height > 2) {
+                        table.setRowHeight(height);
+                    }
+                }
+                if (e.getComponent() instanceof JXList) {
+                    JXList list = (JXList) e.getComponent();
+                    int height = list.getFixedCellHeight() + e.getWheelRotation();
+                    if (height > 2) {
+                        list.setFixedCellHeight(height);
+                    }
+                }
+                if (e.getComponent() instanceof JXTree) {
+                    JXTree table = (JXTree) e.getComponent();
+                    int height = table.getRowHeight() + e.getWheelRotation();
+                    if (height > 2) {
+                        table.setRowHeight(height);
+                    }
+                }
+            }
+            
+        };
+        table.addMouseWheelListener(wheel);
+        list.addMouseWheelListener(wheel);
+        tree.addMouseWheelListener(wheel);
+    }
+
     /**
      * A quick implemenation of a progress bar like icon. Paints a
      * filled rectangle of fixed height and a configurable width
@@ -97,9 +210,16 @@ public class BarRendererDemo {
     public static class BarIcon implements Icon {
 
         private int value;
+        private double relative;
+        private int maxWidth = 40;
+        private int height = 16;
 
         public int getIconHeight() {
-            return 16;
+            return height;
+        }
+        
+        public void setIconHeight(int height) {
+            this.height = height;
         }
 
         public int getIconWidth() {
@@ -107,7 +227,12 @@ public class BarRendererDemo {
         }
         
         public int getMaxIconWidth() {
-            return 40;
+            return maxWidth;
+        }
+        
+        public void setMaxIconWidth(int max) {
+            this.maxWidth  = max;
+            updateRelative();
         }
         
         public void paintIcon(Component c, Graphics g, int x, int y) {
@@ -121,14 +246,15 @@ public class BarRendererDemo {
          *   width relative to the icon's max.
          */
         public void setValue(double thumb) {
-            double d = thumb * getMaxIconWidth();
+            this.relative = thumb;
+            updateRelative();
+        }
+
+        private void updateRelative() {
+            double d = relative * getMaxIconWidth();
             this.value = Double.valueOf(d).intValue();
         }
     }
-
-    private void configureHighlighting(JXTable table, JXList list, JXTree tree) {
-    }
-
 
     /**
      * @param table
@@ -154,6 +280,7 @@ public class BarRendererDemo {
         // add
         configureRendering(table, list, tree);
         configureHighlighting(table, list, tree);
+        installZoomControl(table, list, tree);
         table.setModel(tableModel);
         list.setModel(listModel);
         tree.setModel(new DefaultTreeModel(rootNode));
@@ -169,6 +296,7 @@ public class BarRendererDemo {
     }
 
     
+
 
     private void initData() {
         tableModel = new NumberTableModel(1000, 6);
