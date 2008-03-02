@@ -25,9 +25,6 @@ import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics2D;
-import java.awt.KeyEventPostProcessor;
-import java.awt.KeyboardFocusManager;
-import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -45,7 +42,6 @@ import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
-import javax.swing.KeyStroke;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListModel;
 import javax.swing.SwingUtilities;
@@ -96,27 +92,6 @@ public class SimpleRendererDemo {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        installKeyEventDispatcher();
-    }
-
-    /**
-     * 
-     */
-    private void installKeyEventDispatcher() {
-        KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
-        KeyEventPostProcessor processor = new KeyEventPostProcessor() {
-
-            public boolean postProcessKeyEvent(KeyEvent e) {
-                if (e.isConsumed()) return false;
-                KeyStroke stroke = KeyStroke.getKeyStrokeForEvent(e);
-                if (!KeyStroke.getKeyStroke("ESCAPE").equals(stroke)) return false;
-                LOG.info("got escape");
-                return false;
-            }
-            
-        };
-        manager.addKeyEventPostProcessor(processor);
-        
     }
 
     /**
@@ -148,7 +123,6 @@ public class SimpleRendererDemo {
         stars.addHighlighter(getRangeHighlighter("silver-star.gif", 50, 80));
         stars.addHighlighter(getRangeHighlighter("gold-star.gif", 80, 100));
         list.addHighlighter(stars);
-//        stars.addHighlighter(getRangeHighlighter("bronze-star.gif", 10, 50));
         tree.addHighlighter(stars);
     }
 
@@ -207,50 +181,6 @@ public class SimpleRendererDemo {
         return imagePainter;
     }
 
-//    /**
-//     * A Highlighter that applies a border compound from the given marginBorder and
-//     * the renderer's defaultBorder.
-//     */
-//    public static class BorderHighlighter extends AbstractHighlighter {
-//
-//        private Border paddingBorder;
-//
-//        /**
-//         * 
-//         * PRE: marginBorder != null;
-//         * 
-//         * @param paddingBorder
-//         */
-//        public BorderHighlighter(Border paddingBorder) {
-//            if (paddingBorder == null)
-//                throw new NullPointerException("border must not be null");
-//            this.paddingBorder = paddingBorder;
-//        }
-//
-//
-//        @Override
-//        protected Component doHighlight(Component renderer, ComponentAdapter adapter) {
-//            if (renderer instanceof JComponent) {
-//                ((JComponent) renderer).setBorder(compoundBorder(
-//                        ((JComponent) renderer).getBorder()));
-//            }
-//            return renderer;
-//        }
-//
-//        /**
-//         * 
-//         * @param border
-//         * @return
-//         */
-//        private Border compoundBorder(Border border) {
-//            if (border != null) {
-//                return BorderFactory.createCompoundBorder(border, paddingBorder);
-//            }
-//            return paddingBorder;
-//        }
-//
-//    }
-//
 
     /**
      * @param table
