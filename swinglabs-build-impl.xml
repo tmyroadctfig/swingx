@@ -99,6 +99,7 @@ ${build.branch} ${RELEASE_DSTAMP_LONG} ${projectname}</concat>
     <target name="-pre-bin-bundle" />
     <target name="-do-bin-bundle">
         <zip destfile="${dist.bundles.dir}/${projectname}-${RELEASE_DSTAMP}-bin.zip">
+          <zipfileset dir="." includes="COPYING" prefix="${projectname}-${RELEASE_DSTAMP}-bin"/>
           <zipfileset dir="${bundles.doc.dir}" prefix="${projectname}-${RELEASE_DSTAMP}-bin/docs"/>
           <zipfileset dir="${dist.javadoc.dir}" prefix="${projectname}-${RELEASE_DSTAMP}-bin/docs/javadoc"/>
           <zipfileset dir="lib" includes="**/*.jar" excludes="**/build-only/**" prefix="${projectname}-${RELEASE_DSTAMP}-bin/lib"/>
