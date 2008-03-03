@@ -55,6 +55,24 @@ public class JXBusyLabelVisualCheck extends InteractiveTestCase {
     }
     
     /**
+     * Test for issue #795 - size is set to 0 using default const.
+     */
+    public void interactiveNoArgConst() {
+        JFrame f = new JFrame();
+        f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        final JXBusyLabel label = new JXBusyLabel();
+        label.setText("hi there");
+        f.add(label);
+        f.add(new JButton(new AbstractAction("click me") {
+            public void actionPerformed(ActionEvent e) {
+                label.setBusy(!label.isBusy());
+            }
+        }), BorderLayout.SOUTH);
+        f.pack();
+        f.setVisible(true);
+        
+    }
+    /**
      * Test for memory leak issue #626.
      */
     public void interactiveMemoryLeak() {
