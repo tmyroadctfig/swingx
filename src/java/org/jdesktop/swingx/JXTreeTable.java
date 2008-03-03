@@ -2117,6 +2117,18 @@ public class JXTreeTable extends JXTable {
         }
 
         /**
+         * {@inheritDoc} <p>
+         * 
+         * Overridden to not automatically de/register itself from/to the ToolTipManager.
+         * As rendering component it is not considered to be active in any way, so the
+         * manager must not listen. 
+         */
+        @Override
+        public void setToolTipText(String text) {
+            putClientProperty(TOOL_TIP_TEXT_KEY, text);
+        }
+
+        /**
          * Immutably binds this TreeTableModelAdapter to the specified JXTreeTable.
          * For internal use by JXTreeTable only.
          *

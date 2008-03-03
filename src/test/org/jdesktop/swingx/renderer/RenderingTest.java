@@ -23,6 +23,7 @@ package org.jdesktop.swingx.renderer;
 
 import java.awt.Dimension;
 import java.awt.Point;
+import java.awt.event.MouseListener;
 import java.text.DateFormat;
 import java.util.logging.Logger;
 
@@ -31,14 +32,20 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.ToolTipManager;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import junit.framework.TestCase;
 
+import org.jdesktop.swingx.JXPanel;
 import org.jdesktop.swingx.JXTable;
+import org.jdesktop.swingx.JXTreeTable;
 import org.jdesktop.swingx.painter.ShapePainter;
 import org.jdesktop.swingx.table.TableColumnExt;
+import org.jdesktop.swingx.test.ComponentTreeTableModel;
 import org.jdesktop.swingx.test.XTestUtils;
+import org.jdesktop.test.PropertyChangeReport;
+import org.jdesktop.test.TestUtils;
 
 /**
  * Tests swingx rendering infrastructure: ComponentProvider, CellContext, 
@@ -52,6 +59,122 @@ public class RenderingTest extends TestCase {
             .getName());
 
 
+    
+    /**
+     * Issue #790-swingx: rendering comps must not be registered with the tooltip manager.
+     * 
+     * Here: TreeTableCellRenderer (the tree used for rendering the hierarchical 
+     * column)
+     * 
+     */
+    public void testToolTipManagerTreeTableTreeRenderer() {
+        JXTreeTable treeTable = new JXTreeTable(new ComponentTreeTableModel(new JXPanel()));
+        JComponent label = (JComponent) treeTable.prepareRenderer(treeTable.getCellRenderer(0, 0), 0, 0);
+        String tip = "some tip";
+        PropertyChangeReport report = new PropertyChangeReport();
+        label.addPropertyChangeListener(report);
+        label.setToolTipText(tip);
+        TestUtils.assertPropertyChangeEvent(report, JComponent.TOOL_TIP_TEXT_KEY, null, tip);
+        assertToolTipManagerNotRegistered(label);
+    }
+    
+    /**
+     * Issue #790-swingx: rendering comps must not be registered with the tooltip manager.
+     * 
+     * Here: JRendererCheckBox
+     */
+    public void testToolTipManagerRendererCheckBox() {
+       JRendererCheckBox label = new JRendererCheckBox();
+       assertNull("sanity - no tooltip", label.getToolTipText());
+       String tip = "some tip";
+       PropertyChangeReport report = new PropertyChangeReport();
+       label.addPropertyChangeListener(report);
+       label.setToolTipText(tip);
+       TestUtils.assertPropertyChangeEvent(report, JComponent.TOOL_TIP_TEXT_KEY, null, tip);
+       assertToolTipManagerNotRegistered(label);
+    }
+
+    /**
+     * Issue #790-swingx: rendering comps must not be registered with the tooltip manager.
+     * 
+     * Here: JRendererLabel.
+     * 
+     */
+    public void testToolTipManagerRendererLabel() {
+       JRendererLabel label = new JRendererLabel();
+       assertNull("sanity - no tooltip", label.getToolTipText());
+       String tip = "some tip";
+       PropertyChangeReport report = new PropertyChangeReport();
+       label.addPropertyChangeListener(report);
+       label.setToolTipText(tip);
+       // JRendererLabel is optimized to not fire any property changes
+       assertEquals(0, report.getEventCount());
+       // nevertheless, we want the tip set ;-)
+       assertEquals(tip, label.getToolTipText());
+       assertToolTipManagerNotRegistered(label);
+    }
+
+    /**
+     * Issue #790-swingx: rendering comps must not be registered with the tooltip manager.
+     * 
+     * Sanity: cross-check the "normal" effect of setToolTipText which is that the
+     * ToolTipManager registers itself as mouseListener with the component.
+     * 
+     */
+    public void testToolTipManagerJLabel() {
+       JLabel label = new JLabel();
+       assertNull("sanity - no tooltip", label.getToolTipText());
+       String tip = "some tip";
+       PropertyChangeReport report = new PropertyChangeReport();
+       label.addPropertyChangeListener(report);
+       label.setToolTipText(tip);
+       TestUtils.assertPropertyChangeEvent(report, JComponent.TOOL_TIP_TEXT_KEY, null, tip);
+       assertToolTipManagerRegistered(label);
+    }
+    
+    /**
+     * Asserts that the component is not registered with the ToolTipManager.
+     * There's no direct api to check, so we loop through the mouseListeners and
+     * assert that none of them is a ToolTipManager. <p>
+     * 
+     * This is inherently unsafe, as we rely on the implementation detail that
+     * the manager registers itself as listener (instead of delegating). That's why 
+     * we cross-check a "normal" component's behaviour - if that fails one day, the
+     * implementation detail changed.
+     * 
+     * @param label the component to assert.
+     */
+    private void assertToolTipManagerNotRegistered(JComponent label) {
+        MouseListener[] listeners = label.getMouseListeners();
+        for (MouseListener l : listeners) {
+            assertEquals("registered with tooltipManager", false,
+                    l instanceof ToolTipManager);
+        }
+    }
+    
+    /**
+     * Asserts that the component is registered with the ToolTipManager.
+     * There's no direct api to check, so we loop through the mouseListeners and
+     * assert that none of them is a ToolTipManager. <p>
+     * 
+     * This is inherently unsafe, as we rely on the implementation detail that
+     * the manager registers itself as listener (instead of delegating). That's why 
+     * we cross-check a "normal" component's behaviour - if that fails one day, the
+     * implementation detail changed.
+     * 
+     * @param label the component to assert.
+     */
+    private void assertToolTipManagerRegistered(JComponent label) {
+        MouseListener[] listeners = label.getMouseListeners();
+        int managerCount = 0;
+        for (MouseListener l : listeners) {
+            if (l instanceof ToolTipManager) {
+                managerCount++;
+            }
+        }
+        assertEquals("registered with tooltipManager", 1, managerCount);
+    }
+    
     /**
      * Issue #768-swingx: cleanup access to string representation of provider.
      * 

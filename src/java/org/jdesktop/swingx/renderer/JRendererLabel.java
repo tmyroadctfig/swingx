@@ -179,8 +179,19 @@ public class JRendererLabel extends JLabel implements PainterAware {
         }        
     }
 
+    
+    /**
+     * {@inheritDoc} <p>
+     * 
+     * Overridden to not automatically de/register itself from/to the ToolTipManager.
+     * As rendering component it is not considered to be active in any way, so the
+     * manager must not listen. 
+     */
+    @Override
+    public void setToolTipText(String text) {
+        putClientProperty(TOOL_TIP_TEXT_KEY, text);
+    }
 
- 
     /**
      * Overridden for performance reasons.
      * See the <a href="#override">Implementation Note</a> 
