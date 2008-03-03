@@ -826,7 +826,7 @@ public class JXDatePicker extends JComponent {
      *
      * @return String The string used for identifying ActionEvents.
      * 
-     * @deprecated no longer used. The command is internally determined and
+     * @deprecated (since release 0.9.2) no longer used. The command is internally determined and
      * either datePickerCommit or datePickerCancel, depending on the user
      * gesture which triggered the action.
      */
@@ -840,7 +840,7 @@ public class JXDatePicker extends JComponent {
      *
      * @param actionCommand The string used for identifying ActionEvents.
      * 
-     * @deprecated no longer used. The command is internally determined and
+     * @deprecated (since release 0.9.2) no longer used. The command is internally determined and
      * either datePickerCommit or datePickerCancel, depending on the user
      * gesture which triggered the action.
      */
@@ -853,7 +853,7 @@ public class JXDatePicker extends JComponent {
      * Fires an ActionEvent with this picker's actionCommand
      * to all listeners.
      * 
-     * @deprecated no longer used. The command is internally determined and
+     * @deprecated (since release 0.9.2) no longer used. The command is internally determined and
      * either datePickerCommit or datePickerCancel, depending on the user
      * gesture which triggered the action.
      */
@@ -1015,7 +1015,7 @@ public class JXDatePicker extends JComponent {
      *
      * @param millis milliseconds
      * 
-     * @deprecated use {@link #setDate(Date)}
+     * @deprecated (since release 0.9.2) use {@link #setDate(Date)}
      */
     @Deprecated
     public void setDateInMillis(long millis) {
@@ -1027,7 +1027,7 @@ public class JXDatePicker extends JComponent {
      *
      * @return the date in milliseconds, -1 if there is no selection.
      * 
-     * @deprecated use {@link #getDate()}
+     * @deprecated (since release 0.9.2) use {@link #getDate()}
      */
     @Deprecated
     public long getDateInMillis() {
@@ -1044,7 +1044,7 @@ public class JXDatePicker extends JComponent {
      * 
      * @return the date shown in the TodayPanel in millis
      * 
-     * @deprecated use {@link #getLinkDay()}
+     * @deprecated (since release 0.9.2) use {@link #getLinkDay()}
      */
     @Deprecated
     public long getLinkDate() {
@@ -1063,7 +1063,7 @@ public class JXDatePicker extends JComponent {
      * @param linkFormatString String used to format the link
      * @see java.text.MessageFormat
      * 
-     * @deprecated use {@link #setLinkDay(Date, String)}
+     * @deprecated (since release 0.9.2) use {@link #setLinkDay(Date, String)}
      */
     @Deprecated
     public void setLinkDate(long linkDate, String linkFormatString) {
@@ -1077,7 +1077,7 @@ public class JXDatePicker extends JComponent {
      * 
      * @param linkDate the date in millis to use in the TodayPanel.
      * 
-     * @deprecated use {@link #setLinkDay(Date)}
+     * @deprecated (since release 0.9.2) use {@link #setLinkDay(Date)}
      */
     @Deprecated
     public void setLinkDate(long linkDate) {
@@ -1088,7 +1088,7 @@ public class JXDatePicker extends JComponent {
      * 
      * @return the date shown in the LinkPanel.
      * 
-     * @deprecated use {@link #getLinkDay()}
+     * @deprecated (since release 0.9.2) use {@link #getLinkDay()}
      */
     @Deprecated
     public Date getToday() {
@@ -1100,7 +1100,7 @@ public class JXDatePicker extends JComponent {
      * 
      * @param linkDate
      * 
-     * @deprecated use {@link #setLinkDay(Date)}
+     * @deprecated (since release 0.9.2) use {@link #setLinkDay(Date)}
      */
     @Deprecated
     public void setToday(Date linkDate) {
@@ -1119,7 +1119,7 @@ public class JXDatePicker extends JComponent {
      * @see #setTimeZone
      * @see #getTimeZone
      * 
-     * @deprecated use {@link #JXDatePicker(Date, Locale)}
+     * @deprecated (since release 0.9.2) use {@link #JXDatePicker(Date, Locale)}
      */
     @Deprecated
     public JXDatePicker(long millis, Locale locale) {
@@ -1144,7 +1144,7 @@ public class JXDatePicker extends JComponent {
      * @see #setTimeZone
      * @see #getTimeZone
      * 
-     * @deprecated use {@link #JXDatePicker(Date)}
+     * @deprecated (since release 0.9.2) use {@link #JXDatePicker(Date)}
      */
     @Deprecated
     public JXDatePicker(long millis) {

@@ -239,7 +239,7 @@ public abstract class ComponentProvider<T extends JComponent>
      * 
      * @param context the cell context.
      * @return a appropriate string representation of the cell's content.
-     * @deprecated use {@link #getString(Object)}
+     * @deprecated (since release 0.9.2) use {@link #getString(Object)}
      */
     @Deprecated
     public String getStringValue(CellContext context) {

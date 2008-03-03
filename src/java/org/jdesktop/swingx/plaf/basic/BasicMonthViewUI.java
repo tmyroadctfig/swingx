@@ -113,13 +113,13 @@ public class BasicMonthViewUI extends MonthViewUI {
     @SuppressWarnings("all")
     private static final Logger LOG = Logger.getLogger(BasicMonthViewUI.class
             .getName());
-    /** @deprecated no longer used, no replacement. */
+    /** @deprecated (since release 0.9.2) no longer used, no replacement. */
     @Deprecated
     protected static final int LEADING_DAY_OFFSET = 1;
-    /** @deprecated no longer used, no replacement. */
+    /** @deprecated (since release 0.9.2) no longer used, no replacement. */
     @Deprecated
     protected static final int NO_OFFSET = 0;
-    /** @deprecated no longer used, no replacement. */
+    /** @deprecated (since release 0.9.2) no longer used, no replacement. */
     @Deprecated
     protected static final int TRAILING_DAY_OFFSET = -1;
 
@@ -199,14 +199,14 @@ public class BasicMonthViewUI extends MonthViewUI {
      * 
      * PENDING: JW - really want to adjust here? Need to check in usage
      *   anyway.
-     *   @deprecated only read in deprecated methods (but calculation still triggered
+     *   @deprecated (since release 0.9.2) only read in deprecated methods (but calculation still triggered
      *    in layout, because some of the deprecated are public/protected)
      */
     @Deprecated
     private int startX;
     /**
      * Top of first row of displayed months. 
-     *   @deprecated only read in deprecated methods (but calculation still triggered
+     *   @deprecated (since release 0.9.2) only read in deprecated methods (but calculation still triggered
      *    in layout, because some of the deprecated are public/protected)
      */
     @Deprecated
@@ -2516,7 +2516,7 @@ public class BasicMonthViewUI extends MonthViewUI {
      * @param dayOfWeek day of the week to calculate view index for, acceptable values are
      * <code>Calendar.MONDAY</code> - <code>Calendar.SUNDAY</code>
      * @return view index for the specified day of the week
-     * @deprecated with revised location/date mapping no longer needed, 
+     * @deprecated (since release 0.9.2) with revised location/date mapping no longer needed, 
      *     no longer used internally
      */
     @Deprecated
@@ -2537,7 +2537,7 @@ public class BasicMonthViewUI extends MonthViewUI {
      * @param y y position of the pointer
      * @return MONTH_UP, MONTH_DOWN or -1 when no button is selected.
      * 
-     * @deprecated use {@link #getTraversableGridPositionAtLocation(int, int)}
+     * @deprecated (since release 0.9.2) use {@link #getTraversableGridPositionAtLocation(int, int)}
      */
     @Deprecated
     protected int getTraversableButtonAt(int x, int y) {
@@ -2551,7 +2551,7 @@ public class BasicMonthViewUI extends MonthViewUI {
      * @param y y location
      * @return a new <code>Point</code> object containing the row as the x value
      * and column as the y value
-     * @deprecated use {@link #getMonthGridPositionAtLocation(int, int)} - this method is
+     * @deprecated (since release 0.9.2) use {@link #getMonthGridPositionAtLocation(int, int)} - this method is
      *   no longer used internally. Note that the coordinate mapping in the 
      *   returned Point of new method is the other way round 
      *   (p.x == column, p.y == row) as in this!
@@ -2582,7 +2582,7 @@ public class BasicMonthViewUI extends MonthViewUI {
      * old way of calculating the position of the grid of months.
      * This is no longer used in current code, only in deprecated.
      * 
-     * @deprecated the result is no longer used except from deprecated methods.
+     * @deprecated (since release 0.9.2) the result is no longer used except from deprecated methods.
      */
     @Deprecated
     private void calculateStartPositionUnused() {
@@ -2600,7 +2600,7 @@ public class BasicMonthViewUI extends MonthViewUI {
     /**
      * {@inheritDoc}
      * 
-     * @deprecated use {@link #getDayAtLocation(int, int)} This method is
+     * @deprecated (since release 0.9.2) use {@link #getDayAtLocation(int, int)} This method is
      * no longer used internally
      */
     @Deprecated
@@ -2613,7 +2613,7 @@ public class BasicMonthViewUI extends MonthViewUI {
     /**
      * @return the start of today.
      * 
-     * @deprecated use {@link #getToday()}
+     * @deprecated (since release 0.9.2) use {@link #getToday()}
      */
     @Deprecated
     protected long getTodayInMillis() {
@@ -2629,7 +2629,7 @@ public class BasicMonthViewUI extends MonthViewUI {
      * @param date long representing the date you want to compare to today.
      * @return true if the date passed is the same as today.
      * 
-     * @deprecated use {@link #isToday(Date)}
+     * @deprecated (since release 0.9.2) use {@link #isToday(Date)}
      */
     @Deprecated
     protected boolean isToday(long date) {
@@ -2669,7 +2669,7 @@ public class BasicMonthViewUI extends MonthViewUI {
      * 
      * @param firstDisplayedDate the firstDisplayedDate to set
      * 
-     * @deprecated use {@link #setFirstDisplayedDay(Date)}
+     * @deprecated (since release 0.9.2) use {@link #setFirstDisplayedDay(Date)}
      */
     @Deprecated
     protected void setFirstDisplayedDate(long firstDisplayedDate) {
@@ -2678,7 +2678,7 @@ public class BasicMonthViewUI extends MonthViewUI {
     /**
      * @return the firstDisplayedDate
      * 
-     * @deprecated use {@link #getFirstDisplayedDay()}
+     * @deprecated (since release 0.9.2) use {@link #getFirstDisplayedDay()}
      */
     @Deprecated
     protected long getFirstDisplayedDate() {
@@ -2693,7 +2693,7 @@ public class BasicMonthViewUI extends MonthViewUI {
      * 
      * @param millis the date to configure the calendar with
      * @return the monthView's calendar, configured with the given date.
-     * @deprecated use {@link #getCalendar(Date)}
+     * @deprecated (since release 0.9.2) use {@link #getCalendar(Date)}
      */
     @Deprecated
     protected Calendar getCalendar(long millis) {

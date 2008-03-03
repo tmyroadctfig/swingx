@@ -52,7 +52,7 @@ public abstract class MonthViewUI extends ComponentUI {
      * 
      * @return long The date.
      * 
-     * @deprecated use getLastDisplayedDate() instead
+     * @deprecated (since release 0.9.2) use getLastDisplayedDate() instead
      * 
      */
     @Deprecated
@@ -67,7 +67,7 @@ public abstract class MonthViewUI extends ComponentUI {
      * @param y Y position
      * @return long The date, -1 if position does not contain a date.
      * 
-     * @deprecated use {@link #getDayAtLocation(int, int)}
+     * @deprecated (since release 0.9.2) use {@link #getDayAtLocation(int, int)}
      */
     @Deprecated
     public abstract long getDayAt(int x, int y);
@@ -82,7 +82,7 @@ public abstract class MonthViewUI extends ComponentUI {
      * 
      * @return long The date.
      * 
-     * @deprecated use {@link #getLastDisplayedDay()}
+     * @deprecated (since release 0.9.2) use {@link #getLastDisplayedDay()}
      */
     @Deprecated
     public abstract long getLastDisplayedDate();

@@ -439,7 +439,7 @@ public class SearchFactory {
      * 
      * @return the location of the window if visible, or the last known
      *   location.
-     * @deprecated use {@link #hideSharedFindPanel(boolean)} instead  
+     * @deprecated (since release 0.9.2) use {@link #hideSharedFindPanel(boolean)} instead  
      */
     @Deprecated
     protected Point hideSharedFindPanel() {

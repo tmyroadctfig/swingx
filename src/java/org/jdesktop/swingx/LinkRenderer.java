@@ -57,7 +57,7 @@ import java.awt.event.ActionListener;
  * 
  * @author Jeanette Winzenburg
  * 
- * @deprecated as renderer (the editor part is not yet handled), 
+ * @deprecated (since release 0.9.2) as renderer (the editor part is not yet handled), 
  *    use the SwingX DefaultXXRenderer configured with a 
  *    {@link org.jdesktop.swingx.renderer.HyperlinkProvider} instead
  */

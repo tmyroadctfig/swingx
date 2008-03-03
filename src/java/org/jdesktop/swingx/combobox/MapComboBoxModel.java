@@ -47,7 +47,7 @@ public class MapComboBoxModel<K, V> extends ListComboBoxModel<K> {
     protected Map<K, V> map_data;
     
     /**
-     * @deprecated no longer used, remove after 0.9.3 release
+     * @deprecated (since release 0.9.2) no longer used, remove after 0.9.3 release
      */
     @Deprecated
     protected boolean inverted;
