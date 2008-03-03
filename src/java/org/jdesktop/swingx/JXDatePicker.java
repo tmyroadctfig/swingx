@@ -91,7 +91,7 @@ import org.jdesktop.swingx.util.Contract;
  * picker.getMonthView().setUpperBound(calendar.getTime());
  * </code></pre>
  * 
- * Similar to a JXMonthView, the JXDatePicker fire an ActionEvent when the user
+ * Similar to a JXMonthView, the JXDatePicker fires an ActionEvent when the user
  * actively commits or cancels a selection. Interested client code can add a
  * ActionListener to be notified by the user action.
  * 
@@ -100,7 +100,7 @@ import org.jdesktop.swingx.util.Contract;
  * ActionListener l = new ActionListener() {
  *     public void actionPerformed(ActionEvent e) {
  *         if (JXDatePicker.COMMIT_KEY.equals(e.getActionCommand)) {
- *             safeDate(picker.getDate());
+ *             saveDate(picker.getDate());
  *         }
  *     }
  * };
@@ -186,8 +186,7 @@ public class JXDatePicker extends JComponent {
 
 
     /**
-     * Create a new date picker using the current date as the initial
-     * selection and the default abstract formatter
+     * Intantiates a date picker with no selection and the default abstract formatter
      * <code>JXDatePickerFormatter</code>.
      * <p/>
      * The date picker is configured with the default time zone and locale
@@ -202,7 +201,7 @@ public class JXDatePicker extends JComponent {
     
 
     /**
-     * Create a new date picker using the specified time as the initial
+     * Intantiates a date picker using the specified time as the initial
      * selection and the default abstract formatter
      * <code>JXDatePickerFormatter</code>.
      * <p/>
@@ -217,8 +216,7 @@ public class JXDatePicker extends JComponent {
     }
     
     /**
-     * Create a new date picker using the current date as the initial
-     * selection and the default abstract formatter
+     * Intantiates a date picker with no selection and the default abstract formatter
      * <code>JXDatePickerFormatter</code>.
      * <p/>
      * The date picker is configured with the default time zone and specified 
@@ -233,7 +231,7 @@ public class JXDatePicker extends JComponent {
     }
 
     /**
-     * Create a new date picker using the specified time as the initial
+     * Intantiates a date picker using the specified time as the initial
      * selection and the default abstract formatter
      * <code>JXDatePickerFormatter</code>.
      * <p/>
@@ -259,22 +257,26 @@ public class JXDatePicker extends JComponent {
      * 
      * Does nothing if the ui vetos the new date - as might happen if
      * the code tries to set a date which is unselectable in the 
-     * monthView's context. The actual value of the new Date might
-     * be changed by the ui, the default implementation cleans
-     * the Date by zeroing all time components. <p>
+     * monthView's context. The actual value of the new Date is controlled
+     * by the JXMonthView's DateSelectionModel. The default implementation
+     * normalizes the date to the start of the day in the model's calendar's 
+     * coordinates, that is all time fields are zeroed. To keep the time fields,
+     * configure the monthView with a SingleDaySelectionModel.
+     * <p>
      * 
      * At all "stable" (= not editing in date input field nor 
      * in the monthView) times the date is the same in the 
      * JXMonthView, this JXDatePicker and the editor. If a new Date
-     * is set, this invariant is enforce by the DatePickerUI.<p>
-     * 
-     * A not null default value is set on instantiation.
+     * is set, this invariant is enforced by the DatePickerUI.
+     * <p>
      * 
      * This is a bound property. 
      * 
      *  
      * @param date the new date to set.
      * @see #getDate()
+     * @see org.jdesktop.swingx.calendar.DateSelectionModel
+     * @see org.jdesktop.swingx.calendar.SingleDaySelectionModel
      */
     public void setDate(Date date) {
         /*
@@ -320,7 +322,6 @@ public class JXDatePicker extends JComponent {
 
         updateLinkFormat();
         linkDate = _monthView.getToday();
-//        _linkDate = System.currentTimeMillis();
         _linkPanel = new TodayPanel();
     }
 
@@ -916,12 +917,6 @@ public class JXDatePicker extends JComponent {
             listener.actionPerformed(e);
         }
     }
-    /*
-    public void setLocale(Locale l) {
-        super.setLocale(l);
-        _monthView.setLocale(l);
-    }*/
-    
  
     /**
      * Pes: added setLocale method to refresh link text on locale changes
@@ -967,16 +962,15 @@ public class JXDatePicker extends JComponent {
             g.drawLine(0, 1, getWidth(), 1);
         }
 
+        /**
+         * {@inheritDoc} <p>
+         *  Overridden to update the link format and hyperlink text.
+         */
         @Override
         public void setLocale(Locale l) {
             super.setLocale(l);
-            /* FIXME: PeS: Uncomment this after updateLinkFormat works correctly
-             * 
-             * and then delete following line
-             */
             updateLinkFormat();
             todayLink.setText(getLinkFormat().format(new Object[]{getLinkDay()}));
-//            todayLink.setText(DateFormat.getDateInstance(DateFormat.MEDIUM, l).format(new Date(_linkDate)));
         }
         
         private final class TodayAction extends AbstractAction {
@@ -995,14 +989,6 @@ public class JXDatePicker extends JComponent {
                 if (delegate !=  null) {
                     delegate.actionPerformed(null);
                 }
-                //                Date span = new DateSpan(_linkDate, _linkDate).getStartAsDate();
-//                if (select) {
-//                    _monthView.setSelectedDate(span);
-//                    _monthView.commitSelection();
-//                    select = false;
-//                } else {
-//                    _monthView.ensureDateVisible(_linkDate);
-//                }
                 
             }
         }
@@ -1124,13 +1110,6 @@ public class JXDatePicker extends JComponent {
     @Deprecated
     public JXDatePicker(long millis, Locale locale) {
         this(new Date(millis), locale);
-//        init();
-//        if (locale != null) {
-//            setLocale(locale);
-//        }
-//        // install the controller before setting the date
-//        updateUI();
-//        setDate(new Date(millis));
     }
     
     /**
