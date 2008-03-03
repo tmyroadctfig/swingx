@@ -2386,7 +2386,10 @@ public class JXTreeTable extends JXTable {
             Object value,
             boolean isSelected, boolean hasFocus, int row, int column) {
             assert table == treeTable;
-
+            // JW: quick fix for the tooltip part of #794-swingx:
+            // visual properties must be reset in each cycle.
+            setToolTipText(null);
+            
             if (isSelected) {
                 setBackground(table.getSelectionBackground());
                 setForeground(table.getSelectionForeground());
