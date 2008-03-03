@@ -189,7 +189,6 @@ public class JXBusyLabel extends JLabel {
 
         PainterIcon icon = new PainterIcon(dim);
         icon.setPainter(busyPainter);
-        this.setPreferredSize(dim);
         this.setIcon(icon);
     }
     /**
@@ -206,6 +205,7 @@ public class JXBusyLabel extends JLabel {
         BusyLabelUI ui = (BusyLabelUI)getUI();
         if (ui != null) {
             busyPainter = ui.getBusyPainter(dim);
+            
         }
         
         return busyPainter;
@@ -308,11 +308,11 @@ public class JXBusyLabel extends JLabel {
     public final BusyPainter getBusyPainter() {
         if (null == busyPainter) {
             Dimension prefSize = getPreferredSize();
-            
-            busyPainter = createBusyPainter(prefSize);
+
+            busyPainter = createBusyPainter((prefSize.width == 0 && prefSize.height == 0 && !isPreferredSizeSet()) ? null : prefSize);
             
             if (null != busyPainter) {
-                if (null == prefSize) {
+                if (!isPreferredSizeSet() && (null == prefSize || prefSize.width == 0 || prefSize.height == 0)) {
                     Rectangle rt = busyPainter.getTrajectory().getBounds();
                     Rectangle rp = busyPainter.getPointShape().getBounds();
                     int max = Math.max(rp.width, rp.height);
