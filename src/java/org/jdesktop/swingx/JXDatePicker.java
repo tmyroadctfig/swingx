@@ -128,7 +128,7 @@ import org.jdesktop.swingx.util.Contract;
  * @author Jeanette Winzenburg
  * 
  * @see JXMonthView
- * @see DateSelectionModel
+ * @see org.jdesktop.swingx.calendar.DateSelectionModel
  * @see DatePickerFormatter
  * 
  */

@@ -207,7 +207,7 @@ public class BasicTaskPaneUI extends TaskPaneUI {
         /**
          * Gets current title height. Default value is 25.
          * @return Current title height.
-         * @deprecated. Use getTitleHeight(java.awt.Component) instead. Kept only for compatibility reasons. Will be removed before 1.0 release.
+         * @deprecated Use getTitleHeight(java.awt.Component) instead. Kept only for compatibility reasons. Will be removed before 1.0 release.
          */
         protected int getTitleHeight() {
                 return titleHeight;

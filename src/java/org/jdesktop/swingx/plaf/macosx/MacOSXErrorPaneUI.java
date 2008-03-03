@@ -186,8 +186,9 @@ public class MacOSXErrorPaneUI extends BasicErrorPaneUI {
     }
 
     /**
-     * {@inheritDoc}
+     * @deprecated no longer used remove after 0.9.3.
      */
+    @Deprecated
     protected Dimension calculatePreferredDialogSize() {
         //TODO returns a Dimension that is either X wide, or as wide as necessary
         //to show the title. It is Y high.

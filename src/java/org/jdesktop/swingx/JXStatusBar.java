@@ -50,7 +50,7 @@ import org.jdesktop.swingx.plaf.StatusBarUI;
  * will cause the component to occupy a fixed area on the <code>JXStatusBar</code>.
  * The size of the area remains constant when the <code>JXStatusBar</code> is resized.
  * A constraint with this behavior may also take a width value, see 
- * {@link JXStatusBar.Constraint#setPreferredWidth(int)}. The width is a preferred
+ * {@link JXStatusBar.Constraint#setFixedWidth(int)}. The width is a preferred
  * minimum width. If the component preferred width is greater than the constraint
  * width, the component width will apply.</p>
  * 

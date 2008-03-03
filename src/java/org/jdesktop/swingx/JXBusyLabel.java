@@ -111,7 +111,7 @@ public class JXBusyLabel extends JLabel {
      * Direction is used to set the initial direction in which the
      * animation starts.
      * 
-     * @see #setStartDirection
+     * @see JXBusyLabel#setDirection(org.jdesktop.swingx.JXBusyLabel.Direction)
      */
     public static enum Direction {
         /**
