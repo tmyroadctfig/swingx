@@ -196,7 +196,6 @@ public class JXDatePickerTest extends InteractiveTestCase {
      */
     public void testSetDateKeepsTime() {
         JXDatePicker picker = new JXDatePicker();
-        picker.setDate(null);
         DateSelectionModel selectionModel = new SingleDaySelectionModel();
         picker.getMonthView().setSelectionModel(selectionModel);
         Date date = new Date();
@@ -1056,7 +1055,6 @@ public class JXDatePickerTest extends InteractiveTestCase {
      */
     public void testSetDateCleansDate() {
         JXDatePicker picker = new JXDatePicker();
-        picker.setDate(null);
         Date date = calendar.getTime();
         picker.setDate(date);
         assertEquals(CalendarUtils.startOfDay(calendar, date), picker.getDate());
@@ -1068,7 +1066,6 @@ public class JXDatePickerTest extends InteractiveTestCase {
      */
     public void testSetDateDoesNotChangeOriginal() {
         JXDatePicker picker = new JXDatePicker();
-        picker.setDate(null);
         Date date = calendar.getTime();
         Date copy = new Date(date.getTime());
         picker.setDate(date);
@@ -1080,7 +1077,6 @@ public class JXDatePickerTest extends InteractiveTestCase {
      */
     public void testDateProperty() {
         JXDatePicker picker = new JXDatePicker();
-        picker.setDate(null);
         Date date = XTestUtils.getStartOfToday(5);
         PropertyChangeReport report = new PropertyChangeReport();
         picker.addPropertyChangeListener("date", report);
@@ -1094,7 +1090,6 @@ public class JXDatePickerTest extends InteractiveTestCase {
      */
     public void testDatePropertyThroughEditor() {
         JXDatePicker picker = new JXDatePicker();
-        picker.setDate(null);
         Date date = XTestUtils.getStartOfToday(5);
         PropertyChangeReport report = new PropertyChangeReport();
         picker.addPropertyChangeListener("date", report);
@@ -1108,7 +1103,6 @@ public class JXDatePickerTest extends InteractiveTestCase {
      */
     public void testDatePropertyThroughSelection() {
         JXDatePicker picker = new JXDatePicker();
-        picker.setDate(null);
         Date date = XTestUtils.getStartOfToday(5);
         PropertyChangeReport report = new PropertyChangeReport();
         picker.addPropertyChangeListener("date", report);
@@ -1394,7 +1388,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      *
      */
     public void testEditorValueOnSetMonthView() {
-        JXDatePicker picker = new JXDatePicker();
+        JXDatePicker picker = new JXDatePicker(new Date());
         // set unselected monthView
         picker.setMonthView(new JXMonthView());
         // sanity: picker takes it
@@ -1529,15 +1523,9 @@ public class JXDatePickerTest extends InteractiveTestCase {
         assertEquals("pref width must be same for empty/filled", filled.width, empty.width);
     }
     
-    @SuppressWarnings("deprecation")
     public void testDefaultConstructor() {
         JXDatePicker datePicker = new JXDatePicker();
         assertNull(datePicker.getDate());
-        // changed default behaviour: unselected as of version 1.77
-//        calendar.setTimeInMillis(System.currentTimeMillis());
-//        Date today = cleanupDate(calendar);
-//        assertTrue(today.equals(datePicker.getDate()));
-//        assertTrue(today.getTime() == datePicker.getDateInMillis());
     }
 
     @SuppressWarnings("deprecation")
@@ -1553,7 +1541,6 @@ public class JXDatePickerTest extends InteractiveTestCase {
     @SuppressWarnings("deprecation")
     public void testNullSelection() {
         JXDatePicker datePicker = new JXDatePicker();
-        datePicker.setDate(null);
         assertTrue(null == datePicker.getDate());
         assertTrue(-1 == datePicker.getDateInMillis());
     }

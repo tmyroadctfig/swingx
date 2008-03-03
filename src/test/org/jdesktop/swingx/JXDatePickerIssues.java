@@ -106,7 +106,6 @@ public class JXDatePickerIssues extends InteractiveTestCase {
         JComponent comp = Box.createVerticalBox();
         comp.add(new JLabel("setDate(null)"));
         JXDatePicker picker = new JXDatePicker();
-        picker.setDate(null);
         comp.add(picker);
         comp.add(new JLabel("initial -1"));
         comp.add(new JXDatePicker(-1));
@@ -208,7 +207,6 @@ public class JXDatePickerIssues extends InteractiveTestCase {
      */
     public void interactiveLinkDate() {
         final JXDatePicker picker = new JXDatePicker();
-        picker.setDate(null);
         setLinkDateNextMonth(picker);
         Action action = new AbstractAction("next linkdate month") {
 
@@ -270,7 +268,7 @@ public class JXDatePickerIssues extends InteractiveTestCase {
      * of the formattedTextField.
      */
     public void interactivePrefSize() {
-        JXDatePicker picker = new JXDatePicker();
+        JXDatePicker picker = new JXDatePicker(new Date());
         JFormattedTextField field = new JFormattedTextField(new DatePickerFormatter());
         field.setValue(picker.getDate());
         JComponent panel = new JPanel();
@@ -315,8 +313,7 @@ public class JXDatePickerIssues extends InteractiveTestCase {
      */
     public void interactiveVisibleMonth() {
         calendar.add(Calendar.YEAR, 1);
-        final JXDatePicker picker = new JXDatePicker();
-        picker.setDate(calendar.getTime());
+        final JXDatePicker picker = new JXDatePicker(calendar.getTime());
         JXFrame frame = wrapInFrame(picker, "sanity - monthview shows selected");
         Action toggleWrapper = new AbstractAction("open popup") {
 
@@ -380,7 +377,6 @@ public class JXDatePickerIssues extends InteractiveTestCase {
      */
     public void testLinkDate() {
         JXDatePicker picker = new JXDatePicker();
-        picker.setDate(null);
         Date today = picker.getLinkDay();
         Date firstDisplayedDate = picker.getMonthView().getFirstDisplayedDay();
         assertSameMonth(today, firstDisplayedDate);

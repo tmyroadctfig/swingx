@@ -515,7 +515,7 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
         JPanel panel = new JPanel();
 
         final JComboBox zoneSelector = new JComboBox(TimeZone.getAvailableIDs());
-        final JXDatePicker picker = new JXDatePicker();
+        final JXDatePicker picker = new JXDatePicker(new Date());
         final JXMonthView monthView = new JXMonthView();
         monthView.setSelectionDate(picker.getDate());
         monthView.setLowerBound(XTestUtils.getStartOfToday(-10));

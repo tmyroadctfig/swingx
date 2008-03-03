@@ -186,8 +186,8 @@ public class JXDatePicker extends JComponent {
 
 
     /**
-     * Intantiates a date picker with no selection and the default abstract formatter
-     * <code>JXDatePickerFormatter</code>.
+     * Intantiates a date picker with no selection and the default 
+     * <code>DatePickerFormatter</code>.
      * <p/>
      * The date picker is configured with the default time zone and locale
      *
@@ -202,8 +202,8 @@ public class JXDatePicker extends JComponent {
 
     /**
      * Intantiates a date picker using the specified time as the initial
-     * selection and the default abstract formatter
-     * <code>JXDatePickerFormatter</code>.
+     * selection and the default 
+     * <code>DatePickerFormatter</code>.
      * <p/>
      * The date picker is configured with the default time zone and locale
      *
@@ -216,8 +216,8 @@ public class JXDatePicker extends JComponent {
     }
     
     /**
-     * Intantiates a date picker with no selection and the default abstract formatter
-     * <code>JXDatePickerFormatter</code>.
+     * Intantiates a date picker with no selection and the default 
+     * <code>DatePickerFormatter</code>.
      * <p/>
      * The date picker is configured with the default time zone and specified 
      * locale
@@ -232,8 +232,8 @@ public class JXDatePicker extends JComponent {
 
     /**
      * Intantiates a date picker using the specified time as the initial
-     * selection and the default abstract formatter
-     * <code>JXDatePickerFormatter</code>.
+     * selection and the default 
+     * <code>DatePickerFormatter</code>.
      * <p/>
      * The date picker is configured with the default time zone and specified locale
      *
@@ -241,6 +241,7 @@ public class JXDatePicker extends JComponent {
      * @param locale initial Locale
      * @see #setTimeZone
      * @see #getTimeZone
+     * 
      */
     public JXDatePicker(Date selection, Locale locale) {
         init();
@@ -298,7 +299,7 @@ public class JXDatePicker extends JComponent {
         long oldMillis = getDateInMillis();
         this.date = date;
         firePropertyChange("date", old, getDate());
-        // JW: remove when removing the deprecated method
+        // PENDING JW: remove when removing the deprecated method
         firePropertyChange("dateInMillis", oldMillis, getDateInMillis());
     }
 

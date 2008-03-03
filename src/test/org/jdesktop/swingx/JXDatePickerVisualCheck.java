@@ -554,7 +554,6 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
      */
     public void interactiveActionEventSetValue() {
         final JXDatePicker picker = new JXDatePicker();
-//        picker.setDate(null);
         final JTextField simpleField = new JTextField("simple field");
         final JFormattedTextField textField = new JFormattedTextField(DateFormat.getDateInstance());
         textField.setValue(new Date());
@@ -609,7 +608,6 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
      */
     public void interactiveNullDate() {
         JXDatePicker picker = new JXDatePicker();
-        picker.setDate(null);
         showInFrame(picker, "null date in picker");
     }
 
