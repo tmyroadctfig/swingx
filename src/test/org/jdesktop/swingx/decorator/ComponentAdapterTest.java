@@ -46,6 +46,231 @@ import org.jdesktop.test.AncientSwingTeam;
  * @author Jeanette Winzenburg
  */
 public class ComponentAdapterTest extends TestCase {
+    /**
+     * Issue #791-swingx: complete coordinate transformation methods - missing id --> index
+     * 
+     * Tree has no columns/identifiers - implement reasonable default.
+     */
+    public void testColumnIdentifierAtList() {
+        JXListT tree = new JXListT(new String[] {"one" });
+        ComponentAdapter adapter = tree.getComponentAdapter(0);
+        assertEquals(ComponentAdapter.DEFAULT_COLUMN_IDENTIFIER, adapter.getColumnIdentifierAt(0));
+    }
+    /**
+     * Issue #791-swingx: complete coordinate transformation methods - missing id --> index
+     * 
+     * Here test contract: must throw IllegalArgumentException if invalid index.
+     */
+    public void testColumnIdentifierAtListInvalidIndex() {
+        JXListT table =  new JXListT(new String[] {"one" });
+        ComponentAdapter adapter = table.getComponentAdapter(0);
+        try {
+            adapter.getColumnIdentifierAt(adapter.getColumnCount());
+            fail("must throw at invalid columnIndex: " + adapter.getColumnCount());
+        } catch (ArrayIndexOutOfBoundsException e) {
+            // behaves as documented  
+        } catch (Exception e) {
+            fail("expected ArrayIndexOutOfBounds but was: " + e);
+        }
+    }
+ 
+    /**
+     * Issue #791-swingx: complete coordinate transformation methods - missing id --> index
+     * 
+     * Here test contract: must throw NPE if nullIdentifier.
+     */
+    public void testColumnIdentifierReverseListNullIdentifier() {
+        JXListT table =  new JXListT(new String[] {"one" });
+        ComponentAdapter adapter = table.getComponentAdapter(0);
+        try {
+            adapter.getColumnIndex(null);
+            fail("must throw at invalid columnIndex: " + adapter.getColumnCount());
+        } catch (NullPointerException e) {
+            // behaves as documented  
+        } catch (Exception e) {
+            fail("expected ArrayIndexOutOfBounds but was: " + e);
+        }
+    }
+    /**
+     * Issue #791-swingx: complete coordinate transformation methods - missing id --> index
+     * 
+     * Tree has no columns/identifiers - implement reasonable default.
+     */
+    public void testColumnIdentifierListReverse() {
+        JXListT tree = new JXListT(new String[] {"one" });
+        ComponentAdapter adapter = tree.getComponentAdapter(0);
+        assertEquals(0, adapter.getColumnIndex(ComponentAdapter.DEFAULT_COLUMN_IDENTIFIER));
+    }
+
+    /**
+     * Issue #791-swingx: complete coordinate transformation methods - missing id --> index
+     * 
+     * Tree has no columns/identifiers - implement reasonable default.
+     */
+    public void testColumnIdentifierListNotFound() {
+        JXListT tree = new JXListT(new String[] {"one" });
+        ComponentAdapter adapter = tree.getComponentAdapter(0);
+        assertEquals(-1, adapter.getColumnIndex("unknown"));
+    }
+
+    
+    /**
+     * Issue #791-swingx: complete coordinate transformation methods - missing id --> index
+     * 
+     * Tree has no columns/identifiers - implement reasonable default.
+     */
+    public void testColumnIdentifierAtTree() {
+        JXTreeT tree = new JXTreeT();
+        ComponentAdapter adapter = tree.getComponentAdapter(0);
+        assertEquals(ComponentAdapter.DEFAULT_COLUMN_IDENTIFIER, adapter.getColumnIdentifierAt(0));
+    }
+    /**
+     * Issue #791-swingx: complete coordinate transformation methods - missing id --> index
+     * 
+     * Here test contract: must throw IllegalArgumentException if invalid index.
+     */
+    public void testColumnIdentifierAtTreeInvalidIndex() {
+        JXTreeT table =  new JXTreeT();
+        ComponentAdapter adapter = table.getComponentAdapter(0);
+        try {
+            adapter.getColumnIdentifierAt(adapter.getColumnCount());
+            fail("must throw at invalid columnIndex: " + adapter.getColumnCount());
+        } catch (ArrayIndexOutOfBoundsException e) {
+            // behaves as documented  
+        } catch (Exception e) {
+            fail("expected ArrayIndexOutOfBounds but was: " + e);
+        }
+    }
+ 
+    /**
+     * Issue #791-swingx: complete coordinate transformation methods - missing id --> index
+     * 
+     * Here test contract: must throw NPE if nullIdentifier.
+     */
+    public void testColumnIdentifierReverseTreeNullIdentifier() {
+        JXTreeT table =  new JXTreeT();
+        ComponentAdapter adapter = table.getComponentAdapter(0);
+        try {
+            adapter.getColumnIndex(null);
+            fail("must throw at invalid columnIndex: " + adapter.getColumnCount());
+        } catch (NullPointerException e) {
+            // behaves as documented  
+        } catch (Exception e) {
+            fail("expected ArrayIndexOutOfBounds but was: " + e);
+        }
+    }
+    /**
+     * Issue #791-swingx: complete coordinate transformation methods - missing id --> index
+     * 
+     * Tree has no columns/identifiers - implement reasonable default.
+     */
+    public void testColumnIdentifierTreeReverse() {
+        JXTreeT tree = new JXTreeT();
+        ComponentAdapter adapter = tree.getComponentAdapter(0);
+        assertEquals(0, adapter.getColumnIndex(ComponentAdapter.DEFAULT_COLUMN_IDENTIFIER));
+    }
+
+    /**
+     * Issue #791-swingx: complete coordinate transformation methods - missing id --> index
+     * 
+     * Tree has no columns/identifiers - implement reasonable default.
+     */
+    public void testColumnIdentifierTreeNotFound() {
+        JXTreeT tree = new JXTreeT();
+        ComponentAdapter adapter = tree.getComponentAdapter(0);
+        assertEquals(-1, adapter.getColumnIndex("unknown"));
+    }
+    
+    /**
+     * Issue #791-swingx: complete coordinate transformation methods - missing id --> index
+     * 
+     * Here: must return model index for hidden columns
+     */
+    public void testColumnIdentifierReverseHidden() {
+        JXTableT table =  new JXTableT(new AncientSwingTeam());
+        ComponentAdapter adapter = table.getComponentAdapter(0, 0);
+        Object id = new Integer(50);
+        table.getColumn(1).setIdentifier(id);
+        table.getColumnExt(1).setVisible(false);
+        assertEquals(1, adapter.getColumnIndex(id));
+    }
+
+
+    /**
+     * Issue #791-swingx: complete coordinate transformation methods - missing id --> index
+     * 
+     * Here: must return model index
+     */
+    public void testColumnIdentifierReverse() {
+        JXTableT table =  new JXTableT(new AncientSwingTeam());
+        ComponentAdapter adapter = table.getComponentAdapter(0, 0);
+        Object id = new Integer(50);
+        table.getColumn(1).setIdentifier(id);
+        assertEquals(1, adapter.getColumnIndex(id));
+    }
+
+    /**
+     * Issue #791-swingx: complete coordinate transformation methods - missing id --> index
+     * 
+     * Here: must return model index if identifier not known.
+     */
+    public void testColumnIdentifierReverseNotFound() {
+        JXTableT table =  new JXTableT(new AncientSwingTeam());
+        ComponentAdapter adapter = table.getComponentAdapter(0, 0);
+        Object id = new Integer(50);
+        table.getColumn(1).setIdentifier(id);
+        assertEquals(-1, adapter.getColumnIndex("unknown"));
+    }
+
+    /**
+     * Issue #791-swingx: complete coordinate transformation methods - missing id --> index
+     * 
+     * Here test contract: must throw IllegalArgumentException if invalid index.
+     */
+    public void testColumnIdentifierAtInvalidIndex() {
+        JXTableT table =  new JXTableT(new AncientSwingTeam());
+        ComponentAdapter adapter = table.getComponentAdapter(0, 0);
+        try {
+            adapter.getColumnIdentifierAt(adapter.getColumnCount());
+            fail("must throw at invalid columnIndex: " + adapter.getColumnCount());
+        } catch (ArrayIndexOutOfBoundsException e) {
+            // behaves as documented  
+        } catch (Exception e) {
+            fail("expected ArrayIndexOutOfBounds but was: " + e);
+        }
+    }
+
+    /**
+     * Issue #791-swingx: complete coordinate transformation methods - missing id --> index
+     * 
+     * Here test contract: must throw NPE if Null identifier.
+     */
+    public void testColumnIdentifierReverseNullIdentifier() {
+        JXTableT table =  new JXTableT(new AncientSwingTeam());
+        ComponentAdapter adapter = table.getComponentAdapter(0, 0);
+        try {
+            adapter.getColumnIndex(null);
+            fail("must throw for null identifier");
+        } catch (NullPointerException e) {
+            // behaves as documented  
+        } catch (Exception e) {
+            fail("expected ArrayIndexOutOfBounds but was: " + e);
+        }
+    }
+    /**
+     * Issue #791-swingx: complete coordinate transformation methods - missing id --> index
+     * 
+     * 
+     */
+    public void testColumnIdentifierAt() {
+        JXTableT table =  new JXTableT(new AncientSwingTeam());
+        ComponentAdapter adapter = table.getComponentAdapter(0, 0);
+        Object id = new Integer(50);
+        table.getColumn(0).setIdentifier(id);
+        assertEquals(table.getColumn(0).getIdentifier(), adapter.getColumnIdentifierAt(0));
+        // this fails because the adapter returns a string representation of the identifier
+//        assertEquals(table.getColumn(0).getIdentifier(), adapter.getColumnIdentifier(0));
+    }
  
     /**
      * Issue #767-swingx: consistent string representation.
@@ -132,6 +357,9 @@ public class ComponentAdapterTest extends TestCase {
             super(model);
         }
 
+        public JXTreeT() {
+            super();
+        }
         @Override
         public ComponentAdapter getComponentAdapter(int row) {
             return super.getComponentAdapter(row);
@@ -221,6 +449,9 @@ public class ComponentAdapterTest extends TestCase {
             super(model);
         }
 
+        public JXListT(Object[] data) {
+            super(data);
+        }
         @Override
         public ComponentAdapter getComponentAdapter(int row) {
             return super.getComponentAdapter(row);
@@ -349,6 +580,24 @@ public class ComponentAdapterTest extends TestCase {
             public String getColumnIdentifier(int columnIndex) {
                 return null;
             }
+            
+            
+
+            @Override
+            public Object getColumnIdentifierAt(int columnIndex) {
+                // TODO Auto-generated method stub
+                return null;
+            }
+
+
+
+            @Override
+            public int getColumnIndex(Object identifier) {
+                // TODO Auto-generated method stub
+                return 0;
+            }
+
+
 
             @Override
             public String getColumnName(int columnIndex) {

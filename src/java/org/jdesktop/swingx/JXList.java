@@ -1254,22 +1254,22 @@ public class JXList extends JList {
             return list.isSelectedIndex(row);
         }
 
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public String getColumnName(int columnIndex) {
-            return "Column_" + columnIndex;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public String getColumnIdentifier(int columnIndex) {
-            return null;
-        }
-
+//        /**
+//         * {@inheritDoc}
+//         */
+//        @Override
+//        public String getColumnName(int columnIndex) {
+//            return "Column_" + columnIndex;
+//        }
+//
+//        /**
+//         * {@inheritDoc}
+//         */
+//        @Override
+//        public String getColumnIdentifier(int columnIndex) {
+//            return null;
+//        }
+//
     }
 
     // ------------------------------ renderers

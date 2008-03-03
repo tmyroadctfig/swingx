@@ -3202,6 +3202,11 @@ public class JXTable extends JTable
         }
 
         protected TableColumn getColumnByModelIndex(int modelColumn) {
+            // throwing here makes a filter test fail .. it's probably an issue
+            // but don't want to touch (swingx filters will be gone soon)
+//            if ((modelColumn < 0) || (modelColumn >= getColumnCount())) {
+//                throw new IllegalArgumentException("invalid column index: " + modelColumn);
+//            }
             List columns = table.getColumns(true);
             for (Iterator iter = columns.iterator(); iter.hasNext();) {
                 TableColumn column = (TableColumn) iter.next();
@@ -3211,16 +3216,32 @@ public class JXTable extends JTable
             }
             return null;
         }
-
+        
+//        @Override
+//        public String getColumnIdentifier(int columnIndex) {
+////            TableColumn column = getColumnByModelIndex(columnIndex);
+////            Object identifier = column != null ? column.getIdentifier() : null;
+//            Object identifier = getColumnIdentifierAt(columnIndex);
+//            return identifier != null ? identifier.toString() : null;
+//        }
+        
         
         @Override
-        public String getColumnIdentifier(int columnIndex) {
-            
+        public Object getColumnIdentifierAt(int columnIndex) {
+            if ((columnIndex < 0) || (columnIndex >= getColumnCount())) {
+                throw new ArrayIndexOutOfBoundsException("invalid column index: " + columnIndex);
+            }
             TableColumn column = getColumnByModelIndex(columnIndex);
             Object identifier = column != null ? column.getIdentifier() : null;
-            return identifier != null ? identifier.toString() : null;
+            return identifier;
         }
-        
+
+        @Override
+        public int getColumnIndex(Object identifier) {
+            TableColumn column = table.getColumnExt(identifier);
+            return column != null ? column.getModelIndex() : -1;
+        }
+
         @Override
         public int getColumnCount() {
             return table.getModel().getColumnCount();

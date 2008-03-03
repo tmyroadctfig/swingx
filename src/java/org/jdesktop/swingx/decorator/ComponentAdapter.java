@@ -88,6 +88,8 @@ import org.jdesktop.swingx.renderer.StringValue;
  * 
  * PENDING JW: add model-index based access to string rep. <p>
  * PENDING JW: anything to gain by generics here?<p>
+ * PENDING JW: formally document that row/column coordinates must be valid in all methods taking
+ *  model coordinates, that is 0<= row < getRowCount().
  * 
  * @author Ramesh Gupta
  * @author Karl Schaefer
@@ -98,6 +100,7 @@ import org.jdesktop.swingx.renderer.StringValue;
  * @see org.jdesktop.swingx.decorator.Filter
  */
 public abstract class ComponentAdapter {
+    public static final Object DEFAULT_COLUMN_IDENTIFIER = "Column0";
     /** current row in view coordinates. */
     public int row = 0;
     /** current column in view coordinates. */
@@ -136,25 +139,101 @@ public abstract class ComponentAdapter {
      * columns it returns a name - most will do so for the
      * subset with isTestable = true.
      * 
+     * This implementation delegates to getColumnIdentifierAt and returns it's
+     * toString or null.
+     * 
      * @param columnIndex in model coordinates
-     * @return column name or null if not found/not testable.
+     * @return column name or null if not found
      */
-    public abstract String getColumnName(int columnIndex);
+    public String getColumnName(int columnIndex) {
+        Object identifier = getColumnIdentifierAt(columnIndex);
+        return identifier != null ? identifier.toString() : null;
+    }
 
     /**
      * Returns the columns logical name (== identifier) of the column at 
-     * columnIndex in model coordinates.
+     * columnIndex in model coordinates.<p>
      * 
      * Note: it's up to the implementation to decide for which
      * columns it returns a name - most will do so for the
-     * subset with isTestable = true.
+     * subset with isTestable = true.<p>
      * 
-     * @param columnIndex in model coordinates
+     * This implementation delegates to getColumnName. <p>
+     * 
+     * PENDING JW: this is deprecated because the type of an identifer
+     * shouldn't be restricted to String. The only way to gently replace this method is
+     * to add another with a different name - which makes that other name suboptimal.
+     * Maybe we should jump for a rude change and let this return an Object. 
+     * 
+     * @param columnIndex in model coordinates, must be valid.
      * @return the String value of the column identifier at columnIndex
      *   or null if no identifier set
+     *   
+     * @deprecated use #getColumnIdentifierAt(int)  
      */
-    public abstract String getColumnIdentifier(int columnIndex);
+    @Deprecated
+    public String getColumnIdentifier(int columnIndex) {
+        return getColumnName(columnIndex);
+    }
+    
+    
+    /**
+     * Returns logical identifier of the column at 
+     * columnIndex in model coordinates.
+     * 
+     * Note: it's up to the implementation to decide for which
+     * columns it returns an identifier - most will do so for the
+     * subset with isTestable = true.<p>
+     * 
+     * This implementation returns DEFAULT_COLUMN_IDENTIFIER.
+     * 
+     * @param columnIndex in model coordinates, must be valid.
+     * @return the identifier of the column at columnIndex or null if it has none.
+     * @throws ArrayIndexOutOfBoundsException if columnIndex < 0 or columnIndex >= getColumnCount().
+     *  
+     *  
+     * @see #getColumnIndex(Object)  
+     */
+    public Object getColumnIdentifierAt(int columnIndex) {
+        if ((columnIndex < 0) || (columnIndex >= getColumnCount())) {
+            throw new ArrayIndexOutOfBoundsException("invalid column index: " + columnIndex);
+        }
+        return DEFAULT_COLUMN_IDENTIFIER;
+    }
 
+    /**
+     * Returns the column index in model coordinates for the logical identifier.
+     * <p>
+     * 
+     * This implementation returns 0 if the identifier is the same as the one
+     * known identifier returned from getColumnIdentifierAt(0), or -1 otherwise.
+     * So subclasses with one column and a customizable identifier need not
+     * override. Subclasses which support multiple columns must override this as
+     * well to keep the contract as in (assuming that the lookup succeeded):
+     * 
+     * <pre><code>
+     *  Object id = getColumnIdentifierAt(index);
+     *  assertEquals(index, getColumnIndex(index);
+     *  // and the reverse 
+     *  int column = getColumnIndex(identifier);
+     *  assertEquals(identifier, getColumnIdentifierAt(column));
+     * </code></pre>
+     * 
+     * 
+     * @param identifier the column's identifier, must not be null
+     * @return the index of the column identified by identifier in model
+     *         coordinates or -1 if no column with the given identifier is
+     *         found.
+     * @throws NullPointerException if identifier is null.
+     * @see #getColumnIdentifierAt(int)
+     */
+    public int getColumnIndex(Object identifier) {
+        if (identifier.equals(getColumnIdentifierAt(0))) {
+            return 0;
+        }
+        return -1;
+    }
+    
     /**
      * Returns the number of columns in the target's data model.
      *
