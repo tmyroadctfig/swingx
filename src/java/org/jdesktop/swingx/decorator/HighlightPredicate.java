@@ -401,6 +401,44 @@ public interface HighlightPredicate {
         
     }
     
+
+    /**
+     * A HighlightPredicate based on column identifier.
+     * 
+     */
+    public static class IdentifierHighlightPredicate implements HighlightPredicate {
+        List<Object> columnList;
+        
+        /**
+         * Instantiates a predicate which returns true for the
+         * given column identifiers.
+         * 
+         * @param columns the identitiers of the columns to highlight.
+         */
+        public IdentifierHighlightPredicate(Object... columns) {
+            columnList = new ArrayList<Object>();
+            for (int i = 0; i < columns.length; i++) {
+                columnList.add(columns[i]);
+            }
+        }
+        
+        /**
+         * {@inheritDoc}
+         * 
+         * This implementation returns true if the adapter's column
+         * is contained in this predicates list.
+         * 
+         */
+        public boolean isHighlighted(Component renderer, ComponentAdapter adapter) {
+            int modelIndex = adapter.viewToModel(adapter.column);
+            Object identifier = adapter.getColumnIdentifierAt(modelIndex);
+            return identifier != null ? columnList.contains(identifier) : false;
+        }
+        
+    }
+    
+
+    
     /**
      * A {@code HighlightPredicate} based on adapter depth.
      * 

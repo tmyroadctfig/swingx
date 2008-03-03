@@ -22,6 +22,7 @@ import org.jdesktop.swingx.RolloverProducer;
 import org.jdesktop.swingx.decorator.HighlightPredicate.AndHighlightPredicate;
 import org.jdesktop.swingx.decorator.HighlightPredicate.ColumnHighlightPredicate;
 import org.jdesktop.swingx.decorator.HighlightPredicate.EqualsHighlightPredicate;
+import org.jdesktop.swingx.decorator.HighlightPredicate.IdentifierHighlightPredicate;
 import org.jdesktop.swingx.decorator.HighlightPredicate.NotHighlightPredicate;
 import org.jdesktop.swingx.decorator.HighlightPredicate.OrHighlightPredicate;
 
@@ -462,7 +463,18 @@ public class HighlightPredicateTest extends InteractiveTestCase {
         assertTrue("column 1 must be highlighted", predicate.isHighlighted(allColored, adapter));
     }
 
+    public void testIdentifierDefault() {
+        HighlightPredicate predicate = new IdentifierHighlightPredicate(ComponentAdapter.DEFAULT_COLUMN_IDENTIFIER);
+        ComponentAdapter adapter = createComponentAdapter(allColored, false);
+        assertTrue("default (single) column must be highlighted", predicate.isHighlighted(allColored, adapter));
+    }
 
+    public void testIdentifierFalse() {
+        HighlightPredicate predicate = new IdentifierHighlightPredicate("unknown");
+        ComponentAdapter adapter = createComponentAdapter(allColored, false);
+        assertFalse("unknown identifier must not highlight", predicate.isHighlighted(allColored, adapter));
+    }
+    
     public void testPattern() {
         // start with "t"
         Pattern pattern = Pattern.compile("^t", 0);
