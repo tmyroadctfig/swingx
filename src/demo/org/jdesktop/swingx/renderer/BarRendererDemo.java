@@ -88,7 +88,7 @@ public class BarRendererDemo {
     /**
      * Configure the given collection components with the same
      * rendering representation.
-     * 
+     * <
      * Note: this method is extracted for emphasis only :-)
      */
     private void configureRendering(JXTable table, JXList list, JXTree tree) {
@@ -113,7 +113,10 @@ public class BarRendererDemo {
         tree.setCellRenderer(new DefaultTreeRenderer((StringValue) mv));
     }
 
-
+    /**
+     * Configures and installs the shared highlighter for the table, list and tree.
+     * 
+     */
     private void configureHighlighting(JXTable table, JXList list, JXTree tree) {
         final int defaultHeight = table.getRowHeight();
         Highlighter zoomHighlighter = new AbstractHighlighter() {
@@ -163,9 +166,8 @@ public class BarRendererDemo {
     }
 
     /**
-     * @param table
-     * @param list
-     * @param tree
+     * Configures and registeres the shared MouseWheelListener for the table, list
+     * and tree.
      */
     private void installZoomControl(JXTable table, JXList list, JXTree tree) {
         MouseWheelListener wheel = new MouseWheelListener() {
@@ -257,7 +259,8 @@ public class BarRendererDemo {
     }
 
     /**
-     * @param table
+     * Configures some defaults, namely the same fixed rowheight on the
+     * table, list and tree.
      */
     private void configureComponents(JXTable table, JXList list, JXTree tree) {
         table.setColumnControlVisible(true);
@@ -270,6 +273,8 @@ public class BarRendererDemo {
     
 
     /**
+     * Creates and configures the content pane.
+     * 
      * @return the component to show.
      */
     private Component createContent() {
