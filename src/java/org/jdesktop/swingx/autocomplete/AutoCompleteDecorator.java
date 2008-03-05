@@ -268,7 +268,6 @@ public class AutoCompleteDecorator {
         // otherwise the last mark would have been retained which is quiet confusing
         textComponent.addFocusListener(new AutoCompleteFocusAdapter() {
             public void focusGained(FocusEvent e) {
-                JTextComponent textComponent = (JTextComponent) e.getSource();
                 adaptor.markEntireText();
             }
         });
