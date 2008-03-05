@@ -21,31 +21,18 @@
 
 package org.jdesktop.swingx.plaf.macosx;
 
-import java.awt.FlowLayout;
-import java.awt.LayoutManager;
-import javax.swing.BorderFactory;
 import javax.swing.JComponent;
-import javax.swing.border.Border;
-import javax.swing.plaf.BorderUIResource;
+import javax.swing.LookAndFeel;
 import javax.swing.plaf.ComponentUI;
-import javax.swing.plaf.UIResource;
+
 import org.jdesktop.swingx.JXStatusBar;
-import org.jdesktop.swingx.plaf.StatusBarUI;
+import org.jdesktop.swingx.plaf.basic.BasicStatusBarUI;
 
 /**
  *
  * @author rbair
  */
-public class MacOSXStatusBarUI extends StatusBarUI {
-    /**
-     * The one and only JXStatusBar for this UI delegate
-     */
-    private JXStatusBar statusBar;
-    
-    /** Creates a new instance of BasicStatusBarUI */
-    public MacOSXStatusBarUI() {
-    }
-    
+public class MacOSXStatusBarUI extends BasicStatusBarUI {
     /**
      * Returns an instance of the UI delegate for the specified component.
      * Each subclass must provide its own static <code>createUI</code>
@@ -61,78 +48,19 @@ public class MacOSXStatusBarUI extends StatusBarUI {
     }	
     
     /**
-     * Configures the specified component appropriate for the look and feel.
-     * This method is invoked when the <code>ComponentUI</code> instance is being installed
-     * as the UI delegate on the specified component.  This method should
-     * completely configure the component for the look and feel,
-     * including the following:
-     * <ol>
-     * <li>Install any default property values for color, fonts, borders,
-     *     icons, opacity, etc. on the component.  Whenever possible, 
-     *     property values initialized by the client program should <i>not</i> 
-     *     be overridden.
-     * <li>Install a <code>LayoutManager</code> on the component if necessary.
-     * <li>Create/add any required sub-components to the component.
-     * <li>Create/install event listeners on the component.
-     * <li>Create/install a <code>PropertyChangeListener</code> on the component in order
-     *     to detect and respond to component property changes appropriately.
-     * <li>Install keyboard UI (mnemonics, traversal, etc.) on the component.
-     * <li>Initialize any appropriate instance data.
-     * </ol>
-     * @param c the component where this UI delegate is being installed
-     *
-     * @see #uninstallUI
-     * @see javax.swing.JComponent#setUI
-     * @see javax.swing.JComponent#updateUI
+     * @deprecated (since release 0.9.2)
      */
-    @Override
-    public void installUI(JComponent c) {
-        assert c instanceof JXStatusBar;
-        statusBar = (JXStatusBar)c;
-        
-        Border b = statusBar.getBorder();
-        if (b == null || b instanceof UIResource) {
-            statusBar.setBorder(new BorderUIResource(BorderFactory.createEmptyBorder(4, 5, 4, 22)));
-        }
-        
-        LayoutManager m = statusBar.getLayout();
-        if (m == null) {
-            statusBar.setLayout(new FlowLayout());
-        }
-        installDefaults();
+    @Deprecated
+    protected void installDefaults() {
+        LookAndFeel.installProperty(statusBar, "opaque", false);
     }
     
-    protected void installDefaults() {
-        statusBar.setOpaque(false);
-    }
-
     /**
-     * Reverses configuration which was done on the specified component during
-     * <code>installUI</code>.  This method is invoked when this 
-     * <code>UIComponent</code> instance is being removed as the UI delegate 
-     * for the specified component.  This method should undo the
-     * configuration performed in <code>installUI</code>, being careful to 
-     * leave the <code>JComponent</code> instance in a clean state (no 
-     * extraneous listeners, look-and-feel-specific property objects, etc.).
-     * This should include the following:
-     * <ol>
-     * <li>Remove any UI-set borders from the component.
-     * <li>Remove any UI-set layout managers on the component.
-     * <li>Remove any UI-added sub-components from the component.
-     * <li>Remove any UI-added event/property listeners from the component.
-     * <li>Remove any UI-installed keyboard UI from the component.
-     * <li>Nullify any allocated instance data objects to allow for GC.
-     * </ol>
-     * @param c the component from which this UI delegate is being removed;
-     *          this argument is often ignored,
-     *          but might be used if the UI object is stateless
-     *          and shared by multiple components
-     *
-     * @see #installUI
-     * @see javax.swing.JComponent#updateUI
+     * {@inheritDoc}
      */
-    @Override
-    public void uninstallUI(JComponent c) {
-        assert c instanceof JXStatusBar;
+    protected void installDefaults(JXStatusBar sb) {
+        super.installDefaults(sb);
+        
+        LookAndFeel.installProperty(statusBar, "opaque", false);
     }
 }
