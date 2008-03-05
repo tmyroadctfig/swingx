@@ -30,11 +30,11 @@ import javax.swing.ComboBoxModel;
 
 /**
  * A {@code ComboBoxModel} for {@code List}s.
+ *
+ * @param <E> the type of elements maintained by the list backing this model
  * 
  * @author jm158417
  * @author Karl George Schaefer
- *
- * @param <E> the type of elements maintained by the list backing this model
  */
 public class ListComboBoxModel<E> extends AbstractListModel implements ComboBoxModel, ActionListener {
     /**
@@ -47,6 +47,8 @@ public class ListComboBoxModel<E> extends AbstractListModel implements ComboBoxM
      * <p>
      * This model does <b>not</b> make a copy of the list, so any changes in
      * the list without synchronizing the model may have drastic effects.
+     * <p>
+     * TODO make final after 0.9.3, when {@link MapComboBoxModel#buildIndex()} is removed
      */
     protected List<E> data;
     
@@ -54,10 +56,6 @@ public class ListComboBoxModel<E> extends AbstractListModel implements ComboBoxM
      * The currently selected item.
      */
     protected E selected;
-    
-    ListComboBoxModel() {
-        this(new ArrayList<E>());
-    }
     
     /**
      * Creates a {@code ListComboBoxModel} backed by the supplied {@code list}.

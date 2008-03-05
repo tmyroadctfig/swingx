@@ -24,11 +24,7 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
-
-import javax.swing.AbstractListModel;
-import javax.swing.ComboBoxModel;
 
 /**
  * <p>
@@ -97,14 +93,11 @@ import javax.swing.ComboBoxModel;
  * @author joshy
  * @author Karl Schaefer
  */
-public class EnumComboBoxModel<E extends Enum<E>> 
-        extends AbstractListModel implements ComboBoxModel {
+public class EnumComboBoxModel<E extends Enum<E>> extends ListComboBoxModel<E> {
     private static final long serialVersionUID = 2176566393195371004L;
     
     private final Map<String, E> valueMap;
     private final Class<E> enumClass;
-    private final List<E> quickList;
-    private E selected = null;
 
     /**
      * Creates an {@code EnumComboBoxModel} for the enum represent by the
@@ -117,13 +110,13 @@ public class EnumComboBoxModel<E extends Enum<E>>
      *             than one constant
      */
     public EnumComboBoxModel(Class<E> en) {
+        super(new ArrayList<E>(EnumSet.allOf(en)));
+        
         //we could size these, probably not worth it; enums are usually small 
         valueMap = new HashMap<String, E>();
-        quickList = new ArrayList<E>();
         enumClass = en;
         
-        EnumSet<E> ens = EnumSet.allOf(en);
-        Iterator<E> iter = ens.iterator();
+        Iterator<E> iter = data.iterator();
         
         while (iter.hasNext()) {
             E element = iter.next();
@@ -135,24 +128,7 @@ public class EnumComboBoxModel<E extends Enum<E>>
             }
             
             valueMap.put(s, element);
-            quickList.add(element);
         }
-        
-        selected = quickList.get(0);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public int getSize() {
-        return quickList.size();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public E getElementAt(int index) {
-        return quickList.get(index);
     }
 
     /**
@@ -173,13 +149,6 @@ public class EnumComboBoxModel<E extends Enum<E>>
         }
         
         this.fireContentsChanged(this, 0, getSize());
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    public E getSelectedItem() {
-	return selected;
     }
     
     /*

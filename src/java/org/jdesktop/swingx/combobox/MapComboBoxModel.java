@@ -23,6 +23,7 @@ package org.jdesktop.swingx.combobox;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -66,13 +67,31 @@ public class MapComboBoxModel<K, V> extends ListComboBoxModel<K> {
      *                the map backing this model
      */
     public MapComboBoxModel(Map<K, V> map) {
+        super(buildIndex(map));
         this.map_data = map;
         
         buildIndex();
         
+        //TODO remove this with buildIndex removal
         if(data.size() > 0) {
             selected = data.get(0);
         }
+    }
+    
+    /**
+     * Builds an index for this model. This method ensures that the map is always presented in a
+     * consistent order.
+     * <p>
+     * This method is called by the constructor and the {@code List} is passed to {@code super}.
+     * 
+     * @param <E>
+     *                the type of keys for the map
+     * @param map
+     *                the map to build an index for
+     * @return a list containing the map keys
+     */
+    private static <E> List<E> buildIndex(Map<E, ?> map) {
+        return new ArrayList<E>(map.keySet());
     }
     
     /**
@@ -80,7 +99,10 @@ public class MapComboBoxModel<K, V> extends ListComboBoxModel<K> {
      * ensures that the map is always presented in a consistent order.
      * <p>
      * This method is called by the constructor.
+     * 
+     * @deprecated (since release 0.9.2) no longer used; use {@link #buildIndex(Map)} instead
      */
+    @Deprecated
     protected void buildIndex() {
         data = new ArrayList<K>(map_data.keySet());
     }
@@ -97,6 +119,7 @@ public class MapComboBoxModel<K, V> extends ListComboBoxModel<K> {
      */
     public void actionPerformed(ActionEvent evt) {
         if(evt.getActionCommand().equals(UPDATE)) {
+            //TODO after 0.9.3: replace with different logic so data can be final
             buildIndex();
             fireContentsChanged(this, 0, getSize());
         }
