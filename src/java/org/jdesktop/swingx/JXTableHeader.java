@@ -94,24 +94,6 @@ public class JXTableHeader extends JTableHeader
         super(columnModel);
     }
 
-    /**
-     * {@inheritDoc}
-     * <p>
-     * 
-     * Overridden to initialize autoscrolls property to true.
-     * <p>
-     * 
-     * N
-     * 
-     * @see #setDraggedDistance(int)
-     */
-//    @Override
-//    protected void initializeLocalVars() {
-//        super.initializeLocalVars();
-//        // enabled again - after fix of #788-swingx
-//        // no ... it's not fixed, something changed in 1.5
-//        setAutoscrolls(false);
-//    }
 
     /**
      * Sets the associated JTable. Enables enhanced header
@@ -326,8 +308,11 @@ public class JXTableHeader extends JTableHeader
      * 
      * Overridden to scroll the table to keep the dragged column visible.
      * This side-effect is enabled only if the header's autoscroll property is
-     * <code>true</code> and the associated table is of type JXTable.<p>
+     * <code>true</code> and the associated table is of type JXTable.<p> 
      * 
+     * The autoscrolls is disabled by default. With or without - core 
+     * issue #6503981 has weird effects (for jdk 1.6 - 1.6u3) on a plain 
+     * JTable as well as a JXTable, fixed in 1.6u4.
      * 
      */
     @Override

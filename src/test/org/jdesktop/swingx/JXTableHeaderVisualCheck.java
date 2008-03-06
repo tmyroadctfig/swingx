@@ -69,6 +69,18 @@ public class JXTableHeaderVisualCheck extends InteractiveTestCase {
     }
     
     /**
+     * Issue #683-swingx: Autoscroll if column dragged outside.
+     * Plain ol' JTable - core bug 6503981
+     */
+    public void interactiveHeaderAutoScrollCoreIssue() {
+        JTable table = new JXTable(20, 30);
+        table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        JXFrame frame = showWithScrollingInFrame(table, "core bug 1.6 before u4 - scroll to last column and drag");
+        frame.applyComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+        frame.setSize(400, 400);
+    }
+    
+    /**
      * Issue #485-swingx: table header disappears if all header values are
      * empty. Compare core <--> JXTable
      * fixed for SwingX.
