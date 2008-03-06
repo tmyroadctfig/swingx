@@ -33,7 +33,9 @@ import java.util.TimeZone;
 import java.util.logging.Logger;
 
 import javax.swing.Action;
+import javax.swing.Box;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.calendar.CalendarUtils;
@@ -58,10 +60,10 @@ public class JXMonthViewIssues extends InteractiveTestCase {
       setSystemLF(true);
       InteractiveTestCase  test = new JXMonthViewIssues();
       try {
-//          test.runInteractiveTests();
+          test.runInteractiveTests();
 //        test.runInteractiveTests("interactive.*Locale.*");
 //          test.runInteractiveTests("interactive.*AutoScroll.*");
-        test.runInteractiveTests("interactive.*First.*");
+//        test.runInteractiveTests("interactive.*First.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
@@ -76,6 +78,20 @@ public class JXMonthViewIssues extends InteractiveTestCase {
     // the calendar to use, its date is initialized with the today-field in setUpCalendar
     protected Calendar calendar;
 
+    
+    
+    /**
+     * Issue ??-swingx: JXMonthView must have visual clue if enabled.
+     */
+    public void interactiveDisabled() {
+        JXMonthView monthView = new JXMonthView();
+        monthView.setEnabled(false);
+        JComponent comp = Box.createHorizontalBox();
+        comp.add(monthView);
+        comp.add(new JXMonthView());
+        showInFrame(comp, "disabled <--> enabled");
+        
+    }
     
     /**
      * Issue #736-swingx: monthView cannot cope with minimalDaysInFirstWeek.

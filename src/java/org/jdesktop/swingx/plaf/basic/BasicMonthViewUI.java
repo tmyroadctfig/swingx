@@ -1015,13 +1015,20 @@ public class BasicMonthViewUI extends MonthViewUI {
 
         // Determine how many columns of calendars we want to paint.
         calendarColumnCount = 1;
-        calendarColumnCount += (monthView.getWidth() - calendarWidth) /
+        int addColumns = (monthView.getWidth() - calendarWidth) /
                 (calendarWidth + CALENDAR_SPACING);
+        // happens if used as renderer in a tree.. don't know yet why
+        if (addColumns > 0) {
+            calendarColumnCount += addColumns;
+        }
 
         // Determine how many rows of calendars we want to paint.
         calendarRowCount = 1;
-        calendarRowCount += (monthView.getHeight() - calendarHeight) /
+        int addRows = (monthView.getHeight() - calendarHeight) /
                 (calendarHeight + CALENDAR_SPACING);
+        if (addRows > 0) {
+            calendarRowCount += addRows;
+        }
 
         if (oldNumCalCols != calendarColumnCount ||
                 oldNumCalRows != calendarRowCount) {
