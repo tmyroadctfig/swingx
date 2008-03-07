@@ -90,7 +90,7 @@ public class JXTableIssues extends InteractiveTestCase {
 //          test.runInteractiveTests();
 //            test.runInteractiveTests("interactive.*Scroll.*");
          //   test.runInteractiveTests("interactive.*Render.*");
-            test.runInteractiveTests(".*OnEscape.*");
+            test.runInteractiveTests("interactive.*Sort.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();

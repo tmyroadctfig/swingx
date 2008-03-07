@@ -44,10 +44,12 @@ public class NumberEditorExt extends DefaultCellEditor {
         textField.removeActionListener(delegate);
         // replace the delegate created in DefaultCellEditor
         delegate = new EditorDelegate() {
+                @Override
                 public void setValue(Object value) {
                     ((JFormattedTextField)getComponent()).setValue(value);
                 }
 
+                @Override
                 public Object getCellEditorValue() {
                     JFormattedTextField textField = ((JFormattedTextField)getComponent());
                     try {
@@ -70,6 +72,7 @@ public class NumberEditorExt extends DefaultCellEditor {
     }
     
     /** Override and set the border back to normal in case there was an error previously */
+    @Override
     public Component getTableCellEditorComponent(JTable table, Object value,
                                              boolean isSelected,
                                              int row, int column) {
@@ -133,6 +136,7 @@ public class NumberEditorExt extends DefaultCellEditor {
          * is invalid
          */
         textField.setInputVerifier(new InputVerifier() {
+            @Override
             public boolean verify(JComponent input) {
                 JFormattedTextField ftf = (JFormattedTextField) input;
                 return ftf.isEditValid();
