@@ -42,8 +42,6 @@ public class DaySelectionModel extends AbstractDateSelectionModel {
     private SelectionMode selectionMode;
     private SortedSet<Date> selectedDates;
     private SortedSet<Date> unselectableDates;
-    private Date upperBound;
-    private Date lowerBound;
 
     /**
      * 
@@ -250,63 +248,6 @@ public class DaySelectionModel extends AbstractDateSelectionModel {
         return upperBound != null && upperBound.getTime() < date.getTime() ||
                 lowerBound != null && lowerBound.getTime() > date.getTime() ||
                 unselectableDates != null && unselectableDates.contains(date);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public Date getUpperBound() {
-        return upperBound;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void setUpperBound(Date upperBound) {
-        if (upperBound != null) {
-                upperBound = startOfDay(upperBound);
-        }
-        if ((upperBound != null && !upperBound.equals(this.upperBound)) ||
-                (upperBound == null && upperBound != this.upperBound)) {
-            this.upperBound = upperBound;
-            if (!isSelectionEmpty() && selectedDates.last().after(this.upperBound)) {
-                if (this.upperBound != null) {
-                    // Remove anything above the upper bound
-                    long justAboveUpperBoundMs = this.upperBound.getTime() + 1;
-                    if (!selectedDates.isEmpty() && selectedDates.last().before(this.upperBound))
-                        removeSelectionInterval(this.upperBound, new Date(justAboveUpperBoundMs));
-                }
-            }
-            fireValueChanged(EventType.UPPER_BOUND_CHANGED);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public Date getLowerBound() {
-        return lowerBound;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void setLowerBound(Date lowerBound) {
-        if (lowerBound != null) {
-              lowerBound = startOfDay(lowerBound);
-        }
-        if ((lowerBound != null && !lowerBound.equals(this.lowerBound)) ||
-                (lowerBound == null && lowerBound != this.lowerBound)) {
-            this.lowerBound = lowerBound;
-            if (this.lowerBound != null) {
-                // Remove anything below the lower bound
-                long justBelowLowerBoundMs = this.lowerBound.getTime() - 1;
-                if (!isSelectionEmpty() && selectedDates.first().before(this.lowerBound)) {
-                    removeSelectionInterval(selectedDates.first(), new Date(justBelowLowerBoundMs));
-                }
-            }
-            fireValueChanged(EventType.LOWER_BOUND_CHANGED);
-        }
     }
 
 

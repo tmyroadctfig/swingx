@@ -420,13 +420,41 @@ public class DefaultDateSelectionModelTest extends AbstractTestDateSelectionMode
      *
      */
     public void testLowerBound() {
-        Date today = XTestUtils.getStartOfToday();
         model.setLowerBound(today);
         // the bound itself is allowed
         model.setSelectionInterval(today, today);
         assertEquals("selected upper bound", model.getLowerBound(), 
                 model.getFirstSelectionDate());
     }
+    
+    /**
+     *  respect upper bound - the bound itself 
+     *  a valid selection.
+     *
+     */
+    public void testLowerBoundJustBelow() {
+        model.setLowerBound(today);
+        // the bound itself is allowed
+        calendar.add(Calendar.HOUR_OF_DAY, -1);
+        model.setSelectionInterval(calendar.getTime(), calendar.getTime());
+        assertEquals("future selection just above must be rejected", null, 
+                model.getFirstSelectionDate());
+    }
+    /**
+     *  respect upper bound - the bound itself 
+     *  a valid selection.
+     *
+     */
+    public void testLowerBoundJustAbove() {
+        model.setLowerBound(today);
+        // the bound itself is allowed
+        calendar.add(Calendar.HOUR_OF_DAY, +1);
+        model.setSelectionInterval(calendar.getTime(), calendar.getTime());
+        assertEquals("selected just below upper bound", calendar.getTime(), 
+                model.getFirstSelectionDate());
+    }
+    
+
     /**
      *  respect upper bound - the day after is
      *  an invalid selection.
@@ -461,11 +489,37 @@ public class DefaultDateSelectionModelTest extends AbstractTestDateSelectionMode
      *
      */
     public void testUpperBound() {
-        Date today = XTestUtils.getStartOfToday();
         model.setUpperBound(today);
         // the bound itself is allowed
         model.setSelectionInterval(today, today);
         assertEquals("selected upper bound", model.getUpperBound(), 
+                model.getFirstSelectionDate());
+    }
+    
+    /**
+     *  respect upper bound - the bound itself 
+     *  a valid selection.
+     *
+     */
+    public void testUpperBoundJustAbove() {
+        model.setUpperBound(today);
+        // the bound itself is allowed
+        calendar.add(Calendar.HOUR_OF_DAY, 1);
+        model.setSelectionInterval(calendar.getTime(), calendar.getTime());
+        assertEquals("future selection just above must be rejected", null, 
+                model.getFirstSelectionDate());
+    }
+    /**
+     *  respect upper bound - the bound itself 
+     *  a valid selection.
+     *
+     */
+    public void testUpperBoundJustBelow() {
+        model.setUpperBound(today);
+        // the bound itself is allowed
+        calendar.add(Calendar.HOUR_OF_DAY, -1);
+        model.setSelectionInterval(calendar.getTime(), calendar.getTime());
+        assertEquals("selected just below upper bound", calendar.getTime(), 
                 model.getFirstSelectionDate());
     }
     

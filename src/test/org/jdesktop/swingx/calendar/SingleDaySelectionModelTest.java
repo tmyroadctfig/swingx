@@ -500,8 +500,10 @@ public class SingleDaySelectionModelTest extends AbstractTestDateSelectionModel 
         model.setUpperBound(startOfDay(today));
         // the bound itself is allowed
         model.setSelectionInterval(today, today);
+        assertEquals(today, model.getFirstSelectionDate());
         assertTrue("same day as upper bound is allowed", model.isSelected(today));
     }
+    
     /**
      * first set the unselectables then set the selection to an unselectable.
      */

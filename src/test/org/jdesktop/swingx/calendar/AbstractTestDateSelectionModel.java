@@ -55,6 +55,112 @@ public class AbstractTestDateSelectionModel extends TestCase {
     // the calendar to use, its date is initialized with the today-field in setUpCalendar
     protected Calendar calendar;
 
+    /**
+     * Issue ??-swingx: setLowerBound doesn't clear selection after.
+     * Not fire if upper bound set to same
+     */
+    public void testSetLowerBoundSameNotFire() {
+        model.setLowerBound(today);
+        DateSelectionReport report = new DateSelectionReport();
+        model.addDateSelectionListener(report);
+        model.setLowerBound(today);
+        assertEquals("same bound, no event fired", 0, report.getEventCount());
+    }
+
+    /**
+     * Issue ??-swingx: setLowerBound doesn't clear selection after.
+     * Fire if upper bound is removed.
+     */
+    public void testSetLowerBoundFireRemove() {
+        model.setLowerBound(today);
+        DateSelectionReport report = new DateSelectionReport();
+        model.addDateSelectionListener(report);
+        model.setLowerBound(null);
+        assertEquals("same bound, no event fired", 1, report.getEventCount(EventType.LOWER_BOUND_CHANGED));
+    }
+    
+    /**
+     * Issue ??-swingx: setLowerBound doesn't clear selection after.
+     * Fire if upper bound is set.
+     */
+    public void testSetLowerBoundFireSet() {
+        DateSelectionReport report = new DateSelectionReport();
+        model.addDateSelectionListener(report);
+        model.setLowerBound(today);
+        assertEquals("same bound, no event fired", 1, report.getEventCount(EventType.LOWER_BOUND_CHANGED));
+    }
+    
+    /**
+     * Issue ??-swingx: setUpperBound doesn't clear selection after.
+     * Not fire if upper bound set to same
+     */
+    public void testSetUpperBoundSameNotFire() {
+        model.setUpperBound(today);
+        DateSelectionReport report = new DateSelectionReport();
+        model.addDateSelectionListener(report);
+        model.setUpperBound(today);
+        assertEquals("same bound, no event fired", 0, report.getEventCount());
+    }
+
+    /**
+     * Issue ??-swingx: setUpperBound doesn't clear selection after.
+     * Fire if upper bound is removed.
+     */
+    public void testSetUpperBoundFireRemove() {
+        model.setUpperBound(today);
+        DateSelectionReport report = new DateSelectionReport();
+        model.addDateSelectionListener(report);
+        model.setUpperBound(null);
+        assertEquals("same bound, no event fired", 1, report.getEventCount(EventType.UPPER_BOUND_CHANGED));
+    }
+    
+    /**
+     * Issue ??-swingx: setUpperBound doesn't clear selection after.
+     * Fire if upper bound is set.
+     */
+    public void testSetUpperBoundFireSet() {
+        DateSelectionReport report = new DateSelectionReport();
+        model.addDateSelectionListener(report);
+        model.setUpperBound(today);
+        assertEquals("same bound, no event fired", 1, report.getEventCount(EventType.UPPER_BOUND_CHANGED));
+    }
+    
+    /**
+     * Issue ??-swingx: setUpperBound doesn't clear selection after.
+     * suspected NPE on removing upper bound when there is a selection.
+     */
+    public void testSetUpperBoundNPE() {
+        model.setUpperBound(today);
+        model.setSelectionInterval(yesterday, yesterday);
+        model.setUpperBound(null);
+    }
+
+    /**
+     * Issue ??-swingx: setUpperBound doesn't clear selection after.
+     * suspected NPE on removing lower bound when there is a selection.
+     */
+    public void testSetLowerBoundNPE() {
+        model.setLowerBound(yesterday);
+        model.setSelectionInterval(today, today);
+        model.setLowerBound(null);
+    }
+    /**
+     * Issue ??-swingx: setUpperBound doesn't clear selection after
+     */
+    public void testSetUpperBoundClearsSelectionAfter() {
+        model.setSelectionInterval(tomorrow, tomorrow);
+        model.setUpperBound(today);
+        assertTrue("future selection must be cleared", model.isSelectionEmpty());
+    }
+    
+    /**
+     * Issue ??-swingx: setUpperBound doesn't clear selection after
+     */
+    public void testSetLowerBoundClearsSelectionBefore() {
+        model.setSelectionInterval(yesterday, yesterday);
+        model.setLowerBound(today);
+        assertTrue("future selection must be cleared", model.isSelectionEmpty());
+    }
     
     /**
      * Issue #713-Swingx: DateSelectionModel needs richer api.
@@ -456,7 +562,7 @@ public class AbstractTestDateSelectionModel extends TestCase {
     /**
      * Initializes the calendar to the default instance and the predefined dates
      * in the coordinate system of the calendar. Note that the hour is set
-     * to "about" in all dates, to be reasonably well into the day. The time
+     * to "about 5" in all dates, to be reasonably well into the day. The time
      * fields of all dates are the same, the calendar is pre-set with the
      * today field.
      */

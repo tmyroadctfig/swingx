@@ -37,7 +37,7 @@ import org.jdesktop.swingx.event.DateSelectionEvent.EventType;
 
 /**
  * Abstract base implementation of DateSelectionModel. Implements
- * notification and Calendar related properties.
+ * notification, Calendar related properties and lower/upper bounds.
  * 
  * @author Jeanette Winzenburg
  */
@@ -47,6 +47,9 @@ public abstract class AbstractDateSelectionModel implements DateSelectionModel {
     protected EventListenerMap listenerMap;
     protected boolean adjusting;
     protected Calendar calendar;
+    protected Date upperBound;
+    protected Date lowerBound;
+
     /** 
      * the locale used by the calendar. <p>
      * NOTE: need to keep separately as a Calendar has no getter.
@@ -210,8 +213,60 @@ public abstract class AbstractDateSelectionModel implements DateSelectionModel {
         return startOfDay(selected).equals(startOfDay(compare));
     }
 
-//------------------- listeners
-    
+//------------------- bounds
+
+    /**
+     * {@inheritDoc}
+     */
+    public Date getUpperBound() {
+        return upperBound;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setUpperBound(Date upperBound) {
+        if (upperBound != null) {
+            upperBound = getNormalizedDate(upperBound);
+        }
+        if (CalendarUtils.areEqual(upperBound, getUpperBound()))
+            return;
+        this.upperBound = upperBound;
+        if (this.upperBound != null && !isSelectionEmpty()) {
+            long justAboveUpperBoundMs = this.upperBound.getTime() + 1;
+            removeSelectionInterval(new Date(justAboveUpperBoundMs),
+                    getLastSelectionDate());
+        }
+        fireValueChanged(EventType.UPPER_BOUND_CHANGED);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Date getLowerBound() {
+        return lowerBound;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setLowerBound(Date lowerBound) {
+        if (lowerBound != null) {
+            lowerBound = getNormalizedDate(lowerBound);
+        }
+        if (CalendarUtils.areEqual(lowerBound, getLowerBound()))
+            return;
+        this.lowerBound = lowerBound;
+        if (this.lowerBound != null && !isSelectionEmpty()) {
+            // Remove anything below the lower bound
+            long justBelowLowerBoundMs = this.lowerBound.getTime() - 1;
+            removeSelectionInterval(getFirstSelectionDate(), new Date(
+                    justBelowLowerBoundMs));
+        }
+        fireValueChanged(EventType.LOWER_BOUND_CHANGED);
+    }
+
+
     /**
      * {@inheritDoc}
      */

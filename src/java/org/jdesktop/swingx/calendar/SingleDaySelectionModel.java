@@ -27,10 +27,19 @@ import org.jdesktop.swingx.event.DateSelectionEvent.EventType;
 import org.jdesktop.swingx.util.Contract;
 
 /**
- * DateSelectionModel which allows a single selection only. Takes dates as-is.
+ * DateSelectionModel which allows a single selection only. <p>
  * 
  * Temporary quick & dirty class to explore requirements as needed by
- * a DatePicker.
+ * a DatePicker. Need to define the states more exactly. Currently 
+ * 
+ * <li> takes all Dates as-are (that is the normalized is the same as the given):
+ * selected, unselectable, lower/upper bounds
+ * <li> interprets any Date between the start/end of day of the selected as selected
+ * <li> interprets any Date between the start/end of an unselectable date as unselectable
+ * <li> interprets the lower/upper bounds as being the start/end of the given
+ * dates, that is any Date after the start of day of the lower and before the end of
+ * day of the upper is selectable.
+ * 
  * 
  * @author Jeanette Winzenburg
  */
@@ -38,18 +47,23 @@ public class SingleDaySelectionModel extends AbstractDateSelectionModel {
 
     private SortedSet<Date> selectedDates;
     private SortedSet<Date> unselectableDates;
-    private Date upperBound;
-    private Date lowerBound;
-
+    
     /**
-     * 
+     * Instantiates a SingleDaySelectionModel with default locale.
      */
     public SingleDaySelectionModel() {
         this(null);
     }
 
     /**
+     * Instantiates a SingleSelectionModel with the given locale. If the locale is
+     * null, the Locale's default is used.
      * 
+     * PENDING JW: fall back to JComponent.getDefaultLocale instead? We use this
+     *   with components anyway?
+     * 
+     * @param locale the Locale to use with this model, defaults to Locale.default()
+     *    if null.
      */
     public SingleDaySelectionModel(Locale locale) {
         super(locale);
@@ -306,56 +320,6 @@ public class SingleDaySelectionModel extends AbstractDateSelectionModel {
         return !isSelectable(date);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public Date getUpperBound() {
-        return upperBound;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void setUpperBound(Date upperBound) {
-        if ((upperBound != null && !upperBound.equals(this.upperBound)) ||
-                (upperBound == null && upperBound != this.upperBound)) {
-            this.upperBound = upperBound;
-            if (!isSelectionEmpty() && selectedDates.last().after(this.upperBound)) {
-                if (this.upperBound != null) {
-                    // Remove anything above the upper bound
-                    long justAboveUpperBoundMs = this.upperBound.getTime() + 1;
-                    if (!selectedDates.isEmpty() && selectedDates.last().before(this.upperBound))
-                        removeSelectionInterval(this.upperBound, new Date(justAboveUpperBoundMs));
-                }
-            }
-            fireValueChanged(EventType.UPPER_BOUND_CHANGED);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public Date getLowerBound() {
-        return lowerBound;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void setLowerBound(Date lowerBound) {
-        if ((lowerBound != null && !lowerBound.equals(this.lowerBound)) ||
-                (lowerBound == null && lowerBound != this.lowerBound)) {
-            this.lowerBound = lowerBound;
-            if (this.lowerBound != null) {
-                // Remove anything below the lower bound
-                long justBelowLowerBoundMs = this.lowerBound.getTime() - 1;
-                if (!isSelectionEmpty() && selectedDates.first().before(this.lowerBound)) {
-                    removeSelectionInterval(selectedDates.first(), new Date(justBelowLowerBoundMs));
-                }
-            }
-            fireValueChanged(EventType.LOWER_BOUND_CHANGED);
-        }
-    }
 
 
 
