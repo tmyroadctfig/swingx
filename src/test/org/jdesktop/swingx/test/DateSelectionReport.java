@@ -11,6 +11,7 @@ package org.jdesktop.swingx.test;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.jdesktop.swingx.calendar.DateSelectionModel;
 import org.jdesktop.swingx.event.DateSelectionEvent;
 import org.jdesktop.swingx.event.DateSelectionListener;
 import org.jdesktop.swingx.event.DateSelectionEvent.EventType;
@@ -26,8 +27,22 @@ public class DateSelectionReport implements DateSelectionListener {
      */
     protected List<DateSelectionEvent> events = new LinkedList<DateSelectionEvent>();
     
+    /**
+     * Instantiates a DateSelectionReport.
+     */
+    public DateSelectionReport() {}
+
+    /**
+     * Instantiates a DateSelectionReport and registers itself to the given model.
+     * @param model the DateSelectionModel to listen to, must not be null.
+     */
+    public DateSelectionReport(DateSelectionModel model) {
+        model.addDateSelectionListener(this);
+    }
+    
 //------------------------ implement DateSelectionListener
     
+
     public void valueChanged(DateSelectionEvent evt) {
         events.add(0, evt);
     }

@@ -461,8 +461,7 @@ public class JXMonthViewIssues extends InteractiveTestCase {
        JXMonthView view = new JXMonthView();
        // otherwise the add action isn't called
        view.setSelectionMode(SelectionMode.SINGLE_INTERVAL_SELECTION);
-       DateSelectionReport report = new DateSelectionReport();
-       view.getSelectionModel().addDateSelectionListener(report);
+       DateSelectionReport report = new DateSelectionReport(view.getSelectionModel());
        Action select = view.getActionMap().get("adjustSelectionNextDay");
        select.actionPerformed(null);
        assertTrue("ui keyboard action must have started model adjusting", 

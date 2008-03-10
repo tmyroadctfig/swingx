@@ -24,12 +24,14 @@ package org.jdesktop.swingx.calendar;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.SortedSet;
 import java.util.TimeZone;
 import java.util.TreeSet;
 
 import junit.framework.TestCase;
 
 import org.jdesktop.swingx.calendar.DateSelectionModel.SelectionMode;
+import org.jdesktop.swingx.event.DateSelectionEvent;
 import org.jdesktop.swingx.event.DateSelectionEvent.EventType;
 import org.jdesktop.swingx.test.DateSelectionReport;
 
@@ -61,8 +63,7 @@ public class AbstractTestDateSelectionModel extends TestCase {
      */
     public void testSetLowerBoundSameNotFire() {
         model.setLowerBound(today);
-        DateSelectionReport report = new DateSelectionReport();
-        model.addDateSelectionListener(report);
+        DateSelectionReport report = new DateSelectionReport(model);
         model.setLowerBound(today);
         assertEquals("same bound, no event fired", 0, report.getEventCount());
     }
@@ -73,8 +74,7 @@ public class AbstractTestDateSelectionModel extends TestCase {
      */
     public void testSetLowerBoundFireRemove() {
         model.setLowerBound(today);
-        DateSelectionReport report = new DateSelectionReport();
-        model.addDateSelectionListener(report);
+        DateSelectionReport report = new DateSelectionReport(model);
         model.setLowerBound(null);
         assertEquals("bound changed, event must be fired", 1, report.getEventCount(EventType.LOWER_BOUND_CHANGED));
     }
@@ -84,8 +84,7 @@ public class AbstractTestDateSelectionModel extends TestCase {
      * Fire if upper bound is set.
      */
     public void testSetLowerBoundFireSet() {
-        DateSelectionReport report = new DateSelectionReport();
-        model.addDateSelectionListener(report);
+        DateSelectionReport report = new DateSelectionReport(model);
         model.setLowerBound(today);
         assertEquals("bound changed, event must be fired", 1, report.getEventCount(EventType.LOWER_BOUND_CHANGED));
     }
@@ -96,8 +95,7 @@ public class AbstractTestDateSelectionModel extends TestCase {
      */
     public void testSetUpperBoundSameNotFire() {
         model.setUpperBound(today);
-        DateSelectionReport report = new DateSelectionReport();
-        model.addDateSelectionListener(report);
+        DateSelectionReport report = new DateSelectionReport(model);
         model.setUpperBound(today);
         assertEquals("same bound, no event fired", 0, report.getEventCount());
     }
@@ -108,8 +106,7 @@ public class AbstractTestDateSelectionModel extends TestCase {
      */
     public void testSetUpperBoundFireRemove() {
         model.setUpperBound(today);
-        DateSelectionReport report = new DateSelectionReport();
-        model.addDateSelectionListener(report);
+        DateSelectionReport report = new DateSelectionReport(model);
         model.setUpperBound(null);
         assertEquals("bound changed, event must be fired", 1, report.getEventCount(EventType.UPPER_BOUND_CHANGED));
     }
@@ -119,8 +116,7 @@ public class AbstractTestDateSelectionModel extends TestCase {
      * Fire if upper bound is set.
      */
     public void testSetUpperBoundFireSet() {
-        DateSelectionReport report = new DateSelectionReport();
-        model.addDateSelectionListener(report);
+        DateSelectionReport report = new DateSelectionReport(model);
         model.setUpperBound(today);
         assertEquals("bound changed, event must be fired", 1, report.getEventCount(EventType.UPPER_BOUND_CHANGED));
     }
@@ -327,8 +323,7 @@ public class AbstractTestDateSelectionModel extends TestCase {
      * Here: null locale falls back to Locale.default, no fire if had.
      */
     public void testCalendarLocaleNullNoNofify() {
-        DateSelectionReport report = new DateSelectionReport();
-        model.addDateSelectionListener(report);
+        DateSelectionReport report = new DateSelectionReport(model);
         model.setLocale(null);
         assertEquals(0, report.getEventCount());
     }
@@ -340,8 +335,7 @@ public class AbstractTestDateSelectionModel extends TestCase {
     public void testCalendarLocaleNoChangeNoNotify() {
         // config with a known timezone and date
         Locale tz = model.getLocale();
-        DateSelectionReport report = new DateSelectionReport();
-        model.addDateSelectionListener(report);
+        DateSelectionReport report = new DateSelectionReport(model);
         model.setLocale(tz);
         assertEquals(0, report.getEventCount());
     }
@@ -356,8 +350,7 @@ public class AbstractTestDateSelectionModel extends TestCase {
         if (model.getLocale().equals(tz)) {
             tz = Locale.FRENCH;
         }
-        DateSelectionReport report = new DateSelectionReport();
-        model.addDateSelectionListener(report);
+        DateSelectionReport report = new DateSelectionReport(model);
         model.setLocale(tz);
         assertEquals(1, report.getEventCount());
         assertEquals(EventType.CALENDAR_CHANGED, report.getLastEventType());
@@ -394,8 +387,7 @@ public class AbstractTestDateSelectionModel extends TestCase {
     public void testCalendarTimeZoneNoChangeNoNotify() {
         // config with a known timezone and date
         TimeZone tz = model.getTimeZone();
-        DateSelectionReport report = new DateSelectionReport();
-        model.addDateSelectionListener(report);
+        DateSelectionReport report = new DateSelectionReport(model);
         model.setTimeZone(tz);
         assertEquals(0, report.getEventCount());
     }
@@ -410,8 +402,7 @@ public class AbstractTestDateSelectionModel extends TestCase {
         if (model.getTimeZone().equals(tz)) {
             tz = TimeZone.getTimeZone("GMT+5");
         }
-        DateSelectionReport report = new DateSelectionReport();
-        model.addDateSelectionListener(report);
+        DateSelectionReport report = new DateSelectionReport(model);
         model.setTimeZone(tz);
         assertEquals(1, report.getEventCount(EventType.CALENDAR_CHANGED));
     }
@@ -446,8 +437,7 @@ public class AbstractTestDateSelectionModel extends TestCase {
      */
     public void testCalendarMinimalDaysInFirstWeekNoChangeNoNotify() {
         int first = model.getMinimalDaysInFirstWeek();
-        DateSelectionReport report = new DateSelectionReport();
-        model.addDateSelectionListener(report);
+        DateSelectionReport report = new DateSelectionReport(model);
         model.setMinimalDaysInFirstWeek(first);
         assertEquals(0, report.getEventCount());
     }
@@ -460,8 +450,7 @@ public class AbstractTestDateSelectionModel extends TestCase {
         int first = model.getMinimalDaysInFirstWeek() + 1;
         //sanity
         assertTrue(first <= Calendar.SATURDAY);
-        DateSelectionReport report = new DateSelectionReport();
-        model.addDateSelectionListener(report);
+        DateSelectionReport report = new DateSelectionReport(model);
         model.setMinimalDaysInFirstWeek(first);
         assertEquals(1, report.getEventCount());
         assertEquals(EventType.CALENDAR_CHANGED, report.getLastEventType());
@@ -495,8 +484,7 @@ public class AbstractTestDateSelectionModel extends TestCase {
      */
     public void testCalendarFirstDayOfWeekNoChangeNoNotify() {
         int first = model.getFirstDayOfWeek();
-        DateSelectionReport report = new DateSelectionReport();
-        model.addDateSelectionListener(report);
+        DateSelectionReport report = new DateSelectionReport(model);
         model.setFirstDayOfWeek(first);
         assertEquals(0, report.getEventCount());
     }
@@ -509,8 +497,7 @@ public class AbstractTestDateSelectionModel extends TestCase {
         int first = model.getFirstDayOfWeek() + 1;
         //sanity
         assertTrue(first <= Calendar.SATURDAY);
-        DateSelectionReport report = new DateSelectionReport();
-        model.addDateSelectionListener(report);
+        DateSelectionReport report = new DateSelectionReport(model);
         model.setFirstDayOfWeek(first);
         assertEquals(1, report.getEventCount());
         assertEquals(EventType.CALENDAR_CHANGED, report.getLastEventType());
@@ -536,6 +523,229 @@ public class AbstractTestDateSelectionModel extends TestCase {
     public void testCalendarFirstDayOfWeekInitial() {
         assertEquals(calendar.getFirstDayOfWeek(), model.getFirstDayOfWeek());
         assertEquals(model.getFirstDayOfWeek(), model.getCalendar().getFirstDayOfWeek());
+    }
+
+//-------------------- commone contract: normalized
+    
+    /**
+     * test the contract as doc'ed 
+     */
+    public void testNormalizedDateContract() {
+        model.setSelectionInterval(today, today);
+        assertEquals(model.getNormalizedDate(today), model.getFirstSelectionDate());
+    }
+    
+    /**
+     * Normalized must throw NPE if given date is null
+     */
+    public void testNormalizedDateNull() {
+        try {
+            model.getNormalizedDate(null);
+            fail("normalizedDate must throw NPE if date is null");
+        } catch (NullPointerException e) {
+            // expected 
+        } catch (Exception e) {
+            fail("unexpected exception " + e);
+        }
+    }
+
+    /**
+     * Test that the date is cloned (for safety)
+     */
+    public void testNormalizedDateCloned() {
+        assertNotSame(today, model.getNormalizedDate(today));
+    }
+    
+    // --------------------- common contract: bounds
+
+    /**
+     * test that the bounds are normalized as expected.
+     * Here: upper bound.
+     */
+    public void testNormalizeUpperBound() {
+        model.setUpperBound(today);
+        assertEquals(model.getNormalizedDate(today), model.getUpperBound());
+        model.setUpperBound(null);
+        assertEquals("sanity - upper bound removed", null, model.getUpperBound());
+    }
+    
+    /**
+     * test that the bounds are normalized as expected. 
+     * Here: lower bound.
+     */
+    public void testNormalizeLowerBound() {
+        model.setLowerBound(today);
+        assertEquals(model.getNormalizedDate(today), model.getLowerBound());
+        model.setLowerBound(null);
+        assertEquals("sanity - upper bound removed", null, model.getLowerBound());
+    }
+
+
+    /**
+     * respect upper bound - the bound itself is a valid selection, the day
+     * after is not. Remove bound allows the day after again.
+     * 
+     */
+    public void testUpperBoundAllowedFutureBlocked() {
+        model.setUpperBound(today);
+        // the bound itself is allowed
+        model.setSelectionInterval(today, today);
+        assertFalse("upper bound is selectable", model.isSelectionEmpty());
+        assertTrue("upper bound must be selected", model.isSelected(today));
+        DateSelectionReport report = new DateSelectionReport(model);
+        model.setSelectionInterval(tomorrow, tomorrow);
+        assertFalse("future must not be selected", model.isSelected(tomorrow));
+        assertEquals("no event fired", 0, report.getEventCount());
+        // remove bound allows selection of tomorrow
+        model.setUpperBound(null);
+        model.setSelectionInterval(tomorrow, tomorrow);
+        assertTrue("tomorrow must be selected after removing upper bound ",
+                model.isSelected(tomorrow));
+    }
+    
+    /**
+     * respect upper bound - the bound itself is a valid selection, the day
+     * before is not. Remove bound allows the day before again.
+     * 
+     */
+    public void testLowerBoundAllowedPastBlocked() {
+        model.setLowerBound(today);
+        // the bound itself is allowed
+        model.setSelectionInterval(today, today);
+        assertFalse("lower bound is selectable", model.isSelectionEmpty());
+        assertTrue("loweer bound must be selected", model.isSelected(today));
+        DateSelectionReport report = new DateSelectionReport(model);
+        model.setSelectionInterval(yesterday, yesterday);
+        assertFalse("past must not be selected", model.isSelected(yesterday));
+        assertEquals("no event fired", 0, report.getEventCount());
+        // remove bound allows selection of tomorrow
+        model.setLowerBound(null);
+        model.setSelectionInterval(yesterday, yesterday);
+        assertTrue("past must be selected after removing lower bound ",
+                model.isSelected(yesterday));
+    }
+    
+    /**
+     * respect both bounds - overlapping: no selection.
+     *
+     */
+    public void testBothBoundsOverlap() {
+        model.setLowerBound(today);
+        model.setUpperBound(yesterday);
+        DateSelectionReport report = new DateSelectionReport(model);
+        model.setSelectionInterval(today, today);
+        assertEquals("selection must be empty", 0, model.getSelection().size());
+        assertEquals("no event fired", 0, report.getEventCount());
+    }
+
+    /**
+     * respect both bounds - same date: single selection allowed.
+     *
+     */
+    public void testBothBoundsSame() {
+        model.setLowerBound(today);
+        model.setUpperBound(today);
+        model.setSelectionInterval(today, today);
+        assertTrue("selected bounds", model.isSelected(today));
+    }
+
+
+    /**
+     * Common contract: the exact date marked as unselectable
+     * 
+     * first set the unselectables then set the selection to it must not change
+     * the selection state (still empty).
+     */
+    public void testUnselectableDates() {
+        SortedSet<Date> unselectableDates = new TreeSet<Date>();
+        unselectableDates.add(today);
+        model.setUnselectableDates(unselectableDates);
+        model.setSelectionInterval(today, today);
+        assertTrue("selection must be empty", model.isSelectionEmpty());
+    }
+
+    
+    /**
+     * adding api: adjusting
+     *
+     */
+    public void testEventsCarryAdjustingFlagTrue() {
+        Date date = calendar.getTime();
+        model.setAdjusting(true);
+        DateSelectionReport report = new DateSelectionReport(model);
+        model.setSelectionInterval(date, date);
+        assertEquals(model.isAdjusting(), report.getLastEvent().isAdjusting());
+        // sanity: revert 
+        model.setAdjusting(false);
+        report.clear();
+        model.removeSelectionInterval(date, date);
+        assertEquals(model.isAdjusting(), report.getLastEvent().isAdjusting());
+        
+    }
+
+    /**
+     * adding api: adjusting
+     *
+     */
+    public void testEventsCarryAdjustingFlagFalse() {
+        Date date = calendar.getTime();
+        DateSelectionReport report = new DateSelectionReport(model);
+        model.setSelectionInterval(date, date);
+        assertEquals(model.isAdjusting(), report.getLastEvent().isAdjusting());
+    }
+    
+    /**
+     * adding api: adjusting.
+     *
+     */
+    public void testAdjusting() {
+        // default value
+        assertFalse(model.isAdjusting());
+        DateSelectionReport report = new DateSelectionReport(model);
+        // set adjusting
+        model.setAdjusting(true);
+        assertTrue("model must be adjusting", model.isAdjusting());
+        assertEquals(1, report.getEventCount());
+        assertEquals(DateSelectionEvent.EventType.ADJUSTING_STARTED, 
+                report.getLastEventType());
+        // next round - reset to default adjusting
+        report.clear();
+        model.setAdjusting(false);
+        assertFalse("model must not be adjusting", model.isAdjusting());
+        assertEquals(1, report.getEventCount());
+        assertEquals(DateSelectionEvent.EventType.ADJUSTING_STOPPED, 
+                report.getLastEventType());
+        
+    }
+    
+    /**
+     * test that isSelected with null date throws NPE
+     */
+    public void testIsSelectedNull() {
+//        model.setSelectionInterval(today, today);
+        try {
+            model.isSelected(null);
+            fail("null is not allowed");
+        } catch (NullPointerException e) {
+            // expected
+        } catch (Exception e) {
+            fail("expected NPE instead of " + e);
+        }
+    }
+    
+    /**
+     * null unselectables not allowed.
+     */
+    public void testUnselectableDatesNull() {
+        try {
+            model.setUnselectableDates(null);
+            fail("must fail with null set of unselectables");
+            // expected
+        } catch (NullPointerException e) {
+            // expected
+        } catch (Exception e) {
+            fail("expected NPE instead of " + e);
+        }
     }
 
 //------------------------ convenience and setup    

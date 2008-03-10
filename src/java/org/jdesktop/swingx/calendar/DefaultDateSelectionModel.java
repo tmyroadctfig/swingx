@@ -26,6 +26,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.jdesktop.swingx.event.DateSelectionEvent.EventType;
+import org.jdesktop.swingx.util.Contract;
 
 /**
  * 
@@ -194,6 +195,7 @@ public class DefaultDateSelectionModel extends AbstractDateSelectionModel {
      * {@inheritDoc}
      */
     public boolean isSelected(final Date date) {
+        Contract.asNotNull(date, "date must not be null");
         return selectedDates.contains(date);
     }
 

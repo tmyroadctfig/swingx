@@ -208,8 +208,8 @@ public class DaySelectionModel extends AbstractDateSelectionModel {
      * {@inheritDoc}
      */
     public boolean isSelected(Date date) {
-        date = startOfDay(date);
-        return selectedDates.contains(date);
+        // JW: don't need Contract ... startOfDay will throw NPE if null
+        return selectedDates.contains(startOfDay(date));
     }
 
     /**

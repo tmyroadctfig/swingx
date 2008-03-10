@@ -34,32 +34,11 @@ import org.jdesktop.swingx.calendar.DateSelectionModel.SelectionMode;
  */
 public class DaySelectionModelTest extends AbstractTestDateSelectionModel {
 
-    /**
-     * test the contract as doc'ed 
-     */
-    public void testNormalizedDateContract() {
-        model.setSelectionInterval(today, today);
-        assertEquals(model.getNormalizedDate(today), model.getFirstSelectionDate());
-    }
-    
-    /**
-     * Normalized must throw NPE if given date is null
-     */
-    public void testNormalizedDateNull() {
-        try {
-            model.getNormalizedDate(null);
-            fail("normalizedDate must throw NPE if date is null");
-        } catch (NullPointerException e) {
-            // expected 
-        } catch (Exception e) {
-            fail("unexpected exception " + e);
-        }
-    }
 
     /**
      * DaySelectionModel normalizes to start of day.
      */
-    public void testNormalizedDateCloned() {
+    public void testNormalizedDateStartOfDay() {
         assertEquals(startOfDay(today), model.getNormalizedDate(today));
         assertNotSame(startOfDay(today), model.getNormalizedDate(today));
     }
@@ -109,47 +88,23 @@ public class DaySelectionModelTest extends AbstractTestDateSelectionModel {
         
     }
 
-    /**
-     * expose more selection constraint methods in JXMonthView
-     *
-     */
-    public void testUpperBound() {
-        model.setUpperBound(today);
-        assertEquals(startOfDay(today), model.getUpperBound());
-        // remove again
-        model.setUpperBound(null);
-        assertEquals(null, model.getUpperBound());
-    }
-    
-    /**
-     * expose more selection constraint methods in JXMonthView
-     *
-     */
-    public void testLowerBound() {
-        model.setLowerBound(today);
-        assertEquals(startOfDay(today), model.getLowerBound());
-        // remove again
-        model.setLowerBound(null);
-        assertEquals(null, model.getLowerBound());
-    }
+     
 
     /**
-     * test unselectable: use methods with Date.
-     *
+     * Set unselectable and test that all dates of the day are unselectable.
      */
-    public void testUnselectableDate() {
-        // initial
-        assertFalse(model.isUnselectableDate(today));
-        // set unselectable today
-        SortedSet<Date> unselectables = new TreeSet<Date>();
-        unselectables.add(today);
-        model.setUnselectableDates(unselectables);
-        assertTrue("raqw today must be unselectable", 
+    public void testUnselectableDatesCompleteDay() {
+        SortedSet<Date> unselectableDates = new TreeSet<Date>();
+        unselectableDates.add(today);
+        model.setUnselectableDates(unselectableDates);
+        // all dates in today must be rejected
+        assertTrue("raw today must be unselectable", 
                 model.isUnselectableDate(today));
         assertTrue("start of today must be unselectable", 
                 model.isUnselectableDate(startOfDay(today)));
         assertTrue("end of today must be unselectable", 
                 model.isUnselectableDate(endOfDay(today)));
+        // remove the unselectable 
         model.setUnselectableDates(new TreeSet<Date>());
         assertFalse(model.isUnselectableDate(today));
         assertFalse(model.isUnselectableDate(startOfDay(today)));

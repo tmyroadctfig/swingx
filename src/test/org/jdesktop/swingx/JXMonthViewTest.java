@@ -1545,8 +1545,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
         JXMonthView view = new JXMonthView();
         Action select = view.getActionMap().get("selectNextDay");
         select.actionPerformed(null);
-        DateSelectionReport report = new DateSelectionReport();
-        view.getSelectionModel().addDateSelectionListener(report);
+        DateSelectionReport report = new DateSelectionReport(view.getSelectionModel());
         Action cancel = view.getActionMap().get("cancelSelection");
         cancel.actionPerformed(null);
         assertFalse("ui keyboard action must have stopped model adjusting", 
@@ -1561,8 +1560,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
         JXMonthView view = new JXMonthView();
         Action select = view.getActionMap().get("selectNextDay");
         select.actionPerformed(null);
-        DateSelectionReport report = new DateSelectionReport();
-        view.getSelectionModel().addDateSelectionListener(report);
+        DateSelectionReport report = new DateSelectionReport(view.getSelectionModel());
         Action cancel = view.getActionMap().get("acceptSelection");
         cancel.actionPerformed(null);
         assertFalse("ui keyboard action must have stopped model adjusting", 
@@ -1577,8 +1575,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
      */
     public void testAdjustingSetOnSelect() {
         JXMonthView view = new JXMonthView();
-        DateSelectionReport report = new DateSelectionReport();
-        view.getSelectionModel().addDateSelectionListener(report);
+        DateSelectionReport report = new DateSelectionReport(view.getSelectionModel());
         Action select = view.getActionMap().get("selectNextDay");
         select.actionPerformed(null);
         assertTrue("ui keyboard action must have started model adjusting", 
@@ -1596,8 +1593,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
         JXMonthView view = new JXMonthView();
         // otherwise the add action isn't called
         view.setSelectionMode(SelectionMode.SINGLE_INTERVAL_SELECTION);
-        DateSelectionReport report = new DateSelectionReport();
-        view.getSelectionModel().addDateSelectionListener(report);
+        DateSelectionReport report = new DateSelectionReport(view.getSelectionModel());
         Action select = view.getActionMap().get("adjustSelectionNextDay");
         select.actionPerformed(null);
         assertTrue("ui keyboard action must have started model adjusting", 

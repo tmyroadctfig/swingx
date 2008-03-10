@@ -269,6 +269,7 @@ public class SingleDaySelectionModel extends AbstractDateSelectionModel {
      * {@inheritDoc}
      */
     public boolean isSelected(Date date) {
+        Contract.asNotNull(date, "date must not be null");
         if (isSelectionEmpty()) return false;
         return isSameDay(selectedDates.first(), date);
     }

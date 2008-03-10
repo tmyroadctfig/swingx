@@ -23,10 +23,10 @@ package org.jdesktop.swingx.calendar;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.jdesktop.swingx.InteractiveTestCase;
-import org.jdesktop.swingx.calendar.DateSelectionModel;
-import org.jdesktop.swingx.calendar.DefaultDateSelectionModel;
 import org.jdesktop.swingx.event.DateSelectionEvent;
 import org.jdesktop.swingx.test.DateSelectionReport;
 
@@ -54,8 +54,7 @@ public class DateSelectionModelIssues extends InteractiveTestCase {
      *
      */
     public void testEventImmutable() {
-        DateSelectionReport report = new DateSelectionReport();
-        model.addDateSelectionListener(report);
+        DateSelectionReport report = new DateSelectionReport(model);
         Date date = new Date();
         model.setSelectionInterval(date, date);
         assertEquals(1, report.getEventCount());
@@ -65,6 +64,18 @@ public class DateSelectionModelIssues extends InteractiveTestCase {
         Date next = new Date();
         model.setSelectionInterval(next, next);
         assertSame(date, event.getSelection().first());
+    }
+    
+    /**
+     * Inconsistency in TreeSet in contains with null parameter
+     * if empty --> nothing 
+     * if not empty --> throws NPE
+     */
+    public void testSortedSetContainsNull() {
+        SortedSet<Date> dates = new TreeSet<Date>();
+        dates.contains(null); 
+        dates.add(new Date());
+        dates.contains(null);
     }
     
     @Override

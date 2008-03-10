@@ -170,69 +170,81 @@ public interface DateSelectionModel {
     //-------------------- selection 
     
     /**
-     * Add the specified selection interval to the selection model.
+     * Adds the specified selection interval to the selection model.
      *
      * @param startDate interval start date, must not be null
-     * @param endDate   interval end date, must not be null
+     * @param endDate   interval end date >= start date, must not be null
+     * @throws NullPointerException if any of the dates is null
      */
     public void addSelectionInterval(Date startDate, Date endDate);
 
     /**
-     * Set the specified selection interval to the selection model.
+     * Sest the specified selection interval to the selection model.
      *
      * @param startDate interval start date, must not be null
-     * @param endDate   interval end date, must not be null
+     * @param endDate   interval end date >= start date, must not be null
+     * @throws NullPointerException if any of the dates is null
      */
     public void setSelectionInterval(Date startDate, Date endDate);
 
     /**
-     * Remove the specifed selection interval from the selection model. If
+     * Removes the specifed selection interval from the selection model. If
      * the selection is changed by this method, it fires a DateSelectionEvent
      * of type DATES_REMOVED.
      *
      * @param startDate interval start date, must not be null
-     * @param endDate   interval end date, must not be null
+     * @param endDate   interval end date >= start date, must not be null
+     * @throws NullPointerException if any of the dates is null
      */
     public void removeSelectionInterval(Date startDate, Date endDate);
 
     /**
-     * Clear any selection from the selection model. Fires an Event of 
+     * Clears any selection from the selection model. Fires an Event of 
      * type SELECTION_CLEARED if there had been a selection, does nothing
      * otherwise.
      */
     public void clearSelection();
 
     /**
-     * Get the current selection.
+     * Returns the current selection.
      *
      * @return sorted set of selected dates, guaranteed to be never null.
      */
     public SortedSet<Date> getSelection();
 
     /**
+     * Returns the earliest date in the selection or null if the selection is empty.
      * 
-     * @return the first earliest date in the selection, or null if isSelectionEmpty.
+     * @return the earliest date in the selection, or null if isSelectionEmpty.
+     * 
+     * @see #getLastSelectionDate()
+     * @see #getSelection()
+     * @see #isSelectionEmpty()
      */
     public Date getFirstSelectionDate();
 
     /**
+     * Returns the latest date in the selection or null if the selection is empty.
      * 
-     * @return the first earliest date in the selection, or null if isSelectionEmpty.
+     * @return the lastest date in the selection, or null if isSelectionEmpty.
+     * 
+     * @see #getFirstSelectionDate()
+     * @see #getSelection()
+     * @see #isSelectionEmpty()
      */
     public Date getLastSelectionDate();
 
 
     /**
-     * Return true if the date specified is selected, false otherwise. <p>
+     * Returns true if the date specified is selected, false otherwise. <p>
      * 
      * Note: it is up to implementations to define the exact notion of selected.
      * It does not imply the exact date as given is contained the set returned from 
      * getSelection().
      * 
-     * PENDING JW: allow null? 
-     *
-     * @param date date to check for selection
+     * @param date date to check for selection, must not be null
      * @return true if the date is selected, false otherwise
+     * @throws NullPointerException if the date is null
      */
     public boolean isSelected(final Date date);
 
@@ -248,13 +260,10 @@ public interface DateSelectionModel {
      * <pre><code>
      * if ((date != null) &amp;&amp; isSelectable(date)) {
      *     setSelectionInterval(date, date);
-     *     assertEquals(getNormalized(date), getSelection().first());
+     *     assertEquals(getNormalized(date), getFirstSelectionDate();
      * }
      * </code></pre>
      * 
-     * PENDING JW: should we allow null here? All other methods don't (most
-     * are based on intervals which get whacky if one of boundaries is null),
-     * so technically, client code needs to check against null anyway. 
      * 
      * @return the date as it would be normalized before used in the model, 
      *    must not be null.
@@ -263,7 +272,7 @@ public interface DateSelectionModel {
     public Date getNormalizedDate(Date date);
     
     /**
-     * Return true if the selection is empty, false otherwise.
+     * Returns true if the selection is empty, false otherwise.
      *
      * @return true if the selection is empty, false otherwise
      */
@@ -278,7 +287,13 @@ public interface DateSelectionModel {
     public SortedSet<Date> getUnselectableDates();
 
     /**
-     * Set which dates are unable to be selected.
+     * Sets a collection of dates which are not selectable.<p>
+     * 
+     * Note: it is up to implementations to define the exact notion of unselectableDate.
+     * It does not imply the only the exact date as given is unselectable, it might
+     * have a period like "all dates on the same day".
+     * 
+     * PENDING JW: any collection would do - why insist on a SortedSet?
      *
      * @param unselectableDates dates that are unselectable, must not be null and 
      *   must not contain null dates.
@@ -286,7 +301,7 @@ public interface DateSelectionModel {
     public void setUnselectableDates(SortedSet<Date> unselectableDates);
 
     /**
-     * Return true is the specified date is unselectable.
+     * Returns true is the specified date is unselectable.
      *
      * @param unselectableDate the date to check for unselectability, must not be null.
      * @return true is the date is unselectable, false otherwise
