@@ -48,7 +48,7 @@ public class MapComboBoxModel<K, V> extends ListComboBoxModel<K> {
     protected Map<K, V> map_data;
     
     /**
-     * @deprecated (since release 0.9.2) no longer used, remove after 0.9.3 release
+     * @deprecated no longer used, remove after 0.9.3 release
      */
     @Deprecated
     protected boolean inverted;
@@ -100,7 +100,7 @@ public class MapComboBoxModel<K, V> extends ListComboBoxModel<K> {
      * <p>
      * This method is called by the constructor.
      * 
-     * @deprecated (since release 0.9.2) no longer used; use {@link #buildIndex(Map)} instead
+     * @deprecated no longer used; use {@link #buildIndex(Map)} instead
      */
     @Deprecated
     protected void buildIndex() {

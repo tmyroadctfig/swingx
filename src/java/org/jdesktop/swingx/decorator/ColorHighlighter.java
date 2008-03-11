@@ -127,7 +127,7 @@ public class ColorHighlighter extends AbstractHighlighter {
      * @param cellForeground foreground color for unselected cell state
      * 
      * 
-     * @deprecated (since release 0.9.2) use
+     * @deprecated (pre-0.9.2) use
      *             {@link #ColorHighlighter(HighlightPredicate, Color, Color)}
      *             changed method signature for consistency.
      * 
@@ -147,7 +147,7 @@ public class ColorHighlighter extends AbstractHighlighter {
      * @param cellForeground foreground color for unselected cell state
      * @param selectedBackground background color for selected cell state
      * @param selectedForeground foreground color for selected cell state
-     * @deprecated (since release 0.9.2) use
+     * @deprecated (pre-0.9.2) use
      *             {@link #ColorHighlighter(HighlightPredicate, Color, Color, Color, Color)}
      *             changed method signature for consistency.
      * 

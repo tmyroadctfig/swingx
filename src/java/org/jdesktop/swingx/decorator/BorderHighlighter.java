@@ -141,7 +141,7 @@ public class BorderHighlighter extends AbstractHighlighter {
      * @param paddingBorder the border to apply as visual decoration.
      * @param predicate the HighlightPredicate to use
      * 
-     * @deprecated (since release 0.9.2) use {@link #BorderHighlighter(HighlightPredicate, Border)}
+     * @deprecated (pre-0.9.2) use {@link #BorderHighlighter(HighlightPredicate, Border)}
      * 
      */
     @Deprecated
@@ -160,7 +160,7 @@ public class BorderHighlighter extends AbstractHighlighter {
      * @param compound the compound property
      * @param inner the inner property
      * 
-     * @deprecated (since release 0.9.2) use {@link #BorderHighlighter(HighlightPredicate, Border, boolean, boolean)}
+     * @deprecated (pre-0.9.2) use {@link #BorderHighlighter(HighlightPredicate, Border, boolean, boolean)}
      *   - sig changed for consistency (predicate first always)
      */
     @Deprecated
@@ -183,7 +183,7 @@ public class BorderHighlighter extends AbstractHighlighter {
      * @param paddingBorder the border to apply as visual decoration.
      * @param compound the compound property.
      * 
-     * @deprecated (since release 0.9.2) use {@link #BorderHighlighter(HighlightPredicate, Border, boolean)}
+     * @deprecated (pre-0.9.2) use {@link #BorderHighlighter(HighlightPredicate, Border, boolean)}
      *   - sig changed for consistency (predicate first always)
      */
     @Deprecated

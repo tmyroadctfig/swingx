@@ -153,25 +153,25 @@ public class JXMonthView extends JComponent {
     public static final String TRAVERSABLE = "traversable";
     public static final String FLAGGED_DATES = "flaggedDates";
 
-    /** @deprecated (since release 0.9.2) use hardcoded property name - this violated naming convention #751.*/
+    /** @deprecated (pre-0.9.2) use hardcoded property name - this violated naming convention #751.*/
     @Deprecated
     public static final String SHOW_LEADING_DATES = "showLeadingDates";
-    /** @deprecated (since release 0.9.2) use hardcoded property name - this violated naming convention #751.*/
+    /** @deprecated (pre-0.9.2) use hardcoded property name - this violated naming convention #751.*/
     @Deprecated
     public static final String SHOW_TRAILING_DATES = "showTrailingDates";
-    /** @deprecated (since release 0.9.2) use hardcoded property name - this violated naming convention #751.*/
+    /** @deprecated (pre-0.9.2) use hardcoded property name - this violated naming convention #751.*/
     @Deprecated
     public static final String WEEK_NUMBER = "weekNumber";
-    /** @deprecated (since release 0.9.2) use hardcoded property name, changed to "firstDisplayedDay". */
+    /** @deprecated (pre-0.9.2) use hardcoded property name, changed to "firstDisplayedDay". */
     @Deprecated
     public static final String FIRST_DISPLAYED_DATE = "firstDisplayedDate";
     /** Return value used to identify when the month down button is pressed. 
-     * @deprecated (since release 0.9.2) moved to ui
+     * @deprecated (pre-0.9.2) moved to ui
      */
     @Deprecated
     public static final int MONTH_DOWN = 1;
     /** Return value used to identify when the month up button is pressed. 
-     * @deprecated (since release 0.9.2) moved to ui
+     * @deprecated (pre-0.9.2) moved to ui
      */
     @Deprecated
     public static final int MONTH_UP = 2;
@@ -1798,7 +1798,7 @@ public class JXMonthView extends JComponent {
      * 
      * @return the first Date in the selection or null if empty.
      * 
-     * @deprecated (since release 0.9.2) use {@link #getSelectionDate()} name change to 
+     * @deprecated (pre-0.9.2) use {@link #getSelectionDate()} name change to 
      *   align with new DateSelectionModel api
      */
     @Deprecated
@@ -1812,7 +1812,7 @@ public class JXMonthView extends JComponent {
      * 
      * @param newDate the selection date to set
      * 
-     * @deprecated (since release 0.9.2) use {@link #setSelectionDate(Date)} - name change to 
+     * @deprecated (pre-0.9.2) use {@link #setSelectionDate(Date)} - name change to 
      *   align with new DateSelectionModel api
      */
     @Deprecated
@@ -1827,7 +1827,7 @@ public class JXMonthView extends JComponent {
      * @param date The date to check
      * @return true if the date is selected, false otherwise
      * 
-     * @deprecated (since release 0.9.2) use {@link #isSelected(Date)}  - name change to 
+     * @deprecated (pre-0.9.2) use {@link #isSelected(Date)}  - name change to 
      *   align with DateSelectionModel api
      */
     @Deprecated
@@ -1843,7 +1843,7 @@ public class JXMonthView extends JComponent {
      * @param x X position
      * @param y Y position
      * @return long The date, -1 if position does not contain a date.
-     * @deprecated (since release 0.9.2) use {@link #getDayAtLocation(int, int)}
+     * @deprecated (pre-0.9.2) use {@link #getDayAtLocation(int, int)}
      */
     @Deprecated
     public long getDayAt(int x, int y) {
@@ -1855,7 +1855,7 @@ public class JXMonthView extends JComponent {
      * Whether or not to show leading dates for a months displayed by this component.
      *
      * @param value true if leading dates should be displayed, false otherwise.
-     * @deprecated (since release 0.9.2) use {@link #setShowingLeadingDays(boolean)} 
+     * @deprecated (pre-0.9.2) use {@link #setShowingLeadingDays(boolean)} 
      *  - name change to comply with property naming conventions and 
      *  consistently using "Day" instead of "Date". 
      */
@@ -1869,7 +1869,7 @@ public class JXMonthView extends JComponent {
      *
      * @return true if leading dates are shown, false otherwise.
      * 
-     * @deprecated (since release 0.9.2) use {@link #isShowingLeadingDays()}
+     * @deprecated (pre-0.9.2) use {@link #isShowingLeadingDays()}
      *  - name change to comply with property naming conventions and 
      *  consistently using "Day" instead of "Date". 
      */
@@ -1882,7 +1882,7 @@ public class JXMonthView extends JComponent {
      * Whether or not to show trailing dates for the months displayed by this component.
      *
      * @param value true if trailing dates should be displayed, false otherwise.
-     * @deprecated (since release 0.9.2) use {@link #setShowingTrailingDays(boolean)} - 
+     * @deprecated (pre-0.9.2) use {@link #setShowingTrailingDays(boolean)} - 
      *  - name change to comply with property naming conventions and 
      *  consistently using "Day" instead of "Date". 
      */
@@ -1895,7 +1895,7 @@ public class JXMonthView extends JComponent {
      * 
      * @return true if the trailing dates in of a month are showing, false otherwise.
      * 
-     * @deprecated (since release 0.9.2) use {@link #isShowingTrailingDays()} 
+     * @deprecated (pre-0.9.2) use {@link #isShowingTrailingDays()} 
      *  - name change to comply with property naming conventions and 
      *  consistently using "Day" instead of "Date". 
      */
@@ -1912,7 +1912,7 @@ public class JXMonthView extends JComponent {
      * @param date date which to test for flagged status
      * @return true if the date is flagged, false otherwise
      * 
-     * @deprecated (since release 0.9.2) use {@link #isFlaggedDate(Date)}
+     * @deprecated (pre-0.9.2) use {@link #isFlaggedDate(Date)}
      */
     @Deprecated
     public boolean isFlaggedDate(long date) {
@@ -1924,7 +1924,7 @@ public class JXMonthView extends JComponent {
      *
      * @param flaggedDates the dates to be flagged
      * 
-     * @deprecated (since release 0.9.2) use {@link #setFlaggedDates(Date[])}
+     * @deprecated (pre-0.9.2) use {@link #setFlaggedDates(Date[])}
      */
     @Deprecated
     public void setFlaggedDates(long[] flaggedDates) {
@@ -1946,7 +1946,7 @@ public class JXMonthView extends JComponent {
      * @param date The date to check
      * @return true if the date is selected, false otherwise
      * 
-     * @deprecated (since release 0.9.2) use {@link #setSelectionDate(Date)}
+     * @deprecated (pre-0.9.2) use {@link #setSelectionDate(Date)}
      */
     @Deprecated
     public boolean isSelectedDate(long date) {
@@ -1959,7 +1959,7 @@ public class JXMonthView extends JComponent {
      * @param date date which to test for unselectable status
      * @return true if the date is unselectable, false otherwise
      * 
-     * @deprecated (since release 0.9.2) use {@link #isUnselectableDate(Date)}
+     * @deprecated (pre-0.9.2) use {@link #isUnselectableDate(Date)}
      */
     @Deprecated
     public boolean isUnselectableDate(long date) {
@@ -1971,7 +1971,7 @@ public class JXMonthView extends JComponent {
      *
      * @param unselectableDates the dates that should be unselectable
      * 
-     * @deprecated (since release 0.9.2) use {@link #setUnselectableDates(Date...)}
+     * @deprecated (pre-0.9.2) use {@link #setUnselectableDates(Date...)}
      */
     @Deprecated
     public void setUnselectableDates(long[] unselectableDates) {
@@ -1992,7 +1992,7 @@ public class JXMonthView extends JComponent {
      * temporary widened access for testing.
      * 
      * @param millis the instance in millis which should be used as today.
-     * @deprecated (since release 0.9.2) use {@link #setToday(Date)}
+     * @deprecated (pre-0.9.2) use {@link #setToday(Date)}
      */
     @Deprecated
     protected void setTodayInMillis(long millis) {
@@ -2004,7 +2004,7 @@ public class JXMonthView extends JComponent {
      * 
      * @return the start of today in millis.
      * 
-     * @deprecated (since release 0.9.2) use {@link #getToday()}
+     * @deprecated (pre-0.9.2) use {@link #getToday()}
      */
     @Deprecated
     public long getTodayInMillis() {
@@ -2061,7 +2061,7 @@ public class JXMonthView extends JComponent {
      * @param date millis representing the date to make visible.
      * @see #ensureDateVisible(Date)
      * 
-     * @deprecated (since release 0.9.2) use {@link #ensureDateVisible(Date)}
+     * @deprecated (pre-0.9.2) use {@link #ensureDateVisible(Date)}
      */
     @Deprecated
     public void ensureDateVisible(long date) {
@@ -2094,7 +2094,7 @@ public class JXMonthView extends JComponent {
      * Returns the first displayed date.
      *
      * @return long The first displayed date.
-     * @deprecated (since release 0.9.2) use {@link #getFirstDisplayedDay()}
+     * @deprecated (pre-0.9.2) use {@link #getFirstDisplayedDay()}
      */
     @Deprecated
     public long getFirstDisplayedDate() {
@@ -2109,7 +2109,7 @@ public class JXMonthView extends JComponent {
      * are reset to 0.
      *
      * @param date The first displayed date.
-     * @deprecated (since release 0.9.2) use {@link #setFirstDisplayedDay(Date)}
+     * @deprecated (pre-0.9.2) use {@link #setFirstDisplayedDay(Date)}
      */
     @Deprecated
     public void setFirstDisplayedDate(long date) {
@@ -2123,7 +2123,7 @@ public class JXMonthView extends JComponent {
      * visible month was April the time returned would be April 30, 23:59:59.
      *
      * @return long The last displayed date.
-     * @deprecated (since release 0.9.2) use {@link #getLastDisplayedDay()} instead
+     * @deprecated (pre-0.9.2) use {@link #getLastDisplayedDay()} instead
      */
     @Deprecated
     public long getLastDisplayedDate() {
@@ -2140,7 +2140,7 @@ public class JXMonthView extends JComponent {
      *   created.
      * @param locale desired locale, if null the system default locale is used
      * 
-     * @deprecated (since release 0.9.2) use {@link #JXMonthView(Date, DateSelectionModel, Locale)}
+     * @deprecated (pre-0.9.2) use {@link #JXMonthView(Date, DateSelectionModel, Locale)}
      */
     @Deprecated
     public JXMonthView(long firstDisplayedDate, final DateSelectionModel model, final Locale locale) {
@@ -2153,7 +2153,7 @@ public class JXMonthView extends JComponent {
      * display.
      *
      * @param firstDisplayedDate The first month to display.
-     * @deprecated (since release 0.9.2) use {@link #JXMonthView(Date)}(
+     * @deprecated (pre-0.9.2) use {@link #JXMonthView(Date)}(
      */
     @Deprecated
     public JXMonthView(long firstDisplayedDate) {
@@ -2169,7 +2169,7 @@ public class JXMonthView extends JComponent {
      * @param model the selection model to use, if null a <code>DefaultSelectionModel</code> is
      *   created.
      *   
-     * @deprecated (since release 0.9.2) use {@link #JXMonthView(Date, DateSelectionModel)}  
+     * @deprecated (pre-0.9.2) use {@link #JXMonthView(Date, DateSelectionModel)}  
      */
     @Deprecated
     public JXMonthView(long firstDisplayedDate, final DateSelectionModel model) {
@@ -2181,7 +2181,7 @@ public class JXMonthView extends JComponent {
      *
      * @return String The string used for identifying ActionEvents.
      * 
-     * @deprecated (since release 0.9.2) no longer used. The command is internally determined and
+     * @deprecated (pre-0.9.2) no longer used. The command is internally determined and
      * either monthViewCommit or monthViewCancel, depending on the user
      * gesture which triggered the action.
      */
@@ -2195,7 +2195,7 @@ public class JXMonthView extends JComponent {
      *
      * @param actionCommand The string used for identifying ActionEvents.
      * 
-     * @deprecated (since release 0.9.2) no longer used. The command is internally determined and
+     * @deprecated (pre-0.9.2) no longer used. The command is internally determined and
      * either monthViewCommit or monthViewCancel, depending on the user
      * gesture which triggered the action.
      */

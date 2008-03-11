@@ -48,7 +48,7 @@ public class MacOSXStatusBarUI extends BasicStatusBarUI {
     }	
     
     /**
-     * @deprecated (since release 0.9.2)
+     * @deprecated (pre-0.9.2)
      */
     @Deprecated
     protected void installDefaults() {
