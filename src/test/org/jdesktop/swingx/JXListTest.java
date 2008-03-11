@@ -800,21 +800,21 @@ public class JXListTest extends InteractiveTestCase {
      *
      */
     public void testAddRowAboveSelectionInvertedOrder() {
-        JXList table = new JXList(ascendingListModel, true);
+        JXList list = new JXList(ascendingListModel, true);
         // select the last row in view coordinates
-        int selectedRow = table.getElementCount() - 1;
-        table.setSelectedIndex(selectedRow);
+        int selectedRow = list.getElementCount() - 2;
+        list.setSelectedIndex(selectedRow);
         // set a pipeline - ascending, no change
-        table.toggleSortOrder();
+        list.toggleSortOrder();
         // revert order 
-        table.toggleSortOrder();
-        assertEquals("first row must be selected", 0, table.getSelectedIndex());
-        // remove row in model coordinates
+        list.toggleSortOrder();
+        assertEquals("second row must be selected", 1, list.getSelectedIndex());
+        // add row in model coordinates
         // insert high value
         Object row = new Integer(100);
         ascendingListModel.addElement(row);
         // selection must be moved one below
-        assertEquals("selection must be incremented by one ", 1, table.getSelectedIndex());
+        assertEquals("selection must be incremented by one ", 2, list.getSelectedIndex());
         
     }
 

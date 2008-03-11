@@ -13,6 +13,18 @@ import org.jdesktop.swingx.decorator.PatternFilter;
 
 public class JXListIssues extends JXListTest {
 
+    public static void main(String[] args) {
+        setSystemLF(true);
+        JXListIssues test = new JXListIssues();
+        try {
+          test.runInteractiveTests();
+//            test.runInteractiveTests("interactive.*Rollover.*");
+        } catch (Exception e) {
+            System.err.println("exception when executing interactive tests:");
+            e.printStackTrace();
+        }
+    }
+
     /**
      * Issue #601-swingx: allow LAF to hook in LAF provided renderers.
      * 

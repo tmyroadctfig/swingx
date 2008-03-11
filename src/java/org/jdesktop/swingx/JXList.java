@@ -933,28 +933,36 @@ public class JXList extends JList {
                     boolean wasEnabled = getSelectionMapper().isEnabled();
                     getSelectionMapper().setEnabled(false);
                     try {
-                        updateSelection(e);
-                        refireIntervalAdded(e);
+                        updateModelSelection(e);
+                        ignoreFilterContentChanged = true;
+                        getFilters().flush();
+                        ignoreFilterContentChanged = false;
+                        // do the mapping after the flush and refire
+                        refireMappedEvent(getMappedEvent(e));
                     } finally {
+                        // for mutations, super and UI must be done with updating their internals
+                        // before it's safe to synch the view selection
                         getSelectionMapper().setEnabled(wasEnabled);
                     }
-                    ignoreFilterContentChanged = true;
-                    getFilters().flush();
-                    ignoreFilterContentChanged = false;
                 }
 
                 public void intervalRemoved(ListDataEvent e) {
                     boolean wasEnabled = getSelectionMapper().isEnabled();
                     getSelectionMapper().setEnabled(false);
                     try {
-                        updateSelection(e);
-                        refireIntervalRemoved(e);
+                        updateModelSelection(e);
+                        // do the mapping before flushing
+                        // otherwise we may get indexOOBs
+                        ListDataEvent mappedEvent = getMappedEvent(e);
+                        ignoreFilterContentChanged = true;
+                        getFilters().flush();
+                        ignoreFilterContentChanged = false;
+                        refireMappedEvent(mappedEvent);
                     } finally {
+                        // for mutations, super and UI must be done with updating their internals
+                        // before it's safe to synch the view selection
                         getSelectionMapper().setEnabled(wasEnabled);
                     }
-                    ignoreFilterContentChanged = true;
-                    getFilters().flush();
-                    ignoreFilterContentChanged = false;
                 }
 
                 public void contentsChanged(ListDataEvent e) {
@@ -988,33 +996,42 @@ public class JXList extends JList {
         }
 
         /**
-         * Refires the received event. Tries its best to map to the new
-         * coordinates. 
-         * 
-         * @param e the ListDataEvent received from the wrapped model.
+         * @param mappedEvent
          */
-        private void refireIntervalRemoved(ListDataEvent e) {
+        protected void refireMappedEvent(ListDataEvent mappedEvent) {
+            if (mappedEvent == null) return;
+            if (mappedEvent.getType() == ListDataEvent.INTERVAL_REMOVED) {
+                fireIntervalRemoved(this, mappedEvent.getIndex0(), mappedEvent.getIndex1());
+            } else if (mappedEvent.getType() == ListDataEvent.INTERVAL_ADDED) {
+                fireIntervalAdded(this, mappedEvent.getIndex0(), mappedEvent.getIndex1());
+            } else {
+                fireContentsChanged(this, mappedEvent.getIndex0(), mappedEvent.getIndex1());
+            }
+        }
+
+
+        private ListDataEvent getMappedEvent(ListDataEvent e) {
             // quick check for single item removal
             if ((e.getIndex0() != - 1) 
                 && (e.getIndex0() == e.getIndex1())) {
-                // single outside - no notification
                 int viewIndex = convertIndexToView(e.getIndex0());
-                if (viewIndex == -1) return;
-                fireIntervalRemoved(this, viewIndex, viewIndex);
-                return;
+                // single outside - no notification
+                if (viewIndex == -1) return null;
+                return new ListDataEvent(this, e.getType(), viewIndex, viewIndex);
             }
             Point mappedRange = getContinousMappedRange(e);
             if (mappedRange == null) {
              // cant help - no support for discontiouns interval remove notification
-                fireContentsChanged(this, -1, -1); 
+                return new ListDataEvent(this, ListDataEvent.CONTENTS_CHANGED, -1, -1);
             } else if (OUTSIDE == mappedRange) {
+                return null;
                 // do nothing, everything is outside
-            } else {
-                // we could map the continous range in model coordinates to
-                // a continous range in view coordinates
-                fireIntervalRemoved(this, mappedRange.x, mappedRange.y);
-            } 
+            }
+            // could map to a continous interval
+            return new ListDataEvent(this, e.getType(), mappedRange.x, mappedRange.y);
         }
+
+
         
         
         protected Point getContinousMappedRange(ListDataEvent e) {
@@ -1034,41 +1051,11 @@ public class JXList extends JList {
             return new Point(mapped.get(0), mapped.get(mapped.size() - 1));
         }
 
-        /**
-         * Refires the received event. Tries its best to map to the new
-         * coordinates. At this point, the internals (selection, filter) are
-         * updated, so it's safe to use the conversion methods.
-         * 
-         * @param e the ListDataEvent received from the wrapped model.
-         */
-        private void refireIntervalAdded(ListDataEvent e) {
-            // quick check for single item removal
-            if ((e.getIndex0() != - 1) 
-                && (e.getIndex0() == e.getIndex1())) {
-                // single outside - no notification
-                int viewIndex = convertIndexToView(e.getIndex0());
-                if (viewIndex == -1) return;
-                fireIntervalAdded(this, viewIndex, viewIndex);
-                return;
-            }
-            Point mappedRange = getContinousMappedRange(e);
-            if (mappedRange == null) {
-             // cant help - no support for discontiouns interval remove notification
-                fireContentsChanged(this, -1, -1); 
-            } else if (OUTSIDE == mappedRange) {
-                // do nothing, everything is outside
-            } else {
-                // we could map the continous range in model coordinates to
-                // a continous range in view coordinates
-                fireIntervalAdded(this, mappedRange.x, mappedRange.y);
-            } 
-        }
-        
         private void updateInternals(ListDataEvent e) {
             boolean wasEnabled = getSelectionMapper().isEnabled();
             getSelectionMapper().setEnabled(false);
             try {
-                updateSelection(e);
+                updateModelSelection(e);
             } finally {
                 getSelectionMapper().setEnabled(wasEnabled);
             }
@@ -1077,7 +1064,13 @@ public class JXList extends JList {
             ignoreFilterContentChanged = false;
         }
 
-        protected void updateSelection(ListDataEvent e) {
+        /**
+         * Adjusts the model coordinates of the selection as appropriate
+         * for the given event.
+         * 
+         * @param e the ListDataEvent to adjust from.
+         */
+        protected void updateModelSelection(ListDataEvent e) {
             if (e.getType() == ListDataEvent.INTERVAL_REMOVED) {
                 getSelectionMapper()
                         .removeIndexInterval(e.getIndex0(), e.getIndex1());
