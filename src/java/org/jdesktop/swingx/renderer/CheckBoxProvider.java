@@ -25,7 +25,7 @@ import javax.swing.AbstractButton;
 import javax.swing.JLabel;
 
 /**
- * A component provider which uses a AbstractButton.
+ * A component provider which uses a JCheckBox.
  * <p>
  * 
  * This implementation respects a BooleanValue and a StringValue to configure
@@ -49,16 +49,15 @@ import javax.swing.JLabel;
  *     };
  *     StringValue sv = new StringValue() {
  *         public String getString(Object value) {
- *           if (value instanceof TableColumnExt) {
+ *           if (value instanceof TableColumnExt) 
  *               return ((TableColumnExt) value).getTitle();
  *           return &quot;&quot;;
  *         }
  *     };
  *     list.setCellRenderer(new DefaultListRenderer(
- *           new ButtonProvider(new MappedValue(sv, bv), JLabel.LEADING))); 
+ *           new CheckBoxProvider(new MappedValue(sv, null, bv), JLabel.LEADING))); 
  * </code></pre>
  * 
- * PENDING: rename ... this is actually a CheckBoxProvider.
  * 
  * @see BooleanValue
  * @see StringValue
@@ -71,7 +70,7 @@ public class CheckBoxProvider extends ComponentProvider<AbstractButton> {
     private boolean borderPainted;
 
     /**
-     * Instantiates a ButtonProvider with default properties. <p> 
+     * Instantiates a CheckBoxProvider with default properties. <p> 
      *
      */
     public CheckBoxProvider() {
@@ -79,7 +78,17 @@ public class CheckBoxProvider extends ComponentProvider<AbstractButton> {
     }
 
     /**
-     * Instantiates a ButtonProvider with the given StringValue and
+     * Instantiates a CheckBoxProvider with the given StringValue and default
+     * alignment.
+     * 
+     * @param stringValue the StringValue to use for formatting.
+     */
+    public CheckBoxProvider(StringValue stringValue) {
+        this(stringValue, JLabel.CENTER);
+    }
+
+    /**
+     * Instantiates a CheckBoxProvider with the given StringValue and
      * alignment. 
      * 
      * @param stringValue the StringValue to use for formatting.
@@ -90,12 +99,6 @@ public class CheckBoxProvider extends ComponentProvider<AbstractButton> {
         setBorderPainted(true);
     }
 
-    /**
-     * @param stringValue
-     */
-    public CheckBoxProvider(StringValue stringValue) {
-        this(stringValue, JLabel.CENTER);
-    }
 
     /**
      * Returns the border painted flag.
@@ -107,7 +110,7 @@ public class CheckBoxProvider extends ComponentProvider<AbstractButton> {
     }
 
     /**
-     * Sets the border painted flag. the underlying checkbox
+     * Sets the border painted flag. The underlying checkbox
      * is configured with this value on every request.<p>
      * 
      * The default value is true.
@@ -162,7 +165,7 @@ public class CheckBoxProvider extends ComponentProvider<AbstractButton> {
      * {@inheritDoc}<p>
      * 
      * Here: set's the buttons horizontal alignment and borderpainted properties
-     * to this controller's properties.
+     * to this provider's properties.
      */
     @Override
     protected void configureState(CellContext context) {

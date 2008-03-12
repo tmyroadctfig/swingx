@@ -55,17 +55,21 @@ import javax.swing.JLabel;
  *         }
  *     };
  *     list.setCellRenderer(new DefaultListRenderer(
- *           new ButtonProvider(new MappedValue(sv, bv), JLabel.LEADING))); 
+ *           new ButtonProvider(new MappedValue(sv, null, bv), JLabel.LEADING))); 
  * </code></pre>
  * 
- * PENDING: rename ... this is actually a CheckBoxProvider.
  * 
  * @see BooleanValue
  * @see StringValue
  * @see MappedValue
  * 
  * @author Jeanette Winzenburg
+ * 
+ * @deprecated use {@link CheckBoxProvider} which is the renamed version of this. 
+ * No longer maintained, all changes - if any - go into the replacement.
+ * 
  */
+@Deprecated
 public class ButtonProvider extends ComponentProvider<AbstractButton> {
 
     private boolean borderPainted;
