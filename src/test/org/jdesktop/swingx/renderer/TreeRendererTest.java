@@ -219,7 +219,7 @@ public class TreeRendererTest extends InteractiveTestCase {
     public void interactiveTreeButtonFormatting() {
         TreeModel model = createActionTreeModel();
         JTree tree = new JTree(model);
-        ButtonProvider wrappee = createButtonProvider();
+        CheckBoxProvider wrappee = createButtonProvider();
         tree.setCellRenderer(new DefaultTreeRenderer(new WrappingProvider(wrappee)));
         
         JList list = new JList(createActionListModel());
@@ -370,7 +370,7 @@ public class TreeRendererTest extends InteractiveTestCase {
      * 
      * @return a button controller specialized on ActionEntryNode.
      */
-    private ButtonProvider createButtonProvider() {
+    private CheckBoxProvider createButtonProvider() {
         StringValue sv = new StringValue() {
 
             public String getString(Object value) {
@@ -392,7 +392,7 @@ public class TreeRendererTest extends InteractiveTestCase {
             
         };
 
-        ButtonProvider wrapper = new ButtonProvider(new MappedValue(sv, null, bv), JLabel.LEADING);
+        CheckBoxProvider wrapper = new CheckBoxProvider(new MappedValue(sv, null, bv), JLabel.LEADING);
         return wrapper;
     }
 

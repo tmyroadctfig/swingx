@@ -147,7 +147,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
         button.setBorder(BorderFactory.createCompoundBorder(new DropShadowBorder(), button.getBorder()));
          showInFrame(button, "Fancy..");
     }
-    public static class NormalButtonProvider extends ButtonProvider {
+    public static class NormalButtonProvider extends CheckBoxProvider {
 
         private Border border;
 
@@ -707,93 +707,26 @@ public class RendererVisualCheck extends InteractiveTestCase {
     }
     
 //----------------------- experiments with "CheckList" fakes
+ 
     
     /**
      * Use a custom button controller to show both checkbox icon and text to
      * render Actions in a JXList.
      */
-    public void interactiveTableWithRolloverListColumnControl() {
+    public void interactiveCheckListColumnControl() {
         TableModel model = new AncientSwingTeam();
         JXTable table = new JXTable(model);
+        table.setColumnControlVisible(true);
         JXList list = new JXList();
         // quick-fill and hook to table columns' visibility state
         configureList(list, table, true);
-        // a custom rendering button controller showing both checkbox and text
-        ButtonProvider wrapper = new RolloverRenderingButtonController();
-        list.setCellRenderer(new DefaultListRenderer(wrapper));
-        JXFrame frame = showWithScrollingInFrame(table, list,
-                "rollover checkbox list-renderer");
-        addStatusMessage(frame, "fake editable list: use rollover renderer - not really working");
-        frame.pack();
-    }
-
-
-    /**
-     * 
-     * Naive implementation: toggle the selected status of the last
-     * stored action. Doesn't work reliably.... requires to leave the
-     * item before the next click updates the action.
-     * 
-     */
-    public static class RolloverRenderingButtonController extends ButtonProvider
-       implements RolloverRenderer {
-
-        private AbstractActionExt actionExt;
-
-        public RolloverRenderingButtonController() {
-            setHorizontalAlignment(JLabel.LEADING);
-        }
-        
-        @Override
-        protected void format(CellContext context) {
-            if (!(context.getValue() instanceof AbstractActionExt)) {
-                super.format(context);
-                return;
-            }
-            
-            actionExt = (AbstractActionExt) context.getValue();
-            rendererComponent.setAction(actionExt);
-            rendererComponent.setSelected(actionExt.isSelected());
-//            rendererComponent.setText(((AbstractActionExt) context.getValue()).getName());
-        }
-
-        public void doClick() {
-            boolean selected = !actionExt.isSelected();
-                        rendererComponent.doClick(0);
-//            actionExt.setSelected(rendererComponent.isSelected());
-            actionExt.setSelected(selected);
-//            rendererComponent.setSelected(selected);
-            
-        }
-
-        public boolean isEnabled() {
-            // TODO Auto-generated method stub
-            return true;
-        }
-        
-    }
-    
-    /**
-     * Use a custom button controller to show both checkbox icon and text to
-     * render Actions in a JXList.
-     */
-    public void interactiveTableWithListColumnControl() {
-        TableModel model = new AncientSwingTeam();
-        JXTable table = new JXTable(model);
-        JXList list = new JXList(); 
-        Highlighter highlighter = HighlighterFactory.createSimpleStriping();
-        table.addHighlighter(highlighter);
-        list.addHighlighter(highlighter);
-        // quick-fill and hook to table columns' visibility state
-        configureList(list, table, false);
-        // a custom rendering button controller showing both checkbox and text
         StringValue sv = new StringValue() {
 
             public String getString(Object value) {
                 if (value instanceof AbstractActionExt) {
                     return ((AbstractActionExt) value).getName();
                 }
-                return "";
+                return TO_STRING.getString(value);
             }
             
         };
@@ -807,13 +740,13 @@ public class RendererVisualCheck extends InteractiveTestCase {
             }
             
         };
-        ComponentProvider wrapper = new ButtonProvider(new MappedValue(sv, null, bv), JLabel.LEADING); 
-        list.setCellRenderer(new DefaultListRenderer(wrapper));
+        CheckBoxProvider provider = new CheckBoxProvider(new MappedValue(sv, null, bv), JLabel.LEADING);
+        list.setCellRenderer(new DefaultListRenderer(provider));
         JXFrame frame = showWithScrollingInFrame(table, list,
-                "checkbox list-renderer");
-        addStatusMessage(frame, "fake editable list: space/doubleclick on selected item toggles column visibility");
-        frame.pack();
+                "rollover checkbox list-renderer");
+        addStatusMessage(frame, "CheckList renderer (not completely active - no hotspot, doubleclick only)");
     }
+
 
     /**
      * Fills the list with a collection of actions (as returned from the 

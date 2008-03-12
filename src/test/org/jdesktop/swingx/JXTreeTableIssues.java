@@ -55,7 +55,7 @@ import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.action.LinkAction;
 import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
-import org.jdesktop.swingx.renderer.ButtonProvider;
+import org.jdesktop.swingx.renderer.CheckBoxProvider;
 import org.jdesktop.swingx.renderer.CellContext;
 import org.jdesktop.swingx.renderer.ComponentProvider;
 import org.jdesktop.swingx.renderer.DefaultTableRenderer;
@@ -714,7 +714,7 @@ public class JXTreeTableIssues extends InteractiveTestCase {
             }
             
         };
-        ComponentProvider provider = new ButtonProvider(sv);
+        ComponentProvider provider = new CheckBoxProvider(sv);
 //            /**
 //             * custom tooltip: show row. Note: the context is that 
 //             * of the rendering tree. No way to get at table state?
@@ -925,7 +925,7 @@ public class JXTreeTableIssues extends InteractiveTestCase {
      */
     public void interactiveTreeTableGetValueRenderer() {
         JXTreeTable tree = new JXTreeTable(new ComponentTreeTableModel(new JXFrame()));
-        ComponentProvider provider = new ButtonProvider(StringValue.TO_STRING) {
+        ComponentProvider provider = new CheckBoxProvider(StringValue.TO_STRING) {
             
             @Override
             protected String getValueAsString(CellContext context) {

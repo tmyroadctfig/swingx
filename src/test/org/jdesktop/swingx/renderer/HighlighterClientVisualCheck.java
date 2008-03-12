@@ -194,7 +194,7 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
 
         // boolean
         JXList listb = new JXList(createListModel(source, 4));
-        listb.setCellRenderer(new DefaultListRenderer(new ButtonProvider()));
+        listb.setCellRenderer(new DefaultListRenderer(new CheckBoxProvider()));
         listb.setFixedCellHeight(list0.getPreferredSize().height
                 / source.getRowCount());
         listb.setHighlighters(simpleStriping, magenta, derivedFont, gradient);

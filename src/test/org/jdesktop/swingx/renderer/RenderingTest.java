@@ -225,7 +225,7 @@ public class RenderingTest extends TestCase {
             
         };
         CellContext context =  new TableCellContext();
-        ComponentProvider<AbstractButton> provider = new ButtonProvider(sv);
+        ComponentProvider<AbstractButton> provider = new CheckBoxProvider(sv);
         AbstractButton label = provider.getRendererComponent(context);
         assertEquals(sv.getString(context.getValue()), label.getText());
         assertEquals(sv.getString(context.getValue()), provider.getString(context.getValue()));
@@ -462,7 +462,7 @@ public class RenderingTest extends TestCase {
             }
             
         };
-        ButtonProvider provider = new ButtonProvider(new MappedValue(sv, null, bv));
+        CheckBoxProvider provider = new CheckBoxProvider(new MappedValue(sv, null, bv));
         TableCellContext context = new TableCellContext();
         context.value = column;
         AbstractButton button = provider.getRendererComponent(context);
@@ -478,7 +478,7 @@ public class RenderingTest extends TestCase {
      *
      */
     public void testButtonProviderDefaultsTwoConstructor() {
-        ButtonProvider provider = new ButtonProvider(null, JLabel.RIGHT);
+        CheckBoxProvider provider = new CheckBoxProvider(null, JLabel.RIGHT);
         TableCellContext context = new TableCellContext();
         AbstractButton button = provider.getRendererComponent(context);
         // empty context
@@ -505,7 +505,7 @@ public class RenderingTest extends TestCase {
      *
      */
     public void testButtonProviderDefaultsOneConstructor() {
-        ButtonProvider provider = new ButtonProvider(null);
+        CheckBoxProvider provider = new CheckBoxProvider(null);
         TableCellContext context = new TableCellContext();
         AbstractButton button = provider.getRendererComponent(context);
         // empty context
@@ -532,7 +532,7 @@ public class RenderingTest extends TestCase {
      *
      */
     public void testButtonProviderDefaultsEmptyConstructor() {
-        ButtonProvider provider = new ButtonProvider();
+        CheckBoxProvider provider = new CheckBoxProvider();
         TableCellContext context = new TableCellContext();
         AbstractButton button = provider.getRendererComponent(context);
         // empty context
@@ -555,7 +555,7 @@ public class RenderingTest extends TestCase {
      *
      */
     public void testButtonProviderConstructor() {
-        ComponentProvider provider = new ButtonProvider();
+        ComponentProvider provider = new CheckBoxProvider();
         assertEquals(JLabel.CENTER, provider.getHorizontalAlignment());
         assertEquals(StringValue.EMPTY, provider.getToStringConverter());
        
@@ -566,7 +566,7 @@ public class RenderingTest extends TestCase {
      *
      */
     public void testButtonProviderBorderPainted() {
-        ButtonProvider provider = new ButtonProvider();
+        CheckBoxProvider provider = new CheckBoxProvider();
         TableCellContext context = new TableCellContext();
         AbstractButton button = provider.getRendererComponent(context);
         assertEquals(provider.isBorderPainted(), button.isBorderPainted());
@@ -579,7 +579,7 @@ public class RenderingTest extends TestCase {
      *
      */
     public void testButtonProviderHorizontalAlignment() {
-        ButtonProvider provider = new ButtonProvider();
+        CheckBoxProvider provider = new CheckBoxProvider();
         CellContext context = new TableCellContext();
         AbstractButton button = provider.getRendererComponent(context);
         assertEquals(provider.getHorizontalAlignment(), button.getHorizontalAlignment());
@@ -669,7 +669,7 @@ public class RenderingTest extends TestCase {
         // test LabelProvider
         // same for list and table
         assertEmptyContext(new LabelProvider());
-        assertEmptyContext(new ButtonProvider());
+        assertEmptyContext(new CheckBoxProvider());
         assertEmptyContext(new HyperlinkProvider());
     }
     
@@ -697,7 +697,7 @@ public class RenderingTest extends TestCase {
         // wrong assumption - we are wrapping...
 //        assertSame(FormatStringValue.DATE_TO_STRING, renderer.componentController.formatter);
         assertSame(FormatStringValue.DATE_TO_STRING, ((WrappingProvider) renderer.componentController).wrappee.formatter);
-        ComponentProvider controller = new ButtonProvider();
+        ComponentProvider controller = new CheckBoxProvider();
         renderer = new DefaultTreeRenderer(controller);
         assertSame(controller, renderer.componentController);
     }
@@ -712,7 +712,7 @@ public class RenderingTest extends TestCase {
         renderer = new DefaultListRenderer(FormatStringValue.DATE_TO_STRING);
         assertTrue(renderer.componentController instanceof LabelProvider);
         assertSame(FormatStringValue.DATE_TO_STRING, renderer.componentController.formatter);
-        ComponentProvider controller = new ButtonProvider();
+        ComponentProvider controller = new CheckBoxProvider();
         renderer = new DefaultListRenderer(controller);
         assertSame(controller, renderer.componentController);
     }
@@ -727,7 +727,7 @@ public class RenderingTest extends TestCase {
         renderer = new DefaultTableRenderer(FormatStringValue.DATE_TO_STRING);
         assertTrue(renderer.componentController instanceof LabelProvider);
         assertSame(FormatStringValue.DATE_TO_STRING, renderer.componentController.formatter);
-        ComponentProvider controller = new ButtonProvider();
+        ComponentProvider controller = new CheckBoxProvider();
         renderer = new DefaultTableRenderer(controller);
         assertSame(controller, renderer.componentController);
     }

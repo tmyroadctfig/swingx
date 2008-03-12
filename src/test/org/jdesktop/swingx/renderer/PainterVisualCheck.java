@@ -207,7 +207,7 @@ public class PainterVisualCheck extends InteractiveTestCase {
             }
             
         };
-        ButtonProvider wrapper = new ButtonProvider(new MappedValue(sv, null, bv), JLabel.LEADING);
+        CheckBoxProvider wrapper = new CheckBoxProvider(new MappedValue(sv, null, bv), JLabel.LEADING);
         list.setCellRenderer(new DefaultListRenderer(wrapper));
         JXFrame frame = showWithScrollingInFrame(table, list,
                 "checkbox list-renderer - striping and gradient");

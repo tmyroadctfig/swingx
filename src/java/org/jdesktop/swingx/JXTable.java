@@ -109,7 +109,7 @@ import org.jdesktop.swingx.decorator.SortOrder;
 import org.jdesktop.swingx.event.TableColumnModelExtListener;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 import org.jdesktop.swingx.plaf.UIManagerExt;
-import org.jdesktop.swingx.renderer.ButtonProvider;
+import org.jdesktop.swingx.renderer.CheckBoxProvider;
 import org.jdesktop.swingx.renderer.DefaultTableRenderer;
 import org.jdesktop.swingx.renderer.FormatStringValue;
 import org.jdesktop.swingx.renderer.IconValue;
@@ -3722,7 +3722,7 @@ public class JXTable extends JTable
         setDefaultRenderer(ImageIcon.class, renderer);
         // use a ButtonProvider for booleans
         setDefaultRenderer(Boolean.class, new DefaultTableRenderer(
-                new ButtonProvider()));
+                new CheckBoxProvider()));
 
 
 //        // standard renderers
