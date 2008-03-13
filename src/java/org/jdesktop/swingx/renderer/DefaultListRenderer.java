@@ -232,7 +232,11 @@ public class DefaultListRenderer
         return componentController.getString(value);
     }
 
-
+  //----------------- allow access to ComponentProvider (for wrapping)
+    
+    public ComponentProvider getComponentProvider() {
+        return componentController;
+    }
 }
 
 

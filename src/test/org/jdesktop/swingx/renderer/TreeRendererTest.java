@@ -198,18 +198,6 @@ public class TreeRendererTest extends InteractiveTestCase {
         frame.setVisible(true);
     }
     
-    /**
-     * Example for using no node icons in the tree.
-     * 
-     */
-    public void interactiveNoIcons() {
-        JTree tree = new JTree();
-        tree.setCellRenderer(new DefaultTreeRenderer(IconValue.NONE));
-        final JXFrame frame = wrapWithScrollingInFrame(tree, "tree - no icons");
-        frame.setVisible(true);
-    }
-    
-   
 
     /**
      * Example for using arbitrary wrappee controllers. Here: a 

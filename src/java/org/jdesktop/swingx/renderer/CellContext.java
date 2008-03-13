@@ -126,6 +126,11 @@ public class CellContext<T extends JComponent> implements Serializable {
         this.leaf = leaf;
     }
 
+    public Object replaceValue(Object value) {
+        Object old = getValue();
+        this.value = value;
+        return old;
+    }
     // -------------------- accessors of installed state
 
     /**

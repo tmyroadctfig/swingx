@@ -56,6 +56,7 @@ public class WrappingProvider extends
     ComponentProvider<WrappingIconPanel>  implements RolloverRenderer {
 
     protected ComponentProvider wrappee;
+    private boolean unwrapUserObject;
 
     /**
      * Instantiates a WrappingProvider with default LabelProvider.
@@ -109,13 +110,27 @@ public class WrappingProvider extends
      * @param delegate the provider to use as delegate
      */
     public WrappingProvider(ComponentProvider delegate) {
-        super();
+        this(delegate, true);
+    }
+    
+    /**
+     * Instantiates a WrappingProvider with the given delegate
+     * provider for the node content and unwrapUserObject property. 
+     * If the delegate is null, a default LabelProvider will be used. 
+     * 
+     * @param delegate the provider to use as delegate
+     * @param unwrapUserObject a flag indicating whether this provider
+     * should auto-unwrap the userObject from the context value. 
+     */
+    public WrappingProvider(ComponentProvider delegate, boolean unwrapUserObject) {
+         super();
         // PENDING JW: this is inherently unsafe - must not call 
         // non-final methods from constructor
         setWrappee(delegate);
         setToStringConverter(StringValue.EMPTY);
+        setUnwrapUserObject(unwrapUserObject);
     }
-    
+
     /**
      * Sets the given provider as delegate for the node content. 
      * If the delegate is null, a default LabelProvider is set.<p>
@@ -129,7 +144,7 @@ public class WrappingProvider extends
             delegate = new LabelProvider();
         }
         this.wrappee = delegate;
-        rendererComponent.setComponent(delegate.rendererComponent);
+//        rendererComponent.setComponent(delegate.rendererComponent);
     }
 
     /**
@@ -141,27 +156,78 @@ public class WrappingProvider extends
         return wrappee;
     }
     
+    /**
+     * Sets the unwrapUserObject property. If true, this provider 
+     * replaces a context value of type XXNode with its user object before
+     * delegating to the wrappee. Otherwise the value is passed as-is always.<p>
+     * 
+     * The default value is true.
+     * 
+     * @param unwrap
+     * @see #getUnwrapUserObject()
+     */
+    public void setUnwrapUserObject(boolean unwrap) {
+        this.unwrapUserObject = unwrap;
+    }
+    
+    /**
+     * Returns a boolean indicating whether this provider tries to unwrap 
+     * a userObject from a tree/table/node type value before delegating the
+     * context. 
+     * 
+     * @return a flag indicating the auto-unwrap property.
+     * 
+     * @see #setUnwrapUserObject(boolean)
+     */
+    public boolean getUnwrapUserObject() {
+        return unwrapUserObject;
+    }
     
     /**
      * {@inheritDoc} <p>
      * 
      * Overridden to comply to contract: returns the string representation as 
      * provided by the wrappee (as this level has no string rep). Must do the
-     * same unwrapping magic as in configuring the rendering component. Here:
-     * unwraps userObject of DefaultMutableTreeNode and TreeTableNode.<p>
+     * same unwrapping magic as in configuring the rendering component if the
+     * unwrapUserObject property is true. <p>
      * 
-     * PENDING JW: factor the unwrapping into one place.
      * 
+     * @param value the Object to get a String representation for.
+     * 
+     * @see #setUnwrapUserObject(boolean)
+     * @see #getUnwrappedValue(Object)
      */
     @Override
     public String getString(Object value) {
+        value = getUnwrappedValue(value);
+        return wrappee.getString(value);
+    }
+
+    /**
+     * Returns the value as it should be passed to the delegate. If the unwrapUserObject
+     * property is true, tries return a userObject as appropriate for the value type.
+     * Returns the given value itself, ff the property is false or the type does 
+     * not support the notion of userObject<p>
+     * 
+     * Here: unwraps userObject of DefaultMutableTreeNode and TreeTableNode.<p>
+     * 
+     * @param value the value to possibly unwrap
+     * @return the userObject if the value has an appropriate type and the 
+     *   unwrapUserObject property is true, otherwise returns the value unchanged.
+     *   
+     * @see #setUnwrapUserObject(boolean)
+     * @see #getString(Object)
+     * @see #getRendererComponent(CellContext)  
+     */
+    protected Object getUnwrappedValue(Object value) {
+        if (!getUnwrapUserObject()) return value;
         if (value instanceof DefaultMutableTreeNode) {
             value = ((DefaultMutableTreeNode) value).getUserObject();
         } else if (value instanceof TreeTableNode) {
             TreeTableNode node = (TreeTableNode) value;
             value = node.getUserObject();
         }
-        return wrappee.getString(value);
+        return value;
     }
 
     /**
@@ -187,26 +253,27 @@ public class WrappingProvider extends
      * @param oldValue the value to restore the context to.
      */
     protected void restoreContextValue(CellContext context, Object oldValue) {
-        context.value = oldValue;
+        context.replaceValue(oldValue);
     }
 
     /**
-     * Replace the context's value with the userobject 
-     * if it's a treenode. <p>
+     * Replace the context's value with the userobject if the value is a type
+     * supporting the notion of userObject and this provider's unwrapUserObject
+     * property is true. Otherwise does nothing.<p>
+     * 
      * Subclasses may override but must guarantee to return the original 
      * value for restoring. 
      * 
      * @param context the context to adjust
      * @return the old context value
+     * 
+     * @see #setUnwrapUserObject(boolean)
+     * @see #getString(Object)
      */
     protected Object adjustContextValue(CellContext context) {
         Object oldValue = context.getValue();
-        if (oldValue instanceof DefaultMutableTreeNode) {
-            context.value = ((DefaultMutableTreeNode) oldValue).getUserObject();
-        } else if (oldValue instanceof TreeTableNode) {
-            TreeTableNode node = (TreeTableNode) oldValue;
-            context.value = node.getUserObject();
-            
+        if (getUnwrapUserObject()) {
+            context.replaceValue(getUnwrappedValue(oldValue));
         }
         return oldValue;
     }

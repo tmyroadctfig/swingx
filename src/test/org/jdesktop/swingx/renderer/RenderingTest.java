@@ -58,8 +58,82 @@ public class RenderingTest extends TestCase {
     private static final Logger LOG = Logger.getLogger(RenderingTest.class
             .getName());
 
+    public void testWrappingProviderUnwrapContructor() {
+        WrappingProvider provider = new WrappingProvider(new LabelProvider(), false);
+    }
+    /**
+     * Issue ?? swingx: support to configure the auto-unwrap of tree/table/xx/nodes.
+     * 
+     * Initial default is true.
+     */
+    public void testWrappingProviderUserObjectUnwrapInitial() {
+        WrappingProvider provider = new WrappingProvider();
+        assertEquals(true, provider.getUnwrapUserObject());
+    }
 
+    /**
+     * Issue ?? swingx: support to configure the auto-unwrap of tree/table/xx/nodes.
+     * setter sets
+     */
+    public void testWrappingProviderUserObjectUnwrapSet() {
+        WrappingProvider provider = new WrappingProvider();
+        boolean unwrap = !provider.getUnwrapUserObject();
+        provider.setUnwrapUserObject(unwrap);
+        assertEquals(unwrap, provider.getUnwrapUserObject());
+    }
+    
+    /**
+     * Issue ?? swingx: support to configure the auto-unwrap of tree/table/xx/nodes.
+     * Respect unwrap flag in getString.
+     */
+    public void testWrappingProviderUserObjectUnwrapRespectString() {
+        StringValue sv = new StringValue() {
 
+            public String getString(Object value) {
+                if (value instanceof Point) {
+                    return "x of Point: " + ((Point) value).x;
+                }
+                return TO_STRING.getString(value);
+            }
+            
+        };
+        CellContext context =  new TableCellContext();
+        Point p = new Point(10, 20);
+        context.replaceValue(new DefaultMutableTreeNode(p));
+        WrappingProvider provider = new WrappingProvider(sv);
+        provider.setUnwrapUserObject(false);
+        assertEquals("must not unwrap the user object", 
+                sv.getString(context.getValue()), provider.getString(context.getValue()));
+    }
+    
+    /**
+     * Issue ?? swingx: support to configure the auto-unwrap of tree/table/xx/nodes.
+     * Respect unwrap flag in configuring a renderer.
+     */
+    public void testWrappingProviderUserObjectUnwrapRespectRenderer() {
+        StringValue sv = new StringValue() {
+
+            public String getString(Object value) {
+                if (value instanceof Point) {
+                    return "x of Point: " + ((Point) value).x;
+                }
+                return TO_STRING.getString(value);
+            }
+            
+        };
+        CellContext context =  new TableCellContext();
+        Point p = new Point(10, 20);
+        context.replaceValue(new DefaultMutableTreeNode(p));
+        WrappingProvider provider = new WrappingProvider(sv);
+        provider.setUnwrapUserObject(false);
+        LabelProvider wrappee = (LabelProvider) provider.getWrappee();
+        // configure 
+        provider.getRendererComponent(context);
+        assertEquals("must not unwrap the user object", 
+                sv.getString(context.getValue()), 
+                wrappee.rendererComponent.getText());
+    }
+    
     /**
      * Issue #790-swingx: rendering comps must not be registered with the tooltip manager.
      * 
