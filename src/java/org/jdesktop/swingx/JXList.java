@@ -1217,6 +1217,21 @@ public class JXList extends JList {
          * {@inheritDoc}
          */
         @Override
+        public String getStringAt(int row, int column) {
+            // PENDING JW: here we are duplicating code from the list
+            // that's because list api is in view-coordinates
+            ListCellRenderer renderer = list.getDelegatingRenderer().getDelegateRenderer();
+            if (renderer instanceof StringValue) {
+                return ((StringValue) renderer).getString(getValueAt(row, column));
+            }
+            return StringValue.TO_STRING.getString(getValueAt(row, column));
+        }
+        
+        
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public void setValueAt(Object aValue, int row, int column) {
             throw new UnsupportedOperationException(
                     "The model is immutable.");

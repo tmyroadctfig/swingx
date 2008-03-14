@@ -346,7 +346,10 @@ public abstract class ComponentAdapter {
      * query the count of visible rows.<p>
      * 
      * This implementation messages the StringValue.TO_STRING with the filteredValue,
-     * subclasses should re-implement and use the api appropriate for the target component type.
+     * subclasses should re-implement and use the api appropriate for the target component type.<p>
+     * 
+     * PENDING JW: what about null cell values? StringValue has a contract to return a 
+     * empty string then, would that be okay here as well?
      * 
      * @param row the row of the cell in view coordinates
      * @param column the column of the cell in model coordinates.
@@ -355,6 +358,22 @@ public abstract class ComponentAdapter {
      */
     public String getFilteredStringAt(int row, int column) {
         return StringValue.TO_STRING.getString(getFilteredValueAt(row, column));
+    }
+    
+    /**
+     * Returns the String representation of the value of the cell identified by the row
+     * specified row and column in model coordinates.<p>
+     *
+     * This implementation messages the StringValue.TO_STRING with the valueAt,
+     * subclasses should re-implement and use the api appropriate for the target component type.<p>
+     * 
+     * @param row in model coordinates
+     * @param column in model coordinates
+     * @return the value of the target component's cell identified by the
+     *          specified row and column
+     */
+    public String getStringAt(int row, int column) {
+        return StringValue.TO_STRING.getString(getValueAt(row, column));
     }
     
     /**

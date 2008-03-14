@@ -3199,6 +3199,9 @@ public class JXTable extends JTable
         }
 
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public String getColumnName(int columnIndex) {
             TableColumn column = getColumnByModelIndex(columnIndex);
@@ -3230,6 +3233,9 @@ public class JXTable extends JTable
 //        }
         
         
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public Object getColumnIdentifierAt(int columnIndex) {
             if ((columnIndex < 0) || (columnIndex >= getColumnCount())) {
@@ -3240,17 +3246,26 @@ public class JXTable extends JTable
             return identifier;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public int getColumnIndex(Object identifier) {
             TableColumn column = table.getColumnExt(identifier);
             return column != null ? column.getModelIndex() : -1;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public int getColumnCount() {
             return table.getModel().getColumnCount();
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public int getRowCount() {
             return table.getModel().getRowCount();
@@ -3264,11 +3279,17 @@ public class JXTable extends JTable
             return table.getModel().getValueAt(row, column);
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public void setValueAt(Object aValue, int row, int column) {
             table.getModel().setValueAt(aValue, row, column);
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public boolean isCellEditable(int row, int column) {
             return table.getModel().isCellEditable(row, column);
@@ -3276,6 +3297,9 @@ public class JXTable extends JTable
 
         
         
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public boolean isTestable(int column) {
             return getColumnByModelIndex(column) != null;
@@ -3301,6 +3325,16 @@ public class JXTable extends JTable
         }
 
         
+        /**
+         * {@inheritDoc}<p>
+         * 
+         * PENDING JW: this is implemented to duplicate this table's lookup code if 
+         * the column is not visible. That's not good enough
+         * if subclasses implemented a different strategy! We do it anyway for now,
+         * mostly we will be lucky and improve the situation against using toString
+         * always.
+         * 
+         */
         @Override
         public String getFilteredStringAt(int row, int column) {
             int viewColumn = modelToView(column);
@@ -3309,14 +3343,73 @@ public class JXTable extends JTable
             }
             // PENDING JW: how to get a String rep for invisible cells? 
             // rows may be filtered, columns hidden.
+            TableCellRenderer renderer = getRendererByModelColumn(column);
+            if (renderer instanceof StringValue) {
+                return ((StringValue) renderer).getString(getFilteredValueAt(row, column));
+            }
             return super.getFilteredStringAt(row, column);
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public String getString() {
-            return table.getStringAt(row, column);
+             return table.getStringAt(row, column);
         }
 
+        /**
+         * {@inheritDoc}
+         * 
+         * PENDING JW: this is implemented to duplicate this table's lookup code if 
+         * either the row or the column is not visible. That's not good enough
+         * if subclasses implemented a different strategy! We do it anyway for now,
+         * mostly we will be lucky and improve the situation against using toString
+         * always.
+         * 
+         */
+        @Override
+        public String getStringAt(int row, int column) {
+            int viewRow = table.convertRowIndexToView(row);
+            int viewColumn = table.convertColumnIndexToView(column);
+            if ((viewRow >= 0) && (viewColumn >= 0)) { 
+                return table.getStringAt(viewRow, viewColumn);
+            }
+            
+            TableCellRenderer renderer = getRendererByModelColumn(column);
+            if (renderer instanceof StringValue) {
+                return ((StringValue) renderer).getString(getValueAt(row, column));
+            }
+            // no luck - return default
+            return super.getStringAt(row, column);
+        }
+
+        /**
+         * Returns a suitable renderer for the column index in model coordinates.
+         * 
+         * PENDING JW: this duplicates this table's lookup code if 
+         * column is not visible. That's not good enough
+         * if subclasses implemented a different strategy! We do it anyway for now,
+         * mostly we will be lucky and improve the situation against using toString
+         * always.
+         * 
+         * @param column the columnIndex in model coordinates
+         * @return a renderer suitable for rendering cells in the given column
+         */
+        private TableCellRenderer getRendererByModelColumn(int column) {
+            // PENDING JW: here we are tricksing - duplicating JXTable renderer lookup strategy
+            // that's inherently unsafe, as subclasses may decide to do it differently
+            TableColumn tableColumn = getColumnByModelIndex(column);
+            TableCellRenderer renderer = tableColumn.getCellRenderer();
+            if (renderer == null) {
+                renderer = table.getDefaultRenderer(table.getModel().getColumnClass(column));
+            }
+            if (renderer == null) {
+                renderer = table.getDefaultRenderer(Object.class);
+            }
+            return renderer;
+        }
+        
         /**
          * {@inheritDoc}
          */

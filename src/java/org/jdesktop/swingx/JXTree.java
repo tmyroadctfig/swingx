@@ -1477,10 +1477,17 @@ public class JXTree extends JTree {
          */
         @Override
         public String getString() {
-            // TODO Auto-generated method stub
             return tree.getStringAt(row);
         }
 
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String getStringAt(int row, int column) {
+            return tree.getStringAt(row);
+        }
+        
         /**
          * {@inheritDoc}
          */

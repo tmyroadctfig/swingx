@@ -275,11 +275,11 @@ public class ComponentAdapterTest extends TestCase {
     /**
      * Issue #767-swingx: consistent string representation.
      * 
-     * Here: test api on ComponentAdapter.
+     * Here: test api on tree's ComponentAdapter.
      */
-    public void testTreeGetString() {
-        JXTreeT list = new JXTreeT(AncientSwingTeam.createNamedColorTreeModel());
-        list.expandAll();
+    public void testTreeGetStringAt() {
+        JXTreeT tree = new JXTreeT(AncientSwingTeam.createNamedColorTreeModel());
+        tree.expandAll();
         StringValue sv = new StringValue() {
 
             public String getString(Object value) {
@@ -291,20 +291,45 @@ public class ComponentAdapterTest extends TestCase {
             }
             
         };
-        list.setCellRenderer(new DefaultTreeRenderer(sv));
-        String text = sv.getString(((DefaultMutableTreeNode) list.getPathForRow(2).getLastPathComponent()).getUserObject());
-        ComponentAdapter adapter = list.getComponentAdapter(2);
+        tree.setCellRenderer(new DefaultTreeRenderer(sv));
+        String text = sv.getString(((DefaultMutableTreeNode) tree.getPathForRow(2).getLastPathComponent()).getUserObject());
+        ComponentAdapter adapter = tree.getComponentAdapter(2);
+        assertEquals(text, adapter.getStringAt(2, 0));
+    }
+
+    /**
+     * Issue #767-swingx: consistent string representation.
+     * 
+     * Here: test api on tree's ComponentAdapter.
+     */
+    public void testTreeGetString() {
+        JXTreeT tree = new JXTreeT(AncientSwingTeam.createNamedColorTreeModel());
+        tree.expandAll();
+        StringValue sv = new StringValue() {
+
+            public String getString(Object value) {
+                if (value instanceof Color) {
+                    Color color = (Color) value;
+                    return "R/G/B: " + color.getRGB();
+                }
+                return TO_STRING.getString(value);
+            }
+            
+        };
+        tree.setCellRenderer(new DefaultTreeRenderer(sv));
+        String text = sv.getString(((DefaultMutableTreeNode) tree.getPathForRow(2).getLastPathComponent()).getUserObject());
+        ComponentAdapter adapter = tree.getComponentAdapter(2);
         assertEquals(text, adapter.getString());
     }
 
     /**
      * Issue #767-swingx: consistent string representation.
      * 
-     * Here: test api on ComponentAdapter.
+     * Here: test api on tree's ComponentAdapter.
      */
     public void testTreeGetFilteredString() {
-        JXTreeT list = new JXTreeT(AncientSwingTeam.createNamedColorTreeModel());
-        list.expandAll();
+        JXTreeT tree = new JXTreeT(AncientSwingTeam.createNamedColorTreeModel());
+        tree.expandAll();
         StringValue sv = new StringValue() {
 
             public String getString(Object value) {
@@ -316,20 +341,20 @@ public class ComponentAdapterTest extends TestCase {
             }
             
         };
-        list.setCellRenderer(new DefaultTreeRenderer(sv));
-        String text = sv.getString(((DefaultMutableTreeNode) list.getPathForRow(2).getLastPathComponent()).getUserObject());
-        ComponentAdapter adapter = list.getComponentAdapter(2);
+        tree.setCellRenderer(new DefaultTreeRenderer(sv));
+        String text = sv.getString(((DefaultMutableTreeNode) tree.getPathForRow(2).getLastPathComponent()).getUserObject());
+        ComponentAdapter adapter = tree.getComponentAdapter(2);
         assertEquals(text, adapter.getFilteredStringAt(2, 0));
     }
 
     /**
      * Issue #767-swingx: consistent string representation.
      * 
-     * Here: test api on ComponentAdapter.
+     * Here: test api on tree's ComponentAdapter.
      */
     public void testTreeGetStringColumn() {
-        JXTreeT list = new JXTreeT(AncientSwingTeam.createNamedColorTreeModel());
-        list.expandAll();
+        JXTreeT tree = new JXTreeT(AncientSwingTeam.createNamedColorTreeModel());
+        tree.expandAll();
         StringValue sv = new StringValue() {
 
             public String getString(Object value) {
@@ -341,15 +366,14 @@ public class ComponentAdapterTest extends TestCase {
             }
             
         };
-        list.setCellRenderer(new DefaultTreeRenderer(sv));
-        String text = sv.getString(((DefaultMutableTreeNode) list.getPathForRow(2).getLastPathComponent()).getUserObject());
-        ComponentAdapter adapter = list.getComponentAdapter(2);
+        tree.setCellRenderer(new DefaultTreeRenderer(sv));
+        String text = sv.getString(((DefaultMutableTreeNode) tree.getPathForRow(2).getLastPathComponent()).getUserObject());
+        ComponentAdapter adapter = tree.getComponentAdapter(2);
         assertEquals(text, adapter.getString(0));
     }
 
     /**
      * Subclass to access ComponentAdapter.
-     * @author Jeanette Winzenburg
      */
     public static class JXTreeT extends JXTree {
 
@@ -370,7 +394,57 @@ public class ComponentAdapterTest extends TestCase {
     /**
      * Issue #767-swingx: consistent string representation.
      * 
-     * Here: test api on ComponentAdapter.
+     * Here: test api on list's ComponentAdapter.
+     */
+    public void testListGetStringAtSorted() {
+        JXListT list = new JXListT(AncientSwingTeam.createNamedColorListModel());
+        list.setFilterEnabled(true);
+        StringValue sv = new StringValue() {
+
+            public String getString(Object value) {
+                if (value instanceof Color) {
+                    Color color = (Color) value;
+                    return "R/G/B: " + color.getRGB();
+                }
+                return TO_STRING.getString(value);
+            }
+            
+        };
+        list.setCellRenderer(new DefaultListRenderer(sv));
+        list.toggleSortOrder();
+        String text = sv.getString(list.getWrappedModel().getElementAt(2));
+        ComponentAdapter adapter = list.getComponentAdapter(2);
+        assertEquals(text, adapter.getStringAt(2, 0));
+    }
+
+    /**
+     * Issue #767-swingx: consistent string representation.
+     * 
+     * Here: test api on list's ComponentAdapter.
+     */
+    public void testListGetStringAtUnsorted() {
+        JXListT list = new JXListT(AncientSwingTeam.createNamedColorListModel());
+        StringValue sv = new StringValue() {
+
+            public String getString(Object value) {
+                if (value instanceof Color) {
+                    Color color = (Color) value;
+                    return "R/G/B: " + color.getRGB();
+                }
+                return TO_STRING.getString(value);
+            }
+            
+        };
+        list.setCellRenderer(new DefaultListRenderer(sv));
+        String text = sv.getString(list.getElementAt(2));
+        ComponentAdapter adapter = list.getComponentAdapter(2);
+        assertEquals(text, adapter.getStringAt(2, 0));
+    }
+
+    /**
+     * Issue #767-swingx: consistent string representation.
+     * 
+     * Here: test api on list's ComponentAdapter.
      */
     public void testListGetString() {
         JXListT list = new JXListT(AncientSwingTeam.createNamedColorListModel());
@@ -394,7 +468,7 @@ public class ComponentAdapterTest extends TestCase {
     /**
      * Issue #767-swingx: consistent string representation.
      * 
-     * Here: test api on ComponentAdapter.
+     * Here: test api on list's ComponentAdapter.
      */
     public void testListGetFilteredString() {
         JXListT list = new JXListT(AncientSwingTeam.createNamedColorListModel());
@@ -418,7 +492,7 @@ public class ComponentAdapterTest extends TestCase {
     /**
      * Issue #767-swingx: consistent string representation.
      * 
-     * Here: test api on ComponentAdapter.
+     * Here: test api on list's ComponentAdapter.
      */
     public void testListGetStringColumn() {
         JXListT list = new JXListT(AncientSwingTeam.createNamedColorListModel());
@@ -441,7 +515,6 @@ public class ComponentAdapterTest extends TestCase {
 
     /**
      * Subclass to access ComponentAdapter.
-     * @author Jeanette Winzenburg
      */
     public static class JXListT extends JXList {
 
@@ -458,11 +531,113 @@ public class ComponentAdapterTest extends TestCase {
         }
 
     }
-    
+ 
     /**
      * Issue #767-swingx: consistent string representation.
      * 
-     * Here: test api on ComponentAdapter.
+     * Here: test api on table's ComponentAdapter.
+     */
+    public void testTableGetStringColumnHiddenColumn() {
+        JXTableT table = new JXTableT(new AncientSwingTeam());
+        StringValue sv = new StringValue() {
+
+            public String getString(Object value) {
+                if (value instanceof Color) {
+                    Color color = (Color) value;
+                    return "R/G/B: " + color.getRGB();
+                }
+                return TO_STRING.getString(value);
+            }
+            
+        };
+        table.setDefaultRenderer(Color.class, new DefaultTableRenderer(sv));
+        table.getColumnExt(2).setVisible(false);
+        String text = sv.getString(table.getModel().getValueAt(2, 2));
+        ComponentAdapter adapter = table.getComponentAdapter(2, 2);
+        assertEquals(text, adapter.getString(2));
+    }
+
+
+    /**
+     * Issue #767-swingx: consistent string representation.
+     * 
+     * Here: test api on table's ComponentAdapter.
+     */
+    public void testTableGetStringAtHiddenColumn() {
+        JXTableT table = new JXTableT(new AncientSwingTeam());
+        StringValue sv = new StringValue() {
+
+            public String getString(Object value) {
+                if (value instanceof Color) {
+                    Color color = (Color) value;
+                    return "R/G/B: " + color.getRGB();
+                }
+                return TO_STRING.getString(value);
+            }
+            
+        };
+        table.setDefaultRenderer(Color.class, new DefaultTableRenderer(sv));
+        table.getColumnExt(2).setVisible(false);
+        String text = sv.getString(table.getModel().getValueAt(2, 2));
+        ComponentAdapter adapter = table.getComponentAdapter(2, 2);
+        assertEquals(text, adapter.getStringAt(2, 2));
+    }
+
+
+    /**
+     * Issue #767-swingx: consistent string representation.
+     * 
+     * Here: test api on table's ComponentAdapter.
+     */
+    public void testTableGetStringAtSorted() {
+        JXTableT table = new JXTableT(new AncientSwingTeam());
+        StringValue sv = new StringValue() {
+
+            public String getString(Object value) {
+                if (value instanceof Color) {
+                    Color color = (Color) value;
+                    return "R/G/B: " + color.getRGB();
+                }
+                return TO_STRING.getString(value);
+            }
+            
+        };
+        table.setDefaultRenderer(Color.class, new DefaultTableRenderer(sv));
+        table.toggleSortOrder(2);
+        String text = sv.getString(table.getModel().getValueAt(2, 2));
+        ComponentAdapter adapter = table.getComponentAdapter(2, 2);
+        assertEquals(text, adapter.getStringAt(2, 2));
+    }
+
+   
+    /**
+     * Issue #767-swingx: consistent string representation.
+     * 
+     * Here: test api on table's ComponentAdapter.
+     */
+    public void testTableGetStringAtUnsorted() {
+        JXTableT table = new JXTableT(new AncientSwingTeam());
+        StringValue sv = new StringValue() {
+
+            public String getString(Object value) {
+                if (value instanceof Color) {
+                    Color color = (Color) value;
+                    return "R/G/B: " + color.getRGB();
+                }
+                return TO_STRING.getString(value);
+            }
+            
+        };
+        table.setDefaultRenderer(Color.class, new DefaultTableRenderer(sv));
+        String text = sv.getString(table.getValueAt(2, 2));
+        ComponentAdapter adapter = table.getComponentAdapter(2, 2);
+        assertEquals(text, adapter.getStringAt(2, 2));
+    }
+
+    /**
+     * Issue #767-swingx: consistent string representation.
+     * 
+     * Here: test api on table's ComponentAdapter.
      */
     public void testTableGetString() {
         JXTableT table = new JXTableT(new AncientSwingTeam());
@@ -486,7 +661,7 @@ public class ComponentAdapterTest extends TestCase {
     /**
      * Issue #767-swingx: consistent string representation.
      * 
-     * Here: test api on ComponentAdapter.
+     * Here: test api on table's ComponentAdapter.
      */
     public void testTableGetFilteredString() {
         JXTableT table = new JXTableT(new AncientSwingTeam());
@@ -510,7 +685,7 @@ public class ComponentAdapterTest extends TestCase {
     /**
      * Issue #767-swingx: consistent string representation.
      * 
-     * Here: test api on ComponentAdapter.
+     * Here: test api on table's ComponentAdapter.
      */
     public void testTableGetStringColumn() {
         JXTableT table = new JXTableT(new AncientSwingTeam());
@@ -534,7 +709,6 @@ public class ComponentAdapterTest extends TestCase {
     /**
      * Overridden to get access to componentAdapter.
      * 
-     * @author Jeanette Winzenburg
      */
     public static class JXTableT extends JXTable {
 
