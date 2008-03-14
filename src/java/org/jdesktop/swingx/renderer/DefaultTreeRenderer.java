@@ -22,14 +22,10 @@
 package org.jdesktop.swingx.renderer;
 
 
-import java.awt.Color;
 import java.awt.Component;
-import java.io.Serializable;
 
 import javax.swing.JTree;
 import javax.swing.tree.TreeCellRenderer;
-
-import org.jdesktop.swingx.RolloverRenderer;
 
 
 /**
@@ -41,10 +37,9 @@ import org.jdesktop.swingx.RolloverRenderer;
  * 
  * 
  */
-public class DefaultTreeRenderer 
-        implements TreeCellRenderer, RolloverRenderer, StringValue, Serializable {
+public class DefaultTreeRenderer extends AbstractRenderer
+        implements TreeCellRenderer {
 
-    protected ComponentProvider componentController;
     private CellContext<JTree> cellContext;
     
     /**
@@ -66,10 +61,11 @@ public class DefaultTreeRenderer
      *        use for cell rendering
      */
     public DefaultTreeRenderer(ComponentProvider componentProvider) {
-        if (componentProvider == null) {
-            componentProvider = new WrappingProvider();
-        }
-        this.componentController = componentProvider;
+        super(componentProvider);
+//        if (componentProvider == null) {
+//            componentProvider = new WrappingProvider();
+//        }
+//        this.componentController = componentProvider;
         this.cellContext = new TreeCellContext();
     }
 
@@ -114,7 +110,7 @@ public class DefaultTreeRenderer
     public DefaultTreeRenderer(IconValue iv, StringValue sv) {
         this(new WrappingProvider(iv, sv));
     }
-    
+
     // -------------- implements javax.swing.table.TableCellRenderer
     /**
      * 
@@ -135,48 +131,12 @@ public class DefaultTreeRenderer
             cellContext.installContext(tree, value, row, 0, selected, hasFocus, expanded, leaf);
             return componentController.getRendererComponent(cellContext);
         }
-    
-       /**
-        * @param background
-        */
-       public void setBackground(Color background) {
-           componentController.getDefaultVisuals().setBackground(background);
-           
-       }
-       /**
-        * @param foreground
-        */
-       public void setForeground(Color foreground) {
-           componentController.getDefaultVisuals().setForeground(foreground);
-       }
 
-//----------------- RolloverRenderer
-    
-       /**
-        * {@inheritDoc}
-        */
-       public void doClick() {
-           if (isEnabled()) {
-               ((RolloverRenderer) componentController).doClick(); 
-           }
-       }
 
-       /**
-        * {@inheritDoc}
-        */
-       public boolean isEnabled() {
-           return (componentController instanceof RolloverRenderer) && 
-              ((RolloverRenderer) componentController).isEnabled();
-       }
-
-// ------------ implement StringValue
-       
-       /**
-        * {@inheritDoc}
-        */
-       public String getString(Object value) {
-           return componentController.getString(value);
-       }
+    @Override
+    protected ComponentProvider createDefaultComponentProvider() {
+        return new WrappingProvider();
+    }
 
 
 }

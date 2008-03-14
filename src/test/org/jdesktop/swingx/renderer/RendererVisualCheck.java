@@ -92,7 +92,6 @@ import org.jdesktop.swingx.JXTree;
 import org.jdesktop.swingx.JXTreeTable;
 import org.jdesktop.swingx.LinkModel;
 import org.jdesktop.swingx.LinkRenderer;
-import org.jdesktop.swingx.RolloverRenderer;
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.action.LinkModelAction;
 import org.jdesktop.swingx.border.DropShadowBorder;
