@@ -48,9 +48,9 @@ import javax.swing.table.TableCellRenderer;
  *         StringValue.EMPTY, IconValue.ICON), JLabel.CENTER);
  * setDefaultRenderer(Icon.class, renderer);
  * setDefaultRenderer(ImageIcon.class, renderer);
- * // use a ButtonProvider for booleans
+ * // use a CheckBoxProvider for booleans
  * setDefaultRenderer(Boolean.class,
- *         new DefaultTableRenderer(new ButtonProvider()));
+ *         new DefaultTableRenderer(new CheckBoxProvider()));
  * </code></pre>
  * 
  * 
@@ -91,10 +91,6 @@ public class DefaultTableRenderer extends AbstractRenderer
      */
     public DefaultTableRenderer(ComponentProvider componentProvider) {
         super(componentProvider);
-//        if (componentProvider == null) {
-//            componentProvider = new LabelProvider();
-//        }
-//        this.componentController = componentProvider;
         this.cellContext = new TableCellContext();
     }
 
@@ -147,6 +143,9 @@ public class DefaultTableRenderer extends AbstractRenderer
         return componentController.getRendererComponent(cellContext);
     }
 
+    /**
+     * {@inheritDoc}
+     */ 
     @Override
     protected ComponentProvider createDefaultComponentProvider() {
         return new LabelProvider();

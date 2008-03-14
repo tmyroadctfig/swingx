@@ -62,10 +62,6 @@ public class DefaultTreeRenderer extends AbstractRenderer
      */
     public DefaultTreeRenderer(ComponentProvider componentProvider) {
         super(componentProvider);
-//        if (componentProvider == null) {
-//            componentProvider = new WrappingProvider();
-//        }
-//        this.componentController = componentProvider;
         this.cellContext = new TreeCellContext();
     }
 
@@ -114,11 +110,11 @@ public class DefaultTreeRenderer extends AbstractRenderer
     // -------------- implements javax.swing.table.TableCellRenderer
     /**
      * 
-     * Returns a configured component, appropriate to render the given
-     * tree cell.  
+     * Returns a configured component, appropriate to render the given tree
+     * cell.
      * 
      * @param tree the <code>JTree</code>
-     * @param value the value to assign to the cell 
+     * @param value the value to assign to the cell
      * @param selected true if cell is selected
      * @param expanded true if the cell is expanded
      * @param leaf true if the cell is a leaf
@@ -126,13 +122,18 @@ public class DefaultTreeRenderer extends AbstractRenderer
      * @param row the row of the cell to render
      * @return a component to render the given list cell.
      */
-       public Component getTreeCellRendererComponent(JTree tree, Object value, 
-                boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
-            cellContext.installContext(tree, value, row, 0, selected, hasFocus, expanded, leaf);
-            return componentController.getRendererComponent(cellContext);
-        }
+    public Component getTreeCellRendererComponent(JTree tree, Object value,
+            boolean selected, boolean expanded, boolean leaf, int row,
+            boolean hasFocus) {
+        cellContext.installContext(tree, value, row, 0, selected, hasFocus,
+                expanded, leaf);
+        return componentController.getRendererComponent(cellContext);
+    }
 
 
+    /**
+     * {@inheritDoc}
+     */ 
     @Override
     protected ComponentProvider createDefaultComponentProvider() {
         return new WrappingProvider();

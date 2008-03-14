@@ -37,10 +37,11 @@ import javax.swing.ListCellRenderer;
  * <p>
  * 
  * Note: core DefaultListCellRenderer shows either an icon or the element's
- * toString representation, depending on whether or not the given value given
- * value is of type icon or implementors. The empty/null provider taking
+ * toString representation, depending on whether or not the given value 
+ * is of type icon or implementors. This renderer's empty/null provider 
  * constructor takes care of configuring the default provider with a converter
- * which mimics that behaviour. When using of the converter taking constructors,
+ * which mimics that behaviour. When instantiating this renderer with
+ * any of the constructors which have converters as parameters,
  * it's up to the client code to supply the appropriate converter, if needed:
  * 
  * 
@@ -62,7 +63,6 @@ import javax.swing.ListCellRenderer;
  * 
  * <p>
  * 
- * PENDING: better support core consistent icon handling? 
  * 
  * @author Jeanette Winzenburg
  * 
@@ -95,40 +95,14 @@ public class DefaultListRenderer extends AbstractRenderer
      * Note: the default provider is configured with a custom StringValue
      * which behaves exactly as core DefaultListCellRenderer: depending on 
      * whether or not given value is of type icon or implementors, it shows 
-     * the icon or the element's toString.  
+     * either the icon or the element's toString.  
      * 
      * @param componentProvider the provider of the configured component to
      *   use for cell rendering
      */
     public DefaultListRenderer(ComponentProvider componentProvider) {
         super(componentProvider);
-//        if (componentProvider == null) {
-//            componentProvider = new LabelProvider(createDefaultStringValue());
-//        }
-//        this.componentController = componentProvider;
         this.cellContext = new ListCellContext();
-    }
-
-    /**
-     * Creates and returns the default StringValue for a JList.<p>
-     * This is added to keep consistent with core list rendering which
-     * shows either the Icon (for Icon value types) or the default 
-     * to-string for non-icon types.
-     * 
-     * @return the StringValue to use by default.
-     */
-    private StringValue createDefaultStringValue() {
-        StringValue sv = new StringValue() {
-
-            public String getString(Object value) {
-                if (value instanceof Icon) {
-                    return "";
-                }
-                return StringValue.TO_STRING.getString(value);
-            }
-
-        };
-        return new MappedValue(sv, IconValue.ICON);
     }
 
     /**
@@ -184,10 +158,36 @@ public class DefaultListRenderer extends AbstractRenderer
         return componentController.getRendererComponent(cellContext);
     }
 
+    /**
+     * {@inheritDoc}
+     */ 
     @Override
     protected ComponentProvider createDefaultComponentProvider() {
         return new LabelProvider(createDefaultStringValue());
     }
+
+    /**
+     * Creates and returns the default StringValue for a JList.<p>
+     * This is added to keep consistent with core list rendering which
+     * shows either the Icon (for Icon value types) or the default 
+     * to-string for non-icon types.
+     * 
+     * @return the StringValue to use by default.
+     */
+    private StringValue createDefaultStringValue() {
+        StringValue sv = new StringValue() {
+
+            public String getString(Object value) {
+                if (value instanceof Icon) {
+                    return "";
+                }
+                return StringValue.TO_STRING.getString(value);
+            }
+
+        };
+        return new MappedValue(sv, IconValue.ICON);
+    }
+
 
 }
 

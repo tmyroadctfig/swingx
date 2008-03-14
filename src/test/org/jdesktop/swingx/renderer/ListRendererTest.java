@@ -81,38 +81,26 @@ public class ListRendererTest extends InteractiveTestCase {
     }
 
     /**
-     * test if icon handling is the same for core default and
-     * swingx.
-     *
+     * test if default icon/text handling in DefaultListRenderer 
+     * is the same as core default. 
+      *
      */
     public void testIcon() {
         Icon icon = XTestUtils.loadDefaultIcon();
-        JList list = new JList(new Object[] {icon, "dummy"});
+        String text = "dummy";
+        JList list = new JList(new Object[] {icon, text});
         coreListRenderer.getListCellRendererComponent(list, icon, 0, false, false);
-        assertEquals(icon, coreListRenderer.getIcon());
-        assertEquals("", coreListRenderer.getText());
-        coreListRenderer.getListCellRendererComponent(list, "dummy", 1, false, false);
-        assertNull(coreListRenderer.getIcon());
-        assertEquals("dummy", coreListRenderer.getText());
-        // must be handled by DefaultListRenderer
-//        StringValue sv = new StringValue() {
-//
-//            public String getString(Object value) {
-//                if (value instanceof Icon) {
-//                    return "";
-//                }
-//                return StringValue.TO_STRING.getString(value);
-//            }
-//            
-//        };
-//        ListCellRenderer xListRenderer = new DefaultListRenderer(
-//                new MappedValue(sv, IconValue.ICON));
         JLabel label = (JLabel) xListRenderer.getListCellRendererComponent(null, icon, 0, false, false);
-        assertEquals(icon, label.getIcon());
-        assertEquals("", label.getText());
-        label = (JLabel) xListRenderer.getListCellRendererComponent(null, "dummy", 0, false, false);
-        assertEquals("dummy", label.getText());
-        assertNull(label.getIcon());
+        assertEquals("sanity: core shows icon", icon, coreListRenderer.getIcon());
+        assertEquals("sanity: core shows empty string", "", coreListRenderer.getText());
+        assertEquals("swingx renderer same icon as core", coreListRenderer.getIcon(), label.getIcon());
+        assertEquals("swingx renderer same text as core", coreListRenderer.getText(), label.getText());
+        coreListRenderer.getListCellRendererComponent(list, text, 1, false, false);
+        label = (JLabel) xListRenderer.getListCellRendererComponent(null, text, 1, false, false);
+        assertNull("sanity: core has null icon", coreListRenderer.getIcon());
+        assertEquals("sanity: core shows text", text, coreListRenderer.getText());
+        assertEquals("swingx renderer same same icon as core", coreListRenderer.getIcon(), label.getIcon());
+        assertEquals("swingx renderer same text as core", coreListRenderer.getText(), label.getText());
     }
  
     /**
