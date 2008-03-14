@@ -14,6 +14,7 @@ import javax.swing.JPanel;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 
+import org.jdesktop.swingx.JXImagePanel.Style;
 import org.jdesktop.swingx.border.DropShadowBorder;
 
 /**
@@ -46,6 +47,13 @@ public class JXImagePanelVisualCheck extends InteractiveTestCase {
 DropShadowBorder()));
         p.add(imagePanel);
         showInFrame(p, "JXImagePanel with drop shadow border");
+    }
+    
+    public void interactiveScalingTest() {
+        JXImagePanel p = new JXImagePanel(JXImagePanelVisualCheck.class
+                .getResource("header_jnet_new.jpg"));
+        p.setStyle(Style.SCALED_KEEP_ASPECT_RATIO);
+        showInFrame(p, "image scaling test");
     }
     
     /**

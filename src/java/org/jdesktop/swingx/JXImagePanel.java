@@ -200,7 +200,7 @@ public class JXImagePanel extends JXPanel {
     }
     
     /**
-     * Overriden to paint the image on the panel
+     * Overridden to paint the image on the panel
      * @param g 
      */
     protected void paintComponent(Graphics g) {
@@ -265,17 +265,17 @@ public class JXImagePanel extends JXPanel {
                     g2.drawImage(img, insets.left, insets.top, pw, ph, null);
                     break;
                 case SCALED_KEEP_ASPECT_RATIO:
-                    int w;
-                    int h;
-                    if ((imgWidth - pw) > (imgHeight - ph)) {
-                        w = pw;
-                        final float ratio = ((float)w) / ((float)imgWidth);
-                        h = (int)(imgHeight * ratio);
+                    int w = pw;
+                    int h = ph;
+                    final float ratioW = ((float) w) / ((float) imgWidth);
+                    final float ratioH = ((float) h) / ((float) imgHeight);
+                    
+                    if (ratioW < ratioH) {
+                        h = (int)(imgHeight * ratioW);
                     } else {
-                        h = ph;
-                        final float ratio = ((float)h) / ((float)imgHeight);
-                        w = (int)(imgWidth * ratio);
+                        w = (int)(imgWidth * ratioH);
                     }
+                    
                     final int x = (pw - w) / 2 + insets.left;
                     final int y = (ph - h) / 2 + insets.top;
                     g2.drawImage(img, x, y, w, h, null);
