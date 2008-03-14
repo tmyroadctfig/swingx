@@ -30,6 +30,7 @@ import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
 import javax.swing.Action;
+import javax.swing.BorderFactory;
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.Icon;
 import javax.swing.JButton;
@@ -56,7 +57,9 @@ import org.jdesktop.swingx.JXTable.NumberEditor;
 import org.jdesktop.swingx.JXTableHeader.SortGestureRecognizer;
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.action.LinkModelAction;
+import org.jdesktop.swingx.decorator.AbstractHighlighter;
 import org.jdesktop.swingx.decorator.ColorHighlighter;
+import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.Filter;
 import org.jdesktop.swingx.decorator.FilterPipeline;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
@@ -98,7 +101,8 @@ public class JXTableVisualCheck extends JXTableUnitTest {
           
 //          test.runInteractiveTests("interactive.*Policy.*");
 //        test.runInteractiveTests("interactive.*Rollover.*");
-        test.runInteractiveTests("interactive.*Floating.*");
+//        test.runInteractiveTests("interactive.*Floating.*");
+        test.runInteractiveTests("interactiveColumnHighlighting");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
@@ -1625,6 +1629,42 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         table.addHighlighter(new ColorHighlighter(HighlightPredicate.EDITABLE, Color.RED,
                 Color.WHITE));
         JFrame frame = wrapWithScrollingInFrame(table, "Editability Highlighter Test");
+        frame.setVisible(true);
+    }
+    
+    public void interactiveColumnHighlighting() {
+        JXTable table = new JXTable(new AncientSwingTeam());
+        
+        table.getColumnExt("Favorite Color").setHighlighters(new AbstractHighlighter() {
+            @Override
+            protected Component doHighlight(Component renderer, ComponentAdapter adapter) {
+                Color color = (Color) adapter.getValue();
+                
+                if (renderer instanceof JComponent) {
+                    ((JComponent) renderer).setBorder(BorderFactory.createLineBorder(color));
+                }
+                
+                return renderer;
+            }
+        });
+        
+        table.getColumnExt("No.").addHighlighter(
+            new AbstractHighlighter(new HighlightPredicate() {
+                public boolean isHighlighted(Component renderer, ComponentAdapter adapter) {
+                    return adapter.getValue().toString().contains("8");
+                }
+            }) {
+                @Override
+                protected Component doHighlight(Component renderer, ComponentAdapter adapter) {
+                    Font f = renderer.getFont().deriveFont(Font.ITALIC);
+                    renderer.setFont(f);
+                    
+                    return renderer;
+                }
+            }
+        );
+        
+        JFrame frame = wrapWithScrollingInFrame(table, "Column Highlighter Test");
         frame.setVisible(true);
     }
     

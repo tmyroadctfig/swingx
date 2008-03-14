@@ -25,9 +25,15 @@ import java.beans.PropertyChangeListener;
 import java.util.Comparator;
 import java.util.Hashtable;
 
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
+
+import org.jdesktop.swingx.decorator.CompoundHighlighter;
+import org.jdesktop.swingx.decorator.Highlighter;
+import org.jdesktop.swingx.util.Contract;
 
 /**
  * <code>TableColumn</code> extension for enhanced view column configuration.
@@ -74,6 +80,7 @@ import javax.swing.table.TableColumn;
  * @author Ramesh Gupta
  * @author Amy Fowler
  * @author Jeanette Winzenburg
+ * @author Karl Schaefer
  * 
  * @see TableColumnModelExt
  * @see ColumnFactory
@@ -81,7 +88,7 @@ import javax.swing.table.TableColumn;
  */
 public class TableColumnExt extends TableColumn
     implements Cloneable {
-
+    
     /** visible property. Initialized to <code>true</code>.*/
     protected boolean visible = true;
     
@@ -101,6 +108,13 @@ public class TableColumnExt extends TableColumn
     /** storage for client properties. */
     protected Hashtable<Object, Object> clientProperties;
 
+    /**
+     * The compound highlighter for the column.
+     */
+    protected CompoundHighlighter compoundHighlighter;
+    
+    private ChangeListener highlighterChangeListener;
+    
     /**
      * Creates new table view column with a model index = 0.
      */
@@ -142,6 +156,142 @@ public class TableColumnExt extends TableColumn
         super(modelIndex, width, cellRenderer, cellEditor);
     }
 
+    /**
+     * Returns the CompoundHighlighter assigned to the table, null if none.
+     * PENDING: open up for subclasses again?.
+     * 
+     * @return the CompoundHighlighter assigned to the table.
+     * @see #setCompoundHighlighter(CompoundHighlighter)
+     */
+    private CompoundHighlighter getCompoundHighlighter() {
+        return compoundHighlighter;
+    }
+
+    /**
+     * Assigns a CompoundHighlighter to the table, maybe null to remove all
+     * Highlighters.<p>
+     * 
+     * The default value is <code>null</code>. <p>
+     * 
+     * PENDING: open up for subclasses again?.
+     * @param pipeline the CompoundHighlighter to use for renderer decoration. 
+     * @see #getCompoundHighlighter()
+     * @see #addHighlighter(Highlighter)
+     * @see #removeHighlighter(Highlighter)
+     * 
+     */
+    private void setCompoundHighlighter(CompoundHighlighter pipeline) {
+        CompoundHighlighter old = getCompoundHighlighter();
+        if (old != null) {
+            old.removeChangeListener(getHighlighterChangeListener());
+        }
+        compoundHighlighter = pipeline;
+        if (compoundHighlighter != null) {
+            compoundHighlighter.addChangeListener(getHighlighterChangeListener());
+        }
+        // PENDING: wrong event - the property is either "compoundHighlighter"
+        // or "highlighters" with the old/new array as value
+        firePropertyChange("highlighters", old, getCompoundHighlighter());
+    }
+    
+    /**
+     * Sets the <code>Highlighter</code>s to the column, replacing any old settings.
+     * None of the given Highlighters must be null.<p>
+     * 
+     * @param highlighters zero or more not null highlighters to use for renderer decoration.
+     * 
+     * @see #getHighlighters()
+     * @see #addHighlighter(Highlighter)
+     * @see #removeHighlighter(Highlighter)
+     * 
+     */
+    public void setHighlighters(Highlighter... highlighters) {
+        Contract.asNotNull(highlighters, "highlighters cannot be null or contain null");
+
+        CompoundHighlighter pipeline = null;
+        if (highlighters.length > 0) {    
+           pipeline = new CompoundHighlighter(highlighters);
+        }
+        
+        setCompoundHighlighter(pipeline);
+    }
+
+    /**
+     * Returns the <code>Highlighter</code>s used by this column.
+     * Maybe empty, but guarantees to be never null.
+     * @return the Highlighters used by this column, guaranteed to never null.
+     * @see #setHighlighters(Highlighter[])
+     */
+    public Highlighter[] getHighlighters() {
+        return getCompoundHighlighter() != null ? 
+                getCompoundHighlighter().getHighlighters() : 
+                    CompoundHighlighter.EMPTY_HIGHLIGHTERS;
+    }
+    /**
+     * Adds a Highlighter. Appends to the end of the list of used
+     * Highlighters.
+     * <p>
+     * 
+     * @param highlighter the <code>Highlighter</code> to add.
+     * @throws NullPointerException if <code>Highlighter</code> is null.
+     * 
+     * @see #removeHighlighter(Highlighter)
+     * @see #setHighlighters(Highlighter[])
+     */
+    public void addHighlighter(Highlighter highlighter) {
+        CompoundHighlighter pipeline = getCompoundHighlighter();
+        if (pipeline == null) {
+           setCompoundHighlighter(new CompoundHighlighter(highlighter)); 
+        } else {
+            pipeline.addHighlighter(highlighter);
+        }
+    }
+
+    /**
+     * Removes the given Highlighter. <p>
+     * 
+     * Does nothing if the Highlighter is not contained.
+     * 
+     * @param highlighter the Highlighter to remove.
+     * @see #addHighlighter(Highlighter)
+     * @see #setHighlighters(Highlighter...)
+     */
+    public void removeHighlighter(Highlighter highlighter) {
+        if ((getCompoundHighlighter() == null)) return;
+        getCompoundHighlighter().removeHighlighter(highlighter);
+    }
+    
+    /**
+     * Returns the <code>ChangeListener</code> to use with highlighters. Lazily 
+     * creates the listener.
+     * 
+     * @return the ChangeListener for observing changes of highlighters, 
+     *   guaranteed to be <code>not-null</code>
+     */
+    protected ChangeListener getHighlighterChangeListener() {
+        if (highlighterChangeListener == null) {
+            highlighterChangeListener = createHighlighterChangeListener();
+        }
+        return highlighterChangeListener;
+    }
+
+    /**
+     * Creates and returns the ChangeListener observing Highlighters.
+     * <p>
+     * A property change event is create for a state change.
+     * 
+     * @return the ChangeListener defining the reaction to changes of
+     *         highlighters.
+     */
+    protected ChangeListener createHighlighterChangeListener() {
+        return new ChangeListener() {
+            public void stateChanged(ChangeEvent e) {
+                //return null for old state since it is unknown
+                firePropertyChange("highlighters", null, getCompoundHighlighter());
+            }
+        };
+    }
+    
     /** 
      * Returns true if the user <i>can</i> resize the TableColumn's width, 
      * false otherwise. This is a usability override: it takes into account
@@ -424,26 +574,24 @@ public class TableColumnExt extends TableColumn
       * @return a clone of this TableColumn
       */
      @Override
+     @SuppressWarnings("unchecked")
      public Object clone() {
-         final TableColumnExt copy = new TableColumnExt(
-             this.getModelIndex(), this.getWidth(),
-             this.getCellRenderer(), this.getCellEditor());
-
-         copy.setEditable(this.isEditable());
-         copy.setHeaderValue(this.getHeaderValue());	// no need to copy setTitle();
-         copy.setToolTipText(getToolTipText());
-         copy.setIdentifier(this.getIdentifier());
-         copy.setMaxWidth(this.getMaxWidth());
-         copy.setMinWidth(this.getMinWidth());
-         copy.setPreferredWidth(this.getPreferredWidth());
-         copy.setPrototypeValue(this.getPrototypeValue());
-         // JW: isResizable is overridden to return a calculated property!
-         copy.setResizable(super.getResizable());
-         copy.setVisible(this.isVisible());
-         copy.setSortable(this.isSortable());
-         copy.setComparator(getComparator());
-         copyClientPropertiesTo(copy);
-         return copy;
+         TableColumnExt clone = null;
+         
+         try {
+             clone = (TableColumnExt) super.clone();
+             
+             //ensure different reference objects for mutable fields
+             if (clientProperties != null) {
+                 clone.clientProperties = (Hashtable<Object, Object>) clientProperties.clone();
+             }
+             
+             if (compoundHighlighter != null) {
+                 clone.compoundHighlighter = new CompoundHighlighter(getHighlighters());
+             }
+         } catch (CloneNotSupportedException e) {} // Won't happen
+         
+         return clone;
      }
 
      /**
@@ -451,7 +599,9 @@ public class TableColumnExt extends TableColumn
       * to the target column.
       * 
       * @param copy the target column.
+      * @deprecated was used by old clone
       */
+     @Deprecated
      protected void copyClientPropertiesTo(TableColumnExt copy) {
         if (clientProperties == null) return;
         for(Object key: clientProperties.keySet()) {

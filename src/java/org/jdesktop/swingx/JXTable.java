@@ -2333,7 +2333,8 @@ public class JXTable extends JTable
         } else if (event.getPropertyName().equals("sortable")) {
             updateSortingAfterColumnChanged((TableColumn) event.getSource(), 
                     (Boolean) event.getNewValue());
-           
+        } else if ("highlighters".equals(event.getPropertyName())) {
+            repaint();
         }
         
     }
@@ -3669,11 +3670,23 @@ public class JXTable extends JTable
         adjustComponentOrientation(stamp);
         // #258-swingx: hacking around DefaultTableCellRenderer color memory.
         resetDefaultTableCellRendererColors(stamp, row, column);
-        if (compoundHighlighter == null) {
-            return stamp; // no need to decorate renderer with highlighters
-        } else {
-            return compoundHighlighter.highlight(stamp, getComponentAdapter(row, column));
+        
+        ComponentAdapter adapter = getComponentAdapter(row, column);
+        
+        if (compoundHighlighter != null) {
+            stamp = compoundHighlighter.highlight(stamp, adapter);
         }
+        
+        TableColumnExt columnExt = getColumnExt(column);
+        
+        if (columnExt != null) {
+            CompoundHighlighter columnHighlighters
+                    = new CompoundHighlighter(columnExt.getHighlighters());
+            
+            stamp = columnHighlighters.highlight(stamp, adapter);
+        }
+        
+        return stamp;
     }
 
     /**

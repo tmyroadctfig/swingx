@@ -6,6 +6,8 @@
  */
 package org.jdesktop.swingx.table;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.text.Collator;
 import java.util.Comparator;
@@ -13,6 +15,9 @@ import java.util.Date;
 
 import junit.framework.TestCase;
 
+import org.jdesktop.swingx.decorator.ColorHighlighter;
+import org.jdesktop.swingx.decorator.CompoundHighlighter;
+import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.test.PropertyChangeReport;
 import org.jdesktop.test.SerializableSupport;
 
@@ -204,6 +209,179 @@ public class TableColumnExtTest extends TestCase {
         column.putClientProperty(key, value);
         TableColumnExt cloned = (TableColumnExt) column.clone();
         assertEquals("client property must be in cloned", value, cloned.getClientProperty(key));
+        
+        key = "single";
+        column.putClientProperty(key, value);
+        //sanity check
+        assertSame(value, column.getClientProperty(key));
+        
+        assertNull("cloned client properties must be in independant",
+                cloned.getClientProperty(key));
     }
 
+    private static class HighlightersChangeListener implements PropertyChangeListener {
+        private boolean eventCalled;
+        
+        /**
+         * {@inheritDoc}
+         */
+        public void propertyChange(PropertyChangeEvent evt) {
+            if ("highlighters".equals(evt.getPropertyName())) {
+                eventCalled = true;
+            }
+        }
+        
+    }
+    
+    //begin SwingX Issue #770 checks
+    /**
+     * Check for setHighlighters portion of #770.
+     */
+    public void testSetHighlighters() {
+        TableColumnExt column = new TableColumnExt(0);
+        HighlightersChangeListener hcl = new HighlightersChangeListener();
+        column.addPropertyChangeListener(hcl);
+        
+        Highlighter h1 = new ColorHighlighter();
+        Highlighter h2 = new ColorHighlighter();
+        
+        //sanity check
+        assertFalse(hcl.eventCalled);
+        
+        //base case no highlighters
+        assertSame(CompoundHighlighter.EMPTY_HIGHLIGHTERS, column.getHighlighters());
+        
+        column.setHighlighters(h1);
+        assertTrue(hcl.eventCalled);
+        assertEquals(1, column.getHighlighters().length);
+        assertSame(h1, column.getHighlighters()[0]);
+        
+        //reset state
+        hcl.eventCalled = false;
+        
+        column.removeHighlighter(h1);
+        assertTrue(hcl.eventCalled);
+        //we have a compound, but empty highlighter
+        assertEquals(0, column.getHighlighters().length);
+        assertNotSame(CompoundHighlighter.EMPTY_HIGHLIGHTERS, column.getHighlighters());
+        
+        //reset state
+        hcl.eventCalled = false;
+        
+        column.setHighlighters(h1, h2);
+        assertTrue(hcl.eventCalled);
+        assertEquals(2, column.getHighlighters().length);
+        assertSame(h1, column.getHighlighters()[0]);
+        assertSame(h2, column.getHighlighters()[1]);
+    }
+    
+    /**
+     * Check for addHighlighter portion of #770.
+     */
+    public void testAddHighlighter() {
+        TableColumnExt column = new TableColumnExt(0);
+        HighlightersChangeListener hcl = new HighlightersChangeListener();
+        column.addPropertyChangeListener(hcl);
+        
+        Highlighter h1 = new ColorHighlighter();
+        Highlighter h2 = new ColorHighlighter();
+        
+        //sanity check
+        assertFalse(hcl.eventCalled);
+        
+        //base case no highlighters
+        assertSame(CompoundHighlighter.EMPTY_HIGHLIGHTERS, column.getHighlighters());
+        
+        column.addHighlighter(h1);
+        assertTrue(hcl.eventCalled);
+        assertEquals(1, column.getHighlighters().length);
+        assertSame(h1, column.getHighlighters()[0]);
+        
+        //reset state
+        hcl.eventCalled = false;
+        
+        column.removeHighlighter(h1);
+        assertTrue(hcl.eventCalled);
+        //we have a compound, but empty highlighter
+        assertEquals(0, column.getHighlighters().length);
+        assertNotSame(CompoundHighlighter.EMPTY_HIGHLIGHTERS, column.getHighlighters());
+        
+        //reset state
+        hcl.eventCalled = false;
+        
+        column.setHighlighters(h1);
+        column.addHighlighter(h2);
+        assertTrue(hcl.eventCalled);
+        assertEquals(2, column.getHighlighters().length);
+        assertSame(h1, column.getHighlighters()[0]);
+        assertSame(h2, column.getHighlighters()[1]);
+    }
+    
+    /**
+     * Check for removeHighlighter portion of #770.
+     */
+    public void testRemoveHighlighter() {
+        TableColumnExt column = new TableColumnExt(0);
+        HighlightersChangeListener hcl = new HighlightersChangeListener();
+        column.addPropertyChangeListener(hcl);
+        
+        Highlighter h1 = new ColorHighlighter();
+        Highlighter h2 = new ColorHighlighter();
+        Highlighter h3 = new ColorHighlighter();
+        
+        //sanity check
+        assertFalse(hcl.eventCalled);
+        
+        //ensure that nothing goes awry
+        column.removeHighlighter(h1);
+        assertFalse(hcl.eventCalled);
+        
+        column.setHighlighters(h1, h2, h3);
+        
+        //reset state
+        hcl.eventCalled = false;
+        
+        column.removeHighlighter(h2);
+        assertTrue(hcl.eventCalled);
+        assertEquals(2, column.getHighlighters().length);
+        assertSame(h1, column.getHighlighters()[0]);
+        assertSame(h3, column.getHighlighters()[1]);
+    }
+    
+    /**
+     * Check to ensure that the clone returns the highlighters correctly. Part of #770.
+     */
+    public void testClonedHighlighters() {
+        TableColumnExt column = new TableColumnExt(0);
+        Highlighter h1 = new ColorHighlighter();
+        Highlighter h2 = new ColorHighlighter();
+        Highlighter h3 = new ColorHighlighter();
+        
+        column.setHighlighters(h1, h2);
+        
+        TableColumnExt clone = (TableColumnExt) column.clone();
+        
+        Highlighter[] columnHighlighters = column.getHighlighters();
+        Highlighter[] cloneHighlighters = clone.getHighlighters();
+        
+        assertEquals(2, columnHighlighters.length);
+        assertEquals(columnHighlighters.length, cloneHighlighters.length);
+        assertSame(h1, columnHighlighters[0]);
+        assertSame(columnHighlighters[0], cloneHighlighters[0]);
+        assertSame(h2, columnHighlighters[1]);
+        assertSame(columnHighlighters[1], cloneHighlighters[1]);
+        
+        column.addHighlighter(h3);
+        
+        columnHighlighters = column.getHighlighters();
+        cloneHighlighters = clone.getHighlighters();
+        
+        assertEquals(3, columnHighlighters.length);
+        assertEquals(columnHighlighters.length, cloneHighlighters.length + 1);
+        assertSame(h1, columnHighlighters[0]);
+        assertSame(columnHighlighters[0], cloneHighlighters[0]);
+        assertSame(h2, columnHighlighters[1]);
+        assertSame(columnHighlighters[1], cloneHighlighters[1]);
+        assertSame(h3, columnHighlighters[2]);
+    }
 }
