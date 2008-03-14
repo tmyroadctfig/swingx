@@ -2436,7 +2436,7 @@ public class JXTable extends JTable
      * Returns the ColumnFactory. <p>
      * 
      * @return the columnFactory to use for column creation and
-     *   configuration.
+     *   configuration, guaranteed to not be null.
      *   
      * @see #setColumnFactory(ColumnFactory)
      * @see org.jdesktop.swingx.table.ColumnFactory
@@ -2461,7 +2461,11 @@ public class JXTable extends JTable
     /**
      * Sets the <code>ColumnFactory</code> to use for column creation and 
      * configuration. The default value is the shared application
-     * ColumnFactory.
+     * ColumnFactory.<p>
+     * 
+     * Note: this method has no side-effect, that is existing columns are 
+     * <b>not</b> re-created automatically, client code must trigger it
+     * manually.  
      * 
      * @param columnFactory the factory to use, <code>null</code> indicates
      *    to use the shared application factory.
