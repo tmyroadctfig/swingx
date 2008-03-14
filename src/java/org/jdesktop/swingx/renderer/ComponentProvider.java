@@ -145,9 +145,9 @@ public abstract class ComponentProvider<T extends JComponent>
      */
     public ComponentProvider(StringValue converter, int alignment) {
         setHorizontalAlignment(alignment);
-        setToStringConverter(converter);
+        setStringValue(converter);
         rendererComponent = createRendererComponent();
-        defaultVisuals = createRendererController();
+        defaultVisuals = createDefaultVisuals();
     }
 
     /**
@@ -197,11 +197,9 @@ public abstract class ComponentProvider<T extends JComponent>
      * Sets the StringValue to use. If the given StringValue is null,
      * defaults to <code>StringValue.TO_STRING</code>. <p>
      * 
-     * PENDING JW: rename!
-     * 
      * @param formatter the format to use.
      */
-    public void setToStringConverter(StringValue formatter) {
+    public void setStringValue(StringValue formatter) {
         if (formatter == null) {
             formatter = StringValue.TO_STRING;
         }
@@ -212,42 +210,11 @@ public abstract class ComponentProvider<T extends JComponent>
      * Returns the StringValue to use for obtaining 
      * the String representation. <p>
      * 
-     * PENDING JW: rename!
-     * 
      * @return the StringValue used by this provider, guaranteed to
      *   be not null.
      */
-    public StringValue getToStringConverter() {
+    public StringValue getStringValue() {
         return formatter;
-    }
-
-    /**
-     * Returns a string representation of the content.<p>
-     * 
-     * PENDING: This is a first attempt - we need a consistent string representation
-     * across all (new and old) theme: rendering, (pattern) filtering/highlighting,
-     * searching, auto-complete, what else??   <p>
-     * 
-     * PENDING JW: this _cannot_ be the hook for client code as described above. Instead,
-     * it is used internally for safely getting at the value (need to check against
-     * null). For now it's deprecated, will remove. Subclasses should use getValueAsString(), client
-     * code should use ??.
-     * 
-     * <p>
-     * PENDING JW: rename! <p>
-     * 
-     * 
-     * @param context the cell context.
-     * @return a appropriate string representation of the cell's content.
-     * @deprecated (pre-0.9.2) use {@link #getString(Object)}
-     */
-    @Deprecated
-    public String getStringValue(CellContext context) {
-        Object value = null;
-        if (context != null) {
-            value = context.getValue();
-        }
-        return formatter.getString(value);
     }
 
     /**
@@ -261,7 +228,8 @@ public abstract class ComponentProvider<T extends JComponent>
      * 
      * <pre><code>
      * if (equals(value, context.getValue()) {
-     *     assertEquals(provider.getString(value), provider.getRenderingComponent(context).getText());
+     *     assertEquals(provider.getString(value), 
+     *     provider.getRenderingComponent(context).getText());
      * }
      * </code></pre>
      * 
@@ -371,7 +339,7 @@ public abstract class ComponentProvider<T extends JComponent>
      * @return the controller used to configure the default visuals of
      *   the rendering component.
      */
-    protected DefaultVisuals<T> createRendererController() {
+    protected DefaultVisuals<T> createDefaultVisuals() {
         return new DefaultVisuals<T>();
     }
 
@@ -380,8 +348,63 @@ public abstract class ComponentProvider<T extends JComponent>
      * 
      * @return the default visual configurator used by this.
      */
-    protected DefaultVisuals<T> getRendererController() {
+    protected DefaultVisuals<T> getDefaultVisuals() {
         return defaultVisuals;
     }
 
+//-------------- deprecated methods - these will be romved after the next release    
+    /**
+     * Returns the StringValue to use for obtaining the String representation.
+     * <p>
+     * 
+     * @return the StringValue used by this provider, guaranteed to be not null.
+     * @deprecated use {@link #getStringValue()}
+     */
+    @Deprecated
+    public StringValue getToStringConverter() {
+        return formatter;
+    }
+
+    /**
+     * Sets the StringValue to use. If the given StringValue is null,
+     * defaults to <code>StringValue.TO_STRING</code>.
+     * <p>
+     * 
+     * @param formatter the format to use.
+     * @deprecated use {@link #setStringValue(StringValue)}
+     */
+    @Deprecated
+    public void setToStringConverter(StringValue formatter) {
+        if (formatter == null) {
+            formatter = StringValue.TO_STRING;
+        }
+        this.formatter = formatter;
+    }
+
+
+    /**
+     * Factory method to create and return the DefaultVisuals used by this
+     * to configure the default visuals. Here: creates the default controller
+     * parameterized to the same type as this.
+     * 
+     * @return the controller used to configure the default visuals of
+     *   the rendering component.
+     *   
+     *   @deprecated use {@link #createDefaultVisuals()}
+     */
+    @Deprecated
+    protected DefaultVisuals<T> createRendererController() {
+        return new DefaultVisuals<T>();
+    }
+
+    /**
+     * Intermediate exposure during refactoring...
+     * 
+     * @return the default visual configurator used by this.
+     * @deprecated use {@link #getDefaultVisuals()}
+     */
+    @Deprecated
+    protected DefaultVisuals<T> getRendererController() {
+        return defaultVisuals;
+    }
 }

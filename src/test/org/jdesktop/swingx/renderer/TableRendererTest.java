@@ -83,7 +83,7 @@ public class TableRendererTest extends InteractiveTestCase {
         FormatStringValue sv = new FormatStringValue(DateFormat.getTimeInstance());
         int align = JLabel.RIGHT;
         DefaultTableRenderer renderer = new DefaultTableRenderer(sv, align);
-        assertEquals(sv, renderer.componentController.getToStringConverter());
+        assertEquals(sv, renderer.componentController.getStringValue());
         assertEquals(align, renderer.componentController.getHorizontalAlignment());
     }
     /**

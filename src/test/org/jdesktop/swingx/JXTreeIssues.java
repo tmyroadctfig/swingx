@@ -140,7 +140,7 @@ public class JXTreeIssues extends JXTreeUnitTest {
             
         };
         WrappingProvider provider = new WrappingProvider(sv);
-        provider.setToStringConverter(new MappedValue(null, iv));
+        provider.setStringValue(new MappedValue(null, iv));
         tree.setCellRenderer(new DefaultTreeRenderer(provider));
         tree.setRowHeight(22);
         JXFrame frame = wrapWithScrollingInFrame(tree,

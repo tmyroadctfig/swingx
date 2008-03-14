@@ -155,14 +155,14 @@ public class DefaultTableRenderer
      * @param background
      */
     public void setBackground(Color background) {
-        componentController.getRendererController().setBackground(background);
+        componentController.getDefaultVisuals().setBackground(background);
         
     }
     /**
      * @param foreground
      */
     public void setForeground(Color foreground) {
-        componentController.getRendererController().setForeground(foreground);
+        componentController.getDefaultVisuals().setForeground(foreground);
     }
 
 //----------------- RolloverRenderer

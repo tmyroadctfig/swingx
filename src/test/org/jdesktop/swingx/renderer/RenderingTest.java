@@ -490,15 +490,15 @@ public class RenderingTest extends TestCase {
         // sanity ...
         assertTrue(provider.getWrappee() instanceof LabelProvider);
         assertEquals("wrappee's StringValue must be default", 
-                new LabelProvider().getToStringConverter(),
-                provider.getWrappee().getToStringConverter()); 
+                new LabelProvider().getStringValue(),
+                provider.getWrappee().getStringValue()); 
         StringValue sv = FormatStringValue.DATE_TO_STRING;
         WrappingProvider customStringValue = new WrappingProvider(sv);
         assertEquals("wrappee's StringValue must be configured to given", sv, 
-                customStringValue.getWrappee().getToStringConverter());
+                customStringValue.getWrappee().getStringValue());
         WrappingProvider iconValueAndCustomStringValue = new WrappingProvider(null, sv);
         assertEquals("wrappee's StringValue must be configured to given", sv, 
-                iconValueAndCustomStringValue.getWrappee().getToStringConverter());
+                iconValueAndCustomStringValue.getWrappee().getStringValue());
     }
     
     /**
@@ -511,7 +511,7 @@ public class RenderingTest extends TestCase {
                      provider.getWrappee().getClass(), 
                 provider.getWrappee() instanceof LabelProvider);
         assertEquals("default StringValue must be empty", StringValue.EMPTY, 
-                provider.getToStringConverter());
+                provider.getStringValue());
     }
     
     /**
@@ -631,7 +631,7 @@ public class RenderingTest extends TestCase {
     public void testButtonProviderConstructor() {
         ComponentProvider provider = new CheckBoxProvider();
         assertEquals(JLabel.CENTER, provider.getHorizontalAlignment());
-        assertEquals(StringValue.EMPTY, provider.getToStringConverter());
+        assertEquals(StringValue.EMPTY, provider.getStringValue());
        
     }
 
@@ -673,7 +673,7 @@ public class RenderingTest extends TestCase {
         DefaultTableRenderer numberRenderer = (DefaultTableRenderer) table.getDefaultRenderer(Number.class);
         JLabel label = (JLabel) numberRenderer.getTableCellRendererComponent(table, null, false, false, 0, 0);
         assertEquals(JLabel.RIGHT, label.getHorizontalAlignment());
-        assertEquals(FormatStringValue.NUMBER_TO_STRING, numberRenderer.componentController.getToStringConverter());
+        assertEquals(FormatStringValue.NUMBER_TO_STRING, numberRenderer.componentController.getStringValue());
         // icon
         DefaultTableRenderer iconRenderer = (DefaultTableRenderer) table.getDefaultRenderer(Icon.class);
         JLabel iconLabel = (JLabel) iconRenderer.getTableCellRendererComponent(table, null, false, false, 0, 0);
@@ -691,7 +691,7 @@ public class RenderingTest extends TestCase {
         int align = JLabel.RIGHT;
         LabelProvider provider = new LabelProvider(sv, align);
         assertEquals(align, provider.getHorizontalAlignment());
-        assertEquals(sv, provider.getToStringConverter());
+        assertEquals(sv, provider.getStringValue());
     }
     
     /**
@@ -700,7 +700,7 @@ public class RenderingTest extends TestCase {
     public void testConstructorDefault() {
         LabelProvider provider = new LabelProvider();
         assertEquals(JLabel.LEADING, provider.getHorizontalAlignment());
-        assertEquals(StringValue.TO_STRING, provider.getToStringConverter());
+        assertEquals(StringValue.TO_STRING, provider.getStringValue());
     }
     
     /**
@@ -710,7 +710,7 @@ public class RenderingTest extends TestCase {
         int align = JLabel.RIGHT;
         LabelProvider provider = new LabelProvider(align);
         assertEquals(align, provider.getHorizontalAlignment());
-        assertEquals(StringValue.TO_STRING, provider.getToStringConverter());
+        assertEquals(StringValue.TO_STRING, provider.getStringValue());
     }
     
     /**
@@ -720,7 +720,7 @@ public class RenderingTest extends TestCase {
         FormatStringValue sv = new FormatStringValue(DateFormat.getTimeInstance());
         LabelProvider provider = new LabelProvider(sv);
         assertEquals(JLabel.LEADING, provider.getHorizontalAlignment());
-        assertEquals(sv, provider.getToStringConverter());
+        assertEquals(sv, provider.getStringValue());
     }
 
     /**
@@ -823,14 +823,6 @@ public class RenderingTest extends TestCase {
     public void testGetComponentNullContext() {
         ComponentProvider controller = new LabelProvider();
         assertEquals(controller.rendererComponent, controller.getRendererComponent(null));
-    }
-    /**
-     * public methods of <code>ComponentProvider</code> must cope
-     * with null context. Here: test getStringValue.
-     */
-    public void testStringValueNullContext() {
-        ComponentProvider controller = new LabelProvider();
-        controller.getStringValue(null);
     }
     
     /**

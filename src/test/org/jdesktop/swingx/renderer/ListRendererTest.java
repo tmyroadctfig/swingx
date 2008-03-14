@@ -76,7 +76,7 @@ public class ListRendererTest extends InteractiveTestCase {
         FormatStringValue sv = new FormatStringValue(DateFormat.getTimeInstance());
         int align = JLabel.RIGHT;
         DefaultListRenderer renderer = new DefaultListRenderer(sv, align);
-        assertEquals(sv, renderer.componentController.getToStringConverter());
+        assertEquals(sv, renderer.componentController.getStringValue());
         assertEquals(align, renderer.componentController.getHorizontalAlignment());
     }
 

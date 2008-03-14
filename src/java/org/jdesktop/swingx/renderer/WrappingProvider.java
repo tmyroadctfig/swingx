@@ -74,7 +74,7 @@ public class WrappingProvider extends
      */
     public WrappingProvider(IconValue iconValue, StringValue wrappeeStringValue) {
         this(wrappeeStringValue);
-        setToStringConverter(new MappedValue(null, iconValue));
+        setStringValue(new MappedValue(null, iconValue));
     }
 
     /**
@@ -85,7 +85,7 @@ public class WrappingProvider extends
      */
     public WrappingProvider(IconValue iconValue) {
         this();
-        setToStringConverter(new MappedValue(null, iconValue));
+        setStringValue(new MappedValue(null, iconValue));
     }
    
     /**
@@ -127,7 +127,7 @@ public class WrappingProvider extends
         // PENDING JW: this is inherently unsafe - must not call 
         // non-final methods from constructor
         setWrappee(delegate);
-        setToStringConverter(StringValue.EMPTY);
+        setStringValue(StringValue.EMPTY);
         setUnwrapUserObject(unwrapUserObject);
     }
 
