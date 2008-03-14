@@ -7,6 +7,7 @@
 
 package org.jdesktop.swingx;
 
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.net.URL;
@@ -18,6 +19,7 @@ import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
 
 import org.jdesktop.swingx.FindTest.TestListModel;
 import org.jdesktop.swingx.FindTest.TestTableModel;
@@ -34,9 +36,9 @@ public class FindVisualCheck extends InteractiveTestCase {
 //      Locale.setDefault(new Locale("es"));
       FindVisualCheck test = new FindVisualCheck();
       try {
-        test.runInteractiveTests();
+//        test.runInteractiveTests();
 //          test.runInteractiveTests("interactive.*Compare.*");
-//          test.runInteractiveTests("interactive.*Tree.*");
+          test.runInteractiveTests("interactive.*Close.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
@@ -54,7 +56,52 @@ public class FindVisualCheck extends InteractiveTestCase {
         super("Find Action Test");
     }
 
-   
+   /**
+    * Requirement: hook into close. 
+    * 
+    * Solution: put the custom action in the panel's action map with the 
+    * key JXDialog.CLOSE_ACTION_COMMAND.
+    * 
+    * Nasty problem is that the custom action overwrites the default, 
+    * so the dialog is not closed. Nasty solution is to go up the until the
+    * JXDialog is found and manually invoke its close.
+    */
+    public void interactiveCustomClose() {
+        final SearchFactory custom = new SearchFactory() {
+
+            @Override
+            public JXFindPanel createFindPanel() {
+                final JXFindPanel panel = super.createFindPanel();
+                Action customClose = new AbstractAction() {
+
+                    public void actionPerformed(ActionEvent e) {
+                        LOG.info("my action");
+                        // this is nasty ... 
+                        Window window = SwingUtilities.getWindowAncestor(panel);
+                        if (window instanceof JXDialog) {
+                            ((JXDialog) window).doClose();
+                        }
+                    }
+                    
+                };
+                panel.getActionMap().put(JXDialog.CLOSE_ACTION_COMMAND, customClose);
+                return panel;
+            }
+            
+        };
+        final JXTable table = new JXTable(new AncientSwingTeam());
+        Action customFind = new AbstractAction() {
+
+            public void actionPerformed(ActionEvent e) {
+                custom.showFindDialog(table, table.getSearchable());
+                
+            }
+            
+        };
+        table.getActionMap().put("find", customFind);
+        showWithScrollingInFrame(table, "augment close action of dialog");
+        
+    }
     /**
      * Issue #720, 692-swingx: findDialog on tree selection as match-marker lost
      * 
