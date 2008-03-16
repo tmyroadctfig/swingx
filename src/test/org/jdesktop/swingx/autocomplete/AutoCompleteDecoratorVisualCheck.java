@@ -22,7 +22,6 @@ public class AutoCompleteDecoratorVisualCheck extends InteractiveTestCase {
         }
     }
 
-
     public void interactiveCompletionAtTopTest() {
         JComboBox combo = new JComboBox(new String[] {
                 "A1", "A2", "A3", "A4", "A5",
@@ -35,6 +34,16 @@ public class AutoCompleteDecoratorVisualCheck extends InteractiveTestCase {
         
         JFrame frame = wrapInFrame(combo, "show combo ");
         frame.setSize(200, 200);
+        frame.setVisible(true);
+    }
+    
+    public void interactiveCompletionOfEmptyCombo() {
+        JComboBox combo = new JComboBox(new String[0]);
+        
+        AutoCompleteDecorator.decorate(combo);
+        
+        JFrame frame = wrapInFrame(combo, "empty combo");
+        frame.pack();
         frame.setVisible(true);
     }
     

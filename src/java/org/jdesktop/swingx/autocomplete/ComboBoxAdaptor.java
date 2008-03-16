@@ -78,11 +78,17 @@ public class ComboBoxAdaptor extends AbstractAutoCompleteAdaptor implements Acti
         // other systems
         Accessible a = comboBox.getUI().getAccessibleChild(comboBox, 0);
         
-        if (a instanceof ComboPopup) {
+        if (getItemCount() > 0 && a instanceof ComboPopup) {
             JList list = ((ComboPopup) a).getList();
             int lastIndex = list.getModel().getSize() - 1;
             
             Rectangle rect = list.getCellBounds(lastIndex, lastIndex);
+            
+            if (rect == null) {
+                throw new IllegalStateException(
+                        "attempting to access index " + lastIndex + " for " + comboBox);
+            }
+            
             list.scrollRectToVisible(rect);
         }
         
