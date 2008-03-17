@@ -15,6 +15,7 @@ import java.util.Vector;
 import java.util.regex.Pattern;
 
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.ListCellRenderer;
@@ -51,6 +52,77 @@ public class JXListTest extends InteractiveTestCase {
     protected ListModel listModel;
     protected DefaultListModel ascendingListModel;
 
+    /**
+     * Issue #816-swingx: Delegating renderer must create list's default.
+     * Delegating uses default on null, here: default default.
+     */
+    public void testDelegatingRendererUseDefaultSetNull() {
+        JXList list = new JXList();
+        ListCellRenderer defaultRenderer = list.createDefaultCellRenderer();
+        DelegatingRenderer renderer = (DelegatingRenderer) list.getCellRenderer();
+        list.setCellRenderer(null);
+        assertEquals("wrapping renderer must use list's default on null", 
+                defaultRenderer.getClass(), renderer.getDelegateRenderer().getClass());
+    }
+
+    /**
+     * Issue #816-swingx: Delegating renderer must create list's default.
+     * Delegating has default from list initially, here: default default.
+     */
+    public void testDelegatingRendererUseDefault() {
+        JXList list = new JXList();
+        ListCellRenderer defaultRenderer = list.createDefaultCellRenderer();
+        assertEquals("sanity: creates default", DefaultListRenderer.class, 
+                defaultRenderer.getClass());
+        DelegatingRenderer renderer = (DelegatingRenderer) list.getCellRenderer();
+        assertEquals(defaultRenderer.getClass(), renderer.getDelegateRenderer().getClass());
+    }
+    
+    /**
+     * Issue #816-swingx: Delegating renderer must create list's default.
+     * Delegating has default from list initially, here: custom default.
+     */
+    public void testDelegatingRendererUseCustomDefaultSetNull() {
+        JXList list = new JXList() {
+
+            @Override
+            protected ListCellRenderer createDefaultCellRenderer() {
+                return new CustomDefaultRenderer();
+            }
+            
+        };
+        ListCellRenderer defaultRenderer = list.createDefaultCellRenderer();
+        DelegatingRenderer renderer = (DelegatingRenderer) list.getCellRenderer();
+        list.setCellRenderer(null);
+        assertEquals("wrapping renderer must use list's default on null",
+                defaultRenderer.getClass(), renderer.getDelegateRenderer().getClass());
+    }
+    
+    /**
+     * Issue #816-swingx: Delegating renderer must create list's default.
+     * Delegating has default from list initially, here: custom default.
+     */
+    public void testDelegatingRendererUseCustomDefault() {
+        JXList list = new JXList() {
+
+            @Override
+            protected ListCellRenderer createDefaultCellRenderer() {
+                return new CustomDefaultRenderer();
+            }
+            
+        };
+        ListCellRenderer defaultRenderer = list.createDefaultCellRenderer();
+        assertEquals("sanity: creates custom", CustomDefaultRenderer.class, 
+                defaultRenderer.getClass());
+        DelegatingRenderer renderer = (DelegatingRenderer) list.getCellRenderer();
+        assertEquals(defaultRenderer.getClass(), renderer.getDelegateRenderer().getClass());
+    }
+    /**
+     * Dummy extension for testing - does nothing more as super.
+     */
+    public static class CustomDefaultRenderer extends DefaultListCellRenderer {
+    }
+    
     /**
      * Issue #767-swingx: consistent string representation.
      * 

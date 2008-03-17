@@ -37,7 +37,6 @@ import java.util.regex.Pattern;
 
 import javax.swing.AbstractListModel;
 import javax.swing.Action;
-import javax.swing.DefaultListCellRenderer;
 import javax.swing.JComponent;
 import javax.swing.JList;
 import javax.swing.KeyStroke;
@@ -1427,7 +1426,7 @@ public class JXList extends JList {
     private DelegatingRenderer getDelegatingRenderer() {
         if (delegatingRenderer == null) {
             // only called once... to get hold of the default?
-            delegatingRenderer = new DelegatingRenderer(createDefaultCellRenderer());
+            delegatingRenderer = new DelegatingRenderer();
         }
         return delegatingRenderer;
     }
@@ -1442,11 +1441,33 @@ public class JXList extends JList {
         return new DefaultListRenderer();
     }
 
+    /**
+     * {@inheritDoc} <p>
+     * 
+     * Overridden to return the delegating renderer which is wrapped around the
+     * original to support highlighting. The returned renderer is of type 
+     * DelegatingRenderer and guaranteed to not-null<p>
+     * 
+     * @see #setCellRenderer(ListCellRenderer)
+     * @see DelegatingRenderer
+     */
     @Override
     public ListCellRenderer getCellRenderer() {
         return getDelegatingRenderer();
     }
 
+    /**
+     * {@inheritDoc} <p>
+     * 
+     * Overridden to wrap the given renderer in a DelegatingRenderer to support
+     * highlighting. <p>
+     * 
+     * Note: the wrapping implies that the renderer returned from the getCellRenderer
+     * is <b>not</b> the renderer as given here, but the wrapper. 
+     * 
+     * @see #getCellRenderer()
+     * 
+     */
     @Override
     public void setCellRenderer(ListCellRenderer renderer) {
         // JW: Pending - probably fires propertyChangeEvent with wrong newValue?
@@ -1456,37 +1477,90 @@ public class JXList extends JList {
         super.setCellRenderer(delegatingRenderer);
     }
 
+    /**
+     * A decorator for the original ListCellRenderer. Needed to hook highlighters
+     * after messaging the delegate.<p>
+     * 
+     * PENDING JW: formally implement UIDependent?
+     */
     public class DelegatingRenderer implements ListCellRenderer, RolloverRenderer {
-
+        /** the delegate. */
         private ListCellRenderer delegateRenderer;
 
+        /**
+         * Instantiates a DelegatingRenderer with list's default renderer as delegate.
+         */
+        public DelegatingRenderer() {
+            this(null);
+        }
+        
+        /**
+         * Instantiates a DelegatingRenderer with the given delegate. If the
+         * delegate is null, the default is created via the list's factory method.
+         * 
+         * @param delegate the delegate to use, if null the list's default is
+         *   created and used.
+         */
         public DelegatingRenderer(ListCellRenderer delegate) {
             setDelegateRenderer(delegate);
         }
 
+        /**
+         * Sets the delegate. If the
+         * delegate is null, the default is created via the list's factory method.
+         * 
+         * @param delegate the delegate to use, if null the list's default is
+         *   created and used.
+         */
         public void setDelegateRenderer(ListCellRenderer delegate) {
             if (delegate == null) {
-                delegate = new DefaultListCellRenderer();
+                delegate = createDefaultCellRenderer();
             }
             delegateRenderer = delegate;
         }
 
-        
+        /**
+         * Returns the delegate.
+         * 
+         * @return the delegate renderer used by this renderer, guaranteed to
+         *   not-null.
+         */
         public ListCellRenderer getDelegateRenderer() {
             return delegateRenderer;
         }
 
-        public boolean isEnabled() {
-            return (delegateRenderer instanceof RolloverRenderer) && 
-               ((RolloverRenderer) delegateRenderer).isEnabled();
-        }
-        
-        public void doClick() {
-            if (isEnabled()) {
-                ((RolloverRenderer) delegateRenderer).doClick();
-            }
-        }
-        public Component getListCellRendererComponent(JList list, Object value,
+        /**
+         * Updates the ui of the delegate.
+         */
+         public void updateUI() {
+             updateRendererUI(delegateRenderer);
+         }
+
+         /**
+          * 
+          * @param renderer the renderer to update the ui of.
+          */
+         private void updateRendererUI(ListCellRenderer renderer) {
+             // PENDING JW: use updateComponentTree instead?
+             if (renderer instanceof JComponent) {
+                 ((JComponent) renderer).updateUI();
+             } else if (renderer != null) {
+                 Component comp = renderer.getListCellRendererComponent(
+                         JXList.this, null, -1, false, false);
+                 if (comp instanceof JComponent) {
+                     ((JComponent) comp).updateUI();
+                 }
+             }
+
+         }
+         
+         // --------- implement ListCellRenderer
+        /**
+         * {@inheritDoc} <p>
+         * 
+         * Overridden to apply the highlighters, if any, after calling the delegate.
+         */
+       public Component getListCellRendererComponent(JList list, Object value,
                 int index, boolean isSelected, boolean cellHasFocus) {
             Component comp = delegateRenderer.getListCellRendererComponent(list, value, index,
                     isSelected, cellHasFocus);
@@ -1497,23 +1571,26 @@ public class JXList extends JList {
         }
 
 
-        public void updateUI() {
-            updateRendererUI(delegateRenderer);
+        // implement RolloverRenderer
+        
+        /**
+         * {@inheritDoc}
+         * 
+         */
+        public boolean isEnabled() {
+            return (delegateRenderer instanceof RolloverRenderer) && 
+               ((RolloverRenderer) delegateRenderer).isEnabled();
         }
-
-        private void updateRendererUI(ListCellRenderer renderer) {
-            if (renderer instanceof JComponent) {
-                ((JComponent) renderer).updateUI();
-            } else if (renderer != null) {
-                Component comp = renderer.getListCellRendererComponent(
-                        JXList.this, null, -1, false, false);
-                if (comp instanceof JComponent) {
-                    ((JComponent) comp).updateUI();
-                }
+        
+        /**
+         * {@inheritDoc}
+         */
+        public void doClick() {
+            if (isEnabled()) {
+                ((RolloverRenderer) delegateRenderer).doClick();
             }
-
         }
-
+        
     }
 
     // --------------------------- updateUI
