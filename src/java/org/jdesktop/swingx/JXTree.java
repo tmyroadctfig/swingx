@@ -450,18 +450,27 @@ public class JXTree extends JTree {
          * null if no matching
          */
         protected SearchResult findMatchAt(Pattern pattern, int row) {
-            TreePath path = getPathForRow(row);
-            Object value = null;
-            if (path != null) {
-                value = path.getLastPathComponent();
-            }
-            if (value != null) {
-                Matcher matcher = pattern.matcher(value.toString());
+            String text = getStringAt(row);
+            if ((text != null) && (text.length() > 0 )) {
+                Matcher matcher = pattern.matcher(text);
                 if (matcher.find()) {
                     return createSearchResult(matcher, row, -1);
                 }
             }
             return null;
+         // this is pre-767-swingx: consistent string api
+//            TreePath path = getPathForRow(row);
+//            Object value = null;
+//            if (path != null) {
+//                value = path.getLastPathComponent();
+//            }
+//            if (value != null) {
+//                Matcher matcher = pattern.matcher(value.toString());
+//                if (matcher.find()) {
+//                    return createSearchResult(matcher, row, -1);
+//                }
+//            }
+//            return null;
         }
 
         @Override

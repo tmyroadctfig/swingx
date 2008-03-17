@@ -109,16 +109,28 @@ public class SearchPredicate implements HighlightPredicate {
      * @return
      */
     private boolean test(Component renderer, ComponentAdapter adapter) {
+        // PENDING JW: why convert here? we are focused on the adaüter's cell
+        // looks like an oversight as of ol' days ;-)
          int  columnToTest = adapter.viewToModel(adapter.column);
+         String value = adapter.getString(columnToTest);
+         
+         if ((value == null) || (value.length() == 0)) {
+             return false;
+         }
+         return pattern.matcher(value).find();
          // PENDING JW: change to adapter.getString to use uniform string rep
-        Object  value = adapter.getValue(columnToTest);
-        if (value == null) {
-            return false;
-        }
-        else {
-            return pattern.matcher(value.toString()).find();
-        }
-    }
+      // this is pre-767-swingx: consistent string api
+//        Object  value = adapter.getValue(columnToTest);
+//        
+//        if (value == null) {
+//            return false;
+//        }
+//        else {
+//            return pattern.matcher(value.toString()).find();
+//        }
+         
+         
+     }
 
     /**
      * A quick pre-check.

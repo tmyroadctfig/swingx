@@ -89,13 +89,20 @@ public class PatternPredicate implements HighlightPredicate {
     private boolean test(Component renderer, ComponentAdapter adapter) {
         if (!adapter.isTestable(testColumn))
             return false;
-        Object value = adapter.getValue(testColumn);
-
-        if (value == null) {
+        String value = adapter.getString(testColumn);
+        
+        if ((value == null) || (value.length() == 0)) {
             return false;
-        } else {
-            return pattern.matcher(value.toString()).find();
         }
+        return pattern.matcher(value).find();
+     // this is pre-767-swingx: consistent string api
+//        Object value = adapter.getValue(testColumn);
+//
+//        if (value == null) {
+//            return false;
+//        } else {
+//            return pattern.matcher(value.toString()).find();
+//        }
     }
 
     /**

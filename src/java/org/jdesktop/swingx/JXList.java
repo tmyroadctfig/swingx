@@ -307,14 +307,23 @@ public class JXList extends JList {
          * @return <code>SearchResult</code> if matched otherwise null
          */
         protected SearchResult findMatchAt(Pattern pattern, int row) {
-            Object value = getElementAt(row);
-            if (value != null) {
-                Matcher matcher = pattern.matcher(value.toString());
+            String text = getStringAt(row);
+            if ((text != null) && (text.length() > 0 )) {
+                Matcher matcher = pattern.matcher(text);
                 if (matcher.find()) {
                     return createSearchResult(matcher, row, -1);
                 }
             }
             return null;
+// this is pre-767-swingx: consistent string api
+//            Object value = getElementAt(row);
+//            if (value != null) {
+//                Matcher matcher = pattern.matcher(value.toString());
+//                if (matcher.find()) {
+//                    return createSearchResult(matcher, row, -1);
+//                }
+//            }
+//            return null;
         }
         
         @Override

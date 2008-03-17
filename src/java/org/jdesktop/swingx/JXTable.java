@@ -2932,21 +2932,22 @@ public class JXTable extends JTable
          * @return an appropriate <code>SearchResult</code> if matching or null
          */
         protected SearchResult findMatchAt(Pattern pattern, int row, int column) {
-            Object value = getValueAt(row, column);
-            if (value != null) {
-                Matcher matcher = pattern.matcher(value.toString());
-                if (matcher.find()) {
-                    return createSearchResult(matcher, row, column);
-                }
-            }
-            // @KEEP JW replacement once we have a uniform string representatioon
-//            String text = getStringAt(row, column);
-//            if ((text != null) && (text.length() > 0 )) {
-//                Matcher matcher = pattern.matcher(text);
+         // this is pre-767-swingx: consistent string api
+//            Object value = getValueAt(row, column);
+//            if (value != null) {
+//                Matcher matcher = pattern.matcher(value.toString());
 //                if (matcher.find()) {
 //                    return createSearchResult(matcher, row, column);
 //                }
 //            }
+//             @KEEP JW replacement once we have a uniform string representatioon
+            String text = getStringAt(row, column);
+            if ((text != null) && (text.length() > 0 )) {
+                Matcher matcher = pattern.matcher(text);
+                if (matcher.find()) {
+                    return createSearchResult(matcher, row, column);
+                }
+            }
             return null;
         }
 
