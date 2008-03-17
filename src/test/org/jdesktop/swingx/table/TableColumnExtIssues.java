@@ -25,6 +25,17 @@ import org.jdesktop.test.SerializableSupport;
  */
 public class TableColumnExtIssues extends TestCase {
 
+    public void testChangeNofification() {
+        TableColumnExt column = new TableColumnExt(0);
+        column.setMaxWidth(1000);
+        PropertyChangeReport r = new PropertyChangeReport();
+        column.addPropertyChangeListener(r);
+        TableColumnExt clone = (TableColumnExt) column.clone();
+        clone.setMinWidth(44);
+        assertEquals("listener must not be notified on changes of the original", 
+                0, r.getEventCount());
+    }
+
     /**
      * Issue #??-swingx: tableColumnExt does not fire propertyChange on resizable.
      * 
