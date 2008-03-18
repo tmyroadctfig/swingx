@@ -45,6 +45,7 @@ import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
 import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeExpansionListener;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeCellRenderer;
@@ -66,7 +67,6 @@ import org.jdesktop.swingx.decorator.ShuttleSorter;
 import org.jdesktop.swingx.decorator.HighlightPredicate.AndHighlightPredicate;
 import org.jdesktop.swingx.decorator.HighlightPredicate.ColumnHighlightPredicate;
 import org.jdesktop.swingx.decorator.HighlightPredicate.DepthHighlightPredicate;
-import org.jdesktop.swingx.renderer.StringValue;
 import org.jdesktop.swingx.test.ComponentTreeTableModel;
 import org.jdesktop.swingx.test.XTestUtils;
 import org.jdesktop.swingx.treetable.DefaultMutableTreeTableNode;
@@ -105,6 +105,11 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
     /**
      * Issue #??-swingx: Tooltip by highlighter in hierarchical column
      *
+     * Not reliably updated.
+     * 
+     * To reproduce: 
+     * - move to some row over the hierarchical column where the tooltip is showing
+     * - move the next row, typically the tooltip is not showing
      */
     public void interactiveHierarchicalToolTip() {
         final JXTreeTable table = new JXTreeTable(treeTableModel);
@@ -115,13 +120,13 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
             @Override
             protected Component doHighlight(Component component,
                     ComponentAdapter adapter) {
-                ((JComponent) component).setToolTipText(StringValue.TO_STRING.getString(adapter.getValue()));
+                ((JComponent) component).setToolTipText(adapter.getString());
                 return component;
             }
             
         };
         table.addHighlighter(toolTip);
-        final JXFrame frame = wrapWithScrollingInFrame(table, "Selection/Expansion Hacks and Bidi Compliance");
+        JXFrame frame = wrapWithScrollingInFrame(table, "ToolTip with Highlighter (hierarchical column)");
         addComponentOrientationToggle(frame);
         frame.setVisible(true);
     }
@@ -799,19 +804,17 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
      * Issue #226: no per-cell tooltips in TreeColumn. 
      * Note: this explicitly uses core default renderers!
      */
-    public void interactiveTestToolTips() {
+    public void interactiveTestToolTipsCoreRenderer() {
         JXTreeTable treeTable = new JXTreeTable(treeTableModel);
-        // JW: don't use this idiom - Stackoverflow...
-        // multiple delegation - need to solve or discourage
-        treeTable.setTreeCellRenderer(createRenderer());
-        treeTable.setDefaultRenderer(Object.class, createTableRenderer(treeTable.getDefaultRenderer(Object.class)));
+        treeTable.setTreeCellRenderer(createTreeRenderer());
+        treeTable.setDefaultRenderer(Object.class, createTableRenderer());
         
         JXTree tree = new JXTree(treeTableModel);
-        tree.setCellRenderer(createRenderer());
+        tree.setCellRenderer(createTreeRenderer());
         // I'm registered to do tool tips so we can draw tips for the renderers
         ToolTipManager toolTipManager = ToolTipManager.sharedInstance();
         toolTipManager.registerComponent(tree);
-        JXFrame frame = wrapWithScrollingInFrame(treeTable, tree, "tooltips");
+        JXFrame frame = wrapWithScrollingInFrame(treeTable, tree, "tooltips with core renderers");
         frame.setVisible(true);  
     }
 
@@ -819,7 +822,8 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
      * Creates and returns a core default table cell renderer with tooltip.
      * @return
      */
-    private TableCellRenderer createTableRenderer(final TableCellRenderer delegate) {
+    private TableCellRenderer createTableRenderer() {
+        final TableCellRenderer delegate = new DefaultTableCellRenderer();
         TableCellRenderer l = new TableCellRenderer() {
 
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
@@ -836,7 +840,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
      * Creates and returns a core default tree cell renderer with tooltip.
      * @return
      */
-    private TreeCellRenderer createRenderer() {
+    private TreeCellRenderer createTreeRenderer() {
         final TreeCellRenderer delegate = new DefaultTreeCellRenderer();
         TreeCellRenderer renderer = new TreeCellRenderer() {
 
