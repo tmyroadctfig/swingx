@@ -423,17 +423,7 @@ public class XLocalizeTest extends InteractiveTestCase {
         other.setLocale(A_LOCALE);
         other.getColumnExt(0).setTitle(other.getLocale().getLanguage());
         JXFrame frame = wrapWithScrollingInFrame(table, other, "different locals: de <--> vs fr");
-        Action toggleLocale = new AbstractActionExt("toggle useFindBar") {
-
-            private boolean useFindBar;
-
-            public void actionPerformed(ActionEvent e) {
-                useFindBar = !useFindBar;
-                SearchFactory.getInstance().setUseFindBar(useFindBar);
-            }
-            
-        };
-        addAction(frame, toggleLocale);
+        addSearchModeToggle(frame);
         addMessage(frame, "Find panel/bar should be localized per-table");
         frame.pack();
         frame.setVisible(true);

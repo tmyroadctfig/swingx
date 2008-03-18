@@ -46,6 +46,13 @@ import org.jdesktop.test.AncientSwingTeam;
  * @author Jeanette Winzenburg
  */
 public class ComponentAdapterTest extends TestCase {
+    
+    /**
+     * A custom StringValue for Color. Maps to a string composed of the
+     * prefix "R/G/B: " and the Color's rgb value.
+     */
+    private StringValue sv;
+
     /**
      * Issue #791-swingx: complete coordinate transformation methods - missing id --> index
      * 
@@ -280,17 +287,6 @@ public class ComponentAdapterTest extends TestCase {
     public void testTreeGetStringAt() {
         JXTreeT tree = new JXTreeT(AncientSwingTeam.createNamedColorTreeModel());
         tree.expandAll();
-        StringValue sv = new StringValue() {
-
-            public String getString(Object value) {
-                if (value instanceof Color) {
-                    Color color = (Color) value;
-                    return "R/G/B: " + color.getRGB();
-                }
-                return TO_STRING.getString(value);
-            }
-            
-        };
         tree.setCellRenderer(new DefaultTreeRenderer(sv));
         String text = sv.getString(((DefaultMutableTreeNode) tree.getPathForRow(2).getLastPathComponent()).getUserObject());
         ComponentAdapter adapter = tree.getComponentAdapter(2);
@@ -305,17 +301,6 @@ public class ComponentAdapterTest extends TestCase {
     public void testTreeGetString() {
         JXTreeT tree = new JXTreeT(AncientSwingTeam.createNamedColorTreeModel());
         tree.expandAll();
-        StringValue sv = new StringValue() {
-
-            public String getString(Object value) {
-                if (value instanceof Color) {
-                    Color color = (Color) value;
-                    return "R/G/B: " + color.getRGB();
-                }
-                return TO_STRING.getString(value);
-            }
-            
-        };
         tree.setCellRenderer(new DefaultTreeRenderer(sv));
         String text = sv.getString(((DefaultMutableTreeNode) tree.getPathForRow(2).getLastPathComponent()).getUserObject());
         ComponentAdapter adapter = tree.getComponentAdapter(2);
@@ -330,17 +315,6 @@ public class ComponentAdapterTest extends TestCase {
     public void testTreeGetFilteredString() {
         JXTreeT tree = new JXTreeT(AncientSwingTeam.createNamedColorTreeModel());
         tree.expandAll();
-        StringValue sv = new StringValue() {
-
-            public String getString(Object value) {
-                if (value instanceof Color) {
-                    Color color = (Color) value;
-                    return "R/G/B: " + color.getRGB();
-                }
-                return TO_STRING.getString(value);
-            }
-            
-        };
         tree.setCellRenderer(new DefaultTreeRenderer(sv));
         String text = sv.getString(((DefaultMutableTreeNode) tree.getPathForRow(2).getLastPathComponent()).getUserObject());
         ComponentAdapter adapter = tree.getComponentAdapter(2);
@@ -355,17 +329,6 @@ public class ComponentAdapterTest extends TestCase {
     public void testTreeGetStringColumn() {
         JXTreeT tree = new JXTreeT(AncientSwingTeam.createNamedColorTreeModel());
         tree.expandAll();
-        StringValue sv = new StringValue() {
-
-            public String getString(Object value) {
-                if (value instanceof Color) {
-                    Color color = (Color) value;
-                    return "R/G/B: " + color.getRGB();
-                }
-                return TO_STRING.getString(value);
-            }
-            
-        };
         tree.setCellRenderer(new DefaultTreeRenderer(sv));
         String text = sv.getString(((DefaultMutableTreeNode) tree.getPathForRow(2).getLastPathComponent()).getUserObject());
         ComponentAdapter adapter = tree.getComponentAdapter(2);
@@ -399,17 +362,6 @@ public class ComponentAdapterTest extends TestCase {
     public void testListGetStringAtSorted() {
         JXListT list = new JXListT(AncientSwingTeam.createNamedColorListModel());
         list.setFilterEnabled(true);
-        StringValue sv = new StringValue() {
-
-            public String getString(Object value) {
-                if (value instanceof Color) {
-                    Color color = (Color) value;
-                    return "R/G/B: " + color.getRGB();
-                }
-                return TO_STRING.getString(value);
-            }
-            
-        };
         list.setCellRenderer(new DefaultListRenderer(sv));
         list.toggleSortOrder();
         String text = sv.getString(list.getWrappedModel().getElementAt(2));
@@ -424,17 +376,6 @@ public class ComponentAdapterTest extends TestCase {
      */
     public void testListGetStringAtUnsorted() {
         JXListT list = new JXListT(AncientSwingTeam.createNamedColorListModel());
-        StringValue sv = new StringValue() {
-
-            public String getString(Object value) {
-                if (value instanceof Color) {
-                    Color color = (Color) value;
-                    return "R/G/B: " + color.getRGB();
-                }
-                return TO_STRING.getString(value);
-            }
-            
-        };
         list.setCellRenderer(new DefaultListRenderer(sv));
         String text = sv.getString(list.getElementAt(2));
         ComponentAdapter adapter = list.getComponentAdapter(2);
@@ -448,17 +389,6 @@ public class ComponentAdapterTest extends TestCase {
      */
     public void testListGetString() {
         JXListT list = new JXListT(AncientSwingTeam.createNamedColorListModel());
-        StringValue sv = new StringValue() {
-
-            public String getString(Object value) {
-                if (value instanceof Color) {
-                    Color color = (Color) value;
-                    return "R/G/B: " + color.getRGB();
-                }
-                return TO_STRING.getString(value);
-            }
-            
-        };
         list.setCellRenderer(new DefaultListRenderer(sv));
         String text = sv.getString(list.getElementAt(2));
         ComponentAdapter adapter = list.getComponentAdapter(2);
@@ -472,17 +402,6 @@ public class ComponentAdapterTest extends TestCase {
      */
     public void testListGetFilteredString() {
         JXListT list = new JXListT(AncientSwingTeam.createNamedColorListModel());
-        StringValue sv = new StringValue() {
-
-            public String getString(Object value) {
-                if (value instanceof Color) {
-                    Color color = (Color) value;
-                    return "R/G/B: " + color.getRGB();
-                }
-                return TO_STRING.getString(value);
-            }
-            
-        };
         list.setCellRenderer(new DefaultListRenderer(sv));
         String text = sv.getString(list.getElementAt(2));
         ComponentAdapter adapter = list.getComponentAdapter(2);
@@ -496,17 +415,6 @@ public class ComponentAdapterTest extends TestCase {
      */
     public void testListGetStringColumn() {
         JXListT list = new JXListT(AncientSwingTeam.createNamedColorListModel());
-        StringValue sv = new StringValue() {
-
-            public String getString(Object value) {
-                if (value instanceof Color) {
-                    Color color = (Color) value;
-                    return "R/G/B: " + color.getRGB();
-                }
-                return TO_STRING.getString(value);
-            }
-            
-        };
         list.setCellRenderer(new DefaultListRenderer(sv));
         String text = sv.getString(list.getElementAt(2));
         ComponentAdapter adapter = list.getComponentAdapter(2);
@@ -539,17 +447,6 @@ public class ComponentAdapterTest extends TestCase {
      */
     public void testTableGetStringColumnHiddenColumn() {
         JXTableT table = new JXTableT(new AncientSwingTeam());
-        StringValue sv = new StringValue() {
-
-            public String getString(Object value) {
-                if (value instanceof Color) {
-                    Color color = (Color) value;
-                    return "R/G/B: " + color.getRGB();
-                }
-                return TO_STRING.getString(value);
-            }
-            
-        };
         table.setDefaultRenderer(Color.class, new DefaultTableRenderer(sv));
         table.getColumnExt(2).setVisible(false);
         String text = sv.getString(table.getModel().getValueAt(2, 2));
@@ -565,17 +462,6 @@ public class ComponentAdapterTest extends TestCase {
      */
     public void testTableGetStringAtHiddenColumn() {
         JXTableT table = new JXTableT(new AncientSwingTeam());
-        StringValue sv = new StringValue() {
-
-            public String getString(Object value) {
-                if (value instanceof Color) {
-                    Color color = (Color) value;
-                    return "R/G/B: " + color.getRGB();
-                }
-                return TO_STRING.getString(value);
-            }
-            
-        };
         table.setDefaultRenderer(Color.class, new DefaultTableRenderer(sv));
         table.getColumnExt(2).setVisible(false);
         String text = sv.getString(table.getModel().getValueAt(2, 2));
@@ -591,17 +477,6 @@ public class ComponentAdapterTest extends TestCase {
      */
     public void testTableGetStringAtSorted() {
         JXTableT table = new JXTableT(new AncientSwingTeam());
-        StringValue sv = new StringValue() {
-
-            public String getString(Object value) {
-                if (value instanceof Color) {
-                    Color color = (Color) value;
-                    return "R/G/B: " + color.getRGB();
-                }
-                return TO_STRING.getString(value);
-            }
-            
-        };
         table.setDefaultRenderer(Color.class, new DefaultTableRenderer(sv));
         table.toggleSortOrder(2);
         String text = sv.getString(table.getModel().getValueAt(2, 2));
@@ -617,17 +492,6 @@ public class ComponentAdapterTest extends TestCase {
      */
     public void testTableGetStringAtUnsorted() {
         JXTableT table = new JXTableT(new AncientSwingTeam());
-        StringValue sv = new StringValue() {
-
-            public String getString(Object value) {
-                if (value instanceof Color) {
-                    Color color = (Color) value;
-                    return "R/G/B: " + color.getRGB();
-                }
-                return TO_STRING.getString(value);
-            }
-            
-        };
         table.setDefaultRenderer(Color.class, new DefaultTableRenderer(sv));
         String text = sv.getString(table.getValueAt(2, 2));
         ComponentAdapter adapter = table.getComponentAdapter(2, 2);
@@ -641,17 +505,6 @@ public class ComponentAdapterTest extends TestCase {
      */
     public void testTableGetString() {
         JXTableT table = new JXTableT(new AncientSwingTeam());
-        StringValue sv = new StringValue() {
-
-            public String getString(Object value) {
-                if (value instanceof Color) {
-                    Color color = (Color) value;
-                    return "R/G/B: " + color.getRGB();
-                }
-                return TO_STRING.getString(value);
-            }
-            
-        };
         table.setDefaultRenderer(Color.class, new DefaultTableRenderer(sv));
         String text = sv.getString(table.getValueAt(2, 2));
         ComponentAdapter adapter = table.getComponentAdapter(2, 2);
@@ -665,17 +518,6 @@ public class ComponentAdapterTest extends TestCase {
      */
     public void testTableGetFilteredString() {
         JXTableT table = new JXTableT(new AncientSwingTeam());
-        StringValue sv = new StringValue() {
-
-            public String getString(Object value) {
-                if (value instanceof Color) {
-                    Color color = (Color) value;
-                    return "R/G/B: " + color.getRGB();
-                }
-                return TO_STRING.getString(value);
-            }
-            
-        };
         table.setDefaultRenderer(Color.class, new DefaultTableRenderer(sv));
         String text = sv.getString(table.getValueAt(2, 2));
         ComponentAdapter adapter = table.getComponentAdapter(2, 2);
@@ -689,17 +531,6 @@ public class ComponentAdapterTest extends TestCase {
      */
     public void testTableGetStringColumn() {
         JXTableT table = new JXTableT(new AncientSwingTeam());
-        StringValue sv = new StringValue() {
-
-            public String getString(Object value) {
-                if (value instanceof Color) {
-                    Color color = (Color) value;
-                    return "R/G/B: " + color.getRGB();
-                }
-                return TO_STRING.getString(value);
-            }
-            
-        };
         table.setDefaultRenderer(Color.class, new DefaultTableRenderer(sv));
         String text = sv.getString(table.getValueAt(2, 2));
         ComponentAdapter adapter = table.getComponentAdapter(2, 2);
@@ -751,27 +582,16 @@ public class ComponentAdapterTest extends TestCase {
         ComponentAdapter adapter = new ComponentAdapter(table) {
 
             @Override
-            public String getColumnIdentifier(int columnIndex) {
-                return null;
-            }
-            
-            
-
-            @Override
             public Object getColumnIdentifierAt(int columnIndex) {
                 // TODO Auto-generated method stub
                 return null;
             }
-
-
 
             @Override
             public int getColumnIndex(Object identifier) {
                 // TODO Auto-generated method stub
                 return 0;
             }
-
-
 
             @Override
             public String getColumnName(int columnIndex) {
@@ -784,15 +604,12 @@ public class ComponentAdapterTest extends TestCase {
             @Override
             public Object getFilteredValueAt(int row, int column) {
                 return getValueAt(table.convertRowIndexToModel(row), column);
-//                return table.getValueAt(row, modelToView(column)); // in view coordinates
             }
-
 
             @Override
             public Object getValueAt(int row, int column) {
                 return table.getModel().getValueAt(row, column);
             }
-
             
             @Override
             public Object getValue() {
@@ -847,7 +664,32 @@ public class ComponentAdapterTest extends TestCase {
         return model;
     }
 
-    public void testDummy() {
-        
+   
+    /**
+     * Creates and returns a StringValue which maps a Color to it's R/G/B rep, 
+     * prepending "R/G/B: "
+     * 
+     * @return the StringValue for color.
+     */
+    private StringValue createColorStringValue() {
+        StringValue sv = new StringValue() {
+
+            public String getString(Object value) {
+                if (value instanceof Color) {
+                    Color color = (Color) value;
+                    return "R/G/B: " + color.getRGB();
+                }
+                return TO_STRING.getString(value);
+            }
+            
+        };
+        return sv;
     }
+
+    @Override
+    protected void setUp() throws Exception {
+        sv = createColorStringValue();
+    }
+    
+
 }

@@ -176,18 +176,9 @@ public class FindVisualCheck extends InteractiveTestCase {
     public void interactiveCompareFindStrategy() {
         final JXTable first = new JXTable(new TestTableModel());
         first.setColumnControlVisible(true);
-        Action action = new AbstractAction("toggle batch/incremental"){
-            boolean useFindBar;
-            public void actionPerformed(ActionEvent e) {
-                useFindBar = !useFindBar;
-                SearchFactory.getInstance().setUseFindBar(useFindBar);
-            }
-            
-        };
-        
         final JXTreeTable second = new JXTreeTable(new FileSystemModel());
         JXFrame frame = wrapWithScrollingInFrame(first, second, "Batch/Incremental Search");
-        addAction(frame, action);
+        addSearchModeToggle(frame);
         addMessage(frame, "Press ctrl-F to open search widget");
         frame.setVisible(true);
     }

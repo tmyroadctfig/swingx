@@ -237,6 +237,21 @@ public abstract class InteractiveTestCase extends junit.framework.TestCase {
         addAction(frame, toggleComponentOrientation);
     }
     
+    /**
+     * Creates and adds a button toggling the frame's componentOrientation.
+     * @param frame
+     */
+    public void addSearchModeToggle(final JXFrame frame) {
+        Action action = new AbstractAction("toggle batch/incremental"){
+            public void actionPerformed(ActionEvent e) {
+                boolean useFindBar = !SearchFactory.getInstance().isUseFindBar(null, null);
+                SearchFactory.getInstance().setUseFindBar(useFindBar);
+            }
+            
+        };
+        addAction(frame, action);
+    }
+    
     public void addMessage(JXFrame frame, String message) {
         JXStatusBar statusBar = getStatusBar(frame);
         statusBar.add(new JLabel(message), JXStatusBar.Constraint.ResizeBehavior.FILL);
