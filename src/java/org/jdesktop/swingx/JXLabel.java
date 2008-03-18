@@ -43,6 +43,8 @@ import java.util.List;
 import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.SizeRequirements;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentEvent.ElementChange;
 import javax.swing.plaf.basic.BasicHTML;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.AttributeSet;
@@ -147,12 +149,21 @@ public class JXLabel extends JLabel {
         initLineWrapSupport();
     }
 
+    /**
+     * Creates new JXLabel with given icon.
+     * @param image the icon to set.
+     */
     public JXLabel(Icon image) {
         super(image);
         initPainterSupport();
         initLineWrapSupport();
     }
 
+    /**
+     * Creates new JXLabel with given icon and alignment.
+     * @param image the icon to set.
+     * @param horizontalAlignment the text alignment.
+     */
     public JXLabel(Icon image, int horizontalAlignment) {
         super(image, horizontalAlignment);
         initPainterSupport();
@@ -175,12 +186,23 @@ public class JXLabel extends JLabel {
         initLineWrapSupport();
     }
 
+    /**
+     * Creates new JXLabel with given text, icon and alignment.
+     * @param text the test to set.
+     * @param image the icon to set.
+     * @param horizontalAlignment the text alignment relative to the icon.
+     */
     public JXLabel(String text, Icon image, int horizontalAlignment) {
         super(text, image, horizontalAlignment);
         initPainterSupport();
         initLineWrapSupport();
     }
 
+    /**
+     * Creates new JXLabel with given text and alignment.
+     * @param text the test to set.
+     * @param horizontalAlignment the text alignment.
+     */
     public JXLabel(String text, int horizontalAlignment) {
         super(text, horizontalAlignment);
         initPainterSupport();
@@ -277,26 +299,34 @@ public class JXLabel extends JLabel {
         } else {
             // #swingx-780 preferred size is not set properly when parent container doesn't enforce the width
             View view = (View) getClientProperty(BasicHTML.propertyKey);
-            Rectangle b = super.getBounds();
             Container tla = super.getTopLevelAncestor();
-            if (view == null || tla == null) {
+            if (view == null || tla == null || !(view instanceof Renderer)) {
                 return size;
             }
+            
+            int w = ((Renderer) view).getWidth();
+            int h = ((Renderer) view).getHeight();
+            Icon ic = getIcon();
+            int icw = ic != null ? (ic.getIconWidth() + getIconTextGap()) : 0;
+            if ((getWidth() - icw) == w && getHeight() == h) {
+                // no change bail out
+                size.width = Math.max(size.width - icw, w);
+                size.height = Math.max(size.height, h);
+                return size;
+            }
+            Rectangle b = super.getBounds();
             Rectangle s = tla.getBounds();
             int newW = Math.min(b.width, s.width);
             if (newW == 0) {
                 return size;
             }
-            Icon i = getIcon();
-            if (i != null) {
-                newW -= i.getIconWidth() + getIconTextGap();
+            if (ic != null) {
+                newW -= icw;
                 
             }
-            if (b.width > 0) {
-                size.setSize(newW - 10, view.getPreferredSpan(View.Y_AXIS) );
-            } else {
-                view.setSize(newW , Integer.MAX_VALUE);
-            }
+
+            view.setSize(newW, (int) Math.max(super.getPreferredSize().height, view.getPreferredSpan(View.Y_AXIS)));
+            size.setSize(newW ,  view.getPreferredSpan(View.Y_AXIS) );
         }
         return size;
     }
@@ -370,7 +400,9 @@ public class JXLabel extends JLabel {
 
     private boolean paintBorderInsets = true;
 
-	private int maxLineSpan = -1;
+        private int maxLineSpan = -1;
+
+    public boolean painted;
     
     /**
      * Returns true if the background painter should paint where the border is
@@ -388,7 +420,7 @@ public class JXLabel extends JLabel {
      * Set to true if the background painter should paint where the border is
      * or false if it should only paint inside the border. This property is true by default.
      * This property affects the width, height,
-     * and intial transform passed to the background painter.
+     * and initial transform passed to the background painter.
      * 
      * This is a bound property.
      * @param paintBorderInsets new value of the paintBorderInsets property
@@ -410,6 +442,7 @@ public class JXLabel extends JLabel {
         if (ignoreRepaint) {
             return;
         }
+        painted = true;
         if (backgroundPainter == null && foregroundPainter == null) {
             super.paintComponent(g);
         } else {
@@ -417,12 +450,12 @@ public class JXLabel extends JLabel {
             pHeight = getHeight();
             Insets i = getInsets();
             if (backgroundPainter != null) {
-            	Graphics2D tmp = (Graphics2D) g.create();
+                Graphics2D tmp = (Graphics2D) g.create();
                 if(!isPaintBorderInsets()) {
                     tmp.translate(i.left, i.top);
                     pWidth = pWidth - i.left - i.right;
                     pHeight = pHeight - i.top - i.bottom;
-            	}
+                }
                 backgroundPainter.paint(tmp, this, pWidth, pHeight);
                 tmp.dispose();
             }
@@ -435,12 +468,12 @@ public class JXLabel extends JLabel {
                 double wy = Math.sin(textRotation) * tPoint.getX() + Math.cos(textRotation) * tPoint.getY();
                 double x = (getWidth() - wx) / 2 + Math.sin(textRotation) * tPoint.getY();
                 double y = (getHeight() - wy) / 2;
-            	Graphics2D tmp = (Graphics2D) g.create();
-            	if (i != null) {
+                Graphics2D tmp = (Graphics2D) g.create();
+                if (i != null) {
                     tmp.translate(i.left + x, i.top + y);
-            	} else {
-            		tmp.translate(x, y);
-            	}
+                } else {
+                        tmp.translate(x, y);
+                }
                 tmp.rotate(textRotation);
 
                 painting = true;
@@ -546,10 +579,10 @@ public class JXLabel extends JLabel {
             pHeight = (int) ty;
             ignoreRepaint = false;
         }
-		return new Point2D.Double(tx,ty);
-	}
+                return new Point2D.Double(tx,ty);
+        }
 
-	@Override
+        @Override
     public void repaint() {
         if (ignoreRepaint) {
             return;
@@ -602,7 +635,7 @@ public class JXLabel extends JLabel {
     }
 
     protected MultiLineSupport getMultiLineSupport() {
-    	return new MultiLineSupport();
+        return new MultiLineSupport();
     }
     // ----------------------------------------------------------
     // WARNING:
@@ -798,7 +831,9 @@ public class JXLabel extends JLabel {
 
         JXLabel host;
 
-        private int width;
+        private float width;
+
+        private float height;
 
         Renderer(JXLabel c, ViewFactory f, View v, boolean wordWrap) {
             super(null, wordWrap);
@@ -809,9 +844,21 @@ public class JXLabel extends JLabel {
             // initially layout to the preferred size
             setSize(c.getMaxLineSpan() > -1 ? c.getMaxLineSpan() : view.getPreferredSpan(X_AXIS), view.getPreferredSpan(Y_AXIS));
         }
-
+        
+        @Override
+        protected void updateLayout(ElementChange ec, DocumentEvent e, Shape a) {
+            if ( (a != null)) {
+                // should damage more intelligently
+                preferenceChanged(null, true, true);
+                Container host = getContainer();
+                if (host != null) {
+                    host.repaint();
+                }
+            }
+        }
+        
         public void preferenceChanged(View child, boolean width, boolean height) {
-            if (host != null) {
+            if (host != null && host.painted) {
                 host.revalidate();
                 host.repaint();
             }
@@ -835,8 +882,10 @@ public class JXLabel extends JLabel {
         public void paint(Graphics g, Shape allocation) {
             Rectangle alloc = allocation.getBounds();
             view.setSize(alloc.width, alloc.height);
+            this.width = alloc.width;
+            this.height = alloc.height;
             if (g.getClipBounds() == null) {
-            	g.setClip(alloc);
+                g.setClip(alloc);
                 view.paint(g, allocation);
                 g.setClip(null);
             } else {
@@ -892,20 +941,22 @@ public class JXLabel extends JLabel {
          * @param height the height
          */
         public void setSize(float width, float height) {
-            if (width == this.width) {
+            if (width == this.width && height == this.height) {
                 return;
             }
             this.width = (int) width;
+            this.height = (int) height;
             view.setSize(width, height);
         }
         
         @Override
         public float getPreferredSpan(int axis) {
-            if (axis == X_AXIS && width > 0) {
+            if (axis == X_AXIS) {
                 // width currently laid out to
-                return width;
-                }
-                return view.getPreferredSpan(axis);
+                return width > 0 ? width : view.getPreferredSpan(axis);
+            } else {
+                return  view.getPreferredSpan(axis);
+            }
         }
 
         /**
@@ -932,6 +983,14 @@ public class JXLabel extends JLabel {
         private View view;
 
         private ViewFactory factory;
+
+        public int getWidth() {
+            return (int) width;
+        }
+
+        public int getHeight() {
+            return (int) height;
+        }
 
     }
 
@@ -1551,7 +1610,6 @@ public class JXLabel extends JLabel {
             }
             return super.viewToModel(x, y, a, bias);
         }
-
     }
 
     /**
@@ -1570,7 +1628,5 @@ public class JXLabel extends JLabel {
         public StateInvariantError(String s) {
             super(s);
         }
-
     }
-
 }
