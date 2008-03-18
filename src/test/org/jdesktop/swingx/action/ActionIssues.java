@@ -10,6 +10,8 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.io.Serializable;
+import java.lang.ref.ReferenceQueue;
+import java.lang.ref.WeakReference;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -152,6 +154,23 @@ public class ActionIssues extends ActionTest implements Serializable {
         assertEquals("must have one event for selected", 1, report.getEventCount("selected"));
     }
     
+    /**
+     * Template to try and test memory leaks (from Palantir blog).
+     * TODO apply for listener problems
+     */
+    public void testMemory() {
+        //create test object
+        Object testObject = new Object();
+        // create queue and weak reference
+        ReferenceQueue queue = new ReferenceQueue();
+        WeakReference ref = new WeakReference(testObject, queue);
+        // set hard reference to null
+        testObject = null;
+//        force garbage collection
+        System.gc();
+        // soft reference should now be enqueued (no leak)
+        assertTrue(ref.isEnqueued());
+    }
     
 
 }

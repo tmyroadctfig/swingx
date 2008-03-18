@@ -43,19 +43,20 @@ public abstract class Filter {
     int order = -1;	// package private
 
     /**
-     * Constructs a new filter for the first column of a data model (in model coordinates).
+     * Constructs a new filter for the first column of a data model.
      */
     public Filter() {
         this(0);
     }
 
     /**
-     * Constructs a new filter for the specified column of a data model (in model coordinates).
+     * Constructs a new filter for the specified column of a data model in absolute 
+     * model coordinates.
      *
-     * @param col column index in model coordinates
+     * @param column column index in absolute model coordinates
      */
-    public Filter(int col) {
-        column = col;
+    public Filter(int column) {
+        this.column = column;
         init();
     }
 
@@ -76,7 +77,7 @@ public abstract class Filter {
     /**
      * Returns the model index of the column that this filter has been bound to.
      *
-     * @return the model index of the column that this filter has been bound to
+     * @return the column index in absolute model coordinates
      */
     public int getColumnIndex() {
         return column;  // model coordinates
@@ -85,7 +86,7 @@ public abstract class Filter {
     /**
      * TODO: PENDING: not tested!
      * 
-     * @param modelColumn
+     * @param column column index in absolute model coordinates
      */
     public void setColumnIndex(int modelColumn) {
         if (getColumnIndex() == modelColumn) return;
@@ -108,8 +109,8 @@ public abstract class Filter {
      *
      * PRE: 0 <= row < getSize()
      *  
-     * @param row row index in this filters "view" coordinates - 
-     * @return row index in model coordinates
+     * @param row the row index in this filter's output ("view") coordinates
+     * @return row index in absolute model coordinates
      */
     public int convertRowIndexToModel(int row) {
         int mappedRow = mapTowardModel(row);
@@ -139,11 +140,12 @@ public abstract class Filter {
 
     /**
      * Returns the value at the specified row and column.
+     * The column index is in absolute column coordinates.
      * 
      * PRE: 0 <= row < getSize()
      * 
-     * @param row row index in this filter's "view" coordinates
-     * @param column column index in model coordinates
+     * @param row the row index in this filter's output ("view") coordinates
+     * @param column column index in absolute model coordinates
      * @return the value at the specified row and column
      */
     public Object getValueAt(int row, int column) {
@@ -156,14 +158,32 @@ public abstract class Filter {
     }
 
     /**
+     * Returns the string representation at the specified row and column.
+     * The column index is in absolute column coordinates.
+     * 
+     * PRE: 0 <= row < getSize()
+     * 
+     * @param row the row index in this filter's output ("view") coordinates
+     * @param column column index in model coordinates
+     * @return the string representation of the cell at the specified row and column.
+     */
+    public String getStringAt(int row, int column) {
+        int mappedRow = mapTowardModel(row);
+        Filter filter = getMappingFilter();
+        if (filter != null) {
+            return filter.getStringAt(mappedRow, column);
+        }
+        return adapter.getStringAt(mappedRow, column);
+    }
+    /**
      * Sets the specified value as the new value for the cell identified by the
-     * specified row and column index.
+     * specified row and column index. The column index is in absolute column coordinates.
      *
      * PRE: 0 <= row < getSize()
      * 
      * @param aValue new value for the specified cell
-     * @param row row index in this filter's "view" coordinates
-     * @param column column index in model coordinates
+     * @param row the row index in this filter's output ("view") coordinates
+     * @param column the column index in absolute model coordinates
      */
     public void setValueAt(Object aValue, int row, int column) {
         int mappedRow = mapTowardModel(row);
@@ -176,13 +196,13 @@ public abstract class Filter {
     }
 
     /**
-     * returns editability of the cell identified by the specified row
-     * and column index.
+     * Returns editability of the cell identified by the specified row
+     * and column index. The column index is in absolute column coordinates.
      * 
      * PRE: 0 &lt;= row &lt; <code>getSize()</code>
      * 
-     * @param row row index in this filter's "view" coordinates
-     * @param column
+     * @param row the row index in this filter's output ("view") coordinates
+     * @param column column index in model coordinates
      * @return true if the cell at the specified row/col is editable
      */
     public boolean isCellEditable(int row, int column) {
@@ -196,10 +216,10 @@ public abstract class Filter {
 
 
     /**
-     * Returns the number of records that remain in this filter's "view"
+     * Returns the number of records that remain in this filter's output ("view")
      * after the input records have been filtered.
      *
-     * @return the number of records that remain in this filter's "view"
+     * @return the number of records that remain in this filter's output ("view")
      * after the input records have been filtered
      */
     public abstract int getSize();
@@ -208,9 +228,9 @@ public abstract class Filter {
 //---------------------------------- for subclasses
 
     /**
-     * Returns the number of records that are processed by this filter.
+     * Returns the number of records of this filter's input ("model"). 
      *
-     * @return the number of records that are processed by this filter
+     * @return the number of records of this filter's input ("model").
      */
     protected int getInputSize() {
         return pipeline == null ? adapter == null ?
@@ -218,11 +238,12 @@ public abstract class Filter {
     }
 
     /**
-     * Returns the value of the cell at the specified row and column (in model coordinates).
+     * Returns the value of the cell at the specified row and column. 
+     * The column index is in absolute column coordinates.
      *
-     * @param row in the coordinates of what is the filter's "view" of the model
+     * @param row in the coordinates of what is the filter's input ("model"). 
      * @param column in model coordinates
-     * @return the value of the cell at the specified row and column (in model coordinates)
+     * @return the value of the cell at the specified row and column.
      */
     protected Object getInputValue(int row, int column) {
         Filter filter = getMappingFilter();
@@ -236,6 +257,24 @@ public abstract class Filter {
         return null;
     }
 
+    /**
+     * Returns the string representation of cell at the specified row and column.
+     *
+     * @param row in the coordinates of what is the filter's "model" (== input) coordinates
+     * @param column in model coordinates
+     * @return the string representation of the cell at the specified row and column.
+     */
+    protected String getInputString(int row, int column) {
+        Filter filter = getMappingFilter();
+        if (filter != null) {
+            return filter.getStringAt(row, column);
+        }
+        if (adapter != null) {
+            return adapter.getStringAt(row, column);
+        }
+
+        return null;
+    }
     /**
      * Provides filter-specific initialization. Called from the <code>Filter</code>
      * constructor.

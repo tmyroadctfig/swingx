@@ -117,6 +117,8 @@ public class ComponentAdapterClientTest extends InteractiveTestCase {
             
         };
         table.setCellRenderer(new DefaultListRenderer(sv));
+        HighlightPredicate predicate = new PatternPredicate(Pattern.compile("R/G/B: -2", 0), 2, 2);
+        table.addHighlighter(new ColorHighlighter(predicate, null, Color.RED));
         Action action = new AbstractAction("toggle batch/incremental"){
             boolean useFindBar;
             public void actionPerformed(ActionEvent e) {
@@ -151,6 +153,8 @@ public class ComponentAdapterClientTest extends InteractiveTestCase {
             
         };
         table.setCellRenderer(new DefaultTreeRenderer(sv));
+        HighlightPredicate predicate = new PatternPredicate(Pattern.compile("R/G/B: -2", 0), 2, 2);
+        table.addHighlighter(new ColorHighlighter(predicate, null, Color.RED));
         Action action = new AbstractAction("toggle batch/incremental"){
             boolean useFindBar;
             public void actionPerformed(ActionEvent e) {
@@ -243,11 +247,37 @@ public class ComponentAdapterClientTest extends InteractiveTestCase {
         assertEquals(2, matchRow);
     }
 
-    
+ 
     /**
      * Issue #767-swingx: consistent string representation.
      * 
      * Here: test api on JXTable.
+     */
+    public void testTableGetStringUsedInPatternFilter() {
+        JXTableT table = new JXTableT(new AncientSwingTeam());
+        StringValue sv = new StringValue() {
+
+            public String getString(Object value) {
+                if (value instanceof Color) {
+                    Color color = (Color) value;
+                    return "R/G/B: " + color.getRGB();
+                }
+                return TO_STRING.getString(value);
+            }
+            
+        };
+        table.setDefaultRenderer(Color.class, new DefaultTableRenderer(sv));
+        PatternFilter filter = new PatternFilter("R/G/B: -2", 0, 2);
+//        HighlightPredicate predicate = new PatternPredicate(Pattern.compile("R/G/B: -2", 0), 2, 2);
+        table.setFilters(new FilterPipeline(filter));
+        assertTrue(table.getRowCount() > 0);
+        assertEquals(sv.getString(table.getValueAt(0, 2)), table.getStringAt(0, 2));
+    }
+
+    /**
+     * Issue #767-swingx: consistent string representation.
+     * 
+     * Here: test SearchPredicate uses getStringXX.
      */
     public void testTableGetStringUsedInSearchPredicate() {
         JXTableT table = new JXTableT(new AncientSwingTeam());
@@ -275,7 +305,7 @@ public class ComponentAdapterClientTest extends InteractiveTestCase {
     /**
      * Issue #767-swingx: consistent string representation.
      * 
-     * Here: test api on JXTable.
+     * Here: test PatternPredicate uses getStringxx().
      */
     public void testTableGetStringUsedInPatternPredicate() {
         JXTableT table = new JXTableT(new AncientSwingTeam());

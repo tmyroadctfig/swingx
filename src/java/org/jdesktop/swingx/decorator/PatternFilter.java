@@ -149,9 +149,19 @@ public class PatternFilter extends Filter implements PatternMatcher {
         if (!adapter.isTestable(getColumnIndex())) {
             return false; 
         }
+        String text = getInputString(row, getColumnIndex());
+        return isEmpty(text) ? false : pattern.matcher(text).find();
+// pre-767-swingx: use componentAdapter's string rep
+//        Object value = getInputValue(row, getColumnIndex());
+//        return value == null ? false : pattern.matcher(value.toString()).find();
+    }
 
-        Object value = getInputValue(row, getColumnIndex());
-        return value == null ? false : pattern.matcher(value.toString()).find();
+    /**
+     * @param text
+     * @return
+     */
+    private boolean isEmpty(String text) {
+        return (text == null) || (text.length() == 0);
     }
 
     /**
