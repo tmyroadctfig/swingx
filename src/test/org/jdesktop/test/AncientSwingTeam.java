@@ -1,6 +1,7 @@
 package org.jdesktop.test;
 
 import java.awt.Color;
+import java.util.Arrays;
 
 import javax.swing.AbstractListModel;
 import javax.swing.ListModel;
@@ -8,7 +9,12 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreeModel;
+
+import org.jdesktop.swingx.treetable.AbstractMutableTreeTableNode;
+import org.jdesktop.swingx.treetable.DefaultMutableTreeTableNode;
+import org.jdesktop.swingx.treetable.DefaultTreeTableModel;
+import org.jdesktop.swingx.treetable.MutableTreeTableNode;
+import org.jdesktop.swingx.treetable.TreeTableModel;
 
 /**
  * Standard Table with class-Infos. Taken from some old
@@ -53,6 +59,51 @@ public class AncientSwingTeam extends AbstractTableModel {
         return new DefaultTreeModel(root);
     };
 
+    /**
+     * 
+     * Creates and returns a DefaultTreeModel with a String root and
+     * children of type NamedColor wrapped into DefaultMutableTreeNodes.
+     * @return a DefaultTreeModel containing items of type NamedColor.
+     */
+    public static TreeTableModel createNamedColorTreeTableModel() {
+        final TableModel wrappee = new AncientSwingTeam();
+        DefaultMutableTreeTableNode root = new DefaultMutableTreeTableNode("Named Colors");
+        for (int i = 0; i < wrappee.getRowCount(); i++) {
+            MutableTreeTableNode node = createNamedColorTreeTableNode(wrappee,
+                    i);
+            root.add(node);
+        }
+        return new DefaultTreeTableModel(root, Arrays.asList(new String[] { "Color", "LastName" }));
+    }
+
+    private static MutableTreeTableNode createNamedColorTreeTableNode(
+            final TableModel wrappee, final int i) {
+        MutableTreeTableNode node = new AbstractMutableTreeTableNode() {
+
+            public int getColumnCount() {
+                return 2;
+            }
+
+            public Object getValueAt(int column) {
+                switch (column) {
+                case 0:
+                    return wrappee.getValueAt(i, 2);
+                case 1: 
+                    return wrappee.getValueAt(i, 1);
+                }
+                return null;
+            }
+
+            @Override
+            public Object getUserObject() {
+                return getValueAt(0);
+            }
+            
+            
+        };
+        return node;
+    };
+    
     protected final String[] names = { "First Name", "Last Name", "Favorite Color",
             "No.", "Vegetarian" };
         NamedColor aqua        = new NamedColor(new Color(127, 255, 212), "Aqua");

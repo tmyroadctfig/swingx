@@ -21,7 +21,19 @@
  */
 package org.jdesktop.swingx.decorator;
 
-import junit.framework.TestCase;
+import java.awt.Color;
+import java.util.regex.Pattern;
+
+import org.jdesktop.swingx.InteractiveTestCase;
+import org.jdesktop.swingx.JXFrame;
+import org.jdesktop.swingx.JXTree;
+import org.jdesktop.swingx.JXTreeTable;
+import org.jdesktop.swingx.decorator.ComponentAdapterTest.JXTreeTableT;
+import org.jdesktop.swingx.renderer.DefaultTableRenderer;
+import org.jdesktop.swingx.renderer.DefaultTreeRenderer;
+import org.jdesktop.swingx.renderer.StringValue;
+import org.jdesktop.swingx.treetable.TreeTableModel;
+import org.jdesktop.test.AncientSwingTeam;
 
 /**
  * Test to exposed known issues of <code>ComponentAdapter</code>.
@@ -33,7 +45,84 @@ import junit.framework.TestCase;
  * 
  * @author Jeanette Winzenburg
  */
-public class ComponentAdapterIssues extends TestCase {
+public class ComponentAdapterIssues extends InteractiveTestCase {
+
+    public static void main(String[] args) {
+        ComponentAdapterIssues test = new ComponentAdapterIssues();
+        try {
+            test.runInteractiveTests();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private StringValue sv;
+    
+    /**
+     * Issue ??-swingx: TreeTable doesn't return correct string value for hierarchical column.
+     * 
+     * This is probably a variant of not using the table's renderer (at least I expect it 
+     * to be solved then at the latest). In the meantime, might want to do something special
+     * for the hierarchical column?
+     */
+    public void interactiveTreeTableStringValue() {
+        TreeTableModel model = AncientSwingTeam.createNamedColorTreeTableModel();
+        JXTreeTable treeTable = new JXTreeTable(model);
+        treeTable.setRootVisible(true);
+        treeTable.setTreeCellRenderer(new DefaultTreeRenderer(sv));
+        JXTree tree =  new JXTree(model);
+        tree.setCellRenderer(new DefaultTreeRenderer(sv));
+        HighlightPredicate predicate = new PatternPredicate(Pattern.compile("R/G/B: -2", 0), 0, -1);
+        ColorHighlighter hl = new ColorHighlighter(predicate, null, Color.RED);
+        treeTable.addHighlighter(hl);
+        tree.addHighlighter(hl);
+        JXFrame frame = wrapWithScrollingInFrame(tree, treeTable, "string rep in hierarchical column");
+        show(frame);
+    }
+
+    
+    /**
+     * Issue #767-swingx: consistent string representation.
+     * 
+     * Problem: string rep of hierarchical column
+     */
+    public void testTreeTableGetStringUsedInPatternPredicate() {
+        JXTreeTableT table = new JXTreeTableT(AncientSwingTeam.createNamedColorTreeTableModel());
+        table.setTreeCellRenderer(new DefaultTreeRenderer(sv));
+        int matchRow = 2;
+        int matchColumn = 0;
+        String text = sv.getString(table.getValueAt(matchRow, matchColumn));
+        ComponentAdapter adapter = table.getComponentAdapter(matchRow, matchColumn);
+        Pattern pattern = Pattern.compile(text, 0);
+        HighlightPredicate predicate = new PatternPredicate(pattern, matchRow, matchColumn);
+        assertTrue(predicate.isHighlighted(null, adapter));
+    }
+
+    /**
+     * Creates and returns a StringValue which maps a Color to it's R/G/B rep, 
+     * prepending "R/G/B: "
+     * 
+     * @return the StringValue for color.
+     */
+    private StringValue createColorStringValue() {
+        StringValue sv = new StringValue() {
+
+            public String getString(Object value) {
+                if (value instanceof Color) {
+                    Color color = (Color) value;
+                    return "R/G/B: " + color.getRGB();
+                }
+                return TO_STRING.getString(value);
+            }
+            
+        };
+        return sv;
+    }
+
+    @Override
+    protected void setUp() throws Exception {
+        sv = createColorStringValue();
+    }
 
     public void testDummy() {
         

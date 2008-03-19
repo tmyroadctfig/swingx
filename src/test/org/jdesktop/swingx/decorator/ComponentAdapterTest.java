@@ -34,10 +34,12 @@ import junit.framework.TestCase;
 import org.jdesktop.swingx.JXList;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.JXTree;
+import org.jdesktop.swingx.JXTreeTable;
 import org.jdesktop.swingx.renderer.DefaultListRenderer;
 import org.jdesktop.swingx.renderer.DefaultTableRenderer;
 import org.jdesktop.swingx.renderer.DefaultTreeRenderer;
 import org.jdesktop.swingx.renderer.StringValue;
+import org.jdesktop.swingx.treetable.TreeTableModel;
 import org.jdesktop.test.AncientSwingTeam;
 
 /**
@@ -553,6 +555,25 @@ public class ComponentAdapterTest extends TestCase {
         }
         
     }
+
+    
+    /**
+     * Overridden to get access to componentAdapter.
+     * 
+     */
+    public static class JXTreeTableT extends JXTreeTable {
+
+        public JXTreeTableT(TreeTableModel model) {
+            super(model);
+        }
+
+        @Override
+        public ComponentAdapter getComponentAdapter(int row, int column) {
+            return super.getComponentAdapter(row, column);
+        }
+        
+    }
+
     /**
      * Issue #??- ComponentAdapter's default implementation does not
      *    return the value at the adapter's view state.
