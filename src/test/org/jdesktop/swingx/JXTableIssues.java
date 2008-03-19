@@ -21,8 +21,10 @@
 package org.jdesktop.swingx;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GraphicsEnvironment;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
@@ -38,6 +40,7 @@ import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
 import javax.swing.Action;
 import javax.swing.ActionMap;
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.CellEditor;
 import javax.swing.JButton;
@@ -60,7 +63,11 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 
 import org.jdesktop.swingx.action.BoundAction;
+import org.jdesktop.swingx.decorator.AbstractHighlighter;
+import org.jdesktop.swingx.decorator.ColorHighlighter;
+import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.FilterPipeline;
+import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.PatternFilter;
 import org.jdesktop.swingx.decorator.SortKey;
 import org.jdesktop.swingx.table.TableColumnExt;
@@ -90,7 +97,8 @@ public class JXTableIssues extends InteractiveTestCase {
 //          test.runInteractiveTests();
 //            test.runInteractiveTests("interactive.*Scroll.*");
          //   test.runInteractiveTests("interactive.*Render.*");
-            test.runInteractiveTests("interactive.*Sort.*");
+//            test.runInteractiveTests("interactive.*Sort.*");
+            test.runInteractiveTests("interactive.*Highlight.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
@@ -786,4 +794,37 @@ public class JXTableIssues extends InteractiveTestCase {
         fail("check status ...");
     }
 
+    /**
+     * Match highlighter fails to display correctly if column-based highlighter alters background
+     * color.
+     */
+    public void interactiveColumnHighlightingWithSearch() {
+        JXTable table = new JXTable(new AncientSwingTeam());
+        
+        table.getColumnExt("Favorite Color").setHighlighters(new AbstractHighlighter() {
+            @Override
+            protected Component doHighlight(Component renderer, ComponentAdapter adapter) {
+                Color color = (Color) adapter.getValue();
+                
+                if (renderer instanceof JComponent) {
+                    ((JComponent) renderer).setBorder(BorderFactory.createLineBorder(color));
+                }
+                
+                return renderer;
+            }
+        });
+        
+        table.getColumnExt(0).addHighlighter(
+                new ColorHighlighter(new HighlightPredicate() {
+                    public boolean isHighlighted(Component renderer, ComponentAdapter adapter) {
+                        return adapter.getValue().toString().contains("e");
+                    }
+                }, Color.GREEN, null));
+        
+        JFrame frame = wrapWithScrollingInFrame(table, "Column Highlighter with Search Test");
+        table.putClientProperty(JXTable.MATCH_HIGHLIGHTER, true);
+        //should highlight Jeff with Yellow
+        table.getSearchable().search("e", 3);
+        frame.setVisible(true);
+    }
 }

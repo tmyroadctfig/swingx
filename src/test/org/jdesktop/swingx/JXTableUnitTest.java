@@ -56,6 +56,7 @@ import javax.swing.table.TableModel;
 
 import org.jdesktop.swingx.JXTable.GenericEditor;
 import org.jdesktop.swingx.action.BoundAction;
+import org.jdesktop.swingx.decorator.AbstractHighlighter;
 import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.Filter;
@@ -3494,5 +3495,49 @@ public class JXTableUnitTest extends InteractiveTestCase {
             }
             this.fireTableDataChanged();
         }
+    }
+    
+    // test per-column highlighting
+    private static class TestingHighlighter extends AbstractHighlighter {
+        private List events;
+        
+        public TestingHighlighter(List events) {
+            this.events = events;
+        }
+        
+        @Override
+        protected Component doHighlight(Component component, ComponentAdapter adapter) {
+            events.add(this);
+            return component;
+        }
+    }
+    
+    public void testColumnHighlighting() {
+        JXTable table = new JXTable(tableModel);
+        List events = new ArrayList();
+        
+        Highlighter tableHighlighter = new TestingHighlighter(events);
+        Highlighter columnHighlighter = new TestingHighlighter(events);
+        
+        //sanity check
+        assertEquals(0, events.size());
+        
+        table.addHighlighter(tableHighlighter);
+        table.getColumnExt(0).addHighlighter(columnHighlighter);
+        
+        //explicity prepare the renderer
+        table.prepareRenderer(new DefaultTableCellRenderer(), 0, 0);
+        
+        assertEquals(2, events.size());
+        assertSame(events.get(0), tableHighlighter);
+        assertSame(events.get(1), columnHighlighter);
+        
+        events.clear();
+        
+        //explicity prepare the renderer
+        table.prepareRenderer(new DefaultTableCellRenderer(), 0, 1);
+        
+        assertEquals(1, events.size());
+        assertSame(events.get(0), tableHighlighter);
     }
 }
