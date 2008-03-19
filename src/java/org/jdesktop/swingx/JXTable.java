@@ -3644,8 +3644,16 @@ public class JXTable extends JTable
      * <p>
      * 
      * Adjusts component orientation (guaranteed to happen before applying
-     * Highlighters)
-     * <p>.
+     * Highlighters).
+     * <p>
+     * 
+     * Per-column highlighters contained in
+     * {@link TableColumnExt#getHighlighters()} are applied to the renderer
+     * <i>after</i> the table highlighters.
+     * <p>
+     * 
+     * TODO kgs: interaction of search highlighter and column highlighters
+     * <p>
      * 
      * Note: DefaultTableCellRenderer and subclasses require a hack to play
      * nicely with Highlighters because it has an internal "color memory" in

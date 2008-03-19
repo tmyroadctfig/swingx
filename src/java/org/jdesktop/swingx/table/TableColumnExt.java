@@ -47,7 +47,7 @@ import org.jdesktop.swingx.util.Contract;
  * <code>TableColumnModelExt</code> manages sets of visible/hidden 
  * <code>TableColumnExt</code>s controlled by the columns' <code>visible</code>
  * property. Typically, users can toggle column visibility at runtime, f.i.
- * through a dedicated control in the uppder trailing corner of a 
+ * through a dedicated control in the upper trailing corner of a 
  * <code>JScrollPane</code>.
  * <p>
  * 
@@ -64,6 +64,12 @@ import org.jdesktop.swingx.util.Contract;
  * 
  * <li><b>Tooltip</b>: <code>toolTipText</code> holds the column tooltip
  * which is shown when hovering over the column's header.
+ * 
+ * <li><b>Highlighter</b>: <code>highlighters</code> holds the column
+ * highlighters; these are applied to the renderer after the table highlighters.
+ * Any change to the highlighters (setting them, adding one, removing one, or
+ * changing one) will result in a {@code PropertyChangeEvent} being fired for
+ * "highlighters".
  * </ul>
  * 
  * 
