@@ -42,12 +42,13 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import javax.swing.AbstractAction;
-import javax.swing.AbstractButton;
 import javax.swing.AbstractListModel;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
@@ -81,7 +82,6 @@ import javax.swing.tree.TreeModel;
 
 import org.jdesktop.swingx.EditorPaneLinkVisitor;
 import org.jdesktop.swingx.InteractiveTestCase;
-import org.jdesktop.swingx.JXButton;
 import org.jdesktop.swingx.JXEditorPaneTest;
 import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXHyperlink;
@@ -94,19 +94,19 @@ import org.jdesktop.swingx.LinkModel;
 import org.jdesktop.swingx.LinkRenderer;
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.action.LinkModelAction;
-import org.jdesktop.swingx.border.DropShadowBorder;
 import org.jdesktop.swingx.decorator.AbstractHighlighter;
+import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
-import org.jdesktop.swingx.decorator.PainterHighlighter;
-import org.jdesktop.swingx.painter.MattePainter;
+import org.jdesktop.swingx.decorator.PatternPredicate;
 import org.jdesktop.swingx.table.ColumnControlButton;
 import org.jdesktop.swingx.test.ComponentTreeTableModel;
 import org.jdesktop.swingx.test.XTestUtils;
 import org.jdesktop.swingx.treetable.FileSystemModel;
 import org.jdesktop.swingx.treetable.TreeTableModel;
+import org.jdesktop.swingx.treetable.TreeTableNode;
 import org.jdesktop.test.AncientSwingTeam;
 
 /**
@@ -119,8 +119,8 @@ public class RendererVisualCheck extends InteractiveTestCase {
         setSystemLF(true);
         RendererVisualCheck test = new RendererVisualCheck();
         try {
-            test.runInteractiveTests();
-//          test.runInteractiveTests(".*Text.*");
+//            test.runInteractiveTests();
+          test.runInteractiveTests(".*CustomIcons.*");
 //          test.runInteractiveTests(".*XLabel.*");
 //          test.runInteractiveTests(".*Color.*");
 //          test.runInteractiveTests("interactive.*ColumnControl.*");
@@ -130,68 +130,21 @@ public class RendererVisualCheck extends InteractiveTestCase {
         }
     }
     
-    public void interactiveTreeFancyButton() {
-        JXTree tree = new JXTree();
-        MattePainter painter = new MattePainter(Color.YELLOW);
-        Highlighter hl = new PainterHighlighter(HighlightPredicate.ROLLOVER_ROW, painter);
-        tree.addHighlighter(hl);
-        ComponentProvider provider = new NormalButtonProvider(StringValue.TO_STRING, JLabel.LEADING);
-        tree.setCellRenderer(new DefaultTreeRenderer(provider));
-        tree.setRolloverEnabled(true);
-        showWithScrollingInFrame(tree, "Fancy..");
-    }
-    
-    public void interactiveFancyButton() {
-        JXButton button = new JXButton("Dummy .... but lonnnnnnngg");
-        button.setBorder(BorderFactory.createCompoundBorder(new DropShadowBorder(), button.getBorder()));
-         showInFrame(button, "Fancy..");
-    }
-    public static class NormalButtonProvider extends CheckBoxProvider {
-
-        private Border border;
-
-        /**
-         * @param toString
-         * @param leading
-         */
-        public NormalButtonProvider(StringValue toString, int leading) {
-            super(toString, leading);
-            setBorderPainted(true);
-        }
-
-        
-        @Override
-        protected void configureState(CellContext context) {
-            super.configureState(context);
-            rendererComponent.setBorder(border);
-        }
-
-
-        @Override
-        protected AbstractButton createRendererComponent() {
-            JXButton button = new JXButton();
-            border = BorderFactory.createCompoundBorder(
-                    new DropShadowBorder(),
-                    button.getBorder());
-            return button;
-        }
-        
-        
-        
-    }
     /**
-     * example to configure treeTable hierarchical column (same for tree) with
-     * custom icon and content mapping.
+     * List/tree filled with TreeNodes wrapping a File.
      * 
      */
-    public void interactiveTreeTableCustomIcons() {
-        TreeTableModel model = new FileSystemModel();
-        JXTreeTable table = new JXTreeTable(model);
+    public void interactiveTreeNodeCustomIcons() {
+        ListModel files = createFileListModel();
+        
+        JXList table = new JXList(files);
         StringValue sv = new StringValue() {
 
             public String getString(Object value) {
                 if (value instanceof File) {
-                    return FileSystemView.getFileSystemView().getSystemDisplayName((File) value); 
+                    return FileSystemView.getFileSystemView().getSystemDisplayName((File) value)
+                       + " Type: " 
+                       + FileSystemView.getFileSystemView().getSystemTypeDescription((File) value); 
                 } 
                 return TO_STRING.getString(value);
             }
@@ -205,9 +158,195 @@ public class RendererVisualCheck extends InteractiveTestCase {
                 } 
                 return null;
             }};
-        table.setTreeCellRenderer(new DefaultTreeRenderer(iv, sv));
-        showWithScrollingInFrame(table, "Tree/Table: wrapping provider with custom");
+        table.setCellRenderer(new DefaultListRenderer(new MappedValue(sv, iv)));
+        final JXTree tree = new JXTree(createFileNodeModel());
+        final DefaultTreeRenderer treeRenderer = new DefaultTreeRenderer(iv, sv);
         
+        tree.setCellRenderer(treeRenderer);
+        // string based. Note: this example is locale dependent
+        String folderDescription = ".*ordner.*";
+        PatternPredicate predicate = new PatternPredicate(Pattern.compile(folderDescription, 0), 0, -1);
+        Highlighter hl = new ColorHighlighter(predicate, null, Color.RED);
+        table.addHighlighter(hl);
+        tree.addHighlighter(hl);
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.YEAR, -1);
+        final Date lastYear = calendar.getTime();
+        // install value based highlighter 
+        final HighlightPredicate valueBased = new HighlightPredicate() {
+
+            public boolean isHighlighted(Component renderer,
+                    ComponentAdapter adapter) {
+                if (!(adapter.getValue() instanceof File)) return false;
+                File file = (File) adapter.getValue();
+                Date date = new Date(file.lastModified());
+                return date.after(lastYear);
+            }
+            
+        };
+        final ColorHighlighter back =  new ColorHighlighter(valueBased, Color.YELLOW, null);
+        table.addHighlighter(back);
+        tree.addHighlighter(back);
+        final HighlightPredicate valueBasedUnwrap = new HighlightPredicate() {
+
+            public boolean isHighlighted(Component renderer,
+                    ComponentAdapter adapter) {
+                File file = getUserObject(adapter.getValue());
+                if (file == null) return false;
+                Date date = new Date(file.lastModified());
+                return date.after(lastYear);
+            }
+
+            private File getUserObject(Object value) {
+                if (value instanceof File) return (File) value;
+                if (value instanceof DefaultMutableTreeNode) {
+                    return getUserObject(((DefaultMutableTreeNode) value).getUserObject());
+                }
+                if (value instanceof TreeTableNode) {
+                    return getUserObject(((TreeTableNode) value).getUserObject());
+                }
+                return null;
+            }
+            
+        };
+        JXFrame frame = showWithScrollingInFrame(tree, table, "Tree/List: same string/icon values ");
+        Action toggleUnwrap = new AbstractAction("toggle unwrapUserObject") {
+
+            public void actionPerformed(ActionEvent e) {
+                WrappingProvider provider = (WrappingProvider) treeRenderer.getComponentProvider();
+                provider.setUnwrapUserObject(!provider.getUnwrapUserObject());
+                tree.revalidate();
+                tree.repaint();
+            }
+            
+        };
+        addAction(frame, toggleUnwrap);
+        Action togglePredicate = new AbstractAction("toggle predicateUnwrap") {
+
+            public void actionPerformed(ActionEvent e) {
+                HighlightPredicate old = back.getHighlightPredicate();
+                back.setHighlightPredicate(old == valueBased ? valueBasedUnwrap : valueBased);
+            }
+            
+        };
+        addAction(frame, togglePredicate);
+        Action toggleLargeModel = new AbstractAction("toggle largeModel") {
+
+            public void actionPerformed(ActionEvent e) {
+                tree.setLargeModel(!tree.isLargeModel());
+                tree.revalidate();
+                tree.repaint();
+            }
+            
+        };
+        addAction(frame, toggleLargeModel);
+        addStatusMessage(frame, "node is treeNode wrapping file - string/value based Highlighters differ");
+        
+    }
+   
+    
+    /**
+     * @return
+     */
+    private TreeModel createFileNodeModel() {
+        FileSystemModel tree = new FileSystemModel();
+        File root = tree.getRoot();
+        DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode(root);
+        for (int i = 0; i < tree.getChildCount(root); i++) {
+            rootNode.add(new DefaultMutableTreeNode(tree.getChild(root, i)));
+        }
+        
+        return new DefaultTreeModel(rootNode);
+    }
+
+    /**
+     * @return
+     */
+    private ListModel createFileListModel() {
+        FileSystemModel tree = new FileSystemModel();
+        DefaultListModel list = new DefaultListModel();
+        File root = tree.getRoot();
+        list.addElement(root);
+        for (int i = 0; i < tree.getChildCount(root); i++) {
+            list.addElement(tree.getChild(root, i));
+        }
+        return list;
+    }
+
+    /**
+     * example to configure treeTable hierarchical column (same for tree) with
+     * custom icon and content mapping. Here the nodes are actually of type File.
+     * 
+     * PENDING JW:
+     * TreeTable string rep is not correctly recognized in the PatternHighlighter,
+     *  - will be correct automatically, once we make it to really use the table/model rep
+     *  - could explicitly use the treecellrenderer as stringValue in the meantime?
+     */
+    public void interactiveTreeTableCustomIcons() {
+        // modify the file model to return the file itself for the hierarchical column
+        TreeTableModel model = new FileSystemModel() {
+            
+            @Override
+            public Object getValueAt(Object node, int column) {
+                if (column == 0) {
+                    return node;
+                }
+                return super.getValueAt(node, column);
+            }
+            
+        };
+        JXTreeTable table = new JXTreeTable(model);
+        StringValue sv = new StringValue() {
+
+            public String getString(Object value) {
+                if (value instanceof File) {
+                    return FileSystemView.getFileSystemView().getSystemDisplayName((File) value)
+                       + " Type: " 
+                       + FileSystemView.getFileSystemView().getSystemTypeDescription((File) value)
+                    ; 
+                } 
+                return TO_STRING.getString(value);
+            }
+            
+        };
+        IconValue iv = new IconValue() {
+
+            public Icon getIcon(Object value) {
+                if (value instanceof File) {
+                    return  FileSystemView.getFileSystemView().getSystemIcon((File) value);
+                } 
+                return null;
+            }};
+        final DefaultTreeRenderer treeRenderer = new DefaultTreeRenderer(iv, sv);
+        table.setTreeCellRenderer(treeRenderer);
+        final JXTree tree = new JXTree(model);
+        tree.setCellRenderer(treeRenderer);
+        // string based. Note: this example is locale dependent
+        String folderDescription = ".*ordner.*";
+        PatternPredicate predicate = new PatternPredicate(Pattern.compile(folderDescription, 0), 0, -1);
+        Highlighter hl = new ColorHighlighter(predicate, null, Color.RED);
+        table.addHighlighter(hl);
+        tree.addHighlighter(hl);
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.YEAR, -1);
+        final Date lastYear = calendar.getTime();
+        // install value based highlighter 
+        HighlightPredicate valueBased = new HighlightPredicate() {
+
+            public boolean isHighlighted(Component renderer,
+                    ComponentAdapter adapter) {
+                if (!(adapter.getValue() instanceof File)) return false;
+                File file = (File) adapter.getValue();
+                Date date = new Date(file.lastModified());
+                return date.after(lastYear);
+            }
+            
+        };
+        ColorHighlighter back =  new ColorHighlighter(valueBased, Color.YELLOW, null);
+        table.addHighlighter(back);
+        tree.addHighlighter(back);
+        JXFrame frame =showWithScrollingInFrame(tree, table, "Tree/Table: same string/icon value");
+        addStatusMessage(frame, "node is File - string/value based highlighters same");
     }
     
     /**

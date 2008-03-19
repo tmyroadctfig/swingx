@@ -21,6 +21,7 @@
  */
 package org.jdesktop.swingx.renderer;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
 import java.awt.Point;
@@ -28,25 +29,37 @@ import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.util.logging.Logger;
 
+import javax.swing.AbstractButton;
 import javax.swing.AbstractListModel;
+import javax.swing.BorderFactory;
 import javax.swing.Icon;
+import javax.swing.JLabel;
 import javax.swing.JTree;
-import javax.swing.JViewport;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListModel;
 import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
+import javax.swing.border.Border;
 import javax.swing.plaf.basic.BasicTreeUI;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreePath;
 
 import org.jdesktop.swingx.InteractiveTestCase;
+import org.jdesktop.swingx.JXButton;
 import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXList;
+import org.jdesktop.swingx.JXPanel;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.JXTree;
 import org.jdesktop.swingx.JXTreeTable;
+import org.jdesktop.swingx.RolloverProducer;
+import org.jdesktop.swingx.RolloverRenderer;
+import org.jdesktop.swingx.border.DropShadowBorder;
+import org.jdesktop.swingx.decorator.HighlightPredicate;
+import org.jdesktop.swingx.decorator.Highlighter;
+import org.jdesktop.swingx.decorator.PainterHighlighter;
+import org.jdesktop.swingx.painter.MattePainter;
 import org.jdesktop.swingx.test.ComponentTreeTableModel;
 import org.jdesktop.swingx.test.XTestUtils;
 
@@ -217,6 +230,85 @@ public class RendererIssues extends InteractiveTestCase {
         toolTipManager.registerComponent(tree);
         JXFrame frame = showWithScrollingInFrame(tree, "tooltip");
         show(frame, 400, 400);
+    }
+
+    
+    /**
+     * PENDING JW: really fancify or remove ;-)
+     */
+    public void interactiveTreeFancyButton() {
+        JXTree tree = new JXTree();
+        tree.setRowHeight(30);
+        MattePainter painter = new MattePainter(Color.YELLOW);
+        Highlighter hl = new PainterHighlighter(HighlightPredicate.ROLLOVER_ROW, painter);
+        tree.addHighlighter(hl);
+        ComponentProvider provider = new NormalButtonProvider(StringValue.TO_STRING, JLabel.LEADING);
+        tree.setCellRenderer(new DefaultTreeRenderer(provider));
+        tree.setRolloverEnabled(true);
+        showWithScrollingInFrame(tree, "Fancy..");
+    }
+    
+    public void interactiveFancyButton() {
+        JXButton button = new JXButton("Dummy .... but lonnnnnnngg");
+        button.setBorder(BorderFactory.createCompoundBorder(new DropShadowBorder(), button.getBorder()));
+        JXPanel panel = new JXPanel();
+        panel.add(button);
+        showInFrame(panel, "Fancy..");
+    }
+    
+    public static class NormalButtonProvider extends CheckBoxProvider 
+        implements RolloverRenderer {
+
+        private Border border;
+
+        /**
+         * @param toString
+         * @param leading
+         */
+        public NormalButtonProvider(StringValue toString, int leading) {
+            super(toString, leading);
+            setBorderPainted(true);
+        }
+
+        
+        @Override
+        protected void configureState(CellContext context) {
+            super.configureState(context);
+            rendererComponent.setBorder(border);
+            Point p = (Point) context.getComponent().getClientProperty(
+                    RolloverProducer.ROLLOVER_KEY);
+            if (/* hasFocus || */(p != null && (p.x >= 0)
+                    && (p.x == context.getColumn()) && (p.y == context.getRow()))) {
+                rendererComponent.getModel().setRollover(true);
+            } else {
+                rendererComponent.getModel().setRollover(false);
+            }
+        }
+
+
+        @Override
+        protected AbstractButton createRendererComponent() {
+            JXButton button = new JXButton();
+            border = BorderFactory.createCompoundBorder(
+                    new DropShadowBorder(),
+                    button.getBorder());
+            return button;
+        }
+
+
+        public void doClick() {
+            // TODO Auto-generated method stub
+            
+        }
+
+
+        public boolean isEnabled() {
+            // TODO Auto-generated method stub
+            return true;
+        }
+        
+        
+        
     }
 
     /**
