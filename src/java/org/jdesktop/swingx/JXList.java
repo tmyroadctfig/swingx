@@ -1466,14 +1466,27 @@ public class JXList extends JList {
     }
 
     /**
+     * Returns the renderer installed by client code or the default if none has
+     * been set.
+     * 
+     * @return the wrapped renderer.
+     * @see #setCellRenderer(ListCellRenderer)
+     */
+    public ListCellRenderer getWrappedCellRenderer() {
+        return getDelegatingRenderer().getDelegateRenderer();
+    }
+    
+    /**
      * {@inheritDoc} <p>
      * 
      * Overridden to wrap the given renderer in a DelegatingRenderer to support
      * highlighting. <p>
      * 
      * Note: the wrapping implies that the renderer returned from the getCellRenderer
-     * is <b>not</b> the renderer as given here, but the wrapper. 
+     * is <b>not</b> the renderer as given here, but the wrapper. To access the original,
+     * use <code>getWrappedCellRenderer</code>.
      * 
+     * @see #getWrappedCellRenderer()
      * @see #getCellRenderer()
      * 
      */
@@ -1568,6 +1581,7 @@ public class JXList extends JList {
          * {@inheritDoc} <p>
          * 
          * Overridden to apply the highlighters, if any, after calling the delegate.
+         * The decorators are not applied if the row is invalid.
          */
        public Component getListCellRendererComponent(JList list, Object value,
                 int index, boolean isSelected, boolean cellHasFocus) {

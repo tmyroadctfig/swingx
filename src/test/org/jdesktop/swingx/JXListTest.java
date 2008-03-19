@@ -54,6 +54,30 @@ public class JXListTest extends InteractiveTestCase {
 
     /**
      * Issue #816-swingx: Delegating renderer must create list's default.
+     * Consistent api: expose wrappedRenderer the same way as wrappedModel
+     */
+    public void testWrappedRendererDefault() {
+        JXList list = new JXList();
+        DelegatingRenderer renderer = (DelegatingRenderer) list.getCellRenderer();
+        assertSame("wrapping renderer must use list's default on null", 
+                 renderer.getDelegateRenderer(), list.getWrappedCellRenderer());
+    }
+
+    /**
+     * Issue #816-swingx: Delegating renderer must create list's default.
+     * Consistent api: expose wrappedRenderer the same way as wrappedModel
+     */
+    public void testWrappedRendererCustom() {
+        JXList list = new JXList();
+        DelegatingRenderer renderer = (DelegatingRenderer) list.getCellRenderer();
+        ListCellRenderer custom = new DefaultListRenderer();
+        list.setCellRenderer(custom);
+        assertSame("wrapping renderer must use list's default on null", 
+                 renderer.getDelegateRenderer(), list.getWrappedCellRenderer());
+    }
+    
+    /**
+     * Issue #816-swingx: Delegating renderer must create list's default.
      * Delegating uses default on null, here: default default.
      */
     public void testDelegatingRendererUseDefaultSetNull() {

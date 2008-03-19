@@ -47,6 +47,7 @@ import javax.swing.JComponent;
 import javax.swing.JPopupMenu;
 import javax.swing.JTree;
 import javax.swing.KeyStroke;
+import javax.swing.ListCellRenderer;
 import javax.swing.SwingUtilities;
 import javax.swing.event.CellEditorListener;
 import javax.swing.event.ChangeEvent;
@@ -60,10 +61,12 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
+import org.jdesktop.swingx.JXList.DelegatingRenderer;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.CompoundHighlighter;
 import org.jdesktop.swingx.decorator.FilterPipeline;
 import org.jdesktop.swingx.decorator.Highlighter;
+import org.jdesktop.swingx.renderer.DefaultTreeRenderer;
 import org.jdesktop.swingx.renderer.StringValue;
 import org.jdesktop.swingx.tree.DefaultXTreeCellEditor;
 
@@ -892,40 +895,6 @@ public class JXTree extends JTree {
     }
 
     
-    private DelegatingRenderer getDelegatingRenderer() {
-        if (delegatingRenderer == null) {
-            // only called once... to get hold of the default?
-            delegatingRenderer = new DelegatingRenderer();
-            delegatingRenderer.setDelegateRenderer(super.getCellRenderer());
-        }
-        return delegatingRenderer;
-    }
-
-
-    /**
-     * {@inheritDoc} <p>
-     * 
-     * Overridden to return the DelegateRenderer which
-     * is wrapped around the actual renderer. 
-     */
-    @Override
-    public TreeCellRenderer getCellRenderer() {
-        return getDelegatingRenderer();
-    }
-
-    /**
-     * {@inheritDoc} <p>
-     * 
-     * Overridden to wrap the given renderer in a DelegateRenderer.
-     */
-    @Override
-    public void setCellRenderer(TreeCellRenderer renderer) {
-        // PENDING: do something against recursive setting
-        // == multiple delegation...
-        getDelegatingRenderer().setDelegateRenderer(renderer);
-        super.setCellRenderer(delegatingRenderer);
-    }
-
     /**
      * Sets the Icon to use for the handle of an expanded node.<p>
      * 
@@ -1045,6 +1014,83 @@ public class JXTree extends JTree {
         return overwriteIcons;
     }
     
+    private DelegatingRenderer getDelegatingRenderer() {
+        if (delegatingRenderer == null) {
+            // only called once... to get hold of the default?
+            delegatingRenderer = new DelegatingRenderer();
+        }
+        return delegatingRenderer;
+    }
+
+    /**
+     * Creates and returns the default cell renderer to use. Subclasses
+     * may override to use a different type. Here: returns a <code>DefaultTreeCellRenderer</code>.
+     * <p>
+     * Note: this implementation will be changed to return <code>DefaultTreeRenderer</code>, once
+     * WrappingProvider is reasonably stable. 
+     * 
+     * @return the default cell renderer to use with this tree.
+     */
+    protected TreeCellRenderer createDefaultCellRenderer() {
+        return new DefaultTreeCellRenderer();
+    }
+
+
+    /**
+     * {@inheritDoc} <p>
+     * 
+     * Overridden to return the delegating renderer which is wrapped around the
+     * original to support highlighting. The returned renderer is of type 
+     * DelegatingRenderer and guaranteed to not-null<p>
+     * 
+     * @see #setCellRenderer(TreeCellRenderer)
+     * @see DelegatingRenderer
+     */
+    @Override
+    public TreeCellRenderer getCellRenderer() {
+        return getDelegatingRenderer();
+    }
+
+    /**
+     * Returns the renderer installed by client code or the default if none has
+     * been set.
+     * 
+     * @return the wrapped renderer.
+     * @see #setCellRenderer(TreeCellRenderer)
+     */
+    public TreeCellRenderer getWrappedCellRenderer() {
+        return getDelegatingRenderer().getDelegateRenderer();
+    }
+
+    /**
+     * {@inheritDoc} <p>
+     * 
+     * Overridden to wrap the given renderer in a DelegatingRenderer to support
+     * highlighting. <p>
+     * 
+     * Note: the wrapping implies that the renderer returned from the getCellRenderer
+     * is <b>not</b> the renderer as given here, but the wrapper. To access the original,
+     * use <code>getWrappedCellRenderer</code>.
+     * 
+     * @see #getWrappedCellRenderer()
+     * @see #getCellRenderer()
+     */
+    @Override
+    public void setCellRenderer(TreeCellRenderer renderer) {
+        // PENDING: do something against recursive setting
+        // == multiple delegation...
+        getDelegatingRenderer().setDelegateRenderer(renderer);
+        super.setCellRenderer(delegatingRenderer);
+    }
+
+    /**
+     * A decorator for the original TreeCellRenderer. Needed to hook highlighters
+     * after messaging the delegate.<p>
+     * 
+     * PENDING JW: formally implement UIDependent? 
+     * PENDING JW: missing updateUI anyway (got lost when c&p from JXList ;-)
+     * PENDING JW: missing override of updateUI in xtree ...
+     */
     public class DelegatingRenderer implements TreeCellRenderer, RolloverRenderer {
         private Icon    closedIcon = null;
         private Icon    openIcon = null;
@@ -1052,8 +1098,25 @@ public class JXTree extends JTree {
        
         private TreeCellRenderer delegate;
         
+        /**
+         * Instantiates a DelegatingRenderer with tree's default renderer as delegate.
+         */
         public DelegatingRenderer() {
+            this(null);
             initIcons(new DefaultTreeCellRenderer());
+        }
+
+        /**
+         * Instantiates a DelegatingRenderer with the given delegate. If the
+         * delegate is null, the default is created via the list's factory method.
+         * 
+         * @param delegate the delegate to use, if null the tree's default is
+         *   created and used.
+         */
+        public DelegatingRenderer(TreeCellRenderer delegate) {
+            initIcons((DefaultTreeCellRenderer) (delegate instanceof DefaultTreeCellRenderer ? 
+                    delegate : new DefaultTreeCellRenderer()));
+            setDelegateRenderer(delegate);
         }
 
         /**
@@ -1069,18 +1132,20 @@ public class JXTree extends JTree {
         }
 
         /**
-         * Set the delegate renderer. 
+         * Sets the delegate. If the
+         * delegate is null, the default is created via the list's factory method.
          * Updates the folder/leaf icons. 
          * 
          * THINK: how to update? always override with this.icons, only
          * if renderer's icons are null, update this icons if they are not,
          * update all if only one is != null.... ??
          * 
-         * @param delegate
+         * @param delegate the delegate to use, if null the list's default is
+         *   created and used.
          */
         public void setDelegateRenderer(TreeCellRenderer delegate) {
             if (delegate == null) {
-                delegate = new DefaultTreeCellRenderer();
+                delegate = createDefaultCellRenderer();
             }
             this.delegate = delegate;
             updateIcons();
@@ -1124,33 +1189,49 @@ public class JXTree extends JTree {
         
         //--------------- TreeCellRenderer
         
+        /**
+         * Returns the delegate.
+         * 
+         * @return the delegate renderer used by this renderer, guaranteed to
+         *   not-null.
+         */
         public TreeCellRenderer getDelegateRenderer() {
             return delegate;
         }
-            public Component getTreeCellRendererComponent(JTree tree, Object value, 
-                    boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
-                Component result = delegate.getTreeCellRendererComponent(tree, value, 
-                        selected, expanded, leaf, row, hasFocus);
+        
+        /**
+         * {@inheritDoc} <p>
+         * 
+         * Overridden to apply the highlighters, if any, after calling the delegate.
+         * The decorators are not applied if the row is invalid.
+         */
+        public Component getTreeCellRendererComponent(JTree tree, Object value,
+                boolean selected, boolean expanded, boolean leaf, int row,
+                boolean hasFocus) {
+            Component result = delegate.getTreeCellRendererComponent(tree,
+                    value, selected, expanded, leaf, row, hasFocus);
 
-                    if ((compoundHighlighter != null) && (row < getRowCount()) && (row >= 0)){
-                        result = compoundHighlighter.highlight(result, getComponentAdapter(row));
-                    }
+            if ((compoundHighlighter != null) && (row < getRowCount())
+                    && (row >= 0)) {
+                result = compoundHighlighter.highlight(result,
+                        getComponentAdapter(row));
+            }
 
-                 return result;
-            }
+            return result;
+        }
             
-            //------------------ RolloverRenderer
+            // ------------------ RolloverRenderer
+
+        public boolean isEnabled() {
+            return (delegate instanceof RolloverRenderer)
+                    && ((RolloverRenderer) delegate).isEnabled();
+        }
             
-            public boolean isEnabled() {
-                return (delegate instanceof RolloverRenderer) && 
-                   ((RolloverRenderer) delegate).isEnabled();
+        public void doClick() {
+            if (isEnabled()) {
+                ((RolloverRenderer) delegate).doClick();
             }
-            
-            public void doClick() {
-                if (isEnabled()) {
-                    ((RolloverRenderer) delegate).doClick();
-                }
-            }
+        }
 
     }
 

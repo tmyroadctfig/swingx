@@ -19,6 +19,7 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreePath;
 
+import org.jdesktop.swingx.JXTree.DelegatingRenderer;
 import org.jdesktop.swingx.JXTreeTableUnitTest.InsertTreeTableModel;
 import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
@@ -46,6 +47,103 @@ public class JXTreeUnitTest extends InteractiveTestCase {
         super("JXTree Test");
     }
 
+    /**
+     * Issue #817-swingx: Delegating renderer must create list's default.
+     * Consistent api: expose wrappedRenderer the same way as wrappedModel
+     */
+    public void testWrappedRendererDefault() {
+        JXTree list = new JXTree();
+        DelegatingRenderer renderer = (DelegatingRenderer) list.getCellRenderer();
+        assertSame("wrapping renderer must use list's default on null", 
+                 renderer.getDelegateRenderer(), list.getWrappedCellRenderer());
+    }
+
+    /**
+     * Issue #817-swingx: Delegating renderer must create list's default.
+     * Consistent api: expose wrappedRenderer the same way as wrappedModel
+     */
+    public void testWrappedRendererCustom() {
+        JXTree list = new JXTree();
+        DelegatingRenderer renderer = (DelegatingRenderer) list.getCellRenderer();
+        TreeCellRenderer custom = new DefaultTreeRenderer();
+        list.setCellRenderer(custom);
+        assertSame("wrapping renderer must use list's default on null", 
+                 renderer.getDelegateRenderer(), list.getWrappedCellRenderer());
+    }
+    
+    /**
+     * Issue #817-swingx: Delegating renderer must create list's default.
+     * Delegating uses default on null, here: default default.
+     */
+    public void testDelegatingRendererUseDefaultSetNull() {
+        JXTree list = new JXTree();
+        TreeCellRenderer defaultRenderer = list.createDefaultCellRenderer();
+        DelegatingRenderer renderer = (DelegatingRenderer) list.getCellRenderer();
+        list.setCellRenderer(null);
+        assertEquals("wrapping renderer must use list's default on null", 
+                defaultRenderer.getClass(), renderer.getDelegateRenderer().getClass());
+    }
+
+    /**
+     * Issue #817-swingx: Delegating renderer must create list's default.
+     * Delegating has default from list initially, here: default default.
+     * 
+     * Note: this test has to be changed once we switch to default to DefaultTreeRenderer.
+     */
+    public void testDelegatingRendererUseDefault() {
+        JXTree list = new JXTree();
+        TreeCellRenderer defaultRenderer = list.createDefaultCellRenderer();
+        assertEquals("sanity: creates default", DefaultTreeCellRenderer.class, 
+                defaultRenderer.getClass());
+        DelegatingRenderer renderer = (DelegatingRenderer) list.getCellRenderer();
+        assertEquals(defaultRenderer.getClass(), renderer.getDelegateRenderer().getClass());
+    }
+    
+    /**
+     * Issue #817-swingx: Delegating renderer must create list's default.
+     * Delegating has default from list initially, here: custom default.
+     */
+    public void testDelegatingRendererUseCustomDefaultSetNull() {
+        JXTree list = new JXTree() {
+
+            @Override
+            protected TreeCellRenderer createDefaultCellRenderer() {
+                return new CustomDefaultRenderer();
+            }
+            
+        };
+        TreeCellRenderer defaultRenderer = list.createDefaultCellRenderer();
+        DelegatingRenderer renderer = (DelegatingRenderer) list.getCellRenderer();
+        list.setCellRenderer(null);
+        assertEquals("wrapping renderer must use list's default on null",
+                defaultRenderer.getClass(), renderer.getDelegateRenderer().getClass());
+    }
+    
+    /**
+     * Issue #817-swingx: Delegating renderer must create list's default.
+     * Delegating has default from list initially, here: custom default.
+     */
+    public void testDelegatingRendererUseCustomDefault() {
+        JXTree list = new JXTree() {
+
+            @Override
+            protected TreeCellRenderer createDefaultCellRenderer() {
+                return new CustomDefaultRenderer();
+            }
+            
+        };
+        TreeCellRenderer defaultRenderer = list.createDefaultCellRenderer();
+        assertEquals("sanity: creates custom", CustomDefaultRenderer.class, 
+                defaultRenderer.getClass());
+        DelegatingRenderer renderer = (DelegatingRenderer) list.getCellRenderer();
+        assertEquals(defaultRenderer.getClass(), renderer.getDelegateRenderer().getClass());
+    }
+    /**
+     * Dummy extension for testing - does nothing more as super.
+     * For tree, we subclass swingx renderer, as the default still it core default.
+     */
+    public static class CustomDefaultRenderer extends DefaultTreeRenderer {
+    }
     
     /**
      * Issue #767-swingx: consistent string representation.
