@@ -94,7 +94,7 @@ public class JXTreeTableIssues extends InteractiveTestCase {
     private static final Logger LOG = Logger.getLogger(JXTreeTableIssues.class
             .getName());
     public static void main(String[] args) {
-//        setSystemLF(true);
+        setSystemLF(true);
         JXTreeTableIssues test = new JXTreeTableIssues();
         try {
 //            test.runInteractiveTests();
@@ -102,13 +102,93 @@ public class JXTreeTableIssues extends InteractiveTestCase {
 //            test.runInteractiveTests(".*Text.*");
 //            test.runInteractiveTests(".*TreeExpand.*");
 //            test.runInteractiveTests("interactive.*ClipIssueD.*");
-          test.runInteractiveTests("interactive.*Blinks.*");
+          test.runInteractiveTests("interactive.*CustomColor.*");
               
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
         }
     }
+
+    /**
+     * Custom renderer colors of Swingx DefaultTreeRenderer not respected.
+     * (same in J/X/Tree). 
+     * 
+     * A bit surprising - probably due to the half-hearted support (backward
+     * compatibility) of per-provider colors: they are set by the glueing
+     * renderer to the provider's default visuals. Which is useless if the
+     * provider is a wrapping provider - the wrappee's default visuals are unchanged.
+     * 
+     * PENDING JW: think about complete removal. Client code should move over
+     * completely to highlighter/renderer separation anyway.
+     * 
+     * 
+     */
+    public void interactiveXRendererCustomColor() {
+        JXTreeTable treeTable = new JXTreeTable(new FileSystemModel());
+        treeTable.addHighlighter(HighlighterFactory.createSimpleStriping());
+        DefaultTreeRenderer swingx = new DefaultTreeRenderer();
+        // in a treetable this has no effect: treetable.applyRenderer 
+        // internally resets them to the same colors as tree itself
+        // (configured by the table's highlighters
+        swingx.setBackground(Color.YELLOW);
+        treeTable.setTreeCellRenderer(swingx);
+        JTree tree = new JXTree(treeTable.getTreeTableModel());
+        DefaultTreeRenderer other = new DefaultTreeRenderer();
+        other.setBackground(Color.YELLOW);
+//        other.setBackgroundSelectionColor(Color.RED);
+        tree.setCellRenderer(other);
+        JXFrame frame = wrapWithScrollingInFrame(treeTable, tree, "swingx renderers - highlight complete cell");
+        frame.setVisible(true);  
+    }
+
+    /**
+     * Custom renderer colors of core DefaultTreeCellRenderer not respected.
+     * This is intentional: treeTable's highlighters must rule, so the
+     * renderer colors are used to force the treecellrenderer to use the 
+     * correct values.
+     */
+    public void interactiveCoreRendererCustomColor() {
+        JXTreeTable treeTable = new JXTreeTable(new FileSystemModel());
+        treeTable.addHighlighter(HighlighterFactory.createSimpleStriping());
+        DefaultTreeCellRenderer legacy = createBackgroundTreeRenderer();
+        // in a treetable this has no effect: treetable.applyRenderer 
+        // internally resets them to the same colors as tree itself
+        // (configured by the table's highlighters
+        legacy.setBackgroundNonSelectionColor(Color.YELLOW);
+        legacy.setBackgroundSelectionColor(Color.RED);
+        treeTable.setTreeCellRenderer(legacy);
+        JTree tree = new JXTree(treeTable.getTreeTableModel());
+        DefaultTreeCellRenderer other = createBackgroundTreeRenderer();
+        other.setBackgroundNonSelectionColor(Color.YELLOW);
+        other.setBackgroundSelectionColor(Color.RED);
+        tree.setCellRenderer(other);
+        JXFrame frame = wrapWithScrollingInFrame(treeTable, tree, "legacy renderers - highlight complete cell");
+        frame.setVisible(true);  
+    }
+
+    private DefaultTreeCellRenderer createBackgroundTreeRenderer() {
+        DefaultTreeCellRenderer legacy = new DefaultTreeCellRenderer() {
+
+            @Override
+            public Component getTreeCellRendererComponent(JTree tree,
+                    Object value, boolean sel, boolean expanded, boolean leaf,
+                    int row, boolean hasFocus) {
+                Component comp = super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf,
+                        row, hasFocus);
+                if (sel) {
+                    comp.setBackground(getBackgroundSelectionColor());
+                } else {
+                    comp.setBackground(getBackgroundNonSelectionColor());
+                }
+                return comp;
+            }
+            
+            
+        };
+        return legacy;
+    }
+
 
     /**
      * Issue #766-swingx: drop image is blinking over hierarchical column.

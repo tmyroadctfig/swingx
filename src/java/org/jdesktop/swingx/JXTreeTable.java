@@ -916,30 +916,43 @@ public class JXTreeTable extends JXTable {
     }
 
     /**
-     * Overrides superclass version to provide support for cell decorators.
+     * {@inheritDoc} <p>
+     * 
+     * Overridden to decorate the tree's renderer after calling super.
+     * At that point, it is only the tree itself that has been decorated. 
      *
      * @param renderer the <code>TableCellRenderer</code> to prepare
      * @param row the row of the cell to render, where 0 is the first row
      * @param column the column of the cell to render, where 0 is the first column
      * @return the <code>Component</code> used as a stamp to render the specified cell
+     * 
+     * @see #applyRenderer(Component, ComponentAdapter)
      */
     @Override
     public Component prepareRenderer(TableCellRenderer renderer, int row,
         int column) {
-        
         Component component = super.prepareRenderer(renderer, row, column);
         return applyRenderer(component, getComponentAdapter(row, column)); 
     }
 
     /**
-     * Performs necessary housekeeping before the renderer is actually applied.
-     *
-     * @param component
+     * Performs configuration of the tree's renderer if the adapter's column is
+     * the hierarchical column, does nothing otherwise.
+     * <p>
+     * 
+     * Note: this is legacy glue if the treeCellRenderer is of type
+     * DefaultTreeCellRenderer. In that case the renderer's
+     * background/foreground/Non/Selection colors are set to the tree's
+     * background/foreground depending on the adapter's selection state. Does
+     * nothing if the treeCellRenderer is backed by a ComponentProvider.
+     * 
+     * @param component the rendering component
      * @param adapter component data adapter
-     * @throws NullPointerException if the specified component or adapter is null
+     * @throws NullPointerException if the specified component or adapter is
+     *         null
      */
     protected Component applyRenderer(Component component,
-        ComponentAdapter adapter) {
+            ComponentAdapter adapter) {
         if (component == null) {
             throw new IllegalArgumentException("null component");
         }
@@ -954,18 +967,21 @@ public class JXTreeTable extends JXTable {
             TreeCellRenderer tcr = renderer.getCellRenderer();
             if (tcr instanceof JXTree.DelegatingRenderer) {
                 tcr = ((JXTree.DelegatingRenderer) tcr).getDelegateRenderer();
-                
+
             }
             if (tcr instanceof DefaultTreeCellRenderer) {
+
                 DefaultTreeCellRenderer dtcr = ((DefaultTreeCellRenderer) tcr);
+                // this effectively overwrites the dtcr settings
                 if (adapter.isSelected()) {
                     dtcr.setTextSelectionColor(component.getForeground());
                     dtcr.setBackgroundSelectionColor(component.getBackground());
-               } else {
+                } else {
                     dtcr.setTextNonSelectionColor(component.getForeground());
-                    dtcr.setBackgroundNonSelectionColor(component.getBackground());
+                    dtcr.setBackgroundNonSelectionColor(component
+                            .getBackground());
                 }
-            } 
+            }
         }
         return component;
     }
