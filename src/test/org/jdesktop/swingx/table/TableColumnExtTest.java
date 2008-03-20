@@ -6,8 +6,6 @@
  */
 package org.jdesktop.swingx.table;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.text.Collator;
 import java.util.Comparator;
@@ -219,57 +217,46 @@ public class TableColumnExtTest extends TestCase {
                 cloned.getClientProperty(key));
     }
 
-    private static class HighlightersChangeListener implements PropertyChangeListener {
-        private boolean eventCalled;
-        
-        /**
-         * {@inheritDoc}
-         */
-        public void propertyChange(PropertyChangeEvent evt) {
-            if ("highlighters".equals(evt.getPropertyName())) {
-                eventCalled = true;
-            }
-        }
-        
-    }
-    
     //begin SwingX Issue #770 checks
     /**
      * Check for setHighlighters portion of #770.
      */
     public void testSetHighlighters() {
         TableColumnExt column = new TableColumnExt(0);
-        HighlightersChangeListener hcl = new HighlightersChangeListener();
+        PropertyChangeReport hcl = new PropertyChangeReport();
         column.addPropertyChangeListener(hcl);
         
         Highlighter h1 = new ColorHighlighter();
         Highlighter h2 = new ColorHighlighter();
         
         //sanity check
-        assertFalse(hcl.eventCalled);
+        assertEquals(0, hcl.getEventCount());
         
         //base case no highlighters
         assertSame(CompoundHighlighter.EMPTY_HIGHLIGHTERS, column.getHighlighters());
         
         column.setHighlighters(h1);
-        assertTrue(hcl.eventCalled);
+        assertEquals(1, hcl.getEventCount());
+        assertEquals("highlighters", hcl.getLastProperty());
         assertEquals(1, column.getHighlighters().length);
         assertSame(h1, column.getHighlighters()[0]);
         
         //reset state
-        hcl.eventCalled = false;
+        hcl.clear();
         
         column.removeHighlighter(h1);
-        assertTrue(hcl.eventCalled);
+        assertEquals(1, hcl.getEventCount());
+        assertEquals("highlighters", hcl.getLastProperty());
         //we have a compound, but empty highlighter
         assertEquals(0, column.getHighlighters().length);
         assertNotSame(CompoundHighlighter.EMPTY_HIGHLIGHTERS, column.getHighlighters());
         
         //reset state
-        hcl.eventCalled = false;
+        hcl.clear();
         
         column.setHighlighters(h1, h2);
-        assertTrue(hcl.eventCalled);
+        assertEquals(1, hcl.getEventCount());
+        assertEquals("highlighters", hcl.getLastProperty());
         assertEquals(2, column.getHighlighters().length);
         assertSame(h1, column.getHighlighters()[0]);
         assertSame(h2, column.getHighlighters()[1]);
@@ -280,38 +267,42 @@ public class TableColumnExtTest extends TestCase {
      */
     public void testAddHighlighter() {
         TableColumnExt column = new TableColumnExt(0);
-        HighlightersChangeListener hcl = new HighlightersChangeListener();
+        PropertyChangeReport hcl = new PropertyChangeReport();
         column.addPropertyChangeListener(hcl);
         
         Highlighter h1 = new ColorHighlighter();
         Highlighter h2 = new ColorHighlighter();
         
         //sanity check
-        assertFalse(hcl.eventCalled);
+        assertEquals(0, hcl.getEventCount());
         
         //base case no highlighters
         assertSame(CompoundHighlighter.EMPTY_HIGHLIGHTERS, column.getHighlighters());
         
         column.addHighlighter(h1);
-        assertTrue(hcl.eventCalled);
+        assertEquals(1, hcl.getEventCount());
+        assertEquals("highlighters", hcl.getLastProperty());
         assertEquals(1, column.getHighlighters().length);
         assertSame(h1, column.getHighlighters()[0]);
         
         //reset state
-        hcl.eventCalled = false;
+        hcl.clear();
         
         column.removeHighlighter(h1);
-        assertTrue(hcl.eventCalled);
+        assertEquals(1, hcl.getEventCount());
+        assertEquals("highlighters", hcl.getLastProperty());
         //we have a compound, but empty highlighter
         assertEquals(0, column.getHighlighters().length);
         assertNotSame(CompoundHighlighter.EMPTY_HIGHLIGHTERS, column.getHighlighters());
         
-        //reset state
-        hcl.eventCalled = false;
-        
         column.setHighlighters(h1);
+        
+        //reset state
+        hcl.clear();
+        
         column.addHighlighter(h2);
-        assertTrue(hcl.eventCalled);
+        assertEquals(1, hcl.getEventCount());
+        assertEquals("highlighters", hcl.getLastProperty());
         assertEquals(2, column.getHighlighters().length);
         assertSame(h1, column.getHighlighters()[0]);
         assertSame(h2, column.getHighlighters()[1]);
@@ -322,7 +313,7 @@ public class TableColumnExtTest extends TestCase {
      */
     public void testRemoveHighlighter() {
         TableColumnExt column = new TableColumnExt(0);
-        HighlightersChangeListener hcl = new HighlightersChangeListener();
+        PropertyChangeReport hcl = new PropertyChangeReport();
         column.addPropertyChangeListener(hcl);
         
         Highlighter h1 = new ColorHighlighter();
@@ -330,19 +321,20 @@ public class TableColumnExtTest extends TestCase {
         Highlighter h3 = new ColorHighlighter();
         
         //sanity check
-        assertFalse(hcl.eventCalled);
+        assertEquals(0, hcl.getEventCount());
         
         //ensure that nothing goes awry
         column.removeHighlighter(h1);
-        assertFalse(hcl.eventCalled);
+        assertEquals(0, hcl.getEventCount());
         
         column.setHighlighters(h1, h2, h3);
         
         //reset state
-        hcl.eventCalled = false;
+        hcl.clear();
         
         column.removeHighlighter(h2);
-        assertTrue(hcl.eventCalled);
+        assertEquals(1, hcl.getEventCount());
+        assertEquals("highlighters", hcl.getLastProperty());
         assertEquals(2, column.getHighlighters().length);
         assertSame(h1, column.getHighlighters()[0]);
         assertSame(h3, column.getHighlighters()[1]);
