@@ -28,8 +28,6 @@ import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXTree;
 import org.jdesktop.swingx.JXTreeTable;
-import org.jdesktop.swingx.decorator.ComponentAdapterTest.JXTreeTableT;
-import org.jdesktop.swingx.renderer.DefaultTableRenderer;
 import org.jdesktop.swingx.renderer.DefaultTreeRenderer;
 import org.jdesktop.swingx.renderer.StringValue;
 import org.jdesktop.swingx.treetable.TreeTableModel;
@@ -81,23 +79,6 @@ public class ComponentAdapterIssues extends InteractiveTestCase {
     }
 
     
-    /**
-     * Issue #767-swingx: consistent string representation.
-     * 
-     * Problem: string rep of hierarchical column
-     */
-    public void testTreeTableGetStringUsedInPatternPredicate() {
-        JXTreeTableT table = new JXTreeTableT(AncientSwingTeam.createNamedColorTreeTableModel());
-        table.setTreeCellRenderer(new DefaultTreeRenderer(sv));
-        int matchRow = 2;
-        int matchColumn = 0;
-        String text = sv.getString(table.getValueAt(matchRow, matchColumn));
-        ComponentAdapter adapter = table.getComponentAdapter(matchRow, matchColumn);
-        Pattern pattern = Pattern.compile(text, 0);
-        HighlightPredicate predicate = new PatternPredicate(pattern, matchRow, matchColumn);
-        assertTrue(predicate.isHighlighted(null, adapter));
-    }
-
     /**
      * Creates and returns a StringValue which maps a Color to it's R/G/B rep, 
      * prepending "R/G/B: "

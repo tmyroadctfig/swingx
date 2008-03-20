@@ -33,6 +33,7 @@ import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.JXTree;
 import org.jdesktop.swingx.decorator.ComponentAdapterTest.JXTableT;
 import org.jdesktop.swingx.decorator.ComponentAdapterTest.JXTreeT;
+import org.jdesktop.swingx.decorator.ComponentAdapterTest.JXTreeTableT;
 import org.jdesktop.swingx.renderer.DefaultListRenderer;
 import org.jdesktop.swingx.renderer.DefaultTableRenderer;
 import org.jdesktop.swingx.renderer.DefaultTreeRenderer;
@@ -116,11 +117,43 @@ public class ComponentAdapterClientTest extends InteractiveTestCase {
 //--------------- unit tests
 
     /**
+     * Issue #821-swingx: JXTreeTable broken string rep of hierarchical column
+     * 
+     * here: test highlight
+     */
+    public void testTreeTableGetStringUsedInPatternPredicate() {
+        JXTreeTableT table = new JXTreeTableT(AncientSwingTeam.createNamedColorTreeTableModel());
+        table.setTreeCellRenderer(new DefaultTreeRenderer(sv));
+        int matchRow = 2;
+        int matchColumn = 0;
+        String text = sv.getString(table.getValueAt(matchRow, matchColumn));
+        ComponentAdapter adapter = table.getComponentAdapter(matchRow, matchColumn);
+        Pattern pattern = Pattern.compile(text, 0);
+        HighlightPredicate predicate = new PatternPredicate(pattern, matchColumn, -1);
+        assertTrue(predicate.isHighlighted(null, adapter));
+    }
+
+    /**
+     * Issue #821-swingx: JXTreeTable broken string rep of hierarchical column
+     * 
+     * here: test search
+     */
+    public void testTreeTableGetStringUsedInSearch() {
+        JXTreeTableT table = new JXTreeTableT(AncientSwingTeam.createNamedColorTreeTableModel());
+        table.setTreeCellRenderer(new DefaultTreeRenderer(sv));
+        String text = sv.getString(table.getValueAt(2, 0));
+        int matchRow = table.getSearchable().search(text);
+        assertEquals(2, matchRow);
+    }
+
+
+
+    /**
      * Issue #767-swingx: consistent string representation.
      * 
      * Here: test TableSearchable uses getStringXX
      */
-    public void testTreeGetStringAt() {
+    public void testTreeGetStringAtUsedInSearch() {
         JXTreeT tree = new JXTreeT(AncientSwingTeam.createNamedColorTreeModel());
         tree.expandAll();
         tree.setCellRenderer(new DefaultTreeRenderer(sv));
@@ -181,7 +214,7 @@ public class ComponentAdapterClientTest extends InteractiveTestCase {
     public void testTableGetStringUsedInSearchPredicate() {
         JXTableT table = new JXTableT(new AncientSwingTeam());
         table.setDefaultRenderer(Color.class, new DefaultTableRenderer(sv));
-        int matchRow = 2;
+        int matchRow = 3;
         int matchColumn = 2;
         String text = sv.getString(table.getValueAt(matchRow, matchColumn));
         ComponentAdapter adapter = table.getComponentAdapter(matchRow, matchColumn);
@@ -198,12 +231,12 @@ public class ComponentAdapterClientTest extends InteractiveTestCase {
     public void testTableGetStringUsedInPatternPredicate() {
         JXTableT table = new JXTableT(new AncientSwingTeam());
         table.setDefaultRenderer(Color.class, new DefaultTableRenderer(sv));
-        int matchRow = 2;
+        int matchRow = 3;
         int matchColumn = 2;
         String text = sv.getString(table.getValueAt(matchRow, matchColumn));
         ComponentAdapter adapter = table.getComponentAdapter(matchRow, matchColumn);
         Pattern pattern = Pattern.compile(text, 0);
-        HighlightPredicate predicate = new PatternPredicate(pattern, matchRow, matchColumn);
+        HighlightPredicate predicate = new PatternPredicate(pattern, matchColumn, -1);
         assertTrue(predicate.isHighlighted(null, adapter));
     }
 

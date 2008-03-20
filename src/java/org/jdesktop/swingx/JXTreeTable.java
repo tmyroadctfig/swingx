@@ -1600,6 +1600,15 @@ public class JXTreeTable extends JXTable {
         return super.getCellEditor(row, column);
     }
     
+    
+    @Override
+    public String getStringAt(int row, int column) {
+        if (isHierarchical(column)) {
+            return renderer.getStringAt(row);
+        }
+        return super.getStringAt(row, column);
+    }
+
     /**
      * ListToTreeSelectionModelWrapper extends DefaultTreeSelectionModel
      * to listen for changes in the ListSelectionModel it maintains. Once
