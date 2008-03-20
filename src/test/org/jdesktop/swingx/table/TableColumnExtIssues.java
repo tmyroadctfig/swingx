@@ -15,7 +15,6 @@ import junit.framework.TestCase;
 
 import org.jdesktop.test.PropertyChangeReport;
 import org.jdesktop.test.SerializableSupport;
-import org.jdesktop.test.TestUtils;
 
 /**
  * Test to exposed known issues of <code>TableColumnExt</code>.
@@ -30,18 +29,21 @@ public class TableColumnExtIssues extends TestCase {
 
     /**
      * Issue #815-swingx: Listeners must not be cloned.
-     * Sanity: test that listeners registered with the clone are not
-     * notified when changing the original.
+     * Test that a listener registered with the clone is not registered 
+     * with the original.
      */
-    public void testListenerNotificationOrigChanged() {
+    public void testListenersOriginalNotRegistered() {
         TableColumnCloneable column = new TableColumnCloneable();
         column.setPreferredWidth(column.getMinWidth());
+        int old = column.getPropertyChangeListeners().length;
+        assertEquals("sanity, no listener", 0, old);
         TableColumnCloneable clone = (TableColumnCloneable) column.clone();
         PropertyChangeReport report = new PropertyChangeReport();
         clone.addPropertyChangeListener(report);
-        column.setPreferredWidth(column.getPreferredWidth() + 10);
-        assertEquals(0, report.getEventCount());
+        assertEquals(old, column.getPropertyChangeListeners().length);
     }
+    
+
     
     /**
      * Issue #815-swingx: Listeners must not be cloned.
@@ -59,7 +61,22 @@ public class TableColumnExtIssues extends TestCase {
     }
     
     /**
-     * TableColumn sub with a better-behaved clone - removes the cloned listeners
+     * Issue #815-swingx: Listeners must not be cloned.
+     * Test that the listeners are still registered to the old.
+     */
+    public void testListenersOriginalRegistered() {
+        TableColumnCloneable column = new TableColumnCloneable();
+        PropertyChangeReport report = new PropertyChangeReport();
+        column.addPropertyChangeListener(report);
+        int old = column.getPropertyChangeListeners().length;
+        column.clone();
+        assertEquals(old, column.getPropertyChangeListeners().length);
+     }
+    
+    /**
+     * Try a TableColumn sub with a better-behaved clone - removes the cloned listeners.
+     * 
+     * Doesn't help: the listeners are removed from the original as well.
      */
     public static class TableColumnCloneable extends TableColumn implements Cloneable {
 
@@ -67,8 +84,9 @@ public class TableColumnExtIssues extends TestCase {
         public Object clone()  {
             try {
                 TableColumn column = (TableColumn) super.clone();
-                for (int i = 0; i < getPropertyChangeListeners().length; i++) {
-                    column.removePropertyChangeListener(getPropertyChangeListeners()[i]);
+                PropertyChangeListener[] listeners = getPropertyChangeListeners();
+                for (PropertyChangeListener listener : listeners) {
+                    column.removePropertyChangeListener(listener);
                 }
                 return column;
             } catch (CloneNotSupportedException e) { // don't expect
