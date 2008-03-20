@@ -40,6 +40,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JToolBar;
 import javax.swing.JViewport;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
@@ -63,6 +64,7 @@ import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.Filter;
 import org.jdesktop.swingx.decorator.FilterPipeline;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
+import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
 import org.jdesktop.swingx.decorator.PatternFilter;
 import org.jdesktop.swingx.decorator.ShuttleSorter;
@@ -1633,7 +1635,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
     }
     
     public void interactiveColumnHighlighting() {
-        JXTable table = new JXTable(new AncientSwingTeam());
+        final JXTable table = new JXTable(new AncientSwingTeam());
         
         table.getColumnExt("Favorite Color").setHighlighters(new AbstractHighlighter() {
             @Override
@@ -1648,23 +1650,36 @@ public class JXTableVisualCheck extends JXTableUnitTest {
             }
         });
         
-        table.getColumnExt("No.").addHighlighter(
-            new AbstractHighlighter(new HighlightPredicate() {
-                public boolean isHighlighted(Component renderer, ComponentAdapter adapter) {
-                    return adapter.getValue().toString().contains("8");
-                }
-            }) {
-                @Override
-                protected Component doHighlight(Component renderer, ComponentAdapter adapter) {
-                    Font f = renderer.getFont().deriveFont(Font.ITALIC);
-                    renderer.setFont(f);
-                    
-                    return renderer;
+        JFrame frame = wrapWithScrollingInFrame(table, "Column Highlighter Test");
+        JToolBar bar = new JToolBar();
+        bar.add(new AbstractAction("Toggle") {
+            boolean state = false;
+            
+            public void actionPerformed(ActionEvent e) {
+                if (state) {
+                    table.getColumnExt("No.").setHighlighters(new Highlighter[0]);
+                    state = false;
+                } else {
+                    table.getColumnExt("No.").addHighlighter(
+                        new AbstractHighlighter(new HighlightPredicate() {
+                            public boolean isHighlighted(Component renderer, ComponentAdapter adapter) {
+                                return adapter.getValue().toString().contains("8");
+                            }
+                        }) {
+                            @Override
+                            protected Component doHighlight(Component renderer, ComponentAdapter adapter) {
+                                Font f = renderer.getFont().deriveFont(Font.ITALIC);
+                                renderer.setFont(f);
+                                
+                                return renderer;
+                            }
+                        }
+                    );
+                    state = true;
                 }
             }
-        );
-        
-        JFrame frame = wrapWithScrollingInFrame(table, "Column Highlighter Test");
+        });
+        frame.add(bar, BorderLayout.NORTH);
         frame.setVisible(true);
     }
     
