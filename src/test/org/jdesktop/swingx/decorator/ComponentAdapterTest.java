@@ -280,7 +280,39 @@ public class ComponentAdapterTest extends TestCase {
         // this fails because the adapter returns a string representation of the identifier
 //        assertEquals(table.getColumn(0).getIdentifier(), adapter.getColumnIdentifier(0));
     }
- 
+
+    
+    /**
+     * Issue #821-swingx: JXTreeTable broken string rep of hierarchical column
+     * 
+     * here: test ComponentAdapter on hidden hierarchical column
+     */
+    public void testTreeTableGetStringColumnHiddenHierarchicalColumn() {
+        JXTreeTableT table = new JXTreeTableT(AncientSwingTeam.createNamedColorTreeTableModel());
+        table.setTreeCellRenderer(new DefaultTreeRenderer(sv));
+        table.getColumnExt(0).setVisible(false);
+        String text = sv.getString(table.getModel().getValueAt(2, 0));
+        ComponentAdapter adapter = table.getComponentAdapter(2, 0);
+        assertEquals(text, adapter.getString(0));
+    }
+
+
+    /**
+     * Issue #821-swingx: JXTreeTable broken string rep of hierarchical column
+     * 
+     * here: test ComponentAdapter on hidden hierarchical column
+     */
+    public void testTreeTableGetStringAtHiddenHierarchicalColumn() {
+        JXTreeTableT table = new JXTreeTableT(AncientSwingTeam.createNamedColorTreeTableModel());
+        table.setTreeCellRenderer(new DefaultTreeRenderer(sv));
+        table.getColumnExt(0).setVisible(false);
+        String text = sv.getString(table.getModel().getValueAt(2, 0));
+        ComponentAdapter adapter = table.getComponentAdapter(2, 0);
+        assertEquals(text, adapter.getStringAt(2, 0));
+    }
+
+
+
     /**
      * Issue #767-swingx: consistent string representation.
      * 

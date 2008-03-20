@@ -20,6 +20,7 @@
  */
 package org.jdesktop.swingx;
 
+import java.awt.Color;
 import java.awt.Point;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
@@ -40,6 +41,9 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
+import org.jdesktop.swingx.decorator.ComponentAdapterTest.JXTreeTableT;
+import org.jdesktop.swingx.renderer.DefaultTreeRenderer;
+import org.jdesktop.swingx.renderer.StringValue;
 import org.jdesktop.swingx.table.TableColumnExt;
 import org.jdesktop.swingx.test.ComponentTreeTableModel;
 import org.jdesktop.swingx.test.TreeTableUtils;
@@ -49,6 +53,7 @@ import org.jdesktop.swingx.treetable.FileSystemModel;
 import org.jdesktop.swingx.treetable.MutableTreeTableNode;
 import org.jdesktop.swingx.treetable.TreeTableModel;
 import org.jdesktop.swingx.treetable.TreeTableNode;
+import org.jdesktop.test.AncientSwingTeam;
 import org.jdesktop.test.PropertyChangeReport;
 import org.jdesktop.test.TableModelReport;
 import org.jdesktop.test.TreeSelectionReport;
@@ -64,6 +69,29 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
         super("JXTreeTable Unit Test");
     }
 
+    /**
+     * Issue #821-swingx: JXTreeTable broken string rep of hierarchical column
+     * Here we test the getStringAt for the hierarchical column.
+     */
+    public void testGetStringAtHierarchicalColumn() {
+        JXTreeTable table = new JXTreeTableT(AncientSwingTeam.createNamedColorTreeTableModel());
+        StringValue sv = new StringValue() {
+
+            public String getString(Object value) {
+                if (value instanceof Color) {
+                    Color color = (Color) value;
+                    return "R/G/B: " + color.getRGB();
+                }
+                return TO_STRING.getString(value);
+            }
+            
+        };
+        table.setTreeCellRenderer(new DefaultTreeRenderer(sv));
+        String text = sv.getString(table.getValueAt(2, 0));
+        assertTrue("sanity: text not empty", text.length() > 0);
+        assertEquals(text, table.getStringAt(2, 0));
+    }
+    
     /**
      * Issue #769-swingx: setXXIcon on renderer vs setXXIcon on Tree/Table.
      * Characterize treeTable behaviour.

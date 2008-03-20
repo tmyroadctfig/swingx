@@ -1600,13 +1600,34 @@ public class JXTreeTable extends JXTable {
         return super.getCellEditor(row, column);
     }
     
-    
+    /**
+     * {@inheritDoc} <p>
+     * 
+     * Overridden to message the tree directly if the column is the view index of
+     * the hierarchical column. <p>
+     * 
+     * PENDING JW: revisit once we switch to really using a table renderer. As is, it's
+     * a quick fix for #821-swingx: string rep for hierarchical column incorrect.
+     */
     @Override
     public String getStringAt(int row, int column) {
         if (isHierarchical(column)) {
-            return renderer.getStringAt(row);
+            return getHierarchicalStringAt(row);
         }
         return super.getStringAt(row, column);
+    }
+
+    /**
+     * Returns the String representation of the hierarchical column at the given 
+     * row. <p>
+     * 
+     * @param row the row index in view coordinates
+     * @return the string representation of the hierarchical column at the given row.
+     * 
+     * @see #getStringAt(int, int)
+     */
+    private String getHierarchicalStringAt(int row) {
+        return renderer.getStringAt(row);
     }
 
     /**
@@ -2558,6 +2579,7 @@ public class JXTreeTable extends JXTable {
             super(component);
             table = component;
         }
+        
         public JXTreeTable getTreeTable() {
             return table;
         }
@@ -2601,6 +2623,47 @@ public class JXTreeTable extends JXTable {
         public boolean isHierarchical() {
             return table.isHierarchical(column);
         }
+
+        /**
+         * {@inheritDoc} <p>
+         * 
+         * Overridden to fix #821-swingx: string rep of hierarchical column incorrect.
+         * In this case we must delegate to the tree directly if hidden, the visible
+         * is handled by the TreeTable itself.<p>
+         * 
+         * PENDING JW: revisit once we switch to really using a table renderer. 
+         */
+        @Override
+        public String getFilteredStringAt(int row, int column) {
+            if (table.getTreeTableModel().getHierarchicalColumn() == column) {
+                if (modelToView(column) < 0) {
+                    // hidden hierarchical column, access directly
+                    return table.getHierarchicalStringAt(row);
+                }
+            }
+            return super.getFilteredStringAt(row, column);
+        }
+        
+        /**
+         * {@inheritDoc} <p>
+         * 
+         * Overridden to fix #821-swingx: string rep of hierarchical column incorrect.
+         * In this case we must delegate to the tree directly if hidden, the visible
+         * is handled by the TreeTable itself.<p>
+         * 
+         * PENDING JW: revisit once we switch to really using a table renderer. 
+         */
+        @Override
+        public String getStringAt(int row, int column) {
+            if (table.getTreeTableModel().getHierarchicalColumn() == column) {
+                if (modelToView(column) < 0) {
+                    // hidden hierarchical column, access directly
+                    return table.getHierarchicalStringAt(row);
+                }
+            }
+            return super.getStringAt(row, column);
+        }
+        
     }
 
 }

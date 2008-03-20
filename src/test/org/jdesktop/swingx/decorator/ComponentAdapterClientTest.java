@@ -116,6 +116,7 @@ public class ComponentAdapterClientTest extends InteractiveTestCase {
     
 //--------------- unit tests
 
+
     /**
      * Issue #821-swingx: JXTreeTable broken string rep of hierarchical column
      * 

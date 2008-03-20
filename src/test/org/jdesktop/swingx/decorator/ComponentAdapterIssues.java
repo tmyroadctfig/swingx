@@ -78,7 +78,8 @@ public class ComponentAdapterIssues extends InteractiveTestCase {
         show(frame);
     }
 
-    
+
+
     /**
      * Creates and returns a StringValue which maps a Color to it's R/G/B rep, 
      * prepending "R/G/B: "
