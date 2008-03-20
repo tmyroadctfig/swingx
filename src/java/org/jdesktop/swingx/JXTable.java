@@ -2334,7 +2334,16 @@ public class JXTable extends JTable
             updateSortingAfterColumnChanged((TableColumn) event.getSource(), 
                     (Boolean) event.getNewValue());
         } else if ("highlighters".equals(event.getPropertyName())) {
-            repaint();
+            if (event.getSource() instanceof TableColumnExt && getRowCount() > 0) {
+                TableColumnExt column = (TableColumnExt) event.getSource();
+                
+                Rectangle r = getCellRect(0,
+                        convertColumnIndexToView(column.getModelIndex()), true);
+                r.height = getHeight();
+                repaint(r);
+            } else {
+                repaint();
+            }
         }
         
     }
