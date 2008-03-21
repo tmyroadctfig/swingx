@@ -1112,7 +1112,8 @@ public class JXLoginPane extends JXPanel {
     		if (capsLockSupport)
     			KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(capsOnListener);
     	    Container c = JXLoginPane.this;
-    	    while (c.getParent() != null) {
+    	    // #810 bail out on first window found up the hierarchy (modal dialogs)
+            while (!(c.getParent() == null || c instanceof Window)) {
     	    	c = c.getParent();
     	    }
     	    if (c instanceof Window) {
@@ -1131,7 +1132,8 @@ public class JXLoginPane extends JXPanel {
     		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(
     				capsOnListener);
     	    Container c = JXLoginPane.this;
-    	    while (c.getParent() != null) {
+            // #810 bail out on first window found up the hierarchy (modal dialogs)
+    	    while (!(c.getParent() == null || c instanceof Window)) {
     	    	c = c.getParent();
     	    }
     	    if (c instanceof Window) {
@@ -1674,33 +1676,35 @@ public class JXLoginPane extends JXPanel {
     }
 
     /**
-     * Window event listener to invoke capslock test when login panel get activated.
+     * Window event listener to invoke capslock test when login panel get
+     * activated.
      */
     public static class CapsOnWinListener extends WindowAdapter implements
-			WindowFocusListener {
-		private CapsOnTest cot;
-		private long stamp;
+            WindowFocusListener {
+        private CapsOnTest cot;
 
-		public CapsOnWinListener(CapsOnTest cot) {
-			this.cot = cot;
-		}
+        private long stamp;
 
-		public void windowActivated(WindowEvent e) {
-			cot.runTest();
-			stamp = System.currentTimeMillis();
-		}
+        public CapsOnWinListener(CapsOnTest cot) {
+            this.cot = cot;
+        }
 
-		public void windowGainedFocus(WindowEvent e) {
-		    System.out.println("winFocusGained");
-			// repeat test only if more then 20ms passed between activation test and now.
-			if (stamp + 20 < System.currentTimeMillis()) {
-				cot.runTest();
-			}
-		}
+        public void windowActivated(WindowEvent e) {
+            cot.runTest();
+            stamp = System.currentTimeMillis();
+        }
 
-		public void windowLostFocus(WindowEvent e) {
-			// ignore
-		}
+        public void windowGainedFocus(WindowEvent e) {
+            // repeat test only if more then 20ms passed between activation test
+            // and now.
+            if (stamp + 20 < System.currentTimeMillis()) {
+                cot.runTest();
+            }
+        }
 
-	}
+        public void windowLostFocus(WindowEvent e) {
+            // ignore
+        }
+
+    }
 }
