@@ -43,6 +43,7 @@ import java.util.List;
 import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.SizeRequirements;
+import javax.swing.border.Border;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentEvent.ElementChange;
 import javax.swing.plaf.basic.BasicHTML;
@@ -324,9 +325,12 @@ public class JXLabel extends JLabel {
                 newW -= icw;
                 
             }
-
+            Insets i = getInsets();
+            if (i != null) {
+                newW -= i.left + i.right;
+            }
             view.setSize(newW, (int) Math.max(super.getPreferredSize().height, view.getPreferredSpan(View.Y_AXIS)));
-            size.setSize(newW ,  view.getPreferredSpan(View.Y_AXIS) );
+            size.setSize(newW,  view.getPreferredSpan(View.Y_AXIS) + (i != null ? (i.top + i.bottom) : 0) );
         }
         return size;
     }
