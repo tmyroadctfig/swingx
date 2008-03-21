@@ -40,6 +40,8 @@ import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.test.XTestUtils;
 import org.jdesktop.test.SerializableSupport;
 
+import com.sun.java.swing.plaf.motif.MotifLookAndFeel;
+
 /**
  * Tests behaviour of SwingX renderers. Currently: mostly characterization to
  * guarantee that they behave similar to the standard.
@@ -156,9 +158,16 @@ public class ListRendererTest extends InteractiveTestCase {
     /**
      * base interaction with list: focused, not-selected uses UI border.
      * 
-     * TODO: fix and reinstate the test
+     * TODO: fix and reinstate the test 
+     * JW Done, partly: the new server seems to have MotifLF 
+     * as systemLF? - so backing out early. 
+     * Still open: Need to think about the validity of this test anway
      */
-    public void xtestListFocusBorder() {
+    public void testListFocusBorder() {
+        if (UIManager.getLookAndFeel() instanceof MotifLookAndFeel) {
+            LOG.info("can't run test - MotifLF uses the same focusBorder for list and table");
+            return;
+        }
         // access ui colors
         Border focusBorder = UIManager.getBorder("List.focusCellHighlightBorder");
         // sanity

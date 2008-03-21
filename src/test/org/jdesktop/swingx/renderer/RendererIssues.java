@@ -32,13 +32,19 @@ import java.util.logging.Logger;
 import javax.swing.AbstractButton;
 import javax.swing.AbstractListModel;
 import javax.swing.BorderFactory;
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.Icon;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JTree;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListModel;
+import javax.swing.LookAndFeel;
 import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.Border;
 import javax.swing.plaf.basic.BasicTreeUI;
 import javax.swing.table.TableCellRenderer;
@@ -62,6 +68,8 @@ import org.jdesktop.swingx.decorator.PainterHighlighter;
 import org.jdesktop.swingx.painter.MattePainter;
 import org.jdesktop.swingx.test.ComponentTreeTableModel;
 import org.jdesktop.swingx.test.XTestUtils;
+
+import com.sun.java.swing.plaf.motif.MotifLookAndFeel;
 
 /**
  * Test around known issues of SwingX renderers. <p>
@@ -334,6 +342,40 @@ public class RendererIssues extends InteractiveTestCase {
        assertEquals(custom, comp.getIcon());
     }
 
+    /**
+     * base interaction with list: focused, not-selected uses UI border.
+     * Moved from ListRendererTest: failes on the new server (what's the default LF there?)
+     * TODO: fix and reinstate the test
+     * @throws UnsupportedLookAndFeelException 
+     */
+    public void testListFocusBorder() throws UnsupportedLookAndFeelException {
+        LookAndFeel lf = UIManager.getLookAndFeel();
+        try {
+            UIManager.setLookAndFeel(new MotifLookAndFeel());
+            JList list = new JList(new Object[] {1, 2, 3});
+            ListCellRenderer coreListRenderer = new DefaultListCellRenderer();
+            ListCellRenderer xListRenderer = new DefaultListRenderer();
+            // access ui colors
+            Border focusBorder = UIManager.getBorder("List.focusCellHighlightBorder");
+            // sanity
+            assertNotNull(focusBorder);
+            // JW: this looks suspicious ... 
+            // RAH: line below makes hudson fail the test tho it runs fine locally ...
+            assertNotSame(focusBorder, UIManager.getBorder("Table.focusCellHighlightBorder"));
+            // need to prepare directly - focus is true only if list is focusowner
+            JComponent coreComponent = (JComponent) coreListRenderer.getListCellRendererComponent(list, 
+                    null, 0, false, true);
+            // sanity: known standard behaviour
+            assertEquals(focusBorder, coreComponent.getBorder());
+            // prepare extended
+            JComponent xComponent = (JComponent) xListRenderer.getListCellRendererComponent(list, 
+                    null, 0, false, true);
+            // assert behaviour same as standard
+            assertEquals(coreComponent.getBorder(), xComponent.getBorder());
+        } finally {
+            UIManager.setLookAndFeel(lf);
+        }
+    }
 
     /**
      * test if renderer properties are updated on LF change. <p>
