@@ -62,6 +62,8 @@ public class CompoundPainter<T> extends AbstractPainter<T> {
     private AffineTransform transform;
     private boolean clipPreserved = false;
 
+    private boolean checkForDirtyChildPainters = true;
+
     /** Creates a new instance of CompoundPainter */
     public CompoundPainter() {
     }
@@ -184,12 +186,45 @@ public class CompoundPainter<T> extends AbstractPainter<T> {
     private boolean clearLocalCacheOnly = false;
 
     /**
-     * <p>This <code>CompoundPainter</code> is dirty if it, or any of its children,
-     * are dirty. Thus, we iterate
-     * over all child <code>Painter</code>s and query them to see
-     * if they are dirty. If so, then true is returned. Otherwise, we defer
-     * to the super implementation.</p>
+     * Used by {@link #isDirty()} to check if the child <code>Painter</code>s
+     * should be checked for their <code>dirty</code> flag as part of
+     * processing.<br>
+     * Default value is: <code>true</code><br>
+     * This should be set to </code>false</code> if the cacheable state
+     * of the child <code>Painter</code>s are different from each other.  This
+     * will allow the cacheable == <code>true</code> <code>Painter</code>s to
+     * keep their cached image during regular repaints.  In this case,
+     * client code should call {@link #clearCache()} manually when the cacheable
+     * <code>Painter</code>s should be updated.
      *
+     *
+     * @see #isDirty()
+     */
+    public boolean isCheckingDirtyChildPainters() {
+        return checkForDirtyChildPainters;
+    }
+    /**
+     * Set the flag used by {@link #isDirty()} to check if the 
+     * child <code>Painter</code>s should be checked for their 
+     * <code>dirty</code> flag as part of processing.
+     *
+     * @see #isCheckingDirtyChildPainters()
+     * @see #isDirty()
+     */
+    public void setCheckingDirtyChildPainters(boolean b) {
+        this.checkForDirtyChildPainters = b;
+    }
+
+    /**
+     * <p>This <code>CompoundPainter</code> is dirty if it, or (optionally)
+     * any of its children, are dirty. If the super implementation returns
+     * <code>true</code>, we return <code>true</code>.  Otherwise, if
+     * {@link #isCheckForDirtyChildPainters()} is <code>true</code>, we iterate
+     * over all child <code>Painter</code>s and query them to see
+     * if they are dirty. If so, then <code>true</code> is returned. 
+     * Otherwise, we return <code>false</code>.</p>
+     *
+     * @see #isCheckingDirtyChildPainters()
      * @inheritDoc
      */
     @Override
@@ -197,7 +232,8 @@ public class CompoundPainter<T> extends AbstractPainter<T> {
         boolean dirty = super.isDirty();
         if (dirty) {
             return true;
-        } else {
+        } 
+        else if (isCheckingDirtyChildPainters()) {
             for (Painter p : painters) {
                 if (p instanceof AbstractPainter) {
                     AbstractPainter ap = (AbstractPainter)p;
@@ -206,8 +242,8 @@ public class CompoundPainter<T> extends AbstractPainter<T> {
                     }
                 }
             }
-            return false;
         }
+        return false;
     }
 
     /**
