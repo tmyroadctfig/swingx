@@ -19,8 +19,10 @@
 package org.jdesktop.swingx;
 
 import java.awt.AlphaComposite;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.GradientPaint;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Window;
@@ -40,6 +42,7 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.UIManager.LookAndFeelInfo;
 
+import org.jdesktop.swingx.JXLoginPane.JXLoginFrame;
 import org.jdesktop.swingx.JXLoginPane.SaveMode;
 import org.jdesktop.swingx.auth.LoginService;
 import org.jdesktop.swingx.editors.PainterUtil;
@@ -156,11 +159,27 @@ public class JXLoginPaneVisualCheck extends InteractiveTestCase {
     }
 
     /**
+     * Issue #538-swingx Failure to set locale at runtime
+     *
+     */
+    public void interactiveSetBackground() {
+        JXLoginPane panel = new JXLoginPane();
+        panel.setBackgroundPainter(new MattePainter(Color.RED, true));
+        JFrame frame = JXLoginPane.showLoginFrame(panel);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setJMenuBar(createMenuBar(panel));
+
+        panel.setSaveMode(SaveMode.BOTH);
+        
+        frame.pack();
+        frame.setVisible(true);
+    }
+
+    /**
      * Issue #777-swingx Custom banner not picked up due to double updateUI() call
      *
      */
     public void interactiveCustomBannerDisplay() {
-        sun.awt.AppContext.getAppContext().put("JComponent.defaultLocale", Locale.FRANCE);
         JXLoginPane panel = new JXLoginPane();
         panel.setUI(new DummyLoginPaneUI(panel));
         JFrame frame = JXLoginPane.showLoginFrame(panel);
@@ -180,14 +199,14 @@ public class JXLoginPaneVisualCheck extends InteractiveTestCase {
         sun.awt.AppContext.getAppContext().put("JComponent.defaultLocale", Locale.FRANCE);
         final JXLoginPane panel = new JXLoginPane(new LoginService() {
 
-			public boolean authenticate(String name, char[] password,
-					String server) throws Exception {
-				if (true) {
-					throw new Exception("Ex.");
-				}
-				return false;
-			}});
-        final JFrame frame = JXLoginPane.showLoginFrame(panel);
+                        public boolean authenticate(String name, char[] password,
+                                        String server) throws Exception {
+                                if (true) {
+                                        throw new Exception("Ex.");
+                                }
+                                return false;
+                        }});
+        final JXLoginFrame frame = JXLoginPane.showLoginFrame(panel);
         // if uncomented dialog will disappear immediatelly dou to invocation of login action
         //frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setJMenuBar(createMenuBar(panel));
@@ -198,9 +217,42 @@ public class JXLoginPaneVisualCheck extends InteractiveTestCase {
         frame.pack();
         frame.setVisible(true);
         SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				evaluateChildren(frame.getContentPane().getComponents());
-			}});
+                        public void run() {
+                                evaluateChildren(frame.getContentPane().getComponents());
+                        }});
+        
+    }
+    
+    /**
+     * Issue #636-swingx Unexpected resize on long exception message.
+     *
+     */
+    public void interactiveBackground() {
+        sun.awt.AppContext.getAppContext().put("JComponent.defaultLocale", Locale.FRANCE);
+        final JXLoginPane panel = new JXLoginPane(new LoginService() {
+
+                        public boolean authenticate(String name, char[] password,
+                                        String server) throws Exception {
+                                if (true) {
+                                        throw new Exception("Ex.");
+                                }
+                                return false;
+                        }});
+        final JXLoginFrame frame = JXLoginPane.showLoginFrame(panel);
+        // if uncomented dialog will disappear immediatelly dou to invocation of login action
+        //frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setJMenuBar(createMenuBar(panel));
+        panel.setErrorMessage("TO TO TO TO TO TO TO TO TO TO TO TO TO TO TO TO TO TO TO TO TO TO Unexpected resize on long exception message. Unexpected resize on long exception message.");
+
+        panel.setSaveMode(SaveMode.BOTH);
+        frame.getContentPane().setBackgroundPainter(new MattePainter(new GradientPaint(0,0,Color.BLUE, 1,0,Color.YELLOW), true));
+        
+        frame.pack();
+        frame.setVisible(true);
+        SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                                evaluateChildren(frame.getContentPane().getComponents());
+                        }});
         
     }
     

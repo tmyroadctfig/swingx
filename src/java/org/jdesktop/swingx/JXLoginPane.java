@@ -445,11 +445,10 @@ public class JXLoginPane extends JXPanel {
         } else {
             saveMode = SaveMode.NONE;
         }
-
-//        if (!initDone) {
-        	initComponents();
-//        }
-//        updateUI();
+        
+        // #732 set all internal components opacity to false in order to allow top level (frame's content pane) background painter to have any effect.
+        setOpaque(false);
+      	initComponents();
     }
     
     /**
@@ -586,6 +585,7 @@ public class JXLoginPane extends JXPanel {
         saveCB.setSelected(false); //TODO should get this from prefs!!! And, it should be based on the user
         //determine whether to show/hide the save check box based on the SaveMode
         saveCB.setVisible(saveMode == SaveMode.PASSWORD || saveMode == SaveMode.BOTH);
+        saveCB.setOpaque(false);
         
         capsOn = new JLabel(" ");
         // don't show by default. We perform test when login panel gets focus.
@@ -594,6 +594,7 @@ public class JXLoginPane extends JXPanel {
         GridLayout grid = new GridLayout(2,1);
         grid.setVgap(5);
         JPanel fields = new JPanel(grid);
+        fields.setOpaque(false);
         fields.add(namePanel.getComponent());
         fields.add(passwordField);
 
@@ -681,6 +682,7 @@ public class JXLoginPane extends JXPanel {
             gridBagConstraints.insets = new Insets(0, lShift, 0, 11);
             loginPanel.add(capsOn, gridBagConstraints);
         }
+        loginPanel.setOpaque(false);
         return loginPanel;
     }
     
@@ -706,7 +708,7 @@ public class JXLoginPane extends JXPanel {
 
         //create the default label
         messageLabel = new JLabel(" ");
-        messageLabel.setOpaque(true);
+        messageLabel.setOpaque(false);
         messageLabel.setFont(messageLabel.getFont().deriveFont(Font.BOLD));
 
         //create the main components
@@ -724,6 +726,7 @@ public class JXLoginPane extends JXPanel {
         //aggregate the optional message label, content, and error label into
         //the contentPanel
         contentPanel = new JXPanel(new VerticalLayout());
+        contentPanel.setOpaque(false);
         messageLabel.setBorder(BorderFactory.createEmptyBorder(12, 12, 7, 11));
         contentPanel.add(messageLabel);
         loginPanel.setBorder(BorderFactory.createEmptyBorder(0, 36, 7, 11));
@@ -1468,13 +1471,20 @@ public class JXLoginPane extends JXPanel {
     }
     }
     
-    public static final class JXLoginFrame extends JFrame {
+    public static final class JXLoginFrame extends JXFrame {
         private JXLoginPane panel;
     
         public JXLoginFrame(JXLoginPane p) {
-            super(UIManagerExt.getString(CLASS_NAME + ".titleString", p.getLocale())); 
+            super(UIManagerExt.getString(CLASS_NAME + ".titleString", p.getLocale()));
+            JXPanel cp = new JXPanel();
+            cp.setOpaque(true);
+            setContentPane(cp);
             this.panel = p;
             initWindow(this, panel);
+        }
+        
+        public JXPanel getContentPane() {
+            return (JXPanel) super.getContentPane();
         }
         
         public JXLoginPane.Status getStatus() {
@@ -1484,6 +1494,7 @@ public class JXLoginPane extends JXPanel {
         public JXLoginPane getPanel() {
             return panel;
         }
+
     }
     
     /**
@@ -1540,8 +1551,10 @@ public class JXLoginPane extends JXPanel {
         // cancelButton.setText(UIManager.getString(CLASS_NAME + ".cancelString"));
         // okButton.setText(UIManager.getString(CLASS_NAME + ".loginString"));
         JXBtnPanel buttonPanel = new JXBtnPanel(okButton, cancelButton);
+        buttonPanel.setOpaque(false);
         panel.setButtonPanel(buttonPanel);
         JXPanel controls = new JXPanel(new FlowLayout(FlowLayout.RIGHT));
+        controls.setOpaque(false);
         new BoxLayout(controls, BoxLayout.X_AXIS);
         controls.add(Box.createHorizontalGlue());
         controls.add(buttonPanel);
