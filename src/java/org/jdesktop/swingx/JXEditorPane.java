@@ -695,6 +695,9 @@ public class JXEditorPane extends JEditorPane implements /*Searchable, */Targeta
         public void caretUpdate(CaretEvent evt) {
             StyledDocument document = (StyledDocument)getDocument();
             int dot = evt.getDot();
+            //SwingX #257--ensure display shows the valid attributes
+            dot = dot > 0 ? dot - 1 : dot;
+            
             Element elem = document.getCharacterElement(dot);
             AttributeSet set = elem.getAttributes();
 
