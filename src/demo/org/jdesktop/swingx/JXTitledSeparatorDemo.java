@@ -22,6 +22,7 @@
 package org.jdesktop.swingx;
 
 import java.awt.Color;
+import java.awt.ComponentOrientation;
 import java.awt.Font;
 import javax.swing.*;
 
@@ -33,12 +34,24 @@ public class JXTitledSeparatorDemo extends JPanel {
     public JXTitledSeparatorDemo() {
         setLayout(new VerticalLayout(3));
         add(new JXTitledSeparator());
+        add(new JXTitledSeparator()).setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
         
         JXTitledSeparator s = new JXTitledSeparator();
         s.setTitle("Custom Title");
         add(s);
         
         s = new JXTitledSeparator();
+        s.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+        s.setTitle("Custom Title");
+        add(s);
+        
+        s = new JXTitledSeparator();
+        s.setFont(new Font("Times New Roman", Font.ITALIC, 16));
+        s.setTitle("Custom Font");
+        add(s);
+        
+        s = new JXTitledSeparator();
+        s.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
         s.setFont(new Font("Times New Roman", Font.ITALIC, 16));
         s.setTitle("Custom Font");
         add(s);
@@ -49,6 +62,18 @@ public class JXTitledSeparatorDemo extends JPanel {
         add(s);
         
         s = new JXTitledSeparator();
+        s.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+        s.setForeground(Color.BLUE.darker());
+        s.setTitle("Custom Foreground");
+        add(s);
+        
+        s = new JXTitledSeparator();
+        s.setHorizontalAlignment(SwingConstants.CENTER);
+        s.setTitle("Center Alignment");
+        add(s);
+        
+        s = new JXTitledSeparator();
+        s.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
         s.setHorizontalAlignment(SwingConstants.CENTER);
         s.setTitle("Center Alignment");
         add(s);
@@ -59,11 +84,63 @@ public class JXTitledSeparatorDemo extends JPanel {
         add(s);
         
         s = new JXTitledSeparator();
+        s.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+        s.setHorizontalAlignment(SwingConstants.TRAILING);
+        s.setTitle("Trailing Alignment");
+        add(s);
+        
+        s = new JXTitledSeparator();
+        s.setHorizontalAlignment(SwingConstants.LEADING);
+        s.setTitle("Leading Alignment");
+        add(s);
+        
+        s = new JXTitledSeparator();
+        s.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+        s.setHorizontalAlignment(SwingConstants.LEADING);
+        s.setTitle("Leading Alignment");
+        add(s);
+        
+        s = new JXTitledSeparator();
+        s.setHorizontalAlignment(SwingConstants.LEFT);
+        s.setTitle("Left Alignment");
+        add(s);
+        
+        s = new JXTitledSeparator();
+        s.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+        s.setHorizontalAlignment(SwingConstants.LEFT);
+        s.setTitle("Left Alignment");
+        add(s);
+        
+        s = new JXTitledSeparator();
+        s.setHorizontalAlignment(SwingConstants.RIGHT);
+        s.setTitle("Right Alignment");
+        add(s);
+        
+        s = new JXTitledSeparator();
+        s.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+        s.setHorizontalAlignment(SwingConstants.RIGHT);
+        s.setTitle("Right Alignment");
+        add(s);
+        
+        s = new JXTitledSeparator();
         s.setIcon(new ImageIcon(JXTitledSeparatorDemo.class.getResource("resources/green-orb.png")));
         s.setTitle("Custom Icon");
         add(s);
         
         s = new JXTitledSeparator();
+        s.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+        s.setIcon(new ImageIcon(JXTitledSeparatorDemo.class.getResource("resources/green-orb.png")));
+        s.setTitle("Custom Icon");
+        add(s);
+        
+        s = new JXTitledSeparator();
+        s.setIcon(new ImageIcon(JXTitledSeparatorDemo.class.getResource("resources/green-orb.png")));
+        s.setHorizontalTextPosition(SwingConstants.LEFT);
+        s.setTitle("Custom Icon, LEFT Horizontal Text Position");
+        add(s);
+        
+        s = new JXTitledSeparator();
+        s.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
         s.setIcon(new ImageIcon(JXTitledSeparatorDemo.class.getResource("resources/green-orb.png")));
         s.setHorizontalTextPosition(SwingConstants.LEFT);
         s.setTitle("Custom Icon, LEFT Horizontal Text Position");

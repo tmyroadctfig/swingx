@@ -22,6 +22,7 @@
 package org.jdesktop.swingx;
 
 import java.awt.Color;
+import java.awt.ComponentOrientation;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -55,17 +56,17 @@ import javax.swing.plaf.FontUIResource;
  * <pre><code>
  *  //create a plain separator
  *  JXTitledSeparator sep = new JXTitledSeparator();
- *  sep.setText("Customer Info");
+ *  sep.setTitle("Customer Info");
  *
  *  //create a separator with an icon
  *  sep = new JXTitledSeparator();
- *  sep.setText("Customer Info");
+ *  sep.setTitle("Customer Info");
  *  sep.setIcon(new ImageIcon("myimage.png"));
  *
  *  //create a separator with an icon to the right of the title,
  *  //center justified
  *  sep = new JXTitledSeparator();
- *  sep.setText("Customer Info");
+ *  sep.setTitle("Customer Info");
  *  sep.setIcon(new ImageIcon("myimage.png"));
  *  sep.setHorizontalAlignment(SwingConstants.CENTER);
  *  sep.setHorizontalTextPosition(SwingConstants.TRAILING);
@@ -147,6 +148,7 @@ public class JXTitledSeparator extends JXPanel {
      * Implementation detail. Handles updates of title color and font on LAF change. For more 
      * details see swingx#451.
      */
+    //TODO remove this method in favor of UI delegate -- kgs
     protected void updateTitle()
     {
       if (label == null) return;
@@ -169,7 +171,31 @@ public class JXTitledSeparator extends JXPanel {
     private void layoutSeparator() {
         removeAll();
         
-        switch (label.getHorizontalAlignment()) {
+        //SwingX #304 fix alignment issues
+        //this is really a hacky fix, but a fix nonetheless
+        //we need a better layout approach for this class
+        int alignment = getHorizontalAlignment();
+        
+        if (!getComponentOrientation().isLeftToRight()) {
+            switch (alignment) {
+            case SwingConstants.LEFT:
+                alignment = SwingConstants.RIGHT;
+                break;
+            case SwingConstants.RIGHT:
+                alignment = SwingConstants.LEFT;
+                break;
+            case SwingConstants.EAST:
+                alignment = SwingConstants.WEST;
+                break;
+            case SwingConstants.WEST:
+                alignment = SwingConstants.EAST;
+                break;
+            default:
+                break;
+            }
+        }
+        
+        switch (alignment) {
             case SwingConstants.LEFT:
             case SwingConstants.LEADING:
             case SwingConstants.WEST:
@@ -307,6 +333,22 @@ public class JXTitledSeparator extends JXPanel {
     }
     
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ComponentOrientation getComponentOrientation() {
+        return label.getComponentOrientation();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setComponentOrientation(ComponentOrientation o) {
+        label.setComponentOrientation(o);
+    }
+
+    /**
      * Defines the icon this component will display.  If
      * the value of icon is null, nothing is displayed.
      * <p>
@@ -333,7 +375,7 @@ public class JXTitledSeparator extends JXPanel {
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     @Override
     public void setForeground(Color foreground) {
@@ -344,7 +386,7 @@ public class JXTitledSeparator extends JXPanel {
     }
     
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     @Override
     public void setFont(Font font) {
