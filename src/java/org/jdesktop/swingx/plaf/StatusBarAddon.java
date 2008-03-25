@@ -21,6 +21,7 @@
 package org.jdesktop.swingx.plaf;
 
 import org.jdesktop.swingx.JXStatusBar;
+import org.jdesktop.swingx.plaf.windows.WindowsLookAndFeelAddons;
 import org.jdesktop.swingx.util.OS;
 
 /**
@@ -61,6 +62,18 @@ public class StatusBarAddon extends AbstractComponentAddon {
         if (OS.isUsingWindowsVisualStyles()) {
             defaults.add(JXStatusBar.uiClassID,
                     "org.jdesktop.swingx.plaf.windows.WindowsStatusBarUI");
+            
+            String xpStyle = OS.getWindowsVisualStyle();
+            
+            if (WindowsLookAndFeelAddons.SILVER_VISUAL_STYLE.equalsIgnoreCase(xpStyle)) {
+                defaults.add("StatusBar.leftImage", "resources/silver-statusbar-left.png");
+                defaults.add("StatusBar.middleImage", "resources/silver-statusbar-middle.png");
+                defaults.add("StatusBar.rightImage", "resources/silver-statusbar-right.png");
+            } else {
+                defaults.add("StatusBar.leftImage", "resources/statusbar-left.png");
+                defaults.add("StatusBar.middleImage", "resources/statusbar-middle.png");
+                defaults.add("StatusBar.rightImage", "resources/statusbar-right.png");
+            }
         } else {
             defaults.add(JXStatusBar.uiClassID,
                     "org.jdesktop.swingx.plaf.windows.WindowsClassicStatusBarUI");

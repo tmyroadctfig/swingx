@@ -28,6 +28,7 @@ import javax.imageio.ImageIO;
 import javax.swing.JComponent;
 import javax.swing.plaf.ComponentUI;
 import org.jdesktop.swingx.JXStatusBar;
+import org.jdesktop.swingx.plaf.UIManagerExt;
 import org.jdesktop.swingx.plaf.basic.BasicStatusBarUI;
 
 /**
@@ -38,17 +39,6 @@ public class WindowsStatusBarUI extends BasicStatusBarUI {
     private BufferedImage leftImage;
     private BufferedImage middleImage;
     private BufferedImage rightImage;
-    
-    /** Creates a new instance of BasicStatusBarUI */
-    public WindowsStatusBarUI() {
-        try {
-            leftImage = ImageIO.read(getClass().getResource("resources/statusbar-left.png"));
-            middleImage = ImageIO.read(getClass().getResource("resources/statusbar-middle.png"));
-            rightImage = ImageIO.read(getClass().getResource("resources/statusbar-right.png"));
-        } catch (Exception e) {
-            //hmmmm... should log this I guess
-        }
-    }
     
     /**
      * Returns an instance of the UI delegate for the specified component.
@@ -63,7 +53,17 @@ public class WindowsStatusBarUI extends BasicStatusBarUI {
     public static ComponentUI createUI(JComponent c) {
         return new WindowsStatusBarUI();
     }	
-
+    
+    protected void installDefaults(JXStatusBar sb) {
+        try {
+            leftImage = ImageIO.read(WindowsStatusBarUI.class.getResource(UIManagerExt.getString("StatusBar.leftImage")));
+            middleImage = ImageIO.read(WindowsStatusBarUI.class.getResource(UIManagerExt.getString("StatusBar.middleImage")));
+            rightImage = ImageIO.read(WindowsStatusBarUI.class.getResource(UIManagerExt.getString("StatusBar.rightImage")));
+        } catch (Exception e) {
+            //hmmmm... should log this I guess
+        }
+    }
+    
     @Override protected void paintBackground(Graphics2D g, JXStatusBar statusBar) {
         //if bidi, reverse the image painting order
         //TODO need to handle vertical stretching better
