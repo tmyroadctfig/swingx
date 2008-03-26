@@ -90,13 +90,13 @@ public class JXTaskPaneTest extends InteractiveTestCase {
     assertFalse(report.getLastOldBooleanValue());
 
     // EXPANDED
-    assertTrue(group.isExpanded());
-    group.setExpanded(false);
-    assertFalse(group.isExpanded());
-    assertEquals(JXTaskPane.EXPANDED_CHANGED_KEY, report.getLastEvent()
+    assertFalse(group.isCollapsed());
+    group.setCollapsed(true);
+    assertTrue(group.isCollapsed());
+    assertEquals("collapsed", report.getLastEvent()
       .getPropertyName());
-    assertFalse(report.getLastNewBooleanValue());
-    assertTrue(report.getLastOldBooleanValue());
+    assertTrue(report.getLastNewBooleanValue());
+    assertFalse(report.getLastOldBooleanValue());
 
     new JXTaskPaneBeanInfo();
   }
@@ -140,8 +140,8 @@ public class JXTaskPaneTest extends InteractiveTestCase {
     JXTaskPane taskPane = new JXTaskPane();
     // start with a not expanded or animated taskPane
     taskPane.setAnimated(false);
-    taskPane.setExpanded(false);
-    assertFalse(taskPane.isExpanded());
+    taskPane.setCollapsed(true);
+    assertTrue(taskPane.isCollapsed());
 
     class ListenForEvents implements PropertyChangeListener {
       private boolean expandedEventReceived;
@@ -167,13 +167,13 @@ public class JXTaskPaneTest extends InteractiveTestCase {
     taskPane.setAnimated(true);
     
     // expand the taskPane and...
-    taskPane.setExpanded(true);
+    taskPane.setCollapsed(false);
     // ...wait until listener has been notified
     while (!listener.expandedEventReceived) { Thread.sleep(100); }
     
     // collapse the taskPane and...
     // ...wait until listener has been notified
-    taskPane.setExpanded(false);
+    taskPane.setCollapsed(true);
     while (!listener.collapsedEventReceived) { Thread.sleep(100); }
     
     assertEquals(2, listener.animationStart);

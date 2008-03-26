@@ -160,6 +160,7 @@ public class BasicTaskPaneUI extends TaskPaneUI {
 	ActionMap getActionMap() {
 		ActionMap map = new ActionMapUIResource();
 		map.put("toggleExpanded", new ToggleExpandedAction());
+		map.put("toggleCollapsed", new ToggleCollapsedAction());
 		return map;
 	}
 
@@ -401,14 +402,17 @@ public class BasicTaskPaneUI extends TaskPaneUI {
 
 		public void mouseReleased(MouseEvent e) {
 			if (isInBorder(e)) {
-				group.setExpanded(!group.isExpanded());
+				group.setCollapsed(!group.isCollapsed());
 			}
 		}
 	}
 
 	/**
 	 * Toggle expanded action.
+	 * 
+	 * @deprecated
 	 */
+	@Deprecated
 	class ToggleExpandedAction extends AbstractAction {
 		/**
 		 * Serial version UID.
@@ -426,6 +430,28 @@ public class BasicTaskPaneUI extends TaskPaneUI {
 		public boolean isEnabled() {
 			return group.isVisible();
 		}
+	}
+	
+	/**
+	 * Toggle expanded action.
+	 */
+	class ToggleCollapsedAction extends AbstractAction {
+	    /**
+	     * Serial version UID.
+	     */
+	    private static final long serialVersionUID = 5676859881615358815L;
+	    
+	    public ToggleCollapsedAction() {
+	        super("toggleCollapsed");
+	    }
+	    
+	    public void actionPerformed(ActionEvent e) {
+	        group.setCollapsed(!group.isCollapsed());
+	    }
+	    
+	    public boolean isEnabled() {
+	        return group.isVisible();
+	    }
 	}
 
 	/**
@@ -812,10 +838,10 @@ public class BasicTaskPaneUI extends TaskPaneUI {
 		protected void paintChevronControls(JXTaskPane group, Graphics g,
 				int x, int y, int width, int height) {
 			ChevronIcon chevron;
-			if (group.isExpanded()) {
-				chevron = new ChevronIcon(true);
-			} else {
+			if (group.isCollapsed()) {
 				chevron = new ChevronIcon(false);
+			} else {
+				chevron = new ChevronIcon(true);
 			}
 			int chevronX = x + width / 2 - chevron.getIconWidth() / 2;
 			int chevronY = y + (height / 2 - chevron.getIconHeight());

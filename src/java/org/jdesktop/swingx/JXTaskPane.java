@@ -151,7 +151,10 @@ public class JXTaskPane extends JPanel implements
 
   /**
    * Used when generating PropertyChangeEvents for the "expanded" property
+   * 
+   * @deprecated
    */
+  @Deprecated
   public static final String EXPANDED_CHANGED_KEY = "expanded";
 
   /**
@@ -182,7 +185,7 @@ public class JXTaskPane extends JPanel implements
   private String title;
   private Icon icon;
   private boolean special;
-  private boolean expanded = true;
+  private boolean collapsed;
   private boolean scrollOnExpand;
 
   private JXCollapsiblePane collapsePane;
@@ -335,10 +338,9 @@ public class JXTaskPane extends JPanel implements
    * @javabean.property bound="true" preferred="true"
    */
   public void setSpecial(boolean special) {
-    if (this.special != special) {
+      boolean oldValue = isSpecial();
       this.special = special;
-      firePropertyChange(SPECIAL_CHANGED_KEY, !special, special);
-    }
+      firePropertyChange(SPECIAL_CHANGED_KEY, oldValue, isSpecial());
   }
 
   /**
@@ -347,18 +349,17 @@ public class JXTaskPane extends JPanel implements
    * @param scrollOnExpand true to scroll this group to be
    * visible if this group is expanded.
    * 
-   * @see #setExpanded(boolean)
+   * @see #setCollapsed(boolean)
    * 
    * @javabean.property
    *          bound="true"
    *          preferred="true"
    */
   public void setScrollOnExpand(boolean scrollOnExpand) {
-    if (this.scrollOnExpand != scrollOnExpand) {
+      boolean oldValue = isScrollOnExpand();
       this.scrollOnExpand = scrollOnExpand;
       firePropertyChange(SCROLL_ON_EXPAND_CHANGED_KEY,
-        !scrollOnExpand, scrollOnExpand);
-    }
+              oldValue, isScrollOnExpand());
   }
   
   /**
@@ -372,29 +373,56 @@ public class JXTaskPane extends JPanel implements
     return scrollOnExpand;
   }
   
+    /**
+     * Expands or collapses this group.
+     * 
+     * @param collapsed
+     *                true to collapse the group, false to expand it
+     * @javabean.property
+     *          bound="true"
+     *          preferred="false"
+     */
+    public void setCollapsed(boolean collapsed) {
+        boolean oldValue = isCollapsed();
+        this.collapsed = collapsed;
+        collapsePane.setCollapsed(collapsed);
+        firePropertyChange("collapsed", oldValue, isCollapsed());
+    }
+    
+    /**
+     * Returns the collapsed state of this task pane.
+     * 
+     * @return {@code true} if the task pane is collapsed; {@code false}
+     *         otherwise
+     */
+    public boolean isCollapsed() {
+        return collapsed;
+    }
+  
   /**
-   * Expands or collapses this group.
    * 
    * @param expanded true to expand the group, false to collapse it
+   * @deprecated use setCollapsed
    * @javabean.property
    *          bound="true"
    *          preferred="true"
    */
+  @Deprecated
   public void setExpanded(boolean expanded) {
-    if (this.expanded != expanded) {
-      this.expanded = expanded;
-      collapsePane.setCollapsed(!expanded);
-      firePropertyChange(EXPANDED_CHANGED_KEY, !expanded, expanded);
-    }
+      boolean oldValue = isExpanded();
+      setCollapsed(!expanded);
+      firePropertyChange(EXPANDED_CHANGED_KEY, oldValue, isExpanded());
   }
 
   /**
-   * Returns true if this taskpane is expanded, false if it is collapsed.
+   * Returns true if this task pane is expanded, false if it is collapsed.
    * 
-   * @return true if this taskpane is expanded, false if it is collapsed.
+   * @return true if this task pane is expanded, false if it is collapsed.
+   * @deprecated
    */
+  @Deprecated
   public boolean isExpanded() {
-    return expanded;
+    return !isCollapsed();
   }
 
   /**
@@ -406,17 +434,16 @@ public class JXTaskPane extends JPanel implements
    *          preferred="true"
    */
   public void setAnimated(boolean animated) {
-    if (isAnimated() != animated) {
+      boolean oldValue = isAnimated();
       collapsePane.setAnimated(animated);
-      firePropertyChange(ANIMATED_CHANGED_KEY, !isAnimated(), isAnimated());
-    }
+      firePropertyChange(ANIMATED_CHANGED_KEY, oldValue, isAnimated());
   }
   
   /**
-   * Returns true if this taskpane is animated during expand/collapse
+   * Returns true if this task pane is animated during expand/collapse
    * transition.
    * 
-   * @return true if this taskpane is animated during expand/collapse
+   * @return true if this task pane is animated during expand/collapse
    *         transition.
    */
   public boolean isAnimated() {
@@ -445,7 +472,7 @@ public class JXTaskPane extends JPanel implements
   }
   
   /**
-   * Overriden to redirect call to the content pane.
+   * Overridden to redirect call to the content pane.
    */
   @Override
   protected void addImpl(Component comp, Object constraints, int index) {
@@ -455,7 +482,7 @@ public class JXTaskPane extends JPanel implements
   }
 
   /**
-   * Overriden to redirect call to the content pane.
+   * Overridden to redirect call to the content pane.
    */
   @Override
   public void setLayout(LayoutManager mgr) {
@@ -465,7 +492,7 @@ public class JXTaskPane extends JPanel implements
   }
   
   /**
-   * Overriden to redirect call to the content pane
+   * Overridden to redirect call to the content pane
    */
   @Override
   public void remove(Component comp) {
@@ -473,7 +500,7 @@ public class JXTaskPane extends JPanel implements
   }
 
   /**
-   * Overriden to redirect call to the content pane.
+   * Overridden to redirect call to the content pane.
    */
   @Override
   public void remove(int index) {
@@ -481,7 +508,7 @@ public class JXTaskPane extends JPanel implements
   }
   
   /**
-   * Overriden to redirect call to the content pane.
+   * Overridden to redirect call to the content pane.
    */
   @Override
   public void removeAll() {
@@ -498,8 +525,8 @@ public class JXTaskPane extends JPanel implements
       + getTitle()
       + ",icon="
       + getIcon()
-      + ",expanded="
-      + String.valueOf(isExpanded())
+      + ",collapsed="
+      + String.valueOf(isCollapsed())
       + ",special="
       + String.valueOf(isSpecial())
       + ",scrollOnExpand=" 
