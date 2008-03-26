@@ -219,16 +219,6 @@ public class JXErrorPane extends JComponent {
         updateUI();
     }
     
-    public Dimension getPreferredSize() {
-        if (super.isPreferredSizeSet()) {
-            return super.getPreferredSize();
-        } else {
-            // PENDING JW: quick fix for compile error - needs revisit
-            // 
-            return ((BasicErrorPaneUI) getUI()).calculatePreferredSize();
-        }
-    }
-    
     //------------------------------------------------------------- UI Logic
     
     /**

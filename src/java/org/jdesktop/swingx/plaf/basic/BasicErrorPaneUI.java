@@ -974,9 +974,15 @@ public class BasicErrorPaneUI extends ErrorPaneUI {
          * are visible, or not.
          */
         public Dimension preferredLayoutSize(Container parent) {
-            final int prefWidth = parent.getWidth();
+            int prefWidth = parent.getWidth();
             int prefHeight = parent.getHeight();
             final Insets insets = parent.getInsets();
+            int pw = detailButton.isVisible() ? detailButton.getPreferredSize().width : 0;
+            pw += detailButton.isVisible() ? detailButton.getPreferredSize().width : 0;
+            pw += reportButton.isVisible() ? (5 + reportButton.getPreferredSize().width) : 0;
+            pw += closeButton.isVisible() ? (5 + closeButton.getPreferredSize().width) : 0;
+            System.out.println("PW:" + pw + ", " + prefWidth);
+            prefWidth = Math.max(prefWidth, pw) + insets.left + insets.right;
             if (errorMessage != null) {
                 //set a temp editor to a certain size, just to determine what its
                 //pref height is
@@ -997,6 +1003,7 @@ public class BasicErrorPaneUI extends ErrorPaneUI {
                 if (detailsPanel.isVisible()) {
                     prefHeight += getDetailsHeight();
                 }
+                
             }
             
             return new Dimension(

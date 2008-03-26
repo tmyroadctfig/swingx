@@ -40,6 +40,14 @@ public class JXErrorPaneVisualCheck extends InteractiveTestCase {
     }
     
     /**
+     * Issue #802-swingx: Default size is too small. 
+     */
+    public void interactiveTooSmall() {
+        JXErrorPane.showDialog(null, new ErrorInfo("Title", "This is a test!", null,
+                null, new Exception("This is a test!"), null, null));
+    }
+    
+    /**
      * Issue #468-swingx: JXErrorPane can't cope with null errorInfo.
      *
      */
