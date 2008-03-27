@@ -37,6 +37,7 @@ import javax.swing.Icon;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JTree;
@@ -90,18 +91,28 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         try {
 //            test.runInteractiveTests();
 //            test.runInteractiveTests("interactive.*Hierarchical.*");
-               test.runInteractiveTests("interactive.*ToolTip.*");
+//               test.runInteractiveTests("interactive.*ToolTip.*");
 //           test.runInteractiveTests("interactive.*DnD.*");
 //             test.runInteractiveTests("interactive.*Compare.*");
 //             test.runInteractiveTests("interactive.*RowHeightCompare.*");
 //             test.runInteractiveTests("interactive.*RToL.*");
 //             test.runInteractiveTests("interactive.*Insert.*");
-//             test.runInteractiveTests("interactive.*Edit.*");
+             test.runInteractiveTests("interactive.*LAF.*");
         } catch (Exception ex) {
 
         }
     }
 
+    /**
+     * Reported: toggling LAF doesn't update treetable?
+     * WorksforMe.
+     */
+    public void interactiveToggleLAF() {
+        JXTreeTable table = new JXTreeTable(treeTableModel);
+        JXFrame frame = wrapInFrame(new JScrollPane(table), "Toggle LAF", true);
+        show(frame);
+    }
+    
     /**
      * Issue #??-swingx: Tooltip by highlighter in hierarchical column
      *
