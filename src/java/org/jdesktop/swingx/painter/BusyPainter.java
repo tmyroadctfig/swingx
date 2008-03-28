@@ -23,6 +23,7 @@ package org.jdesktop.swingx.painter;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.PathIterator;
@@ -57,6 +58,8 @@ public class BusyPainter<T> extends AbstractPainter<T> {
     private Shape trajectory;
 
     private Direction direction = Direction.RIGHT;
+
+    private boolean paintCentered;
 
     /**
      * Creates new busy painter initialized to the shape of circle and bounds size 26x26 points.
@@ -110,6 +113,13 @@ public class BusyPainter<T> extends AbstractPainter<T> {
      */
     @Override
     protected void doPaint(Graphics2D g, T t, int width, int height) {
+        Rectangle r = getTrajectory().getBounds();
+        int tw = width - r.width - 2*r.x;
+        int th = height - r.height - 2*r.y;
+        if (isPaintCentered()) {
+            ((Graphics2D) g).translate(tw/2, th/2);
+        }
+
         PathIterator pi = trajectory.getPathIterator(null);
         float[] coords = new float[6];
         Float cp = new Point2D.Float();
@@ -195,6 +205,17 @@ public class BusyPainter<T> extends AbstractPainter<T> {
         }
         g.translate(-center.x, -center.y);
 
+        if (isPaintCentered()) {
+            ((Graphics2D) g).translate(-tw/2, -th/2);
+        }
+    }
+
+    /**
+     * Gets value of centering hint. If true, shape will be positioned in the center of painted area.
+     * @return Whether shape will be centered over painting area or not.
+     */
+    private boolean isPaintCentered() {
+        return this.paintCentered;
     }
 
     private void drawAt(Graphics2D g, int i, Point2D.Float p, Float c) {
@@ -584,6 +605,18 @@ public class BusyPainter<T> extends AbstractPainter<T> {
      */
     public Direction getDirection() {
         return this.direction;
+    }
+
+    protected Shape provideShape(Graphics2D g, T comp, int width, int height) {
+        return new Rectangle(0,0,width,height);
+    }
+
+    /**
+     * Centers shape in the area covered by the painter.
+     * @param paintCentered Centering hint.
+     */
+    public void setPaintCentered(boolean paintCentered) {
+        this.paintCentered = paintCentered;
     }
 
 }
