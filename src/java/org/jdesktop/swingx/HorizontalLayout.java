@@ -80,8 +80,8 @@ public class HorizontalLayout implements LayoutManager {
             if (m.isVisible()) {
                 Dimension componentPreferredSize =
                         parent.getComponent(i).getPreferredSize();
-                pref.height += Math.max(pref.height, componentPreferredSize.height);
-                pref.width = componentPreferredSize.width + gap;
+                pref.height = Math.max(pref.height, componentPreferredSize.height);
+                pref.width += componentPreferredSize.width + gap;
             }
         }
         pref.width += insets.left + insets.right;
