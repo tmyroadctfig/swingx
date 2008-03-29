@@ -31,6 +31,7 @@ import javax.swing.JComponent;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JPopupMenu;
+import javax.swing.JSplitPane;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -148,6 +149,34 @@ public class JXTaskPaneContainerVisualCheck extends InteractiveTestCase {
             }
         }), BorderLayout.SOUTH);
         
+        frame.pack();
+        frame.setVisible(true);
+    }
+    
+    /**
+     * Ensure correct painting when in JSplitPane.
+     * <p>
+     * SwingX issue #434
+     */
+    public void interactiveSplitPaneTest() {
+        final JXTaskPaneContainer container = new JXTaskPaneContainer();
+        final JXTaskPane pane1 = new JXTaskPane();
+        pane1.setTitle("First");
+        container.add(pane1);
+        
+        final JXTaskPane pane2 = new JXTaskPane();
+        pane2.setTitle("Second");
+        container.add(pane2);
+        
+        final JXTaskPane pane3 = new JXTaskPane();
+        pane3.setTitle("Third");
+        container.add(pane3);
+        
+        JSplitPane splitter = new JSplitPane();
+        splitter.setLeftComponent(container);
+        splitter.setContinuousLayout(true);
+        
+        JXFrame frame = wrapInFrame(splitter, "split pane test");
         frame.pack();
         frame.setVisible(true);
     }
