@@ -45,7 +45,33 @@ import javax.swing.border.Border;
  * <code>JXCollapsiblePane</code> provides a component which can collapse or
  * expand its content area with animation and fade in/fade out effects.
  * It also acts as a standard container for other Swing components.
- *
+ * <p>
+ * The {@code JXCollapsiblePane} has a "content pane" that actually holds the 
+ * displayed contents. This means that colors, fonts, and other display 
+ * configuration items must be set on the content pane.
+ * 
+ * <pre><code>
+ * // to set the font
+ * collapsiblePane.getContentPane().setFont(font);
+ * // to set the background color
+ * collapsiblePane.getContentPane().setBackground(Color.RED);
+ * </code>
+ * </pre>
+ * 
+ * For convenience, the {@code add} and {@code remove} methods forward to the
+ * content pane.  The following code shows to ways to add a child to the
+ * content pane.
+ * 
+ * <pre><code>
+ * // to add a child
+ * collapsiblePane.getContentPane().add(component);
+ * // to add a child
+ * collapsiblePane.add(component);
+ * </code>
+ * </pre>
+ * 
+ * To set the content pane, do not use {@code add}, use {@link #setContentPane(Container)}.
+ * 
  * <p>
  * In this example, the <code>JXCollapsiblePane</code> is used to build
  * a Search pane which can be shown and hidden on demand.
