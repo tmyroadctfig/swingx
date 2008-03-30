@@ -45,7 +45,6 @@ import javax.swing.UIManager.LookAndFeelInfo;
 import org.jdesktop.swingx.JXLoginPane.JXLoginFrame;
 import org.jdesktop.swingx.JXLoginPane.SaveMode;
 import org.jdesktop.swingx.auth.LoginService;
-import org.jdesktop.swingx.editors.PainterUtil;
 import org.jdesktop.swingx.graphics.GraphicsUtilities;
 import org.jdesktop.swingx.painter.MattePainter;
 import org.jdesktop.swingx.plaf.basic.BasicLoginPaneUI;
