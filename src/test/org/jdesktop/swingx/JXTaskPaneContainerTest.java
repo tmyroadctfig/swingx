@@ -28,10 +28,6 @@ public class JXTaskPaneContainerTest extends InteractiveTestCase {
     super(testTitle);
   }
 
-  public void testBean() throws Exception {
-    new JXTaskPaneContainerBeanInfo();
-  }
-  
   public void testAddon() throws Exception {
     // move around all addons
     TestUtilities.cycleAddons(new JXTaskPaneContainer());

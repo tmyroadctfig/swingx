@@ -98,7 +98,6 @@ public class JXTaskPaneTest extends InteractiveTestCase {
     assertTrue(report.getLastNewBooleanValue());
     assertFalse(report.getLastOldBooleanValue());
 
-    new JXTaskPaneBeanInfo();
   }
 
   public void testContentPane() {
