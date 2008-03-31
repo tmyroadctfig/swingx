@@ -45,14 +45,19 @@
     <resources>
       <resource>
         <directory>../src/java</directory>
-        <!--includes>
-          <include>README.txt</include>
-        </includes-->
         <excludes>
           <exclude>**/*.java</exclude>
         </excludes>
       </resource>
     </resources>
+    <testResources>
+	  <testResource>
+        <directory>../src/java</directory>
+        <excludes>
+          <exclude>**/*.java</exclude>
+        </excludes>
+      </testResource>
+    </testResources>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
