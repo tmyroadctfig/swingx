@@ -42,6 +42,17 @@
   <build>
     <sourceDirectory>../src/java</sourceDirectory>
     <testSourceDirectory>../src/test</testSourceDirectory>
+    <resources>
+      <resource>
+        <directory>../src/java</directory>
+        <!--includes>
+          <include>README.txt</include>
+        </includes-->
+        <excludes>
+          <exclude>**/*.java</exclude>
+        </excludes>
+      </resource>
+    </resources>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
