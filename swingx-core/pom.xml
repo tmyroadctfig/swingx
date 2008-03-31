@@ -52,7 +52,7 @@
     </resources>
     <testResources>
 	  <testResource>
-        <directory>../src/java</directory>
+        <directory>../src/test</directory>
         <excludes>
           <exclude>**/*.java</exclude>
         </excludes>
