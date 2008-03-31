@@ -69,8 +69,13 @@ public class XTestUtils {
     
     
     public static BufferedImage loadDefaultImage() {
+        return loadDefaultImage(IMAGE_NAME);
+    }
+
+
+    public static BufferedImage loadDefaultImage(String imageName) {
         try {
-            return ImageIO.read(BASE.getResource(IMAGE_DIR + IMAGE_NAME));
+            return ImageIO.read(BASE.getResource(IMAGE_DIR + imageName));
         } catch (IOException e) {
             LOG.warning("no reason this should happen .... we are ");
         }

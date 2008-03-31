@@ -21,18 +21,31 @@
  */
 package org.jdesktop.swingx.renderer;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.event.ActionEvent;
+import java.io.IOException;
 import java.util.logging.Logger;
 
+import javax.swing.Action;
 import javax.swing.Icon;
+import javax.swing.JComponent;
+import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.TreePath;
 
 import org.jdesktop.swingx.InteractiveTestCase;
+import org.jdesktop.swingx.JXFrame;
+import org.jdesktop.swingx.JXPanel;
 import org.jdesktop.swingx.JXTree;
+import org.jdesktop.swingx.action.AbstractActionExt;
+import org.jdesktop.swingx.painter.ImagePainter;
+import org.jdesktop.swingx.test.ComponentTreeTableModel;
+import org.jdesktop.swingx.test.XTestUtils;
 
 /**
  * Known/open issues with tree renderer.
@@ -75,6 +88,53 @@ public class TreeRendererIssues extends InteractiveTestCase {
         }
     }
 
+    public void interactiveTransparentRenderer() throws IOException {
+        final JXTree tree = new JXTree(new ComponentTreeTableModel(new JXFrame()));
+        tree.setEditable(true);
+        StringValue sv = new StringValue() {
+
+            public String getString(Object value) {
+                if (value instanceof Component) {
+                    return ((Component) value).getName();
+                }
+                return " - no component - ";
+            }};
+        DefaultTreeRenderer renderer = new DefaultTreeRenderer(sv);
+        tree.setCellRenderer(renderer);
+        tree.setForeground(Color.WHITE);
+        JXPanel panel = new JXPanel(new BorderLayout());
+        ImagePainter imagePainter = new ImagePainter(XTestUtils.loadDefaultImage()); 
+        imagePainter.setFillHorizontal(true);
+        imagePainter.setFillVertical(true);
+        panel.setBackgroundPainter(imagePainter);
+        panel.add(new JScrollPane(tree));
+        
+        JXFrame frame = wrapInFrame(panel, "renderer");
+        WrappingProvider provider = (WrappingProvider) renderer.getComponentProvider();
+        provider.getWrappee().getRendererComponent(null).setOpaque(false);
+        tree.setOpaque(false);
+        ((JComponent) tree.getParent()).setOpaque(false);
+        ((JComponent) tree.getParent().getParent()).setOpaque(false);
+        Action edit = new AbstractActionExt("edit") {
+
+            public void actionPerformed(ActionEvent e) {
+                if (tree.isSelectionEmpty()) return;
+                TreePath path = tree.getSelectionPath();
+                Component comp = (Component) path.getLastPathComponent();
+                String oldName = comp.getName();
+                if (oldName == null) {
+                    oldName = "none";
+                }
+                String changed = oldName.length() > 60 ? oldName.substring(0, 20) :
+                    oldName + "+++++++++++++++++++++++++++++++++++++++++++++";
+                tree.getModel().valueForPathChanged(path, changed);
+            }
+            
+        };
+        addAction(frame, edit);
+        show(frame);
+    }
+    
     /**
      * Sanity: icons updated on LF change.
      */
