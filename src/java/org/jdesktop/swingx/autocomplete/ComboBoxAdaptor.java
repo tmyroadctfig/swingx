@@ -69,6 +69,11 @@ public class ComboBoxAdaptor extends AbstractAutoCompleteAdaptor implements Acti
     }
     
     public void setSelectedItem(Object item) {
+    	//SwingX 834: avoid moving when already selected
+    	if (item == getSelectedItem()) {
+    		return;
+    	}
+    	
         // kgs - back door our way to finding the JList that displays the data.
         // then we ask the list to scroll until the last cell is visible. this
         // will cause the selected item to appear closest to the top.
