@@ -24,6 +24,7 @@ package org.jdesktop.swingx;
 import junit.framework.TestCase;
 
 import org.jdesktop.test.PropertyChangeReport;
+import org.jdesktop.test.TestUtils;
 
 /**
  * 
@@ -42,7 +43,8 @@ public class JXTaskPaneIssues extends TestCase {
         PropertyChangeReport report = new PropertyChangeReport();
         pane.addPropertyChangeListener(report);
         pane.setExpanded(!pane.isExpanded());
-        assertEquals("must fire exactly one expanded", 1, report.getEventCount("expanded"));
+        TestUtils.assertPropertyChangeEvent(report, "expanded", 
+                !pane.isExpanded(), pane.isExpanded(), false);
     }
     
     /**
