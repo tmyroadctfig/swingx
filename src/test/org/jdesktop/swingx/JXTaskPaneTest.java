@@ -8,6 +8,7 @@ package org.jdesktop.swingx;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import javax.swing.AbstractAction;
@@ -94,10 +95,16 @@ public class JXTaskPaneTest extends InteractiveTestCase {
     assertFalse(group.isCollapsed());
     group.setCollapsed(true);
     assertTrue(group.isCollapsed());
-    assertEquals("collapsed", report.getLastEvent()
+    PropertyChangeEvent event =  report.getLastEvent("collapsed");
+//    assertEquals("expanded", report.getLastEvent()
+//    		.getPropertyName());
+    assertTrue((Boolean) event.getNewValue());
+    assertFalse((Boolean) event.getOldValue());
+    //TODO remove when expanded deprecation is removed
+    assertEquals("expanded", report.getLastEvent()
       .getPropertyName());
-    assertTrue(report.getLastNewBooleanValue());
-    assertFalse(report.getLastOldBooleanValue());
+    assertFalse(report.getLastNewBooleanValue());
+    assertTrue(report.getLastOldBooleanValue());
 
   }
 
