@@ -763,39 +763,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
         assertEquals(calendar.getTime(), monthView.getToday());
     }
     
-    /**
-     * Issue 711-swingx: today is notify-only property.
-     *  
-     */
-    @SuppressWarnings("deprecation")
-    public void testTodayMillisSet() {
-        JXMonthView monthView = new JXMonthView();
-        // tomorrow
-        calendar.add(Calendar.DAY_OF_MONTH, 1);
-        monthView.setTodayInMillis(calendar.getTimeInMillis());
-        CalendarUtils.startOfDay(calendar);
-        assertEquals(calendar.getTime(), new Date(monthView.getTodayInMillis()));
-    }
     
-    /**
-     * Issue 711-swingx: today is notify-only property.
-     * 
-     */
-    @SuppressWarnings("deprecation")
-    public void testTodayMillisSetNotification() {
-        JXMonthView monthView = new JXMonthView();
-        long todayInMillis = monthView.getTodayInMillis();
-        // tomorrow
-        calendar.add(Calendar.DAY_OF_MONTH, 1);
-        PropertyChangeReport report = new PropertyChangeReport();
-        monthView.addPropertyChangeListener(report);
-        monthView.setTodayInMillis(calendar.getTimeInMillis());
-        CalendarUtils.startOfDay(calendar);
-        TestUtils.assertPropertyChangeEvent(report, "today", 
-                new Date(todayInMillis), calendar.getTime(), false);
-        TestUtils.assertPropertyChangeEvent(report, "todayInMillis", 
-                todayInMillis, calendar.getTimeInMillis(), false);
-    }
     /**
      * Issue 711-swingx: today is notify-only property.
      * SetToday should 
@@ -867,8 +835,6 @@ public class JXMonthViewTest extends MockObjectTestCase {
         monthView.addPropertyChangeListener(report);
         monthView.ensureDateVisible(calendar.getTime());
         CalendarUtils.startOfMonth(calendar);
-        TestUtils.assertPropertyChangeEvent(report, "firstDisplayedDate", 
-                firstDisplayedDate.getTime(), calendar.getTimeInMillis(), false);
         TestUtils.assertPropertyChangeEvent(report, "firstDisplayedDay", 
                 firstDisplayedDate, calendar.getTime(), false);
     }
@@ -888,8 +854,6 @@ public class JXMonthViewTest extends MockObjectTestCase {
         monthView.addPropertyChangeListener(report);
         monthView.setFirstDisplayedDay(calendar.getTime());
         CalendarUtils.startOfMonth(calendar);
-        TestUtils.assertPropertyChangeEvent(report, "firstDisplayedDate", 
-                firstDisplayedDate.getTime(), calendar.getTimeInMillis(), false);
         TestUtils.assertPropertyChangeEvent(report, "firstDisplayedDay", 
                 firstDisplayedDate, calendar.getTime(), false);
     }
@@ -1885,18 +1849,6 @@ public class JXMonthViewTest extends MockObjectTestCase {
         monthView.setSelectionInterval(date, date);
     }
 
-    /**
-     * test flagged dates (deprecated api with long).
-     */
-    @SuppressWarnings("deprecation")
-    public void testFlaggedDateMillis() {
-        JXMonthView monthView = new JXMonthView();
-        Date date = new Date();
-
-        assertFalse(monthView.isFlaggedDate(date.getTime()));
-        monthView.setFlaggedDates(new long[]{date.getTime()});
-        assertTrue(monthView.isFlaggedDate(date.getTime()));
-    }
 
     /**
      * test setting/checking flagged dates (api with Date)
@@ -2029,22 +1981,6 @@ public class JXMonthViewTest extends MockObjectTestCase {
         assertTrue(monthView.isShowingTrailingDays());
     }
 
-    /**
-     * test unselectable: use methods with long.
-     */
-    @SuppressWarnings("deprecation")
-    public void testUnselectableDateLong() {
-        JXMonthView monthView = new JXMonthView();
-        Date date = new Date();
-
-        assertFalse(monthView.isUnselectableDate(date.getTime()));
-        monthView.setUnselectableDates(new long[]{date.getTime()});
-        assertTrue(monthView.isUnselectableDate(date.getTime()));
-        // undocumented
-        monthView.setUnselectableDates((long[]) null);
-        assertFalse(monthView.isUnselectableDate(date.getTime()));
-    }
-    
     private Date startOfDay(Date date) {
         return CalendarUtils.startOfDay(calendar, date);
     }

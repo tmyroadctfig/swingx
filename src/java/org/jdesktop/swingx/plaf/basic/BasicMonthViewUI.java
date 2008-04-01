@@ -113,15 +113,6 @@ public class BasicMonthViewUI extends MonthViewUI {
     @SuppressWarnings("all")
     private static final Logger LOG = Logger.getLogger(BasicMonthViewUI.class
             .getName());
-    /** @deprecated (pre-0.9.2) no longer used, no replacement. */
-    @Deprecated
-    protected static final int LEADING_DAY_OFFSET = 1;
-    /** @deprecated (pre-0.9.2) no longer used, no replacement. */
-    @Deprecated
-    protected static final int NO_OFFSET = 0;
-    /** @deprecated (pre-0.9.2) no longer used, no replacement. */
-    @Deprecated
-    protected static final int TRAILING_DAY_OFFSET = -1;
 
     
     private static final int WEEKS_IN_MONTH = 6;
@@ -2515,77 +2506,6 @@ public class BasicMonthViewUI extends MonthViewUI {
     
 
     /**
-     * Get the view index for the specified day of the week.  This value will range
-     * from 0 to DAYS_IN_WEEK - 1.  For example if the first day of the week was set
-     * to Calendar.MONDAY and we requested the view index for Calendar.TUESDAY the result
-     * would be 1.
-     *
-     * @param dayOfWeek day of the week to calculate view index for, acceptable values are
-     * <code>Calendar.MONDAY</code> - <code>Calendar.SUNDAY</code>
-     * @return view index for the specified day of the week
-     * @deprecated (pre-0.9.2) with revised location/date mapping no longer needed, 
-     *     no longer used internally
-     */
-    @Deprecated
-    @SuppressWarnings("unused")
-    private int getDayOfWeekViewIndex(int dayOfWeek) {
-        int result = dayOfWeek - monthView.getFirstDayOfWeek();
-        if (result < 0) {
-            result += JXMonthView.DAYS_IN_WEEK;
-        }
-        return result;
-    }
-    /**
-     * Returns an index defining which, if any, of the buttons for
-     * traversing the month was pressed.  This method should only be
-     * called when <code>setTraversable</code> is set to true.
-     *
-     * @param x x position of the pointer
-     * @param y y position of the pointer
-     * @return MONTH_UP, MONTH_DOWN or -1 when no button is selected.
-     * 
-     * @deprecated (pre-0.9.2) use {@link #getTraversableGridPositionAtLocation(int, int)}
-     */
-    @Deprecated
-    protected int getTraversableButtonAt(int x, int y) {
-        return getTraversableGridPositionAtLocation(x, y);
-    }
-
-    /**
-     * Get the row and column for the calendar at the specified coordinates
-     *
-     * @param x x location
-     * @param y y location
-     * @return a new <code>Point</code> object containing the row as the x value
-     * and column as the y value
-     * @deprecated (pre-0.9.2) use {@link #getMonthGridPositionAtLocation(int, int)} - this method is
-     *   no longer used internally. Note that the coordinate mapping in the 
-     *   returned Point of new method is the other way round 
-     *   (p.x == column, p.y == row) as in this!
-     */
-    @Deprecated
-    protected Point getCalRowColAt(int x, int y) {
-        if (isLeftToRight ? (startX > x) : (startX < x) || startY > y) {
-            return NO_SUCH_CALENDAR;
-        }
-
-        Point result = new Point();
-        // Determine which row of calendars we're in.
-        result.x = (y - startY) / (calendarHeight + CALENDAR_SPACING);
-
-        // Determine which column of calendars we're in.
-        result.y = (isLeftToRight ? (x - startX) : (startX - x)) /
-                (calendarWidth + CALENDAR_SPACING);
-
-        // Make sure the row and column of calendars calculated is being
-        // managed.
-        if (result.x > calendarRowCount - 1 || result.y > calendarColumnCount -1) {
-            result = NO_SUCH_CALENDAR;
-        }
-
-        return result;
-    }
-    /**
      * old way of calculating the position of the grid of months.
      * This is no longer used in current code, only in deprecated.
      * 
@@ -2603,112 +2523,6 @@ public class BasicMonthViewUI extends MonthViewUI {
         // Calculate offset in y-axis for centering calendars.
         startY = calculateCalendarGridY();
     }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @deprecated (pre-0.9.2) use {@link #getDayAtLocation(int, int)} This method is
-     * no longer used internally
-     */
-    @Deprecated
-    @Override
-    public long getDayAt(int x, int y) {
-        Date cal = getDayAtLocation(x, y);
-        return cal != null ? cal.getTime() : -1;
-    }
-
-    /**
-     * @return the start of today.
-     * 
-     * @deprecated (pre-0.9.2) use {@link #getToday()}
-     */
-    @Deprecated
-    protected long getTodayInMillis() {
-        return getToday().getTime();
-    }
-    
-    
-    /**
-     * Returns true if the date passed in is the same as today.
-     *
-     * PENDING JW: really want the exact test?
-     * 
-     * @param date long representing the date you want to compare to today.
-     * @return true if the date passed is the same as today.
-     * 
-     * @deprecated (pre-0.9.2) use {@link #isToday(Date)}
-     */
-    @Deprecated
-    protected boolean isToday(long date) {
-        return date == getToday().getTime();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public long getLastDisplayedDate() {
-        return lastDisplayedDate.getTime();
-    }
-
-    /**
-     * {@inheritDoc} <p>
-     * 
-     * This method will be hidden soon: the newer perspective is that the
-     * ui is responsible to keep the value in a reasonable state to query from
-     * the outside. 
-     */
-    @Override
-    public long calculateLastDisplayedDate() {
-        updateLastDisplayedDay(getFirstDisplayedDay());
-        // NOTE JW: this is the only place (outside the getter/setter) 
-        // where the field is accessed directly - no need to cleanup because
-        // this will be removed before final.
-        return lastDisplayedDate.getTime();
-    }
-
-    /**
-     * Sets the firstDisplayedDate property to the given value. Must update
-     * dependent state as well. 
-     * 
-     * Here: updated lastDisplayedDatefirstDisplayedMonth/Year accordingly.
-     * 
-     * 
-     * @param firstDisplayedDate the firstDisplayedDate to set
-     * 
-     * @deprecated (pre-0.9.2) use {@link #setFirstDisplayedDay(Date)}
-     */
-    @Deprecated
-    protected void setFirstDisplayedDate(long firstDisplayedDate) {
-        setFirstDisplayedDay(new Date(firstDisplayedDate));
-    }
-    /**
-     * @return the firstDisplayedDate
-     * 
-     * @deprecated (pre-0.9.2) use {@link #getFirstDisplayedDay()}
-     */
-    @Deprecated
-    protected long getFirstDisplayedDate() {
-        return firstDisplayedDate.getTime();
-    }
-
-    /**
-     * Returns the monthViews calendar configured to the given time.
-     * 
-     * NOTE: it's safe to change the calendar state without resetting because
-     * it's JXMonthView's responsibility to protect itself.
-     * 
-     * @param millis the date to configure the calendar with
-     * @return the monthView's calendar, configured with the given date.
-     * @deprecated (pre-0.9.2) use {@link #getCalendar(Date)}
-     */
-    @Deprecated
-    protected Calendar getCalendar(long millis) {
-        Calendar calendar = monthView.getCalendar();
-        calendar.setTimeInMillis(millis);
-        return calendar;
-    }
-
 
     
 }

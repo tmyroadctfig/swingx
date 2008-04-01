@@ -108,7 +108,6 @@ public class JXDatePickerIssues extends InteractiveTestCase {
         JXDatePicker picker = new JXDatePicker();
         comp.add(picker);
         comp.add(new JLabel("initial -1"));
-        comp.add(new JXDatePicker(-1));
         showInFrame(comp, "null date");
     }
 

@@ -71,7 +71,7 @@ public class FindTest extends InteractiveTestCase {
         SearchFactory.getInstance().showFindDialog(table, table.getSearchable());
         Window window = SwingUtilities.getWindowAncestor(findPanel);
         assertSame(frame, window.getOwner());
-        SearchFactory.getInstance().hideSharedFindPanel();
+        SearchFactory.getInstance().hideSharedFindPanel(true);
         assertFalse("window must not be displayable", window.isDisplayable());
         assertNull("findPanel must be unparented", findPanel.getParent());
     }

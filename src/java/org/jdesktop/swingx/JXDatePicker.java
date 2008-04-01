@@ -296,11 +296,8 @@ public class JXDatePicker extends JComponent {
             return;
         }
         Date old = getDate();
-        long oldMillis = getDateInMillis();
         this.date = date;
         firePropertyChange("date", old, getDate());
-        // PENDING JW: remove when removing the deprecated method
-        firePropertyChange("dateInMillis", oldMillis, getDateInMillis());
     }
 
  
@@ -823,46 +820,6 @@ public class JXDatePicker extends JComponent {
         return ((DatePickerUI) ui).getBaseline(width, height);
     }
 
-    /**
-     * Returns the string currently used to identiy fired ActionEvents.
-     *
-     * @return String The string used for identifying ActionEvents.
-     * 
-     * @deprecated (pre-0.9.2) no longer used. The command is internally determined and
-     * either datePickerCommit or datePickerCancel, depending on the user
-     * gesture which triggered the action.
-     */
-    @Deprecated
-    public String getActionCommand() {
-        return _actionCommand;
-    }
-
-    /**
-     * Sets the string used to identify fired ActionEvents.
-     *
-     * @param actionCommand The string used for identifying ActionEvents.
-     * 
-     * @deprecated (pre-0.9.2) no longer used. The command is internally determined and
-     * either datePickerCommit or datePickerCancel, depending on the user
-     * gesture which triggered the action.
-     */
-    @Deprecated
-    public void setActionCommand(String actionCommand) {
-        _actionCommand = actionCommand;
-    }
-
-    /**
-     * Fires an ActionEvent with this picker's actionCommand
-     * to all listeners.
-     * 
-     * @deprecated (pre-0.9.2) no longer used. The command is internally determined and
-     * either datePickerCommit or datePickerCancel, depending on the user
-     * gesture which triggered the action.
-     */
-    @Deprecated
-    protected void fireActionPerformed() {
-        fireActionPerformed(getActionCommand());
-    }
 
     /**
      * Adds an ActionListener.
@@ -997,139 +954,6 @@ public class JXDatePicker extends JComponent {
 
 //----------------------- deprecated
     
-    /**
-     * Set the currently selected date.
-     *
-     * @param millis milliseconds
-     * 
-     * @deprecated (pre-0.9.2) use {@link #setDate(Date)}
-     */
-    @Deprecated
-    public void setDateInMillis(long millis) {
-        setDate(new Date(millis));
-    }
-
-    /**
-     * Returns the currently selected date in milliseconds.
-     *
-     * @return the date in milliseconds, -1 if there is no selection.
-     * 
-     * @deprecated (pre-0.9.2) use {@link #getDate()}
-     */
-    @Deprecated
-    public long getDateInMillis() {
-        long result = -1;
-        Date selection = getDate();
-        if (selection != null) {
-            result = selection.getTime();
-        }
-        return result;
-    }
-
-    /**
-     * Returns the date shown in the LinkPanel as millis.
-     * 
-     * @return the date shown in the TodayPanel in millis
-     * 
-     * @deprecated (pre-0.9.2) use {@link #getLinkDay()}
-     */
-    @Deprecated
-    public long getLinkDate() {
-        return getLinkDay().getTime();
-    }
-
-    /**
-     * Set the date the link will use and the string defining a MessageFormat to
-     * format the link. If no valid date is in the editor when the popup is
-     * displayed the popup will focus on the month the linkDate is in. Calling
-     * this method will replace the currently installed linkPanel and install a
-     * new one with the requested date and format.
-     * 
-     * 
-     * @param linkDate Date in milliseconds
-     * @param linkFormatString String used to format the link
-     * @see java.text.MessageFormat
-     * 
-     * @deprecated (pre-0.9.2) use {@link #setLinkDay(Date, String)}
-     */
-    @Deprecated
-    public void setLinkDate(long linkDate, String linkFormatString) {
-        setLinkDay(new Date(linkDate), linkFormatString);
-    }
-    
-    /**
-     * Sets the date used in the TodayPanel.<p>
-     * 
-     * PENDING JW ... quick api hack for testing.
-     * 
-     * @param linkDate the date in millis to use in the TodayPanel.
-     * 
-     * @deprecated (pre-0.9.2) use {@link #setLinkDay(Date)}
-     */
-    @Deprecated
-    public void setLinkDate(long linkDate) {
-        setLinkDay(new Date(linkDate));
-    }
-    /**
-     * Returns the date shown in the LinkPanel.
-     * 
-     * @return the date shown in the LinkPanel.
-     * 
-     * @deprecated (pre-0.9.2) use {@link #getLinkDay()}
-     */
-    @Deprecated
-    public Date getToday() {
-        return getLinkDay();
-    }
-    
-    /**
-     * PENDING JW ... quick api hack for testing.
-     * 
-     * @param linkDate
-     * 
-     * @deprecated (pre-0.9.2) use {@link #setLinkDay(Date)}
-     */
-    @Deprecated
-    public void setToday(Date linkDate) {
-        setLinkDay(linkDate);
-    }
-
-    /**
-     * Create a new date picker using the specified time as the initial
-     * selection and the default abstract formatter
-     * <code>JXDatePickerFormatter</code>.
-     * <p/>
-     * The date picker is configured with the default time zone and specified locale
-     *
-     * @param millis initial time in milliseconds
-     * @param locale initial Locale
-     * @see #setTimeZone
-     * @see #getTimeZone
-     * 
-     * @deprecated (pre-0.9.2) use {@link #JXDatePicker(Date, Locale)}
-     */
-    @Deprecated
-    public JXDatePicker(long millis, Locale locale) {
-        this(new Date(millis), locale);
-    }
-    
-    /**
-     * Create a new date picker using the specified time as the initial
-     * selection and the default abstract formatter
-     * <code>JXDatePickerFormatter</code>.
-     * <p/>
-     * The date picker is configured with the default time zone and locale
-     *
-     * @param millis initial time in milliseconds
-     * @see #setTimeZone
-     * @see #getTimeZone
-     * 
-     * @deprecated (pre-0.9.2) use {@link #JXDatePicker(Date)}
-     */
-    @Deprecated
-    public JXDatePicker(long millis) {
-        this(millis, null);
-    }
 
 }    
  

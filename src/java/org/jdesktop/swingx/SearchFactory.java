@@ -434,17 +434,6 @@ public class SearchFactory {
         return (window instanceof JXDialog) ? (JXDialog) window : null;
     }
 
-    /**
-     * Hides the findPanel's toplevel window and returns its location.
-     * 
-     * @return the location of the window if visible, or the last known
-     *   location.
-     * @deprecated (pre-0.9.2) use {@link #hideSharedFindPanel(boolean)} instead  
-     */
-    @Deprecated
-    protected Point hideSharedFindPanel() {
-        return hideSharedFindPanel(true);
-    }
 
     /**
      * Hides the findPanel's toplevel window and returns its location.

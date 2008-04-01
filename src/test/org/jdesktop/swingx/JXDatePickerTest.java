@@ -1528,21 +1528,17 @@ public class JXDatePickerTest extends InteractiveTestCase {
         assertNull(datePicker.getDate());
     }
 
-    @SuppressWarnings("deprecation")
     public void testConstructor() {
         calendar.setTimeInMillis(System.currentTimeMillis());
         calendar.add(Calendar.DAY_OF_MONTH, 5);
         Date expectedDate = cleanupDate(calendar);
         JXDatePicker datePicker = new JXDatePicker(calendar.getTime());
         assertTrue(expectedDate.equals(datePicker.getDate()));
-        assertTrue(expectedDate.getTime() == datePicker.getDateInMillis());
     }
 
-    @SuppressWarnings("deprecation")
     public void testNullSelection() {
         JXDatePicker datePicker = new JXDatePicker();
         assertTrue(null == datePicker.getDate());
-        assertTrue(-1 == datePicker.getDateInMillis());
     }
 
     public void testSetDate() {

@@ -117,52 +117,6 @@ public class ColorHighlighter extends AbstractHighlighter {
     }
 
     
-    /**
-     * Constructs a <code>ColorHighlighter</code> with the specified
-     * unselected colors and HighlightPredicate. Initializes selected colors to
-     * null.
-     * 
-     * @param predicate the HighlightPredicate to use.
-     * @param cellBackground background color for unselected cell state
-     * @param cellForeground foreground color for unselected cell state
-     * 
-     * 
-     * @deprecated (pre-0.9.2) use
-     *             {@link #ColorHighlighter(HighlightPredicate, Color, Color)}
-     *             changed method signature for consistency.
-     * 
-     */
-    @Deprecated
-    public ColorHighlighter(Color cellBackground, Color cellForeground,
-            HighlightPredicate predicate) {
-        this(predicate, cellBackground, cellForeground, null, null);
-    }
-
-    /**
-     * Constructs a <code>ColorHighlighter</code> with the specified colors
-     * and HighlightPredicate.
-     * 
-     * @param predicate the HighlightPredicate to use.
-     * @param cellBackground background color for unselected cell state
-     * @param cellForeground foreground color for unselected cell state
-     * @param selectedBackground background color for selected cell state
-     * @param selectedForeground foreground color for selected cell state
-     * @deprecated (pre-0.9.2) use
-     *             {@link #ColorHighlighter(HighlightPredicate, Color, Color, Color, Color)}
-     *             changed method signature for consistency.
-     * 
-     */
-    @Deprecated
-    public ColorHighlighter(Color cellBackground, Color cellForeground,
-            Color selectedBackground, Color selectedForeground,
-            HighlightPredicate predicate) {
-        super(predicate);
-        this.background = cellBackground;
-        this.foreground = cellForeground;
-        this.selectedBackground = selectedBackground;
-        this.selectedForeground = selectedForeground;
-    }
-    
 
     /**
      * {@inheritDoc}

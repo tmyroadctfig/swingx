@@ -131,68 +131,6 @@ public class BorderHighlighter extends AbstractHighlighter {
     }
 
 
-    /**
-     * 
-     * Instantiates a BorderHighlighter with the given padding, 
-     * HighlightPredicate and default compound property. 
-     * If the predicate is null, the highlighter
-     * will be applied unconditionally.
-     * 
-     * @param paddingBorder the border to apply as visual decoration.
-     * @param predicate the HighlightPredicate to use
-     * 
-     * @deprecated (pre-0.9.2) use {@link #BorderHighlighter(HighlightPredicate, Border)}
-     * 
-     */
-    @Deprecated
-    public BorderHighlighter(Border paddingBorder, HighlightPredicate predicate) {
-        this(predicate, paddingBorder, true);
-    }
-
-    /**
-     * 
-     * Instantiates a BorderHighlighter with the given padding, 
-     * HighlightPredicate and compound property. If the predicate is null, the highlighter
-     * will be applied unconditionally.
-     * 
-     * @param paddingBorder the border to apply as visual decoration.
-     * @param predicate the HighlightPredicate to use
-     * @param compound the compound property
-     * @param inner the inner property
-     * 
-     * @deprecated (pre-0.9.2) use {@link #BorderHighlighter(HighlightPredicate, Border, boolean, boolean)}
-     *   - sig changed for consistency (predicate first always)
-     */
-    @Deprecated
-    public BorderHighlighter(Border paddingBorder, 
-            HighlightPredicate predicate, boolean compound, boolean inner) {
-        super(predicate);
-        this.paddingBorder = paddingBorder;
-        this.compound = compound;
-        this.inner = inner;
-    }
-
-
-    /**
-     * 
-     * Instantiates a BorderHighlighter with the given padding, 
-     * HighlightPredicate, compound property and default inner property. 
-     * If the predicate is null, the highlighter
-     * will be applied unconditionally.
-     * @param predicate the HighlightPredicate to use
-     * @param paddingBorder the border to apply as visual decoration.
-     * @param compound the compound property.
-     * 
-     * @deprecated (pre-0.9.2) use {@link #BorderHighlighter(HighlightPredicate, Border, boolean)}
-     *   - sig changed for consistency (predicate first always)
-     */
-    @Deprecated
-    public BorderHighlighter(
-            Border paddingBorder, boolean compound, HighlightPredicate predicate) {
-        super(predicate);
-        this.paddingBorder = paddingBorder;
-        this.compound = compound;
-    }
 
 
     /**

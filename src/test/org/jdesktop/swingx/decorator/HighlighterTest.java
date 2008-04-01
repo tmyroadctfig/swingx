@@ -92,7 +92,7 @@ public class HighlighterTest extends InteractiveTestCase {
         PainterHighlighter all = new PainterHighlighter(HighlightPredicate.NEVER, mattePainter);
         assertEquals(HighlightPredicate.NEVER, all.getHighlightPredicate());
         assertEquals(mattePainter, all.getPainter());
-        PainterHighlighter allOld = new PainterHighlighter(mattePainter, HighlightPredicate.NEVER);
+        PainterHighlighter allOld = new PainterHighlighter(HighlightPredicate.NEVER, mattePainter);
         assertEquals(HighlightPredicate.NEVER, allOld.getHighlightPredicate());
         assertEquals(mattePainter, allOld.getPainter());
     }

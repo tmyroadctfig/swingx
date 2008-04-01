@@ -108,11 +108,11 @@ public class SelectionIssues extends InteractiveTestCase {
                 }
                 today.add(Calendar.DAY_OF_MONTH, 1);
                 us.setSelectionDate(today.getTime());
-                LOG.info("firstDisplayed before: " + new Date(us.getFirstDisplayedDate()));
+                LOG.info("firstDisplayed before: " + us.getFirstDisplayedDay());
                 
                 // shouldn't effect scrolling state
                 us.revalidate();
-                LOG.info("firstDisplayed: " + new Date(us.getFirstDisplayedDate()));
+                LOG.info("firstDisplayed: " + us.getFirstDisplayedDay());
                 // client code must trigger 
 //                us.ensureDateVisible(today.getTimeInMillis());
             }

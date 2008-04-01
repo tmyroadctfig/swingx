@@ -400,6 +400,8 @@ public class RenderingTest extends TestCase {
      * Here: must show the
      * description instead of setting the icon.
      *
+     * PENDING JW: revisit .. Icon.EMPTY vs. Icon.NONE: what exactly is the expected 
+     * behaviour?
      */
     public void testLabelProviderRespectStringValueNoIcon() {
         ImageIcon icon = (ImageIcon) XTestUtils.loadDefaultIcon();

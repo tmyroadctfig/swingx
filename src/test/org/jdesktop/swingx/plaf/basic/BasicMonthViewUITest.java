@@ -1054,15 +1054,8 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
         Dimension pref = monthView.getPreferredSize();
         pref.width = pref.width / 2;
         pref.height = pref.height / 2;
-        long dayLong = monthView.getDayAt(pref.width, pref.height);
-        assertTrue(dayLong > 0);
         Date date = monthView.getDayAtLocation(pref.width, pref.height);
         assertNotNull(date);
-        Calendar cal = monthView.getCalendar();
-        cal.setTimeInMillis(dayLong);
-        assertEquals(cal.getTime(), date);
-        assertTrue(CalendarUtils.isSameDay(cal, date));
-        assertEquals(new Date(dayLong), date);
     }
 
     
