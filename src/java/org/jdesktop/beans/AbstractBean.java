@@ -29,48 +29,63 @@ import java.beans.VetoableChangeListener;
 import java.beans.VetoableChangeSupport;
 
 /**
- * <p>A convenience class from which to extend all non-visual AbstractBeans. It
+ * <p>
+ * A convenience class from which to extend all non-visual AbstractBeans. It
  * manages the PropertyChange notification system, making it relatively trivial
- * to add support for property change events in getters/setters.</p>
+ * to add support for property change events in getters/setters.
+ * </p>
  * 
- * <p>A non-visual java bean is a Java class that conforms to the AbstractBean 
- * patterns to allow visual manipulation of the bean's properties and event 
- * handlers at design-time.</p>
- *
- * <p>Here is a simple example bean that contains one property, foo, and the
- * proper pattern for implementing property change notification:
+ * <p>
+ * A non-visual java bean is a Java class that conforms to the AbstractBean
+ * patterns to allow visual manipulation of the bean's properties and event
+ * handlers at design-time.
+ * </p>
+ * 
+ * <p>
+ * Here is a simple example bean that contains one property, foo, and the proper
+ * pattern for implementing property change notification:
+ * 
  * <pre><code>
- *  public class ABean extends AbstractBean {
- *    private String foo;
- *    
- *    public void setFoo(String newFoo) {
- *      String old = getFoo();
- *      this.foo = newFoo;
- *      firePropertyChange("foo", old, getFoo());
- *    }
- *
- *    public String getFoo() {
- *      return foo;
- *    }
- *  }
- * </code></pre></p>
- *
- * <p>You will notice that "getFoo()" is used in the setFoo method rather than
+ * public class ABean extends AbstractBean {
+ * 	private String foo;
+ * 
+ * 	public void setFoo(String newFoo) {
+ * 		String old = getFoo();
+ * 		this.foo = newFoo;
+ * 		firePropertyChange(&quot;foo&quot;, old, getFoo());
+ * 	}
+ * 
+ * 	public String getFoo() {
+ * 		return foo;
+ * 	}
+ * }
+ * </code></pre>
+ * 
+ * </p>
+ * 
+ * <p>
+ * You will notice that "getFoo()" is used in the setFoo method rather than
  * accessing "foo" directly for the gets. This is done intentionally so that if
  * a subclass overrides getFoo() to return, for instance, a constant value the
- * property change notification system will continue to work properly.</p>
- *
- * <p>The firePropertyChange method takes into account the old value and the new
- * value. Only if the two differ will it fire a property change event. So you can
- * be assured from the above code fragment that a property change event will only
- * occur if old is indeed different from getFoo()</p>
+ * property change notification system will continue to work properly.
+ * </p>
  * 
- * <p><code>AbstractBean</code> also supports vetoable {@link PropertyChangeEvent} events. 
- * These events are similar to <code>PropertyChange</code> events, except a special
- * exception can be used to veto changing the property. For example, perhaps the
- * property is changing from "fred" to "red", but a listener deems that "red" is 
- * unexceptable. In this case, the listener can fire a veto exception and the property must
+ * <p>
+ * The firePropertyChange method takes into account the old value and the new
+ * value. Only if the two differ will it fire a property change event. So you
+ * can be assured from the above code fragment that a property change event will
+ * only occur if old is indeed different from getFoo()
+ * </p>
+ * 
+ * <p>
+ * <code>AbstractBean</code> also supports vetoable
+ * {@link PropertyChangeEvent} events. These events are similar to
+ * <code>PropertyChange</code> events, except a special exception can be used
+ * to veto changing the property. For example, perhaps the property is changing
+ * from "fred" to "red", but a listener deems that "red" is unexceptable. In
+ * this case, the listener can fire a veto exception and the property must
  * remain "fred". For example:
+ * 
  * <pre><code>
  *  public class ABean extends AbstractBean {
  *    private String foo;
@@ -78,9 +93,8 @@ import java.beans.VetoableChangeSupport;
  *    public void setFoo(String newFoo) throws PropertyVetoException {
  *      String old = getFoo();
  *      this.foo = newFoo;
- *      fireVetoableChange("foo", old, getFoo());
+ *      fireVetoableChange(&quot;foo&quot;, old, getFoo());
  *    }
- *
  *    public String getFoo() {
  *      return foo;
  *    }
@@ -90,22 +104,36 @@ import java.beans.VetoableChangeSupport;
  *    public static void main(String... args) {
  *      try {
  *        ABean a = new ABean();
- *        a.setFoo("fred");
+ *        a.setFoo(&quot;fred&quot;);
  *        a.addVetoableChangeListener(new VetoableChangeListener() {
  *          public void vetoableChange(PropertyChangeEvent evt) throws PropertyVetoException {
- *            if ("red".equals(evt.getNewValue()) {
- *              throw new PropertyVetoException("Cannot be red!", evt);
+ *            if (&quot;red&quot;.equals(evt.getNewValue()) {
+ *              throw new PropertyVetoException(&quot;Cannot be red!&quot;, evt);
  *            }
  *          }
  *        }
- *        a.setFoo("red");
+ *        a.setFoo(&quot;red&quot;);
  *      } catch (Exception e) {
  *        e.printStackTrace(); // this will be executed
  *      }
  *    }
  *  }
- * </code></pre></p>
- *
+ * </code></pre>
+ * 
+ * </p>
+ * <p>
+ * {@code AbstractBean} is not {@link java.io.Serializable}. Special care must
+ * be taken when creating {@code Serializable} subclasses, as the
+ * {@code Serializable} listeners will not be saved.  Subclasses will need to 
+ * manually save the serializable listeners.  The {@link AbstractSerializableBean}
+ * is {@code Serializable} and already handles the listeners correctly.  If 
+ * possible, it is recommended that {@code Serializable} beans should extend
+ * {@code AbstractSerializableBean}.  If it is not possible, the
+ * {@code AbstractSerializableBean} bean implementation provides details on
+ * how to correctly serialize an {@code AbstractBean} subclass.
+ * </p>
+ * 
+ * @see AbstractSerializableBean
  * @status REVIEWED
  * @author rbair
  */
@@ -461,7 +489,7 @@ public abstract class AbstractBean {
     }
     
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public Object clone() throws CloneNotSupportedException {
         AbstractBean result = (AbstractBean) super.clone();
