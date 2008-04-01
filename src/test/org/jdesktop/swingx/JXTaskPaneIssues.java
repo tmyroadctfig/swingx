@@ -23,11 +23,27 @@ package org.jdesktop.swingx;
 
 import junit.framework.TestCase;
 
+import org.jdesktop.test.PropertyChangeReport;
+
 /**
  * 
  * @author Jeanette Winzenburg
  */
 public class JXTaskPaneIssues extends TestCase {
+    
+    /**
+     * Issue #835-swingx: event notification on expanded.
+     * Here: two events fired on setExpanded
+     * @deprecated remove with {@link JXTaskPane#setExpanded(boolean)}
+     */
+    @Deprecated
+    public void testSingleExpanded() {
+        JXTaskPane pane = new JXTaskPane();
+        PropertyChangeReport report = new PropertyChangeReport();
+        pane.addPropertyChangeListener(report);
+        pane.setExpanded(!pane.isExpanded());
+        assertEquals("must fire exactly one expanded", 1, report.getEventCount("expanded"));
+    }
     
     /**
      * Empty test method to keep the test runner happy if we have no 
