@@ -20,6 +20,7 @@ import org.jdesktop.swingx.icon.EmptyIcon;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 import org.jdesktop.swingx.plaf.metal.MetalLookAndFeelAddons;
 import org.jdesktop.test.PropertyChangeReport;
+import org.jdesktop.test.TestUtils;
 
 public class JXTaskPaneTest extends InteractiveTestCase {
 
@@ -191,4 +192,20 @@ public class JXTaskPaneTest extends InteractiveTestCase {
       || "org.jdesktop.swingx.plaf.misc.GlossyTaskPaneUI".equals(uiClass));
   }
   
+    /**
+	 * Issue 835-swingx: expanded property change notification is missing on
+	 * setCollapsed.
+	 * 
+	 * @deprecated remove with {@link JXTaskPane#setExpanded(boolean)}
+	 */
+	@Deprecated
+	public void testExpandedNotification() {
+		JXTaskPane group = new JXTaskPane();
+		boolean initial = group.isCollapsed();
+		PropertyChangeReport report = new PropertyChangeReport();
+		group.addPropertyChangeListener(report);
+		group.setCollapsed(!initial);
+		TestUtils.assertPropertyChangeEvent(report, "expanded", !initial,
+				initial, false);
+	}
 }

@@ -21,29 +21,13 @@
  */
 package org.jdesktop.swingx;
 
-import org.jdesktop.test.PropertyChangeReport;
-import org.jdesktop.test.TestUtils;
+import junit.framework.TestCase;
 
 /**
  * 
  * @author Jeanette Winzenburg
  */
-public class JXTaskPaneIssues {
-
-    /**
-     * Issue ??-swingx: expanded property change notification is missing on
-     * setCollapsed.
-     */
-    public void testExpandedNotification() {
-        JXTaskPane group = new JXTaskPane();
-        boolean initial = group.isCollapsed();
-        PropertyChangeReport report = new PropertyChangeReport();
-        group.addPropertyChangeListener(report);
-        group.setCollapsed(!initial);
-        TestUtils.assertPropertyChangeEvent(report, "expanded", !initial,
-                initial, false);
-    }
-
+public class JXTaskPaneIssues extends TestCase {
     
     /**
      * Empty test method to keep the test runner happy if we have no 

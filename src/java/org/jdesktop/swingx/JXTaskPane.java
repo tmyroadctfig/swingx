@@ -81,7 +81,7 @@ import org.jdesktop.swingx.plaf.TaskPaneUI;
  * actionPane.setTitle("Files and Folders");
  * actionPane.setSpecial(true);
  * 
- * // actions can be added, an hyperlink will be created
+ * // actions can be added, a hyperlink will be created
  * Action renameSelectedFile = createRenameFileAction();
  * actionPane.add(renameSelectedFile);
  * actionPane.add(createDeleteFileAction());
@@ -107,7 +107,7 @@ import org.jdesktop.swingx.plaf.TaskPaneUI;
  * // and a file browser in the middle
  * frame.add(fileBrowser, BorderLayout.CENTER);
  * 
- * frame.pack().
+ * frame.pack();
  * frame.setVisible(true);
  * </code>
  * </pre>
@@ -387,6 +387,7 @@ public class JXTaskPane extends JPanel implements
         this.collapsed = collapsed;
         collapsePane.setCollapsed(collapsed);
         firePropertyChange("collapsed", oldValue, isCollapsed());
+        firePropertyChange("expanded", !oldValue, !isCollapsed());
     }
     
     /**
