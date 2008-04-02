@@ -215,4 +215,19 @@ public class JXTaskPaneTest extends InteractiveTestCase {
 		TestUtils.assertPropertyChangeEvent(report, "expanded", !initial,
 				initial, false);
 	}
+    
+    /**
+     * Issue #835-swingx: event notification on expanded.
+     * Here: two events fired on setExpanded
+     * @deprecated remove with {@link JXTaskPane#setExpanded(boolean)}
+     */
+    @Deprecated
+    public void testSingleExpanded() {
+        JXTaskPane pane = new JXTaskPane();
+        PropertyChangeReport report = new PropertyChangeReport();
+        pane.addPropertyChangeListener(report);
+        pane.setExpanded(!pane.isExpanded());
+        TestUtils.assertPropertyChangeEvent(report, "expanded", 
+                !pane.isExpanded(), pane.isExpanded(), false);
+    }
 }

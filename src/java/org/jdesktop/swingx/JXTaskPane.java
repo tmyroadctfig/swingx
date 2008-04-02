@@ -410,9 +410,7 @@ public class JXTaskPane extends JPanel implements
    */
   @Deprecated
   public void setExpanded(boolean expanded) {
-      boolean oldValue = isExpanded();
       setCollapsed(!expanded);
-      firePropertyChange(EXPANDED_CHANGED_KEY, oldValue, isExpanded());
   }
 
   /**
