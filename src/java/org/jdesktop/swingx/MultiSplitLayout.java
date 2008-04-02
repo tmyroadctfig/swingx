@@ -583,7 +583,7 @@ public class MultiSplitLayout implements LayoutManager
    * @param root the node whose size is required.
    * @return the minimum size.
    */
-  Dimension minimumNodeSize(Node root) {
+  public Dimension minimumNodeSize(Node root) {
     assert( root.isVisible );
     if (root instanceof Leaf) {
       Component child = childForNode(root);
@@ -615,6 +615,52 @@ public class MultiSplitLayout implements LayoutManager
             continue;
           Dimension size = minimumNodeSize(splitChild);
           width = Math.max(width, size.width);
+          height += size.height;
+        }
+      }
+      return new Dimension(width, height);
+    }
+  }
+  
+  /**
+   * Get the maximum size of this node. Sums the minumum sizes of rows or 
+   * columns to get the overall maximum size for the layout node, including the 
+   * dividers.
+   * @param root the node whose size is required.
+   * @return the minimum size.
+   */
+  public Dimension maximumNodeSize(Node root) {
+    assert( root.isVisible );
+    if (root instanceof Leaf) {
+      Component child = childForNode(root);
+      return ((child != null) && child.isVisible() ) ? child.getMaximumSize() : new Dimension(0, 0);
+    }
+    else if (root instanceof Divider) {
+      if ( !((Divider)root).isVisible()  )
+        return new Dimension(0,0);
+      int dividerSize = getDividerSize();
+      return new Dimension(dividerSize, dividerSize);
+    }
+    else {
+      Split split = (Split)root;
+      List<Node> splitChildren = split.getChildren();
+      int width = Integer.MAX_VALUE;
+      int height = Integer.MAX_VALUE;
+      if (split.isRowLayout()) {
+    	for(Node splitChild : splitChildren) {
+          if ( !splitChild.isVisible())
+            continue;
+          Dimension size = maximumNodeSize(splitChild);
+          width += size.width;
+          height = Math.min(height, size.height);
+        }
+      }
+      else {
+    	for(Node splitChild : splitChildren) {
+          if ( !splitChild.isVisible())
+            continue;
+          Dimension size = maximumNodeSize(splitChild);
+          width = Math.min(width, size.width);
           height += size.height;
         }
       }
@@ -1022,6 +1068,7 @@ public class MultiSplitLayout implements LayoutManager
       Iterator<Node> splitChildren = split.getChildren().iterator();
       Rectangle childBounds = null;
       int dividerSize = getDividerSize();
+       boolean initSplit = false;
       
       
       /* Layout the Split's child Nodes' along the X axis.  The bounds
@@ -1049,7 +1096,13 @@ public class MultiSplitLayout implements LayoutManager
           }
           else {
             if ((dividerChild != null) && dividerChild.isVisible()) {
-              childWidth = dividerChild.getBounds().getX() - x;
+              double cw = dividerChild.getBounds().getX() - x;
+              if ( cw > 0.0 )
+                childWidth = cw;
+              else {
+                childWidth = preferredNodeSize(splitChild).getWidth();
+                initSplit = true;
+              }
             }
             else {
               childWidth = split.getBounds().getMaxX() - x;
@@ -1058,7 +1111,7 @@ public class MultiSplitLayout implements LayoutManager
           childBounds = boundsWithXandWidth(bounds, x, childWidth);
           layout1(splitChild, childBounds);
           
-          if (getFloatingDividers() && (dividerChild != null) && dividerChild.isVisible()) {
+          if (( initSplit || getFloatingDividers()) && (dividerChild != null) && dividerChild.isVisible()) {
             double dividerX = childBounds.getMaxX();
             Rectangle dividerBounds;
             dividerBounds = boundsWithXandWidth(bounds, dividerX, dividerSize);
@@ -1093,7 +1146,13 @@ public class MultiSplitLayout implements LayoutManager
           }
           else {
             if ((dividerChild != null) && dividerChild.isVisible()) {
-              childHeight = dividerChild.getBounds().getY() - y;
+              double cy = dividerChild.getBounds().getY() - y;
+              if ( cy > 0.0 )
+                childHeight = cy;
+              else {
+                childHeight = preferredNodeSize(splitChild).getHeight();
+                initSplit = true;
+              }
             }
             else {
               childHeight = split.getBounds().getMaxY() - y;
@@ -1102,7 +1161,7 @@ public class MultiSplitLayout implements LayoutManager
           childBounds = boundsWithYandHeight(bounds, y, childHeight);
           layout1(splitChild, childBounds);
           
-          if (getFloatingDividers() && (dividerChild != null) && dividerChild.isVisible()) {
+          if (( initSplit || getFloatingDividers()) && (dividerChild != null) && dividerChild.isVisible()) {
             double dividerY = childBounds.getMaxY();
             Rectangle dividerBounds = boundsWithYandHeight(bounds, dividerY, dividerSize);
             dividerChild.setBounds(dividerBounds);
@@ -1125,7 +1184,7 @@ public class MultiSplitLayout implements LayoutManager
 
   /**
    * Get the layout mode
-   * @return the current layout mode
+   * @param layoutMode
    */
   public int getLayoutMode()
   {
