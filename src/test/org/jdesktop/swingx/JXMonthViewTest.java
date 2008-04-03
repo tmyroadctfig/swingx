@@ -22,6 +22,7 @@ package org.jdesktop.swingx;
 
 import java.awt.GraphicsEnvironment;
 import java.lang.reflect.InvocationTargetException;
+import java.text.DateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
@@ -35,6 +36,7 @@ import javax.swing.Action;
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 
+import org.jdesktop.swingx.JXMonthViewIssues.FixedLocaleSelectionModel;
 import org.jdesktop.swingx.calendar.CalendarUtils;
 import org.jdesktop.swingx.calendar.DateSelectionModel;
 import org.jdesktop.swingx.calendar.DaySelectionModel;
@@ -1244,9 +1246,15 @@ public class JXMonthViewTest extends MockObjectTestCase {
      * timezones.
      * Configure the monthView with a fixed timezone to clear up the mist ...
      * 
+     * This did fail on the server on 31mar2008, us/pacific timezone, en_US locale. 
+     * Trying to sim the context then. 
      */
     public void testTimeZoneChangeToday() {
-        JXMonthView monthView = new JXMonthView();
+        FixedLocaleSelectionModel model = new FixedLocaleSelectionModel();
+
+        
+        JXMonthView monthView = new JXMonthView(model.getCalendar().getTime(), model, model.getLocale());
+        monthView.setToday(model.getCalendar().getTime());
         // config with a known timezone and date
         TimeZone tz = TimeZone.getTimeZone("GMT+4");
         monthView.setTimeZone(tz);
@@ -1274,6 +1282,28 @@ public class JXMonthViewTest extends MockObjectTestCase {
         // in a shift into the opposite direction of the offset
         assertEquals("first displayed must be offset by real offset", 
                 realOffset,  monthView.getFirstDisplayedDay().getTime() - firstDisplayed.getTime());
+    }   
+
+    /**
+     * Try to track spurious timezone failures. Extended to mimic server
+     * context 31mar2008, us/pacific timezone, en_US locale. No luck...
+     */
+    public static class FixedLocaleSelectionModel extends DaySelectionModel {
+
+        @Override
+        public void setLocale(Locale locale) {
+            this.locale = new Locale("en", "US"); //Locale.US;
+            calendar = Calendar.getInstance(TimeZone.getTimeZone("US/Pacific"), this.locale);
+            calendar.set(2008, Calendar.MARCH, 31, 11, 45);
+            LOG.info("calendar timezone " + calendar.getTimeZone() 
+                    + "\n" + calendar + 
+                    "\n" + this.locale);
+            DateFormat format = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL, this.locale);
+            format.setTimeZone(calendar.getTimeZone());
+            LOG.info("" + format.format(calendar.getTime()));
+            fireValueChanged(EventType.CALENDAR_CHANGED);
+        }
+        
     }
 
     /**

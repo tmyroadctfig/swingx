@@ -25,10 +25,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.TimeZone;
 import java.util.logging.Logger;
 
@@ -39,6 +41,7 @@ import javax.swing.JComponent;
 
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.calendar.CalendarUtils;
+import org.jdesktop.swingx.calendar.DaySelectionModel;
 import org.jdesktop.swingx.calendar.DateSelectionModel.SelectionMode;
 import org.jdesktop.swingx.event.DateSelectionEvent.EventType;
 import org.jdesktop.swingx.test.DateSelectionReport;
@@ -258,6 +261,138 @@ public class JXMonthViewIssues extends InteractiveTestCase {
     
 //----------------------
 
+    /**
+     * Issue #618-swingx: JXMonthView displays problems with non-default
+     * timezones.
+     * 
+     * Here: test that the first displayed date is offset by offset diff of 
+     * timezones.
+     * Configure the monthView with a fixed timezone to clear up the mist ...
+     * 
+     */
+    public void testTimeZoneChangeToday() {
+        Locale componentDefault = JComponent.getDefaultLocale();
+        try {
+        FixedLocaleSelectionModel model = new FixedLocaleSelectionModel();
+        JComponent.setDefaultLocale(model.getLocale());
+        Locale.setDefault(model.getLocale());
+        Calendar modelCal = model.getCalendar();
+        Date fixed = modelCal.getTime();
+        
+
+        JXMonthView monthView = new JXMonthView(fixed, model);
+        Calendar myCal = monthView.getCalendar();
+//        myCal.setTimeInMillis(myCal.getTimeInMillis() + 2667600000l);
+        LOG.info("monthView timezone " + monthView.getTimeZone() 
+                + "\n" + myCal + 
+                "\n" + monthView.getLocale());
+        DateFormat format = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL, monthView.getLocale());
+        format.setTimeZone(myCal.getTimeZone());
+        LOG.info("" + format.format(myCal.getTime()));
+
+        
+        // config with a known timezone and date
+        TimeZone tz = TimeZone.getTimeZone("GMT+4");
+        Calendar calendar = Calendar.getInstance(tz);
+        calendar.set(2008, Calendar.MARCH, 31, 11, 45);
+        Date today = calendar.getTime();
+        
+        monthView.setTimeZone(tz);
+        monthView.setFirstDisplayedDay(today);
+        Date anchor = monthView.getAnchorDate();
+        assertEquals(today, anchor);
+        Date firstDisplayed = monthView.getFirstDisplayedDay();
+        calendar.setTime(firstDisplayed);
+        assertTrue(CalendarUtils.isStartOfMonth(calendar));
+        
+        // get another timezone with known offset
+        TimeZone tzOther = TimeZone.getTimeZone("GMT+7");
+        // newOffset minus oldOffset (real time, adjusted to DST)
+        int oldOffset = tz.getOffset(anchor.getTime());
+        int newOffset = tzOther.getOffset(anchor.getTime());
+        int realOffset = oldOffset - newOffset;
+        monthView.setTimeZone(tzOther);
+        Calendar otherCalendar = Calendar.getInstance(tzOther);
+        otherCalendar.setTime(monthView.getFirstDisplayedDay());
+        assertTrue(CalendarUtils.isStartOfMonth(otherCalendar));
+        // PENDING JW: sure this is the correct direction of the shift?
+        // yeah, think so: the anchor is fixed, moving the timezone results
+        // in a shift into the opposite direction of the offset
+        assertEquals("first displayed must be offset by real offset", 
+                realOffset,  monthView.getFirstDisplayedDay().getTime() - firstDisplayed.getTime());
+
+        } finally {
+            // reset componentLocale
+            JComponent.setDefaultLocale(componentDefault);
+            Locale.setDefault(componentDefault);
+        }
+        
+    }
+
+    /**
+     * Try to track spurious timezone failures. Extended to mimic server
+     * context 31mar2008, us/pacific timezone, en_US locale. No luck...
+     */
+    public static class FixedLocaleSelectionModel extends DaySelectionModel {
+
+        @Override
+        public void setLocale(Locale locale) {
+            this.locale = new Locale("en", "US"); //Locale.US;
+            calendar = Calendar.getInstance(TimeZone.getTimeZone("US/Pacific"), this.locale);
+            calendar.set(2008, Calendar.MARCH, 31, 11, 45);
+            LOG.info("calendar timezone " + calendar.getTimeZone() 
+                    + "\n" + calendar + 
+                    "\n" + this.locale);
+            DateFormat format = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL, this.locale);
+            format.setTimeZone(calendar.getTimeZone());
+            LOG.info("" + format.format(calendar.getTime()));
+            fireValueChanged(EventType.CALENDAR_CHANGED);
+        }
+        
+    }
+
+    /**
+     * Issue #618-swingx: JXMonthView displays problems with non-default
+     * timezones.
+     * 
+     * Here: test that the first displayed date is offset by offset diff of 
+     * timezones.
+     * Configure the monthView with a fixed timezone to clear up the mist ...
+     * 
+     */
+    public void testTimeZoneChangeOffsetFirstDisplayedDate() {
+        JXMonthView monthView = new JXMonthView();
+        // config with a known timezone and date
+        TimeZone tz = TimeZone.getTimeZone("GMT+4");
+        monthView.setTimeZone(tz);
+        Calendar calendar = Calendar.getInstance(tz);
+        Date today = calendar.getTime();
+        monthView.setFirstDisplayedDay(today);
+        Date anchor = monthView.getAnchorDate();
+        assertEquals(today, anchor);
+        Date firstDisplayed = monthView.getFirstDisplayedDay();
+        calendar.setTime(firstDisplayed);
+        assertTrue(CalendarUtils.isStartOfMonth(calendar));
+        
+        // get another timezone with known offset
+        TimeZone tzOther = TimeZone.getTimeZone("GMT+7");
+        // newOffset minus oldOffset (real time, adjusted to DST)
+        int oldOffset = tz.getOffset(anchor.getTime());
+        int newOffset = tzOther.getOffset(anchor.getTime());
+        int realOffset = oldOffset - newOffset;
+        monthView.setTimeZone(tzOther);
+        Calendar otherCalendar = Calendar.getInstance(tzOther);
+        otherCalendar.setTime(monthView.getFirstDisplayedDay());
+        assertTrue(CalendarUtils.isStartOfMonth(otherCalendar));
+        // PENDING JW: sure this is the correct direction of the shift?
+        // yeah, think so: the anchor is fixed, moving the timezone results
+        // in a shift into the opposite direction of the offset
+        assertEquals("first displayed must be offset by real offset", 
+                realOffset,  monthView.getFirstDisplayedDay().getTime() - firstDisplayed.getTime());
+    }
+    
+
+    
     /**
      * characterize what a weekinterval selection is meant to do.
      * MultipleIntervalSelection where each interval is one or more weeks?
