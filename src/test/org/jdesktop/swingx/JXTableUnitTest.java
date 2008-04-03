@@ -121,6 +121,20 @@ public class JXTableUnitTest extends InteractiveTestCase {
         UIManager.put("JXTable.rowHeight", uiTableRowHeight);
         super.tearDown();
     }
+
+    /**
+     * Issue #838-swingx: table.prepareRenderer adds bogey listener to column highlighter.
+     * 
+     */
+    public void testColumnHighlighterListener() {
+        JXTable table = new JXTable(10, 2);
+        ColorHighlighter highlighter = new ColorHighlighter();
+        table.getColumnExt(0).addHighlighter(highlighter);
+        int listenerCount = highlighter.getChangeListeners().length;
+        assertEquals(1, listenerCount);
+        table.prepareRenderer(table.getCellRenderer(0, 0), 0, 0);
+        assertEquals(listenerCount, highlighter.getChangeListeners().length);
+    }
     
     /**
      * Issue #767-swingx: consistent string representation.

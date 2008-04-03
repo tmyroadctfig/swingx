@@ -3698,10 +3698,14 @@ public class JXTable extends JTable
         TableColumnExt columnExt = getColumnExt(column);
         
         if (columnExt != null) {
-            CompoundHighlighter columnHighlighters
-                    = new CompoundHighlighter(columnExt.getHighlighters());
+            // JW: fix for #838 - artificial compound installs listener
+            for (Highlighter highlighter : columnExt.getHighlighters()) {
+                stamp = highlighter.highlight(stamp, adapter);
+                
+            }
+//            CompoundHighlighter columnHighlighters
+//                    = new CompoundHighlighter(columnExt.getHighlighters());
             
-            stamp = columnHighlighters.highlight(stamp, adapter);
         }
         
         return stamp;
