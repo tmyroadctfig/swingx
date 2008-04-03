@@ -1250,6 +1250,13 @@ public class JXMonthViewTest extends MockObjectTestCase {
      * Trying to sim the context then. 
      */
     public void testTimeZoneChangeToday() {
+        // PENDING JW: remove again...
+        // temporary debug log
+        Calendar localCal = Calendar.getInstance();
+        LOG.info("server locale: " + Locale.getDefault() 
+                + "\n server timezone: " + localCal.getTimeZone()
+                + "\n server local time: " + calendar.getTime());
+        
         FixedLocaleSelectionModel model = new FixedLocaleSelectionModel();
 
         
