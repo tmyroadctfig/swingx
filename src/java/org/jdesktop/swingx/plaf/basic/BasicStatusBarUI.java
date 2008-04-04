@@ -21,24 +21,182 @@
 
 package org.jdesktop.swingx.plaf.basic;
 
-import org.jdesktop.swingx.JXStatusBar;
-import org.jdesktop.swingx.JXStatusBar.Constraint;
-import org.jdesktop.swingx.plaf.StatusBarUI;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Insets;
+import java.awt.LayoutManager;
+import java.awt.LayoutManager2;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.Window;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.util.HashMap;
+import java.util.Map;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.JComponent;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.plaf.BorderUIResource;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.UIResource;
-import java.awt.*;
-import java.util.HashMap;
-import java.util.Map;
+
+import org.jdesktop.swingx.JXStatusBar;
+import org.jdesktop.swingx.JXStatusBar.Constraint;
+import org.jdesktop.swingx.plaf.StatusBarUI;
 
 /**
  *
  * @author rbair
+ * @author Karl Schaefer
  */
 public class BasicStatusBarUI extends StatusBarUI {
+    private class Handler implements MouseListener, MouseMotionListener, PropertyChangeListener {
+        private Window window = SwingUtilities.getWindowAncestor(statusBar);
+        private int handleBoundary = getHandleBoundary();
+        private boolean validPress = false;
+        private Point startingPoint;
+        
+        private int getHandleBoundary() {
+            Border border = statusBar.getBorder();
+            
+            if (border == null) {
+                return 0;
+            }
+            
+            if (statusBar.getComponentOrientation().isLeftToRight()) {
+                return border.getBorderInsets(statusBar).right;
+            } else {
+                return border.getBorderInsets(statusBar).left;
+            }
+        }
+        
+        private boolean isHandleAreaPoint(Point point) {
+            if (window == null || window.isMaximumSizeSet()) {
+                return false;
+            }
+            
+            if (statusBar.getComponentOrientation().isLeftToRight()) {
+                return point.x >= statusBar.getWidth() - handleBoundary;
+            } else {
+                return point.x <= handleBoundary;
+            }
+        }
+        
+        /**
+         * {@inheritDoc}
+         */
+        public void mouseClicked(MouseEvent e) {
+            //does nothing
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public void mouseEntered(MouseEvent e) {
+            if (isHandleAreaPoint(e.getPoint())) {
+                if (statusBar.getComponentOrientation().isLeftToRight()) {
+                    window.setCursor(Cursor.getPredefinedCursor(
+                            Cursor.SE_RESIZE_CURSOR));
+                } else {
+                    window.setCursor(Cursor.getPredefinedCursor(
+                            Cursor.SW_RESIZE_CURSOR));
+                }
+            } else {
+                window.setCursor(null);
+            }
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public void mouseExited(MouseEvent e) {
+            if (!validPress) {
+                window.setCursor(null);
+            }
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public void mousePressed(MouseEvent e) {
+            validPress = SwingUtilities.isLeftMouseButton(e) && isHandleAreaPoint(e.getPoint()); 
+            startingPoint = e.getPoint();
+            SwingUtilities.convertPointToScreen(startingPoint, statusBar);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public void mouseReleased(MouseEvent e) {
+            validPress = !SwingUtilities.isLeftMouseButton(e);
+            
+            window.setCursor(null);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public void mouseDragged(MouseEvent e) {
+            if (validPress) {
+                Rectangle wb = window.getBounds();
+                Point p = e.getPoint();
+                SwingUtilities.convertPointToScreen(p, statusBar);
+                
+                wb.height += (p.y - startingPoint.y);
+                if (statusBar.getComponentOrientation().isLeftToRight()) {
+                    wb.width += (p.x - startingPoint.x);
+                } else {
+                    wb.x += (p.x - startingPoint.x);
+                    wb.width += (startingPoint.x - p.x);
+                }
+                
+                window.setBounds(wb);
+                startingPoint = p;
+            }
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public void mouseMoved(MouseEvent e) {
+            if (isHandleAreaPoint(e.getPoint())) {
+                if (statusBar.getComponentOrientation().isLeftToRight()) {
+                    window.setCursor(Cursor.getPredefinedCursor(
+                            Cursor.SE_RESIZE_CURSOR));
+                } else {
+                    window.setCursor(Cursor.getPredefinedCursor(
+                            Cursor.SW_RESIZE_CURSOR));
+                }
+            } else {
+                window.setCursor(null);
+            }
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public void propertyChange(PropertyChangeEvent evt) {
+            if ("ancestor".equals(evt.getPropertyName())) {
+                window = SwingUtilities.getWindowAncestor(statusBar);
+            } else if ("border".equals(evt.getPropertyName())) {
+                handleBoundary = getHandleBoundary();
+            } else if ("componentOrientation".equals(evt.getPropertyName())) {
+                handleBoundary = getHandleBoundary();
+            }
+        }
+    }
+    
     public static final String AUTO_ADD_SEPARATOR = new StringBuffer("auto-add-separator").toString();
     /**
      * Used to help reduce the amount of trash being generated
@@ -48,6 +206,14 @@ public class BasicStatusBarUI extends StatusBarUI {
      * The one and only JXStatusBar for this UI delegate
      */
     protected JXStatusBar statusBar;
+    
+    protected MouseListener mouseListener;
+    
+    protected MouseMotionListener mouseMotionListener;
+    
+    protected PropertyChangeListener propertyChangeListener;
+    
+    private Handler handler;
     
     /** Creates a new instance of BasicStatusBarUI */
     public BasicStatusBarUI() {
@@ -98,7 +264,73 @@ public class BasicStatusBarUI extends StatusBarUI {
         }
     }
     
-    protected void installListeners(JXStatusBar sb) { }
+    private Handler getHandler() {
+        if (handler == null) {
+            handler = new Handler();
+        }
+        
+        return handler;
+    }
+    
+    /**
+     * Creates a {@code MouseListener} which will be added to the 
+     * status bar. If this method returns null then it will not 
+     * be added to the status bar.
+     * <p>
+     * Subclasses may override this method to return instances of their own
+     * MouseEvent handlers.
+     *
+     * @return an instance of a {@code MouseListener} or null
+     */
+    protected MouseListener createMouseListener() {
+        return getHandler();
+    }
+    
+    /**
+     * Creates a {@code MouseMotionListener} which will be added to the 
+     * status bar. If this method returns null then it will not 
+     * be added to the status bar.
+     * <p>
+     * Subclasses may override this method to return instances of their own
+     * MouseEvent handlers.
+     *
+     * @return an instance of a {@code MouseMotionListener} or null
+     */
+    protected MouseMotionListener createMouseMotionListener() {
+        return getHandler();
+    }
+    
+    /**
+     * Creates a {@code PropertyChangeListener} which will be added to the 
+     * status bar. If this method returns null then it will not 
+     * be added to the status bar.
+     * <p>
+     * Subclasses may override this method to return instances of their own
+     * PropertyChangeEvent handlers.
+     *
+     * @return an instance of a {@code PropertyChangeListener} or null
+     */
+    protected PropertyChangeListener createPropertyChangeListener() {
+        return getHandler();
+    }
+    
+    /**
+     * Create and install the listeners for the status bar.
+     * This method is called when the UI is installed.
+     */
+    protected void installListeners(JXStatusBar sb) {
+        if ((mouseListener = createMouseListener()) != null) {
+            statusBar.addMouseListener(mouseListener);
+        }
+        
+        if ((mouseMotionListener = createMouseMotionListener()) != null) {
+            statusBar.addMouseMotionListener(mouseMotionListener);
+        }
+        
+        if ((propertyChangeListener = createPropertyChangeListener()) != null) {
+            statusBar.addPropertyChangeListener(propertyChangeListener);
+        }
+    }
     
     /**
      * {@inheritDoc}
@@ -113,7 +345,25 @@ public class BasicStatusBarUI extends StatusBarUI {
     }
     
     protected void uninstallDefaults(JXStatusBar sb) { }
-    protected void uninstallListeners(JXStatusBar sb) { }
+    
+    /**
+     * Remove the installed listeners from the status bar.
+     * The number and types of listeners removed in this method should be
+     * the same that were added in <code>installListeners</code>
+     */
+    protected void uninstallListeners(JXStatusBar sb) {
+        if (mouseListener != null) {
+            statusBar.removeMouseListener(mouseListener);
+        }
+        
+        if (mouseMotionListener != null) {
+            statusBar.removeMouseMotionListener(mouseMotionListener);
+        }
+        
+        if (propertyChangeListener != null) {
+            statusBar.removePropertyChangeListener(propertyChangeListener);
+        }
+    }
     
     @Override
     public void paint(Graphics g, JComponent c) {
