@@ -41,9 +41,10 @@ public class JXCollapsiblePaneBeanInfo extends BeanInfoSupport {
         bd.setValue("isContainer", Boolean.TRUE);
         bd.setValue("containerDelegate", "getContentPane");
         
-        setPreferred(true, "animated", "collapsed", "orientation");
-        setBound(true, "animated", "collapsed", "orientation");
+        setPreferred(true, "animated", "collapsed", "orientation", "direction");
+        setBound(true, "animated", "collapsed", "orientation", "direction");
         setPropertyEditor(OrientationPropertyEditor.class, "orientation");
+        setPropertyEditor(DirectionPropertyEditor.class, "direction");
     }
 
     public static final class OrientationPropertyEditor extends EnumPropertyEditor<JXCollapsiblePane.Orientation> {
@@ -52,4 +53,9 @@ public class JXCollapsiblePaneBeanInfo extends BeanInfoSupport {
         }
     }
 
+    public static final class DirectionPropertyEditor extends EnumPropertyEditor<JXCollapsiblePane.Direction> {
+    	public DirectionPropertyEditor() {
+    		super(JXCollapsiblePane.Direction.class);
+    	}
+    }
 }

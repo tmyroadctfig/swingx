@@ -154,12 +154,16 @@ import javax.swing.border.Border;
  *
  * @author rbair (from the JDNC project)
  * @author <a href="mailto:fred@L2FProd.com">Frederic Lavigne</a>
+ * @author Karl George Schaefer
  */
 public class JXCollapsiblePane extends JXPanel {
     /**
      * The orientation defines in which direction the collapsible pane will
      * expand.
+     * 
+     * @deprecated use {@link Direction}
      */
+    @Deprecated
     public enum Orientation {
         /**
          * The horizontal orientation makes the collapsible pane
@@ -174,15 +178,62 @@ public class JXCollapsiblePane extends JXPanel {
     }
 
     /**
-     * Used when generating PropertyChangeEvents for the "animationState"
-     * property. The PropertyChangeEvent will takes the following different values
-     * for {@link PropertyChangeEvent#getNewValue()}:
-     * <ul>
-     * <li><code>reinit</code> every time the animation starts
-     * <li><code>expanded</code> when the animation ends and the pane is expanded
-     * <li><code>collapsed</code> when the animation ends and the pane is collapsed
-     * </ul>
+     * The direction defines how the collapsible pane will collapse. The
+     * constant names were designed by choosing a fixed point and then
+     * determining the collapsing direction from that fixed point. This means
+     * {@code RIGHT} expands to the right and this is probably the best
+     * expansion for a component in {@link BorderLayout#EAST}.
      */
+    public enum Direction {
+        /**
+         * Collapses left. Suitable for {@link BorderLayout#WEST}.
+         */
+        LEFT(false),
+
+        /**
+         * Collapses right. Suitable for {@link BorderLayout#EAST}.
+         */
+        RIGHT(false),
+
+        /**
+         * Collapses up. Suitable for {@link BorderLayout#NORTH}.
+         */
+        UP(true),
+
+        /**
+         * Collapses down. Suitable for {@link BorderLayout#SOUTH}.
+         */
+        DOWN(true);
+
+        private final boolean vertical;
+
+        private Direction(boolean vertical) {
+            this.vertical = vertical;
+        }
+
+        /**
+         * Gets the orientation for this direction.
+         * 
+         * @return {@code true} if the direction is vertical, {@code false}
+         *         otherwise
+         */
+        public boolean isVertical() {
+            return vertical;
+        }
+    }
+    
+    /**
+	 * Used when generating PropertyChangeEvents for the "animationState"
+	 * property. The PropertyChangeEvent will takes the following different
+	 * values for {@link PropertyChangeEvent#getNewValue()}:
+	 * <ul>
+	 * <li><code>reinit</code> every time the animation starts
+	 * <li><code>expanded</code> when the animation ends and the pane is
+	 * expanded
+	 * <li><code>collapsed</code> when the animation ends and the pane is
+	 * collapsed
+	 * </ul>
+	 */
     public final static String ANIMATION_STATE_KEY = "animationState";
 
     /**
@@ -212,7 +263,7 @@ public class JXCollapsiblePane extends JXPanel {
     /**
      * Defines the orientation of the component.
      */
-    private Orientation orientation = Orientation.VERTICAL;
+    private Direction direction = Direction.UP;
 
     /**
      * Timer used for doing the transparency animation (fade-in)
@@ -225,20 +276,34 @@ public class JXCollapsiblePane extends JXPanel {
     private AnimationParams animationParams;
 
     /**
-     * Constructs a new JXCollapsiblePane with a {@link JPanel} as content pane
+     * Constructs a new JXCollapsiblePane with a {@link JXPanel} as content pane
      * and a vertical {@link VerticalLayout} with a gap of 2 pixels as layout
      * manager and a vertical orientation.
      */
     public JXCollapsiblePane() {
-        this(Orientation.VERTICAL, new BorderLayout(0, 0));
+        this(Direction.UP, new BorderLayout(0, 0));
     }
 
     /**
-     * Constructs a new JXCollapsiblePane with a {@link JPanel} as content pane
+     * Constructs a new JXCollapsiblePane with a {@link JXPanel} as content pane
      * and the specified orientation.
+     * 
+     * @deprecated use {@link #JXCollapsiblePane(Direction)}
      */
+    @Deprecated
     public JXCollapsiblePane(Orientation orientation) {
         this(orientation, new BorderLayout(0, 0));
+    }
+    
+    /**
+     * Constructs a new JXCollapsiblePane with a {@link JXPanel} as content pane and the specified
+     * direction.
+     * 
+     * @param direction
+     *                the direction to collapse the container
+     */
+    public JXCollapsiblePane(Direction direction) {
+        this(direction, new BorderLayout(0, 0));
     }
 
     /**
@@ -246,7 +311,7 @@ public class JXCollapsiblePane extends JXPanel {
      * and the given LayoutManager and a vertical orientation
      */
     public JXCollapsiblePane(LayoutManager layout) {
-        this(Orientation.VERTICAL, layout);
+        this(Direction.UP, layout);
     }
 
     /**
@@ -255,22 +320,52 @@ public class JXCollapsiblePane extends JXPanel {
      * a vertical {@link VerticalLayout} with a gap of 2 pixels as layout
      * manager. A horizontal orientation enables a horizontal
      * {@link HorizontalLayout} with a gap of 2 pixels as layout manager
+     * 
+     * @deprecated use {@link #JXCollapsiblePane(Direction, LayoutManager)}
      */
+    @Deprecated
     public JXCollapsiblePane(Orientation orientation, LayoutManager layout) {
+    	this(getDirection(orientation), layout);
+    }
+    	
+    /**
+	 * @deprecated only used to convent orientation to direction, remove with
+	 *             orientation
+	 */
+    @Deprecated
+    private static Direction getDirection(Orientation orientation) {
+    	switch (orientation) {
+		case HORIZONTAL:
+			return Direction.DOWN;
+		case VERTICAL:
+			return Direction.UP;
+		default:
+			throw new IllegalStateException();
+		}
+    }
+    
+	/**
+	 * Constructs a new JXCollapsiblePane with a {@link JPanel} as content pane
+	 * and the given LayoutManager and orientation. A vertical orientation
+	 * enables a vertical {@link VerticalLayout} with a gap of 2 pixels as
+	 * layout manager. A horizontal orientation enables a horizontal
+	 * {@link HorizontalLayout} with a gap of 2 pixels as layout manager
+	 * 
+	 * @param direction
+	 *            the direction this pane collapses
+	 * @param layout
+	 *            of this collapsible pane
+	 */
+	public JXCollapsiblePane(Direction direction, LayoutManager layout) {
         super.setLayout(layout);
 
-        this.orientation = orientation;
-
-        JXPanel panel = new JXPanel();
-        if (orientation == Orientation.VERTICAL) {
-            panel.setLayout(new VerticalLayout(2));
-        } else {
-            panel.setLayout(new HorizontalLayout(2));
-        }
-        setContentPane(panel);
-
+        this.direction = direction;
         animator = new AnimationListener();
         setAnimationParams(new AnimationParams(30, 8, 0.01f, 1.0f));
+
+        JXPanel panel = new JXPanel();
+        setContentPane(panel);
+        setDirection(direction);
 
         // add an action to automatically toggle the state of the pane
         getActionMap().put(TOGGLE_ACTION, new ToggleAction());
@@ -445,35 +540,70 @@ public class JXCollapsiblePane extends JXPanel {
      * @param orientation the new {@link Orientation} for this collapsible pane
      * @throws IllegalStateException when this method is called while a
      *                               collapsing/restore operation is running
+     * @deprecated
      * @javabean.property
      *    bound="true"
      *    preferred="true"
      */
+    @Deprecated
     public void setOrientation(Orientation orientation) {
-        if (orientation != this.orientation) {
-            if (animateTimer.isRunning()) {
-                throw new IllegalStateException("Orientation cannot be changed " +
-                    "during collapsing.");
-            }
-
-            this.orientation = orientation;
-
-            if (orientation == Orientation.VERTICAL) {
-                getContentPane().setLayout(new VerticalLayout(2));
-            } else {
-                getContentPane().setLayout(new HorizontalLayout(2));
-            }
-        }
+    	setDirection(getDirection(orientation));
+    }
+    
+    /**
+     * @see #setOrientation(Orientation)
+     * @return the current {@link Orientation}
+     * @deprecated
+     */
+    @Deprecated
+    public Orientation getOrientation() {
+        return direction.isVertical() ? Orientation.VERTICAL : Orientation.HORIZONTAL;
+    }
+    
+    /**
+     * Changes the direction of this collapsible pane. Doing so changes the
+     * layout of the underlying content pane. If the chosen direction is
+     * vertical, a vertical layout with a gap of 2 pixels is chosen. Otherwise,
+     * a horizontal layout with a gap of 2 pixels is chosen.
+     *
+     * @see #getDirection()
+     * @param direction the new {@link Direction} for this collapsible pane
+     * @throws IllegalStateException when this method is called while a
+     *                               collapsing/restore operation is running
+     * @javabean.property
+     *    bound="true"
+     *    preferred="true"
+     */
+    public void setDirection(Direction direction) {
+    	if (animateTimer.isRunning()) {
+    		throw new IllegalStateException("cannot be change direction while collapsing.");
+    	}
+    	
+    	Direction oldValue = getDirection();
+    	this.direction = direction;
+    	
+    	if (direction.isVertical()) {
+    		getContentPane().setLayout(new VerticalLayout(2));
+    	} else {
+    		getContentPane().setLayout(new HorizontalLayout(2));
+    	}
+    	
+    	firePropertyChange("direction", oldValue, getDirection());
+    	firePropertyChange("orientation",
+				oldValue.isVertical() ? Orientation.VERTICAL
+						: Orientation.HORIZONTAL,
+				getDirection().isVertical() ? Orientation.VERTICAL
+						: Orientation.HORIZONTAL);
     }
     
     /**
      * @see #setOrientation(Orientation)
      * @return the current {@link Orientation}
      */
-    public Orientation getOrientation() {
-        return orientation;
+    public Direction getDirection() {
+    	return direction;
     }
-
+    
     /**
      * @return true if the pane is collapsed, false if expanded
      */
@@ -507,16 +637,16 @@ public class JXCollapsiblePane extends JXPanel {
             collapsed = val;
             if (isAnimated()) {
                 if (collapsed) {
-                    int dimension = orientation == Orientation.VERTICAL ?
+                    int dimension = direction.isVertical() ?
                                     wrapper.getHeight() : wrapper.getWidth();
                     setAnimationParams(new AnimationParams(30,
                                                            Math.max(8, dimension / 10), 1.0f, 0.01f));
                     animator.reinit(dimension, 0);
                     animateTimer.start();
                 } else {
-                    int dimension = orientation == Orientation.VERTICAL ?
+                    int dimension = direction.isVertical() ?
                                     wrapper.getHeight() : wrapper.getWidth();
-                    int preferredDimension = orientation == Orientation.VERTICAL ?
+                    int preferredDimension = direction.isVertical() ?
                                              getContentPane().getPreferredSize().height :
                                              getContentPane().getPreferredSize().width;
                     int delta = Math.max(8, preferredDimension / 10);
@@ -584,13 +714,13 @@ public class JXCollapsiblePane extends JXPanel {
          */
         Dimension dim = getContentPane().getPreferredSize();
         if (currentDimension != -1) {
-                if (orientation == Orientation.VERTICAL) {
+                if (direction.isVertical()) {
                     dim.height = currentDimension;
                 } else {
                     dim.width = currentDimension;
                 }
         } else if(wrapper.collapsedState) {
-            if (orientation == Orientation.VERTICAL) {
+            if (direction.isVertical()) {
                 dim.height = 0;
             } else {
                 dim.width = 0;
@@ -727,7 +857,7 @@ public class JXCollapsiblePane extends JXPanel {
                 final int delta = contracting?-1 * animationParams.delta
                                   :animationParams.delta;
                 int newDimension;
-                if (orientation == Orientation.VERTICAL) {
+                if (direction.isVertical()) {
                     newDimension = wrapper.getHeight() + delta;
                 } else {
                     newDimension = wrapper.getWidth() + delta;
@@ -742,7 +872,7 @@ public class JXCollapsiblePane extends JXPanel {
                     }
                 }
                 int dimension;
-                if (orientation == Orientation.VERTICAL) {
+                if (direction.isVertical()) {
                     dimension = wrapper.getView().getPreferredSize().height;
                 } else {
                     dimension = wrapper.getView().getPreferredSize().width;
@@ -751,11 +881,17 @@ public class JXCollapsiblePane extends JXPanel {
 
                 Rectangle bounds = wrapper.getBounds();
 
-                if (orientation == Orientation.VERTICAL) {
+                if (direction.isVertical()) {
                     int oldHeight = bounds.height;
                     bounds.height = newDimension;
                     wrapper.setBounds(bounds);
-                    wrapper.setViewPosition(new Point(0, wrapper.getView().getPreferredSize().height - newDimension));
+                    
+                    if (direction == Direction.DOWN) {
+                    	wrapper.setViewPosition(new Point(0, wrapper.getView().getPreferredSize().height - newDimension));
+                    } else {
+                    	wrapper.setViewPosition(new Point(0, newDimension));
+                    }
+                    
                     bounds = getBounds();
                     bounds.height = (bounds.height - oldHeight) + newDimension;
                     currentDimension = bounds.height;
@@ -763,7 +899,13 @@ public class JXCollapsiblePane extends JXPanel {
                     int oldWidth = bounds.width;
                     bounds.width = newDimension;
                     wrapper.setBounds(bounds);
-                    wrapper.setViewPosition(new Point(wrapper.getView().getPreferredSize().width - newDimension, 0));
+                    
+                    if (direction == Direction.RIGHT) {
+                    	wrapper.setViewPosition(new Point(wrapper.getView().getPreferredSize().width - newDimension, 0));
+                    } else {
+                    	wrapper.setViewPosition(new Point(newDimension, 0));
+                    }
+                    
                     bounds = getBounds();
                     bounds.width = (bounds.width - oldWidth) + newDimension;
                     currentDimension = bounds.width;
