@@ -21,6 +21,7 @@
 package org.jdesktop.swingx.renderer;
 
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 
 import org.jdesktop.swingx.JXHyperlink;
@@ -191,23 +192,6 @@ public class HyperlinkProvider
 
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected JXHyperlink createRendererComponent() {
-        return new JXHyperlink() {
-
-            @Override
-            public void updateUI() {
-                super.updateUI();
-                setBorderPainted(true);
-                setOpaque(true);
-            }
-            
-        };
-    }
-
-    /**
      * {@inheritDoc} <p>
      * 
      * Overridden to set the hyperlink's rollover state. 
@@ -220,9 +204,11 @@ public class HyperlinkProvider
                     .getClientProperty(RolloverProducer.ROLLOVER_KEY);
             if (/*hasFocus || */(p != null && (p.x >= 0) && 
                     (p.x == context.getColumn()) && (p.y == context.getRow()))) {
+                if (!rendererComponent.getModel().isRollover())
                  rendererComponent.getModel().setRollover(true);
             } else {
-                rendererComponent.getModel().setRollover(false);
+                if (rendererComponent.getModel().isRollover())
+                 rendererComponent.getModel().setRollover(false);
             }
         }
     }
@@ -247,9 +233,113 @@ public class HyperlinkProvider
             linkAction.setTarget(null);
         }
         // hmm... the hyperlink should do this automatically..
-        rendererComponent.setForeground(linkAction.isVisited() ? 
+//        if (!context.isSelected())
+            rendererComponent.setForeground(linkAction.isVisited() ? 
                 rendererComponent.getClickedColor() : rendererComponent.getUnclickedColor());
         
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected JXHyperlink createRendererComponent() {
+        // PENDING JW: extract into a standalone class (like JRendererLabel)
+        return new JXHyperlink() {
+
+            @Override
+            public void updateUI() {
+                super.updateUI();
+                setBorderPainted(true);
+                setOpaque(true);
+            }
+            /**
+             * {@inheritDoc} <p>
+             * 
+             * Overridden to not automatically de/register itself from/to the ToolTipManager.
+             * As rendering component it is not considered to be active in any way, so the
+             * manager must not listen. 
+             */
+            @Override
+            public void setToolTipText(String text) {
+                putClientProperty(TOOL_TIP_TEXT_KEY, text);
+            }
+            
+            /**
+             * Overridden for performance reasons.
+             * See the <a href="#override">Implementation Note</a> 
+             * for more information.
+             *
+             * @since 1.5
+             */
+            @Override
+            public void invalidate() {}
+
+            /**
+             * Overridden for performance reasons.
+             * See the <a href="#override">Implementation Note</a> 
+             * for more information.
+             */
+            @Override
+            public void validate() {}
+
+            /**
+             * Overridden for performance reasons.
+             * See the <a href="#override">Implementation Note</a> 
+             * for more information.
+             */
+            @Override
+            public void revalidate() {}
+
+            /**
+             * Overridden for performance reasons.
+             * See the <a href="#override">Implementation Note</a> 
+             * for more information.
+             */
+            @Override
+            public void repaint(long tm, int x, int y, int width, int height) {}
+
+            /**
+             * Overridden for performance reasons.
+             * See the <a href="#override">Implementation Note</a> 
+             * for more information.
+             */
+            @Override
+            public void repaint(Rectangle r) { }
+
+            /**
+             * Overridden for performance reasons.
+             * See the <a href="#override">Implementation Note</a> 
+             * for more information.
+             *
+             * @since 1.5
+             */
+            @Override
+            public void repaint() {
+            }
+
+            /**
+             * Overridden for performance reasons.
+             * See the <a href="#override">Implementation Note</a> 
+             * for more information.
+             */
+            @Override
+            protected void firePropertyChange(String propertyName, Object oldValue, Object newValue) {  
+                // Strings get interned...
+                if ("text".equals(propertyName)) {
+                    super.firePropertyChange(propertyName, oldValue, newValue);
+                }
+            }
+
+            /**
+             * Overridden for performance reasons.
+             * See the <a href="#override">Implementation Note</a> 
+             * for more information.
+             */
+            @Override
+            public void firePropertyChange(String propertyName, boolean oldValue, boolean newValue) { }
+            
+        };
     }
 
 

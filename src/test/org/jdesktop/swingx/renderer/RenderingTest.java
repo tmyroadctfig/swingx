@@ -23,6 +23,7 @@ package org.jdesktop.swingx.renderer;
 
 import java.awt.Dimension;
 import java.awt.Point;
+import java.awt.event.ActionEvent;
 import java.awt.event.MouseListener;
 import java.text.DateFormat;
 import java.util.logging.Logger;
@@ -37,9 +38,11 @@ import javax.swing.tree.DefaultMutableTreeNode;
 
 import junit.framework.TestCase;
 
+import org.jdesktop.swingx.JXHyperlink;
 import org.jdesktop.swingx.JXPanel;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.JXTreeTable;
+import org.jdesktop.swingx.action.LinkAction;
 import org.jdesktop.swingx.painter.ShapePainter;
 import org.jdesktop.swingx.table.TableColumnExt;
 import org.jdesktop.swingx.test.ComponentTreeTableModel;
@@ -169,11 +172,42 @@ public class RenderingTest extends TestCase {
         TestUtils.assertPropertyChangeEvent(report, JComponent.TOOL_TIP_TEXT_KEY, null, tip);
         assertToolTipManagerNotRegistered(label);
     }
-    
+
     /**
+     * Issue #790-swingx: rendering comps must not be registered with the
+     * tooltip manager.
+     * 
+     * Here: Hyperlink in provider
+     */
+    public void testToolTipManagerHyperlinkProvider() {
+        LinkAction linkAction = new LinkAction() {
+
+            public void actionPerformed(ActionEvent e) {
+                // do nothing
+            }
+
+            @Override
+            protected void installTarget() {
+                super.installTarget();
+                setShortDescription(getName());
+            }
+
+        };
+        HyperlinkProvider provider = new HyperlinkProvider(linkAction,
+                Object.class);
+        CellContext context = new TableCellContext();
+        context.replaceValue("dummy");
+        JXHyperlink label = provider.getRendererComponent(context);
+        assertEquals("sanity - tooltip is set to value", "dummy", label
+                .getToolTipText());
+        assertToolTipManagerNotRegistered(label);
+    }
+
+
+   /**
      * Issue #790-swingx: rendering comps must not be registered with the tooltip manager.
      * 
-     * Here: JRendererCheckBox
+     * Here: JRendererCheckBox-
      */
     public void testToolTipManagerRendererCheckBox() {
        JRendererCheckBox label = new JRendererCheckBox();
