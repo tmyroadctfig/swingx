@@ -12,7 +12,10 @@ import java.awt.Component;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
+import javax.swing.Icon;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JTextField;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
@@ -22,6 +25,7 @@ import org.jdesktop.swingx.decorator.HighlighterFactory.UIColorHighlighter;
 import org.jdesktop.swingx.painter.MattePainter;
 import org.jdesktop.swingx.painter.Painter;
 import org.jdesktop.swingx.renderer.JRendererLabel;
+import org.jdesktop.swingx.test.XTestUtils;
 import org.jdesktop.test.ChangeReport;
 
 /**
@@ -165,6 +169,57 @@ public class HighlighterTest extends InteractiveTestCase {
         assertEquals(selectedBackground, allColored.getBackground());
     }
 
+//-------------- IconHighlighter
+
+    public void testIconHighlighterNotHighlightUnable() {
+        Icon icon = XTestUtils.loadDefaultIcon();
+        JTextField allColored = new JTextField();
+        IconHighlighter hl = new IconHighlighter(icon);
+        ComponentAdapter adapter = createDummyComponentAdapter(allColored);
+        assertNotNull(hl.highlight(allColored, adapter));
+    }
+
+
+    public void testIconHighlighterNotHighlight() {
+        Icon icon = XTestUtils.loadDefaultIcon();
+        allColored.setIcon(icon);
+        IconHighlighter hl = new IconHighlighter();
+        assertNotNull(hl.highlight(allColored, createComponentAdapter(allColored)));
+        assertEquals(icon, allColored.getIcon());
+    }
+
+    public void testIconHighlighterHighlight() {
+        Icon icon = XTestUtils.loadDefaultIcon();
+        IconHighlighter hl = new IconHighlighter(icon);
+        assertNotNull(hl.highlight(allColored, createComponentAdapter(allColored)));
+        assertEquals(icon, allColored.getIcon());
+    }
+    
+    public void testIconHighlightChangeIcon() {
+        IconHighlighter hl = new IconHighlighter();
+        Icon icon = XTestUtils.loadDefaultIcon();
+        ChangeReport report = new ChangeReport();
+        hl.addChangeListener(report);
+        hl.setIcon(icon);
+        assertEquals(icon, hl.getIcon());
+        assertEquals(1, report.getEventCount());
+    }
+    public void testIconHighlighterConstructors() {
+        IconHighlighter empty = new IconHighlighter();
+        assertIconHighlighter(empty, HighlightPredicate.ALWAYS, null);
+        IconHighlighter never = new IconHighlighter(HighlightPredicate.NEVER);
+        assertIconHighlighter(never, HighlightPredicate.NEVER, null);
+        Icon icon = XTestUtils.loadDefaultIcon();
+        IconHighlighter withIcon = new IconHighlighter(icon);
+        assertIconHighlighter(withIcon, HighlightPredicate.ALWAYS, icon);
+        IconHighlighter complete = new IconHighlighter(HighlightPredicate.NEVER, icon);
+        assertIconHighlighter(complete, HighlightPredicate.NEVER, icon);
+    }
+    
+    private void assertIconHighlighter(IconHighlighter hl, HighlightPredicate predicate, Icon icon) {
+        assertEquals(predicate, hl.getHighlightPredicate());
+        assertEquals(icon, hl.getIcon());
+    }
 //-------------- BorderHighlighter
     
     public void testBorderPaddingNull() {
@@ -658,5 +713,54 @@ public class HighlighterTest extends InteractiveTestCase {
         };
         return adapter;
     }
-    
+ 
+    private ComponentAdapter createDummyComponentAdapter(JComponent allColored) {
+        ComponentAdapter adapter = new ComponentAdapter(allColored) {
+
+            @Override
+            public Object getFilteredValueAt(int row, int column) {
+                // TODO Auto-generated method stub
+                return null;
+            }
+
+            @Override
+            public Object getValueAt(int row, int column) {
+                // TODO Auto-generated method stub
+                return null;
+            }
+
+            @Override
+            public boolean hasFocus() {
+                // TODO Auto-generated method stub
+                return false;
+            }
+
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                // TODO Auto-generated method stub
+                return false;
+            }
+
+            @Override
+            public boolean isEditable() {
+                // TODO Auto-generated method stub
+                return false;
+            }
+
+            @Override
+            public boolean isSelected() {
+                // TODO Auto-generated method stub
+                return false;
+            }
+
+            @Override
+            public void setValueAt(Object value, int row, int column) {
+                // TODO Auto-generated method stub
+                
+            }
+            
+        };
+        return adapter;
+    }
+
 }

@@ -63,23 +63,6 @@ public class RenderingTest extends TestCase {
     private static final Logger LOG = Logger.getLogger(RenderingTest.class
             .getName());
 
-    /**
-     * Issue #840-swingx: hyperlink foreground unreadable for dark selection colors.
-     * 
-     * Test that selected foreground is same as table. 
-     */
-    public void testHyperlinkProviderForeground() {
-        JXTable table = new JXTable(20, 2);
-        HyperlinkProvider provider = new HyperlinkProvider();
-        JXHyperlink hyperlink = provider.getRendererComponent(null);
-        Color unclicked = hyperlink.getUnclickedColor();
-        table.setDefaultRenderer(Object.class, new DefaultTableRenderer(provider));
-        table.prepareRenderer(table.getCellRenderer(0, 0), 0, 0);
-        assertEquals("hyperlink foreground set to unclicked", unclicked, hyperlink.getForeground());
-        table.setRowSelectionInterval(0, 0);
-        assertEquals("hyperlink foreground set to table's selection foreground", 
-                table.getSelectionForeground(), hyperlink.getForeground());
-    }
     
     public void testWrappingProviderUnwrapContructor() {
         WrappingProvider provider = new WrappingProvider(new LabelProvider(), false);
