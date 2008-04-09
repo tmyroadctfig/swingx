@@ -219,9 +219,12 @@ public class HyperlinkProvider
      * Overridden to set the LinkAction's target to the context's value, if 
      * targetable.<p>
      * 
-     * PENDING: Forces foreground color
-     * to those defined by hyperlink - this should happen automatically? Hyperlink
-     * bug?
+     * Forces foreground color to the one defined by hyperlink for unselected
+     * cells, doesn't change the foreground for selected (as darkish text on dark selection
+     * background might be unreadable, Issue #840-swingx). Not entirely safe because
+     * the unselected background might be dark as well. Need to find a better way in
+     * the long run. Until then, client code can use Highlighters to repair 
+     * (which is nasty!). 
      * 
      */
     @Override
@@ -233,7 +236,9 @@ public class HyperlinkProvider
             linkAction.setTarget(null);
         }
         // hmm... the hyperlink should do this automatically..
-//        if (!context.isSelected())
+        // Issue #840-swingx: hyperlink unreadable if selected (for dark selection colors)
+        // so we only force clicked/unclicked if unselected 
+        if (!context.isSelected())
             rendererComponent.setForeground(linkAction.isVisited() ? 
                 rendererComponent.getClickedColor() : rendererComponent.getUnclickedColor());
         
