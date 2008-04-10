@@ -187,9 +187,29 @@ public class HyperlinkProvider
         rendererComponent.doClick();
     }
     
-//------------------------ TableCellRenderer
+//------------------------ ComponentProvider 
     
+    /**
+     * {@inheritDoc} <p>
+     * 
+     * PENDING JW: Needs to be overridden - doesn't comply to contract!. Not sure
+     * how to do it without disturbing the hyperlinks current setting?
+     * All hyperlink properties are defined by the LinkAction configured
+     * with the target ...  
+     */
+    @Override
+    public String getString(Object value) {
+        if (isTargetable(value)) {
+            Object oldTarget = linkAction.getTarget();
+            linkAction.setTarget(value);
+            String text = linkAction.getName();
+            linkAction.setTarget(oldTarget);
+            return text;
+        }
+        return super.getString(value);
+    }
 
+   
 
     /**
      * {@inheritDoc} <p>
@@ -224,7 +244,10 @@ public class HyperlinkProvider
      * background might be unreadable, Issue #840-swingx). Not entirely safe because
      * the unselected background might be dark as well. Need to find a better way in
      * the long run. Until then, client code can use Highlighters to repair 
-     * (which is nasty!). 
+     * (which is nasty!). <p>
+     * 
+     * PENDING JW: by-passes XXValues - state currently is completely defined by
+     * the action. Hmm ... 
      * 
      */
     @Override

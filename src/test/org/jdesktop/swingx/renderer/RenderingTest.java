@@ -63,6 +63,30 @@ public class RenderingTest extends TestCase {
     private static final Logger LOG = Logger.getLogger(RenderingTest.class
             .getName());
 
+    /**
+     * Issue #842-swingx: HyperlinkProvider getString doesn't serve its contract.
+     * 
+     */
+    public void testHyperlinkStringValue() {
+        LinkAction linkAction = new LinkAction() {
+
+            public void actionPerformed(ActionEvent e) {
+                // nothing
+            }
+
+            @Override
+            protected void installTarget() {
+                setName("pref" + String.valueOf(target));
+            }
+            
+            
+        };
+        HyperlinkProvider provider = new HyperlinkProvider(linkAction, Object.class);
+        Object target = null;
+        assertEquals("pref" + String.valueOf(target), provider.getString(target));
+    }
+    
+
     
     public void testWrappingProviderUnwrapContructor() {
         WrappingProvider provider = new WrappingProvider(new LabelProvider(), false);

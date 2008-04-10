@@ -26,6 +26,7 @@ import java.awt.Component;
 import java.awt.Font;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.util.logging.Logger;
 
@@ -62,6 +63,7 @@ import org.jdesktop.swingx.JXTree;
 import org.jdesktop.swingx.JXTreeTable;
 import org.jdesktop.swingx.RolloverProducer;
 import org.jdesktop.swingx.RolloverRenderer;
+import org.jdesktop.swingx.action.LinkAction;
 import org.jdesktop.swingx.border.DropShadowBorder;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.Highlighter;
@@ -320,6 +322,7 @@ public class RendererIssues extends InteractiveTestCase {
         
     }
 
+//--------------- unit tests
     
     /**
      * Issue #840-swingx: hyperlink foreground unreadable for dark selection colors.
