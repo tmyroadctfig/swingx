@@ -23,9 +23,8 @@ package org.jdesktop.swingx;
 
 
 import java.awt.BorderLayout;
+import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.logging.Logger;
@@ -33,8 +32,9 @@ import java.util.logging.Logger;
 import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JLabel;
+import javax.swing.JDialog;
 import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 
 import org.jdesktop.swingx.action.AbstractActionExt;
 
@@ -58,6 +58,7 @@ public class JXTaskPaneIssues extends InteractiveTestCase {
     
     /**
      * Trying to resize a top-level window on collapsed state changes of a taskpane.
+     * Need to listen to "animationState" which is fired when animation is complete.
      */
     public void interactiveDialogWithCollapsible() {
         JXTaskPane pane = new JXTaskPane();
@@ -78,7 +79,7 @@ public class JXTaskPaneIssues extends InteractiveTestCase {
         PropertyChangeListener l = new PropertyChangeListener() {
 
             public void propertyChange(PropertyChangeEvent evt) {
-                if ("collapsed".equals(evt.getPropertyName())) {
+                if ("animationState".equals(evt.getPropertyName())) {
                     dialog.pack();
                 }
             }
@@ -95,7 +96,7 @@ public class JXTaskPaneIssues extends InteractiveTestCase {
      */
     public void interactiveDialogWithHidden() {
         JXPanel pane = new JXPanel(new BorderLayout());
-        final JLabel label = new JLabel("dummy ... with a looooooooooooong title");
+        final JButton label = new JButton("dummy ... with a looooooooooooong title");
         Action action = new AbstractActionExt("something to click") {
 
             public void actionPerformed(ActionEvent e) {
@@ -109,7 +110,7 @@ public class JXTaskPaneIssues extends InteractiveTestCase {
         KeyStroke keyStroke = KeyStroke.getKeyStroke("F3");
         label.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(keyStroke, actionKey);
         
-        Action hide = new AbstractActionExt("toggle visible") {
+        Action hide = new AbstractActionExt("hide other, then press F3") {
 
             public void actionPerformed(ActionEvent e) {
                 // OOPS ... visible is _not_ a bean property
@@ -120,10 +121,12 @@ public class JXTaskPaneIssues extends InteractiveTestCase {
         };
         pane.add(new JButton(hide), BorderLayout.NORTH);
         final JXDialog dialog = new JXDialog(pane);
+        dialog.setTitle("hiding a component plain ");
         dialog.pack();
         dialog.setVisible(true);
     }
-    
+
+
     /**
      * Empty test method to keep the test runner happy if we have no 
      * open issues.
