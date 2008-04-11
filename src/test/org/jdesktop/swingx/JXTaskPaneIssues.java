@@ -21,14 +21,70 @@
  */
 package org.jdesktop.swingx;
 
-import junit.framework.TestCase;
+
+import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.util.logging.Logger;
+
+import javax.swing.Action;
+import javax.swing.JComponent;
+import javax.swing.KeyStroke;
+
+import org.jdesktop.swingx.action.AbstractActionExt;
 
 /**
  * 
  * @author Jeanette Winzenburg
  */
-public class JXTaskPaneIssues extends TestCase {
+public class JXTaskPaneIssues extends InteractiveTestCase {
+    @SuppressWarnings("unused")
+    private static final Logger LOG = Logger.getLogger(JXTaskPaneIssues.class
+            .getName());
     
+    public static void main(String[] args) {
+        JXTaskPaneIssues test = new JXTaskPaneIssues();
+        try {
+            test.runInteractiveTests();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
+    /**
+     * Trying to resize a top-level window on collapsed state changes of a taskpane.
+     */
+    public void interactiveDialogWithCollapsible() {
+        JXTaskPane pane = new JXTaskPane();
+        pane.setTitle("dummy ... with a looooooooooooong title");
+        Action action = new AbstractActionExt("something to click") {
+
+            public void actionPerformed(ActionEvent e) {
+                LOG.info("got me");
+            }
+            
+        };
+        JComponent button = (JComponent) pane.add(action);
+        Object actionKey = "dummy";
+        button.getActionMap().put(actionKey, action);
+        KeyStroke keyStroke = KeyStroke.getKeyStroke("F3");
+        button.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(keyStroke, actionKey);
+        final JXDialog dialog = new JXDialog(pane);
+        PropertyChangeListener l = new PropertyChangeListener() {
+
+            public void propertyChange(PropertyChangeEvent evt) {
+                if ("collapsed".equals(evt.getPropertyName())) {
+                    dialog.pack();
+                }
+            }
+            
+        };
+        pane.addPropertyChangeListener(l);
+        dialog.pack();
+        dialog.setVisible(true);
+    }
+    
+
     /**
      * Empty test method to keep the test runner happy if we have no 
      * open issues.
