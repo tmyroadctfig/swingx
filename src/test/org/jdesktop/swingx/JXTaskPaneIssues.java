@@ -22,13 +22,18 @@
 package org.jdesktop.swingx;
 
 
+import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.logging.Logger;
 
 import javax.swing.Action;
+import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.KeyStroke;
 
 import org.jdesktop.swingx.action.AbstractActionExt;
@@ -85,6 +90,40 @@ public class JXTaskPaneIssues extends InteractiveTestCase {
     }
     
 
+    /**
+     * Quick check to see if hidden comps receive a keybinding (no).
+     */
+    public void interactiveDialogWithHidden() {
+        JXPanel pane = new JXPanel(new BorderLayout());
+        final JLabel label = new JLabel("dummy ... with a looooooooooooong title");
+        Action action = new AbstractActionExt("something to click") {
+
+            public void actionPerformed(ActionEvent e) {
+                LOG.info("got me");
+            }
+            
+        };
+        pane.add(label);
+        Object actionKey = "dummy";
+        label.getActionMap().put(actionKey, action);
+        KeyStroke keyStroke = KeyStroke.getKeyStroke("F3");
+        label.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(keyStroke, actionKey);
+        
+        Action hide = new AbstractActionExt("toggle visible") {
+
+            public void actionPerformed(ActionEvent e) {
+                // OOPS ... visible is _not_ a bean property
+                // so property change listener is useless if we want to pack
+                label.setVisible(!label.isVisible());
+            }
+            
+        };
+        pane.add(new JButton(hide), BorderLayout.NORTH);
+        final JXDialog dialog = new JXDialog(pane);
+        dialog.pack();
+        dialog.setVisible(true);
+    }
+    
     /**
      * Empty test method to keep the test runner happy if we have no 
      * open issues.
