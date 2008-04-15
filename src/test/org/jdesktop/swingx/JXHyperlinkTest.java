@@ -8,11 +8,13 @@
 package org.jdesktop.swingx;
 
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseListener;
 import java.util.logging.Logger;
 
 import junit.framework.TestCase;
 
 import org.jdesktop.swingx.action.LinkAction;
+import org.jdesktop.swingx.plaf.basic.BasicHyperlinkUI.BasicHyperlinkListener;
 import org.jdesktop.test.PropertyChangeReport;
 
 /**
@@ -28,6 +30,14 @@ public class JXHyperlinkTest extends TestCase {
     
     private PropertyChangeReport report;
 
+    public void testHyperlinkButtonListener() {
+        JXHyperlink hyperlink = new JXHyperlink();
+        MouseListener[] listeners = hyperlink.getMouseListeners();
+        for (MouseListener mouseListener : listeners) {
+            if(mouseListener instanceof BasicHyperlinkListener) return;
+        }
+        fail("hyperlink must have installed a BasicHyperlinkListener");
+    }
     
     /**
      * test control of the clicked property.

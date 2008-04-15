@@ -15,10 +15,12 @@ import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.DefaultListModel;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListModel;
@@ -51,7 +53,7 @@ public class JXHyperlinkVisualCheck extends InteractiveTestCase {
     }
 
     public static void main(String[] args) throws Exception {
-//      setSystemLF(true);
+      setSystemLF(true);
       JXHyperlinkVisualCheck test = new JXHyperlinkVisualCheck();
       try {
 //          test.runInteractiveTests();
@@ -80,6 +82,8 @@ public class JXHyperlinkVisualCheck extends InteractiveTestCase {
             
         };
         JXHyperlink hyperlink = new JXHyperlink(action );
+//      hyperlink.setMargin(new Insets(10, 10, 10, 10));
+        hyperlink.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         JFrame frame = wrapInFrame(hyperlink, "show html underline ");
         frame.setSize(200, 200);
         frame.setVisible(true);
@@ -101,6 +105,8 @@ public class JXHyperlinkVisualCheck extends InteractiveTestCase {
             
         };
         JXHyperlink hyperlink = new JXHyperlink(action );
+//        hyperlink.setMargin(new Insets(10, 10, 10, 10));
+        hyperlink.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         JFrame frame = wrapInFrame(hyperlink, "show html underline ");
         frame.setSize(200, 200);
         frame.setVisible(true);
@@ -133,13 +139,20 @@ public class JXHyperlinkVisualCheck extends InteractiveTestCase {
         Action action = new AbstractAction("LinkModel@somewhere") {
 
             public void actionPerformed(ActionEvent e) {
-                // TODO Auto-generated method stub
+                LOG.info("gotcha!");
                 
             }
             
         };
         JXHyperlink hyperlink = new JXHyperlink(action );
-        JFrame frame = wrapInFrame(hyperlink, "show underline - no link action");
+//        JButton hyperlink = new JButton("LinkModel somewhere");
+//      hyperlink.setMargin(new Insets(10, 10, 10, 10));
+        hyperlink.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        JXPanel panel = new JXPanel(new BorderLayout());
+        panel.add(hyperlink);
+        panel.add(new JLabel("south"), BorderLayout.SOUTH);
+        panel.add(new JLabel("north"), BorderLayout.NORTH);
+        JFrame frame = wrapInFrame(panel, "show underline - no link action");
         frame.setSize(200, 200);
         frame.setVisible(true);
         

@@ -31,24 +31,27 @@ import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.Reader;
 import java.io.StringReader;
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.util.logging.Logger;
 
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonModel;
+import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import javax.swing.event.ChangeEvent;
 import javax.swing.plaf.BorderUIResource;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.UIResource;
+import javax.swing.plaf.basic.BasicButtonListener;
 import javax.swing.plaf.basic.BasicButtonUI;
 import javax.swing.plaf.basic.BasicGraphicsUtils;
 import javax.swing.plaf.basic.BasicHTML;
@@ -70,6 +73,10 @@ import javax.swing.text.html.StyleSheet;
  */
 public class BasicHyperlinkUI extends BasicButtonUI {
 
+    @SuppressWarnings("unused")
+    private static final Logger LOG = Logger.getLogger(BasicHyperlinkUI.class
+            .getName());
+    
     public static ComponentUI createUI(JComponent c) {
         return new BasicHyperlinkUI();
     }
@@ -80,7 +87,7 @@ public class BasicHyperlinkUI extends BasicButtonUI {
 
     private static Rectangle iconRect = new Rectangle();
 
-    private static MouseListener handCursorListener = new HandCursor();
+//    private static MouseListener handCursorListener = new HandCursor();
 
     protected int dashedRectGapX;
 
@@ -126,14 +133,14 @@ public class BasicHyperlinkUI extends BasicButtonUI {
     @Override
     protected void installListeners(AbstractButton b) {
         super.installListeners(b);
-        b.addMouseListener(handCursorListener);
+//        b.addMouseListener(handCursorListener);
         b.addPropertyChangeListener(pcListener);
     }
 
     @Override
     protected void uninstallListeners(AbstractButton b) {
         super.uninstallListeners(b);
-        b.removeMouseListener(handCursorListener);
+//        b.removeMouseListener(handCursorListener);
         b.removePropertyChangeListener(pcListener);
     }
 
@@ -267,11 +274,19 @@ public class BasicHyperlinkUI extends BasicButtonUI {
         }
 
         // focus painted same color as text
-        int width = b.getWidth();
-        int height = b.getHeight();
         g.setColor(getFocusColor());
-        BasicGraphicsUtils.drawDashedRect(g, dashedRectGapX, dashedRectGapY,
-                width - dashedRectGapWidth, height - dashedRectGapHeight);
+        // paint the focus rect around the union of text rect and icon rect
+        // PENDING JW: duplicated to handle insets
+        Rectangle iconTextRect = getIconTextRect(b); 
+        // PENDING JW: better factor handling of insets - the bare union doesn't respect insets
+//        Rectangle iconTextRect = textRect.union(iconRect);
+        BasicGraphicsUtils.drawDashedRect(g, iconTextRect.x, iconTextRect.y, 
+                iconTextRect.width, iconTextRect.height);
+        // pre-#167-swingx: active area too large
+//        int width = b.getWidth();
+//        int height = b.getHeight();
+//        BasicGraphicsUtils.drawDashedRect(g, dashedRectGapX, dashedRectGapY,
+//                width - dashedRectGapWidth, height - dashedRectGapHeight);
     }
 
     @Override
@@ -279,6 +294,109 @@ public class BasicHyperlinkUI extends BasicButtonUI {
         // setTextShiftOffset();
     }
 
+    
+    @Override
+    protected BasicButtonListener createButtonListener(AbstractButton b) {
+        return new BasicHyperlinkListener(b);
+    }
+
+    /**
+     * {@inheritDoc} <p>
+     * 
+     * Overridden to return true if the position is inside the union of the
+     * text and icon rectangle, false otherwise.
+     */
+    @Override
+    public boolean contains(JComponent c, int x, int y) {
+        AbstractButton button = (AbstractButton) c;
+        return isInside(getIconTextRect(button), x, y);
+    }
+
+    /**
+     * @param iconTextRect
+     * @param point
+     * @return
+     */
+    private boolean isInside(Rectangle iconTextRect, int x, int y) {
+        if (iconTextRect == null) return false;
+        return iconTextRect.contains(x, y);
+    }
+
+    /**
+     * C&p'ed from BasicGraphicsUtils (getPreferredButtonSize).
+     * 
+     * @param b the button to analyse.
+     * @return the union of the text and icon rectangle of the AbstractButton
+     *   or null if the button has children (??) 
+     */
+    protected Rectangle getIconTextRect(AbstractButton b) {
+        if (b.getComponentCount() > 0) {
+            return null;
+        }
+
+        Icon icon = (Icon) b.getIcon();
+        String text = b.getText();
+
+        Font font = b.getFont();
+        FontMetrics fm = b.getFontMetrics(font);
+
+        Rectangle iconR = new Rectangle();
+        Rectangle textR = new Rectangle();
+        Rectangle viewR = new Rectangle(b.getSize());
+
+        SwingUtilities.layoutCompoundLabel((JComponent) b, fm, text, icon,
+                b.getVerticalAlignment(), b.getHorizontalAlignment(), b
+                        .getVerticalTextPosition(), b
+                        .getHorizontalTextPosition(), viewR, iconR, textR,
+                (text == null ? 0 : b.getIconTextGap()));
+
+        /*
+         * The preferred size of the button is the size of the text and icon
+         * rectangles plus the buttons insets.
+         */
+
+        Rectangle r = iconR.union(textR);
+
+        Insets insets = b.getInsets();
+        r.width += insets.left + insets.right;
+        r.height += insets.top + insets.bottom;
+        // PENDING JW: why not?
+//        r.x -= insets.left;
+        r.y -= insets.top;
+        return r;
+    }
+
+    /**
+     * A BasicButtonListener specialized to the needs of a Hyperlink. 
+     * 
+     * @author Jeanette Winzenburg
+     */
+    public static class BasicHyperlinkListener extends BasicButtonListener {
+
+        /**
+         * @param b
+         */
+        public BasicHyperlinkListener(AbstractButton b) {
+            super(b);
+        }
+
+        
+        @Override
+        public void stateChanged(ChangeEvent e) {
+            AbstractButton button = (AbstractButton) e.getSource();
+            if (button.isRolloverEnabled()) {
+                button.setCursor(button.getModel().isRollover() ? 
+                        // PENDING JW: support customizable cursor
+                        Cursor.getPredefinedCursor(Cursor.HAND_CURSOR) : null);
+            }
+            super.stateChanged(e);
+        }
+    }
+    
+    /**
+     * No longer used internally, replaced by BasicHyperlinkListener.
+     */
+    @Deprecated
     static class HandCursor extends MouseAdapter {
         @Override
         public void mouseEntered(MouseEvent e) {
