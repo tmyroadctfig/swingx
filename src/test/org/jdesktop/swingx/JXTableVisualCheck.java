@@ -103,8 +103,8 @@ public class JXTableVisualCheck extends JXTableUnitTest {
           
 //          test.runInteractiveTests("interactive.*Policy.*");
 //        test.runInteractiveTests("interactive.*Rollover.*");
-//        test.runInteractiveTests("interactive.*Floating.*");
-        test.runInteractiveTests("interactiveColumnHighlighting");
+        test.runInteractiveTests("interactive.*Vertical.*");
+//        test.runInteractiveTests("interactiveColumnHighlighting");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
@@ -1090,11 +1090,20 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         table.setModel(new DefaultTableModel(10, 5));
         // initial state of column control visibility doesn't seem to matter
 //      table.setColumnControlVisible(true);
-        JScrollPane scrollPane1 = new JScrollPane(table);
+        final JScrollPane scrollPane1 = new JScrollPane(table);
         scrollPane1.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         
-        JXFrame frame = wrapInFrame(scrollPane1, "JXTable Vertical ScrollBar Policy");
+        final JXFrame frame = wrapInFrame(scrollPane1, "JXTable Vertical ScrollBar Policy - always");
         addAction(frame, toggleAction);
+        Action packAction = new AbstractAction("Pack frame") {
+
+            public void actionPerformed(ActionEvent e) {
+                frame.remove(scrollPane1);
+                frame.add(scrollPane1);
+            }
+            
+        };
+        addAction(frame, packAction);
         frame.setVisible(true);
     }
 
@@ -1116,11 +1125,20 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         table.setModel(new DefaultTableModel(10, 5));
         // initial state of column control visibility doesn't seem to matter
 //        table.setColumnControlVisible(true);
-        JScrollPane scrollPane1 = new JScrollPane(table);
+        final JScrollPane scrollPane1 = new JScrollPane(table);
         scrollPane1.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
         
-        JXFrame frame = wrapInFrame(scrollPane1, "JXTable Vertical ScrollBar Policy");
+        final JXFrame frame = wrapInFrame(scrollPane1, "JXTable Vertical ScrollBar Policy - never");
         addAction(frame, toggleAction);
+        Action packAction = new AbstractAction("Pack frame") {
+
+            public void actionPerformed(ActionEvent e) {
+                frame.remove(scrollPane1);
+                frame.add(scrollPane1);
+            }
+            
+        };
+        addAction(frame, packAction);
         frame.setVisible(true);
     }
 

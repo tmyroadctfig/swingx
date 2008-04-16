@@ -682,7 +682,11 @@ public class JXTable extends JTable
         boolean old = isColumnControlVisible();
         this.columnControlVisible = visible;
         if (old != isColumnControlVisible()) {
-            configureColumnControl();
+            if (isColumnControlVisible()) {
+                configureColumnControl();
+            } else {
+                unconfigureColumnControl();
+            }
             firePropertyChange("columnControlVisible", old, !old);
         }
     }
@@ -785,12 +789,66 @@ public class JXTable extends JTable
     }
 
 
+    
+    /**
+     * Unconfigures the enclosing <code>JScrollPane</code>. <p>
+     *  
+     * Overridden to addionally unconfigure the upper trailing corner 
+     * with the column control.
+     * 
+     * @see #unconfigureColumnControl()
+     * 
+     */
+    @Override
+    protected void unconfigureEnclosingScrollPane() {
+        unconfigureColumnControl();
+        super.unconfigureEnclosingScrollPane();
+    }
+
+    /**
+     * /** Unconfigures the upper trailing corner of an enclosing
+     * <code>JScrollPane</code>.
+     * 
+     * Here: removes the upper trailing corner and resets.
+     * 
+     * @see #setColumnControlVisible(boolean)
+     * @see #setColumnControl(JComponent)
+     */
+    protected void unconfigureColumnControl() {
+        // if (!isColumnControlVisible()) return;
+        Container p = getParent();
+        if (p instanceof JViewport) {
+            Container gp = p.getParent();
+            if (gp instanceof JScrollPane) {
+                JScrollPane scrollPane = (JScrollPane) gp;
+                // Make certain we are the viewPort's view and not, for
+                // example, the rowHeaderView of the scrollPane -
+                // an implementor of fixed columns might do this.
+                JViewport viewport = scrollPane.getViewport();
+                if (viewport == null || viewport.getView() != this) {
+                    return;
+                }
+                if (verticalScrollPolicy != 0) {
+                    // Fix #155-swingx: reset only if we had force always before
+                    // PENDING: JW - doesn't cope with dynamically changing the
+                    // policy
+                    // shouldn't be much of a problem because doesn't happen too
+                    // often??
+                    scrollPane.setVerticalScrollBarPolicy(verticalScrollPolicy);
+                    verticalScrollPolicy = 0;
+                }
+                scrollPane.setCorner(JScrollPane.UPPER_TRAILING_CORNER, null);
+            }
+        }
+
+    }
+
     /**
      * Configures the upper trailing corner of an enclosing 
      * <code>JScrollPane</code>.
      * 
-     * Adds/removes the <code>ColumnControl</code> depending on the 
-     * <code>columnControlVisible</code> property.<p>
+     * Adds the <code>ColumnControl</code> if the 
+     * <code>columnControlVisible</code> property is true.<p>
      * 
      * @see #setColumnControlVisible(boolean)
      * @see #setColumnControl(JComponent)
@@ -809,29 +867,32 @@ public class JXTable extends JTable
                     return;
                 }
                 if (isColumnControlVisible()) {
-                    verticalScrollPolicy = scrollPane
+                    if (verticalScrollPolicy == 0) {
+                        verticalScrollPolicy = scrollPane
                             .getVerticalScrollBarPolicy();
+                    }
                     scrollPane.setCorner(JScrollPane.UPPER_TRAILING_CORNER,
                             getColumnControl());
 
                     scrollPane
                             .setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-                } else {
-                    if (verticalScrollPolicy != 0) {
-                        // Fix #155-swingx: reset only if we had force always before
-                        // PENDING: JW - doesn't cope with dynamically changing the policy
-                        // shouldn't be much of a problem because doesn't happen too often?? 
-                        scrollPane.setVerticalScrollBarPolicy(verticalScrollPolicy);
-                    }
-                    try {
-                        scrollPane.setCorner(JScrollPane.UPPER_TRAILING_CORNER,
-                                null);
-                    } catch (Exception ex) {
-                        // Ignore spurious exception thrown by JScrollPane. This
-                        // is a Swing bug!
-                    }
-
-                }
+                } 
+//                else {
+//                    if (verticalScrollPolicy != 0) {
+//                        // Fix #155-swingx: reset only if we had force always before
+//                        // PENDING: JW - doesn't cope with dynamically changing the policy
+//                        // shouldn't be much of a problem because doesn't happen too often?? 
+//                        scrollPane.setVerticalScrollBarPolicy(verticalScrollPolicy);
+//                    }
+//                    try {
+//                        scrollPane.setCorner(JScrollPane.UPPER_TRAILING_CORNER,
+//                                null);
+//                    } catch (Exception ex) {
+//                        // Ignore spurious exception thrown by JScrollPane. This
+//                        // is a Swing bug!
+//                    }
+//
+//                }
             }
         }
     }

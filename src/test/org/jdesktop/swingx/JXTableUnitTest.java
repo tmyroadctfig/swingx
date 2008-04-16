@@ -33,7 +33,9 @@ import javax.swing.DefaultListSelectionModel;
 import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
@@ -122,6 +124,63 @@ public class JXTableUnitTest extends InteractiveTestCase {
         super.tearDown();
     }
 
+    /**
+     * Issue #844-swingx: JXTable throws NPE with custom corner.
+     * 
+     * @throws Exception
+     */
+    public void testCornerNPE() throws Exception {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.info("cannot run testCornerNPE - headless environment");
+            return;
+        }
+        
+        JXTable table = new JXTable(10, 2);
+        final JScrollPane scrollPane = new JScrollPane(table);
+        final JFrame frame = new JFrame();
+        frame.add(scrollPane);
+        frame.pack();
+        SwingUtilities.invokeAndWait(new Runnable() {
+            public void run() {
+                scrollPane.setCorner(JScrollPane.UPPER_TRAILING_CORNER, new JPanel());
+                assertNotNull("sanity ...", scrollPane.getCorner(JScrollPane.UPPER_TRAILING_CORNER));
+                frame.remove(scrollPane);
+                frame.add(scrollPane);
+                assertNull("xTable allows only columnControlButton as corner", 
+                        scrollPane.getCorner(JScrollPane.UPPER_TRAILING_CORNER));
+            }
+        });
+    }
+    /**
+     * Issue #844-swingx: JXTable throws NPE with custom corner.
+     * Regression testing (Issue #155-swingx) - scrollpane policy must be respected.
+     * @throws Exception
+     */
+    public void testCornerNPEVerticalSPPolicy() throws Exception {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.info("cannot run testCornerNPE - headless environment");
+            return;
+        }
+        
+        final JXTable table = new JXTable(10, 2);
+        final JScrollPane scrollPane = new JScrollPane(table);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+        table.setColumnControlVisible(true);
+        final JFrame frame = new JFrame();
+        frame.add(scrollPane);
+        frame.pack();
+        SwingUtilities.invokeAndWait(new Runnable() {
+            public void run() {
+                frame.remove(scrollPane);
+                frame.add(scrollPane);
+                assertSame(table.getColumnControl(), scrollPane.getCorner(JScrollPane.UPPER_TRAILING_CORNER));
+                table.setColumnControlVisible(false);
+                assertEquals(JScrollPane.VERTICAL_SCROLLBAR_NEVER, scrollPane.getVerticalScrollBarPolicy());
+            }
+        });
+    }
     /**
      * Issue #838-swingx: table.prepareRenderer adds bogey listener to column highlighter.
      * 
