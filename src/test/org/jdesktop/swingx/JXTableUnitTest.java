@@ -125,6 +125,55 @@ public class JXTableUnitTest extends InteractiveTestCase {
     }
 
     /**
+     * Issue #??-swingx: JXTable respect custom corner if columnControl not visible
+     * 
+     * Test correct un-/config on toggling the controlVisible property
+     */
+    public void testColumnControlVisible() {
+        JXTable table = new JXTable(10, 2);
+        JScrollPane scrollPane = new JScrollPane(table);
+        table.setColumnControlVisible(true);
+        assertSame("sanity: column control set", table.getColumnControl(), scrollPane.getCorner(JScrollPane.UPPER_TRAILING_CORNER));
+        table.setColumnControlVisible(false);
+        assertEquals("columnControl must be removed from corner if not visible", 
+                null, scrollPane.getCorner(JScrollPane.UPPER_TRAILING_CORNER));
+    }
+    /**
+     * Issue #??-swingx: JXTable respect custom corner if columnControl not visible
+     * 
+     * @throws Exception
+     */
+    public void testCornerRespectCustom() throws Exception {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.info("cannot run testCornerNPE - headless environment");
+            return;
+        }
+        
+        final JXTable table = new JXTable(10, 2);
+        final JScrollPane scrollPane = new JScrollPane(table);
+        final JFrame frame = new JFrame();
+        frame.add(scrollPane);
+        frame.pack();
+        SwingUtilities.invokeAndWait(new Runnable() {
+            public void run() {
+                JPanel panel = new JPanel();
+                scrollPane.setCorner(JScrollPane.UPPER_TRAILING_CORNER, panel);
+                assertEquals("sanity ...", panel, scrollPane.getCorner(JScrollPane.UPPER_TRAILING_CORNER));
+                frame.remove(scrollPane);
+                frame.add(scrollPane);
+                if (table.isColumnControlVisible()) {
+                    assertEquals(table.getColumnControl(), scrollPane.getCorner(JScrollPane.UPPER_TRAILING_CORNER));
+                } else {
+                    assertEquals("xTable respects custom corner if columnControl invisible", 
+                            panel,
+                        scrollPane.getCorner(JScrollPane.UPPER_TRAILING_CORNER));
+                }
+            }
+        });
+    }
+
+    /**
      * Issue #844-swingx: JXTable throws NPE with custom corner.
      * 
      * @throws Exception
@@ -147,8 +196,8 @@ public class JXTableUnitTest extends InteractiveTestCase {
                 assertNotNull("sanity ...", scrollPane.getCorner(JScrollPane.UPPER_TRAILING_CORNER));
                 frame.remove(scrollPane);
                 frame.add(scrollPane);
-                assertNull("xTable allows only columnControlButton as corner", 
-                        scrollPane.getCorner(JScrollPane.UPPER_TRAILING_CORNER));
+//                assertNull("xTable allows only columnControlButton as corner", 
+//                        scrollPane.getCorner(JScrollPane.UPPER_TRAILING_CORNER));
             }
         });
     }

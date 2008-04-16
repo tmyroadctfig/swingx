@@ -679,16 +679,18 @@ public class JXTable extends JTable
      * 
      */
     public void setColumnControlVisible(boolean visible) {
+        if (isColumnControlVisible() == visible)
+            return;
         boolean old = isColumnControlVisible();
-        this.columnControlVisible = visible;
-        if (old != isColumnControlVisible()) {
-            if (isColumnControlVisible()) {
-                configureColumnControl();
-            } else {
-                unconfigureColumnControl();
-            }
-            firePropertyChange("columnControlVisible", old, !old);
+        if (old) {
+            unconfigureColumnControl();
         }
+        this.columnControlVisible = visible;
+        if (isColumnControlVisible()) {
+            configureColumnControl();
+        }
+        firePropertyChange("columnControlVisible", old, !old);
+
     }
 
 
@@ -815,7 +817,6 @@ public class JXTable extends JTable
      * @see #setColumnControl(JComponent)
      */
     protected void unconfigureColumnControl() {
-        // if (!isColumnControlVisible()) return;
         Container p = getParent();
         if (p instanceof JViewport) {
             Container gp = p.getParent();
@@ -837,7 +838,9 @@ public class JXTable extends JTable
                     scrollPane.setVerticalScrollBarPolicy(verticalScrollPolicy);
                     verticalScrollPolicy = 0;
                 }
-                scrollPane.setCorner(JScrollPane.UPPER_TRAILING_CORNER, null);
+                if (isColumnControlVisible()) {
+                    scrollPane.setCorner(JScrollPane.UPPER_TRAILING_CORNER, null);
+                }
             }
         }
 
