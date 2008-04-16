@@ -14,6 +14,7 @@ import javax.swing.table.TableColumn;
 import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.action.AbstractActionExt;
+import org.jdesktop.swingx.test.ColumnModelReport;
 
 /**
  * Test to exposed known issues of <code>TableColumnModelExt</code>
@@ -41,6 +42,21 @@ public class TableColumnModelExtIssues extends TableColumnModelTest {
            e.printStackTrace();
        }
    }
+
+    /**
+     * Issue #846-swingx
+     */
+    public void testFalseIsRemovedToInvisible() {
+        DefaultTableColumnModelExt columnModel = (DefaultTableColumnModelExt) createColumnModel(3);
+        TableColumnExt columnB = columnModel.getColumnExt(1);
+        columnModel.getColumnExt(0).setVisible(false);
+        ColumnModelReport report = new ColumnModelReport();
+        columnModel.addColumnModelListener(report);
+        columnModel.removeColumn(columnB);
+        int oldIndex = report.getLastRemoveEvent().getFromIndex();
+        assertEquals("old visible index of removed", 0, oldIndex);
+        assertEquals("old column really removed", false, columnModel.isRemovedToInvisibleEvent(oldIndex));
+    }
 
     /**
      * Issue #624-swingx: support use-case to store/restore column sequence.
