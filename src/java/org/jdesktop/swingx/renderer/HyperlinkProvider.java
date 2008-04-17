@@ -261,10 +261,14 @@ public class HyperlinkProvider
         // hmm... the hyperlink should do this automatically..
         // Issue #840-swingx: hyperlink unreadable if selected (for dark selection colors)
         // so we only force clicked/unclicked if unselected 
-        if (!context.isSelected())
+        if (!context.isSelected()) {
             rendererComponent.setForeground(linkAction.isVisited() ? 
                 rendererComponent.getClickedColor() : rendererComponent.getUnclickedColor());
-        
+        } else {
+            // JW: workaround #845-swingx which was introduced by fixing #840
+            // if we interfere with the colors, need to do always. Not quite understood
+            rendererComponent.setForeground(context.getSelectionForeground());
+        }
     }
 
     /**

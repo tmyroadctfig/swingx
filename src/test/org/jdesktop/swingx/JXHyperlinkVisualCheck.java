@@ -58,9 +58,9 @@ public class JXHyperlinkVisualCheck extends InteractiveTestCase {
       try {
 //          test.runInteractiveTests();
           test.runInteractiveTests("interactive.*Table.*");
-//          test.runInteractiveTests("interactive.*List.*");
-//          test.runInteractiveTests("interactive.*Tree.*");
-          test.runInteractiveTests("interactive.*Underline.*");
+          test.runInteractiveTests("interactive.*List.*");
+          test.runInteractiveTests("interactive.*Tree.*");
+//          test.runInteractiveTests("interactive.*Underline.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
