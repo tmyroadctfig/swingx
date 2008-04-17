@@ -325,26 +325,6 @@ public class RendererIssues extends InteractiveTestCase {
 //--------------- unit tests
     
     /**
-     * Issue #840-swingx: hyperlink foreground unreadable for dark selection colors.
-     * 
-     * Test that selected foreground is same as table. 
-     * 
-     * PENDING: moved from normal tests because fails on server (motif again?)
-     */
-    public void testHyperlinkProviderForeground() {
-        JXTable table = new JXTable(20, 2);
-        HyperlinkProvider provider = new HyperlinkProvider();
-        JXHyperlink hyperlink = provider.getRendererComponent(null);
-        Color unclicked = hyperlink.getUnclickedColor();
-        table.setDefaultRenderer(Object.class, new DefaultTableRenderer(provider));
-        table.prepareRenderer(table.getCellRenderer(0, 0), 0, 0);
-        assertEquals("hyperlink foreground set to unclicked", unclicked, hyperlink.getForeground());
-        table.setRowSelectionInterval(0, 0);
-        assertEquals("hyperlink foreground set to table's selection foreground", 
-                table.getSelectionForeground(), hyperlink.getForeground());
-    }
-
-    /**
      * Issue #774-swingx: support per node-type icons.
      * 
      * postponed to 0.9.x - will break all interface implementors.

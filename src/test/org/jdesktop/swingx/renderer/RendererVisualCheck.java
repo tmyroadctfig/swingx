@@ -95,6 +95,7 @@ import org.jdesktop.swingx.LinkRenderer;
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.action.LinkModelAction;
 import org.jdesktop.swingx.decorator.AbstractHighlighter;
+import org.jdesktop.swingx.decorator.BorderHighlighter;
 import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
@@ -187,6 +188,9 @@ public class RendererVisualCheck extends InteractiveTestCase {
         final ColorHighlighter back =  new ColorHighlighter(valueBased, Color.YELLOW, null);
         table.addHighlighter(back);
         tree.addHighlighter(back);
+        tree.setRolloverEnabled(true);
+        tree.addHighlighter(new BorderHighlighter(HighlightPredicate.ROLLOVER_ROW, 
+                BorderFactory.createLineBorder(Color.BLUE)));
         final HighlightPredicate valueBasedUnwrap = new HighlightPredicate() {
 
             public boolean isHighlighted(Component renderer,

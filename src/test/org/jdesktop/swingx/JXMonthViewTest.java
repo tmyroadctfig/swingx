@@ -1423,7 +1423,6 @@ public class JXMonthViewTest extends MockObjectTestCase {
     
     /**
      * test doc'ed behaviour: model must not be null.
-     * PENDING: the old problem - how do we test fail-fast implemented? 
      *
      */
     public void testSetModelNull() {
@@ -1433,9 +1432,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
             monthView.setSelectionModel(null);
             fail("null model must not be accepted");
         } catch (NullPointerException ex) {
-            // expected - but ...?
-            LOG.info("got NPE as expected - but how test fail fast? \n " 
-                    + ex.getMessage());
+            // expected - but how do we test fail-fast implemented
         }
     }
     

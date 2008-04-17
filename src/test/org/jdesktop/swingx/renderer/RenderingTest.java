@@ -64,6 +64,28 @@ public class RenderingTest extends TestCase {
             .getName());
 
     /**
+     * Issue #840-swingx: hyperlink foreground unreadable for dark selection colors.
+     * 
+     * Test that selected foreground is same as table. 
+     * 
+     */
+    public void testHyperlinkProviderForeground() {
+        JXTable table = new JXTable(20, 2);
+        HyperlinkProvider provider = new HyperlinkProvider();
+        JXHyperlink hyperlink = provider.getRendererComponent(null);
+        Color unclicked = hyperlink.getUnclickedColor();
+        table.setDefaultRenderer(Object.class, new DefaultTableRenderer(provider));
+        table.prepareRenderer(table.getCellRenderer(0, 0), 0, 0);
+        assertEquals("hyperlink foreground set to unclicked", unclicked, hyperlink.getForeground());
+        table.setRowSelectionInterval(0, 0);
+        // JW: had been failing before because I forgot to re-prepare :-)
+        table.prepareRenderer(table.getCellRenderer(0, 0), 0, 0);
+        assertEquals("hyperlink foreground set to table's selection foreground", 
+                table.getSelectionForeground(), hyperlink.getForeground());
+    }
+
+
+    /**
      * Issue #842-swingx: HyperlinkProvider getString doesn't serve its contract.
      * 
      */
@@ -936,8 +958,6 @@ public class RenderingTest extends TestCase {
             fail("invoke paintComponent with null graphics must throw NPE");
         } catch (NullPointerException e) {
             // basically the right thing - but how to test the fail-fast?
-            LOG.info("got the expected NPE - " +
-                        "but how to test the fail-fast impl? " + e);
         } catch (Exception e) {
             fail("unexpected exception invoke paintcomponent with null" + e);
         }
@@ -956,8 +976,6 @@ public class RenderingTest extends TestCase {
             fail("invoke paintComponent with null graphics must throw NPE");
         } catch (NullPointerException e) {
             // basically the right thing - but how to test the fail-fast?
-            LOG.info("got the expected NPE - " +
-                        "but how to test the fail-fast impl? " + e);
         } catch (Exception e) {
             fail("unexpected exception invoke paintcomponent with null" + e);
         }
@@ -977,8 +995,6 @@ public class RenderingTest extends TestCase {
             fail("invoke paintComponent with null graphics must throw NPE");
         } catch (NullPointerException e) {
             // basically the right thing - but how to test the fail-fast?
-            LOG.info("got the expected NPE - " +
-                        "but how to test the fail-fast impl? " + e);
         } catch (Exception e) {
             fail("unexpected exception invoke paintcomponent with null" + e);
         }
@@ -998,8 +1014,6 @@ public class RenderingTest extends TestCase {
             fail("invoke paintComponent with null graphics must throw NPE");
         } catch (NullPointerException e) {
             // basically the right thing - but how to test the fail-fast?
-            LOG.info("got the expected NPE - " +
-                        "but how to test the fail-fast impl? " + e);
         } catch (Exception e) {
             fail("unexpected exception invoke paintcomponent with null" + e);
         }
