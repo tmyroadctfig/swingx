@@ -125,7 +125,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
     }
 
     /**
-     * Issue #??-swingx: JXTable respect custom corner if columnControl not visible
+     * Issue #847-swingx: JXTable respect custom corner if columnControl not visible
      * 
      * Test correct un-/config on toggling the controlVisible property
      */
@@ -138,8 +138,9 @@ public class JXTableUnitTest extends InteractiveTestCase {
         assertEquals("columnControl must be removed from corner if not visible", 
                 null, scrollPane.getCorner(JScrollPane.UPPER_TRAILING_CORNER));
     }
+    
     /**
-     * Issue #??-swingx: JXTable respect custom corner if columnControl not visible
+     * Issue #847-swingx: JXTable respect custom corner if columnControl not visible
      * 
      * @throws Exception
      */
@@ -196,8 +197,6 @@ public class JXTableUnitTest extends InteractiveTestCase {
                 assertNotNull("sanity ...", scrollPane.getCorner(JScrollPane.UPPER_TRAILING_CORNER));
                 frame.remove(scrollPane);
                 frame.add(scrollPane);
-//                assertNull("xTable allows only columnControlButton as corner", 
-//                        scrollPane.getCorner(JScrollPane.UPPER_TRAILING_CORNER));
             }
         });
     }
@@ -230,6 +229,21 @@ public class JXTableUnitTest extends InteractiveTestCase {
             }
         });
     }
+
+    /**
+     * Issue #844-swingx: JXTable throws NPE with custom corner.
+     * Regression testing (Issue #155-swingx) - scrollpane policy must be respected.
+     */
+    public void testCornerNPEVerticalSPOnUpdateUI(){
+        final JXTable table = new JXTable(10, 2);
+        final JScrollPane scrollPane = new JScrollPane(table);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+        table.setColumnControlVisible(true);
+        table.updateUI();
+        table.setColumnControlVisible(false);
+        assertEquals(JScrollPane.VERTICAL_SCROLLBAR_NEVER, scrollPane.getVerticalScrollBarPolicy());
+    }
+
     /**
      * Issue #838-swingx: table.prepareRenderer adds bogey listener to column highlighter.
      * 
