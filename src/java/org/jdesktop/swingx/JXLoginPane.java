@@ -45,6 +45,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
+import java.awt.event.WindowListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
@@ -129,6 +130,7 @@ import org.jdesktop.swingx.util.WindowUtils;
  */
 public class JXLoginPane extends JXPanel {
     
+
 	/**
 	 * The Logger
 	 */
@@ -1114,11 +1116,7 @@ public class JXLoginPane extends JXPanel {
 	    	// TODO: keep it here until all ui stuff is moved to uidelegate.
     		if (capsLockSupport)
     			KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(capsOnListener);
-    	    Container c = JXLoginPane.this;
-    	    // #810 bail out on first window found up the hierarchy (modal dialogs)
-            while (!(c.getParent() == null || c instanceof Window)) {
-    	    	c = c.getParent();
-    	    }
+    	    Container c = getTLA();
     	    if (c instanceof Window) {
     	    	Window w = (Window) c;
     	    	w.removeWindowFocusListener(capsOnWinListener );
@@ -1129,16 +1127,21 @@ public class JXLoginPane extends JXPanel {
     	}
     	super.removeNotify();
     }
+
+	private Window getTLA() {
+		Container c = JXLoginPane.this;
+		// #810 bail out on first window found up the hierarchy (modal dialogs)
+		while (!(c.getParent() == null || c instanceof Window)) {
+			c = c.getParent();
+		}
+		return (Window) c;
+	}
     
     public void addNotify() {
     	try {
     		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(
     				capsOnListener);
-    	    Container c = JXLoginPane.this;
-            // #810 bail out on first window found up the hierarchy (modal dialogs)
-    	    while (!(c.getParent() == null || c instanceof Window)) {
-    	    	c = c.getParent();
-    	    }
+    	    Container c = getTLA();
     	    if (c instanceof Window) {
     	    	Window w = (Window) c;
     	    	w.addWindowFocusListener(capsOnWinListener );
@@ -1631,7 +1634,7 @@ public class JXLoginPane extends JXPanel {
     
     private class CapsOnTest {
         
-        KeyEventDispatcher ked;
+    	RemovableKeyEventDispatcher ked;
 
         public void runTest() {
             boolean success = false;
@@ -1654,25 +1657,7 @@ public class JXLoginPane extends JXPanel {
                     }
                     // Temporarily installed listener with auto-uninstall after
                     // test is finished.
-                    ked = new KeyEventDispatcher() {
-                        public boolean dispatchKeyEvent(KeyEvent e) {
-                            if (e.getID() != KeyEvent.KEY_PRESSED) {
-                                return true;
-                            }
-                            if (isTestingCaps && e.getKeyCode() > 64 && e.getKeyCode() < 91) {
-                                setCapsLock(!e.isShiftDown() && Character.isUpperCase(e.getKeyChar()));
-                            }
-                            if (isTestingCaps && (e.getKeyCode() == KeyEvent.VK_BACK_SPACE)) {
-                                // uninstall
-                                isTestingCaps = false;
-                                KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(this);
-                                if (ked == this) {
-                                    ked = null;
-                                }
-                            }
-                            return true;
-                        }
-                    };
+                    ked = new RemovableKeyEventDispatcher(this);
                     kfm.addKeyEventDispatcher(ked);
                     Robot r = new Robot();
                     isTestingCaps = true;
@@ -1683,9 +1668,18 @@ public class JXLoginPane extends JXPanel {
                 } catch (Exception e1) {
                     // this can happen for example due to security reasons in unsigned applets
                     // when we can't test caps lock state programatically bail out silently
+                	
+                	// no matter what's the cause - uninstall
+                    ked.uninstall();
                 }
             }
         }
+
+		public void clean() {
+			if (ked != null) {
+				ked.cleanOnBogusFocus();
+			}
+		}
     }
 
     /**
@@ -1693,7 +1687,7 @@ public class JXLoginPane extends JXPanel {
      * activated.
      */
     public static class CapsOnWinListener extends WindowAdapter implements
-            WindowFocusListener {
+            WindowFocusListener, WindowListener {
         private CapsOnTest cot;
 
         private long stamp;
@@ -1715,9 +1709,61 @@ public class JXLoginPane extends JXPanel {
             }
         }
 
-        public void windowLostFocus(WindowEvent e) {
-            // ignore
-        }
+		@Override
+		public void windowOpened(WindowEvent arg0) {
+        	cot.clean();
+		}
 
+    }
+
+	public class RemovableKeyEventDispatcher implements KeyEventDispatcher {
+		
+		private CapsOnTest cot;
+		private boolean tested = false;
+		private int retry = 0;
+		public RemovableKeyEventDispatcher(CapsOnTest capsOnTest) {
+			this.cot = capsOnTest;
+		}
+            public boolean dispatchKeyEvent(KeyEvent e) {
+                tested = true;
+                if (e.getID() != KeyEvent.KEY_PRESSED) {
+                    return true;
+                }
+                if (isTestingCaps && e.getKeyCode() > 64 && e.getKeyCode() < 91) {
+                    setCapsLock(!e.isShiftDown() && Character.isUpperCase(e.getKeyChar()));
+                }
+                if (isTestingCaps && (e.getKeyCode() == KeyEvent.VK_BACK_SPACE)) {
+                    // uninstall
+                    uninstall();
+                    retry = 0;
+                }
+                return true;
+            }
+            void uninstall() {
+                isTestingCaps = false;
+                KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(this);
+                if (cot.ked == this) {
+                    cot.ked = null;
+                }
+            }
+            void cleanOnBogusFocus() {
+            	// #799 happens on windows when focus is lost during initialization of program since focusLost() even is not issued by jvm in this case (WinXP-WinVista only)
+            	SwingUtilities.invokeLater(new Runnable(){
+					@Override
+					public void run() {
+		            	if (!tested) {
+		            		uninstall();
+		                    if (retry < 3) {
+		                    	// try 3 times to regain the focus
+			            		Window w = JXLoginPane.this.getTLA();
+			            		if (w != null) {
+			            			w.toFront();
+			            		}
+			            		cot.runTest();
+			            		retry++;
+		                    }
+		            	}
+					}});
+            }
     }
 }
