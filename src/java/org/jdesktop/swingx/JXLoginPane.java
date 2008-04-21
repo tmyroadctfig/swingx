@@ -1716,54 +1716,62 @@ public class JXLoginPane extends JXPanel {
 
     }
 
-	public class RemovableKeyEventDispatcher implements KeyEventDispatcher {
-		
-		private CapsOnTest cot;
-		private boolean tested = false;
-		private int retry = 0;
-		public RemovableKeyEventDispatcher(CapsOnTest capsOnTest) {
-			this.cot = capsOnTest;
-		}
-            public boolean dispatchKeyEvent(KeyEvent e) {
-                tested = true;
-                if (e.getID() != KeyEvent.KEY_PRESSED) {
-                    return true;
-                }
-                if (isTestingCaps && e.getKeyCode() > 64 && e.getKeyCode() < 91) {
-                    setCapsLock(!e.isShiftDown() && Character.isUpperCase(e.getKeyChar()));
-                }
-                if (isTestingCaps && (e.getKeyCode() == KeyEvent.VK_BACK_SPACE)) {
-                    // uninstall
-                    uninstall();
-                    retry = 0;
-                }
+    public class RemovableKeyEventDispatcher implements KeyEventDispatcher {
+
+        private CapsOnTest cot;
+
+        private boolean tested = false;
+
+        private int retry = 0;
+
+        public RemovableKeyEventDispatcher(CapsOnTest capsOnTest) {
+            this.cot = capsOnTest;
+        }
+
+        public boolean dispatchKeyEvent(KeyEvent e) {
+            tested = true;
+            if (e.getID() != KeyEvent.KEY_PRESSED) {
                 return true;
             }
-            void uninstall() {
-                isTestingCaps = false;
-                KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(this);
-                if (cot.ked == this) {
-                    cot.ked = null;
+            if (isTestingCaps && e.getKeyCode() > 64 && e.getKeyCode() < 91) {
+                setCapsLock(!e.isShiftDown()
+                        && Character.isUpperCase(e.getKeyChar()));
+            }
+            if (isTestingCaps && (e.getKeyCode() == KeyEvent.VK_BACK_SPACE)) {
+                // uninstall
+                uninstall();
+                retry = 0;
+            }
+            return true;
+        }
+
+        void uninstall() {
+            isTestingCaps = false;
+            KeyboardFocusManager.getCurrentKeyboardFocusManager()
+                    .removeKeyEventDispatcher(this);
+            if (cot.ked == this) {
+                cot.ked = null;
+            }
+        }
+
+        void cleanOnBogusFocus() {
+            // #799 happens on windows when focus is lost during initialization of program since focusLost() even is not issued by jvm in this case (WinXP-WinVista only)
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    if (!tested) {
+                        uninstall();
+                        if (retry < 3) {
+                            // try 3 times to regain the focus
+                            Window w = JXLoginPane.this.getTLA();
+                            if (w != null) {
+                                w.toFront();
+                            }
+                            cot.runTest();
+                            retry++;
+                        }
+                    }
                 }
-            }
-            void cleanOnBogusFocus() {
-            	// #799 happens on windows when focus is lost during initialization of program since focusLost() even is not issued by jvm in this case (WinXP-WinVista only)
-            	SwingUtilities.invokeLater(new Runnable(){
-					@Override
-					public void run() {
-		            	if (!tested) {
-		            		uninstall();
-		                    if (retry < 3) {
-		                    	// try 3 times to regain the focus
-			            		Window w = JXLoginPane.this.getTLA();
-			            		if (w != null) {
-			            			w.toFront();
-			            		}
-			            		cot.runTest();
-			            		retry++;
-		                    }
-		            	}
-					}});
-            }
+            });
+        }
     }
 }
