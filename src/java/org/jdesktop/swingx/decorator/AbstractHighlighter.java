@@ -42,9 +42,9 @@ import org.jdesktop.swingx.event.WeakEventListenerList;
  * 
  *     private Font font;
  * 
- *     public FontHighlighter(Font font, HighlightPredicate predicate) {
+ *     public FontHighlighter(HighlightPredicate predicate, Font font) {
  *         super(predicate);
- *         this.font = font;
+ *         setFont(font);
  *     }
  * 
  *     &#64;Override
@@ -53,6 +53,13 @@ import org.jdesktop.swingx.event.WeakEventListenerList;
  *         component.setFont(font);
  *         return component;
  *     }
+ *     
+ *     public final void setFont(Font font) {
+ *        if (equals(font, this.font)) return;
+ *        this.font = font;
+ *        fireStateChanged();
+ *     }
+ *     
  * 
  * }
  * 
@@ -68,8 +75,8 @@ import org.jdesktop.swingx.event.WeakEventListenerList;
  *         return (value instanceof Number) &amp;&amp; ((Number) value).intValue() &lt; 0;
  *     }
  * };
- * table.setHighlighters(new ColorHighlighter(Color.RED, null, predicate),
- *         new FontHighlighter(myBoldFont, predicate));
+ * table.setHighlighters(new ColorHighlighter(predicate, Color.RED, null),
+ *         new FontHighlighter(predicate, myBoldFont));
  * </code></pre>
  * 
  * @author Jeanette Winzenburg
