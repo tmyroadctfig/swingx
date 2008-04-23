@@ -38,7 +38,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 
-import javax.imageio.ImageIO;
 import javax.swing.Action;
 import javax.swing.DefaultListModel;
 import javax.swing.JCheckBox;
@@ -51,7 +50,6 @@ import javax.swing.table.TableModel;
 import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXList;
-import org.jdesktop.swingx.JXPanel;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.action.ActionContainerFactory;
@@ -69,6 +67,7 @@ import org.jdesktop.swingx.painter.ShapePainter;
 import org.jdesktop.swingx.painter.AbstractLayoutPainter.HorizontalAlignment;
 import org.jdesktop.swingx.painter.AbstractLayoutPainter.VerticalAlignment;
 import org.jdesktop.swingx.table.ColumnControlButton;
+import org.jdesktop.swingx.test.XTestUtils;
 import org.jdesktop.test.AncientSwingTeam;
 
 /**
@@ -92,6 +91,7 @@ public class PainterVisualCheck extends InteractiveTestCase {
       try {
 //        test.runInteractiveTests();
          test.runInteractiveTests("interactive.*Gradient.*");
+         test.runInteractiveTests("interactive.*Icon.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
@@ -248,6 +248,7 @@ public class PainterVisualCheck extends InteractiveTestCase {
         return new Color(base.getRed(), base.getGreen(), base.getBlue(),
                 transparency);
     }
+    
     // ------------------------
     /**
      * Use highlighter with background image painter. Shared by table and list.
@@ -259,8 +260,7 @@ public class PainterVisualCheck extends InteractiveTestCase {
                 JLabel.RIGHT);
         table.getColumn(0).setCellRenderer(
                 new DefaultTableRenderer(controller));
-        final ImagePainter imagePainter = new ImagePainter(ImageIO.read(JXPanel.class
-                .getResource("resources/images/kleopatra.jpg")));
+        final ImagePainter imagePainter = new ImagePainter(XTestUtils.loadDefaultImage());
         HighlightPredicate predicate = new ColumnHighlightPredicate(0);
         Highlighter iconHighlighter = new PainterHighlighter(predicate, imagePainter );
         Highlighter alternateRowHighlighter = HighlighterFactory.createSimpleStriping();
@@ -277,6 +277,28 @@ public class PainterVisualCheck extends InteractiveTestCase {
         frame.pack();
     }
   
+    /**
+     * Use highlighter with image painter which is positioned relative to 
+     * cell value. 
+     */
+    public void interactivePositionedIconPainterHighlight()  {
+        TableModel model = new AncientSwingTeam();
+        JXTable table = new JXTable(model);
+//        table.setBackground(HighlighterFactory.LEDGER);
+        final ImagePainter imagePainter = new ImagePainter(XTestUtils.loadDefaultImage("green-orb.png"));
+        imagePainter.setHorizontalAlignment(HorizontalAlignment.RIGHT);
+        ValueBasedPositionalHighlighter iconHighlighter = new ValueBasedPositionalHighlighter();
+        iconHighlighter.setDelegatePainter(imagePainter);
+        iconHighlighter.setHorizontalAlignment(HorizontalAlignment.LEFT);
+        table.getColumnExt(3).addHighlighter(iconHighlighter);
+        // re-use component controller and highlighter in a JXList
+        JXList list = new JXList(createListNumberModel(), true);
+        list.setCellRenderer(new DefaultListRenderer(new LabelProvider(JLabel.RIGHT)));
+        list.addHighlighter(iconHighlighter);
+        list.toggleSortOrder();
+        showWithScrollingInFrame(table, list, 
+                "value-based image position highlighting plus striping");
+    }
 //  ----------------- Transparent gradient on default (swingx) rendering label
 
     
@@ -291,6 +313,7 @@ public class PainterVisualCheck extends InteractiveTestCase {
         ComponentProvider<JLabel> controller = new LabelProvider(
                 JLabel.RIGHT) ;
         final ValueBasedGradientHighlighter gradientHighlighter = createTransparentGradientHighlighter();
+        gradientHighlighter.setHorizontalAlignment(HorizontalAlignment.RIGHT);
         Highlighter alternateRowHighlighter = HighlighterFactory.createSimpleStriping();
         table.addHighlighter(alternateRowHighlighter);
         table.addHighlighter(gradientHighlighter);
@@ -323,6 +346,7 @@ public class PainterVisualCheck extends InteractiveTestCase {
 //        table.setDefaultRenderer(Number.class, new DefaultTableRenderer(
 //                controller));
         ValueBasedGradientHighlighter gradientHighlighter = createTransparentGradientHighlighter();
+        gradientHighlighter.setHorizontalAlignment(HorizontalAlignment.RIGHT);
         table.addHighlighter(gradientHighlighter);
         // re-use component controller and highlighter in a JXList
         JXList list = new JXList(createListNumberModel(), true);
@@ -375,7 +399,11 @@ public class PainterVisualCheck extends InteractiveTestCase {
             if (painter == null) return;
             // use epsilon
             if (xFactor != 0.0) {
+                int oldWidth = width;
                 width = (int) (xFactor * width);
+                if (getHorizontalAlignment() == HorizontalAlignment.RIGHT) {
+                    g.translate(oldWidth - width, 0);
+                }
             }
             if (yFactor != 0.0) {
                 int oldHeight = height;
@@ -392,20 +420,16 @@ public class PainterVisualCheck extends InteractiveTestCase {
     // -------------------- Value-based transparent gradient highlighter
 
     /**
-     * A LegacyHighlighter which applies a value-proportional gradient to PainterAware
+     * A Highlighter which applies a value-proportional gradient to PainterAware
      * rendering components if the value is a Number. The gradient is a simple
-     * yellow to white-transparent paint. The yellow can be toggled to
+     * red to red.brigther paint. The red can be toggled to
      * half-transparent.<p>
      * 
-     * PENDING: How to the same but not use a gradient but a solid colered bar,
-     * covering a relative portion of the comp?
      */
     public static class ValueBasedGradientHighlighter extends
             PainterHighlighter {
         float maxValue = 100;
 
-//        private MattePainter<JComponent> painter;
-//        private RelativePainter<JComponent> wrapper;
         private boolean yellowTransparent;
 
         public ValueBasedGradientHighlighter() {
@@ -419,7 +443,6 @@ public class PainterVisualCheck extends InteractiveTestCase {
             super(new RelativePainter<JComponent>());
             setYellowTransparent(b);
         }
-
         
         /**
          * Overridden to do nothing if it's not a RelativePainter. We 
@@ -431,7 +454,6 @@ public class PainterVisualCheck extends InteractiveTestCase {
             super.setPainter(painter);
         }
 
-        
         @Override
         public RelativePainter getPainter() {
             return (RelativePainter) super.getPainter();
@@ -442,7 +464,8 @@ public class PainterVisualCheck extends InteractiveTestCase {
             if (adapter.getValue() instanceof Number) {
                 float end = getEndOfGradient((Number) adapter.getValue());
                 if (end > 1) {
-                    renderer.setBackground(Color.YELLOW.darker());
+                    renderer.setBackground(Color.RED.darker());
+                    renderer.setForeground(Color.WHITE);
                 } else if (end > 0.02) {
                     Painter painter = getPainter(end);
                     ((PainterAware) renderer).setPainter(painter);
@@ -461,18 +484,25 @@ public class PainterVisualCheck extends InteractiveTestCase {
             fireStateChanged();
         }
 
-
+        public void setHorizontalAlignment(HorizontalAlignment align) {
+            getPainter().setHorizontalAlignment(align);
+            fireStateChanged();
+        }
+        
+        public HorizontalAlignment getHorizontalAlignment() {
+            return getPainter().getHorizontalAlignment();
+        }
+        
         private Painter getPainter(float end) {
             if (getPainter().getPainter() == null) {
-                Color startColor = getTransparentColor(Color.YELLOW,
+                Color startColor = getTransparentColor(Color.RED,
                         yellowTransparent ? 125 : 254);
-                Color endColor = getTransparentColor(Color.WHITE, 0);
+                Color endColor = getTransparentColor(Color.RED.brighter(), 0);
+                boolean isRightAligned = HorizontalAlignment.RIGHT == getHorizontalAlignment();
                 GradientPaint paint = new GradientPaint(new Point2D.Double(0, 0),
-                        startColor, new Point2D.Double(100, 0), endColor);
-                // LinearGradientPaint paint = new LinearGradientPaint(0.0f, 0.0f,
-                // 1f, 0f,
-                // new float[] {0,end}, new Color[] {startColor
-                // , endColor});
+                        isRightAligned ? endColor : startColor, 
+                        new Point2D.Double(100, 0), 
+                        isRightAligned ? startColor : endColor);
                 MattePainter painter = new MattePainter<JComponent>(paint);
                 painter.setPaintStretched(true);
                 getPainter().setPainter(painter);
@@ -490,9 +520,81 @@ public class PainterVisualCheck extends InteractiveTestCase {
             float end = number.floatValue() / maxValue;
             return end;
         }
+       
+    }
 
+    
+    
+    /**
+     * A Highlighter which applies a value-proportional gradient to PainterAware
+     * rendering components if the value is a Number. The gradient is a simple
+     * red to red.brigther paint. The red can be toggled to
+     * half-transparent.<p>
+     * 
+     */
+    public static class ValueBasedPositionalHighlighter extends
+            PainterHighlighter {
+        float maxValue = 100;
+
+        public ValueBasedPositionalHighlighter() {
+            super(new RelativePainter<JComponent>());
+        }
+        
+        /**
+         * Overridden to do nothing if it's not a RelativePainter. We 
+         * roll our own.
+         */
+        @Override
+        public void setPainter(Painter painter) {
+            if (!(painter instanceof RelativePainter)) return; 
+            super.setPainter(painter);
+        }
+        
+        @Override
+        public RelativePainter getPainter() {
+            return (RelativePainter) super.getPainter();
+        }
+
+        public void setDelegatePainter(Painter painter) {
+            getPainter().setPainter(painter);
+        }
+        
+        @Override
+        protected Component doHighlight(Component renderer, ComponentAdapter adapter) {
+            if (adapter.getValue() instanceof Number) {
+                float end = getEndOfGradient((Number) adapter.getValue());
+                if (end > 1) {
+                    renderer.setBackground(Color.RED.darker());
+                    renderer.setForeground(Color.WHITE);
+                } else if (end > 0.02) {
+                    Painter painter = getPainter(end);
+                    ((PainterAware) renderer).setPainter(painter);
+                }
+            }            
+            return renderer;
+        }
+
+        public void setHorizontalAlignment(HorizontalAlignment align) {
+            getPainter().setHorizontalAlignment(align);
+            fireStateChanged();
+        }
+        
+        public HorizontalAlignment getHorizontalAlignment() {
+            return getPainter().getHorizontalAlignment();
+        }
+        
+        private Painter getPainter(float end) {
+            getPainter().setXFactor(end);
+            return getPainter();
+        }
+
+        private float getEndOfGradient(Number number) {
+            float end = number.floatValue() / maxValue;
+            return end;
+        }
         
     }
+
     /**
      * creates and returns a highlighter with a value-based transparent gradient
      * if the cell content type is a Number.
