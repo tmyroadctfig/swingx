@@ -28,6 +28,7 @@ import java.awt.Graphics2D;
 import java.awt.Polygon;
 import java.awt.Shape;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
@@ -45,6 +46,7 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.KeyStroke;
 import javax.swing.ListModel;
+import javax.swing.Timer;
 import javax.swing.table.TableModel;
 
 import org.jdesktop.swingx.InteractiveTestCase;
@@ -60,12 +62,14 @@ import org.jdesktop.swingx.decorator.HighlighterFactory;
 import org.jdesktop.swingx.decorator.PainterHighlighter;
 import org.jdesktop.swingx.decorator.HighlightPredicate.ColumnHighlightPredicate;
 import org.jdesktop.swingx.painter.AbstractLayoutPainter;
+import org.jdesktop.swingx.painter.AbstractPainter;
 import org.jdesktop.swingx.painter.ImagePainter;
 import org.jdesktop.swingx.painter.MattePainter;
 import org.jdesktop.swingx.painter.Painter;
 import org.jdesktop.swingx.painter.ShapePainter;
 import org.jdesktop.swingx.painter.AbstractLayoutPainter.HorizontalAlignment;
 import org.jdesktop.swingx.painter.AbstractLayoutPainter.VerticalAlignment;
+import org.jdesktop.swingx.painter.effects.InnerGlowPathEffect;
 import org.jdesktop.swingx.table.ColumnControlButton;
 import org.jdesktop.swingx.test.XTestUtils;
 import org.jdesktop.test.AncientSwingTeam;
@@ -90,7 +94,7 @@ public class PainterVisualCheck extends InteractiveTestCase {
       PainterVisualCheck test = new PainterVisualCheck();
       try {
 //        test.runInteractiveTests();
-         test.runInteractiveTests("interactive.*Gradient.*");
+//         test.runInteractiveTests("interactive.*Gradient.*");
          test.runInteractiveTests("interactive.*Icon.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
@@ -284,9 +288,10 @@ public class PainterVisualCheck extends InteractiveTestCase {
     public void interactivePositionedIconPainterHighlight()  {
         TableModel model = new AncientSwingTeam();
         JXTable table = new JXTable(model);
-//        table.setBackground(HighlighterFactory.LEDGER);
+        table.setRowHeight(30);
         final ImagePainter imagePainter = new ImagePainter(XTestUtils.loadDefaultImage("green-orb.png"));
         imagePainter.setHorizontalAlignment(HorizontalAlignment.RIGHT);
+        imagePainter.setAreaEffects(new InnerGlowPathEffect());
         ValueBasedPositionalHighlighter iconHighlighter = new ValueBasedPositionalHighlighter();
         iconHighlighter.setDelegatePainter(imagePainter);
         iconHighlighter.setHorizontalAlignment(HorizontalAlignment.LEFT);
@@ -297,9 +302,72 @@ public class PainterVisualCheck extends InteractiveTestCase {
         list.addHighlighter(iconHighlighter);
         list.toggleSortOrder();
         showWithScrollingInFrame(table, list, 
-                "value-based image position highlighting plus striping");
+                "value-based image position highlighting");
     }
-//  ----------------- Transparent gradient on default (swingx) rendering label
+
+    /**
+     * Use highlighter with image painter which is positioned relative to 
+     * cell value. 
+     */
+    public void interactiveAnimatedIconPainterHighlight()  {
+        TableModel model = new AncientSwingTeam();
+        JXTable table = new JXTable(model);
+        ImagePainter imagePainter = new ImagePainter(XTestUtils.loadDefaultImage("green-orb.png"));
+        imagePainter.setHorizontalAlignment(HorizontalAlignment.RIGHT);
+        final RelativePainter painter = new RelativePainter(imagePainter);
+        PainterHighlighter iconHighlighter = new ListeningPainterHighlighter();
+        iconHighlighter.setHighlightPredicate(HighlightPredicate.ROLLOVER_ROW);
+        iconHighlighter.setPainter(painter);
+        ActionListener l = new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                double fraction = painter.getXFactor();
+                fraction = fraction > 1 ? 0.0 : fraction + 0.1;
+                painter.setXFactor(fraction);
+            }
+            
+        };
+        table.addHighlighter(iconHighlighter);
+        showWithScrollingInFrame(table, 
+                "value-based image position highlighting");
+        Timer timer = new Timer(100, l);
+        timer.start();
+    }
+    
+
+    public static class ListeningPainterHighlighter extends PainterHighlighter {
+
+        private PropertyChangeListener painterListener;
+        
+        @Override
+        public void setPainter(Painter painter) {
+            if (getPainter() instanceof AbstractPainter) {
+                ((AbstractPainter) getPainter()).removePropertyChangeListener(painterListener);
+            }
+            super.setPainter(painter);
+            if (painter instanceof AbstractPainter) {
+                ((AbstractPainter) painter).addPropertyChangeListener(getPainterListener());
+            }
+        }
+
+        /**
+         * @return
+         */
+        private PropertyChangeListener getPainterListener() {
+            if (painterListener == null) {
+                painterListener = new PropertyChangeListener() {
+
+                    public void propertyChange(PropertyChangeEvent evt) {
+                        fireStateChanged();
+                    }
+                    
+                };
+            }
+            return painterListener;
+        }
+        
+        
+    }
+    //  ----------------- Transparent gradient on default (swingx) rendering label
 
     
     /**
@@ -376,7 +444,9 @@ public class PainterVisualCheck extends InteractiveTestCase {
         }
         
         public void setPainter(Painter<T> painter) {
+            Object old = getPainter();
             this.painter = painter;
+            firePropertyChange("painter", old, getPainter());
         }
         
         public Painter<T> getPainter() {
@@ -388,9 +458,18 @@ public class PainterVisualCheck extends InteractiveTestCase {
         }
         
         public void setXFactor(double xPercent) {
+            double old = getXFactor();
             this.xFactor = xPercent;
+            firePropertyChange("xFactor", old, getXFactor());
         }
         
+        /**
+         * @return
+         */
+        private double getXFactor() {
+            return xFactor;
+        }
+
         public void setYFactor(double yPercent) {
             this.yFactor = yPercent;
         }
