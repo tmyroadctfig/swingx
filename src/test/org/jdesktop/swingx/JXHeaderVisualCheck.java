@@ -35,6 +35,7 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 
 import org.jdesktop.swingx.JXHeader.IconPosition;
@@ -49,8 +50,43 @@ import org.jdesktop.swingx.test.XTestUtils;
  */
 public class JXHeaderVisualCheck extends InteractiveTestCase {
 
+    
+    public static void main(String args[]) {
+        JXHeaderVisualCheck test = new JXHeaderVisualCheck();
+        try {
+          test.runInteractiveTests();
+        } catch (Exception e) {
+            System.err.println("exception when executing interactive tests:");
+            e.printStackTrace();
+        } 
+    }
+
+    @Override
+    protected void setUp() throws Exception {
+        setSystemLF(true);
+    }
 
     // ------------------ interactive
+    
+    public void interactiveHeaderInTabbedPane() {
+        JTabbedPane pane = new JTabbedPane();
+        pane.addTab("first", createHeader());
+        pane.addTab("second", createHeader());
+        showInFrame(pane, "NPE: header in tabbedPane?");
+        
+    }
+
+    private JXHeader createHeader() {
+        JXHeader header = new JXHeader();
+        header.setTitle("AlbumManager");
+        String headerLong = "An adaption from JGoodies Binding Tutorial in the context"
+                + " of BeansBinding/AppFramework. "
+                + "The Tabs show different styles of typical interaction "
+                + "setups (in-place editing vs. dialog-editing). ";
+        header.setDescription(headerLong);
+        header.setIcon(XTestUtils.loadDefaultIcon());
+        return header;
+    }
 
     /**
      * #647-swingx JXLabel looses html rendering on font change.
@@ -120,14 +156,7 @@ public class JXHeaderVisualCheck extends InteractiveTestCase {
      * context.
      */
     public void interactiveHTMLTextWrapLong() {
-        JXHeader header = new JXHeader();
-        header.setTitle("AlbumManager");
-        String headerLong = "An adaption from JGoodies Binding Tutorial in the context"
-                + " of BeansBinding/AppFramework. "
-                + "The Tabs show different styles of typical interaction "
-                + "setups (in-place editing vs. dialog-editing). ";
-        header.setDescription(headerLong);
-        header.setIcon(XTestUtils.loadDefaultIcon());
+        JXHeader header = createHeader();
         JXHeader footer = new JXHeader();
         footer.setTitle("Notes:");
         String footerDescription = "<html>"
@@ -199,21 +228,6 @@ public class JXHeaderVisualCheck extends InteractiveTestCase {
         p.add(header);
         p.setPreferredSize(new Dimension(400,150));
         showInFrame(p, "word wrapping JXHeader");
-    }
-    
-    public static void main(String args[]) {
-        JXHeaderVisualCheck test = new JXHeaderVisualCheck();
-        try {
-          test.runInteractiveTests();
-        } catch (Exception e) {
-            System.err.println("exception when executing interactive tests:");
-            e.printStackTrace();
-        } 
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        setSystemLF(true);
     }
     
     /**
