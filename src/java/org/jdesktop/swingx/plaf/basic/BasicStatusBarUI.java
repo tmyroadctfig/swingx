@@ -140,7 +140,7 @@ public class BasicStatusBarUI extends StatusBarUI {
          */
         public void mouseReleased(MouseEvent e) {
             validPress = !SwingUtilities.isLeftMouseButton(e);
-            
+            window.validate();
             window.setCursor(null);
         }
 
@@ -162,6 +162,7 @@ public class BasicStatusBarUI extends StatusBarUI {
                 }
                 
                 window.setBounds(wb);
+                window.validate();
                 startingPoint = p;
             }
         }
