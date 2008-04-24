@@ -124,6 +124,41 @@ public class JXTableUnitTest extends InteractiveTestCase {
         super.tearDown();
     }
 
+    
+    /**
+     * Quick check for a forum report:
+     * getValueAt called on init for each cell (even the invisible).
+     * 
+     * Looks okay: getValueAt called for visible cells only.
+     * @throws Exception 
+     * 
+     */
+    public void testGetValueOnInit() throws Exception {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.info("cannot run test - headless environment");
+            return;
+        }
+        final List<Integer> set = new ArrayList<Integer>();
+        final JXTable table = new JXTable() {
+
+            @Override
+            public Object getValueAt(int row, int column) {
+                set.add(row);
+                return super.getValueAt(row, column);
+            }
+            
+        };
+        showWithScrollingInFrame(table, "");
+        table.setModel(new DefaultTableModel(100, 5));
+        SwingUtilities.invokeAndWait(new Runnable() {
+            public void run() {
+                assertEquals(table.getColumnCount() * table.getVisibleRowCount(), set.size());
+                
+            }
+        });
+
+    }
     /**
      * Issue #847-swingx: JXTable respect custom corner if columnControl not visible
      * 
