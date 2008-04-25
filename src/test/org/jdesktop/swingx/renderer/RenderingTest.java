@@ -187,23 +187,6 @@ public class RenderingTest extends TestCase {
                 wrappee.rendererComponent.getText());
     }
     
-    /**
-     * Issue #790-swingx: rendering comps must not be registered with the tooltip manager.
-     * 
-     * Here: TreeTableCellRenderer (the tree used for rendering the hierarchical 
-     * column)
-     * 
-     */
-    public void testToolTipResetTreeTableTreeRenderer() {
-        JXTreeTable treeTable = new JXTreeTable(new ComponentTreeTableModel(new JXPanel()));
-        JComponent label = (JComponent) treeTable.prepareRenderer(treeTable.getCellRenderer(0, 0), 0, 0);
-        String tip = "some tip";
-        label.setToolTipText(tip);
-        assertEquals("sanity: tooltip must be set", tip, label.getToolTipText());
-        // prepare again
-        label = (JComponent) treeTable.prepareRenderer(treeTable.getCellRenderer(0, 0), 0, 0);
-        assertEquals("tooltip must be reset in each prepare", null, label.getToolTipText());
-    }
 
     /**
      * Issue #790-swingx: rendering comps must not be registered with the tooltip manager.

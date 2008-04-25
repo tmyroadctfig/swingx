@@ -26,7 +26,6 @@ import java.awt.Component;
 import java.awt.Font;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.util.logging.Logger;
 
@@ -55,7 +54,6 @@ import javax.swing.tree.TreePath;
 import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXButton;
 import org.jdesktop.swingx.JXFrame;
-import org.jdesktop.swingx.JXHyperlink;
 import org.jdesktop.swingx.JXList;
 import org.jdesktop.swingx.JXPanel;
 import org.jdesktop.swingx.JXTable;
@@ -63,7 +61,6 @@ import org.jdesktop.swingx.JXTree;
 import org.jdesktop.swingx.JXTreeTable;
 import org.jdesktop.swingx.RolloverProducer;
 import org.jdesktop.swingx.RolloverRenderer;
-import org.jdesktop.swingx.action.LinkAction;
 import org.jdesktop.swingx.border.DropShadowBorder;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.Highlighter;
@@ -323,7 +320,25 @@ public class RendererIssues extends InteractiveTestCase {
     }
 
 //--------------- unit tests
-    
+ 
+    /**
+     * Issue #794-swingx: tooltip must be reset.
+     * 
+     * Here: TreeTableCellRenderer (the tree used for rendering the hierarchical 
+     * column)
+     * 
+     */
+    public void testToolTipResetTreeTableTreeRenderer() {
+        JXTreeTable treeTable = new JXTreeTable(new ComponentTreeTableModel(new JXPanel()));
+        JComponent label = (JComponent) treeTable.prepareRenderer(treeTable.getCellRenderer(0, 0), 0, 0);
+        String tip = "some tip";
+        label.setToolTipText(tip);
+        assertEquals("sanity: tooltip must be set", tip, label.getToolTipText());
+        // prepare again
+        label = (JComponent) treeTable.prepareRenderer(treeTable.getCellRenderer(0, 0), 0, 0);
+        assertEquals("tooltip must be reset in each prepare", null, label.getToolTipText());
+    }
+
     /**
      * Issue #774-swingx: support per node-type icons.
      * 
