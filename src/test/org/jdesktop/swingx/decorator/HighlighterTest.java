@@ -22,11 +22,13 @@ import javax.swing.border.CompoundBorder;
 
 import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.decorator.HighlighterFactory.UIColorHighlighter;
+import org.jdesktop.swingx.painter.AbstractAreaPainter;
 import org.jdesktop.swingx.painter.MattePainter;
 import org.jdesktop.swingx.painter.Painter;
 import org.jdesktop.swingx.renderer.JRendererLabel;
 import org.jdesktop.swingx.test.XTestUtils;
 import org.jdesktop.test.ChangeReport;
+import org.jdesktop.test.PropertyChangeReport;
 
 /**
  * 
@@ -84,8 +86,8 @@ public class HighlighterTest extends InteractiveTestCase {
     }
 
 //-------------------PainterHighlighter
-    @SuppressWarnings("deprecation")
-    public void testPainterHighlighterConstructors() {
+    
+     public void testPainterHighlighterConstructors() {
         PainterHighlighter hl = new PainterHighlighter();
         assertEquals(HighlightPredicate.ALWAYS, hl.getHighlightPredicate());
         assertNull(hl.getPainter());
@@ -111,6 +113,53 @@ public class HighlighterTest extends InteractiveTestCase {
         assertEquals(1, report.getEventCount());
      }
     
+    /**
+     * Issue #851-swingx: Highlighter must notify on painter property change
+     */
+    public void testPainterHighlighterPainterPropertyChangeNotificatioon() {
+        PainterHighlighter hl = new PainterHighlighter();
+        Color red = Color.RED;
+        MattePainter mattePainter = new MattePainter(red);
+        assertEquals(red, mattePainter.getFillPaint());
+        PropertyChangeReport p = new PropertyChangeReport();
+        mattePainter.addPropertyChangeListener(p);
+        hl.setPainter(mattePainter);
+        assertEquals(mattePainter, hl.getPainter());
+        ChangeReport report = new ChangeReport();
+        hl.addChangeListener(report);
+        mattePainter.setFillPaint(Color.BLUE);
+        assertEquals(p.getEventCount(), report.getEventCount());
+     }
+
+    /**
+     * Issue #851-swingx: Highlighter must notify on painter property change.
+     * 
+     * Here: the Highlighter must not fire if the painter is changed during
+     * the decoration. Supported in base to ease subclassing and keep
+     * backward compatibility
+     */
+    public void testPainterHighlighterPainterPropertyNotNotifyInternalChange() {
+        Color red = Color.RED;
+        MattePainter mattePainter = new MattePainter(red);
+        assertEquals(red, mattePainter.getFillPaint());
+        PainterHighlighter hl = new PainterHighlighter(mattePainter) {
+
+            @Override
+            protected Component doHighlight(Component component,
+                    ComponentAdapter adapter) {
+                ((AbstractAreaPainter) getPainter()).setFillPaint(Color.BLUE);
+                return super.doHighlight(component, adapter);
+            }
+            
+        };
+        ChangeReport report = new ChangeReport();
+        hl.addChangeListener(report);
+        ComponentAdapter adapter = createComponentAdapter(allColored, false);
+        hl.highlight(allColored, adapter);
+        assertEquals(Color.BLUE, mattePainter.getFillPaint());
+        assertEquals(0, report.getEventCount());
+     }
+
     public void testPainterHighlighterUsePainter() {
         ComponentAdapter adapter = createComponentAdapter(allColored, false);
         MattePainter mattePainter = new MattePainter();

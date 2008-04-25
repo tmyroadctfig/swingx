@@ -62,7 +62,6 @@ import org.jdesktop.swingx.decorator.HighlighterFactory;
 import org.jdesktop.swingx.decorator.PainterHighlighter;
 import org.jdesktop.swingx.decorator.HighlightPredicate.ColumnHighlightPredicate;
 import org.jdesktop.swingx.painter.AbstractLayoutPainter;
-import org.jdesktop.swingx.painter.AbstractPainter;
 import org.jdesktop.swingx.painter.ImagePainter;
 import org.jdesktop.swingx.painter.MattePainter;
 import org.jdesktop.swingx.painter.Painter;
@@ -93,9 +92,9 @@ public class PainterVisualCheck extends InteractiveTestCase {
 //      setSystemLF(true);
       PainterVisualCheck test = new PainterVisualCheck();
       try {
-//        test.runInteractiveTests();
+        test.runInteractiveTests();
 //         test.runInteractiveTests("interactive.*Gradient.*");
-         test.runInteractiveTests("interactive.*Icon.*");
+//         test.runInteractiveTests("interactive.*Icon.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
@@ -288,7 +287,6 @@ public class PainterVisualCheck extends InteractiveTestCase {
     public void interactivePositionedIconPainterHighlight()  {
         TableModel model = new AncientSwingTeam();
         JXTable table = new JXTable(model);
-        table.setRowHeight(30);
         final ImagePainter imagePainter = new ImagePainter(XTestUtils.loadDefaultImage("green-orb.png"));
         imagePainter.setHorizontalAlignment(HorizontalAlignment.RIGHT);
         imagePainter.setAreaEffects(new InnerGlowPathEffect());
@@ -312,10 +310,10 @@ public class PainterVisualCheck extends InteractiveTestCase {
     public void interactiveAnimatedIconPainterHighlight()  {
         TableModel model = new AncientSwingTeam();
         JXTable table = new JXTable(model);
-        ImagePainter imagePainter = new ImagePainter(XTestUtils.loadDefaultImage("green-orb.png"));
+        ImagePainter<Component> imagePainter = new ImagePainter<Component>(XTestUtils.loadDefaultImage("green-orb.png"));
         imagePainter.setHorizontalAlignment(HorizontalAlignment.RIGHT);
-        final RelativePainter painter = new RelativePainter(imagePainter);
-        PainterHighlighter iconHighlighter = new ListeningPainterHighlighter();
+        final RelativePainter painter = new RelativePainter<Component>(imagePainter);
+        PainterHighlighter iconHighlighter = new PainterHighlighter();
         iconHighlighter.setHighlightPredicate(HighlightPredicate.ROLLOVER_ROW);
         iconHighlighter.setPainter(painter);
         ActionListener l = new ActionListener() {
@@ -328,45 +326,12 @@ public class PainterVisualCheck extends InteractiveTestCase {
         };
         table.addHighlighter(iconHighlighter);
         showWithScrollingInFrame(table, 
-                "value-based image position highlighting");
+                "Animated highlighter: marching icon on rollover");
         Timer timer = new Timer(100, l);
         timer.start();
     }
     
 
-    public static class ListeningPainterHighlighter extends PainterHighlighter {
-
-        private PropertyChangeListener painterListener;
-        
-        @Override
-        public void setPainter(Painter painter) {
-            if (getPainter() instanceof AbstractPainter) {
-                ((AbstractPainter) getPainter()).removePropertyChangeListener(painterListener);
-            }
-            super.setPainter(painter);
-            if (painter instanceof AbstractPainter) {
-                ((AbstractPainter) painter).addPropertyChangeListener(getPainterListener());
-            }
-        }
-
-        /**
-         * @return
-         */
-        private PropertyChangeListener getPainterListener() {
-            if (painterListener == null) {
-                painterListener = new PropertyChangeListener() {
-
-                    public void propertyChange(PropertyChangeEvent evt) {
-                        fireStateChanged();
-                    }
-                    
-                };
-            }
-            return painterListener;
-        }
-        
-        
-    }
     //  ----------------- Transparent gradient on default (swingx) rendering label
 
     
@@ -590,6 +555,7 @@ public class PainterVisualCheck extends InteractiveTestCase {
             return getPainter();
         }
 
+ 
         private Color getTransparentColor(Color base, int transparency) {
             return new Color(base.getRed(), base.getGreen(), base.getBlue(),
                     transparency);
@@ -666,7 +632,6 @@ public class PainterVisualCheck extends InteractiveTestCase {
             getPainter().setXFactor(end);
             return getPainter();
         }
-
         private float getEndOfGradient(Number number) {
             float end = number.floatValue() / maxValue;
             return end;
