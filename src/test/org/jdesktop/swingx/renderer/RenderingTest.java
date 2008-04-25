@@ -22,7 +22,6 @@
 package org.jdesktop.swingx.renderer;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
@@ -60,6 +59,7 @@ import org.jdesktop.test.TestUtils;
  * @author Jeanette Winzenburg
  */
 public class RenderingTest extends TestCase {
+    @SuppressWarnings("unused")
     private static final Logger LOG = Logger.getLogger(RenderingTest.class
             .getName());
 
