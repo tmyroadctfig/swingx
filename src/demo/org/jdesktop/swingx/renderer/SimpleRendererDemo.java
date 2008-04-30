@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 import javax.imageio.ImageIO;
 import javax.swing.AbstractListModel;
@@ -56,6 +57,7 @@ import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXList;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.JXTree;
+import org.jdesktop.swingx.SearchFactory;
 import org.jdesktop.swingx.JXList.DelegatingRenderer;
 import org.jdesktop.swingx.decorator.AbstractHighlighter;
 import org.jdesktop.swingx.decorator.BorderHighlighter;
@@ -64,7 +66,9 @@ import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.CompoundHighlighter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.Highlighter;
+import org.jdesktop.swingx.decorator.HighlighterFactory;
 import org.jdesktop.swingx.decorator.PainterHighlighter;
+import org.jdesktop.swingx.decorator.PatternPredicate;
 import org.jdesktop.swingx.decorator.HighlightPredicate.TypeHighlightPredicate;
 import org.jdesktop.swingx.graphics.GraphicsUtilities;
 import org.jdesktop.swingx.painter.ImagePainter;
@@ -92,6 +96,7 @@ public class SimpleRendererDemo {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        SearchFactory.getInstance().setUseFindBar(true);
     }
 
     /**
@@ -123,6 +128,17 @@ public class SimpleRendererDemo {
         stars.addHighlighter(getRangeHighlighter("silver-star.gif", 50, 80));
         stars.addHighlighter(getRangeHighlighter("gold-star.gif", 80, 100));
         list.addHighlighter(stars);
+        
+        // choose a random first name to highlight
+        int rndIndex = new Double(Math.random() * contributors.size()).intValue();
+        String match = contributors.get(rndIndex).firstName;
+        System.out.println(match);
+        HighlightPredicate predicate = new PatternPredicate(Pattern.compile(match), 0);
+        Highlighter foreground = new ColorHighlighter(predicate, 
+                HighlighterFactory.NOTEPAD, Color.MAGENTA);
+        table.addHighlighter(foreground);
+        list.addHighlighter(foreground);
+        tree.addHighlighter(foreground);
     }
 
 
