@@ -103,6 +103,28 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         }
     }
 
+    
+    /**
+     * Issue #853-swingx: tree is not disabled.
+     * 
+     */
+    public void interactiveDisabledTreeColumn() {
+        final JXTreeTable treeTable = new JXTreeTable(new FileSystemModel());
+        JXFrame frame = showWithScrollingInFrame(treeTable, "disabled - tree follows table");
+        Action action = new AbstractActionExt("toggle enabled") {
+
+            public void actionPerformed(ActionEvent e) {
+                treeTable.setEnabled(!treeTable.isEnabled());
+                
+            }
+            
+        };
+        addAction(frame, action);
+        show(frame);
+        
+    }
+
+    
     /**
      * Reported: toggling LAF doesn't update treetable?
      * WorksforMe.

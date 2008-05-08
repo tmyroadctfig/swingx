@@ -279,6 +279,17 @@ public class JXTreeTable extends JXTable {
     }
     
     /**
+     * {@inheritDoc} <p>
+     * 
+     * Overridden to keep the tree's enabled in synch.
+     */
+    @Override
+    public void setEnabled(boolean enabled) {
+        renderer.setEnabled(enabled);
+        super.setEnabled(enabled);
+    }
+    
+    /**
      * Overriden to invoke repaint for the particular location if
      * the column contains the tree. This is done as the tree editor does
      * not fill the bounds of the cell, we need the renderer to paint

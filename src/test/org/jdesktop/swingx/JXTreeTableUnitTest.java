@@ -21,6 +21,7 @@
 package org.jdesktop.swingx;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Point;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
@@ -67,6 +68,26 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
     
     public JXTreeTableUnitTest() {
         super("JXTreeTable Unit Test");
+    }
+
+    /**
+     * Issue #853-swingx: tree is not disabled.
+     * 
+     */
+    public void testDisabledTreeColumn() {
+        JXTreeTable treeTable = new JXTreeTable(new FileSystemModel());
+        treeTable.setEnabled(false);
+        assertEquals(false, ((Component) treeTable.getCellRenderer(0, 0)).isEnabled());
+    }
+    
+    /**
+     * Issue #853-swingx: tree is not disabled.
+     * 
+     */
+    public void testDisabledTreeColumnPrepared() {
+        JXTreeTable treeTable = new JXTreeTable(new FileSystemModel());
+        treeTable.setEnabled(false);
+        assertEquals(false, treeTable.prepareRenderer(treeTable.getCellRenderer(0, 0), 0, 0).isEnabled());
     }
 
     /**
