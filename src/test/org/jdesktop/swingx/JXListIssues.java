@@ -4,12 +4,14 @@
  */
 package org.jdesktop.swingx;
 
+import javax.swing.DefaultListModel;
 import javax.swing.JList;
 import javax.swing.plaf.UIResource;
 
 import org.jdesktop.swingx.decorator.Filter;
 import org.jdesktop.swingx.decorator.FilterPipeline;
 import org.jdesktop.swingx.decorator.PatternFilter;
+import org.jdesktop.swingx.decorator.SortOrder;
 
 public class JXListIssues extends JXListTest {
 
@@ -25,6 +27,23 @@ public class JXListIssues extends JXListTest {
         }
     }
 
+    /**
+     * Issue #855-swingx: throws AIOOB on repeated remove/add.
+     * Reason is that the lead/anchor is not removed in removeIndexInterval
+     */
+    public void testAddRemoveSelect() {
+        DefaultListModel model = new DefaultListModel();
+        model.addElement("something");
+        JXList list = new JXList(model, true);
+        list.setSortOrder(SortOrder.ASCENDING);
+        list.setSelectedIndex(0);
+        model.remove(0);
+        assertTrue("sanity - empty selection after remove", list.isSelectionEmpty());
+        model.addElement("element");
+        assertTrue("sanity - empty selection re-adding", list.isSelectionEmpty());
+        list.setSelectedIndex(0);
+    }
+    
     /**
      * Issue #601-swingx: allow LAF to hook in LAF provided renderers.
      * 
