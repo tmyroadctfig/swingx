@@ -221,7 +221,9 @@ public class DefaultSelectionMapper implements SelectionMapper {
      */
     private void mapTowardsModel(int firstIndex, int lastIndex) {
         int safeFirstIndex = Math.max(0, firstIndex);
-        for (int i = safeFirstIndex; i <= lastIndex; i++) {
+        // Fix for #855-swingx: JXList AIOOB on select after remove/add data items
+        int safeLastIndex = getSafeLastIndex(lastIndex);
+        for (int i = safeFirstIndex; i <= safeLastIndex; i++) {
             int modelIndex = convertToModel(i);
             if (viewSelection.isSelectedIndex(i)) {
                 modelSelection.addSelectionInterval(modelIndex, modelIndex);
@@ -234,6 +236,16 @@ public class DefaultSelectionMapper implements SelectionMapper {
             modelSelection.moveLeadSelectionIndex(convertToModel(lead));
         }
 
+    }
+
+    /**
+     * @param lastIndex the view index to limit against the pipeline's output size
+     * @return a valid view index (can be passed into convertToModel)
+     */
+    private int getSafeLastIndex(int lastIndex) {
+        if ((pipeline == null) || !pipeline.isAssigned()) return lastIndex;
+        // PENDING JW: negative? 
+        return Math.min(lastIndex, pipeline.getOutputSize() - 1);
     }
 
     private int[] getSelectedRows(ListSelectionModel selection) {

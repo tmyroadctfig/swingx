@@ -7,6 +7,7 @@ package org.jdesktop.swingx;
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
 import javax.swing.plaf.UIResource;
+import javax.swing.table.DefaultTableModel;
 
 import org.jdesktop.swingx.decorator.Filter;
 import org.jdesktop.swingx.decorator.FilterPipeline;
@@ -29,21 +30,22 @@ public class JXListIssues extends JXListTest {
 
     /**
      * Issue #855-swingx: throws AIOOB on repeated remove/add.
-     * Reason is that the lead/anchor is not removed in removeIndexInterval
+     * Open question: should selectionMapper guard against invalid
+     * selection indices from view selection? Currently it blows. 
+     * Probably good because it's most certainly a programming error.
      */
-    public void testAddRemoveSelect() {
+    public void testInvalidViewSelect() {
         DefaultListModel model = new DefaultListModel();
         model.addElement("something");
         JXList list = new JXList(model, true);
         list.setSortOrder(SortOrder.ASCENDING);
-        list.setSelectedIndex(0);
-        model.remove(0);
-        assertTrue("sanity - empty selection after remove", list.isSelectionEmpty());
-        model.addElement("element");
-        assertTrue("sanity - empty selection re-adding", list.isSelectionEmpty());
-        list.setSelectedIndex(0);
+        // list guards against invalid index
+        list.setSelectedIndex(1);
+        // selectionModel can't do anything (has no notion about size)
+        // selectionMapper doesn't guard and blows on conversion - should it?
+        list.getSelectionModel().setSelectionInterval(1, 1);
     }
-    
+
     /**
      * Issue #601-swingx: allow LAF to hook in LAF provided renderers.
      * 

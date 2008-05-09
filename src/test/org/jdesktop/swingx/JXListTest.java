@@ -52,6 +52,46 @@ public class JXListTest extends InteractiveTestCase {
     protected ListModel listModel;
     protected DefaultListModel ascendingListModel;
 
+    
+    /**
+     * Issue #855-swingx: throws AIOOB on repeated remove/add.
+     * Reason is that the lead/anchor is not removed in removeIndexInterval
+     */
+    public void testAddRemoveSelect() {
+        DefaultListModel model = new DefaultListModel();
+        model.addElement("something");
+        JXList list = new JXList(model, true);
+        list.setSortOrder(SortOrder.ASCENDING);
+        list.setSelectedIndex(0);
+        model.remove(0);
+        assertTrue("sanity - empty selection after remove", list.isSelectionEmpty());
+        model.addElement("element");
+        assertTrue("sanity - empty selection re-adding", list.isSelectionEmpty());
+        list.setSelectedIndex(0);
+    }
+    
+    /**
+     * Issue #855-swingx: throws AIOOB on repeated remove/add.
+     * Reason is that the lead/anchor is not removed in removeIndexInterval.
+     * 
+     * Compare JXTable behaviour: doesn't blow. JXList probably does because of 
+     * the necessary event mapping. Sequence of selection/pipeline induced 
+     * cleanup is different.
+     * 
+     */
+    public void testAddRemoveSelectTable() {
+        DefaultTableModel model = new DefaultTableModel(0, 1);
+        model.addRow(new Object[] {"something"});
+        JXTable list = new JXTable(model);
+        list.setSortOrder(0, SortOrder.ASCENDING);
+        list.setRowSelectionInterval(0, 0);
+        model.removeRow(0);
+        assertTrue("sanity - empty selection after remove", list.getSelectionModel().isSelectionEmpty());
+        model.addRow(new Object[] {"something"});
+        assertTrue("sanity - empty selection re-adding", list.getSelectionModel().isSelectionEmpty());
+        list.setRowSelectionInterval(0, 0);
+    }
+
     /**
      * Issue #816-swingx: Delegating renderer must create list's default.
      * Consistent api: expose wrappedRenderer the same way as wrappedModel
