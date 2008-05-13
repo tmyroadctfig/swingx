@@ -34,6 +34,7 @@ import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Box;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
@@ -75,6 +76,70 @@ public class JXDatePickerIssues extends InteractiveTestCase {
 
 
     private Calendar calendar;
+
+    /**
+     * Compare behaviour of notifyAction: DatePicker vs. core components.
+     * 
+     * The requirement (from forum) is to trigger the default button on enter.
+     * DatePicker: always eats - BasicDatePickerUI commit action always enabled
+     * JComboBox: always pass-through
+     * JFormattedDateField: pass-through if unchanged, eats if changed.
+     * JTextField: eats if has actionListeners, pass-through if none.
+     */
+    public void interactiveDialogFocus() {
+        final JComponent content = Box.createVerticalBox();
+        final JXDatePicker picker = new JXDatePicker(calendar.getTime());
+        final Action original = picker.getActionMap().get(JXDatePicker.COMMIT_KEY);
+        Action wrapper = new AbstractAction() {
+
+            public void actionPerformed(ActionEvent e) {
+                original.actionPerformed(e);
+                
+            }
+
+            @Override
+            public boolean isEnabled() {
+                JFormattedTextField editor = picker.getEditor();
+                Action action = editor.getActionMap().get(JTextField.notifyAction);
+                return action.isEnabled();
+            }
+            
+        };
+        picker.getActionMap().put(JXDatePicker.COMMIT_KEY, wrapper);
+        JComboBox combo = new JComboBox(new Object[] {calendar.getTime()});
+        combo.setEditable(true);
+        JFormattedTextField field = new JFormattedTextField();
+        field.setValue(calendar.getTime());
+        JTextField simple = new JTextField(calendar.getTime().toString());
+        ActionListener l = new ActionListener() {
+
+            public void actionPerformed(ActionEvent e) {
+                LOG.info("action from fields: " + e.getSource().getClass());
+                
+            }
+            
+        };
+        combo.addActionListener(l);
+        field.addActionListener(l);
+        simple.addActionListener(l);
+        content.add(picker);
+        content.add(combo);
+        content.add(field);
+        content.add(simple);
+        Action open =  new AbstractAction("open") {
+
+            public void actionPerformed(ActionEvent e) {
+                JXDialog dialog = new JXDialog(content);
+                dialog.pack();
+                dialog.setVisible(true);
+                
+            }
+            
+        };
+        
+        showInFrame(new JButton(open), "dialog close");
+    }
+    
 
     /**
      * Compare picker and combo behaviour on toggle lf.
