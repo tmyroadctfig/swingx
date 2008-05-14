@@ -56,6 +56,12 @@ public class FindTest extends InteractiveTestCase {
      * 
      */
     public void testSearchFactoryNullTarget() {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.info("cannot run testSearchFactoryNullTarget - headless environment");
+            return;
+        }
+        
         JXTable table = new JXTable(20, 2);
         SearchFactory.getInstance().showFindDialog(null, table.getSearchable());
     }
