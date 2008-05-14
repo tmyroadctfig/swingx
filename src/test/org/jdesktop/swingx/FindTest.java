@@ -51,7 +51,14 @@ public class FindTest extends InteractiveTestCase {
         SearchFactory.setInstance(new SearchFactory());
     }
 
-
+    /**
+     * Findbugs: NPE in SearchFactory - showFindDialog for null target component.
+     * 
+     */
+    public void testSearchFactoryNullTarget() {
+        JXTable table = new JXTable(20, 2);
+        SearchFactory.getInstance().showFindDialog(null, table.getSearchable());
+    }
     /**
      * Issue #718-swingx: shared FindPanel not updated on LF change.
      * 

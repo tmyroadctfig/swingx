@@ -377,7 +377,9 @@ public class SearchFactory {
                 findDialog.setLocation(location);
             }
         } 
-        findDialog.setLocale(target.getLocale());
+        if (target != null) {
+            findDialog.setLocale(target.getLocale());
+        }
         getSharedFindPanel().setSearchable(searchable);
         installFindRemover(target, findDialog);
         findDialog.setVisible(true);

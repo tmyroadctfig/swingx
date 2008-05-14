@@ -48,9 +48,6 @@ public class EditorPaneLinkVisitor implements ActionListener {
     }
     
     public EditorPaneLinkVisitor(JXEditorPane pane) {
-        if (editorPane != null) {
-            editorPane.removeHyperlinkListener(getHyperlinkListener());
-        }
         if (pane == null) {
             pane = createDefaultEditorPane();
         }
