@@ -76,6 +76,7 @@ import org.jdesktop.test.AncientSwingTeam;
 import org.jdesktop.test.CellEditorReport;
 import org.jdesktop.test.PropertyChangeReport;
 import org.jdesktop.test.SerializableSupport;
+import org.jdesktop.test.TestUtils;
 
 /**
  * Test to exposed known issues of <code>JXTable</code>.
@@ -105,7 +106,37 @@ public class JXTableIssues extends InteractiveTestCase {
         } 
     }
     
+    /**
+     * Issue #856-swingx: no notification on filters changed
+     */
+    public void testFiltersProperty() {
+        JXTable table = new JXTable(10, 2);
+        FilterPipeline pipeline = table.getFilters();
+        assertNotNull("sanity: pipeline never null", pipeline);
+        FilterPipeline other = new FilterPipeline();
+        PropertyChangeReport report = new PropertyChangeReport();
+        table.addPropertyChangeListener(report);
+        table.setFilters(other);
+        assertEquals("sanity: new pipeline set", other, table.getFilters());
+        TestUtils.assertPropertyChangeEvent(report, "filters", pipeline, other, false);
+    }
 
+    /**
+     * Issue #856-swingx: no notification on filters changed
+     * 
+     * Here: test JXList
+     */
+    public void testFiltersPropertyList() {
+        JXList table = new JXList(true);
+        FilterPipeline pipeline = table.getFilters();
+        assertNotNull("sanity: pipeline never null", pipeline);
+        FilterPipeline other = new FilterPipeline();
+        PropertyChangeReport report = new PropertyChangeReport();
+        table.addPropertyChangeListener(report);
+        table.setFilters(other);
+        assertEquals("sanity: new pipeline set", other, table.getFilters());
+        TestUtils.assertPropertyChangeEvent(report, "filters", pipeline, other, false);
+    }
     /**
      * Issue #610-swingx: Cancel editing via Escape doesn't fire editingCanceled.
      * 
