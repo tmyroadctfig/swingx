@@ -243,6 +243,11 @@ public class WrappingProvider extends
             restoreContextValue(context, oldValue);
             return rendererComponent;
         }
+        // PENDING JW: Findbugs barking [NP] Load of known null value
+        // probably can move the return rendererComponent from the if
+        // to here (the contract is to return the comp as-is if the
+        // context is null) - so we can do it here instead of delegating
+        // to super?
         return super.getRendererComponent(context);
     }
 

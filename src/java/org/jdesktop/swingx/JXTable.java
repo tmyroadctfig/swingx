@@ -1699,7 +1699,7 @@ public class JXTable extends JTable
         int anchor = getSelectionModel().getAnchorSelectionIndex();
         int lastRow = getModel().getRowCount() - 1;
         if ((lead > lastRow) || (anchor > lastRow)) {
-            lead = anchor = lastRow;
+            lead = lastRow;
             getSelectionModel().setAnchorSelectionIndex(lead);
             getSelectionModel().setLeadSelectionIndex(lead);
         }

@@ -259,7 +259,7 @@ public abstract class AbstractMutableTreeTableNode implements
     @Override
     public String toString() {
         if (userObject == null) {
-            return null;
+            return "";
         } else {
             return userObject.toString();
         }

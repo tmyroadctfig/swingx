@@ -362,6 +362,7 @@ public interface HighlightPredicate {
          * odd group number.
          */
         public boolean isHighlighted(Component renderer, ComponentAdapter adapter) {
+            // JW: oddness check is okay - adapter.row must be a valid view coordinate
             return (adapter.row / linesPerGroup) % 2 == 1;
         }
         
