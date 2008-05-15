@@ -80,7 +80,7 @@ import org.jdesktop.swingx.util.WindowUtils;
  * 
  * @author Jeanette Winzenburg
  */
-public class SimpleRendererDemo {
+public final class SimpleRendererDemo {
     @SuppressWarnings("unused")
     private static final Logger LOG = Logger.getLogger(SimpleRendererDemo.class
             .getName());

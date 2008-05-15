@@ -385,7 +385,6 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
         table.setTreeTableModel(createCustomTreeTableModelFromDefault());  
         SwingUtilities.invokeAndWait(new Runnable() {
             public void run() {
-                LOG.info("sanity - did testTableEventOnSetModel run?");
                 assertEquals("tableModel must have fired", 1, report.getEventCount());
                 assertTrue("event type must be structureChanged " + TableModelReport.printEvent(report.getLastEvent()), 
                         report.isStructureChanged(report.getLastEvent()));

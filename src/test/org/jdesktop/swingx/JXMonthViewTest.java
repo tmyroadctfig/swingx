@@ -1682,14 +1682,12 @@ public class JXMonthViewTest extends MockObjectTestCase {
             fail("null array must throw NPE");
         } catch (NullPointerException e) {
             // expected
-            LOG.info("got NPE as expected - how to test fail fast?");
         }
         try {
             monthView.setUnselectableDates(new Date[] {new Date(), null});
             fail("null elements must throw NPE");
         } catch (NullPointerException e) {
             // expected
-            LOG.info("got NPE as expected - how to test fail fast?");
         }
     }
 

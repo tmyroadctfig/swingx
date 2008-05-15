@@ -73,7 +73,7 @@ import org.jdesktop.swingx.util.WindowUtils;
  * 
  * @author Jeanette Winzenburg
  */
-public class AnimatedRendererDemo {
+public final class AnimatedRendererDemo {
     @SuppressWarnings("unused")
     private static final Logger LOG = Logger.getLogger(AnimatedRendererDemo.class
             .getName());
