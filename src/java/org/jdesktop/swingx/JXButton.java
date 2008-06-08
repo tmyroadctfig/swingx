@@ -67,21 +67,24 @@ public class JXButton extends JButton {
     private String text = "";
     private boolean borderPainted;
     private boolean contentAreaFilled;
-    
+
     private Painter<JXButton> fgPainter = new DefaultForegroundPainter();
     private Painter<JXButton> bgPainter = new DefaultBackgroundPainter();
 
     /** Creates a new instance of JXButton */
     public JXButton() {}
-    public JXButton(String text) { 
-        super(text); 
+    public JXButton(String text) {
+        super(text);
         this.text = text;
     }
-    public JXButton(Action a) { 
-        super(a); 
+    public JXButton(Action a) {
+        super();
+        // swingx-849 Has to set action explicitly after UI resources are already initialized by
+        //implicit constructor to ensure properties defined in action are initialized properly.
+        setAction(a);
     }
     public JXButton(Icon icon) { super(icon); }
-    public JXButton(String text, Icon icon) { 
+    public JXButton(String text, Icon icon) {
         super(text, icon);
         this.text = text;
     }
@@ -92,40 +95,40 @@ public class JXButton extends JButton {
         contentAreaFilled = true;
         super.init(text, icon);
     }
-    
+
     @Override
     public void setText(String text) {
         this.text = text;
         super.setText(text);
     }
-    
+
     @Override
     public String getText() {
         return this.text;
     }
-    
+
     @Override
     public void setBorderPainted(boolean b) {
         this.borderPainted = b;
         super.setBorderPainted(b);
     }
-    
+
     @Override
     public boolean isBorderPainted() {
         return this.borderPainted;
     }
-    
+
     @Override
     public void setContentAreaFilled(boolean b) {
         this.contentAreaFilled = b;
         super.setContentAreaFilled(b);
     }
-    
+
     @Override
     public boolean isContentAreaFilled() {
         return this.contentAreaFilled;
     }
-    
+
     public Painter<JXButton> getBackgroundPainter() {
         return bgPainter;
     }
@@ -146,28 +149,28 @@ public class JXButton extends JButton {
         firePropertyChange("foregroundPainter", old, getForegroundPainter());
         repaint();
     }
-    
+
     private boolean paintBorderInsets = true;
     private boolean painting;
     private boolean opaque = true;
-    
+
     /**
      * Returns true if the background painter should paint where the border is
-     * or false if it should only paint inside the border. This property is 
+     * or false if it should only paint inside the border. This property is
      * true by default. This property affects the width, height,
      * and intial transform passed to the background painter.
      */
     public boolean isPaintBorderInsets() {
         return paintBorderInsets;
     }
-    
+
     /**
      * Sets the paintBorderInsets property.
      * Set to true if the background painter should paint where the border is
      * or false if it should only paint inside the border. This property is true by default.
      * This property affects the width, height,
      * and intial transform passed to the background painter.
-     * 
+     *
      * This is a bound property.
      */
     public void setPaintBorderInsets(boolean paintBorderInsets) {
@@ -175,12 +178,12 @@ public class JXButton extends JButton {
         this.paintBorderInsets = paintBorderInsets;
         firePropertyChange("paintBorderInsets", old, isPaintBorderInsets());
     }
-    
+
     @Override
     public boolean isOpaque() {
         return painting ? opaque : super.isOpaque();
     }
-    
+
     protected void paintComponent(Graphics g) {
         Painter<JXButton> bgPainter = getBackgroundPainter();
         Painter<JXButton> fgPainter = getForegroundPainter();
@@ -191,12 +194,12 @@ public class JXButton extends JButton {
             invokePainter(g, fgPainter);
         }
     }
-    
+
     private void invokePainter(Graphics g, Painter<JXButton> ptr) {
         if(ptr == null) return;
-        
+
         Graphics2D g2d = (Graphics2D) g.create();
-        
+
         try {
             if(isPaintBorderInsets()) {
                 ptr.paint(g2d, this, getWidth(), getHeight());
@@ -248,7 +251,7 @@ public class JXButton extends JButton {
             b.borderPainted = t1;
             b.contentAreaFilled = t2;
             b.setPainting(false);
-             
+
         }
 
         //if any of the state of the JButton that affects the foreground has changed,
