@@ -22,6 +22,7 @@
 package org.jdesktop.swingx;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import javax.swing.Icon;
 import org.jdesktop.swingx.plaf.HeaderUI;
@@ -29,14 +30,14 @@ import org.jdesktop.swingx.plaf.HeaderAddon;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 
 /**
- * <p><code>JXHeader is a simple component consisting of a title, a description, 
+ * <p><code>JXHeader is a simple component consisting of a title, a description,
  * and an icon. An example of such a component can be seen on
  * <a href="http://jext.free.fr/header.png">Romain Guys ProgX website</a></p>
  *
- * <p><code>JXHeader</code> is a simple component that is also sufficiently 
+ * <p><code>JXHeader</code> is a simple component that is also sufficiently
  * configurable to be usable. The description area
  * accepts HTML conforming to version 3.2 of the HTML standard. The icon, title,
- * and description are all configurable. <code>JXHeader</code> itself extends 
+ * and description are all configurable. <code>JXHeader</code> itself extends
  * {@link JXPanel}, providing translucency and painting delegates.</p>
  *
  * <p>If I were to reconstruct the ui shown in the above screenshot, I might
@@ -50,7 +51,7 @@ import org.jdesktop.swingx.plaf.LookAndFeelAddons;
  *      Icon icon = new ImageIcon(getClass().getResource("tools.png"));
  *      header.setIcon(icon);
  * </code></pre></p>
- * 
+ *
  * Note: The HTML support doesn't exist yet. The UI delegate needs to discover whether
  * the text supplied is HTML or not, and change the content type of the editor pane
  * being used. The problem is that if "text/html" is always used, the font is wrong.
@@ -63,7 +64,7 @@ import org.jdesktop.swingx.plaf.LookAndFeelAddons;
  *      <li><b>Header.defaultIcon:</b> The default icon to use when creating a new JXHeader.</li>
  *  </ul>
  * </p>
- * 
+ *
  * @status REVIEWED
  * @author rbair
  * @author rah003
@@ -73,17 +74,17 @@ public class JXHeader extends JXPanel {
 	 * SerialVersionUID.
 	 */
 	private static final long serialVersionUID = 3593838231433068954L;
-	
+
 	/**
      * JXHeader pluggable UI key <i>HeaderUI</i>
      */
     public final static String uiClassID = "HeaderUI";
-    
+
     // ensure at least the default ui is registered
     static {
         LookAndFeelAddons.contribute(new HeaderAddon());
     }
-    
+
     /**
      * Specifies desired location of the icon relative to the title/description text.
      */
@@ -105,25 +106,25 @@ public class JXHeader extends JXPanel {
     private Color titleForeground;
     private Color descriptionForeground;
     private IconPosition iconPosition = IconPosition.RIGHT;
-    
+
     /** Creates a new instance of JXHeader */
     public JXHeader() {
     }
-    
-    /** 
+
+    /**
      * Creates a new instance of JXHeader. PropertyChangeEvents are fired
      * when the title and description properties are set.
-     * 
+     *
      * @param title specifies the title property for this JXHeader
      * @param description specifies the description property for this JXHeader
      */
     public JXHeader(String title, String description) {
         this(title, description, null);
     }
-    
+
     /** Creates a new instance of JXHeader. PropertyChangeEvents are fired
      * when the title and description properties are set.
-     * 
+     *
      * @param title specifies the title property for this JXHeader
      * @param description specifies the description property for this JXHeader
      * @param icon specifies the icon property for this JXHeader
@@ -133,16 +134,16 @@ public class JXHeader extends JXPanel {
         setDescription(description);
         setIcon(icon);
     }
-    
+
     //------------------------------------------------------------- UI Logic
-    
+
     /**
      * {@inheritDoc}
      */
     public HeaderUI getUI() {
         return (HeaderUI)super.getUI();
     }
-    
+
     /**
      * Sets the look and feel (L&F) object that renders this component.
      *
@@ -152,7 +153,7 @@ public class JXHeader extends JXPanel {
     public void setUI(HeaderUI ui) {
         super.setUI(ui);
     }
-    
+
     /**
      * Returns the name of the L&F class that renders this component.
      *
@@ -163,7 +164,7 @@ public class JXHeader extends JXPanel {
     public String getUIClassID() {
         return uiClassID;
     }
-    
+
     /**
      * Notification from the <code>UIManager</code> that the L&F has changed.
      * Replaces the current UI object with the latest version from the
@@ -176,11 +177,11 @@ public class JXHeader extends JXPanel {
         setUI((HeaderUI) LookAndFeelAddons
                 .getUI(this, HeaderUI.class));
     }
-    
+
     /**
      * Sets the title to use. This may be either plain text, or a simplified
      * version of HTML, as JLabel would use.
-     * 
+     *
      * @param title the Title. May be null.
      */
     public void setTitle(String title) {
@@ -188,7 +189,7 @@ public class JXHeader extends JXPanel {
         this.title = title;
         firePropertyChange("title", old, getTitle());
     }
-    
+
     /**
      * Gets the title. This may use HTML, such as
      * that supported by JLabel (version 3.2 of the HTML spec).
@@ -197,11 +198,11 @@ public class JXHeader extends JXPanel {
     public String getTitle() {
         return title;
     }
-    
+
     /**
      * Sets the description for this header. This may use HTML, such as
      * that supported by JLabel (version 3.2 of the HTML spec).
-     * 
+     *
      * @param description the description. May be null, may be HTML or plain text.
      */
     public void setDescription(String description) {
@@ -212,17 +213,17 @@ public class JXHeader extends JXPanel {
 
     /**
      * Gets the description.
-     * 
+     *
      * @return description
      */
     public String getDescription() {
         return description;
     }
-    
+
     /**
-     * Sets the icon to use for the header. It is generally recommended that this 
+     * Sets the icon to use for the header. It is generally recommended that this
      * be an image 64x64 pixels in size, and that the icon have no gaps at the top.
-     * 
+     *
      * @param icon may be null
      */
     public void setIcon(Icon icon) {
@@ -230,18 +231,18 @@ public class JXHeader extends JXPanel {
         this.icon = icon;
         firePropertyChange("icon", old, getIcon());
     }
-    
+
     /**
      * Gets the icon.
-     * 
+     *
      * @return the Icon being used. May be null.
      */
     public Icon getIcon() {
         return icon;
     }
-    
+
     /**
-     * Sets new font for both, title and description line of the header. 
+     * Sets new font for both, title and description line of the header.
      * @see javax.swing.JComponent#setFont(java.awt.Font)
      */
     @Override
@@ -250,7 +251,7 @@ public class JXHeader extends JXPanel {
         setTitleFont(font);
         setDescriptionFont(font);
     }
-    
+
     /**
      * Sets new font for title.
      * @param font New title font.
@@ -260,7 +261,7 @@ public class JXHeader extends JXPanel {
         this.titleFont = font;
         firePropertyChange("titleFont", old, getTitleFont());
     }
-    
+
     /**
      * Gets title font.
      *
@@ -269,7 +270,7 @@ public class JXHeader extends JXPanel {
     public Font getTitleFont() {
         return titleFont;
     }
-    
+
     /**
      * Sets font for the description line of header.
      * @param font New description font.
@@ -279,7 +280,7 @@ public class JXHeader extends JXPanel {
         this.descriptionFont = font;
         firePropertyChange("descriptionFont", old, getDescriptionFont());
     }
-    
+
     /**
      * Gets description font.
      *
@@ -324,7 +325,7 @@ public class JXHeader extends JXPanel {
 		this.descriptionForeground = descriptionForeground;
         firePropertyChange("descriptionForeground", old, getDescriptionForeground());
 	}
-    
+
 	/**
 	 * Gets current icon position. Default is RIGHT.
 	 * @return Current Icon position.
@@ -342,5 +343,12 @@ public class JXHeader extends JXPanel {
 		IconPosition old = getIconPosition();
 		this.iconPosition = iconPosition;
 		firePropertyChange("iconPosition", old, getIconPosition());
+	}
+
+	public Dimension getPreferredSize() {
+	    Dimension s = super.getPreferredSize();
+	    // TODO: hack for JXLabel issue ... see JXHeaderVisualCheck.interactiveCustomProperties();
+	    s.width += 5;
+	    return s;
 	}
 }

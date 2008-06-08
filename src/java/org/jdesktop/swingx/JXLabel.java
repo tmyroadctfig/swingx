@@ -30,6 +30,8 @@ import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.Shape;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.geom.Point2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -43,7 +45,6 @@ import java.util.List;
 import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.SizeRequirements;
-import javax.swing.border.Border;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentEvent.ElementChange;
 import javax.swing.plaf.basic.BasicHTML;
@@ -77,37 +78,37 @@ import org.jdesktop.swingx.painter.Painter;
  * A {@link javax.swing.JLabel} subclass which supports {@link org.jdesktop.swingx.painter.Painter}s, multi-line text,
  * and text rotation.
  * </p>
- * 
+ *
  * <p>
  * Painter support consists of the <code>foregroundPainter</code> and <code>backgroundpainter</code> properties. The
  * <code>backgroundPainter</code> refers to a painter responsible for painting <i>beneath</i> the text and icon. This
  * painter, if set, will paint regardless of the <code>opaque</code> property. If the background painter does not
  * fully paint each pixel, then you should make sure the <code>opaque</code> property is set to false.
  * </p>
- * 
+ *
  * <p>
  * The <code>foregroundPainter</code> is responsible for painting the icon and the text label. If no foregroundPainter
  * is specified, then the look and feel will paint the label. Note that if opaque is set to true and the look and feel
  * is rendering the foreground, then the foreground <i>may</i> paint over the background. Most look and feels will
  * paint a background when <code>opaque</code> is true. To avoid this behavior, set <code>opaque</code> to false.
  * </p>
- * 
+ *
  * <p>
  * Since JXLabel is not opaque by default (<code>isOpaque()</code> returns false), neither of these problems
  * typically present themselves.
  * </p>
- * 
+ *
  * <p>
  * Multi-line text is enabled via the <code>lineWrap</code> property. Simply set it to true. By default, line wrapping
  * occurs on word boundaries.
  * </p>
- * 
+ *
  * <p>
  * The text (actually, the entire foreground and background) of the JXLabel may be rotated. Set the
  * <code>rotation</code> property to specify what the rotation should be.
  * </p>
  * TODO not yet determined what API this will use.
- * 
+ *
  * @author joshua.marinacci@sun.com
  * @author rbair
  * @author rah
@@ -137,7 +138,10 @@ public class JXLabel extends JLabel {
 
     private int pHeight;
 
-    private boolean ignoreRepaint;
+    // using reverse logic ... some methods causing reflow of text are called from super constructor, but private variables are initialized only after call to super so have to rely on default for boolean being false
+    private boolean dontIgnoreRepaint = false;
+
+    private int prevTlaWidth;
 
     private static final String oldRendererKey = "was" + BasicHTML.propertyKey;
 
@@ -173,12 +177,12 @@ public class JXLabel extends JLabel {
 
     /**
      * Create a new JXLabel with the given text as the text for the label. This is shorthand for:
-     * 
+     *
      * <pre><code>
      * JXLabel label = new JXLabel();
      * label.setText(&quot;Some Text&quot;);
      * </code></pre>
-     * 
+     *
      * @param text the text to set.
      */
     public JXLabel(String text) {
@@ -226,12 +230,22 @@ public class JXLabel extends JLabel {
      */
     private void initLineWrapSupport() {
         addPropertyChangeListener(new MultiLineSupport());
+        addComponentListener(new ComponentAdapter() {
+            public void componentResized(ComponentEvent e) {
+                if (!isLineWrap()) {
+                    return;
+                }
+                View view = (View) getClientProperty(BasicHTML.propertyKey);
+                if (view != null && view instanceof Renderer) {
+                    view.setSize(getWidth() - 1, ((Renderer) view).height);
+                }
+            }});
     }
 
     /**
      * Returns the current foregroundPainter. This is a bound property. By default the foregroundPainter will be an
      * internal painter which executes the standard painting code (paintComponent()).
-     * 
+     *
      * @return the current foreground painter.
      */
     public final Painter getForegroundPainter() {
@@ -241,7 +255,7 @@ public class JXLabel extends JLabel {
     /**
      * Sets a new foregroundPainter on the label. This will replace the existing foreground painter. Existing painters
      * can be wrapped by using a CompoundPainter.
-     * 
+     *
      * @param painter
      */
     public void setForegroundPainter(Painter painter) {
@@ -255,7 +269,7 @@ public class JXLabel extends JLabel {
      * Sets a Painter to use to paint the background of this component By default there is already a single painter
      * installed which draws the normal background for this component according to the current Look and Feel. Calling
      * <CODE>setBackgroundPainter</CODE> will replace that existing painter.
-     * 
+     *
      * @param p the new painter
      * @see #getBackgroundPainter()
      */
@@ -265,11 +279,11 @@ public class JXLabel extends JLabel {
         firePropertyChange("backgroundPainter", old, getBackgroundPainter());
         repaint();
     }
-    
+
     /**
      * Returns the current background painter. The default value of this property is a painter which draws the normal
      * JPanel background according to the current look and feel.
-     * 
+     *
      * @return the current painter
      * @see #setBackgroundPainter(Painter)
      */
@@ -279,14 +293,14 @@ public class JXLabel extends JLabel {
 
     /**
      * Gets current value of text rotation in rads.
-     * 
+     *
      * @return a double representing the current rotation of the text
      * @see #setTextRotation(double)
      */
     public double getTextRotation() {
         return textRotation;
     }
-    
+
     @Override
     public Dimension getPreferredSize() {
         Dimension size = super.getPreferredSize();
@@ -304,26 +318,36 @@ public class JXLabel extends JLabel {
             if (view == null || tla == null || !(view instanceof Renderer)) {
                 return size;
             }
-            
+            Rectangle tlaBounds = tla.getBounds();
+            int modTlaWidth = tlaBounds.width;
+            //#swingx-780 watch out for ancestor providing more width to us
+            Insets tlaInsets = tla.getInsets();
+            if (tlaInsets != null) {
+                modTlaWidth -= tlaInsets.left + tlaInsets.right + 3;
+            }
             int w = ((Renderer) view).getWidth();
             int h = ((Renderer) view).getHeight();
             Icon ic = getIcon();
-            int icw = ic != null ? (ic.getIconWidth() + getIconTextGap()) : 0;
-            if ((getWidth() - icw) == w && getHeight() == h) {
+            int iconWidth = ic != null ? (ic.getIconWidth() + getIconTextGap()) : 0;
+            if (this.prevTlaWidth == modTlaWidth && (getWidth() - iconWidth) == w ) {
                 // no change bail out
-                size.width = Math.max(size.width - icw, w);
-                size.height = Math.max(size.height, h);
+                size.width = Math.max(size.width - iconWidth, w);
+                size.height =  Math.max(getHeight(), size.height);
+                this.prevTlaWidth = modTlaWidth;
                 return size;
             }
-            Rectangle b = super.getBounds();
-            Rectangle s = tla.getBounds();
-            int newW = Math.min(b.width, s.width);
-            if (newW == 0) {
-                return size;
-            }
+            //#swingx-780 - incorrect reflow on resize when parent embeded in scrollpane
+            Rectangle superBounds = super.getBounds();
+            int newW = tlaBounds.width <= 0 ? w : (tlaBounds.width - 1);//was: Math.min(superBounds.width, tlaBounds.width);
+            this.prevTlaWidth = modTlaWidth;
+
             if (ic != null) {
-                newW -= icw;
-                
+                newW -= iconWidth;
+
+            }
+            //#swingx-780 take into account top level ancestor insets
+            if (tlaInsets != null) {
+                newW -= tlaInsets.left + tlaInsets.right + 3;
             }
             Insets i = getInsets();
             if (i != null) {
@@ -338,7 +362,7 @@ public class JXLabel extends JLabel {
     public int getMaxLineSpan() {
         return maxLineSpan ;
     }
-    
+
     public void setMaxLineSpan(int maxLineSpan) {
             int old = getMaxLineSpan();
             this.maxLineSpan = maxLineSpan;
@@ -360,7 +384,7 @@ public class JXLabel extends JLabel {
      * suggests only text rotation, the whole foreground painter is rotated in fact. Due to various reasons it is
      * strongly discouraged to access any size related properties of the label from other threads then EDT when this
      * property is set.
-     * 
+     *
      * @param textOrientation Value for text rotation in range <0,2PI>
      * @see #getTextRotation()
      */
@@ -376,7 +400,7 @@ public class JXLabel extends JLabel {
     /**
      * Enables line wrapping support for plain text. By default this support is disabled to mimic default of the JLabel.
      * Value of this property has no effect on HTML text.
-     * 
+     *
      * @param b the new value
      */
     public void setLineWrap(boolean b) {
@@ -388,14 +412,14 @@ public class JXLabel extends JLabel {
                 // XXX There is a bug here. In order to make painter work with this, caching has to be disabled
                 ((AbstractPainter) getForegroundPainter()).setCacheable(!b);
             }
-            repaint();
+            //repaint();
         }
     }
 
     /**
      * Returns the current status of line wrap support. The default value of this property is false to mimic default
      * JLabel behavior. Value of this property has no effect on HTML text.
-     * 
+     *
      * @return the current multiple line splitting status
      */
     public boolean isLineWrap() {
@@ -407,10 +431,10 @@ public class JXLabel extends JLabel {
         private int maxLineSpan = -1;
 
     public boolean painted;
-    
+
     /**
      * Returns true if the background painter should paint where the border is
-     * or false if it should only paint inside the border. This property is 
+     * or false if it should only paint inside the border. This property is
      * true by default. This property affects the width, height,
      * and intial transform passed to the background painter.
      * @return current value of the paintBorderInsets property
@@ -418,14 +442,14 @@ public class JXLabel extends JLabel {
     public boolean isPaintBorderInsets() {
         return paintBorderInsets;
     }
-    
+
     /**
      * Sets the paintBorderInsets property.
      * Set to true if the background painter should paint where the border is
      * or false if it should only paint inside the border. This property is true by default.
      * This property affects the width, height,
      * and initial transform passed to the background painter.
-     * 
+     *
      * This is a bound property.
      * @param paintBorderInsets new value of the paintBorderInsets property
      */
@@ -434,7 +458,7 @@ public class JXLabel extends JLabel {
         this.paintBorderInsets = paintBorderInsets;
         firePropertyChange("paintBorderInsets", old, isPaintBorderInsets());
     }
-    
+
     /**
      * @param g graphics to paint on
      */
@@ -443,7 +467,7 @@ public class JXLabel extends JLabel {
         // resizing the text view causes recursive callback to the paint down the road. In order to prevent such
         // computationally intensive series of repaints every call to paint is skipped while top most call is being
         // executed.
-        if (ignoreRepaint) {
+        if (!dontIgnoreRepaint) {
             return;
         }
         painted = true;
@@ -494,7 +518,7 @@ public class JXLabel extends JLabel {
             }
         }
     }
-    
+
     private Point2D calculateT() {
         double tx = (double) getWidth();
         double ty = (double) getHeight();
@@ -518,7 +542,7 @@ public class JXLabel extends JLabel {
             // inside square with diagonal equal min(height, width) (Should be the largest rectangular area that
             // fits in, math proof available upon request)
 
-            ignoreRepaint = true;
+            dontIgnoreRepaint = false;
             double square = Math.min(getHeight(), getWidth()) * Math.cos(Math.PI / 4d);
 
             View v = (View) getClientProperty(BasicHTML.propertyKey);
@@ -581,14 +605,14 @@ public class JXLabel extends JLabel {
             }
             pWidth = (int) tx;
             pHeight = (int) ty;
-            ignoreRepaint = false;
+            dontIgnoreRepaint = true;
         }
                 return new Point2D.Double(tx,ty);
         }
 
         @Override
     public void repaint() {
-        if (ignoreRepaint) {
+        if (!dontIgnoreRepaint) {
             return;
         }
         super.repaint();
@@ -596,7 +620,7 @@ public class JXLabel extends JLabel {
 
     @Override
     public void repaint(int x, int y, int width, int height) {
-        if (ignoreRepaint) {
+        if (!dontIgnoreRepaint) {
             return;
         }
         super.repaint(x, y, width, height);
@@ -604,7 +628,7 @@ public class JXLabel extends JLabel {
 
     @Override
     public void repaint(long tm) {
-        if (ignoreRepaint) {
+        if (!dontIgnoreRepaint) {
             return;
         }
         super.repaint(tm);
@@ -612,7 +636,7 @@ public class JXLabel extends JLabel {
 
     @Override
     public void repaint(long tm, int x, int y, int width, int height) {
-        if (ignoreRepaint) {
+        if (!dontIgnoreRepaint) {
             return;
         }
         super.repaint(tm, x, y, width, height);
@@ -667,6 +691,9 @@ public class JXLabel extends JLabel {
         public void propertyChange(PropertyChangeEvent evt) {
             String name = evt.getPropertyName();
             JXLabel src = (JXLabel) evt.getSource();
+            if ("ancestor".equals(name)) {
+                src.dontIgnoreRepaint = true;
+            }
             if (src.isLineWrap()) {
                 if ("font".equals(name) || "foreground".equals(name) || "maxLineSpan".equals(name)) {
                     if (evt.getOldValue() != null && !isHTML(src.getText())) {
@@ -677,7 +704,7 @@ public class JXLabel extends JLabel {
                             && !isHTML((String) evt.getNewValue())) {
                         // was html , but is not
                         if (src.getClientProperty(oldRendererKey) == null
-                                && src.getClientProperty(BasicHTML.propertyKey) != null) {                       
+                                && src.getClientProperty(BasicHTML.propertyKey) != null) {
                             src.putClientProperty(oldRendererKey, src.getClientProperty(BasicHTML.propertyKey));
                         }
                         src.putClientProperty(BasicHTML.propertyKey, createView(src));
@@ -848,7 +875,7 @@ public class JXLabel extends JLabel {
             // initially layout to the preferred size
             setSize(c.getMaxLineSpan() > -1 ? c.getMaxLineSpan() : view.getPreferredSpan(X_AXIS), view.getPreferredSpan(Y_AXIS));
         }
-        
+
         @Override
         protected void updateLayout(ElementChange ec, DocumentEvent e, Shape a) {
             if ( (a != null)) {
@@ -860,7 +887,7 @@ public class JXLabel extends JLabel {
                 }
             }
         }
-        
+
         public void preferenceChanged(View child, boolean width, boolean height) {
             if (host != null && host.painted) {
                 host.revalidate();
@@ -879,7 +906,7 @@ public class JXLabel extends JLabel {
 
         /**
          * Renders the view.
-         * 
+         *
          * @param g the graphics context
          * @param allocation the region to render into
          */
@@ -901,7 +928,7 @@ public class JXLabel extends JLabel {
 
         /**
          * Sets the view parent.
-         * 
+         *
          * @param parent the parent view
          */
         public void setParent(View parent) {
@@ -911,7 +938,7 @@ public class JXLabel extends JLabel {
         /**
          * Returns the number of views in this view. Since this view simply wraps the root of the view hierarchy it has
          * exactly one child.
-         * 
+         *
          * @return the number of views
          * @see #getView
          */
@@ -921,7 +948,7 @@ public class JXLabel extends JLabel {
 
         /**
          * Gets the n-th view in this container.
-         * 
+         *
          * @param n the number of the view to get
          * @return the view
          */
@@ -931,7 +958,7 @@ public class JXLabel extends JLabel {
 
         /**
          * Returns the document model underlying the view.
-         * 
+         *
          * @return the model
          */
         public Document getDocument() {
@@ -940,7 +967,7 @@ public class JXLabel extends JLabel {
 
         /**
          * Sets the view size.
-         * 
+         *
          * @param width the width
          * @param height the height
          */
@@ -952,7 +979,7 @@ public class JXLabel extends JLabel {
             this.height = (int) height;
             view.setSize(width, height);
         }
-        
+
         @Override
         public float getPreferredSpan(int axis) {
             if (axis == X_AXIS) {
@@ -966,7 +993,7 @@ public class JXLabel extends JLabel {
         /**
          * Fetches the container hosting the view. This is useful for things like scheduling a repaint, finding out the
          * host components font, etc. The default implementation of this is to forward the query to the parent view.
-         * 
+         *
          * @return the container
          */
         public Container getContainer() {
@@ -977,7 +1004,7 @@ public class JXLabel extends JLabel {
          * Fetches the factory to be used for building the various view fragments that make up the view that represents
          * the model. This is what determines how the model will be represented. This is implemented to fetch the
          * factory provided by the associated EditorKit.
-         * 
+         *
          * @return the factory
          */
         public ViewFactory getViewFactory() {
@@ -1000,7 +1027,7 @@ public class JXLabel extends JLabel {
 
     /**
      * <code>AnotherAbstractDocument</code>
-     * 
+     *
      * @inheritDoc
      */
     private static abstract class AlterAbstractDocument extends AbstractDocument implements Document, Serializable {
@@ -1083,7 +1110,7 @@ public class JXLabel extends JLabel {
          * This is implemented to let the superclass find the position along the major axis and the allocation of the
          * row is used along the minor axis, so that even though the children are different heights they all get the
          * same caret height.
-         * 
+         *
          * @param pos the position to convert
          * @param a the allocated region to render into
          * @return the bounding box of the given position
@@ -1110,7 +1137,7 @@ public class JXLabel extends JLabel {
 
         /**
          * Range represented by a row in the paragraph is only a subset of the total range of the paragraph element.
-         * 
+         *
          * @see View#getRange
          */
         public int getStartOffset() {
@@ -1139,7 +1166,7 @@ public class JXLabel extends JLabel {
          * along the minor axis.
          * <p>
          * This is implemented to do a baseline layout of the children by calling BoxView.baselineLayout.
-         * 
+         *
          * @param targetSpan the total span given to the view, which whould be used to layout the children.
          * @param axis the axis being layed out.
          * @param offsets the offsets from the origin of the view for each of the child views. This is a return value
@@ -1180,7 +1207,7 @@ public class JXLabel extends JLabel {
         /**
          * Whether we need to justify this {@code Row}. At this time (jdk1.6) we support justification on for non 18n
          * text.
-         * 
+         *
          * @return {@code true} if this {@code Row} should be justified.
          */
         private boolean isJustifyEnabled() {
@@ -1315,7 +1342,7 @@ public class JXLabel extends JLabel {
 
         /**
          * Fetches the child view index representing the given position in the model.
-         * 
+         *
          * @param pos the position >= 0
          * @return index of the view representing the given position, or -1 if no view represents that position
          */
@@ -1335,7 +1362,7 @@ public class JXLabel extends JLabel {
 
         /**
          * Gets the left inset.
-         * 
+         *
          * @return the inset
          */
         protected short getLeftInset() {
@@ -1368,14 +1395,14 @@ public class JXLabel extends JLabel {
 
     /**
      * <code>AnotherGlyphView</code>
-     * 
+     *
      * @inheritDoc
      */
     static class AlterGlyphView extends GlyphView implements TabableView, Cloneable {
 
         /**
          * Constructs a new view wrapped on an element.
-         * 
+         *
          * @param elem the element
          */
         public AlterGlyphView(Element elem) {
@@ -1490,14 +1517,14 @@ public class JXLabel extends JLabel {
     /**
      * SegmentCache caches <code>Segment</code>s to avoid continually creating and destroying of <code>Segment</code>s.
      * A common use of this class would be:
-     * 
+     *
      * <pre>
      *   Segment segment = segmentCache.getSegment();
      *   // do something with segment
      *   ...
      *   segmentCache.releaseSegment(segment);
      * </pre>
-     * 
+     *
      * @version 1.6 11/17/05
      */
     static class SegmentCache {
@@ -1557,12 +1584,12 @@ public class JXLabel extends JLabel {
         /**
          * Releases a Segment. You should not use a Segment after you release it, and you should NEVER release the same
          * Segment more than once, eg:
-         * 
+         *
          * <pre>
          * segmentCache.releaseSegment(segment);
          * segmentCache.releaseSegment(segment);
          * </pre>
-         * 
+         *
          * Will likely result in very bad things happening!
          */
         public void releaseSegment(Segment segment) {
@@ -1584,7 +1611,7 @@ public class JXLabel extends JLabel {
 
     /**
      * <code>AnotherBoxView</code>
-     * 
+     *
      * @inheritDoc
      */
     static class AlterBoxView extends BoxView {
@@ -1619,14 +1646,14 @@ public class JXLabel extends JLabel {
     /**
      * This exception is to report the failure of state invarient assertion that was made. This indicates an internal
      * error has occurred.
-     * 
+     *
      * @author Timothy Prinzing
      * @version 1.18 11/17/05
      */
     static class StateInvariantError extends Error {
         /**
          * Creates a new StateInvariantFailure object.
-         * 
+         *
          * @param s a string indicating the assertion that failed
          */
         public StateInvariantError(String s) {

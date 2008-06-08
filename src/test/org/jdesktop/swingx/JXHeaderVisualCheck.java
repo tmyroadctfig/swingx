@@ -8,12 +8,12 @@
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
@@ -25,6 +25,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.net.URL;
@@ -42,15 +43,15 @@ import org.jdesktop.swingx.JXHeader.IconPosition;
 import org.jdesktop.swingx.test.XTestUtils;
 
 /**
- * Tests previously created to expose known issues of <code>JXHeader</code>, now fixed. 
+ * Tests previously created to expose known issues of <code>JXHeader</code>, now fixed.
  * Still need visual inspection from time to time.
  * <p>
- * 
+ *
  * @author Jeanette Winzenburg
  */
 public class JXHeaderVisualCheck extends InteractiveTestCase {
 
-    
+
     public static void main(String args[]) {
         JXHeaderVisualCheck test = new JXHeaderVisualCheck();
         try {
@@ -58,7 +59,7 @@ public class JXHeaderVisualCheck extends InteractiveTestCase {
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
-        } 
+        }
     }
 
     @Override
@@ -67,13 +68,13 @@ public class JXHeaderVisualCheck extends InteractiveTestCase {
     }
 
     // ------------------ interactive
-    
+
     public void interactiveHeaderInTabbedPane() {
         JTabbedPane pane = new JTabbedPane();
         pane.addTab("first", createHeader());
         pane.addTab("second", createHeader());
         showInFrame(pane, "NPE: header in tabbedPane?");
-        
+
     }
 
     private JXHeader createHeader() {
@@ -97,7 +98,7 @@ public class JXHeaderVisualCheck extends InteractiveTestCase {
 		final JXHeader header = new JXHeader("My Title",
 				"<html>My short description<br>some text<html>");
 		f.add(header, BorderLayout.CENTER);
- 
+
 		JButton changeFont = new JButton("Font");
 		f.add(changeFont, BorderLayout.SOUTH);
 		changeFont.addActionListener(new ActionListener() {
@@ -109,7 +110,7 @@ public class JXHeaderVisualCheck extends InteractiveTestCase {
 				});
 			}
 		});
-	     
+
 		f.setSize(400, 200);
 		f.setVisible(true);
 	}
@@ -117,7 +118,7 @@ public class JXHeaderVisualCheck extends InteractiveTestCase {
     /**
      * Short description in header produces unexpected line wraps in
      * footer.
-     * 
+     *
      * Note: the frame is not packed to simulate the appframework
      * context.
      */
@@ -148,10 +149,10 @@ public class JXHeaderVisualCheck extends InteractiveTestCase {
         frame.setSize(800, 400);
         frame.setVisible(true);
     }
-    
+
     /**
      * Long description in header produces expected line-wrap in footer.
-     * 
+     *
      * Note: the frame is not packed to simulate the appframework
      * context.
      */
@@ -181,26 +182,29 @@ public class JXHeaderVisualCheck extends InteractiveTestCase {
     /**
      * Issue #403-swingx: JXHeader doesn't show custom values.
      * <p>
-     * 
+     *
      * All values are passed in the constructor.
      */
     public void interactiveCustomProperties() {
         URL url = getClass().getResource("resources/images/wellTop.gif");;
-        
+
         assertNotNull(url);
         JPanel p = new JPanel(new BorderLayout());
         JXHeader header = new JXHeader("MyTitle", "MyDescription", new ImageIcon(url));
         header.setIconPosition(IconPosition.LEFT);
-        p.add(header);
+        JPanel px = new JPanel(new GridLayout(2,1));
+        px.add(header);
+        px.add(new JXHeader("MyTitle", "MyDescription", new ImageIcon(url)));
+        p.add(px);
         // added just to better visualize bkg gradient in the JXHeader.
         p.add(new JLabel("Reference component"), BorderLayout.SOUTH);
         showInFrame(p, "JXHeader with custom properties");
     }
-    
+
     /**
      * Issue #469-swingx: JXHeader doesn't wrap words in description.<p>
      * Issue #634-swingx: JXHeader uses incorrect font for description.<p>
-     * 
+     *
      * All values are passed in the constructor.
      */
     public void interactiveWordWrapping() {
@@ -212,10 +216,10 @@ public class JXHeaderVisualCheck extends InteractiveTestCase {
         p.setPreferredSize(new Dimension(200,150));
         showInFrame(p, "word wrapping JXHeader");
     }
-    
+
     /**
      * Test custom title font and color use.
-     * 
+     *
      * All values are passed in the constructor.
      */
     public void interactiveCustomTitle() {
@@ -229,11 +233,11 @@ public class JXHeaderVisualCheck extends InteractiveTestCase {
         p.setPreferredSize(new Dimension(400,150));
         showInFrame(p, "word wrapping JXHeader");
     }
-    
+
     /**
-     * Empty test method to keep the testrunner happy. 
+     * Empty test method to keep the testrunner happy.
      */
     public void testDummy() {
-        
+
     }
 }
