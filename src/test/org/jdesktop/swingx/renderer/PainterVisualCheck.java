@@ -34,6 +34,7 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -47,12 +48,16 @@ import javax.swing.JLabel;
 import javax.swing.KeyStroke;
 import javax.swing.ListModel;
 import javax.swing.Timer;
+import javax.swing.filechooser.FileSystemView;
 import javax.swing.table.TableModel;
+import javax.swing.tree.TreeModel;
 
 import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXList;
 import org.jdesktop.swingx.JXTable;
+import org.jdesktop.swingx.JXTree;
+import org.jdesktop.swingx.JXBusyLabel.Direction;
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.action.ActionContainerFactory;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
@@ -62,6 +67,7 @@ import org.jdesktop.swingx.decorator.HighlighterFactory;
 import org.jdesktop.swingx.decorator.PainterHighlighter;
 import org.jdesktop.swingx.decorator.HighlightPredicate.ColumnHighlightPredicate;
 import org.jdesktop.swingx.painter.AbstractLayoutPainter;
+import org.jdesktop.swingx.painter.BusyPainter;
 import org.jdesktop.swingx.painter.ImagePainter;
 import org.jdesktop.swingx.painter.MattePainter;
 import org.jdesktop.swingx.painter.Painter;
@@ -71,6 +77,7 @@ import org.jdesktop.swingx.painter.AbstractLayoutPainter.VerticalAlignment;
 import org.jdesktop.swingx.painter.effects.InnerGlowPathEffect;
 import org.jdesktop.swingx.table.ColumnControlButton;
 import org.jdesktop.swingx.test.XTestUtils;
+import org.jdesktop.swingx.treetable.FileSystemModel;
 import org.jdesktop.test.AncientSwingTeam;
 
 /**
@@ -92,9 +99,10 @@ public class PainterVisualCheck extends InteractiveTestCase {
 //      setSystemLF(true);
       PainterVisualCheck test = new PainterVisualCheck();
       try {
-        test.runInteractiveTests();
+//        test.runInteractiveTests();
 //         test.runInteractiveTests("interactive.*Gradient.*");
 //         test.runInteractiveTests("interactive.*Icon.*");
+        test.runInteractiveTests("interactive.*Animated.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
@@ -303,6 +311,8 @@ public class PainterVisualCheck extends InteractiveTestCase {
                 "value-based image position highlighting");
     }
 
+    
+    
     /**
      * Use highlighter with image painter which is positioned relative to 
      * cell value. 
@@ -331,6 +341,86 @@ public class PainterVisualCheck extends InteractiveTestCase {
         timer.start();
     }
     
+    /**
+     * Use highlighter with BusyPainter.
+     */
+    public void interactiveAnimatedBusyPainterHighlight()  {
+        TableModel model = new AncientSwingTeam();
+        JXTable table = new JXTable(model);
+        final BusyPainter busyPainter = new BusyPainter() {
+            /**
+             * Overridden to fix Issue #861-swingx: must notify on change
+             * @param frame
+             */
+            @Override
+            public void setFrame(int frame) {
+                int old = getFrame();
+                super.setFrame(frame);
+                firePropertyChange("frame", old, getFrame());
+            }
+            
+        };
+        PainterHighlighter iconHighlighter = new PainterHighlighter();
+        iconHighlighter.setHighlightPredicate(HighlightPredicate.ROLLOVER_ROW);
+        iconHighlighter.setPainter(busyPainter);
+        ActionListener l = new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                int frame = busyPainter.getFrame();
+                frame = (frame+1)%busyPainter.getPoints();
+                busyPainter.setFrame(frame);
+            }
+            
+        };
+        table.addHighlighter(iconHighlighter);
+        showWithScrollingInFrame(table, 
+                "Animated highlighter: marching icon on rollover");
+        Timer timer = new Timer(100, l);
+        timer.start();
+    }
+    
+    /**
+     * Issue #862-swingx: SwingX rendering components should be PainterAware.
+     * 
+     * Currently this works only with a local version which has WrappingIconPanel
+     * implement the PainterAware by delegating to its content delegate. 
+     */
+    public void interactiveAnimatedIconPainterHighlightTree()  {
+        TreeModel model = new FileSystemModel();
+        JXTree tree = new JXTree(model);
+        tree.setRolloverEnabled(true);
+        StringValue sv = new StringValue() {
+
+            public String getString(Object value) {
+                if (value instanceof File) {
+                    return FileSystemView.getFileSystemView().getSystemDisplayName((File) value)
+                       + " Type: " 
+                       + FileSystemView.getFileSystemView().getSystemTypeDescription((File) value); 
+                } 
+                return TO_STRING.getString(value);
+            }
+            
+        };
+        tree.setCellRenderer(new DefaultTreeRenderer(sv));
+        ImagePainter<Component> imagePainter = new ImagePainter<Component>(XTestUtils.loadDefaultImage("green-orb.png"));
+        imagePainter.setHorizontalAlignment(HorizontalAlignment.RIGHT);
+        final RelativePainter painter = new RelativePainter<Component>(imagePainter);
+        PainterHighlighter iconHighlighter = new PainterHighlighter();
+        iconHighlighter.setHighlightPredicate(HighlightPredicate.ROLLOVER_ROW);
+        iconHighlighter.setPainter(painter);
+        ActionListener l = new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                double fraction = painter.getXFactor();
+                fraction = fraction > 1 ? 0.0 : fraction + 0.1;
+                painter.setXFactor(fraction);
+            }
+            
+        };
+        tree.addHighlighter(iconHighlighter);
+        showWithScrollingInFrame(tree, 
+                "Animated highlighter: marching icon on rollover");
+        Timer timer = new Timer(100, l);
+        timer.start();
+    }
 
     //  ----------------- Transparent gradient on default (swingx) rendering label
 
