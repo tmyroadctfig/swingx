@@ -150,7 +150,16 @@ public class DefaultTableColumnModelExt extends DefaultTableColumnModel
      * @return true if the column was moved to invisible
      */
     public boolean isRemovedToInvisibleEvent(int oldIndex) {
-        return oldIndexes.containsValue(oldIndex);
+        // PENDING JW: proposed fix for #846-swingx - returns false toInvisible
+        // doesn't seem to work?
+//        if (oldIndexes.containsValue(oldIndex)) {
+//            for (Map.Entry<TableColumnExt, Integer> e : oldIndexes.entrySet()) {
+//             if (e.getValue().equals(oldIndex) && invisibleColumns.contains(e.getKey()))
+//                 return true;
+//            }
+//          }
+//          return false; 
+          return oldIndexes.containsValue(oldIndex);
     }
 
     /**

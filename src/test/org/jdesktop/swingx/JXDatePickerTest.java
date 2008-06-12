@@ -79,6 +79,18 @@ public class JXDatePickerTest extends InteractiveTestCase {
     }
     
     /**
+     * Sanity: report in forum that editor not disabled if picker disabled.
+     * Looks okay.
+     */
+    public void testEnabled() {
+        JXDatePicker picker = new JXDatePicker();
+        picker.setEnabled(false);
+        assertFalse("sanity: picker disabled", picker.isEnabled());
+        assertEquals("editor enabled must follow picker enabled", 
+                picker.isEnabled(), picker.getEditor().isEnabled());
+    }
+    
+    /**
      * Issue #764-swingx: JXDatePicker sizing 
      * 
      * editor must respect columns.

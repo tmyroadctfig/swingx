@@ -639,7 +639,7 @@ public class FilterPipeline {
 
         @Override
         public int getSize() {
-            return getInputSize();
+            return this.getInputSize();
         }
 
         @Override
