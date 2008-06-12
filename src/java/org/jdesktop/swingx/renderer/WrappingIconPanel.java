@@ -16,11 +16,15 @@ import javax.swing.JLabel;
 import javax.swing.border.Border;
 
 import org.jdesktop.swingx.JXPanel;
+import org.jdesktop.swingx.painter.Painter;
 
 /**
- * Compound component for usage in tree renderer.
+ * Compound component for usage in tree renderer. <p>
+ * 
+ * This implements the PainterAware by delegating to the delegate component if that
+ * is of type PainterAware. Does nothing if not.
  */
-public class WrappingIconPanel extends JXPanel {
+public class WrappingIconPanel extends JXPanel implements PainterAware {
     JComponent delegate;
     JLabel iconLabel;
     String labelPosition = BorderLayout.CENTER; //2;
@@ -121,6 +125,34 @@ public class WrappingIconPanel extends JXPanel {
     public Rectangle getDelegateBounds() {
         if (delegate == null) return null;
         return delegate.getBounds();
+    }
+
+
+    /**
+     * {@inheritDoc} <p>
+     * 
+     * Returns the delegate's Painter if it is of type PainterAware or null otherwise.
+     * 
+     * @return the delegate's Painter or null.
+     */
+    public Painter getPainter() {
+        if (delegate instanceof PainterAware) {
+            return ((PainterAware) delegate).getPainter();
+        }
+        return null;
+    }
+
+
+    /**
+     * Sets the delegate's Painter if it is of type PainterAware. Does nothing otherwise.
+     * 
+     * @param painter the Painter to apply to the delegate.
+     */
+    public void setPainter(Painter painter) {
+        if (delegate instanceof PainterAware) {
+            ((PainterAware) delegate).setPainter(painter);
+        }
+        
     }
     
     
