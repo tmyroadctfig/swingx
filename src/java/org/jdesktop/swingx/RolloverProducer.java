@@ -28,86 +28,147 @@ import java.awt.event.MouseMotionListener;
 import javax.swing.JComponent;
 
 /**
- * Mouse/Motion/Listener which stores mouse location as 
- * client property in the target JComponent.
+ * Mouse/Motion/Listener which maps mouse coordinates to client coordinates
+ * and stores these as client properties in the target JComponent. The exact
+ * mapping process is left to subclasses. Typically, they will map to "cell"
+ * coordinates. <p>
  * 
- * Note: assumes that the component it is listening to is 
- * of type JComponent!
+ * Note: this class assumes that the target component is of type JComponent.<p>
+ * Note: this implementation is stateful, it can't be shared across different 
+ * instances of a target component.<p>
+ * 
+ * PENDING JW: why isn't this abstract? Subclasses should be forced to implement
+ * the mapping? <p>
  * 
  * @author Jeanette Winzenburg
  */
 public class RolloverProducer implements MouseListener, MouseMotionListener {
 
+    /** 
+     * Key for client property mapped from mouse-triggered action.
+     * Note that the actual mouse-event which results in setting the property
+     * depends on the implementation of the concrete RolloverProducer. 
+     */
+    public static final String CLICKED_KEY = "swingx.clicked";
+
+    /** Key for client property mapped from rollover events */
+    public static final String ROLLOVER_KEY = "swingx.rollover";
+
+    //        public static final String PRESSED_KEY = "swingx.pressed";
+
     //----------------- mouseListener
-        
-        public static final String CLICKED_KEY = "swingx.clicked";
-        public static final String ROLLOVER_KEY = "swingx.rollover";
-//        public static final String PRESSED_KEY = "swingx.pressed";
-        
-        
-        public void mouseClicked(MouseEvent e) {
-        }
 
-        public void mousePressed(MouseEvent e) {
-            
-        }
+    /**
+     * Implemented to map to client property clicked and fire always.
+     */
+    public void mouseReleased(MouseEvent e) {
+        updateRollover(e, CLICKED_KEY, true);
+    }
 
-        public void mouseReleased(MouseEvent e) {
-            updateRollover(e, CLICKED_KEY);
-            
-        }
+    /**
+     * Implemented to map to client property rollover and fire only if client
+     * coordinate changed.
+     */
+    public void mouseEntered(MouseEvent e) {
+        updateRollover(e, ROLLOVER_KEY, false);
+    }
 
-        public void mouseEntered(MouseEvent e) {
-            updateRollover(e, ROLLOVER_KEY);
-        }
+    /**
+     * Implemented to remove client properties rollover and clicked. if the
+     * source is a JComponent. Does nothing otherwise.
+     */
+    public void mouseExited(MouseEvent e) {
+        ((JComponent) e.getSource()).putClientProperty(ROLLOVER_KEY, null);
+        ((JComponent) e.getSource()).putClientProperty(CLICKED_KEY, null);
+    }
 
+    /**
+     * Implemented to do nothing.
+     */
+    public void mouseClicked(MouseEvent e) {
+    }
 
-        public void mouseExited(MouseEvent e) {
-            if (e.getSource() instanceof JComponent) {
-                ((JComponent) e.getSource()).putClientProperty(ROLLOVER_KEY, null);
-                ((JComponent) e.getSource()).putClientProperty(CLICKED_KEY, null);
-//                ((JComponent) e.getSource()).putClientProperty(PRESSED_KEY, null);
-            }
-            
-        }
+    /**
+     * Implemented to do nothing.
+     */
+    public void mousePressed(MouseEvent e) {
+    }
 
-//---------------- MouseMotionListener
-        public void mouseDragged(MouseEvent e) {
-            // TODO Auto-generated method stub
-            
-        }
+    // ---------------- MouseMotionListener
+    /**
+     * Implemented to do nothing.
+     * PENDING JW: probably should do something? Mapped coordinates will be out of synch
+     * after a drag.
+     */
+    public void mouseDragged(MouseEvent e) {
+    }
 
-        public void mouseMoved(MouseEvent e) {
-            updateRollover(e, ROLLOVER_KEY);
-        }
+    /**
+     * Implemented to map to client property rollover and fire only if client
+     * coordinate changed.
+     */
+    public void mouseMoved(MouseEvent e) {
+        updateRollover(e, ROLLOVER_KEY, false);
+    }
 
-        protected void updateRollover(MouseEvent e, String property) {
-            updateRolloverPoint((JComponent) e.getComponent(), e.getPoint());
-            updateClientProperty((JComponent) e.getSource(), property);
-        }
+    //---------------- mapping methods
+    
+    /**
+     * Controls the mapping of the given mouse event to a client property. This
+     * implementation first calls updateRolloverPoint to convert the mouse coordinates.
+     * Then calls updateClientProperty to actually set the client property in the
+     * 
+     * @param e the MouseEvent to map to client coordinates
+     * @param property the client property to map to
+     * @param fireAlways a flag indicating whether a client event should be fired if unchanged.
+     * 
+     * @see #updateRolloverPoint(JComponent, Point)
+     * @see #updateClientProperty(JComponent, String, boolean)
+     */
+    protected void updateRollover(MouseEvent e, String property,
+            boolean fireAlways) {
+        updateRolloverPoint((JComponent) e.getComponent(), e.getPoint());
+        updateClientProperty((JComponent) e.getSource(), property, fireAlways);
+    }
 
-        protected Point rollover = new Point(-1, -1);
-        
-        protected void updateClientProperty(JComponent component, String property) {
+    /** Current mouse location in client coordinates. */
+    protected Point rollover = new Point(-1, -1);
+
+    /**
+     * Sets the given client property to the value of current mouse location in 
+     * client coordinates. If fireAlways, the property is force to fire a change.
+     *  
+     * @param component the target component
+     * @param property the client property to set
+     * @param fireAlways a flag indicating whether a client property 
+     *  should be forced to fire an event.
+     */
+    protected void updateClientProperty(JComponent component, String property,
+            boolean fireAlways) {
+        if (fireAlways) {
+            // fix Issue #864-swingx: force propertyChangeEvent
+            component.putClientProperty(property, null);
+            component.putClientProperty(property, new Point(rollover));
+        } else {
             Point p = (Point) component.getClientProperty(property);
             if (p == null || (rollover.x != p.x) || (rollover.y != p.y)) {
                 component.putClientProperty(property, new Point(rollover));
             }
         }
-
-        /**
-         * Subclasses must override to map the given mouse coordinates into
-         * appropriate client coordinates. The result must be stored in the 
-         * rollover field. 
-         * 
-         * Here: does nothing.
-         * 
-         * @param component
-         * @param mousePoint
-         */
-        protected void updateRolloverPoint(JComponent component, Point mousePoint) {
-            
-        }
-        
-        
     }
+
+    /**
+     * Subclasses must override to map the given mouse coordinates into
+     * appropriate client coordinates. The result must be stored in the 
+     * rollover field. 
+     * 
+     * Here: does nothing.
+     * 
+     * @param component
+     * @param mousePoint
+     */
+    protected void updateRolloverPoint(JComponent component, Point mousePoint) {
+
+    }
+
+}

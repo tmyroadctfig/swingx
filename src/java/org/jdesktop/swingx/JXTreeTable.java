@@ -2299,9 +2299,9 @@ public class JXTreeTable extends JXTable {
                  * @param property
                  */
                 @Override
-                protected void updateRollover(MouseEvent e, String property) {
+                protected void updateRollover(MouseEvent e, String property, boolean fireAlways) {
                     if (CLICKED_KEY.equals(property)) {
-                        super.updateRollover(e, property);
+                        super.updateRollover(e, property, fireAlways);
                     }
                 }
                 @Override

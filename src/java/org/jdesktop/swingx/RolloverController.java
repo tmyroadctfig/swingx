@@ -4,11 +4,16 @@
  */
 package org.jdesktop.swingx;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.logging.Logger;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.JComponent;
+import javax.swing.KeyStroke;
 
 /**
  * Controller for "live" behaviour of XXRenderers.
@@ -29,6 +34,9 @@ import java.beans.PropertyChangeListener;
  */
 public abstract class RolloverController<T extends JComponent> implements
         PropertyChangeListener {
+    @SuppressWarnings("unused")
+    private static final Logger LOG = Logger.getLogger(RolloverController.class
+            .getName());
     /**
      * the key of the rollover click action which is installed in the 
      * component's actionMap.
