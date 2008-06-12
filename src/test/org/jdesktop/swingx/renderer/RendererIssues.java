@@ -26,6 +26,7 @@ import java.awt.Component;
 import java.awt.Font;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.util.logging.Logger;
 
@@ -37,6 +38,7 @@ import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JTree;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListModel;
@@ -61,6 +63,7 @@ import org.jdesktop.swingx.JXTree;
 import org.jdesktop.swingx.JXTreeTable;
 import org.jdesktop.swingx.RolloverProducer;
 import org.jdesktop.swingx.RolloverRenderer;
+import org.jdesktop.swingx.action.LinkAction;
 import org.jdesktop.swingx.border.DropShadowBorder;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.Highlighter;
@@ -68,6 +71,7 @@ import org.jdesktop.swingx.decorator.PainterHighlighter;
 import org.jdesktop.swingx.painter.MattePainter;
 import org.jdesktop.swingx.test.ComponentTreeTableModel;
 import org.jdesktop.swingx.test.XTestUtils;
+import org.jdesktop.test.AncientSwingTeam;
 
 import com.sun.java.swing.plaf.motif.MotifLookAndFeel;
 
@@ -88,17 +92,64 @@ public class RendererIssues extends InteractiveTestCase {
         setSystemLF(true);
         RendererIssues test = new RendererIssues();
         try {
-            test.runInteractiveTests();
+//            test.runInteractiveTests();
 //          test.runInteractiveTests(".*Text.*");
 //          test.runInteractiveTests(".*XLabel.*");
 //          test.runInteractiveTests(".*Color.*");
 //          test.runInteractiveTests("interactive.*ColumnControl.*");
+          test.runInteractiveTests("interactive.*Hyperlink.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
         }
     }
+    
+    /**
+     * Issue #??-swingx: hyperlink not activated on second click
+     * 
+     * Originally reported for not opening a dialog. But independent of that,
+     * mis-behaves always. 
+     */
+    public void interactiveHyperlinkOpenDialog() {
+        JXTable table = new JXTable(new AncientSwingTeam());
+        final JXFrame frame = wrapWithScrollingInFrame(table, "Hyperlink opens dialog");
+        LinkAction action = new LinkAction() {
 
+            public void actionPerformed(ActionEvent e) {
+                JOptionPane.showMessageDialog(frame, "clicked test!");
+            }
+            
+        };
+        table.getColumn(0).setCellRenderer(new DefaultTableRenderer(
+                new HyperlinkProvider(action)));
+        table.setEditable(false);
+        show(frame);
+    }
+
+    /**
+     * Issue #??-swingx: hyperlink not activated on second click
+     * 
+     * Originally reported for not opening a dialog. But independent of that,
+     * mis-behaves always. 
+     * 
+     */
+    public void interactiveHyperlinkPrint() {
+        JXTable table = new JXTable(new AncientSwingTeam());
+        final JXFrame frame = wrapWithScrollingInFrame(table, "Hyperlink prints console");
+        LinkAction action = new LinkAction() {
+
+            public void actionPerformed(ActionEvent e) {
+                LOG.info("got action");
+            }
+            
+        };
+        table.getColumn(0).setCellRenderer(new DefaultTableRenderer(
+                new HyperlinkProvider(action)));
+        table.setEditable(false);
+        show(frame);
+    }
+    
+    
     public void interactiveToolTipList() {
         final JXTree table = new JXTree(new ComponentTreeTableModel(new JXFrame()));
         table.expandAll();
