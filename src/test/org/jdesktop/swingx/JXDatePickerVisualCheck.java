@@ -46,6 +46,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
@@ -83,9 +84,10 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
         JXDatePickerVisualCheck test = new JXDatePickerVisualCheck();
         
         try {
-            test.runInteractiveTests();
+//            test.runInteractiveTests();
 //            test.runInteractiveTests("interactive.*PrefSize.*");
 //            test.runInteractiveTests("interactive.*Keep.*");
+          test.runInteractiveTests("interactive.*PC.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
@@ -487,6 +489,36 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
         frame.pack();
     }
   
+    /**
+     * Checking PropertyChangeEvent: report in forum that no event for date fired.
+     * here not reproducible.. problem of WizardPage?
+     */
+    public void interactivePCEvent() {
+        JXDatePicker picker = new JXDatePicker(new Date());
+        JFormattedTextField textField = new JFormattedTextField(DateFormat.getDateInstance());
+        textField.setValue(new Date());
+        
+        PropertyChangeListener l = new PropertyChangeListener() {
+
+            public void propertyChange(PropertyChangeEvent e) {
+                LOG.info("got pce from: " + e.getSource().getClass().getSimpleName() + 
+                        "\n" + e.getPropertyName() + e.getNewValue());
+                
+            }
+            
+        };
+        textField.addPropertyChangeListener(l);
+        picker.addPropertyChangeListener(l);
+//        picker.getMonthView().addActionListener(l);
+        JPanel panel = new JPanel();
+        panel.add(textField);
+        panel.add(picker);
+        JTabbedPane tab = new JTabbedPane();
+        tab.add("fields", panel);
+        tab.add("dummy", new JLabel("dummy"));
+        JXFrame frame = showInFrame(tab, "Compare propertChange events: keyboard/mouse");
+        frame.pack();
+    }
     
     /**
      * Issue #235-swingx: action events
