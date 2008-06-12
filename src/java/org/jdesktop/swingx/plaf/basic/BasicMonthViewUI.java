@@ -190,14 +190,14 @@ public class BasicMonthViewUI extends MonthViewUI {
      * 
      * PENDING: JW - really want to adjust here? Need to check in usage
      *   anyway.
-     *   @deprecated (pre-0.9.2) only read in deprecated methods (but calculation still triggered
+     *   @deprecated (pre-0.9.3) (pre-0.9.2) only read in deprecated methods (but calculation still triggered
      *    in layout, because some of the deprecated are public/protected)
      */
     @Deprecated
     private int startX;
     /**
      * Top of first row of displayed months. 
-     *   @deprecated (pre-0.9.2) only read in deprecated methods (but calculation still triggered
+     *   @deprecated (pre-0.9.3) (pre-0.9.2) only read in deprecated methods (but calculation still triggered
      *    in layout, because some of the deprecated are public/protected)
      */
     @Deprecated
@@ -2509,7 +2509,7 @@ public class BasicMonthViewUI extends MonthViewUI {
      * old way of calculating the position of the grid of months.
      * This is no longer used in current code, only in deprecated.
      * 
-     * @deprecated (pre-0.9.2) the result is no longer used except from deprecated methods.
+     * @deprecated (pre-0.9.3) (pre-0.9.2) the result is no longer used except from deprecated methods.
      */
     @Deprecated
     private void calculateStartPositionUnused() {

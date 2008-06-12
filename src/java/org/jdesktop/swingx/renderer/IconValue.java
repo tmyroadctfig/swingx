@@ -85,7 +85,7 @@ public interface IconValue extends Serializable {
     /**
      * Always null. 
      * 
-     * @deprecated (pre-0.9.2) use {@link #NONE} 
+     * @deprecated (pre-0.9.3) (pre-0.9.2) use {@link #NONE} 
      */
     @Deprecated
     public static final IconValue EMPTY = new IconValue() {

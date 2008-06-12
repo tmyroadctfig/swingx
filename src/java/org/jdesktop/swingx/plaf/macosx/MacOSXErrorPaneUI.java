@@ -186,7 +186,7 @@ public class MacOSXErrorPaneUI extends BasicErrorPaneUI {
     }
 
     /**
-     * @deprecated (pre-0.9.2) no longer used remove after 0.9.3.
+     * @deprecated (pre-0.9.3) (pre-0.9.2) no longer used remove after 0.9.3.
      */
     @Deprecated
     protected Dimension calculatePreferredDialogSize() {

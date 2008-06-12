@@ -68,7 +68,7 @@ public class Utilities {
     /** Operating system is Compaq TRU64 Unix */
     public static final int OS_TRU64 = OS_SUNOS << 1;
 
-    /** @deprecated (pre-0.9.2) please use OS_TRU64 instead */
+    /** @deprecated (pre-0.9.3) (pre-0.9.2) please use OS_TRU64 instead */
     @Deprecated
     private static final int OS_DEC = OS_TRU64 << 1;
 

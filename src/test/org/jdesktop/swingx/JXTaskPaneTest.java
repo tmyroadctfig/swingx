@@ -203,7 +203,7 @@ public class JXTaskPaneTest extends InteractiveTestCase {
 	 * Issue 835-swingx: expanded property change notification is missing on
 	 * setCollapsed.
 	 * 
-	 * @deprecated remove with {@link JXTaskPane#setExpanded(boolean)}
+	 * @deprecated (pre-0.9.3) remove with {@link JXTaskPane#setExpanded(boolean)}
 	 */
 	@Deprecated
 	public void testExpandedNotification() {
@@ -219,7 +219,7 @@ public class JXTaskPaneTest extends InteractiveTestCase {
     /**
      * Issue #835-swingx: event notification on expanded.
      * Here: two events fired on setExpanded
-     * @deprecated remove with {@link JXTaskPane#setExpanded(boolean)}
+     * @deprecated (pre-0.9.3) remove with {@link JXTaskPane#setExpanded(boolean)}
      */
     @Deprecated
     public void testSingleExpanded() {

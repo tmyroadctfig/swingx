@@ -208,7 +208,7 @@ public class BasicTaskPaneUI extends TaskPaneUI {
         /**
          * Gets current title height. Default value is 25.
          * @return Current title height.
-         * @deprecated (pre-0.9.2) Use getTitleHeight(java.awt.Component) instead. Kept only for compatibility reasons. Will be removed before 1.0 release.
+         * @deprecated (pre-0.9.3) (pre-0.9.2) Use getTitleHeight(java.awt.Component) instead. Kept only for compatibility reasons. Will be removed before 1.0 release.
          */
 	@Deprecated
         protected int getTitleHeight() {
@@ -410,7 +410,7 @@ public class BasicTaskPaneUI extends TaskPaneUI {
 	/**
 	 * Toggle expanded action.
 	 * 
-	 * @deprecated
+	 * @deprecated (pre-0.9.3)
 	 */
 	@Deprecated
 	class ToggleExpandedAction extends AbstractAction {

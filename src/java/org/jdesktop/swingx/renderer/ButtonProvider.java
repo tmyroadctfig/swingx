@@ -65,7 +65,7 @@ import javax.swing.JLabel;
  * 
  * @author Jeanette Winzenburg
  * 
- * @deprecated use {@link CheckBoxProvider} which is the renamed version of this. 
+ * @deprecated (pre-0.9.3) use {@link CheckBoxProvider} which is the renamed version of this. 
  * No longer maintained, all changes - if any - go into the replacement.
  * 
  */

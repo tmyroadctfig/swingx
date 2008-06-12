@@ -169,7 +169,7 @@ public abstract class ComponentAdapter {
      * @return the String value of the column identifier at columnIndex
      *   or null if no identifier set
      *   
-     * @deprecated use #getColumnIdentifierAt(int)  
+     * @deprecated (pre-0.9.3) use #getColumnIdentifierAt(int)  
      */
     @Deprecated
     public String getColumnIdentifier(int columnIndex) {

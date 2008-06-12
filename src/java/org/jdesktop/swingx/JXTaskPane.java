@@ -152,7 +152,7 @@ public class JXTaskPane extends JPanel implements
   /**
    * Used when generating PropertyChangeEvents for the "expanded" property
    * 
-   * @deprecated
+   * @deprecated (pre-0.9.3)
    */
   @Deprecated
   public static final String EXPANDED_CHANGED_KEY = "expanded";
@@ -403,7 +403,7 @@ public class JXTaskPane extends JPanel implements
   /**
    * 
    * @param expanded true to expand the group, false to collapse it
-   * @deprecated use setCollapsed
+   * @deprecated (pre-0.9.3) use setCollapsed
    * @javabean.property
    *          bound="true"
    *          preferred="true"
@@ -417,7 +417,7 @@ public class JXTaskPane extends JPanel implements
    * Returns true if this task pane is expanded, false if it is collapsed.
    * 
    * @return true if this task pane is expanded, false if it is collapsed.
-   * @deprecated
+   * @deprecated (pre-0.9.3)
    */
   @Deprecated
   public boolean isExpanded() {

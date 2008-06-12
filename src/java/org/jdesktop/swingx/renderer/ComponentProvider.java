@@ -358,7 +358,7 @@ public abstract class ComponentProvider<T extends JComponent>
      * <p>
      * 
      * @return the StringValue used by this provider, guaranteed to be not null.
-     * @deprecated use {@link #getStringValue()}
+     * @deprecated (pre-0.9.3) use {@link #getStringValue()}
      */
     @Deprecated
     public StringValue getToStringConverter() {
@@ -371,7 +371,7 @@ public abstract class ComponentProvider<T extends JComponent>
      * <p>
      * 
      * @param formatter the format to use.
-     * @deprecated use {@link #setStringValue(StringValue)}
+     * @deprecated (pre-0.9.3) use {@link #setStringValue(StringValue)}
      */
     @Deprecated
     public void setToStringConverter(StringValue formatter) {
@@ -390,7 +390,7 @@ public abstract class ComponentProvider<T extends JComponent>
      * @return the controller used to configure the default visuals of
      *   the rendering component.
      *   
-     *   @deprecated use {@link #createDefaultVisuals()}
+     *   @deprecated (pre-0.9.3) use {@link #createDefaultVisuals()}
      */
     @Deprecated
     protected DefaultVisuals<T> createRendererController() {
@@ -401,7 +401,7 @@ public abstract class ComponentProvider<T extends JComponent>
      * Intermediate exposure during refactoring...
      * 
      * @return the default visual configurator used by this.
-     * @deprecated use {@link #getDefaultVisuals()}
+     * @deprecated (pre-0.9.3) use {@link #getDefaultVisuals()}
      */
     @Deprecated
     protected DefaultVisuals<T> getRendererController() {

@@ -161,7 +161,7 @@ public class JXCollapsiblePane extends JXPanel {
      * The orientation defines in which direction the collapsible pane will
      * expand.
      * 
-     * @deprecated use {@link Direction}
+     * @deprecated (pre-0.9.3) use {@link Direction}
      */
     @Deprecated
     public enum Orientation {
@@ -288,7 +288,7 @@ public class JXCollapsiblePane extends JXPanel {
      * Constructs a new JXCollapsiblePane with a {@link JXPanel} as content pane
      * and the specified orientation.
      * 
-     * @deprecated use {@link #JXCollapsiblePane(Direction)}
+     * @deprecated (pre-0.9.3) use {@link #JXCollapsiblePane(Direction)}
      */
     @Deprecated
     public JXCollapsiblePane(Orientation orientation) {
@@ -321,7 +321,7 @@ public class JXCollapsiblePane extends JXPanel {
      * manager. A horizontal orientation enables a horizontal
      * {@link HorizontalLayout} with a gap of 2 pixels as layout manager
      * 
-     * @deprecated use {@link #JXCollapsiblePane(Direction, LayoutManager)}
+     * @deprecated (pre-0.9.3) use {@link #JXCollapsiblePane(Direction, LayoutManager)}
      */
     @Deprecated
     public JXCollapsiblePane(Orientation orientation, LayoutManager layout) {
@@ -329,7 +329,7 @@ public class JXCollapsiblePane extends JXPanel {
     }
     	
     /**
-	 * @deprecated only used to convent orientation to direction, remove with
+	 * @deprecated (pre-0.9.3) only used to convent orientation to direction, remove with
 	 *             orientation
 	 */
     @Deprecated
@@ -540,7 +540,7 @@ public class JXCollapsiblePane extends JXPanel {
      * @param orientation the new {@link Orientation} for this collapsible pane
      * @throws IllegalStateException when this method is called while a
      *                               collapsing/restore operation is running
-     * @deprecated
+     * @deprecated (pre-0.9.3)
      * @javabean.property
      *    bound="true"
      *    preferred="true"
@@ -553,7 +553,7 @@ public class JXCollapsiblePane extends JXPanel {
     /**
      * @see #setOrientation(Orientation)
      * @return the current {@link Orientation}
-     * @deprecated
+     * @deprecated (pre-0.9.3)
      */
     @Deprecated
     public Orientation getOrientation() {
