@@ -515,9 +515,10 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
         panel.add(picker);
         JTabbedPane tab = new JTabbedPane();
         tab.add("fields", panel);
-        tab.add("dummy", new JLabel("dummy"));
+        tab.add("dummy", new JTextField("dummy"));
         JXFrame frame = showInFrame(tab, "Compare propertChange events: keyboard/mouse");
         frame.pack();
+        
     }
     
     /**
