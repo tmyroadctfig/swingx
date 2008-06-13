@@ -8,6 +8,7 @@
 
 package org.jdesktop.test;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -24,10 +25,10 @@ public class ListDataReport implements ListDataListener {
     /**
      * Holds a list of all canceled events.
      */
-    protected List<ListDataEvent> changedEvents = new LinkedList<ListDataEvent>();
-    protected List<ListDataEvent> addedEvents = new LinkedList<ListDataEvent>();
-    protected List<ListDataEvent> removedEvents = new LinkedList<ListDataEvent>();
-    protected List<ListDataEvent> allEvents = new LinkedList<ListDataEvent>();
+    protected List<ListDataEvent> changedEvents = Collections.synchronizedList(new LinkedList<ListDataEvent>());
+    protected List<ListDataEvent> addedEvents = Collections.synchronizedList(new LinkedList<ListDataEvent>());
+    protected List<ListDataEvent> removedEvents = Collections.synchronizedList(new LinkedList<ListDataEvent>());
+    protected List<ListDataEvent> allEvents = Collections.synchronizedList(new LinkedList<ListDataEvent>());
 
 //  ------------------ implement ListDataListener    
 

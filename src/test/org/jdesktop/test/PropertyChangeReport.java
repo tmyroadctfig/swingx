@@ -10,6 +10,7 @@ package org.jdesktop.test;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -27,8 +28,8 @@ public class PropertyChangeReport implements PropertyChangeListener {
     /**
      * Holds a list of all received PropertyChangeEvents.
      */
-    protected List<PropertyChangeEvent> events = new LinkedList<PropertyChangeEvent>();
-    protected Map<String, PropertyChangeEvent> eventMap = new HashMap<String, PropertyChangeEvent>();
+    protected List<PropertyChangeEvent> events = Collections.synchronizedList(new LinkedList<PropertyChangeEvent>());
+    protected Map<String, PropertyChangeEvent> eventMap = Collections.synchronizedMap(new HashMap<String, PropertyChangeEvent>());
     
 //------------------------ implement PropertyChangeListener
     

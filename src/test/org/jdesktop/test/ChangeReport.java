@@ -8,6 +8,7 @@
 
 package org.jdesktop.test;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -25,8 +26,8 @@ public class ChangeReport implements ChangeListener {
     /**
      * Holds a list of all received PropertyChangeEvents.
      */
-    protected List<ChangeEvent> events = new LinkedList<ChangeEvent>();
-    protected Map<Object, ChangeEvent> eventMap = new HashMap<Object, ChangeEvent>();
+    protected List<ChangeEvent> events = Collections.synchronizedList(new LinkedList<ChangeEvent>());
+    protected Map<Object, ChangeEvent> eventMap = Collections.synchronizedMap(new HashMap<Object, ChangeEvent>());
     
 //------------------------ implement PropertyChangeListener
     

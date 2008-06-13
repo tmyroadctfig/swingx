@@ -8,6 +8,7 @@
 
 package org.jdesktop.test;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -23,9 +24,9 @@ public class CellEditorReport implements CellEditorListener {
     /**
      * Holds a list of all canceled events.
      */
-    protected List<ChangeEvent> canceledEvents = new LinkedList<ChangeEvent>();
-    protected List<ChangeEvent> stoppedEvents = new LinkedList<ChangeEvent>();
-    protected List<ChangeEvent> allEvents = new LinkedList<ChangeEvent>();
+    protected List<ChangeEvent> canceledEvents = Collections.synchronizedList(new LinkedList<ChangeEvent>());
+    protected List<ChangeEvent> stoppedEvents = Collections.synchronizedList(new LinkedList<ChangeEvent>());
+    protected List<ChangeEvent> allEvents = Collections.synchronizedList(new LinkedList<ChangeEvent>());
     
     
 //------------------------ implement CellEditorListener

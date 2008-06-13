@@ -8,6 +8,7 @@
 
 package org.jdesktop.test;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -24,7 +25,7 @@ public class TreeSelectionReport implements TreeSelectionListener {
     /**
      * Holds a list of all received PropertyChangeEvents.
      */
-    protected List<TreeSelectionEvent> events = new LinkedList<TreeSelectionEvent>();
+    protected List<TreeSelectionEvent> events = Collections.synchronizedList(new LinkedList<TreeSelectionEvent>());
     
 //------------------------ implement ListSelectionListener
     

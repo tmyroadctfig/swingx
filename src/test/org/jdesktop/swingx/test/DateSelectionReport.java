@@ -8,6 +8,7 @@
 
 package org.jdesktop.swingx.test;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -25,7 +26,7 @@ public class DateSelectionReport implements DateSelectionListener {
     /**
      * Holds a list of all received DateSelectionEvents.
      */
-    protected List<DateSelectionEvent> events = new LinkedList<DateSelectionEvent>();
+    protected List<DateSelectionEvent> events = Collections.synchronizedList(new LinkedList<DateSelectionEvent>());
     
     /**
      * Instantiates a DateSelectionReport.

@@ -8,6 +8,7 @@
 package org.jdesktop.swingx.test;
 
 import java.beans.PropertyChangeEvent;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -28,12 +29,12 @@ public class ColumnModelReport implements TableColumnModelExtListener {
     /**
      * Holds a list of all received ValueChangeEvents.
      */
-    private List<TableColumnModelEvent> removedEvents = new LinkedList<TableColumnModelEvent>();
-    private List<TableColumnModelEvent> addedEvents = new LinkedList<TableColumnModelEvent>();
-    private List<TableColumnModelEvent> movedEvents = new LinkedList<TableColumnModelEvent>();
+    private List<TableColumnModelEvent> removedEvents = Collections.synchronizedList(new LinkedList<TableColumnModelEvent>());
+    private List<TableColumnModelEvent> addedEvents = Collections.synchronizedList(new LinkedList<TableColumnModelEvent>());
+    private List<TableColumnModelEvent> movedEvents = Collections.synchronizedList(new LinkedList<TableColumnModelEvent>());
     
-    private List<ListSelectionEvent> selectionEvents = new LinkedList<ListSelectionEvent>();
-    private List<ChangeEvent> changeEvents = new LinkedList<ChangeEvent>();
+    private List<ListSelectionEvent> selectionEvents = Collections.synchronizedList(new LinkedList<ListSelectionEvent>());
+    private List<ChangeEvent> changeEvents = Collections.synchronizedList(new LinkedList<ChangeEvent>());
     
 //    private List<PropertyChangeEvent> columnPropertyEvents = new LinkedList<PropertyChangeEvent>();
 

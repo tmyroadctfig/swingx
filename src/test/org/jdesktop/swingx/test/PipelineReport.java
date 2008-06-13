@@ -8,6 +8,7 @@
 
 package org.jdesktop.swingx.test;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -25,10 +26,10 @@ public class PipelineReport implements PipelineListener {
     /**
      * Holds a list of all received PropertyChangeEvents.
      */
-    protected List<PipelineEvent> events = new LinkedList<PipelineEvent>();
-    protected List<PipelineEvent> orderChanged = new LinkedList<PipelineEvent>();
-    protected List<PipelineEvent> contentsChanged = new LinkedList<PipelineEvent>();
-    protected Map<Object, PipelineEvent> eventMap = new HashMap<Object, PipelineEvent>();
+    protected List<PipelineEvent> events = Collections.synchronizedList(new LinkedList<PipelineEvent>());
+    protected List<PipelineEvent> orderChanged = Collections.synchronizedList(new LinkedList<PipelineEvent>());
+    protected List<PipelineEvent> contentsChanged = Collections.synchronizedList(new LinkedList<PipelineEvent>());
+    protected Map<Object, PipelineEvent> eventMap = Collections.synchronizedMap(new HashMap<Object, PipelineEvent>());
     
 //------------------------ implement PropertyChangeListener
     

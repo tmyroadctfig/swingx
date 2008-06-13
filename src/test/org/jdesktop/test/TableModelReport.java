@@ -21,6 +21,7 @@
  */
 package org.jdesktop.test;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -34,10 +35,10 @@ import javax.swing.event.TableModelListener;
  */
 public class TableModelReport implements TableModelListener {
 
-    List<TableModelEvent> allEvents = new LinkedList<TableModelEvent>();
-    List<TableModelEvent> updateEvents = new LinkedList<TableModelEvent>();
-    List<TableModelEvent> insertEvents = new LinkedList<TableModelEvent>();
-    List<TableModelEvent> deleteEvents = new LinkedList<TableModelEvent>();
+    List<TableModelEvent> allEvents = Collections.synchronizedList(new LinkedList<TableModelEvent>());
+    List<TableModelEvent> updateEvents = Collections.synchronizedList(new LinkedList<TableModelEvent>());
+    List<TableModelEvent> insertEvents = Collections.synchronizedList(new LinkedList<TableModelEvent>());
+    List<TableModelEvent> deleteEvents = Collections.synchronizedList(new LinkedList<TableModelEvent>());
     
 //------------------- TableModelListener    
     public void tableChanged(TableModelEvent e) {

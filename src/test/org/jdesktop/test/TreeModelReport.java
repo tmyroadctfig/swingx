@@ -21,6 +21,7 @@
  */
 package org.jdesktop.test;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -34,11 +35,11 @@ import javax.swing.event.TreeModelListener;
  */
 public class TreeModelReport implements TreeModelListener {
 
-    List<TreeModelEvent> allEvents = new LinkedList<TreeModelEvent>();
-    List<TreeModelEvent> updateEvents = new LinkedList<TreeModelEvent>();
-    List<TreeModelEvent> insertEvents = new LinkedList<TreeModelEvent>();
-    List<TreeModelEvent> deleteEvents = new LinkedList<TreeModelEvent>();
-    List<TreeModelEvent> structureEvents = new LinkedList<TreeModelEvent>();
+    List<TreeModelEvent> allEvents = Collections.synchronizedList(new LinkedList<TreeModelEvent>());
+    List<TreeModelEvent> updateEvents = Collections.synchronizedList(new LinkedList<TreeModelEvent>());
+    List<TreeModelEvent> insertEvents = Collections.synchronizedList(new LinkedList<TreeModelEvent>());
+    List<TreeModelEvent> deleteEvents = Collections.synchronizedList(new LinkedList<TreeModelEvent>());
+    List<TreeModelEvent> structureEvents = Collections.synchronizedList(new LinkedList<TreeModelEvent>());
     
 //------------------- TableModelListener    
     public void treeNodesChanged(TreeModelEvent e) {

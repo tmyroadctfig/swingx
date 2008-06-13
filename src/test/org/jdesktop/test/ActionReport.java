@@ -10,6 +10,7 @@ package org.jdesktop.test;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -24,8 +25,8 @@ public class ActionReport implements ActionListener {
     /**
      * Holds a list of all received PropertyChangeEvents.
      */
-    protected List<ActionEvent> events = new LinkedList<ActionEvent>();
-    protected Map<Object, ActionEvent> eventMap = new HashMap<Object, ActionEvent>();
+    protected List<ActionEvent> events = Collections.synchronizedList(new LinkedList<ActionEvent>());
+    protected Map<Object, ActionEvent> eventMap = Collections.synchronizedMap(new HashMap<Object, ActionEvent>());
     
 //------------------------ implement PropertyChangeListener
     
