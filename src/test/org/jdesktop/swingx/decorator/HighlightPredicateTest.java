@@ -635,10 +635,6 @@ public class HighlightPredicateTest extends InteractiveTestCase {
                 return null;
             }
 
-            @Override
-            public String getColumnIdentifier(int columnIndex) {
-                return null;
-            }
             
         };
         return adapter;
@@ -702,10 +698,6 @@ public class HighlightPredicateTest extends InteractiveTestCase {
                 return null;
             }
 
-            @Override
-            public String getColumnIdentifier(int columnIndex) {
-                return null;
-            }
             
         };
         return adapter;

@@ -678,11 +678,6 @@ public class FilterTest extends InteractiveTestCase {
         }
 
         @Override
-        public String getColumnIdentifier(int columnIndex) {
-            return getColumnName(columnIndex);
-        }
-
-        @Override
         public Object getValueAt(int row, int column) {
             return tableModel.getValueAt(row, column);
         }

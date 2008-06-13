@@ -184,25 +184,6 @@ public class BasicMonthViewUI extends MonthViewUI {
 //    private Rectangle dirtyRect = new Rectangle();
     private Rectangle bounds = new Rectangle();
     
-    /**
-     * Horizontal edge of the first column of displayed months. The edge is 
-     * left/right depending on componentOrientation isLeftToRight or not.
-     * 
-     * PENDING: JW - really want to adjust here? Need to check in usage
-     *   anyway.
-     *   @deprecated (pre-0.9.3) (pre-0.9.2) only read in deprecated methods (but calculation still triggered
-     *    in layout, because some of the deprecated are public/protected)
-     */
-    @Deprecated
-    private int startX;
-    /**
-     * Top of first row of displayed months. 
-     *   @deprecated (pre-0.9.3) (pre-0.9.2) only read in deprecated methods (but calculation still triggered
-     *    in layout, because some of the deprecated are public/protected)
-     */
-    @Deprecated
-    private int startY;
-
     /** 
      * height of month header of the view, that is the name and the arrows.
      * initially, it's the same as the day-box-height, adjusted to arrow icon height
@@ -966,9 +947,6 @@ public class BasicMonthViewUI extends MonthViewUI {
      * initialized before calling this. 
      */
     private void calculateMonthGridBounds() {
-        // PENDING JW: this is the "old way" - keep until the deprecated
-        // methods are removed.
-        calculateStartPositionUnused();
         calendarGrid.setBounds(calculateCalendarGridX(), 
                 calculateCalendarGridY(), 
                 calculateCalendarGridWidth(), 
@@ -2501,28 +2479,6 @@ public class BasicMonthViewUI extends MonthViewUI {
 
     }
 
-// -- deprecated methods, no longer used internally, kept a short while
-    
-    
-
-    /**
-     * old way of calculating the position of the grid of months.
-     * This is no longer used in current code, only in deprecated.
-     * 
-     * @deprecated (pre-0.9.3) (pre-0.9.2) the result is no longer used except from deprecated methods.
-     */
-    @Deprecated
-    private void calculateStartPositionUnused() {
-        // Calculate offset in x-axis for centering calendars.
-        int width = monthView.getWidth();
-        startX = (width - calculateCalendarGridWidth()) / 2;
-        if (!isLeftToRight) {
-            startX = width - startX;
-        }
-
-        // Calculate offset in y-axis for centering calendars.
-        startY = calculateCalendarGridY();
-    }
 
     
 }

@@ -754,10 +754,6 @@ public class HighlighterTest extends InteractiveTestCase {
                 return null;
             }
 
-            @Override
-            public String getColumnIdentifier(int columnIndex) {
-                return null;
-            }
             
         };
         return adapter;

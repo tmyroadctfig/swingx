@@ -150,32 +150,6 @@ public abstract class ComponentAdapter {
         return identifier != null ? identifier.toString() : null;
     }
 
-    /**
-     * Returns the columns logical name (== identifier) of the column at 
-     * columnIndex in model coordinates.<p>
-     * 
-     * Note: it's up to the implementation to decide for which
-     * columns it returns a name - most will do so for the
-     * subset with isTestable = true.<p>
-     * 
-     * This implementation delegates to getColumnName. <p>
-     * 
-     * PENDING JW: this is deprecated because the type of an identifer
-     * shouldn't be restricted to String. The only way to gently replace this method is
-     * to add another with a different name - which makes that other name suboptimal.
-     * Maybe we should jump for a rude change and let this return an Object. 
-     * 
-     * @param columnIndex in model coordinates, must be valid.
-     * @return the String value of the column identifier at columnIndex
-     *   or null if no identifier set
-     *   
-     * @deprecated (pre-0.9.3) use #getColumnIdentifierAt(int)  
-     */
-    @Deprecated
-    public String getColumnIdentifier(int columnIndex) {
-        return getColumnName(columnIndex);
-    }
-    
     
     /**
      * Returns logical identifier of the column at 
@@ -186,6 +160,12 @@ public abstract class ComponentAdapter {
      * subset with isTestable = true.<p>
      * 
      * This implementation returns DEFAULT_COLUMN_IDENTIFIER.
+     * 
+     * PENDING JW: This method replaces the old getColumnIdentifier(int)
+     * which returned a String which is overly restrictive.
+     * The only way to gently replace this method was
+     * to add this with a different name - which makes this name suboptimal.
+     * Probably should rename again once the old has died out ;-)
      * 
      * @param columnIndex in model coordinates, must be valid.
      * @return the identifier of the column at columnIndex or null if it has none.

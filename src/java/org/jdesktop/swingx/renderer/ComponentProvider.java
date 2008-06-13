@@ -352,59 +352,5 @@ public abstract class ComponentProvider<T extends JComponent>
         return defaultVisuals;
     }
 
-//-------------- deprecated methods - these will be romved after the next release    
-    /**
-     * Returns the StringValue to use for obtaining the String representation.
-     * <p>
-     * 
-     * @return the StringValue used by this provider, guaranteed to be not null.
-     * @deprecated (pre-0.9.3) use {@link #getStringValue()}
-     */
-    @Deprecated
-    public StringValue getToStringConverter() {
-        return formatter;
-    }
 
-    /**
-     * Sets the StringValue to use. If the given StringValue is null,
-     * defaults to <code>StringValue.TO_STRING</code>.
-     * <p>
-     * 
-     * @param formatter the format to use.
-     * @deprecated (pre-0.9.3) use {@link #setStringValue(StringValue)}
-     */
-    @Deprecated
-    public void setToStringConverter(StringValue formatter) {
-        if (formatter == null) {
-            formatter = StringValue.TO_STRING;
-        }
-        this.formatter = formatter;
-    }
-
-
-    /**
-     * Factory method to create and return the DefaultVisuals used by this
-     * to configure the default visuals. Here: creates the default controller
-     * parameterized to the same type as this.
-     * 
-     * @return the controller used to configure the default visuals of
-     *   the rendering component.
-     *   
-     *   @deprecated (pre-0.9.3) use {@link #createDefaultVisuals()}
-     */
-    @Deprecated
-    protected DefaultVisuals<T> createRendererController() {
-        return new DefaultVisuals<T>();
-    }
-
-    /**
-     * Intermediate exposure during refactoring...
-     * 
-     * @return the default visual configurator used by this.
-     * @deprecated (pre-0.9.3) use {@link #getDefaultVisuals()}
-     */
-    @Deprecated
-    protected DefaultVisuals<T> getRendererController() {
-        return defaultVisuals;
-    }
 }

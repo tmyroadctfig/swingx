@@ -83,7 +83,9 @@ public interface IconValue extends Serializable {
     };
     
     /**
-     * Always null. 
+     * Always null. <p>
+     * 
+     * PENDING JW: there's an open test issue when removing this. Needs further evaluation.
      * 
      * @deprecated (pre-0.9.3) (pre-0.9.2) use {@link #NONE} 
      */
