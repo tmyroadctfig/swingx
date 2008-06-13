@@ -346,6 +346,8 @@ public class PainterVisualCheck extends InteractiveTestCase {
     public void interactiveAnimatedBusyPainterHighlight()  {
         TableModel model = new AncientSwingTeam();
         JXTable table = new JXTable(model);
+        table.getColumn(0).setCellRenderer(new DefaultTableRenderer(
+                new HyperlinkProvider()));
         final BusyPainter busyPainter = new BusyPainter() {
             /**
              * Overridden to fix Issue #861-swingx: must notify on change

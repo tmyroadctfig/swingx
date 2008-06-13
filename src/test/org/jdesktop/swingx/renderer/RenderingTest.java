@@ -63,6 +63,15 @@ public class RenderingTest extends TestCase {
     private static final Logger LOG = Logger.getLogger(RenderingTest.class
             .getName());
 
+    /**
+     * Issue #863-swingx: SwingX renderering components must be PainterAware.
+     * Here: test Hyperlink
+     */
+    public void testHyperlinkPainterAware() {
+        HyperlinkProvider provider = new HyperlinkProvider();
+        assertTrue("hyperlink as rendering comp must be PainterAware", provider.getRendererComponent(null) instanceof PainterAware);
+    }
+
     
     /**
      * Issue #863-swingx: SwingX renderering components must be PainterAware.
