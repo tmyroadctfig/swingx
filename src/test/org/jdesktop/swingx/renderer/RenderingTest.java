@@ -63,6 +63,17 @@ public class RenderingTest extends TestCase {
     private static final Logger LOG = Logger.getLogger(RenderingTest.class
             .getName());
 
+    
+    /**
+     * Issue #863-swingx: SwingX renderering components must be PainterAware.
+     * Here: test WrappingIconPanel
+     */
+    public void testWrappingIconPanelPainterAware() {
+        DefaultTreeRenderer renderer = new DefaultTreeRenderer();
+        JComponent rendererComponent = renderer.getComponentProvider().getRendererComponent(null);
+        assertTrue("wrappingIconPanel as rendering comp must be PainterAware", rendererComponent instanceof PainterAware);
+    }
+    
     /**
      * Issue #840-swingx: hyperlink foreground unreadable for dark selection colors.
      * 
