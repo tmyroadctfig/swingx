@@ -137,7 +137,7 @@ public class JXTreeVisualCheck extends JXTreeUnitTest {
             }
             
         };
-        JXFrame frame = wrapWithScrollingInFrame(tree, "selection colors");
+        JXFrame frame = wrapWithScrollingInFrame(tree, "selection colors- compare list repaint");
         addAction(frame, toggleSelectionColors);
         show(frame);
     }

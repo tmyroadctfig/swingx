@@ -22,6 +22,7 @@
 
 package org.jdesktop.swingx;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Point;
@@ -289,6 +290,33 @@ public class JXTreeTable extends JXTable {
         super.setEnabled(enabled);
     }
     
+
+    /**
+     * {@inheritDoc} <p>
+     * 
+     * Overridden to keep the tree's selectionBackground in synch.
+     */
+    @Override
+    public void setSelectionBackground(Color selectionBackground) {
+        // happens on instantiation, updateUI is called before the renderer is installed
+        if (renderer != null)
+            renderer.setSelectionBackground(selectionBackground);
+        super.setSelectionBackground(selectionBackground);
+    }
+
+    /**
+     * {@inheritDoc} <p>
+     * 
+     * Overridden to keep the tree's selectionForeground in synch.
+     */
+    @Override
+    public void setSelectionForeground(Color selectionForeground) {
+        // happens on instantiation, updateUI is called before the renderer is installed
+        if (renderer != null)
+            renderer.setSelectionForeground(selectionForeground);
+        super.setSelectionForeground(selectionForeground);
+    }
+
     /**
      * Overriden to invoke repaint for the particular location if
      * the column contains the tree. This is done as the tree editor does

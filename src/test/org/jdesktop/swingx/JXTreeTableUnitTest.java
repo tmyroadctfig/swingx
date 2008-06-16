@@ -60,6 +60,7 @@ import org.jdesktop.test.TableModelReport;
 import org.jdesktop.test.TreeSelectionReport;
 
 public class JXTreeTableUnitTest extends InteractiveTestCase {
+    @SuppressWarnings ("unused")
     private static final Logger LOG = Logger
             .getLogger(JXTreeTableUnitTest.class.getName());
     
@@ -70,6 +71,27 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
         super("JXTreeTable Unit Test");
     }
 
+    /**
+     * Issue #862-swingx: JXTree - add api for selection colors.
+     * Here: test that the tree in JXTreeTable is kept in synch.
+     */
+    public void testSelectionBackground() {
+        JXTreeTable treeTable = new JXTreeTable(new FileSystemModel());
+        treeTable.setSelectionBackground(Color.RED);
+        assertEquals(treeTable.getSelectionBackground(), 
+                ((JXTree) treeTable.getCellRenderer(0, 0)).getSelectionBackground());
+    }
+    
+    /**
+     * Issue #862-swingx: JXTree - add api for selection colors.
+     * Here: test that the tree in JXTreeTable is kept in synch.
+     */
+    public void testSelectionForeground() {
+        JXTreeTable treeTable = new JXTreeTable(new FileSystemModel());
+        treeTable.setSelectionForeground(Color.RED);
+        assertEquals(treeTable.getSelectionForeground(), 
+                ((JXTree) treeTable.getCellRenderer(0, 0)).getSelectionForeground());
+    }
     /**
      * Issue #853-swingx: tree is not disabled.
      * 

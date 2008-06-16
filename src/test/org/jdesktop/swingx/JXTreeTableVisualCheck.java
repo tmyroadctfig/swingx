@@ -68,6 +68,7 @@ import org.jdesktop.swingx.decorator.ShuttleSorter;
 import org.jdesktop.swingx.decorator.HighlightPredicate.AndHighlightPredicate;
 import org.jdesktop.swingx.decorator.HighlightPredicate.ColumnHighlightPredicate;
 import org.jdesktop.swingx.decorator.HighlightPredicate.DepthHighlightPredicate;
+import org.jdesktop.swingx.renderer.DefaultTreeRenderer;
 import org.jdesktop.swingx.test.ComponentTreeTableModel;
 import org.jdesktop.swingx.test.XTestUtils;
 import org.jdesktop.swingx.treetable.DefaultMutableTreeTableNode;
@@ -97,11 +98,41 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
 //             test.runInteractiveTests("interactive.*RowHeightCompare.*");
 //             test.runInteractiveTests("interactive.*RToL.*");
 //             test.runInteractiveTests("interactive.*Insert.*");
-             test.runInteractiveTests("interactive.*LAF.*");
+             test.runInteractiveTests("interactive.*Selection.*");
         } catch (Exception ex) {
 
         }
     }
+
+    /**
+     * Issue #862-swingx: JXTree - add api for selection colors.
+     * Here: check colors when used in JXTreeTable
+     */
+    public void interactiveSelectionColors() {
+        final JXTreeTable tree = new JXTreeTable(new FileSystemModel());
+        // use SwingX renderer which is aware of per-tree selection colors
+        tree.setTreeCellRenderer(new DefaultTreeRenderer());
+        final Color uiBackground = tree.getSelectionBackground();
+        final Color uiForeground = tree.getSelectionForeground();
+        Action toggleSelectionColors = new AbstractAction("toggle selection colors") {
+            
+            public void actionPerformed(ActionEvent e) {
+                if (tree.getSelectionBackground() == uiBackground) {
+                    tree.setSelectionBackground(Color.BLUE);
+                    tree.setSelectionForeground(Color.RED);
+                } else {
+                    tree.setSelectionBackground(uiBackground);
+                    tree.setSelectionForeground(uiForeground);
+                }
+                
+            }
+            
+        };
+        JXFrame frame = wrapWithScrollingInFrame(tree, "selection colors");
+        addAction(frame, toggleSelectionColors);
+        show(frame);
+    }
+    
 
     
     /**
