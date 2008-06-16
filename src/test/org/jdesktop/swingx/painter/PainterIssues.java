@@ -38,6 +38,8 @@ import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXLabel;
 import org.jdesktop.swingx.action.AbstractActionExt;
+import org.jdesktop.test.PropertyChangeReport;
+import org.jdesktop.test.TestUtils;
 
 /**
  * Test to exposed known issues of <code>Painter</code>s.
@@ -62,6 +64,18 @@ public class PainterIssues extends InteractiveTestCase {
       }
   }
 
+    /**
+     * Issue #861-swingx: must fire PCE on property change.
+     * Here: issue examplified for frame property, need to check others as well.
+     */
+    public void testBusyPainterChangeNotification() {
+        BusyPainter painter = new BusyPainter();
+        int frame = painter.getFrame();
+        PropertyChangeReport report = new PropertyChangeReport();
+        painter.addPropertyChangeListener(report);
+        painter.setFrame(frame + 1);
+        TestUtils.assertPropertyChangeEvent(report, "frame", frame, frame + 1);
+    }
     
     /**
      * Issue #??-swingx: default foreground painter not guaranteed after change.

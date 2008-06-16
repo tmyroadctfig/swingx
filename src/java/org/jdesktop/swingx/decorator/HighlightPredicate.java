@@ -174,6 +174,19 @@ public interface HighlightPredicate {
     };
     
     /**
+     * Focus predicate.
+     */
+    public static final HighlightPredicate HAS_FOCUS = new HighlightPredicate() {
+        /**
+         * {@inheritDoc} <p>
+         * 
+         * Implemented to return truw if the given adapter hasFocus, false otherwise.
+         */
+        public boolean isHighlighted(Component renderer, ComponentAdapter adapter) {
+            return adapter.hasFocus();
+        }
+    };
+    /**
      * Even rows.
      * 
      * PENDING: this is zero based (that is "really" even 0, 2, 4 ..), differing 

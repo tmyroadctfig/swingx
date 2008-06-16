@@ -73,7 +73,29 @@ public class HighlightPredicateTest extends InteractiveTestCase {
     }
 
     // ---------------- predefined predicate
+    
+    /**
+     * Issue #858-swingx: predefined focus predicate. 
+     * 
+     * Test the HAS_FOCUS predicate
+     */
+    public void testHasFocus() {
+        ComponentAdapter adapter = createComponentAdapter(allColored, true, true);
+        assertTrue("sanity", adapter.hasFocus());
+        assertEquals(adapter.hasFocus(), HighlightPredicate.HAS_FOCUS.isHighlighted(allColored, adapter));
+     }
  
+    /**
+     * Issue #858-swingx: predefined focus predicate. 
+     * 
+     * Test the HAS_FOCUS predicate
+     */
+    public void testNotHasFocus() {
+        ComponentAdapter adapter = createComponentAdapter(allColored, false);
+        assertFalse("sanity", adapter.hasFocus());
+        assertEquals(adapter.hasFocus(), HighlightPredicate.HAS_FOCUS.isHighlighted(allColored, adapter));
+     }
+    
     /**
      * test the IS_FOLDER predicate.
      *
@@ -560,9 +582,9 @@ public class HighlightPredicateTest extends InteractiveTestCase {
      * Creates and returns a ComponentAdapter on the given 
      * label with the specified selection state and non-editable.
      * 
-     * @param label
-     * @param selected
-     * @return
+     * @param label the adapter's component
+     * @param selected the adapter's selected property
+     * @return a ComponentAdapter of the label with the given properties.
      */
     protected ComponentAdapter createComponentAdapter(final JLabel label, final boolean selected) {
         return createComponentAdapter(label, selected, false);
@@ -571,12 +593,12 @@ public class HighlightPredicateTest extends InteractiveTestCase {
     /**
      * Creates and returns a ComponentAdapter on the given 
      * label with the specified selection and editable state. IsLeaf returns
-     * the same value as selected.
+     * the same value as selected. HasFocus returns selected && editable.
      * 
-     * @param label
-     * @param selected
-     * @param editable
-     * @return
+     * @param label the adapter's component
+     * @param selected the adapter's selected property
+     * @param editable the adapter's editable property
+     * @return a ComponentAdapter of the label with the given properties.
      */
     protected ComponentAdapter createComponentAdapter(final JLabel label,
             final boolean selected, final boolean editable) {
@@ -611,7 +633,7 @@ public class HighlightPredicateTest extends InteractiveTestCase {
 
             @Override
             public boolean hasFocus() {
-                return false;
+                return isSelected() && isEditable();
             }
             
             @Override
