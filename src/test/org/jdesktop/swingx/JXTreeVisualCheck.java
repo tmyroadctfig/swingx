@@ -56,6 +56,7 @@ import org.jdesktop.swingx.decorator.PatternPredicate;
 import org.jdesktop.swingx.decorator.SearchPredicate;
 import org.jdesktop.swingx.decorator.HighlightPredicate.DepthHighlightPredicate;
 import org.jdesktop.swingx.renderer.CellContext;
+import org.jdesktop.swingx.renderer.DefaultListRenderer;
 import org.jdesktop.swingx.renderer.DefaultTreeRenderer;
 import org.jdesktop.swingx.renderer.IconValue;
 import org.jdesktop.swingx.renderer.StringValue;
@@ -75,14 +76,71 @@ public class JXTreeVisualCheck extends JXTreeUnitTest {
       try {
 //          test.runInteractiveTests();
 //          test.runInteractiveTests("interactive.*RToL.*");
-          test.runInteractiveTests("interactive.*Revalidate.*");
+//          test.runInteractiveTests("interactive.*Revalidate.*");
 //          test.runInteractiveTests("interactiveRootExpansionTest");
+        test.runInteractiveTests("interactive.*Selection.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
       }
   }
 
+    /**
+     * Issue #862-swingx: JXTree - add api for selection colors.
+     */
+    public void interactiveSelectionColors() {
+        final JXTree tree = new JXTree();
+        // use SwingX renderer which is aware of per-tree selection colors
+        tree.setCellRenderer(new DefaultTreeRenderer());
+        final Color uiBackground = tree.getSelectionBackground();
+        final Color uiForeground = tree.getSelectionForeground();
+        Action toggleSelectionColors = new AbstractAction("toggle selection colors") {
+            
+            public void actionPerformed(ActionEvent e) {
+                if (tree.getSelectionBackground() == uiBackground) {
+                    tree.setSelectionBackground(Color.BLUE);
+                    tree.setSelectionForeground(Color.RED);
+                } else {
+                    tree.setSelectionBackground(uiBackground);
+                    tree.setSelectionForeground(uiForeground);
+                }
+                
+            }
+            
+        };
+        JXFrame frame = wrapWithScrollingInFrame(tree, "selection colors");
+        addAction(frame, toggleSelectionColors);
+        show(frame);
+    }
+    
+    /**
+     * Issue #862-swingx: JXTree - add api for selection colors.
+     * Compare with JList repaint behaviour.
+     */
+    public void interactiveSelectionColorsList() {
+        final JXList tree = new JXList(new Object[]{"one", "two", "three"});
+        // use SwingX renderer which is aware of per-tree selection colors
+        tree.setCellRenderer(new DefaultListRenderer());
+        final Color uiBackground = tree.getSelectionBackground();
+        final Color uiForeground = tree.getSelectionForeground();
+        Action toggleSelectionColors = new AbstractAction("toggle selection colors") {
+            
+            public void actionPerformed(ActionEvent e) {
+                if (tree.getSelectionBackground() == uiBackground) {
+                    tree.setSelectionBackground(Color.BLUE);
+                    tree.setSelectionForeground(Color.RED);
+                } else {
+                    tree.setSelectionBackground(uiBackground);
+                    tree.setSelectionForeground(uiForeground);
+                }
+                
+            }
+            
+        };
+        JXFrame frame = wrapWithScrollingInFrame(tree, "selection colors");
+        addAction(frame, toggleSelectionColors);
+        show(frame);
+    }
     /**
      * Requirements
      * - no icons, use IconValue.NONE

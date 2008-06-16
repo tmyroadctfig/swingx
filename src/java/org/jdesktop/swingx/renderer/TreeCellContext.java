@@ -12,6 +12,8 @@ import javax.swing.border.LineBorder;
 import javax.swing.plaf.basic.BasicGraphicsUtils;
 import javax.swing.tree.TreePath;
 
+import org.jdesktop.swingx.JXTree;
+
 /**
  * Tree specific cellContext.
  * <ul>
@@ -20,6 +22,8 @@ import javax.swing.tree.TreePath;
  * rolling its own? The missing ui-border probably is a consequence of the
  * border hacking as implemented in core default renderer. SwingX has a
  * composite default which should use the "normal" border.
+ * <li> PENDING: selection colors couple explicitly to SwingX - should we go JXTree as
+ *   generic type?
  * </ul>
  */
 public class TreeCellContext extends CellContext<JTree> {
@@ -63,6 +67,9 @@ public class TreeCellContext extends CellContext<JTree> {
      */
     @Override
     protected Color getSelectionBackground() {
+        if (getComponent() instanceof JXTree) {
+            return ((JXTree) getComponent()).getSelectionBackground();
+        }
         return UIManager.getColor("Tree.selectionBackground");
     }
 
@@ -71,6 +78,9 @@ public class TreeCellContext extends CellContext<JTree> {
      */
     @Override
     protected Color getSelectionForeground() {
+        if (getComponent() instanceof JXTree) {
+            return ((JXTree) getComponent()).getSelectionForeground();
+        }
         return UIManager.getColor("Tree.selectionForeground");
     }
 

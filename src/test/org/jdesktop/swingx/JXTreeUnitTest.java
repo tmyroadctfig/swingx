@@ -12,6 +12,7 @@ import java.util.Vector;
 import java.util.regex.Pattern;
 
 import javax.swing.JTree;
+import javax.swing.UIManager;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellEditor;
 import javax.swing.tree.DefaultTreeCellRenderer;
@@ -32,6 +33,8 @@ import org.jdesktop.swingx.treetable.DefaultMutableTreeTableNode;
 import org.jdesktop.swingx.treetable.FileSystemModel;
 import org.jdesktop.swingx.treetable.TreeTableModel;
 import org.jdesktop.test.AncientSwingTeam;
+import org.jdesktop.test.PropertyChangeReport;
+import org.jdesktop.test.TestUtils;
 
 
 /**
@@ -47,6 +50,59 @@ public class JXTreeUnitTest extends InteractiveTestCase {
         super("JXTree Test");
     }
 
+    /**
+     * Issue #862-swingx: JXTree - add api for selection colors.
+     */
+    public void testSelectionBackground() {
+        JXTree tree = new JXTree();
+        Color uiColor = UIManager.getColor("Tree.selectionBackground");
+        assertEquals(uiColor, tree.getSelectionBackground());
+        Color customColor = Color.RED;
+        tree.setSelectionBackground(customColor);
+        tree.updateUI();
+        assertEquals("custom color must not be reset by ui", customColor, tree.getSelectionBackground());
+    }
+    
+    /**
+     * Issue #862-swingx: JXTree - add api for selection colors.
+     */
+    public void testSelectionForeground() {
+        JXTree tree = new JXTree();
+        Color uiColor = UIManager.getColor("Tree.selectionForeground");
+        assertEquals(uiColor, tree.getSelectionForeground());
+        Color customColor = Color.RED;
+        tree.setSelectionForeground(customColor);
+        tree.updateUI();
+        assertEquals("custom color must not be reset by ui", customColor, tree.getSelectionForeground());
+    }
+    
+    
+    /**
+     * Issue #862-swingx: JXTree - add api for selection colors.
+     */
+    public void testSelectionBackgroundChange() {
+        JXTree tree = new JXTree();
+        Color uiColor = tree.getSelectionBackground();
+        Color customColor = Color.RED;
+        PropertyChangeReport report = new PropertyChangeReport();
+        tree.addPropertyChangeListener(report);
+        tree.setSelectionBackground(customColor);
+        TestUtils.assertPropertyChangeEvent(report, "selectionBackground", uiColor, customColor);
+    }
+    
+    /**
+     * Issue #862-swingx: JXTree - add api for selection colors.
+     */
+    public void testSelectionForegroundChange() {
+        JXTree tree = new JXTree();
+        Color uiColor = tree.getSelectionForeground();
+        Color customColor = Color.RED;
+        PropertyChangeReport report = new PropertyChangeReport();
+        tree.addPropertyChangeListener(report);
+        tree.setSelectionForeground(customColor);
+        TestUtils.assertPropertyChangeEvent(report, "selectionForeground", uiColor, customColor);
+    }
+    
     /**
      * Issue #817-swingx: Delegating renderer must create list's default.
      * Consistent api: expose wrappedRenderer the same way as wrappedModel

@@ -22,6 +22,7 @@
 package org.jdesktop.swingx;
 
 import java.applet.Applet;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.KeyboardFocusManager;
@@ -48,11 +49,13 @@ import javax.swing.JPopupMenu;
 import javax.swing.JTree;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import javax.swing.event.CellEditorListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
+import javax.swing.plaf.UIResource;
 import javax.swing.plaf.basic.BasicTreeUI;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeCellRenderer;
@@ -115,6 +118,8 @@ public class JXTree extends JTree {
      * focus back to the tree after terminating edits.
      */
     private CellEditorListener editorListener;
+    private Color selectionForeground;
+    private Color selectionBackground;
     
     
     
@@ -864,6 +869,135 @@ public class JXTree extends JTree {
 
     }
 
+    /**
+     * Returns the background color for selected cells.
+     *
+     * @return the <code>Color</code> used for the background of
+     * selected list items
+     * @see #setSelectionBackground
+     * @see #setSelectionForeground
+     */
+    public Color getSelectionBackground() {
+        return selectionBackground;
+    }
+    
+    /**
+     * Returns the selection foreground color.
+     *
+     * @return the <code>Color</code> object for the foreground property
+     * @see #setSelectionForeground
+     * @see #setSelectionBackground
+     */
+    public Color getSelectionForeground() {
+        return selectionForeground;
+    }
+    
+    
+    /**
+     * Sets the foreground color for selected cells.  Cell renderers
+     * can use this color to render text and graphics for selected
+     * cells.
+     * <p>
+     * The default value of this property is defined by the look
+     * and feel implementation.
+     * <p>
+     * This is a JavaBeans bound property.
+     *
+     * @param selectionForeground  the <code>Color</code> to use in the foreground
+     *                             for selected list items
+     * @see #getSelectionForeground
+     * @see #setSelectionBackground
+     * @see #setForeground
+     * @see #setBackground
+     * @see #setFont
+     * @beaninfo
+     *       bound: true
+     *   attribute: visualUpdate true
+     * description: The foreground color of selected cells.
+     */
+    public void setSelectionForeground(Color selectionForeground) {
+        Object oldValue = getSelectionForeground();
+        this.selectionForeground = selectionForeground;
+        firePropertyChange("selectionForeground", oldValue, getSelectionForeground());
+        repaint();
+    }
+
+    /**
+     * Sets the background color for selected cells.  Cell renderers
+     * can use this color to the fill selected cells.
+     * <p>
+     * The default value of this property is defined by the look
+     * and feel implementation.
+     * <p>
+     * This is a JavaBeans bound property.
+     *
+     * @param selectionBackground  the <code>Color</code> to use for the 
+     *                             background of selected cells
+     * @see #getSelectionBackground
+     * @see #setSelectionForeground
+     * @see #setForeground
+     * @see #setBackground
+     * @see #setFont
+     * @beaninfo
+     *       bound: true
+     *   attribute: visualUpdate true
+     * description: The background color of selected cells.
+     */
+    public void setSelectionBackground(Color selectionBackground) {
+        Object oldValue = getSelectionBackground();
+        this.selectionBackground = selectionBackground;
+        firePropertyChange("selectionBackground", oldValue, getSelectionBackground());
+        repaint();
+    }
+
+    /**
+     * {@inheritDoc} <p>
+     * 
+     * Overridden to update selection background/foreground. Mimicking behaviour of 
+     * ui-delegates for JTable, JList.
+     */
+    @Override
+    public void updateUI() {
+        uninstallSelectionColors();
+        super.updateUI();
+        installSelectionColors();
+    }
+
+    /**
+     * Installs selection colors from UIManager.
+     */
+    private void installSelectionColors() {
+        if (isUIResource(getSelectionBackground())) {
+            setSelectionBackground(UIManager.getColor("Tree.selectionBackground"));
+        }
+        if (isUIResource(getSelectionForeground())) {
+            setSelectionForeground(UIManager.getColor("Tree.selectionForeground"));
+        }
+        
+    }
+
+    /**
+     * Uninstalls selection colors.
+     */
+    private void uninstallSelectionColors() {
+        if (isUIResource(getSelectionBackground())) {
+            setSelectionBackground(null);
+        }
+        if (isUIResource(getSelectionForeground())) {
+            setSelectionForeground(null);
+        }
+    }
+
+    /**
+     * Checks if the given value should be set by the LAF.
+     * 
+     * @param value the value to check
+     * @return true if the value is null or of type UIResource, false otherwise.
+     */
+    private boolean isUIResource(Object value) {
+        return (value == null) || (value instanceof UIResource);
+    }
+    
     /**
      * Returns the string representation of the cell value at the given position. 
      * 
@@ -1632,21 +1766,6 @@ public class JXTree extends JTree {
             /** TODO:  */
         }
         
-//        /**
-//         * {@inheritDoc}
-//         */
-//        @Override
-//        public String getColumnName(int columnIndex) {
-//            return "Column_" + columnIndex;
-//        }
-//        
-//        /**
-//         * {@inheritDoc}
-//         */
-//        @Override
-//        public String getColumnIdentifier(int columnIndex) {
-//            return null;
-//        }
     }
 
 
