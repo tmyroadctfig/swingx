@@ -7,22 +7,18 @@
 package org.jdesktop.swingx;
 
 import java.awt.Color;
-import java.awt.Component;
-import java.awt.event.ActionEvent;
 
-import javax.swing.AbstractAction;
 import javax.swing.AbstractListModel;
-import javax.swing.Action;
 
 import org.jdesktop.swingx.decorator.AbstractHighlighter;
 import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.CompoundHighlighter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
-import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.SearchPredicate;
-import org.jdesktop.swingx.renderer.DefaultTableRenderer;
-import org.jdesktop.swingx.renderer.StringValue;
-import org.jdesktop.test.AncientSwingTeam;
+import org.jdesktop.swingx.search.PatternModel;
+import org.jdesktop.swingx.search.SearchFactory;
+import org.jdesktop.swingx.search.Searchable;
+import org.jdesktop.swingx.search.TableSearchable;
 
 
 /**
@@ -101,7 +97,7 @@ public class FindIssues extends FindTest {
         @Override
         public Searchable getSearchable() {
             if (searchable == null) {
-                searchable = new XTableSearchable();
+                searchable = new XTableSearchable(this);
             }
             return searchable;
         }
@@ -109,6 +105,13 @@ public class FindIssues extends FindTest {
         public class XTableSearchable extends TableSearchable {
 
             
+            /**
+             * @param table
+             */
+            public XTableSearchable(XXTable table) {
+                super(table);
+            }
+
             @Override
             protected AbstractHighlighter getConfiguredMatchHighlighter() {
                 CompoundHighlighter searchHL = (CompoundHighlighter) getMatchHighlighter();

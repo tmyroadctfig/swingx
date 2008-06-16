@@ -18,7 +18,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-package org.jdesktop.swingx;
+package org.jdesktop.swingx.search;
 
 import java.awt.Component;
 import java.awt.Container;
@@ -42,6 +42,11 @@ import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
+import org.jdesktop.swingx.JXDialog;
+import org.jdesktop.swingx.JXFindBar;
+import org.jdesktop.swingx.JXFindPanel;
+import org.jdesktop.swingx.JXFrame;
+import org.jdesktop.swingx.JXRootPane;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 import org.jdesktop.swingx.util.Utilities;
 

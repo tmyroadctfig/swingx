@@ -24,6 +24,7 @@ import javax.swing.SwingUtilities;
 import org.jdesktop.swingx.FindTest.TestListModel;
 import org.jdesktop.swingx.FindTest.TestTableModel;
 import org.jdesktop.swingx.action.AbstractActionExt;
+import org.jdesktop.swingx.search.SearchFactory;
 import org.jdesktop.swingx.treetable.FileSystemModel;
 import org.jdesktop.test.AncientSwingTeam;
 

@@ -35,6 +35,7 @@ import javax.swing.JComponent;
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 import org.jdesktop.swingx.plaf.UIManagerExt;
+import org.jdesktop.swingx.search.PatternModel;
 import org.jdesktop.test.PropertyChangeReport;
 import org.jdesktop.test.TestUtils;
 

@@ -28,6 +28,8 @@ import javax.swing.JLabel;
 import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 
+import org.jdesktop.swingx.search.Searchable;
+
 /**
  * A simple low-intrusion default widget for incremental search.
  * 

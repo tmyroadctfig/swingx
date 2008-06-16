@@ -24,7 +24,11 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.text.BadLocationException;
 
 import org.jdesktop.swingx.JXEditorPane.DocumentSearchable;
-import org.jdesktop.swingx.JXTable.TableSearchable;
+import org.jdesktop.swingx.search.AbstractSearchable;
+import org.jdesktop.swingx.search.PatternModel;
+import org.jdesktop.swingx.search.SearchFactory;
+import org.jdesktop.swingx.search.Searchable;
+import org.jdesktop.swingx.search.TableSearchable;
 
 public class FindTest extends InteractiveTestCase {
     private static final Logger LOG = Logger
@@ -65,78 +69,6 @@ public class FindTest extends InteractiveTestCase {
         JXTable table = new JXTable(20, 2);
         SearchFactory.getInstance().showFindDialog(null, table.getSearchable());
     }
-    /**
-     * Issue #718-swingx: shared FindPanel not updated on LF change.
-     * 
-     * Here: check that containing dialog is disposed, old api (no boolean).
-     */
-    @SuppressWarnings("deprecation")
-    public void testFindDialogDisposeDeprecated() {
-        // This test will not work in a headless configuration.
-        if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run test - headless environment");
-            return;
-        }
-        JXFrame frame = new JXFrame();
-        JXTable table = new JXTable();
-        frame.add(table);
-        JComponent findPanel = SearchFactory.getInstance().getSharedFindPanel();
-        SearchFactory.getInstance().showFindDialog(table, table.getSearchable());
-        Window window = SwingUtilities.getWindowAncestor(findPanel);
-        assertSame(frame, window.getOwner());
-        SearchFactory.getInstance().hideSharedFindPanel(true);
-        assertFalse("window must not be displayable", window.isDisplayable());
-        assertNull("findPanel must be unparented", findPanel.getParent());
-    }
-    
-    /**
-     * Issue #718-swingx: shared FindPanel not updated on LF change.
-     * 
-     * Here: check that containing dialog is disposed, new api with flag.
-     */
-    public void testFindDialogDispose() {
-        // This test will not work in a headless configuration.
-        if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run test - headless environment");
-            return;
-        }
-        JXFrame frame = new JXFrame();
-        JXTable table = new JXTable();
-        frame.add(table);
-        JComponent findPanel = SearchFactory.getInstance().getSharedFindPanel();
-        SearchFactory.getInstance().showFindDialog(table, table.getSearchable());
-        Window window = SwingUtilities.getWindowAncestor(findPanel);
-        assertSame(frame, window.getOwner());
-        SearchFactory.getInstance().hideSharedFindPanel(true);
-        assertFalse("window must not be displayable", window.isDisplayable());
-        assertNull("findPanel must be unparented", findPanel.getParent());
-    }
-    /**
-     * Issue #718-swingx: shared FindPanel not updated on LF change.
-     * 
-     * Here: check that containing dialog is not disposed.
-     */
-    public void testFindDialogHide() {
-        // This test will not work in a headless configuration.
-        if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run test - headless environment");
-            return;
-        }
-        JXFrame frame = new JXFrame();
-        JXTable table = new JXTable();
-        frame.add(table);
-        JComponent findPanel = SearchFactory.getInstance().getSharedFindPanel();
-        SearchFactory.getInstance().showFindDialog(table, table.getSearchable());
-        Container parent = findPanel.getParent();
-        Window window = SwingUtilities.getWindowAncestor(findPanel);
-        assertSame(frame, window.getOwner());
-        SearchFactory.getInstance().hideSharedFindPanel(false);
-        assertFalse("window must not be visible", window.isVisible());
-        assertSame("findPanel must parent must be unchanged", 
-                parent, findPanel.getParent());
-        assertTrue("window must be displayable", window.isDisplayable());
-    }
-    
     /**
      * Issue #718-swingx: shared FindPanel not updated on LF change.
      * 
@@ -275,55 +207,7 @@ public class FindTest extends InteractiveTestCase {
     }
     
     
-    /** 
-     * test if internal state is reset to not found by
-     * passing a null searchstring.
-     *
-     */
-    public void testTableResetStateWithNullSearchString() {
-        JXTable table = new JXTable(new TestTableModel());
-        int row = 39;
-        int firstColumn = 0;
-        String firstSearchText = table.getValueAt(row, firstColumn).toString();
-        PatternModel model = new PatternModel();
-        model.setRawText(firstSearchText);
-        // initialize searchable to "found state"
-        int foundIndex = table.getSearchable().search(model.getPattern(), -1);
-        // sanity asserts
-        int foundColumn = ((TableSearchable) table.getSearchable()).lastSearchResult.foundColumn;
-        assertEquals("last line found", row, foundIndex);
-        assertEquals("column must be updated", firstColumn, foundColumn);
-        // search with null searchstring 
-        int notFoundIndex =  table.getSearchable().search((String) null);
-        assertEquals("nothing found", -1, notFoundIndex);
-        assertEquals("column must be reset", -1, ((TableSearchable) table.getSearchable()).lastSearchResult.foundColumn);
-
-    }
     
-    /** 
-     * test if internal state is reset to not found by
-     * passing a empty (="") searchstring.
-     *
-     */
-    public void testTableResetStateWithEmptySearchString() {
-        JXTable table = new JXTable(new TestTableModel());
-        int row = 39;
-        int firstColumn = 0;
-        String firstSearchText = table.getValueAt(row, firstColumn).toString();
-        PatternModel model = new PatternModel();
-        model.setRawText(firstSearchText);
-        // initialize searchable to "found state"
-        int foundIndex = table.getSearchable().search(model.getPattern(), -1);
-        // sanity asserts
-        int foundColumn = ((TableSearchable) table.getSearchable()).lastSearchResult.foundColumn;
-        assertEquals("last line found", row, foundIndex);
-        assertEquals("column must be updated", firstColumn, foundColumn);
-        // search with null searchstring 
-        int notFoundIndex =  table.getSearchable().search("");
-        assertEquals("nothing found", -1, notFoundIndex);
-        assertEquals("column must be reset", -1, ((TableSearchable) table.getSearchable()).lastSearchResult.foundColumn);
-
-    }
 
     /** 
      * Test SearchHighlight used in incremental search of JXTable.  
@@ -385,37 +269,6 @@ public class FindTest extends InteractiveTestCase {
         
     }
     /**
-     * test if search loops all columns of previous row (backwards search).
-     * 
-     * Hmm... not testable? 
-     * Needed to widen access for lastFoundColumn.
-     */
-    public void testTableFoundNextColumnInPreviousRow() {
-        JXTable table = new JXTable(new TestTableModel());
-        int lastColumn = table.getColumnCount() -1;
-        int row = 39;
-        int firstColumn = lastColumn - 1;
-        String firstSearchText = table.getValueAt(row, firstColumn).toString();
-        // need a pattern for backwards search
-        PatternModel model = new PatternModel();
-        model.setRawText(firstSearchText);
-        int foundIndex = table.getSearchable().search(model.getPattern(), -1, true);
-        assertEquals("last line found", row, foundIndex);
-        int foundColumn = ((TableSearchable) table.getSearchable()).lastSearchResult.foundColumn;
-        assertEquals("column must be updated", firstColumn, foundColumn);
-        // the last char(s) of all values is the row index
-        // here we are searching for an entry in the next row relative to
-        // the previous search and expect the match in the first column (index = 0);
-        int previousRow = row -1;
-        String secondSearchText = String.valueOf(previousRow);
-        model.setRawText(secondSearchText);
-        int secondFoundIndex = table.getSearchable().search(model.getPattern(), previousRow, true);
-        // sanity assert
-        assertEquals("must find match in same row", previousRow, secondFoundIndex);
-        assertEquals("column must be updated", lastColumn, ((TableSearchable) table.getSearchable()).lastSearchResult.foundColumn);
-        
-    }
-    /**
      * test if match in same row but different column is found in backwards
      * search.
      *
@@ -437,49 +290,6 @@ public class FindTest extends InteractiveTestCase {
     }
 
     
-    /**
-     * test if search loops all columns of next row.
-     *
-     * Hmm... not testable? 
-     * Needed to widen access for lastFoundColumn.
-     */
-    public void testTableFoundPreviousColumnInNextRow() {
-        JXTable table = new JXTable(new TestTableModel());
-        int row = 0;
-        int firstColumn = 1;
-        String firstSearchText = table.getValueAt(row, firstColumn).toString();
-        int foundIndex = table.getSearchable().search(firstSearchText);
-        assertEquals("last line found", row, foundIndex);
-        int foundColumn = ((TableSearchable) table.getSearchable()).lastSearchResult.foundColumn;
-        assertEquals("column must be updated", firstColumn, foundColumn);
-        // the last char(s) of all values is the row index
-        // here we are searching for an entry in the next row relative to
-        // the previous search and expect the match in the first column (index = 0);
-        int nextRow = row + 1;
-        String secondSearchText = String.valueOf(nextRow);
-        int secondFoundIndex = table.getSearchable().search(secondSearchText, nextRow);
-        // sanity assert
-        assertEquals("must find match in same row", nextRow, secondFoundIndex);
-        assertEquals("column must be updated", 0, ((TableSearchable) table.getSearchable()).lastSearchResult.foundColumn);
-        
-    }
-    /**
-     * test if match in same row but different column is found in forward
-     * search.
-     *
-     */
-    public void testTableFoundNextColumnInSameRow() {
-        JXTable table = new JXTable(new TestTableModel());
-        int row = 90;
-        int firstColumn = 0;
-        String firstSearchText = table.getValueAt(row, firstColumn).toString();
-        int foundIndex = table.getSearchable().search(firstSearchText);
-        assertEquals("last line found", row, foundIndex);
-        String secondSearchText = table.getValueAt(row, firstColumn +1).toString();
-        int secondFoundIndex = table.getSearchable().search(secondSearchText, foundIndex);
-        assertEquals("must find match in same row", foundIndex, secondFoundIndex);
-        
-    }
     /**
      * check if not-wrapping returns not found marker (-1).
      *

@@ -30,6 +30,8 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.UIManager.LookAndFeelInfo;
 
+import org.jdesktop.swingx.search.SearchFactory;
+
 /**
  * Base class for supporting inclusion of interactive tests into a JUnit test case.
  * Note that the interactive tests are NOT executed by the JUnit framework and

@@ -37,8 +37,6 @@ import java.lang.reflect.Method;
 import java.util.Hashtable;
 import java.util.Vector;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.swing.Action;
 import javax.swing.ActionMap;
@@ -68,6 +66,9 @@ import org.jdesktop.swingx.decorator.CompoundHighlighter;
 import org.jdesktop.swingx.decorator.FilterPipeline;
 import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.renderer.StringValue;
+import org.jdesktop.swingx.search.SearchFactory;
+import org.jdesktop.swingx.search.Searchable;
+import org.jdesktop.swingx.search.TreeSearchable;
 import org.jdesktop.swingx.tree.DefaultXTreeCellEditor;
 
 
@@ -394,7 +395,7 @@ public class JXTree extends JTree {
      */
     public Searchable getSearchable() {
         if (searchable == null) {
-            searchable = new TreeSearchable();
+            searchable = new TreeSearchable(this);
         }
         return searchable;
     }
@@ -410,103 +411,6 @@ public class JXTree extends JTree {
     }
     
  
-    /**
-     * A searchable targetting the visible rows of a JXTree.
-     * 
-     * PENDING: value to string conversion should behave as nextMatch (?) which
-     * uses the convertValueToString().
-     * 
-     */
-    public class TreeSearchable extends AbstractSearchable {
-
-        @Override
-        protected void findMatchAndUpdateState(Pattern pattern, int startRow,
-                boolean backwards) {
-            SearchResult searchResult = null;
-            if (backwards) {
-                for (int index = startRow; index >= 0 && searchResult == null; index--) {
-                    searchResult = findMatchAt(pattern, index);
-                }
-            } else {
-                for (int index = startRow; index < getSize()
-                        && searchResult == null; index++) {
-                    searchResult = findMatchAt(pattern, index);
-                }
-            }
-            updateState(searchResult);
-
-        }
-
-        @Override
-        protected SearchResult findExtendedMatch(Pattern pattern, int row) {
-            return findMatchAt(pattern, row);
-        }
-
-        /**
-         * Matches the cell content at row/col against the given Pattern.
-         * Returns an appropriate SearchResult if matching or null if no
-         * matching
-         * 
-         * @param pattern
-         * @param row
-         *            a valid row index in view coordinates
-         *            a valid column index in view coordinates
-         * @return an appropriate <code>SearchResult</code> if matching or
-         * null if no matching
-         */
-        protected SearchResult findMatchAt(Pattern pattern, int row) {
-            String text = getStringAt(row);
-            if ((text != null) && (text.length() > 0 )) {
-                Matcher matcher = pattern.matcher(text);
-                if (matcher.find()) {
-                    return createSearchResult(matcher, row, -1);
-                }
-            }
-            return null;
-         // this is pre-767-swingx: consistent string api
-//            TreePath path = getPathForRow(row);
-//            Object value = null;
-//            if (path != null) {
-//                value = path.getLastPathComponent();
-//            }
-//            if (value != null) {
-//                Matcher matcher = pattern.matcher(value.toString());
-//                if (matcher.find()) {
-//                    return createSearchResult(matcher, row, -1);
-//                }
-//            }
-//            return null;
-        }
-
-        @Override
-        protected int getSize() {
-            return getRowCount();
-        }
-
-        /**
-         * @param result
-         * @return {@code true} if the {@code result} contains a match;
-         *         {@code false} otherwise
-         */
-        protected boolean hasMatch(SearchResult result) {
-            return result.getFoundRow() >= 0;
-        }
-        
-
-        @Override
-        protected void moveMatchMarker() {
-            // the common behaviour (JXList, JXTable) is to not
-            // move the selection if not found
-            if (!hasMatch(lastSearchResult)) {
-                return;
-            }
-            setSelectionRow(lastSearchResult.foundRow);
-            scrollRowToVisible(lastSearchResult.foundRow);
-
-        }
-
-    }
-    
     /**
      * Collapses all nodes in the tree table.
      */

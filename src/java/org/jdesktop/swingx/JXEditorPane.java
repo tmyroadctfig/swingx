@@ -23,6 +23,8 @@ package org.jdesktop.swingx;
 
 import org.jdesktop.swingx.action.ActionManager;
 import org.jdesktop.swingx.action.Targetable;
+import org.jdesktop.swingx.search.SearchFactory;
+import org.jdesktop.swingx.search.Searchable;
 
 import javax.swing.*;
 import javax.swing.event.CaretEvent;

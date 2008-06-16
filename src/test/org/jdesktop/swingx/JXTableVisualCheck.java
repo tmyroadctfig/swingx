@@ -72,6 +72,7 @@ import org.jdesktop.swingx.decorator.SortController;
 import org.jdesktop.swingx.decorator.Sorter;
 import org.jdesktop.swingx.renderer.DefaultTableRenderer;
 import org.jdesktop.swingx.renderer.HyperlinkProvider;
+import org.jdesktop.swingx.search.SearchFactory;
 import org.jdesktop.swingx.table.ColumnFactory;
 import org.jdesktop.swingx.table.ColumnHeaderRenderer;
 import org.jdesktop.swingx.table.NumberEditorExt;

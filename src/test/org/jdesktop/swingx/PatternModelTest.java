@@ -10,6 +10,7 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
+import org.jdesktop.swingx.search.PatternModel;
 import org.jdesktop.test.PropertyChangeReport;
 
 /**

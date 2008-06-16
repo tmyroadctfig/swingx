@@ -31,6 +31,9 @@ import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
+import org.jdesktop.swingx.search.PatternModel;
+import org.jdesktop.swingx.search.Searchable;
+
 /**
  * Find panel to incorporate search capability into the users application.
  * The most intended usage is to adding this panel to the dialogs.
