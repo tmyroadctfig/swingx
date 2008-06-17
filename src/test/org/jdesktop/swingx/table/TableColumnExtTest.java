@@ -11,11 +11,15 @@ import java.text.Collator;
 import java.util.Comparator;
 import java.util.Date;
 
+import javax.swing.DefaultCellEditor;
+import javax.swing.JTextField;
+
 import junit.framework.TestCase;
 
 import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.CompoundHighlighter;
 import org.jdesktop.swingx.decorator.Highlighter;
+import org.jdesktop.swingx.renderer.DefaultTableRenderer;
 import org.jdesktop.test.PropertyChangeReport;
 import org.jdesktop.test.SerializableSupport;
 
@@ -26,6 +30,19 @@ import org.jdesktop.test.SerializableSupport;
  */
 public class TableColumnExtTest extends TestCase {
 
+    /**
+     * Issue #822-swingx: replace cloneable by copy constructor.
+     * Here: test base properties copied.
+     */
+    public void testCopyConstructor() {
+        TableColumnExt columnExt = new TableColumnExt(10, 200, 
+                new DefaultTableRenderer(), new DefaultCellEditor(new JTextField(20)));
+        TableColumnExt copy = new TableColumnExt(columnExt);
+        assertEquals(columnExt.getModelIndex(), copy.getModelIndex());
+        assertEquals(columnExt.getWidth(), copy.getWidth());
+        assertEquals(columnExt.getCellRenderer(), copy.getCellRenderer());
+        assertEquals(columnExt.getCellEditor(), copy.getCellEditor());
+    }
     /**
      * test remove
      *
@@ -82,7 +99,7 @@ public class TableColumnExtTest extends TestCase {
      * notification, cloned correctly.
      * 
      */
-    public void testHeaderTooltip() {
+    public void testCloneHeaderTooltip() {
         TableColumnExt columnExt = new TableColumnExt();
         columnExt.setTitle("mytitle");
         assertNull("tooltip is null initially", columnExt.getToolTipText());
@@ -96,6 +113,49 @@ public class TableColumnExtTest extends TestCase {
         TableColumnExt cloned = (TableColumnExt) columnExt.clone();
         assertEquals("tooltip property must be cloned", columnExt.getToolTipText(),
                 cloned.getToolTipText());
+    }
+    
+    /**
+     * Issue #154-swingx.
+     * 
+     * added property headerTooltip. Test initial value, propertyChange
+     * notification, cloned correctly.
+     * 
+     */
+    public void testHeaderTooltip() {
+        TableColumnExt columnExt = new TableColumnExt();
+        columnExt.setTitle("mytitle");
+        assertNull("tooltip is null initially", columnExt.getToolTipText());
+        String toolTip = "some column text";
+        PropertyChangeReport report = new PropertyChangeReport();
+        columnExt.addPropertyChangeListener(report);
+        columnExt.setToolTipText(toolTip);
+        assertEquals(toolTip, columnExt.getToolTipText());
+        assertEquals("must have fired one propertyChangeEvent for toolTipText ", 
+                1, report.getEventCount("toolTipText"));
+        TableColumnExt copy = new TableColumnExt(columnExt);
+        assertEquals("tooltip property must be cloned", columnExt.getToolTipText(),
+                copy.getToolTipText());
+    }
+    /**
+     * Test the sortable property: must fire propertyChange and
+     * be cloned properly 
+     *
+     */
+    public void testCloneSortable() {
+        TableColumnExt columnExt = new TableColumnExt();
+        boolean sortable = columnExt.isSortable();
+        assertTrue("columnExt isSortable by default", sortable);
+        PropertyChangeReport report = new PropertyChangeReport();
+        columnExt.addPropertyChangeListener(report);
+        columnExt.setSortable(!sortable);
+        // sanity assert: the change was taken
+        assertEquals(sortable, !columnExt.isSortable());
+        assertEquals("must have fired one propertyChangeEvent for sortable ", 
+                1, report.getEventCount("sortable"));
+        TableColumnExt cloned = (TableColumnExt) columnExt.clone();
+        assertEquals("sortable property must be cloned", columnExt.isSortable(),
+                cloned.isSortable());
     }
     
     /**
@@ -114,9 +174,9 @@ public class TableColumnExtTest extends TestCase {
         assertEquals(sortable, !columnExt.isSortable());
         assertEquals("must have fired one propertyChangeEvent for sortable ", 
                 1, report.getEventCount("sortable"));
-        TableColumnExt cloned = (TableColumnExt) columnExt.clone();
+        TableColumnExt copy = new TableColumnExt(columnExt);
         assertEquals("sortable property must be cloned", columnExt.isSortable(),
-                cloned.isSortable());
+                copy.isSortable());
     }
     
     /**
@@ -149,6 +209,19 @@ public class TableColumnExtTest extends TestCase {
         assertEquals(comparator, clone.getComparator());
     }
 
+    /**
+     * Issue #273-swingx: make Comparator a bound property of TableColumnExt.
+     * (instead of client property)
+     *
+     * test if comparator is cloned. 
+     */
+    public void testCopyComparator() {
+        TableColumnExt tableColumn = new TableColumnExt();
+        Comparator comparator = Collator.getInstance();
+        tableColumn.setComparator(comparator);
+        TableColumnExt clone = new TableColumnExt(tableColumn);
+        assertEquals(comparator, clone.getComparator());
+    }
    /**
      * Issue #280-swingx: tableColumnExt doesn't fire propertyChange on
      * putClientProperty.
@@ -177,7 +250,7 @@ public class TableColumnExtTest extends TestCase {
      * user friendly resizable flag. 
      * 
      */
-    public void testResizable() {
+    public void testCloneResizable() {
         TableColumnExt column = new TableColumnExt(0);
         //sanity assert
         assertTrue("min < max", column.getMinWidth() < column.getMaxWidth());
@@ -196,11 +269,32 @@ public class TableColumnExtTest extends TestCase {
     }
     
     /**
+     * user friendly resizable flag. 
+     * 
+     */
+    public void testResizable() {
+        TableColumnExt column = new TableColumnExt(0);
+        //sanity assert
+        assertTrue("min < max", column.getMinWidth() < column.getMaxWidth());
+        // sanity assert
+        assertTrue("resizable default", column.getResizable());
+        column.setMinWidth(column.getMaxWidth());
+        assertFalse("must not be resizable with equal min-max", column.getResizable());
+        TableColumnExt copy = new TableColumnExt(column);
+        // sanity
+        assertEquals("min-max of clone", copy.getMinWidth(), copy.getMaxWidth());
+        assertFalse("must not be resizable with equal min-max", copy.getResizable());
+        copy.setMinWidth(0);
+        //sanity assert
+        assertTrue("min < max", copy.getMinWidth() < copy.getMaxWidth());
+        assertTrue("cloned base resizable", copy.getResizable());
+    }
+    /**
      * Issue #39-swingx:
      * Client properties not preserved when cloning.
      *
      */
-    public void testClientPropertyClone() {
+    public void testCloneClientProperty() {
         TableColumnExt column = new TableColumnExt(0);
         String key = "property";
         Object value = new Object();
@@ -217,6 +311,27 @@ public class TableColumnExtTest extends TestCase {
                 cloned.getClientProperty(key));
     }
 
+    /**
+     * Issue #39-swingx:
+     * Client properties not preserved when cloning.
+     *
+     */
+    public void testCopyClientProperty() {
+        TableColumnExt column = new TableColumnExt(0);
+        String key = "property";
+        Object value = new Object();
+        column.putClientProperty(key, value);
+        TableColumnExt copy = new TableColumnExt(column);
+        assertEquals("client property must be in cloned", value, copy.getClientProperty(key));
+        
+        key = "single";
+        column.putClientProperty(key, value);
+        //sanity check
+        assertSame(value, column.getClientProperty(key));
+        
+        assertNull("cloned client properties must be in independant",
+                copy.getClientProperty(key));
+    }
     //begin SwingX Issue #770 checks
     /**
      * Check for setHighlighters portion of #770.
@@ -343,7 +458,7 @@ public class TableColumnExtTest extends TestCase {
     /**
      * Check to ensure that the clone returns the highlighters correctly. Part of #770.
      */
-    public void testClonedHighlighters() {
+    public void testCloneHighlighters() {
         TableColumnExt column = new TableColumnExt(0);
         Highlighter h1 = new ColorHighlighter();
         Highlighter h2 = new ColorHighlighter();
@@ -352,6 +467,42 @@ public class TableColumnExtTest extends TestCase {
         column.setHighlighters(h1, h2);
         
         TableColumnExt clone = (TableColumnExt) column.clone();
+        
+        Highlighter[] columnHighlighters = column.getHighlighters();
+        Highlighter[] cloneHighlighters = clone.getHighlighters();
+        
+        assertEquals(2, columnHighlighters.length);
+        assertEquals(columnHighlighters.length, cloneHighlighters.length);
+        assertSame(h1, columnHighlighters[0]);
+        assertSame(columnHighlighters[0], cloneHighlighters[0]);
+        assertSame(h2, columnHighlighters[1]);
+        assertSame(columnHighlighters[1], cloneHighlighters[1]);
+        
+        column.addHighlighter(h3);
+        
+        columnHighlighters = column.getHighlighters();
+        cloneHighlighters = clone.getHighlighters();
+        
+        assertEquals(3, columnHighlighters.length);
+        assertEquals(columnHighlighters.length, cloneHighlighters.length + 1);
+        assertSame(h1, columnHighlighters[0]);
+        assertSame(columnHighlighters[0], cloneHighlighters[0]);
+        assertSame(h2, columnHighlighters[1]);
+        assertSame(columnHighlighters[1], cloneHighlighters[1]);
+        assertSame(h3, columnHighlighters[2]);
+    }
+    /**
+     * Check to ensure that the clone returns the highlighters correctly. Part of #770.
+     */
+    public void testCopyHighlighters() {
+        TableColumnExt column = new TableColumnExt(0);
+        Highlighter h1 = new ColorHighlighter();
+        Highlighter h2 = new ColorHighlighter();
+        Highlighter h3 = new ColorHighlighter();
+        
+        column.setHighlighters(h1, h2);
+        
+        TableColumnExt clone = new TableColumnExt(column);
         
         Highlighter[] columnHighlighters = column.getHighlighters();
         Highlighter[] cloneHighlighters = clone.getHighlighters();

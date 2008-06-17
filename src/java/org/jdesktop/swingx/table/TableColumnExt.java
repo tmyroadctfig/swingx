@@ -163,6 +163,19 @@ public class TableColumnExt extends TableColumn
     }
 
     /**
+     * Instantiates a new table view column with all properties copied from the 
+     * given original.
+     * 
+     * @param columnExt the column to copy properties from
+     * @see #copyFrom(TableColumnExt)
+     */
+    public TableColumnExt(TableColumnExt columnExt) {
+        this(columnExt.getModelIndex(), columnExt.getWidth(), columnExt
+                .getCellRenderer(), columnExt.getCellEditor());
+        copyFrom(columnExt);
+    }
+
+    /**
      * Returns the CompoundHighlighter assigned to the table, null if none.
      * PENDING: open up for subclasses again?.
      * 
@@ -577,10 +590,17 @@ public class TableColumnExt extends TableColumn
       * once to a TableColumnModel. To show TableColumns with the same column of
       * data from the model, create a new instance with the same modelIndex.
       * <p>
-      * This implementation is not compatible with {@link Object#clone()}.
+      * This implementation is not compatible with {@link Object#clone()}. <p>
+      * 
+      * NOTE: this deprecation marker is for change convenience only and 
+      * very short-lived! This method will be
+      * removed before 0.9.4 which will have code-breaking changes anyway.
       *
       * @return a clone of this TableColumn
+      * 
+      * @deprecated use copy constructor {@link #TableColumnExt(TableColumnExt)}
       */
+     @Deprecated
      @Override
      public Object clone() {
          final TableColumnExt copy = new TableColumnExt(
@@ -608,6 +628,50 @@ public class TableColumnExt extends TableColumn
          
          return copy;
      }
+
+     /**
+      * Copies properties from original. Handles all properties except
+      * modelIndex, width, cellRenderer, cellEditor. Called from copy 
+      * constructor.
+      *  
+      * @param original the tableColumn to copy from
+      * 
+      * @see #TableColumnExt(TableColumnExt)
+      */
+     protected void copyFrom(TableColumnExt original) {
+             setEditable(original.isEditable());
+             setHeaderValue(original.getHeaderValue());    // no need to copy setTitle();
+             setToolTipText(original.getToolTipText());
+             setIdentifier(original.getIdentifier());
+             setMaxWidth(original.getMaxWidth());
+             setMinWidth(original.getMinWidth());
+             setPreferredWidth(original.getPreferredWidth());
+             setPrototypeValue(original.getPrototypeValue());
+             // JW: isResizable is overridden to return a calculated property!
+             setResizable(original.isResizable);
+             setVisible(original.isVisible());
+             setSortable(original.isSortable());
+             setComparator(original.getComparator());
+             copyClientPropertiesFrom(original);
+             
+             if (original.compoundHighlighter != null) {
+                 setHighlighters(original.getHighlighters());
+             }
+         
+     }
+     
+     /**
+      * Copies all clientProperties of this <code>TableColumnExt</code>
+      * to the target column.
+      * 
+      * @param copy the target column.
+      */
+     protected void copyClientPropertiesFrom(TableColumnExt original) {
+        if (original.clientProperties == null) return;
+        for(Object key: original.clientProperties.keySet()) {
+            putClientProperty(key, original.getClientProperty(key));
+        }
+    }
 
      /**
       * Copies all clientProperties of this <code>TableColumnExt</code>
