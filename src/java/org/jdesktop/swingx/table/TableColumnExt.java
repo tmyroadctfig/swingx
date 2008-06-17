@@ -92,8 +92,7 @@ import org.jdesktop.swingx.util.Contract;
  * @see ColumnFactory
  * @see javax.swing.JComponent#putClientProperty
  */
-public class TableColumnExt extends TableColumn
-    implements Cloneable {
+public class TableColumnExt extends TableColumn {
     
     /** visible property. Initialized to <code>true</code>.*/
     protected boolean visible = true;
@@ -583,51 +582,6 @@ public class TableColumnExt extends TableColumn
         return clientProperties;
     }
 
-    /**
-      * Returns a copy of this TableColumn. Some implementations of TableColumn
-      * may assume that all TableColumnModels are unique, therefore it is
-      * recommended that the same TableColumn instance not be added more than
-      * once to a TableColumnModel. To show TableColumns with the same column of
-      * data from the model, create a new instance with the same modelIndex.
-      * <p>
-      * This implementation is not compatible with {@link Object#clone()}. <p>
-      * 
-      * NOTE: this deprecation marker is for change convenience only and 
-      * very short-lived! This method will be
-      * removed before 0.9.4 which will have code-breaking changes anyway.
-      *
-      * @return a clone of this TableColumn
-      * 
-      * @deprecated use copy constructor {@link #TableColumnExt(TableColumnExt)}
-      */
-     @Deprecated
-     @Override
-     public Object clone() {
-         final TableColumnExt copy = new TableColumnExt(
-             this.getModelIndex(), this.getWidth(),
-             this.getCellRenderer(), this.getCellEditor());
-         
-         copy.setEditable(this.isEditable());
-         copy.setHeaderValue(this.getHeaderValue());	// no need to copy setTitle();
-         copy.setToolTipText(getToolTipText());
-         copy.setIdentifier(this.getIdentifier());
-         copy.setMaxWidth(this.getMaxWidth());
-         copy.setMinWidth(this.getMinWidth());
-         copy.setPreferredWidth(this.getPreferredWidth());
-         copy.setPrototypeValue(this.getPrototypeValue());
-         // JW: isResizable is overridden to return a calculated property!
-         copy.setResizable(super.getResizable());
-         copy.setVisible(this.isVisible());
-         copy.setSortable(this.isSortable());
-         copy.setComparator(getComparator());
-         copyClientPropertiesTo(copy);
-         
-         if (compoundHighlighter != null) {
-             copy.setHighlighters(getHighlighters());
-         }
-         
-         return copy;
-     }
 
      /**
       * Copies properties from original. Handles all properties except
@@ -673,18 +627,6 @@ public class TableColumnExt extends TableColumn
         }
     }
 
-     /**
-      * Copies all clientProperties of this <code>TableColumnExt</code>
-      * to the target column.
-      * 
-      * @param copy the target column.
-      */
-     protected void copyClientPropertiesTo(TableColumnExt copy) {
-        if (clientProperties == null) return;
-        for(Object key: clientProperties.keySet()) {
-            copy.putClientProperty(key, getClientProperty(key));
-        }
-    }
 
     /**
      * Notifies registered <code>PropertyChangeListener</code>s 

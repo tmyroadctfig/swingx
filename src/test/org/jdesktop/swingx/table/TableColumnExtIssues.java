@@ -96,20 +96,6 @@ public class TableColumnExtIssues extends TestCase {
         
         
     }
-    /**
-     * Issue #815-swingx: Listeners must not be cloned.
-     */
-    public void testChangeNofification() {
-        TableColumnExt column = new TableColumnExt(0);
-        column.setMaxWidth(1000);
-        PropertyChangeReport r = new PropertyChangeReport();
-        column.addPropertyChangeListener(r);
-        TableColumnExt clone = (TableColumnExt) column.clone();
-        // change the clone
-        clone.setMinWidth(44);
-        assertEquals("listener must not be notified on changes of the clone", 
-                0, r.getEventCount());
-    }
 
     /**
      * Issue #??-swingx: tableColumnExt does not fire propertyChange on resizable.
