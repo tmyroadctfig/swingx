@@ -18,7 +18,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-package org.jdesktop.swingx.action;
+package org.jdesktop.swingx.hyperlink;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -27,7 +27,6 @@ import java.beans.PropertyChangeListener;
 
 import javax.swing.Action;
 
-import org.jdesktop.swingx.LinkModel;
 
 /**
  * Specialized LinkAction for a target of type {@link LinkModel}. 

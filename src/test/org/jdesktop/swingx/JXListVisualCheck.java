@@ -15,13 +15,15 @@ import javax.swing.Action;
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
 
-import org.jdesktop.swingx.action.LinkModelAction;
 import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.FilterPipeline;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
 import org.jdesktop.swingx.decorator.PatternFilter;
 import org.jdesktop.swingx.decorator.PatternPredicate;
+import org.jdesktop.swingx.hyperlink.EditorPaneLinkVisitor;
+import org.jdesktop.swingx.hyperlink.LinkModel;
+import org.jdesktop.swingx.hyperlink.LinkModelAction;
 import org.jdesktop.swingx.renderer.DefaultListRenderer;
 import org.jdesktop.swingx.renderer.HyperlinkProvider;
 

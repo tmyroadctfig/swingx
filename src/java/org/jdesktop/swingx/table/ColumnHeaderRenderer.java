@@ -38,7 +38,6 @@ import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 
 import org.jdesktop.swingx.JXTable;
-import org.jdesktop.swingx.LabelProperties;
 import org.jdesktop.swingx.border.IconBorder;
 import org.jdesktop.swingx.decorator.SortOrder;
 import org.jdesktop.swingx.icon.SortArrowIcon;

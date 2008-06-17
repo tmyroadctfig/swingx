@@ -20,7 +20,7 @@
  */
 package org.jdesktop.swingx;
 
-import org.jdesktop.swingx.action.LinkAction;
+import org.jdesktop.swingx.hyperlink.LinkAction;
 import org.jdesktop.swingx.plaf.HyperlinkAddon;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 

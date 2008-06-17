@@ -13,7 +13,7 @@ import java.util.logging.Logger;
 
 import junit.framework.TestCase;
 
-import org.jdesktop.swingx.action.LinkAction;
+import org.jdesktop.swingx.hyperlink.LinkAction;
 import org.jdesktop.swingx.plaf.basic.BasicHyperlinkUI.BasicHyperlinkListener;
 import org.jdesktop.test.PropertyChangeReport;
 

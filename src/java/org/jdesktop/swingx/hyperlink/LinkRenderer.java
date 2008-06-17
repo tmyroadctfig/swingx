@@ -18,9 +18,9 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-package org.jdesktop.swingx;
+package org.jdesktop.swingx.hyperlink;
 
-import org.jdesktop.swingx.action.LinkAction;
+import org.jdesktop.swingx.JXHyperlink;
 import org.jdesktop.swingx.rollover.RolloverProducer;
 import org.jdesktop.swingx.rollover.RolloverRenderer;
 

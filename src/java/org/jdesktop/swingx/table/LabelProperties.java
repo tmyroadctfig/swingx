@@ -19,7 +19,7 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-package org.jdesktop.swingx;
+package org.jdesktop.swingx.table;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -33,7 +33,11 @@ import javax.swing.table.TableCellRenderer;
 
 /**
  * Class used to store label properties in a single object so that they
- * may be applied as a set on renderers.
+ * may be applied as a set on renderers. <p>
+ * 
+ * NOTE JW: no longer used except in ColumnHeaderRenderer which is EOL (will be
+ * removed once we switch over to jdk16). So probably will be removed as well.
+ * 
  * @author Amy Fowler
  * @version 1.0
  */

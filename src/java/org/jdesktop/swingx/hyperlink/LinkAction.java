@@ -2,13 +2,15 @@
  * Created on 28.03.2006
  *
  */
-package org.jdesktop.swingx.action;
+package org.jdesktop.swingx.hyperlink;
 
 import java.awt.event.ItemEvent;
 
+import org.jdesktop.swingx.action.AbstractActionExt;
+
 /**
  * Convenience implementation to simplify {@link org.jdesktop.swingx.JXHyperlink} configuration and
- * provide minimal api as needed by a {@link org.jdesktop.swingx.LinkRenderer}. <p>
+ * provide minimal api as needed by a {@link org.jdesktop.swingx.hyperlink.LinkRenderer}. <p>
  * 
  * PENDING: rename to AbstractLinkAction
  * 

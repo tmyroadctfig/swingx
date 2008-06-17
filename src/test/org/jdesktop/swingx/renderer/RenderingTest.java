@@ -43,7 +43,7 @@ import org.jdesktop.swingx.JXHyperlink;
 import org.jdesktop.swingx.JXPanel;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.JXTreeTable;
-import org.jdesktop.swingx.action.LinkAction;
+import org.jdesktop.swingx.hyperlink.LinkAction;
 import org.jdesktop.swingx.painter.ShapePainter;
 import org.jdesktop.swingx.table.TableColumnExt;
 import org.jdesktop.swingx.test.ComponentTreeTableModel;

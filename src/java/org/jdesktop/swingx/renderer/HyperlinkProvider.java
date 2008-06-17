@@ -25,7 +25,7 @@ import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 
 import org.jdesktop.swingx.JXHyperlink;
-import org.jdesktop.swingx.action.LinkAction;
+import org.jdesktop.swingx.hyperlink.LinkAction;
 import org.jdesktop.swingx.rollover.RolloverProducer;
 import org.jdesktop.swingx.rollover.RolloverRenderer;
 

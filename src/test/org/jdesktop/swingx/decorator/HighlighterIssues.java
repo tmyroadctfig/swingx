@@ -30,9 +30,9 @@ import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXList;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.JXTree;
-import org.jdesktop.swingx.LinkModel;
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.decorator.HighlighterFactory.UIColorHighlighter;
+import org.jdesktop.swingx.hyperlink.LinkModel;
 import org.jdesktop.test.AncientSwingTeam;
 
 

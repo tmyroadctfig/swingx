@@ -10,6 +10,7 @@ import javax.swing.Action;
 
 import junit.framework.TestCase;
 
+import org.jdesktop.swingx.hyperlink.LinkAction;
 import org.jdesktop.test.PropertyChangeReport;
 
 /**
