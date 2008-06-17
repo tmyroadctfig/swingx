@@ -21,6 +21,8 @@
 package org.jdesktop.swingx;
 
 import org.jdesktop.swingx.action.LinkAction;
+import org.jdesktop.swingx.rollover.RolloverProducer;
+import org.jdesktop.swingx.rollover.RolloverRenderer;
 
 import javax.swing.*;
 import javax.swing.border.Border;

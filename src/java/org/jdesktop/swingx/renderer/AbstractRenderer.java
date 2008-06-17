@@ -24,7 +24,7 @@ package org.jdesktop.swingx.renderer;
 import java.awt.Color;
 import java.io.Serializable;
 
-import org.jdesktop.swingx.RolloverRenderer;
+import org.jdesktop.swingx.rollover.RolloverRenderer;
 
 /**
  * Convience common ancestor for SwingX renderers.

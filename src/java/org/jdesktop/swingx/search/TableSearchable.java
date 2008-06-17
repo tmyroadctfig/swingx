@@ -36,7 +36,7 @@ import org.jdesktop.swingx.decorator.SearchPredicate;
 public class TableSearchable extends AbstractSearchable {
 
 
-        private JXTable table;
+        protected JXTable table;
 
         /**
          * @param table

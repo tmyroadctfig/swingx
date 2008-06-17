@@ -8,7 +8,7 @@ import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import org.jdesktop.swingx.RolloverRenderer;
+import org.jdesktop.swingx.rollover.RolloverRenderer;
 import org.jdesktop.swingx.treetable.TreeTableNode;
 
 

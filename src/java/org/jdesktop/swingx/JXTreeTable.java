@@ -70,6 +70,8 @@ import javax.swing.tree.TreeSelectionModel;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.FilterPipeline;
 import org.jdesktop.swingx.decorator.SelectionMapper;
+import org.jdesktop.swingx.rollover.RolloverProducer;
+import org.jdesktop.swingx.rollover.RolloverRenderer;
 import org.jdesktop.swingx.treetable.DefaultTreeTableModel;
 import org.jdesktop.swingx.treetable.TreeTableCellEditor;
 import org.jdesktop.swingx.treetable.TreeTableModel;

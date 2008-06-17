@@ -29,7 +29,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import org.jdesktop.swingx.RolloverProducer;
+import org.jdesktop.swingx.rollover.RolloverProducer;
 import org.jdesktop.swingx.util.Contract;
 
 /**
@@ -103,7 +103,7 @@ public interface HighlightPredicate {
          * the row of its rollover property equals the adapter's row, returns
          * false otherwise.
          * 
-         * @see org.jdesktop.swingx.RolloverProducer
+         * @see org.jdesktop.swingx.rollover.RolloverProducer
          */
         public boolean isHighlighted(Component renderer, ComponentAdapter adapter) {
             if (!adapter.getComponent().isEnabled()) return false;

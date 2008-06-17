@@ -38,6 +38,8 @@ import org.jdesktop.swingx.decorator.SortKey;
 import org.jdesktop.swingx.decorator.SortOrder;
 import org.jdesktop.swingx.renderer.DefaultListRenderer;
 import org.jdesktop.swingx.renderer.StringValue;
+import org.jdesktop.swingx.rollover.ListRolloverController;
+import org.jdesktop.swingx.rollover.RolloverProducer;
 import org.jdesktop.test.AncientSwingTeam;
 import org.jdesktop.test.ListDataReport;
 import org.jdesktop.test.PropertyChangeReport;
@@ -703,8 +705,8 @@ public class JXListTest extends InteractiveTestCase {
     private PropertyChangeListener getLinkControllerAsPropertyChangeListener(JXList table, String propertyName) {
         PropertyChangeListener[] listeners = table.getPropertyChangeListeners(propertyName);
         for (int i = 0; i < listeners.length; i++) {
-            if (listeners[i] instanceof JXList.ListRolloverController) {
-                return (JXList.ListRolloverController) listeners[i];
+            if (listeners[i] instanceof ListRolloverController) {
+                return (ListRolloverController) listeners[i];
             }
         }
         return null;

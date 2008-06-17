@@ -2,7 +2,7 @@
  * Created on 11.04.2006
  *
  */
-package org.jdesktop.swingx;
+package org.jdesktop.swingx.rollover;
 
 import java.awt.Point;
 import java.awt.event.ActionEvent;

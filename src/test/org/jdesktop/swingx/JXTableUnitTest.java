@@ -72,6 +72,9 @@ import org.jdesktop.swingx.decorator.SortOrder;
 import org.jdesktop.swingx.decorator.Sorter;
 import org.jdesktop.swingx.renderer.DefaultTableRenderer;
 import org.jdesktop.swingx.renderer.StringValue;
+import org.jdesktop.swingx.rollover.RolloverController;
+import org.jdesktop.swingx.rollover.RolloverProducer;
+import org.jdesktop.swingx.rollover.TableRolloverController;
 import org.jdesktop.swingx.table.ColumnControlButton;
 import org.jdesktop.swingx.table.ColumnFactory;
 import org.jdesktop.swingx.table.NumberEditorExt;
@@ -2183,8 +2186,8 @@ public class JXTableUnitTest extends InteractiveTestCase {
     private PropertyChangeListener getLinkControllerAsPropertyChangeListener(JXTable table, String propertyName) {
         PropertyChangeListener[] listeners = table.getPropertyChangeListeners(propertyName);
         for (int i = 0; i < listeners.length; i++) {
-            if (listeners[i] instanceof JXTable.TableRolloverController) {
-                return (JXTable.TableRolloverController) listeners[i];
+            if (listeners[i] instanceof TableRolloverController) {
+                return (TableRolloverController) listeners[i];
             }
         }
         return null;

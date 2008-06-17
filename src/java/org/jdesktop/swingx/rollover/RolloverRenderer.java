@@ -2,7 +2,7 @@
  * Created on 29.03.2006
  *
  */
-package org.jdesktop.swingx;
+package org.jdesktop.swingx.rollover;
 
 /**
  * Interface to mark renderers as "live". <p>

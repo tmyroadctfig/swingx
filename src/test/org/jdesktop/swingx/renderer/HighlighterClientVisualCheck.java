@@ -53,7 +53,6 @@ import org.jdesktop.swingx.JXList;
 import org.jdesktop.swingx.JXSearchPanel;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.JXTreeTable;
-import org.jdesktop.swingx.RolloverProducer;
 import org.jdesktop.swingx.decorator.AbstractHighlighter;
 import org.jdesktop.swingx.decorator.BorderHighlighter;
 import org.jdesktop.swingx.decorator.ColorHighlighter;
@@ -67,6 +66,7 @@ import org.jdesktop.swingx.decorator.PatternPredicate;
 import org.jdesktop.swingx.decorator.ShadingColorHighlighter;
 import org.jdesktop.swingx.decorator.HighlightPredicate.ColumnHighlightPredicate;
 import org.jdesktop.swingx.renderer.PainterVisualCheck.ValueBasedGradientHighlighter;
+import org.jdesktop.swingx.rollover.RolloverProducer;
 import org.jdesktop.swingx.treetable.FileSystemModel;
 import org.jdesktop.test.AncientSwingTeam;
 

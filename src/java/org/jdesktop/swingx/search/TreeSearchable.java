@@ -14,7 +14,7 @@ import org.jdesktop.swingx.JXTree;
      */
     public class TreeSearchable extends AbstractSearchable {
 
-        private JXTree tree;
+        protected JXTree tree;
 
 
         /**

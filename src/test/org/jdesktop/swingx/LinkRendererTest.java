@@ -20,6 +20,7 @@ import javax.swing.table.TableCellRenderer;
 import org.jdesktop.swingx.action.LinkModelAction;
 import org.jdesktop.swingx.renderer.DefaultTableRenderer;
 import org.jdesktop.swingx.renderer.HyperlinkProvider;
+import org.jdesktop.swingx.rollover.RolloverProducer;
 
 /**
  * Test around hyperlink rendering.

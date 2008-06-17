@@ -86,93 +86,50 @@ public class FindIssues extends FindTest {
 
     
     public void interactiveTableMarkAllMatches() {
-        JXTable table = new XXTable();
+        JXTable table = new JXTable();
+        table.setSearchable(new XTableSearchable(table));
         table.setModel(new TestTableModel());
         SearchFactory.getInstance().setUseFindBar(true);
         showWithScrollingInFrame(table, "quick sample for mark all matches");
     }
-
-    public static class XXTable extends JXTable {
+    
+    /**
+     * Searchable which highlights all matches.
+     */
+    public static class XTableSearchable extends TableSearchable {
+        
+        /**
+         * @param table
+         */
+        public XTableSearchable(JXTable table) {
+            super(table);
+        }
 
         @Override
-        public Searchable getSearchable() {
-            if (searchable == null) {
-                searchable = new XTableSearchable(this);
+        protected AbstractHighlighter getConfiguredMatchHighlighter() {
+            CompoundHighlighter searchHL = (CompoundHighlighter) getMatchHighlighter();
+            if (!hasMatch(lastSearchResult)) {
+                searchHL.setHighlightPredicate(HighlightPredicate.NEVER);
+            } else {
+                searchHL.setHighlightPredicate(new SearchPredicate(lastSearchResult.getPattern()));
+                ((AbstractHighlighter) searchHL.getHighlighters()[1]).setHighlightPredicate(
+                        new SearchPredicate(lastSearchResult.getPattern(), 
+                                lastSearchResult.getFoundRow(), lastSearchResult.getFoundColumn()));
             }
-            return searchable;
+            return searchHL;
         }
 
-        public class XTableSearchable extends TableSearchable {
-
-            
-            /**
-             * @param table
-             */
-            public XTableSearchable(XXTable table) {
-                super(table);
-            }
-
-            @Override
-            protected AbstractHighlighter getConfiguredMatchHighlighter() {
-                CompoundHighlighter searchHL = (CompoundHighlighter) getMatchHighlighter();
-                if (!hasMatch(lastSearchResult)) {
-                    searchHL.setHighlightPredicate(HighlightPredicate.NEVER);
-                } else {
-                    searchHL.setHighlightPredicate(new SearchPredicate(lastSearchResult.getPattern()));
-                    ((AbstractHighlighter) searchHL.getHighlighters()[1]).setHighlightPredicate(
-                            new SearchPredicate(lastSearchResult.getPattern(), 
-                                    lastSearchResult.getFoundRow(), lastSearchResult.getFoundColumn()));
-                }
-                return searchHL;
-            }
-
-            @Override
-            protected AbstractHighlighter createMatchHighlighter() {
-                ColorHighlighter base = new ColorHighlighter(Color.YELLOW.brighter(), null, 
-                        Color.YELLOW.darker(), null);
-                ColorHighlighter cell = new ColorHighlighter(Color.YELLOW.darker(), null);
-                CompoundHighlighter match = new CompoundHighlighter(base, cell);
-//                match.setHighlightPredicate(HighlightPredicate.NEVER);
-                return match;
-            }
-
-            
-            
-//            protected SearchHighlighter createSearchHighlighter() {
-//                SearchHighlighter highlighter = new SearchHighlighter() {
-//                    int currentViewRow;
-//
-//                    int currentModelColumn;
-//
-//                    /**
-//                     * Overridden to always mark all.
-//                     */
-//                    @Override
-//                    public void setHighlightCell(int row, int modelColumn) {
-//                        currentViewRow = row;
-//                        currentModelColumn = modelColumn;
-//                        super.setHighlightCell(-1, -1);
-//                    }
-//
-//                    @Override
-//                    protected Color computeUnselectedBackground(
-//                            Component renderer, ComponentAdapter adapter) {
-//                        Color color = super.computeUnselectedBackground(
-//                                renderer, adapter);
-//                        if ((adapter.row == currentViewRow)
-//                                && (adapter.column >= 0)
-//                                && (adapter.viewToModel(adapter.column) == currentModelColumn)) {
-//                            return color.darker();
-//                        }
-//                        return color;
-//                    }
-//
-//                };
-//                return highlighter;
-//            }
-//
+        @Override
+        protected AbstractHighlighter createMatchHighlighter() {
+            ColorHighlighter base = new ColorHighlighter(Color.YELLOW.brighter(), null, 
+                    Color.YELLOW.darker(), null);
+            ColorHighlighter cell = new ColorHighlighter(Color.YELLOW.darker(), null);
+            CompoundHighlighter match = new CompoundHighlighter(base, cell);
+            return match;
         }
+
     }
+
     /**
      * #463-swingx: batch find and cellSelection don't play nicely.
      *

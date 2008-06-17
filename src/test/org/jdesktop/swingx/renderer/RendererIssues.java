@@ -59,13 +59,13 @@ import org.jdesktop.swingx.JXPanel;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.JXTree;
 import org.jdesktop.swingx.JXTreeTable;
-import org.jdesktop.swingx.RolloverProducer;
-import org.jdesktop.swingx.RolloverRenderer;
 import org.jdesktop.swingx.border.DropShadowBorder;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.PainterHighlighter;
 import org.jdesktop.swingx.painter.MattePainter;
+import org.jdesktop.swingx.rollover.RolloverProducer;
+import org.jdesktop.swingx.rollover.RolloverRenderer;
 import org.jdesktop.swingx.test.ComponentTreeTableModel;
 import org.jdesktop.swingx.test.XTestUtils;
 

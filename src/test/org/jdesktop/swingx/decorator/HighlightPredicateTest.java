@@ -18,13 +18,13 @@ import java.util.regex.Pattern;
 import javax.swing.JLabel;
 
 import org.jdesktop.swingx.InteractiveTestCase;
-import org.jdesktop.swingx.RolloverProducer;
 import org.jdesktop.swingx.decorator.HighlightPredicate.AndHighlightPredicate;
 import org.jdesktop.swingx.decorator.HighlightPredicate.ColumnHighlightPredicate;
 import org.jdesktop.swingx.decorator.HighlightPredicate.EqualsHighlightPredicate;
 import org.jdesktop.swingx.decorator.HighlightPredicate.IdentifierHighlightPredicate;
 import org.jdesktop.swingx.decorator.HighlightPredicate.NotHighlightPredicate;
 import org.jdesktop.swingx.decorator.HighlightPredicate.OrHighlightPredicate;
+import org.jdesktop.swingx.rollover.RolloverProducer;
 
 /**
  * 
