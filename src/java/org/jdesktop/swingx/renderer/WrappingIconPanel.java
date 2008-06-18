@@ -25,7 +25,7 @@ import org.jdesktop.swingx.painter.Painter;
  * is of type PainterAware. Does nothing if not.
  */
 public class WrappingIconPanel extends JXPanel implements PainterAware {
-    JComponent delegate;
+    protected JComponent delegate;
     JLabel iconLabel;
     String labelPosition = BorderLayout.CENTER; //2;
     int iconLabelGap;
@@ -127,7 +127,8 @@ public class WrappingIconPanel extends JXPanel implements PainterAware {
         return delegate.getBounds();
     }
 
-
+    
+    
     /**
      * {@inheritDoc} <p>
      * 
