@@ -72,6 +72,47 @@ public abstract class InteractiveTestCase extends junit.framework.TestCase {
         super(testTitle);
     }
 
+//----------------- run
+    
+    /**
+     * Runs all tests whose method names match the specified regex pattern.
+     * @param regexPattern regular expression pattern used to match test method names
+     * @throws java.lang.Exception
+     */
+    public void runInteractiveTests(String regexPattern)  throws java.lang.Exception {
+        setUp();
+        Class testClass = getClass();
+        Method methods[] = testClass.getMethods();
+
+        for (int i = 0; i < methods.length; i++) {
+            if (methods[i].getName().matches(regexPattern)) {
+                try {
+                    methods[i].invoke(this);
+                }
+                catch (Exception e) {
+                    System.out.println("could not run interactive test: " +
+                                       methods[i].getName());
+                    e.printStackTrace();
+                }
+            }
+        }
+        if (methods.length == 0) {
+            System.out.println("no test methods found matching the pattern: "+
+                               regexPattern);
+        }
+        tearDown();
+    }
+
+    /**
+     * Runs all test methods which are prefixed with &quot;interactive&quot;.
+     * @throws java.lang.Exception
+     */
+    public void runInteractiveTests() throws java.lang.Exception {
+        runInteractiveTests("interactive.*");
+    }
+
+//------------------------ creating/showing frame
+    
     /**
      * Creates and returns a JXFrame with the specified title, containing
      * the component wrapped into a JScrollPane.
@@ -164,48 +205,55 @@ public abstract class InteractiveTestCase extends junit.framework.TestCase {
      * @return a configured, packed and located JXFrame.
      */
     public JXFrame showInFrame(JComponent component, String title) {
-        JXFrame frame = wrapInFrame(component, title);
+        return showInFrame(component, title, false);
+    }
+
+    /**
+     * Creates, shows and returns a JXFrame with the specified title, containing
+     * the component. Creates and adds a Menubar if showMenu is true.
+     * 
+     * @param component the JComponent to wrap
+     * @param title the title to show in the frame
+     * @param showMenu flag to indicate whether a JMenuBar should be added
+     * @return a configured, packed and located JXFrame.
+     */
+    public JXFrame showInFrame(JComponent component, String title, boolean showMenu) {
+        JXFrame frame = wrapInFrame(component, title, showMenu);
         frame.setVisible(true);
+        return frame;
+    }
+    public JXFrame wrapInFrame(JComponent component, String title, boolean showMenu) {
+        JXFrame frame = wrapInFrame(component, title);
+        if (showMenu) {
+            frame.setJMenuBar(createAndFillMenuBar(component));
+        }
+        frame.pack();
         return frame;
     }
 
     /**
-     * Runs all tests whose method names match the specified regex pattern.
-     * @param regexPattern regular expression pattern used to match test method names
-     * @throws java.lang.Exception
+     * Packs and shows the frame.
+     * 
+     * @param frame
      */
-    public void runInteractiveTests(String regexPattern)  throws java.lang.Exception {
-        setUp();
-        Class testClass = getClass();
-        Method methods[] = testClass.getMethods();
-
-        for (int i = 0; i < methods.length; i++) {
-            if (methods[i].getName().matches(regexPattern)) {
-                try {
-                    methods[i].invoke(this);
-                }
-                catch (Exception e) {
-                    System.out.println("could not run interactive test: " +
-                                       methods[i].getName());
-                    e.printStackTrace();
-                }
-            }
-        }
-        if (methods.length == 0) {
-            System.out.println("no test methods found matching the pattern: "+
-                               regexPattern);
-        }
-        tearDown();
+    public void show(final JXFrame frame) {
+        frame.pack();
+        frame.setVisible(true);
     }
 
     /**
-     * Runs all test methods which are prefixed with &quot;interactive&quot;.
-     * @throws java.lang.Exception
+     * Packs, sizes and shows the frame.
+     * 
+     * @param frame
      */
-    public void runInteractiveTests() throws java.lang.Exception {
-        runInteractiveTests("interactive.*");
+    public void show(final JXFrame frame, int width, int height) {
+        frame.pack();
+        frame.setSize(width, height);
+        frame.setVisible(true);
     }
 
+//---  toolbar, statusbar
+    
     public void addAction(JXFrame frame, Action action) {
         JToolBar toolbar = frame.getRootPaneExt().getToolBar();
         if (toolbar != null) {
@@ -295,6 +343,87 @@ public abstract class InteractiveTestCase extends junit.framework.TestCase {
         frame.pack();
     }
 
+//------------------------ menu
+    
+    /**
+     * Creates, fills and returns a JMenuBar. 
+     * 
+     * @param component the component that was added to the frame.
+     * @return a menu bar filled with actions as defined in createAndAddMenus
+     * 
+     * @see #createAndAddMenus
+     */
+    protected JMenuBar createAndFillMenuBar(JComponent component) {
+        JMenuBar bar = new JMenuBar();
+        createAndAddMenus(bar, component);
+        
+        return bar;
+    }
+
+    /**
+     * Creates menus and adds them to the given menu bar.<p>
+     * 
+     * This implementation adds a menu to choose the LF.
+     * 
+     * @param bar the menubar to fill
+     * @param component the component that was added to the frame.
+     * 
+     */
+    protected void createAndAddMenus(JMenuBar bar, JComponent component) {
+        bar.add(createPlafMenu());
+    }
+
+    /**
+     * Creates a menu filled with one SetPlafAction for each of the currently
+     * installed LFs.
+     * 
+     * @return the menu to use for plaf switching.
+     */
+    protected JMenu createPlafMenu() {
+        LookAndFeelInfo[] plafs = UIManager.getInstalledLookAndFeels();
+        JMenu menu = new JMenu("Set L&F");
+        
+        for (LookAndFeelInfo info : plafs) {
+            menu.add(new SetPlafAction(info.getName(), info.getClassName()));
+        }
+        return menu;
+    }
+
+  //---------------------- laf
+
+    /**
+     * Action to toggle plaf and update all toplevel windows of the
+     * current application. Used to setup the plaf-menu.
+     */
+    private static class SetPlafAction extends AbstractAction {
+        private String plaf;
+        
+        public SetPlafAction(String name, String plaf) {
+            super(name);
+            this.plaf = plaf;
+        }
+        
+        /**
+         * {@inheritDoc}
+         */
+        public void actionPerformed(ActionEvent e) {
+            try {
+                UIManager.setLookAndFeel(plaf);
+                SwingXUtilities.updateAllComponentTreeUIs();
+                
+            } catch (ClassNotFoundException e1) {
+                e1.printStackTrace();
+            } catch (InstantiationException e1) {
+                e1.printStackTrace();
+            } catch (IllegalAccessException e1) {
+                e1.printStackTrace();
+            } catch (UnsupportedLookAndFeelException e1) {
+                e1.printStackTrace();
+            }
+        }
+    }
+    
+
     /**
      * PENDING: JW - this is about toggling the LF, does nothing to update the
      * UI. Check all tests using this method to see if they make sense!
@@ -332,100 +461,6 @@ public abstract class InteractiveTestCase extends junit.framework.TestCase {
         return UIManager.getCrossPlatformLookAndFeelClassName().equals(lf.getClass().getName());
     }
     
-    /**
-     * Action to toggle plaf and update all toplevel windows of the
-     * current application. Used to setup the plaf-menu.
-     */
-    private static class SetPlafAction extends AbstractAction {
-        private String plaf;
-        
-        public SetPlafAction(String name, String plaf) {
-            super(name);
-            this.plaf = plaf;
-        }
-        
-        /**
-         * {@inheritDoc}
-         */
-        public void actionPerformed(ActionEvent e) {
-            try {
-//                Component c = (Component) e.getSource();
-//                Window w = null;
-//                
-//                for (Container p = c.getParent(); p != null; p = p instanceof JPopupMenu ? (Container) ((JPopupMenu) p)
-//                        .getInvoker() : p.getParent()) {
-//                    if (p instanceof Window) {
-//                        w = (Window) p;
-//                    }
-//                }
-                
-                UIManager.setLookAndFeel(plaf);
-                SwingXUtilities.updateAllComponentTreeUIs();
-                
-            } catch (ClassNotFoundException e1) {
-                e1.printStackTrace();
-            } catch (InstantiationException e1) {
-                e1.printStackTrace();
-            } catch (IllegalAccessException e1) {
-                e1.printStackTrace();
-            } catch (UnsupportedLookAndFeelException e1) {
-                e1.printStackTrace();
-            }
-        }
-    }
     
-    private JMenuBar createMenuBar() {
-        JMenuBar bar = new JMenuBar();
-        bar.add(createPlafMenu());
-        
-        return bar;
-    }
-
-    /**
-     * Creates a menu filled with one SetPlafAction for each of the currently
-     * installed LFs.
-     * 
-     * @return the menu to use for plaf switching.
-     */
-    private JMenu createPlafMenu() {
-        LookAndFeelInfo[] plafs = UIManager.getInstalledLookAndFeels();
-        JMenu menu = new JMenu("Set L&F");
-        
-        for (LookAndFeelInfo info : plafs) {
-            menu.add(new SetPlafAction(info.getName(), info.getClassName()));
-        }
-        return menu;
-    }
-    
-    public JXFrame wrapInFrame(JComponent component, String title, boolean showMenu) {
-        JXFrame frame = wrapInFrame(component, title);
-        if (showMenu) {
-            frame.setJMenuBar(createMenuBar());
-        }
-        frame.pack();
-        return frame;
-    }
-
-    /**
-     * Packs and shows the frame.
-     * 
-     * @param frame
-     */
-    public void show(final JXFrame frame) {
-        frame.pack();
-        frame.setVisible(true);
-    }
-
-    /**
-     * Packs, sizes and shows the frame.
-     * 
-     * @param frame
-     */
-    public void show(final JXFrame frame, int width, int height) {
-        frame.pack();
-        frame.setSize(width, height);
-        frame.setVisible(true);
-    }
-    
-
+  
 }

@@ -25,7 +25,6 @@ import java.awt.Container;
 import java.awt.GradientPaint;
 import java.awt.Graphics2D;
 import java.awt.Image;
-import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
 import java.util.Locale;
@@ -36,11 +35,7 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
-import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
-import javax.swing.UIManager.LookAndFeelInfo;
 
 import org.jdesktop.swingx.JXLoginPane.JXLoginFrame;
 import org.jdesktop.swingx.JXLoginPane.SaveMode;
@@ -48,7 +43,6 @@ import org.jdesktop.swingx.auth.LoginService;
 import org.jdesktop.swingx.graphics.GraphicsUtilities;
 import org.jdesktop.swingx.painter.MattePainter;
 import org.jdesktop.swingx.plaf.basic.BasicLoginPaneUI;
-import org.jdesktop.swingx.util.PaintUtils;
 
 /**
  * Simple tests to ensure that the {@code JXLoginPane} can be instantiated and
@@ -73,73 +67,7 @@ public class JXLoginPaneVisualCheck extends InteractiveTestCase {
         }
     }
     
-    private static class SetPlafAction extends AbstractAction {
-        private String plaf;
-        
-        public SetPlafAction(String name, String plaf) {
-            super(name);
-            this.plaf = plaf;
-        }
-        
-        /**
-         * {@inheritDoc}
-         */
-        public void actionPerformed(ActionEvent e) {
-            try {
-                Component c = (Component) e.getSource();
-                Window w = null;
-                
-                for (Container p = c.getParent(); p != null; p = p instanceof JPopupMenu ? (Container) ((JPopupMenu) p)
-                        .getInvoker() : p.getParent()) {
-                    if (p instanceof Window) {
-                        w = (Window) p;
-                    }
-                }
-                
-                UIManager.setLookAndFeel(plaf);
-                SwingUtilities.updateComponentTreeUI(w);
-                w.pack();
-            } catch (ClassNotFoundException e1) {
-                e1.printStackTrace();
-            } catch (InstantiationException e1) {
-                e1.printStackTrace();
-            } catch (IllegalAccessException e1) {
-                e1.printStackTrace();
-            } catch (UnsupportedLookAndFeelException e1) {
-                e1.printStackTrace();
-            }
-        }
-    }
-    
-    private JMenuBar createMenuBar(final JComponent component) {
-        LookAndFeelInfo[] plafs = UIManager.getInstalledLookAndFeels();
-        JMenuBar bar = new JMenuBar();
-        JMenu menu = new JMenu("Set L&F");
-        
-        for (LookAndFeelInfo info : plafs) {
-            menu.add(new SetPlafAction(info.getName(), info.getClassName()));
-        }
-        menu.add(new AbstractAction("Change Locale") {
-
-            public void actionPerformed(ActionEvent e) {
-                if (component.getLocale() == Locale.FRANCE) {
-                    component.setLocale(Locale.ENGLISH);
-                } else {
-                    component.setLocale(Locale.FRANCE);
-                }
-            }});
-        bar.add(menu);
-        
-        return bar;
-    }
-    
-    public JXFrame wrapInFrame(JComponent component, String title) {
-        JXFrame frame = super.wrapInFrame(component, title);
-        frame.setJMenuBar(createMenuBar(component));
-        
-        return frame;
-    }
-    
+     
     /**
      * Issue #538-swingx Failure to set locale at runtime
      *
@@ -149,7 +77,7 @@ public class JXLoginPaneVisualCheck extends InteractiveTestCase {
         JXLoginPane panel = new JXLoginPane();
         JFrame frame = JXLoginPane.showLoginFrame(panel);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setJMenuBar(createMenuBar(panel));
+        frame.setJMenuBar(createAndFillMenuBar(panel));
 
         panel.setSaveMode(SaveMode.BOTH);
         
@@ -166,7 +94,7 @@ public class JXLoginPaneVisualCheck extends InteractiveTestCase {
         panel.setBackgroundPainter(new MattePainter(Color.RED, true));
         JFrame frame = JXLoginPane.showLoginFrame(panel);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setJMenuBar(createMenuBar(panel));
+        frame.setJMenuBar(createAndFillMenuBar(panel));
 
         panel.setSaveMode(SaveMode.BOTH);
         
@@ -182,7 +110,7 @@ public class JXLoginPaneVisualCheck extends InteractiveTestCase {
         JXLoginPane panel = new JXLoginPane();
         panel.setUI(new DummyLoginPaneUI(panel));
         JFrame frame = JXLoginPane.showLoginFrame(panel);
-        frame.setJMenuBar(createMenuBar(panel));
+        frame.setJMenuBar(createAndFillMenuBar(panel));
 
         panel.setSaveMode(SaveMode.BOTH);
         
@@ -208,7 +136,7 @@ public class JXLoginPaneVisualCheck extends InteractiveTestCase {
         final JXLoginFrame frame = JXLoginPane.showLoginFrame(panel);
         // if uncomented dialog will disappear immediatelly dou to invocation of login action
         //frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setJMenuBar(createMenuBar(panel));
+        frame.setJMenuBar(createAndFillMenuBar(panel));
         panel.setErrorMessage("TO TO TO TO TO TO TO TO TO TO TO TO TO TO TO TO TO TO TO TO TO TO Unexpected resize on long exception message. Unexpected resize on long exception message.");
 
         panel.setSaveMode(SaveMode.BOTH);
@@ -240,7 +168,7 @@ public class JXLoginPaneVisualCheck extends InteractiveTestCase {
         final JXLoginFrame frame = JXLoginPane.showLoginFrame(panel);
         // if uncomented dialog will disappear immediatelly dou to invocation of login action
         //frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setJMenuBar(createMenuBar(panel));
+        frame.setJMenuBar(createAndFillMenuBar(panel));
         panel.setErrorMessage("TO TO TO TO TO TO TO TO TO TO TO TO TO TO TO TO TO TO TO TO TO TO Unexpected resize on long exception message. Unexpected resize on long exception message.");
 
         panel.setSaveMode(SaveMode.BOTH);
@@ -270,7 +198,7 @@ public class JXLoginPaneVisualCheck extends InteractiveTestCase {
 				return true;
 			}});
         
-        frame.setJMenuBar(createMenuBar(panel));
+        frame.setJMenuBar(createAndFillMenuBar(panel));
 
         panel.setSaveMode(SaveMode.BOTH);
         
@@ -300,14 +228,6 @@ public class JXLoginPaneVisualCheck extends InteractiveTestCase {
 
 	}
 
-	/**
-     * Do nothing, make the test runner happy
-     * (would output a warning without a test fixture).
-     *
-     */
-    public void testDummy() {
-        
-    }
     
     public class DummyLoginPaneUI extends BasicLoginPaneUI {
 
@@ -328,4 +248,29 @@ public class JXLoginPaneVisualCheck extends InteractiveTestCase {
         }
     }
 
+    
+    @Override
+    protected void createAndAddMenus(JMenuBar menuBar, final JComponent component) {
+        super.createAndAddMenus(menuBar, component);
+        JMenu menu = new JMenu("Locales");
+        menu.add(new AbstractAction("Change Locale") {
+
+            public void actionPerformed(ActionEvent e) {
+                if (component.getLocale() == Locale.FRANCE) {
+                    component.setLocale(Locale.ENGLISH);
+                } else {
+                    component.setLocale(Locale.FRANCE);
+                }
+            }});
+        menuBar.add(menu);
+    }
+
+	/**
+     * Do nothing, make the test runner happy
+     * (would output a warning without a test fixture).
+     *
+     */
+    public void testDummy() {
+        
+    }
 }

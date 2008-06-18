@@ -60,72 +60,6 @@ public class JXTaskPaneContainerVisualCheck extends InteractiveTestCase {
         }
     }
     
-    private static class SetPlafAction extends AbstractAction {
-        private String plaf;
-        
-        public SetPlafAction(String name, String plaf) {
-            super(name);
-            this.plaf = plaf;
-        }
-        
-        /**
-         * {@inheritDoc}
-         */
-        public void actionPerformed(ActionEvent e) {
-            try {
-                Component c = (Component) e.getSource();
-                Window w = null;
-                
-                for (Container p = c.getParent(); p != null; p = p instanceof JPopupMenu ? (Container) ((JPopupMenu) p)
-                        .getInvoker() : p.getParent()) {
-                    if (p instanceof Window) {
-                        w = (Window) p;
-                    }
-                }
-                
-                UIManager.setLookAndFeel(plaf);
-                SwingUtilities.updateComponentTreeUI(w);
-                w.pack();
-            } catch (ClassNotFoundException e1) {
-                e1.printStackTrace();
-            } catch (InstantiationException e1) {
-                e1.printStackTrace();
-            } catch (IllegalAccessException e1) {
-                e1.printStackTrace();
-            } catch (UnsupportedLookAndFeelException e1) {
-                e1.printStackTrace();
-            }
-        }
-    }
-    
-    private JMenuBar createMenuBar(final JComponent component) {
-        LookAndFeelInfo[] plafs = UIManager.getInstalledLookAndFeels();
-        JMenuBar bar = new JMenuBar();
-        JMenu menu = new JMenu("Set L&F");
-        
-        for (LookAndFeelInfo info : plafs) {
-            menu.add(new SetPlafAction(info.getName(), info.getClassName()));
-        }
-        menu.add(new AbstractAction("Change Locale") {
-
-            public void actionPerformed(ActionEvent e) {
-                if (component.getLocale() == Locale.FRANCE) {
-                    component.setLocale(Locale.ENGLISH);
-                } else {
-                    component.setLocale(Locale.FRANCE);
-                }
-            }});
-        bar.add(menu);
-        
-        return bar;
-    }
-    
-    public JXFrame wrapInFrame(JComponent component, String title) {
-        JXFrame frame = super.wrapInFrame(component, title);
-        frame.setJMenuBar(createMenuBar(component));
-        
-        return frame;
-    }
     
     /**
      * Ensure that removing a task pane properly repaints the container.
@@ -179,6 +113,22 @@ public class JXTaskPaneContainerVisualCheck extends InteractiveTestCase {
         JXFrame frame = wrapInFrame(splitter, "split pane test");
         frame.pack();
         frame.setVisible(true);
+    }
+
+    @Override
+    protected void createAndAddMenus(JMenuBar menuBar, final JComponent component) {
+        super.createAndAddMenus(menuBar, component);
+        JMenu menu = new JMenu("Locales");
+        menu.add(new AbstractAction("Change Locale") {
+
+            public void actionPerformed(ActionEvent e) {
+                if (component.getLocale() == Locale.FRANCE) {
+                    component.setLocale(Locale.ENGLISH);
+                } else {
+                    component.setLocale(Locale.FRANCE);
+                }
+            }});
+        menuBar.add(menu);
     }
 
     /**

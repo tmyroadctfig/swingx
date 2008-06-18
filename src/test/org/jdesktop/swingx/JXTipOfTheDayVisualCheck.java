@@ -18,9 +18,6 @@
  */
 package org.jdesktop.swingx;
 
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.util.Locale;
 
@@ -30,15 +27,8 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
-import javax.swing.JPopupMenu;
-import javax.swing.JSplitPane;
 import javax.swing.JTree;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
-import javax.swing.UIManager.LookAndFeelInfo;
 
-import org.jdesktop.swingx.JXLoginPane.SaveMode;
 import org.jdesktop.swingx.plaf.basic.BasicTipOfTheDayUI;
 import org.jdesktop.swingx.tips.DefaultTip;
 import org.jdesktop.swingx.tips.DefaultTipOfTheDayModel;
@@ -67,74 +57,6 @@ public class JXTipOfTheDayVisualCheck extends InteractiveTestCase {
         }
     }
     
-    private static class SetPlafAction extends AbstractAction {
-        private String plaf;
-        
-        public SetPlafAction(String name, String plaf) {
-            super(name);
-            this.plaf = plaf;
-        }
-        
-        /**
-         * {@inheritDoc}
-         */
-        public void actionPerformed(ActionEvent e) {
-            try {
-                Component c = (Component) e.getSource();
-                Window w = null;
-                
-                for (Container p = c.getParent(); p != null; p = p instanceof JPopupMenu ? (Container) ((JPopupMenu) p)
-                        .getInvoker() : p.getParent()) {
-                    if (p instanceof Window) {
-                        w = (Window) p;
-                    }
-                }
-                
-                UIManager.setLookAndFeel(plaf);
-                SwingUtilities.updateComponentTreeUI(w);
-                w.pack();
-            } catch (ClassNotFoundException e1) {
-                e1.printStackTrace();
-            } catch (InstantiationException e1) {
-                e1.printStackTrace();
-            } catch (IllegalAccessException e1) {
-                e1.printStackTrace();
-            } catch (UnsupportedLookAndFeelException e1) {
-                e1.printStackTrace();
-            }
-        }
-    }
-    
-    private JMenuBar createMenuBar(final JComponent component) {
-        LookAndFeelInfo[] plafs = UIManager.getInstalledLookAndFeels();
-        JMenuBar bar = new JMenuBar();
-        JMenu menu = new JMenu("Set L&F");
-        
-        for (LookAndFeelInfo info : plafs) {
-            menu.add(new SetPlafAction(info.getName(), info.getClassName()));
-        }
-        menu.add(new AbstractAction("Change Locale") {
-
-            public void actionPerformed(ActionEvent e) {
-                if (component.getLocale() == Locale.FRANCE) {
-                    component.setLocale(Locale.ENGLISH);
-                } else {
-                    component.setLocale(Locale.FRANCE);
-                }
-                
-                System.err.println(component.getLocale());
-            }});
-        bar.add(menu);
-        
-        return bar;
-    }
-    
-    public JXFrame wrapInFrame(JComponent component, String title) {
-        JXFrame frame = super.wrapInFrame(component, title);
-        frame.setJMenuBar(createMenuBar(component));
-        
-        return frame;
-    }
     
     /**
      * Issue #538-swingx Failure to set locale at runtime
@@ -185,7 +107,24 @@ public class JXTipOfTheDayVisualCheck extends InteractiveTestCase {
 
         return tips;
     }
+
+    @Override
+    protected void createAndAddMenus(JMenuBar menuBar, final JComponent component) {
+        super.createAndAddMenus(menuBar, component);
+        JMenu menu = new JMenu("Locales");
+        menu.add(new AbstractAction("Change Locale") {
+
+            public void actionPerformed(ActionEvent e) {
+                if (component.getLocale() == Locale.FRANCE) {
+                    component.setLocale(Locale.ENGLISH);
+                } else {
+                    component.setLocale(Locale.FRANCE);
+                }
+            }});
+        menuBar.add(menu);
+    }
     
+
     /**
      * Do nothing, make the test runner happy
      * (would output a warning without a test fixture).
