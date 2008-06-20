@@ -106,4 +106,13 @@ public class JXDialogVisualCheck extends InteractiveTestCase {
         showWithScrollingInFrame(comp, "JXDialog custom actions");
      }
 
+    /** 
+     * Do nothing, just to make the runner happy if there are no 
+     * issues.
+     *
+     */
+    public void testDummy() {
+        
+    }
+
 }
