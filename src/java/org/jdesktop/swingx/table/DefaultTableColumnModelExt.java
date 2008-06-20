@@ -26,12 +26,8 @@ import java.beans.PropertyChangeListener;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import javax.swing.event.EventListenerList;
 import javax.swing.event.TableColumnModelListener;
@@ -71,16 +67,16 @@ public class DefaultTableColumnModelExt extends DefaultTableColumnModel
      * all were visible.
      */
     private List<TableColumn> currentColumns = new ArrayList<TableColumn>();
-    /**
-     * Set of invisible columns. 
-     */
-    private Set<TableColumnExt> invisibleColumns = new HashSet<TableColumnExt>();
+//    /**
+//     * Set of invisible columns. 
+//     */
+//    private Set<TableColumnExt> invisibleColumns = new HashSet<TableColumnExt>();
 
-    /** 
-     * used to distinguish a real remove from hiding.
-     */
-    private Map<TableColumnExt, Integer> oldIndexes = new HashMap<TableColumnExt, Integer>();
-    
+//    /** 
+//     * used to distinguish a real remove from hiding.
+//     */
+//    private Map<TableColumnExt, Integer> oldIndexes = new HashMap<TableColumnExt, Integer>();
+//    
     /**
      * Listener attached to TableColumnExt instances to listen for changes
      * to their visibility status, and to hide/show the column as oppropriate
@@ -192,10 +188,10 @@ public class DefaultTableColumnModelExt extends DefaultTableColumnModel
             ((TableColumnExt)column).removePropertyChangeListener(visibilityListener);
         }
         //remove from the invisible columns set and the initialColumns list first
-        invisibleColumns.remove(column);
+//        invisibleColumns.remove(column);
         currentColumns.remove(column);
         initialColumns.remove(column);
-        oldIndexes.remove(column);
+//        oldIndexes.remove(column);
         //let the superclass handle notification etc
         super.removeColumn(column);
     }
@@ -268,8 +264,8 @@ public class DefaultTableColumnModelExt extends DefaultTableColumnModel
      */    
     protected void moveToInvisible(TableColumnExt col) {
         //make invisible
-        invisibleColumns.add(col);
-        oldIndexes.put(col, tableColumns.indexOf(col));
+//        invisibleColumns.add(col);
+//        oldIndexes.put(col, tableColumns.indexOf(col));
         col.putClientProperty(IGNORE_EVENT, Boolean.TRUE);
         super.removeColumn(col);
         col.putClientProperty(IGNORE_EVENT, null);
@@ -284,12 +280,12 @@ public class DefaultTableColumnModelExt extends DefaultTableColumnModel
      * @param col the column which was made visible.
      */    
     protected void moveToVisible(TableColumnExt col) {
-        invisibleColumns.remove(col);
+//        invisibleColumns.remove(col);
 //        Integer oldIndex = oldIndexes.get(col);
 //        if (oldIndex == null) {
 //            oldIndex = getColumnCount();
 //        }
-        oldIndexes.remove(col);
+//        oldIndexes.remove(col);
         col.putClientProperty(IGNORE_EVENT, Boolean.TRUE);
         // two step process: first add at end of columns
         // then move to "best" position relative to where it
