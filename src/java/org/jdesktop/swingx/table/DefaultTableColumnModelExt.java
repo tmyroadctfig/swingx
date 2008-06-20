@@ -159,7 +159,11 @@ public class DefaultTableColumnModelExt extends DefaultTableColumnModel
 //            }
 //          }
 //          return false; 
-          return oldIndexes.containsValue(oldIndex);
+//        return oldIndexes.containsValue(oldIndex);
+
+        if (oldIndex >= currentColumns.size()) return false;
+        if (!(currentColumns.get(oldIndex) instanceof TableColumnExt)) return false;
+        return Boolean.TRUE.equals(((TableColumnExt) currentColumns.get(oldIndex)).getClientProperty(IGNORE_EVENT));
     }
 
     /**
@@ -266,7 +270,9 @@ public class DefaultTableColumnModelExt extends DefaultTableColumnModel
         //make invisible
         invisibleColumns.add(col);
         oldIndexes.put(col, tableColumns.indexOf(col));
+        col.putClientProperty(IGNORE_EVENT, Boolean.TRUE);
         super.removeColumn(col);
+        col.putClientProperty(IGNORE_EVENT, null);
     }
 
 

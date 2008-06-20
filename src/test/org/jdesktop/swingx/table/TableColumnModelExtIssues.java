@@ -15,6 +15,7 @@ import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.test.ColumnModelReport;
+import org.jdesktop.test.TestUtils;
 
 /**
  * Test to exposed known issues of <code>TableColumnModelExt</code>
@@ -44,18 +45,45 @@ public class TableColumnModelExtIssues extends TableColumnModelTest {
    }
 
     /**
-     * Issue #846-swingx
+     * Issue #??-swingx: internal book-keeping must not be routed via columnModel
+     *    column propertyChange <p>
+     * test the change from visible to hidden.
      */
-    public void testFalseIsRemovedToInvisible() {
-        DefaultTableColumnModelExt columnModel = (DefaultTableColumnModelExt) createColumnModel(3);
-        TableColumnExt columnB = columnModel.getColumnExt(1);
+    public void testTableColumnIgnoreNoPropertyNotificationHide() {
+        TableColumnModelExt columnModel = createColumnModel(COLUMN_COUNT);
+        ColumnModelReport report = new ColumnModelReport();
+        columnModel.addColumnModelListener(report);
+        columnModel.getColumnExt(0).setVisible(false);
+        assertEquals("ignore events must not be routed", 0, report.getColumnPropertyEventCount(
+                "TableColumnModelExt.ignoreEvent"));
+    }
+
+    /**
+     * Issue #??-swingx: internal book-keeping must not be routed via columnModel
+     *    column propertyChange <p>
+     * test the change from hidden to visible.
+     */
+    public void testTableColumnIgnoreNoPropertyNotificationShow() {
+        TableColumnModelExt columnModel = createColumnModel(COLUMN_COUNT);
         columnModel.getColumnExt(0).setVisible(false);
         ColumnModelReport report = new ColumnModelReport();
         columnModel.addColumnModelListener(report);
-        columnModel.removeColumn(columnB);
-        int oldIndex = report.getLastRemoveEvent().getFromIndex();
-        assertEquals("old visible index of removed", 0, oldIndex);
-        assertEquals("old column really removed", false, columnModel.isRemovedToInvisibleEvent(oldIndex));
+        columnModel.getColumnExt(0).setVisible(true);
+        assertEquals("ignore events must not be routed", 0, report.getColumnPropertyEventCount(
+                "TableColumnModelExt.ignoreEvent"));
+    }
+
+    /**
+     * Issue #369-swingx: properties of hidden columns are not fired. <p>
+     * test the change from visible to hidden.
+     */
+    public void testHideTableColumnPropertyNotification() {
+        TableColumnModelExt columnModel = createColumnModel(COLUMN_COUNT);
+        ColumnModelReport report = new ColumnModelReport();
+        columnModel.addColumnModelListener(report);
+        columnModel.getColumnExt(0).setVisible(false);
+        TestUtils.assertPropertyChangeEvent(report.getPropertyChangeReport(), 
+                "visible", true, false);
     }
 
     /**

@@ -40,20 +40,97 @@ public class TableColumnModelTest extends InteractiveTestCase {
     protected static final int COLUMN_COUNT = 3;
  
     /**
-     * Issue #369-swingx: properties of hidden columns are not fired. <p>
-     * test the change from visible to hidden.
+     * Issue #846-swingx
      */
-    public void testHideTableColumnPropertyNotification() {
-        TableColumnModelExt columnModel = createColumnModel(COLUMN_COUNT);
-        Object identifier = "0";
-        // sanity...
-        assertNotNull(columnModel.getColumnExt(identifier));
-        ColumnModelReport report = new ColumnModelReport();
+    public void testIsAddedFromInvisibleTrue() {
+        final DefaultTableColumnModelExt columnModel = (DefaultTableColumnModelExt) createColumnModel(3);
+        TableColumnExt columnB = columnModel.getColumnExt(1);
+        columnB.setVisible(false);
+        // can't use report: the isRemovedToInvisible is valid during notification only
+        TableColumnModelListener report = new TableColumnModelListener() {
+
+            public void columnAdded(TableColumnModelEvent e) {
+                int fromIndex = e.getToIndex();
+                assertEquals("old column really removed", true, 
+                        columnModel.isAddedFromInvisibleEvent(fromIndex));
+                // note: the toIndex here is always the last
+                // following are moves to position before hiding
+            }
+            public void columnRemoved(TableColumnModelEvent e) {}
+            public void columnMarginChanged(ChangeEvent e) {  }
+            public void columnMoved(TableColumnModelEvent e) {}
+            public void columnSelectionChanged(ListSelectionEvent e) {}
+            
+        };
         columnModel.addColumnModelListener(report);
-        columnModel.getColumnExt(identifier).setVisible(false);
-        TestUtils.assertPropertyChangeEvent(report.getPropertyChangeReport(), 
-                "visible", true, false);
+        columnB.setVisible(true);
+        // sanity testing internals: marker client property removed
+        assertEquals("ignoreEvents marker must be null", null,  
+                columnB.getClientProperty("TableColumnModelExt.ignoreEvent"));
     }
+
+    /**
+     * Issue #846-swingx
+     */
+    public void testIsRemovedToInvisibleFalse() {
+        final DefaultTableColumnModelExt columnModel = (DefaultTableColumnModelExt) createColumnModel(3);
+        TableColumnExt columnB = columnModel.getColumnExt(1);
+        columnModel.getColumnExt(0).setVisible(false);
+        // can't use report: the isRemovedToInvisible is valid during notification only
+        TableColumnModelListener report = new TableColumnModelListener() {
+
+
+            public void columnRemoved(TableColumnModelEvent e) {
+                int fromIndex = e.getFromIndex();
+                assertEquals("old visible index of removed", 0, fromIndex);
+                assertEquals("old column really removed", false, 
+                        columnModel.isRemovedToInvisibleEvent(fromIndex));
+                
+            }
+            public void columnAdded(TableColumnModelEvent e) {}
+            public void columnMarginChanged(ChangeEvent e) {  }
+            public void columnMoved(TableColumnModelEvent e) {}
+            public void columnSelectionChanged(ListSelectionEvent e) {}
+            
+        };
+        columnModel.addColumnModelListener(report);
+        columnModel.removeColumn(columnB);
+        // sanity testing internals: marker client property removed
+        assertEquals("ignoreEvents marker must be null", null,  
+                columnB.getClientProperty("TableColumnModelExt.ignoreEvent"));
+    }
+    /**
+     * Issue #846-swingx
+     */
+    public void testIsRemovedToInvisibleTrue() {
+        final DefaultTableColumnModelExt columnModel = 
+            (DefaultTableColumnModelExt) createColumnModel(3);
+        final int index = 2;
+        TableColumnExt columnB = columnModel.getColumnExt(index);
+        // can't use report: the isRemovedToInvisible is valid during notification only
+        TableColumnModelListener report = new TableColumnModelListener() {
+
+
+            public void columnRemoved(TableColumnModelEvent e) {
+                int fromIndex = e.getFromIndex();
+                assertEquals("old visible index of removed", index, fromIndex);
+                assertEquals("moved to invisible", true, 
+                        columnModel.isRemovedToInvisibleEvent(fromIndex));
+                
+            }
+            public void columnAdded(TableColumnModelEvent e) {}
+            public void columnMarginChanged(ChangeEvent e) {  }
+            public void columnMoved(TableColumnModelEvent e) {}
+            public void columnSelectionChanged(ListSelectionEvent e) {}
+            
+        };
+        columnModel.addColumnModelListener(report);
+        columnB.setVisible(false);
+        // sanity testing internals: marker client property removed
+        assertEquals("ignoreEvents marker must be null", null,  
+                columnB.getClientProperty("TableColumnModelExt.ignoreEvent"));
+    }
+
     
     /**
      * Issue #369-swingx: properties of hidden columns are not fired. <p>
