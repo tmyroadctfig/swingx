@@ -88,8 +88,8 @@ public class RendererIssues extends InteractiveTestCase {
         setSystemLF(true);
         RendererIssues test = new RendererIssues();
         try {
-            test.runInteractiveTests();
-//          test.runInteractiveTests(".*Text.*");
+//            test.runInteractiveTests();
+          test.runInteractiveTests("interactive.*ToolTip.*");
 //          test.runInteractiveTests(".*XLabel.*");
 //          test.runInteractiveTests(".*Color.*");
 //          test.runInteractiveTests("interactive.*ColumnControl.*");
@@ -139,6 +139,9 @@ public class RendererIssues extends InteractiveTestCase {
                 int row = locationToIndex(event.getPoint());
                 Rectangle r = getCellBounds(row, row);
                 if (r != null) {
+                    if (!getComponentOrientation().isLeftToRight()) {
+                        r.translate(r.width, 0);
+                    }
                     return r.getLocation();
                 }
                 return super.getToolTipLocation(event);
@@ -148,10 +151,11 @@ public class RendererIssues extends InteractiveTestCase {
             
         };
         JXFrame frame = wrapWithScrollingInFrame(list, "list tooltip");
+        addComponentOrientationToggle(frame);
         show(frame, 300, 300);
     }
     
-    public void interactiveToolTip() {
+    public void interactiveToolTipTable() {
         JXTreeTable treeTable = new JXTreeTable(new ComponentTreeTableModel(new JXFrame()));
         treeTable.expandAll();
         JXTable table = new JXTable(treeTable.getModel()) {
@@ -238,6 +242,7 @@ public class RendererIssues extends InteractiveTestCase {
         ToolTipManager toolTipManager = ToolTipManager.sharedInstance();
         toolTipManager.registerComponent(tree);
         JXFrame frame = showWithScrollingInFrame(tree, "tooltip");
+        addComponentOrientationToggle(frame);
         show(frame, 400, 400);
     }
 
