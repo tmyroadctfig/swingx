@@ -44,7 +44,6 @@ import javax.swing.border.Border;
 import javax.swing.event.CellEditorListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.TableModelEvent;
-import javax.swing.table.TableCellRenderer;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
@@ -55,8 +54,8 @@ import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
 import org.jdesktop.swingx.hyperlink.LinkAction;
-import org.jdesktop.swingx.renderer.CheckBoxProvider;
 import org.jdesktop.swingx.renderer.CellContext;
+import org.jdesktop.swingx.renderer.CheckBoxProvider;
 import org.jdesktop.swingx.renderer.ComponentProvider;
 import org.jdesktop.swingx.renderer.DefaultTableRenderer;
 import org.jdesktop.swingx.renderer.DefaultTreeRenderer;
@@ -101,8 +100,8 @@ public class JXTreeTableIssues extends InteractiveTestCase {
 //            test.runInteractiveTests(".*AdapterDeleteUpdate.*");
 //            test.runInteractiveTests(".*Text.*");
 //            test.runInteractiveTests(".*TreeExpand.*");
-//            test.runInteractiveTests("interactive.*ClipIssueD.*");
-          test.runInteractiveTests("interactive.*CustomColor.*");
+            test.runInteractiveTests("interactive.*Clip.*");
+//          test.runInteractiveTests("interactive.*CustomColor.*");
               
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
@@ -877,16 +876,26 @@ public class JXTreeTableIssues extends InteractiveTestCase {
 
 
     /**
-     * example how to use a custom component as
-     * renderer in tree column of TreeTable.
-     *
+     * Experiments to try and understand clipping issues: occasionally, the text
+     * in the tree column is clipped even if there is enough space available.
+     * 
+     * To visualize the rendering component's size we use a WrappingIconProvider
+     * which sets a red border.
+     * 
+     * Calling packxx might pose a problem: for non-large models the node size
+     * is cached. In this case, packing before replacing the renderer will lead
+     * to incorrect sizes which are hard to invalidate (no way except faking a
+     * structural tree event? temporaryly set large model and back, plus repaint
+     * works).
+     * 
      */
     public void interactiveTreeTableClipIssueWrappingProvider() {
         final JXTreeTable treeTable = new JXTreeTable(createActionTreeModel());
         treeTable.setHorizontalScrollEnabled(true);
+        treeTable.setColumnControlVisible(true);
+        // BEWARE: do not pack before setting the renderer
         treeTable.packColumn(0, -1);
-        treeTable.setLargeModel(true);
-               
+
         StringValue format = new StringValue() {
 
             public String getString(Object value) {
@@ -895,58 +904,72 @@ public class JXTreeTableIssues extends InteractiveTestCase {
                 }
                 return StringValue.TO_STRING.getString(value);
             }
-            
+
         };
         ComponentProvider tableProvider = new LabelProvider(format);
-        TableCellRenderer tableRenderer = new DefaultTableRenderer(tableProvider);
         WrappingProvider wrappingProvider = new WrappingProvider(tableProvider) {
             Border redBorder = BorderFactory.createLineBorder(Color.RED);
+
             @Override
             public WrappingIconPanel getRendererComponent(CellContext context) {
-//                Dimension old = rendererComponent.getPreferredSize();
-//                rendererComponent.setPreferredSize(null);
                 super.getRendererComponent(context);
-//                Dimension dim = rendererComponent.getPreferredSize();
-//                dim.width = Math.max(dim.width, treeTable.getColumn(0).getWidth());
-//                rendererComponent.setPreferredSize(dim);
                 rendererComponent.setBorder(redBorder);
                 return rendererComponent;
             }
-            
+
         };
-        DefaultTreeRenderer treeCellRenderer = new DefaultTreeRenderer(wrappingProvider);
+        DefaultTreeRenderer treeCellRenderer = new DefaultTreeRenderer(
+                wrappingProvider);
         treeTable.setTreeCellRenderer(treeCellRenderer);
         treeTable.setHighlighters(HighlighterFactory.createSimpleStriping());
+        // at this point a pack is okay, caching will get the correct values
+        // treeTable.packColumn(0, -1);
+
         final JXTree tree = new JXTree(treeTable.getTreeTableModel());
         tree.setCellRenderer(treeCellRenderer);
-       tree.setScrollsOnExpand(false);
-        JXFrame frame = wrapWithScrollingInFrame(treeTable, tree, "treetable and default wrapping provider");
+        tree.setScrollsOnExpand(false);
+        JXFrame frame = wrapWithScrollingInFrame(treeTable, tree,
+                "treetable and tree with wrapping provider");
+        // revalidate doesn't help
         Action revalidate = new AbstractActionExt("revalidate") {
 
             public void actionPerformed(ActionEvent e) {
                 treeTable.revalidate();
                 tree.revalidate();
-                
-            } };
+                treeTable.repaint();
+            }
+        };
+
+        // hack around incorrect cached node sizes
+        Action large = new AbstractActionExt("large-circle") {
+
+            public void actionPerformed(ActionEvent e) {
+                treeTable.setLargeModel(true);
+                treeTable.setLargeModel(false);
+                treeTable.repaint();
+            }
+        };
         addAction(frame, revalidate);
-        frame.setVisible(true);
+        addAction(frame, large);
+        show(frame);
     }
 
     /**
-     * quick check for text clipping probs.
+     * Experiments to try and understand clipping issues: occasionally, the text
+     * in the tree column is clipped even if there is enough space available.
+     * 
+     * Here we don't change any renderers.
      */
     public void interactiveTreeTableClipIssueDefaultRenderer() {
         final JXTreeTable treeTable = new JXTreeTable(createActionTreeModel());
-//        treeTable.setHorizontalScrollEnabled(true);
+        treeTable.setHorizontalScrollEnabled(true);
         treeTable.setRootVisible(true);
         treeTable.collapseAll();
         treeTable.packColumn(0, -1);
         
         final JTree tree = new JTree(treeTable.getTreeTableModel());
         tree.collapseRow(0);
-        tree.setLargeModel(true);
-//        tree.collapseAll();
-        JXFrame frame = wrapWithScrollingInFrame(//treeTable, 
+        JXFrame frame = wrapWithScrollingInFrame(treeTable, 
                 tree, "JXTreeTable vs. JTree: default renderer");
         Action revalidate = new AbstractActionExt("revalidate") {
 
@@ -960,48 +983,52 @@ public class JXTreeTableIssues extends InteractiveTestCase {
     }
 
     /**
-     * quick check for text clipping probs. Reset treeTable.treeCellRenderer 
+     * Experiments to try and understand clipping issues: occasionally, the text
+     * in the tree column is clipped even if there is enough space available.
+     * Here we set a custom (unchanged default) treeCellRenderer which 
      * removes ellipses altogether.
      * 
      */
     public void interactiveTreeTableClipIssueCustomDefaultRenderer() {
-        TreeCellRenderer renderer =  new DefaultTreeCellRenderer() {
+        TreeCellRenderer renderer = new DefaultTreeCellRenderer() {
 
             @Override
             public Component getTreeCellRendererComponent(JTree tree,
                     Object value, boolean sel, boolean expanded, boolean leaf,
                     int row, boolean hasFocus) {
-                return super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf,
-                        row, hasFocus);
+                return super.getTreeCellRendererComponent(tree, value, sel,
+                        expanded, leaf, row, hasFocus);
             }
-            
+
         };
         final JXTreeTable treeTable = new JXTreeTable(createActionTreeModel());
         treeTable.setTreeCellRenderer(renderer);
-//        treeTable.setHorizontalScrollEnabled(true);
+        treeTable.setHorizontalScrollEnabled(true);
         treeTable.setRootVisible(true);
         treeTable.collapseAll();
         treeTable.packColumn(0, -1);
-        
+
         final JTree tree = new JTree(treeTable.getTreeTableModel());
         tree.setCellRenderer(renderer);
         tree.collapseRow(0);
-        JXFrame frame = wrapWithScrollingInFrame(treeTable, tree, "JXTreeTable vs. JTree: custom default renderer");
+        JXFrame frame = wrapWithScrollingInFrame(treeTable, tree,
+                "JXTreeTable vs. JTree: custom default renderer");
         Action revalidate = new AbstractActionExt("revalidate") {
 
             public void actionPerformed(ActionEvent e) {
                 treeTable.revalidate();
                 tree.revalidate();
-                
-            } };
+
+            }
+        };
         addAction(frame, revalidate);
         frame.setVisible(true);
     }
 
     /**
-     * Dirty example how to configure a custom renderer
-     * to use treeTableModel.getValueAt(...) for showing.
-     *
+     * Dirty example how to configure a custom renderer to use
+     * treeTableModel.getValueAt(...) for showing.
+     * 
      */
     public void interactiveTreeTableGetValueRenderer() {
         JXTreeTable tree = new JXTreeTable(new ComponentTreeTableModel(new JXFrame()));
