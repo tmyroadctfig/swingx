@@ -24,7 +24,6 @@ package org.jdesktop.swingx.renderer;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.util.logging.Logger;
@@ -44,9 +43,6 @@ import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXPanel;
 import org.jdesktop.swingx.JXTree;
 import org.jdesktop.swingx.action.AbstractActionExt;
-import org.jdesktop.swingx.decorator.AbstractHighlighter;
-import org.jdesktop.swingx.decorator.ComponentAdapter;
-import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.painter.ImagePainter;
 import org.jdesktop.swingx.test.ComponentTreeTableModel;
 import org.jdesktop.swingx.test.XTestUtils;
@@ -92,28 +88,6 @@ public class TreeRendererIssues extends InteractiveTestCase {
         }
     }
 
-    /**
-     * Issue #??-swingx: WrappingIconPanel - delegate font unchanged
-     */
-    public void testDelegateFont() {
-        JXTree tree = new JXTree();
-        tree.setCellRenderer(new DefaultTreeRenderer());
-        final Font bold = tree.getFont().deriveFont(Font.BOLD, 20f);
-        Highlighter hl = new AbstractHighlighter() {
-
-            @Override
-            protected Component doHighlight(Component component,
-                    ComponentAdapter adapter) {
-                component.setFont(bold);
-                return component;
-            }
-        };
-        tree.addHighlighter(hl);
-        WrappingIconPanel component = (WrappingIconPanel) tree.getCellRenderer()
-            .getTreeCellRendererComponent(tree, "something", false, false, false, 0, false);
-        assertEquals(bold, component.getFont());
-        assertEquals(bold, component.delegate.getFont());
-    }
 
     public void interactiveTransparentRenderer() throws IOException {
         final JXTree tree = new JXTree(new ComponentTreeTableModel(new JXFrame()));

@@ -238,6 +238,11 @@ public class WrappingProvider extends
         if (context != null) {
             rendererComponent.setComponent(wrappee.rendererComponent);
             Object oldValue = adjustContextValue(context);
+            // PENDING JW: sequence of config?
+            // A - first wrappee, then this allows to override configure/format methods
+            // of this class and overrule the wrappee
+            // B - first this, then wrappee allows overrule by overriding getRendererComp
+            // would take control from wrappee (f.i. Hyperlink foreground)
             super.getRendererComponent(context);
             wrappee.getRendererComponent(context);
             restoreContextValue(context, oldValue);

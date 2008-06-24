@@ -24,6 +24,7 @@ package org.jdesktop.swingx.renderer;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.ComponentOrientation;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.Serializable;
@@ -53,8 +54,11 @@ import org.jdesktop.swingx.JXHyperlink;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.JXTree;
 import org.jdesktop.swingx.action.AbstractActionExt;
+import org.jdesktop.swingx.decorator.AbstractHighlighter;
 import org.jdesktop.swingx.decorator.ColorHighlighter;
+import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
+import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.hyperlink.LinkModel;
 import org.jdesktop.swingx.test.ActionMapTreeTableModel;
 import org.jdesktop.swingx.test.ComponentTreeTableModel;
@@ -97,6 +101,28 @@ public class TreeRendererTest extends InteractiveTestCase {
         }
     }
     
+    /**
+     * Issue #873-swingx: WrappingIconPanel - delegate font unchanged
+     */
+    public void testDelegateFont() {
+        JXTree tree = new JXTree();
+        tree.setCellRenderer(new DefaultTreeRenderer());
+        final Font bold = tree.getFont().deriveFont(Font.BOLD, 20f);
+        Highlighter hl = new AbstractHighlighter() {
+
+            @Override
+            protected Component doHighlight(Component component,
+                    ComponentAdapter adapter) {
+                component.setFont(bold);
+                return component;
+            }
+        };
+        tree.addHighlighter(hl);
+        WrappingIconPanel component = (WrappingIconPanel) tree.getCellRenderer()
+            .getTreeCellRendererComponent(tree, "something", false, false, false, 0, false);
+        assertEquals(bold, component.getFont());
+        assertEquals(bold, component.delegate.getFont());
+    }
 
     /**
      * Wrapping provider: hyperlink foreground must be preserved.

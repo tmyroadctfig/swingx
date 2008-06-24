@@ -7,6 +7,7 @@ package org.jdesktop.swingx.renderer;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.ComponentOrientation;
+import java.awt.Font;
 import java.awt.Rectangle;
 
 import javax.swing.BorderFactory;
@@ -20,6 +21,10 @@ import org.jdesktop.swingx.painter.Painter;
 
 /**
  * Compound component for usage in tree renderer. <p>
+ * 
+ * Supports setting an icon for the node and a delegate component 
+ * which is used to show the text/content of the node. The delegate 
+ * component can be shared across renderers. <p>
  * 
  * This implements the PainterAware by delegating to the delegate component if that
  * is of type PainterAware. Does nothing if not.
@@ -64,12 +69,31 @@ public class WrappingIconPanel extends JXPanel implements PainterAware {
         }
     }
 
-
-    public void setIcon(Icon action) {
-        iconLabel.setIcon(action);
+    /**
+     * Sets the icon.
+     * 
+     * @param icon the icon to use.
+     */
+    public void setIcon(Icon icon) {
+        iconLabel.setIcon(icon);
         iconLabel.setText(null);
     }
-    
+ 
+    /**
+     * Returns the icon used in this panel, may be null.
+     * 
+     * @return the icon used in this panel, may be null.
+     */
+    public Icon getIcon() {
+        return iconLabel.getIcon();
+    }
+
+
+    /**
+     * Sets the delegate component. 
+     * 
+     * @param comp the component to add as delegate.
+     */
     public void setComponent(JComponent comp) {
         if (delegate != null) {
             remove(delegate);
@@ -80,6 +104,11 @@ public class WrappingIconPanel extends JXPanel implements PainterAware {
     }
 
 
+    /**
+     * {@inheritDoc} <p>
+     * 
+     * Overridden to set the background of the delegate and icon label as well.
+     */
     @Override
     public void setBackground(Color bg) {
         super.setBackground(bg);
@@ -91,6 +120,11 @@ public class WrappingIconPanel extends JXPanel implements PainterAware {
         }
     }
 
+    /**
+     * {@inheritDoc} <p>
+     * 
+     * Overridden to set the foreground of the delegate and icon label as well.
+     */
     @Override
     public void setForeground(Color bg) {
         super.setForeground(bg);
@@ -103,32 +137,22 @@ public class WrappingIconPanel extends JXPanel implements PainterAware {
     }
 
 
+    
+    
     /**
-     * Returns the icon used in this panel, may be null.
+     * {@inheritDoc} <p>
      * 
-     * @return the icon used in this panel, may be null.
+     * Overridden to set the Font of the delegate as well.
      */
-    public Icon getIcon() {
-        return iconLabel.getIcon();
+    @Override
+    public void setFont(Font font) {
+        if (delegate != null) {
+            delegate.setFont(font);
+        }
+        super.setFont(font);
     }
 
 
-
-    /**
-     * 
-     * Returns the bounds of the delegate component or null if the delegate is null.
-     * 
-     * PENDING JW: where do we use it? Maybe it was for testing only?
-     * 
-     * @return the bounds of the delegate, or null if the delegate is null.
-     */
-    public Rectangle getDelegateBounds() {
-        if (delegate == null) return null;
-        return delegate.getBounds();
-    }
-
-    
-    
     /**
      * {@inheritDoc} <p>
      * 
@@ -155,6 +179,20 @@ public class WrappingIconPanel extends JXPanel implements PainterAware {
         }
         
     }
+    
+    /**
+     * 
+     * Returns the bounds of the delegate component or null if the delegate is null.
+     * 
+     * PENDING JW: where do we use it? Maybe it was for testing only?
+     * 
+     * @return the bounds of the delegate, or null if the delegate is null.
+     */
+    public Rectangle getDelegateBounds() {
+        if (delegate == null) return null;
+        return delegate.getBounds();
+    }
+
     
     
 }
