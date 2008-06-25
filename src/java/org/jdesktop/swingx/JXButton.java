@@ -101,6 +101,14 @@ public class JXButton extends JButton {
         this.text = text;
         super.setText(text);
     }
+    @Override
+    public void repaint() {
+        if (painting) {
+            // skip repaint requests while painting
+            return;
+        }
+        super.repaint();
+    }
 
     @Override
     public String getText() {
@@ -222,10 +230,14 @@ public class JXButton extends JButton {
             b.opaque = b.isOpaque();
             b.setPainting(true);
             String tmp = b.text;
+            // #swingx-874
+            Icon tmpIcon = b.getIcon();
+            b.setIcon(null);
             b.text = "";
             b.paint(g);
             b.opaque = op;
             b.text = tmp;
+            b.setIcon(tmpIcon);
             b.setPainting(false);
         }
 
@@ -265,4 +277,5 @@ public class JXButton extends JButton {
     protected void setPainting(boolean b) {
         painting = b;
     }
+
 }
