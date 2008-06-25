@@ -26,11 +26,18 @@ import java.awt.Component;
 import java.awt.Font;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
+import java.io.File;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
+import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
 import javax.swing.AbstractListModel;
+import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.Icon;
@@ -46,6 +53,7 @@ import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.Border;
+import javax.swing.filechooser.FileSystemView;
 import javax.swing.plaf.basic.BasicTreeUI;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.tree.TreeCellRenderer;
@@ -60,14 +68,20 @@ import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.JXTree;
 import org.jdesktop.swingx.JXTreeTable;
 import org.jdesktop.swingx.border.DropShadowBorder;
+import org.jdesktop.swingx.decorator.ColorHighlighter;
+import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.PainterHighlighter;
+import org.jdesktop.swingx.decorator.PatternPredicate;
 import org.jdesktop.swingx.painter.MattePainter;
 import org.jdesktop.swingx.rollover.RolloverProducer;
 import org.jdesktop.swingx.rollover.RolloverRenderer;
 import org.jdesktop.swingx.test.ComponentTreeTableModel;
 import org.jdesktop.swingx.test.XTestUtils;
+import org.jdesktop.swingx.treetable.FileSystemModel;
+import org.jdesktop.swingx.treetable.TreeTableModel;
+import org.jdesktop.test.AncientSwingTeam;
 
 import com.sun.java.swing.plaf.motif.MotifLookAndFeel;
 
@@ -98,6 +112,172 @@ public class RendererIssues extends InteractiveTestCase {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
         }
+    }
+
+    /**
+     * example to configure treeTable hierarchical column with
+     * custom icon and content mapping. The nodes are actually of type File.
+     * 
+     * Problem: 
+     * painting on resizing tree column sluggish, especially if the PatternHighlighter
+     * is on. Reason seems to be the FileSystemView - prepare time increases with
+     * number of accesses.
+     */
+    public void interactiveTreeTableCustomIconsPerformance() {
+        // modify the file model to return the file itself for the hierarchical column
+        TreeTableModel model = new FileSystemModel() {
+            
+            @Override
+            public Object getValueAt(Object node, int column) {
+                if (column == 0) {
+                    return node;
+                }
+                return super.getValueAt(node, column);
+            }
+            
+        };
+        final JXTreeTable table = new JXTreeTable(model);
+        table.setAutoResizeMode(JXTable.AUTO_RESIZE_OFF);
+        StringValue sv = new StringValue() {
+
+            public String getString(Object value) {
+                if (value instanceof File) {
+                    return FileSystemView.getFileSystemView().getSystemDisplayName((File) value)
+                       + " Type: " 
+                       + FileSystemView.getFileSystemView().getSystemTypeDescription((File) value)
+                    ; 
+                } 
+                return TO_STRING.getString(value);
+            }
+            
+        };
+        IconValue iv = new IconValue() {
+
+            public Icon getIcon(Object value) {
+                if (value instanceof File) {
+                    return  FileSystemView.getFileSystemView().getSystemIcon((File) value);
+                } 
+                return null;
+            }};
+        final DefaultTreeRenderer treeRenderer = new DefaultTreeRenderer(iv, sv);
+        table.setTreeCellRenderer(treeRenderer);
+        // string based. Note: this example is locale dependent
+        String folderDescription = ".*ordner.*";
+        PatternPredicate predicate = new PatternPredicate(Pattern.compile(folderDescription, 0), 0, -1);
+        final Highlighter hl = new ColorHighlighter(predicate, null, Color.RED);
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.YEAR, -1);
+        final Date lastYear = calendar.getTime();
+        // install value based highlighter 
+        HighlightPredicate valueBased = new HighlightPredicate() {
+
+            public boolean isHighlighted(Component renderer,
+                    ComponentAdapter adapter) {
+                if (!(adapter.getValue() instanceof File)) return false;
+                File file = (File) adapter.getValue();
+                Date date = new Date(file.lastModified());
+                return date.after(lastYear);
+            }
+            
+        };
+        final ColorHighlighter back =  new ColorHighlighter(valueBased, Color.YELLOW, null);
+        JXFrame frame =showWithScrollingInFrame(table, "TreeTable: performance bottleneck is FileSystemView");
+        Action toggleBack = new AbstractAction("toggleBackHighlighter") {
+            boolean hasBack;
+            public void actionPerformed(ActionEvent e) {
+                if (hasBack) {
+                    table.removeHighlighter(back);
+                } else {
+                    table.addHighlighter(back);
+                }
+                hasBack = !hasBack;
+                
+            }
+            
+        };
+        addAction(frame, toggleBack);
+        Action togglePattern = new AbstractAction("togglePatternHighlighter") {
+            boolean hasBack;
+            public void actionPerformed(ActionEvent e) {
+                if (hasBack) {
+                    table.removeHighlighter(hl);
+                } else {
+                    table.addHighlighter(hl);
+                }
+                hasBack = !hasBack;
+                
+            }
+            
+        };
+        addAction(frame, togglePattern);
+        // accessing the FileSystemView is slooooww
+        // increasingly costly over time, shows particularly 
+        // when the patternHighlighter is on
+        // (probably because that increases the number 
+        // of queries to the systemView
+        final JLabel timeL = new JLabel("stop-watch");
+        Action timer = new AbstractAction("start") {
+            public void actionPerformed(ActionEvent e) {
+                timeL.setText("started");
+                long time = System.currentTimeMillis();
+                for (int i = 0; i < 2000; i++) {
+                   table.prepareRenderer(table.getCellRenderer(0, 0), 0, 0); 
+                }
+                timeL.setText("stopped: " + (System.currentTimeMillis() - time));
+            }
+        };
+        addAction(frame, timer);
+        
+        addStatusComponent(frame, timeL);
+        addStatusMessage(frame, "node is File - string/value based highlighters same");
+    }
+
+
+    /**
+     * Playing with rollover for visual clue if cell editable.
+     * The old problem: cursor shoudn't be altered by the rollover
+     * controller but by the rollover renderer.
+     */
+    public void interactiveRolloverEffects() {
+        JXTable table = new JXTable(new AncientSwingTeam());
+        table.setDefaultRenderer(Boolean.class, new DefaultTableRenderer(new RolloverCheckBox()));
+        showWithScrollingInFrame(table, "checkbox rollover effect");
+    }
+    
+    public static class RolloverCheckBox extends CheckBoxProvider 
+        implements RolloverRenderer {
+        boolean wasEditable;
+
+        
+        @Override
+        protected void configureState(CellContext context) {
+            super.configureState(context);
+            if (context.getComponent() !=  null) {
+                Point p = (Point) context.getComponent()
+                        .getClientProperty(RolloverProducer.ROLLOVER_KEY);
+                if (/*hasFocus || */(p != null && (p.x >= 0) && 
+                        (p.x == context.getColumn()) && (p.y == context.getRow()))) {
+                     rendererComponent.getModel().setRollover(true);
+                } else {
+                    rendererComponent.getModel().setRollover(false);
+                }
+            }
+        }
+
+        @Override
+        protected void format(CellContext context) {
+            // TODO Auto-generated method stub
+            super.format(context);
+            wasEditable = context.isEditable();
+        }
+
+        public void doClick() {
+        }
+
+        public boolean isEnabled() {
+            return wasEditable;
+        }
+        
     }
     
     public void interactiveToolTipList() {
