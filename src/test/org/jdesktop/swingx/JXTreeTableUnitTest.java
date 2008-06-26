@@ -71,6 +71,24 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
         super("JXTreeTable Unit Test");
     }
 
+    
+    /**
+     * Issue #766-swingx: drop image is blinking over hierarchical column.
+     * 
+     * Test the hack - enabled by default, can be disabled by setting the
+     * client property to Boolean.FALSE.
+     * 
+     */
+    public void testDropHack() {
+        JXTree tree = new JXTree();
+        assertEquals("sanity - default visible", true, tree.isVisible());
+        JXTreeTable treeTable = new JXTreeTable(new FileSystemModel());
+        JXTree renderer = (JXTree) treeTable.getCellRenderer(0, 0);
+        assertEquals("renderer must be invisible by default", false, renderer.isVisible());
+        treeTable.putClientProperty(JXTreeTable.DROP_HACK_FLAG_KEY, Boolean.FALSE);
+        assertEquals("renderer must be visible if hack disabled", true, renderer.isVisible());
+    }
+
     /**
      * Issue #862-swingx: JXTree - add api for selection colors.
      * Here: test that the tree in JXTreeTable is kept in synch.

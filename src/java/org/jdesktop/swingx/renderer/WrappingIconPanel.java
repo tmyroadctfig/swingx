@@ -152,6 +152,20 @@ public class WrappingIconPanel extends JXPanel implements PainterAware {
         super.setFont(font);
     }
 
+    
+    /**
+     * {@inheritDoc} <p>
+     * 
+     * Overridden to hack around #766-swingx: cursor flickering in DnD
+     * when dragging over tree column. This is a core bug (#6700748) related
+     * to painting the rendering component on a CellRendererPane. A trick
+     * around is to let this return false.  
+     */
+    @Override
+    public boolean isVisible() {
+        return false; 
+    }
+
 
     /**
      * {@inheritDoc} <p>

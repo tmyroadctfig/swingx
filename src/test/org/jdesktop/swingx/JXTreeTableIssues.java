@@ -191,47 +191,6 @@ public class JXTreeTableIssues extends InteractiveTestCase {
     }
 
 
-    /**
-     * Issue #766-swingx: drop image is blinking over hierarchical column.
-     * 
-     * Not sure how to enable in 1.5 (TransferSupport is 1.6 api). But looks 
-     * terrible in 1.6. Probably related to our mouse tricksery? Any ideas anybody?
-     * 
-     */
-    public void interactiveDropOnHierachicalColumnBlinks() {
-        JXTreeTable xTable = new JXTreeTable(new ComponentTreeTableModel(new JXFrame()));
-        xTable.putClientProperty(JXTreeTable.DROP_HACK_FLAG_KEY, Boolean.TRUE);
-        TransferHandler tableTransfer = new TransferHandler() {
-
-            @Override
-            public boolean canImport(JComponent comp,
-                    DataFlavor[] transferFlavors) {
-                return true;
-            }
-            
-            
-
-//            @Override
-//            public boolean canImport (TransferSupport support) {
-//                    return true;
-//            }
-//
-//            @Override
-//            public boolean importData (TransferSupport support) {
-//                    return super.importData(support);
-//            }
-
-    };
-
-       xTable.setTransferHandler(tableTransfer);
-        xTable.expandAll();
-        xTable.setVisibleColumnCount(10);
-        JXFrame frame = wrapWithScrollingInFrame(xTable, "TreeTable: null icons?");
-        JTextField textField = new JTextField("drag");
-        textField.setDragEnabled(true);
-        addStatusComponent(frame, textField);
-        frame.setVisible(true);
-    }
 
     
     /**
