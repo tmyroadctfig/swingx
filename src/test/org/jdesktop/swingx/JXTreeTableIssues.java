@@ -23,6 +23,7 @@ package org.jdesktop.swingx;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.datatransfer.DataFlavor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.lang.reflect.InvocationTargetException;
@@ -33,6 +34,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.CellEditor;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JTextField;
 import javax.swing.JTree;
@@ -200,6 +202,14 @@ public class JXTreeTableIssues extends InteractiveTestCase {
         JXTreeTable xTable = new JXTreeTable(new ComponentTreeTableModel(new JXFrame()));
         xTable.putClientProperty(JXTreeTable.DROP_HACK_FLAG_KEY, Boolean.TRUE);
         TransferHandler tableTransfer = new TransferHandler() {
+
+            @Override
+            public boolean canImport(JComponent comp,
+                    DataFlavor[] transferFlavors) {
+                return true;
+            }
+            
+            
 
 //            @Override
 //            public boolean canImport (TransferSupport support) {
