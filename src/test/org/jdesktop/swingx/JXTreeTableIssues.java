@@ -100,7 +100,7 @@ public class JXTreeTableIssues extends InteractiveTestCase {
 //            test.runInteractiveTests(".*AdapterDeleteUpdate.*");
 //            test.runInteractiveTests(".*Text.*");
 //            test.runInteractiveTests(".*TreeExpand.*");
-            test.runInteractiveTests("interactive.*Clip.*");
+            test.runInteractiveTests("interactive.*Blink.*");
 //          test.runInteractiveTests("interactive.*CustomColor.*");
               
         } catch (Exception e) {
@@ -198,7 +198,7 @@ public class JXTreeTableIssues extends InteractiveTestCase {
      */
     public void interactiveDropOnHierachicalColumnBlinks() {
         JXTreeTable xTable = new JXTreeTable(new ComponentTreeTableModel(new JXFrame()));
-        
+        xTable.putClientProperty(JXTreeTable.DROP_HACK_FLAG_KEY, Boolean.TRUE);
         TransferHandler tableTransfer = new TransferHandler() {
 
 //            @Override
