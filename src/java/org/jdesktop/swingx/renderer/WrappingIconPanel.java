@@ -36,9 +36,17 @@ public class WrappingIconPanel extends JXPanel implements PainterAware {
     int iconLabelGap;
     private Border ltorBorder;
     private Border rtolBorder;
+    private boolean dropHackEnabled;
     
     
     public WrappingIconPanel() {
+        this(true);
+    }
+     /**
+      * 
+     * @param dropHackEnabled
+     */
+    public WrappingIconPanel(boolean dropHackEnabled) {
         setOpaque(false);
         iconLabel = new JRendererLabel();
         iconLabelGap = iconLabel.getIconTextGap();
@@ -47,6 +55,7 @@ public class WrappingIconPanel extends JXPanel implements PainterAware {
         setBorder(null);
         setLayout(new BorderLayout());
         add(iconLabel, BorderLayout.LINE_START);
+        setDropHackEnabled(dropHackEnabled);
     }
     
     
@@ -154,23 +163,31 @@ public class WrappingIconPanel extends JXPanel implements PainterAware {
 
     
     /**
-     * {@inheritDoc} <p>
+     * {@inheritDoc}
+     * <p>
      * 
-     * Overridden to hack around #766-swingx: cursor flickering in DnD
-     * when dragging over tree column. This is a core bug (#6700748) related
-     * to painting the rendering component on a CellRendererPane. A trick
-     * around is to let this return false.  
+     * Overridden to hack around #766-swingx: cursor flickering in DnD when
+     * dragging over tree column. This is a core bug (#6700748) related to
+     * painting the rendering component on a CellRendererPane. A trick around is
+     * to let this return false.
+     * <p>
+     * 
+     * Some LayoutManagers don't layout an invisible component, so need to make
+     * the hack-enabled configurable. This implementation will return false 
+     * if isDropHackEnabled, super.isVisible otherwise.
      */
     @Override
     public boolean isVisible() {
-        return false; 
+        return dropHackEnabled ? false : super.isVisible();
     }
 
 
     /**
-     * {@inheritDoc} <p>
+     * {@inheritDoc}
+     * <p>
      * 
-     * Returns the delegate's Painter if it is of type PainterAware or null otherwise.
+     * Returns the delegate's Painter if it is of type PainterAware or null
+     * otherwise.
      * 
      * @return the delegate's Painter or null.
      */
@@ -205,6 +222,20 @@ public class WrappingIconPanel extends JXPanel implements PainterAware {
     public Rectangle getDelegateBounds() {
         if (delegate == null) return null;
         return delegate.getBounds();
+    }
+
+
+    /**
+     * Sets the dropHackEnabled property. <p>
+     * 
+     * The default value is true.
+     * 
+     * @param dropHackEnabled 
+     * 
+     * @see #isVisible()
+     */
+    public void setDropHackEnabled(boolean dropHackEnabled) {
+        this.dropHackEnabled = dropHackEnabled;
     }
 
     

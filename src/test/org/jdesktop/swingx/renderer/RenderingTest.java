@@ -64,6 +64,34 @@ public class RenderingTest extends TestCase {
             .getName());
 
     /**
+     * Issue #766-swingx: flickering cursor on drop over.
+     * 
+     * test hack configuration (arrrggg ...)
+     */
+    public void testWrappingIconPanelDropHackDefault() {
+        JXPanel sanity = new JXPanel();
+        assertEquals("visible by default", true, sanity.isVisible());
+        WrappingIconPanel panel = new WrappingIconPanel();
+        assertEquals("invisible by default", false, panel.isVisible());
+        panel.setDropHackEnabled(false);
+        assertEquals("disabled hack", true, panel.isVisible());
+    }
+    
+    /**
+     * Issue #766-swingx: flickering cursor on drop over.
+     * 
+     * test hack configuration (arrrggg ...)
+     */
+    public void testWrappingIconPanelDropHackConstructor() {
+        JXPanel sanity = new JXPanel();
+        assertEquals("visible by default", true, sanity.isVisible());
+        WrappingIconPanel panel = new WrappingIconPanel(false);
+        assertEquals("invisible by default", true, panel.isVisible());
+        panel.setDropHackEnabled(true);
+        assertEquals("disabled hack", false, panel.isVisible());
+    }
+    
+    /**
      * Issue #863-swingx: SwingX renderering components must be PainterAware.
      * Here: test Hyperlink
      */

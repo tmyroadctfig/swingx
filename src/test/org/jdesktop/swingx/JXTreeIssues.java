@@ -10,12 +10,15 @@ import java.awt.Component;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.util.Locale;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
+import javax.swing.AbstractListModel;
 import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.JTree;
+import javax.swing.ListModel;
 import javax.swing.plaf.UIResource;
 
 import org.jdesktop.swingx.decorator.AbstractHighlighter;
@@ -23,6 +26,7 @@ import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.renderer.CellContext;
+import org.jdesktop.swingx.renderer.DefaultListRenderer;
 import org.jdesktop.swingx.renderer.DefaultTreeRenderer;
 import org.jdesktop.swingx.renderer.IconValue;
 import org.jdesktop.swingx.renderer.MappedValue;
@@ -131,6 +135,61 @@ public class JXTreeIssues extends JXTreeUnitTest {
 
         };
         treeP.setCellRenderer(new DefaultTreeRenderer(provider));
+        showWithScrollingInFrame(tree, treeP, "bold font: decorate vs. config");
+    }
+    
+    /**
+     * Size effecting decoration vs. initial config (in provider).
+     * 
+     * For comparison: JXList
+     * 
+     * Decoration: use highlighter 
+     * - works correctly 
+     * 
+     * Config in Provider (usually not recommended): 
+     * - override getRendererComponent, works correctly
+     *  
+     */
+    public void interactiveBoldList() {
+        final Locale[] locales = Locale.getAvailableLocales();
+        ListModel model = new AbstractListModel() {
+
+            public Object getElementAt(int index) {
+                return locales[index];
+            }
+
+            public int getSize() {
+                return locales.length;
+            }
+            
+        };
+        JXList tree = new JXList(model);
+        tree.setCellRenderer(new DefaultListRenderer());
+        final Font bold = tree.getFont().deriveFont(Font.BOLD, 20f);
+        Highlighter hl = new AbstractHighlighter(HighlightPredicate.EVEN) {
+
+            @Override
+            protected Component doHighlight(Component component,
+                    ComponentAdapter adapter) {
+                component.setFont(bold);
+                return component;
+            }
+        };
+        tree.addHighlighter(hl);
+        JXList treeP = new JXList(model);
+        WrappingProvider provider = new WrappingProvider() {
+            
+            @Override
+            public WrappingIconPanel getRendererComponent(CellContext context) {
+                super.getRendererComponent(context);
+                if (context.getRow() % 2 == 0) {
+                    rendererComponent.setFont(bold);
+                }
+                return rendererComponent;
+            }
+
+        };
+        treeP.setCellRenderer(new DefaultListRenderer(provider));
         showWithScrollingInFrame(tree, treeP, "bold font: decorate vs. config");
     }
     
