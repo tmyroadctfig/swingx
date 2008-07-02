@@ -522,7 +522,7 @@ public class RenderingTest extends TestCase {
         ImageIcon icon = (ImageIcon) XTestUtils.loadDefaultIcon();
         icon.setDescription("description");
         LabelProvider provider = new LabelProvider(
-                new MappedValue(StringValue.TO_STRING, IconValue.EMPTY));
+                new MappedValue(StringValue.TO_STRING, IconValue.NONE));
         TableCellContext context = new TableCellContext();
         context.value = icon;
         JLabel label = provider.getRendererComponent(context);

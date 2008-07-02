@@ -83,7 +83,7 @@ public class WindowsTaskPaneUI extends BasicTaskPaneUI {
           0,
           getRoundHeight(),
           group.getWidth(),
-          getTitleHeight() - getRoundHeight());
+          getTitleHeight(group) - getRoundHeight());
       } else {
         Paint oldPaint = ((Graphics2D)g).getPaint();
         GradientPaint gradient = new GradientPaint(
@@ -93,7 +93,7 @@ public class WindowsTaskPaneUI extends BasicTaskPaneUI {
             titleBackgroundGradientStart
             :titleBackgroundGradientEnd,
           group.getWidth(),
-          getTitleHeight(),
+          getTitleHeight(group),
           group.getComponentOrientation().isLeftToRight()?
             titleBackgroundGradientEnd
             :titleBackgroundGradientStart);
@@ -119,7 +119,7 @@ public class WindowsTaskPaneUI extends BasicTaskPaneUI {
           0,
           getRoundHeight(),
           group.getWidth(),
-          getTitleHeight() - getRoundHeight());
+          getTitleHeight(group) - getRoundHeight());
         ((Graphics2D)g).setPaint(oldPaint);
       }
     }

@@ -1,12 +1,24 @@
 /*
- * ShapeUtils.java
+ * $Id$
  *
- * Created on October 18, 2006, 10:22 PM
+ * Copyright 2006 Sun Microsystems, Inc., 4150 Network Circle,
+ * Santa Clara, California 95054, U.S.A. All rights reserved.
  *
- * To change this template, choose Tools | Template Manager
- * and open the template in the editor.
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *
  */
-
 package org.jdesktop.swingx.util;
 
 import java.awt.Font;
@@ -69,15 +81,20 @@ public final class ShapeUtils {
     }
 
     public static Shape generateShapeFromText(Font font, char ch) {
-        return generateShapeFromText(font, new String(new char[] {ch}));
+        return generateShapeFromText(font, String.valueOf(ch));
     }
     
     public static Shape generateShapeFromText(Font font, String string) {
         BufferedImage img = new BufferedImage(100,100,BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2 = img.createGraphics();
-        GlyphVector vect = font.createGlyphVector(g2.getFontRenderContext(), string);
-        Shape shape = vect.getOutline(0f,(float)-vect.getVisualBounds().getY());
-        g2.dispose();
-        return shape;
+        
+        try {
+            GlyphVector vect = font.createGlyphVector(g2.getFontRenderContext(), string);
+            Shape shape = vect.getOutline(0f,(float)-vect.getVisualBounds().getY());
+            
+            return shape;
+        } finally {
+            g2.dispose();
+        }
     }
 }

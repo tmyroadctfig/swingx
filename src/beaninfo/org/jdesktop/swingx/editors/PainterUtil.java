@@ -89,7 +89,7 @@ public class PainterUtil {
     }*/
     
     public static Painter loadPainter(File file) throws FileNotFoundException, MalformedURLException, IOException {
-        return loadPainter(file.toURL(), file.toURL());
+        return loadPainter(file.toURI().toURL(), file.toURI().toURL());
     }
     
     private static Painter loadPainter(final URL in, URL baseURL) throws FileNotFoundException, IOException {
@@ -112,7 +112,7 @@ public class PainterUtil {
     }
     
     static public void savePainterToFile(Painter compoundPainter, File file) throws IOException {
-        savePainterToFile(compoundPainter,file,file.getParentFile().toURL());
+        savePainterToFile(compoundPainter,file,file.getParentFile().toURI().toURL());
     }
     
     static public void savePainterToFile(Painter compoundPainter, File file, URL baseURL) throws IOException {

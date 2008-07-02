@@ -153,8 +153,8 @@ public class PainterVisualCheck extends RichInteractiveTestCase {
                     "be slower than using the cache. Also, both painters are run on background " +
                     "threads so as not to block the GUI)"));
         } finally {
-            t1.stop();
-            t2.stop();
+            t1.interrupt();
+            t2.interrupt();
         }
     }
 

@@ -40,7 +40,7 @@ import javax.swing.tree.TreeCellRenderer;
  * to perform the actual editing.
  * <p>To support editing of the tree column we can not make the tree
  * editable. The reason this doesn't work is that you can not use
- * the same component for editing and renderering. The table may have
+ * the same component for editing and rendering. The table may have
  * the need to paint cells, while a cell is being edited. If the same
  * component were used for the rendering and editing the component would
  * be moved around, and the contents would change. When editing, this
@@ -68,7 +68,7 @@ import javax.swing.tree.TreeCellRenderer;
  * an instance of DefaultTreeCellRenderer. If you need custom
  * TreeCellRenderers, that don't descend from DefaultTreeCellRenderer,
  * and you want to support editing in JXTreeTable, you will have
- * to do something similiar.
+ * to do something similar.
  *
  * @author Scott Violet
  * @author Ramesh Gupta

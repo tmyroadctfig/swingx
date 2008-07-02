@@ -24,10 +24,10 @@ public class PainterToXMLTest {
         ImagePainter ip = new ImagePainter();
         ip.setImageString("file:/Users/joshy/Pictures/cooltikis.jpg");
         File outfile = new File("/Users/joshy/Desktop/test.xml");
-        PainterUtil.savePainterToFile(ip, outfile, outfile.getParentFile().toURL());
+        PainterUtil.savePainterToFile(ip, outfile, outfile.getParentFile().toURI().toURL());
         p("testing saving an image painter with relative image URLs");
         outfile = new File("/Users/joshy/Pictures/deleteme.xml");
-        PainterUtil.savePainterToFile(ip, outfile, outfile.getParentFile().toURL());
+        PainterUtil.savePainterToFile(ip, outfile, outfile.getParentFile().toURI().toURL());
     }
 
     private static void p(String string) {

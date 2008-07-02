@@ -26,7 +26,7 @@ public class URLPainterTest {
         p("loading from an absolute xml url & absolute image url");
         ip = (ImagePainter) PainterUtil.loadPainter(
                 new File("/Users/joshy/projects/current/swingx/"+
-                "src/beaninfo/org/jdesktop/swingx/painter/demo/URLPainterTest1.xml").toURL());
+                "src/beaninfo/org/jdesktop/swingx/painter/demo/URLPainterTest1.xml").toURI().toURL());
         p("image = " + ip.getImage());
         
         p("-----------");
@@ -39,7 +39,7 @@ public class URLPainterTest {
         p("loading from an absolute xml url & relative image url");
         ip = (ImagePainter) PainterUtil.loadPainter(
                 new File("/Users/joshy/projects/current/swingx/"+
-                "src/beaninfo/org/jdesktop/swingx/painter/demo/URLPainterTest2.xml").toURL());
+                "src/beaninfo/org/jdesktop/swingx/painter/demo/URLPainterTest2.xml").toURI().toURL());
         p("image = " + ip.getImage());
         
         p("-----------");

@@ -158,7 +158,7 @@ public class JXImageView extends JXPanel {
      * @throws java.io.IOException thrown if the image cannot be loaded
      */
     public void setImage(File file) throws IOException {
-        setImageURL(file.toURL());
+        setImageURL(file.toURI().toURL());
     }
     
     /**
