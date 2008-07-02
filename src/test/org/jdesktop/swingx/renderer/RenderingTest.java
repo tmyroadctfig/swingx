@@ -44,6 +44,7 @@ import org.jdesktop.swingx.JXPanel;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.JXTreeTable;
 import org.jdesktop.swingx.hyperlink.LinkAction;
+import org.jdesktop.swingx.icon.EmptyIcon;
 import org.jdesktop.swingx.painter.ShapePainter;
 import org.jdesktop.swingx.table.TableColumnExt;
 import org.jdesktop.swingx.test.ComponentTreeTableModel;
@@ -526,7 +527,10 @@ public class RenderingTest extends TestCase {
         TableCellContext context = new TableCellContext();
         context.value = icon;
         JLabel label = provider.getRendererComponent(context);
-        assertNull("icon must be null", label.getIcon());
+        Icon i = label.getIcon();
+        assertTrue("icon must be empty", i instanceof EmptyIcon);
+        assertEquals("icon must have no width", 0, i.getIconWidth());
+        assertEquals("icon must have no height", 0, i.getIconHeight());
         assertEquals("label text must be default to-string", StringValue.TO_STRING.getString(icon), label.getText());
     }
     
