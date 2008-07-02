@@ -27,6 +27,7 @@ import java.util.List;
 
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
+import javax.swing.tree.TreeModel;
 
 /**
  * TODO add type doc
@@ -41,6 +42,28 @@ public class TreeModelReport implements TreeModelListener {
     List<TreeModelEvent> deleteEvents = Collections.synchronizedList(new LinkedList<TreeModelEvent>());
     List<TreeModelEvent> structureEvents = Collections.synchronizedList(new LinkedList<TreeModelEvent>());
     
+    /**
+     * Instantiates a report.
+     */
+    public TreeModelReport() {
+        this(null);
+    }
+    
+    
+
+    /**
+     * Instantiates a report and registers itself as listener to the given model, 
+     * if it is not null.
+     * 
+     * @param model the model to register as listener to
+     */
+    public TreeModelReport(TreeModel model) {
+        if (model != null) {
+            model.addTreeModelListener(this);
+        }
+    }
+
+
 //------------------- TableModelListener    
     public void treeNodesChanged(TreeModelEvent e) {
         allEvents.add(0, e);

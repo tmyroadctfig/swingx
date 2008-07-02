@@ -27,6 +27,7 @@ import java.util.List;
 
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
+import javax.swing.table.TableModel;
 
 /**
  * TODO add type doc
@@ -40,6 +41,22 @@ public class TableModelReport implements TableModelListener {
     List<TableModelEvent> insertEvents = Collections.synchronizedList(new LinkedList<TableModelEvent>());
     List<TableModelEvent> deleteEvents = Collections.synchronizedList(new LinkedList<TableModelEvent>());
     
+    /**
+     * Instantiates a report.
+     */
+    public TableModelReport() {
+        this(null);
+    }
+    
+    /**
+     * Instantiates a report and registers to the given model if it is not null. 
+     * @param model the model to register to 
+     */
+    public TableModelReport(TableModel model) {
+        if (model != null) {
+            model.addTableModelListener(this);
+        }
+    }
 //------------------- TableModelListener    
     public void tableChanged(TableModelEvent e) {
         allEvents.add(0, e);
