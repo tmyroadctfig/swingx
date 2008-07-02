@@ -46,7 +46,7 @@ public class RepaintManagerX extends RepaintManager {
             int lastDeltaY = c.getY();
             Container parent = c.getParent();
             while (parent instanceof JComponent) {
-                if (!parent.isVisible() || (parent.getPeer() == null)) {
+                if (!parent.isVisible() || !parent.isDisplayable()) {
                     return;
                 }
                 if (parent instanceof JXPanel && (((JXPanel)parent).getAlpha() < 1f ||
