@@ -24,6 +24,7 @@ package org.jdesktop.test;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
@@ -36,10 +37,15 @@ import javax.swing.table.TableModel;
  */
 public class TableModelReport implements TableModelListener {
 
+    @SuppressWarnings("unused")
+    private static final Logger LOG = Logger.getLogger(TableModelReport.class
+            .getName());
+    
     List<TableModelEvent> allEvents = Collections.synchronizedList(new LinkedList<TableModelEvent>());
     List<TableModelEvent> updateEvents = Collections.synchronizedList(new LinkedList<TableModelEvent>());
     List<TableModelEvent> insertEvents = Collections.synchronizedList(new LinkedList<TableModelEvent>());
     List<TableModelEvent> deleteEvents = Collections.synchronizedList(new LinkedList<TableModelEvent>());
+    private boolean verbose;
     
     /**
      * Instantiates a report.
@@ -50,15 +56,31 @@ public class TableModelReport implements TableModelListener {
     
     /**
      * Instantiates a report and registers to the given model if it is not null. 
+     * 
      * @param model the model to register to 
      */
     public TableModelReport(TableModel model) {
+        this(model, false);
+    }
+    
+    /**
+     * Instantiates a report and registers to the given model if it is not null. 
+     * If verbose, prints the event (use for debugging only).
+     * 
+     * @param model the model to register to 
+     */
+    public TableModelReport(TableModel model, boolean verbose) {
         if (model != null) {
             model.addTableModelListener(this);
         }
+        this.verbose = verbose;
     }
+    
 //------------------- TableModelListener    
     public void tableChanged(TableModelEvent e) {
+        if (verbose) {
+           LOG.info(printEvent(e)); 
+        }
         allEvents.add(0, e);
         if (isUpdate(e)) {
             updateEvents.add(0, e);

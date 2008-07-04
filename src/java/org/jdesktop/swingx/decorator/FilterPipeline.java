@@ -621,6 +621,20 @@ public class FilterPipeline {
     }
 
     public class IdentityFilter extends Filter {
+        
+        
+        /**
+         * PENDING JW: fires always, even without sorter ..
+         * Could do better - but will break behaviour of apps which relied on
+         * the (buggy) side-effect of repainting on each change.
+         * 
+         */
+        @Override
+        public void refresh() {
+//            if ((sortController == null) 
+//                    || (sortController.getSortKeys().size() == 0)) return;
+            super.refresh();
+        }
 
         @Override
         protected void init() {
