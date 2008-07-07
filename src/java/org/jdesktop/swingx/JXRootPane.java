@@ -41,9 +41,6 @@ import javax.swing.JRootPane;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 
-import org.jdesktop.swingx.event.MessageSource;
-import org.jdesktop.swingx.event.ProgressSource;
-
 /**
  * Extends the JRootPane by supporting specific placements for a toolbar and a
  * status bar. If a status bar exists, then toolbars, menus and any
@@ -302,14 +299,14 @@ public class JXRootPane extends JRootPane {
         if (statusBar == null || comp == null) {
             return;
         }
-        if (comp instanceof MessageSource) {
-            MessageSource source = (MessageSource) comp;
+//        if (comp instanceof MessageSource) {
+//            MessageSource source = (MessageSource) comp;
 //            source.addMessageListener(statusBar);
-        }
-        if (comp instanceof ProgressSource) {
-            ProgressSource source = (ProgressSource) comp;
+//        }
+//        if (comp instanceof ProgressSource) {
+//            ProgressSource source = (ProgressSource) comp;
 //            source.addProgressListener(statusBar);
-        }
+//        }
         if (comp instanceof Container) {
             Component[] comps = ((Container) comp).getComponents();
             for (int i = 0; i < comps.length; i++) {
@@ -322,14 +319,14 @@ public class JXRootPane extends JRootPane {
         if (statusBar == null || comp == null) {
             return;
         }
-        if (comp instanceof MessageSource) {
-            MessageSource source = (MessageSource) comp;
+//        if (comp instanceof MessageSource) {
+//            MessageSource source = (MessageSource) comp;
 //            source.removeMessageListener(statusBar);
-        }
-        if (comp instanceof ProgressSource) {
-            ProgressSource source = (ProgressSource) comp;
+//        }
+//        if (comp instanceof ProgressSource) {
+//            ProgressSource source = (ProgressSource) comp;
 //            source.removeProgressListener(statusBar);
-        }
+//        }
         if (comp instanceof Container) {
             Component[] comps = ((Container) comp).getComponents();
             for (int i = 0; i < comps.length; i++) {
@@ -350,21 +347,21 @@ public class JXRootPane extends JRootPane {
         JXStatusBar oldStatusBar = this.statusBar;
         this.statusBar = statusBar;
 
-        if (statusBar != null) {
-            if (handler == null) {
+//        if (statusBar != null) {
+//            if (handler == null) {
                 // Create the new mouse handler and register the toolbar
                 // and menu components.
 //                handler = new MouseMessagingHandler(this, statusBar);
-                if (toolBar != null) {
+//                if (toolBar != null) {
 //                    handler.registerListeners(toolBar.getComponents());
-                }
-                if (menuBar != null) {
+//                }
+//                if (menuBar != null) {
 //                    handler.registerListeners(menuBar.getSubElements());
-                }
-            } else {
+//                }
+//            } else {
 //                handler.setMessageListener(statusBar);
-            }
-        }
+//            }
+//        }
 
         Component[] comps = getContentPane().getComponents();
         for (int i = 0; i < comps.length; i++) {
@@ -387,7 +384,7 @@ public class JXRootPane extends JRootPane {
         return statusBar;
     }
 
-    private MouseMessagingHandler handler;
+//    private MouseMessagingHandler handler;
 
     /**
      * Set the toolbar bar for this root pane. If the status bar exists, then
@@ -410,14 +407,14 @@ public class JXRootPane extends JRootPane {
         if (oldToolBar != null) {
             getContentPane().remove(oldToolBar);
             
-            if (handler != null) {
-                handler.unregisterListeners(oldToolBar.getComponents());
-            }
+//            if (handler != null) {
+//                handler.unregisterListeners(oldToolBar.getComponents());
+//            }
         }
         
-        if (handler != null && this.toolBar != null) {
-            handler.registerListeners(this.toolBar.getComponents());
-        }
+//        if (handler != null && this.toolBar != null) {
+//            handler.registerListeners(this.toolBar.getComponents());
+//        }
 
         getContentPane().add(BorderLayout.NORTH, this.toolBar);
         
@@ -446,13 +443,13 @@ public class JXRootPane extends JRootPane {
 
         super.setJMenuBar(menuBar);
 
-        if (handler != null && oldMenuBar != null) {
-            handler.unregisterListeners(oldMenuBar.getSubElements());
-        }
-
-        if (handler != null && menuBar != null) {
-            handler.registerListeners(menuBar.getSubElements());
-        }
+//        if (handler != null && oldMenuBar != null) {
+//            handler.unregisterListeners(oldMenuBar.getSubElements());
+//        }
+//
+//        if (handler != null && menuBar != null) {
+//            handler.registerListeners(menuBar.getSubElements());
+//        }
     }
 
     /**

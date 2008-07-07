@@ -9,25 +9,37 @@ package org.jdesktop.swingx;
 
 import java.awt.Component;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
+import javax.swing.JPanel;
 import javax.swing.JToolBar;
 
 import junit.framework.TestCase;
 
-import org.jdesktop.swingx.RootPaneMessagingTest.ProgressComponent;
-import org.jdesktop.swingx.RootPaneMessagingTest.TestComponent;
+import org.jdesktop.swingx.event.MessageListener;
+import org.jdesktop.swingx.event.MessageSource;
+import org.jdesktop.swingx.event.MessageSourceSupport;
+import org.jdesktop.swingx.event.ProgressListener;
+import org.jdesktop.swingx.event.ProgressSource;
 
 /**
  * There are several commented out portions of this file. They should be moved
  * or changed once a "status bean" is implemented that provides the functionality
  * originally envisioned for the JXRootPane/JXStatusBar coupling
  */
-public class RootPaneTest extends TestCase {
+public class RootPaneMessagingTest extends TestCase {
 
     private Action[] actions;
     private TestComponent[] comps;
@@ -308,6 +320,147 @@ public class RootPaneTest extends TestCase {
 	    putValue(Action.LONG_DESCRIPTION, description);
 	}
 	public void actionPerformed(ActionEvent evt) {}
+    }
+
+    /**
+     * A panel with some buttons to fire progress messages.
+     */
+    public static class ProgressComponent extends TestComponent
+	implements ActionListener {
+
+	private JButton start, stop, progress;
+
+	public ProgressComponent() {
+	    super();
+	}
+
+	@Override
+    protected void initUI() {
+	    setBorder(BorderFactory.createTitledBorder("Progress Messages"));
+	    start = new JButton("Start");
+	    start.addActionListener(this);
+
+	    stop = new JButton("Stop");
+	    stop.addActionListener(this);
+
+	    progress = new JButton("Progress");
+	    progress.addActionListener(this);
+
+	    add(start);
+	    add(stop);
+	    add(progress);
+	}
+
+	public void actionPerformed(ActionEvent evt) {
+	    Object source = evt.getSource();
+	    if (source == start) {
+		support.fireProgressStarted(0,0);
+	    } else if (source == stop) {
+		support.fireProgressEnded();
+	    } else if (source == progress) {
+		doLongOperation();
+	    }
+	}
+
+	/**
+	 * Demonstrates how to use the progress bar feature.
+	 */
+	private void doLongOperation() {
+	    final int start = 0;
+	    final int stop = 100;
+
+	    // Initialized the progress start.
+	    support.fireProgressStarted(start, stop);
+
+	    final Timer timer = new Timer();
+
+	    TimerTask task = new TimerTask() {
+		    int progress = start;
+		    @Override
+            public void run() {
+			progress += 10;
+			if (progress > stop) {
+			    support.fireProgressEnded();
+			    timer.cancel();
+			} else {
+			    support.fireProgressIncremented(progress);
+			}
+		    }
+		};
+	    timer.schedule(task, 250L, 250L);
+
+
+	}
+
+    }
+
+
+    /**
+     * A test component which is a source of messages.
+     */
+    public static class TestComponent extends JPanel implements MessageSource,
+								ProgressSource {
+
+	protected  MessageSourceSupport support;
+	private JLabel label;
+	private String text;
+
+	public TestComponent(String text) {
+	    support = new MessageSourceSupport(this);
+	    addMouseListener(new MouseHandler());
+	    this.text = text;
+	    initUI();
+	}
+
+	public TestComponent() {
+	    this("TestComponent");
+	}
+
+	protected void initUI() {
+	    label = new JLabel(text);
+	    add(label);
+	}
+
+	public void addMessageListener(MessageListener l) {
+	    support.addMessageListener(l);
+	}
+
+	public void removeMessageListener(MessageListener l) {
+	    support.removeMessageListener(l);
+	}
+
+	public MessageListener[] getMessageListeners() {
+	    return support.getMessageListeners();
+	}
+
+	public void addProgressListener(ProgressListener l) {
+	    support.addProgressListener(l);
+	}
+
+	public void removeProgressListener(ProgressListener l) {
+	    support.removeProgressListener(l);
+	}
+
+	public ProgressListener[] getProgressListeners() {
+	    return support.getProgressListeners();
+	}
+
+	// Returns a message identifying this component.
+	public String getMessage() {
+	    return "I'm a " + text;
+	}
+
+	// Sends a persistent message to the any listeners.
+	public void sendMessage() {
+	    support.fireMessage(getMessage());
+	}
+
+	private class MouseHandler extends MouseAdapter {
+	    @Override
+        public void mouseEntered(MouseEvent evt) {
+		sendMessage();
+	    }
+	}
     }
 
 }
