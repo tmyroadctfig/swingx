@@ -13,14 +13,13 @@ import java.awt.event.MouseListener;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
+import javax.swing.JPanel;
 import javax.swing.JToolBar;
 
 import junit.framework.TestCase;
-
-import org.jdesktop.swingx.RootPaneMessagingTest.ProgressComponent;
-import org.jdesktop.swingx.RootPaneMessagingTest.TestComponent;
 
 /**
  * There are several commented out portions of this file. They should be moved
@@ -30,7 +29,7 @@ import org.jdesktop.swingx.RootPaneMessagingTest.TestComponent;
 public class RootPaneTest extends TestCase {
 
     private Action[] actions;
-    private TestComponent[] comps;
+    private JLabel[] comps;
 
     private static final int HEAD = 0;
     private static final int BODY = 1;
@@ -45,11 +44,11 @@ public class RootPaneTest extends TestCase {
 	actions[2] = new TestAction("Save", 'S', "Saves an item");
 	actions[3] = new TestAction("Exit", 'X', "Exits the application");
 
-	comps = new TestComponent[4];
-	comps[0] = new TestComponent("Head");
-	comps[1] = new TestComponent("Body");
-	comps[2] = new TestComponent("Arms");
-	comps[3] = new TestComponent("Legs");
+	comps = new JLabel[4];
+	comps[0] = new JLabel("Head");
+	comps[1] = new JLabel("Body");
+	comps[2] = new JLabel("Arms");
+	comps[3] = new JLabel("Legs");
     }
 
     @Override
@@ -66,7 +65,7 @@ public class RootPaneTest extends TestCase {
      * Simple test to ensure that components are added/removed
      * and registered/unregistered correctly.
      */
-    public void testComponentRegistration() {
+    public void JPanelRegistration() {
 	JXRootPane rootPane = new JXRootPane();
 	JXStatusBar statusBar = new JXStatusBar();
 	rootPane.setStatusBar(statusBar);
@@ -82,7 +81,7 @@ public class RootPaneTest extends TestCase {
 //	// status bar. The PERSISTENT message is sent to the
 //	// trailing message location.
 //	for (int i = 0; i < comps.length; i++) {
-//	    TestComponent comp = comps[i];
+//	    JPanel comp = comps[i];
 //	    comp.sendMessage();
 //	    assertEquals(comp.getMessage(), statusBar.getTrailingMessage());
 //	}
@@ -97,7 +96,7 @@ public class RootPaneTest extends TestCase {
 //	// Ensure that the status bar has been unregistered.
 //	statusBar.setTrailingMessage("");
 //	for (int i = 0; i < comps.length; i++) {
-//	    TestComponent comp = comps[i];
+//	    JPanel comp = comps[i];
 //	    comp.sendMessage();
 //	    assertEquals("", statusBar.getTrailingMessage());
 //	}
@@ -125,7 +124,7 @@ public class RootPaneTest extends TestCase {
 //	// The status bar should get all messages send to all
 //	// components.
 //	for (int i = 0; i < comps.length; i++) {
-//	    TestComponent comp = comps[i];
+//	    JPanel comp = comps[i];
 //	    comp.sendMessage();
 //	    assertEquals(comp.getMessage(), statusBar.getTrailingMessage());
 //	}
@@ -138,7 +137,7 @@ public class RootPaneTest extends TestCase {
 //	// Ensure that the status bar has been unregistered.
 //	statusBar.setTrailingMessage("");
 //	for (int i = 0; i < comps.length; i++) {
-//	    TestComponent comp = comps[i];
+//	    JPanel comp = comps[i];
 //	    comp.sendMessage();
 //	    assertEquals("", statusBar.getTrailingMessage());
 //	}
@@ -160,7 +159,7 @@ public class RootPaneTest extends TestCase {
 //	// The status bar should get all messages send to all
 //	// components.
 //	for (int i = 0; i < comps.length; i++) {
-//	    TestComponent comp = comps[i];
+//	    JPanel comp = comps[i];
 //	    comp.sendMessage();
 //	    assertEquals(comp.getMessage(), statusBar.getTrailingMessage());
 //	}
@@ -173,7 +172,7 @@ public class RootPaneTest extends TestCase {
 //	// Ensure that the status bar has been unregistered.
 //	statusBar.setTrailingMessage("");
 //	for (int i = 0; i < comps.length; i++) {
-//	    TestComponent comp = comps[i];
+//	    JPanel comp = comps[i];
 //	    comp.sendMessage();
 //	    assertEquals("", statusBar.getTrailingMessage());
 //	}
@@ -277,10 +276,10 @@ public class RootPaneTest extends TestCase {
 	JXRootPane rootPane = new JXRootPane();
 
 	Component[] comps = new Component[4];
-	comps[0] = new TestComponent("Head");
-	comps[1] = new TestComponent("Body");
-	comps[2] = new TestComponent("Arms");
-	comps[3] = new TestComponent("Legs");
+	comps[0] = new JLabel("Head");
+	comps[1] = new JLabel("Body");
+	comps[2] = new JLabel("Arms");
+	comps[3] = new JLabel("Legs");
 
 	rootPane.setStatusBar(new JXStatusBar());
 	rootPane.setToolBar(toolBar);
@@ -289,7 +288,7 @@ public class RootPaneTest extends TestCase {
 	for (int i = 0; i < comps.length; i++) {
 	    rootPane.add(comps[i]);
 	}
-	rootPane.add(new ProgressComponent());
+	rootPane.add(new JPanel());
 
 	JXFrame frame = new JXFrame();
 	frame.setRootPane(rootPane);
