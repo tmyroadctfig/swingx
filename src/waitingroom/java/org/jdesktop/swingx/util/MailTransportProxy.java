@@ -24,7 +24,7 @@ import java.util.List;
 
 /**
  * This is a proxy interface to allow usage of the JDIC mail transport for error logging
- * without adding dependensies on the JDIC itaelf.
+ * without adding dependencies on the JDIC itself.
  *
  * @author Alexander Zuev
  * @version 1.0
@@ -32,11 +32,11 @@ import java.util.List;
 public interface MailTransportProxy {
     /**
      * Compose and send message
-     * @param toAddr List of addresses to whom to send this mesage
+     * @param toAddr List of addresses to whom to send this message
      * @param ccAddr List of addresses to whom to carbon-copy this message
      * @param subject Message subject
      * @param body Message main text
-     * @param attach Pathis to files that needs to be send in attachment with this message
+     * @param attach Path to files that needs to be send in attachment with this message
      */
     public void mailMessage(List<String> toAddr, List<String> ccAddr,
                             String subject, String body, List<String> attach) throws Error;
