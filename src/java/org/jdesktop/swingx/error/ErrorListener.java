@@ -22,7 +22,6 @@
 package org.jdesktop.swingx.error;
 
 import java.util.EventListener;
-import org.jdesktop.swingx.*;
 
 /**
  * ErrorListener defines the interface for an object which listens to errors generated

@@ -25,8 +25,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Level;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
 import javax.swing.SwingUtilities;
 
 /**
@@ -149,7 +148,7 @@ public class ErrorInfo {
             //properties and the "state" at the time of this exception may not be
             //accurate!
             Properties props = System.getProperties();
-            for (Map.Entry entry : props.entrySet()) {
+            for (Map.Entry<Object, Object> entry : props.entrySet()) {
                 String key = entry.getKey() == null ? null : entry.getKey().toString();
                 String val = entry.getKey() == null ? null : entry.getValue().toString();
                 if (key != null) {

@@ -24,7 +24,7 @@ package org.jdesktop.swingx.error;
 import java.util.EventObject;
 
 /**
- * Defines an event which encapsulates an error which occured in a JX Swing component
+ * Defines an event which encapsulates an error which occurred in a JX Swing component
  * which supports ErrorListeners.
  *
  * @author Joshua Marinacci joshua.marinacci@sun.com
