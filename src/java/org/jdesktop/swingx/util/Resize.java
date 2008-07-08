@@ -30,7 +30,9 @@ package org.jdesktop.swingx.util;
  * no resizing whatsoever.
  *
  * @author rbair
+ * @deprecated no longer used
  */
+@Deprecated
 public enum Resize {
     HORIZONTAL,
     VERTICAL,
