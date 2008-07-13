@@ -4446,5 +4446,17 @@ public class JXTable extends JTable
         repaint();
     }
 
+    /**
+     * {@inheritDoc} <p>
+     * Overridden because super throws NPE on null param.
+     */
+    @Override
+    public void setGridColor(Color gridColor) {
+        Color old = getGridColor();
+        this.gridColor = gridColor;
+        firePropertyChange("gridColor", old, getGridColor());
+        repaint();
+    }
+
     
 }

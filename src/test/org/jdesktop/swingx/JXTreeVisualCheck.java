@@ -74,11 +74,11 @@ public class JXTreeVisualCheck extends JXTreeUnitTest {
 //      setSystemLF(true);
       JXTreeVisualCheck test = new JXTreeVisualCheck();
       try {
-//          test.runInteractiveTests();
+          test.runInteractiveTests();
 //          test.runInteractiveTests("interactive.*RToL.*");
 //          test.runInteractiveTests("interactive.*Revalidate.*");
 //          test.runInteractiveTests("interactiveRootExpansionTest");
-        test.runInteractiveTests("interactive.*Selection.*");
+//        test.runInteractiveTests("interactive.*Selection.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
@@ -108,7 +108,7 @@ public class JXTreeVisualCheck extends JXTreeUnitTest {
             }
             
         };
-        JXFrame frame = wrapWithScrollingInFrame(tree, "selection colors");
+        JXFrame frame = wrapWithScrollingInFrame(tree, "selection color property in JXTree");
         addAction(frame, toggleSelectionColors);
         show(frame);
     }
@@ -137,7 +137,7 @@ public class JXTreeVisualCheck extends JXTreeUnitTest {
             }
             
         };
-        JXFrame frame = wrapWithScrollingInFrame(tree, "selection colors- compare list repaint");
+        JXFrame frame = wrapWithScrollingInFrame(tree, "selection color property - compare list repaint");
         addAction(frame, toggleSelectionColors);
         show(frame);
     }
@@ -160,17 +160,9 @@ public class JXTreeVisualCheck extends JXTreeUnitTest {
             }
             
         };
-        
-        WrappingProvider provider = new WrappingProvider(IconValue.NONE,  sv) {
-
-            @Override
-            protected Object adjustContextValue(CellContext context) {
-                return context.getValue();
-            }
-            
-            
-        };
-        tree.setCellRenderer(new DefaultTreeRenderer(provider));
+        DefaultTreeRenderer renderer = new DefaultTreeRenderer(IconValue.NONE, sv);
+        ((WrappingProvider) renderer.getComponentProvider()).setUnwrapUserObject(false);
+        tree.setCellRenderer(renderer);
         JXFrame frame = wrapWithScrollingInFrame(tree, "WrappingProvider: no icons, no unwrapped userObject");
         frame.pack();
         frame.setSize(400, 200);
@@ -262,9 +254,11 @@ public class JXTreeVisualCheck extends JXTreeUnitTest {
             
         };
         addAction(frame, handleVisible);
-        frame.pack();
-        frame.setSize(400, 400);
-        frame.setVisible(true);
+        addComponentOrientationToggle(frame);
+        show(frame, 400, 400);
+//        frame.pack();
+//        frame.setSize(400, 400);
+//        frame.setVisible(true);
     }
 
     /**
@@ -360,46 +354,18 @@ public class JXTreeVisualCheck extends JXTreeUnitTest {
     /**
      * visualize editing of the hierarchical column, both
      * in a tree and a xTree switching CO.
-     *
-     * standard editor
-     */
-    public void interactiveTreeEditingRToL() {
-        JTree tree =  new JTree(); 
-        tree.setEditable(true);
-        JXTree xTree = new JXTree();
-        xTree.setEditable(true);
-        final JXFrame frame = wrapWithScrollingInFrame(tree, xTree, "standard Editing: compare tree and xtree");
-        addComponentOrientationToggle(frame);
-        frame.setVisible(true);
-        
-    }
-
-
-
-    /**
-     * visualize editing of the hierarchical column, both
-     * in a tree and a xTree switching CO.
      * using DefaultXTreeCellEditor.
      */
     public void interactiveXTreeEditingRToL() {
         JTree tree =  new JTree(); 
         tree.setEditable(true);
-        DefaultTreeCellRenderer renderer = new DefaultTreeCellRenderer();
-        tree.setCellRenderer(renderer);
-        tree.setCellEditor(new DefaultXTreeCellEditor(tree, renderer));
         JXTree xTree = new JXTree();
+        xTree.setCellRenderer(new DefaultTreeRenderer());
         xTree.setEditable(true);
-        // JW: changed xTree to use the xEditor by default
-//        TreeCellRenderer xRenderer = xTree.getCellRenderer();
-//        if (xRenderer instanceof JXTree.DelegatingRenderer) {
-//            TreeCellRenderer delegate = ((JXTree.DelegatingRenderer) xRenderer).getDelegateRenderer();
-//            if (delegate instanceof DefaultTreeCellRenderer) { 
-//                xTree.setCellEditor(new DefaultXTreeCellEditor(xTree, (DefaultTreeCellRenderer) delegate));
-//            }   
-//        }
-        final JXFrame frame = wrapWithScrollingInFrame(tree, xTree, "XEditing: compare tree and xtree");
+        final JXFrame frame = wrapWithScrollingInFrame(xTree, tree, "XEditing: compare JXTree vs. JTree");
         addComponentOrientationToggle(frame);
-        frame.setVisible(true);
+        addMessage(frame, "JXTree configured with SwingX renderer/treeEditor");
+        show(frame);
         
     }
 
@@ -411,10 +377,12 @@ public class JXTreeVisualCheck extends JXTreeUnitTest {
      */
     public void interactiveUnselectedFocusedBackground() {
         JXTree xtree = new JXTree(treeTableModel);
+        xtree.setCellRenderer(new DefaultTreeRenderer());
         xtree.setBackground(new Color(0xF5, 0xFF, 0xF5));
         JTree tree = new JTree(treeTableModel);
         tree.setBackground(new Color(0xF5, 0xFF, 0xF5));
-        showWithScrollingInFrame(xtree, tree, "Unselected focused background: JXTree/JTree" );
+        JXFrame frame = wrapWithScrollingInFrame(xtree, tree, "Unselected focused background: JXTree/JTree" );
+        addMessage(frame, "xtree uses swingx renderer");
     }
 
     /**
@@ -431,16 +399,6 @@ public class JXTreeVisualCheck extends JXTreeUnitTest {
         showWithScrollingInFrame(tree, "foreground rollover, custom cursor " );
     }
 
-    /**
-     * Issue ??: Background highlighters not working on JXTree.
-     *
-     */
-    public void interactiveTestRolloverHighlightForeground() {
-        JXTree tree = new JXTree(treeTableModel);
-        tree.setRolloverEnabled(true);
-        tree.setHighlighters(createRolloverHighlighter(true));
-        showWithScrollingInFrame(tree, "Rollover - foreground " );
-    }
 
     public void interactiveTestDepthHighlighter() {
         JXTree tree = new JXTree(treeTableModel);
@@ -465,7 +423,9 @@ public class JXTreeVisualCheck extends JXTreeUnitTest {
         tree.setRolloverEnabled(true);
         tree.setCellRenderer(new DefaultTreeRenderer());
         tree.setHighlighters(createRolloverHighlighter(false));
-        showWithScrollingInFrame(tree, "Rollover - background " );
+        JXFrame frame = wrapWithScrollingInFrame(tree, "Rollover - background " );
+        addMessage(frame, "here we use a SwingX renderer - backgound okay");
+        show(frame);
     }
     
     private Highlighter createRolloverHighlighter(boolean useForeground) {
@@ -487,16 +447,22 @@ public class JXTreeVisualCheck extends JXTreeUnitTest {
     
     /**
      * Issue ??: Background highlighters not working on JXTree.
+     * 
+     * It's a problem of core DefaultTreeCellRenderer. SwingX renderers are okay.
      *
      */
     public void interactiveTestHighlighters() {
         JXTree tree = new JXTree(treeTableModel);
         String pattern = "o";
-        tree.setHighlighters(new ColorHighlighter(new PatternPredicate(Pattern.compile(pattern), 0), null, 
-                Color.red),
+        tree.setHighlighters(new ColorHighlighter(new PatternPredicate(Pattern.compile(pattern), 0), 
+                Color.YELLOW, 
+                Color.RED),
                 HighlighterFactory.createSimpleStriping(HighlighterFactory.LINE_PRINTER));
-        showWithScrollingInFrame(tree, "Highlighters: " + pattern);
+        JXFrame frame = wrapWithScrollingInFrame(tree, "Foreground/background Highlighter: " + pattern);
+        addMessage(frame, "here we use a core default renderer - background highlighter not working!");
+        show(frame);
     }
+    
     
     
     public void interactiveTestToolTips() {
@@ -508,9 +474,7 @@ public class JXTreeVisualCheck extends JXTreeUnitTest {
         // should JXTree? 
         ToolTipManager toolTipManager = ToolTipManager.sharedInstance();
         toolTipManager.registerComponent(tree);
-        JFrame frame = wrapWithScrollingInFrame(tree, "tooltips");
-        frame.setVisible(true);  
-
+        showWithScrollingInFrame(tree, "tooltips");
     }
     
     
@@ -538,8 +502,7 @@ public class JXTreeVisualCheck extends JXTreeUnitTest {
         JXTree tree = new JXTree(treeTableModel);
         tree.setDragEnabled(true);
         tree.putClientProperty("JTree.lineStyle", "None");
-        JFrame frame = wrapWithScrollingInFrame(tree, "LineStyle Test");
-        frame.setVisible(true);  
+        showWithScrollingInFrame(tree, "LineStyle Test - none");
     }
 
     /**    
@@ -568,60 +531,11 @@ public class JXTreeVisualCheck extends JXTreeUnitTest {
                 "Toggle Tree properties ");
         addAction(frame, toggleRoot);
         addAction(frame, toggleHandles);
-        frame.setVisible(true);
-    }
-    
-    /**    
-     * setting tree properties: scrollsOnExpand.
-     * does nothing...
-     * 
-     */    
-    public void interactiveTestTreeExpand() {
-        final JXTree treeTable = new JXTree(treeTableModel);
-        Action toggleScrolls = new AbstractAction("Toggle Scroll") {
-
-            public void actionPerformed(ActionEvent e) {
-                treeTable.setScrollsOnExpand(!treeTable.getScrollsOnExpand());
-                
-            }
-            
-        };
-         Action expand = new AbstractAction("Expand") {
-
-            public void actionPerformed(ActionEvent e) {
-                int[] selectedRows = treeTable.getSelectionRows();
-                if (selectedRows.length > 0) {
-                    treeTable.expandRow(selectedRows[0]);
-                }
-               
-            }
-            
-        };
- 
-        treeTable.setRowHeight(22);
-        JXFrame frame = wrapWithScrollingInFrame(treeTable,
-                "Toggle Tree expand properties ");
-        addAction(frame, toggleScrolls);
-        addAction(frame, expand);
-        frame.setVisible(true);
+        show(frame);
     }
     
 
     
-    /**
-     * test if showsRootHandles client property is respected by JXTree.
-     */
-    public void interactiveTestShowsRootHandles() {
-        JXTree tree = new JXTree(treeTableModel);
-        tree.setShowsRootHandles(false);
-        tree.setRootVisible(false);
-        JXTree otherTree = new JXTree(treeTableModel);
-        otherTree.setRootVisible(true);
-        otherTree.setShowsRootHandles(false);
-        JFrame frame = wrapWithScrollingInFrame(tree, otherTree, "ShowsRootHandles");
-        frame.setVisible(true);  
-    }
-
     /**
      * Ensure that the root node is expanded if invisible and child added.
      */
@@ -646,6 +560,6 @@ public class JXTreeVisualCheck extends JXTreeUnitTest {
  
         JXFrame frame = wrapWithScrollingInFrame(tree, "Root Node Expansion Test");
         addAction(frame, addChild);
-        frame.setVisible(true);
+        show(frame);
     }
 }

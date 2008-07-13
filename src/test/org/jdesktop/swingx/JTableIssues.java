@@ -26,6 +26,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellEditor;
@@ -173,12 +174,26 @@ public class JTableIssues extends InteractiveTestCase {
         assertEquals("", 1, report.getStoppedEventCount());
     }
 
+
+    /**
+     * core issue: JTable cannot cope with null selection background.
+     *
+     */
+    public void testNullGridColor() {
+        JTable table = new JTable();
+//        assertNotNull(UIManager.getColor("Table.gridColor"));
+        assertNotNull(table.getGridColor());
+        assertEquals(UIManager.getColor("Table.gridColor"), table.getGridColor());
+        table.setGridColor(null);
+    }
+
     /**
      * core issue: JTable cannot cope with null selection background.
      *
      */
     public void testNullSelectionBackground() {
         JTable table = new JTable();
+        assertNotNull(table.getSelectionBackground());
         table.setSelectionBackground(null);
     }
     

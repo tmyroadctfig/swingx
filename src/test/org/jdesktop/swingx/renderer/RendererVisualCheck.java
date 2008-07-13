@@ -98,6 +98,8 @@ import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
 import org.jdesktop.swingx.decorator.PatternPredicate;
+import org.jdesktop.swingx.decorator.HighlightPredicate.AndHighlightPredicate;
+import org.jdesktop.swingx.decorator.HighlightPredicate.ColumnHighlightPredicate;
 import org.jdesktop.swingx.hyperlink.EditorPaneLinkVisitor;
 import org.jdesktop.swingx.hyperlink.LinkModel;
 import org.jdesktop.swingx.hyperlink.LinkModelAction;
@@ -325,6 +327,9 @@ public class RendererVisualCheck extends InteractiveTestCase {
         table.setTreeCellRenderer(treeRenderer);
         final JXTree tree = new JXTree(model);
         tree.setCellRenderer(treeRenderer);
+        tree.setRolloverEnabled(true);
+        tree.addHighlighter(new BorderHighlighter(HighlightPredicate.ROLLOVER_ROW, 
+                BorderFactory.createLineBorder(Color.BLUE)));
         // string based. Note: this example is locale dependent
         String folderDescription = ".*ordner.*";
         PatternPredicate predicate = new PatternPredicate(Pattern.compile(folderDescription, 0), 0, -1);
