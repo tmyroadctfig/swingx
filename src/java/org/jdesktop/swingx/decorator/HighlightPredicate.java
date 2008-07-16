@@ -38,6 +38,13 @@ import org.jdesktop.swingx.util.Contract;
  * This is a on/off <b>decision</b> only, the actual decoration is
  * left to the AbstractHighlighter which typically respects this predicate. <p>
  * 
+ * Note: implementations should be immutable because <code>Highlighter</code>s 
+ * guarantee to notify listeners on any state change which might effect the highlight. 
+ * They can't comply to that contract if predicate internal state changes under their 
+ * feet. If dynamic predicate state is required, the safe alternative is to create 
+ * and set a new predicate.<p>
+ * 
+ * 
  * @author Jeanette Winzenburg
  * 
  * @see AbstractHighlighter
@@ -107,9 +114,6 @@ public interface HighlightPredicate {
          */
         public boolean isHighlighted(Component renderer, ComponentAdapter adapter) {
             if (!adapter.getComponent().isEnabled()) return false;
-            // JW: where to put constants? 
-            // this is a back-reference into swingx simply to access
-            // a string constant. Hmmm...
             Point p = (Point) adapter.getComponent().getClientProperty(
                     RolloverProducer.ROLLOVER_KEY);
             return p != null &&  p.y == adapter.row;
@@ -477,14 +481,15 @@ public interface HighlightPredicate {
         /**
          * {@inheritDoc}
          * 
-         * This implementation returns true if the adapter's depth
-         * is contained in this predicates list.
+         * This implementation returns true if the adapter's depth is contained
+         * in this predicates list.
          * 
          */
-		public boolean isHighlighted(Component renderer, ComponentAdapter adapter) {
+        public boolean isHighlighted(Component renderer,
+                ComponentAdapter adapter) {
             int depth = adapter.getDepth();
             return depthList.contains(depth);
-		}
+        }
     	
     }
     
