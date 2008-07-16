@@ -23,6 +23,7 @@ package org.jdesktop.swingx.renderer;
 
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 
 import javax.swing.JCheckBox;
 
@@ -43,23 +44,38 @@ public class JRendererCheckBox extends JCheckBox implements PainterAware {
     /**
      * {@inheritDoc}
      */
+    public Painter getPainter() {
+        return painter;
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
     public void setPainter(Painter painter) {
         this.painter = painter;
         if (painter != null) {
             // ui maps to !opaque
             // Note: this is incomplete - need to keep track of the 
             // "real" contentfilled property
+            // JW: revisit - really needed after fix for #897?
             setContentAreaFilled(false);
-        }
+        } // PENDING JW: asymetric! no else?
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritDoc} <p>
+     * 
+     * Overridden to return true if there is no painter.<p>
+     * 
      */
-    public Painter getPainter() {
-        return painter;
+    @Override
+    public boolean isOpaque() {
+        // JW: fix for #897, not sure of any side-effects
+        // contentAreaFilled and opaque might be inconsistent
+        return painter == null;
     }
-    
+
     /**
      * {@inheritDoc} <p>
      * 
@@ -132,21 +148,81 @@ public class JRendererCheckBox extends JCheckBox implements PainterAware {
         }
 
     }
+    
     /**
-     * Overridden for performance reasons.<p>
-     * PENDING: Think about Painters and opaqueness?
-     * 
+     * Overridden for performance reasons.
+     * See the <a href="#override">Implementation Note</a> 
+     * for more information.
+     *
+     * @since 1.5
      */
-    //        public boolean isOpaque() { 
-    //            Color back = getBackground();
-    //            Component p = getParent(); 
-    //            if (p != null) { 
-    //                p = p.getParent(); 
-    //            }
-    //            // p should now be the JTable. 
-    //            boolean colorMatch = (back != null) && (p != null) && 
-    //                back.equals(p.getBackground()) && 
-    //                            p.isOpaque();
-    //            return !colorMatch && super.isOpaque(); 
-    //        }
+    @Override
+    public void invalidate() {}
+
+    /**
+     * Overridden for performance reasons.
+     * See the <a href="#override">Implementation Note</a> 
+     * for more information.
+     */
+    @Override
+    public void validate() {}
+
+    /**
+     * Overridden for performance reasons.
+     * See the <a href="#override">Implementation Note</a> 
+     * for more information.
+     */
+    @Override
+    public void revalidate() {}
+
+    /**
+     * Overridden for performance reasons.
+     * See the <a href="#override">Implementation Note</a> 
+     * for more information.
+     */
+    @Override
+    public void repaint(long tm, int x, int y, int width, int height) {}
+
+    /**
+     * Overridden for performance reasons.
+     * See the <a href="#override">Implementation Note</a> 
+     * for more information.
+     */
+    @Override
+    public void repaint(Rectangle r) { }
+
+    /**
+     * Overridden for performance reasons.
+     * See the <a href="#override">Implementation Note</a> 
+     * for more information.
+     *
+     * @since 1.5
+     */
+    @Override
+    public void repaint() {
+    }
+
+    /**
+     * Overridden for performance reasons.
+     * See the <a href="#override">Implementation Note</a> 
+     * for more information.
+     */
+    @Override
+    protected void firePropertyChange(String propertyName, Object oldValue, Object newValue) {  
+        // Strings get interned...
+        if ("text".equals(propertyName)) {
+            super.firePropertyChange(propertyName, oldValue, newValue);
+        }
+    }
+
+    /**
+     * Overridden for performance reasons.
+     * See the <a href="#override">Implementation Note</a> 
+     * for more information.
+     */
+    @Override
+    public void firePropertyChange(String propertyName, boolean oldValue, boolean newValue) { }
+
+
+
 }

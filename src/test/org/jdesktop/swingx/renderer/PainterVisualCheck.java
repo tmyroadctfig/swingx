@@ -25,16 +25,20 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.GradientPaint;
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.Polygon;
+import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
+import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -65,7 +69,9 @@ import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
 import org.jdesktop.swingx.decorator.PainterHighlighter;
 import org.jdesktop.swingx.decorator.HighlightPredicate.ColumnHighlightPredicate;
+import org.jdesktop.swingx.decorator.HighlightPredicate.NotHighlightPredicate;
 import org.jdesktop.swingx.painter.AbstractLayoutPainter;
+import org.jdesktop.swingx.painter.AbstractPainter;
 import org.jdesktop.swingx.painter.BusyPainter;
 import org.jdesktop.swingx.painter.ImagePainter;
 import org.jdesktop.swingx.painter.MattePainter;
@@ -98,10 +104,10 @@ public class PainterVisualCheck extends InteractiveTestCase {
 //      setSystemLF(true);
       PainterVisualCheck test = new PainterVisualCheck();
       try {
-//        test.runInteractiveTests();
+        test.runInteractiveTests();
 //         test.runInteractiveTests("interactive.*Gradient.*");
 //         test.runInteractiveTests("interactive.*Icon.*");
-        test.runInteractiveTests("interactive.*Animated.*");
+//        test.runInteractiveTests("interactive.*Animated.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
@@ -361,6 +367,8 @@ public class PainterVisualCheck extends InteractiveTestCase {
             }
             
         };
+        // JW: how do we ask for the height of the painter?
+        table.setRowHeight(26);
         PainterHighlighter iconHighlighter = new PainterHighlighter();
         iconHighlighter.setHighlightPredicate(HighlightPredicate.ROLLOVER_ROW);
         iconHighlighter.setPainter(busyPainter);
@@ -374,7 +382,7 @@ public class PainterVisualCheck extends InteractiveTestCase {
         };
         table.addHighlighter(iconHighlighter);
         showWithScrollingInFrame(table, 
-                "Animated highlighter: marching icon on rollover");
+                "Animated highlighter: BusyPainter on Rollover");
         Timer timer = new Timer(100, l);
         timer.start();
     }
@@ -422,6 +430,103 @@ public class PainterVisualCheck extends InteractiveTestCase {
         Timer timer = new Timer(100, l);
         timer.start();
     }
+
+    
+    /**
+     * Use custom painter and highlighter for per-row image decoration.
+     * 
+     * @throws IOException
+     */
+    public void interactivePerRowImage() throws IOException {
+        
+        JXTable table = new JXTable(new AncientSwingTeam());
+        table.setForeground(Color.MAGENTA);
+        table.setSelectionForeground(Color.BLUE);
+        table.setColumnControlVisible(true);
+        table.setRowHeight(25);
+        final BufferedImage moon = XTestUtils.loadDefaultImage("moon.jpg");
+        final BufferedImage rocket = XTestUtils.loadDefaultImage("500by500.png");
+        HighlightPredicate rocketPredicate = new HighlightPredicate() {
+
+            public boolean isHighlighted(Component renderer,
+                    ComponentAdapter adapter) {
+                return ((Integer) adapter.getValue(3)).intValue() < 50;
+            }
+            
+        };
+        HighlightPredicate moonPredicate = new NotHighlightPredicate(rocketPredicate);
+        table.setHighlighters(
+                new SubImagePainterHighlighter(rocketPredicate, 
+                        new SubImagePainter(rocket))
+                ,
+                new SubImagePainterHighlighter(moonPredicate, 
+                        new SubImagePainter(moon))
+        );
+        JXFrame frame = wrapWithScrollingInFrame(table, "painter in renderer");
+        show(frame);
+    }
+    
+    /**
+     * Custom PainterHighlighter configures a SubImagePainter.
+     * 
+     */
+    public static class SubImagePainterHighlighter extends PainterHighlighter {
+
+        
+        public SubImagePainterHighlighter(HighlightPredicate predicate, SubImagePainter painter) {
+            super(predicate, painter);
+        }
+        
+        @Override
+        protected Component doHighlight(Component component,
+                ComponentAdapter adapter) {
+            Rectangle cellRect = getCellBounds(adapter);
+            ((SubImagePainter) getPainter()).setImageClip(cellRect);
+            return super.doHighlight(component, adapter);
+        }
+        
+        private Rectangle getCellBounds(ComponentAdapter adapter) {
+            // PENDING JW: add method to adapter
+            JXTable table = (JXTable) adapter.getComponent();
+            Rectangle cellRect = table.getCellRect(adapter.row, 
+                    adapter.column, false);
+            return cellRect;
+        }
+
+        
+    }
+    
+    /**
+     * Simple Painter for subimage.
+     */
+    public static class SubImagePainter extends AbstractPainter {
+        BufferedImage image;
+        Rectangle imageClip;
+
+        public SubImagePainter(BufferedImage image) {
+            super(false);
+            this.image = image;
+        }
+        
+        public void setImageClip(Rectangle imageClip) {
+            this.imageClip = imageClip;
+        }
+        
+        @Override
+        protected void doPaint(Graphics2D g, Object object, int width,
+                int height) {
+            if ((imageClip == null) || (imageClip.width <= 0) || (imageClip.height <= 0)) return;
+            if (imageClip.x + width >= image.getWidth()) return;
+            if (imageClip.y + height >= image.getWidth()) return;
+            Image subImage = image.getSubimage(
+                    imageClip.x, imageClip.y, 
+                    width, height);
+            g.drawImage(subImage, 0, 0, width, height, null);
+            
+        }
+        
+    }
+    
 
     //  ----------------- Transparent gradient on default (swingx) rendering label
 

@@ -97,13 +97,13 @@ import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
+import org.jdesktop.swingx.decorator.PainterHighlighter;
 import org.jdesktop.swingx.decorator.PatternPredicate;
-import org.jdesktop.swingx.decorator.HighlightPredicate.AndHighlightPredicate;
-import org.jdesktop.swingx.decorator.HighlightPredicate.ColumnHighlightPredicate;
 import org.jdesktop.swingx.hyperlink.EditorPaneLinkVisitor;
 import org.jdesktop.swingx.hyperlink.LinkModel;
 import org.jdesktop.swingx.hyperlink.LinkModelAction;
 import org.jdesktop.swingx.hyperlink.LinkRenderer;
+import org.jdesktop.swingx.painter.BusyPainter;
 import org.jdesktop.swingx.table.ColumnControlButton;
 import org.jdesktop.swingx.test.ComponentTreeTableModel;
 import org.jdesktop.swingx.test.XTestUtils;
@@ -132,7 +132,21 @@ public class RendererVisualCheck extends InteractiveTestCase {
             e.printStackTrace();
         }
     }
+
     
+    /**
+     * Issue #897-swingx: Opacity issues of JRendererCheckBox - striping lost.
+     * 
+     *  Reported against Nimbus, but similar in other LAFs if combined
+     *  with Painter.
+     */
+    public void interactiveCheckBoxRenderer() {
+        JXTable table = new JXTable(new AncientSwingTeam());
+        table.addHighlighter(HighlighterFactory.createSimpleStriping());
+        table.addHighlighter(new PainterHighlighter(HighlightPredicate.ROLLOVER_ROW, new BusyPainter()));
+        showWithScrollingInFrame(table, "Checkbox: striping lost on rollover");
+    }
+
     /**
      * List/tree filled with TreeNodes wrapping a File.
      * 

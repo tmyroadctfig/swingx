@@ -23,6 +23,7 @@ package org.jdesktop.swingx.renderer;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
@@ -64,6 +65,7 @@ import org.jdesktop.swingx.painter.Painter;
 public class JRendererLabel extends JLabel implements PainterAware {
 
     protected Painter painter;
+    private boolean strict;
 
     /**
      * 
@@ -153,6 +155,20 @@ public class JRendererLabel extends JLabel implements PainterAware {
             scratch.dispose();
         }
     }
+    
+//    public void setStrictWidth(boolean strict) {
+//        this.strict = strict;
+//    }
+//
+//    @Override
+//    public Dimension getMaximumSize() {
+//        if (strict) {
+//            return super.getMaximumSize();
+//        }
+//        Dimension max = super.getMaximumSize();
+//        max.width = Integer.MAX_VALUE - 1;
+//        return max;
+//    }
 
     /**
      * PRE: painter != null, isOpaque()

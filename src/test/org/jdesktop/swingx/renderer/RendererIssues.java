@@ -103,7 +103,7 @@ public class RendererIssues extends InteractiveTestCase {
         RendererIssues test = new RendererIssues();
         try {
 //            test.runInteractiveTests();
-          test.runInteractiveTests("interactive.*ToolTip.*");
+          test.runInteractiveTests("interactive.*CheckBox.*");
 //          test.runInteractiveTests(".*XLabel.*");
 //          test.runInteractiveTests(".*Color.*");
 //          test.runInteractiveTests("interactive.*ColumnControl.*");
@@ -114,6 +114,8 @@ public class RendererIssues extends InteractiveTestCase {
         }
     }
 
+    
+    
     /**
      * example to configure treeTable hierarchical column with
      * custom icon and content mapping. The nodes are actually of type File.

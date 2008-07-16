@@ -298,7 +298,10 @@ public class RenderingTest extends TestCase {
        PropertyChangeReport report = new PropertyChangeReport();
        label.addPropertyChangeListener(report);
        label.setToolTipText(tip);
-       TestUtils.assertPropertyChangeEvent(report, JComponent.TOOL_TIP_TEXT_KEY, null, tip);
+       // JRendererCheckBox is optimized to not fire any property changes
+       assertEquals(0, report.getEventCount());
+       // nevertheless, we want the tip set ;-)
+       assertEquals(tip, label.getToolTipText());
        assertToolTipManagerNotRegistered(label);
     }
 
