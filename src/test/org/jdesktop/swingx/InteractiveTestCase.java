@@ -144,8 +144,9 @@ public abstract class InteractiveTestCase extends junit.framework.TestCase {
     }
 
     /**
-     * Creates and returns a JXFrame with the specified title, containing
-     * the component.
+     * Creates and returns a JXFrame with the specified title, containing the
+     * component. First frame get's the menubar as defined by
+     * createAndFillMenuBar. Closing the first frame will exit.
      * 
      * @param component the JComponent to wrap
      * @param title the title to show in the frame
@@ -160,7 +161,8 @@ public abstract class InteractiveTestCase extends junit.framework.TestCase {
         frame.setLocation(frameLocation);
         if (frameLocation.x == 0) {
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.setTitle(title+"  [close me and all tests will close]");
+            frame.setTitle(title + "  [close me and all tests will close]");
+            frame.setJMenuBar(createAndFillMenuBar(component));
         }
         frameLocation.x += 30;
         frameLocation.y += 30;

@@ -39,11 +39,16 @@ import javax.swing.AbstractButton;
 import javax.swing.AbstractListModel;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.Icon;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JRadioButton;
+import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListModel;
@@ -68,6 +73,7 @@ import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.JXTree;
 import org.jdesktop.swingx.JXTreeTable;
 import org.jdesktop.swingx.border.DropShadowBorder;
+import org.jdesktop.swingx.color.ColorUtil;
 import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
@@ -103,7 +109,7 @@ public class RendererIssues extends InteractiveTestCase {
         RendererIssues test = new RendererIssues();
         try {
 //            test.runInteractiveTests();
-          test.runInteractiveTests("interactive.*CheckBox.*");
+          test.runInteractiveTests("interactive.*Alpha.*");
 //          test.runInteractiveTests(".*XLabel.*");
 //          test.runInteractiveTests(".*Color.*");
 //          test.runInteractiveTests("interactive.*ColumnControl.*");
@@ -115,6 +121,79 @@ public class RendererIssues extends InteractiveTestCase {
     }
 
     
+    /**
+     * Issue ??-swingx: Boolean renderer background is slightly darker if 
+     * background color is part-transparent.
+     * 
+     * Not only checkbox as renderer - there seem to be subtle differences 
+     * when painting buttons, labels, ... plus it's laf dependent.
+     * 
+     */
+    public void interactiveAlphaBackground() {
+        Color color = ColorUtil.setAlpha(Color.ORANGE, 60);
+        
+        JCheckBox check = new JCheckBox("what's my color?");
+//        check.setOpaque(true);
+//        check.setContentAreaFilled(true);
+        check.setBackground(color);
+        JLabel label = new JLabel("and mine?");
+        label.setOpaque(true);
+        label.setBackground(color );
+        JButton button = new JButton("the new kid on the block");
+        button.setBackground(color);
+        
+        JRadioButton radio = new JRadioButton("radio, raadio ..");
+        radio.setBackground(color);
+        
+        JTextField field = new JTextField(40);
+        field.setBackground(color);
+        JComponent box = Box.createVerticalBox();
+        box.setOpaque(true);
+        box.setBackground(Color.WHITE);
+        box.add(check);
+        box.add(radio);
+        box.add(label);
+        box.add(button);
+        box.add(field);
+        JXFrame frame = wrapInFrame(box, "alpha in plain ..", true);
+        show(frame, 400, 200);
+        
+    }
+
+    /**
+     * Issue ??-swingx: Boolean renderer background is slightly darker if 
+     * background color is part-transparent.
+     * 
+     */
+    public void interactiveCheckBoxAlpha() {
+        JXTable table = new JXTable(new org.jdesktop.test.AncientSwingTeam());
+        table.addHighlighter(new RowHighlighter(new HighlightPredicate() {
+            public boolean isHighlighted(Component renderer, ComponentAdapter adapter) {
+                return ((Boolean) adapter.getValue(4)).booleanValue();
+            }
+        }));
+        showWithScrollingInFrame(table, "boolean renderer and alpha background");
+        
+    }
+
+    static class RowHighlighter extends ColorHighlighter {
+        Font BOLD_FONT;
+
+        RowHighlighter(HighlightPredicate predicate) {
+            super(predicate, ColorUtil.setAlpha(Color.ORANGE, 60), Color.RED);
+        }
+
+        @Override
+        protected Component doHighlight(Component renderer, ComponentAdapter adapter) {
+            renderer.setForeground(getForeground());
+            if (BOLD_FONT == null) {
+                BOLD_FONT = renderer.getFont().deriveFont(Font.BOLD);
+            }
+            renderer.setFont(BOLD_FONT);
+            return super.doHighlight(renderer, adapter);
+        }
+    }
+
     
     /**
      * example to configure treeTable hierarchical column with
