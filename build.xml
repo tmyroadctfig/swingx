@@ -6,7 +6,7 @@
     <description>Builds, tests, and runs the project swingx.</description>
     <import file="swinglabs-build-impl.xml"/>
     <import file="nbproject/build-impl.xml"/>
-    
+
     <!-- This target builds a jar called swingx-bean.jar. This jar contains
          JavaBean class, as well as the basic support classes in the beaninfo
          source tree. It is intended to be small, and useable by other projects
@@ -25,7 +25,7 @@
         </copy>
         <jar basedir="${build.dir}/swingx-bean" jarfile="dist/swingx-bean.jar" />
     </target>
-    
+
     <target name="nbm" description="Generate a NetBeans Module" depends="init,jar,javadoc">
         <taskdef classpath="lib/build-only/beans2nbm.jar" classname="beans2nbm.ant.GenNbmTask" name="nbm"/>
 
@@ -36,21 +36,21 @@
                 <exclude name="**/CVS"/>
             </fileset>
         </zip>
-        
+
         <nbm destfolder="${dist.bundles.dir}"
             destfilename="org-jdesktop-swingx.nbm"
-            description="SwingX extension components are additional Swing 
-                         components that supplement the base set available 
-                         in the JDK." 
-            version="0.9" 
+            description="SwingX extension components are additional Swing
+                         components that supplement the base set available
+                         in the JDK."
+            version="0.9.3"
             homepage="http://swinglabs.org"
-            codename="org.jdesktop.swingx" 
-            jarfilename="${dist.dir}/swingx.jar" 
-            author="The SwingX Team" 
-            displayname="SwingX" 
+            codename="org.jdesktop.swingx"
+            jarfilename="${dist.dir}/swingx.jar"
+            author="The SwingX Team"
+            displayname="SwingX"
             license="lgpl"
-            minjdk="1.5" 
-            sourcejar="${build.dir}/nbm-swingx-src.zip" 
+            minjdk="1.5"
+            sourcejar="${build.dir}/nbm-swingx-src.zip"
             docsjar="${build.dir}/nbm-swingx-javadoc.zip">
                 <bean>org/jdesktop/swingx/JXCollapsiblePane.class</bean>
                 <bean>org/jdesktop/swingx/JXDatePicker.class</bean>
@@ -70,6 +70,50 @@
                 <bean>org/jdesktop/swingx/JXTipOfTheDay.class</bean>
                 <bean>org/jdesktop/swingx/JXRadioGroup.class</bean>
                 <bean>org/jdesktop/swingx/JXTitledSeparator.class</bean>
+        	<bean>org/jdesktop/swingx/JXFindBar.class</bean>
+        	<bean>org/jdesktop/swingx/JXFindPanel.class</bean>
+        	<bean>org/jdesktop/swingx/JXFrame.class</bean>
+        	<bean>org/jdesktop/swingx/JXGlassBox.class</bean>
+        	<bean>org/jdesktop/swingx/JXGradientChooser.class</bean>
+        	<bean>org/jdesktop/swingx/JXLoginDialog.class</bean>
+        	<bean>org/jdesktop/swingx/JXLoginPane.class</bean>
+        	<bean>org/jdesktop/swingx/JXMonthView.class</bean>
+        	<bean>org/jdesktop/swingx/JXMultiSplitPane.class</bean>
+        	<bean>org/jdesktop/swingx/JXMultiThumbSlider.class</bean>
+        	<bean>org/jdesktop/swingx/JXRootPane.class</bean>
+        	<bean>org/jdesktop/swingx/JXSearchPanel.class</bean>
+        	<bean>org/jdesktop/swingx/JXStatusBar.class</bean>
+        	<bean>org/jdesktop/swingx/JXTaskPane.class</bean>
+        	<bean>org/jdesktop/swingx/auth/DefaultUserNameStore.class</bean>
+        	<bean>org/jdesktop/swingx/auth/JAASLoginService.class</bean>
+        	<bean>org/jdesktop/swingx/auth/JDBCLoginService.class</bean>
+        	<bean>org/jdesktop/swingx/border/DropShadowBorder.class</bean>
+        	<bean>org/jdesktop/swingx/painter/AlphaPainter.class</bean>
+        	<bean>org/jdesktop/swingx/painter/CheckerboardPainter.class</bean>
+        	<bean>org/jdesktop/swingx/painter/CompoundPainter.class</bean>
+        	<bean>org/jdesktop/swingx/painter/GlossPainter.class</bean>
+        	<bean>org/jdesktop/swingx/painter/ImagePainter.class</bean>
+        	<bean>org/jdesktop/swingx/painter/MattePainter.class</bean>
+        	<bean>org/jdesktop/swingx/painter/PinstripePainter.class</bean>
+        	<bean>org/jdesktop/swingx/painter/RectanglePainter.class</bean>
+        	<bean>org/jdesktop/swingx/painter/ShapePainter.class</bean>
+        	<bean>org/jdesktop/swingx/painter/TextPainter.class</bean>
             </nbm>
+    </target>
+    <target name="test-report" if="have.tests" >
+        <delete dir="build/test-report"/>
+        <mkdir dir="build/test-report"/>
+        <junitreport todir="build/test-report">
+            <fileset dir="build/test/results">
+                <include name="TEST-*.xml"/>
+            </fileset>
+            <report format="frames" todir="build/test-report"/>
+        </junitreport>
+    </target>
+
+    <target name="-post-jar">
+    	<jar destfile="${dist.dir}/swingx-beaninfo.jar">
+    		<zipfileset dir="${build.beaninfo.classes.dir}" />
+    	</jar>
     </target>
 </project>

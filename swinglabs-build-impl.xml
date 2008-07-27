@@ -5,27 +5,27 @@
     take advantage of. Similar to the NetBeans build-impl.xml file, this file declares
     a few ant tasks which may be overridden by the build.xml file, or simply called to
     directly.
-    
-    This file defines three core targets, "bundles", "javadoc", and "coverage". 
-    The "bundles" target will create the bin.zip and src.zip deliverables for the project. 
-    Properties that can be used to dictate the name of these bundles, and the location 
+
+    This file defines three core targets, "bundles", "javadoc", and "coverage".
+    The "bundles" target will create the bin.zip and src.zip deliverables for the project.
+    Properties that can be used to dictate the name of these bundles, and the location
     of these bundles, can be specified in the project.properties file.
-    
+
     The "javadoc" target can be used to create more complete JavaDocs. References to core
     JDK classes will be linked, and methods with the @inheritDoc JavaDoc tag will actually
     inherit the doc. Note however, that this may require some setup on your system to work
     properly.
-    
+
     The "coverage" target uses EMMA to compute the test coverage. That is, it computes
     what percentage of the project is covered by unit tests. Properties can also be set
     to govern how this coverage is computed.
-    
+
     As with the NetBeans build-impl.xml file, there are -pre and -post targets declared
     for each of these core targets, allowing you to customize in the build.xml file
     how these targets are executed.
-    
+
     This build script must be placed in the root directory alongside the build.xml file.
-    
+
     For the purpose of easier reading the script
     is divided into following sections:
 
@@ -34,11 +34,11 @@
       - javadoc
 
     Version 1.0
--->    
+-->
 <project name="swinglabs-build-impl" default="bundles" basedir=".">
-    <!-- 
+    <!--
     ======================
-    INITIALIZATION SECTION 
+    INITIALIZATION SECTION
     ======================
     -->
     <!-- path element used by EMMA taskdef below: -->
@@ -50,12 +50,12 @@
     <!-- this loads <emma> and <emmajava> custom tasks: -->
     <!--<taskdef resource="emma_ant.properties" classpathref="emma.lib" />-->
 
-    <!-- 
+    <!--
     ======================
-    BUNDLES SECTION 
+    BUNDLES SECTION
     ======================
     -->
-    
+
     <target name="-pre-bundles-init" />
     <!--
         Configures the RELEASE_DSTAMP variable, which is used to create the timestamp
@@ -67,7 +67,7 @@
         </tstamp>
     </target>
     <target name="-post-bundles-init" />
-    
+
     <!--
         Creates the dist.bundles.dir directory
     -->
@@ -76,14 +76,14 @@
     </target>
     <target name="-do-bundles" depends="-pre-bin-bundle,-do-bin-bundle,-post-bin-bundle,-pre-src-bundle,-do-src-bundle,-post-src-bundle,-pre-doc-bundle,-do-doc-bundle,-post-doc-bundle" />
     <target name="-post-bundles" />
-    
+
     <target name="bundles" depends="init,jar,javadoc,-pre-bundles-init,-bundles-init,-post-bundles-init,-pre-bundles,-do-bundles,-post-bundles" />
-    
+
     <target name="update-posted-file" depends="init" if="posted.txt">
         <tstamp>
             <format property="RELEASE_DSTAMP_LONG" pattern="'week'-w-yyyy-MM-dd" />
         </tstamp>
-        
+
         <!--MAIN week-42-2006-10-15 swingx-ws-->
         <!--NOTE: The spacing in this next tag is critical. -->
         <concat destfile="${posted.txt}" append="true">
@@ -95,7 +95,7 @@ ${build.branch} ${RELEASE_DSTAMP_LONG} ${projectname}</concat>
         <zip basedir="${dist.javadoc.dir}" zipfile="${dist.bundles.dir}/${projectname}-${RELEASE_DSTAMP}-javadoc.zip" compress="${javadoc.compress}"/>
     </target>
     <target name="-post-doc-bundle" />
-    
+
     <target name="-pre-bin-bundle" />
     <target name="-do-bin-bundle">
         <zip destfile="${dist.bundles.dir}/${projectname}-${RELEASE_DSTAMP}-bin.zip">
@@ -107,7 +107,7 @@ ${build.branch} ${RELEASE_DSTAMP_LONG} ${projectname}</concat>
         </zip>
     </target>
     <target name="-post-bin-bundle" />
-    
+
     <target name="-pre-src-bundle" />
     <target name="-do-src-bundle">
         <mkdir dir="${build.bundles.dir}" />
@@ -121,7 +121,7 @@ ${build.branch} ${RELEASE_DSTAMP_LONG} ${projectname}</concat>
                 <!-- If anything else needs to be exluded, do so here -->
             </fileset>
         </copy>
-        
+
         <!-- zip up the whole thing -->
         <delete dir="${build.bundles.dir}/zipdir" />
         <mkdir dir="${build.bundles.dir}/zipdir" />
@@ -133,13 +133,13 @@ ${build.branch} ${RELEASE_DSTAMP_LONG} ${projectname}</concat>
         <delete dir="${build.bundles.dir}/zipdir" />
     </target>
     <target name="-post-src-bundle" />
-    
-    <!-- 
+
+    <!--
     ======================
-    COVERAGE SECTION 
+    COVERAGE SECTION
     ======================
     -->
-    
+
     <target name="-pre-coverage" />
     <target name="-do-coverage">
         <delete dir="${build.dir}/emma" />
@@ -172,7 +172,7 @@ ${build.branch} ${RELEASE_DSTAMP_LONG} ${projectname}</concat>
 
         <delete dir="${build.dir}/emma" />
         <mkdir dir="${dist.dir}/coverage" />
-        
+
         <emma>
             <report sourcepath="${emma.report.srcpath}">
                 <fileset dir="${basedir}" >
@@ -187,17 +187,17 @@ ${build.branch} ${RELEASE_DSTAMP_LONG} ${projectname}</concat>
         <!--<delete file="${basedir}/coverage.ec" />-->
     </target>
     <target name="-post-coverage" />
-    
+
     <!-- this -->
     <target name="coverage" depends="init,jar,compile-test,-pre-test-run,-pre-coverage,-do-coverage,-post-coverage,test-report" if="emma.dir">
 <!--
         <fail if="tests.failed">Some tests failed; see details above.</fail>
 -->
     </target>
-    
-    <!-- 
+
+    <!--
     ======================
-    JAVADOC SECTION 
+    JAVADOC SECTION
     ======================
     -->
     <target name="-javadoc-build" depends="init">
@@ -205,7 +205,7 @@ ${build.branch} ${RELEASE_DSTAMP_LONG} ${projectname}</concat>
         <property name="javadoc.core.linkexternal" value="http://java.sun.com/j2se/1.5.0/docs/api/"/>
         <property name="javadoc.core.packagelist" value=""/>
         <property name="javadoc.verbose" value="false"/>
-        
+
         <echo>Using custom javadoc target:
             core src: ${javadoc.core.src}
             core external: ${javadoc.core.linkexternal}
@@ -217,7 +217,7 @@ ${build.branch} ${RELEASE_DSTAMP_LONG} ${projectname}</concat>
                  notree="${javadoc.notree}" use="${javadoc.use}"
                  nonavbar="${javadoc.nonavbar}" noindex="${javadoc.noindex}"
                  splitindex="${javadoc.splitindex}" author="${javadoc.author}"
-                 version="${javadoc.version}" 	
+                 version="${javadoc.version}"
                  windowtitle="${javadoc.windowtitle}"
                  private="${javadoc.private}"
                  additionalparam="${javadoc.additionalparam}"
