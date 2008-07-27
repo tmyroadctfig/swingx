@@ -94,6 +94,12 @@ Java-Bean: True
 Name: org/jdesktop/swingx/JXTree.class
 Java-Bean: True
 
+Name: org/jdesktop/swingx/JXBusyLabel.class
+Java-Bean: True
+
+Name: org/jdesktop/swingx/JXLabel.class
+Java-Bean: True
+
 Name: org/jdesktop/swingx/JXTreeTable.class
 Java-Bean: True
 
