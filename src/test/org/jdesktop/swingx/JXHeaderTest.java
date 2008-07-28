@@ -8,12 +8,12 @@
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
@@ -26,15 +26,16 @@ import java.net.URL;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 import junit.framework.TestCase;
 
 /**
  * Unit test for <code>JXHeader</code>.
  * <p>
- * 
- * All test methods in this class are expected to pass. 
- * 
+ *
+ * All test methods in this class are expected to pass.
+ *
  * @author Jeanette Winzenburg
  */
 public class JXHeaderTest extends TestCase {
@@ -62,7 +63,7 @@ public class JXHeaderTest extends TestCase {
                }
            }
         }
-        assertEquals("the label's text must be equal to the headers title", 
+        assertEquals("the label's text must be equal to the headers title",
                 header.getIcon(), label.getIcon());
     }
 
@@ -84,14 +85,14 @@ public class JXHeaderTest extends TestCase {
                break;
            }
         }
-        assertEquals("the label's text must be equal to the headers title", 
+        assertEquals("the label's text must be equal to the headers title",
                 header.getTitle(), label.getText());
     }
-    
+
     /**
      * Issue #403-swingx: JXHeader doesn't show custom values.
      * <p>
-     * 
+     *
      * Breaking if values are passed in the constructor.
      */
     public void testTitleInContructor() {
@@ -107,8 +108,17 @@ public class JXHeaderTest extends TestCase {
                 break;
             }
         }
-        assertEquals("the label's text must be equal to the headers title", 
+        assertEquals("the label's text must be equal to the headers title",
                 header.getTitle(), label.getText());
     }
 
+    /**
+     * Issue swingx-900 NPE when top level ancestor is not available, while "some" ancestor is.
+     */
+    public void testNPE() {
+        JXHeader header = new JXHeader();
+        JPanel panel = new JPanel();
+        panel.add( header );
+        panel.setBounds( 0, 0, 200, 200 );
+    }
 }

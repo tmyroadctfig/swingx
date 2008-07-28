@@ -50,7 +50,7 @@ import java.beans.PropertyChangeListener;
  */
 public class BasicHeaderUI extends HeaderUI {
 	// Implementation detail. Neeeded to expose getMultiLineSupport() method to allow restoring view
-	// lost after LAF switch 
+	// lost after LAF switch
     protected class DescriptionPane extends JXLabel {
             @Override
             public void paint(Graphics g) {
@@ -59,7 +59,7 @@ public class BasicHeaderUI extends HeaderUI {
                         RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
                 super.paint(g);
             }
-            
+
             public MultiLineSupport getMultiLineSupport() {
             	return super.getMultiLineSupport();
             }
@@ -131,7 +131,7 @@ public class BasicHeaderUI extends HeaderUI {
 
         imagePanel = new JLabel();
         imagePanel.setIcon(header.getIcon() == null ? UIManager.getIcon("Header.defaultIcon") : header.getIcon());
-        
+
         installComponents(header);
         installListeners(header);
     }
@@ -186,14 +186,14 @@ public class BasicHeaderUI extends HeaderUI {
         //I suspect) I'll fall back on the "control" color if JXHeader.background
         //isn't specified.
         if (gradientDarkColor == null) {
-            gradientDarkColor = UIManager.getColor("control"); 
+            gradientDarkColor = UIManager.getColor("control");
         }
-        
+
         Painter p = h.getBackgroundPainter();
         if (p == null || p instanceof PainterUIResource) {
             h.setBackgroundPainter(createBackgroundPainter());
         }
- 
+
         // title properties
         Font titleFont = h.getTitleFont();
         if (titleFont == null || titleFont instanceof FontUIResource) {
@@ -201,7 +201,7 @@ public class BasicHeaderUI extends HeaderUI {
         	// fallback to label font
         	titleLabel.setFont(titleFont != null ? titleFont : UIManager.getFont("Label.font"));
         }
-        
+
         Color titleForeground = h.getTitleForeground();
         if (titleForeground == null || titleForeground instanceof ColorUIResource) {
         	titleForeground = UIManager.getColor("JXHeader.titleForeground");
@@ -210,7 +210,7 @@ public class BasicHeaderUI extends HeaderUI {
         }
 
         titleLabel.setText(h.getTitle());
-        
+
         // description properties
         Font descFont = h.getDescriptionFont();
         if (descFont == null || descFont instanceof FontUIResource) {
@@ -218,14 +218,14 @@ public class BasicHeaderUI extends HeaderUI {
         	// fallback to label font
         	descriptionPane.setFont(descFont != null ? descFont : UIManager.getFont("Label.font"));
         }
-            
+
         Color descForeground = h.getDescriptionForeground();
         if (descForeground == null || descForeground instanceof ColorUIResource) {
         	descForeground = UIManager.getColor("JXHeader.descriptionForeground");
         	// fallback to label foreground
         	descriptionPane.setForeground(descForeground != null ? descForeground : UIManager.getColor("Label.foreground"));
         }
-        
+
         descriptionPane.setText(h.getDescription());
     }
 
@@ -248,8 +248,15 @@ public class BasicHeaderUI extends HeaderUI {
                     	v = (View) descriptionPane.getClientProperty(BasicHTML.propertyKey);
                     }
                     if (v != null) {
-                        int h = Math.max(descriptionPane.getHeight(), header.getTopLevelAncestor().getHeight());
-                        int w = Math.min(header.getTopLevelAncestor().getWidth(), header.getParent().getWidth());
+                        Container tla = header.getTopLevelAncestor();
+                        if (tla == null) {
+                            tla = header.getParent();
+                            while (tla.getParent() != null) {
+                                tla = tla.getParent();
+                            }
+                        }
+                        int h = Math.max(descriptionPane.getHeight(), tla.getHeight());
+                        int w = Math.min(tla.getWidth(), header.getParent().getWidth());
                         // 35 = description pane insets, TODO: obtain dynamically
                         w -= 35 + header.getInsets().left + header.getInsets().right + descriptionPane.getInsets().left + descriptionPane.getInsets().right + imagePanel.getInsets().left + imagePanel.getInsets().right + imagePanel.getWidth() + descriptionPane.getBounds().x;
                     	v.setSize(w, h);
