@@ -121,6 +121,35 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         setSystemLF(true);
     }
 
+    
+    /**
+     * Issue #550-swingx: xtable must not reset columns' pref/size on 
+     * structureChanged if autocreate is false.
+     * 
+     *  
+     */
+    public void interactiveColumnWidthOnStructureChanged() {
+        final JXTable table = new JXTable(new AncientSwingTeam());
+        table.setAutoCreateColumnsFromModel(false);
+        table.setAutoResizeMode(JXTable.AUTO_RESIZE_OFF);
+        table.setColumnControlVisible(true);
+        TableColumn mini = table.getColumn(3);
+        // min/max is respected
+//        mini.setMaxWidth(5);
+//        mini.setMinWidth(5);
+        Action structureChanged = new AbstractAction("fire structure changed") {
+
+            public void actionPerformed(ActionEvent e) {
+                table.tableChanged(null);
+            }
+            
+        };
+        JXFrame frame = showWithScrollingInFrame(table, "structure change must not re-size columns");
+        addAction(frame, structureChanged);
+        show(frame);
+    }
+    
+
     /**
      * Issue #675-swingx: esc doesn't reach rootpane.
      * 

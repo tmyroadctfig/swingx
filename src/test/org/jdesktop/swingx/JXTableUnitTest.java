@@ -128,6 +128,42 @@ public class JXTableUnitTest extends InteractiveTestCase {
         super.tearDown();
     }
 
+    /**
+     * Issue #550-swingx: xtable must not reset columns' pref/size on 
+     * structureChanged if autocreate is false.
+     * 
+     *  here: width (was no problem, default columnFactory only sets pref)
+     */
+    public void testInitializeColumnWidth() {
+        JXTable table = new JXTable(10, 2);
+        table.setAutoResizeMode(JXTable.AUTO_RESIZE_OFF);
+        table.setAutoCreateColumnsFromModel(false);
+        int width = table.getColumn(0).getWidth() + 2;
+        table.getColumn(0).setWidth(width);
+        assertEquals("sanity: ", width, table.getColumn(0).getWidth());
+        table.tableChanged(null);
+        assertEquals("structure changed must not resize column", 
+                width, table.getColumn(0).getWidth() );
+    }
+    
+    /**
+     * Issue #550-swingx: xtable must not reset columns' pref/width on 
+     * structureChanged if autocreate is false.
+     * 
+     * here: prefWidth 
+     */
+    public void testInitializeColumnPrefWidth() {
+        JXTable table = new JXTable(10, 2);
+        table.setAutoResizeMode(JXTable.AUTO_RESIZE_OFF);
+        table.setAutoCreateColumnsFromModel(false);
+        int width = table.getColumn(0).getPreferredWidth() + 2;
+        table.getColumn(0).setPreferredWidth(width);
+        assertEquals("sanity: ", width, table.getColumn(0).getPreferredWidth());
+        table.tableChanged(null);
+        assertEquals("structure changed must not resize column", width, 
+                table.getColumn(0).getPreferredWidth() );
+    }
+    
     
     /**
      * Issue #847-swingx: JXTable respect custom corner if columnControl not visible

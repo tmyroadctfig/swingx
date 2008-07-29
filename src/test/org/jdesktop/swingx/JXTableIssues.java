@@ -107,69 +107,6 @@ public class JXTableIssues extends InteractiveTestCase {
         } 
     }
     
-    /**
-     * Issue #550-swingx: xtable must not reset columns' pref/size on 
-     * structureChanged if autocreate is false.
-     * 
-     *  
-     */
-    public void interactiveColumnWidthOnStructureChanged() {
-        final JXTable table = new JXTable(new AncientSwingTeam());
-        table.setAutoCreateColumnsFromModel(false);
-        table.setAutoResizeMode(JXTable.AUTO_RESIZE_OFF);
-        table.setColumnControlVisible(true);
-        TableColumn mini = table.getColumn(3);
-        // min/max is respected
-//        mini.setMaxWidth(5);
-//        mini.setMinWidth(5);
-        Action structureChanged = new AbstractAction("fire structure changed") {
-
-            public void actionPerformed(ActionEvent e) {
-                table.tableChanged(null);
-            }
-            
-        };
-        JXFrame frame = showWithScrollingInFrame(table, "structure change must not re-size columns");
-        addAction(frame, structureChanged);
-        show(frame);
-    }
-    
-    /**
-     * Issue #550-swingx: xtable must not reset columns' pref/size on 
-     * structureChanged if autocreate is false.
-     * 
-     *  here: width (was no problem, default columnFactory only sets pref)
-     */
-    public void testInitializeColumnWidth() {
-        JXTable table = new JXTable(10, 2);
-        table.setAutoResizeMode(JXTable.AUTO_RESIZE_OFF);
-        table.setAutoCreateColumnsFromModel(false);
-        int width = table.getColumn(0).getWidth() + 2;
-        table.getColumn(0).setWidth(width);
-        assertEquals("sanity: ", width, table.getColumn(0).getWidth());
-        table.tableChanged(null);
-        assertEquals("structure changed must not resize column", 
-                width, table.getColumn(0).getWidth() );
-    }
-    
-    /**
-     * Issue #550-swingx: xtable must not reset columns' pref/width on 
-     * structureChanged if autocreate is false.
-     * 
-     * here: prefWidth 
-     */
-    public void testInitializeColumnPrefWidth() {
-        JXTable table = new JXTable(10, 2);
-        table.setAutoResizeMode(JXTable.AUTO_RESIZE_OFF);
-        table.setAutoCreateColumnsFromModel(false);
-        int width = table.getColumn(0).getPreferredWidth() + 2;
-        table.getColumn(0).setPreferredWidth(width);
-        assertEquals("sanity: ", width, table.getColumn(0).getPreferredWidth());
-        table.tableChanged(null);
-        assertEquals("structure changed must not resize column", width, 
-                table.getColumn(0).getPreferredWidth() );
-    }
-    
 
     /**
      * Quick check for a forum report:

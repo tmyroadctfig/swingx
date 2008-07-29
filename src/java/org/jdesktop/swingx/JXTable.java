@@ -1458,6 +1458,29 @@ public class JXTable extends JTable
         }
     }
 
+    /**
+     * {@inheritDoc} <p>
+     * 
+     * Overridden for documentation clarification. The property has the same
+     * meaning as super, that is if true to re-create all table columns on either 
+     * setting a new TableModel or receiving a structureChanged from the existing. 
+     * The most obvious visual effect is that custom column properties appear to
+     * be "lost". <p> 
+     * 
+     * JXTable does support additonal custom configuration (via a custom 
+     * ColumnFactory) which can (and incorrectly was) called independently from
+     * the creation. Setting this property to false guarantees that no
+     * column configuration is applied.
+     * 
+     * @see #tableChanged(TableModelEvent)
+     * @see org.jdesktop.table.ColumnFactory
+     * 
+     */
+    @Override
+    public boolean getAutoCreateColumnsFromModel() {
+        return super.getAutoCreateColumnsFromModel();
+    }
+
     /** 
      * additionally updates filtered state.
      * {@inheritDoc}
@@ -1485,7 +1508,7 @@ public class JXTable extends JTable
         if (shouldSortOnChange(e)) {
              use(filters);
         }
-        if (isStructureChanged(e)) {
+        if (isStructureChanged(e) && getAutoCreateColumnsFromModel()) {
             initializeColumnWidths();
             resetCalculatedScrollableSize(true);
         }
