@@ -26,6 +26,7 @@ import java.awt.Frame;
 import java.awt.Window;
 import java.util.Locale;
 
+import javax.swing.JPopupMenu;
 import javax.swing.MenuElement;
 import javax.swing.SwingUtilities;
 
@@ -134,5 +135,33 @@ public final class SwingXUtilities {
         for (Window owned : window.getOwnedWindows()) {
             updateAllComponentTreeUIs(owned);
         }
+    }
+
+
+
+    /**
+     * Returns whether the component is part of the parent's
+     * container hierarchy. If a parent in the chain is of type 
+     * JPopupMenu, the parent chain of its invoker is walked.
+     * 
+     * @param focusOwner
+     * @param parent
+     * @return true if the component is contained under the parent's 
+     *    hierachy, coping with JPopupMenus.
+     */
+    public static boolean isDescendingFrom(Component focusOwner, Component parent) {
+        while (focusOwner !=  null) {
+            if (focusOwner instanceof JPopupMenu) {
+                focusOwner = ((JPopupMenu) focusOwner).getInvoker();
+                if (focusOwner == null) {
+                    return false;
+                }
+            }
+            if (focusOwner == parent) {
+                return true;
+            }
+            focusOwner = focusOwner.getParent();
+        }
+        return false;
     }
 }

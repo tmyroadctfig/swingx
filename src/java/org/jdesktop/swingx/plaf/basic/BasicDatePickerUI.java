@@ -63,14 +63,13 @@ import javax.swing.JFormattedTextField.AbstractFormatter;
 import javax.swing.JFormattedTextField.AbstractFormatterFactory;
 import javax.swing.border.Border;
 import javax.swing.plaf.ComponentUI;
-import javax.swing.plaf.InsetsUIResource;
 import javax.swing.plaf.UIResource;
-import javax.swing.text.DefaultCaret;
 import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.View;
 
 import org.jdesktop.swingx.JXDatePicker;
 import org.jdesktop.swingx.JXMonthView;
+import org.jdesktop.swingx.SwingXUtilities;
 import org.jdesktop.swingx.calendar.CalendarUtils;
 import org.jdesktop.swingx.calendar.DatePickerFormatter;
 import org.jdesktop.swingx.calendar.DateSelectionModel;
@@ -884,7 +883,7 @@ public class BasicDatePickerUI extends DatePickerUI {
         if (popup != null) popup.setVisible(false);
     }
 
-    private boolean isPopupVisible() {
+    public boolean isPopupVisible() {
         if (popup != null) {
             return popup.isVisible();
         }
@@ -1423,7 +1422,7 @@ public class BasicDatePickerUI extends DatePickerUI {
                 return;
             }
             Component comp = manager.getPermanentFocusOwner();
-            if ((comp != null) && !isDescendingFrom(comp, datePicker)) {
+            if ((comp != null) && !SwingXUtilities.isDescendingFrom(comp, datePicker)) {
                  unload(false);
                 // on hiding the popup the focusmanager transfers 
                 // focus back to the old permanentFocusOwner
@@ -1436,33 +1435,6 @@ public class BasicDatePickerUI extends DatePickerUI {
             }
         }
         
-        /**
-         * Returns true if the component descends from parent 
-         * walking the invoker chain if a JPopupMenu is found. <p>
-         * 
-         * PENDING: c&p from JXTable - returns false if invoker of popup
-         * is null. That might be a speciality for the table which asks
-         * this method for both focusOwner and permanentFocusOwner.
-         * 
-         * @param focusOwner
-         * @param parent
-         * @return
-         */
-        private boolean isDescendingFrom(Component focusOwner, Component parent) {
-            while (focusOwner !=  null) {
-                if (focusOwner instanceof JPopupMenu) {
-                    focusOwner = ((JPopupMenu) focusOwner).getInvoker();
-                    if (focusOwner == null) {
-                        return false;
-                    }
-                }
-                if (focusOwner == parent) {
-                    return true;
-                }
-                focusOwner = focusOwner.getParent();
-            }
-            return false;
-        }
         
     }
 

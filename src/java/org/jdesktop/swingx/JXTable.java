@@ -3846,32 +3846,32 @@ public class JXTable extends JTable
             KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
         // PENDING JW: special casing to not fall through ... really wanted?
         if (focusOwner == null) return false;
-        if (isDescending(focusOwner)) return true;
+        if (SwingXUtilities.isDescendingFrom(focusOwner, this)) return true;
         // same with permanent focus owner
         Component permanent = 
             KeyboardFocusManager.getCurrentKeyboardFocusManager().getPermanentFocusOwner();
-        return isDescending(permanent);
+        return SwingXUtilities.isDescendingFrom(permanent, this);
     }
 
     /**
      * @param focusOwner
      * @return
      */
-    private boolean isDescending(Component focusOwner) {
-        while (focusOwner !=  null) {
-            if (focusOwner instanceof JPopupMenu) {
-                focusOwner = ((JPopupMenu) focusOwner).getInvoker();
-                if (focusOwner == null) {
-                    return false;
-                }
-            }
-            if (focusOwner == this) {
-                return true;
-            }
-            focusOwner = focusOwner.getParent();
-        }
-        return false;
-    }
+//    private boolean isDescending(Component focusOwner) {
+//        while (focusOwner !=  null) {
+//            if (focusOwner instanceof JPopupMenu) {
+//                focusOwner = ((JPopupMenu) focusOwner).getInvoker();
+//                if (focusOwner == null) {
+//                    return false;
+//                }
+//            }
+//            if (focusOwner == this) {
+//                return true;
+//            }
+//            focusOwner = focusOwner.getParent();
+//        }
+//        return false;
+//    }
 
     protected transient CellEditorRemover editorRemover;
 

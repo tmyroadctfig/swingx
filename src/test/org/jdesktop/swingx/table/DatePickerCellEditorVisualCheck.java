@@ -21,7 +21,6 @@
 package org.jdesktop.swingx.table;
 
 import java.awt.BorderLayout;
-import java.awt.ComponentOrientation;
 import java.awt.event.ActionEvent;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -41,6 +40,7 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeModel;
 
 import org.jdesktop.swingx.InteractiveTestCase;
+import org.jdesktop.swingx.JXDatePicker;
 import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.JXTree;
@@ -76,23 +76,8 @@ public class DatePickerCellEditorVisualCheck extends InteractiveTestCase {
         xTree.setEditable(true);
         xTree.setCellEditor(new DefaultTreeCellEditor(tree, null, new DatePickerCellEditor()));
         final JXFrame frame = wrapWithScrollingInFrame(tree, xTree, "standard Editing (DatePicker): compare tree and xtree");
-        Action toggleComponentOrientation = new AbstractAction("toggle orientation") {
-
-            public void actionPerformed(ActionEvent e) {
-                ComponentOrientation current = frame.getComponentOrientation();
-                if (current == ComponentOrientation.LEFT_TO_RIGHT) {
-                    frame.applyComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
-                } else {
-                    frame.applyComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
-
-                }
-
-            }
-
-        };
-        addAction(frame, toggleComponentOrientation);
-        frame.setVisible(true);
-        
+        addComponentOrientationToggle(frame);
+        show(frame);
     }
 
     /**
@@ -119,23 +104,8 @@ public class DatePickerCellEditorVisualCheck extends InteractiveTestCase {
         xTree.setEditable(true);
         xTree.setCellEditor(new DefaultXTreeCellEditor(xTree, null, new DatePickerCellEditor()));
         final JXFrame frame = wrapWithScrollingInFrame(tree, xTree, "XEditing(DatePicker): compare tree and xtree");
-        Action toggleComponentOrientation = new AbstractAction("toggle orientation") {
-
-            public void actionPerformed(ActionEvent e) {
-                ComponentOrientation current = frame.getComponentOrientation();
-                if (current == ComponentOrientation.LEFT_TO_RIGHT) {
-                    frame.applyComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
-                } else {
-                    frame.applyComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
-
-                }
-
-            }
-
-        };
-        addAction(frame, toggleComponentOrientation);
-        frame.setVisible(true);
-        
+        addComponentOrientationToggle(frame);
+        show(frame);
     }
 
 
@@ -161,9 +131,8 @@ public class DatePickerCellEditorVisualCheck extends InteractiveTestCase {
         };
         JXFrame frame = wrapWithScrollingInFrame(table, "JXTable - date picker cell editor");
         addAction(frame, action);
-        frame.add(new JTextField("yet another thing to focus"), BorderLayout.SOUTH);
-        frame.pack();
-        frame.setVisible(true);
+        frame.add(new JXDatePicker(), BorderLayout.SOUTH);
+        show(frame);
     }
 
 
@@ -204,8 +173,7 @@ public class DatePickerCellEditorVisualCheck extends InteractiveTestCase {
         JXFrame frame = wrapWithScrollingInFrame(tree, "JXTree - date picker cell editor");
         addAction(frame, action);
         frame.add(new JTextField("yet another thing to focus"), BorderLayout.SOUTH);
-        frame.pack();
-        frame.setVisible(true);
+        show(frame);
     }
 
 
@@ -223,8 +191,7 @@ public class DatePickerCellEditorVisualCheck extends InteractiveTestCase {
         installEditors(table);
         JXFrame frame = wrapWithScrollingInFrame(table, "JTable - date picker cell editor");
         frame.add(new JTextField("yet another thing to focus"), BorderLayout.SOUTH);
-        frame.pack();
-        frame.setVisible(true);
+        show(frame);
     }
 
 

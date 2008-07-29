@@ -84,15 +84,42 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
         JXDatePickerVisualCheck test = new JXDatePickerVisualCheck();
         
         try {
-//            test.runInteractiveTests();
+            test.runInteractiveTests();
 //            test.runInteractiveTests("interactive.*PrefSize.*");
 //            test.runInteractiveTests("interactive.*Keep.*");
-          test.runInteractiveTests("interactive.*PC.*");
+//          test.runInteractiveTests("interactive.*PC.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
         }
     }
+
+    /**
+     * Issue #565-swingx: popup not closed if open and 
+     * clicking into other focus-tricksing component (like
+     * picker, combo).
+     * 
+     * And: Compare picker and combo behaviour on toggle lf.
+     * 
+     * Not really comparable: the combo has complete control over the popup, re-creates
+     * both popup and content on install.
+     * 
+     */
+    public void interactiveUpdateUIPickerCompareCombo() {
+//      Trace14.keyboardFocusManager(true);
+       final JXDatePicker picker = new JXDatePicker();
+       picker.getEditor().setName("first DateField");
+        JComboBox box = new JComboBox(new Object[] {"one", "twooooooo", "threeeeeeeeeeee", "GOOO!"});
+        box.setEditable(true);
+        JComponent comp = new JPanel();
+        comp.add(picker);
+        comp.add(new JXDatePicker(new Date()));
+        comp.add(box);
+        JXFrame frame = wrapInFrame(comp, "compare combo <-> picker", true);
+        addMessage(frame, "open popup, click in other picker/combo - popup must close and other focused");
+        show(frame);
+    }
+    
 
     
     /**
