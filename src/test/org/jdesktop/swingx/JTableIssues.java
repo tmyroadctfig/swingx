@@ -30,10 +30,9 @@ import javax.swing.UIManager;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellEditor;
-import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 
-import org.jdesktop.swingx.renderer.StringValue;
+import org.jdesktop.test.AncientSwingTeam;
 import org.jdesktop.test.CellEditorReport;
 import org.jdesktop.test.ListSelectionReport;
 
@@ -238,7 +237,25 @@ public class JTableIssues extends InteractiveTestCase {
     }
     
 //----------------------- interactive
+ 
     
+    /**
+     * Core Issue ??: standalone table header throws NPE on mouse
+     * events.
+     * 
+     * Base reason is that the ui assume a not-null table at varying
+     * places in their code.
+     * 
+     * Reason is an unsafe implementation of viewIndexForColumn. Unconditionally
+     * queries the table for index conversion.
+     */
+    public void interactiveNPEStandaloneHeader() {
+        JXTable table = new JXTable(new AncientSwingTeam());
+        JXTableHeader header = new JXTableHeader(table.getColumnModel());
+        JXFrame frame = showWithScrollingInFrame(header, "Standalone header: NPE on mouse gestures");
+        addMessage(frame, "exact place/gesture is LAF dependent. Base error is to assume header.getTable() != null");
+    }
+
     /**
      * 
      * 

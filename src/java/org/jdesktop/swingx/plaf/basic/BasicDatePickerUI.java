@@ -26,6 +26,7 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FontMetrics;
 import java.awt.Insets;
+import java.awt.KeyboardFocusManager;
 import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -122,6 +123,8 @@ public class BasicDatePickerUI extends DatePickerUI {
     private DateSelectionListener monthViewSelectionListener;
     private ActionListener monthViewActionListener;
     private PropertyChangeListener monthViewPropertyListener;
+
+    private PopupRemover popupRemover;
 
 
     @SuppressWarnings({"UnusedDeclaration"})
@@ -313,6 +316,7 @@ public class BasicDatePickerUI extends DatePickerUI {
         monthViewActionListener = createMonthViewActionListener();
         monthViewPropertyListener = createMonthViewPropertyListener();
         
+        popupRemover = new PopupRemover();
         /*
          * install the listeners
          */
@@ -336,7 +340,6 @@ public class BasicDatePickerUI extends DatePickerUI {
         //
         updateFromMonthViewChanged(null);
     }
-    
     /**
      * Uninstalls and nulls all listeners which had been installed 
      * by this delegate.
@@ -364,6 +367,9 @@ public class BasicDatePickerUI extends DatePickerUI {
             popupButton.removeMouseMotionListener(mouseMotionListener);
         }
 
+        popupRemover.unload();
+        
+        popupRemover = null;
         propertyChangeListener = null;
         mouseListener = null;
         mouseMotionListener = null;
@@ -871,12 +877,19 @@ public class BasicDatePickerUI extends DatePickerUI {
     }
 
     /**
-     * 
+     * PENDING: widened access for debugging - need api to
+     * control popup visibility?
      */
-    private void hidePopup() {
+    public void hidePopup() {
         if (popup != null) popup.setVisible(false);
     }
 
+    private boolean isPopupVisible() {
+        if (popup != null) {
+            return popup.isVisible();
+        }
+        return false;
+    }
     /**
      * Navigates to linkDate. If commit, the linkDate is selected
      * and committed. If not commit, the linkDate is scrolled to visible, if the 
@@ -1338,8 +1351,8 @@ public class BasicDatePickerUI extends DatePickerUI {
          */
         public void focusGained(FocusEvent e) {
             if (e.isTemporary()) return;
+            popupRemover.load();
             if (e.getSource() == datePicker) {
-//                LOG.info("focusGained in ui " + e.getSource().getClass().getSimpleName() );
                datePicker.getEditor().requestFocusInWindow(); 
             }
         }
@@ -1362,18 +1375,95 @@ public class BasicDatePickerUI extends DatePickerUI {
          * transferred permanently from the temporary focusowner
          * to a new "normal" permanentFocusOwner (like a textfield),
          * we don't get it if transfered to a tricksing owner (like
-         * a combo or picker) 
+         * a combo or picker). So can't do anything here. 
          * 
          * listen to keyboardFocusManager?
          */
         public void focusLost(FocusEvent e) {
-//            LOG.info("lost - old " + e);
-//            if (e.isTemporary()) return;
-//            if (e.getSource() == datePicker.getEditor()) {
-//                hidePopup();
-//            }
             
         }
+    }
+
+    public class PopupRemover implements PropertyChangeListener {
+
+        private KeyboardFocusManager manager;
+        private boolean loaded;
+        
+        public void load() {
+            if (manager != KeyboardFocusManager.getCurrentKeyboardFocusManager()) {
+                unload();
+                manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
+            }
+            if (!loaded) {
+                manager.addPropertyChangeListener("permanentFocusOwner", this);
+                loaded = true;
+            }
+        }
+        
+        /**
+         * @param b
+         */
+        private void unload(boolean nullManager) {
+            if (manager != null) {
+                manager.removePropertyChangeListener("permanentFocusOwner", this);
+                if (nullManager) {
+                    manager = null;
+                }
+            }
+            loaded = false;
+         }
+
+        public void unload() {
+            unload(true);
+        }
+        
+        public void propertyChange(PropertyChangeEvent evt) {
+            if (!isPopupVisible()) {
+                unload(false);
+                return;
+            }
+            Component comp = manager.getPermanentFocusOwner();
+            if ((comp != null) && !isDescendingFrom(comp, datePicker)) {
+                 unload(false);
+                // on hiding the popup the focusmanager transfers 
+                // focus back to the old permanentFocusOwner
+                // before showing the popup, that is the picker
+                // or the editor. So we have to force it back ... 
+                hidePopup();
+                comp.requestFocusInWindow();
+                // this has no effect as focus changes are asynchronous
+//                inHide = false;
+            }
+        }
+        
+        /**
+         * Returns true if the component descends from parent 
+         * walking the invoker chain if a JPopupMenu is found. <p>
+         * 
+         * PENDING: c&p from JXTable - returns false if invoker of popup
+         * is null. That might be a speciality for the table which asks
+         * this method for both focusOwner and permanentFocusOwner.
+         * 
+         * @param focusOwner
+         * @param parent
+         * @return
+         */
+        private boolean isDescendingFrom(Component focusOwner, Component parent) {
+            while (focusOwner !=  null) {
+                if (focusOwner instanceof JPopupMenu) {
+                    focusOwner = ((JPopupMenu) focusOwner).getInvoker();
+                    if (focusOwner == null) {
+                        return false;
+                    }
+                }
+                if (focusOwner == parent) {
+                    return true;
+                }
+                focusOwner = focusOwner.getParent();
+            }
+            return false;
+        }
+        
     }
 
     

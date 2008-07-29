@@ -65,7 +65,7 @@ public class JXDatePickerIssues extends InteractiveTestCase {
         try {
 //            test.runInteractiveTests();
 //          test.runInteractiveTests("interactive.*UpdateUI.*");
-          test.runInteractiveTests("interactive.*Focus.*");
+          test.runInteractiveTests("interactive.*Combo.*");
 //          test.runInteractiveTests("interactive.*Visible.*");
           
         } catch (Exception e) {
@@ -142,23 +142,31 @@ public class JXDatePickerIssues extends InteractiveTestCase {
     
 
     /**
-     * Compare picker and combo behaviour on toggle lf.
+     * Issue #565-swingx: popup not closed if open and 
+     * clicking into other focus-tricksing component (like
+     * picker, combo).
+     * 
+     * And: Compare picker and combo behaviour on toggle lf.
      * 
      * Not really comparable: the combo has complete control over the popup, re-creates
      * both popup and content on install.
      * 
      */
     public void interactiveUpdateUIPickerCompareCombo() {
-        JXDatePicker picker = new JXDatePicker();
+//      Trace14.keyboardFocusManager(true);
+       final JXDatePicker picker = new JXDatePicker();
+       picker.getEditor().setName("first DateField");
         JComboBox box = new JComboBox(new Object[] {"one", "twooooooo", "threeeeeeeeeeee", "GOOO!"});
         box.setEditable(true);
         JComponent comp = new JPanel();
         comp.add(picker);
+        comp.add(new JXDatePicker(new Date()));
         comp.add(box);
         JXFrame frame = wrapInFrame(comp, "compare combo <-> picker", true);
         frame.setVisible(true);
     }
     
+
     
     /**
      * Issue #709-swingx: DatePicker should have empty constructor which doesn't select.
@@ -166,7 +174,6 @@ public class JXDatePickerIssues extends InteractiveTestCase {
      * Plus deprecate constructors with long - replace by Date parameters.
      * Deprecate other methods taking long.
      */
-    @SuppressWarnings("deprecation")
     public void interactiveNullDate() {
         JComponent comp = Box.createVerticalBox();
         comp.add(new JLabel("setDate(null)"));

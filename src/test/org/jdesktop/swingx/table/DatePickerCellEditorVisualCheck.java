@@ -51,9 +51,9 @@ public class DatePickerCellEditorVisualCheck extends InteractiveTestCase {
 //        setSystemLF(true);
         DatePickerCellEditorVisualCheck test = new DatePickerCellEditorVisualCheck();
         try {
-//            test.runInteractiveTests();
+            test.runInteractiveTests();
 //          test.runInteractiveTests(".*Text.*");
-          test.runInteractiveTests(".*XTree.*");
+//          test.runInteractiveTests(".*XTree.*");
 //          test.runInteractiveTests(".*Table.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
