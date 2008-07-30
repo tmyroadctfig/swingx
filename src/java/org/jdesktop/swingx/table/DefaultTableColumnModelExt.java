@@ -371,4 +371,11 @@ public class DefaultTableColumnModelExt extends DefaultTableColumnModel
             listenerList.remove(TableColumnModelExtListener.class, (TableColumnModelExtListener) x);
         }
     }
+
+    /**
+     * @return
+     */
+    public TableColumnModelExtListener[] getTableColumnModelExtListeners() {
+        return listenerList.getListeners(TableColumnModelExtListener.class);
+    }
 }

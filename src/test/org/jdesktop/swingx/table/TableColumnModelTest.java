@@ -40,12 +40,17 @@ public class TableColumnModelTest extends InteractiveTestCase {
             .getLogger(TableColumnModelTest.class.getName());
     protected static final int COLUMN_COUNT = 3;
 
+    /**
+     * added api to get array of ext listeners
+     */
     public void testGetTableColumnModelExtListener() {
         // any tableColumnModelExtListener will do
         JXTable table = new JXTable();
-        TableColumnModelExt columnModel = createColumnModel(COLUMN_COUNT);
+        DefaultTableColumnModelExt columnModel = (DefaultTableColumnModelExt) createColumnModel(COLUMN_COUNT);
         columnModel.addColumnModelListener(table);
-//        TableColumnModelExtListener[] listeners = columnModel.get
+        TableColumnModelExtListener[] listeners = columnModel.getTableColumnModelExtListeners();
+        assertEquals(1, listeners.length);
+        assertEquals(table, listeners[0]);
         
     }
     /**
