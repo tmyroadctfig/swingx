@@ -159,7 +159,9 @@ public class DefaultTableColumnModelExt extends DefaultTableColumnModel
 //------------------------ TableColumnModel
     
     /**
-     * {@inheritDoc}
+     * {@inheritDoc} <p>
+     * 
+     * Overridden to update internals related to column visibility.
      */
     @Override
     public void removeColumn(TableColumn column) {
@@ -174,7 +176,9 @@ public class DefaultTableColumnModelExt extends DefaultTableColumnModel
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritDoc} <p>
+     * 
+     * Overridden to update internals related to column visibility.
      */
     @Override
     public void addColumn(TableColumn aColumn) {
@@ -201,7 +205,9 @@ public class DefaultTableColumnModelExt extends DefaultTableColumnModel
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritDoc} <p>
+     * 
+     * Overridden to update internals related to column visibility.
      */
     @Override
     public void moveColumn(int columnIndex, int newIndex) {
@@ -275,18 +281,16 @@ public class DefaultTableColumnModelExt extends DefaultTableColumnModel
      * Changed evaluation JW: may still be required as super removes itself as
      * propertyChangeListener if column is hidden 
      */
-    private final class VisibilityListener implements PropertyChangeListener, Serializable {        
+    private class VisibilityListener implements PropertyChangeListener, Serializable {        
         public void propertyChange(PropertyChangeEvent evt) {
-            if (evt.getPropertyName().equals("visible")) {
-                boolean oldValue = ((Boolean)evt.getOldValue()).booleanValue();
-                boolean newValue = ((Boolean)evt.getNewValue()).booleanValue();
-                TableColumnExt col = (TableColumnExt)evt.getSource();
+            if ("visible".equals(evt.getPropertyName())) {
+                TableColumnExt columnExt = (TableColumnExt)evt.getSource();
 
-                if (oldValue && !newValue) {
-                    moveToInvisible(col);
-                } else if (!oldValue && newValue) {
-                    moveToVisible(col);
+                if (columnExt.isVisible()) {
+                    moveToVisible(columnExt);
                     fireColumnPropertyChange(evt);
+                } else  {
+                    moveToInvisible(columnExt);
                 }
             }  else if (!((TableColumnExt) evt.getSource()).isVisible()) {
                 fireColumnPropertyChange(evt);
@@ -339,7 +343,12 @@ public class DefaultTableColumnModelExt extends DefaultTableColumnModel
 
     
     /**
-     * {@inheritDoc}
+     * {@inheritDoc} <p>
+     * 
+     * 
+     * Overridden to install enhanced notification of listeners of type 
+     * TableColumnModelListenerExt about property changes of contained columns.
+     *  
      */
     @Override
     public void addColumnModelListener(TableColumnModelListener x) {
@@ -350,7 +359,10 @@ public class DefaultTableColumnModelExt extends DefaultTableColumnModel
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritDoc} <p>
+     * 
+     * Overridden to uninstall enhanced notification of listeners of type 
+     * TableColumnModelListenerExt about property changes of contained columns.
      */
     @Override
     public void removeColumnModelListener(TableColumnModelListener x) {

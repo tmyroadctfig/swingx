@@ -23,6 +23,7 @@ package org.jdesktop.swingx.table;
 
 import java.util.List;
 
+import javax.swing.event.TableColumnModelListener;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
@@ -217,5 +218,15 @@ public interface TableColumnModelExt extends TableColumnModel {
      *         <code> (columnIndex < 0) || (columnIndex >= getColumnCount())</code>.
      */
     public TableColumnExt getColumnExt(int columnIndex);
+    
+    /**
+     * Adds a listener for table column model events. This enhances super's 
+     * behaviour in that it guarantees to notify listeners of type 
+     * TableColumnModelListenerExt about property changes of contained columns.
+     *  
+     * @param x  a <code>TableColumnModelListener</code> object
+     */
+    public void addColumnModelListener(TableColumnModelListener x);
 
+    
 }

@@ -18,6 +18,7 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
 import org.jdesktop.swingx.InteractiveTestCase;
+import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.event.TableColumnModelExtListener;
 import org.jdesktop.swingx.test.ColumnModelReport;
 import org.jdesktop.test.TestUtils;
@@ -39,6 +40,14 @@ public class TableColumnModelTest extends InteractiveTestCase {
             .getLogger(TableColumnModelTest.class.getName());
     protected static final int COLUMN_COUNT = 3;
 
+    public void testGetTableColumnModelExtListener() {
+        // any tableColumnModelExtListener will do
+        JXTable table = new JXTable();
+        TableColumnModelExt columnModel = createColumnModel(COLUMN_COUNT);
+        columnModel.addColumnModelListener(table);
+//        TableColumnModelExtListener[] listeners = columnModel.get
+        
+    }
     /**
      * Issue #867-swingx: internal book-keeping must not be routed via columnModel
      *    column propertyChange <p>
