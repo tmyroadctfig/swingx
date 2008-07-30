@@ -71,37 +71,37 @@ public class PatternPredicate implements HighlightPredicate {
         this.highlightColumn = decorateColumn;
     }
 
-//    /**
-//     * Instantiates a Predicate with the given regex and test-/decorate
-//     * column index in model coordinates. The pattern string is compiled to a 
-//     * Pattern with flags 0. A column index of -1 is interpreted
-//     * as "all". (PENDING: search forum for the exact definition, legacy 
-//     * base pattern and search behave differently?) 
-//     * 
-//     * @param regex the regex string to test the cell value against
-//     * @param testColumn the column index of the cell which contains the value
-//     *   to test against the pattern 
-//     * @param decorateColumn the column index of the cell which should be 
-//     *   decorated if the test against the value succeeds.
-//     */
-//    public PatternPredicate(String regex, int testColumn, int decorateColumn) {
-//        this(Pattern.compile(regex), testColumn, decorateColumn);
-//    }
-//
-//    /**
-//     * Instantiates a Predicate with the given regex and test
-//     * column index in model coordinates. The pattern string is compiled to a 
-//     * Pattern with flags 0. A column index of -1 is interpreted
-//     * as "all". (PENDING: search forum for the exact definition, legacy 
-//     * base pattern and search behave differently?) 
-//     * 
-//     * @param regex the regex string to test the cell value against
-//     * @param testColumn the column index of the cell which contains the value
-//     *   to test against the pattern 
-//     */
-//    public PatternPredicate(String regex, int testColumn) {
-//        this(Pattern.compile(regex), testColumn);
-//    }
+    /**
+     * Instantiates a Predicate with the given regex and test-/decorate
+     * column index in model coordinates. The pattern string is compiled to a 
+     * Pattern with flags 0. A column index of -1 is interpreted
+     * as "all". (PENDING: search forum for the exact definition, legacy 
+     * base pattern and search behave differently?) 
+     * 
+     * @param regex the regex string to test the cell value against
+     * @param testColumn the column index of the cell which contains the value
+     *   to test against the pattern 
+     * @param decorateColumn the column index of the cell which should be 
+     *   decorated if the test against the value succeeds.
+     */
+    public PatternPredicate(String regex, int testColumn, int decorateColumn) {
+        this(Pattern.compile(regex), testColumn, decorateColumn);
+    }
+
+    /**
+     * Instantiates a Predicate with the given regex and test
+     * column index in model coordinates. The pattern string is compiled to a 
+     * Pattern with flags 0. A column index of -1 is interpreted
+     * as "all". (PENDING: search forum for the exact definition, legacy 
+     * base pattern and search behave differently?) 
+     * 
+     * @param regex the regex string to test the cell value against
+     * @param testColumn the column index of the cell which contains the value
+     *   to test against the pattern 
+     */
+    public PatternPredicate(String regex, int testColumn) {
+        this(Pattern.compile(regex), testColumn);
+    }
 
     public boolean isHighlighted(Component renderer, ComponentAdapter adapter) {
         if (isHighlightCandidate(renderer, adapter)) {

@@ -90,54 +90,54 @@ public class SearchPredicate implements HighlightPredicate {
         this.highlightRow = row;
     }
 
-//    /**
-//     * Instantiates a Predicate with a Pattern compiled from the given
-//     * regular expression. 
-//     * All matching cells are highlighted.
-//     * 
-//     * @param regex the regular expression to test the cell value against
-//     */
-//    public SearchPredicate(String regex) {
-//        this(regex, ALL, ALL);
-//        
-//    }
-//
-//    /**
-//     * Instantiates a Predicate with a Pattern compiled from the given
-//     * regular expression. Highlighting
-//     * is applied to matching cells in all rows, but only in the given column. A
-//     * value of ALL indicates all columns. <p>
-//     * 
-//     * @param regex the regular expression to test the cell value against
-//     * @param column the column index in model coordinates to limit the highlight to
-//     */
-//    public SearchPredicate(String regex, int column) {
-//        this(regex, ALL, column);
-//    }
-//
-//    /**
-//     * Instantiates a Predicate with a Pattern compiled from the given
-//     * regular expression. Highlighting
-//     * is limited to matching cells in the given column and row. A
-//     * value of ALL indicates all rows/columns. <p>
-//     * 
-//     * Note: the coordinates are asymetric - rows are in view- and
-//     * column in model-coordinates - due to corresponding methods in
-//     * ComponentAdapter. Hmm... no need to? This happens on the
-//     * current adapter state which is view always, so could use view
-//     * only? 
-//     * 
-//     * @param pattern the Pattern to test the cell value against
-//     * @param row the row index in view coordinates to limit the 
-//     *    highlight.
-//     * @param column the column in model coordinates 
-//     *    to limit the highlight to
-//     */
-//    public SearchPredicate(String regex, int row, int column) {
-//        // test against empty string
-//        this((regex != null) && (regex.length() > 0) ? 
-//                Pattern.compile(regex) : null, row, column);
-//    }
+    /**
+     * Instantiates a Predicate with a Pattern compiled from the given
+     * regular expression. 
+     * All matching cells are highlighted.
+     * 
+     * @param regex the regular expression to test the cell value against
+     */
+    public SearchPredicate(String regex) {
+        this(regex, ALL, ALL);
+        
+    }
+
+    /**
+     * Instantiates a Predicate with a Pattern compiled from the given
+     * regular expression. Highlighting
+     * is applied to matching cells in all rows, but only in the given column. A
+     * value of ALL indicates all columns. <p>
+     * 
+     * @param regex the regular expression to test the cell value against
+     * @param column the column index in model coordinates to limit the highlight to
+     */
+    public SearchPredicate(String regex, int column) {
+        this(regex, ALL, column);
+    }
+
+    /**
+     * Instantiates a Predicate with a Pattern compiled from the given
+     * regular expression. Highlighting
+     * is limited to matching cells in the given column and row. A
+     * value of ALL indicates all rows/columns. <p>
+     * 
+     * Note: the coordinates are asymetric - rows are in view- and
+     * column in model-coordinates - due to corresponding methods in
+     * ComponentAdapter. Hmm... no need to? This happens on the
+     * current adapter state which is view always, so could use view
+     * only? 
+     * 
+     * @param pattern the Pattern to test the cell value against
+     * @param row the row index in view coordinates to limit the 
+     *    highlight.
+     * @param column the column in model coordinates 
+     *    to limit the highlight to
+     */
+    public SearchPredicate(String regex, int row, int column) {
+        // test against empty string
+        this((regex != null) && (regex.length() > 0) ? 
+                Pattern.compile(regex) : null, row, column);
+    }
 
     /**
      * 

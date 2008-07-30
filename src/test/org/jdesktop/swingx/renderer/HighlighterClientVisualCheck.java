@@ -87,7 +87,7 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
       try {
 //         test.runInteractiveTests();
 //         test.runInteractiveTests(".*Tool.*");
-         test.runInteractiveTests(".*Tree.*");
+         test.runInteractiveTests("interactive.*Search.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
@@ -389,7 +389,7 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
      */
     public void interactiveSearchPanel() {
         JXTable table = new JXTable(tableModel);
-        final ColorHighlighter cl = new ColorHighlighter(new PatternPredicate(null, 0), null,
+        final ColorHighlighter cl = new ColorHighlighter(new PatternPredicate((Pattern) null, 0), null,
                 Color.RED);
         table.addHighlighter(cl);
         JXSearchPanel searchPanel = new JXSearchPanel();
