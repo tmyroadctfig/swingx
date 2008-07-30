@@ -46,7 +46,6 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import javax.swing.AbstractAction;
 import javax.swing.AbstractListModel;
@@ -102,7 +101,6 @@ import org.jdesktop.swingx.decorator.PatternPredicate;
 import org.jdesktop.swingx.hyperlink.EditorPaneLinkVisitor;
 import org.jdesktop.swingx.hyperlink.LinkModel;
 import org.jdesktop.swingx.hyperlink.LinkModelAction;
-import org.jdesktop.swingx.hyperlink.LinkRenderer;
 import org.jdesktop.swingx.painter.BusyPainter;
 import org.jdesktop.swingx.table.ColumnControlButton;
 import org.jdesktop.swingx.test.ComponentTreeTableModel;
@@ -828,9 +826,6 @@ public class RendererVisualCheck extends InteractiveTestCase {
         LinkModelAction action = new LinkModelAction<LinkModel>(visitor);
         ComponentProvider<JXHyperlink> controller = new HyperlinkProvider(action, LinkModel.class);
         table.setDefaultRenderer(LinkModel.class, new DefaultTableRenderer(controller));
-        LinkModelAction action2 = new LinkModelAction<LinkModel>(visitor);
-        // TODO: obsolete - need to think about what to do with editable link cells?
-        table.setDefaultEditor(LinkModel.class, new LinkRenderer(action2, LinkModel.class));
         JFrame frame = wrapWithScrollingInFrame(table, visitor.getOutputComponent(), "show link renderer in table");
         frame.setVisible(true);
 

@@ -63,6 +63,9 @@ import java.awt.event.ActionListener;
  *    use the SwingX DefaultXXRenderer configured with a 
  *    {@link org.jdesktop.swingx.renderer.HyperlinkProvider} instead 
  *    Will not be removed before the editor part is handled as well.
+ *    Changed my mind - it's not recommended to mis-use the editability for 
+ *    to introduce link behaviour. Just in case someone still does, moved to
+ *    waitingroom. 
  */
 @Deprecated
 public class LinkRenderer extends AbstractCellEditor implements
