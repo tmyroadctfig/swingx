@@ -85,6 +85,7 @@ public class IconHighlighter extends AbstractHighlighter {
      * @param icon the Icon to use for decoration, might be null.
      */
     public void setIcon(Icon icon) {
+        if (areEqual(icon, getIcon())) return;
         this.icon = icon;
         fireStateChanged();
     }

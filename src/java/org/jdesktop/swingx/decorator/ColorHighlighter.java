@@ -25,7 +25,9 @@ import java.awt.Color;
 import java.awt.Component;
 
 /**
- * A Highlighter to modify component colors. 
+ * A Highlighter to modify component colors. <p>
+ * 
+ * PENDING JW: cleanup setters to fire only if property actually changed.
  * 
  * @author Jeanette Winzenburg
  */
@@ -186,6 +188,7 @@ public class ColorHighlighter extends AbstractHighlighter {
      *          or null, to clear any existing background color
      */
     public void setBackground(Color color) {
+        if (areEqual(color, getBackground())) return;
         background = color;
         fireStateChanged();
     }
@@ -208,6 +211,7 @@ public class ColorHighlighter extends AbstractHighlighter {
      *          or null, to clear any existing foreground color
      */
     public void setForeground(Color color) {
+        if (areEqual(color, getForeground())) return;
         foreground = color;
         fireStateChanged();
     }
@@ -230,6 +234,7 @@ public class ColorHighlighter extends AbstractHighlighter {
      *          or null, to clear any existing selected background color
      */
     public void setSelectedBackground(Color color) {
+        if (areEqual(color, getSelectedBackground()))return;
         selectedBackground = color;
         fireStateChanged();
     }
@@ -252,6 +257,7 @@ public class ColorHighlighter extends AbstractHighlighter {
      *          or null, to clear any existing selected foreground color
      */
     public void setSelectedForeground(Color color) {
+        if (areEqual(color, getSelectedForeground())) return;
         selectedForeground = color;
         fireStateChanged();
     }

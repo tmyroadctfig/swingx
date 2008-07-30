@@ -29,12 +29,16 @@ import javax.swing.event.ChangeListener;
 import org.jdesktop.swingx.event.WeakEventListenerList;
 
 /**
- * Abstract <code>Highlighter</code> implementation which manages notification
- * and highlights conditionally, controlled by a HighlightPredicate.
+ * Abstract <code>Highlighter</code> implementation which manages change 
+ * notification and supports conditional highlighting. 
+ * Subclasses are required to fire ChangeEvents on internal changes which might
+ * effect the highlight. The HighlightPredicate controls whether or not
+ * a highlight should be applied for the given ComponentAdapter, 
+ * subclasses must guarantee to respect its decision. 
  * <p>
  * 
  * Concrete custom implementations should focus on a single (or few) visual
- * attributes to highlight - this enhances re-use. F.i. a custom
+ * attribute to highlight. This allows easy re-use by composition.  F.i. a custom
  * FontHighlighter:
  * 
  * <pre><code>
@@ -75,7 +79,8 @@ import org.jdesktop.swingx.event.WeakEventListenerList;
  *         return (value instanceof Number) &amp;&amp; ((Number) value).intValue() &lt; 0;
  *     }
  * };
- * table.setHighlighters(new ColorHighlighter(predicate, Color.RED, null),
+ * table.setHighlighters(
+ *         new ColorHighlighter(predicate, Color.RED, null),
  *         new FontHighlighter(predicate, myBoldFont));
  * </code></pre>
  * 
@@ -129,8 +134,11 @@ public abstract class AbstractHighlighter implements Highlighter {
      * @param predicate the HighlightPredicate to use. 
      */
     public void setHighlightPredicate(HighlightPredicate predicate) {
-        this.predicate = predicate != null ? predicate
-                : HighlightPredicate.ALWAYS;
+        if (predicate == null) {
+            predicate = HighlightPredicate.ALWAYS;
+        }
+        if (areEqual(predicate, getHighlightPredicate())) return;
+        this.predicate = predicate;
         fireStateChanged();
     }
 
@@ -195,18 +203,33 @@ public abstract class AbstractHighlighter implements Highlighter {
     protected abstract Component doHighlight(Component component,
             ComponentAdapter adapter);
 
+
+    /**
+     * Returns true if the to objects are either both null or equal
+     * each other.
+     * 
+     * @param oneItem one item
+     * @param anotherItem another item 
+     * @return true if both are null or equal other, false otherwise.
+     */
+    protected boolean areEqual(Object oneItem, Object anotherItem) {
+        if ((oneItem == null) && (anotherItem == null)) return true;
+        if (anotherItem != null) {
+            return anotherItem.equals(oneItem);
+        }
+        return false;
+    }
+
     //------------------------ implement Highlighter change notification
 
     /**
      * Adds a <code>ChangeListener</code>. ChangeListeners are
      * notified after changes of any attribute. 
      *
-     * PENDING: make final once the LegacyHighlighters are removed.
-     * 
      * @param l the ChangeListener to add
      * @see #removeChangeListener
      */
-    public/* final */void addChangeListener(ChangeListener l) {
+    public final void addChangeListener(ChangeListener l) {
         listenerList.add(ChangeListener.class, l);
     }
 
@@ -240,7 +263,10 @@ public abstract class AbstractHighlighter implements Highlighter {
 
     /** 
      * Notifies registered <code>ChangeListener</code>s about
-     * state changes.
+     * state changes.<p>
+     * 
+     * Note: subclasses should be polite and implement any property
+     * setters to fire only if the property is really changed. 
      *  
      */
     protected final void fireStateChanged() {

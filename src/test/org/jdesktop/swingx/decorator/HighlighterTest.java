@@ -95,15 +95,15 @@ public class HighlighterTest extends InteractiveTestCase {
         PainterHighlighter withPainter = new PainterHighlighter(mattePainter);
         assertEquals(HighlightPredicate.ALWAYS, withPainter.getHighlightPredicate());
         assertEquals(mattePainter, withPainter.getPainter());
+        PainterHighlighter withPredicate = new PainterHighlighter(HighlightPredicate.NEVER);
+        assertEquals(HighlightPredicate.NEVER, withPredicate.getHighlightPredicate());
+        assertEquals(null, withPredicate.getPainter());
         PainterHighlighter all = new PainterHighlighter(HighlightPredicate.NEVER, mattePainter);
         assertEquals(HighlightPredicate.NEVER, all.getHighlightPredicate());
         assertEquals(mattePainter, all.getPainter());
-        PainterHighlighter allOld = new PainterHighlighter(HighlightPredicate.NEVER, mattePainter);
-        assertEquals(HighlightPredicate.NEVER, allOld.getHighlightPredicate());
-        assertEquals(mattePainter, allOld.getPainter());
     }
     
-    public void testPainterHighlighterSetPainterAndNotificatioon() {
+    public void testPainterHighlighterSetPainterChangeNotificatioon() {
         PainterHighlighter hl = new PainterHighlighter();
         ChangeReport report = new ChangeReport();
         hl.addChangeListener(report);
@@ -113,6 +113,14 @@ public class HighlighterTest extends InteractiveTestCase {
         assertEquals(1, report.getEventCount());
      }
     
+    public void testPainterHighlighterSetPainterNoChangeNotificatioon() {
+        MattePainter mattePainter = new MattePainter();
+        PainterHighlighter hl = new PainterHighlighter(mattePainter);
+        ChangeReport report = new ChangeReport();
+        hl.addChangeListener(report);
+        hl.setPainter(mattePainter);
+        assertEquals(0, report.getEventCount());
+     }
     /**
      * Issue #851-swingx: Highlighter must notify on painter property change
      */
@@ -244,7 +252,7 @@ public class HighlighterTest extends InteractiveTestCase {
         assertEquals(icon, allColored.getIcon());
     }
     
-    public void testIconHighlightChangeIcon() {
+    public void testIconHighlightIconChangeNotification() {
         IconHighlighter hl = new IconHighlighter();
         Icon icon = XTestUtils.loadDefaultIcon();
         ChangeReport report = new ChangeReport();
@@ -253,6 +261,16 @@ public class HighlighterTest extends InteractiveTestCase {
         assertEquals(icon, hl.getIcon());
         assertEquals(1, report.getEventCount());
     }
+    
+    public void testIconHighlightIconNoChangeNotification() {
+        Icon icon = XTestUtils.loadDefaultIcon();
+        IconHighlighter hl = new IconHighlighter(icon);
+        ChangeReport report = new ChangeReport();
+        hl.addChangeListener(report);
+        hl.setIcon(icon);
+        assertEquals(0, report.getEventCount());
+    }
+    
     public void testIconHighlighterConstructors() {
         IconHighlighter empty = new IconHighlighter();
         assertIconHighlighter(empty, HighlightPredicate.ALWAYS, null);
@@ -270,6 +288,43 @@ public class HighlighterTest extends InteractiveTestCase {
         assertEquals(icon, hl.getIcon());
     }
 //-------------- BorderHighlighter
+    
+    /**
+     * Test that all properties have setters and fire a changeEvent. 
+     */
+    public void testBorderHighlightSetters() {
+        BorderHighlighter hl = new BorderHighlighter();
+        ChangeReport report = new ChangeReport();
+        hl.addChangeListener(report);
+        hl.setInner(!hl.isInner());
+        assertEquals(1, report.getEventCount());
+        report.clear();
+        hl.setCompound(!hl.isCompound());
+        assertEquals(1, report.getEventCount());
+    }
+    
+    /**
+     * Test setBorder and fire a changeEvent.
+     * (setter was missing) 
+     */
+    public void testBorderHighlightSetBorder() {
+        BorderHighlighter hl = new BorderHighlighter();
+        ChangeReport report = new ChangeReport();
+        hl.addChangeListener(report);
+        Border padding = BorderFactory.createLineBorder(Color.RED, 3);
+        hl.setBorder(padding);
+        assertEquals("sanity: border set", padding, hl.getBorder());
+        assertEquals("must fire on setting border", 1, report.getEventCount());
+        report.clear();
+        hl.setBorder(padding);
+        assertEquals("must not fire on setting the same border", 0, report.getEventCount());
+        hl.setBorder(null);
+        assertEquals("must fire on setting border null", 1, report.getEventCount());
+        report.clear();
+        hl.setBorder(null);
+        assertEquals("must not fire setting same null border", 0, report.getEventCount());
+    }
+    
     
     public void testBorderPaddingNull() {
         BorderHighlighter empty = new BorderHighlighter();
@@ -392,28 +447,60 @@ public class HighlighterTest extends InteractiveTestCase {
 //----------------- testing change notification ColorHighlighter
 
     
-    public void testHighlighterChange() {
+    
+    public void testColorHighlighterChangeNotification() {
         ColorHighlighter highlighter = new ColorHighlighter();
-        ChangeReport changeReport = new ChangeReport();
-        highlighter.addChangeListener(changeReport);
-        assertBaseHighlighterChange(highlighter, changeReport);
+        assertBaseHighlighterChange(highlighter, 1);
     }
 
-    private void assertBaseHighlighterChange(ColorHighlighter highlighter, ChangeReport changeReport) {
-        int count = changeReport.getEventCount();
-        highlighter.setBackground(Color.red);
-        assertEquals("event count must be increased", ++count,  changeReport.getEventCount() );
-        highlighter.setForeground(Color.red);
-        assertEquals("event count must be increased", ++count,  changeReport.getEventCount() );
-        highlighter.setSelectedBackground(Color.red);
-        assertEquals("event count must be increased", ++count,  changeReport.getEventCount() );
-        highlighter.setSelectedForeground(Color.red);
-        assertEquals("event count must be increased", ++count,  changeReport.getEventCount() );
-        highlighter.setHighlightPredicate(HighlightPredicate.NEVER);
-        assertEquals("event count must be increased", ++count, changeReport.getEventCount());
+    public void testColorHighlighterNoChangeNotification() {
+        ColorHighlighter highlighter = new ColorHighlighter(HighlightPredicate.NEVER, 
+                Color.RED, Color.RED, Color.RED, Color.RED);
+        assertBaseHighlighterChange(highlighter, 0);
     }
     
- 
+    private void assertBaseHighlighterChange(ColorHighlighter highlighter,  int count ) {
+        ChangeReport changeReport = new ChangeReport();
+        highlighter.addChangeListener(changeReport);
+        highlighter.setBackground(Color.red);
+        assertEquals("event count ", count,  changeReport.getEventCount() );
+        changeReport.clear();
+        highlighter.setForeground(Color.red);
+        assertEquals("event count ", count,  changeReport.getEventCount() );
+        changeReport.clear();
+        highlighter.setSelectedBackground(Color.red);
+        assertEquals("event count ", count,  changeReport.getEventCount() );
+        changeReport.clear();
+        highlighter.setSelectedForeground(Color.red);
+        assertEquals("event count ", count,  changeReport.getEventCount() );
+        changeReport.clear();
+        highlighter.setHighlightPredicate(HighlightPredicate.NEVER);
+        assertEquals("event count ", count, changeReport.getEventCount());
+    }
+    
+    /**
+     * test that the base implementation is polite and fires only if 
+     * the predicate is really changed.
+     */
+    public void testHighlightPredicateNoChangeNotification() {
+        AbstractHighlighter hl = new AbstractHighlighter() {
+
+            @Override
+            protected Component doHighlight(Component component,
+                    ComponentAdapter adapter) {
+                return component;
+            }
+            
+        };
+        ChangeReport report = new ChangeReport();
+        hl.addChangeListener(report);
+        hl.setHighlightPredicate(HighlightPredicate.ALWAYS);
+        assertEquals("must not fire on setting same predicate", 0, report.getEventCount());
+        report.clear();
+        hl.setHighlightPredicate(null);
+        assertEquals("must not fire on setting same predicate", 0, report.getEventCount());
+        
+    }
 //---------------------- exposing highlighter probs with null component color
     
     public void testLabelSanity() {

@@ -88,7 +88,17 @@ public class PainterHighlighter extends AbstractHighlighter {
      * default predicate.
      */
     public PainterHighlighter() {
-        this(null);
+        this(null, null);
+    }
+    /**
+     * Instantiates a PainterHighlighter with null painter which
+     * uses the given predicate.
+     * 
+     * @param predicate the HighlightPredicate which controls the highlight
+     *   application.
+     */
+    public PainterHighlighter(HighlightPredicate predicate) {
+        this(predicate, null);
     }
     
     /**
@@ -113,6 +123,7 @@ public class PainterHighlighter extends AbstractHighlighter {
     }
 
     
+
     /**
      * Returns to Painter used in this Highlighter. 
      * 
@@ -129,6 +140,7 @@ public class PainterHighlighter extends AbstractHighlighter {
      * @param painter the Painter to uses for decoration.
      */
     public void setPainter(Painter painter) {
+        if (areEqual(painter, getPainter())) return;
         uninstallPainterListener();
         this.painter = painter;
         installPainterListener();

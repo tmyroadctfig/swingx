@@ -245,6 +245,11 @@ public interface HighlightPredicate {
         }
         
     };
+
+    // PENDING: these general type empty arrays don't really belong here?
+    public static final HighlightPredicate[] EMPTY_PREDICATE_ARRAY = new HighlightPredicate[0];
+    public static final Object[] EMPTY_OBJECT_ARRAY = new Object[0];
+    public static final Integer[] EMPTY_INTEGER_ARRAY = new Integer[0];
     
 //----------------- logical implementations amongst HighlightPredicates
     
@@ -273,7 +278,14 @@ public interface HighlightPredicate {
         public boolean isHighlighted(Component renderer, ComponentAdapter adapter) {
             return !predicate.isHighlighted(renderer, adapter);
         }
-        
+
+        /**
+         * @return the contained HighlightPredicate.
+         */
+        public HighlightPredicate getHighlightPredicate() {
+            return predicate;
+        }
+
     }
     
     /**
@@ -312,6 +324,15 @@ public interface HighlightPredicate {
             }
             return !predicate.isEmpty();
         }
+
+        /**
+         * @return the contained HighlightPredicates.
+         */
+        public HighlightPredicate[] getHighlightPredicates() {
+            if (predicate.isEmpty()) return EMPTY_PREDICATE_ARRAY;
+            return predicate.toArray(new HighlightPredicate[predicate.size()]);
+        }
+        
         
     }
     
@@ -351,6 +372,13 @@ public interface HighlightPredicate {
             }
             return false;
         }
+        /**
+         * @return 
+         */
+        public HighlightPredicate[] getHighlightPredicates() {
+            if (predicate.isEmpty()) return EMPTY_PREDICATE_ARRAY;
+            return predicate.toArray(new HighlightPredicate[predicate.size()]);
+        }
         
     }
     
@@ -381,6 +409,14 @@ public interface HighlightPredicate {
         public boolean isHighlighted(Component renderer, ComponentAdapter adapter) {
             // JW: oddness check is okay - adapter.row must be a valid view coordinate
             return (adapter.row / linesPerGroup) % 2 == 1;
+        }
+
+        /**
+         * 
+         * @return the number of lines per group.
+         */
+        public int getLinesPerGroup() {
+            return linesPerGroup;
         }
         
     }
@@ -415,6 +451,16 @@ public interface HighlightPredicate {
         public boolean isHighlighted(Component renderer, ComponentAdapter adapter) {
             int modelIndex = adapter.viewToModel(adapter.column);
             return columnList.contains(modelIndex);
+        }
+
+        /**
+         * PENDING JW: get array of int instead of Integer?
+         * 
+         * @return the columns indices in model coordinates to highlight
+         */
+        public Integer[] getColumns() {
+            if (columnList.isEmpty()) return EMPTY_INTEGER_ARRAY;
+            return columnList.toArray(new Integer[columnList.size()]);
         }
         
     }
@@ -452,6 +498,14 @@ public interface HighlightPredicate {
             Object identifier = adapter.getColumnIdentifierAt(modelIndex);
             return identifier != null ? columnList.contains(identifier) : false;
         }
+
+        /**
+         * @return the identifiers
+         */
+        public Object[] getIdentifiers() {
+            if (columnList.isEmpty()) return EMPTY_OBJECT_ARRAY;
+            return columnList.toArray(new Object[0]);
+        }
         
     }
     
@@ -472,7 +526,7 @@ public interface HighlightPredicate {
          * @param depths the depths to highlight
          */
     	public DepthHighlightPredicate(int... depths) {
-    		depthList = new ArrayList<Integer>();
+    	    depthList = new ArrayList<Integer>();
             for (int i = 0; i < depths.length; i++) {
                 depthList.add(depths[i]);
             }
@@ -489,6 +543,14 @@ public interface HighlightPredicate {
                 ComponentAdapter adapter) {
             int depth = adapter.getDepth();
             return depthList.contains(depth);
+        }
+
+        /**
+         * @return
+         */
+        public Integer[] getDepths() {
+            if (depthList.isEmpty()) return EMPTY_INTEGER_ARRAY;
+            return depthList.toArray(new Integer[depthList.size()]);
         }
     	
     }
@@ -512,6 +574,7 @@ public interface HighlightPredicate {
         }
         /**
          * Instantitates a predicate with the given compare value.
+         * PENDING JW: support array? 
          * @param compareValue the fixed value to compare the 
          *   adapter against.
          */
@@ -530,6 +593,13 @@ public interface HighlightPredicate {
             return compareValue.equals(adapter.getValue());
         }
         
+        /**
+         * @return the value this predicate checks against.
+         */
+        public Object getCompareValue() {
+            return compareValue;
+        }
+        
     }
 
     /**
@@ -538,7 +608,7 @@ public interface HighlightPredicate {
      */
     public static class TypeHighlightPredicate implements HighlightPredicate {
 
-        private Class clazz;
+        private Class<?> clazz;
         
         /**
          * Instantitates a predicate with Object.clazz. This is essentially the
@@ -549,7 +619,10 @@ public interface HighlightPredicate {
             this(Object.class);
         }
         /**
-         * Instantitates a predicate with the given compare class.
+         * Instantitates a predicate with the given compare class.<p>
+         * 
+         * PENDING JW: support array? 
+         * 
          * @param compareValue the fixed class to compare the 
          *   adapter value against.
          */
@@ -566,6 +639,12 @@ public interface HighlightPredicate {
         public boolean isHighlighted(Component renderer, ComponentAdapter adapter) {
             return adapter.getValue() != null ? 
                     clazz.isAssignableFrom(adapter.getValue().getClass()) : false;
+        }
+        /**
+         * @return
+         */
+        public Class<?> getType() {
+            return clazz;
         }
         
     }

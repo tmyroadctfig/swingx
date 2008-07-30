@@ -192,6 +192,8 @@ public class BorderHighlighter extends AbstractHighlighter {
      * 
      * @param inner a boolean indicating whether the highlight border should be 
      *  compounded as inner or outer border.
+     *  
+     *  @see #isInner()
      */
     public void setInner(boolean inner) {
         if (isInner() == inner) return;
@@ -200,14 +202,39 @@ public class BorderHighlighter extends AbstractHighlighter {
     }
     
     /**
+     * Returns the inner property.
      * 
-     * @return the compound property.
+     * @return the inner property.
      * @see #setInner(boolean)
      */
     public boolean isInner() {
         return inner;
     }
+
+    /**
+     * Sets the Border used for highlighting. <p>
+     * 
+     * The default value is null.
+     * 
+     * @param padding the Border to use
+     */
+    public void setBorder(Border padding) {
+        if (areEqual(padding, getBorder())) return;
+        this.paddingBorder = padding;
+        fireStateChanged();
+    }
     
+
+    /**
+     * Returns the border used for highlighing.<p>
+     * 
+     * @return the border used to highlight.
+     */
+    public Border getBorder() {
+        return paddingBorder;
+    }
+    
+
     /**
      * PRE: paddingBorder != null.
      * @param border
@@ -224,16 +251,6 @@ public class BorderHighlighter extends AbstractHighlighter {
                         border);
             }
         }
-        return paddingBorder;
-    }
-    /**
-     * Returns the border used for highlighing.<p>
-     * 
-     * PENDING JW: missing setter
-     * 
-     * @return the border used to highlight.
-     */
-    public Border getBorder() {
         return paddingBorder;
     }
 
