@@ -14,8 +14,6 @@ import javax.swing.table.TableColumn;
 import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.action.AbstractActionExt;
-import org.jdesktop.swingx.test.ColumnModelReport;
-import org.jdesktop.test.TestUtils;
 
 /**
  * Test to exposed known issues of <code>TableColumnModelExt</code>
@@ -43,48 +41,6 @@ public class TableColumnModelExtIssues extends TableColumnModelTest {
            e.printStackTrace();
        }
    }
-
-    /**
-     * Issue #??-swingx: internal book-keeping must not be routed via columnModel
-     *    column propertyChange <p>
-     * test the change from visible to hidden.
-     */
-    public void testTableColumnIgnoreNoPropertyNotificationHide() {
-        TableColumnModelExt columnModel = createColumnModel(COLUMN_COUNT);
-        ColumnModelReport report = new ColumnModelReport();
-        columnModel.addColumnModelListener(report);
-        columnModel.getColumnExt(0).setVisible(false);
-        assertEquals("ignore events must not be routed", 0, report.getColumnPropertyEventCount(
-                "TableColumnModelExt.ignoreEvent"));
-    }
-
-    /**
-     * Issue #??-swingx: internal book-keeping must not be routed via columnModel
-     *    column propertyChange <p>
-     * test the change from hidden to visible.
-     */
-    public void testTableColumnIgnoreNoPropertyNotificationShow() {
-        TableColumnModelExt columnModel = createColumnModel(COLUMN_COUNT);
-        columnModel.getColumnExt(0).setVisible(false);
-        ColumnModelReport report = new ColumnModelReport();
-        columnModel.addColumnModelListener(report);
-        columnModel.getColumnExt(0).setVisible(true);
-        assertEquals("ignore events must not be routed", 0, report.getColumnPropertyEventCount(
-                "TableColumnModelExt.ignoreEvent"));
-    }
-
-    /**
-     * Issue #369-swingx: properties of hidden columns are not fired. <p>
-     * test the change from visible to hidden.
-     */
-    public void testHideTableColumnPropertyNotification() {
-        TableColumnModelExt columnModel = createColumnModel(COLUMN_COUNT);
-        ColumnModelReport report = new ColumnModelReport();
-        columnModel.addColumnModelListener(report);
-        columnModel.getColumnExt(0).setVisible(false);
-        TestUtils.assertPropertyChangeEvent(report.getPropertyChangeReport(), 
-                "visible", true, false);
-    }
 
     /**
      * Issue #624-swingx: support use-case to store/restore column sequence.

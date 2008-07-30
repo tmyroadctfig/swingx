@@ -38,7 +38,50 @@ public class TableColumnModelTest extends InteractiveTestCase {
     private static final Logger LOG = Logger
             .getLogger(TableColumnModelTest.class.getName());
     protected static final int COLUMN_COUNT = 3;
- 
+
+    /**
+     * Issue #867-swingx: internal book-keeping must not be routed via columnModel
+     *    column propertyChange <p>
+     * test the change from visible to hidden.
+     */
+    public void testTableColumnIgnoreNoPropertyNotificationHide() {
+        TableColumnModelExt columnModel = createColumnModel(COLUMN_COUNT);
+        ColumnModelReport report = new ColumnModelReport();
+        columnModel.addColumnModelListener(report);
+        columnModel.getColumnExt(0).setVisible(false);
+        assertEquals("ignore events must not be routed", 0, report.getColumnPropertyEventCount(
+                "TableColumnModelExt.ignoreEvent"));
+    }
+
+    /**
+     * Issue #867-swingx: internal book-keeping must not be routed via columnModel
+     *    column propertyChange <p>
+     * test the change from hidden to visible.
+     */
+    public void testTableColumnIgnoreNoPropertyNotificationShow() {
+        TableColumnModelExt columnModel = createColumnModel(COLUMN_COUNT);
+        columnModel.getColumnExt(0).setVisible(false);
+        ColumnModelReport report = new ColumnModelReport();
+        columnModel.addColumnModelListener(report);
+        columnModel.getColumnExt(0).setVisible(true);
+        assertEquals("ignore events must not be routed", 0, report.getColumnPropertyEventCount(
+                "TableColumnModelExt.ignoreEvent"));
+    }
+
+    /**
+     * Issue #369-swingx: properties of hidden columns are not fired. <p>
+     * test the change from visible to hidden.
+     */
+    public void testHideTableColumnPropertyNotification() {
+        TableColumnModelExt columnModel = createColumnModel(COLUMN_COUNT);
+        ColumnModelReport report = new ColumnModelReport();
+        columnModel.addColumnModelListener(report);
+        columnModel.getColumnExt(0).setVisible(false);
+        TestUtils.assertPropertyChangeEvent(report.getPropertyChangeReport(), 
+                "visible", true, false);
+    }
+
+
     /**
      * Issue #846-swingx
      */

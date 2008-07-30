@@ -271,7 +271,9 @@ public class DefaultTableColumnModelExt extends DefaultTableColumnModel
 
 
     /**
-     * TODO move into propertyChanged! No need for a dedicated listener.
+     * TODO JW: move into propertyChanged! No need for a dedicated listener.
+     * Changed evaluation JW: may still be required as super removes itself as
+     * propertyChangeListener if column is hidden 
      */
     private final class VisibilityListener implements PropertyChangeListener, Serializable {        
         public void propertyChange(PropertyChangeEvent evt) {
@@ -286,7 +288,7 @@ public class DefaultTableColumnModelExt extends DefaultTableColumnModel
                     moveToVisible(col);
                     fireColumnPropertyChange(evt);
                 }
-            } else if (!((TableColumnExt) evt.getSource()).isVisible()) {
+            }  else if (!((TableColumnExt) evt.getSource()).isVisible()) {
                 fireColumnPropertyChange(evt);
             }
         }
@@ -322,6 +324,7 @@ public class DefaultTableColumnModelExt extends DefaultTableColumnModel
      * @see EventListenerList
      */
     protected void fireColumnPropertyChange(PropertyChangeEvent evt) {
+        if (IGNORE_EVENT.equals(evt.getPropertyName())) return;
         // Guaranteed to return a non-null array
         Object[] listeners = listenerList.getListenerList();
         // Process the listeners last to first, notifying
