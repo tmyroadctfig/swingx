@@ -132,8 +132,7 @@ public final class SimpleRendererDemo {
         // choose a random first name to highlight
         int rndIndex = new Double(Math.random() * contributors.size()).intValue();
         String match = contributors.get(rndIndex).firstName;
-        System.out.println(match);
-        HighlightPredicate predicate = new PatternPredicate(Pattern.compile(match), 0);
+        HighlightPredicate predicate = new PatternPredicate(match, 0);
         Highlighter foreground = new ColorHighlighter(predicate, 
                 HighlighterFactory.NOTEPAD, Color.MAGENTA);
         table.addHighlighter(foreground);

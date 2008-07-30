@@ -205,6 +205,7 @@ public class JXTableHeaderIssues extends JXTableHeaderTest {
      * to determine the insets and calc the view rect.
      * 
      */
+    @SuppressWarnings("unused")
     public void interactiveSortedPreferredHeight() {
         final JXTable table = new JXTable(10, 1);
         table.getColumnExt(0).setPreferredWidth(200);

@@ -7,7 +7,6 @@ package org.jdesktop.swingx;
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
 import javax.swing.plaf.UIResource;
-import javax.swing.table.DefaultTableModel;
 
 import org.jdesktop.swingx.decorator.Filter;
 import org.jdesktop.swingx.decorator.FilterPipeline;

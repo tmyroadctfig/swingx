@@ -182,7 +182,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
         tree.setCellRenderer(treeRenderer);
         // string based. Note: this example is locale dependent
         String folderDescription = ".*ordner.*";
-        PatternPredicate predicate = new PatternPredicate(Pattern.compile(folderDescription, 0), 0, -1);
+        PatternPredicate predicate = new PatternPredicate(folderDescription, 0, -1);
         Highlighter hl = new ColorHighlighter(predicate, null, Color.RED);
         table.addHighlighter(hl);
         tree.addHighlighter(hl);
@@ -346,7 +346,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
                 BorderFactory.createLineBorder(Color.BLUE)));
         // string based. Note: this example is locale dependent
         String folderDescription = ".*ordner.*";
-        PatternPredicate predicate = new PatternPredicate(Pattern.compile(folderDescription, 0), 0, -1);
+        PatternPredicate predicate = new PatternPredicate(folderDescription, 0, -1);
         Highlighter hl = new ColorHighlighter(predicate, null, Color.RED);
         table.addHighlighter(hl);
         tree.addHighlighter(hl);

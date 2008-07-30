@@ -133,7 +133,6 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         table.setAutoCreateColumnsFromModel(false);
         table.setAutoResizeMode(JXTable.AUTO_RESIZE_OFF);
         table.setColumnControlVisible(true);
-        TableColumn mini = table.getColumn(3);
         // min/max is respected
 //        mini.setMaxWidth(5);
 //        mini.setMinWidth(5);

@@ -12,7 +12,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.Collator;
 import java.util.Vector;
-import java.util.regex.Pattern;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
@@ -431,7 +430,7 @@ public class JXListTest extends InteractiveTestCase {
         JXList list = new JXList(new Object[] {1, 2, 3});
         ListCellRenderer renderer = list.getCellRenderer();
         renderer.getListCellRendererComponent(list, "dummy", -1, false, false);
-        SearchPredicate predicate = new SearchPredicate(Pattern.compile("\\QNode\\E"));
+        SearchPredicate predicate = new SearchPredicate("\\QNode\\E");
         Highlighter searchHighlighter = new ColorHighlighter(predicate, null, Color.RED);
         list.addHighlighter(searchHighlighter);
         renderer.getListCellRendererComponent(list, "dummy", -1, false, false);
@@ -450,7 +449,7 @@ public class JXListTest extends InteractiveTestCase {
         JXList list = new JXList(new Object[] {1, 2, 3});
         ListCellRenderer renderer = list.getCellRenderer();
         renderer.getListCellRendererComponent(list, "dummy", list.getElementCount(), false, false);
-        SearchPredicate predicate = new SearchPredicate(Pattern.compile("\\QNode\\E"));
+        SearchPredicate predicate = new SearchPredicate("\\QNode\\E");
         Highlighter searchHighlighter = new ColorHighlighter(predicate, null, Color.RED);
         list.addHighlighter(searchHighlighter);
         renderer.getListCellRendererComponent(list, "dummy", list.getElementCount(), false, false);

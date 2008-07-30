@@ -128,8 +128,7 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
         
         Font font = table.getFont().deriveFont(Font.BOLD | Font.ITALIC);
         Highlighter simpleStriping = HighlighterFactory.createSimpleStriping();
-        Pattern pattern = Pattern.compile("^M", 0);
-        PatternPredicate patternPredicate = new PatternPredicate(pattern, 1);
+        PatternPredicate patternPredicate = new PatternPredicate("^M", 1);
         ColorHighlighter magenta = new ColorHighlighter(patternPredicate, null,
                 Color.MAGENTA, null, Color.MAGENTA);
         FontHighlighter derivedFont = new FontHighlighter(font,
@@ -160,7 +159,7 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
         source.toggleSortOrder(3);
         Font font = source.getFont().deriveFont(Font.BOLD | Font.ITALIC);
         Highlighter simpleStriping = HighlighterFactory.createSimpleStriping();
-        Pattern pattern = Pattern.compile("^M", 0);
+        String pattern = "^M";
         PatternPredicate patternPredicate = new PatternPredicate(pattern, 0);
         ColorHighlighter magenta = new ColorHighlighter(patternPredicate, null,
                 Color.MAGENTA, null, Color.MAGENTA);
@@ -504,8 +503,7 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
     public void interactiveTablePatternHighlighter() {
         JXTable table = new JXTable(tableModel);
         table.setColumnControlVisible(true);
-        Pattern pattern = Pattern.compile("^M", 0);
-        table.addHighlighter(new ColorHighlighter(new PatternPredicate(pattern, 1), null, 
+        table.addHighlighter(new ColorHighlighter(new PatternPredicate("^M", 1), null, 
                 Color.red));
         showWithScrollingInFrame(table, "Pattern: highlight row if ^M col 1");
     }

@@ -152,7 +152,7 @@ public class JXListVisualCheck extends JXListTest {
         String pattern = "Row";
         list.setHighlighters(new ColorHighlighter(// columns not really important, ListAdapter.getXXValue
         // uses row only
-        new PatternPredicate(Pattern.compile(pattern), 0), null, 
+        new PatternPredicate(pattern, 0), null, 
                 Color.red));
         showWithScrollingInFrame(list, "PatternHighlighter: " + pattern);
     }

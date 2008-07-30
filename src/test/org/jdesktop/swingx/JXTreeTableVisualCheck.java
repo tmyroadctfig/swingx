@@ -1005,12 +1005,6 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         treeTable.addHighlighter(hl);
         treeTable.addHighlighter(new ColorHighlighter(new PatternPredicate(Pattern.compile("^s", Pattern.CASE_INSENSITIVE), 0), null, 
                 Color.red));
-        // alternative: set a pipeline containing the bunch of highlighters
-//        treeTable.setHighlighters(new CompoundHighlighter(new LegacyHighlighter[] {
-//                AlternateRowHighlighter.quickSilver,
-//                new HierarchicalColumnHighlighter(),
-//                new PatternHighlighter(null, Color.red, "^s",
-//                        Pattern.CASE_INSENSITIVE, 0, -1), }));
         JFrame frame = wrapWithScrollingInFrame(treeTable,
                 "QuickSilver-, Column-, PatternHighligher and LineStyle");
         frame.setVisible(true);
@@ -1191,7 +1185,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         treeTable.setHighlighters(
                         new ColorHighlighter(Color.orange, null),
                         hl,
-                        new ColorHighlighter(new PatternPredicate(Pattern.compile("D"), 0), null,
+                        new ColorHighlighter(new PatternPredicate("D", 0), null,
                                 Color.red));
 
         HighlightPredicate predicate = new HighlightPredicate() {

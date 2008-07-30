@@ -244,7 +244,7 @@ public class RendererIssues extends InteractiveTestCase {
         table.setTreeCellRenderer(treeRenderer);
         // string based. Note: this example is locale dependent
         String folderDescription = ".*ordner.*";
-        PatternPredicate predicate = new PatternPredicate(Pattern.compile(folderDescription, 0), 0, -1);
+        PatternPredicate predicate = new PatternPredicate(folderDescription, 0, -1);
         final Highlighter hl = new ColorHighlighter(predicate, null, Color.RED);
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.YEAR, -1);

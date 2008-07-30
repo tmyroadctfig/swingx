@@ -22,7 +22,6 @@
 package org.jdesktop.swingx.decorator;
 
 import java.awt.Color;
-import java.util.regex.Pattern;
 
 import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXFrame;
@@ -70,7 +69,7 @@ public class ComponentAdapterIssues extends InteractiveTestCase {
         treeTable.setTreeCellRenderer(new DefaultTreeRenderer(sv));
         JXTree tree =  new JXTree(model);
         tree.setCellRenderer(new DefaultTreeRenderer(sv));
-        HighlightPredicate predicate = new PatternPredicate(Pattern.compile("R/G/B: -2", 0), 0, -1);
+        HighlightPredicate predicate = new PatternPredicate("R/G/B: -2", 0, PatternPredicate.ALL);
         ColorHighlighter hl = new ColorHighlighter(predicate, null, Color.RED);
         treeTable.addHighlighter(hl);
         tree.addHighlighter(hl);

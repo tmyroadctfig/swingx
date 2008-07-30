@@ -9,7 +9,6 @@ package org.jdesktop.swingx;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Container;
 import java.awt.GraphicsEnvironment;
 import java.awt.Window;
 import java.net.URL;
@@ -28,7 +27,6 @@ import org.jdesktop.swingx.search.AbstractSearchable;
 import org.jdesktop.swingx.search.PatternModel;
 import org.jdesktop.swingx.search.SearchFactory;
 import org.jdesktop.swingx.search.Searchable;
-import org.jdesktop.swingx.search.TableSearchable;
 
 public class FindTest extends InteractiveTestCase {
     private static final Logger LOG = Logger

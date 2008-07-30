@@ -671,30 +671,30 @@ public class HighlightPredicateTest extends InteractiveTestCase {
                   predicate.isHighlighted(allColored, adapter));
     }
     
-//    public void testPatternWithString() {
-//        // start with "t"
-//        String regex = "^t";
-//        int testColumn = 0;
-//        int decorateColumn = 0;
-//        PatternPredicate predicate = new PatternPredicate(regex, testColumn, decorateColumn);
-//        Pattern pattern = Pattern.compile(regex);
-//        assertEquals(pattern.pattern(), predicate.getPattern().pattern());
-//        ComponentAdapter adapter = createComponentAdapter(allColored, true);
-//        assertEquals("predicate must have same result as matcher", pattern.matcher(allColored.getText()).find(), 
-//                  predicate.isHighlighted(allColored, adapter));
-//    }
-//    
-//    public void testPatternTwoParamConstructorWithString() {
-//        // start with "t"
-//        String regex = "^t";
-//        int testColumn = 0;
-//        HighlightPredicate predicate = new PatternPredicate(regex, testColumn);
-//        Pattern pattern = Pattern.compile(regex);
-//        ComponentAdapter adapter = createComponentAdapter(allColored, true);
-//        assertEquals("predicate must have same result as matcher", pattern.matcher(allColored.getText()).find(), 
-//                  predicate.isHighlighted(allColored, adapter));
-//    }
-// 
+    public void testPatternWithString() {
+        // start with "t"
+        String regex = "^t";
+        int testColumn = 0;
+        int decorateColumn = 0;
+        PatternPredicate predicate = new PatternPredicate(regex, testColumn, decorateColumn);
+        Pattern pattern = Pattern.compile(regex);
+        assertEquals(pattern.pattern(), predicate.getPattern().pattern());
+        ComponentAdapter adapter = createComponentAdapter(allColored, true);
+        assertEquals("predicate must have same result as matcher", pattern.matcher(allColored.getText()).find(), 
+                  predicate.isHighlighted(allColored, adapter));
+    }
+    
+    public void testPatternTwoParamConstructorWithString() {
+        // start with "t"
+        String regex = "^t";
+        int testColumn = 0;
+        HighlightPredicate predicate = new PatternPredicate(regex, testColumn);
+        Pattern pattern = Pattern.compile(regex);
+        ComponentAdapter adapter = createComponentAdapter(allColored, true);
+        assertEquals("predicate must have same result as matcher", pattern.matcher(allColored.getText()).find(), 
+                  predicate.isHighlighted(allColored, adapter));
+    }
+ 
     public void testSearchHighlightConstructorOne() {
         Pattern pattern = Pattern.compile("^t");
         SearchPredicate predicate = new SearchPredicate(pattern);
@@ -791,76 +791,76 @@ public class HighlightPredicateTest extends InteractiveTestCase {
                 predicate.isHighlighted(allColored, adapter));
     }
     
-//    /**
-//     * test match in all cells using regex constructor.
-//     *
-//     */
-//    public void testSearchHighlightAllMatchesWithString() {
-//        // start with "t"
-//        String regex = "^t";
-//        HighlightPredicate predicate = new SearchPredicate(regex);
-//        Pattern pattern = Pattern.compile(regex);
-//        ComponentAdapter adapter = createComponentAdapter(allColored, false);
-//        assertEquals("predicate must have same result as matcher", pattern.matcher(allColored.getText()).find(), 
-//                  predicate.isHighlighted(allColored, adapter));
-//        adapter.row = 5;
-//        adapter.column = 10;
-//        assertEquals("predicate must have same result as matcher", pattern.matcher(allColored.getText()).find(), 
-//                predicate.isHighlighted(allColored, adapter));
-//    }
-//    
-//    /**
-//     * test match limited by column using regex constructor.
-//     *
-//     */
-//    public void testSearchHighlightColumnWithString() {
-//        // start with "t"
-//        String regex = "^t";
-//        int column = 2;
-//        HighlightPredicate predicate = new SearchPredicate(regex, column);
-//        ComponentAdapter adapter = createComponentAdapter(allColored, false);
-//        assertFalse("predicate must not match", 
-//                  predicate.isHighlighted(allColored, adapter));
-//        adapter.column = column;
-//        assertTrue("predicate must match", 
-//                predicate.isHighlighted(allColored, adapter));
-//    }
-//    
-//    /**
-//     * test match limited by row using regex constructor.
-//     *
-//     */
-//    public void testSearchHighlightRowWithString() {
-//        // start with "t"
-//        String regex = "^t";
-//        int row = 2;
-//        HighlightPredicate predicate = new SearchPredicate(regex, row, SearchPredicate.ALL);
-//        ComponentAdapter adapter = createComponentAdapter(allColored, false);
-//        assertFalse("predicate must not match", 
-//                  predicate.isHighlighted(allColored, adapter));
-//        adapter.row = row;
-//        assertTrue("predicate must match", 
-//                predicate.isHighlighted(allColored, adapter));
-//    }
-//
-//    public void testSearchHighlightNullString() {
-//        // start with "t"
-//        String regex = null;
-//        HighlightPredicate predicate = new SearchPredicate(regex);
-//        ComponentAdapter adapter = createComponentAdapter(allColored, false);
-//        assertEquals("null regex must be no match", false, 
-//                  predicate.isHighlighted(allColored, adapter));
-//    }
-//    
-//    public void testSearchHighlightEmptyString() {
-//        // start with "t"
-//        String regex = "";
-//        HighlightPredicate predicate = new SearchPredicate(regex);
-//        ComponentAdapter adapter = createComponentAdapter(allColored, false);
-//        assertEquals("empty regex must be no match", false, 
-//                  predicate.isHighlighted(allColored, adapter));
-//    }
-//    
+    /**
+     * test match in all cells using regex constructor.
+     *
+     */
+    public void testSearchHighlightAllMatchesWithString() {
+        // start with "t"
+        String regex = "^t";
+        HighlightPredicate predicate = new SearchPredicate(regex);
+        Pattern pattern = Pattern.compile(regex);
+        ComponentAdapter adapter = createComponentAdapter(allColored, false);
+        assertEquals("predicate must have same result as matcher", pattern.matcher(allColored.getText()).find(), 
+                  predicate.isHighlighted(allColored, adapter));
+        adapter.row = 5;
+        adapter.column = 10;
+        assertEquals("predicate must have same result as matcher", pattern.matcher(allColored.getText()).find(), 
+                predicate.isHighlighted(allColored, adapter));
+    }
+    
+    /**
+     * test match limited by column using regex constructor.
+     *
+     */
+    public void testSearchHighlightColumnWithString() {
+        // start with "t"
+        String regex = "^t";
+        int column = 2;
+        HighlightPredicate predicate = new SearchPredicate(regex, column);
+        ComponentAdapter adapter = createComponentAdapter(allColored, false);
+        assertFalse("predicate must not match", 
+                  predicate.isHighlighted(allColored, adapter));
+        adapter.column = column;
+        assertTrue("predicate must match", 
+                predicate.isHighlighted(allColored, adapter));
+    }
+    
+    /**
+     * test match limited by row using regex constructor.
+     *
+     */
+    public void testSearchHighlightRowWithString() {
+        // start with "t"
+        String regex = "^t";
+        int row = 2;
+        HighlightPredicate predicate = new SearchPredicate(regex, row, SearchPredicate.ALL);
+        ComponentAdapter adapter = createComponentAdapter(allColored, false);
+        assertFalse("predicate must not match", 
+                  predicate.isHighlighted(allColored, adapter));
+        adapter.row = row;
+        assertTrue("predicate must match", 
+                predicate.isHighlighted(allColored, adapter));
+    }
+
+    public void testSearchHighlightNullString() {
+        // start with "t"
+        String regex = null;
+        HighlightPredicate predicate = new SearchPredicate(regex);
+        ComponentAdapter adapter = createComponentAdapter(allColored, false);
+        assertEquals("null regex must be no match", false, 
+                  predicate.isHighlighted(allColored, adapter));
+    }
+    
+    public void testSearchHighlightEmptyString() {
+        // start with "t"
+        String regex = "";
+        HighlightPredicate predicate = new SearchPredicate(regex);
+        ComponentAdapter adapter = createComponentAdapter(allColored, false);
+        assertEquals("empty regex must be no match", false, 
+                  predicate.isHighlighted(allColored, adapter));
+    }
+    
     public void testSearchHighlightNullPattern() {
         Pattern pattern = null;
         HighlightPredicate predicate = new SearchPredicate(pattern);

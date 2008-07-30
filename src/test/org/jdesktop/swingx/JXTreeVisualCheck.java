@@ -26,13 +26,11 @@ import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.util.logging.Logger;
-import java.util.regex.Pattern;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JFrame;
 import javax.swing.JTree;
 import javax.swing.ToolTipManager;
 import javax.swing.plaf.basic.BasicTreeUI;
@@ -55,14 +53,12 @@ import org.jdesktop.swingx.decorator.HighlighterFactory;
 import org.jdesktop.swingx.decorator.PatternPredicate;
 import org.jdesktop.swingx.decorator.SearchPredicate;
 import org.jdesktop.swingx.decorator.HighlightPredicate.DepthHighlightPredicate;
-import org.jdesktop.swingx.renderer.CellContext;
 import org.jdesktop.swingx.renderer.DefaultListRenderer;
 import org.jdesktop.swingx.renderer.DefaultTreeRenderer;
 import org.jdesktop.swingx.renderer.IconValue;
 import org.jdesktop.swingx.renderer.StringValue;
 import org.jdesktop.swingx.renderer.WrappingProvider;
 import org.jdesktop.swingx.test.ActionMapTreeTableModel;
-import org.jdesktop.swingx.tree.DefaultXTreeCellEditor;
 import org.jdesktop.swingx.treetable.TreeTableNode;
 
 public class JXTreeVisualCheck extends JXTreeUnitTest {
@@ -309,7 +305,7 @@ public class JXTreeVisualCheck extends JXTreeUnitTest {
     
     public void interactiveExpandWithHighlighters() {
         JXTree tree = new JXTree();
-        Highlighter searchHighlighter = new ColorHighlighter(new SearchPredicate(Pattern.compile("\\Qe\\E")), null, 
+        Highlighter searchHighlighter = new ColorHighlighter(new SearchPredicate("\\Qe\\E"), null, 
                 Color.RED);
         tree.addHighlighter(searchHighlighter);
         showWithScrollingInFrame(tree, "NPE on tree expand with highlighter");
@@ -454,7 +450,7 @@ public class JXTreeVisualCheck extends JXTreeUnitTest {
     public void interactiveTestHighlighters() {
         JXTree tree = new JXTree(treeTableModel);
         String pattern = "o";
-        tree.setHighlighters(new ColorHighlighter(new PatternPredicate(Pattern.compile(pattern), 0), 
+        tree.setHighlighters(new ColorHighlighter(new PatternPredicate(pattern, 0), 
                 Color.YELLOW, 
                 Color.RED),
                 HighlighterFactory.createSimpleStriping(HighlighterFactory.LINE_PRINTER));

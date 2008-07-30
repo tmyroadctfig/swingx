@@ -22,7 +22,6 @@
 package org.jdesktop.swingx.decorator;
 
 import java.awt.Color;
-import java.util.regex.Pattern;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
@@ -72,7 +71,7 @@ public class ComponentAdapterClientTest extends InteractiveTestCase {
     public void interactiveTableGetStringUsedInFind() {
         JXTable table = new JXTable(new AncientSwingTeam());
         table.setDefaultRenderer(Color.class, new DefaultTableRenderer(sv));
-        HighlightPredicate predicate = new PatternPredicate(Pattern.compile("R/G/B: -2", 0), 2, 2);
+        HighlightPredicate predicate = new PatternPredicate("R/G/B: -2", 2, 2);
         table.addHighlighter(new ColorHighlighter(predicate, null, Color.RED));
         table.setColumnControlVisible(true);
         
@@ -90,7 +89,7 @@ public class ComponentAdapterClientTest extends InteractiveTestCase {
     public void interactiveListGetStringUsedInFind() {
         JXList table = new JXList(AncientSwingTeam.createNamedColorListModel());
         table.setCellRenderer(new DefaultListRenderer(sv));
-        HighlightPredicate predicate = new PatternPredicate(Pattern.compile("R/G/B: -2", 0), 2, 2);
+        HighlightPredicate predicate = new PatternPredicate("R/G/B: -2", 2, 2);
         table.addHighlighter(new ColorHighlighter(predicate, null, Color.RED));
         JXFrame frame = wrapWithScrollingInFrame(table, "Find/Highlight use adapter string value");
         addSearchModeToggle(frame);
@@ -106,7 +105,7 @@ public class ComponentAdapterClientTest extends InteractiveTestCase {
     public void interactiveTreeGetStringUsedInFind() {
         JXTree table = new JXTree(AncientSwingTeam.createNamedColorTreeModel());
         table.setCellRenderer(new DefaultTreeRenderer(sv));
-        HighlightPredicate predicate = new PatternPredicate(Pattern.compile("R/G/B: -2", 0), 2, 2);
+        HighlightPredicate predicate = new PatternPredicate("R/G/B: -2", 2, 2);
         table.addHighlighter(new ColorHighlighter(predicate, null, Color.RED));
         JXFrame frame = wrapWithScrollingInFrame(table, "Find/Highlight use adapter string value");
         addSearchModeToggle(frame);
@@ -129,8 +128,7 @@ public class ComponentAdapterClientTest extends InteractiveTestCase {
         int matchColumn = 0;
         String text = sv.getString(table.getValueAt(matchRow, matchColumn));
         ComponentAdapter adapter = table.getComponentAdapter(matchRow, matchColumn);
-        Pattern pattern = Pattern.compile(text, 0);
-        HighlightPredicate predicate = new PatternPredicate(pattern, matchColumn, -1);
+        HighlightPredicate predicate = new PatternPredicate(text, matchColumn, PatternPredicate.ALL);
         assertTrue(predicate.isHighlighted(null, adapter));
     }
 
@@ -219,8 +217,7 @@ public class ComponentAdapterClientTest extends InteractiveTestCase {
         int matchColumn = 2;
         String text = sv.getString(table.getValueAt(matchRow, matchColumn));
         ComponentAdapter adapter = table.getComponentAdapter(matchRow, matchColumn);
-        Pattern pattern = Pattern.compile(text, 0);
-        SearchPredicate predicate = new SearchPredicate(pattern, matchRow, matchColumn);
+        SearchPredicate predicate = new SearchPredicate(text, matchRow, matchColumn);
         assertTrue(predicate.isHighlighted(null, adapter));
     }
 
@@ -236,8 +233,7 @@ public class ComponentAdapterClientTest extends InteractiveTestCase {
         int matchColumn = 2;
         String text = sv.getString(table.getValueAt(matchRow, matchColumn));
         ComponentAdapter adapter = table.getComponentAdapter(matchRow, matchColumn);
-        Pattern pattern = Pattern.compile(text, 0);
-        HighlightPredicate predicate = new PatternPredicate(pattern, matchColumn, -1);
+        HighlightPredicate predicate = new PatternPredicate(text, matchColumn, PatternPredicate.ALL);
         assertTrue(predicate.isHighlighted(null, adapter));
     }
 

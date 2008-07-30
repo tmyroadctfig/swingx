@@ -9,7 +9,6 @@ package org.jdesktop.swingx;
 import java.awt.Color;
 import java.util.Hashtable;
 import java.util.Vector;
-import java.util.regex.Pattern;
 
 import javax.swing.JTree;
 import javax.swing.UIManager;
@@ -459,7 +458,7 @@ public class JXTreeUnitTest extends InteractiveTestCase {
         assertTrue(tree.getRowCount() > 0);
         TreeCellRenderer renderer = tree.getCellRenderer();
         renderer.getTreeCellRendererComponent(tree, "dummy", false, false, false, -1, false);
-        SearchPredicate predicate = new SearchPredicate(Pattern.compile("\\QNode\\E"));
+        SearchPredicate predicate = new SearchPredicate("\\QNode\\E");
         Highlighter searchHighlighter = new ColorHighlighter(predicate, null, Color.RED);
         tree.addHighlighter(searchHighlighter);
         renderer.getTreeCellRendererComponent(tree, "dummy", false, false, false, -1, false);
@@ -480,7 +479,7 @@ public class JXTreeUnitTest extends InteractiveTestCase {
         assertTrue(tree.getRowCount() > 0);
         TreeCellRenderer renderer = tree.getCellRenderer();
         renderer.getTreeCellRendererComponent(tree, "dummy", false, false, false, tree.getRowCount(), false);
-        SearchPredicate predicate = new SearchPredicate(Pattern.compile("\\QNode\\E"));
+        SearchPredicate predicate = new SearchPredicate("\\QNode\\E");
         Highlighter searchHighlighter = new ColorHighlighter(predicate, null, Color.RED);
         tree.addHighlighter(searchHighlighter);
         renderer.getTreeCellRendererComponent(tree, "dummy", false, false, false, tree.getRowCount(), false);
