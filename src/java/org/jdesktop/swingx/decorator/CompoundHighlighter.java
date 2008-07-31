@@ -130,8 +130,13 @@ public class CompoundHighlighter extends AbstractHighlighter
         return (Highlighter[])highlighters.toArray(new Highlighter[highlighters.size()]);
     }
 
-//--------------------- implement UIHighlighter
-    @SuppressWarnings("deprecation")
+//--------------------- implement UIDependent
+
+    /**
+     * {@inheritDoc} <p>
+     * 
+     * Implemented to call updateUI on contained Highlighters.
+     */
     public void updateUI() {
         for (Highlighter highlighter : highlighters) {
             updateUI(highlighter);
