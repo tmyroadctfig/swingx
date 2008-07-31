@@ -6,69 +6,59 @@
 
 package org.jdesktop.swingx.painter.demo;
 
-import com.jhlabs.image.ShadowFilter;
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GradientPaint;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.Insets;
 import java.awt.Paint;
 import java.awt.Point;
-import java.awt.Polygon;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.StringReader;
-import java.net.CookieHandler;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import javax.imageio.ImageIO;
-import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.JComponent;
 import javax.swing.JList;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableModel;
-import javax.swing.text.Style;
+
 import org.apache.batik.ext.awt.LinearGradientPaint;
 import org.apache.batik.ext.awt.MultipleGradientPaint;
 import org.jdesktop.swingx.JXButton;
 import org.jdesktop.swingx.JXLabel;
 import org.jdesktop.swingx.JXPanel;
 import org.jdesktop.swingx.editors.PainterUtil;
-import org.jdesktop.swingx.painter.*;
+import org.jdesktop.swingx.painter.AbstractPainter;
+import org.jdesktop.swingx.painter.CompoundPainter;
+import org.jdesktop.swingx.painter.GlossPainter;
+import org.jdesktop.swingx.painter.ImagePainter;
+import org.jdesktop.swingx.painter.MattePainter;
+import org.jdesktop.swingx.painter.Painter;
+import org.jdesktop.swingx.painter.PinstripePainter;
+import org.jdesktop.swingx.painter.RectanglePainter;
+import org.jdesktop.swingx.painter.ShapePainter;
+import org.jdesktop.swingx.painter.TextPainter;
 import org.jdesktop.swingx.painter.effects.GlowPathEffect;
 import org.jdesktop.swingx.painter.effects.InnerGlowPathEffect;
 import org.jdesktop.swingx.painter.effects.InnerShadowPathEffect;
 import org.jdesktop.swingx.painter.effects.NeonBorderEffect;
-import org.jdesktop.swingx.painter.effects.AbstractAreaEffect;
 import org.jdesktop.swingx.painter.effects.ShadowPathEffect;
-import org.jdesktop.swingx.util.PaintUtils;
 import org.jdesktop.swingx.util.ShapeUtils;
-import org.jdesktop.swingx.util.StringUtils;
+
+import com.jhlabs.image.ShadowFilter;
 
 /**
  *
@@ -138,7 +128,7 @@ public class PainterDemoSet extends javax.swing.JFrame {
             //p("cite = " + cite);
             if(cite.contains("$name-")) {
                 //p("contains");
-                String[] ret = StringUtils.regexSearch(cite,"\\$name-(.*?)-(.*)\\$endcite");
+                String[] ret = regexSearch(cite,"\\$name-(.*?)-(.*)\\$endcite");
                 //p("got: " + ret[1]);
                 citeMap.put(ret[1], ret[2]);
                 /*
@@ -154,7 +144,7 @@ public class PainterDemoSet extends javax.swing.JFrame {
             }
         }
     }
-    /*
+    
     private String[] regexSearch(String source, String pattern) {
         Pattern pat = Pattern.compile(pattern,Pattern.DOTALL);
         Matcher matcher = pat.matcher(source);
@@ -165,7 +155,7 @@ public class PainterDemoSet extends javax.swing.JFrame {
         }
         return list;
     }
-     */
+    
     
     
     private void miscDemos(final MultipleGradientPaint gradient) {

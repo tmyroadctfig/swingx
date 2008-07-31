@@ -23,20 +23,20 @@ package org.jdesktop.swingx;
 
 
 import java.awt.BorderLayout;
-import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.lang.reflect.InvocationTargetException;
 import java.util.logging.Logger;
 
 import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JDialog;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
 import org.jdesktop.swingx.action.AbstractActionExt;
+import org.jdesktop.test.PropertyChangeReport;
 
 /**
  * 
@@ -54,6 +54,27 @@ public class JXTaskPaneIssues extends InteractiveTestCase {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+    
+    /**
+     * Taskpane must not fire expanded property change after removal
+     * of deprecated methods.
+     * @throws InvocationTargetException 
+     * @throws InterruptedException 
+     */
+    public void testTaskPaneNoExpandedProperty() throws InterruptedException, InvocationTargetException {
+        JXTaskPane group = new JXTaskPane();
+        boolean initial = group.isCollapsed();
+        final PropertyChangeReport report = new PropertyChangeReport();
+        group.addPropertyChangeListener(report);
+        group.setCollapsed(!initial);
+        SwingUtilities.invokeAndWait(new Runnable() {
+            public void run() {
+                assertEquals("taskpane must not fire expanded property", 0, report.getEventCount("expanded"));
+                
+            }
+        });
+
     }
     
     /**
