@@ -28,6 +28,7 @@ import java.util.Locale;
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JPopupMenu;
@@ -96,14 +97,23 @@ public class JXTaskPaneContainerVisualCheck extends InteractiveTestCase {
         final JXTaskPaneContainer container = new JXTaskPaneContainer();
         final JXTaskPane pane1 = new JXTaskPane();
         pane1.setTitle("First");
+        pane1.add(new JLabel("1"));
+        pane1.add(new JLabel("2"));
+        pane1.add(new JLabel("3"));
         container.add(pane1);
         
         final JXTaskPane pane2 = new JXTaskPane();
         pane2.setTitle("Second");
+        pane2.add(new JLabel("1"));
+        pane2.add(new JLabel("2"));
+        pane2.add(new JLabel("3"));
         container.add(pane2);
         
         final JXTaskPane pane3 = new JXTaskPane();
         pane3.setTitle("Third");
+        pane3.add(new JLabel("1"));
+        pane3.add(new JLabel("2"));
+        pane3.add(new JLabel("3"));
         container.add(pane3);
         
         JSplitPane splitter = new JSplitPane();
