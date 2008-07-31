@@ -117,7 +117,7 @@ public class AutoCompleteDecorator {
      */
     public static void decorate(JTextComponent textComponent, List<?> items, boolean strictMatching, ObjectToStringConverter stringConverter) {
         AbstractAutoCompleteAdaptor adaptor = new TextComponentAdaptor(textComponent, items);
-        AutoCompleteDocument document = new AutoCompleteDocument(adaptor, strictMatching, stringConverter);
+        AutoCompleteDocument document = new AutoCompleteDocument(adaptor, strictMatching, stringConverter, textComponent.getDocument());
         decorate(textComponent, document, adaptor);
     }
     
@@ -144,7 +144,7 @@ public class AutoCompleteDecorator {
      */
     public static void decorate(JList list, JTextComponent textComponent, ObjectToStringConverter stringConverter) {
         AbstractAutoCompleteAdaptor adaptor = new ListAdaptor(list, textComponent, stringConverter);
-        AutoCompleteDocument document = new AutoCompleteDocument(adaptor, true, stringConverter);
+        AutoCompleteDocument document = new AutoCompleteDocument(adaptor, true, stringConverter, textComponent.getDocument());
         decorate(textComponent, document, adaptor);
     }
     
@@ -191,7 +191,8 @@ public class AutoCompleteDecorator {
         // configure the text component=editor component
         JTextComponent editorComponent = (JTextComponent) comboBox.getEditor().getEditorComponent();
         final AbstractAutoCompleteAdaptor adaptor = new ComboBoxAdaptor(comboBox);
-        final AutoCompleteDocument document = new AutoCompleteDocument(adaptor, strictMatching, stringConverter);
+        final AutoCompleteDocument document = new AutoCompleteDocument(adaptor, strictMatching,
+                stringConverter, editorComponent.getDocument());
         decorate(editorComponent, document, adaptor);
         
         //remove old key listener

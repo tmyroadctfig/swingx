@@ -20,17 +20,31 @@
  */
 package org.jdesktop.swingx.autocomplete;
 
+import static org.jdesktop.swingx.autocomplete.ObjectToStringConverter.DEFAULT_IMPLEMENTATION;
+
+import java.awt.Color;
+import java.awt.Font;
+
 import javax.swing.UIManager;
+import javax.swing.event.DocumentListener;
+import javax.swing.event.UndoableEditListener;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
+import javax.swing.text.Element;
 import javax.swing.text.PlainDocument;
+import javax.swing.text.Position;
+import javax.swing.text.Segment;
+import javax.swing.text.Style;
+import javax.swing.text.StyledDocument;
+
+import org.jdesktop.swingx.util.Contract;
 
 /**
  * A document that can be plugged into any JTextComponent to enable automatic completion.
  * It finds and selects matching items using any implementation of the AbstractAutoCompleteAdaptor.
  */
-public class AutoCompleteDocument extends PlainDocument {
-    
+public class AutoCompleteDocument implements StyledDocument {
     /** Flag to indicate if adaptor.setSelectedItem has been called.
      * Subsequent calls to remove/insertString should be ignored
      * as they are likely have been caused by the adapted Component that
@@ -50,6 +64,31 @@ public class AutoCompleteDocument extends PlainDocument {
     
     ObjectToStringConverter stringConverter;
     
+    private Document delegate;
+    
+    /**
+     * Creates a new AutoCompleteDocument for the given AbstractAutoCompleteAdaptor.
+     * @param adaptor The adaptor that will be used to find and select matching
+     * items.
+     * @param strictMatching true, if only items from the adaptor's list should
+     * be allowed to be entered
+     * @param stringConverter the converter used to transform items to strings
+     * @param delegate the {@code Document} delegate backing this document
+     */
+    public AutoCompleteDocument(AbstractAutoCompleteAdaptor adaptor, boolean strictMatching,
+            ObjectToStringConverter stringConverter, Document delegate) {
+        this.adaptor = Contract.asNotNull(adaptor, "adaptor cannot be null");
+        this.strictMatching = strictMatching;
+        this.stringConverter = stringConverter == null ? DEFAULT_IMPLEMENTATION : stringConverter;
+        this.delegate = delegate == null ? new PlainDocument() : delegate;
+        
+        // Handle initially selected object
+        Object selected = adaptor.getSelectedItem();
+        if (selected!=null) setText(stringConverter.getPreferredStringForItem(selected));
+        adaptor.markEntireText();
+    }
+    
+    
     /**
      * Creates a new AutoCompleteDocument for the given AbstractAutoCompleteAdaptor.
      * @param adaptor The adaptor that will be used to find and select matching
@@ -59,14 +98,7 @@ public class AutoCompleteDocument extends PlainDocument {
      * @param stringConverter the converter used to transform items to strings
      */
     public AutoCompleteDocument(AbstractAutoCompleteAdaptor adaptor, boolean strictMatching, ObjectToStringConverter stringConverter) {
-        this.adaptor = adaptor;
-        this.strictMatching = strictMatching;
-        this.stringConverter = stringConverter;
-        
-        // Handle initially selected object
-        Object selected = adaptor.getSelectedItem();
-        if (selected!=null) setText(stringConverter.getPreferredStringForItem(selected));
-        adaptor.markEntireText();
+        this(adaptor, strictMatching, stringConverter, null);
     }
     
     /**
@@ -77,7 +109,7 @@ public class AutoCompleteDocument extends PlainDocument {
      * items.
      */
     public AutoCompleteDocument(AbstractAutoCompleteAdaptor adaptor, boolean strictMatching) {
-        this(adaptor, strictMatching, ObjectToStringConverter.DEFAULT_IMPLEMENTATION);
+        this(adaptor, strictMatching, null);
     }
     
     /**
@@ -91,7 +123,7 @@ public class AutoCompleteDocument extends PlainDocument {
     public void remove(int offs, int len) throws BadLocationException {
         // return immediately when selecting an item
         if (selecting) return;
-        super.remove(offs, len);
+        delegate.remove(offs, len);
         if (!strictMatching) {
             setSelectedItem(getText(0, getLength()), getText(0, getLength()));
             adaptor.getTextComponent().setCaretPosition(offs);
@@ -102,7 +134,7 @@ public class AutoCompleteDocument extends PlainDocument {
         // return immediately when selecting an item
         if (selecting) return;
         // insert the string into the document
-        super.insertString(offs, str, a);
+        delegate.insertString(offs, str, a);
         // lookup and select a matching item
         LookupResult lookupResult = lookupItem(getText(0, getLength()));
         if (lookupResult.matchingItem != null) {
@@ -137,8 +169,8 @@ public class AutoCompleteDocument extends PlainDocument {
     private void setText(String text) {
         try {
             // remove all text and insert the completed string
-            super.remove(0, getLength());
-            super.insertString(0, text, null);
+            delegate.remove(0, getLength());
+            delegate.insertString(0, text, null);
         } catch (BadLocationException e) {
             throw new RuntimeException(e.toString());
         }
@@ -226,5 +258,194 @@ public class AutoCompleteDocument extends PlainDocument {
     private boolean startsWithIgnoreCase(String base, String prefix) {
         if (base.length() < prefix.length()) return false;
         return base.regionMatches(true, 0, prefix, 0, prefix.length());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Style addStyle(String nm, Style parent) {
+        return ((StyledDocument) delegate).addStyle(nm, parent);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Color getBackground(AttributeSet attr) {
+        return ((StyledDocument) delegate).getBackground(attr);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Element getCharacterElement(int pos) {
+        return ((StyledDocument) delegate).getCharacterElement(pos);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Font getFont(AttributeSet attr) {
+        return ((StyledDocument) delegate).getFont(attr);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Color getForeground(AttributeSet attr) {
+        return ((StyledDocument) delegate).getForeground(attr);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Style getLogicalStyle(int p) {
+        return ((StyledDocument) delegate).getLogicalStyle(p);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Element getParagraphElement(int pos) {
+        return ((StyledDocument) delegate).getParagraphElement(pos);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Style getStyle(String nm) {
+        return ((StyledDocument) delegate).getStyle(nm);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void removeStyle(String nm) {
+        ((StyledDocument) delegate).removeStyle(nm);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setCharacterAttributes(int offset, int length, AttributeSet s, boolean replace) {
+        ((StyledDocument) delegate).setCharacterAttributes(offset, length, s, replace);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setLogicalStyle(int pos, Style s) {
+        ((StyledDocument) delegate).setLogicalStyle(pos, s);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setParagraphAttributes(int offset, int length, AttributeSet s, boolean replace) {
+        ((StyledDocument) delegate).setParagraphAttributes(offset, length, s, replace);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void addDocumentListener(DocumentListener listener) {
+        delegate.addDocumentListener(listener);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void addUndoableEditListener(UndoableEditListener listener) {
+        delegate.addUndoableEditListener(listener);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Position createPosition(int offs) throws BadLocationException {
+        return delegate.createPosition(offs);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Element getDefaultRootElement() {
+        return delegate.getDefaultRootElement();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Position getEndPosition() {
+        return delegate.getEndPosition();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public int getLength() {
+        return delegate.getLength();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Object getProperty(Object key) {
+        return delegate.getProperty(key);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Element[] getRootElements() {
+        return delegate.getRootElements();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Position getStartPosition() {
+        return delegate.getStartPosition();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getText(int offset, int length) throws BadLocationException {
+        return delegate.getText(offset, length);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void getText(int offset, int length, Segment txt) throws BadLocationException {
+        delegate.getText(offset, length, txt);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void putProperty(Object key, Object value) {
+        delegate.putProperty(key, value);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void removeDocumentListener(DocumentListener listener) {
+        delegate.removeDocumentListener(listener);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void removeUndoableEditListener(UndoableEditListener listener) {
+        delegate.removeUndoableEditListener(listener);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void render(Runnable r) {
+        delegate.render(r);
     }
 }
