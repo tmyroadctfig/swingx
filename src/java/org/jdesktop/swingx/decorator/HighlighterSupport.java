@@ -21,6 +21,8 @@
  */
 package org.jdesktop.swingx.decorator;
 
+import java.awt.Component;
+
 import javax.swing.JComponent;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -32,6 +34,10 @@ import org.jdesktop.swingx.util.Contract;
  * 
  * Manages the highlighters registered with the highlighter client, listens
  * to highlighter changes and updates the target.
+ * 
+ * 
+ * PENDING JW: this looks so much like a CompoundHighlighter ... probably not
+ * correctly factored.
  * 
  * @author Jeanette Winzenburg
  */
@@ -193,6 +199,18 @@ public class HighlighterSupport implements UIDependent{
         if (getCompoundHighlighter() == null)
             return;
         getCompoundHighlighter().updateUI();
+    }
+
+
+
+    /**
+     * @param stamp
+     * @param adapter
+     */
+    public Component highlight(Component stamp, ComponentAdapter adapter) {
+        if (compoundHighlighter != null) 
+            return compoundHighlighter.highlight(stamp, adapter);
+        return stamp;
     }
 
 }
