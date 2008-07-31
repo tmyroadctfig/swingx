@@ -74,9 +74,35 @@ public class CompoundHighlighter extends AbstractHighlighter
     public CompoundHighlighter(HighlightPredicate predicate, Highlighter... inList) {
         super(predicate);
         highlighters = new ArrayList<Highlighter>();
+        setHighlighters(inList);
+    }
+
+    /**
+     * Sets the given 
+     * <code>Highlighter</code>s. 
+     * 
+     * @param inList zero or more not-null Highlighters to manage by this
+     *   CompoundHighlighter.
+     * @throws NullPointerException if array is null or array contains null values.
+     */
+    public void setHighlighters(Highlighter... inList) {
+        if (highlighters.isEmpty() && (inList.length == 0)) return;
+        removeAllHighlightersSilently();
         for (Highlighter highlighter : inList) {
-            addHighlighter(highlighter);
+            addHighlighterSilently(highlighter, false);
         }
+        fireStateChanged();
+    }
+
+    /**
+     * Removes all contained highlighters without firing an event.
+     * Deregisters the listener from all.
+     */
+    private void removeAllHighlightersSilently() {
+        for (Highlighter highlighter : highlighters) {
+            highlighter.removeChangeListener(getHighlighterChangeListener());
+        }
+        highlighters.clear();
     }
 
     /**
@@ -99,6 +125,11 @@ public class CompoundHighlighter extends AbstractHighlighter
      * @throws NullPointerException if highlighter is null.
      */
     public void addHighlighter(Highlighter highlighter, boolean prepend) {
+        addHighlighterSilently(highlighter, prepend);
+        fireStateChanged();
+    }
+
+    private void addHighlighterSilently(Highlighter highlighter, boolean prepend) {
         Contract.asNotNull(highlighter, "Highlighter must not be null");
         if (prepend) {
             highlighters.add(0, highlighter);
@@ -107,7 +138,6 @@ public class CompoundHighlighter extends AbstractHighlighter
         }
         updateUI(highlighter);
         highlighter.addChangeListener(getHighlighterChangeListener());
-        fireStateChanged();
     }
 
     /**
@@ -127,7 +157,7 @@ public class CompoundHighlighter extends AbstractHighlighter
     }
 
     public Highlighter[] getHighlighters() {
-        return (Highlighter[])highlighters.toArray(new Highlighter[highlighters.size()]);
+        return highlighters.toArray(new Highlighter[highlighters.size()]);
     }
 
 //--------------------- implement UIDependent
