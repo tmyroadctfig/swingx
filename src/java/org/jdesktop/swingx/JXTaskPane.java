@@ -33,8 +33,8 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 
-import org.jdesktop.swingx.plaf.TaskPaneAddon;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
+import org.jdesktop.swingx.plaf.TaskPaneAddon;
 import org.jdesktop.swingx.plaf.TaskPaneUI;
 
 /**
@@ -148,14 +148,6 @@ public class JXTaskPane extends JPanel implements
   static {
     LookAndFeelAddons.contribute(new TaskPaneAddon());
   }
-
-  /**
-   * Used when generating PropertyChangeEvents for the "expanded" property
-   * 
-   * @deprecated (pre-0.9.3)
-   */
-  @Deprecated
-  public static final String EXPANDED_CHANGED_KEY = "expanded";
 
   /**
    * Used when generating PropertyChangeEvents for the "scrollOnExpand" property
@@ -399,30 +391,6 @@ public class JXTaskPane extends JPanel implements
     public boolean isCollapsed() {
         return collapsed;
     }
-  
-  /**
-   * 
-   * @param expanded true to expand the group, false to collapse it
-   * @deprecated (pre-0.9.3) use setCollapsed
-   * @javabean.property
-   *          bound="true"
-   *          preferred="true"
-   */
-  @Deprecated
-  public void setExpanded(boolean expanded) {
-      setCollapsed(!expanded);
-  }
-
-  /**
-   * Returns true if this task pane is expanded, false if it is collapsed.
-   * 
-   * @return true if this task pane is expanded, false if it is collapsed.
-   * @deprecated (pre-0.9.3)
-   */
-  @Deprecated
-  public boolean isExpanded() {
-    return !isCollapsed();
-  }
 
   /**
    * Enables or disables animation during expand/collapse transition.

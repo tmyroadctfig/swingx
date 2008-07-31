@@ -186,20 +186,6 @@ public class MacOSXErrorPaneUI extends BasicErrorPaneUI {
     }
 
     /**
-     * @deprecated (pre-0.9.3) (pre-0.9.2) no longer used remove after 0.9.3.
-     */
-    @Deprecated
-    protected Dimension calculatePreferredDialogSize() {
-        //TODO returns a Dimension that is either X wide, or as wide as necessary
-        //to show the title. It is Y high.
-        if (disclaimerText.isVisible()) {
-            return new Dimension(588, 270);
-        } else {
-            return new Dimension(588, 216);
-        }
-    }
-
-    /**
      * {@inheritDoc}
      */
     protected int getDetailsHeight() {

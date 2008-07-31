@@ -7,8 +7,14 @@
 package org.jdesktop.swingx.util;
 
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Component;
+import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsEnvironment;
+import java.awt.Insets;
+import java.awt.KeyboardFocusManager;
+import java.awt.Rectangle;
+import java.awt.Toolkit;
+import java.awt.Window;
 import java.awt.event.KeyEvent;
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
@@ -22,6 +28,9 @@ import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 
 /**
  * Contribution from NetBeans: Issue #319-swingx. <p>
@@ -68,12 +77,8 @@ public class Utilities {
     /** Operating system is Compaq TRU64 Unix */
     public static final int OS_TRU64 = OS_SUNOS << 1;
 
-    /** @deprecated (pre-0.9.3) (pre-0.9.2) please use OS_TRU64 instead */
-    @Deprecated
-    private static final int OS_DEC = OS_TRU64 << 1;
-
     /** Operating system is OS/2. */
-    public static final int OS_OS2 = OS_DEC << 1;
+    public static final int OS_OS2 = OS_TRU64 << 2;
 
     /** Operating system is Mac. */
     public static final int OS_MAC = OS_OS2 << 1;

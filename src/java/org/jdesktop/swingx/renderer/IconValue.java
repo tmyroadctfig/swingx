@@ -83,23 +83,6 @@ public interface IconValue extends Serializable {
     };
     
     /**
-     * Always null. <p>
-     * 
-     * PENDING JW: there's an open test issue when removing this. Needs further evaluation.
-     * 
-     * @deprecated (pre-0.9.3) (pre-0.9.2) use {@link #NONE} 
-     */
-    @Deprecated
-    public static final IconValue EMPTY = new IconValue() {
-
-        public Icon getIcon(Object value) {
-            return null;
-        }
-        
-    };
-    
-    
-    /**
      * Always NULL_ICON. This is useful to indicate that we really want
      * no icon instead of f.i. a default provided by the CellContext. 
      */

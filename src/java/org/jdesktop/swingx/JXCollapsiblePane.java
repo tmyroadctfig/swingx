@@ -158,26 +158,6 @@ import javax.swing.border.Border;
  */
 public class JXCollapsiblePane extends JXPanel {
     /**
-     * The orientation defines in which direction the collapsible pane will
-     * expand.
-     * 
-     * @deprecated (pre-0.9.3) use {@link Direction}
-     */
-    @Deprecated
-    public enum Orientation {
-        /**
-         * The horizontal orientation makes the collapsible pane
-         * expand horizontally
-         */
-        HORIZONTAL,
-        /**
-         * The horizontal orientation makes the collapsible pane
-         * expand vertically
-         */
-        VERTICAL
-    }
-
-    /**
      * The direction defines how the collapsible pane will collapse. The
      * constant names were designed by choosing a fixed point and then
      * determining the collapsing direction from that fixed point. This means
@@ -283,17 +263,6 @@ public class JXCollapsiblePane extends JXPanel {
     public JXCollapsiblePane() {
         this(Direction.UP, new BorderLayout(0, 0));
     }
-
-    /**
-     * Constructs a new JXCollapsiblePane with a {@link JXPanel} as content pane
-     * and the specified orientation.
-     * 
-     * @deprecated (pre-0.9.3) use {@link #JXCollapsiblePane(Direction)}
-     */
-    @Deprecated
-    public JXCollapsiblePane(Orientation orientation) {
-        this(orientation, new BorderLayout(0, 0));
-    }
     
     /**
      * Constructs a new JXCollapsiblePane with a {@link JXPanel} as content pane and the specified
@@ -312,36 +281,6 @@ public class JXCollapsiblePane extends JXPanel {
      */
     public JXCollapsiblePane(LayoutManager layout) {
         this(Direction.UP, layout);
-    }
-
-    /**
-     * Constructs a new JXCollapsiblePane with a {@link JPanel} as content pane
-     * and the given LayoutManager and orientation. A vertical orientation enables
-     * a vertical {@link VerticalLayout} with a gap of 2 pixels as layout
-     * manager. A horizontal orientation enables a horizontal
-     * {@link HorizontalLayout} with a gap of 2 pixels as layout manager
-     * 
-     * @deprecated (pre-0.9.3) use {@link #JXCollapsiblePane(Direction, LayoutManager)}
-     */
-    @Deprecated
-    public JXCollapsiblePane(Orientation orientation, LayoutManager layout) {
-    	this(getDirection(orientation), layout);
-    }
-    	
-    /**
-	 * @deprecated (pre-0.9.3) only used to convent orientation to direction, remove with
-	 *             orientation
-	 */
-    @Deprecated
-    private static Direction getDirection(Orientation orientation) {
-    	switch (orientation) {
-		case HORIZONTAL:
-			return Direction.DOWN;
-		case VERTICAL:
-			return Direction.UP;
-		default:
-			throw new IllegalStateException();
-		}
     }
     
 	/**
@@ -529,36 +468,6 @@ public class JXCollapsiblePane extends JXPanel {
     public boolean isAnimated() {
         return useAnimation;
     }
-
-    /**
-     * Changes the orientation of this collapsible pane. Doing so changes the
-     * layout of the underlying content pane. If the chosen orientation is
-     * vertical, a vertical layout with a gap of 2 pixels is chosen. Otherwise,
-     * a horizontal layout with a gap of 2 pixels is chosen.
-     *
-     * @see #getOrientation()
-     * @param orientation the new {@link Orientation} for this collapsible pane
-     * @throws IllegalStateException when this method is called while a
-     *                               collapsing/restore operation is running
-     * @deprecated (pre-0.9.3)
-     * @javabean.property
-     *    bound="true"
-     *    preferred="true"
-     */
-    @Deprecated
-    public void setOrientation(Orientation orientation) {
-    	setDirection(getDirection(orientation));
-    }
-    
-    /**
-     * @see #setOrientation(Orientation)
-     * @return the current {@link Orientation}
-     * @deprecated (pre-0.9.3)
-     */
-    @Deprecated
-    public Orientation getOrientation() {
-        return direction.isVertical() ? Orientation.VERTICAL : Orientation.HORIZONTAL;
-    }
     
     /**
      * Changes the direction of this collapsible pane. Doing so changes the
@@ -589,11 +498,6 @@ public class JXCollapsiblePane extends JXPanel {
     	}
     	
     	firePropertyChange("direction", oldValue, getDirection());
-    	firePropertyChange("orientation",
-				oldValue.isVertical() ? Orientation.VERTICAL
-						: Orientation.HORIZONTAL,
-				getDirection().isVertical() ? Orientation.VERTICAL
-						: Orientation.HORIZONTAL);
     }
     
     /**

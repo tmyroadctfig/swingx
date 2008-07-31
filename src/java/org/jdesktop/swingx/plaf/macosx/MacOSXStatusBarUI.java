@@ -48,14 +48,6 @@ public class MacOSXStatusBarUI extends BasicStatusBarUI {
     }	
     
     /**
-     * @deprecated (pre-0.9.3) (pre-0.9.2)
-     */
-    @Deprecated
-    protected void installDefaults() {
-        LookAndFeel.installProperty(statusBar, "opaque", false);
-    }
-    
-    /**
      * {@inheritDoc}
      */
     protected void installDefaults(JXStatusBar sb) {

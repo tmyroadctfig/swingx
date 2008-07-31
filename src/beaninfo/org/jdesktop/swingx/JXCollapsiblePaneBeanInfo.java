@@ -43,14 +43,7 @@ public class JXCollapsiblePaneBeanInfo extends BeanInfoSupport {
         
         setPreferred(true, "animated", "collapsed", "orientation", "direction");
         setBound(true, "animated", "collapsed", "orientation", "direction");
-        setPropertyEditor(OrientationPropertyEditor.class, "orientation");
         setPropertyEditor(DirectionPropertyEditor.class, "direction");
-    }
-
-    public static final class OrientationPropertyEditor extends EnumPropertyEditor<JXCollapsiblePane.Orientation> {
-        public OrientationPropertyEditor() {
-            super(JXCollapsiblePane.Orientation.class);
-        }
     }
 
     public static final class DirectionPropertyEditor extends EnumPropertyEditor<JXCollapsiblePane.Direction> {

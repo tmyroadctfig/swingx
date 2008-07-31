@@ -159,7 +159,6 @@ public class BasicTaskPaneUI extends TaskPaneUI {
 
 	ActionMap getActionMap() {
 		ActionMap map = new ActionMapUIResource();
-		map.put("toggleExpanded", new ToggleExpandedAction());
 		map.put("toggleCollapsed", new ToggleCollapsedAction());
 		return map;
 	}
@@ -204,16 +203,6 @@ public class BasicTaskPaneUI extends TaskPaneUI {
 	protected boolean isInBorder(MouseEvent event) {
 		return event.getY() < getTitleHeight(event.getComponent());
 	}
-
-        /**
-         * Gets current title height. Default value is 25.
-         * @return Current title height.
-         * @deprecated (pre-0.9.3) (pre-0.9.2) Use getTitleHeight(java.awt.Component) instead. Kept only for compatibility reasons. Will be removed before 1.0 release.
-         */
-	@Deprecated
-        protected int getTitleHeight() {
-                return titleHeight;
-        }
  
         /**
          * Gets current title height. Default value is 25 if not specified otherwise. Method checks 
@@ -346,7 +335,7 @@ public class BasicTaskPaneUI extends TaskPaneUI {
 			// if group is expanded but not animated
 			// or if animated has reached expanded state
 			// scroll to visible if scrollOnExpand is enabled
-			if ((JXTaskPane.EXPANDED_CHANGED_KEY.equals(evt.getPropertyName())
+			if (("collapsed".equals(evt.getPropertyName())
 					&& Boolean.TRUE.equals(evt.getNewValue()) && !group
 					.isAnimated())
 					|| (JXCollapsiblePane.ANIMATION_STATE_KEY.equals(evt
@@ -404,31 +393,6 @@ public class BasicTaskPaneUI extends TaskPaneUI {
 			if (isInBorder(e)) {
 				group.setCollapsed(!group.isCollapsed());
 			}
-		}
-	}
-
-	/**
-	 * Toggle expanded action.
-	 * 
-	 * @deprecated (pre-0.9.3)
-	 */
-	@Deprecated
-	class ToggleExpandedAction extends AbstractAction {
-		/**
-		 * Serial version UID.
-		 */
-		private static final long serialVersionUID = 5676859881615358815L;
-
-		public ToggleExpandedAction() {
-			super("toggleExpanded");
-		}
-
-		public void actionPerformed(ActionEvent e) {
-			group.setExpanded(!group.isExpanded());
-		}
-
-		public boolean isEnabled() {
-			return group.isVisible();
 		}
 	}
 	
