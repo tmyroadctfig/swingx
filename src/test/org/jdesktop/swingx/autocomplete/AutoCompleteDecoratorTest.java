@@ -4,8 +4,11 @@
 package org.jdesktop.swingx.autocomplete;
 
 import java.awt.Component;
+import java.util.Arrays;
+import java.util.List;
 
 import javax.swing.JComboBox;
+import javax.swing.JTextPane;
 
 import junit.framework.TestCase;
 
@@ -62,5 +65,10 @@ public class AutoCompleteDecoratorTest extends TestCase {
         //redecorating should not increase listener count
         AutoCompleteDecorator.decorate(combo);
         assertEquals(expectedPropListenerCount, combo.getPropertyChangeListeners("editor").length);
+    }
+    
+    public void testDecoratingJTextPane() {
+        List<String> strings = Arrays.asList("Alpha", "Bravo", "Charlie", "Delta");
+        AutoCompleteDecorator.decorate(new JTextPane(), strings, true);
     }
 }

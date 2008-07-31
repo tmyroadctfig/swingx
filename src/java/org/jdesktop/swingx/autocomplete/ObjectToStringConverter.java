@@ -53,7 +53,7 @@ package org.jdesktop.swingx.autocomplete;
  * public class AirportConverter extends ObjectToStringConverter {
  *
  *   public String[] getPossibleStringsForItem(Object item) {
- *     if (item==null) return null;
+ *     if (item==null) return new String[0];
  *     if (!(item instanceof Airport)) throw new IllegalArgumentException();
  *     Airport airport = (Airport) item;
  *     return new String[]{airport.toString(), airport.icaoCode, airport.iataCode};
@@ -72,7 +72,7 @@ public abstract class ObjectToStringConverter {
     /**
      * Returns all possible <tt>String</tt> representations for a given item.
      * The default implementation wraps the method <tt>getPreferredStringForItem</tt>.
-     * It returns <tt>null</tt>, if the wrapped method returns <tt>null</tt>. Otherwise
+     * It returns an empty array, if the wrapped method returns <tt>null</tt>. Otherwise
      * it returns a one dimensional array containing the wrapped method's return value.
      *
      * @param item the item to convert
@@ -80,7 +80,7 @@ public abstract class ObjectToStringConverter {
      */
     public String[] getPossibleStringsForItem(Object item) {
 	String preferred = getPreferredStringForItem(item);
-	return preferred == null ? null : new String[] { preferred };
+	return preferred == null ? new String[0] : new String[] { preferred };
     }
     
     /**
