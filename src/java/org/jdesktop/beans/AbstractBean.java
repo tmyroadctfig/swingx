@@ -491,6 +491,7 @@ public abstract class AbstractBean {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Object clone() throws CloneNotSupportedException {
         AbstractBean result = (AbstractBean) super.clone();
         result.pcs = new PropertyChangeSupport(result);
