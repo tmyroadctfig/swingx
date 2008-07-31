@@ -217,7 +217,7 @@ public class BasicTaskPaneUI extends TaskPaneUI {
                 int height = titleHeight;
                 
                 if (font != null && !(font instanceof FontUIResource)) {
-                    height = taskPane.getFontMetrics(font).getHeight();
+                    height = Math.max(height, taskPane.getFontMetrics(font).getHeight());
                 }
                 
                 Icon icon = taskPane.getIcon();
