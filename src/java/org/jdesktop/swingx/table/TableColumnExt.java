@@ -33,7 +33,7 @@ import javax.swing.table.TableColumn;
 
 import org.jdesktop.swingx.decorator.CompoundHighlighter;
 import org.jdesktop.swingx.decorator.Highlighter;
-import org.jdesktop.swingx.util.Contract;
+import org.jdesktop.swingx.decorator.UIDependent;
 
 /**
  * <code>TableColumn</code> extension for enhanced view column configuration.
@@ -92,7 +92,7 @@ import org.jdesktop.swingx.util.Contract;
  * @see ColumnFactory
  * @see javax.swing.JComponent#putClientProperty
  */
-public class TableColumnExt extends TableColumn {
+public class TableColumnExt extends TableColumn implements UIDependent {
     
     /** visible property. Initialized to <code>true</code>.*/
     protected boolean visible = true;
@@ -631,4 +631,17 @@ public class TableColumnExt extends TableColumn {
              }
          }
      }
+
+//---------------- implement UIDependent
+    
+    /**
+     * Update ui of owned ui-dependent parts. This implementation
+     * updates the contained highlighters.
+     * 
+     * PENDING JW: take over update of renderers/editors.
+     */
+    public void updateUI() {
+        if (compoundHighlighter == null) return;
+        compoundHighlighter.updateUI();
+    }
 }

@@ -21,9 +21,17 @@
  */
 package org.jdesktop.swingx;
 
+import java.awt.Color;
 import java.beans.PropertyChangeListener;
+import java.util.logging.Logger;
 
+import javax.swing.UIManager;
+import javax.swing.table.TableColumn;
+
+import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.Highlighter;
+import org.jdesktop.swingx.decorator.HighlighterFactory;
+import org.jdesktop.swingx.table.TableColumnExt;
 
 /**
  * Test JXTable as HighlighterClient.
@@ -31,7 +39,41 @@ import org.jdesktop.swingx.decorator.Highlighter;
  * @author Jeanette Winzenburg
  */
 public class TableAsHighlighterClientTest extends AbstractTestHighlighterClient {
-
+    @SuppressWarnings("unused")
+    private static final Logger LOG = Logger
+            .getLogger(TableAsHighlighterClientTest.class.getName());
+    
+    /**
+     * Test that columnHighlighters are updated.
+     */
+    public void testUpdateUIColumnHighlighters() {
+        // force loading of striping colors
+        ColorHighlighter colorHighlighter = (ColorHighlighter) HighlighterFactory.createSimpleStriping();
+        Color uiColor = UIManager.getColor("UIColorHighlighter.stripingBackground");
+        if (uiColor == null) {
+            LOG.info("cannot run test - no ui striping color");
+            return;
+        }
+        assertSame("sanity", uiColor, colorHighlighter.getBackground());
+        JXTable client = new JXTable(10, 3);
+        for (TableColumn tableColumn : client.getColumns(true)) {
+            ((TableColumnExt) tableColumn).addHighlighter(HighlighterFactory.createSimpleStriping());
+        }
+        Color changedUIColor = Color.RED;
+        UIManager.put("UIColorHighlighter.stripingBackground", changedUIColor);
+        client.updateUI();
+        try {
+            for (TableColumn tableColumn : client.getColumns(true)) {
+                Highlighter hl = ((TableColumnExt) tableColumn).getHighlighters()[0];
+                assertSame("support must update ui color", changedUIColor, 
+                        ((ColorHighlighter) hl).getBackground());
+            }
+            
+        } finally {
+            UIManager.put("UIColorHighlighter.stripingBackground", uiColor);
+        }
+    }
+    
     @Override
     protected HighlighterClient createHighlighterClient() {
         return createHighlighterClient(new JXTable());

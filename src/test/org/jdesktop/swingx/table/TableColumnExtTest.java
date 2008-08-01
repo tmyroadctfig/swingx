@@ -19,6 +19,7 @@ import junit.framework.TestCase;
 import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.CompoundHighlighter;
 import org.jdesktop.swingx.decorator.Highlighter;
+import org.jdesktop.swingx.decorator.UIDependent;
 import org.jdesktop.swingx.renderer.DefaultTableRenderer;
 import org.jdesktop.test.PropertyChangeReport;
 import org.jdesktop.test.SerializableSupport;
@@ -30,6 +31,14 @@ import org.jdesktop.test.SerializableSupport;
  */
 public class TableColumnExtTest extends TestCase {
 
+    /**
+     * api change: let TableColumnExt implement UIDependent.
+     */
+    public void testUIDependent() {
+        TableColumnExt columnExt = new TableColumnExt();
+        assertTrue(columnExt instanceof UIDependent);
+    }
+    
     /**
      * Issue #822-swingx: replace cloneable by copy constructor.
      * Here: test base properties copied.

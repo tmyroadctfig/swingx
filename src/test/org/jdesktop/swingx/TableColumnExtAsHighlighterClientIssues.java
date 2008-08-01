@@ -28,11 +28,6 @@ package org.jdesktop.swingx;
  */
 public class TableColumnExtAsHighlighterClientIssues extends
         TableColumnExtAsHighlighterClientTest {
-
-    @Override
-    public void testUpdateUI() {
-        assertUpdateUI();
-    }
     
     public void testDummy() {
         

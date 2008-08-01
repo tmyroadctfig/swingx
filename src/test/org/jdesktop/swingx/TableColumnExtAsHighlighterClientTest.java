@@ -33,21 +33,6 @@ import org.jdesktop.swingx.table.TableColumnExt;
  */
 public class TableColumnExtAsHighlighterClientTest extends AbstractTestHighlighterClient {
 
-    
-    /**
-     * overridden to do nothing - this part is failing
-     */
-    @Override
-    public void testUpdateUI() {
-    }
-    
-    /**
-     * Hook for Issues* subclass
-     */
-    protected void assertUpdateUI() {
-        super.testUpdateUI();
-    }
-
     @Override
     protected HighlighterClient createHighlighterClient() {
         return createHighlighterClient(new TableColumnExt());
@@ -81,7 +66,7 @@ public class TableColumnExtAsHighlighterClientTest extends AbstractTestHighlight
             }
 
             public void updateUI() {
-//                table.updateUI();
+                table.updateUI();
             }
             
         };

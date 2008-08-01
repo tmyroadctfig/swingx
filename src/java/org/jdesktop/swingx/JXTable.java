@@ -99,6 +99,7 @@ import org.jdesktop.swingx.decorator.SizeSequenceMapper;
 import org.jdesktop.swingx.decorator.SortController;
 import org.jdesktop.swingx.decorator.SortKey;
 import org.jdesktop.swingx.decorator.SortOrder;
+import org.jdesktop.swingx.decorator.UIDependent;
 import org.jdesktop.swingx.event.TableColumnModelExtListener;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 import org.jdesktop.swingx.plaf.UIManagerExt;
@@ -4067,12 +4068,25 @@ public class JXTable extends JTable
         List columns = getColumns(true);
         for (Iterator iter = columns.iterator(); iter.hasNext();) {
             TableColumn column = (TableColumn) iter.next();
-            updateEditorUI(column.getCellEditor());
-            updateRendererUI(column.getCellRenderer());
-            updateRendererUI(column.getHeaderRenderer());
+            updateColumnUI(column);
         }
         updateRowHeightUI(true);
         updateHighlighterUI();
+    }
+
+    /**
+     * Updates TableColumn after updateUI changes.
+     * 
+     * @param column
+     */
+    protected void updateColumnUI(TableColumn column) {
+        if (column instanceof UIDependent) {
+            ((UIDependent) column).updateUI();
+        }
+        // PENDING JW: should overtake here only if column !instanceof UIDependent
+        updateEditorUI(column.getCellEditor());
+        updateRendererUI(column.getCellRenderer());
+        updateRendererUI(column.getHeaderRenderer());
     }
 
     /**

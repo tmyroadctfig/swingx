@@ -76,7 +76,11 @@ public class TableColumnExtIssues extends TestCase {
     /**
      * Try a TableColumn sub with a better-behaved clone - removes the cloned listeners.
      * 
-     * Doesn't help: the listeners are removed from the original as well.
+     * Doesn't help: the listeners are removed from the original as well. The problem
+     * is in core - it doesn't provide a well-behaved clone implementation (in fact, it
+     * doesn't provide any implementation). With the private listener registering there
+     * is nothing subclasses can do. Except not implement cloneable (which is the best
+     * to do anyway, see Bloch)
      */
     public static class TableColumnCloneable extends TableColumn implements Cloneable {
 
