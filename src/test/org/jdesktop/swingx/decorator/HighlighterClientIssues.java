@@ -79,15 +79,6 @@ public class HighlighterClientIssues extends InteractiveTestCase {
         show(frame);
     }
 
-    /**
-     * UI-dependent Column highlighter must updated on updateUI.
-     */
-    public void interactiveColumnHighlighterUpdateUI() {
-        JXTable table = new JXTable(new AncientSwingTeam());
-        table.getColumnExt(2).addHighlighter(new UIColorHighlighter());
-        table.addHighlighter(new UIColorHighlighter(new ColumnHighlightPredicate(1)));
-        showWithScrollingInFrame(table, "UpdateUI - table highlighter in second, column highlighter in third");
-    }
     
     /**
      * Highlighters in JXTable must be kept on moving 

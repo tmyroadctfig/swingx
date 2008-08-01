@@ -19,6 +19,7 @@ import javax.swing.JTextField;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
+import javax.swing.plaf.ColorUIResource;
 
 import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.decorator.HighlighterFactory.UIColorHighlighter;
@@ -445,6 +446,32 @@ public class HighlighterTest extends InteractiveTestCase {
         assertEquals("predicate", predicate, highlighter.getHighlightPredicate());
     }
 //----------------- testing change notification ColorHighlighter
+
+    /**
+     * Test ui dependent color is updated.
+     */
+    public void testCustomUIColorHighlighter() {
+        UIColorHighlighter h = new UIColorHighlighter();
+        Color uiBackground = h.getBackground();
+        Color uiColor = UIManager.getColor("UIColorHighlighter.stripingBackground");
+        // very unusual ui striping
+        Color color = new ColorUIResource(Color.BLACK);
+        if (color.equals(uiBackground)) {
+            LOG.info("cannot run testUIColorHighlight - ui striping same as test color");
+            return;
+        }
+        UIManager.put("UIColorHighlighter.stripingBackground", color);
+        try {
+            h.updateUI();
+            assertEquals(color, h.getBackground());
+        } finally {
+            // remove custom setting. DO NOT set th eold uiColor manually!
+            UIManager.put("UIColorHighlighter.stripingBackground", null);
+        }
+        // sanity - reset
+        h.updateUI();
+        assertEquals(uiColor, h.getBackground());
+    }
 
     
     
