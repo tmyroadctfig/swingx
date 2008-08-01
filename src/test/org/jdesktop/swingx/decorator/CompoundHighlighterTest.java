@@ -25,12 +25,10 @@ import java.awt.Color;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.UIManager;
 
 import org.jdesktop.swingx.InteractiveTestCase;
-import org.jdesktop.swingx.decorator.HighlighterSupportTest.HighlighterClient;
 import org.jdesktop.swingx.renderer.JRendererLabel;
 import org.jdesktop.test.ChangeReport;
 
@@ -198,6 +196,7 @@ public class CompoundHighlighterTest extends InteractiveTestCase {
         CompoundHighlighter support = new CompoundHighlighter();
         support.setHighlighters(new Highlighter[] {});
         assertEquals(0, support.getHighlighters().length);
+        assertSame(CompoundHighlighter.EMPTY_HIGHLIGHTERS, support.getHighlighters());
     }
     
     /**
@@ -240,6 +239,50 @@ public class CompoundHighlighterTest extends InteractiveTestCase {
         assertEquals(2, support.getHighlighters().length);
         // assert that it is appended
         assertAsLast(support.getHighlighters(), highlighter);
+    }
+
+    /**
+     * Test strict enforcement of not null allowed in setHighlighters.
+     */
+    public void testSetHighlightersNull() {
+        CompoundHighlighter table = new CompoundHighlighter();
+        try {
+            table.setHighlighters((Highlighter) null);
+            fail("illegal to call setHighlighters(null)");
+            
+        } catch (NullPointerException e) {
+            // expected
+        }
+    }
+
+
+    /**
+     * Test strict enforcement of not null allowed in setHighlighters.
+     */
+    public void testSetHighlightersWithNullArray() {
+        CompoundHighlighter table = new CompoundHighlighter();
+        try {
+            table.setHighlighters((Highlighter[]) null);
+            fail("illegal to call setHighlighters(null)");
+            
+        } catch (NullPointerException e) {
+            // expected
+        }
+    }
+
+    
+    /**
+     * Test strict enforcement of not null allowed in setHighlighters.
+     */
+    public void testSetHighlightersArrayNullElement() {
+        CompoundHighlighter table = new CompoundHighlighter();
+        try {
+            table.setHighlighters(new Highlighter[] {null});
+            fail("illegal to call setHighlighters(null)");
+            
+        } catch (NullPointerException e) {
+            // expected
+        }
     }
 
 //-----------------------  CompoundHighlighter
@@ -468,54 +511,6 @@ public class CompoundHighlighterTest extends InteractiveTestCase {
         return adapter;
     }
  
-    private ComponentAdapter createDummyComponentAdapter(JComponent allColored) {
-        ComponentAdapter adapter = new ComponentAdapter(allColored) {
-
-            @Override
-            public Object getFilteredValueAt(int row, int column) {
-                // TODO Auto-generated method stub
-                return null;
-            }
-
-            @Override
-            public Object getValueAt(int row, int column) {
-                // TODO Auto-generated method stub
-                return null;
-            }
-
-            @Override
-            public boolean hasFocus() {
-                // TODO Auto-generated method stub
-                return false;
-            }
-
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                // TODO Auto-generated method stub
-                return false;
-            }
-
-            @Override
-            public boolean isEditable() {
-                // TODO Auto-generated method stub
-                return false;
-            }
-
-            @Override
-            public boolean isSelected() {
-                // TODO Auto-generated method stub
-                return false;
-            }
-
-            @Override
-            public void setValueAt(Object value, int row, int column) {
-                // TODO Auto-generated method stub
-                
-            }
-            
-        };
-        return adapter;
-    }
 
 
 }

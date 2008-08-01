@@ -37,9 +37,9 @@ public class FindVisualCheck extends InteractiveTestCase {
 //      Locale.setDefault(new Locale("es"));
       FindVisualCheck test = new FindVisualCheck();
       try {
-//        test.runInteractiveTests();
+        test.runInteractiveTests();
 //          test.runInteractiveTests("interactive.*Compare.*");
-          test.runInteractiveTests("interactive.*Close.*");
+//          test.runInteractiveTests("interactive.*Close.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();

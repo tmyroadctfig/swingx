@@ -86,6 +86,7 @@ public class CompoundHighlighter extends AbstractHighlighter
      * @throws NullPointerException if array is null or array contains null values.
      */
     public void setHighlighters(Highlighter... inList) {
+        Contract.asNotNull(inList, "Highlighter must not be null");
         if (highlighters.isEmpty() && (inList.length == 0)) return;
         removeAllHighlightersSilently();
         for (Highlighter highlighter : inList) {
@@ -156,7 +157,13 @@ public class CompoundHighlighter extends AbstractHighlighter
         // should log if this didn't succeed. Maybe
     }
 
+    /**
+     * Returns an array of contained Highlighters.
+     * 
+     * @return
+     */
     public Highlighter[] getHighlighters() {
+        if (highlighters.isEmpty()) return EMPTY_HIGHLIGHTERS;
         return highlighters.toArray(new Highlighter[highlighters.size()]);
     }
 

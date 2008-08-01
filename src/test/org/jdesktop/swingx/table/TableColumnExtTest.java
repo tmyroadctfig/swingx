@@ -266,7 +266,8 @@ public class TableColumnExtTest extends TestCase {
         assertEquals("highlighters", hcl.getLastProperty());
         //we have a compound, but empty highlighter
         assertEquals(0, column.getHighlighters().length);
-        assertNotSame(CompoundHighlighter.EMPTY_HIGHLIGHTERS, column.getHighlighters());
+        // JW: changed CompoundHighlighter to return its EMPTY_HIGHLIGHTERS if empty
+        assertSame(CompoundHighlighter.EMPTY_HIGHLIGHTERS, column.getHighlighters());
         
         //reset state
         hcl.clear();
@@ -310,7 +311,8 @@ public class TableColumnExtTest extends TestCase {
         assertEquals("highlighters", hcl.getLastProperty());
         //we have a compound, but empty highlighter
         assertEquals(0, column.getHighlighters().length);
-        assertNotSame(CompoundHighlighter.EMPTY_HIGHLIGHTERS, column.getHighlighters());
+        // JW: changed CompoundHighlighter to return its EMPTY_HIGHLIGHTERS if empty
+        assertSame(CompoundHighlighter.EMPTY_HIGHLIGHTERS, column.getHighlighters());
         
         column.setHighlighters(h1);
         

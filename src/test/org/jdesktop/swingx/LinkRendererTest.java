@@ -182,6 +182,7 @@ public class LinkRendererTest extends InteractiveTestCase {
         }
     }
 
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
         URL url = getClass().getResource("resources/test.html");

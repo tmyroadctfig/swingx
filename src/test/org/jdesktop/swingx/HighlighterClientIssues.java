@@ -28,9 +28,6 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 
 import org.jdesktop.swingx.decorator.ColorHighlighter;
-import org.jdesktop.swingx.decorator.CompoundHighlighter;
-import org.jdesktop.swingx.decorator.Highlighter;
-import org.jdesktop.test.PropertyChangeReport;
 
 /**
  * Test to exposed known issues of <code>Highlighter</code> client
@@ -105,86 +102,5 @@ public class HighlighterClientIssues extends InteractiveTestCase {
     }
 //------------------------ notification
     
-    /**
-     * PENDING: highlighters is property?
-     */
-    public void testSetHighlightersChangeEvent() {
-        fail("missing test for change notification on setHighlighters");
-        JXTable table = new JXTable();
-        PropertyChangeReport report = new PropertyChangeReport();
-        table.addPropertyChangeListener(report);
-        Highlighter highlighter = new ColorHighlighter();
-        table.setHighlighters(highlighter);
-        assertTrue("table must have fired propertyChange for highlighters", report.hasEvents("highlighters"));
-    }
-    
-    /**
-     * PENDING: if/what to fire on add/remove
-     */
-    public void testAddHighlightersChangeEvent() {
-        fail("missing test for change notification on add Highlighters");
-        JXTable table = new JXTable();
-        PropertyChangeReport report = new PropertyChangeReport();
-        table.addPropertyChangeListener(report);
-        Highlighter highlighter = new ColorHighlighter();
-        table.addHighlighter(highlighter);
-        assertTrue("table must have fired propertyChange for highlighters", report.hasEvents("highlighters"));
-    }
-    
-    /**
-     * PENDING: if/what to fire on add/remove
-     */
-    public void testRemoveHighlightersChangeEvent() {
-        fail("missing test for change notification on remove Highlighters");
-        JXTable table = new JXTable();
-        Highlighter highlighter = new ColorHighlighter();
-        table.setHighlighters(highlighter);
-        PropertyChangeReport report = new PropertyChangeReport();
-        table.addPropertyChangeListener(report);
-        table.removeHighlighter(highlighter);
-        assertTrue("table must have fired propertyChange for highlighters", report.hasEvents("highlighters"));
-    }
-    
 //-------------------------- null and setHighlighters    
-    /**
-     * PENDING: Define how to handle setHighlighters(null).
-     * Strictly: 
-     */
-    public void testSetHighlightersNull() {
-        JXTable table = new JXTable();
-        table.setHighlighters((Highlighter) null);
-        assertEquals(0, table.getHighlighters().length);
-        fail("need to define how to handle setHighlighters(null)");
-    }
-
-    /**
-     * PENDING: Define how to handle setHighlighters(null).
-     */
-    public void testSetHighlightersWithCompoundNull() {
-        JXTable table = new JXTable();
-        table.setHighlighters((CompoundHighlighter) null);
-        assertEquals(0, table.getHighlighters().length);
-        fail("need to define how to handle setHighlighters(null)");
-    }
-
-    /**
-     * PENDING: Define how to handle setHighlighters(null).
-     */
-    public void testSetHighlightersWithNullArray() {
-        JXTable table = new JXTable();
-        table.setHighlighters((Highlighter[]) null);
-        assertEquals(0, table.getHighlighters().length);
-        fail("need to define how to handle setHighlighters(null)");
-    }
-
-    
-    /**
-     * PENDING: Define how to handle setHighlighters(null).
-     */
-    public void testSetHighlightersArrayNullElement() {
-        JXTable table = new JXTable();
-        table.setHighlighters(new Highlighter[] {null});
-        assertEquals(0, table.getHighlighters().length);
-        fail("need to define how to handle setHighlighters(null)");
-    }
 }
