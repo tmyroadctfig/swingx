@@ -174,49 +174,18 @@ public class TableColumnExt extends TableColumn {
         copyFrom(columnExt);
     }
 
-    /**
-     * Returns the CompoundHighlighter assigned to the table, null if none.
-     * PENDING: open up for subclasses again?.
-     * 
-     * @return the CompoundHighlighter assigned to the table.
-     * @see #setCompoundHighlighter(CompoundHighlighter)
-     */
-    private CompoundHighlighter getCompoundHighlighter() {
-        return compoundHighlighter;
-    }
-
-    /**
-     * Assigns a CompoundHighlighter to the table, maybe null to remove all
-     * Highlighters.<p>
-     * 
-     * The default value is <code>null</code>. <p>
-     * 
-     * PENDING: open up for subclasses again?.
-     * @param pipeline the CompoundHighlighter to use for renderer decoration. 
-     * @see #getCompoundHighlighter()
-     * @see #addHighlighter(Highlighter)
-     * @see #removeHighlighter(Highlighter)
-     * 
-     */
-    private void setCompoundHighlighter(CompoundHighlighter pipeline) {
-        CompoundHighlighter old = getCompoundHighlighter();
-        if (old != null) {
-            old.removeChangeListener(getHighlighterChangeListener());
-        }
-        compoundHighlighter = pipeline;
-        if (compoundHighlighter != null) {
-            compoundHighlighter.addChangeListener(getHighlighterChangeListener());
-        }
-        // PENDING: wrong event - the property is either "compoundHighlighter"
-        // or "highlighters" with the old/new array as value
-        firePropertyChange("highlighters", old, getCompoundHighlighter());
-    }
     
     /**
-     * Sets the <code>Highlighter</code>s to the column, replacing any old settings.
+     * Sets the <code>Highlighter</code>s to the table, replacing any old settings.
      * None of the given Highlighters must be null.<p>
      * 
+     * This is a bound property. <p> 
+     * 
+     * Note: as of version #1.257 the null constraint is enforced strictly. To remove
+     * all highlighters use this method without param.
+     * 
      * @param highlighters zero or more not null highlighters to use for renderer decoration.
+     * @throws NullPointerException if array is null or array contains null values.
      * 
      * @see #getHighlighters()
      * @see #addHighlighter(Highlighter)
@@ -224,45 +193,36 @@ public class TableColumnExt extends TableColumn {
      * 
      */
     public void setHighlighters(Highlighter... highlighters) {
-        Contract.asNotNull(highlighters, "highlighters cannot be null or contain null");
-
-        CompoundHighlighter pipeline = null;
-        if (highlighters.length > 0) {    
-           pipeline = new CompoundHighlighter(highlighters);
-        }
-        
-        setCompoundHighlighter(pipeline);
+        Highlighter[] old = getHighlighters();
+        getCompoundHighlighter().setHighlighters(highlighters);
+        firePropertyChange("highlighters", old, getHighlighters());
     }
 
     /**
-     * Returns the <code>Highlighter</code>s used by this column.
+     * Returns the <code>Highlighter</code>s used by this table.
      * Maybe empty, but guarantees to be never null.
-     * @return the Highlighters used by this column, guaranteed to never null.
+     * 
+     * @return the Highlighters used by this table, guaranteed to never null.
      * @see #setHighlighters(Highlighter[])
      */
     public Highlighter[] getHighlighters() {
-        return getCompoundHighlighter() != null ? 
-                getCompoundHighlighter().getHighlighters() : 
-                    CompoundHighlighter.EMPTY_HIGHLIGHTERS;
+        return getCompoundHighlighter().getHighlighters();
     }
     /**
-     * Adds a Highlighter. Appends to the end of the list of used
-     * Highlighters.
+     * Appends a <code>Highlighter</code> to the end of the list of used
+     * <code>Highlighter</code>s. The argument must not be null. 
      * <p>
      * 
-     * @param highlighter the <code>Highlighter</code> to add.
+     * @param highlighter the <code>Highlighter</code> to add, must not be null.
      * @throws NullPointerException if <code>Highlighter</code> is null.
      * 
      * @see #removeHighlighter(Highlighter)
      * @see #setHighlighters(Highlighter[])
      */
     public void addHighlighter(Highlighter highlighter) {
-        CompoundHighlighter pipeline = getCompoundHighlighter();
-        if (pipeline == null) {
-           setCompoundHighlighter(new CompoundHighlighter(highlighter)); 
-        } else {
-            pipeline.addHighlighter(highlighter);
-        }
+        Highlighter[] old = getHighlighters();
+        getCompoundHighlighter().addHighlighter(highlighter);
+        firePropertyChange("highlighters", old, getHighlighters());
     }
 
     /**
@@ -275,10 +235,26 @@ public class TableColumnExt extends TableColumn {
      * @see #setHighlighters(Highlighter...)
      */
     public void removeHighlighter(Highlighter highlighter) {
-        if ((getCompoundHighlighter() == null)) return;
+        Highlighter[] old = getHighlighters();
         getCompoundHighlighter().removeHighlighter(highlighter);
+        firePropertyChange("highlighters", old, getHighlighters());
     }
     
+    /**
+     * Returns the CompoundHighlighter assigned to the table, null if none.
+     * PENDING: open up for subclasses again?.
+     * 
+     * @return the CompoundHighlighter assigned to the table.
+     * @see #setCompoundHighlighter(CompoundHighlighter)
+     */
+    protected CompoundHighlighter getCompoundHighlighter() {
+        if (compoundHighlighter == null) {
+            compoundHighlighter = new CompoundHighlighter();
+            compoundHighlighter.addChangeListener(getHighlighterChangeListener());
+        }
+        return compoundHighlighter;
+    }
+
     /**
      * Returns the <code>ChangeListener</code> to use with highlighters. Lazily 
      * creates the listener.
@@ -296,7 +272,7 @@ public class TableColumnExt extends TableColumn {
     /**
      * Creates and returns the ChangeListener observing Highlighters.
      * <p>
-     * A property change event is create for a state change.
+     * Here: repaints the table on receiving a stateChanged.
      * 
      * @return the ChangeListener defining the reaction to changes of
      *         highlighters.
@@ -304,12 +280,11 @@ public class TableColumnExt extends TableColumn {
     protected ChangeListener createHighlighterChangeListener() {
         return new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
-                //return null for old state since it is unknown
-                firePropertyChange("highlighters", null, getCompoundHighlighter());
+//                repaint();
             }
         };
     }
-    
+
     /** 
      * Returns true if the user <i>can</i> resize the TableColumn's width, 
      * false otherwise. This is a usability override: it takes into account

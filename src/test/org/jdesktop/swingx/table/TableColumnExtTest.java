@@ -235,6 +235,9 @@ public class TableColumnExtTest extends TestCase {
                 copy.getClientProperty(key));
     }
     //begin SwingX Issue #770 checks
+    // PENDING JW: consider to remove the  "HighlighterClient"
+    // related testing here - that part is done in TableColumnExtAsHighlighterClient in package
+    // swingx.
     /**
      * Check for setHighlighters portion of #770.
      */

@@ -100,7 +100,11 @@ public class HighlighterClientIssues extends InteractiveTestCase {
         firstFrame.setVisible(true);
         secondFrame.setVisible(true);
     }
-//------------------------ notification
-    
-//-------------------------- null and setHighlighters    
+
+    /**
+     * Dummy to keep the test runner happy.
+     */
+    public void testDummy() {
+        
+    }
 }

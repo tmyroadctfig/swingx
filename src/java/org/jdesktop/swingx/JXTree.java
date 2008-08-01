@@ -470,94 +470,53 @@ public class JXTree extends JTree {
 //----------------------- Highlighter api
     
     /**
-     * Returns the CompoundHighlighter assigned to the table, null if none.
-     * PENDING: open up for subclasses again?.
-     * 
-     * @return the CompoundHighlighter assigned to the table.
-     * @see #setCompoundHighlighter(CompoundHighlighter)
-     */
-    private CompoundHighlighter getCompoundHighlighter() {
-        return compoundHighlighter;
-    }
-
-    /**
-     * Assigns a CompoundHighlighter to the tree, maybe null to remove all
-     * Highlighters.<p>
-     * 
-     * The default value is <code>null</code>. <p>
-     * 
-     * PENDING: open up for subclasses again?.
-     * @param pipeline the CompoundHighlighter to use for renderer decoration. 
-     * @see #getCompoundHighlighter()
-     * @see #addHighlighter(Highlighter)
-     * @see #removeHighlighter(Highlighter)
-     * 
-     */
-    private void setCompoundHighlighter(CompoundHighlighter pipeline) {
-        CompoundHighlighter old = getCompoundHighlighter();
-        if (old != null) {
-            old.removeChangeListener(getHighlighterChangeListener());
-        }
-        compoundHighlighter = pipeline;
-        if (compoundHighlighter != null) {
-            compoundHighlighter.addChangeListener(getHighlighterChangeListener());
-        }
-        firePropertyChange("highlighters", old, getCompoundHighlighter());
-    }
-
-    /**
      * Sets the <code>Highlighter</code>s to the table, replacing any old settings.
      * None of the given Highlighters must be null.<p>
      * 
-     * Note: the implementation is lenient with a single null highighter
-     * to ease the api change from previous versions.
+     * This is a bound property. <p> 
      * 
-     * PENDING: property change? 
+     * Note: as of version #1.257 the null constraint is enforced strictly. To remove
+     * all highlighters use this method without param.
      * 
      * @param highlighters zero or more not null highlighters to use for renderer decoration.
+     * @throws NullPointerException if array is null or array contains null values.
      * 
      * @see #getHighlighters()
      * @see #addHighlighter(Highlighter)
      * @see #removeHighlighter(Highlighter)
+     * 
      */
     public void setHighlighters(Highlighter... highlighters) {
-        CompoundHighlighter pipeline = null;
-        if ((highlighters != null) && (highlighters.length > 0) && 
-            (highlighters[0] != null)) {    
-           pipeline = new CompoundHighlighter(highlighters);
-        }
-        setCompoundHighlighter(pipeline);
-    }
-    /**
-     * Returns the <code>Highlighter</code>s used by this tree.
-     * Maybe empty, but guarantees to be never null.
-     * @return the Highlighters used by this tree, guaranteed to never null.
-     * @see #setHighlighters(Highlighter[])
-     */
-    public Highlighter[] getHighlighters() {
-        return getCompoundHighlighter() != null ? 
-                getCompoundHighlighter().getHighlighters() : 
-                    CompoundHighlighter.EMPTY_HIGHLIGHTERS;
+        Highlighter[] old = getHighlighters();
+        getCompoundHighlighter().setHighlighters(highlighters);
+        firePropertyChange("highlighters", old, getHighlighters());
     }
 
     /**
-     * Adds a Highlighter. Appends to the end of the list of used
-     * Highlighters.
+     * Returns the <code>Highlighter</code>s used by this table.
+     * Maybe empty, but guarantees to be never null.
+     * 
+     * @return the Highlighters used by this table, guaranteed to never null.
+     * @see #setHighlighters(Highlighter[])
+     */
+    public Highlighter[] getHighlighters() {
+        return getCompoundHighlighter().getHighlighters();
+    }
+    /**
+     * Appends a <code>Highlighter</code> to the end of the list of used
+     * <code>Highlighter</code>s. The argument must not be null. 
      * <p>
      * 
-     * @param highlighter the <code>Highlighter</code> to add.
+     * @param highlighter the <code>Highlighter</code> to add, must not be null.
      * @throws NullPointerException if <code>Highlighter</code> is null.
      * 
      * @see #removeHighlighter(Highlighter)
      * @see #setHighlighters(Highlighter[])
      */
     public void addHighlighter(Highlighter highlighter) {
-        CompoundHighlighter pipeline = getCompoundHighlighter();
-        if (pipeline == null) {
-           setCompoundHighlighter(new CompoundHighlighter(new Highlighter[] {highlighter})); 
-        } else {
-            pipeline.addHighlighter(highlighter);
-        }
+        Highlighter[] old = getHighlighters();
+        getCompoundHighlighter().addHighlighter(highlighter);
+        firePropertyChange("highlighters", old, getHighlighters());
     }
 
     /**
@@ -570,23 +529,54 @@ public class JXTree extends JTree {
      * @see #setHighlighters(Highlighter...)
      */
     public void removeHighlighter(Highlighter highlighter) {
-        if ((getCompoundHighlighter() == null)) return;
+        Highlighter[] old = getHighlighters();
         getCompoundHighlighter().removeHighlighter(highlighter);
+        firePropertyChange("highlighters", old, getHighlighters());
     }
     
+    /**
+     * Returns the CompoundHighlighter assigned to the table, null if none.
+     * PENDING: open up for subclasses again?.
+     * 
+     * @return the CompoundHighlighter assigned to the table.
+     * @see #setCompoundHighlighter(CompoundHighlighter)
+     */
+    protected CompoundHighlighter getCompoundHighlighter() {
+        if (compoundHighlighter == null) {
+            compoundHighlighter = new CompoundHighlighter();
+            compoundHighlighter.addChangeListener(getHighlighterChangeListener());
+        }
+        return compoundHighlighter;
+    }
 
-    private ChangeListener getHighlighterChangeListener() {
+    /**
+     * Returns the <code>ChangeListener</code> to use with highlighters. Lazily 
+     * creates the listener.
+     * 
+     * @return the ChangeListener for observing changes of highlighters, 
+     *   guaranteed to be <code>not-null</code>
+     */
+    protected ChangeListener getHighlighterChangeListener() {
         if (highlighterChangeListener == null) {
-            highlighterChangeListener = new ChangeListener() {
-
-                public void stateChanged(ChangeEvent e) {
-                    repaint();
-                    
-                }
-                
-            };
+            highlighterChangeListener = createHighlighterChangeListener();
         }
         return highlighterChangeListener;
+    }
+
+    /**
+     * Creates and returns the ChangeListener observing Highlighters.
+     * <p>
+     * Here: repaints the table on receiving a stateChanged.
+     * 
+     * @return the ChangeListener defining the reaction to changes of
+     *         highlighters.
+     */
+    protected ChangeListener createHighlighterChangeListener() {
+        return new ChangeListener() {
+            public void stateChanged(ChangeEvent e) {
+                repaint();
+            }
+        };
     }
 
 
@@ -786,6 +776,7 @@ public class JXTree extends JTree {
         uninstallSelectionColors();
         super.updateUI();
         installSelectionColors();
+        updateHighlighterUI();
     }
 
     /**
@@ -811,6 +802,16 @@ public class JXTree extends JTree {
         if (isUIResource(getSelectionForeground())) {
             setSelectionForeground(null);
         }
+    }
+
+    /**
+     * Updates highlighter after <code>updateUI</code> changes.
+     * 
+     * @see org.jdesktop.swingx.decorator.UIDependent
+     */
+    protected void updateHighlighterUI() {
+        if (compoundHighlighter == null) return;
+        compoundHighlighter.updateUI();
     }
 
     /**
