@@ -19,7 +19,7 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
-package org.jdesktop.swingx;
+package org.jdesktop.swingx.decorator;
 
 import java.awt.Color;
 import java.beans.PropertyChangeListener;
@@ -29,9 +29,6 @@ import javax.swing.UIManager;
 
 import junit.framework.TestCase;
 
-import org.jdesktop.swingx.decorator.ColorHighlighter;
-import org.jdesktop.swingx.decorator.Highlighter;
-import org.jdesktop.swingx.decorator.HighlighterFactory;
 import org.jdesktop.test.PropertyChangeReport;
 import org.jdesktop.test.TestUtils;
 

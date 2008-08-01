@@ -19,7 +19,7 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
-package org.jdesktop.swingx;
+package org.jdesktop.swingx.decorator;
 
 import java.awt.Color;
 import java.awt.event.ActionEvent;
@@ -27,9 +27,9 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 
-import org.jdesktop.swingx.decorator.ColorHighlighter;
-import org.jdesktop.swingx.decorator.HighlightPredicate;
-import org.jdesktop.swingx.decorator.HighlighterFactory;
+import org.jdesktop.swingx.InteractiveTestCase;
+import org.jdesktop.swingx.JXFrame;
+import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.decorator.HighlightPredicate.ColumnHighlightPredicate;
 import org.jdesktop.swingx.decorator.HighlighterFactory.UIColorHighlighter;
 import org.jdesktop.test.AncientSwingTeam;

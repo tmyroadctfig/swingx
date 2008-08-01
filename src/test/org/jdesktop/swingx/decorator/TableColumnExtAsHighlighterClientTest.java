@@ -19,25 +19,25 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
-package org.jdesktop.swingx;
+package org.jdesktop.swingx.decorator;
 
 import java.beans.PropertyChangeListener;
 
-import org.jdesktop.swingx.decorator.Highlighter;
+import org.jdesktop.swingx.table.TableColumnExt;
 
 /**
- * Test JXTree as HighlighterClient.
+ * Test JXTable as HighlighterClient.
  * 
  * @author Jeanette Winzenburg
  */
-public class TreeAsHighlighterClientTest extends AbstractTestHighlighterClient {
+public class TableColumnExtAsHighlighterClientTest extends AbstractTestHighlighterClient {
 
     @Override
     protected HighlighterClient createHighlighterClient() {
-        return createHighlighterClient(new JXTree());
+        return createHighlighterClient(new TableColumnExt());
     }
 
-    private HighlighterClient createHighlighterClient(final JXTree table) {
+    private HighlighterClient createHighlighterClient(final TableColumnExt table) {
         HighlighterClient client = new HighlighterClient() {
 
             public void addHighlighter(Highlighter highlighter) {

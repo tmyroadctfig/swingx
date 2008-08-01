@@ -19,7 +19,7 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
-package org.jdesktop.swingx;
+package org.jdesktop.swingx.decorator;
 
 /**
  * Contains failing tests for TableColumnExt in its role as HighlighterClient

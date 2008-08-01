@@ -19,26 +19,25 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
-package org.jdesktop.swingx;
+package org.jdesktop.swingx.decorator;
 
 import java.beans.PropertyChangeListener;
 
-import org.jdesktop.swingx.decorator.Highlighter;
-import org.jdesktop.swingx.table.TableColumnExt;
+import org.jdesktop.swingx.JXList;
 
 /**
- * Test JXTable as HighlighterClient.
+ * Test JXList as HighlighterClient.
  * 
  * @author Jeanette Winzenburg
  */
-public class TableColumnExtAsHighlighterClientTest extends AbstractTestHighlighterClient {
+public class ListAsHighlighterClientTest extends AbstractTestHighlighterClient {
 
     @Override
     protected HighlighterClient createHighlighterClient() {
-        return createHighlighterClient(new TableColumnExt());
+        return createHighlighterClient(new JXList());
     }
 
-    private HighlighterClient createHighlighterClient(final TableColumnExt table) {
+    private HighlighterClient createHighlighterClient(final JXList table) {
         HighlighterClient client = new HighlighterClient() {
 
             public void addHighlighter(Highlighter highlighter) {
@@ -72,5 +71,6 @@ public class TableColumnExtAsHighlighterClientTest extends AbstractTestHighlight
         };
         return client;
     }
+   
 
 }
