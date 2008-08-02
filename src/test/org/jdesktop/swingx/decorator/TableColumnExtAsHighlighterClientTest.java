@@ -21,9 +21,12 @@
  */
 package org.jdesktop.swingx.decorator;
 
+import java.awt.Color;
 import java.beans.PropertyChangeListener;
 
 import org.jdesktop.swingx.table.TableColumnExt;
+import org.jdesktop.test.PropertyChangeReport;
+import org.jdesktop.test.TestUtils;
 
 /**
  * Test JXTable as HighlighterClient.
@@ -31,6 +34,18 @@ import org.jdesktop.swingx.table.TableColumnExt;
  * @author Jeanette Winzenburg
  */
 public class TableColumnExtAsHighlighterClientTest extends AbstractTestHighlighterClient {
+
+    
+
+    public void testHighlighterStateChangeNotification() {
+        TableColumnExt columnExt = new TableColumnExt();
+        ColorHighlighter hl = new ColorHighlighter();
+        columnExt.addHighlighter(hl);
+        PropertyChangeReport report = new PropertyChangeReport();
+        columnExt.addPropertyChangeListener(report);
+        hl.setBackground(Color.RED);
+        TestUtils.assertPropertyChangeEvent(report, "highlighterStateChanged", false, true);
+    }
 
     @Override
     protected HighlighterClient createHighlighterClient() {

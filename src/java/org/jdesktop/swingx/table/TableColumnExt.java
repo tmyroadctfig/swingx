@@ -67,9 +67,11 @@ import org.jdesktop.swingx.decorator.UIDependent;
  * 
  * <li><b>Highlighter</b>: <code>highlighters</code> holds the column
  * highlighters; these are applied to the renderer after the table highlighters.
- * Any change to the highlighters (setting them, adding one, removing one, or
- * changing one) will result in a {@code PropertyChangeEvent} being fired for
- * "highlighters".
+ * Any modification of the list of contained <code>Highlighter</code>s
+ *  (setting them, adding one or removing one) 
+ * will result in a {@code PropertyChangeEvent} being fired for
+ * "highlighters". State changes on contained <code>Highlighter</code>s will 
+ * result in a PropertyChangeEvent for "highlighterStateChanged".
  * </ul>
  * 
  * 
@@ -119,6 +121,8 @@ public class TableColumnExt extends TableColumn implements UIDependent {
     protected CompoundHighlighter compoundHighlighter;
     
     private ChangeListener highlighterChangeListener;
+
+    private boolean ignoreHighlighterStateChange;
     
     /**
      * Creates new table view column with a model index = 0.
@@ -193,9 +197,11 @@ public class TableColumnExt extends TableColumn implements UIDependent {
      * 
      */
     public void setHighlighters(Highlighter... highlighters) {
+        ignoreHighlighterStateChange = true;
         Highlighter[] old = getHighlighters();
         getCompoundHighlighter().setHighlighters(highlighters);
         firePropertyChange("highlighters", old, getHighlighters());
+        ignoreHighlighterStateChange = false;
     }
 
     /**
@@ -220,9 +226,11 @@ public class TableColumnExt extends TableColumn implements UIDependent {
      * @see #setHighlighters(Highlighter[])
      */
     public void addHighlighter(Highlighter highlighter) {
+        ignoreHighlighterStateChange = true;
         Highlighter[] old = getHighlighters();
         getCompoundHighlighter().addHighlighter(highlighter);
         firePropertyChange("highlighters", old, getHighlighters());
+        ignoreHighlighterStateChange = false;
     }
 
     /**
@@ -235,9 +243,11 @@ public class TableColumnExt extends TableColumn implements UIDependent {
      * @see #setHighlighters(Highlighter...)
      */
     public void removeHighlighter(Highlighter highlighter) {
+        ignoreHighlighterStateChange = true;
         Highlighter[] old = getHighlighters();
         getCompoundHighlighter().removeHighlighter(highlighter);
         firePropertyChange("highlighters", old, getHighlighters());
+        ignoreHighlighterStateChange = false;
     }
     
     /**
@@ -280,7 +290,8 @@ public class TableColumnExt extends TableColumn implements UIDependent {
     protected ChangeListener createHighlighterChangeListener() {
         return new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
-//                repaint();
+                if (ignoreHighlighterStateChange) return;
+                firePropertyChange("highlighterStateChanged", false, true);
             }
         };
     }

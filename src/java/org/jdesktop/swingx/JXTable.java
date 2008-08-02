@@ -120,7 +120,6 @@ import org.jdesktop.swingx.table.ColumnFactory;
 import org.jdesktop.swingx.table.DefaultTableColumnModelExt;
 import org.jdesktop.swingx.table.TableColumnExt;
 import org.jdesktop.swingx.table.TableColumnModelExt;
-import org.jdesktop.swingx.util.Contract;
 
 /**
  * <p>
@@ -356,7 +355,7 @@ public class JXTable extends JTable
      * RolloverController: listens to cell over events and repaints
      * entered/exited rows.
      */
-    private TableRolloverController linkController;
+    private TableRolloverController<JXTable> linkController;
 
     /** field to store the autoResizeMode while interactively setting 
      *  horizontal scrollbar to visible.
@@ -519,15 +518,15 @@ public class JXTable extends JTable
         firePropertyChange("rolloverEnabled", old, isRolloverEnabled());
     }
 
-    protected TableRolloverController getLinkController() {
+    protected TableRolloverController<JXTable> getLinkController() {
         if (linkController == null) {
             linkController = createLinkController();
         }
         return linkController;
     }
 
-    protected TableRolloverController createLinkController() {
-        return new TableRolloverController();
+    protected TableRolloverController<JXTable> createLinkController() {
+        return new TableRolloverController<JXTable>();
     }
 
 
@@ -2337,7 +2336,7 @@ public class JXTable extends JTable
         } else if (event.getPropertyName().equals("sortable")) {
             updateSortingAfterColumnChanged((TableColumn) event.getSource(), 
                     (Boolean) event.getNewValue());
-        } else if ("highlighters".equals(event.getPropertyName())) {
+        } else if (event.getPropertyName().startsWith("highlighter")) {
             if (event.getSource() instanceof TableColumnExt && getRowCount() > 0) {
                 TableColumnExt column = (TableColumnExt) event.getSource();
                 

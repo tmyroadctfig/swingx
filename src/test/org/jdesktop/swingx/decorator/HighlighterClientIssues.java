@@ -30,9 +30,6 @@ import javax.swing.Action;
 import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXTable;
-import org.jdesktop.swingx.decorator.HighlightPredicate.ColumnHighlightPredicate;
-import org.jdesktop.swingx.decorator.HighlighterFactory.UIColorHighlighter;
-import org.jdesktop.test.AncientSwingTeam;
 
 /**
  * Test to exposed known issues of <code>Highlighter</code> client
@@ -57,27 +54,6 @@ public class HighlighterClientIssues extends InteractiveTestCase {
             e.printStackTrace();
         } 
   }
-
-    /**
-     * Issue ?? swingx: column highlighter change must update view.
-     */
-    public void interactiveColumnHighlighterChange() {
-        final ColorHighlighter hl = new ColorHighlighter(HighlightPredicate.ODD, Color.RED, Color.BLACK);
-        JXTable table = new JXTable(new AncientSwingTeam());
-        table.getColumnExt(0).addHighlighter(hl);
-        Action action = new AbstractAction("toggle column color") {
-
-            public void actionPerformed(ActionEvent e) {
-                Color old = hl.getBackground();
-                hl.setBackground(old == Color.red ? Color.ORANGE : Color.RED);
-                
-            }
-            
-        };
-        JXFrame frame = wrapWithScrollingInFrame(table, "column highlighter update");
-        addAction(frame, action);
-        show(frame);
-    }
 
     
     /**
