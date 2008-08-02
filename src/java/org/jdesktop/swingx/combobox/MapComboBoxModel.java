@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * A {@code ComboBoxModel} for {@code Map}s. The model will always present a {@code Map}
@@ -48,12 +49,6 @@ public class MapComboBoxModel<K, V> extends ListComboBoxModel<K> {
     protected Map<K, V> map_data;
     
     /**
-     * @deprecated (pre-0.9.3) no longer used, remove after 0.9.3 release
-     */
-    @Deprecated
-    protected boolean inverted;
-    
-    /**
      * Creates an empty model.
      */
     public MapComboBoxModel() {
@@ -68,14 +63,8 @@ public class MapComboBoxModel<K, V> extends ListComboBoxModel<K> {
      */
     public MapComboBoxModel(Map<K, V> map) {
         super(buildIndex(map));
+        
         this.map_data = map;
-        
-        buildIndex();
-        
-        //TODO remove this with buildIndex removal
-        if(data.size() > 0) {
-            selected = data.get(0);
-        }
     }
     
     /**
@@ -95,19 +84,6 @@ public class MapComboBoxModel<K, V> extends ListComboBoxModel<K> {
     }
     
     /**
-     * Builds an index for this model and assigns it to {@link ListComboBoxModel#data} This method
-     * ensures that the map is always presented in a consistent order.
-     * <p>
-     * This method is called by the constructor.
-     * 
-     * @deprecated (pre-0.9.3) no longer used; use {@link #buildIndex(Map)} instead
-     */
-    @Deprecated
-    protected void buildIndex() {
-        data = new ArrayList<K>(map_data.keySet());
-    }
-    
-    /**
      * {@inheritDoc}
      */
     public int getSize() {
@@ -118,9 +94,19 @@ public class MapComboBoxModel<K, V> extends ListComboBoxModel<K> {
      * {@inheritDoc}
      */
     public void actionPerformed(ActionEvent evt) {
+        //kgs - this code might not be performant with large maps
         if(evt.getActionCommand().equals(UPDATE)) {
-            //TODO after 0.9.3: replace with different logic so data can be final
-            buildIndex();
+            //add new keys
+            Set<K> keys = map_data.keySet();
+            keys.removeAll(data);
+            data.addAll(keys);
+            
+            //remove dead keys
+            List<K> copy = new ArrayList<K>(data);
+            keys = map_data.keySet();
+            copy.removeAll(keys);
+            data.removeAll(copy);
+            
             fireContentsChanged(this, 0, getSize());
         }
     }

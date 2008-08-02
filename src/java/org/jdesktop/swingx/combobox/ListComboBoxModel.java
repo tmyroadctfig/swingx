@@ -22,7 +22,6 @@ package org.jdesktop.swingx.combobox;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.AbstractListModel;
@@ -47,10 +46,8 @@ public class ListComboBoxModel<E> extends AbstractListModel implements ComboBoxM
      * <p>
      * This model does <b>not</b> make a copy of the list, so any changes in
      * the list without synchronizing the model may have drastic effects.
-     * <p>
-     * TODO make final after 0.9.3, when {@link MapComboBoxModel#buildIndex()} is removed
      */
-    protected List<E> data;
+    protected final List<E> data;
     
     /**
      * The currently selected item.
