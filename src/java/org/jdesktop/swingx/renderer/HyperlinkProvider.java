@@ -21,7 +21,6 @@
 package org.jdesktop.swingx.renderer;
 
 import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 
 import org.jdesktop.swingx.JXHyperlink;

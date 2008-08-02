@@ -4,25 +4,25 @@
  * Copyright 2004 Sun Microsystems, Inc., 4150 Network Circle,
  * Santa Clara, California 95054, U.S.A. All rights reserved.
  */
-package org.jdesktop.swingx;
+package org.jdesktop.swingx.renderer;
 
 import java.awt.Point;
-import java.awt.event.ActionEvent;
 import java.net.URL;
 import java.util.logging.Logger;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.table.TableCellRenderer;
 
+import org.jdesktop.swingx.InteractiveTestCase;
+import org.jdesktop.swingx.JXFrame;
+import org.jdesktop.swingx.JXHyperlink;
+import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.hyperlink.EditorPaneLinkVisitor;
 import org.jdesktop.swingx.hyperlink.LinkModel;
 import org.jdesktop.swingx.hyperlink.LinkModelAction;
-import org.jdesktop.swingx.renderer.DefaultTableRenderer;
-import org.jdesktop.swingx.renderer.HyperlinkProvider;
 import org.jdesktop.swingx.rollover.RolloverProducer;
+import org.jdesktop.test.AncientSwingTeam;
 
 /**
  * Test around hyperlink rendering.
@@ -32,8 +32,8 @@ import org.jdesktop.swingx.rollover.RolloverProducer;
  * 
  * @author Jeanette Winzenburg
  */
-public class LinkRendererTest extends InteractiveTestCase {
-    private static final Logger LOG = Logger.getLogger(LinkRendererTest.class
+public class HyperlinkProviderTest extends InteractiveTestCase {
+    private static final Logger LOG = Logger.getLogger(HyperlinkProviderTest.class
             .getName());
 
     private LinkModel link;
@@ -150,29 +150,18 @@ public class LinkRendererTest extends InteractiveTestCase {
      * changing LF. 
      */
     public void interactiveTableSelectionBackgroundOnLF() {
-        final JXTable table = new JXTable(2, 2);
+        final JXTable table = new JXTable(new AncientSwingTeam());
         TableCellRenderer linkRenderer = new DefaultTableRenderer(new HyperlinkProvider());
         table.getColumnModel().getColumn(0).setCellRenderer(linkRenderer);
         table.setRowSelectionInterval(1, 1);
-        final JXFrame frame = wrapWithScrollingInFrame(table, "test background");
-        Action toggle = new AbstractAction("toggleLF") {
-            boolean systemLF = defaultToSystemLF;
-
-            public void actionPerformed(ActionEvent e) {
-                systemLF = !systemLF;
-                setSystemLF(systemLF);
-                SwingUtilities.updateComponentTreeUI(table);
-            }
-
-        };
-        addAction(frame, toggle);
+        final JXFrame frame = wrapWithScrollingInFrame(table, "test background must change with LAF");
         frame.setVisible(true);
 
     }
 
     public static void main(String[] args) throws Exception {
         // setSystemLF(true);
-        LinkRendererTest test = new LinkRendererTest();
+        HyperlinkProviderTest test = new HyperlinkProviderTest();
         try {
             test.runInteractiveTests();
             // test.runInteractiveTests("interactive.*Table.*");

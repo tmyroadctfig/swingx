@@ -175,7 +175,6 @@ public class JXDatePicker extends JComponent {
     private Date linkDate;
     
     private JXMonthView _monthView;
-    private String _actionCommand = "selectionChanged";
     private boolean editable = true;
     private EventListenerMap listenerMap;
     protected boolean lightWeightPopupEnabled = JPopupMenu.getDefaultLightWeightPopupEnabled();
@@ -952,8 +951,6 @@ public class JXDatePicker extends JComponent {
         }
     }
 
-//----------------------- deprecated
-    
 
 }    
  

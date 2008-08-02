@@ -174,6 +174,7 @@ public class TreeTableCellEditor extends DefaultCellEditor {
         private int column;
         private int width;
         private JTable table;
+        @SuppressWarnings("deprecation")
         @Override
         public void reshape(int x, int y, int width, int height) {
             // Allows precise positioning of text field in the tree cell.

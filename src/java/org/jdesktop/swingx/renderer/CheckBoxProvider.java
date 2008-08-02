@@ -151,8 +151,8 @@ public class CheckBoxProvider extends ComponentProvider<AbstractButton> {
      *   to use a default BooleanValue instead.
      * 
      * @param context the cell context, must not be null.
-     * @return a appropriate icon representation of the cell's content,
-     *   or null if non if available.
+     * @return the boolean representation of the cell's content,
+     *   or false if none if available.
      */
     protected boolean getValueAsBoolean(CellContext context) {
         if (formatter instanceof BooleanValue) {

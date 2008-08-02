@@ -109,7 +109,7 @@ public class JXList extends JList {
      * RolloverController: listens to cell over events and repaints
      * entered/exited rows.
      */
-    private ListRolloverController linkController;
+    private ListRolloverController<JXList> linkController;
 
     /** A wrapper around the default renderer enabling decoration. */
     private DelegatingRenderer delegatingRenderer;
@@ -304,15 +304,15 @@ public class JXList extends JList {
     }
 
     
-    protected ListRolloverController getLinkController() {
+    protected ListRolloverController<JXList> getLinkController() {
         if (linkController == null) {
             linkController = createLinkController();
         }
         return linkController;
     }
 
-    protected ListRolloverController createLinkController() {
-        return new ListRolloverController();
+    protected ListRolloverController<JXList> createLinkController() {
+        return new ListRolloverController<JXList>();
     }
 
 

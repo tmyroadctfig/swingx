@@ -41,6 +41,11 @@ import org.jdesktop.swingx.painter.Painter;
 public class JRendererCheckBox extends JCheckBox implements PainterAware {
     protected Painter painter;
 
+//    public JRendererCheckBox() {
+//        super();
+//        setContentAreaFilled(true);
+//        setOpaque(true);
+//    }
     /**
      * {@inheritDoc}
      */
@@ -61,6 +66,9 @@ public class JRendererCheckBox extends JCheckBox implements PainterAware {
             // JW: revisit - really needed after fix for #897?
             setContentAreaFilled(false);
         } // PENDING JW: asymetric! no else?
+//        else {
+//            setContentAreaFilled(true);
+//        }
     }
 
     /**

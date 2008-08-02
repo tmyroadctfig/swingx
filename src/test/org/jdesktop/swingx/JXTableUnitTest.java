@@ -3676,9 +3676,9 @@ public class JXTableUnitTest extends InteractiveTestCase {
     
     // test per-column highlighting
     private static class TestingHighlighter extends AbstractHighlighter {
-        private List events;
+        private List<Highlighter> events;
         
-        public TestingHighlighter(List events) {
+        public TestingHighlighter(List<Highlighter> events) {
             this.events = events;
         }
         
@@ -3691,7 +3691,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
     
     public void testColumnHighlighting() {
         JXTable table = new JXTable(tableModel);
-        List events = new ArrayList();
+        List<Highlighter> events = new ArrayList<Highlighter>();
         
         Highlighter tableHighlighter = new TestingHighlighter(events);
         Highlighter columnHighlighter = new TestingHighlighter(events);

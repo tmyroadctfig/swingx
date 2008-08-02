@@ -2,7 +2,7 @@
  * Created on 06.10.2005
  *
  */
-package org.jdesktop.swingx;
+package org.jdesktop.swingx.rollover;
 
 import java.awt.Color;
 import java.awt.event.ActionEvent;
@@ -15,6 +15,12 @@ import javax.swing.JTree;
 import javax.swing.ListModel;
 import javax.swing.table.TableModel;
 
+import org.jdesktop.swingx.InteractiveTestCase;
+import org.jdesktop.swingx.JXFrame;
+import org.jdesktop.swingx.JXList;
+import org.jdesktop.swingx.JXTable;
+import org.jdesktop.swingx.JXTree;
+import org.jdesktop.swingx.JXTreeTable;
 import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.CompoundHighlighter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;

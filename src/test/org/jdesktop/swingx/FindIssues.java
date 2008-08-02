@@ -23,6 +23,7 @@ import org.jdesktop.swingx.search.TableSearchable;
 
 /**
  * Exposing open issues in Searchable implementations.
+ * PENDING JW: should be in package search - but references swingx package internals. 
  * 
  * @author Jeanette Winzenburg
  */

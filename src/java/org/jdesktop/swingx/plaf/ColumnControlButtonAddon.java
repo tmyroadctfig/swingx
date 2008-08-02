@@ -21,8 +21,6 @@
  */
 package org.jdesktop.swingx.plaf;
 
-import java.awt.Insets;
-
 import javax.swing.plaf.InsetsUIResource;
 
 import org.jdesktop.swingx.icon.ColumnControlIcon;

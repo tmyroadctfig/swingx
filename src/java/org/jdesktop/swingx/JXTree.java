@@ -106,7 +106,7 @@ public class JXTree extends JTree {
      * RolloverController: listens to cell over events and
      * repaints entered/exited rows.
      */
-    private TreeRolloverController linkController;
+    private TreeRolloverController<JXTree> linkController;
     private boolean overwriteIcons;
     private Searchable searchable;
     
@@ -603,15 +603,15 @@ public class JXTree extends JTree {
         firePropertyChange("rolloverEnabled", old, isRolloverEnabled());
     }
 
-    protected TreeRolloverController getLinkController() {
+    protected TreeRolloverController<JXTree> getLinkController() {
         if (linkController == null) {
             linkController = createLinkController();
         }
         return linkController;
     }
 
-    protected TreeRolloverController createLinkController() {
-        return new TreeRolloverController();
+    protected TreeRolloverController<JXTree> createLinkController() {
+        return new TreeRolloverController<JXTree>();
     }
 
     /**

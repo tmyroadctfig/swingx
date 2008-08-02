@@ -28,6 +28,12 @@ import org.jdesktop.swingx.search.PatternModel;
 import org.jdesktop.swingx.search.SearchFactory;
 import org.jdesktop.swingx.search.Searchable;
 
+/**
+ * Contains unit test for search related classes.
+ * PENDING JW: should be in package search - but references swingx package internals. 
+ * 
+ * @author Jeanette Winzenburg
+ */
 public class FindTest extends InteractiveTestCase {
     private static final Logger LOG = Logger
             .getLogger(FindTest.class.getName());

@@ -117,7 +117,6 @@ public class BasicMonthViewUI extends MonthViewUI {
     
     private static final int WEEKS_IN_MONTH = 6;
     private static final int CALENDAR_SPACING = 10;
-    private static final Point NO_SUCH_CALENDAR = new Point(-1, -1);
 
     
     /** Return value used to identify when the month down button is pressed. */

@@ -251,7 +251,6 @@ public class JXMonthView extends JComponent {
     private Color monthStringForeground;
     private Color daysOfTheWeekForeground;
     private Color selectedBackground;
-    private String actionCommand = "selectionChanged";
     private Hashtable<Integer, Color> dayToColorTable = new Hashtable<Integer, Color>();
     private Color flaggedDayForeground;
 
