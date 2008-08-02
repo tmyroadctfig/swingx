@@ -42,7 +42,7 @@ public class IconValuesTest extends TestCase {
         File f = File.createTempFile("ivt", "tmp");
         f.deleteOnExit();
         
-        assertEquals(IconValue.NONE.getIcon(f),
+        assertNotSame(IconValue.NONE.getIcon(f),
                 IconValues.FILE_ICON.getIcon(f));
     }
 }
