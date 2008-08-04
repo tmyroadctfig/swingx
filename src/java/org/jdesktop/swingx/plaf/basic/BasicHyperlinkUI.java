@@ -29,8 +29,6 @@ import java.awt.Graphics;
 import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.Shape;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.Reader;
@@ -245,6 +243,14 @@ public class BasicHyperlinkUI extends BasicButtonUI {
     @Override
     protected void paintText(Graphics g, AbstractButton b, Rectangle textRect,
             String text) {
+        //kgs -- SwingX #415: pixel-shift when disabled
+        //BasicButtonUI shifts disabled text to the left by 1 pixel
+        //we compensate for that here, so that all Hyperlinks paint
+        //at the same location regardless of state
+        if (!b.getModel().isEnabled()) {
+            textRect.x += 1;
+        }
+            
         super.paintText(g, b, textRect, text);
         if (b.getModel().isRollover()) {
             paintUnderline(g, b, textRect, text);
@@ -390,23 +396,6 @@ public class BasicHyperlinkUI extends BasicButtonUI {
                         Cursor.getPredefinedCursor(Cursor.HAND_CURSOR) : null);
             }
             super.stateChanged(e);
-        }
-    }
-    
-    /**
-     * No longer used internally, replaced by BasicHyperlinkListener.
-     */
-    @Deprecated
-    static class HandCursor extends MouseAdapter {
-        @Override
-        public void mouseEntered(MouseEvent e) {
-            e.getComponent().setCursor(
-                    Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        }
-
-        @Override
-        public void mouseExited(MouseEvent e) {
-            e.getComponent().setCursor(null);
         }
     }
     

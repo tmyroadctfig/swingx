@@ -50,7 +50,7 @@ public class JXTaskPaneContainerVisualCheck extends InteractiveTestCase {
     }
 
     public static void main(String[] args) throws Exception {
-        // setSystemLF(true);
+//        setSystemLF(true);
         JXTaskPaneContainerVisualCheck test = new JXTaskPaneContainerVisualCheck();
         
         try {
@@ -103,10 +103,24 @@ public class JXTaskPaneContainerVisualCheck extends InteractiveTestCase {
         container.add(pane1);
         
         final JXTaskPane pane2 = new JXTaskPane();
+        class DummyAction extends AbstractAction {
+            DummyAction(String name, boolean enabled) {
+                super(name);
+                
+                setEnabled(enabled);
+            }
+            
+            /**
+             * {@inheritDoc}
+             */
+            public void actionPerformed(ActionEvent e) {
+                //does nothing
+            }
+        }
         pane2.setTitle("Second");
-        pane2.add(new JLabel("1"));
-        pane2.add(new JLabel("2"));
-        pane2.add(new JLabel("3"));
+        pane2.add(new DummyAction("MMMM", true));
+        pane2.add(new DummyAction("MMMM", false));
+        pane2.add(new DummyAction("MMM3", true));
         container.add(pane2);
         
         final JXTaskPane pane3 = new JXTaskPane();
