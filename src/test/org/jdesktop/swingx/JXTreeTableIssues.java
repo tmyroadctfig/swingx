@@ -74,6 +74,7 @@ import org.jdesktop.swingx.treetable.FileSystemModel;
 import org.jdesktop.swingx.treetable.MutableTreeTableNode;
 import org.jdesktop.swingx.treetable.TreeTableModel;
 import org.jdesktop.swingx.treetable.TreeTableNode;
+import org.jdesktop.test.AncientSwingTeam;
 import org.jdesktop.test.TableModelReport;
 
 /**
@@ -96,10 +97,10 @@ public class JXTreeTableIssues extends InteractiveTestCase {
         JXTreeTableIssues test = new JXTreeTableIssues();
         try {
 //            test.runInteractiveTests();
-//            test.runInteractiveTests(".*AdapterDeleteUpdate.*");
+            test.runInteractiveTests(".*ColumnSelection.*");
 //            test.runInteractiveTests(".*Text.*");
 //            test.runInteractiveTests(".*TreeExpand.*");
-            test.runInteractiveTests("interactive.*Blink.*");
+//            test.runInteractiveTests("interactive.*Blink.*");
 //          test.runInteractiveTests("interactive.*CustomColor.*");
               
         } catch (Exception e) {
@@ -108,6 +109,18 @@ public class JXTreeTableIssues extends InteractiveTestCase {
         }
     }
 
+    /**
+     * Issue #875-swingx: cell selection incorrect in hierarchical column.
+     * 
+     */
+    public void interactiveColumnSelection() {
+        JXTreeTable treeTable = new JXTreeTable(new FileSystemModel());
+        treeTable.setColumnSelectionAllowed(true);
+        JXTable table = new JXTable(new AncientSwingTeam());
+        table.setColumnSelectionAllowed(true);
+        JXFrame frame = wrapWithScrollingInFrame(treeTable, table, "columnSelection in treetable");
+        show(frame);
+    }
     /**
      * Custom renderer colors of Swingx DefaultTreeRenderer not respected.
      * (same in J/X/Tree). 
