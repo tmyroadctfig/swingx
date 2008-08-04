@@ -65,6 +65,7 @@ public abstract class AbstractTestHighlighterClient extends TestCase {
      */
     protected abstract HighlighterClient createHighlighterClient();
     
+    
     /**
      * Test that the client is messaged on change to a managed Highlighter.
      */
@@ -285,7 +286,29 @@ public abstract class AbstractTestHighlighterClient extends TestCase {
         assertSame("highlighter must be added as last", highlighter, highlighters[highlighters.length - 1]);
     }
 
-    
+    /**
+     * This interface defines the common contract of clients which provide
+     * support for Highlighters. They must
+     * 
+     * <ul>
+     * <li> have a bound property "highlighters" denoting a collection of
+     * Highlighters
+     * <li> have methods to modify the collection
+     * <li> update the ui of contained Highlighters on LAF changes
+     * <li> apply the highlighters as appropriate. This implies that it must
+     * listen to highlighter state changes to update itself (or related parties)
+     * accordingly.
+     * </ul>
+     * 
+     * The last bullet is a "vague" requirement in that it might vary
+     * considerably across client implementations. While JComponents typically
+     * will invoke a repaint, a non-component might choose to notify some other
+     * listeners. Furthermore, it's not testable, as clients might choose to do
+     * the actual update only if really needed, f.i. not if invisible or if
+     * there are no external listeners.
+     * <p>
+     * 
+     */
     public static interface HighlighterClient {
 
         /**
@@ -303,7 +326,6 @@ public abstract class AbstractTestHighlighterClient extends TestCase {
          * 
          */
         void setHighlighters(Highlighter... highlighters);
-
 
         /**
          * Returns the <code>Highlighter</code>s used by this client.
@@ -343,7 +365,7 @@ public abstract class AbstractTestHighlighterClient extends TestCase {
          * Updates contained Highlighters on LAF changes.
          */
         void updateUI();
-        
+
         /**
          * Adds a PropertyChangeListener which will be notified on changes of the 
          * "highlighters" property.
