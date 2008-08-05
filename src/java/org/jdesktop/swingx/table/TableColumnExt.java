@@ -20,11 +20,15 @@
  */
 
 package org.jdesktop.swingx.table;
+import java.awt.Component;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Comparator;
 import java.util.Hashtable;
 
+import javax.swing.DefaultCellEditor;
+import javax.swing.JComponent;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.table.TableCellEditor;
@@ -34,21 +38,22 @@ import javax.swing.table.TableColumn;
 import org.jdesktop.swingx.decorator.CompoundHighlighter;
 import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.UIDependent;
+import org.jdesktop.swingx.renderer.AbstractRenderer;
 
 /**
  * <code>TableColumn</code> extension for enhanced view column configuration.
  * The general drift is to strengthen the TableColumn abstraction as <b>the</b>
  * place to configure and dynamically update view column properties, covering a
- * broad range of customization requirements. Using collaborators are 
- * expected to listen to property changes and update themselves accordingly.
+ * broad range of customization requirements. Using collaborators are expected
+ * to listen to property changes and update themselves accordingly.
  * <p>
  * 
- * A functionality enhancement is the notion of column visibility: 
- * <code>TableColumnModelExt</code> manages sets of visible/hidden 
- * <code>TableColumnExt</code>s controlled by the columns' <code>visible</code>
- * property. Typically, users can toggle column visibility at runtime, f.i.
- * through a dedicated control in the upper trailing corner of a 
- * <code>JScrollPane</code>.
+ * A functionality enhancement is the notion of column visibility:
+ * <code>TableColumnModelExt</code> manages sets of visible/hidden
+ * <code>TableColumnExt</code>s controlled by the columns'
+ * <code>visible</code> property. Typically, users can toggle column
+ * visibility at runtime, f.i. through a dedicated control in the upper trailing
+ * corner of a <code>JScrollPane</code>.
  * <p>
  * 
  * A prominent group of properties allows fine-grained, per-column control of
@@ -56,8 +61,8 @@ import org.jdesktop.swingx.decorator.UIDependent;
  * 
  * <ul>
  * <li><b>Sorting</b>: <code>sortable</code> controls whether this column
- * should be sortable by user's sort gestures; <code>Comparator</code> can hold a
- * column specific type.
+ * should be sortable by user's sort gestures; <code>Comparator</code> can
+ * hold a column specific type.
  * 
  * <li><b>Editing</b>: <code>editable</code> controls whether cells of this
  * column should be accessible to in-table editing.
@@ -68,10 +73,10 @@ import org.jdesktop.swingx.decorator.UIDependent;
  * <li><b>Highlighter</b>: <code>highlighters</code> holds the column
  * highlighters; these are applied to the renderer after the table highlighters.
  * Any modification of the list of contained <code>Highlighter</code>s
- *  (setting them, adding one or removing one) 
- * will result in a {@code PropertyChangeEvent} being fired for
- * "highlighters". State changes on contained <code>Highlighter</code>s will 
- * result in a PropertyChangeEvent for "highlighterStateChanged".
+ * (setting them, adding one or removing one) will result in a
+ * {@code PropertyChangeEvent} being fired for "highlighters". State changes on
+ * contained <code>Highlighter</code>s will result in a PropertyChangeEvent
+ * for "highlighterStateChanged".
  * </ul>
  * 
  * 
@@ -81,6 +86,11 @@ import org.jdesktop.swingx.decorator.UIDependent;
  * <code>PropertyChangeListener</code>s are notified about changes. TODO:
  * example?
  * <p>
+ * 
+ * A <code>TableColumnExt</code> implements UIDependent, that is it takes over
+ * responsibility to update LAF dependent properties of contained elements when
+ * messaged with updateUI. This implementation updates its <code>Highlighter</code>s,
+ * Cell-/HeaderRenderer and CellEditor. <p>
  * 
  * TODO: explain prototype (sizing, collaborator-used-by ColumnFactory (?))
  * <p>
@@ -92,6 +102,7 @@ import org.jdesktop.swingx.decorator.UIDependent;
  * 
  * @see TableColumnModelExt
  * @see ColumnFactory
+ * @see org.jdesktop.swingx.UIDependent
  * @see javax.swing.JComponent#putClientProperty
  */
 public class TableColumnExt extends TableColumn implements UIDependent {
@@ -649,9 +660,67 @@ public class TableColumnExt extends TableColumn implements UIDependent {
      * Update ui of owned ui-dependent parts. This implementation
      * updates the contained highlighters.
      * 
-     * PENDING JW: take over update of renderers/editors.
      */
     public void updateUI() {
+        updateHighlighterUI();
+        updateRendererUI(getCellRenderer());
+        updateRendererUI(getHeaderRenderer());
+        updateEditorUI(getCellEditor());
+    }
+
+    /**
+     * @param editor 
+     * 
+     */
+    private void updateEditorUI(TableCellEditor editor) {
+        if (editor == null) return;
+        // internal knowledge of core table - already updated
+        if ((editor instanceof JComponent)
+                || (editor instanceof DefaultCellEditor))
+            return;
+        try {
+            Component comp = editor
+                    .getTableCellEditorComponent(null, null, false, -1, -1);
+            if (comp != null) {
+                SwingUtilities.updateComponentTreeUI(comp);
+            }
+        } catch (Exception e) {
+            // can't do anything - renderer can't cope with off-range cells
+        }
+    }
+
+    /**
+     * @param tableCellRenderer 
+     * 
+     */
+    private void updateRendererUI(TableCellRenderer renderer) {
+        if (renderer == null) return;
+        // internal knowledge of core table - already updated
+        if (renderer instanceof JComponent) {
+            return;
+        }
+        Component comp = null;
+        if (renderer instanceof AbstractRenderer) {
+            comp = ((AbstractRenderer) renderer).getComponentProvider().getRendererComponent(null);
+        } else {
+            try {
+                comp = renderer
+                .getTableCellRendererComponent(null, null, false, false,
+                        -1, -1);
+              
+            } catch (Exception e) {
+                // can't do anything - renderer can't cope with off-range cells
+            }
+        }
+        if (comp != null) {
+            SwingUtilities.updateComponentTreeUI(comp);
+        }
+    }
+
+    /**
+     * 
+     */
+    private void updateHighlighterUI() {
         if (compoundHighlighter == null) return;
         compoundHighlighter.updateUI();
     }

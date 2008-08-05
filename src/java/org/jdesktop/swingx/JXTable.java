@@ -103,6 +103,7 @@ import org.jdesktop.swingx.decorator.UIDependent;
 import org.jdesktop.swingx.event.TableColumnModelExtListener;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 import org.jdesktop.swingx.plaf.UIManagerExt;
+import org.jdesktop.swingx.renderer.AbstractRenderer;
 import org.jdesktop.swingx.renderer.CheckBoxProvider;
 import org.jdesktop.swingx.renderer.DefaultTableRenderer;
 import org.jdesktop.swingx.renderer.FormatStringValue;
@@ -4052,9 +4053,7 @@ public class JXTable extends JTable
     @Override
     public void updateUI() {
         super.updateUI();
-        if (columnControlButton != null) {
-            columnControlButton.updateUI();
-        }
+        updateColumnControlUI();
         for (Enumeration defaultEditors = defaultEditorsByColumnClass
                 .elements(); defaultEditors.hasMoreElements();) {
             updateEditorUI(defaultEditors.nextElement());
@@ -4064,9 +4063,7 @@ public class JXTable extends JTable
                 .elements(); defaultRenderers.hasMoreElements();) {
             updateRendererUI(defaultRenderers.nextElement());
         }
-        List columns = getColumns(true);
-        for (Iterator iter = columns.iterator(); iter.hasNext();) {
-            TableColumn column = (TableColumn) iter.next();
+        for (TableColumn column : getColumns(true)) {
             updateColumnUI(column);
         }
         updateRowHeightUI(true);
@@ -4074,18 +4071,88 @@ public class JXTable extends JTable
     }
 
     /**
-     * Updates TableColumn after updateUI changes.
+     * Updates the ui of the columnControl if appropriate.
+     */
+    protected void updateColumnControlUI() {
+        if ((columnControlButton != null) && (columnControlButton.getParent() == null)) {
+            SwingUtilities.updateComponentTreeUI(columnControlButton);
+        }
+    }
+
+    /**
+     * Tries its best to <code>updateUI</code> of the potential
+     * <code>TableCellEditor</code>.
      * 
-     * @param column
+     * @param maybeEditor the potential editor.
+     */
+    private void updateEditorUI(Object maybeEditor) {
+        // maybe null or proxyValue
+        if (!(maybeEditor instanceof TableCellEditor))
+            return;
+        // super handled this
+        if ((maybeEditor instanceof JComponent)
+                || (maybeEditor instanceof DefaultCellEditor))
+            return;
+        // custom editors might balk about fake rows/columns
+        try {
+            Component comp = ((TableCellEditor) maybeEditor)
+                    .getTableCellEditorComponent(this, null, false, -1, -1);
+            if (comp != null) {
+                SwingUtilities.updateComponentTreeUI(comp);
+            }
+        } catch (Exception e) {
+            // ignore - can't do anything
+        }
+    }
+
+    /**
+     * Tries its best to <code>updateUI</code> of the potential
+     * <code>TableCellRenderer</code>.
+     * 
+     * @param maybeRenderer the potential renderer.
+     */
+    private void updateRendererUI(Object maybeRenderer) {
+        // maybe null or proxyValue
+        if (!(maybeRenderer instanceof TableCellRenderer))
+            return;
+        // super handled this
+        if (maybeRenderer instanceof JComponent)
+            return;
+        Component comp = null;
+        if (maybeRenderer instanceof AbstractRenderer) {
+            comp = ((AbstractRenderer) maybeRenderer).getComponentProvider().getRendererComponent(null);
+        } else {
+            try {
+                // custom editors might balk about fake rows/columns
+                comp = ((TableCellRenderer) maybeRenderer)
+                .getTableCellRendererComponent(this, null, false, false,
+                        -1, -1);
+              
+            } catch (Exception e) {
+                // can't do anything - renderer can't cope with off-range cells
+            }
+        }
+        if (comp != null) {
+            SwingUtilities.updateComponentTreeUI(comp);
+        }
+    }
+
+    /**
+     * Updates TableColumn after updateUI changes. This implementation
+     * delegates to the column if it is of type UIDependent, takes over
+     * to try an update of the column's cellEditor, Cell-/HeaderRenderer 
+     * otherwise. 
+     * 
+     * @param column the tableColumn to update.
      */
     protected void updateColumnUI(TableColumn column) {
         if (column instanceof UIDependent) {
             ((UIDependent) column).updateUI();
-        }
-        // PENDING JW: should overtake here only if column !instanceof UIDependent
-        updateEditorUI(column.getCellEditor());
-        updateRendererUI(column.getCellRenderer());
-        updateRendererUI(column.getHeaderRenderer());
+        } else {
+            updateEditorUI(column.getCellEditor());
+            updateRendererUI(column.getCellRenderer());
+            updateRendererUI(column.getHeaderRenderer());
+        }    
     }
 
     /**
@@ -4336,60 +4403,6 @@ public class JXTable extends JTable
         isXTableRowHeightSet = heightSet;
     }
 
-    /**
-     * Tries its best to <code>updateUI</code> of the potential
-     * <code>TableCellEditor</code>.
-     * 
-     * @param maybeEditor the potential editor.
-     */
-    private void updateEditorUI(Object maybeEditor) {
-        // maybe null or proxyValue
-        if (!(maybeEditor instanceof TableCellEditor))
-            return;
-        // super handled this
-        if ((maybeEditor instanceof JComponent)
-                || (maybeEditor instanceof DefaultCellEditor))
-            return;
-        // custom editors might balk about fake rows/columns
-        try {
-            Component comp = ((TableCellEditor) maybeEditor)
-                    .getTableCellEditorComponent(this, null, false, -1, -1);
-            if (comp instanceof JComponent) {
-                ((JComponent) comp).updateUI();
-            }
-        } catch (Exception e) {
-            // ignore - can't do anything
-        }
-    }
-
-    /**
-     * Tries its best to <code>updateUI</code> of the potential
-     * <code>TableCellRenderer</code>.
-     * 
-     * @param maybeRenderer the potential renderer.
-     */
-    private void updateRendererUI(Object maybeRenderer) {
-        // maybe null or proxyValue
-        if (!(maybeRenderer instanceof TableCellRenderer))
-            return;
-        // super handled this
-        if (maybeRenderer instanceof JComponent)
-            return;
-        // custom editors might balk about fake rows/columns
-        try {
-            Component comp = ((TableCellRenderer) maybeRenderer)
-                    .getTableCellRendererComponent(this, null, false, false,
-                            -1, -1);
-            if (comp instanceof JComponent) {
-                ((JComponent) comp).updateUI();
-            }
-        } catch (Exception e) {
-            // ignore - can't do anything
-        }
-    }
-
-
-    
     // ---------------------------- overriding super factory methods and buggy
     /**
      * {@inheritDoc}

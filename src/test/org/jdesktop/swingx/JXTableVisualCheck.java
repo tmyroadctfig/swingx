@@ -50,6 +50,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableColumnModelEvent;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
@@ -71,11 +72,13 @@ import org.jdesktop.swingx.decorator.SortController;
 import org.jdesktop.swingx.decorator.Sorter;
 import org.jdesktop.swingx.hyperlink.LinkModel;
 import org.jdesktop.swingx.hyperlink.LinkModelAction;
+import org.jdesktop.swingx.renderer.CheckBoxProvider;
 import org.jdesktop.swingx.renderer.DefaultTableRenderer;
 import org.jdesktop.swingx.renderer.HyperlinkProvider;
 import org.jdesktop.swingx.search.SearchFactory;
 import org.jdesktop.swingx.table.ColumnFactory;
 import org.jdesktop.swingx.table.ColumnHeaderRenderer;
+import org.jdesktop.swingx.table.DatePickerCellEditor;
 import org.jdesktop.swingx.table.NumberEditorExt;
 import org.jdesktop.swingx.table.TableColumnExt;
 import org.jdesktop.test.AncientSwingTeam;
@@ -95,7 +98,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
       JXTableVisualCheck test = new JXTableVisualCheck();
       try {
 //        test.runInteractiveTests();
-//          test.runInteractiveTests("interactive.*ColumnControl.*");
+          test.runInteractiveTests("interactive.*ColumnControl.*");
 //          test.runInteractiveTests("interactive.*Header.*");
 //          test.runInteractiveTests("interactive.*ColumnProp.*");
 //          test.runInteractiveTests("interactive.*Multiple.*");
@@ -105,7 +108,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
           
 //          test.runInteractiveTests("interactive.*Policy.*");
 //        test.runInteractiveTests("interactive.*Rollover.*");
-        test.runInteractiveTests("interactive.*Vertical.*");
+        test.runInteractiveTests("interactive.*UpdateUI.*");
 //        test.runInteractiveTests("interactiveColumnHighlighting");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
@@ -121,7 +124,39 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         setSystemLF(true);
     }
 
+    /**
+     * Issue #908-swingx: move updateUI responsibility into column.
+     * 
+     */
+    public void interactiveUpdateUIRenderers() {
+        JXTable table = new JXTable(new AncientSwingTeam());
+        table.getColumn(4).setCellRenderer(new DefaultTableRenderer(new CheckBoxProvider()));
+        showWithScrollingInFrame(table, "toggle ui - must update renderers");
+    }
     
+    /**
+     * Issue #908-swingx: move updateUI responsibility into column.
+     * 
+     */
+    public void interactiveUpdateUIEditors() {
+        DefaultTableModel model = new DefaultTableModel(5, 5) {
+
+            @Override
+            public Class<?> getColumnClass(int columnIndex) {
+                if (getValueAt(0, columnIndex) == null)
+                    return super.getColumnClass(columnIndex);
+                return getValueAt(0, columnIndex).getClass();
+            }
+            
+        };
+        for (int i = 0; i < model.getRowCount(); i++) {
+            model.setValueAt(new Date(), i, 0);
+        }
+        JXTable table = new JXTable(model);
+        TableCellEditor editor = new DatePickerCellEditor();
+        table.getColumn(0).setCellEditor(editor);
+        showWithScrollingInFrame(table, "toggle ui - must update editors");
+    }
     /**
      * Issue #550-swingx: xtable must not reset columns' pref/size on 
      * structureChanged if autocreate is false.
