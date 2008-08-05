@@ -40,6 +40,7 @@ import javax.swing.KeyStroke;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListDataEvent;
@@ -56,6 +57,7 @@ import org.jdesktop.swingx.decorator.SelectionMapper;
 import org.jdesktop.swingx.decorator.SortController;
 import org.jdesktop.swingx.decorator.SortKey;
 import org.jdesktop.swingx.decorator.SortOrder;
+import org.jdesktop.swingx.renderer.AbstractRenderer;
 import org.jdesktop.swingx.renderer.DefaultListRenderer;
 import org.jdesktop.swingx.renderer.StringValue;
 import org.jdesktop.swingx.rollover.ListRolloverController;
@@ -1384,15 +1386,22 @@ public class JXList extends JList {
           * @param renderer the renderer to update the ui of.
           */
          private void updateRendererUI(ListCellRenderer renderer) {
-             // PENDING JW: use updateComponentTree instead?
-             if (renderer instanceof JComponent) {
-                 ((JComponent) renderer).updateUI();
-             } else if (renderer != null) {
-                 Component comp = renderer.getListCellRendererComponent(
-                         JXList.this, null, -1, false, false);
-                 if (comp instanceof JComponent) {
-                     ((JComponent) comp).updateUI();
-                 }
+             if (renderer == null) return;
+             Component comp = null;
+             if (renderer instanceof AbstractRenderer) {
+                 comp = ((AbstractRenderer) renderer).getComponentProvider().getRendererComponent(null);
+             } else if (renderer instanceof Component) {
+                 comp = (Component) renderer;
+             } else {
+                 try {
+                     comp = renderer.getListCellRendererComponent(
+                             JXList.this, null, -1, false, false);
+                } catch (Exception e) {
+                    // nothing to do - renderer barked on off-range row
+                }
+             }
+             if (comp != null) {
+                 SwingUtilities.updateComponentTreeUI(comp);
              }
 
          }
@@ -1451,8 +1460,8 @@ public class JXList extends JList {
             delegatingRenderer.updateUI();
         } else {
             ListCellRenderer renderer = getCellRenderer();
-            if (renderer instanceof JComponent) {
-                ((JComponent) renderer).updateUI();
+            if (renderer instanceof Component) {
+                SwingUtilities.updateComponentTreeUI((Component) renderer);
             }
         }
     }

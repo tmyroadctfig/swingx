@@ -29,6 +29,7 @@ import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JTree;
@@ -53,12 +54,15 @@ import org.jdesktop.swingx.decorator.HighlighterFactory;
 import org.jdesktop.swingx.decorator.PatternPredicate;
 import org.jdesktop.swingx.decorator.SearchPredicate;
 import org.jdesktop.swingx.decorator.HighlightPredicate.DepthHighlightPredicate;
+import org.jdesktop.swingx.renderer.CheckBoxProvider;
+import org.jdesktop.swingx.renderer.ComponentProvider;
 import org.jdesktop.swingx.renderer.DefaultListRenderer;
 import org.jdesktop.swingx.renderer.DefaultTreeRenderer;
 import org.jdesktop.swingx.renderer.IconValue;
 import org.jdesktop.swingx.renderer.StringValue;
 import org.jdesktop.swingx.renderer.WrappingProvider;
 import org.jdesktop.swingx.test.ActionMapTreeTableModel;
+import org.jdesktop.swingx.test.XTestUtils;
 import org.jdesktop.swingx.treetable.TreeTableNode;
 
 public class JXTreeVisualCheck extends JXTreeUnitTest {
@@ -70,16 +74,18 @@ public class JXTreeVisualCheck extends JXTreeUnitTest {
 //      setSystemLF(true);
       JXTreeVisualCheck test = new JXTreeVisualCheck();
       try {
-          test.runInteractiveTests();
+//          test.runInteractiveTests();
 //          test.runInteractiveTests("interactive.*RToL.*");
 //          test.runInteractiveTests("interactive.*Revalidate.*");
 //          test.runInteractiveTests("interactiveRootExpansionTest");
-//        test.runInteractiveTests("interactive.*Selection.*");
+        test.runInteractiveTests("interactive.*UpdateUI.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
       }
   }
+
+
 
     /**
      * Issue #862-swingx: JXTree - add api for selection colors.

@@ -16,16 +16,20 @@ import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.AbstractListModel;
 import javax.swing.Action;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.Icon;
 import javax.swing.JTree;
 import javax.swing.ListModel;
 import javax.swing.plaf.UIResource;
+import javax.swing.tree.DefaultTreeCellRenderer;
 
 import org.jdesktop.swingx.decorator.AbstractHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.renderer.CellContext;
+import org.jdesktop.swingx.renderer.CheckBoxProvider;
+import org.jdesktop.swingx.renderer.ComponentProvider;
 import org.jdesktop.swingx.renderer.DefaultListRenderer;
 import org.jdesktop.swingx.renderer.DefaultTreeRenderer;
 import org.jdesktop.swingx.renderer.IconValue;
@@ -62,7 +66,7 @@ public class JXTreeIssues extends JXTreeUnitTest {
 //          test.runInteractiveTests();
 //          test.runInteractiveTests("interactive.*RToL.*");
 //          test.runInteractiveTests("interactive.*Edit.*");
-        test.runInteractiveTests("interactive.*Bold.*");
+        test.runInteractiveTests("interactive.*UpdateUI.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
@@ -93,6 +97,65 @@ public class JXTreeIssues extends JXTreeUnitTest {
                 tree.getCellRenderer() instanceof UIResource);
     }
     
+    
+    private DefaultTreeRenderer sharedRenderer;
+    ComponentProvider provider;
+    
+    
+
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        provider = new CheckBoxProvider(StringValue.TO_STRING);
+        sharedRenderer = new DefaultTreeRenderer(new WrappingProvider(provider));
+    }
+
+
+    /**
+     * Issue ??-swingx: JXTree must update renderer. 
+     * It does ... the renderer comp is never removed from the tree's 
+     * rendererPane? Not true - removed at end of paint.
+     */
+    public void interactiveUpdateUIRenderer() {
+        JXTree tree = new JXTree();
+        tree.setCellRenderer(sharedRenderer);
+        showWithScrollingInFrame(tree, "updateUI must update renderer");
+    }
+
+    /**
+     * share in list - okay.
+     */
+    public void interactiveUpdateUISharedProvider() {
+        JXList list = new JXList(new DefaultComboBoxModel(new String[] {"one", "two", "three"}));
+        list.setCellRenderer(new DefaultListRenderer(provider));
+        showWithScrollingInFrame(list, "list with shared provider");
+    }
+    /**
+     * Issue ??-swingx: JXTree must update renderer
+     * share in other tree - okay
+     */
+    public void interactiveUpdateUIRendererOther() {
+        JXTree tree = new JXTree();
+        tree.setCellRenderer(sharedRenderer);
+        showWithScrollingInFrame(tree, "updateUI must update renderer");
+    }
+
+    /**
+     * Issue ??-swingx: JXTree must update renderer
+     * 
+     * tree renderer not updated if set on the tree (as opposed to using the 
+     * default set by the ui-delegate)
+     */
+    public void interactiveUpdateUICoreDefaultRenderer() {
+        JTree tree = new JTree();
+        DefaultTreeCellRenderer renderer = new DefaultTreeCellRenderer();
+//        renderer.setClosedIcon(XTestUtils.loadDefaultIcon());
+        tree.setCellRenderer(renderer);
+        showWithScrollingInFrame(tree, "JTree/core renderer: updateUI must update renderer");
+    }
+
+    
+
     /**
      * Size effecting decoration vs. initial config (in provider).
      * 
