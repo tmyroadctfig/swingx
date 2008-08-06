@@ -943,7 +943,11 @@ public class JXDatePicker extends JComponent {
                 String key = select ? JXDatePicker.HOME_COMMIT_KEY : JXDatePicker.HOME_NAVIGATE_KEY;
                 select = false;
                 Action delegate = getActionMap().get(key);
-                if (delegate !=  null) {
+                /*
+                 * PatrykRy: Commit today date only when commit action is enabled.
+                 * Home navigate is always enabled.
+                 */
+                if (delegate !=  null && delegate.isEnabled()) {  
                     delegate.actionPerformed(null);
                 }
                 

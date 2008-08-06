@@ -777,6 +777,36 @@ public class BasicDatePickerUI extends DatePickerUI {
     }
 
     //---------------------- updating other properties
+
+    
+    /**
+     * Updates properties which depend on the picker's editable. <p>
+     * 
+     */
+    protected void updateFromEditableChanged() {
+        boolean isEditable = datePicker.isEditable();
+        datePicker.getMonthView().setEnabled(isEditable);
+        datePicker.getEditor().setEditable(isEditable);
+        /*
+         * PatrykRy: Commit today date is not allowed if datepicker is not editable!
+         */
+        setActionEnabled(JXDatePicker.HOME_COMMIT_KEY, isEditable);
+        // for consistency, synch navigation as well 
+        setActionEnabled(JXDatePicker.HOME_NAVIGATE_KEY, isEditable);
+    }
+
+    /**
+     * 
+     * @param key
+     * @param enabled
+     */
+    private void setActionEnabled(String key, boolean enabled) {
+        Action action = datePicker.getActionMap().get(key);
+        if (action != null) {
+            action.setEnabled(enabled);
+        }
+    }
+
     /**
      * Updates the picker's formats to the given TimeZone.
      * @param zone the timezone to set on the formats.
@@ -1213,9 +1243,7 @@ public class BasicDatePickerUI extends DatePickerUI {
                 popupButton.setEnabled(isEnabled);
                 datePicker.getEditor().setEnabled(isEnabled);
             } else if ("editable".equals(property)) {
-                boolean isEditable = datePicker.isEditable();
-                datePicker.getMonthView().setEnabled(isEditable);
-                datePicker.getEditor().setEditable(isEditable);
+                updateFromEditableChanged();
             } else if (JComponent.TOOL_TIP_TEXT_KEY.equals(property)) {
                 String tip = datePicker.getToolTipText();
                 datePicker.getEditor().setToolTipText(tip);

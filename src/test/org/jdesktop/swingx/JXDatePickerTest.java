@@ -77,7 +77,50 @@ public class JXDatePickerTest extends InteractiveTestCase {
     @Override
     public void tearDown() {
     }
-    
+
+    /**
+     * Issue #910-swingx: home commit must be disabled if picker not editable.
+     * 
+     */
+    public void testNotEditableNullHomeNavigate() {
+        JXDatePicker picker = new JXDatePicker();
+        picker.getActionMap().remove(JXDatePicker.HOME_NAVIGATE_KEY);
+        picker.setEditable(!picker.isEditable());
+    }
+
+    /**
+     * Issue #910-swingx: home commit must be disabled if picker not editable.
+     * 
+     */
+    public void testNotEditableDisabledHomeNavigate() {
+        JXDatePicker picker = new JXDatePicker();
+        Action delegate = picker.getActionMap().get(JXDatePicker.HOME_NAVIGATE_KEY);
+        assertEquals(picker.isEditable(), delegate.isEnabled());
+        picker.setEditable(!picker.isEditable());
+        assertEquals(picker.isEditable(), delegate.isEnabled());
+    }
+
+    /**
+     * Issue #910-swingx: home commit must be disabled if picker not editable.
+     * 
+     */
+    public void testNotEditableNullHomeCommit() {
+        JXDatePicker picker = new JXDatePicker();
+        picker.getActionMap().remove(JXDatePicker.HOME_COMMIT_KEY);
+        picker.setEditable(!picker.isEditable());
+    }
+
+    /**
+     * Issue #910-swingx: home commit must be disabled if picker not editable.
+     * 
+     */
+    public void testNotEditableDisabledHomeCommit() {
+        JXDatePicker picker = new JXDatePicker();
+        Action delegate = picker.getActionMap().get(JXDatePicker.HOME_COMMIT_KEY);
+        assertEquals(picker.isEditable(), delegate.isEnabled());
+        picker.setEditable(!picker.isEditable());
+        assertEquals(picker.isEditable(), delegate.isEnabled());
+    }
     /**
      * Sanity: report in forum that editor not disabled if picker disabled.
      * Looks okay.

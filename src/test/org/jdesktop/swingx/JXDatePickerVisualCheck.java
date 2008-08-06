@@ -33,6 +33,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.TimeZone;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
@@ -46,12 +47,17 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.JSpinner;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
+import javax.swing.SpinnerDateModel;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.JSpinner.DefaultEditor;
 import javax.swing.UIManager.LookAndFeelInfo;
+import javax.swing.text.DateFormatter;
+import javax.swing.text.DefaultFormatterFactory;
 
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.calendar.SingleDaySelectionModel;
@@ -84,16 +90,83 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
         JXDatePickerVisualCheck test = new JXDatePickerVisualCheck();
         
         try {
-            test.runInteractiveTests();
+//            test.runInteractiveTests();
 //            test.runInteractiveTests("interactive.*PrefSize.*");
 //            test.runInteractiveTests("interactive.*Keep.*");
-//          test.runInteractiveTests("interactive.*PC.*");
+          test.runInteractiveTests("interactive.*Editable.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
         }
     }
 
+    /**
+     * Issue #910-swingx: commitToday must not be allowed if field not editable.
+     * 
+     */
+    public void interactiveNotEditableCommitToday() {
+        JXDatePicker picker = new JXDatePicker();
+        Calendar cal = picker.getMonthView().getCalendar();
+        cal.add(Calendar.MONTH, 5);
+        picker.setDate(cal.getTime());
+        picker.setEditable(false);
+        showInFrame(picker, "not editable ");
+    }
+    
+    /**
+     * Issue #910-swingx: commitToday must not be allowed if field not editable.
+     * 
+     */
+    public void interactiveNotEditableCompareTextField() {
+        final JXDatePicker picker = new JXDatePicker(new Date());
+        final JFormattedTextField field = new JFormattedTextField(picker.getDate());
+        field.setEditable(false);
+        PropertyChangeListener l = new PropertyChangeListener() {
+
+            public void propertyChange(PropertyChangeEvent evt) {
+                if ("date".equals(evt.getPropertyName())) {
+                    if (picker.getDate() != null)
+                     field.setValue(picker.getDate());
+                }
+            }
+            
+        };
+        picker.addPropertyChangeListener(l);
+        JXPanel panel = new JXPanel();
+        panel.add(picker);
+        panel.add(field);
+        showInFrame(panel, "not editable field ");
+    }
+    /**
+     * From forum: have spinner with the same timezone.
+     */
+    public void interactiveTimeZoneFormat() {
+        final JSpinner spinner = new JSpinner(new SpinnerDateModel());
+        final JXDatePicker picker = new JXDatePicker();
+        picker.setTimeZone(TimeZone.getTimeZone("GMT-10"));
+        picker.setDate(new Date());
+        spinner.setValue(picker.getDate());
+        SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss", picker.getLocale());
+        format.setTimeZone(picker.getTimeZone());
+        JFormattedTextField textField = ((DefaultEditor) spinner.getEditor()).getTextField();
+        textField.setFormatterFactory(
+                new DefaultFormatterFactory(new DateFormatter(format)));
+        PropertyChangeListener l = new PropertyChangeListener() {
+
+            public void propertyChange(PropertyChangeEvent evt) {
+                if ("date".equals(evt.getPropertyName())) {
+                    if (picker.getDate() != null)
+                     spinner.setValue(picker.getDate());
+                }
+            }
+            
+        };
+        picker.addPropertyChangeListener(l);
+        JXPanel panel = new JXPanel();
+        panel.add(picker);
+        panel.add(spinner);
+        showInFrame(panel, "formats in picker and spinner");
+    }
     /**
      * Issue #565-swingx: popup not closed if open and 
      * clicking into other focus-tricksing component (like
