@@ -8,12 +8,12 @@
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
@@ -39,24 +39,26 @@ import org.jdesktop.swingx.JXLoginPane;
  * @author rbair
  */
 public class LoginPaneAddon extends AbstractComponentAddon {
-    
+
     /** Creates a new instance of LoginPaneAddon */
     public LoginPaneAddon() {
         super("JXLoginPane");
     }
-    
+
   @Override
   protected void addBasicDefaults(LookAndFeelAddons addon, DefaultsList defaults) {
     super.addBasicDefaults(addon, defaults);
     Color errorBG = new Color(255, 215, 215);
-    
+
     defaults.add(JXLoginPane.uiClassID, "org.jdesktop.swingx.plaf.basic.BasicLoginPaneUI");
     defaults.add("JXLoginPane.errorIcon",
             LookAndFeel.makeIcon(LoginPaneAddon.class, "basic/resources/error16.png"));
     defaults.add("JXLoginPane.bannerFont", new FontUIResource("Arial Bold", Font.PLAIN, 36));
-    //TODO use safe methods
+    //#911 Not every LAF has Label.font defined ...
+    Font labelFont = UIManager.getFont("Label.font");
+    Font boldLabel = labelFont != null ? labelFont.deriveFont(Font.BOLD) : new Font("SansSerif", Font.BOLD, 12);
     defaults.add("JXLoginPane.pleaseWaitFont",
-            new FontUIResource(UIManager.getFont("Label.font").deriveFont(Font.BOLD)));
+            new FontUIResource(boldLabel));
     defaults.add("JXLoginPane.bannerForeground", new ColorUIResource(Color.WHITE));
     defaults.add("JXLoginPane.bannerDarkBackground", new ColorUIResource(Color.GRAY));
     defaults.add("JXLoginPane.bannerLightBackground", new ColorUIResource(Color.LIGHT_GRAY));
@@ -67,11 +69,11 @@ public class LoginPaneAddon extends AbstractComponentAddon {
                     BorderFactory.createCompoundBorder(
                             BorderFactory.createLineBorder(Color.GRAY.darker()),
                             BorderFactory.createMatteBorder(5, 7, 5, 5, errorBG)))));
-    
+
     UIManagerExt.addResourceBundle(
         "org.jdesktop.swingx.plaf.basic.resources.LoginPane");
   }
-  
+
   @Override
   protected void addMetalDefaults(LookAndFeelAddons addon, DefaultsList defaults) {
     super.addMetalDefaults(addon, defaults);
@@ -92,7 +94,7 @@ public class LoginPaneAddon extends AbstractComponentAddon {
   @Override
   protected void addWindowsDefaults(LookAndFeelAddons addon, DefaultsList defaults) {
     super.addWindowsDefaults(addon, defaults);
-    
+
     defaults.add("JXLoginPane.bannerForeground", new ColorUIResource(Color.WHITE));
     defaults.add("JXLoginPane.bannerDarkBackground", new ColorUIResource(49, 121, 242));
     defaults.add("JXLoginPane.bannerLightBackground", new ColorUIResource(198, 211, 247));
