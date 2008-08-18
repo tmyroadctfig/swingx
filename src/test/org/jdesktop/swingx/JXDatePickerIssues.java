@@ -42,8 +42,10 @@ import javax.swing.JFormattedTextField;
 import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
+import javax.swing.SpinnerDateModel;
 
 import org.jdesktop.swingx.calendar.CalendarUtils;
 import org.jdesktop.swingx.calendar.DatePickerFormatter;
@@ -76,6 +78,37 @@ public class JXDatePickerIssues extends InteractiveTestCase {
 
 
     private Calendar calendar;
+
+    
+    /**
+     * Issue #913-swingx: Datepicker looks bad in some LFs (f.i. Nimbus)
+     * 
+     * not only Nimbus ...
+     * - Metal: starts with different height than textfield, shrinks when coming
+     *   back from another LF
+     * - motif: button is shrunkenn always
+     * - win: halfway okay, but should have buttons "nearer/integrated" to the field
+     *   as spinner, combo does
+     * - Vista: button should visually "merge" into field until rollover (as combo does,
+     *   Spinner not
+     * - Can't remember the reason why combo's button isn't re-used?
+     *       
+     */
+    public void interactiveDatePickerNimbus() {
+        JXDatePicker picker = new JXDatePicker(new Date());
+        JFormattedTextField field = new JFormattedTextField();
+        field.setValue(picker.getDate());
+        JSpinner spinner = new JSpinner(new SpinnerDateModel());
+        spinner.setValue(picker.getDate());
+        JComboBox box = new JComboBox(new Object[] {picker.getDate()});
+        box.setEditable(true);
+        JComponent panel = new JXPanel();
+        panel.add(field);
+        panel.add(picker);
+        panel.add(spinner);
+        panel.add(box);
+        showInFrame(panel, "Nimbus and picker");
+    }
 
     /**
      * Compare behaviour of notifyAction: DatePicker vs. core components.

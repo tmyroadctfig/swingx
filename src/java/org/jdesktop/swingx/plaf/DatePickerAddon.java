@@ -106,5 +106,28 @@ public class DatePickerAddon extends AbstractComponentAddon {
         defaults.add("JXDatePicker.border", "none");
 
     }
+    
+    /** {@inheritDoc} */
+    @Override
+    protected void addNimbusDefaults (LookAndFeelAddons addon, 
+        DefaultsList defaults) {
+        super.addNimbusDefaults (addon, defaults);
+
+        // Issue #913-swingx: ugly in Nimbus
+        // TODO: don't use an image here, Nimbus uses Painters for everything 
+        // => e.g. reuse the
+//        com.sun.java.swing.plaf.nimbus.ComboBoxComboBoxArrowButtonPainter
+        // (at the moment the OS-X icon looks most similar, it's much better
+        //  than no icon...)
+        defaults.add ("JXDatePicker.arrowIcon",
+            LookAndFeel.makeIcon (DatePickerAddon.class, 
+            "macosx/resources/combo-osx.png"));
+
+        // Issue #913-swingx: ugly in Nimbus
+        // remove the border which was installed in addBasicDefaults
+        // this is done by Nimbus
+        defaults.add ("JXDatePicker.border", null);
+    }
+
 }
 
