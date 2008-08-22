@@ -110,6 +110,7 @@ public class JXTaskPaneContainer extends JXPanel {
    * Creates a new empty taskpane.
    */
   public JXTaskPaneContainer() {
+      super(null);
     updateUI();
     
     addContainerListener(new ContainerAdapter() {

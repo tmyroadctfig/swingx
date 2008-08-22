@@ -21,8 +21,6 @@
  */
 package org.jdesktop.swingx;
 
-import javax.swing.plaf.UIResource;
-
 import junit.framework.TestCase;
 
 /**
@@ -30,38 +28,6 @@ import junit.framework.TestCase;
  * @author Jeanette Winzenburg
  */
 public class JXTaskPaneContainerIssues extends TestCase {
-
-    /**
-     * Issue #843-swingx: BasicTaskPaneContainerUI must respect custom Layout.
-     */
-    public void testRespectCustomLayoutGap() {
-        JXTaskPaneContainer container = new JXTaskPaneContainer();
-        VerticalLayout layout = (VerticalLayout) container.getLayout();
-        VerticalLayout custom = new VerticalLayout(layout.getGap() + 10);
-        container.setLayout(custom);
-        container.updateUI();
-        assertEquals(custom.getGap(), ((VerticalLayout) container.getLayout()).getGap());
-    }
-
-    /**
-     * Issue #843-swingx: BasicTaskPaneContainerUI must respect custom Layout.
-     */
-    public void testRespectCustomLayout() {
-        JXTaskPaneContainer container = new JXTaskPaneContainer();
-        VerticalLayout layout = (VerticalLayout) container.getLayout();
-        VerticalLayout custom = new VerticalLayout(layout.getGap() + 10);
-        container.setLayout(custom);
-        container.updateUI();
-        assertSame(custom, container.getLayout());
-    }
-    
-    /**
-     * Issue #843-swingx: BasicTaskPaneContainerUI must respect custom Layout.
-     */
-    public void testLayoutUIResource() {
-        JXTaskPaneContainer container = new JXTaskPaneContainer();
-        assertTrue(container.getLayout() instanceof UIResource);
-    }
     
     /**
      * Empty test method to keep the test runner happy if we have no 

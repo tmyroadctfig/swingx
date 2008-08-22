@@ -20,9 +20,12 @@
  */
 package org.jdesktop.swingx.plaf.basic;
 
+import java.awt.LayoutManager;
+
 import javax.swing.JComponent;
 import javax.swing.LookAndFeel;
 import javax.swing.plaf.ComponentUI;
+import javax.swing.plaf.UIResource;
 
 import org.jdesktop.swingx.JXTaskPaneContainer;
 import org.jdesktop.swingx.VerticalLayout;
@@ -36,7 +39,30 @@ import org.jdesktop.swingx.plaf.TaskPaneContainerUI;
  * @author Karl Schaefer
  */
 public class BasicTaskPaneContainerUI extends TaskPaneContainerUI {
+    /**
+     * A {@code UIResource} implementation of {@code VerticalLayout}.
+     * 
+     * @author Karl George Schaefer
+     */
+    protected class VerticalLayoutUIResource extends VerticalLayout implements UIResource {
+        /**
+         * The default layout. 
+         */
+        public VerticalLayoutUIResource() {
+            super();
+        }
 
+        /**
+         * Defines a layout with the specified gap.
+         * 
+         * @param gap
+         *            the gap between components
+         */
+        public VerticalLayoutUIResource(int gap) {
+            super(gap);
+        }
+    }
+    
   /**
    * Returns a new instance of BasicTaskPaneContainerUI.
    * BasicTaskPaneContainerUI delegates are allocated one per
@@ -61,7 +87,12 @@ public class BasicTaskPaneContainerUI extends TaskPaneContainerUI {
     super.installUI(c);
     taskPane = (JXTaskPaneContainer)c;
     installDefaults();
-    taskPane.setLayout(new VerticalLayout(14));
+    
+    LayoutManager manager = taskPane.getLayout();
+    
+    if (manager == null || manager instanceof UIResource) {
+        taskPane.setLayout(createDefaultLayout());
+    }
   }
 
     /**
@@ -75,6 +106,14 @@ public class BasicTaskPaneContainerUI extends TaskPaneContainerUI {
         LookAndFeelAddons.installBackgroundPainter(taskPane,
                 "TaskPaneContainer.backgroundPainter");
         LookAndFeel.installProperty(taskPane, "opaque", Boolean.TRUE);
+    }
+    
+    /**
+     * Constructs a layout manager to be used by the Look and Feel.
+     * @return the layout manager for the current Look and Feel
+     */
+    protected LayoutManager createDefaultLayout() {
+        return new VerticalLayoutUIResource(14);
     }
     
     /**
