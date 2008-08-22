@@ -379,7 +379,6 @@ public class JXTaskPane extends JPanel implements
         this.collapsed = collapsed;
         collapsePane.setCollapsed(collapsed);
         firePropertyChange("collapsed", oldValue, isCollapsed());
-        firePropertyChange("expanded", !oldValue, !isCollapsed());
     }
     
     /**
