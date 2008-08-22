@@ -296,7 +296,6 @@ public class BasicTaskPaneUI extends TaskPaneUI {
 	 */
 	protected void configure(JXHyperlink link) {
 		link.setOpaque(false);
-		link.setBorder(null);
 		link.setBorderPainted(false);
 		link.setFocusPainted(true);
 		link.setForeground(UIManager.getColor("TaskPane.titleForeground"));

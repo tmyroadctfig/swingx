@@ -120,7 +120,8 @@ public class JXTaskPaneContainerVisualCheck extends InteractiveTestCase {
         pane2.setTitle("Second");
         pane2.add(new DummyAction("MMMM", true));
         pane2.add(new DummyAction("MMMM", false));
-        pane2.add(new DummyAction("MMM3", true));
+        pane2.add(new DummyAction("<html>MMMM</html>", false));
+        pane2.add(new DummyAction("<html>MMMM</html>", true));
         container.add(pane2);
         
         final JXTaskPane pane3 = new JXTaskPane();

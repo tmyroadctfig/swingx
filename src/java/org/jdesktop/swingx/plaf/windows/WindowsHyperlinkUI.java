@@ -34,7 +34,10 @@ import org.jdesktop.swingx.plaf.basic.BasicHyperlinkUI;
 /**
  * Extends BasicHyperlinkUI and paints the text with an offset when mouse
  * pressed.<br>
+ * 
+ * @deprecated pre-0.9.4
  */
+@Deprecated
 public class WindowsHyperlinkUI extends BasicHyperlinkUI {
 
   public static ComponentUI createUI(JComponent c) {

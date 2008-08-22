@@ -116,7 +116,7 @@ public class BasicHyperlinkUI extends BasicButtonUI {
         b.setBorderPainted(false);
         b.setRolloverEnabled(true);
         if (b.getBorder() == null || b.getBorder() instanceof UIResource) {
-            b.setBorder(new BorderUIResource(BorderFactory.createEmptyBorder()));
+            b.setBorder(new BorderUIResource(BorderFactory.createEmptyBorder(0, 1, 0, 0)));
         }
 
         dashedRectGapX = UIManager.getInt("ButtonUI.dashedRectGapX");
