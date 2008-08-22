@@ -183,7 +183,7 @@ public class SearchPredicate implements HighlightPredicate {
      * @return
      */
     private boolean test(Component renderer, ComponentAdapter adapter) {
-        // PENDING JW: why convert here? we are focused on the adaüter's cell
+        // PENDING JW: why convert here? we are focused on the adapter's cell
         // looks like an oversight as of ol' days ;-)
          int  columnToTest = adapter.viewToModel(adapter.column);
          String value = adapter.getString(columnToTest);

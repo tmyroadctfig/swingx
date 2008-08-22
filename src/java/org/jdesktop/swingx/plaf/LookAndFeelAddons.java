@@ -30,6 +30,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.JComponent;
+import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.UIResource;
@@ -169,7 +170,15 @@ public abstract class LookAndFeelAddons {
 
     addon.initialize();
     currentAddon = addon;
+    // JW: we want a marker to discover if the LookAndFeelDefaults have been 
+    // swept from under our feet. The following line looks suspicious, 
+    // as it is setting a user default instead of a LF default. User defaults 
+    // are not touched when resetting a LF
     UIManager.put(APPCONTEXT_INITIALIZED, Boolean.TRUE);
+    // trying to fix #784-swingx: frequent NPE on getUI
+    // JW: we want a marker to discover if the LookAndFeelDefaults have been 
+    // swept from under our feet. 
+    UIManager.getLookAndFeelDefaults().put(APPCONTEXT_INITIALIZED, Boolean.TRUE);
   }
 
   public static LookAndFeelAddons getAddon() {
@@ -337,9 +346,11 @@ public abstract class LookAndFeelAddons {
     if (currentAddon != null) {
       // this is to ensure "UIManager#maybeInitialize" gets called and the
       // LAFState initialized
-      UIManager.getLookAndFeelDefaults();
-
-      if (!UIManager.getBoolean(APPCONTEXT_INITIALIZED)) {
+      UIDefaults defaults = UIManager.getLookAndFeelDefaults();
+//      if (!UIManager.getBoolean(APPCONTEXT_INITIALIZED)) {
+      // JW: trying to fix #784-swingx: frequent NPE in getUI
+      // moved the "marker" property into the LookAndFeelDefaults
+      if (!defaults.getBoolean(APPCONTEXT_INITIALIZED)) {
         setAddon(currentAddon);
       }
     }
