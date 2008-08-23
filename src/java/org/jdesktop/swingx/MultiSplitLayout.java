@@ -519,6 +519,44 @@ public class MultiSplitLayout implements LayoutManager
     }
   }
   
+  /**
+   * Show/Hide nodes. Any dividers that are no longer required due to one of the 
+   * nodes being made visible/invisible are also shown/hidder. The visibility of 
+   * the component managed by the node is also changed by this method
+   * @param name the node name
+   * @param visible the new node visible state
+   */
+  public void displayNode( String name, boolean visible )
+  {
+    Node node = getNodeForComponent( name );
+    if ( node != null ) {
+      Component comp = getComponentForNode( node );
+      comp.setVisible( visible );      
+      node.setVisible( visible );
+      
+      MultiSplitLayout.Split p = node.getParent();
+      if ( !visible ) {
+        p.hide( node );
+        if ( !p.isVisible()) 
+          p.getParent().hide( p );
+
+        p.checkDividers( p );
+        // If the split has become invisible then the parent may also have a 
+        // divider that needs to be hidden.
+        while ( !p.isVisible()) {
+          p = p.getParent();
+          if ( p != null )
+            p.checkDividers( p );
+          else
+            break;        
+        }
+      }
+      else  
+        p.restoreDividers( p );
+    }
+    setFloatingDividers( false );
+  }  
+  
   private Component childForNode(Node node) {
     if (node instanceof Leaf) {
       Leaf leaf = (Leaf)node;
