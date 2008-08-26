@@ -29,7 +29,6 @@ import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JTree;
@@ -54,15 +53,12 @@ import org.jdesktop.swingx.decorator.HighlighterFactory;
 import org.jdesktop.swingx.decorator.PatternPredicate;
 import org.jdesktop.swingx.decorator.SearchPredicate;
 import org.jdesktop.swingx.decorator.HighlightPredicate.DepthHighlightPredicate;
-import org.jdesktop.swingx.renderer.CheckBoxProvider;
-import org.jdesktop.swingx.renderer.ComponentProvider;
 import org.jdesktop.swingx.renderer.DefaultListRenderer;
 import org.jdesktop.swingx.renderer.DefaultTreeRenderer;
 import org.jdesktop.swingx.renderer.IconValue;
 import org.jdesktop.swingx.renderer.StringValue;
 import org.jdesktop.swingx.renderer.WrappingProvider;
 import org.jdesktop.swingx.test.ActionMapTreeTableModel;
-import org.jdesktop.swingx.test.XTestUtils;
 import org.jdesktop.swingx.treetable.TreeTableNode;
 
 public class JXTreeVisualCheck extends JXTreeUnitTest {
@@ -194,7 +190,7 @@ public class JXTreeVisualCheck extends JXTreeUnitTest {
      * 
      * Note: as is, it cannot cope with RToL component orientation.
      */
-    public void interactiveRevalidate() {
+    public void interactiveExpandToWidthHighlighter() {
         final JXTree tree = new JXTree();
         tree.setCellRenderer(new DefaultTreeRenderer());
         tree.expandRow(3);
@@ -258,9 +254,6 @@ public class JXTreeVisualCheck extends JXTreeUnitTest {
         addAction(frame, handleVisible);
         addComponentOrientationToggle(frame);
         show(frame, 400, 400);
-//        frame.pack();
-//        frame.setSize(400, 400);
-//        frame.setVisible(true);
     }
 
     /**
@@ -279,6 +272,13 @@ public class JXTreeVisualCheck extends JXTreeUnitTest {
         return 0;
     }
 
+    /**
+     * Highlighter which sets the preferredWidth of the renderer relative to the 
+     * target component's width. Very special requirement for tree rendering: 
+     * extend the coloring all the way from the node to the boundary of the tree.
+     * An alternative would be to us a renderer which is layout in such
+     * a way so by default.
+     */
     public static class ExtendToWidthHighlighter extends AbstractHighlighter {
         
         private int indent;

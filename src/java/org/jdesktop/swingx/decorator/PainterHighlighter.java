@@ -56,15 +56,18 @@ import org.jdesktop.swingx.renderer.PainterAware;
  * <pre><code>
  * @Override
  * protected Component doHighlight(Component renderer, ComponentAdapter adapter) {
- *     if (adapter.getValue() instanceof Number) {
- *         float end = getEndOfGradient((Number) adapter.getValue());
- *         RelativePainter painter = (RelativePainter) getPainter();
- *         painter.setXFraction(end);
- *         ((PainterAware) renderer).setPainter(painter);
- *     }
- *     return renderer;
+ *      float end = getEndOfGradient((Number) adapter.getValue());
+ *      RelativePainter painter = (RelativePainter) getPainter();
+ *      painter.setXFraction(end);
+ *      ((PainterAware) renderer).setPainter(painter);
+ *      return renderer;
  * }
  * 
+ * @Override
+ * protected boolean canHighlight(Component renderer, ComponentAdapter adapter) {
+ *     return super.canHighlight(renderer, adapter) &&
+ *        (adapter.getValue() instanceof Number);
+ * }
  * </code></pre>
  * 
  * NOTE: this will change once the Painter api is stable.

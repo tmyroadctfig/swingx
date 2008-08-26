@@ -23,7 +23,6 @@ package org.jdesktop.swingx.decorator;
 
 import java.awt.Component;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.event.ChangeEvent;
@@ -160,7 +159,7 @@ public class CompoundHighlighter extends AbstractHighlighter
     /**
      * Returns an array of contained Highlighters.
      * 
-     * @return
+     * @return the contained Highlighters, might be empty but never null.
      */
     public Highlighter[] getHighlighters() {
         if (highlighters.isEmpty()) return EMPTY_HIGHLIGHTERS;
@@ -213,7 +212,9 @@ public class CompoundHighlighter extends AbstractHighlighter
     }
 
    /**
-     * @param hl
+    *  Updates the ui-dependent state of the given Highlighter.
+    *  
+     * @param hl the highlighter to update.
      */
     private void updateUI(Highlighter hl) {
         if (hl instanceof UIDependent) {
@@ -224,11 +225,13 @@ public class CompoundHighlighter extends AbstractHighlighter
 
 //------------------- implement Highlighter    
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected Component doHighlight(Component stamp, ComponentAdapter adapter) {
-        for (Iterator<Highlighter> iter = highlighters.iterator(); iter.hasNext();) {
-            stamp = iter.next().highlight(stamp, adapter);
-            
+        for (Highlighter highlighter : highlighters) {
+            stamp = highlighter.highlight(stamp, adapter);
         }
         return stamp;
     }

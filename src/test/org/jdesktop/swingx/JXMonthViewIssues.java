@@ -21,6 +21,9 @@
  */
 package org.jdesktop.swingx;
 
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -31,9 +34,11 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.TimeZone;
 import java.util.logging.Logger;
 
+import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.JComboBox;
@@ -63,10 +68,10 @@ public class JXMonthViewIssues extends InteractiveTestCase {
       setSystemLF(true);
       InteractiveTestCase  test = new JXMonthViewIssues();
       try {
-          test.runInteractiveTests();
+//          test.runInteractiveTests();
 //        test.runInteractiveTests("interactive.*Locale.*");
 //          test.runInteractiveTests("interactive.*AutoScroll.*");
-//        test.runInteractiveTests("interactive.*First.*");
+        test.runInteractiveTests("interactive.*Anti.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
@@ -82,6 +87,40 @@ public class JXMonthViewIssues extends InteractiveTestCase {
     protected Calendar calendar;
 
     
+    public void interactiveMonthViewAntialised() {
+        final JXMonthView monthView = new JXMonthView();
+        monthView.setAntialiased(true);
+        JComponent comp = Box.createHorizontalBox();
+        comp.add(monthView);
+        comp.add(new JXMonthView());
+        JXFrame frame = wrapInFrame(comp, "antialiased left (1.5)");
+        show(frame);
+    }
+   
+    public void interactiveMonthViewAntialisedPaint() {
+        JXMonthView custom =  new JXMonthView() {
+            
+            @Override
+            public void paint(Graphics g) {
+                Toolkit tk = Toolkit.getDefaultToolkit ();
+                Map map = (Map) (tk.getDesktopProperty ("awt.font.desktophints"));
+                LOG.info("hints " + map);
+                if (map != null) {
+                    ((Graphics2D) g).addRenderingHints(map);
+                }
+                
+                super.paint(g);
+            }
+            
+        };
+        
+        final JXMonthView monthView = new JXMonthView();
+        JComponent comp = Box.createHorizontalBox();
+        comp.add(custom);
+        comp.add(monthView);
+        JXFrame frame = wrapInFrame(comp, "antialiased 1.6paint left");
+        show(frame);
+    }
     
     /**
      * Issue ??-swingx: JXMonthView must have visual clue if enabled.

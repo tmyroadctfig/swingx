@@ -37,7 +37,6 @@ import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -49,10 +48,10 @@ import javax.swing.DefaultListModel;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JTable;
 import javax.swing.KeyStroke;
 import javax.swing.ListModel;
 import javax.swing.Timer;
-import javax.swing.filechooser.FileSystemView;
 import javax.swing.table.TableModel;
 import javax.swing.tree.TreeModel;
 
@@ -177,11 +176,12 @@ public class PainterVisualCheck extends InteractiveTestCase {
         MattePainter<JComponent> p =  new MattePainter<JComponent>(getTransparentColor(Color.BLUE, 125));
         RelativePainter relativePainter = new RelativePainter<JComponent>(p);
         relativePainter.setXFactor(.5);
-        Highlighter hl = new PainterHighlighter(createComponentTextBasedPredicate("y"), relativePainter);
+        Highlighter hl = new PainterHighlighter(createComponentTextBasedPredicate("y"), 
+                relativePainter);
         table.addHighlighter(hl);
         JXFrame frame = wrapWithScrollingInFrame(table, 
                 "painter-aware renderer with value-based highlighting");
-        addStatusComponent(frame, new JLabel("gradient background of cells with value's containing 'y'"));
+        addMessage(frame, "bar in cells with value containing y");
         show(frame);
     }
    
@@ -397,19 +397,8 @@ public class PainterVisualCheck extends InteractiveTestCase {
         TreeModel model = new FileSystemModel();
         JXTree tree = new JXTree(model);
         tree.setRolloverEnabled(true);
-        StringValue sv = new StringValue() {
-
-            public String getString(Object value) {
-                if (value instanceof File) {
-                    return FileSystemView.getFileSystemView().getSystemDisplayName((File) value)
-                       + " Type: " 
-                       + FileSystemView.getFileSystemView().getSystemTypeDescription((File) value); 
-                } 
-                return TO_STRING.getString(value);
-            }
-            
-        };
-        tree.setCellRenderer(new DefaultTreeRenderer(sv));
+        
+        tree.setCellRenderer(new DefaultTreeRenderer(StringValues.FILE_NAME));
         ImagePainter<Component> imagePainter = new ImagePainter<Component>(XTestUtils.loadDefaultImage("green-orb.png"));
         imagePainter.setHorizontalAlignment(HorizontalAlignment.RIGHT);
         final RelativePainter painter = new RelativePainter<Component>(imagePainter);
@@ -491,6 +480,13 @@ public class PainterVisualCheck extends InteractiveTestCase {
             Rectangle cellRect = table.getCellRect(adapter.row, 
                     adapter.column, false);
             return cellRect;
+        }
+
+        @Override
+        protected boolean canHighlight(Component component,
+                ComponentAdapter adapter) {
+            return super.canHighlight(component, adapter) 
+                && (adapter.getComponent() instanceof JTable);
         }
 
         
@@ -700,18 +696,25 @@ public class PainterVisualCheck extends InteractiveTestCase {
         }
 
         @Override
-        protected Component doHighlight(Component renderer, ComponentAdapter adapter) {
-            if (adapter.getValue() instanceof Number) {
-                float end = getEndOfGradient((Number) adapter.getValue());
-                if (end > 1) {
-                    renderer.setBackground(Color.RED.darker());
-                    renderer.setForeground(Color.WHITE);
-                } else if (end > 0.02) {
-                    Painter painter = getPainter(end);
-                    ((PainterAware) renderer).setPainter(painter);
-                }
-            }            
+        protected Component doHighlight(Component renderer,
+                ComponentAdapter adapter) {
+            float end = getEndOfGradient((Number) adapter.getValue());
+            if (end > 1) {
+                renderer.setBackground(Color.RED.darker());
+                renderer.setForeground(Color.WHITE);
+            } else if (end > 0.02) {
+                Painter painter = getPainter(end);
+                ((PainterAware) renderer).setPainter(painter);
+            }
             return renderer;
+        }
+
+        
+        @Override
+        protected boolean canHighlight(Component component,
+                ComponentAdapter adapter) {
+            return (adapter.getValue() instanceof Number) && 
+                super.canHighlight(component, adapter);
         }
 
         /**
@@ -743,7 +746,7 @@ public class PainterVisualCheck extends InteractiveTestCase {
                         isRightAligned ? endColor : startColor, 
                         new Point2D.Double(100, 0), 
                         isRightAligned ? startColor : endColor);
-                MattePainter painter = new MattePainter<JComponent>(paint);
+                MattePainter<JComponent> painter = new MattePainter<JComponent>(paint);
                 painter.setPaintStretched(true);
                 getPainter().setPainter(painter);
             } 
@@ -801,18 +804,24 @@ public class PainterVisualCheck extends InteractiveTestCase {
         }
         
         @Override
-        protected Component doHighlight(Component renderer, ComponentAdapter adapter) {
-            if (adapter.getValue() instanceof Number) {
-                float end = getEndOfGradient((Number) adapter.getValue());
-                if (end > 1) {
-                    renderer.setBackground(Color.RED.darker());
-                    renderer.setForeground(Color.WHITE);
-                } else if (end > 0.02) {
-                    Painter painter = getPainter(end);
-                    ((PainterAware) renderer).setPainter(painter);
-                }
-            }            
+        protected Component doHighlight(Component renderer,
+                ComponentAdapter adapter) {
+            float end = getEndOfGradient((Number) adapter.getValue());
+            if (end > 1) {
+                renderer.setBackground(Color.RED.darker());
+                renderer.setForeground(Color.WHITE);
+            } else if (end > 0.02) {
+                Painter painter = getPainter(end);
+                ((PainterAware) renderer).setPainter(painter);
+            }
             return renderer;
+        }
+
+        @Override
+        protected boolean canHighlight(Component component,
+                ComponentAdapter adapter) {
+            return (adapter.getValue() instanceof Number) && 
+                super.canHighlight(component, adapter);
         }
 
         public void setHorizontalAlignment(HorizontalAlignment align) {

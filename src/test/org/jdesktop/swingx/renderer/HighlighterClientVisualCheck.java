@@ -85,9 +85,9 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
 //      setSystemLF(true);
       HighlighterClientVisualCheck test = new HighlighterClientVisualCheck();
       try {
-//         test.runInteractiveTests();
+         test.runInteractiveTests();
 //         test.runInteractiveTests(".*Tool.*");
-         test.runInteractiveTests("interactive.*Search.*");
+//         test.runInteractiveTests("interactive.*Search.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
@@ -131,8 +131,8 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
         PatternPredicate patternPredicate = new PatternPredicate("^M", 1);
         ColorHighlighter magenta = new ColorHighlighter(patternPredicate, null,
                 Color.MAGENTA, null, Color.MAGENTA);
-        FontHighlighter derivedFont = new FontHighlighter(font,
-                patternPredicate);
+        FontHighlighter derivedFont = new FontHighlighter(patternPredicate,
+                font);
         Highlighter gradient = new ValueBasedGradientHighlighter();
         Highlighter shading = new ShadingColorHighlighter(
                 new HighlightPredicate.ColumnHighlightPredicate(1));
@@ -163,8 +163,8 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
         PatternPredicate patternPredicate = new PatternPredicate(pattern, 0);
         ColorHighlighter magenta = new ColorHighlighter(patternPredicate, null,
                 Color.MAGENTA, null, Color.MAGENTA);
-        FontHighlighter derivedFont = new FontHighlighter(font,
-                patternPredicate);
+        FontHighlighter derivedFont = new FontHighlighter(patternPredicate,
+                font);
         Highlighter gradient = new ValueBasedGradientHighlighter(true);
         Highlighter shading = new ShadingColorHighlighter(
                 new HighlightPredicate.ColumnHighlightPredicate(0));
@@ -231,7 +231,7 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
     public static class FontHighlighter extends AbstractHighlighter {
         
         private Font font;
-        public FontHighlighter(Font font, HighlightPredicate predicate) {
+        public FontHighlighter(HighlightPredicate predicate, Font font) {
             super(predicate);
             this.font = font;
         }
@@ -366,6 +366,7 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
             }
         }
         table.resetSortOrder();
+        // PENDING JW: add and use HighlightPredicate.SELECTED/UN_SELECTED 
         Highlighter hl = new ColorHighlighter() {
 
             @Override
@@ -431,25 +432,7 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
                 break;
             }
         }
-        // PENDING JW: replace by ShadingColorHighlighter?
-        ColorHighlighter shader = new ColorHighlighter(new ColumnHighlightPredicate(hierarchicalColumn), Color.WHITE,
-                null) {
-
-            @Override
-            protected void applyBackground(Component renderer,
-                    ComponentAdapter adapter) {
-                if (adapter.isSelected() || getBackground() == null) return;
-                renderer.setBackground(computeBackgroundSeed(getBackground()));
-            }
-            
-            protected Color computeBackgroundSeed(Color seed) {
-                return new Color(Math.max((int)(seed.getRed()  * 0.95), 0),
-                                 Math.max((int)(seed.getGreen()* 0.95), 0),
-                                 Math.max((int)(seed.getBlue() * 0.95), 0));
-            }
-
-        };
-        treeTable.addHighlighter(shader);
+        treeTable.addHighlighter(new ShadingColorHighlighter(new ColumnHighlightPredicate(hierarchicalColumn)));
         showWithScrollingInFrame(treeTable, "hierarchical column");
         
     }

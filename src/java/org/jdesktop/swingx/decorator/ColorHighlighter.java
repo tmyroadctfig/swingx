@@ -27,8 +27,6 @@ import java.awt.Component;
 /**
  * A Highlighter to modify component colors. <p>
  * 
- * PENDING JW: cleanup setters to fire only if property actually changed.
- * 
  * @author Jeanette Winzenburg
  */
 public class ColorHighlighter extends AbstractHighlighter {

@@ -181,11 +181,11 @@ public class RendererIssues extends InteractiveTestCase {
 
         RowHighlighter(HighlightPredicate predicate) {
             super(predicate, ColorUtil.setAlpha(Color.ORANGE, 60), Color.RED);
+            setSelectedForeground(getForeground());
         }
 
         @Override
         protected Component doHighlight(Component renderer, ComponentAdapter adapter) {
-            renderer.setForeground(getForeground());
             if (BOLD_FONT == null) {
                 BOLD_FONT = renderer.getFont().deriveFont(Font.BOLD);
             }
