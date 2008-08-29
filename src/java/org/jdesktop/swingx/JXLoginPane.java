@@ -8,12 +8,12 @@
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
@@ -26,6 +26,7 @@ import java.awt.ComponentOrientation;
 import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.Dialog;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Frame;
@@ -36,6 +37,7 @@ import java.awt.Image;
 import java.awt.Insets;
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
+import java.awt.LayoutManager;
 import java.awt.Robot;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
@@ -78,6 +80,8 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
+import javax.swing.plaf.basic.BasicHTML;
+import javax.swing.text.View;
 
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.auth.DefaultUserNameStore;
@@ -98,7 +102,7 @@ import org.jdesktop.swingx.util.WindowUtils;
  *  <p>JXLoginPane is a specialized JPanel that implements a Login dialog with
  *  support for saving passwords supplied for future use in a secure
  *  manner. <strong>LoginService</strong> is invoked to perform authentication
- *  and optional <strong>PasswordStore</strong> can be provided to store the user 
+ *  and optional <strong>PasswordStore</strong> can be provided to store the user
  *  login information.</p>
  *
  *  <p> In order to perform the authentication, <strong>JXLoginPane</strong>
@@ -110,7 +114,7 @@ import org.jdesktop.swingx.util.WindowUtils;
  *  is not saved. Similarly, if a <strong>PasswordStore</strong> is
  *  supplied and the password is null, then the <strong>PasswordStore</strong>
  *  will be queried for the password using the <code>get</code> method.
- *  
+ *
  *  Example:
  *  <code><pre>
  *         final JXLoginPane panel = new JXLoginPane(new LoginService() {
@@ -121,7 +125,7 @@ import org.jdesktop.swingx.util.WindowUtils;
  *                      }});
  *      final JFrame frame = JXLoginPane.showLoginFrame(panel);
  * </pre></code>
- * 
+ *
  * @author Bino George
  * @author Shai Almog
  * @author rbair
@@ -129,9 +133,40 @@ import org.jdesktop.swingx.util.WindowUtils;
  * @author rah003
  */
 public class JXLoginPane extends JXPanel {
-    
 
-	/**
+    private static class LoginPaneLayout extends VerticalLayout implements LayoutManager {
+        public Dimension preferredLayoutSize(Container parent) {
+            Insets insets = parent.getInsets();
+            Dimension pref = new Dimension(0, 0);
+            int gap = getGap();
+            for (int i = 0, c = parent.getComponentCount(); i < c; i++) {
+              Component m = parent.getComponent(i);
+              if (m.isVisible()) {
+                Dimension componentPreferredSize = m.getPreferredSize();
+                // swingx-917 - don't let jlabel to force width due to long text
+                if (m instanceof JLabel) {
+                    View view = (View) ((JLabel)m).getClientProperty(BasicHTML.propertyKey);
+                    if (view != null) {
+                        view.setSize(pref.width, m.getHeight());
+                        // get fresh preferred size since we have forced new size on label
+                        componentPreferredSize = m.getPreferredSize();
+                    }
+                } else {
+                    pref.width = Math.max(pref.width, componentPreferredSize.width);
+                }
+                pref.height += componentPreferredSize.height + gap;
+              }
+            }
+
+            pref.width += insets.left + insets.right;
+            pref.height += insets.top + insets.bottom;
+
+            return pref;
+          }
+
+    }
+
+    /**
 	 * The Logger
 	 */
     private static final Logger LOG = Logger.getLogger(JXLoginPane.class.getName());
@@ -148,7 +183,7 @@ public class JXLoginPane extends JXPanel {
      * procedure
      */
     public static final String LOGIN_ACTION_COMMAND = "login";
-    /** 
+    /**
      * Action key for an Action in the ActionMap that cancels the Login
      * procedure
      */
@@ -273,7 +308,7 @@ public class JXLoginPane extends JXPanel {
      * cursor after authentication ends, or is cancelled;
      */
     private Cursor oldCursor;
-    
+
     /**
      * The default login listener used by this panel.
      */
@@ -296,17 +331,17 @@ public class JXLoginPane extends JXPanel {
 	 */
 	private boolean capsLockSupport = true;
 
-	
+
 	/**
 	 * Login/cancel control pane;
 	 */
 	private JXBtnPanel buttonPanel;
 	/**
-	 * Window event listener responsible for triggering caps lock test on vindow activation and 
+	 * Window event listener responsible for triggering caps lock test on vindow activation and
 	 * focus changes.
 	 */
 	private CapsOnWinListener capsOnWinListener = new CapsOnWinListener(capsOnTest);
-    
+
     /**
      * Creates a default JXLoginPane instance
      */
@@ -351,15 +386,15 @@ public class JXLoginPane extends JXPanel {
             }
         }
         saveCB.setText(UIManagerExt.getString(CLASS_NAME + ".rememberPasswordString", getLocale()));
-        // by default, caps is initialized in off state - i.e. without warning. Setting to 
+        // by default, caps is initialized in off state - i.e. without warning. Setting to
         // whitespace preserves formatting of the panel.
         capsOn.setText(isCapsLockOn() ? UIManagerExt.getString(CLASS_NAME + ".capsOnWarning", getLocale()) : " ");
-        
+
         getActionMap().get(LOGIN_ACTION_COMMAND).putValue(Action.NAME, UIManagerExt.getString(CLASS_NAME + ".loginString", getLocale()));
         getActionMap().get(CANCEL_LOGIN_ACTION_COMMAND).putValue(Action.NAME, UIManagerExt.getString(CLASS_NAME + ".cancelString", getLocale()));
 
     }
-    
+
     //--------------------------------------------------------- Constructors
     /**
      * Create a {@code JXLoginPane} that always accepts the user, never stores
@@ -372,18 +407,18 @@ public class JXLoginPane extends JXPanel {
     public JXLoginPane() {
         this(null);
     }
-    
+
     /**
      * Create a {@code JXLoginPane} with the specified {@code LoginService}
      * that does not store user ids or passwords and has no target servers.
-     * 
+     *
      * @param service
      *            the {@code LoginService} to use for logging in
      */
     public JXLoginPane(LoginService service) {
         this(service, null, null);
     }
-    
+
     /**
      * Create a {@code JXLoginPane} with the specified {@code LoginService},
      * {@code PasswordStore}, and {@code UserNameStore}, but without a server
@@ -392,7 +427,7 @@ public class JXLoginPane extends JXPanel {
      * If you do not want to store passwords or user ids, those parameters can
      * be {@code null}. {@code SaveMode} is autoconfigured from passed in store
      * parameters.
-     * 
+     *
      * @param service
      *            the {@code LoginService} to use for logging in
      * @param passwordStore
@@ -404,7 +439,7 @@ public class JXLoginPane extends JXPanel {
     public JXLoginPane(LoginService service, PasswordStore passwordStore, UserNameStore userStore) {
         this(service, passwordStore, userStore, null);
     }
-    
+
     /**
      * Create a {@code JXLoginPane} with the specified {@code LoginService},
      * {@code PasswordStore}, {@code UserNameStore}, and server list.
@@ -415,7 +450,7 @@ public class JXLoginPane extends JXPanel {
      * <p>
      * Setting the server list to {@code null} will unset all of the servers.
      * The server list is guaranteed to be non-{@code null}.
-     * 
+     *
      * @param service
      *            the {@code LoginService} to use for logging in
      * @param passwordStore
@@ -431,12 +466,12 @@ public class JXLoginPane extends JXPanel {
         setPasswordStore(passwordStore);
         setUserNameStore(userStore);
         setServers(servers);
-        
-        
+
+
         //create the login and cancel actions, and add them to the action map
         getActionMap().put(LOGIN_ACTION_COMMAND, createLoginAction());
         getActionMap().put(CANCEL_LOGIN_ACTION_COMMAND, createCancelAction());
-        
+
         //initialize the save mode
         if (passwordStore != null && userStore != null) {
             saveMode = SaveMode.BOTH;
@@ -447,12 +482,12 @@ public class JXLoginPane extends JXPanel {
         } else {
             saveMode = SaveMode.NONE;
         }
-        
+
         // #732 set all internal components opacity to false in order to allow top level (frame's content pane) background painter to have any effect.
         setOpaque(false);
       	initComponents();
     }
-    
+
     /**
      * Sets current state of the caps lock key as detected by the component.
      * @param b True when caps lock is turned on, false otherwise.
@@ -461,14 +496,14 @@ public class JXLoginPane extends JXPanel {
         caps = b;
         capsOn.setText(caps ? UIManagerExt.getString(CLASS_NAME + ".capsOnWarning", getLocale()) : " ");
     }
-    
+
     /**
-     * Gets current state of the caps lock as seen by the login panel. The state seen by the login 
-     * panel and therefore returned by this method can be delayed in comparison to the real caps 
-     * lock state and displayed by the keyboard light. This is usually the case when component or 
+     * Gets current state of the caps lock as seen by the login panel. The state seen by the login
+     * panel and therefore returned by this method can be delayed in comparison to the real caps
+     * lock state and displayed by the keyboard light. This is usually the case when component or
      * its text fields are not focused.
-     * 
-     * @return True when caps lock is on, false otherwise. Returns always false when 
+     *
+     * @return True when caps lock is on, false otherwise. Returns always false when
      * <code>isCapsLockDetectionSupported()</code> returns false.
      */
     public boolean isCapsLockOn() {
@@ -476,28 +511,28 @@ public class JXLoginPane extends JXPanel {
     }
 
     /**
-     * Check current state of the caps lock state detection. Note that the value can change after 
-     * component have been made visible. Due to current problems in locking key state detection by 
-     * core java detection of the changes in caps lock can be always reliably determined. When 
-     * component can't guarantee reliable detection it will switch it off. This is usually the case 
-     * for unsigned applets and webstart invoked application. Since your users are going to pass 
-     * their password in the component you should always sign it when distributing application over 
+     * Check current state of the caps lock state detection. Note that the value can change after
+     * component have been made visible. Due to current problems in locking key state detection by
+     * core java detection of the changes in caps lock can be always reliably determined. When
+     * component can't guarantee reliable detection it will switch it off. This is usually the case
+     * for unsigned applets and webstart invoked application. Since your users are going to pass
+     * their password in the component you should always sign it when distributing application over
      * the network.
      * @return True if changes in caps lock state can be monitored by the component, false otherwise.
      */
     public boolean isCapsLockDetectionSupported() {
         return capsLockSupport;
     }
-    
+
     //------------------------------------------------------------- UI Logic
-    
+
     /**
      * {@inheritDoc}
      */
     public LoginPaneUI getUI() {
         return (LoginPaneUI) super.getUI();
     }
-    
+
     /**
      * Sets the look and feel (L&F) object that renders this component.
      *
@@ -510,12 +545,12 @@ public class JXLoginPane extends JXPanel {
             banner = new JXImagePanel();
         }
         if (errorMessageLabel == null) {
-            errorMessageLabel = new JXLabel(UIManagerExt.getString(CLASS_NAME + ".errorMessage", getLocale())); 
+            errorMessageLabel = new JXLabel(UIManagerExt.getString(CLASS_NAME + ".errorMessage", getLocale()));
         }
         super.setUI(ui);
         banner.setImage(createLoginBanner());
     }
-    
+
     /**
      * Notification from the <code>UIManager</code> that the L&F has changed.
      * Replaces the current UI object with the latest version from the
@@ -547,7 +582,7 @@ public class JXLoginPane extends JXPanel {
         loginPanel.setBorder(BorderFactory.createEmptyBorder(0, 36, 7, 11));
         contentPanel.add(loginPanel, 1);
     }
-    
+
     /**
      * Creates and returns a new LoginPanel, based on the SaveMode state of
      * the login panel. Whenever the SaveMode changes, the panel is recreated.
@@ -557,7 +592,7 @@ public class JXLoginPane extends JXPanel {
      */
     private JXPanel createLoginPanel() {
         JXPanel loginPanel = new JXPanel();
-        
+
         //create the NameComponent
         if (saveMode == SaveMode.NONE) {
             namePanel = new SimpleNamePanel();
@@ -566,12 +601,12 @@ public class JXLoginPane extends JXPanel {
         }
         JLabel nameLabel = new JLabel(UIManagerExt.getString(CLASS_NAME + ".nameString", getLocale()));
         nameLabel.setLabelFor(namePanel.getComponent());
-        
+
         //create the password component
         passwordField = new JPasswordField("", 15);
         JLabel passwordLabel = new JLabel(UIManagerExt.getString(CLASS_NAME + ".passwordString", getLocale()));
         passwordLabel.setLabelFor(passwordField);
-        
+
         //create the server combo box if necessary
         JLabel serverLabel = new JLabel(UIManagerExt.getString(CLASS_NAME + ".serverString", getLocale()));
         if (servers.size() > 1) {
@@ -580,7 +615,7 @@ public class JXLoginPane extends JXPanel {
         } else {
             serverCombo = null;
         }
-        
+
         //create the save check box. By default, it is not selected
         saveCB = new JCheckBox(UIManagerExt.getString(CLASS_NAME + ".rememberPasswordString", getLocale()));
         saveCB.setIconTextGap(10);
@@ -588,10 +623,10 @@ public class JXLoginPane extends JXPanel {
         //determine whether to show/hide the save check box based on the SaveMode
         saveCB.setVisible(saveMode == SaveMode.PASSWORD || saveMode == SaveMode.BOTH);
         saveCB.setOpaque(false);
-        
+
         capsOn = new JLabel(" ");
         // don't show by default. We perform test when login panel gets focus.
-        
+
         int lShift = 3;// lShift is used to align all other components with the checkbox
         GridLayout grid = new GridLayout(2,1);
         grid.setVgap(5);
@@ -607,7 +642,7 @@ public class JXLoginPane extends JXPanel {
         gridBagConstraints.anchor = GridBagConstraints.LINE_START;
         gridBagConstraints.insets = new Insets(4, lShift, 5, 11);
         loginPanel.add(nameLabel, gridBagConstraints);
-        
+
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
@@ -618,14 +653,14 @@ public class JXLoginPane extends JXPanel {
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new Insets(0, 0, 5, 0);
         loginPanel.add(fields, gridBagConstraints);
-        
+
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = GridBagConstraints.LINE_START;
         gridBagConstraints.insets = new Insets(5, lShift, 5, 11);
         loginPanel.add(passwordLabel, gridBagConstraints);
-        
+
         if (serverCombo != null) {
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
@@ -687,9 +722,9 @@ public class JXLoginPane extends JXPanel {
         loginPanel.setOpaque(false);
         return loginPanel;
     }
-    
+
     /**
-     * This method adds functionality to support bidi languages within this 
+     * This method adds functionality to support bidi languages within this
      * component
      */
     public void setComponentOrientation(ComponentOrientation orient) {
@@ -700,7 +735,7 @@ public class JXLoginPane extends JXPanel {
             progressPanel.applyComponentOrientation(orient);
         }
     }
-    
+
     /**
      * Create all of the UI components for the login panel
      */
@@ -715,7 +750,7 @@ public class JXLoginPane extends JXPanel {
 
         //create the main components
         loginPanel = createLoginPanel();
-        
+
         //create the message and hyperlink and hide them
         errorMessageLabel.setIcon(UIManager.getIcon(CLASS_NAME + ".errorIcon", getLocale()));
         errorMessageLabel.setVerticalTextPosition(SwingConstants.TOP);
@@ -724,10 +759,10 @@ public class JXLoginPane extends JXPanel {
         errorMessageLabel.setBackgroundPainter(new MattePainter(UIManager.getColor(CLASS_NAME + ".errorBackground", getLocale()), true));
         errorMessageLabel.setMaxLineSpan(320);
         errorMessageLabel.setVisible(false);
-        
+
         //aggregate the optional message label, content, and error label into
         //the contentPanel
-        contentPanel = new JXPanel(new VerticalLayout());
+        contentPanel = new JXPanel(new LoginPaneLayout());
         contentPanel.setOpaque(false);
         messageLabel.setBorder(BorderFactory.createEmptyBorder(12, 12, 7, 11));
         contentPanel.add(messageLabel);
@@ -735,7 +770,7 @@ public class JXLoginPane extends JXPanel {
         contentPanel.add(loginPanel);
         errorMessageLabel.setBorder(UIManager.getBorder(CLASS_NAME + ".errorBorder", getLocale()));
         contentPanel.add(errorMessageLabel);
-        
+
         //create the progress panel
         progressPanel = new JXPanel(new GridBagLayout());
         progressMessageLabel = new JLabel(UIManagerExt.getString(CLASS_NAME + ".pleaseWait", getLocale()));
@@ -746,12 +781,12 @@ public class JXLoginPane extends JXPanel {
         progressPanel.add(progressMessageLabel, new GridBagConstraints(0, 0, 2, 1, 1.0, 0.0, GridBagConstraints.LINE_START, GridBagConstraints.HORIZONTAL, new Insets(12, 12, 11, 11), 0, 0));
         progressPanel.add(pb, new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 24, 11, 7), 0, 0));
         progressPanel.add(cancelButton, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(0, 0, 11, 11), 0, 0));
-        
+
         //layout the panel
         setLayout(new BorderLayout());
         add(banner, BorderLayout.NORTH);
         add(contentPanel, BorderLayout.CENTER);
-        
+
     }
 
     /**
@@ -761,21 +796,21 @@ public class JXLoginPane extends JXPanel {
     protected Image createLoginBanner() {
         return getUI() == null ? null : getUI().getBanner();
     }
-    
+
     /**
      * Create and return an Action for logging in
      */
     protected Action createLoginAction() {
         return new LoginAction(this);
     }
-    
+
     /**
      * Create and return an Action for canceling login
      */
     protected Action createCancelAction() {
         return new CancelAction(this);
     }
-    
+
     //------------------------------------------------------ Bean Properties
     //TODO need to fire property change events!!!
     /**
@@ -784,7 +819,7 @@ public class JXLoginPane extends JXPanel {
     public SaveMode getSaveMode() {
         return saveMode;
     }
-    
+
     /**
      * The save mode indicates whether the "save" password is checked by default. This method
      * makes no difference if the passwordStore is null.
@@ -799,14 +834,14 @@ public class JXLoginPane extends JXPanel {
             firePropertyChange("saveMode", oldMode, getSaveMode());
         }
     }
-    
+
     /**
      * @return the List of servers
      */
     public List<String> getServers() {
         return Collections.unmodifiableList(servers);
     }
-    
+
     /**
      * Sets the list of servers. See the servers field javadoc for more info
      */
@@ -821,20 +856,20 @@ public class JXLoginPane extends JXPanel {
             firePropertyChange("servers", old, getServers());
         }
     }
-    
+
     private LoginListener getDefaultLoginListener() {
         if (defaultLoginListener == null) {
             defaultLoginListener = new LoginListenerImpl();
         }
-        
+
         return defaultLoginListener;
     }
-    
+
     /**
      * Sets the {@code LoginService} for this panel. Setting the login service
      * to {@code null} will actually set the service to use
      * {@code NullLoginService}.
-     * 
+     *
      * @param service
      *            the service to set. If {@code service == null}, then a
      *            {@code NullLoginService} is used.
@@ -842,20 +877,20 @@ public class JXLoginPane extends JXPanel {
     public void setLoginService(LoginService service) {
         LoginService oldService = getLoginService();
         LoginService newService = service == null ? new NullLoginService() : service;
-        
+
         //newService is guaranteed to be nonnull
         if (!newService.equals(oldService)) {
             if (oldService != null) {
                 oldService.removeLoginListener(getDefaultLoginListener());
             }
-            
+
             loginService = newService;
             this.loginService.addLoginListener(getDefaultLoginListener());
-            
+
             firePropertyChange("loginService", oldService, getLoginService());
         }
     }
-    
+
     /**
      * Gets the <strong>LoginService</strong> for this panel.
      *
@@ -864,7 +899,7 @@ public class JXLoginPane extends JXPanel {
     public LoginService getLoginService() {
         return loginService;
     }
-    
+
     /**
      * Sets the <strong>PasswordStore</strong> for this panel.
      *
@@ -873,18 +908,18 @@ public class JXLoginPane extends JXPanel {
     public void setPasswordStore(PasswordStore store) {
         PasswordStore oldStore = getPasswordStore();
         PasswordStore newStore = store == null ? new NullPasswordStore() : store;
-        
+
         //newStore is guaranteed to be nonnull
         if (!newStore.equals(oldStore)) {
             passwordStore = newStore;
-            
+
             firePropertyChange("passwordStore", oldStore, getPasswordStore());
         }
     }
-    
+
     /**
      * Gets the {@code UserNameStore} for this panel.
-     * 
+     *
      * @return the {@code UserNameStore}
      */
     public UserNameStore getUserNameStore() {
@@ -898,11 +933,11 @@ public class JXLoginPane extends JXPanel {
     public void setUserNameStore(UserNameStore store) {
         UserNameStore oldStore = getUserNameStore();
         UserNameStore newStore = store == null ? new DefaultUserNameStore() : store;
-        
+
         //newStore is guaranteed to be nonnull
         if (!newStore.equals(oldStore)) {
             userNameStore = newStore;
-            
+
             firePropertyChange("userNameStore", oldStore, getUserNameStore());
         }
     }
@@ -915,7 +950,7 @@ public class JXLoginPane extends JXPanel {
     public PasswordStore getPasswordStore() {
         return passwordStore;
     }
-    
+
     /**
      * Sets the <strong>User name</strong> for this panel.
      *
@@ -926,7 +961,7 @@ public class JXLoginPane extends JXPanel {
             namePanel.setUserName(username);
         }
     }
-    
+
     /**
      * Gets the <strong>User name</strong> for this panel.
      * @return the user name
@@ -934,7 +969,7 @@ public class JXLoginPane extends JXPanel {
     public String getUserName() {
         return namePanel == null ? null : namePanel.getUserName();
     }
-    
+
     /**
      * Sets the <strong>Password</strong> for this panel.
      *
@@ -943,7 +978,7 @@ public class JXLoginPane extends JXPanel {
     public void setPassword(char[] password) {
         passwordField.setText(new String(password));
     }
-    
+
     /**
      * Gets the <strong>Password</strong> for this panel.
      *
@@ -952,18 +987,18 @@ public class JXLoginPane extends JXPanel {
     public char[] getPassword() {
         return passwordField.getPassword();
     }
-    
+
     /**
      * Return the image used as the banner
      */
     public Image getBanner() {
         return banner.getImage();
     }
-    
+
     /**
      * Set the image to use for the banner. If the {@code img} is {@code null},
      * then no image will be displayed.
-     * 
+     *
      * @param img
      *            the image to display
      */
@@ -971,18 +1006,18 @@ public class JXLoginPane extends JXPanel {
         // we do not expose the ImagePanel, so we will produce property change
         // events here
         Image oldImage = getBanner();
-        
+
         if (oldImage != img) {
             banner.setImage(img);
             firePropertyChange("banner", oldImage, getBanner());
         }
     }
-    
+
     /**
      * Set the text to use when creating the banner. If a custom banner image is
      * specified, then this is ignored. If {@code text} is {@code null}, then
      * no text is displayed.
-     * 
+     *
      * @param text
      *            the text to display
      */
@@ -1013,35 +1048,35 @@ public class JXLoginPane extends JXPanel {
     public String getMessage() {
         return messageLabel.getText();
     }
-    
+
     /**
      * Sets a custom message for this login panel
      */
     public void setMessage(String message) {
         messageLabel.setText(message);
     }
-    
+
     /**
      * Returns the error message for this login panel
      */
     public String getErrorMessage() {
         return errorMessageLabel.getText();
     }
-    
+
     /**
      * Sets the error message for this login panel
      */
     public void setErrorMessage(String errorMessage) {
         errorMessageLabel.setText(errorMessage);
     }
-    
+
     /**
      * Returns the panel's status
      */
     public Status getStatus() {
         return status;
     }
-    
+
     /**
      * Change the status
      */
@@ -1052,18 +1087,18 @@ public class JXLoginPane extends JXPanel {
             firePropertyChange("status", oldStatus, newStatus);
         }
     }
-    
+
     public void setLocale(Locale l) {
         super.setLocale(l);
         reinitLocales(l);
     }
     //-------------------------------------------------------------- Methods
-    
+
     /**
      * Initiates the login procedure. This method is called internally by
      * the LoginAction. This method handles cursor management, and actually
-     * calling the LoginService's startAuthentication method. Method will return 
-     * immediately if asynchronous login is enabled or will block until 
+     * calling the LoginService's startAuthentication method. Method will return
+     * immediately if asynchronous login is enabled or will block until
      * authentication finishes if <code>getSynchronous()</code> returns true.
      */
     protected void startLogin() {
@@ -1083,13 +1118,13 @@ public class JXLoginPane extends JXPanel {
             setCursor(oldCursor);
         }
     }
-    
+
     /**
      * Cancels the login procedure. Handles cursor management and interfacing
-     * with the LoginService's cancelAuthentication method. Calling this method 
-     * has an effect only when authentication is still in progress (i.e. after 
-     * previous call to <code>startAuthentications()</code> and only when 
-     * authentication is performed asynchronously (<code>getSynchronous()</code> 
+     * with the LoginService's cancelAuthentication method. Calling this method
+     * has an effect only when authentication is still in progress (i.e. after
+     * previous call to <code>startAuthentications()</code> and only when
+     * authentication is performed asynchronously (<code>getSynchronous()</code>
      * returns false).
      */
     protected void cancelLogin() {
@@ -1098,19 +1133,19 @@ public class JXLoginPane extends JXPanel {
         loginService.cancelAuthentication();
         setCursor(oldCursor);
     }
-    
+
     /**
-     * Puts the password into the password store. If password store is not set, method will do 
+     * Puts the password into the password store. If password store is not set, method will do
      * nothing.
      */
     protected void savePassword() {
-        if (saveCB.isSelected() 
+        if (saveCB.isSelected()
             && (saveMode == SaveMode.BOTH || saveMode == SaveMode.PASSWORD)
             && passwordStore != null) {
             passwordStore.set(getUserName(),getLoginService().getServer(),getPassword());
         }
     }
-    
+
     public void removeNotify() {
     	try {
 	    	// TODO: keep it here until all ui stuff is moved to uidelegate.
@@ -1136,7 +1171,7 @@ public class JXLoginPane extends JXPanel {
 		}
 		return (Window) c;
 	}
-    
+
     public void addNotify() {
     	try {
     		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(
@@ -1155,7 +1190,7 @@ public class JXLoginPane extends JXPanel {
     }
     //--------------------------------------------- Listener Implementations
     /*
-     
+
      For Login (initiated in LoginAction):
         0) set the status
         1) Immediately disable the login action
@@ -1164,18 +1199,18 @@ public class JXLoginPane extends JXPanel {
           a) enable the cancel login action
           b) set the message text
         4) hide the content pane, show the progress pane
-     
+
      When cancelling (initiated in CancelAction):
          0) set the status
          1) Disable the cancel login action
          2) Change the message text on the progress pane
-     
+
      When cancel finishes (handled in LoginListener):
          0) set the status
          1) hide the progress pane, show the content pane
          2) enable the close action (part of enclosing window)
          3) enable the login action
-     
+
      When login fails (handled in LoginListener):
          0) set the status
          1) hide the progress pane, show the content pane
@@ -1183,7 +1218,7 @@ public class JXLoginPane extends JXPanel {
          3) enable the login action
          4) Show the error message
          5) resize the window (part of enclosing window)
-     
+
      When login succeeds (handled in LoginListener):
          0) set the status
          1) close the dialog/frame (part of enclosing window)
@@ -1203,7 +1238,7 @@ public class JXLoginPane extends JXPanel {
             }
             setStatus(Status.SUCCEEDED);
         }
-            
+
         public void loginStarted(LoginEvent source) {
             getActionMap().get(LOGIN_ACTION_COMMAND).setEnabled(false);
             getActionMap().get(CANCEL_LOGIN_ACTION_COMMAND).setEnabled(true);
@@ -1234,7 +1269,7 @@ public class JXLoginPane extends JXPanel {
             setStatus(Status.CANCELLED);
         }
     }
-    
+
     //---------------------------------------------- Default Implementations
     /**
      * Action that initiates a login procedure. Delegates to JXLoginPane.startLogin
@@ -1242,7 +1277,7 @@ public class JXLoginPane extends JXPanel {
     private static final class LoginAction extends AbstractActionExt {
     private JXLoginPane panel;
     public LoginAction(JXLoginPane p) {
-        super(UIManagerExt.getString(CLASS_NAME + ".loginString", p.getLocale()), LOGIN_ACTION_COMMAND); 
+        super(UIManagerExt.getString(CLASS_NAME + ".loginString", p.getLocale()), LOGIN_ACTION_COMMAND);
         this.panel = p;
     }
     public void actionPerformed(ActionEvent e) {
@@ -1250,15 +1285,15 @@ public class JXLoginPane extends JXPanel {
     }
     public void itemStateChanged(ItemEvent e) {}
     }
-    
+
     /**
-     * Action that cancels the login procedure. 
+     * Action that cancels the login procedure.
      */
     private static final class CancelAction extends AbstractActionExt {
         private JXLoginPane panel;
         public CancelAction(JXLoginPane p) {
             //TODO localize
-            super(UIManagerExt.getString(CLASS_NAME + ".cancelLogin", p.getLocale()), CANCEL_LOGIN_ACTION_COMMAND); 
+            super(UIManagerExt.getString(CLASS_NAME + ".cancelLogin", p.getLocale()), CANCEL_LOGIN_ACTION_COMMAND);
             this.panel = p;
             this.setEnabled(false);
         }
@@ -1267,7 +1302,7 @@ public class JXLoginPane extends JXPanel {
         }
         public void itemStateChanged(ItemEvent e) {}
     }
-    
+
     /**
      * Simple login service that allows everybody to login. This is useful in demos and allows
      * us to avoid having to check for LoginService being null
@@ -1285,7 +1320,7 @@ public class JXLoginPane extends JXPanel {
             return 7;
         }
     }
-    
+
     /**
      * Simple PasswordStore that does not remember passwords
      */
@@ -1307,14 +1342,14 @@ public class JXLoginPane extends JXPanel {
             return 7;
         }
     }
-    
+
     //--------------------------------- Default NamePanel Implementations
     public static interface NameComponent {
         public String getUserName();
         public void setUserName(String userName);
         public JComponent getComponent();
     }
-    
+
     /**
      * If a UserNameStore is not used, then this text field is presented allowing the user
      * to simply enter their user name
@@ -1333,7 +1368,7 @@ public class JXLoginPane extends JXPanel {
             return this;
         }
     }
-    
+
     /**
      * If a UserNameStore is used, then this combo box is presented allowing the user
      * to select a previous login name, or type in a new login name
@@ -1394,7 +1429,7 @@ public class JXLoginPane extends JXPanel {
     public static Status showLoginDialog(Component parent, LoginService svc, PasswordStore ps, UserNameStore us) {
         return showLoginDialog(parent, svc, ps, us, null);
     }
-    
+
     /**
      * Shows a login dialog. This method blocks.
      * @return The status of the login operation
@@ -1403,7 +1438,7 @@ public class JXLoginPane extends JXPanel {
         JXLoginPane panel = new JXLoginPane(svc, ps, us, servers);
         return showLoginDialog(parent, panel);
     }
-    
+
     /**
      * Shows a login dialog. This method blocks.
      * @return The status of the login operation
@@ -1423,7 +1458,7 @@ public class JXLoginPane extends JXPanel {
         dlg.setVisible(true);
         return dlg.getStatus();
     }
-    
+
     /**
      * Shows a login frame. A JFrame is not modal, and thus does not block
      */
@@ -1436,7 +1471,7 @@ public class JXLoginPane extends JXPanel {
     public static JXLoginFrame showLoginFrame(LoginService svc, PasswordStore ps, UserNameStore us) {
         return showLoginFrame(svc, ps, us, null);
     }
-    
+
     /**
      */
     public static JXLoginFrame showLoginFrame(LoginService svc, PasswordStore ps, UserNameStore us, List<String> servers) {
@@ -1452,31 +1487,31 @@ public class JXLoginPane extends JXPanel {
 
     public static final class JXLoginDialog extends JDialog {
         private JXLoginPane panel;
-        
+
         public JXLoginDialog(Frame parent, JXLoginPane p) {
             super(parent, true);
             init(p);
         }
-        
+
         public JXLoginDialog(Dialog parent, JXLoginPane p) {
             super(parent, true);
             init(p);
         }
-        
+
     protected void init(JXLoginPane p) {
-        setTitle(UIManagerExt.getString(CLASS_NAME + ".titleString", getLocale())); 
+        setTitle(UIManagerExt.getString(CLASS_NAME + ".titleString", getLocale()));
         this.panel = p;
         initWindow(this, panel);
     }
-    
+
     public JXLoginPane.Status getStatus() {
         return panel.getStatus();
     }
     }
-    
+
     public static final class JXLoginFrame extends JXFrame {
         private JXLoginPane panel;
-    
+
         public JXLoginFrame(JXLoginPane p) {
             super(UIManagerExt.getString(CLASS_NAME + ".titleString", p.getLocale()));
             JXPanel cp = new JXPanel();
@@ -1485,27 +1520,27 @@ public class JXLoginPane extends JXPanel {
             this.panel = p;
             initWindow(this, panel);
         }
-        
+
         public JXPanel getContentPane() {
             return (JXPanel) super.getContentPane();
         }
-        
+
         public JXLoginPane.Status getStatus() {
             return panel.getStatus();
         }
-        
+
         public JXLoginPane getPanel() {
             return panel;
         }
 
     }
-    
+
     /**
      * Utility method for initializing a Window for displaying a LoginDialog.
      * This is particularly useful because the differences between JFrame and
      * JDialog are so minor.
      *
-     * Note: This method is package private for use by JXLoginDialog (proper, 
+     * Note: This method is package private for use by JXLoginDialog (proper,
      * not JXLoginPane.JXLoginDialog). Change to private if JXLoginDialog is
      * removed.
      */
@@ -1561,7 +1596,7 @@ public class JXLoginPane extends JXPanel {
         new BoxLayout(controls, BoxLayout.X_AXIS);
         controls.add(Box.createHorizontalGlue());
         controls.add(buttonPanel);
-        w.add(controls, BorderLayout.SOUTH);            
+        w.add(controls, BorderLayout.SOUTH);
         w.addWindowListener(new WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent e) {
                 panel.cancelLogin();
@@ -1596,7 +1631,7 @@ public class JXLoginPane extends JXPanel {
         w.pack();
         w.setLocation(WindowUtils.getPointForCentering(w));
     }
-    
+
     private void setButtonPanel(JXBtnPanel buttonPanel) {
 		this.buttonPanel = buttonPanel;
 	}
@@ -1629,11 +1664,11 @@ public class JXLoginPane extends JXPanel {
         public JButton getOk() {
             return ok;
         }
-        
+
     }
-    
+
     private class CapsOnTest {
-        
+
     	RemovableKeyEventDispatcher ked;
 
         public void runTest() {
@@ -1668,7 +1703,7 @@ public class JXLoginPane extends JXPanel {
                 } catch (Exception e1) {
                     // this can happen for example due to security reasons in unsigned applets
                     // when we can't test caps lock state programatically bail out silently
-                	
+
                 	// no matter what's the cause - uninstall
                     ked.uninstall();
                 }
