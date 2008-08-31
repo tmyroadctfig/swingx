@@ -30,8 +30,6 @@ import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.Shape;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
 import java.awt.geom.Point2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -138,10 +136,10 @@ public class JXLabel extends JLabel {
 
     private int pHeight;
 
-    // using reverse logic ... some methods causing reflow of text are called from super constructor, but private variables are initialized only after call to super so have to rely on default for boolean being false
+    // using reverse logic ... some methods causing re-flow of text are called from super constructor, but private variables are initialized only after call to super so have to rely on default for boolean being false
     private boolean dontIgnoreRepaint = false;
 
-    private int prevTlaWidth;
+    private int occupiedWidth;
 
     private static final String oldRendererKey = "was" + BasicHTML.propertyKey;
 
@@ -215,12 +213,18 @@ public class JXLabel extends JLabel {
     }
 
     private void initPainterSupport() {
-        foregroundPainter = new AbstractPainter() {
-            protected void doPaint(Graphics2D g, Object object, int width, int height) {
+        foregroundPainter = new AbstractPainter<JXLabel>() {
+            protected void doPaint(Graphics2D g, JXLabel label, int width, int height) {
                 Insets i = getInsets();
                 g = (Graphics2D) g.create(-i.left, -i.top, width, height);
-                JXLabel.super.paintComponent(g);
+                label.paint(g);
                 g.dispose();
+            }
+            //if any of the state of the JButton that affects the foreground has changed,
+            //then I must clear the cache. This is really hard to get right, there are
+            //bound to be bugs. An alternative is to NEVER cache.
+            protected boolean shouldUseCache() {
+                return false;
             }
         };
     }
@@ -230,16 +234,9 @@ public class JXLabel extends JLabel {
      */
     private void initLineWrapSupport() {
         addPropertyChangeListener(new MultiLineSupport());
-        addComponentListener(new ComponentAdapter() {
-            public void componentResized(ComponentEvent e) {
-                if (!isLineWrap()) {
-                    return;
-                }
-                View view = (View) getClientProperty(BasicHTML.propertyKey);
-                if (view != null && view instanceof Renderer) {
-                    view.setSize(getWidth() - 1, ((Renderer) view).height);
-                }
-            }});
+        // FYI: no more listening for componentResized. Those events are delivered out
+        // of order and without old values are meaningless and forcing us to react when
+        // not necessary. Instead overriding reshape() ensures we have control over old AND new size.
     }
 
     /**
@@ -250,6 +247,37 @@ public class JXLabel extends JLabel {
      */
     public final Painter getForegroundPainter() {
         return foregroundPainter;
+    }
+
+    @Override
+    public void reshape(int x, int y, int w, int h) {
+        int oldH = getHeight();
+        super.reshape(x, y, w, h);
+        if (!isLineWrap()) {
+            return;
+        }
+        // TODO:HAD
+        //System.out.println("resized: " + w + ", " + h);
+        if (oldH == 0) {
+            //System.out.println("BAIL OUT");
+            return;
+        }
+        //System.out.println("res:" + getVisibleRect());
+        if (w > getVisibleRect().width) {
+            w = getVisibleRect().width;
+        }
+        View view = (View) getClientProperty(BasicHTML.propertyKey);
+        if (view != null && view instanceof Renderer) {
+            Insets i = getInsets();
+            int dx = i.left + i.right;
+            Rectangle iconR = calculateIconRect();
+            int gap = (iconR.width == 0) ? 0 : getIconTextGap();
+
+            //occupiedWidth = dx + iconR.width + gap;
+            //((Renderer) view).invalidated = true;
+            view.setSize(w - occupiedWidth, h);
+        }
+
     }
 
     /**
@@ -304,7 +332,10 @@ public class JXLabel extends JLabel {
     @Override
     public Dimension getPreferredSize() {
         Dimension size = super.getPreferredSize();
+        //System.out.println("GPC!!!: " + size);
+        //if (true) return size;
         if (isPreferredSizeSet()) {
+            //System.out.println("ret 0");
             return size;
         } else if (this.textRotation != NORMAL) {
             // #swingx-680 change the preferred size when rotation is set ... ideally this would be solved in the LabelUI rather then here
@@ -316,47 +347,164 @@ public class JXLabel extends JLabel {
             View view = (View) getClientProperty(BasicHTML.propertyKey);
             Container tla = super.getTopLevelAncestor();
             if (view == null || tla == null || !(view instanceof Renderer)) {
+                //System.out.println("ret 1:" + size + ", " + view + ", " + tla);
                 return size;
             }
-            Rectangle tlaBounds = tla.getBounds();
-            int modTlaWidth = tlaBounds.width;
-            //#swingx-780 watch out for ancestor providing more width to us
-            Insets tlaInsets = tla.getInsets();
-            if (tlaInsets != null) {
-                modTlaWidth -= tlaInsets.left + tlaInsets.right + 3;
-            }
-            int w = ((Renderer) view).getWidth();
-            int h = ((Renderer) view).getHeight();
-            Icon ic = getIcon();
-            int iconWidth = ic != null ? (ic.getIconWidth() + getIconTextGap()) : 0;
-            if (this.prevTlaWidth == modTlaWidth && (getWidth() - iconWidth) == w ) {
-                // no change bail out
-                size.width = Math.max(size.width - iconWidth, w);
-                size.height =  Math.max(getHeight(), size.height);
-                this.prevTlaWidth = modTlaWidth;
-                return size;
-            }
-            //#swingx-780 - incorrect reflow on resize when parent embeded in scrollpane
-            Rectangle superBounds = super.getBounds();
-            int newW = tlaBounds.width <= 0 ? w : (tlaBounds.width - 1);//was: Math.min(superBounds.width, tlaBounds.width);
-            this.prevTlaWidth = modTlaWidth;
+            Insets insets = getInsets();
+            int dx = insets.left + insets.right;
+            int dy = insets.top + insets.bottom;
+            //System.out.println("INSETS:" + insets);
+            //System.out.println("BORDER:" + this.getBorder());
+            Rectangle textR = new Rectangle();
+            Rectangle viewR = new Rectangle();
+            textR.x = textR.y = textR.width = textR.height = 0;
+            viewR.x = dx;
+            viewR.y = dy;
+            viewR.width = viewR.height = Short.MAX_VALUE;
+            // layout label
+            // 1) icon
+            Rectangle iconR = calculateIconRect();
+            // 2) init textR
+            boolean textIsEmpty = (getText() == null) || getText().equals("");
+            int lsb = 0;
+            /* Unless both text and icon are non-null, we effectively ignore
+             * the value of textIconGap.
+             */
+            int gap;
 
-            if (ic != null) {
-                newW -= iconWidth;
+            if (textIsEmpty) {
+                textR.width = textR.height = 0;
+                gap = 0;
+            }
+            else {
+                int availTextWidth;
+                gap = (iconR.width == 0) ? 0 : getIconTextGap();
+
+                occupiedWidth = dx + iconR.width + gap;
+                if (getHorizontalTextPosition() == CENTER) {
+                    availTextWidth = viewR.width;
+                }
+                else {
+                    availTextWidth = viewR.width - (iconR.width + gap);
+                }
+                float xPrefSpan = view.getPreferredSpan(View.X_AXIS);
+                //System.out.println("atw:" + availTextWidth + ", vps:" + xPrefSpan);
+                textR.width = Math.min(availTextWidth, (int) xPrefSpan);
+                if (maxLineSpan > 0) {
+                    textR.width = Math.min(textR.width, maxLineSpan);
+                    if (xPrefSpan > maxLineSpan) {
+                        view.setSize(maxLineSpan, textR.height);
+                    }
+                }
+                textR.height = (int) view.getPreferredSpan(View.Y_AXIS);
+                if (textR.height == 0) {
+                    textR.height = getFont().getSize();
+                }
+                //System.out.println("atw:" + availTextWidth + ", vps:" + xPrefSpan + ", h:" + textR.height);
 
             }
-            //#swingx-780 take into account top level ancestor insets
-            if (tlaInsets != null) {
-                newW -= tlaInsets.left + tlaInsets.right + 3;
+            // 3) set text xy based on h/v text pos
+            if (getVerticalTextPosition() == TOP) {
+                if (getHorizontalTextPosition() != CENTER) {
+                    textR.y = 0;
+                }
+                else {
+                    textR.y = -(textR.height + gap);
+                }
             }
-            Insets i = getInsets();
-            if (i != null) {
-                newW -= i.left + i.right;
+            else if (getVerticalTextPosition() == CENTER) {
+                textR.y = (iconR.height / 2) - (textR.height / 2);
             }
-            view.setSize(newW, (int) Math.max(super.getPreferredSize().height, view.getPreferredSpan(View.Y_AXIS)));
-            size.setSize(newW,  view.getPreferredSpan(View.Y_AXIS) + (i != null ? (i.top + i.bottom) : 0) );
+            else { // (verticalTextPosition == BOTTOM)
+                if (getVerticalTextPosition() != CENTER) {
+                    textR.y = iconR.height - textR.height;
+                }
+                else {
+                    textR.y = (iconR.height + gap);
+                }
+            }
+
+            if (getHorizontalTextPosition() == LEFT) {
+                textR.x = -(textR.width + gap);
+            }
+            else if (getHorizontalTextPosition() == CENTER) {
+                textR.x = (iconR.width / 2) - (textR.width / 2);
+            }
+            else { // (horizontalTextPosition == RIGHT)
+                textR.x = (iconR.width + gap);
+            }
+
+            // 4) shift label around based on its alignment
+            int labelR_x = Math.min(iconR.x, textR.x);
+            int labelR_width = Math.max(iconR.x + iconR.width,
+                                        textR.x + textR.width) - labelR_x;
+            int labelR_y = Math.min(iconR.y, textR.y);
+            int labelR_height = Math.max(iconR.y + iconR.height,
+                                         textR.y + textR.height) - labelR_y;
+
+            int dax, day;
+
+            if (getVerticalAlignment() == TOP) {
+                day = viewR.y - labelR_y;
+            }
+            else if (getVerticalAlignment() == CENTER) {
+                day = (viewR.y + (viewR.height / 2)) - (labelR_y + (labelR_height / 2));
+            }
+            else { // (verticalAlignment == BOTTOM)
+                day = (viewR.y + viewR.height) - (labelR_y + labelR_height);
+            }
+
+            if (getHorizontalAlignment() == LEFT) {
+                dax = viewR.x - labelR_x;
+            }
+            else if (getHorizontalAlignment() == RIGHT) {
+                dax = (viewR.x + viewR.width) - (labelR_x + labelR_width);
+            }
+            else { // (horizontalAlignment == CENTER)
+                dax = (viewR.x + (viewR.width / 2)) -
+                     (labelR_x + (labelR_width / 2));
+            }
+
+            textR.x += dax;
+            textR.y += day;
+
+            iconR.x += dax;
+            iconR.y += day;
+
+            if (lsb < 0) {
+                // lsb is negative. Shift the x location so that the text is
+                // visually drawn at the right location.
+                textR.x -= lsb;
+            }
+            // EO layout label
+
+            int x1 = Math.min(iconR.x, textR.x);
+            int x2 = Math.max(iconR.x + iconR.width, textR.x + textR.width);
+            int y1 = Math.min(iconR.y, textR.y);
+            int y2 = Math.max(iconR.y + iconR.height, textR.y + textR.height);
+            Dimension rv = new Dimension(x2 - x1, y2 - y1);
+
+            rv.width += dx;
+            rv.height += dy;
+            //System.out.println("returning: " + rv);
+            return rv;
         }
+        //System.out.println("ret 3");
         return size;
+    }
+
+    private Rectangle calculateIconRect() {
+        Rectangle iconR = new Rectangle();
+        Icon icon = isEnabled() ? getIcon() : getDisabledIcon();
+        iconR.x = iconR.y = iconR.width = iconR.height = 0;
+        if (icon != null) {
+            iconR.width = icon.getIconWidth();
+            iconR.height = icon.getIconHeight();
+        }
+        else {
+            iconR.width = iconR.height = 0;
+        }
+        return iconR;
     }
 
     public int getMaxLineSpan() {
@@ -464,14 +612,15 @@ public class JXLabel extends JLabel {
      */
     @Override
     protected void paintComponent(Graphics g) {
+        //System.out.println("in");
         // resizing the text view causes recursive callback to the paint down the road. In order to prevent such
         // computationally intensive series of repaints every call to paint is skipped while top most call is being
         // executed.
-        if (!dontIgnoreRepaint) {
-            return;
-        }
+//        if (!dontIgnoreRepaint) {
+//            return;
+//        }
         painted = true;
-        if (backgroundPainter == null && foregroundPainter == null) {
+        if (painting || backgroundPainter == null && foregroundPainter == null) {
             super.paintComponent(g);
         } else {
             pWidth = getWidth();
@@ -510,6 +659,7 @@ public class JXLabel extends JLabel {
                 // g2.setColor(Color.RED);
                 // g2.fillRect(0, 0, getWidth(), getHeight());
                 // g2.setColor(c);
+                //System.out.println("PW:" + pWidth + ", PH:" + pHeight);
                 foregroundPainter.paint(tmp, this, pWidth, pHeight);
                 tmp.dispose();
                 painting = false;
@@ -862,6 +1012,8 @@ public class JXLabel extends JLabel {
 
         JXLabel host;
 
+        boolean invalidated = false;
+
         private float width;
 
         private float height;
@@ -872,8 +1024,18 @@ public class JXLabel extends JLabel {
             view = v;
             view.setParent(this);
             host = c;
+            //System.out.println("vir: " +  host.getVisibleRect());
+            int w;
+            if (host.getVisibleRect().width == 0) {
+                invalidated = true;
+                return;
+            } else {
+                w = host.getVisibleRect().width;
+            }
+            //System.out.println("w:" + w);
             // initially layout to the preferred size
-            setSize(c.getMaxLineSpan() > -1 ? c.getMaxLineSpan() : view.getPreferredSpan(X_AXIS), view.getPreferredSpan(Y_AXIS));
+            //setSize(c.getMaxLineSpan() > -1 ? c.getMaxLineSpan() : view.getPreferredSpan(X_AXIS), view.getPreferredSpan(Y_AXIS));
+            setSize(c.getMaxLineSpan() > -1 ? c.getMaxLineSpan() : w, host.getVisibleRect().height);
         }
 
         @Override
@@ -912,9 +1074,9 @@ public class JXLabel extends JLabel {
          */
         public void paint(Graphics g, Shape allocation) {
             Rectangle alloc = allocation.getBounds();
-            view.setSize(alloc.width, alloc.height);
-            this.width = alloc.width;
-            this.height = alloc.height;
+            //view.setSize(alloc.width, alloc.height);
+            //this.width = alloc.width;
+            //this.height = alloc.height;
             if (g.getClipBounds() == null) {
                 g.setClip(alloc);
                 view.paint(g, allocation);
@@ -972,18 +1134,37 @@ public class JXLabel extends JLabel {
          * @param height the height
          */
         public void setSize(float width, float height) {
+            //System.out.println("SS:" + width + " (" + host.maxLineSpan + "), " + height);
+            if (host.maxLineSpan > 0) {
+                width = Math.min(width, host.maxLineSpan);
+            }
             if (width == this.width && height == this.height) {
                 return;
             }
             this.width = (int) width;
             this.height = (int) height;
-            view.setSize(width, height);
+            view.setSize(width, height == 0 ? Short.MAX_VALUE : height);
+            if (this.height == 0) {
+                this.height = view.getPreferredSpan(View.Y_AXIS);
+            }
         }
 
         @Override
         public float getPreferredSpan(int axis) {
             if (axis == X_AXIS) {
+                //System.out.println("inv: " + invalidated + ", w:" + width + ", vw:" + host.getVisibleRect());
                 // width currently laid out to
+                if (invalidated) {
+                    int w = host.getVisibleRect().width;
+                    if (w != 0) {
+                        //System.out.println("vrh: " + host.getVisibleRect().height);
+                        invalidated = false;
+                        // JXLabelTest4 works
+                        setSize(w - (host.getOccupiedWidth()), host.getVisibleRect().height);
+                        // JXLabelTest3 works; 20 == width of the parent border!!! ... why should this screw with us?
+                        //setSize(w - (host.getOccupiedWidth()+20), host.getVisibleRect().height);
+                    }
+                }
                 return width > 0 ? width : view.getPreferredSpan(axis);
             } else {
                 return  view.getPreferredSpan(axis);
@@ -1659,5 +1840,9 @@ public class JXLabel extends JLabel {
         public StateInvariantError(String s) {
             super(s);
         }
+    }
+
+    protected int getOccupiedWidth() {
+        return occupiedWidth;
     }
 }
