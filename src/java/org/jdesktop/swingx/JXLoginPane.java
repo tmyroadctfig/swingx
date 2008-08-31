@@ -300,12 +300,12 @@ public class JXLoginPane extends JXPanel {
      */
     private List<String> servers;
     /**
-     *  Whether to save password or username or both
+     *  Whether to save password or username or both.
      */
     private SaveMode saveMode;
     /**
      * Tracks the cursor at the time that authentication was started, and restores to that
-     * cursor after authentication ends, or is cancelled;
+     * cursor after authentication ends, or is canceled;
      */
     private Cursor oldCursor;
 
@@ -313,34 +313,24 @@ public class JXLoginPane extends JXPanel {
      * The default login listener used by this panel.
      */
     private LoginListener defaultLoginListener;
-    private CapsOnTest capsOnTest = new CapsOnTest();
+    private final CapsOnTest capsOnTest;
     private boolean caps;
     private boolean isTestingCaps;
-    private KeyEventDispatcher capsOnListener = new KeyEventDispatcher() {
-        public boolean dispatchKeyEvent(KeyEvent e) {
-            if (e.getID() != KeyEvent.KEY_PRESSED) {
-                return false;
-            }
-            if (e.getKeyCode() == 20) {
-                setCapsLock(!isCapsLockOn());
-            }
-            return false;
-		}};
-	/**
-	 * Caps lock detection support
-	 */
-	private boolean capsLockSupport = true;
+    private final KeyEventDispatcher capsOnListener;
+    /**
+     * Caps lock detection support
+     */
+    private boolean capsLockSupport = true;
 
-
-	/**
-	 * Login/cancel control pane;
-	 */
-	private JXBtnPanel buttonPanel;
-	/**
-	 * Window event listener responsible for triggering caps lock test on vindow activation and
-	 * focus changes.
-	 */
-	private CapsOnWinListener capsOnWinListener = new CapsOnWinListener(capsOnTest);
+    /**
+     * Login/cancel control pane;
+     */
+    private JXBtnPanel buttonPanel;
+    /**
+     * Window event listener responsible for triggering caps lock test on vindow activation and
+     * focus changes.
+     */
+    private final CapsOnWinListener capsOnWinListener;
 
     /**
      * Creates a default JXLoginPane instance
@@ -462,6 +452,26 @@ public class JXLoginPane extends JXPanel {
      *            a list of servers to authenticate against
      */
     public JXLoginPane(LoginService service, PasswordStore passwordStore, UserNameStore userStore, List<String> servers) {
+        //init capslock detection support
+        if (Boolean.parseBoolean(System.getProperty("swingx.enableCapslockTesting"))) {
+            capsOnTest = new CapsOnTest();
+            capsOnListener = new KeyEventDispatcher() {
+                public boolean dispatchKeyEvent(KeyEvent e) {
+                    if (e.getID() != KeyEvent.KEY_PRESSED) {
+                        return false;
+                    }
+                    if (e.getKeyCode() == 20) {
+                        setCapsLock(!isCapsLockOn());
+                    }
+                    return false;
+                        }};
+            capsOnWinListener = new CapsOnWinListener(capsOnTest);
+        } else {
+            capsOnTest = null;
+            capsOnListener = null;
+            capsOnWinListener = null;
+            capsLockSupport = false;
+        }
         setLoginService(service);
         setPasswordStore(passwordStore);
         setUserNameStore(userStore);
