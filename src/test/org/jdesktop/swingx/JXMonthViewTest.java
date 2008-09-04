@@ -166,9 +166,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
         monthView.addPropertyChangeListener(report);
         boolean showing = monthView.isAntialiased();
         monthView.setAntialiased(!showing);
-        TestUtils.assertPropertyChangeEvent(report, "antialiased", showing, !showing, false);
-        // JW: fire the old as well until the method is removed
-        TestUtils.assertPropertyChangeEvent(report, "antialiased", showing, !showing, false);
+        TestUtils.assertPropertyChangeEvent(report, "antialiased", showing, !showing);
     }
 
     /**
@@ -193,9 +191,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
         monthView.addPropertyChangeListener(report);
         boolean showing = monthView.isShowingLeadingDays();
         monthView.setShowingLeadingDays(!showing);
-        TestUtils.assertPropertyChangeEvent(report, "showingLeadingDays", showing, !showing, false);
-        // JW: fire the old as well until the method is removed
-        TestUtils.assertPropertyChangeEvent(report, "showLeadingDates", showing, !showing, false);
+        TestUtils.assertPropertyChangeEvent(report, "showingLeadingDays", showing, !showing);
     }
 
     /**
@@ -221,10 +217,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
         monthView.addPropertyChangeListener(report);
         boolean showing = monthView.isShowingTrailingDays();
         monthView.setShowingTrailingDays(!showing);
-        TestUtils.assertPropertyChangeEvent(report, "showingTrailingDays", showing, !showing, false);
-        // JW: fire the old as well until the method is removed
-        TestUtils.assertPropertyChangeEvent(report, "showTrailingDates", showing, !showing, false);
-        
+        TestUtils.assertPropertyChangeEvent(report, "showingTrailingDays", showing, !showing);
     }
 
     /**
@@ -778,9 +771,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
         monthView.setToday(calendar.getTime());
         CalendarUtils.startOfDay(calendar);
         TestUtils.assertPropertyChangeEvent(report, "today", 
-                today, calendar.getTime(), false);
-        TestUtils.assertPropertyChangeEvent(report, "todayInMillis", 
-                today.getTime(), calendar.getTimeInMillis(), false);
+                today, calendar.getTime());
     }
 
     
@@ -824,7 +815,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
     /**
      * Issue #711-swingx: remove fake property change notification.
      * 
-     * Here: test that ensureVisibleDate with millis fires once only.
+     * Here: test that ensureVisibleDate fires once only.
      */
     public void testEnsureVisibleDateNofication() {
         JXMonthView monthView = new JXMonthView();

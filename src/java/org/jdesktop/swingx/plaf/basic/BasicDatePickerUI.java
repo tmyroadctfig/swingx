@@ -1281,7 +1281,7 @@ public class BasicDatePickerUI extends DatePickerUI {
                 updateFromSelectionModelChanged((DateSelectionModel) e.getOldValue());
             } else if ("timeZone".equals(e.getPropertyName())) {
                 updateTimeZone((TimeZone) e.getOldValue());
-            } else if ("todayInMillis".equals(e.getPropertyName())) {
+            } else if ("today".equals(e.getPropertyName())) {
                 updateLinkDate();
             }
         }

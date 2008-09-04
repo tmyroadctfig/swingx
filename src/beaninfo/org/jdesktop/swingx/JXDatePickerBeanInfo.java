@@ -37,7 +37,7 @@ public class JXDatePickerBeanInfo extends BeanInfoSupport {
     protected void initialize() {
         BeanDescriptor bd = getBeanDescriptor();
         bd.setValue("isContainer", Boolean.FALSE);
-        setPreferred(true, "date", "dateInMillis", "formats");
+        setPreferred(true, "date", "formats");
         setPreferred(false, "background", "border", "foreground", "toolTipText");
     }
 }

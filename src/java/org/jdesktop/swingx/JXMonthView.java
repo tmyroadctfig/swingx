@@ -124,11 +124,6 @@ import org.jdesktop.swingx.util.Contract;
  * (that is, normalize all to the start of the day, which means zeroing all time
  * fields).<p>
  * 
- * NOTE: all methods taking/returning millis are deprecated (or will be as soon as they
- * have equivalents taking/returning Date) and typically less-maintained then the Date methods.
- * We highlighly recommend to not use them, if there's an alternative - in SwingX, all
- * deprecated API will be removed before final!
- *  
  * @author Joshua Outwater
  * @author Jeanette Winzenburg
  * @version  $Revision$
@@ -391,6 +386,7 @@ public class JXMonthView extends JComponent {
      * @return The <code>TimeZone</code> used by the <code>JXMonthView</code>.
      */
     public TimeZone getTimeZone() {
+        // PENDING JW: looks fishy (left-over?) .. why not ask the model?
         return cal.getTimeZone();
     }
 
@@ -711,10 +707,6 @@ public class JXMonthView extends JComponent {
         Date oldToday = getToday();
         // PENDING JW: do we really want the start of today? 
         this.today = startOfDay(date);
-        // PENDING JW: need notification for millis property until we
-        // remove it!
-        firePropertyChange("todayInMillis", 
-                oldToday != null ? oldToday.getTime() : 0, getToday().getTime());
         firePropertyChange("today", oldToday, getToday());
     }
 
@@ -1022,16 +1014,16 @@ public class JXMonthView extends JComponent {
         repaint();
     }
 
-//--------------------- flagged dates
+    // --------------------- flagged dates
     /**
-     * Identifies whether or not the date passed is a flagged date.  <b>All dates are modified to remove their hour of
-     * day, minute, second, and millisecond before being added to the selection model</b>
-     *
-     * @param date date which to test for flagged status 
+     * Identifies whether or not the date passed is a flagged date. 
+     * 
+     * @param date date which to test for flagged status
      * @return true if the date is flagged, false otherwise
      */
     public boolean isFlaggedDate(Date date) {
-        if (date == null) return false;
+        if (date == null)
+            return false;
         return flaggedDates.isSelected(date);
     }
     
@@ -1137,8 +1129,6 @@ public class JXMonthView extends JComponent {
 
         leadingDays = value;
         firePropertyChange("showingLeadingDays", !leadingDays, leadingDays);
-        // JW: fire the old event until the deprecated method is removed
-        firePropertyChange("showLeadingDates", !leadingDays, leadingDays);
     }
 
     /**
@@ -1162,8 +1152,6 @@ public class JXMonthView extends JComponent {
 
         trailingDays = value;
         firePropertyChange("showingTrailingDays", !trailingDays, trailingDays);
-        // JW: fire the old event until the deprecated method is removed
-        firePropertyChange("showTrailingDates", !trailingDays, trailingDays);
     }
 
     /**
@@ -1763,6 +1751,9 @@ public class JXMonthView extends JComponent {
 
 //--- deprecated code - NOTE: these methods will be removed soon! 
 
+    /**
+     * @deprecated - this is kept as a reminder only, <b>don't use</b>!
+     */
      @Deprecated
     protected void cleanupWeekSelectionDates(Date startDate, Date endDate) {
         int count = 1;

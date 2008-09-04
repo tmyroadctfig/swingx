@@ -47,6 +47,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Map;
 import java.util.SortedSet;
 import java.util.TimeZone;
 import java.util.logging.Logger;
@@ -1016,8 +1017,17 @@ public class BasicMonthViewUI extends MonthViewUI {
         super.paint(g, c);
 
         Object oldAAValue = null;
+        Map map = null;
         Graphics2D g2 = (g instanceof Graphics2D) ? (Graphics2D)g : null;
         if (g2 != null && monthView.isAntialiased()) {
+            // PENDING JW: issue 750-swingx - use default OS antialiased property 
+            // this is 1.6 only, so keep the old mechanism for now - until we know
+            // how exactly to handle the antialiased correctly
+//            Toolkit tk = Toolkit.getDefaultToolkit ();
+//            map = (Map) (tk.getDesktopProperty ("awt.font.desktophints"));
+//            if (map != null) {
+//                g2.addRenderingHints(map);
+//            }
             oldAAValue = g2.getRenderingHint(
                 RenderingHints.KEY_TEXT_ANTIALIASING);
             g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
@@ -1048,6 +1058,8 @@ public class BasicMonthViewUI extends MonthViewUI {
                 cal.add(Calendar.MONTH, 1);
             }
         }
+        
+        
 
         if (g2 != null && monthView.isAntialiased()) {
             g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
@@ -1071,9 +1083,6 @@ public class BasicMonthViewUI extends MonthViewUI {
      */
     @SuppressWarnings({"UnusedDeclaration"})
     protected void paintMonth(Graphics g, int x, int y, int width, int height, Calendar calendar) {
-        // PEINDING JW: remove usage of deprecated api
-        // use Date instead of millis
-
         // Paint month name background.
         paintMonthStringBackground(g, x, y,
                 width, fullMonthBoxHeight, calendar);
@@ -1511,7 +1520,7 @@ public class BasicMonthViewUI extends MonthViewUI {
      */
     protected void paintDayBackground(Graphics g, int x, int y, int width, int height,
                                       Calendar cal) {
-        Date date = cal.getTime(); //InMillis();
+        Date date = cal.getTime(); 
         
         if (monthView.isSelected(date)) {
             g.setColor(monthView.getSelectedBackground());

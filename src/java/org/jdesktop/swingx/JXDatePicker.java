@@ -147,6 +147,8 @@ public class JXDatePicker extends JComponent {
 
     public static final String EDITOR = "editor";
     public static final String MONTH_VIEW = "monthView";
+    /** @deprecated no longer used - all "millis" are replaced by date */ 
+    @Deprecated
     public static final String DATE_IN_MILLIS = "dateInMillis";
     public static final String LINK_PANEL = "linkPanel";
 
@@ -558,7 +560,7 @@ public class JXDatePicker extends JComponent {
      * a new one with the requested date and format.
      * 
      * 
-     * @param linkDay         Date in milliseconds
+     * @param linkDay     the Date to set on the LinkPanel 
      * @param linkFormatString String used to format the link
      * @see java.text.MessageFormat
      */

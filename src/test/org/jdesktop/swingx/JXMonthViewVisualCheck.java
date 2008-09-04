@@ -282,7 +282,7 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
      */
     public void interactiveUpdateUIMonthView() {
 //        calendar.set(1955, 10, 9);
-        final JXMonthView monthView = new JXMonthView(); //calendar.getTimeInMillis());
+        final JXMonthView monthView = new JXMonthView(); 
         monthView.setTraversable(true);
         final JXFrame frame = showInFrame(monthView, "MonthView update ui - visible month kept");
         Action action = new AbstractActionExt("toggleUI") {

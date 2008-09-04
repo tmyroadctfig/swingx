@@ -38,7 +38,6 @@ import java.util.Map;
 import java.util.TimeZone;
 import java.util.logging.Logger;
 
-import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.JComboBox;

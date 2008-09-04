@@ -11,6 +11,7 @@ import java.awt.Color;
 import javax.swing.LookAndFeel;
 import javax.swing.UIDefaults;
 import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.plaf.BorderUIResource;
@@ -19,14 +20,28 @@ import javax.swing.plaf.basic.BasicLookAndFeel;
 
 import junit.framework.TestCase;
 
+import org.jdesktop.swingx.JXMonthView;
 import org.jdesktop.swingx.plaf.basic.BasicLookAndFeelAddons;
 
 public class LookAndFeelAddonsTest extends TestCase {
 
-  public LookAndFeelAddonsTest(String arg0) {
-    super(arg0);
-  }
 
+   /**
+     * Issue #784-swingx: Frequent NPE in getUI of (new) SwingX components.
+     * 
+     * Here: test reload if same instance of LAF is set (example from
+     * bug report)
+     * @throws UnsupportedLookAndFeelException 
+     */
+    public void testReloadAddons() throws UnsupportedLookAndFeelException {
+        // load the addon for a new component
+        new JXMonthView();
+        // reset laf
+         UIManager.setLookAndFeel(UIManager.getLookAndFeel());
+         // check that the addon is still available
+        new JXMonthView();
+
+    }
   /**
    * A look and feel can't override SwingX defaults
    */

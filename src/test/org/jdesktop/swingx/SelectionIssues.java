@@ -113,8 +113,6 @@ public class SelectionIssues extends InteractiveTestCase {
                 // shouldn't effect scrolling state
                 us.revalidate();
                 LOG.info("firstDisplayed: " + us.getFirstDisplayedDay());
-                // client code must trigger 
-//                us.ensureDateVisible(today.getTimeInMillis());
             }
             
         };
