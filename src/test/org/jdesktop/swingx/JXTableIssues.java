@@ -66,6 +66,7 @@ import org.jdesktop.swingx.action.BoundAction;
 import org.jdesktop.swingx.decorator.AbstractHighlighter;
 import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
+import org.jdesktop.swingx.decorator.Filter;
 import org.jdesktop.swingx.decorator.FilterPipeline;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.PatternFilter;
@@ -99,13 +100,46 @@ public class JXTableIssues extends InteractiveTestCase {
 //            test.runInteractiveTests("interactive.*Scroll.*");
          //   test.runInteractiveTests("interactive.*Render.*");
 //            test.runInteractiveTests("interactive.*Sort.*");
-            test.runInteractiveTests("interactive.*ColumnWidth.*");
+            test.runInteractiveTests("interactive.*Repaint.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
         } 
     }
     
+    /**
+     * Issue #??-swingx: problems indy rowheight and filters.
+     * 
+     * ArrayIndexOutOfBounds on insert. 
+     *
+     */
+    public void testIndividualRowHeightAndFilterInsert() {
+        JXTable table = new JXTable(createAscendingModel(0, 50));
+        table.setRowHeightEnabled(true);
+        table.setRowHeight(1, 100);
+        final FilterPipeline filterPipeline = new FilterPipeline(new PatternFilter("[123]",0,0));
+        table.setFilters(filterPipeline);
+        // sanity
+        assertEquals(1, table.getValueAt(0, 0));
+        ((DefaultTableModel) table.getModel()).addRow(new Object[] {1, null, null, null});
+    }
+
+    /**
+     * Issue #??-swingx: problems indy rowheight and filters.
+     * 
+     * ArrayIndexOutOfBounds on remove. 
+     *
+     */
+    public void testIndividualRowHeightAndFilterRemove() {
+        JXTable table = new JXTable(createAscendingModel(0, 50));
+        table.setRowHeightEnabled(true);
+        table.setRowHeight(1, 100);
+        final FilterPipeline filterPipeline = new FilterPipeline(new PatternFilter("[123]",0,0));
+        table.setFilters(filterPipeline);
+        // sanity
+        assertEquals(1, table.getValueAt(0, 0));
+        ((DefaultTableModel) table.getModel()).removeRow(table.getModel().getRowCount() - 1);
+    }
 
     /**
      * Quick check for a forum report:
@@ -174,87 +208,6 @@ public class JXTableIssues extends InteractiveTestCase {
         assertEquals("sanity: new pipeline set", other, table.getFilters());
         TestUtils.assertPropertyChangeEvent(report, "filters", pipeline, other, false);
     }
-    /**
-     * Issue #610-swingx: Cancel editing via Escape doesn't fire editingCanceled.
-     * 
-     * Reported against ComboBoxCellEditor in the autoComplete package, but actually
-     * a JTable _never_ fires a editingCanceled for any editor. Reason is that the
-     * cancel Action registered in BasisTableUI incorrectly calls table.removeEditor
-     * instead of getCelleditor.cancelEditing.
-     * 
-     * Quick hack around that: JXTable registers its own cancel action.
-     * 
-     * Still open: esc when popup is open will only close the popup, not cancel the
-     * edit (which requires a second esc). 
-     *  
-     */
-    public void interactiveEditingCanceledOnEscape() {
-        final JTextField field = new JTextField();
-        JXTable xTable = new JXTable(10, 3);
-        CellEditor editor = xTable.getDefaultEditor(Object.class);
-        CellEditorListener l =  new CellEditorListener() {
-
-            public void editingCanceled(ChangeEvent e) {
-                field.setText("canceled");
-                
-            }
-
-            public void editingStopped(ChangeEvent e) {
-                field.setText("stopped");
-                
-            }};
-        editor.addCellEditorListener(l);
-        JTable table = new JTable(xTable.getModel());
-        CellEditor coreEditor = table.getDefaultEditor(Object.class);
-        coreEditor.addCellEditorListener(l);
-        JXFrame frame = wrapWithScrollingInFrame(xTable, table, "#610-swingx: escape doesn't fire editing canceled");
-        frame.add(field, BorderLayout.SOUTH);
-        frame.setVisible(true);
-    }
-    /**
-     * row index conversion goes nuts if not re-sorted on update.
-     * Looks like a repaint problem.
-     */
-    public void interactiveSortOnUpdate() {
-        JXTable xtable = new JXTable(new AncientSwingTeam()) {
-
-            @Override
-            protected boolean shouldSortOnChange(TableModelEvent e) {
-                if (isUpdate(e)) {
-                    return false;
-                }
-                return super.shouldSortOnChange(e);
-            }
-            
-        };
-        JXTable table = new JXTable(xtable.getModel()) {
-
-            @Override
-            protected boolean shouldSortOnChange(TableModelEvent e) {
-                if (isUpdate(e)) {
-                    repaint(e);
-                    return false;
-                }
-                return super.shouldSortOnChange(e);
-            }
-
-            /**
-             * Hack to repaint at the correct row in terms of 
-             * view coordinates.
-             * @param e
-             */
-            private void repaint(TableModelEvent e) {
-                int firstRow = convertRowIndexToView(e.getFirstRow());
-                Rectangle rowRect = getCellRect(firstRow, 0, true);
-                rowRect.width = getWidth();
-                repaint(rowRect);
-            }
-            
-        };
-        JXFrame frame = wrapWithScrollingInFrame(xtable, table, "edit and shouldSortOnChange false");
-        frame.setVisible(true);
-    }
-    
 
     /**
      * Issue #847-swingx: JXTable respect custom corner if columnControl not visible
@@ -563,7 +516,161 @@ public class JXTableIssues extends InteractiveTestCase {
     }
 
 //----------------- interactive
+
+    /**
+     * Unconditional repaint on cell update (through the default
+     * identify filter). 
+     */
+    public void interactiveRepaintOnUpdateSingleCell() {
+        JXTable table =  new JXTable(10, 5);
+        // highlight complete row if first cell starts with a
+        HighlightPredicate predicate = new HighlightPredicate() {
+
+            public boolean isHighlighted(Component renderer,
+                    ComponentAdapter adapter) {
+                return adapter.getString(0).startsWith("a");
+            }
+            
+        };
+        ColorHighlighter highlighter = new ColorHighlighter(predicate, Color.MAGENTA, null, Color.MAGENTA, null);
+        table.addHighlighter(highlighter);
+        JXTable other = new JXTable(table.getModel());
+        other.setFilters(new FilterPipeline(new IdentityFilter()));
+        other.addHighlighter(highlighter);
+        JXFrame frame = wrapWithScrollingInFrame(table, other, "repaint on update in first");
+        addMessage(frame, "edit first cell in left table (start with/out a)");
+        show(frame);
+    }
     
+    public class IdentityFilter extends Filter {
+        
+        
+        /**
+         * PENDING JW: fires always, even without sorter ..
+         * Could do better - but will break behaviour of apps which relied on
+         * the (buggy) side-effect of repainting on each change.
+         * 
+         */
+        @Override
+        public void refresh() {
+            if ((pipeline == null) ||
+              (pipeline.getSortController().getSortKeys().size() == 0)) return;
+            super.refresh();
+        }
+
+        @Override
+        protected void init() {
+
+        }
+
+        @Override
+        protected void reset() {
+
+        }
+
+        @Override
+        protected void filter() {
+
+        }
+
+        @Override
+        public int getSize() {
+            return this.getInputSize();
+        }
+
+        @Override
+        protected int mapTowardModel(int row) {
+            return row;
+        }
+
+        @Override
+        protected int mapTowardView(int row) {
+            return row;
+        }
+    }
+
+    /**
+     * Issue #610-swingx: Cancel editing via Escape doesn't fire editingCanceled.
+     * 
+     * Reported against ComboBoxCellEditor in the autoComplete package, but actually
+     * a JTable _never_ fires a editingCanceled for any editor. Reason is that the
+     * cancel Action registered in BasisTableUI incorrectly calls table.removeEditor
+     * instead of getCelleditor.cancelEditing.
+     * 
+     * Quick hack around that: JXTable registers its own cancel action.
+     * 
+     * Still open: esc when popup is open will only close the popup, not cancel the
+     * edit (which requires a second esc). 
+     *  
+     */
+    public void interactiveEditingCanceledOnEscape() {
+        final JTextField field = new JTextField();
+        JXTable xTable = new JXTable(10, 3);
+        CellEditor editor = xTable.getDefaultEditor(Object.class);
+        CellEditorListener l =  new CellEditorListener() {
+
+            public void editingCanceled(ChangeEvent e) {
+                field.setText("canceled");
+                
+            }
+
+            public void editingStopped(ChangeEvent e) {
+                field.setText("stopped");
+                
+            }};
+        editor.addCellEditorListener(l);
+        JTable table = new JTable(xTable.getModel());
+        CellEditor coreEditor = table.getDefaultEditor(Object.class);
+        coreEditor.addCellEditorListener(l);
+        JXFrame frame = wrapWithScrollingInFrame(xTable, table, "#610-swingx: escape doesn't fire editing canceled");
+        frame.add(field, BorderLayout.SOUTH);
+        frame.setVisible(true);
+    }
+    /**
+     * row index conversion goes nuts if not re-sorted on update.
+     * Looks like a repaint problem.
+     */
+    public void interactiveSortOnUpdate() {
+        JXTable xtable = new JXTable(new AncientSwingTeam()) {
+
+            @Override
+            protected boolean shouldSortOnChange(TableModelEvent e) {
+                if (isUpdate(e)) {
+                    return false;
+                }
+                return super.shouldSortOnChange(e);
+            }
+            
+        };
+        JXTable table = new JXTable(xtable.getModel()) {
+
+            @Override
+            protected boolean shouldSortOnChange(TableModelEvent e) {
+                if (isUpdate(e)) {
+                    repaint(e);
+                    return false;
+                }
+                return super.shouldSortOnChange(e);
+            }
+
+            /**
+             * Hack to repaint at the correct row in terms of 
+             * view coordinates.
+             * @param e
+             */
+            private void repaint(TableModelEvent e) {
+                int firstRow = convertRowIndexToView(e.getFirstRow());
+                Rectangle rowRect = getCellRect(firstRow, 0, true);
+                rowRect.width = getWidth();
+                repaint(rowRect);
+            }
+            
+        };
+        JXFrame frame = wrapWithScrollingInFrame(xtable, table, "edit and shouldSortOnChange false");
+        frame.setVisible(true);
+    }
+    
+
     public void interactiveIndividualRowHeightAndFilter() {
         final JXTable table = new JXTable(createAscendingModel(0, 50));
         table.setRowHeightEnabled(true);
