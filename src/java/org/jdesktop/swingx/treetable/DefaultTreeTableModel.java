@@ -72,17 +72,20 @@ public class DefaultTreeTableModel extends AbstractTreeTableModel {
     }
 
     /**
-     * Creates a new {@code DefaultTreeTableModel} with the specified
-     * {@code root}. {@code asksAllowsChildren} is disabled and {@code isLeaf}
-     * will provide the same semantics as {@code AbstractTreeTableModel.isLeaf}.
+     * Creates a new {@code DefaultTreeTableModel} with the specified {@code
+     * root}. {@code asksAllowsChildren} is disabled and {@code isLeaf} will
+     * provide the same semantics as {@code AbstractTreeTableModel.isLeaf}.
      * 
      * @param root
      *            the root node of the tree
+     * @param columnNames
+     *            the names of the columns used by this model
+     * @see #setColumnIdentifiers(List)
      */
     public DefaultTreeTableModel(TreeTableNode root, List<?> columnNames) {
         super(root);
+        
         setColumnIdentifiers(columnNames);
-
     }
 
     private boolean isValidTreeTableNode(Object node) {
@@ -138,7 +141,7 @@ public class DefaultTreeTableModel extends AbstractTreeTableModel {
 
         return autoCalculatedIndentifiers;
     }
-
+    
     /**
      * Returns the root of the tree. Returns {@code null} only if the tree has
      * no nodes.
@@ -395,5 +398,30 @@ public class DefaultTreeTableModel extends AbstractTreeTableModel {
 
         modelSupport.fireChildRemoved(new TreePath(getPathToRoot(parent)),
                 index, node);
+    }
+
+    /**
+     * Called when value for the item identified by path has been changed. If
+     * newValue signifies a truly new value the model should post a {@code
+     * treeNodesChanged} event.
+     * <p>
+     * This changes the object backing the {@code TreeTableNode} described by
+     * the path. This change does not alter a nodes children in any way. If you
+     * need to change structure of the node, use one of the provided mutator
+     * methods.
+     * 
+     * @param path
+     *            path to the node that has changed
+     * @param newValue
+     *            the new value
+     * @throws ClassCastException
+     *             if {@code path.getLastPathComponent()} is not a {@code
+     *             TreeTableNode}
+     */
+    public void valueForPathChanged(TreePath path, Object newValue) {
+        TreeTableNode node = (TreeTableNode) path.getLastPathComponent();
+        node.setUserObject(newValue);
+        
+        modelSupport.firePathChanged(path);
     }
 }
