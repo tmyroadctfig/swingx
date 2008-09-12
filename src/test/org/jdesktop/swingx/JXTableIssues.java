@@ -96,51 +96,17 @@ public class JXTableIssues extends InteractiveTestCase {
         JXTableIssues test = new JXTableIssues();
         setSystemLF(true);
         try {
-//          test.runInteractiveTests();
+          test.runInteractiveTests();
 //            test.runInteractiveTests("interactive.*Scroll.*");
          //   test.runInteractiveTests("interactive.*Render.*");
 //            test.runInteractiveTests("interactive.*Sort.*");
-            test.runInteractiveTests("interactive.*Repaint.*");
+//            test.runInteractiveTests("interactive.*Repaint.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
         } 
     }
     
-    /**
-     * Issue #??-swingx: problems indy rowheight and filters.
-     * 
-     * ArrayIndexOutOfBounds on insert. 
-     *
-     */
-    public void testIndividualRowHeightAndFilterInsert() {
-        JXTable table = new JXTable(createAscendingModel(0, 50));
-        table.setRowHeightEnabled(true);
-        table.setRowHeight(1, 100);
-        final FilterPipeline filterPipeline = new FilterPipeline(new PatternFilter("[123]",0,0));
-        table.setFilters(filterPipeline);
-        // sanity
-        assertEquals(1, table.getValueAt(0, 0));
-        ((DefaultTableModel) table.getModel()).addRow(new Object[] {1, null, null, null});
-    }
-
-    /**
-     * Issue #??-swingx: problems indy rowheight and filters.
-     * 
-     * ArrayIndexOutOfBounds on remove. 
-     *
-     */
-    public void testIndividualRowHeightAndFilterRemove() {
-        JXTable table = new JXTable(createAscendingModel(0, 50));
-        table.setRowHeightEnabled(true);
-        table.setRowHeight(1, 100);
-        final FilterPipeline filterPipeline = new FilterPipeline(new PatternFilter("[123]",0,0));
-        table.setFilters(filterPipeline);
-        // sanity
-        assertEquals(1, table.getValueAt(0, 0));
-        ((DefaultTableModel) table.getModel()).removeRow(table.getModel().getRowCount() - 1);
-    }
-
     /**
      * Quick check for a forum report:
      * getValueAt called on init for each cell (even the invisible).

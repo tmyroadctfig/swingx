@@ -128,6 +128,42 @@ public class JXTableUnitTest extends InteractiveTestCase {
         super.tearDown();
     }
 
+    
+    /**
+     * Issue #924-swingx: problems indy rowheight and filters.
+     * 
+     * ArrayIndexOutOfBounds on insert. 
+     *
+     */
+    public void testIndividualRowHeightAndFilterInsert() {
+        JXTable table = new JXTable(createAscendingModel(0, 50));
+        table.setRowHeightEnabled(true);
+        table.setRowHeight(1, 100);
+        final FilterPipeline filterPipeline = new FilterPipeline(new PatternFilter("[123]",0,0));
+        table.setFilters(filterPipeline);
+        // sanity
+        assertEquals(1, table.getValueAt(0, 0));
+        ((DefaultTableModel) table.getModel()).addRow(new Object[] {1, null, null, null});
+    }
+
+    /**
+     * Issue #924-swingx: problems indy rowheight and filters.
+     * 
+     * ArrayIndexOutOfBounds on remove. 
+     *
+     */
+    public void testIndividualRowHeightAndFilterRemove() {
+        JXTable table = new JXTable(createAscendingModel(0, 50));
+        table.setRowHeightEnabled(true);
+        table.setRowHeight(1, 100);
+        final FilterPipeline filterPipeline = new FilterPipeline(new PatternFilter("[123]",0,0));
+        table.setFilters(filterPipeline);
+        // sanity
+        assertEquals(1, table.getValueAt(0, 0));
+        ((DefaultTableModel) table.getModel()).removeRow(table.getModel().getRowCount() - 1);
+    }
+
+
     /**
      * Issue #550-swingx: xtable must not reset columns' pref/size on 
      * structureChanged if autocreate is false.

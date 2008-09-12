@@ -1483,9 +1483,8 @@ public class JXTable extends JTable
         return super.getAutoCreateColumnsFromModel();
     }
 
-    /** 
-     * additionally updates filtered state.
-     * {@inheritDoc}
+    /**
+     * additionally updates filtered state. {@inheritDoc}
      */
     @Override
     public void tableChanged(TableModelEvent e) {
@@ -1502,13 +1501,17 @@ public class JXTable extends JTable
         boolean wasEnabled = getSelectionMapper().isEnabled();
         getSelectionMapper().setEnabled(false);
         try {
-        super.tableChanged(e);
-        updateSelectionAndRowModel(e);
+            SizeSequence rowModel = nullSuperRowModel(e);
+            super.tableChanged(e);
+            if (rowModel != null) {
+                retoreSuperRowModel(rowModel);
+            }
+            updateSelectionAndRowModel(e);
         } finally {
             getSelectionMapper().setEnabled(wasEnabled);
         }
         if (shouldSortOnChange(e)) {
-             use(filters);
+            use(filters);
         }
         if (isStructureChanged(e) && getAutoCreateColumnsFromModel()) {
             initializeColumnWidths();
@@ -1517,6 +1520,48 @@ public class JXTable extends JTable
     }
 
     
+    /**
+     * Sets super's rowModel to the given SizeSequence if not null,
+     * does nothing if null.
+     * 
+     * Hack around #924-swingx.
+     * @param rowModel the SizeSequence to set super's rowModel to.
+     */
+    private void retoreSuperRowModel(SizeSequence rowModel) {
+        if (rowModel == null) return;
+        setSuperRowModel(rowModel);
+    }
+
+    /**
+     * Nulls super's rowModel and returns the old one if rowHeightEnabled and
+     * the event is either a remove or a insert. Does nothing and returns null
+     * otherwise.
+     * 
+     * Hack around #924-swingx.
+     * 
+     * @param e the TableModelEvent used to decide whether a nulling is needed.
+     * @return super's old SizeSequence or null 
+     */
+    private SizeSequence nullSuperRowModel(TableModelEvent e) {
+        if (!isRowHeightEnabled())
+            return null;
+        if (!isInsertRemove(e))
+            return null;
+        SizeSequence result = getSuperRowModel();
+        setSuperRowModel(null);
+        return result;
+    }
+
+    /**
+     * @param e
+     * @return
+     */
+    private boolean isInsertRemove(TableModelEvent e) {
+        if (isStructureChanged(e)) return false;
+        if ((e.getType() == TableModelEvent.INSERT) || (e.getType() == TableModelEvent.DELETE)) return true;
+        return false;
+    }
+
     /**
      * Returns a boolean to indicate whether the table should be
      * resorted after receiving the given event. This implementation 
@@ -4347,6 +4392,32 @@ public class JXTable extends JTable
         return null;
     }
 
+    /**
+     * Sets super's private <code>rowModel</code> which holds the
+     * individual rowHeights. This method will do nothing if the
+     * access failed, f.i. in sandbox restricted applications.
+     * 
+     * @param rowModel the SizeSequence to set super's rowModel to.
+     */
+    private void setSuperRowModel(SizeSequence rowModel) {
+        try {
+            Field field = getRowModelField();
+            if (field != null) {
+                field.set(this, rowModel);
+            }
+        } catch (SecurityException e) {
+            LOG.fine("cannot use reflection "
+                    + " - expected behaviour in sandbox");
+        } catch (IllegalArgumentException e) {
+            LOG
+                    .fine("problem while accessing super's private field - private api changed?");
+        } catch (IllegalAccessException e) {
+            LOG
+                    .fine("cannot access private field "
+                            + " - expected behaviour in sandbox. "
+                            + "Could be program logic running wild in unrestricted contexts");
+        }
+    }
     /**
      * Returns super's private field which holds the individual rowHeights. This
      * method will return <code>null</code> if the access failed, f.i. in
