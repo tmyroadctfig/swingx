@@ -104,6 +104,7 @@ ${build.branch} ${RELEASE_DSTAMP_LONG} ${projectname}</concat>
           <zipfileset dir="${dist.javadoc.dir}" prefix="${projectname}-${RELEASE_DSTAMP}-bin/docs/javadoc"/>
           <zipfileset dir="lib" includes="**/*.jar" excludes="**/build-only/**" prefix="${projectname}-${RELEASE_DSTAMP}-bin/lib"/>
           <zipfileset file="${dist.jar}" fullpath="${projectname}-${RELEASE_DSTAMP}-bin/${projectname}-${RELEASE_DSTAMP}.jar"/>
+          <zipfileset file="${dist.beaninfo.jar}" fullpath="${projectname}-${RELEASE_DSTAMP}-bin/${projectname}-beaninfo-${RELEASE_DSTAMP}.jar"/>
         </zip>
     </target>
     <target name="-post-bin-bundle" />
@@ -141,7 +142,7 @@ ${build.branch} ${RELEASE_DSTAMP_LONG} ${projectname}</concat>
     -->
 
     <target name="-pre-coverage" />
-    <target name="-do-coverage">
+    <target name="-do-coverage" unless="skip.coverage">
         <delete dir="${build.dir}/emma" />
         <mkdir dir="${build.dir}/emma" />
         <taskdef name="emma" classname="com.vladium.emma.emmaTask" classpath="${emma.dir}/emma.jar:${emma.dir}/emma_ant.jar" />
@@ -189,7 +190,7 @@ ${build.branch} ${RELEASE_DSTAMP_LONG} ${projectname}</concat>
     <target name="-post-coverage" />
 
     <!-- this -->
-    <target name="coverage" depends="init,jar,compile-test,-pre-test-run,-pre-coverage,-do-coverage,-post-coverage,test-report" if="emma.dir">
+    <target name="coverage" depends="init,jar,compile-test,-pre-test-run,-pre-coverage,-do-coverage,-post-coverage,test-report" if="emma.dir" >
 <!--
         <fail if="tests.failed">Some tests failed; see details above.</fail>
 -->
@@ -213,7 +214,8 @@ ${build.branch} ${RELEASE_DSTAMP_LONG} ${projectname}</concat>
         </echo>
         <mkdir dir="${dist.javadoc.dir}"/>
         <javadoc destdir="${dist.javadoc.dir}"
-                 source="${javac.source}"
+                 packagenames="org.jdesktop.*"
+                 defaultexcludes="yes"
                  notree="${javadoc.notree}" use="${javadoc.use}"
                  nonavbar="${javadoc.nonavbar}" noindex="${javadoc.noindex}"
                  splitindex="${javadoc.splitindex}" author="${javadoc.author}"
@@ -221,17 +223,17 @@ ${build.branch} ${RELEASE_DSTAMP_LONG} ${projectname}</concat>
                  windowtitle="${javadoc.windowtitle}"
                  private="${javadoc.private}"
                  additionalparam="${javadoc.additionalparam}"
-                 failonerror="true" useexternalfile="false"
+                 failonerror="false" useexternalfile="false"
                  verbose="${javadoc.verbose}"
                  maxmemory="1024M"
                  sourcepath="${javadoc.srcpath}">
+            <excludepackage name="java.*"/>
+            <excludepackage name="javax.*"/>
             <link offline="true" href="${javadoc.core.linkexternal}"
                   packagelistLoc="${javadoc.core.packagelist}"/>
             <classpath>
                 <path path="${run.classpath}"/>
             </classpath>
-            <packageset dir="${src.beaninfo.dir}" includes="*/**"/>
-            <packageset dir="${java.dir}" includes="*/**"/>
             <taglet name="org.jdesktop.swinglabs.javadoc.DemoTaglet">
                 <path path="${demo.taglet.jar}" />
             </taglet>
