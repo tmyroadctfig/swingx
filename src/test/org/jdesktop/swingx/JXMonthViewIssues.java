@@ -21,7 +21,6 @@
  */
 package org.jdesktop.swingx;
 
-import java.awt.BorderLayout;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Toolkit;
@@ -43,7 +42,6 @@ import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JLabel;
 
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.calendar.CalendarUtils;
@@ -87,52 +85,6 @@ public class JXMonthViewIssues extends InteractiveTestCase {
     // the calendar to use, its date is initialized with the today-field in setUpCalendar
     protected Calendar calendar;
 
-    /**
-     * Issue #926-swingx: JXMonthView not repainted when unselectable dates 
-     * changed?
-     * 
-     * to reproduce: 
-     * - choose new unselectable with second picker
-     * - no visual change
-     * - choose new flagged date with first picker
-     * - unselectable updated
-     *  
-     */
-    public void interactiveMonthViewRepaintOnUnselectable() {
-        final JXMonthView monthView = new JXMonthView();
-        // first of month as unselectable
-        monthView.setUnselectableDates(monthView.getCalendar().getTime());
-        final JXFrame frame = wrapInFrame(monthView, "Set new Unselectable date with second picker");
-        addComponentOrientationToggle(frame);
-        final JXDatePicker picker = new JXDatePicker();
-        picker.addActionListener(new ActionListener() {
-
-            public void actionPerformed(ActionEvent e) {
-                if (e.getActionCommand().equals(JXDatePicker.CANCEL_KEY)) return;
-                if (picker.getDate() == null) return;
-                monthView.setFlaggedDates(picker.getDate());
-            }
-            
-        });
-        final JXDatePicker unselectable = new JXDatePicker();
-        picker.addActionListener(new ActionListener() {
-
-            public void actionPerformed(ActionEvent e) {
-                if (e.getActionCommand().equals(JXDatePicker.CANCEL_KEY)) return;
-                if (unselectable.getDate() == null) return;
-                monthView.setUnselectableDates(unselectable.getDate());
-            }
-            
-        });
-        JComponent pickers = Box.createHorizontalBox();
-        pickers.add(new JLabel("Flagged: "));
-        pickers.add(picker);
-        pickers.add(new JLabel("Unselectable: "));
-        pickers.add(unselectable);
-        frame.add(pickers, BorderLayout.SOUTH);
-        show(frame);
-        
-    }
     
     public void interactiveMonthViewAntialised() {
         final JXMonthView monthView = new JXMonthView();

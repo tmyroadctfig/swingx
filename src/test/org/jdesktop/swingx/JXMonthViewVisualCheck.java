@@ -21,6 +21,7 @@
  */
 package org.jdesktop.swingx;
 
+import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -37,6 +38,7 @@ import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 
@@ -63,14 +65,62 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
       setSystemLF(true);
       JXMonthViewVisualCheck  test = new JXMonthViewVisualCheck();
       try {
-//          test.runInteractiveTests();
-        test.runInteractiveTests(".*TimeZone.*");
+          test.runInteractiveTests();
+//        test.runInteractiveTests(".*TimeZone.*");
 //        test.runInteractiveTests("interactive.*Toggle.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
       }
   }
+
+    /**
+     * Issue #926-swingx: JXMonthView not repainted when unselectable dates 
+     * changed?
+     * 
+     * to reproduce: 
+     * - choose new unselectable with second picker
+     * - no visual change
+     * - choose new flagged date with first picker
+     * - unselectable updated
+     *  
+     *  Dooooh ... invalid: user error (c&p)
+     */
+    public void interactiveMonthViewRepaintOnUnselectable() {
+        final JXMonthView monthView = new JXMonthView();
+        // first of month as unselectable
+        monthView.setUnselectableDates(monthView.getCalendar().getTime());
+        final JXFrame frame = wrapInFrame(monthView, "Set new Unselectable date with second picker");
+        addComponentOrientationToggle(frame);
+        final JXDatePicker picker = new JXDatePicker();
+        picker.addActionListener(new ActionListener() {
+
+            public void actionPerformed(ActionEvent e) {
+                if (e.getActionCommand().equals(JXDatePicker.CANCEL_KEY)) return;
+                if (picker.getDate() == null) return;
+                monthView.setFlaggedDates(picker.getDate());
+            }
+            
+        });
+        final JXDatePicker unselectable = new JXDatePicker();
+        unselectable.addActionListener(new ActionListener() {
+
+            public void actionPerformed(ActionEvent e) {
+                if (e.getActionCommand().equals(JXDatePicker.CANCEL_KEY)) return;
+                if (unselectable.getDate() == null) return;
+                monthView.setUnselectableDates(unselectable.getDate());
+            }
+            
+        });
+        JComponent pickers = Box.createHorizontalBox();
+        pickers.add(new JLabel("Flagged: "));
+        pickers.add(picker);
+        pickers.add(new JLabel("Unselectable: "));
+        pickers.add(unselectable);
+        frame.add(pickers, BorderLayout.SOUTH);
+        show(frame);
+        
+    }
 
     /**
      * Issue #786-swingx: IllegalStateException when paintDays of April 2008.
