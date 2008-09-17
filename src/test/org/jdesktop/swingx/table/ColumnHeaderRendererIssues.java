@@ -21,11 +21,9 @@
  */
 package org.jdesktop.swingx.table;
 
-import java.awt.ComponentOrientation;
 import java.awt.event.ActionEvent;
 import java.util.logging.Logger;
 
-import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
@@ -61,8 +59,8 @@ public class ColumnHeaderRendererIssues extends InteractiveTestCase {
         ColumnHeaderRendererIssues test = new ColumnHeaderRendererIssues();
         setSystemLF(true);
         try {
-//          test.runInteractiveTests();
-          test.runInteractiveTests("interactive.*LF.*");
+          test.runInteractiveTests();
+//          test.runInteractiveTests("interactive.*LF.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
@@ -241,31 +239,10 @@ public class ColumnHeaderRendererIssues extends InteractiveTestCase {
     }
 
     
-
-    /**
-     * Issue ??-swingx: sort icon in configured 
-     * shared renderer is duplicated.
-     *
-     */
-    public void interactiveHeaderRendererConfigureShared() {
-        JXTable table = new JXTable(10, 2);
-        ColumnHeaderRenderer renderer = new ColumnHeaderRenderer(table.getTableHeader());
-//        renderer.setHorizontalAlignment(JLabel.RIGHT);
-        table.getColumnExt(1).setHeaderRenderer(renderer);
-        showWithScrollingInFrame(table, "sortIcon in second column wrong");
-    }
-
     /**
      * Issue #??-jdnc: configure header/column to show icon.
      * 
-     * All:
-     * don't handle header values of icon type by default
-     * label properties not reset on each call (which produces
-     * problems with the shared ui-provided renderer) 
-     *  
-     * Mustang:
-     * duplicate sort icon (when using swingx sorting)
-     * custom icon overpaints sort icon (when using 1.6 sorting) 
+     * Icon as header value not used. (Showing resource location)
      */
     public void interactiveHeaderIcon() {
         final JXTable table = new JXTable();
@@ -277,12 +254,7 @@ public class ColumnHeaderRendererIssues extends InteractiveTestCase {
                 super.configureTableColumn(model, columnExt);
                 if (columnExt.getModelIndex() == 1) {
                     // default can't cope
-//                    columnExt.setHeaderValue(XTestUtils.loadDefaultIcon());
-//                    columnExt.setHeaderValue(null);
-                    // not working - column renderer doesn't reset shared renderers state!
-                    ColumnHeaderRenderer renderer = new ColumnHeaderRenderer(table.getTableHeader());
-                    renderer.setIcon(XTestUtils.loadDefaultIcon());
-                    columnExt.setHeaderRenderer(renderer);
+                    columnExt.setHeaderValue(XTestUtils.loadDefaultIcon());
                 }
             }
             
@@ -291,7 +263,7 @@ public class ColumnHeaderRendererIssues extends InteractiveTestCase {
         table.setModel(new DefaultTableModel(new String[]{"first", "second", "third"}, 10));
         JScrollPane pane = new JScrollPane(table);
        table.setColumnControlVisible(true);
-       final JXFrame frame = wrapInFrame(pane, "Icon on second header - SwingX sort icon");
+       final JXFrame frame = wrapInFrame(pane, "Icon as column header value (not mapped)");
        frame.setVisible(true);
 
     }
@@ -300,6 +272,8 @@ public class ColumnHeaderRendererIssues extends InteractiveTestCase {
     /**
      * Issue #??-jdnc: configure header/column to show icon.
      * 
+     * We try to set an icon on second column only. We see the icon on
+     * all columns.
      * 
      * All:
      * don't handle header values of icon type by default
@@ -339,9 +313,7 @@ public class ColumnHeaderRendererIssues extends InteractiveTestCase {
         table.setModel(new DefaultTableModel(new String[]{"first", "second", "third"}, 10));
         JScrollPane pane = new JScrollPane(table);
        table.setColumnControlVisible(true);
-       final JXFrame frame = wrapInFrame(pane, "Icon on second header - Mustang sort icon");
-       frame.setVisible(true);
-
+       showInFrame(pane, "Icon on second header - Mustang sort icon");
     }
     /**
      * Issue #79-jdnc: leading/trailing (?) doesn't work.
@@ -370,23 +342,9 @@ public class ColumnHeaderRendererIssues extends InteractiveTestCase {
         table.setModel(new DefaultTableModel(10, alignText.length));
         JScrollPane pane = new JScrollPane(table);
        table.setColumnControlVisible(true);
-       final JXFrame frame = wrapInFrame(pane, "RToL and column text alignment");
-       Action toggleComponentOrientation = new AbstractAction("toggle orientation") {
-
-           public void actionPerformed(ActionEvent e) {
-               ComponentOrientation current = frame.getComponentOrientation();
-               if (current == ComponentOrientation.LEFT_TO_RIGHT) {
-                   frame.applyComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
-               } else {
-                   frame.applyComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
-
-               }
-
-           }
-
-       };
-       addAction(frame, toggleComponentOrientation);
-       frame.setVisible(true);
+       final JXFrame frame = wrapInFrame(pane, "RToL and column text alignment, trailing/leading");
+       addComponentOrientationToggle(frame);
+       show(frame);
 
     }
 
@@ -408,23 +366,9 @@ public class ColumnHeaderRendererIssues extends InteractiveTestCase {
         table.setModel(new DefaultTableModel(10, 6));
         JScrollPane pane = new JScrollPane(table);
        table.setColumnControlVisible(true);
-       final JXFrame frame = wrapInFrame(pane, "RToL and column text alignment");
-       Action toggleComponentOrientation = new AbstractAction("toggle orientation") {
-
-           public void actionPerformed(ActionEvent e) {
-               ComponentOrientation current = frame.getComponentOrientation();
-               if (current == ComponentOrientation.LEFT_TO_RIGHT) {
-                   frame.applyComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
-               } else {
-                   frame.applyComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
-
-               }
-
-           }
-
-       };
-       addAction(frame, toggleComponentOrientation);
-       frame.setVisible(true);
+       final JXFrame frame = wrapInFrame(pane, "RToL and column text alignment RIGHT");
+       addComponentOrientationToggle(frame);
+       show(frame);
 
     }
 

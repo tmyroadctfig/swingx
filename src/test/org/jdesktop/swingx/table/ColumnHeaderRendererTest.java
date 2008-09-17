@@ -68,7 +68,7 @@ public class ColumnHeaderRendererTest extends InteractiveTestCase {
         JTable table = new JTable(xTable.getModel());
         JXFrame frame = wrapWithScrollingInFrame(xTable, table, "JXTable <-> JTable: compare header height");
         frame.add(field, BorderLayout.SOUTH);
-        frame.setVisible(true);
+        show(frame);
     }
 
     /**
