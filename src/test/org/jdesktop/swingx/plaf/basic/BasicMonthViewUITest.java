@@ -21,6 +21,8 @@
  */
 package org.jdesktop.swingx.plaf.basic;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.ComponentOrientation;
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
@@ -37,7 +39,10 @@ import java.util.Locale;
 import java.util.logging.Logger;
 
 import javax.swing.Action;
+import javax.swing.Box;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.UIManager;
 
 import org.jdesktop.swingx.InteractiveTestCase;
@@ -75,12 +80,44 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
   }
  
     /**
-     * Issue #781-swingx: reverse coordinate mapping form date to bounds.
+     * Issue #750-swingx: use rendering to side-step antialiase probs.
      * 
      * Debugging ...
      */
-    public void interactiveBoundsFromDate() {
+    public void interactiveRenderingOn() {
+        // force default loading
+        new JXMonthView();
+        // this is global state - uncomment for debug painting completely
+//        UIManager.put("JXMonthView.trailingDayForeground", Color.YELLOW);
+//        UIManager.put("JXMonthView.leadingDayForeground", Color.ORANGE);
+//        UIManager.put("JXMonthView.weekOfTheYearForeground", Color.GREEN);
+//        UIManager.put("JXMonthView.unselectableDayForeground", Color.MAGENTA);
+        String frameTitle = "Debug painting: rendering on";
+        showDebugMonthView(frameTitle, null);
+    }
+
+    /**
+     * Issue #750-swingx: use rendering to side-step antialiase probs.
+     * 
+     * Debugging ...
+     */
+    public void interactiveRenderingOff() {
+        String frameTitle = "Debug painting: rendering off";
+        Boolean disableRendering = Boolean.TRUE;
+        showDebugMonthView(frameTitle, disableRendering);
+    }
+    /**
+     * @param frameTitle
+     * @param disableRendering
+     */
+    private void showDebugMonthView(String frameTitle, Boolean disableRendering) {
         final JXMonthView monthView = new JXMonthView();
+        monthView.putClientProperty("disableRendering", disableRendering);
+        monthView.setDayForeground(Calendar.SUNDAY, Color.BLUE);
+        monthView.setDaysOfTheWeekForeground(Color.RED);
+        monthView.setFlaggedDayForeground(Color.CYAN);
+        monthView.setSelectedBackground(Color.GRAY);
+        monthView.setTodayBackground(Color.PINK);
         monthView.setTraversable(true);
         monthView.setShowingWeekNumber(true);
         monthView.setShowingLeadingDays(true);
@@ -88,37 +125,37 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
         monthView.setSelectionMode(SelectionMode.SINGLE_INTERVAL_SELECTION);
         monthView.setPreferredCols(2);
         monthView.setPreferredRows(2);
-        final BasicMonthViewUI ui = ((BasicMonthViewUI) monthView.getUI());
-        Action action = new AbstractActionExt("toggle minimal") {
-
-            public void actionPerformed(ActionEvent e) {
-                int minimal = monthView.getSelectionModel().getMinimalDaysInFirstWeek();
-                monthView.getSelectionModel().setMinimalDaysInFirstWeek(minimal > 1 ? 1 : 4);
-            }
-            
-        };
-        final JXFrame frame = wrapInFrame(monthView, "test mapping: printed on mouse release");
-        addAction(frame, action);
+        final JXFrame frame = wrapInFrame(monthView, frameTitle);
         addComponentOrientationToggle(frame);
         final JXDatePicker picker = new JXDatePicker();
+        picker.getMonthView().putClientProperty("disableRendering", disableRendering);
         picker.addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
                 if (e.getActionCommand().equals(JXDatePicker.CANCEL_KEY)) return;
                 if (picker.getDate() == null) return;
-//                LOG.info("logical monthPosition " + 
-//                        ui.getMonthGridPosition(picker.getDate()) 
-//                        + "\n  bounds " + ui.getMonthBounds(picker.getDate()));
-                LOG.info("logical dayPosition " + 
-                        ui.getDayGridPosition(picker.getDate()) 
-                        + "\n  bounds " + ui.getDayBounds(picker.getDate()));
-
+                monthView.setFlaggedDates(picker.getDate());
             }
             
         });
-        addStatusComponent(frame, picker);
-        frame.pack();
-        frame.setVisible(true);
+        final JXDatePicker unselectable = new JXDatePicker();
+        unselectable.getMonthView().putClientProperty("disableRendering", disableRendering);
+        unselectable.addActionListener(new ActionListener() {
+
+            public void actionPerformed(ActionEvent e) {
+                if (e.getActionCommand().equals(JXDatePicker.CANCEL_KEY)) return;
+                if (unselectable.getDate() == null) return;
+                monthView.setUnselectableDates(unselectable.getDate());
+            }
+            
+        });
+        JComponent pickers = Box.createHorizontalBox();
+        pickers.add(new JLabel("Flagged: "));
+        pickers.add(picker);
+        pickers.add(new JLabel("Unselectable: "));
+        pickers.add(unselectable);
+        frame.add(pickers, BorderLayout.SOUTH);
+        show(frame);
     }
 
 

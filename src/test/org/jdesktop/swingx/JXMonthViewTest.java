@@ -34,6 +34,7 @@ import java.util.logging.Logger;
 import javax.swing.Action;
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 
 import org.jdesktop.swingx.calendar.CalendarUtils;
 import org.jdesktop.swingx.calendar.DateSelectionModel;
@@ -70,6 +71,8 @@ public class JXMonthViewTest extends MockObjectTestCase {
     // calendar default instance init with today
     private Calendar calendar;
 
+    private JXMonthView monthView;
+    
     @Override
     public void setUp() {
         calendar = Calendar.getInstance();
@@ -92,6 +95,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
         componentLocale = JComponent.getDefaultLocale();
 //        LOG.info("componentLocale " + componentLocale);
 //        JComponent.setDefaultLocale(Locale.US);
+        monthView = new JXMonthView();
     }
 
     @Override
@@ -99,6 +103,18 @@ public class JXMonthViewTest extends MockObjectTestCase {
         JComponent.setDefaultLocale(componentLocale);
     }
 
+    public void testInitialOpaque() {
+        assertTrue(monthView.isOpaque());
+    }
+    
+    public void testInitialBoxPadding() {
+        assertTrue(monthView.getBoxPaddingX() > 0);
+        assertEquals(UIManager.getInt("JXMonthView.boxPaddingX"), monthView.getBoxPaddingX());
+        assertTrue(monthView.getBoxPaddingY() > 0);
+        assertEquals(UIManager.getInt("JXMonthView.boxPaddingY"), monthView.getBoxPaddingY());
+        
+    }
+    
     
     /**
      * Issue #752-swingx: custom daysOfWeek lost in updateUI

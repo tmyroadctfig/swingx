@@ -1260,7 +1260,11 @@ public class JXMonthView extends JComponent {
      *
      * @return boolean <code>true</code> if anti-aliased text is enabled,
      * <code>false</code> otherwise.
+     * 
+     * @deprecated will be removed without replacement to align with core Swing 
+     * which api for setting per-instance antialiased property. 
      */
+    @Deprecated
     public boolean isAntialiased() {
         return antialiased;
     }
@@ -1270,7 +1274,11 @@ public class JXMonthView extends JComponent {
      *
      * @param antiAlias <code>true</code> for anti-aliased text,
      * <code>false</code> to turn it off.
+     * 
+     * @deprecated will be removed without replacement to align with core Swing 
+     * which api for setting per-instance antialiased property. 
      */
+    @Deprecated
     public void setAntialiased(boolean antiAlias) {
         if (this.antialiased == antiAlias) {
             return;
