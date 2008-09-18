@@ -1225,17 +1225,11 @@ public class BasicMonthViewUI extends MonthViewUI {
      */
     @Override
     public void paint(Graphics g, JComponent c) {
-        // PENDING JW: remove call to super - does nothing anyway? 
-        super.paint(g, c);
-
         Rectangle clip = g.getClipBounds();
         // PENDING JW: remove as filling the background must be done in update(...) 
-
         Graphics tmp = g.create();
         paintBackground(clip, tmp);
         tmp.dispose();
-        
-//        g.setColor(monthView.getForeground());
 
         // Get a calender set to the first displayed date
         Calendar cal = getCalendar();
@@ -1259,6 +1253,22 @@ public class BasicMonthViewUI extends MonthViewUI {
     }
 
     /**
+     * Paints background of the given rectangle.
+     * 
+     * PENDING JW: this is called from paint, which shouldnt do 
+     * it? It's the responsibility of super update(comp, g).
+     * 
+     * @param clip
+     * @param g
+     */
+    protected void paintBackground(final Rectangle clip, final Graphics g) {
+        if (monthView.isOpaque()) {
+            g.setColor(monthView.getBackground());
+            g.fillRect(clip.x, clip.y, clip.width, clip.height);
+        }
+    }
+
+    /**
      * Paints a month.  It is assumed the given calendar is already set to the
      * first day of the month to be painted.<p>
      * 
@@ -1274,25 +1284,13 @@ public class BasicMonthViewUI extends MonthViewUI {
      */
     @SuppressWarnings({"UnusedDeclaration"})
     protected void paintMonth(Graphics g, int x, int y, int width, int height, Calendar calendar) {
-        // Paint month name background.
-        paintMonthStringBackground(g, x, y,
-                width, fullMonthBoxHeight, calendar);
+        paintMonthHeader(g, x, y, width, calendar);
 
-        paintMonthStringForeground(g, x, y,
-                width, fullMonthBoxHeight, calendar);
-
-        // Paint arrow buttons for traversing months if enabled.
-        if (monthView.isTraversable()) {
-            //draw the icons
-            monthDownImage.paintIcon(monthView, g, x + arrowPaddingX, y + ((fullMonthBoxHeight - monthDownImage.getIconHeight()) / 2));
-            monthUpImage.paintIcon(monthView, g, x + width - arrowPaddingX - monthUpImage.getIconWidth(), y + ((fullMonthBoxHeight - monthDownImage.getIconHeight()) / 2));
-        }
-
-        paintDaysOfTheWeek(g, x, y, width, calendar);
+        paintDayHeaders(g, x, y, width, calendar);
         // new top is below monthBox and daysOfWeek header
         int yNew = y + fullMonthBoxHeight + fullBoxHeight;
         // paint the column of week numbers
-        paintWeeksOfYear(g, x, yNew, width, calendar);
+        paintWeekHeaders(g, x, yNew, width, calendar);
 
         int xOffset = 0;
         if (monthView.isShowingWeekNumber()) {
@@ -1306,6 +1304,141 @@ public class BasicMonthViewUI extends MonthViewUI {
 
     }
 
+
+    /**
+     * Paints the header of a month. 
+     * It is assumed the given calendar is already set to the
+     * first day of the month to be painted.<p>
+     * 
+     * PENDING JW: switch over to use renderer.
+     * Note: the given calendar must not be changed.
+     *
+     * @param g Graphics object.
+     * @param x x location of month
+     * @param y y location of month
+     * @param width width of month
+     * @param height height of month
+     * @param calendar the calendar specifying the the first day of the month to paint, 
+     *  must not be null
+     */
+    protected void paintMonthHeader(Graphics g, int x, int y, int width,
+            Calendar calendar) {
+        // Paint month name background.
+        paintMonthStringBackground(g, x, y,
+                width, fullMonthBoxHeight, calendar);
+
+        paintMonthStringForeground(g, x, y,
+                width, fullMonthBoxHeight, calendar);
+
+        // Paint arrow buttons for traversing months if enabled.
+        if (monthView.isTraversable()) {
+            //draw the icons
+            monthDownImage.paintIcon(monthView, g, x + arrowPaddingX, y + ((fullMonthBoxHeight - monthDownImage.getIconHeight()) / 2));
+            monthUpImage.paintIcon(monthView, g, x + width - arrowPaddingX - monthUpImage.getIconWidth(), y + ((fullMonthBoxHeight - monthDownImage.getIconHeight()) / 2));
+        }
+    }
+
+    /**
+     * Paints the background of the month string.  The bounding box for this
+     * background can be modified by setting its insets via
+     * setMonthStringInsets.  The color of the background can be set via
+     * setMonthStringBackground.
+     *
+     * PENDING JW: switch over to use renderer.
+     * Note: the given calendar must not be changed.
+     *
+     * @param g Graphics object to paint to.
+     * @param x x-coordinate of upper left corner.
+     * @param y y-coordinate of upper left corner.
+     * @param width width of the bounding box.
+     * @param height height of the bounding box.
+     * 
+     * @see org.jdesktop.swingx.JXMonthView#setMonthStringBackground
+     * @see org.jdesktop.swingx.JXMonthView#setMonthStringInsets
+     */
+    protected void paintMonthStringBackground(Graphics g, int x, int y,
+                                              int width, int height, Calendar cal) {
+        // Modify bounds by the month string insets.
+        Insets monthStringInsets = monthView.getMonthStringInsets();
+        x = isLeftToRight ? x + monthStringInsets.left : x + monthStringInsets.right;
+        y = y + monthStringInsets.top;
+        width = width - monthStringInsets.left - monthStringInsets.right;
+        height = height - monthStringInsets.top - monthStringInsets.bottom;
+    
+        g.setColor(monthView.getMonthStringBackground());
+        g.fillRect(x, y, width, height);
+    }
+
+    /**
+     * 
+     * PENDING JW: switch over to use renderer.
+     * 
+     * Note: the given calendar must not be changed.
+     * 
+     * @param g Graphics object to paint to.
+     * @param x x-coordinate of upper left corner.
+     * @param y y-coordinate of upper left corner.
+     * @param width width of the bounding box.
+     * @param height height of the bounding box.
+     * @param cal the calendar specifying the day to use, must not be null
+     */
+    protected void paintMonthStringForeground(Graphics g, int x, int y,
+                                              int width, int height, Calendar cal) {
+        // Paint month name.
+        // 
+        Font oldFont = monthView.getFont();
+    
+        // TODO: Calculating the bounds of the text dynamically so we can invoke
+        // a popup for selecting the month/year to view.
+        g.setFont(derivedFont);
+        FontMetrics fm = monthView.getFontMetrics(derivedFont);
+        int month = cal.get(Calendar.MONTH);
+        String monthName = monthsOfTheYear[month];
+        String yearString = Integer.toString(cal.get(Calendar.YEAR));
+    
+        Rectangle2D rect = fm.getStringBounds(monthName, g);
+        monthStringBounds[month] = new Rectangle((int) rect.getX(), (int) rect.getY(),
+                (int) rect.getWidth(), (int) rect.getHeight());
+        int spaceWidth = (int) fm.getStringBounds(" ", g).getWidth();
+        rect = fm.getStringBounds(yearString, g);
+        yearStringBounds[month] = new Rectangle((int) rect.getX(), (int) rect.getY(),
+                (int) rect.getWidth(), (int) rect.getHeight());
+        // END
+    
+        g.setColor(monthView.getMonthStringForeground());
+        int tmpX =
+                x + (calendarWidth / 2) -
+                        ((monthStringBounds[month].width + yearStringBounds[month].width + spaceWidth) / 2);
+        int tmpY = y + monthView.getBoxPaddingY() + ((monthBoxHeight - boxHeight) / 2) +
+                fm.getAscent();
+        monthStringBounds[month].x = tmpX;
+        yearStringBounds[month].x = (monthStringBounds[month].x + monthStringBounds[month].width +
+                spaceWidth);
+    
+        paintMonthStringForeground(g,monthName, monthStringBounds[month].x, tmpY, yearString, yearStringBounds[month].x, tmpY, cal);
+        g.setFont(oldFont);
+    }
+
+    /**
+     * Paints only text for month and year. No calculations made. Used by custom LAFs. 
+     * <p>
+     * 
+     * Note: the given calendar must not be changed.
+     * 
+     * @param g Graphics to paint into.
+     * @param monthName Name of the month.
+     * @param monthX Month string x coordinate.
+     * @param monthY Month string y coordinate.
+     * @param yearName Name (number) of the year.
+     * @param yearX Year string x coordinate.
+     * @param yearY Year string y coordinate.
+     */
+    protected void paintMonthStringForeground(Graphics g, String monthName, int monthX, int monthY, 
+            String yearName, int yearX, int yearY, Calendar cal) {
+        g.drawString(monthName, monthX, monthY);
+        g.drawString(yearName, yearX, yearY);
+    }
+
     /**
      * Paints the row which contains the days of the week.
      * 
@@ -1315,8 +1448,13 @@ public class BasicMonthViewUI extends MonthViewUI {
      * @param width
      * @param calendar
      */
-    protected void paintDaysOfTheWeek(Graphics g, int x, int y, int width,
+    protected void paintDayHeaders(Graphics g, int x, int y, int width,
             Calendar calendar) {
+        // handle backward compatibility until the deprecated methods are removed
+        if (!useRenderingHandler()) {
+            paintDaysOfTheWeek(g, x, y, width, calendar);
+            return;
+        }
         // Paint background of the short names for the days of the week.
         boolean showingWeekNumber = monthView.isShowingWeekNumber();
         int tmpX = isLeftToRight ? x + (showingWeekNumber ? fullBoxWidth : 0) : x;
@@ -1328,7 +1466,6 @@ public class BasicMonthViewUI extends MonthViewUI {
         int dayIndex = monthView.getFirstDayOfWeek() - 1;
         String[] daysOfTheWeek = monthView.getDaysOfTheWeek();
 
-        if (useRenderingHandler()) {
             int leftOfDay = isLeftToRight ? tmpX : tmpX + tmpWidth - fullBoxWidth;
             for (int i = 0; i < JXMonthView.DAYS_IN_WEEK; i++) {
                 
@@ -1339,98 +1476,187 @@ public class BasicMonthViewUI extends MonthViewUI {
                 }
                 leftOfDay = isLeftToRight ? leftOfDay + fullBoxWidth : leftOfDay - fullBoxWidth;
             }
-            return;
-        } 
-
-        Font oldFont = monthView.getFont();
-        g.setFont(derivedFont);
-        g.setColor(monthView.getDaysOfTheWeekForeground());
-        FontMetrics fm = monthView.getFontMetrics(derivedFont);
-        for (int i = 0; i < JXMonthView.DAYS_IN_WEEK; i++) {
-            tmpX = isLeftToRight ?
-                    x + (i * fullBoxWidth) + monthView.getBoxPaddingX() +
-                            (boxWidth / 2) -
-                            (fm.stringWidth(daysOfTheWeek[dayIndex]) /
-                                    2) :
-                    x + width - (i * fullBoxWidth) - monthView.getBoxPaddingX() -
-                            (boxWidth / 2) -
-                            (fm.stringWidth(daysOfTheWeek[dayIndex]) /
-                                    2);
-            if (showingWeekNumber) {
-                tmpX += isLeftToRight ? fullBoxWidth : -fullBoxWidth;
-            }
-            tmpY = y + fullMonthBoxHeight + monthView.getBoxPaddingY() + fm.getAscent();
-            g.drawString(daysOfTheWeek[dayIndex], tmpX, tmpY);
-            dayIndex++;
-            if (dayIndex == JXMonthView.DAYS_IN_WEEK) {
-                dayIndex = 0;
-            }
-        }
-        g.setFont(oldFont);
     }
-    
+
     /**
+     * PENDING JW: this implementation actually only paints the line separating the
+     * daysOfTheWeek row from the days.
      * 
-     * Paints all days in the days' grid, that is the month area below
-     * the daysOfWeek and to the right/left (depending on 
-     * the monthView's componentOrientation) of the weekOfYears. 
-     * The calendar
-     * represents the first day of the month to paint. <p>
      * 
-     * Note: the calendar must not be changed.
+     * @param g
+     * @param x
+     * @param y
+     * @param width
+     * @param height
+     * @param cal
+     */
+    protected void paintDayOfTheWeekBackground(Graphics g, int x, int y, int width, int height, Calendar cal) {
+        int boxPaddingX = monthView.getBoxPaddingX();
+        g.setColor(monthView.getForeground());
+        g.drawLine(x + boxPaddingX, y + height - 1, x + width - boxPaddingX, y + height - 1);
+    }
+
+    /**
+     * Paints the weeks of year if the showingWeek property is true. Does
+     * nothing otherwise.
+     * 
+     * It is assumed the given calendar is already set to the first day of the
+     * month. The calendar is unchanged when leaving this method.
+     * 
+     * Note: the given calendar must not be changed.
+     * 
+     * PENDING JW: this implementation doesn't need the height - should it be
+     * given anyway for symetry in case subclasses need it?
      * 
      * @param g Graphics object.
-     * @param left the left boundary of the day grid.
-     * @param top the upper boundary of the day grid
-     * @param width the width of the day grid.
-     * @param cal the calendar specifying the the first day of the month to paint, 
-     *   must not be null
+     * @param x x location of month
+     * @param initialY y the upper bound of the "weekNumbers-box"
+     * @param width width of month
+     * @param cal the calendar specifying the the first day of the month to
+     *        paint, must not be null
      */
-    protected void paintDays(Graphics g, int left, int top, int width, Calendar cal) {
-        
+    protected void paintWeekHeaders(Graphics g, int x, int initialY, int width,
+            Calendar cal) {
+        if (!monthView.isShowingWeekNumber())
+            return;
+        if (!useRenderingHandler()) {
+            paintWeeksOfYear(g, x, initialY, width, cal);
+            return;
+        }
+        int tmpX = isLeftToRight ? x : x + width - fullBoxWidth;
+        paintWeekOfYearBackground(g, tmpX, initialY, fullBoxWidth,
+                calendarHeight - (fullMonthBoxHeight + fullBoxHeight), cal);
+    
         Calendar calendar = (Calendar) cal.clone();
-        CalendarUtils.startOfMonth(calendar);
-        Date startOfMonth = calendar.getTime();
-        CalendarUtils.endOfMonth(calendar);
-        Date endOfMonth = calendar.getTime();
-        // reset the clone
+        int weeks = getWeeks(calendar);
         calendar.setTime(cal.getTime());
-        // alwaysfill the day grid in the month completely
-//        int weeks = getWeeks(calendar);
-        // adjust to start of week 
-        calendar.setTime(cal.getTime());
-        CalendarUtils.startOfWeek(calendar);
-        // painting a grid of day boxes, all with dimensions 
-        // width == fullBoxWidth and height = fullBoxHeight.
-        int topOfDay = top;
-        // 
-        for (int week = 0; week < WEEKS_IN_MONTH; week++) {
-            // PENDING JW: further simplify - now that we have the reverse mapping
-            // (from logical to bounds) - use it! That will keep the RToL logic
-            // out of here (which was the whole point of introducing logical coords).
-//            for (int week = 0; week <= weeks; week++) {
-            int leftOfDay = isLeftToRight ? left : left + width - fullBoxWidth;
-            
-            for (int day = 0; day < 7; day++) {
-                if (calendar.getTime().before(startOfMonth)) {
-                    // leading
-                    paintLeadingDay(g, leftOfDay, topOfDay, calendar);
-                   
-                } else if (calendar.getTime().after(endOfMonth)) {
-                    paintTrailingDay(g, leftOfDay, topOfDay, calendar);
-                    
-                } else {
-                    paintDay(g, leftOfDay, topOfDay, calendar);
-                }
-                leftOfDay = isLeftToRight ? leftOfDay + fullBoxWidth : leftOfDay - fullBoxWidth;
-                calendar.add(Calendar.DAY_OF_MONTH, 1);
+        for (int weekOfYear = 0; weekOfYear <= weeks; weekOfYear++) {
+            if (useRenderingHandler()) {
+                renderingHandler.paintWeekOfYear(g, tmpX, initialY, calendar);
+            } else {
+                paintWeekOfYearForeground(g, tmpX, initialY, fullBoxWidth,
+                        fullBoxHeight, calendar);
             }
-            // the assumption is not always true - fails if we had the turn-on of DST with
-//            if (!CalendarUtils.isStartOfWeek(calendar)) {
-//                throw new IllegalStateException("started painting at " + firstStartOfWeek + 
-//                		" should still be on the start of a week instead of " + calendar.getTime());
-//            }
-            topOfDay += fullBoxHeight;
+            initialY += fullBoxHeight;
+            calendar.add(Calendar.WEEK_OF_YEAR, 1);
+        }
+    
+    }
+
+    /**
+     * PENDING JW: this implementation actually only paints the line separating the
+     * weekOfYear column from the days.
+     * 
+     * @param g
+     * @param x
+     * @param y
+     * @param width
+     * @param height
+     * @param cal
+     */
+    protected void paintWeekOfYearBackground(Graphics g, int x, int y, int width, int height, Calendar cal) {
+        int boxPaddingY = monthView.getBoxPaddingY();
+        x = isLeftToRight ? x + width - 1 : x;
+        g.setColor(monthView.getForeground());
+        g.drawLine(x, y + boxPaddingY, x, y + height - boxPaddingY);
+    }
+
+    /**
+         * 
+         * Paints all days in the days' grid, that is the month area below
+         * the daysOfWeek and to the right/left (depending on 
+         * the monthView's componentOrientation) of the weekOfYears. 
+         * The calendar
+         * represents the first day of the month to paint. <p>
+         * 
+         * Note: the calendar must not be changed.
+         * 
+         * @param g Graphics object.
+         * @param left the left boundary of the day grid.
+         * @param top the upper boundary of the day grid
+         * @param width the width of the day grid.
+         * @param cal the calendar specifying the the first day of the month to paint, 
+         *   must not be null
+         */
+        protected void paintDays(Graphics g, int left, int top, int width, Calendar cal) {
+            
+            Calendar calendar = (Calendar) cal.clone();
+            CalendarUtils.startOfMonth(calendar);
+            Date startOfMonth = calendar.getTime();
+            CalendarUtils.endOfMonth(calendar);
+            Date endOfMonth = calendar.getTime();
+            // reset the clone
+            calendar.setTime(cal.getTime());
+            // alwaysfill the day grid in the month completely
+    //        int weeks = getWeeks(calendar);
+            // adjust to start of week 
+            calendar.setTime(cal.getTime());
+            CalendarUtils.startOfWeek(calendar);
+            // painting a grid of day boxes, all with dimensions 
+            // width == fullBoxWidth and height = fullBoxHeight.
+            int topOfDay = top;
+            // 
+            for (int week = 0; week < WEEKS_IN_MONTH; week++) {
+                // PENDING JW: further simplify - now that we have the reverse mapping
+                // (from logical to bounds) - use it! That will keep the RToL logic
+                // out of here (which was the whole point of introducing logical coords).
+    //            for (int week = 0; week <= weeks; week++) {
+                int leftOfDay = isLeftToRight ? left : left + width - fullBoxWidth;
+                
+                for (int day = 0; day < 7; day++) {
+                    if (calendar.getTime().before(startOfMonth)) {
+                        // leading
+                        paintDayOffMonth(g, leftOfDay, topOfDay, calendar, true);
+                       
+                    } else if (calendar.getTime().after(endOfMonth)) {
+                        paintDayOffMonth(g, leftOfDay, topOfDay, calendar, false);
+                        
+                    } else {
+                        paintDayInMonth(g, leftOfDay, topOfDay, calendar);
+                    }
+                    leftOfDay = isLeftToRight ? leftOfDay + fullBoxWidth : leftOfDay - fullBoxWidth;
+                    calendar.add(Calendar.DAY_OF_MONTH, 1);
+                }
+                // the assumption is not always true - fails if we had the turn-on of DST with
+    //            if (!CalendarUtils.isStartOfWeek(calendar)) {
+    //                throw new IllegalStateException("started painting at " + firstStartOfWeek + 
+    //                		" should still be on the start of a week instead of " + calendar.getTime());
+    //            }
+                topOfDay += fullBoxHeight;
+            }
+        }
+
+    /**
+     * Paints a day not contained in the month, represented by the calendar,
+     * in a day-box located at left/top. The size of the day-box is defined by
+     * fullBoxWidth/Height. The date can be leading/trailing as indicated by
+     * the flag. Does nothing if the corresponding isShowingXX property of
+     * the JXMonthView is false.
+     * 
+     * Note: the given calendar must not be changed.
+     * 
+     * @param g the Graphics to paint into.
+     * @param left the left boundary of the day-box to paint.
+     * @param top the upper boundary of the day-box to paint.
+     * @param calendar the calendar specifying the the day to paint, must not be
+     *        null
+     * @param leading flag to indicate a leading/trailing date       
+     */
+    protected void paintDayOffMonth(Graphics g, int left, int top,
+            Calendar calendar, boolean leading) {
+        
+        if (leading && !monthView.isShowingLeadingDays())
+            return;
+        if (!leading && !monthView.isShowingTrailingDays()) 
+            return;
+        if (useRenderingHandler()) {
+            renderingHandler.paintDayOff(g, left, top, calendar, leading);
+        } else {
+            if (leading) {
+                paintLeadingDay(g, left, top, calendar);
+            } else {
+                paintTrailingDay(g, left, top, calendar);
+            }
         }
     }
 
@@ -1449,101 +1675,14 @@ public class BasicMonthViewUI extends MonthViewUI {
      * @param calendar the calendar specifying the the day to paint, must not be
      *        null
      */
-    protected void paintDay(Graphics g, int left, int top, Calendar calendar) {
+    protected void paintDayInMonth(Graphics g, int left, int top,
+            Calendar calendar) {
         if (useRenderingHandler()) {
             renderingHandler.paintDay(g, left, top, calendar);
-            
-        } else {
-            if (monthView.isUnselectableDate(calendar.getTime())) {
-                paintUnselectableDayBackground(g, left, top, fullBoxWidth, fullBoxHeight,
-                        calendar);
-                paintUnselectableDayForeground(g, left, top, fullBoxWidth, fullBoxHeight,
-                        calendar);
-    
-            } else if (monthView.isFlaggedDate(calendar.getTime())) {
-                paintFlaggedDayBackground(g, left, top, fullBoxWidth, fullBoxHeight,
-                        calendar);
-                paintFlaggedDayForeground(g, left, top, fullBoxWidth, fullBoxHeight,
-                        calendar);
-          } else {
-                            paintDayBackground(g, left, top, fullBoxWidth, fullBoxHeight,
-                        calendar);
-                paintDayForeground(g, left, top, fullBoxWidth, fullBoxHeight,
-                        calendar);
-            } 
+        } else { 
+            paintDay(g, left, top, calendar);
         }
     }
-
-    /**
-     * @return
-     */
-    private boolean useRenderingHandler() {
-        if (Boolean.TRUE.equals(monthView.getClientProperty("disableRendering"))) return false;
-        return renderingHandler != null;
-    }
-
-
-    /**
-     * Paints a trailing day of the current month, represented by the calendar,
-     * in a day-box located at left/top. The size of the day-box is defined by
-     * fullBoxWidth/Height. Does nothing if the monthView's
-     * isShowingTrailingDates is false.
-     * <p>
-     * 
-     * Note: the given calendar must not be changed.
-     * 
-     * @param g the Graphics to paint into.
-     * @param left the left boundary of the day-box to paint.
-     * @param top the upper boundary of the day-box to paint.
-     * @param calendar the calendar specifying the the day to paint, must not be
-     *        null
-     */
-    protected void paintTrailingDay(Graphics g, int left, int top,
-            Calendar calendar) {
-        if (!monthView.isShowingTrailingDays()) return;
-        if (useRenderingHandler()) {
-           renderingHandler.paintDayOff(g, left, top, calendar, false);
-        } else {
-            paintTrailingDayBackground(g, left, top, fullBoxWidth,
-                        fullBoxHeight, calendar);
-            paintTrailingDayForeground(g, left, top, fullBoxWidth,
-                        fullBoxHeight, calendar);
-        }
-            
-        
-    }
-
-
-    /**
-     * Paints a leading day of the current month, represented by the calendar,
-     * in a day-box located at left/top. The size of the day-box is defined by
-     * fullBoxWidth/Height. Does nothing if the monthView's
-     * isShowingLeadingDates is false.
-     * <p>
-     * 
-     * Note: the given calendar must not be changed.
-     * 
-     * @param g the Graphics to paint into.
-     * @param left the left boundary of the day-box to paint.
-     * @param top the upper boundary of the day-box to paint.
-     * @param calendar the calendar specifying the the day to paint, must not be
-     *        null
-     */
-    protected void paintLeadingDay(Graphics g, int left, int top,
-            Calendar calendar) {
-        if (!monthView.isShowingLeadingDays())
-            return;
-        if (useRenderingHandler()) {
-            renderingHandler.paintDayOff(g, left, top, calendar, true);
-        } else {
-            paintLeadingDayBackground(g, left, top, fullBoxWidth,
-                    fullBoxHeight, calendar);
-            paintLeadingDayForeground(g, left, top, fullBoxWidth,
-                    fullBoxHeight, calendar);
-        }
-
-    }
-
 
     /**
      * Returns the number of weeks to paint in the current month, as represented
@@ -1570,505 +1709,23 @@ public class BasicMonthViewUI extends MonthViewUI {
     }
 
     /**
-     * Paints the weeks of year if the showingWeek property is true. Does
-     * nothing otherwise.
-     * 
-     * It is assumed the given calendar is already set to the first day of the
-     * month. The calendar is unchanged when leaving this method.
-     * 
-     * Note: the given calendar must not be changed.
-     * 
-     * PENDING JW: this implementation doesn't need the height - should it be
-     * given anyway for symetry in case subclasses need it?
-     * 
-     * @param g Graphics object.
-     * @param x x location of month
-     * @param initialY y the upper bound of the "weekNumbers-box"
-     * @param width width of month
-     * @param cal the calendar specifying the the first day of the month to
-     *        paint, must not be null
-     */
-    protected void paintWeeksOfYear(Graphics g, int x, int initialY, int width,
-            Calendar cal) {
-        if (!monthView.isShowingWeekNumber())
-            return;
-        int tmpX = isLeftToRight ? x : x + width - fullBoxWidth;
-        paintWeekOfYearBackground(g, tmpX, initialY, fullBoxWidth,
-                calendarHeight - (fullMonthBoxHeight + fullBoxHeight), cal);
-
-        Calendar calendar = (Calendar) cal.clone();
-        int weeks = getWeeks(calendar);
-        calendar.setTime(cal.getTime());
-        for (int weekOfYear = 0; weekOfYear <= weeks; weekOfYear++) {
-            if (useRenderingHandler()) {
-                renderingHandler.paintWeekOfYear(g, tmpX, initialY, calendar);
-            } else {
-                paintWeekOfYearForeground(g, tmpX, initialY, fullBoxWidth,
-                        fullBoxHeight, calendar);
-            }
-            initialY += fullBoxHeight;
-            calendar.add(Calendar.WEEK_OF_YEAR, 1);
-        }
-
-    }
-
-    /**
-     * PENDING JW: this implementation actually only paints the line separating the
-     * daysOfTheWeek row from the days.
-     * 
-     * 
-     * @param g
-     * @param x
-     * @param y
-     * @param width
-     * @param height
-     * @param cal
-     */
-    protected void paintDayOfTheWeekBackground(Graphics g, int x, int y, int width, int height, Calendar cal) {
-        int boxPaddingX = monthView.getBoxPaddingX();
-        g.setColor(monthView.getForeground());
-        g.drawLine(x + boxPaddingX, y + height - 1, x + width - boxPaddingX, y + height - 1);
-    }
-
-    /**
-     * PENDING JW: this implementation actually only paints the line separating the
-     * weekOfYear column from the days.
-     * 
-     * @param g
-     * @param x
-     * @param y
-     * @param width
-     * @param height
-     * @param cal
-     */
-    protected void paintWeekOfYearBackground(Graphics g, int x, int y, int width, int height, Calendar cal) {
-        int boxPaddingY = monthView.getBoxPaddingY();
-        x = isLeftToRight ? x + width - 1 : x;
-        g.setColor(monthView.getForeground());
-        g.drawLine(x, y + boxPaddingY, x, y + height - boxPaddingY);
-    }
-
-    /**
-     * Paints the week of the year of the week of the year represented by the
-     * given calendar.
+     * Returns a boolean indicating whether to use the rendering mechanism
+     * instead of drawing the text manually. If true, it's safe to access the
+     * renderingHandler.
      * <p>
      * 
-     * Note: the given calendar must not be changed.
-     *
-     * @param g Graphics object
-     * @param x x-coordinate of upper left corner.
-     * @param y y-coordinate of upper left corner.
-     * @param width width of bounding box
-     * @param height height of bounding box
-     */
-    @SuppressWarnings({"UNUSED_SYMBOL", "UnusedDeclaration"})
-    protected void paintWeekOfYearForeground(Graphics g, int x, int y, int width, int height, 
-            Calendar cal) {
-        String str = Integer.toString(cal.get(Calendar.WEEK_OF_YEAR));
-        FontMetrics fm;
-
-        g.setColor(weekOfTheYearForeground);
-
-        int boxPaddingX = monthView.getBoxPaddingX();
-        int boxPaddingY = monthView.getBoxPaddingY();
-
-        fm = g.getFontMetrics();
-        g.drawString(str,
-                isLeftToRight ?
-                        x + boxPaddingX +
-                                boxWidth - fm.stringWidth(str) :
-                        x + boxPaddingX +
-                                boxWidth - fm.stringWidth(str) - 1,
-                y + boxPaddingY + fm.getAscent());
-    }
-
-    /**
-     * Paints the background of the month string.  The bounding box for this
-     * background can be modified by setting its insets via
-     * setMonthStringInsets.  The color of the background can be set via
-     * setMonthStringBackground.
-     *
-     * Note: the given calendar must not be changed.
-     *
-     * @param g Graphics object to paint to.
-     * @param x x-coordinate of upper left corner.
-     * @param y y-coordinate of upper left corner.
-     * @param width width of the bounding box.
-     * @param height height of the bounding box.
-     * 
-     * @see org.jdesktop.swingx.JXMonthView#setMonthStringBackground
-     * @see org.jdesktop.swingx.JXMonthView#setMonthStringInsets
-     */
-    protected void paintMonthStringBackground(Graphics g, int x, int y,
-                                              int width, int height, Calendar cal) {
-        // Modify bounds by the month string insets.
-        Insets monthStringInsets = monthView.getMonthStringInsets();
-        x = isLeftToRight ? x + monthStringInsets.left : x + monthStringInsets.right;
-        y = y + monthStringInsets.top;
-        width = width - monthStringInsets.left - monthStringInsets.right;
-        height = height - monthStringInsets.top - monthStringInsets.bottom;
-
-        g.setColor(monthView.getMonthStringBackground());
-        g.fillRect(x, y, width, height);
-    }
-
-    /**
-     * Note: the given calendar must not be changed.
-     * 
-     * @param g Graphics object to paint to.
-     * @param x x-coordinate of upper left corner.
-     * @param y y-coordinate of upper left corner.
-     * @param width width of the bounding box.
-     * @param height height of the bounding box.
-     * @param cal the calendar specifying the day to use, must not be null
-     */
-    protected void paintMonthStringForeground(Graphics g, int x, int y,
-                                              int width, int height, Calendar cal) {
-        // Paint month name.
-        // 
-        Font oldFont = monthView.getFont();
-
-        // TODO: Calculating the bounds of the text dynamically so we can invoke
-        // a popup for selecting the month/year to view.
-        g.setFont(derivedFont);
-        FontMetrics fm = monthView.getFontMetrics(derivedFont);
-        int month = cal.get(Calendar.MONTH);
-        String monthName = monthsOfTheYear[month];
-        String yearString = Integer.toString(cal.get(Calendar.YEAR));
-
-        Rectangle2D rect = fm.getStringBounds(monthName, g);
-        monthStringBounds[month] = new Rectangle((int) rect.getX(), (int) rect.getY(),
-                (int) rect.getWidth(), (int) rect.getHeight());
-        int spaceWidth = (int) fm.getStringBounds(" ", g).getWidth();
-        rect = fm.getStringBounds(yearString, g);
-        yearStringBounds[month] = new Rectangle((int) rect.getX(), (int) rect.getY(),
-                (int) rect.getWidth(), (int) rect.getHeight());
-        // END
-
-        g.setColor(monthView.getMonthStringForeground());
-        int tmpX =
-                x + (calendarWidth / 2) -
-                        ((monthStringBounds[month].width + yearStringBounds[month].width + spaceWidth) / 2);
-        int tmpY = y + monthView.getBoxPaddingY() + ((monthBoxHeight - boxHeight) / 2) +
-                fm.getAscent();
-        monthStringBounds[month].x = tmpX;
-        yearStringBounds[month].x = (monthStringBounds[month].x + monthStringBounds[month].width +
-                spaceWidth);
-
-        paintMonthStringForeground(g,monthName, monthStringBounds[month].x, tmpY, yearString, yearStringBounds[month].x, tmpY, cal);
-        g.setFont(oldFont);
-    }
-
-    /**
-     * Paints only text for month and year. No calculations made. Used by custom LAFs. 
+     * Note: (mostly) for debugging the rendering mechanism can be disabled per
+     * monthView instance. To do so, set a client property with key
+     * "disableRendering" to Boolean.TRUE.
      * <p>
      * 
-     * Note: the given calendar must not be changed.
-     * 
-     * @param g Graphics to paint into.
-     * @param monthName Name of the month.
-     * @param monthX Month string x coordinate.
-     * @param monthY Month string y coordinate.
-     * @param yearName Name (number) of the year.
-     * @param yearX Year string x coordinate.
-     * @param yearY Year string y coordinate.
+     * @return a boolean indicating whether to use the renderer mechanism.
      */
-    protected void paintMonthStringForeground(Graphics g, String monthName, int monthX, int monthY, 
-            String yearName, int yearX, int yearY, Calendar cal) {
-        g.drawString(monthName, monthX, monthY);
-        g.drawString(yearName, yearX, yearY);
+    private boolean useRenderingHandler() {
+        if (Boolean.TRUE.equals(monthView.getClientProperty("disableRendering"))) return false;
+        return renderingHandler != null;
     }
 
-    /**
-     * Paint the background for the day specified by the given calendar.
-     * <p>
-     * 
-     * Note: the given calendar must not be changed.
-     * 
-     *
-     * @param g Graphics object to paint to
-     * @param x x-coordinate of upper left corner
-     * @param y y-coordinate of upper left corner
-     * @param width width of bounding box for the day
-     * @param height height of bounding box for the day
-     * @param cal the calendar specifying the day to paint, must not be null
-     * @see  org.jdesktop.swingx.JXMonthView#isSelectedDate
-     * @see  #isToday
-     */
-    protected void paintDayBackground(Graphics g, int x, int y, int width, int height,
-                                      Calendar cal) {
-        Date date = cal.getTime(); 
-        
-        if (monthView.isSelected(date)) {
-            g.setColor(monthView.getSelectedBackground());
-            g.fillRect(x, y, width, height);
-        }
-
-        // If the date is today make sure we draw it's background over the selected
-        // background.
-        if (isToday(date)) {
-            g.setColor(monthView.getTodayBackground());
-            g.drawRect(x, y, width - 1, height - 1);
-        }
-    }
-
-    /**
-     * Paint the foreground for the specified day.
-     * <p>
-     * 
-     * Note: the given calendar must not be changed.
-     *
-     * @param g Graphics object to paint to
-     * @param x x-coordinate of upper left corner
-     * @param y y-coordinate of upper left corner
-     * @param width width of bounding box for the day
-     * @param height height of bounding box for the day
-     * @param cal the calendar specifying the day to paint, must not be null
-     */
-    protected void paintDayForeground(Graphics g, int x, int y, int width, int height, Calendar cal) {
-        String numericDay = dayOfMonthFormatter.format(cal.getTime());
-
-        int boxPaddingX = monthView.getBoxPaddingX();
-        int boxPaddingY = monthView.getBoxPaddingY();
-        
-        g.setColor(monthView.getDayForeground(cal.get(Calendar.DAY_OF_WEEK)));
-        paintDayForeground(g, numericDay, isLeftToRight ? x + boxPaddingX + boxWidth : x + boxPaddingX + boxWidth - 1,
-                y + boxPaddingY, cal);
-    }
-
-    /**
-     * Paints string of the day. No calculations made. Used by LAFs.
-     * <p>
-     * 
-     * Note: the given calendar must not be changed.
-     * @param g Graphics to paint on.
-     * @param numericDay Text representation of the day.
-     * @param x X coordinate of the upper <b>right</b> corner.
-     * @param y Y coordinate of the upper <b>right</b> corner.
-     */
-    protected void paintDayForeground(Graphics g, String numericDay, int x, int y, Calendar cal) {
-        
-//        SwingXUtilities.drawStringUnderlineCharacterAt(monthView, g, numericDay, -1, x, y);
-//        BasicGraphicsUtils.drawString(g, numericDay, -1, x, y);
-        
-        FontMetrics fm = g.getFontMetrics();
-        g.drawString(numericDay, x - fm.stringWidth(numericDay), y + fm.getAscent());
-    }
-
-    /**
-     * Paint the background for the specified flagged day. The default implementation just calls
-     * <code>paintDayBackground</code>.
-     * <p>
-     * 
-     * Note: the given calendar must not be changed.
-     * 
-     * @param g Graphics object to paint to
-     * @param x x-coordinate of upper left corner
-     * @param y y-coordinate of upper left corner
-     * @param width width of bounding box for the day
-     * @param height height of bounding box for the day
-     * @param cal the calendar specifying the day to paint, must not be null
-     */
-    protected void paintFlaggedDayBackground(Graphics g, int x, int y, int width, int height, Calendar cal) {
-        paintDayBackground(g, x, y, width, height, cal);
-    }
-
-    /**
-     * Paint the foreground for the specified flagged day.
-     * <p>
-     * 
-     * Note: the given calendar must not be changed.
-     *
-     * @param g Graphics object to paint to
-     * @param x x-coordinate of upper left corner
-     * @param y y-coordinate of upper left corner
-     * @param width width of bounding box for the day
-     * @param height height of bounding box for the day
-     * @param cal the calendar specifying the day to paint, must not be null
-     */
-    protected void paintFlaggedDayForeground(Graphics g, int x, int y, int width, int height, Calendar cal) {
-        Date date = cal.getTime();
-        String numericDay = dayOfMonthFormatter.format(date);
-        FontMetrics fm;
-
-        int boxPaddingX = monthView.getBoxPaddingX();
-        int boxPaddingY = monthView.getBoxPaddingY();
-
-        Font oldFont = monthView.getFont();
-        g.setColor(monthView.getFlaggedDayForeground());
-        g.setFont(derivedFont);
-        fm = monthView.getFontMetrics(derivedFont);
-        g.drawString(numericDay,
-                isLeftToRight ?
-                        x + boxPaddingX +
-                                boxWidth - fm.stringWidth(numericDay):
-                        x + boxPaddingX +
-                                boxWidth - fm.stringWidth(numericDay) - 1,
-                y + boxPaddingY + fm.getAscent());
-        g.setFont(oldFont);
-    }
-
-    /**
-     * Paint the foreground for the specified unselectable day.
-     * <p>
-     * 
-     * Note: the given calendar must not be changed.
-     *
-     * @param g Graphics object to paint to
-     * @param x x-coordinate of upper left corner
-     * @param y y-coordinate of upper left corner
-     * @param width width of bounding box for the day
-     * @param height height of bounding box for the day
-     * @param cal the calendar specifying the day to paint, must not be null
-     */
-    protected void paintUnselectableDayBackground(Graphics g, int x, int y, int width, int height, Calendar cal) {
-        paintDayBackground(g, x, y, width, height, cal);
-    }
-
-    /**
-     * Paint the foreground for the specified unselectable day.
-     * <p>
-     * 
-     * Note: the given calendar must not be changed.
-     *
-     * @param g Graphics object to paint to
-     * @param x x-coordinate of upper left corner
-     * @param y y-coordinate of upper left corner
-     * @param width width of bounding box for the day
-     * @param height height of bounding box for the day
-     * @param cal the calendar specifying the day to paint, must not be null
-     */
-    protected void paintUnselectableDayForeground(Graphics g, int x, int y, int width, int height, Calendar cal) {
-        paintDayForeground(g, x, y, width, height, cal);
-        g.setColor(unselectableDayForeground);
-
-        String numericDay = dayOfMonthFormatter.format(cal.getTime());
-        FontMetrics fm = monthView.getFontMetrics(derivedFont);
-        int boxPaddingX = monthView.getBoxPaddingX();
-        int boxPaddingY = monthView.getBoxPaddingY();
-        width = fm.stringWidth(numericDay);
-        height = fm.getAscent();
-        x = isLeftToRight ? x + boxPaddingX + boxWidth - fm.stringWidth(numericDay) :
-                x + boxPaddingX +
-                        boxWidth - fm.stringWidth(numericDay) - 1;
-        y = y + boxPaddingY;
-
-        g.drawLine(x, y, x + width, y + height);
-        g.drawLine(x + 1, y, x + width + 1, y + height);
-        g.drawLine(x + width, y, x, y + height);
-        g.drawLine(x + width - 1, y, x - 1, y + height);
-    }
-
-    /**
-     * Paint the background for the specified leading day.
-     * <p>
-     * 
-     * Note: the given calendar must not be changed.
-     *
-     * @param g Graphics object to paint to
-     * @param x x-coordinate of upper left corner
-     * @param y y-coordinate of upper left corner
-     * @param width width of bounding box for the day
-     * @param height height of bounding box for the day
-     * @param cal the calendar specifying the day to paint, must not be null
-     */
-    protected void paintLeadingDayBackground(Graphics g, int x, int y, int width, int height, Calendar cal) {
-        paintDayBackground(g, x, y, width, height, cal);
-    }
-
-    /**
-     * Paint the foreground for the specified leading day.
-     * <p>
-     * 
-     * Note: the given calendar must not be changed.
-     *
-     * @param g Graphics object to paint to
-     * @param x x-coordinate of upper left corner
-     * @param y y-coordinate of upper left corner
-     * @param width width of bounding box for the day
-     * @param height height of bounding box for the day
-     * @param cal the calendar specifying the day to paint, must not be null
-     */
-    protected void paintLeadingDayForeground(Graphics g, int x, int y, int width, int height, Calendar cal) {
-        String numericDay = dayOfMonthFormatter.format(cal.getTime());
-        FontMetrics fm;
-
-        g.setColor(leadingDayForeground);
-
-        int boxPaddingX = monthView.getBoxPaddingX();
-        int boxPaddingY = monthView.getBoxPaddingY();
-
-        fm = g.getFontMetrics();
-        int ltorOffset = x + boxPaddingX +
-                boxWidth - fm.stringWidth(numericDay);
-        g.drawString(numericDay,
-                isLeftToRight ?
-                        ltorOffset :
-                        ltorOffset - 1,
-                y + boxPaddingY + fm.getAscent());
-    }
-
-    /**
-     * Paint the background for the specified trailing day.
-     * <p>
-     * 
-     * Note: the given calendar must not be changed.
-     *
-     * @param g Graphics object to paint to
-     * @param x x-coordinate of upper left corner
-     * @param y y-coordinate of upper left corner
-     * @param width width of bounding box for the day
-     * @param height height of bounding box for the day
-     * @param cal the calendar specifying the day to paint, must not be null
-     */
-    protected void paintTrailingDayBackground(Graphics g, int x, int y, int width, int height, Calendar cal) {
-        paintLeadingDayBackground(g, x, y, width, height, cal);
-    }
-
-    /**
-     * Paint the foreground for the specified trailing day.
-     * <p>
-     * 
-     * Note: the given calendar must not be changed.
-     *
-     * @param g Graphics object to paint to
-     * @param x x-coordinate of upper left corner
-     * @param y y-coordinate of upper left corner
-     * @param width width of bounding box for the day
-     * @param height height of bounding box for the day
-     * @param cal the calendar specifying the day to paint, must not be null
-     */
-    protected void paintTrailingDayForeground(Graphics g, int x, int y, int width, int height, Calendar cal) {
-        String numericDay = dayOfMonthFormatter.format(cal.getTime());
-        FontMetrics fm;
-
-        g.setColor(trailingDayForeground);
-
-        int boxPaddingX = monthView.getBoxPaddingX();
-        int boxPaddingY = monthView.getBoxPaddingY();
-
-        fm = g.getFontMetrics();
-        g.drawString(numericDay,
-                isLeftToRight ?
-                        x + boxPaddingX +
-                                boxWidth - fm.stringWidth(numericDay) :
-                        x + boxPaddingX +
-                                boxWidth - fm.stringWidth(numericDay) - 1,
-                y + boxPaddingY + fm.getAscent());
-    }
-
-
-    protected void paintBackground(final Rectangle clip, final Graphics g) {
-        if (monthView.isOpaque()) {
-            g.setColor(monthView.getBackground());
-            g.fillRect(clip.x, clip.y, clip.width, clip.height);
-        }
-    }
-
-//---------------------- end of painting
-    
-//---------------------- navigation support    
-    
     private void traverseMonth(int arrowType) {
         if (arrowType == MONTH_DOWN) {
             previousMonth();
@@ -2767,6 +2424,540 @@ public class BasicMonthViewUI extends MonthViewUI {
 
     }
 
-
+//--------------------- deprecated painting api
+//--------------------- this is still serviced (if a ui doesn't install a renderingHandler)
+//--------------------- but no longer actively maintained    
     
+
+    /**
+     * Paints the row which contains the days of the week.
+     * 
+     * @param g
+     * @param x
+     * @param y
+     * @param width
+     * @param calendar
+     * 
+     * @deprecated
+     */
+    @Deprecated
+    protected void paintDaysOfTheWeek(Graphics g, int x, int y, int width,
+            Calendar calendar) {
+        // Paint background of the short names for the days of the week.
+        boolean showingWeekNumber = monthView.isShowingWeekNumber();
+        int tmpX = isLeftToRight ? x + (showingWeekNumber ? fullBoxWidth : 0) : x;
+        int tmpY = y + fullMonthBoxHeight;
+        int tmpWidth = width - (showingWeekNumber ? fullBoxWidth : 0);
+        paintDayOfTheWeekBackground(g, tmpX, tmpY, tmpWidth, fullBoxHeight, calendar);
+    
+        // Paint short representation of day of the week.
+        int dayIndex = monthView.getFirstDayOfWeek() - 1;
+        String[] daysOfTheWeek = monthView.getDaysOfTheWeek();
+    
+        Font oldFont = monthView.getFont();
+        g.setFont(derivedFont);
+        g.setColor(monthView.getDaysOfTheWeekForeground());
+        FontMetrics fm = monthView.getFontMetrics(derivedFont);
+        for (int i = 0; i < JXMonthView.DAYS_IN_WEEK; i++) {
+            tmpX = isLeftToRight ?
+                    x + (i * fullBoxWidth) + monthView.getBoxPaddingX() +
+                            (boxWidth / 2) -
+                            (fm.stringWidth(daysOfTheWeek[dayIndex]) /
+                                    2) :
+                    x + width - (i * fullBoxWidth) - monthView.getBoxPaddingX() -
+                            (boxWidth / 2) -
+                            (fm.stringWidth(daysOfTheWeek[dayIndex]) /
+                                    2);
+            if (showingWeekNumber) {
+                tmpX += isLeftToRight ? fullBoxWidth : -fullBoxWidth;
+            }
+            tmpY = y + fullMonthBoxHeight + monthView.getBoxPaddingY() + fm.getAscent();
+            g.drawString(daysOfTheWeek[dayIndex], tmpX, tmpY);
+            dayIndex++;
+            if (dayIndex == JXMonthView.DAYS_IN_WEEK) {
+                dayIndex = 0;
+            }
+        }
+        g.setFont(oldFont);
+    }
+
+    /**
+     * Paints a day the current month, represented by the calendar in a day-box
+     * located at left/top. The size of the day-box is defined by
+     * fullBoxWidth/Height. The appearance of the day depends on its state (like
+     * unselectable, flagged, selected)
+     * <p>
+     * 
+     * Note: the given calendar must not be changed.
+     * 
+     * @param g the Graphics to paint into.
+     * @param left the left boundary of the day-box to paint.
+     * @param top the upper boundary of the day-box to paint.
+     * @param calendar the calendar specifying the the day to paint, must not be
+     *        null
+     * 
+     * @deprecated
+     */
+    @Deprecated
+    protected void paintDay(Graphics g, int left, int top, Calendar calendar) {
+        if (monthView.isUnselectableDate(calendar.getTime())) {
+            paintUnselectableDayBackground(g, left, top, fullBoxWidth,
+                    fullBoxHeight, calendar);
+            paintUnselectableDayForeground(g, left, top, fullBoxWidth,
+                    fullBoxHeight, calendar);
+    
+        } else if (monthView.isFlaggedDate(calendar.getTime())) {
+            paintFlaggedDayBackground(g, left, top, fullBoxWidth,
+                    fullBoxHeight, calendar);
+            paintFlaggedDayForeground(g, left, top, fullBoxWidth,
+                    fullBoxHeight, calendar);
+        } else {
+            paintDayBackground(g, left, top, fullBoxWidth, fullBoxHeight,
+                    calendar);
+            paintDayForeground(g, left, top, fullBoxWidth, fullBoxHeight,
+                    calendar);
+        }
+    }
+
+    /**
+     * Paints a trailing day of the current month, represented by the calendar,
+     * in a day-box located at left/top. The size of the day-box is defined by
+     * fullBoxWidth/Height. Does nothing if the monthView's
+     * isShowingTrailingDates is false.
+     * <p>
+     * 
+     * Note: the given calendar must not be changed.
+     * 
+     * @param g the Graphics to paint into.
+     * @param left the left boundary of the day-box to paint.
+     * @param top the upper boundary of the day-box to paint.
+     * @param calendar the calendar specifying the the day to paint, must not be
+     *        null
+     *        
+     * @deprecated       
+     */
+    @Deprecated
+    protected void paintTrailingDay(Graphics g, int left, int top,
+            Calendar calendar) {
+        if (!monthView.isShowingTrailingDays()) return;
+            paintTrailingDayBackground(g, left, top, fullBoxWidth,
+                        fullBoxHeight, calendar);
+            paintTrailingDayForeground(g, left, top, fullBoxWidth,
+                        fullBoxHeight, calendar);
+    }
+
+    /**
+     * Paints a leading day of the current month, represented by the calendar,
+     * in a day-box located at left/top. The size of the day-box is defined by
+     * fullBoxWidth/Height. Does nothing if the monthView's
+     * isShowingLeadingDates is false.
+     * <p>
+     * 
+     * Note: the given calendar must not be changed.
+     * 
+     * @param g the Graphics to paint into.
+     * @param left the left boundary of the day-box to paint.
+     * @param top the upper boundary of the day-box to paint.
+     * @param calendar the calendar specifying the the day to paint, must not be
+     *        null
+     *        
+     * @deprecated       
+     */
+    @Deprecated
+    protected void paintLeadingDay(Graphics g, int left, int top,
+            Calendar calendar) {
+        if (!monthView.isShowingLeadingDays())
+            return;
+        paintLeadingDayBackground(g, left, top, fullBoxWidth, fullBoxHeight,
+                calendar);
+        paintLeadingDayForeground(g, left, top, fullBoxWidth, fullBoxHeight,
+                calendar);
+    }
+
+    /**
+     * Paints the weeks of year if the showingWeek property is true. Does
+     * nothing otherwise.
+     * 
+     * It is assumed the given calendar is already set to the first day of the
+     * month. The calendar is unchanged when leaving this method.
+     * 
+     * Note: the given calendar must not be changed.
+     * 
+     * PENDING JW: this implementation doesn't need the height - should it be
+     * given anyway for symetry in case subclasses need it?
+     * 
+     * @param g Graphics object.
+     * @param x x location of month
+     * @param initialY y the upper bound of the "weekNumbers-box"
+     * @param width width of month
+     * @param cal the calendar specifying the the first day of the month to
+     *        paint, must not be null
+     *        
+     * @deprecated       
+     */
+    @Deprecated
+    protected void paintWeeksOfYear(Graphics g, int x, int initialY, int width,
+            Calendar cal) {
+        if (!monthView.isShowingWeekNumber())
+            return;
+        int tmpX = isLeftToRight ? x : x + width - fullBoxWidth;
+        paintWeekOfYearBackground(g, tmpX, initialY, fullBoxWidth,
+                calendarHeight - (fullMonthBoxHeight + fullBoxHeight), cal);
+    
+        Calendar calendar = (Calendar) cal.clone();
+        int weeks = getWeeks(calendar);
+        calendar.setTime(cal.getTime());
+        for (int weekOfYear = 0; weekOfYear <= weeks; weekOfYear++) {
+                paintWeekOfYearForeground(g, tmpX, initialY, fullBoxWidth,
+                        fullBoxHeight, calendar);
+            initialY += fullBoxHeight;
+            calendar.add(Calendar.WEEK_OF_YEAR, 1);
+        }
+    
+    }
+
+    /**
+     * Paints the week of the year of the week of the year represented by the
+     * given calendar.
+     * <p>
+     * 
+     * Note: the given calendar must not be changed.
+     *
+     * @param g Graphics object
+     * @param x x-coordinate of upper left corner.
+     * @param y y-coordinate of upper left corner.
+     * @param width width of bounding box
+     * @param height height of bounding box
+     * 
+     * @deprecated
+     */
+    @Deprecated
+    @SuppressWarnings({"UNUSED_SYMBOL", "UnusedDeclaration"})
+    protected void paintWeekOfYearForeground(Graphics g, int x, int y, int width, int height, 
+            Calendar cal) {
+        String str = Integer.toString(cal.get(Calendar.WEEK_OF_YEAR));
+        FontMetrics fm;
+    
+        g.setColor(weekOfTheYearForeground);
+    
+        int boxPaddingX = monthView.getBoxPaddingX();
+        int boxPaddingY = monthView.getBoxPaddingY();
+    
+        fm = g.getFontMetrics();
+        g.drawString(str,
+                isLeftToRight ?
+                        x + boxPaddingX +
+                                boxWidth - fm.stringWidth(str) :
+                        x + boxPaddingX +
+                                boxWidth - fm.stringWidth(str) - 1,
+                y + boxPaddingY + fm.getAscent());
+    }
+
+    /**
+     * Paint the background for the day specified by the given calendar.
+     * <p>
+     * 
+     * Note: the given calendar must not be changed.
+     * 
+     *
+     * @param g Graphics object to paint to
+     * @param x x-coordinate of upper left corner
+     * @param y y-coordinate of upper left corner
+     * @param width width of bounding box for the day
+     * @param height height of bounding box for the day
+     * @param cal the calendar specifying the day to paint, must not be null
+     * @see  org.jdesktop.swingx.JXMonthView#isSelectedDate
+     * @see  #isToday
+     * 
+     * @deprecated
+     * 
+     */
+    @Deprecated
+    protected void paintDayBackground(Graphics g, int x, int y, int width, int height,
+                                      Calendar cal) {
+        Date date = cal.getTime(); 
+        
+        if (monthView.isSelected(date)) {
+            g.setColor(monthView.getSelectedBackground());
+            g.fillRect(x, y, width, height);
+        }
+    
+        // If the date is today make sure we draw it's background over the selected
+        // background.
+        if (isToday(date)) {
+            g.setColor(monthView.getTodayBackground());
+            g.drawRect(x, y, width - 1, height - 1);
+        }
+    }
+
+    /**
+     * Paint the foreground for the specified day.
+     * <p>
+     * 
+     * Note: the given calendar must not be changed.
+     *
+     * @param g Graphics object to paint to
+     * @param x x-coordinate of upper left corner
+     * @param y y-coordinate of upper left corner
+     * @param width width of bounding box for the day
+     * @param height height of bounding box for the day
+     * @param cal the calendar specifying the day to paint, must not be null
+     * 
+     * @deprecated
+     */
+    @Deprecated
+    protected void paintDayForeground(Graphics g, int x, int y, int width, int height, Calendar cal) {
+        String numericDay = dayOfMonthFormatter.format(cal.getTime());
+    
+        int boxPaddingX = monthView.getBoxPaddingX();
+        int boxPaddingY = monthView.getBoxPaddingY();
+        
+        g.setColor(monthView.getDayForeground(cal.get(Calendar.DAY_OF_WEEK)));
+        paintDayForeground(g, numericDay, isLeftToRight ? x + boxPaddingX + boxWidth : x + boxPaddingX + boxWidth - 1,
+                y + boxPaddingY, cal);
+    }
+
+    /**
+     * Paints string of the day. No calculations made. Used by LAFs.
+     * <p>
+     * 
+     * Note: the given calendar must not be changed.
+     * @param g Graphics to paint on.
+     * @param numericDay Text representation of the day.
+     * @param x X coordinate of the upper <b>right</b> corner.
+     * @param y Y coordinate of the upper <b>right</b> corner.
+     * 
+     * @deprecated
+     */
+    @Deprecated
+    protected void paintDayForeground(Graphics g, String numericDay, int x, int y, Calendar cal) {
+        FontMetrics fm = g.getFontMetrics();
+        g.drawString(numericDay, x - fm.stringWidth(numericDay), y + fm.getAscent());
+    }
+
+    /**
+     * Paint the background for the specified flagged day. The default implementation just calls
+     * <code>paintDayBackground</code>.
+     * <p>
+     * 
+     * Note: the given calendar must not be changed.
+     * 
+     * @param g Graphics object to paint to
+     * @param x x-coordinate of upper left corner
+     * @param y y-coordinate of upper left corner
+     * @param width width of bounding box for the day
+     * @param height height of bounding box for the day
+     * @param cal the calendar specifying the day to paint, must not be null
+     * 
+     * @deprecated
+     */
+    @Deprecated
+    protected void paintFlaggedDayBackground(Graphics g, int x, int y, int width, int height, Calendar cal) {
+        paintDayBackground(g, x, y, width, height, cal);
+    }
+
+    /**
+     * Paint the foreground for the specified flagged day.
+     * <p>
+     * 
+     * Note: the given calendar must not be changed.
+     *
+     * @param g Graphics object to paint to
+     * @param x x-coordinate of upper left corner
+     * @param y y-coordinate of upper left corner
+     * @param width width of bounding box for the day
+     * @param height height of bounding box for the day
+     * @param cal the calendar specifying the day to paint, must not be null
+     * 
+     * @deprecated
+     */
+    @Deprecated
+    protected void paintFlaggedDayForeground(Graphics g, int x, int y, int width, int height, Calendar cal) {
+        Date date = cal.getTime();
+        String numericDay = dayOfMonthFormatter.format(date);
+        FontMetrics fm;
+    
+        int boxPaddingX = monthView.getBoxPaddingX();
+        int boxPaddingY = monthView.getBoxPaddingY();
+    
+        Font oldFont = monthView.getFont();
+        g.setColor(monthView.getFlaggedDayForeground());
+        g.setFont(derivedFont);
+        fm = monthView.getFontMetrics(derivedFont);
+        g.drawString(numericDay,
+                isLeftToRight ?
+                        x + boxPaddingX +
+                                boxWidth - fm.stringWidth(numericDay):
+                        x + boxPaddingX +
+                                boxWidth - fm.stringWidth(numericDay) - 1,
+                y + boxPaddingY + fm.getAscent());
+        g.setFont(oldFont);
+    }
+
+    /**
+     * Paint the foreground for the specified unselectable day.
+     * <p>
+     * 
+     * Note: the given calendar must not be changed.
+     *
+     * @param g Graphics object to paint to
+     * @param x x-coordinate of upper left corner
+     * @param y y-coordinate of upper left corner
+     * @param width width of bounding box for the day
+     * @param height height of bounding box for the day
+     * @param cal the calendar specifying the day to paint, must not be null
+     * 
+     * @deprecated
+     */
+    @Deprecated
+    protected void paintUnselectableDayBackground(Graphics g, int x, int y, int width, int height, Calendar cal) {
+        paintDayBackground(g, x, y, width, height, cal);
+    }
+
+    /**
+     * Paint the foreground for the specified unselectable day.
+     * <p>
+     * 
+     * Note: the given calendar must not be changed.
+     *
+     * @param g Graphics object to paint to
+     * @param x x-coordinate of upper left corner
+     * @param y y-coordinate of upper left corner
+     * @param width width of bounding box for the day
+     * @param height height of bounding box for the day
+     * @param cal the calendar specifying the day to paint, must not be null
+     * 
+     * @deprecated
+     */
+    @Deprecated
+    protected void paintUnselectableDayForeground(Graphics g, int x, int y, int width, int height, Calendar cal) {
+        paintDayForeground(g, x, y, width, height, cal);
+        g.setColor(unselectableDayForeground);
+    
+        String numericDay = dayOfMonthFormatter.format(cal.getTime());
+        FontMetrics fm = monthView.getFontMetrics(derivedFont);
+        int boxPaddingX = monthView.getBoxPaddingX();
+        int boxPaddingY = monthView.getBoxPaddingY();
+        width = fm.stringWidth(numericDay);
+        height = fm.getAscent();
+        x = isLeftToRight ? x + boxPaddingX + boxWidth - fm.stringWidth(numericDay) :
+                x + boxPaddingX +
+                        boxWidth - fm.stringWidth(numericDay) - 1;
+        y = y + boxPaddingY;
+    
+        g.drawLine(x, y, x + width, y + height);
+        g.drawLine(x + 1, y, x + width + 1, y + height);
+        g.drawLine(x + width, y, x, y + height);
+        g.drawLine(x + width - 1, y, x - 1, y + height);
+    }
+
+    /**
+     * Paint the background for the specified leading day.
+     * <p>
+     * 
+     * Note: the given calendar must not be changed.
+     *
+     * @param g Graphics object to paint to
+     * @param x x-coordinate of upper left corner
+     * @param y y-coordinate of upper left corner
+     * @param width width of bounding box for the day
+     * @param height height of bounding box for the day
+     * @param cal the calendar specifying the day to paint, must not be null
+     * 
+     * @deprecated
+     */
+    @Deprecated
+    protected void paintLeadingDayBackground(Graphics g, int x, int y, int width, int height, Calendar cal) {
+        paintDayBackground(g, x, y, width, height, cal);
+    }
+
+    /**
+     * Paint the foreground for the specified leading day.
+     * <p>
+     * 
+     * Note: the given calendar must not be changed.
+     *
+     * @param g Graphics object to paint to
+     * @param x x-coordinate of upper left corner
+     * @param y y-coordinate of upper left corner
+     * @param width width of bounding box for the day
+     * @param height height of bounding box for the day
+     * @param cal the calendar specifying the day to paint, must not be null
+     * 
+     * @deprecated
+     */
+    @Deprecated
+    protected void paintLeadingDayForeground(Graphics g, int x, int y, int width, int height, Calendar cal) {
+        String numericDay = dayOfMonthFormatter.format(cal.getTime());
+        FontMetrics fm;
+    
+        g.setColor(leadingDayForeground);
+    
+        int boxPaddingX = monthView.getBoxPaddingX();
+        int boxPaddingY = monthView.getBoxPaddingY();
+    
+        fm = g.getFontMetrics();
+        int ltorOffset = x + boxPaddingX +
+                boxWidth - fm.stringWidth(numericDay);
+        g.drawString(numericDay,
+                isLeftToRight ?
+                        ltorOffset :
+                        ltorOffset - 1,
+                y + boxPaddingY + fm.getAscent());
+    }
+
+    /**
+     * Paint the background for the specified trailing day.
+     * <p>
+     * 
+     * Note: the given calendar must not be changed.
+     *
+     * @param g Graphics object to paint to
+     * @param x x-coordinate of upper left corner
+     * @param y y-coordinate of upper left corner
+     * @param width width of bounding box for the day
+     * @param height height of bounding box for the day
+     * @param cal the calendar specifying the day to paint, must not be null
+     * 
+     * @deprecated
+     */
+    @Deprecated
+    protected void paintTrailingDayBackground(Graphics g, int x, int y, int width, int height, Calendar cal) {
+        paintLeadingDayBackground(g, x, y, width, height, cal);
+    }
+
+    /**
+     * Paint the foreground for the specified trailing day.
+     * <p>
+     * 
+     * Note: the given calendar must not be changed.
+     *
+     * @param g Graphics object to paint to
+     * @param x x-coordinate of upper left corner
+     * @param y y-coordinate of upper left corner
+     * @param width width of bounding box for the day
+     * @param height height of bounding box for the day
+     * @param cal the calendar specifying the day to paint, must not be null
+     * 
+     * @deprecated
+     */
+    @Deprecated
+    protected void paintTrailingDayForeground(Graphics g, int x, int y, int width, int height, Calendar cal) {
+        String numericDay = dayOfMonthFormatter.format(cal.getTime());
+        FontMetrics fm;
+    
+        g.setColor(trailingDayForeground);
+    
+        int boxPaddingX = monthView.getBoxPaddingX();
+        int boxPaddingY = monthView.getBoxPaddingY();
+    
+        fm = g.getFontMetrics();
+        g.drawString(numericDay,
+                isLeftToRight ?
+                        x + boxPaddingX +
+                                boxWidth - fm.stringWidth(numericDay) :
+                        x + boxPaddingX +
+                                boxWidth - fm.stringWidth(numericDay) - 1,
+                y + boxPaddingY + fm.getAscent());
+    }
 }
