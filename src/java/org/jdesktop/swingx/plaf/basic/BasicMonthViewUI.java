@@ -71,6 +71,7 @@ import org.jdesktop.swingx.event.DateSelectionListener;
 import org.jdesktop.swingx.plaf.MonthViewUI;
 import org.jdesktop.swingx.renderer.FormatStringValue;
 import org.jdesktop.swingx.renderer.LabelProvider;
+import org.jdesktop.swingx.renderer.PainterAware;
 
 /**
  * Base implementation of the <code>JXMonthView</code> UI.<p>
@@ -437,8 +438,10 @@ public class BasicMonthViewUI extends MonthViewUI {
         private MonthViewCellContext cellContext;
         private LabelProvider weekOfYearProvider;
         private LabelProvider dayOfWeekProvider;
+        private TextCrossingPainter textCross;
         
         public void install() {
+            textCross = new TextCrossingPainter<JLabel>();
             rendererPane = new CellRendererPane();
             monthView.add(rendererPane);
             if (dayProvider == null) {
@@ -455,6 +458,7 @@ public class BasicMonthViewUI extends MonthViewUI {
         
         public void uninstall() {
             monthView.remove(rendererPane);
+            textCross = null;
             rendererPane = null;
             cellContext = null;
             dayProvider.setStringValue(null);
@@ -486,7 +490,7 @@ public class BasicMonthViewUI extends MonthViewUI {
                     isToday(calendar.getTime()));
             // 2. getComponent
             JComponent comp = dayProvider.getRendererComponent(cellContext);
-            // "highlight"
+            // 3. "highlight"
 
             if (monthView.isFlaggedDate(calendar.getTime())) {
                 comp.setForeground(monthView.getFlaggedDayForeground());
@@ -496,25 +500,15 @@ public class BasicMonthViewUI extends MonthViewUI {
                     comp.setForeground(perDay);
                 }
             }
-            renderDayBox(g, left, top, comp);
-
-            // cross-out for unselectables
-            if (monthView.isUnselectableDate(calendar.getTime())) {
-                // PENDING JW: this looks different from the old version
-                // because we don't care about the string rep of the date
-                // but cross out the complete box
-                // should we install the earlier?
-                g.setColor(unselectableDayForeground);
-                int x = left + monthView.getBoxPaddingX();
-                int y = top + monthView.getBoxPaddingY();
-                int width = fullBoxWidth - 2 * monthView.getBoxPaddingX();
-                int height = fullBoxHeight - 2 * monthView.getBoxPaddingY();
-                g.drawLine(x, y, x + width, y + height);
-                g.drawLine(x + 1, y, x + width + 1, y + height);
-                g.drawLine(x + width, y, x, y + height);
-                g.drawLine(x + width - 1, y, x - 1, y + height);
-
+            if (monthView.isUnselectableDate(calendar.getTime()) 
+                    && (comp instanceof PainterAware )
+                    && (comp instanceof JLabel)) {
+                textCross.setForeground(unselectableDayForeground);
+                ((PainterAware) comp).setPainter(textCross);
             }
+            
+            // 4. doRender
+            renderDayBox(g, left, top, comp);
         }
         /**
          * PENDING JW: set the calendar as value, not the Date. Doing so
@@ -540,12 +534,13 @@ public class BasicMonthViewUI extends MonthViewUI {
                     false);
             // 2. getComponent
             JComponent comp = weekOfYearProvider.getRendererComponent(cellContext);
-            // "highlight"
+            // 3. "highlight"
             if (weekOfTheYearForeground != null) {
                 comp.setForeground(weekOfTheYearForeground);
             } 
+            // 4. doRender
             renderDayBox(g, left, top, comp);
-            
+           
         }
 
         /**
