@@ -1255,6 +1255,15 @@ public class JXMonthView extends JComponent {
     }
 
     /**
+     * 
+     * @param dayOfWeek
+     * @return
+     */
+    public String getDayOfTheWeek(int dayOfWeek) {
+        return getDaysOfTheWeek()[dayOfWeek - 1];
+    }
+    
+    /**
      * Returns true if anti-aliased text is enabled for this component, false
      * otherwise.
      *

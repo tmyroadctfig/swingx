@@ -37,38 +37,21 @@ import org.jdesktop.swingx.renderer.CellContext;
  */
 class MonthViewCellContext extends CellContext<JXMonthView> {
 
-    private boolean trailing;
-    private boolean leading;
-    private boolean today;
+    private DayState dayState;
 
-
-    public void installInMonthDayContext(JXMonthView component, Object value, boolean selected, 
-             boolean today) {
+    public void installMonthContext(JXMonthView component, Object value, boolean selected, 
+             DayState dayState) {
         super.installContext(component, value, -1, -1, selected, false,
                 true, true);
-        this.leading = false;
-        this.trailing = false;
-        this.today = today;
+        this.dayState = dayState;
     }
 
-    public void installOutMonthDayContext(JXMonthView component, Object value, boolean leading) {
-        installInMonthDayContext(component, value, false, false);
-        if (leading) {
-            this.leading = true;
-            this.trailing = false;
-        } else {
-            this.leading = false;
-            this.trailing = true;
-        }
-    }
-    
-    
     @Override
     protected Color getForeground() {
-        if (leading) {
+        if (DayState.LEADING == dayState) {
             return UIManager.getColor(getUIPrefix() + "leadingDayForeground");
         }
-        if (trailing) {
+        if (DayState.TRAILING == dayState) {
             return UIManager.getColor(getUIPrefix() + "trailingDayForeground");
         }
         return super.getForeground();
@@ -77,7 +60,7 @@ class MonthViewCellContext extends CellContext<JXMonthView> {
 
     @Override
     protected Color getSelectionBackground() {
-        if (leading || trailing) return getBackground();
+        if (DayState.LEADING == dayState || DayState.TRAILING == dayState) return getBackground();
         return getComponent() != null ? getComponent().getSelectedBackground() : null;
     }
 
@@ -107,7 +90,7 @@ class MonthViewCellContext extends CellContext<JXMonthView> {
      * @return
      */
     protected boolean isToday() {
-        return today;
+        return DayState.TODAY == dayState;
     }
 
     @Override
