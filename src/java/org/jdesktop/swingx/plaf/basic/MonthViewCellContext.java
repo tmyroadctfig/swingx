@@ -24,10 +24,10 @@ package org.jdesktop.swingx.plaf.basic;
 import java.awt.Color;
 
 import javax.swing.BorderFactory;
-import javax.swing.UIManager;
 import javax.swing.border.Border;
 
 import org.jdesktop.swingx.JXMonthView;
+import org.jdesktop.swingx.plaf.UIManagerExt;
 import org.jdesktop.swingx.renderer.CellContext;
 
 /**
@@ -49,10 +49,10 @@ class MonthViewCellContext extends CellContext<JXMonthView> {
     @Override
     protected Color getForeground() {
         if (DayState.LEADING == dayState) {
-            return UIManager.getColor(getUIPrefix() + "leadingDayForeground");
+            return UIManagerExt.getColor(getUIPrefix() + "leadingDayForeground");
         }
         if (DayState.TRAILING == dayState) {
-            return UIManager.getColor(getUIPrefix() + "trailingDayForeground");
+            return UIManagerExt.getColor(getUIPrefix() + "trailingDayForeground");
         }
         return super.getForeground();
     }
@@ -61,12 +61,13 @@ class MonthViewCellContext extends CellContext<JXMonthView> {
     @Override
     protected Color getSelectionBackground() {
         if (DayState.LEADING == dayState || DayState.TRAILING == dayState) return getBackground();
-        return getComponent() != null ? getComponent().getSelectedBackground() : null;
+        return getComponent() != null ? getComponent().getSelectionBackground() : null;
     }
 
     @Override
     protected Color getSelectionForeground() {
-        return getForeground();
+        if (DayState.LEADING == dayState || DayState.TRAILING == dayState) return getForeground();
+        return getComponent() != null ? getComponent().getSelectionForeground() : null;
     }
 
     

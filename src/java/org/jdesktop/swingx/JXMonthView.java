@@ -249,6 +249,8 @@ public class JXMonthView extends JComponent {
     private Hashtable<Integer, Color> dayToColorTable = new Hashtable<Integer, Color>();
     private Color flaggedDayForeground;
 
+    private Color selectedForeground;
+
     /**
      * Create a new instance of the <code>JXMonthView</code> class using the
      * default Locale and the current system time as the first date to 
@@ -1348,8 +1350,54 @@ public class JXMonthView extends JComponent {
      *
      * @return the selected background color.
      */
-    public Color getSelectedBackground() {
+    public Color getSelectionBackground() {
         return selectedBackground;
+    }
+
+    /**
+     * Sets the selected background color to <code>c</code>.  The default color
+     * is installed by the ui.
+     *
+     * @param c Selected background.
+     */
+    public void setSelectionBackground(Color c) {
+        Color old = getSelectionBackground();
+        selectedBackground = c;
+        firePropertyChange("selectionBackground", old, getSelectionBackground());
+    }
+
+    /**
+     * Returns the selected foreground color.
+     *
+     * @return the selected foreground color.
+     */
+    public Color getSelectionForeground() {
+        return selectedForeground;
+    }
+
+    /**
+     * Sets the selected foreground color to <code>c</code>.  The default color
+     * is installed by the ui.
+     *
+     * @param c Selected foreground.
+     */
+    public void setSelectionForeground(Color c) {
+        Color old = getSelectionForeground();
+        selectedForeground = c;
+        firePropertyChange("selectionForeground", old, getSelectionForeground());
+    }
+
+    /**
+     * Returns the selected background color.
+     *
+     * @return the selected background color.
+     * 
+     * @deprecated use {@link #getSelectionBackground()} renamed for 
+     *   cross-component consistency.
+     */
+    @Deprecated
+    public Color getSelectedBackground() {
+        return getSelectionBackground();
     }
 
     /**
@@ -1357,11 +1405,15 @@ public class JXMonthView extends JComponent {
      * is <code>138, 173, 209 (Blue-ish)</code>
      *
      * @param c Selected background.
+     * 
+     * @deprecated use {@link #setSelectionBackground(Color)} renamed for
+     *   cross-component consistency.
      */
+    @Deprecated
     public void setSelectedBackground(Color c) {
-        selectedBackground = c;
-        repaint();
+        setSelectionBackground(c);
     }
+
 
     /**
      * Returns the color used when painting the today background.
@@ -1430,8 +1482,9 @@ public class JXMonthView extends JComponent {
      * @param c color to set
      */
     public void setDaysOfTheWeekForeground(Color c) {
+        Color old = getDaysOfTheWeekForeground();
         daysOfTheWeekForeground = c;
-        repaint();
+        firePropertyChange("daysOfTheWeekForeground", old, getDaysOfTheWeekForeground());
     }
 
     /**
@@ -1476,8 +1529,9 @@ public class JXMonthView extends JComponent {
      * @param c The color to be used for painting.
      */
     public void setFlaggedDayForeground(Color c) {
+        Color old = getFlaggedDayForeground();
         flaggedDayForeground = c;
-        repaint();
+        firePropertyChange("flaggedDayForeground", old, getFlaggedDayForeground());
     }
 
     /**

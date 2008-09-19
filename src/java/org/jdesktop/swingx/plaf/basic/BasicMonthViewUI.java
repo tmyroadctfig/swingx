@@ -69,6 +69,7 @@ import org.jdesktop.swingx.calendar.DateSelectionModel.SelectionMode;
 import org.jdesktop.swingx.event.DateSelectionEvent;
 import org.jdesktop.swingx.event.DateSelectionListener;
 import org.jdesktop.swingx.plaf.MonthViewUI;
+import org.jdesktop.swingx.plaf.UIManagerExt;
 import org.jdesktop.swingx.renderer.FormatStringValue;
 import org.jdesktop.swingx.renderer.LabelProvider;
 import org.jdesktop.swingx.renderer.PainterAware;
@@ -286,27 +287,50 @@ public class BasicMonthViewUI extends MonthViewUI {
 
     protected void installDefaults() {
         
-        Color background = monthView.getBackground();
-        if (background == null || background instanceof UIResource) {
-            monthView.setBackground(UIManager.getColor("JXMonthView.background"));
+       // JW: access all properties via the UIManagerExt ..
+        //        BasicLookAndFeel.installColorsAndFont(monthView, 
+//                "JXMonthView.background", "JXMonthView.foreground", "JXMonthView.font");
+        
+        if (isUIInstallable(monthView.getBackground())) {
+            monthView.setBackground(UIManagerExt.getColor("JXMonthView.background"));
         }
-        monthView.setBoxPaddingX(UIManager.getInt("JXMonthView.boxPaddingX"));
-        monthView.setBoxPaddingY(UIManager.getInt("JXMonthView.boxPaddingY"));
-        monthView.setMonthStringBackground(UIManager.getColor("JXMonthView.monthStringBackground"));
-        monthView.setMonthStringForeground(UIManager.getColor("JXMonthView.monthStringForeground"));
-        monthView.setDaysOfTheWeekForeground(UIManager.getColor("JXMonthView.daysOfTheWeekForeground"));
-        monthView.setSelectedBackground(UIManager.getColor("JXMonthView.selectedBackground"));
-        monthView.setFlaggedDayForeground(UIManager.getColor("JXMonthView.flaggedDayForeground"));
-        Font f = monthView.getFont();
-        if (f == null || f instanceof UIResource) {
+        if (isUIInstallable(monthView.getForeground())) {
+            monthView.setForeground(UIManagerExt.getColor("JXMonthView.foreground"));
+        }
+        if (isUIInstallable(monthView.getFont())) {
+            // PENDING JW: missing in managerExt? Or not applicable anyway?
             monthView.setFont(UIManager.getFont("JXMonthView.font"));
         }
+        if (isUIInstallable(monthView.getMonthStringBackground())) {
+            monthView.setMonthStringBackground(UIManagerExt.getColor("JXMonthView.monthStringBackground"));
+        }
+        if (isUIInstallable(monthView.getMonthStringForeground())) {
+            monthView.setMonthStringForeground(UIManagerExt.getColor("JXMonthView.monthStringForeground"));
+        }
+        if (isUIInstallable(monthView.getDaysOfTheWeekForeground())) {
+            monthView.setDaysOfTheWeekForeground(UIManagerExt.getColor("JXMonthView.daysOfTheWeekForeground"));
+        }
+        if (isUIInstallable(monthView.getSelectionBackground())) {
+            monthView.setSelectionBackground(UIManagerExt.getColor("JXMonthView.selectedBackground"));
+        }
+        if (isUIInstallable(monthView.getSelectionForeground())) {
+            monthView.setSelectionForeground(UIManagerExt.getColor("JXMonthView.selectedForeground"));
+        }
+        if (isUIInstallable(monthView.getFlaggedDayForeground())) {
+            monthView.setFlaggedDayForeground(UIManagerExt.getColor("JXMonthView.flaggedDayForeground"));
+        }
+        
+        // PENDING JW: remove here if rendererHandler takes over control completely
+        // as is, some properties are duplicated
+        monthView.setBoxPaddingX(UIManagerExt.getInt("JXMonthView.boxPaddingX"));
+        monthView.setBoxPaddingY(UIManagerExt.getInt("JXMonthView.boxPaddingY"));
+        
         monthDownImage = UIManager.getIcon("JXMonthView.monthDownFileName");
         monthUpImage = UIManager.getIcon("JXMonthView.monthUpFileName");
-        weekOfTheYearForeground = UIManager.getColor("JXMonthView.weekOfTheYearForeground");
-        leadingDayForeground = UIManager.getColor("JXMonthView.leadingDayForeground");
-        trailingDayForeground = UIManager.getColor("JXMonthView.trailingDayForeground");
-        unselectableDayForeground = UIManager.getColor("JXMonthView.unselectableDayForeground");
+        weekOfTheYearForeground = UIManagerExt.getColor("JXMonthView.weekOfTheYearForeground");
+        unselectableDayForeground = UIManagerExt.getColor("JXMonthView.unselectableDayForeground");
+        leadingDayForeground = UIManagerExt.getColor("JXMonthView.leadingDayForeground");
+        trailingDayForeground = UIManagerExt.getColor("JXMonthView.trailingDayForeground");
         derivedFont = createDerivedFont();
         
         // install date/locale related state
@@ -314,6 +338,15 @@ public class BasicMonthViewUI extends MonthViewUI {
         updateLocale();
     }
 
+    /**
+     * 
+     * @param property
+     * @return
+     */
+    protected boolean isUIInstallable(Object property) {
+       return (property == null) || (property instanceof UIResource);
+    }
+    
     protected void uninstallDefaults() {}
 
     protected void installKeyboardActions() {
@@ -439,16 +472,21 @@ public class BasicMonthViewUI extends MonthViewUI {
      * 
      * TODO add type doc
      */
-    protected class RenderingHandler {
+    protected /* static */ class RenderingHandler {
         private LabelProvider dayProvider;
         private MonthViewCellContext cellContext;
         private LabelProvider weekOfYearProvider;
         private LabelProvider dayOfWeekProvider;
         private TextCrossingPainter textCross;
+        private Color unselectableDayForeground;
+        private Color weekOfTheYearForeground;
         
         public void install() {
+            weekOfTheYearForeground = UIManagerExt.getColor("JXMonthView.weekOfTheYearForeground");
+            unselectableDayForeground = UIManagerExt.getColor("JXMonthView.unselectableDayForeground");
             textCross = new TextCrossingPainter<JLabel>();
             if (dayProvider == null) {
+                // PENDING JW: obstacle to making class static
                 FormatStringValue sv = new FormatStringValue(dayOfMonthFormatter) {
 
                     @Override
@@ -476,12 +514,14 @@ public class BasicMonthViewUI extends MonthViewUI {
                 StringValue dsv = new StringValue() {
 
                     public String getString(Object value) {
-                        if (value instanceof Calendar) {
-                            int day = ((Calendar) value).get(Calendar.DAY_OF_WEEK);
-                            // PENDING JW: hard-coded coupling to target
-                            // not re-usable
-                            return monthView.getDayOfTheWeek(day);
-                        }
+                        // PENDING JW: obstacle to making class static if formatting is
+                        // handled here 
+//                        if (value instanceof Calendar) {
+//                            int day = ((Calendar) value).get(Calendar.DAY_OF_WEEK);
+//                            // PENDING JW: hard-coded coupling to target
+//                            // not re-usable
+//                            return monthView.getDayOfTheWeek(day);
+//                        }
                         return TO_STRING.getString(value);
                     }
                     
@@ -501,6 +541,8 @@ public class BasicMonthViewUI extends MonthViewUI {
             dayProvider = null;
             weekOfYearProvider = null;
             dayOfWeekProvider = null;
+            unselectableDayForeground = null;
+            weekOfTheYearForeground = null;
         }
 
         /**
@@ -515,7 +557,7 @@ public class BasicMonthViewUI extends MonthViewUI {
          * 
          * @return the component to use for renderring.
          */
-        public JComponent prepareDayRenderer(Calendar calendar, DayState dayState) {
+        public JComponent prepareDayRenderer(JXMonthView monthView, Calendar calendar, DayState dayState) {
             // equivalent to prepare renderer:
             // 1. configure the cellContext with value
             cellContext.installMonthContext(monthView, 
@@ -533,7 +575,9 @@ public class BasicMonthViewUI extends MonthViewUI {
                 comp.setForeground(monthView.getFlaggedDayForeground());
             } else {
                 Color perDay = monthView.getDayForeground(calendar.get(Calendar.DAY_OF_WEEK));
-                if (perDay != null) {
+                if ((perDay != null) && (perDay != monthView.getForeground())) {
+                    // PENDING JW: this here prevents selection foreground on all
+                    // if not checked for "normal" foreground
                     comp.setForeground(perDay);
                 }
             }
@@ -554,7 +598,7 @@ public class BasicMonthViewUI extends MonthViewUI {
          * @param calendar the calendar which represents the date to render.
          * @param isLeading boolean indicating whether the off day is leading or trailing
          */
-        public JComponent prepareDayOffRenderer(Calendar calendar, DayState dayState) {
+        public JComponent prepareDayOffRenderer(JXMonthView monthView, Calendar calendar, DayState dayState) {
             cellContext.installMonthContext(monthView, calendar, false, 
                     dayState);
             JComponent comp = dayProvider.getRendererComponent(cellContext);
@@ -572,7 +616,7 @@ public class BasicMonthViewUI extends MonthViewUI {
          * @param top the y coordinate of the upper left corner of the day box
          * @param calendar the calendar which represents the date to render.
          */
-        public JComponent prepareWeekOfYearRenderer(Calendar calendar) {
+        public JComponent prepareWeekOfYearRenderer(JXMonthView monthView, Calendar calendar) {
             // equivalent to prepare renderer:
             // 1. configure the cellContext with value
             cellContext.installMonthContext(monthView, 
@@ -591,40 +635,24 @@ public class BasicMonthViewUI extends MonthViewUI {
            return comp;
         }
 
-//        /**
-//         * 
-//         * @param calendar the calendar which represents the date to render.
-//         */
-//        public JComponent prepareDayOfWeekRenderer(String dayOfWeekString) {
-//            // configure
-//            cellContext.installInMonthDayContext(monthView, 
-//                    dayOfWeekString, false, DayState.DAY_OF_WEEK);
-//            // get renderingComp
-//            JComponent comp = dayOfWeekProvider.getRendererComponent(cellContext);
-//            // highlight
-//            comp.setFont(derivedFont);
-//            if (monthView.getDaysOfTheWeekForeground() != null) {
-//                comp.setForeground(monthView.getDaysOfTheWeekForeground());
-//            }
-//            return comp;
-//        }
 
         /**
          * 
          * @param calendar the calendar which represents the date to render.
          */
-        public JComponent prepareDayOfWeekRenderer(Calendar calendar) {
+        public JComponent prepareDayOfWeekRenderer(JXMonthView monthView, Calendar calendar) {
+            String dayOfWeekString = monthView.getDayOfTheWeek(calendar.get(Calendar.DAY_OF_WEEK));
+            // configure
+            cellContext.installMonthContext(monthView, 
+                    dayOfWeekString, false, DayState.DAY_OF_WEEK);
             // PENDING JW: can we handle this in the formatter?
             // yes - but the price to pay is a hardcoded coupling from 
             // the stringValue to the monthView
-//            String dayOfWeekString = monthView.getDayOfTheWeek(calendar.get(Calendar.DAY_OF_WEEK));
-//            // configure
-//            cellContext.installMonthContext(monthView, 
-//                    dayOfWeekString, false, DayState.DAY_OF_WEEK);
-            cellContext.installMonthContext(monthView, calendar, false, DayState.DAY_OF_WEEK);
+//            cellContext.installMonthContext(monthView, calendar, false, DayState.DAY_OF_WEEK);
             // get renderingComp
             JComponent comp = dayOfWeekProvider.getRendererComponent(cellContext);
             // highlight
+            // PENDING JW: obstacle to making class static
             comp.setFont(derivedFont);
             if (monthView.getDaysOfTheWeekForeground() != null) {
                 comp.setForeground(monthView.getDaysOfTheWeekForeground());
@@ -1513,7 +1541,7 @@ public class BasicMonthViewUI extends MonthViewUI {
         Calendar cal = (Calendar) calendar.clone();
         CalendarUtils.startOfWeek(cal);
         for (int i = 0; i < JXMonthView.DAYS_IN_WEEK; i++) {
-            JComponent comp = renderingHandler.prepareDayOfWeekRenderer(cal);
+            JComponent comp = renderingHandler.prepareDayOfWeekRenderer(monthView, cal);
             renderDayBox(g, leftOfDay, tmpY, comp);
             leftOfDay = isLeftToRight ? leftOfDay + fullBoxWidth : leftOfDay
                     - fullBoxWidth;
@@ -1594,7 +1622,7 @@ public class BasicMonthViewUI extends MonthViewUI {
         int weeks = getWeeks(calendar);
         calendar.setTime(cal.getTime());
         for (int weekOfYear = 0; weekOfYear <= weeks; weekOfYear++) {
-            JComponent comp = renderingHandler.prepareWeekOfYearRenderer(calendar);
+            JComponent comp = renderingHandler.prepareWeekOfYearRenderer(monthView, calendar);
             // 4. doRender
             renderDayBox(g, tmpX, initialY, comp);
             initialY += fullBoxHeight;
@@ -1715,7 +1743,7 @@ public class BasicMonthViewUI extends MonthViewUI {
             return;
         if (!leading && !monthView.isShowingTrailingDays())
             return;
-        JComponent comp = renderingHandler.prepareDayOffRenderer(calendar, leading ? 
+        JComponent comp = renderingHandler.prepareDayOffRenderer(monthView, calendar, leading ? 
                 DayState.LEADING : DayState.TRAILING);
         renderDayBox(g, left, top, comp);
 
@@ -1743,7 +1771,7 @@ public class BasicMonthViewUI extends MonthViewUI {
             paintDay(g, left, top, calendar);
             return;
         } 
-        JComponent comp = renderingHandler.prepareDayRenderer(calendar, 
+        JComponent comp = renderingHandler.prepareDayRenderer(monthView, calendar, 
                 isToday(calendar.getTime()) ? DayState.TODAY : DayState.IN_MONTH);
         // 4. doRender
         renderDayBox(g, left, top, comp);
@@ -2286,14 +2314,20 @@ public class BasicMonthViewUI extends MonthViewUI {
                 updateLocale();
             } else if ("timeZone".equals(property)) {
                 dayOfMonthFormatter.setTimeZone((TimeZone) evt.getNewValue());
-            } else if ("flaggedDates".equals(property)
-                || "showingTrailingDays".equals(property)
-                || "showingLeadingDays".equals(property)
-                || "today".equals(property)
-                || "antialiased".equals(property)
-                ) {
-                monthView.repaint();
+//            } else if ("flaggedDates".equals(property)
+//                || "showingTrailingDays".equals(property)
+//                || "showingLeadingDays".equals(property)
+//                || "today".equals(property)
+//                || "antialiased".equals(property)
+//                || "selectionBackground".equals(property)
+//                || "selectionForeground".equals(property)
+//                || "flaggedDayForeground".equals(property)
+//                
+//                ) {
+//                monthView.repaint();
+                // too many properties, simply repaint always (waiting for complaints ;-)
             } else {
+                monthView.repaint();
 //                LOG.info("got propertyChange:" + property);
             }
         }
@@ -2757,7 +2791,7 @@ public class BasicMonthViewUI extends MonthViewUI {
         Date date = cal.getTime(); 
         
         if (monthView.isSelected(date)) {
-            g.setColor(monthView.getSelectedBackground());
+            g.setColor(monthView.getSelectionBackground());
             g.fillRect(x, y, width, height);
         }
     

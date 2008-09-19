@@ -20,6 +20,7 @@
  */
 package org.jdesktop.swingx;
 
+import java.awt.Color;
 import java.awt.GraphicsEnvironment;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
@@ -103,6 +104,94 @@ public class JXMonthViewTest extends MockObjectTestCase {
         JComponent.setDefaultLocale(componentLocale);
     }
 
+    /**
+     * Issue #932-swingx: ui overwrites custom settings.
+     * test daysoftheweekforeground property.
+     * 
+     */
+    public void testDaysOfTheWeekForegroundUpdateUI() {
+        Color old = monthView.getDaysOfTheWeekForeground();
+        Color color = Color.PINK;
+        if (color.equals(old)) {
+            color = Color.MAGENTA;
+        }
+        monthView.setDaysOfTheWeekForeground(color);
+        monthView.updateUI();
+        assertEquals(color, monthView.getDaysOfTheWeekForeground());
+    }
+
+    /**
+     * Issue #931-swingx: missing change notification.
+     * test setting selectionBackground property.
+     * 
+     */
+    public void testDaysOfTheWeekForeground() {
+        Color old = monthView.getDaysOfTheWeekForeground();
+        Color color = Color.PINK;
+        if (color.equals(old)) {
+            color = Color.MAGENTA;
+        }
+        PropertyChangeReport report = new PropertyChangeReport();
+        monthView.addPropertyChangeListener(report);
+        monthView.setDaysOfTheWeekForeground(color);
+        assertEquals(color, monthView.getDaysOfTheWeekForeground());
+        TestUtils.assertPropertyChangeEvent(report, "daysOfTheWeekForeground", old, color);
+    }
+
+    /**
+     * Issue #931-swingx: missing change notification.
+     * test setting selectionBackground property.
+     * 
+     */
+    public void testFlaggedDayForeground() {
+        Color old = monthView.getFlaggedDayForeground();
+        Color color = Color.PINK;
+        if (color.equals(old)) {
+            color = Color.MAGENTA;
+        }
+        PropertyChangeReport report = new PropertyChangeReport();
+        monthView.addPropertyChangeListener(report);
+        monthView.setFlaggedDayForeground(color);
+        assertEquals(color, monthView.getFlaggedDayForeground());
+        TestUtils.assertPropertyChangeEvent(report, "flaggedDayForeground", old, color);
+    }
+
+    /**
+     * Issue #931-swingx: missing change notification.
+     * test setting selectionBackground property.
+     * 
+     */
+    public void testSelectionForeground() {
+        Color old = monthView.getSelectionForeground();
+        Color color = Color.PINK;
+        if (color.equals(old)) {
+            color = Color.MAGENTA;
+        }
+        PropertyChangeReport report = new PropertyChangeReport();
+        monthView.addPropertyChangeListener(report);
+        monthView.setSelectionForeground(color);
+        assertEquals(color, monthView.getSelectionForeground());
+        TestUtils.assertPropertyChangeEvent(report, "selectionForeground", old, color);
+    }
+
+    /**
+     * Issue #931-swingx: missing change notification.
+     * test setting selectionBackground property.
+     * 
+     */
+    public void testSelectionBackground() {
+        Color old = monthView.getSelectionBackground();
+        Color color = Color.PINK;
+        if (color.equals(old)) {
+            color = Color.MAGENTA;
+        }
+        PropertyChangeReport report = new PropertyChangeReport();
+        monthView.addPropertyChangeListener(report);
+        monthView.setSelectionBackground(color);
+        assertEquals(color, monthView.getSelectionBackground());
+        TestUtils.assertPropertyChangeEvent(report, "selectionBackground", old, color);
+    }
+    
     public void testInitialOpaque() {
         assertTrue(monthView.isOpaque());
     }

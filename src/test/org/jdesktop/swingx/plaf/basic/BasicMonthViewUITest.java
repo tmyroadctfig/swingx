@@ -116,7 +116,8 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
         monthView.setDayForeground(Calendar.SUNDAY, Color.BLUE);
         monthView.setDaysOfTheWeekForeground(Color.RED);
         monthView.setFlaggedDayForeground(Color.CYAN);
-        monthView.setSelectedBackground(Color.GRAY);
+        monthView.setSelectionBackground(Color.GRAY);
+        monthView.setSelectionForeground(Color.GREEN);
         monthView.setTodayBackground(Color.PINK);
         monthView.setTraversable(true);
         monthView.setShowingWeekNumber(true);

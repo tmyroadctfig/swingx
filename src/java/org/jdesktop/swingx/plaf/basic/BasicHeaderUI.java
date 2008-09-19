@@ -21,6 +21,32 @@
 
 package org.jdesktop.swingx.plaf.basic;
 
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.Font;
+import java.awt.GradientPaint;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.RenderingHints;
+import java.awt.event.HierarchyBoundsAdapter;
+import java.awt.event.HierarchyBoundsListener;
+import java.awt.event.HierarchyEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.util.logging.Logger;
+
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.UIManager;
+import javax.swing.plaf.ColorUIResource;
+import javax.swing.plaf.ComponentUI;
+import javax.swing.plaf.FontUIResource;
+import javax.swing.plaf.basic.BasicHTML;
+import javax.swing.text.View;
+
 import org.jdesktop.swingx.JXHeader;
 import org.jdesktop.swingx.JXLabel;
 import org.jdesktop.swingx.JXHeader.IconPosition;
@@ -29,34 +55,28 @@ import org.jdesktop.swingx.painter.Painter;
 import org.jdesktop.swingx.plaf.HeaderUI;
 import org.jdesktop.swingx.plaf.PainterUIResource;
 
-import javax.swing.*;
-import javax.swing.plaf.ColorUIResource;
-import javax.swing.plaf.ComponentUI;
-import javax.swing.plaf.FontUIResource;
-import javax.swing.plaf.basic.BasicHTML;
-import javax.swing.text.View;
-
-import java.awt.*;
-import java.awt.event.HierarchyBoundsAdapter;
-import java.awt.event.HierarchyBoundsListener;
-import java.awt.event.HierarchyEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-
 /**
  *
  * @author rbair
  * @author rah003
  */
 public class BasicHeaderUI extends HeaderUI {
+    @SuppressWarnings("unused")
+    private static final Logger LOG = Logger.getLogger(BasicHeaderUI.class
+            .getName());
 	// Implementation detail. Neeeded to expose getMultiLineSupport() method to allow restoring view
 	// lost after LAF switch
     protected class DescriptionPane extends JXLabel {
             @Override
             public void paint(Graphics g) {
+//                LOG.info(getText() + ": all hints " + ((Graphics2D)g).getRenderingHints()
+//                        + "\n     " + ": aliased " + ((Graphics2D)g).getRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING));
                 // switch off jxlabel default antialiasing
-                ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
-                        RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
+                // JW: that cost me dearly to track down - it's the default foreground painter
+                // which is an AbstractPainter which has _global_ antialiased on by default
+                // and here the _text_ antialiased is turned off
+//                ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+//                        RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
                 super.paint(g);
             }
 

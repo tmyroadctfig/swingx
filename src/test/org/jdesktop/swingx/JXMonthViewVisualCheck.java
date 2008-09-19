@@ -21,7 +21,7 @@
  */
 package org.jdesktop.swingx;
 
-import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -33,12 +33,12 @@ import java.util.Locale;
 import java.util.TimeZone;
 import java.util.logging.Logger;
 
+import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 
@@ -65,9 +65,9 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
       setSystemLF(true);
       JXMonthViewVisualCheck  test = new JXMonthViewVisualCheck();
       try {
-          test.runInteractiveTests();
+//          test.runInteractiveTests();
 //        test.runInteractiveTests(".*TimeZone.*");
-//        test.runInteractiveTests("interactive.*Toggle.*");
+        test.runInteractiveTests("interactive.*Repaint.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
@@ -75,49 +75,54 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
   }
 
     /**
-     * Issue #926-swingx: JXMonthView not repainted when unselectable dates 
-     * changed?
+     * Issue #931-swingx: JXMonthView not repainted on property change.
      * 
-     * to reproduce: 
-     * - choose new unselectable with second picker
-     * - no visual change
-     * - choose new flagged date with first picker
-     * - unselectable updated
-     *  
-     *  Dooooh ... invalid: user error (c&p)
+     * look for
+     * - selectionBackground
+     * - selectionForeground (not taken?)
+     * 
+     * 
      */
-    public void interactiveMonthViewRepaintOnUnselectable() {
+    public void interactiveRepaintOnPropertyChange() {
         final JXMonthView monthView = new JXMonthView();
-        // first of month as unselectable
-        monthView.setUnselectableDates(monthView.getCalendar().getTime());
-        final JXFrame frame = wrapInFrame(monthView, "Set new Unselectable date with second picker");
-        addComponentOrientationToggle(frame);
-        final JXDatePicker picker = new JXDatePicker();
-        picker.addActionListener(new ActionListener() {
-
+        monthView.setSelectionDate(CalendarUtils.startOfWeek(calendar, new Date()));
+        monthView.setFlaggedDates(CalendarUtils.endOfWeek(calendar, new Date()));
+        final Color selectionBackground = monthView.getSelectionBackground();
+        final Color selectionForeground = monthView.getSelectionForeground();
+        final Color flaggedDayForeground = monthView.getFlaggedDayForeground();
+        JXFrame frame = wrapInFrame(monthView, "repaint on propertyChange");
+        Action toggleBackground = new AbstractAction("toggleSelectionBack") {
+            
             public void actionPerformed(ActionEvent e) {
-                if (e.getActionCommand().equals(JXDatePicker.CANCEL_KEY)) return;
-                if (picker.getDate() == null) return;
-                monthView.setFlaggedDates(picker.getDate());
+                monthView.setSelectionBackground(
+                        Color.PINK.equals(monthView.getSelectionBackground()) ? 
+                                selectionBackground : Color.PINK);
             }
             
-        });
-        final JXDatePicker unselectable = new JXDatePicker();
-        unselectable.addActionListener(new ActionListener() {
-
+        };
+        addAction(frame, toggleBackground);
+        Action toggleForeground = new AbstractAction("toggleSelectionFore") {
+            
             public void actionPerformed(ActionEvent e) {
-                if (e.getActionCommand().equals(JXDatePicker.CANCEL_KEY)) return;
-                if (unselectable.getDate() == null) return;
-                monthView.setUnselectableDates(unselectable.getDate());
+                
+                monthView.setSelectionForeground(
+                        Color.RED.equals(monthView.getSelectionForeground()) ? 
+                                selectionForeground : Color.RED);
             }
             
-        });
-        JComponent pickers = Box.createHorizontalBox();
-        pickers.add(new JLabel("Flagged: "));
-        pickers.add(picker);
-        pickers.add(new JLabel("Unselectable: "));
-        pickers.add(unselectable);
-        frame.add(pickers, BorderLayout.SOUTH);
+        };
+        addAction(frame, toggleForeground);
+        Action toggleFlaggedForeground = new AbstractAction("toggleFlaggedFore") {
+            
+            public void actionPerformed(ActionEvent e) {
+                
+                monthView.setFlaggedDayForeground(
+                        Color.GREEN.equals(monthView.getFlaggedDayForeground()) ? 
+                                flaggedDayForeground : Color.GREEN);
+            }
+            
+        };
+        addAction(frame, toggleFlaggedForeground);
         show(frame);
         
     }

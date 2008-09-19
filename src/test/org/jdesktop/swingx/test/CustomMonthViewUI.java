@@ -26,7 +26,7 @@ public class CustomMonthViewUI extends BasicMonthViewUI {
     @Override
     protected void installDefaults() {
         super.installDefaults();
-        monthView.setSelectedBackground(Color.MAGENTA);
+        monthView.setSelectionBackground(Color.MAGENTA);
     }
     
     
