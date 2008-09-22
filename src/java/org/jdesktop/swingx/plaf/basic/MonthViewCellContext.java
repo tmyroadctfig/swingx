@@ -24,9 +24,13 @@ package org.jdesktop.swingx.plaf.basic;
 import java.awt.Color;
 
 import javax.swing.BorderFactory;
+import javax.swing.Icon;
+import javax.swing.SwingConstants;
+import javax.swing.UIManager;
 import javax.swing.border.Border;
 
 import org.jdesktop.swingx.JXMonthView;
+import org.jdesktop.swingx.border.IconBorder;
 import org.jdesktop.swingx.plaf.UIManagerExt;
 import org.jdesktop.swingx.renderer.CellContext;
 
@@ -89,6 +93,9 @@ class MonthViewCellContext extends CellContext<JXMonthView> {
         if (getComponent() == null) {
             return super.getBorder();
         }
+        if (DayState.TITLE == dayState) {
+            return getTitleBorder();
+        }
         if (isToday()) {
             int x = getComponent().getBoxPaddingX();
             int y = getComponent().getBoxPaddingY();
@@ -96,6 +103,24 @@ class MonthViewCellContext extends CellContext<JXMonthView> {
            Border empty = BorderFactory.createEmptyBorder(y - 1, x - 1, y - 1, x -1);
            return BorderFactory.createCompoundBorder(todayBorder, empty);
         }
+        return BorderFactory.createEmptyBorder(getComponent().getBoxPaddingY(), getComponent().getBoxPaddingX(), getComponent().getBoxPaddingY(), getComponent().getBoxPaddingX());
+    }
+
+    /**
+     * @return
+     */
+    private Border getTitleBorder() {
+        if (getComponent().isTraversable()) {
+            Icon downIcon = UIManager.getIcon("JXMonthView.monthDownFileName");
+            Icon upIcon = UIManager.getIcon("JXMonthView.monthUpFileName");
+
+            IconBorder up = new IconBorder(upIcon, SwingConstants.EAST, getComponent().getBoxPaddingX());
+            IconBorder down = new IconBorder(downIcon, SwingConstants.WEST, getComponent().getBoxPaddingX());
+            Border compound = BorderFactory.createCompoundBorder(up, down);
+            Border empty = BorderFactory.createEmptyBorder(2* getComponent().getBoxPaddingY(), 0, 2*getComponent().getBoxPaddingY(), 0);
+            return BorderFactory.createCompoundBorder(compound, empty);
+        }
+        
         return BorderFactory.createEmptyBorder(getComponent().getBoxPaddingY(), getComponent().getBoxPaddingX(), getComponent().getBoxPaddingY(), getComponent().getBoxPaddingX());
     }
 

@@ -192,8 +192,9 @@ public class BasicMonthViewUI extends MonthViewUI {
      * height of month header of the view, that is the name and the arrows.
      * initially, it's the same as the day-box-height, adjusted to arrow icon height
      * and arrow padding if traversable
-     * 
+     * @deprecated no longer used in paint/layout with renderer.
      */
+    @Deprecated
     private int monthBoxHeight;
     /** height of month header including the monthView's box padding. */
     private int fullMonthBoxHeight;
@@ -493,10 +494,15 @@ public class BasicMonthViewUI extends MonthViewUI {
         private TextCrossingPainter textCross;
         private Color unselectableDayForeground;
         private Color weekOfTheYearForeground;
+//        private Icon monthUpImage;
+//        private Icon monthDownImage;
         
         public void install() {
             weekOfTheYearForeground = UIManagerExt.getColor("JXMonthView.weekOfTheYearForeground");
             unselectableDayForeground = UIManagerExt.getColor("JXMonthView.unselectableDayForeground");
+//            this.monthDownImage = UIManager.getIcon("JXMonthView.monthDownFileName");
+//            this.monthUpImage = UIManager.getIcon("JXMonthView.monthUpFileName");
+
             textCross = new TextCrossingPainter<JLabel>();
             if (dayProvider == null) {
                 // PENDING JW: obstacle to making class static
@@ -1452,27 +1458,7 @@ public class BasicMonthViewUI extends MonthViewUI {
         JComponent comp = renderingHandler.prepareMonthHeaderRenderer(monthView, calendar, DayState.TITLE);
         renderTitleBox(g, x, y, comp);
             // Paint arrow buttons for traversing months if enabled.
-            paintTraversalIcons(g, x, y, width);
-    }
-
-    /**
-     * Paints the month traversal icons. Does nothing if the monthView is not
-     * traversable.
-     * 
-     * @param g Graphics object.
-     * @param x x location of month
-     * @param y y location of month
-     * @param width width of month
-     */
-    private void paintTraversalIcons(Graphics g, int x, int y, int width) {
-        if (!monthView.isTraversable())
-            return;
-        // draw the icons
-        monthDownImage.paintIcon(monthView, g, x + arrowPaddingX, y
-                + ((fullMonthBoxHeight - monthDownImage.getIconHeight()) / 2));
-        monthUpImage.paintIcon(monthView, g, x + width - arrowPaddingX
-                - monthUpImage.getIconWidth(), y
-                + ((fullMonthBoxHeight - monthDownImage.getIconHeight()) / 2));
+//            paintTraversalIcons(g, x, y, width);
     }
 
     /**
@@ -2147,12 +2133,12 @@ public class BasicMonthViewUI extends MonthViewUI {
                 maxMonthHeight = Math.max(maxMonthHeight, pref.height);
             }
             
-            if (monthView.isTraversable()) {
-                // PENDING JW: move into header  
-                maxMonthWidth += monthDownImage.getIconWidth() +
-                    monthUpImage.getIconWidth() + (arrowPaddingX * 4);
-                maxMonthHeight = Math.max(monthDownImage.getIconHeight() + 2 * arrowPaddingY, maxMonthHeight);
-            }
+//            if (monthView.isTraversable()) {
+//                // PENDING JW: move into header  
+//                maxMonthWidth += monthDownImage.getIconWidth() +
+//                    monthUpImage.getIconWidth() + (arrowPaddingX * 4);
+//                maxMonthHeight = Math.max(monthDownImage.getIconHeight() + 2 * arrowPaddingY, maxMonthHeight);
+//            }
             
             int maxBoxWidth = 0;
             int maxBoxHeight = 0;
@@ -2185,7 +2171,7 @@ public class BasicMonthViewUI extends MonthViewUI {
             // adjust the month box height accordingly.
             monthBoxHeight = Math.max(boxHeight, maxMonthHeight);
             // PENDING JW: move into header  
-            fullMonthBoxHeight = monthBoxHeight + 2 * monthView.getBoxPaddingY();
+            fullMonthBoxHeight = monthBoxHeight ; // + 2 * monthView.getBoxPaddingY();
 
             // Keep track of calendar width and height for use later.
             calendarWidth = fullBoxWidth * JXMonthView.DAYS_IN_WEEK;
@@ -2712,6 +2698,29 @@ public class BasicMonthViewUI extends MonthViewUI {
             String yearName, int yearX, int yearY, Calendar cal) {
         g.drawString(monthName, monthX, monthY);
         g.drawString(yearName, yearX, yearY);
+    }
+
+    /**
+     * Paints the month traversal icons. Does nothing if the monthView is not
+     * traversable.
+     * 
+     * @param g Graphics object.
+     * @param x x location of month
+     * @param y y location of month
+     * @param width width of month
+     * 
+     * @deprecated used by non-rendering code only.
+     */
+    @Deprecated
+    private void paintTraversalIcons(Graphics g, int x, int y, int width) {
+        if (!monthView.isTraversable())
+            return;
+        // draw the icons
+        monthDownImage.paintIcon(monthView, g, x + arrowPaddingX, y
+                + ((fullMonthBoxHeight - monthDownImage.getIconHeight()) / 2));
+        monthUpImage.paintIcon(monthView, g, x + width - arrowPaddingX
+                - monthUpImage.getIconWidth(), y
+                + ((fullMonthBoxHeight - monthDownImage.getIconHeight()) / 2));
     }
 
     /**
