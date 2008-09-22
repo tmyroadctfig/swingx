@@ -200,14 +200,17 @@ public class BasicMonthViewUI extends MonthViewUI {
     /** 
      * raw witdth of a "day" box calculated from fontMetrics and "widest" content.
      *  this is the same for days-of-the-week, weeks-of-the-year and days
-     * 
+     * @deprecated no longer used in paint/layout with renderer.
      */
+    @Deprecated
     private int boxWidth;
     /** 
      * raw height of a "day" box calculated from fontMetrics and "widest" content.
      *  this is the same for days-of-the-week, weeks-of-the-year and days
+     * @deprecated no longer used in paint/layout with renderer.
      * 
      */
+    @Deprecated
     private int boxHeight;
     /** 
      * width of a "day" box including the monthView's box padding
@@ -236,7 +239,16 @@ public class BasicMonthViewUI extends MonthViewUI {
      * The bounding box of the grid of visible months. 
      */
     protected Rectangle calendarGrid = new Rectangle();
+    
+    /** array of bounds of the month strings. 
+     * @deprecated no longer used in paint/layout with renderer.
+     */
+    @Deprecated
     private Rectangle[] monthStringBounds = new Rectangle[12];
+    /** array of bounds of the year strings. 
+     * @deprecated no longer used in paint/layout with renderer.
+     */
+    @Deprecated
     private Rectangle[] yearStringBounds = new Rectangle[12];
     private String[] daysOfTheWeek;
 
@@ -534,7 +546,7 @@ public class BasicMonthViewUI extends MonthViewUI {
                     public String getString(Object value) {
                         if (value instanceof Calendar) {
                             String month = monthsOfTheYear[((Calendar) value).get(Calendar.MONTH)];
-                            return month + " " + ((Calendar) value).get(Calendar.YEAR);
+                            return month + " " + ((Calendar) value).get(Calendar.YEAR); // + "something reaaaaaly long";
                         }
                         return TO_STRING.getString(value);
                     }
@@ -2116,6 +2128,97 @@ public class BasicMonthViewUI extends MonthViewUI {
         }
 
         public void layoutContainer(Container parent) {
+            // handle backward compatibility until the deprecated methods are
+            // removed
+            if (!useRenderingHandler()) {
+                layoutContainerFM(parent);
+                return;
+            }
+
+            int maxMonthWidth = 0;
+            int maxMonthHeight = 0;
+            Calendar calendar = getCalendar();
+            for (int i = calendar.getMinimum(Calendar.MONTH); i <= calendar.getMaximum(Calendar.MONTH); i++) {
+                calendar.set(Calendar.MONTH, i);
+                CalendarUtils.startOfMonth(calendar);
+                JComponent comp = renderingHandler.prepareMonthHeaderRenderer(monthView, calendar, DayState.TITLE);
+                Dimension pref = comp.getPreferredSize();
+                maxMonthWidth = Math.max(maxMonthWidth, pref.width);
+                maxMonthHeight = Math.max(maxMonthHeight, pref.height);
+            }
+            
+            if (monthView.isTraversable()) {
+                // PENDING JW: move into header  
+                maxMonthWidth += monthDownImage.getIconWidth() +
+                    monthUpImage.getIconWidth() + (arrowPaddingX * 4);
+                maxMonthHeight = Math.max(monthDownImage.getIconHeight() + 2 * arrowPaddingY, maxMonthHeight);
+            }
+            
+            int maxBoxWidth = 0;
+            int maxBoxHeight = 0;
+            calendar = getCalendar();
+            CalendarUtils.startOfWeek(calendar);
+            for (int i = 0; i < JXMonthView.DAYS_IN_WEEK; i++) {
+                JComponent comp = renderingHandler.prepareDayOfWeekRenderer(monthView, calendar);
+                Dimension pref = comp.getPreferredSize();
+                maxBoxWidth = Math.max(maxBoxWidth, pref.width);
+                maxBoxHeight = Math.max(maxBoxHeight, pref.height);
+                calendar.add(Calendar.DATE, 1);
+            }
+            
+            calendar = getCalendar();
+            for (int i = 0; i < calendar.getMaximum(Calendar.DAY_OF_MONTH); i++) {
+                JComponent comp = renderingHandler.prepareDayRenderer(monthView, calendar, DayState.IN_MONTH);
+                Dimension pref = comp.getPreferredSize();
+                maxBoxWidth = Math.max(maxBoxWidth, pref.width);
+                maxBoxHeight = Math.max(maxBoxHeight, pref.height);
+                calendar.add(Calendar.DATE, 1);
+            }
+            
+            // PENDING JW: currently doesn't handle monthHeader pref > sum of box widths
+            fullBoxWidth = maxBoxWidth;
+            fullBoxHeight = maxBoxHeight;
+            boxWidth = maxBoxWidth - 2 * monthView.getBoxPaddingX();
+            boxHeight = maxBoxHeight - 2 * monthView.getBoxPaddingY();
+
+            // If the calendar is traversable, check the icon heights and
+            // adjust the month box height accordingly.
+            monthBoxHeight = Math.max(boxHeight, maxMonthHeight);
+            // PENDING JW: move into header  
+            fullMonthBoxHeight = monthBoxHeight + 2 * monthView.getBoxPaddingY();
+
+            // Keep track of calendar width and height for use later.
+            calendarWidth = fullBoxWidth * JXMonthView.DAYS_IN_WEEK;
+            if (monthView.isShowingWeekNumber()) {
+                calendarWidth += fullBoxWidth;
+            }
+            fullCalendarWidth = calendarWidth + CALENDAR_SPACING;
+            
+            calendarHeight = (fullBoxHeight * 7) + fullMonthBoxHeight;
+            fullCalendarHeight = calendarHeight + CALENDAR_SPACING;
+            // Calculate minimum width/height for the component.
+            int prefRows = monthView.getPreferredRows();
+            preferredSize.height = (calendarHeight * prefRows) +
+                    (CALENDAR_SPACING * (prefRows - 1));
+
+            int prefCols = monthView.getPreferredCols();
+            preferredSize.width = (calendarWidth * prefCols) +
+                    (CALENDAR_SPACING * (prefCols - 1));
+
+            // Add insets to the dimensions.
+            Insets insets = monthView.getInsets();
+            preferredSize.width += insets.left + insets.right;
+            preferredSize.height += insets.top + insets.bottom;
+           
+            calculateMonthGridLayoutProperties();
+
+        }
+
+        /**
+         * Old style layout - not using the renderer.
+         * 
+         */
+        private void layoutContainerFM(Container parent) {
             // Loop through year and get largest representation of the month.
             // Keep track of the longest month so we can loop through it to
             // determine the width of a date box.
@@ -2147,10 +2250,10 @@ public class BasicMonthViewUI extends MonthViewUI {
                 }
                 cal.add(Calendar.MONTH, 1);
             }
-
             // Loop through the days of the week and adjust the box width
             // accordingly.
             boxHeight = fm.getHeight();
+            boxWidth = 0;
             String[] daysOfTheWeek = monthView.getDaysOfTheWeek();
             for (String dayOfTheWeek : daysOfTheWeek) {
                 currWidth = fm.stringWidth(dayOfTheWeek);
@@ -2237,7 +2340,6 @@ public class BasicMonthViewUI extends MonthViewUI {
             preferredSize.height += insets.top + insets.bottom;
            
             calculateMonthGridLayoutProperties();
-
         }
 
 

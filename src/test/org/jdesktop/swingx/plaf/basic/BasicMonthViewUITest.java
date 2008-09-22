@@ -38,6 +38,7 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.logging.Logger;
 
+import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.JComboBox;
@@ -128,6 +129,15 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
         monthView.setPreferredRows(2);
         final JXFrame frame = wrapInFrame(monthView, frameTitle);
         addComponentOrientationToggle(frame);
+        Action toggleTraversable = new AbstractAction("toggle traversable") {
+
+            public void actionPerformed(ActionEvent e) {
+                monthView.setTraversable(!monthView.isTraversable());
+                
+            }
+            
+        };
+        addAction(frame, toggleTraversable);
         final JXDatePicker picker = new JXDatePicker();
         picker.getMonthView().putClientProperty("disableRendering", disableRendering);
         picker.addActionListener(new ActionListener() {
@@ -150,11 +160,27 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
             }
             
         });
+        final JComboBox zoneSelector = new JComboBox(Locale.getAvailableLocales());
+        // Synchronize the monthView's and selector's zones.
+        zoneSelector.setSelectedItem(monthView.getLocale());
+
+        // Set the monthView's time zone based on the selected time zone.
+        zoneSelector.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                Locale zone = (Locale) zoneSelector.getSelectedItem();
+                monthView.setLocale(zone);
+//                monthView.revalidate();
+            }
+        });
+
+
         JComponent pickers = Box.createHorizontalBox();
         pickers.add(new JLabel("Flagged: "));
         pickers.add(picker);
         pickers.add(new JLabel("Unselectable: "));
         pickers.add(unselectable);
+        pickers.add(new JLabel("Locale: "));
+        pickers.add(zoneSelector);
         frame.add(pickers, BorderLayout.SOUTH);
         show(frame);
     }
