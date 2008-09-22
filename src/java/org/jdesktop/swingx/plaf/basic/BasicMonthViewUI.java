@@ -477,6 +477,7 @@ public class BasicMonthViewUI extends MonthViewUI {
         private MonthViewCellContext cellContext;
         private LabelProvider weekOfYearProvider;
         private LabelProvider dayOfWeekProvider;
+        private LabelProvider titleProvider;
         private TextCrossingPainter textCross;
         private Color unselectableDayForeground;
         private Color weekOfTheYearForeground;
@@ -527,6 +528,19 @@ public class BasicMonthViewUI extends MonthViewUI {
                     
                 };
                 dayOfWeekProvider = new LabelProvider(dsv, JLabel.CENTER);
+                
+                StringValue tsv = new StringValue() {
+
+                    public String getString(Object value) {
+                        if (value instanceof Calendar) {
+                            String month = monthsOfTheYear[((Calendar) value).get(Calendar.MONTH)];
+                            return month + " " + ((Calendar) value).get(Calendar.YEAR);
+                        }
+                        return TO_STRING.getString(value);
+                    }
+                    
+                };
+                titleProvider = new LabelProvider(tsv, JLabel.CENTER);
             }
             if (cellContext == null) {
                 cellContext = new MonthViewCellContext();
@@ -541,6 +555,7 @@ public class BasicMonthViewUI extends MonthViewUI {
             dayProvider = null;
             weekOfYearProvider = null;
             dayOfWeekProvider = null;
+            titleProvider = null;
             unselectableDayForeground = null;
             weekOfTheYearForeground = null;
         }
@@ -657,6 +672,20 @@ public class BasicMonthViewUI extends MonthViewUI {
             if (monthView.getDaysOfTheWeekForeground() != null) {
                 comp.setForeground(monthView.getDaysOfTheWeekForeground());
             }
+            return comp;
+        }
+
+        /**
+         * @param monthView
+         * @param calendar
+         * @param title
+         * @return
+         */
+        public JComponent prepareMonthHeaderRenderer(JXMonthView monthView,
+                Calendar calendar, DayState dayState) {
+            cellContext.installMonthContext(monthView, calendar, false, dayState);
+            JComponent comp = titleProvider.getRendererComponent(cellContext);
+            comp.setFont(derivedFont);
             return comp;
         }
 
@@ -1377,137 +1406,61 @@ public class BasicMonthViewUI extends MonthViewUI {
 
 
     /**
-     * Paints the header of a month. 
-     * It is assumed the given calendar is already set to the
-     * first day of the month to be painted.<p>
+     * Paints the header of a month. It is assumed the given calendar is already
+     * set to the first day of the month to be painted.
+     * <p>
      * 
-     * PENDING JW: switch over to use renderer.
-     * Note: the given calendar must not be changed.
-     *
+     * Note: the given calendar must
+     * not be changed.
+     * 
      * @param g Graphics object.
      * @param x x location of month
      * @param y y location of month
      * @param width width of month
      * @param height height of month
-     * @param calendar the calendar specifying the the first day of the month to paint, 
-     *  must not be null
+     * @param calendar the calendar specifying the the first day of the month to
+     *        paint, must not be null
      */
     protected void paintMonthHeader(Graphics g, int x, int y, int width,
             Calendar calendar) {
-        // Paint month name background.
-        paintMonthStringBackground(g, x, y,
-                width, fullMonthBoxHeight, calendar);
+        // handle backward compatibility until the deprecated methods are
+        // removed
+        if (!useRenderingHandler()) {
+            // Paint month name background.
+            paintMonthStringBackground(g, x, y, width, fullMonthBoxHeight,
+                    calendar);
 
-        paintMonthStringForeground(g, x, y,
-                width, fullMonthBoxHeight, calendar);
+            paintMonthStringForeground(g, x, y, width, fullMonthBoxHeight,
+                    calendar);
 
-        // Paint arrow buttons for traversing months if enabled.
-        if (monthView.isTraversable()) {
-            //draw the icons
-            monthDownImage.paintIcon(monthView, g, x + arrowPaddingX, y + ((fullMonthBoxHeight - monthDownImage.getIconHeight()) / 2));
-            monthUpImage.paintIcon(monthView, g, x + width - arrowPaddingX - monthUpImage.getIconWidth(), y + ((fullMonthBoxHeight - monthDownImage.getIconHeight()) / 2));
+            paintTraversalIcons(g, x, y, width);
+            return;
         }
+        
+        JComponent comp = renderingHandler.prepareMonthHeaderRenderer(monthView, calendar, DayState.TITLE);
+        renderTitleBox(g, x, y, comp);
+            // Paint arrow buttons for traversing months if enabled.
+            paintTraversalIcons(g, x, y, width);
     }
 
     /**
-     * Paints the background of the month string.  The bounding box for this
-     * background can be modified by setting its insets via
-     * setMonthStringInsets.  The color of the background can be set via
-     * setMonthStringBackground.
-     *
-     * PENDING JW: switch over to use renderer.
-     * Note: the given calendar must not be changed.
-     *
-     * @param g Graphics object to paint to.
-     * @param x x-coordinate of upper left corner.
-     * @param y y-coordinate of upper left corner.
-     * @param width width of the bounding box.
-     * @param height height of the bounding box.
+     * Paints the month traversal icons. Does nothing if the monthView is not
+     * traversable.
      * 
-     * @see org.jdesktop.swingx.JXMonthView#setMonthStringBackground
-     * @see org.jdesktop.swingx.JXMonthView#setMonthStringInsets
+     * @param g Graphics object.
+     * @param x x location of month
+     * @param y y location of month
+     * @param width width of month
      */
-    protected void paintMonthStringBackground(Graphics g, int x, int y,
-                                              int width, int height, Calendar cal) {
-        // Modify bounds by the month string insets.
-        Insets monthStringInsets = monthView.getMonthStringInsets();
-        x = isLeftToRight ? x + monthStringInsets.left : x + monthStringInsets.right;
-        y = y + monthStringInsets.top;
-        width = width - monthStringInsets.left - monthStringInsets.right;
-        height = height - monthStringInsets.top - monthStringInsets.bottom;
-    
-        g.setColor(monthView.getMonthStringBackground());
-        g.fillRect(x, y, width, height);
-    }
-
-    /**
-     * 
-     * PENDING JW: switch over to use renderer.
-     * 
-     * Note: the given calendar must not be changed.
-     * 
-     * @param g Graphics object to paint to.
-     * @param x x-coordinate of upper left corner.
-     * @param y y-coordinate of upper left corner.
-     * @param width width of the bounding box.
-     * @param height height of the bounding box.
-     * @param cal the calendar specifying the day to use, must not be null
-     */
-    protected void paintMonthStringForeground(Graphics g, int x, int y,
-                                              int width, int height, Calendar cal) {
-        // Paint month name.
-        // 
-        Font oldFont = monthView.getFont();
-    
-        // TODO: Calculating the bounds of the text dynamically so we can invoke
-        // a popup for selecting the month/year to view.
-        g.setFont(derivedFont);
-        FontMetrics fm = monthView.getFontMetrics(derivedFont);
-        int month = cal.get(Calendar.MONTH);
-        String monthName = monthsOfTheYear[month];
-        String yearString = Integer.toString(cal.get(Calendar.YEAR));
-    
-        Rectangle2D rect = fm.getStringBounds(monthName, g);
-        monthStringBounds[month] = new Rectangle((int) rect.getX(), (int) rect.getY(),
-                (int) rect.getWidth(), (int) rect.getHeight());
-        int spaceWidth = (int) fm.getStringBounds(" ", g).getWidth();
-        rect = fm.getStringBounds(yearString, g);
-        yearStringBounds[month] = new Rectangle((int) rect.getX(), (int) rect.getY(),
-                (int) rect.getWidth(), (int) rect.getHeight());
-        // END
-    
-        g.setColor(monthView.getMonthStringForeground());
-        int tmpX =
-                x + (calendarWidth / 2) -
-                        ((monthStringBounds[month].width + yearStringBounds[month].width + spaceWidth) / 2);
-        int tmpY = y + monthView.getBoxPaddingY() + ((monthBoxHeight - boxHeight) / 2) +
-                fm.getAscent();
-        monthStringBounds[month].x = tmpX;
-        yearStringBounds[month].x = (monthStringBounds[month].x + monthStringBounds[month].width +
-                spaceWidth);
-    
-        paintMonthStringForeground(g,monthName, monthStringBounds[month].x, tmpY, yearString, yearStringBounds[month].x, tmpY, cal);
-        g.setFont(oldFont);
-    }
-
-    /**
-     * Paints only text for month and year. No calculations made. Used by custom LAFs. 
-     * <p>
-     * 
-     * Note: the given calendar must not be changed.
-     * 
-     * @param g Graphics to paint into.
-     * @param monthName Name of the month.
-     * @param monthX Month string x coordinate.
-     * @param monthY Month string y coordinate.
-     * @param yearName Name (number) of the year.
-     * @param yearX Year string x coordinate.
-     * @param yearY Year string y coordinate.
-     */
-    protected void paintMonthStringForeground(Graphics g, String monthName, int monthX, int monthY, 
-            String yearName, int yearX, int yearY, Calendar cal) {
-        g.drawString(monthName, monthX, monthY);
-        g.drawString(yearName, yearX, yearY);
+    private void paintTraversalIcons(Graphics g, int x, int y, int width) {
+        if (!monthView.isTraversable())
+            return;
+        // draw the icons
+        monthDownImage.paintIcon(monthView, g, x + arrowPaddingX, y
+                + ((fullMonthBoxHeight - monthDownImage.getIconHeight()) / 2));
+        monthUpImage.paintIcon(monthView, g, x + width - arrowPaddingX
+                - monthUpImage.getIconWidth(), y
+                + ((fullMonthBoxHeight - monthDownImage.getIconHeight()) / 2));
     }
 
     /**
@@ -1549,23 +1502,6 @@ public class BasicMonthViewUI extends MonthViewUI {
 
         }
         
-//        // Paint short representation of day of the week.
-//        int dayIndex = monthView.getFirstDayOfWeek() - 1;
-//        String[] daysOfTheWeek = monthView.getDaysOfTheWeek();
-//
-//        int leftOfDay = isLeftToRight ? tmpX : tmpX + tmpWidth - fullBoxWidth;
-//        for (int i = 0; i < JXMonthView.DAYS_IN_WEEK; i++) {
-//            // PENDING JW: use the calendar here
-//            JComponent comp = renderingHandler
-//                    .prepareDayOfWeekRenderer(daysOfTheWeek[dayIndex]);
-//            renderDayBox(g, leftOfDay, tmpY, comp);
-//            dayIndex++;
-//            if (dayIndex == JXMonthView.DAYS_IN_WEEK) {
-//                dayIndex = 0;
-//            }
-//            leftOfDay = isLeftToRight ? leftOfDay + fullBoxWidth : leftOfDay
-//                    - fullBoxWidth;
-//        }
     }
 
     /**
@@ -1804,6 +1740,30 @@ public class BasicMonthViewUI extends MonthViewUI {
 
 
     /**
+     * Renders the component at the given location. The width/height is that 
+     * of a month header cell.<p>
+     * 
+     * PENDING JW: insets where to? the task of the cellContext?
+     * 
+     * @param g the Graphics to paint into.
+     * @param left the x coordinate of upper left corner of the day box
+     * @param top the y coordinate of the upper left corner of the day box
+     * @param component the rendering component to paint with.
+     */
+    private void renderTitleBox(Graphics g, int x, int y, JComponent comp) {
+        // Modify bounds by the month string insets.
+        Insets monthStringInsets = monthView.getMonthStringInsets();
+        x = isLeftToRight ? x + monthStringInsets.left : x + monthStringInsets.right;
+        y = y + monthStringInsets.top;
+        int width = calendarWidth - monthStringInsets.left - monthStringInsets.right;
+        int height = fullMonthBoxHeight - monthStringInsets.top - monthStringInsets.bottom;
+        rendererPane.paintComponent(g, comp, monthView, x, y, width, height, true);
+    }
+
+    /**
+     * Renders the component at the given location. The width/height is that 
+     * of a day box cell.
+     * 
      * @param g the Graphics to paint into.
      * @param left the x coordinate of upper left corner of the day box
      * @param top the y coordinate of the upper left corner of the day box
@@ -2541,6 +2501,116 @@ public class BasicMonthViewUI extends MonthViewUI {
 //--------------------- this is still serviced (if a ui doesn't install a renderingHandler)
 //--------------------- but no longer actively maintained    
     
+
+    /**
+     * Paints the background of the month string.  The bounding box for this
+     * background can be modified by setting its insets via
+     * setMonthStringInsets.  The color of the background can be set via
+     * setMonthStringBackground.
+     *
+     * PENDING JW: switch over to use renderer.
+     * Note: the given calendar must not be changed.
+     *
+     * @param g Graphics object to paint to.
+     * @param x x-coordinate of upper left corner.
+     * @param y y-coordinate of upper left corner.
+     * @param width width of the bounding box.
+     * @param height height of the bounding box.
+     * 
+     * @see org.jdesktop.swingx.JXMonthView#setMonthStringBackground
+     * @see org.jdesktop.swingx.JXMonthView#setMonthStringInsets
+     * 
+     * @deprecated
+     */
+    @Deprecated
+    protected void paintMonthStringBackground(Graphics g, int x, int y,
+                                              int width, int height, Calendar cal) {
+        // Modify bounds by the month string insets.
+        Insets monthStringInsets = monthView.getMonthStringInsets();
+        x = isLeftToRight ? x + monthStringInsets.left : x + monthStringInsets.right;
+        y = y + monthStringInsets.top;
+        width = width - monthStringInsets.left - monthStringInsets.right;
+        height = height - monthStringInsets.top - monthStringInsets.bottom;
+    
+        g.setColor(monthView.getMonthStringBackground());
+        g.fillRect(x, y, width, height);
+    }
+
+    /**
+     * 
+     * PENDING JW: switch over to use renderer.
+     * 
+     * Note: the given calendar must not be changed.
+     * 
+     * @param g Graphics object to paint to.
+     * @param x x-coordinate of upper left corner.
+     * @param y y-coordinate of upper left corner.
+     * @param width width of the bounding box.
+     * @param height height of the bounding box.
+     * @param cal the calendar specifying the day to use, must not be null
+     * 
+     * @deprecated
+     */
+    @Deprecated
+    protected void paintMonthStringForeground(Graphics g, int x, int y,
+                                              int width, int height, Calendar cal) {
+        // Paint month name.
+        // 
+        Font oldFont = monthView.getFont();
+    
+        // TODO: Calculating the bounds of the text dynamically so we can invoke
+        // a popup for selecting the month/year to view.
+        g.setFont(derivedFont);
+        FontMetrics fm = monthView.getFontMetrics(derivedFont);
+        int month = cal.get(Calendar.MONTH);
+        String monthName = monthsOfTheYear[month];
+        String yearString = Integer.toString(cal.get(Calendar.YEAR));
+    
+        Rectangle2D rect = fm.getStringBounds(monthName, g);
+        monthStringBounds[month] = new Rectangle((int) rect.getX(), (int) rect.getY(),
+                (int) rect.getWidth(), (int) rect.getHeight());
+        int spaceWidth = (int) fm.getStringBounds(" ", g).getWidth();
+        rect = fm.getStringBounds(yearString, g);
+        yearStringBounds[month] = new Rectangle((int) rect.getX(), (int) rect.getY(),
+                (int) rect.getWidth(), (int) rect.getHeight());
+        // END
+    
+        g.setColor(monthView.getMonthStringForeground());
+        int tmpX =
+                x + (calendarWidth / 2) -
+                        ((monthStringBounds[month].width + yearStringBounds[month].width + spaceWidth) / 2);
+        int tmpY = y + monthView.getBoxPaddingY() + ((monthBoxHeight - boxHeight) / 2) +
+                fm.getAscent();
+        monthStringBounds[month].x = tmpX;
+        yearStringBounds[month].x = (monthStringBounds[month].x + monthStringBounds[month].width +
+                spaceWidth);
+    
+        paintMonthStringForeground(g,monthName, monthStringBounds[month].x, tmpY, yearString, yearStringBounds[month].x, tmpY, cal);
+        g.setFont(oldFont);
+    }
+
+    /**
+     * Paints only text for month and year. No calculations made. Used by custom LAFs. 
+     * <p>
+     * 
+     * Note: the given calendar must not be changed.
+     * 
+     * @param g Graphics to paint into.
+     * @param monthName Name of the month.
+     * @param monthX Month string x coordinate.
+     * @param monthY Month string y coordinate.
+     * @param yearName Name (number) of the year.
+     * @param yearX Year string x coordinate.
+     * @param yearY Year string y coordinate.
+     * 
+     * @deprecated
+     */
+    @Deprecated
+    protected void paintMonthStringForeground(Graphics g, String monthName, int monthX, int monthY, 
+            String yearName, int yearX, int yearY, Calendar cal) {
+        g.drawString(monthName, monthX, monthY);
+        g.drawString(yearName, yearX, yearY);
+    }
 
     /**
      * Paints the row which contains the days of the week.

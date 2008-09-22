@@ -7,6 +7,7 @@ package org.jdesktop.swingx.test;
 import java.awt.Color;
 
 import javax.swing.JComponent;
+import javax.swing.plaf.ColorUIResource;
 import javax.swing.plaf.ComponentUI;
 
 import org.jdesktop.swingx.plaf.basic.BasicMonthViewUI;
@@ -26,7 +27,7 @@ public class CustomMonthViewUI extends BasicMonthViewUI {
     @Override
     protected void installDefaults() {
         super.installDefaults();
-        monthView.setSelectionBackground(Color.MAGENTA);
+        monthView.setSelectionBackground(new ColorUIResource(Color.MAGENTA));
     }
     
     

@@ -32,5 +32,5 @@ public enum DayState {
     LEADING,
     TRAILING,
     WEEK_OF_YEAR,
-    DAY_OF_WEEK
+    DAY_OF_WEEK, TITLE
 }

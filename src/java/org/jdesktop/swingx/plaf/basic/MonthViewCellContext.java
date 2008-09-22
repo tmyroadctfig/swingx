@@ -54,9 +54,21 @@ class MonthViewCellContext extends CellContext<JXMonthView> {
         if (DayState.TRAILING == dayState) {
             return UIManagerExt.getColor(getUIPrefix() + "trailingDayForeground");
         }
+        if ((DayState.TITLE == dayState) && (getComponent() != null)) {
+            return getComponent().getMonthStringForeground();
+        }
         return super.getForeground();
     }
 
+    
+
+    @Override
+    protected Color getBackground() {
+        if ((DayState.TITLE == dayState) && (getComponent() != null)) {
+            return getComponent().getMonthStringBackground();
+        }
+        return super.getBackground();
+    }
 
     @Override
     protected Color getSelectionBackground() {

@@ -65,9 +65,9 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
       setSystemLF(true);
       JXMonthViewVisualCheck  test = new JXMonthViewVisualCheck();
       try {
-//          test.runInteractiveTests();
+          test.runInteractiveTests();
 //        test.runInteractiveTests(".*TimeZone.*");
-        test.runInteractiveTests("interactive.*Repaint.*");
+//        test.runInteractiveTests("interactive.*Repaint.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
@@ -508,10 +508,10 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
     public void interactiveUpdateLocale() {
         JComponent panel = Box.createVerticalBox();
 
-        final JComboBox zoneSelector = new JComboBox(Locale.getAvailableLocales());
         final JXMonthView monthView = new JXMonthView();
         monthView.setTraversable(true);
         monthView.setShowingWeekNumber(true);
+        final JComboBox zoneSelector = new JComboBox(Locale.getAvailableLocales());
         // Synchronize the monthView's and selector's zones.
         zoneSelector.setSelectedItem(monthView.getLocale());
 
