@@ -44,7 +44,9 @@ import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.SortedSet;
 import java.util.TimeZone;
 import java.util.logging.Logger;
@@ -70,6 +72,7 @@ import org.jdesktop.swingx.event.DateSelectionEvent;
 import org.jdesktop.swingx.event.DateSelectionListener;
 import org.jdesktop.swingx.plaf.MonthViewUI;
 import org.jdesktop.swingx.plaf.UIManagerExt;
+import org.jdesktop.swingx.renderer.ComponentProvider;
 import org.jdesktop.swingx.renderer.FormatStringValue;
 import org.jdesktop.swingx.renderer.LabelProvider;
 import org.jdesktop.swingx.renderer.PainterAware;
@@ -486,124 +489,166 @@ public class BasicMonthViewUI extends MonthViewUI {
      * TODO add type doc
      */
     protected /* static */ class RenderingHandler {
-        private LabelProvider dayProvider;
         private MonthViewCellContext cellContext;
-        private LabelProvider weekOfYearProvider;
-        private LabelProvider dayOfWeekProvider;
-        private LabelProvider titleProvider;
         private TextCrossingPainter textCross;
         private Color unselectableDayForeground;
         private Color weekOfTheYearForeground;
-//        private Icon monthUpImage;
-//        private Icon monthDownImage;
+        private Map<DayState, ComponentProvider<?>> providers;
         
         public void install() {
             weekOfTheYearForeground = UIManagerExt.getColor("JXMonthView.weekOfTheYearForeground");
             unselectableDayForeground = UIManagerExt.getColor("JXMonthView.unselectableDayForeground");
-//            this.monthDownImage = UIManager.getIcon("JXMonthView.monthDownFileName");
-//            this.monthUpImage = UIManager.getIcon("JXMonthView.monthUpFileName");
-
             textCross = new TextCrossingPainter<JLabel>();
-            if (dayProvider == null) {
-                // PENDING JW: obstacle to making class static
-                FormatStringValue sv = new FormatStringValue(dayOfMonthFormatter) {
-
-                    @Override
-                    public String getString(Object value) {
-                        if (value instanceof Calendar) {
-                            value = ((Calendar) value).getTime();
-                        }
-                        return super.getString(value);
-                    }
-                    
-                };
-                // PENDING JW: update formatter?
-                dayProvider = new LabelProvider(sv, JLabel.RIGHT);
-                StringValue wsv = new StringValue() {
-
-                    public String getString(Object value) {
-                        if (value instanceof Calendar) {
-                            value = ((Calendar) value).get(Calendar.WEEK_OF_YEAR);
-                        }
-                        return TO_STRING.getString(value);
-                    }
-                    
-                };
-                weekOfYearProvider = new LabelProvider(wsv, JLabel.RIGHT);
-                StringValue dsv = new StringValue() {
-
-                    public String getString(Object value) {
-                        // PENDING JW: obstacle to making class static if formatting is
-                        // handled here 
-//                        if (value instanceof Calendar) {
-//                            int day = ((Calendar) value).get(Calendar.DAY_OF_WEEK);
-//                            // PENDING JW: hard-coded coupling to target
-//                            // not re-usable
-//                            return monthView.getDayOfTheWeek(day);
-//                        }
-                        return TO_STRING.getString(value);
-                    }
-                    
-                };
-                dayOfWeekProvider = new LabelProvider(dsv, JLabel.CENTER);
-                
-                StringValue tsv = new StringValue() {
-
-                    public String getString(Object value) {
-                        if (value instanceof Calendar) {
-                            String month = monthsOfTheYear[((Calendar) value).get(Calendar.MONTH)];
-                            return month + " " + ((Calendar) value).get(Calendar.YEAR); // + "something reaaaaaly long";
-                        }
-                        return TO_STRING.getString(value);
-                    }
-                    
-                };
-                titleProvider = new LabelProvider(tsv, JLabel.CENTER);
-            }
             if (cellContext == null) {
                 cellContext = new MonthViewCellContext();
             }
+            installProviders();
             
+        }
+
+        /**
+         * 
+         */
+        private void installProviders() {
+            providers = new HashMap<DayState, ComponentProvider<?>>();
+            // PENDING JW: obstacle to making class static
+            // PENDING JW: update formatter?
+            FormatStringValue sv = new FormatStringValue(dayOfMonthFormatter) {
+
+                @Override
+                public String getString(Object value) {
+                    if (value instanceof Calendar) {
+                        value = ((Calendar) value).getTime();
+                    }
+                    return super.getString(value);
+                }
+
+            };
+            ComponentProvider<?> provider = new LabelProvider(sv, JLabel.RIGHT);
+            providers.put(DayState.IN_MONTH, provider);
+            providers.put(DayState.TODAY, provider);
+            providers.put(DayState.TRAILING, provider);
+            providers.put(DayState.LEADING, provider);
+
+            StringValue wsv = new StringValue() {
+
+                public String getString(Object value) {
+                    if (value instanceof Calendar) {
+                        value = ((Calendar) value).get(Calendar.WEEK_OF_YEAR);
+                    }
+                    return TO_STRING.getString(value);
+                }
+
+            };
+            ComponentProvider<?> weekOfYearProvider = new LabelProvider(wsv,
+                    JLabel.RIGHT);
+            providers.put(DayState.WEEK_OF_YEAR, weekOfYearProvider);
+
+            StringValue dsv = new StringValue() {
+
+                public String getString(Object value) {
+                    // PENDING JW: obstacle to making class static if formatting
+                    // is
+                    // handled here
+                    if (value instanceof Calendar) {
+                        int day = ((Calendar) value).get(Calendar.DAY_OF_WEEK);
+                        // PENDING JW: hard-coded coupling to target
+                        // not re-usable
+                        return monthView.getDayOfTheWeek(day);
+                    }
+                    return TO_STRING.getString(value);
+                }
+
+            };
+            ComponentProvider<?> dayOfWeekProvider = new LabelProvider(dsv,
+                    JLabel.CENTER);
+            providers.put(DayState.DAY_OF_WEEK, dayOfWeekProvider);
+
+            StringValue tsv = new StringValue() {
+
+                public String getString(Object value) {
+                    if (value instanceof Calendar) {
+                        String month = monthsOfTheYear[((Calendar) value)
+                                .get(Calendar.MONTH)];
+                        return month + " "
+                                + ((Calendar) value).get(Calendar.YEAR); 
+                    }
+                    return TO_STRING.getString(value);
+                }
+
+            };
+            ComponentProvider<?> titleProvider = new LabelProvider(tsv,
+                    JLabel.CENTER);
+            providers.put(DayState.TITLE, titleProvider);
         }
         
         public void uninstall() {
             textCross = null;
             cellContext = null;
-            dayProvider.setStringValue(null);
-            dayProvider = null;
-            weekOfYearProvider = null;
-            dayOfWeekProvider = null;
-            titleProvider = null;
+            uninstallProviders();
             unselectableDayForeground = null;
             weekOfTheYearForeground = null;
         }
 
         /**
-         * Returns a rendering component configured for the given Calendar.
          * 
-         * PENDING JW: set the calendar as value, not the Date. Doing so
-         * will leave concrete formatting to the provider.
-         * 
-         * NOTE: the calendar state must not be changed! 
-         * 
-         * @param calendar the calendar which represents the date to render.
-         * 
-         * @return the component to use for renderring.
          */
-        public JComponent prepareDayRenderer(JXMonthView monthView, Calendar calendar, DayState dayState) {
-            // equivalent to prepare renderer:
-            // 1. configure the cellContext with value
-            cellContext.installMonthContext(monthView, 
-                    //value
-                    calendar,
-                    // selected
-                    monthView.isSelected(calendar.getTime()), 
-                    // special cell: today (because it effects the border)
+        private void uninstallProviders() {
+            if (providers != null) {
+                for (Map.Entry<DayState, ComponentProvider<?>> providerEntry : providers.entrySet()) {
+                    providerEntry.getValue().setStringValue(null);
+                }
+                providers.clear();
+                providers = null;
+            }
+        }
+        
+        /**
+         * Configures and returns a component for rendering of the given monthView cell.
+         * 
+         * @param monthView the JXMonthView to render onto
+         * @param calendar the cell value
+         * @param dayState the DayState of the cell
+         * @return a component configured for rendering the given cell
+         */
+        public JComponent prepareRenderer(JXMonthView monthView, Calendar calendar, DayState dayState) {
+            cellContext.installMonthContext(monthView, calendar, 
+                    shouldSelect(monthView, calendar, dayState), 
                     dayState);
-            // 2. getComponent
-            JComponent comp = dayProvider.getRendererComponent(cellContext);
-            // 3. "highlight"
+            JComponent comp = providers.get(dayState).getRendererComponent(cellContext);
+            return highlight(comp, monthView, calendar, dayState);
+        }
 
+        /**
+         * 
+         * PENDING JW: replace hard-coded logic by giving over to highlighters.
+         * 
+         * @param monthView the JXMonthView to render onto
+         * @param calendar the cell value
+         * @param dayState the DayState of the cell
+         * @param dayState
+         */
+        private JComponent highlight(JComponent comp, JXMonthView monthView,
+                Calendar calendar, DayState dayState) {
+            // do nothing
+            if ((DayState.LEADING == dayState) || (DayState.TRAILING == dayState)) return comp;
+            if (DayState.WEEK_OF_YEAR == dayState) {
+                if (weekOfTheYearForeground != null) {
+                    comp.setForeground(weekOfTheYearForeground);
+                } 
+                return comp;
+            }
+            if (DayState.TITLE == dayState) {
+                comp.setFont(derivedFont);
+                return comp;
+            }
+            if (DayState.DAY_OF_WEEK == dayState) {
+                comp.setFont(derivedFont);
+                if (monthView.getDaysOfTheWeekForeground() != null) {
+                    comp.setForeground(monthView.getDaysOfTheWeekForeground());
+                }
+                return comp;
+            }
             if (monthView.isFlaggedDate(calendar.getTime())) {
                 comp.setForeground(monthView.getFlaggedDayForeground());
             } else {
@@ -621,92 +666,159 @@ public class BasicMonthViewUI extends MonthViewUI {
             }
             
             return comp;
+            
         }
 
         /**
-         * 
-         * @param g the Graphics to paint into.
-         * @param left the x coordinate of upper left corner of the day box
-         * @param top the y coordinate of the upper left corner of the day box
-         * @param calendar the calendar which represents the date to render.
-         * @param isLeading boolean indicating whether the off day is leading or trailing
-         */
-        public JComponent prepareDayOffRenderer(JXMonthView monthView, Calendar calendar, DayState dayState) {
-            cellContext.installMonthContext(monthView, calendar, false, 
-                    dayState);
-            JComponent comp = dayProvider.getRendererComponent(cellContext);
-            return comp;
-        }
-
-        /**
-         * PENDING JW: set the calendar as value, not the Date. Doing so
-         * will leave concrete formatting to the provider.
-         * 
-         * NOTE: the calendar state must not be changed! 
-         * 
-         * @param g the Graphics to paint into.
-         * @param left the x coordinate of upper left corner of the day box
-         * @param top the y coordinate of the upper left corner of the day box
-         * @param calendar the calendar which represents the date to render.
-         */
-        public JComponent prepareWeekOfYearRenderer(JXMonthView monthView, Calendar calendar) {
-            // equivalent to prepare renderer:
-            // 1. configure the cellContext with value
-            cellContext.installMonthContext(monthView, 
-                    //value
-                    calendar,
-                    // selected
-                    false,
-                    // special cell: today (because it effects the border)
-                    DayState.WEEK_OF_YEAR);
-            // 2. getComponent
-            JComponent comp = weekOfYearProvider.getRendererComponent(cellContext);
-            // 3. "highlight"
-            if (weekOfTheYearForeground != null) {
-                comp.setForeground(weekOfTheYearForeground);
-            } 
-           return comp;
-        }
-
-
-        /**
-         * 
-         * @param calendar the calendar which represents the date to render.
-         */
-        public JComponent prepareDayOfWeekRenderer(JXMonthView monthView, Calendar calendar) {
-            String dayOfWeekString = monthView.getDayOfTheWeek(calendar.get(Calendar.DAY_OF_WEEK));
-            // configure
-            cellContext.installMonthContext(monthView, 
-                    dayOfWeekString, false, DayState.DAY_OF_WEEK);
-            // PENDING JW: can we handle this in the formatter?
-            // yes - but the price to pay is a hardcoded coupling from 
-            // the stringValue to the monthView
-//            cellContext.installMonthContext(monthView, calendar, false, DayState.DAY_OF_WEEK);
-            // get renderingComp
-            JComponent comp = dayOfWeekProvider.getRendererComponent(cellContext);
-            // highlight
-            // PENDING JW: obstacle to making class static
-            comp.setFont(derivedFont);
-            if (monthView.getDaysOfTheWeekForeground() != null) {
-                comp.setForeground(monthView.getDaysOfTheWeekForeground());
-            }
-            return comp;
-        }
-
-        /**
-         * @param monthView
-         * @param calendar
-         * @param title
+         * @param monthView the JXMonthView to render onto
+         * @param calendar the cell value
+         * @param dayState the DayState of the cell
          * @return
          */
-        public JComponent prepareMonthHeaderRenderer(JXMonthView monthView,
-                Calendar calendar, DayState dayState) {
-            cellContext.installMonthContext(monthView, calendar, false, dayState);
-            JComponent comp = titleProvider.getRendererComponent(cellContext);
-            comp.setFont(derivedFont);
-            return comp;
+        private boolean shouldSelect(JXMonthView monthView, Calendar calendar,
+                DayState dayState) {
+            if (!isSelectable(dayState)) return false;
+            return monthView.isSelected(calendar.getTime());
         }
 
+        
+        /**
+         * @param dayState
+         * @return
+         */
+        private boolean isSelectable(DayState dayState) {
+            return (DayState.IN_MONTH == dayState) || (DayState.TODAY == dayState);
+        }
+
+//        /**
+//         * Returns a rendering component configured for the given Calendar.
+//         * 
+//         * PENDING JW: set the calendar as value, not the Date. Doing so
+//         * will leave concrete formatting to the provider.
+//         * 
+//         * NOTE: the calendar state must not be changed! 
+//         * 
+//         * @param calendar the calendar which represents the date to render.
+//         * 
+//         * @return the component to use for renderring.
+//         */
+//        public JComponent prepareDayRenderer(JXMonthView monthView, Calendar calendar, DayState dayState) {
+//            // equivalent to prepare renderer:
+//            // 1. configure the cellContext with value
+//            cellContext.installMonthContext(monthView, 
+//                    //value
+//                    calendar,
+//                    // selected
+//                    monthView.isSelected(calendar.getTime()), 
+//                    // special cell: today (because it effects the border)
+//                    dayState);
+//            // 2. getComponent
+//            JComponent comp = dayProvider.getRendererComponent(cellContext);
+//            // 3. "highlight"
+//
+//            if (monthView.isFlaggedDate(calendar.getTime())) {
+//                comp.setForeground(monthView.getFlaggedDayForeground());
+//            } else {
+//                Color perDay = monthView.getDayForeground(calendar.get(Calendar.DAY_OF_WEEK));
+//                if ((perDay != null) && (perDay != monthView.getForeground())) {
+//                    // PENDING JW: this here prevents selection foreground on all
+//                    // if not checked for "normal" foreground
+//                    comp.setForeground(perDay);
+//                }
+//            }
+//            if (monthView.isUnselectableDate(calendar.getTime()) 
+//                    && (comp instanceof PainterAware )) {
+//                textCross.setForeground(unselectableDayForeground);
+//                ((PainterAware) comp).setPainter(textCross);
+//            }
+//            
+//            return comp;
+//        }
+//
+//        /**
+//         * 
+//         * @param g the Graphics to paint into.
+//         * @param left the x coordinate of upper left corner of the day box
+//         * @param top the y coordinate of the upper left corner of the day box
+//         * @param calendar the calendar which represents the date to render.
+//         * @param isLeading boolean indicating whether the off day is leading or trailing
+//         */
+//        public JComponent prepareDayOffRenderer(JXMonthView monthView, Calendar calendar, DayState dayState) {
+//            cellContext.installMonthContext(monthView, calendar, false, 
+//                    dayState);
+//            JComponent comp = dayProvider.getRendererComponent(cellContext);
+//            return comp;
+//        }
+//
+//        /**
+//         * PENDING JW: set the calendar as value, not the Date. Doing so
+//         * will leave concrete formatting to the provider.
+//         * 
+//         * NOTE: the calendar state must not be changed! 
+//         * 
+//         * @param g the Graphics to paint into.
+//         * @param left the x coordinate of upper left corner of the day box
+//         * @param top the y coordinate of the upper left corner of the day box
+//         * @param calendar the calendar which represents the date to render.
+//         */
+//        public JComponent prepareWeekOfYearRenderer(JXMonthView monthView, Calendar calendar, DayState dayState) {
+//            // equivalent to prepare renderer:
+//            // 1. configure the cellContext with value
+//            cellContext.installMonthContext(monthView, 
+//                    //value
+//                    calendar,
+//                    // selected
+//                    false,
+//                    // special cell: today (because it effects the border)
+//                    dayState);
+//            // 2. getComponent
+//            JComponent comp = weekOfYearProvider.getRendererComponent(cellContext);
+//            // 3. "highlight"
+//            if (weekOfTheYearForeground != null) {
+//                comp.setForeground(weekOfTheYearForeground);
+//            } 
+//           return comp;
+//        }
+//
+//
+//        /**
+//         * 
+//         * @param calendar the calendar which represents the date to render.
+//         */
+//        public JComponent prepareDayOfWeekRenderer(JXMonthView monthView, Calendar calendar, DayState dayState) {
+////            String dayOfWeekString = monthView.getDayOfTheWeek(calendar.get(Calendar.DAY_OF_WEEK));
+////            // configure
+////            cellContext.installMonthContext(monthView, 
+////                    dayOfWeekString, false, DayState.DAY_OF_WEEK);
+//            // PENDING JW: can we handle this in the formatter?
+//            // yes - but the price to pay is a hardcoded coupling from 
+//            // the stringValue to the monthView
+//            cellContext.installMonthContext(monthView, calendar, false, dayState);
+////             get renderingComp
+//            JComponent comp = dayOfWeekProvider.getRendererComponent(cellContext);
+//            // highlight
+//            // PENDING JW: obstacle to making class static
+//            comp.setFont(derivedFont);
+//            if (monthView.getDaysOfTheWeekForeground() != null) {
+//                comp.setForeground(monthView.getDaysOfTheWeekForeground());
+//            }
+//            return comp;
+//        }
+//
+//        /**
+//         * @param monthView
+//         * @param calendar
+//         * @param title
+//         * @return
+//         */
+//        public JComponent prepareMonthHeaderRenderer(JXMonthView monthView,
+//                Calendar calendar, DayState dayState) {
+//            cellContext.installMonthContext(monthView, calendar, false, dayState);
+//            JComponent comp = titleProvider.getRendererComponent(cellContext);
+//            comp.setFont(derivedFont);
+//            return comp;
+//        }
+//
 
         
 
@@ -1345,9 +1457,9 @@ public class BasicMonthViewUI extends MonthViewUI {
     public void paint(Graphics g, JComponent c) {
         Rectangle clip = g.getClipBounds();
         // PENDING JW: remove as filling the background must be done in update(...) 
-        Graphics tmp = g.create();
-        paintBackground(clip, tmp);
-        tmp.dispose();
+//        Graphics tmp = g.create();
+//        paintBackground(clip, tmp);
+//        tmp.dispose();
 
         // Get a calender set to the first displayed date
         Calendar cal = getCalendar();
@@ -1368,22 +1480,6 @@ public class BasicMonthViewUI extends MonthViewUI {
         
         
 
-    }
-
-    /**
-     * Paints background of the given rectangle.
-     * 
-     * PENDING JW: this is called from paint, which shouldnt do 
-     * it? It's the responsibility of super update(comp, g).
-     * 
-     * @param clip
-     * @param g
-     */
-    protected void paintBackground(final Rectangle clip, final Graphics g) {
-        if (monthView.isOpaque()) {
-            g.setColor(monthView.getBackground());
-            g.fillRect(clip.x, clip.y, clip.width, clip.height);
-        }
     }
 
     /**
@@ -1451,11 +1547,19 @@ public class BasicMonthViewUI extends MonthViewUI {
             paintMonthStringForeground(g, x, y, width, fullMonthBoxHeight,
                     calendar);
 
-            paintTraversalIcons(g, x, y, width);
+            if (monthView.isTraversable()) {
+            // draw the icons
+            monthDownImage.paintIcon(monthView, g, x + arrowPaddingX, y
+                    + ((fullMonthBoxHeight - monthDownImage.getIconHeight()) / 2));
+            monthUpImage.paintIcon(monthView, g, x + width - arrowPaddingX
+                    - monthUpImage.getIconWidth(), y
+                    + ((fullMonthBoxHeight - monthDownImage.getIconHeight()) / 2));
+            }
+            
             return;
         }
         
-        JComponent comp = renderingHandler.prepareMonthHeaderRenderer(monthView, calendar, DayState.TITLE);
+        JComponent comp = renderingHandler.prepareRenderer(monthView, calendar, DayState.TITLE);
         renderTitleBox(g, x, y, comp);
             // Paint arrow buttons for traversing months if enabled.
 //            paintTraversalIcons(g, x, y, width);
@@ -1492,7 +1596,7 @@ public class BasicMonthViewUI extends MonthViewUI {
         Calendar cal = (Calendar) calendar.clone();
         CalendarUtils.startOfWeek(cal);
         for (int i = 0; i < JXMonthView.DAYS_IN_WEEK; i++) {
-            JComponent comp = renderingHandler.prepareDayOfWeekRenderer(monthView, cal);
+            JComponent comp = renderingHandler.prepareRenderer(monthView, cal, DayState.DAY_OF_WEEK);
             renderDayBox(g, leftOfDay, tmpY, comp);
             leftOfDay = isLeftToRight ? leftOfDay + fullBoxWidth : leftOfDay
                     - fullBoxWidth;
@@ -1556,7 +1660,7 @@ public class BasicMonthViewUI extends MonthViewUI {
         int weeks = getWeeks(calendar);
         calendar.setTime(cal.getTime());
         for (int weekOfYear = 0; weekOfYear <= weeks; weekOfYear++) {
-            JComponent comp = renderingHandler.prepareWeekOfYearRenderer(monthView, calendar);
+            JComponent comp = renderingHandler.prepareRenderer(monthView, calendar, DayState.WEEK_OF_YEAR);
             // 4. doRender
             renderDayBox(g, tmpX, initialY, comp);
             initialY += fullBoxHeight;
@@ -1677,7 +1781,7 @@ public class BasicMonthViewUI extends MonthViewUI {
             return;
         if (!leading && !monthView.isShowingTrailingDays())
             return;
-        JComponent comp = renderingHandler.prepareDayOffRenderer(monthView, calendar, leading ? 
+        JComponent comp = renderingHandler.prepareRenderer(monthView, calendar, leading ? 
                 DayState.LEADING : DayState.TRAILING);
         renderDayBox(g, left, top, comp);
 
@@ -1705,7 +1809,7 @@ public class BasicMonthViewUI extends MonthViewUI {
             paintDay(g, left, top, calendar);
             return;
         } 
-        JComponent comp = renderingHandler.prepareDayRenderer(monthView, calendar, 
+        JComponent comp = renderingHandler.prepareRenderer(monthView, calendar, 
                 isToday(calendar.getTime()) ? DayState.TODAY : DayState.IN_MONTH);
         // 4. doRender
         renderDayBox(g, left, top, comp);
@@ -2127,7 +2231,7 @@ public class BasicMonthViewUI extends MonthViewUI {
             for (int i = calendar.getMinimum(Calendar.MONTH); i <= calendar.getMaximum(Calendar.MONTH); i++) {
                 calendar.set(Calendar.MONTH, i);
                 CalendarUtils.startOfMonth(calendar);
-                JComponent comp = renderingHandler.prepareMonthHeaderRenderer(monthView, calendar, DayState.TITLE);
+                JComponent comp = renderingHandler.prepareRenderer(monthView, calendar, DayState.TITLE);
                 Dimension pref = comp.getPreferredSize();
                 maxMonthWidth = Math.max(maxMonthWidth, pref.width);
                 maxMonthHeight = Math.max(maxMonthHeight, pref.height);
@@ -2145,7 +2249,7 @@ public class BasicMonthViewUI extends MonthViewUI {
             calendar = getCalendar();
             CalendarUtils.startOfWeek(calendar);
             for (int i = 0; i < JXMonthView.DAYS_IN_WEEK; i++) {
-                JComponent comp = renderingHandler.prepareDayOfWeekRenderer(monthView, calendar);
+                JComponent comp = renderingHandler.prepareRenderer(monthView, calendar, DayState.DAY_OF_WEEK);
                 Dimension pref = comp.getPreferredSize();
                 maxBoxWidth = Math.max(maxBoxWidth, pref.width);
                 maxBoxHeight = Math.max(maxBoxHeight, pref.height);
@@ -2154,7 +2258,7 @@ public class BasicMonthViewUI extends MonthViewUI {
             
             calendar = getCalendar();
             for (int i = 0; i < calendar.getMaximum(Calendar.DAY_OF_MONTH); i++) {
-                JComponent comp = renderingHandler.prepareDayRenderer(monthView, calendar, DayState.IN_MONTH);
+                JComponent comp = renderingHandler.prepareRenderer(monthView, calendar, DayState.IN_MONTH);
                 Dimension pref = comp.getPreferredSize();
                 maxBoxWidth = Math.max(maxBoxWidth, pref.width);
                 maxBoxHeight = Math.max(maxBoxHeight, pref.height);
@@ -2591,6 +2695,26 @@ public class BasicMonthViewUI extends MonthViewUI {
     
 
     /**
+     * Paints background of the given rectangle.
+     * 
+     * PENDING JW: this is called from paint, which shouldnt do 
+     * it? It's the responsibility of super update(comp, g).
+     * 
+     * @param clip
+     * @param g
+     * 
+     * @deprecated no longer used - it's up to subclasses to implement
+     * if they think it's needed.
+     */
+    @Deprecated
+    protected void paintBackground(final Rectangle clip, final Graphics g) {
+        if (monthView.isOpaque()) {
+            g.setColor(monthView.getBackground());
+            g.fillRect(clip.x, clip.y, clip.width, clip.height);
+        }
+    }
+
+    /**
      * Paints the background of the month string.  The bounding box for this
      * background can be modified by setting its insets via
      * setMonthStringInsets.  The color of the background can be set via
@@ -2698,29 +2822,6 @@ public class BasicMonthViewUI extends MonthViewUI {
             String yearName, int yearX, int yearY, Calendar cal) {
         g.drawString(monthName, monthX, monthY);
         g.drawString(yearName, yearX, yearY);
-    }
-
-    /**
-     * Paints the month traversal icons. Does nothing if the monthView is not
-     * traversable.
-     * 
-     * @param g Graphics object.
-     * @param x x location of month
-     * @param y y location of month
-     * @param width width of month
-     * 
-     * @deprecated used by non-rendering code only.
-     */
-    @Deprecated
-    private void paintTraversalIcons(Graphics g, int x, int y, int width) {
-        if (!monthView.isTraversable())
-            return;
-        // draw the icons
-        monthDownImage.paintIcon(monthView, g, x + arrowPaddingX, y
-                + ((fullMonthBoxHeight - monthDownImage.getIconHeight()) / 2));
-        monthUpImage.paintIcon(monthView, g, x + width - arrowPaddingX
-                - monthUpImage.getIconWidth(), y
-                + ((fullMonthBoxHeight - monthDownImage.getIconHeight()) / 2));
     }
 
     /**
