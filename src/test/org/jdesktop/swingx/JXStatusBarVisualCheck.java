@@ -12,10 +12,12 @@ import javax.swing.BoxLayout;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.border.TitledBorder;
 
 import org.jdesktop.swingx.action.AbstractActionExt;
+import org.jdesktop.test.AncientSwingTeam;
 
 public class JXStatusBarVisualCheck extends InteractiveTestCase {
     @SuppressWarnings("unused")
@@ -23,30 +25,40 @@ public class JXStatusBarVisualCheck extends InteractiveTestCase {
             .getLogger(JXStatusBarVisualCheck.class.getName());
     
     public static void main(String[] args) {
-        setSystemLF(true);
         JXStatusBarVisualCheck test = new JXStatusBarVisualCheck();
         try {
             test.runInteractiveTests();
+//            test.runInteractiveTests("interactive.*Decorate.*");
         } catch (Exception ex) {
 
         }
     }
 
     /**
+     * Issue #936-swingx: JXRootPane can't cope with default decoration.
+     * Strictly speaking, can be run in isolation only - global state!
+     * To see the misbehaviour, uncomment the decortion settings.
+     */
+    public void interactiveDefaultDecorated() {
+//        JFrame.setDefaultLookAndFeelDecorated(true);
+        setSystemLF(false);
+        JXTable table = new JXTable(new AncientSwingTeam());
+        JXFrame frame = wrapWithScrollingInFrame(table, "statusbar in default laf decorated frame");
+        addStatusMessage(frame, "we must be showing");
+        show(frame);
+    }
+    /**
      * Use-case: mimic win2k explorer status bar.
      * 
-     * has a 
-     * - leading message area which resizes on frame resize
-     * - two trailing fixed size text areas with different fixed sizes.
+     * has a - leading message area which resizes on frame resize - two trailing
+     * fixed size text areas with different fixed sizes.
      * 
-     * goal:
-     * - add the message text
-     * - add the trailing labels
-     * - auto-space (in win2k that would be "gaps" between the labels, in other 
-     * LFs it would be), that is no need to manually insert anything nor fiddle
-     * with "insets". The LF should come up with a reasonable default.
-     * - simple constraint for trailing, that is no need for any hack with weights
-     *  
+     * goal: - add the message text - add the trailing labels - auto-space (in
+     * win2k that would be "gaps" between the labels, in other LFs it would be),
+     * that is no need to manually insert anything nor fiddle with "insets". The
+     * LF should come up with a reasonable default. - simple constraint for
+     * trailing, that is no need for any hack with weights
+     * 
      */
     public void interactiveWin2kExplorerStatus() {
         JComponent panel = new JXPanel();

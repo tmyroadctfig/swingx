@@ -4,21 +4,87 @@
  */
 package org.jdesktop.swingx;
 
+import java.awt.Dimension;
+import java.awt.GraphicsEnvironment;
 import java.awt.event.ActionEvent;
+import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 
+import org.jdesktop.test.AncientSwingTeam;
 import org.jdesktop.test.PropertyChangeReport;
 
+    
 /**
  * @author  Jeanette Winzenburg
  */
 public class JXRootPaneTest extends InteractiveTestCase {
  
+    @SuppressWarnings("unused")
+    private static final Logger LOG = Logger.getLogger(JXRootPaneTest.class
+            .getName());
+    
+    /**
+     * Issue #936-swingx: JXRootPane cannot cope with default laf decoration. 
+     * 
+     * here the actual test: pref size with laf decoration 
+     */
+    public void testLayoutWithLAFDecoration() {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.info("cannot run testLAFDecorationLayout - headless environment");
+            return;
+        }
+        
+        JFrame.setDefaultLookAndFeelDecorated(true);
+        JXFrame frame = new JXFrame();
+        frame.add(new JXTable(new AncientSwingTeam()));
+        frame.pack();
+        Dimension dim = frame.getSize();
+        assertEquals(dim, frame.getPreferredSize());
+        JXStatusBar bar = new JXStatusBar();
+        bar.add(new JLabel("need some content"));
+        frame.setStatusBar(bar);
+        frame.pack();
+        try {
+            assertEquals(dim.height + bar.getPreferredSize().height, frame.getPreferredSize().height);
+        } finally {
+            JFrame.setDefaultLookAndFeelDecorated(false);
+        }
+    }
+
+    /**
+     * Issue #936-swingx: JXRootPane cannot cope with default laf decoration. 
+     * Compare: no laf decoration
+     */
+    public void testLayoutWithOut() {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.info("cannot run testLAFDecorationLayout - headless environment");
+            return;
+        }
+        JXFrame frame = new JXFrame();
+        frame.add(new JXTable(new AncientSwingTeam()));
+        frame.pack();
+        Dimension dim = frame.getSize();
+        assertEquals(dim, frame.getPreferredSize());
+        JXStatusBar bar = new JXStatusBar();
+        bar.add(new JLabel("need some content"));
+        frame.setStatusBar(bar);
+        frame.pack();
+        try {
+            assertEquals(dim.height + bar.getPreferredSize().height, frame.getPreferredSize().height);
+        } finally {
+            JFrame.setDefaultLookAndFeelDecorated(false);
+        }
+    }
+
     /**
      * Issue #566: JXRootPane eats escape from popups (JXDatePicker).
      *

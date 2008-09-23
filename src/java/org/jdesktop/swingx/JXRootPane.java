@@ -27,6 +27,7 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.LayoutManager;
+import java.awt.LayoutManager2;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -54,91 +55,55 @@ import javax.swing.KeyStroke;
  */
 public class JXRootPane extends JRootPane {
     protected class XRootLayout extends RootLayout {
+
+        LayoutManager2 delegate;
+
+        public void setLayoutManager(LayoutManager2 delegate) {
+            this.delegate = delegate;
+        }
+
         /**
          * {@inheritDoc}
          */
         @Override
         public Dimension preferredLayoutSize(Container parent) {
-            Dimension rd, mbd, sbd;
-            Insets i = getInsets();
-        
-            if(contentPane != null) {
-                rd = contentPane.getPreferredSize();
-            } else {
-                rd = parent.getSize();
+            Dimension pref = delegatePreferredLayoutSize(parent);
+            if (statusBar != null && statusBar.isVisible()) {
+                Dimension statusPref = statusBar.getPreferredSize();
+                pref.width = Math.max(pref.width, statusPref.width);
+                pref.height += statusPref.height;
             }
-            if(menuBar != null && menuBar.isVisible()) {
-                mbd = menuBar.getPreferredSize();
-            } else {
-                mbd = new Dimension(0, 0);
-            }
-            if(statusBar != null && statusBar.isVisible()) {
-                sbd = statusBar.getPreferredSize();
-            } else {
-                sbd = new Dimension(0, 0);
-            }
-            
-            return new Dimension(Math.max(rd.width, Math.max(mbd.width, sbd.width))
-                    + i.left + i.right, rd.height + mbd.height + sbd.height
-                    + i.top + i.bottom);
+            return pref;
         }
-        
+
         /**
          * {@inheritDoc}
          */
         @Override
         public Dimension minimumLayoutSize(Container parent) {
-            Dimension rd, mbd, sbd;
-            Insets i = getInsets();
-            
-            if(contentPane != null) {
-                rd = contentPane.getMinimumSize();
-            } else {
-                rd = parent.getSize();
+            Dimension pref = delegateMinimumLayoutSize(parent);
+            if (statusBar != null && statusBar.isVisible()) {
+                Dimension statusPref = statusBar.getMinimumSize();
+                pref.width = Math.max(pref.width, statusPref.width);
+                pref.height += statusPref.height;
             }
-            if(menuBar != null && menuBar.isVisible()) {
-                mbd = menuBar.getMinimumSize();
-            } else {
-                mbd = new Dimension(0, 0);
-            }
-            if(statusBar != null && statusBar.isVisible()) {
-                sbd = statusBar.getMinimumSize();
-            } else {
-                sbd = new Dimension(0, 0);
-            }
-            
-            return new Dimension(Math.max(rd.width, Math.max(mbd.width, sbd.width))
-                    + i.left + i.right, rd.height + mbd.height + sbd.height
-                    + i.top + i.bottom);
+            return pref;
+
         }
-        
+
         /**
          * {@inheritDoc}
          */
         @Override
         public Dimension maximumLayoutSize(Container target) {
-            Dimension rd, mbd, sbd;
-            Insets i = getInsets();
-            if(menuBar != null && menuBar.isVisible()) {
-                mbd = menuBar.getMaximumSize();
-            } else {
-                mbd = new Dimension(0, 0);
+            Dimension pref = delegateMaximumLayoutSize(target);
+            if (statusBar != null && statusBar.isVisible()) {
+                Dimension statusPref = statusBar.getMaximumSize();
+                pref.width = Math.max(pref.width, statusPref.width);
+                // PENDING JW: overflow?
+                pref.height += statusPref.height;
             }
-            if(statusBar != null && statusBar.isVisible()) {
-                sbd = statusBar.getMaximumSize();
-            } else {
-                sbd = new Dimension(0, 0);
-            }
-            if(contentPane != null) {
-                rd = contentPane.getMaximumSize();
-            } else {
-                // This is silly, but should stop an overflow error
-                rd = new Dimension(Integer.MAX_VALUE, 
-                        Integer.MAX_VALUE - i.top - i.bottom - mbd.height - sbd.height - 1);
-            }
-            
-            return new Dimension(Math.min(rd.width, Math.min(mbd.width, sbd.width)) + i.left + i.right,
-                                         rd.height + mbd.height + sbd.height + i.top + i.bottom);
+            return pref;
         }
 
         /**
@@ -146,33 +111,63 @@ public class JXRootPane extends JRootPane {
          */
         @Override
         public void layoutContainer(Container parent) {
+            delegateLayoutContainer(parent);
+            if (statusBar == null || !statusBar.isVisible())
+                return;
             Rectangle b = parent.getBounds();
             Insets i = getInsets();
-            int contentY = 0;
-            int adjustH = 0;
             int w = b.width - i.right - i.left;
             int h = b.height - i.top - i.bottom;
-        
-            if(layeredPane != null) {
-                layeredPane.setBounds(i.left, i.top, w, h);
+            Dimension statusPref = statusBar.getPreferredSize();
+            statusBar.setBounds(i.right, b.height - i.bottom
+                    - statusPref.height, w, statusPref.height);
+            if (contentPane != null) {
+                Rectangle bounds = contentPane.getBounds();
+                contentPane.setBounds(bounds.x, bounds.y, bounds.width,
+                        bounds.height - statusPref.height);
             }
-            if(glassPane != null) {
-                glassPane.setBounds(i.left, i.top, w, h);
-            }
-            // Note: This is laying out the children in the layeredPane,
-            // technically, these are not our children.
-            if(menuBar != null && menuBar.isVisible()) {
-                Dimension mbd = menuBar.getPreferredSize();
-                menuBar.setBounds(0, 0, w, mbd.height);
-                contentY += mbd.height;
-            }
-            if(statusBar != null && statusBar.isVisible()) {
-                Dimension sbd = statusBar.getPreferredSize();
-                statusBar.setBounds(0, h - sbd.height, w, sbd.height);
-                adjustH += sbd.height;
-            }
-            if(contentPane != null) {
-                contentPane.setBounds(0, contentY, w, h - contentY - adjustH);
+
+        }
+
+        /**
+         * @param parent
+         * @return
+         */
+        private Dimension delegatePreferredLayoutSize(Container parent) {
+            if (delegate == null)
+                return super.preferredLayoutSize(parent);
+            return delegate.preferredLayoutSize(parent);
+        }
+
+        /**
+         * @param parent
+         * @return
+         */
+        private Dimension delegateMinimumLayoutSize(Container parent) {
+            if (delegate == null)
+                return super.minimumLayoutSize(parent);
+            return delegate.minimumLayoutSize(parent);
+        }
+
+        /**
+         * @param target
+         * @return
+         */
+        private Dimension delegateMaximumLayoutSize(Container parent) {
+            if (delegate == null)
+
+                return super.maximumLayoutSize(parent);
+            return delegate.maximumLayoutSize(parent);
+        }
+
+        /**
+         * @param parent
+         */
+        private void delegateLayoutContainer(Container parent) {
+            if (delegate == null) {
+                super.layoutContainer(parent);
+            } else {
+                delegate.layoutContainer(parent);
             }
         }
     }
@@ -248,6 +243,17 @@ public class JXRootPane extends JRootPane {
             }
         });
         return c;
+    }
+
+    
+    @Override
+    public void setLayout(LayoutManager layout) {
+        if (layout instanceof XRootLayout) {
+            super.setLayout(layout);
+        } else {
+            if (layout instanceof LayoutManager2)
+            ((XRootLayout) getLayout()).setLayoutManager((LayoutManager2) layout);
+        }
     }
 
     /**
