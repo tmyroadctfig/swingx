@@ -542,9 +542,9 @@ public class BasicMonthViewUI extends MonthViewUI {
      */
     protected /* static */ class RenderingHandler {
         /** The CellContext for content and default visual config. */
-        private MonthViewCellContext cellContext;
+        private CalendarCellContext cellContext;
         /** The providers to use per DayState. */
-        private Map<DayState, ComponentProvider<?>> providers;
+        private Map<CalendarState, ComponentProvider<?>> providers;
         // Formatters/state used by Providers. 
         /** Formatter used to format the day of the week to a numerical value. */
         private SimpleDateFormat dayFormatter;
@@ -570,7 +570,7 @@ public class BasicMonthViewUI extends MonthViewUI {
             weekOfTheYearForeground = UIManagerExt.getColor("JXMonthView.weekOfTheYearForeground");
             unselectableDayForeground = UIManagerExt.getColor("JXMonthView.unselectableDayForeground");
             textCross = new TextCrossingPainter<JLabel>();
-            cellContext = new MonthViewCellContext();
+            cellContext = new CalendarCellContext();
             installProviders();
         }
 
@@ -578,7 +578,7 @@ public class BasicMonthViewUI extends MonthViewUI {
          * Creates and stores ComponentProviders for all DayStates.
          */
         private void installProviders() {
-            providers = new HashMap<DayState, ComponentProvider<?>>();
+            providers = new HashMap<CalendarState, ComponentProvider<?>>();
             FormatStringValue sv = new FormatStringValue(dayFormatter) {
 
                 @Override
@@ -591,10 +591,10 @@ public class BasicMonthViewUI extends MonthViewUI {
 
             };
             ComponentProvider<?> provider = new LabelProvider(sv, JLabel.RIGHT);
-            providers.put(DayState.IN_MONTH, provider);
-            providers.put(DayState.TODAY, provider);
-            providers.put(DayState.TRAILING, provider);
-            providers.put(DayState.LEADING, provider);
+            providers.put(CalendarState.IN_MONTH, provider);
+            providers.put(CalendarState.TODAY, provider);
+            providers.put(CalendarState.TRAILING, provider);
+            providers.put(CalendarState.LEADING, provider);
 
             StringValue wsv = new StringValue() {
 
@@ -608,7 +608,7 @@ public class BasicMonthViewUI extends MonthViewUI {
             };
             ComponentProvider<?> weekOfYearProvider = new LabelProvider(wsv,
                     JLabel.RIGHT);
-            providers.put(DayState.WEEK_OF_YEAR, weekOfYearProvider);
+            providers.put(CalendarState.WEEK_OF_YEAR, weekOfYearProvider);
 
             StringValue dsv = new StringValue() {
 
@@ -628,7 +628,7 @@ public class BasicMonthViewUI extends MonthViewUI {
             };
             ComponentProvider<?> dayOfWeekProvider = new LabelProvider(dsv,
                     JLabel.CENTER);
-            providers.put(DayState.DAY_OF_WEEK, dayOfWeekProvider);
+            providers.put(CalendarState.DAY_OF_WEEK, dayOfWeekProvider);
 
             StringValue tsv = new StringValue() {
 
@@ -645,7 +645,7 @@ public class BasicMonthViewUI extends MonthViewUI {
             };
             ComponentProvider<?> titleProvider = new LabelProvider(tsv,
                     JLabel.CENTER);
-            providers.put(DayState.TITLE, titleProvider);
+            providers.put(CalendarState.TITLE, titleProvider);
         }
         
         /**
@@ -688,7 +688,7 @@ public class BasicMonthViewUI extends MonthViewUI {
          * @param dayState the DayState of the cell
          * @return a component configured for rendering the given cell
          */
-        public JComponent prepareRenderer(JXMonthView monthView, Calendar calendar, DayState dayState) {
+        public JComponent prepareRenderingComponent(JXMonthView monthView, Calendar calendar, CalendarState dayState) {
             cellContext.installMonthContext(monthView, calendar, 
                     shouldSelect(monthView, calendar, dayState), 
                     dayState);
@@ -706,19 +706,19 @@ public class BasicMonthViewUI extends MonthViewUI {
          * @param dayState
          */
         private JComponent highlight(JComponent comp, JXMonthView monthView,
-                Calendar calendar, DayState dayState) {
-            if ((DayState.LEADING == dayState) || (DayState.TRAILING == dayState)) return comp;
-            if (DayState.WEEK_OF_YEAR == dayState) {
+                Calendar calendar, CalendarState dayState) {
+            if ((CalendarState.LEADING == dayState) || (CalendarState.TRAILING == dayState)) return comp;
+            if (CalendarState.WEEK_OF_YEAR == dayState) {
                 if (weekOfTheYearForeground != null) {
                     comp.setForeground(weekOfTheYearForeground);
                 } 
                 return comp;
             }
-            if (DayState.TITLE == dayState) {
+            if (CalendarState.TITLE == dayState) {
                 comp.setFont(getDerivedFont(comp.getFont()));
                 return comp;
             }
-            if (DayState.DAY_OF_WEEK == dayState) {
+            if (CalendarState.DAY_OF_WEEK == dayState) {
                 comp.setFont(getDerivedFont(comp.getFont()));
                 if (monthView.getDaysOfTheWeekForeground() != null) {
                     comp.setForeground(monthView.getDaysOfTheWeekForeground());
@@ -760,7 +760,7 @@ public class BasicMonthViewUI extends MonthViewUI {
          * @return
          */
         private boolean shouldSelect(JXMonthView monthView, Calendar calendar,
-                DayState dayState) {
+                CalendarState dayState) {
             if (!isSelectable(dayState)) return false;
             return monthView.isSelected(calendar.getTime());
         }
@@ -770,8 +770,8 @@ public class BasicMonthViewUI extends MonthViewUI {
          * @param dayState
          * @return
          */
-        private boolean isSelectable(DayState dayState) {
-            return (DayState.IN_MONTH == dayState) || (DayState.TODAY == dayState);
+        private boolean isSelectable(CalendarState dayState) {
+            return (CalendarState.IN_MONTH == dayState) || (CalendarState.TODAY == dayState);
         }
 
     }
@@ -1493,7 +1493,7 @@ public class BasicMonthViewUI extends MonthViewUI {
             return;
         }
         
-        JComponent comp = renderingHandler.prepareRenderer(monthView, calendar, DayState.TITLE);
+        JComponent comp = renderingHandler.prepareRenderingComponent(monthView, calendar, CalendarState.TITLE);
         renderTitleBox(g, x, y, comp);
     }
 
@@ -1528,7 +1528,7 @@ public class BasicMonthViewUI extends MonthViewUI {
         Calendar cal = (Calendar) calendar.clone();
         CalendarUtils.startOfWeek(cal);
         for (int i = 0; i < JXMonthView.DAYS_IN_WEEK; i++) {
-            JComponent comp = renderingHandler.prepareRenderer(monthView, cal, DayState.DAY_OF_WEEK);
+            JComponent comp = renderingHandler.prepareRenderingComponent(monthView, cal, CalendarState.DAY_OF_WEEK);
             renderDayBox(g, leftOfDay, tmpY, comp);
             leftOfDay = isLeftToRight ? leftOfDay + fullBoxWidth : leftOfDay
                     - fullBoxWidth;
@@ -1592,7 +1592,7 @@ public class BasicMonthViewUI extends MonthViewUI {
         int weeks = getWeeks(calendar);
         calendar.setTime(cal.getTime());
         for (int weekOfYear = 0; weekOfYear <= weeks; weekOfYear++) {
-            JComponent comp = renderingHandler.prepareRenderer(monthView, calendar, DayState.WEEK_OF_YEAR);
+            JComponent comp = renderingHandler.prepareRenderingComponent(monthView, calendar, CalendarState.WEEK_OF_YEAR);
             // 4. doRender
             renderDayBox(g, tmpX, initialY, comp);
             initialY += fullBoxHeight;
@@ -1720,8 +1720,8 @@ public class BasicMonthViewUI extends MonthViewUI {
             return;
         if (!leading && !monthView.isShowingTrailingDays())
             return;
-        JComponent comp = renderingHandler.prepareRenderer(monthView, calendar, leading ? 
-                DayState.LEADING : DayState.TRAILING);
+        JComponent comp = renderingHandler.prepareRenderingComponent(monthView, calendar, leading ? 
+                CalendarState.LEADING : CalendarState.TRAILING);
         renderDayBox(g, left, top, comp);
 
     }
@@ -1748,8 +1748,8 @@ public class BasicMonthViewUI extends MonthViewUI {
             paintDay(g, left, top, calendar);
             return;
         } 
-        JComponent comp = renderingHandler.prepareRenderer(monthView, calendar, 
-                isToday(calendar.getTime()) ? DayState.TODAY : DayState.IN_MONTH);
+        JComponent comp = renderingHandler.prepareRenderingComponent(monthView, calendar, 
+                isToday(calendar.getTime()) ? CalendarState.TODAY : CalendarState.IN_MONTH);
         // 4. doRender
         renderDayBox(g, left, top, comp);
 
@@ -2165,7 +2165,7 @@ public class BasicMonthViewUI extends MonthViewUI {
             for (int i = calendar.getMinimum(Calendar.MONTH); i <= calendar.getMaximum(Calendar.MONTH); i++) {
                 calendar.set(Calendar.MONTH, i);
                 CalendarUtils.startOfMonth(calendar);
-                JComponent comp = renderingHandler.prepareRenderer(monthView, calendar, DayState.TITLE);
+                JComponent comp = renderingHandler.prepareRenderingComponent(monthView, calendar, CalendarState.TITLE);
                 Dimension pref = comp.getPreferredSize();
                 maxMonthWidth = Math.max(maxMonthWidth, pref.width);
                 maxMonthHeight = Math.max(maxMonthHeight, pref.height);
@@ -2176,7 +2176,7 @@ public class BasicMonthViewUI extends MonthViewUI {
             calendar = getCalendar();
             CalendarUtils.startOfWeek(calendar);
             for (int i = 0; i < JXMonthView.DAYS_IN_WEEK; i++) {
-                JComponent comp = renderingHandler.prepareRenderer(monthView, calendar, DayState.DAY_OF_WEEK);
+                JComponent comp = renderingHandler.prepareRenderingComponent(monthView, calendar, CalendarState.DAY_OF_WEEK);
                 Dimension pref = comp.getPreferredSize();
                 maxBoxWidth = Math.max(maxBoxWidth, pref.width);
                 maxBoxHeight = Math.max(maxBoxHeight, pref.height);
@@ -2185,7 +2185,7 @@ public class BasicMonthViewUI extends MonthViewUI {
             
             calendar = getCalendar();
             for (int i = 0; i < calendar.getMaximum(Calendar.DAY_OF_MONTH); i++) {
-                JComponent comp = renderingHandler.prepareRenderer(monthView, calendar, DayState.IN_MONTH);
+                JComponent comp = renderingHandler.prepareRenderingComponent(monthView, calendar, CalendarState.IN_MONTH);
                 Dimension pref = comp.getPreferredSize();
                 maxBoxWidth = Math.max(maxBoxWidth, pref.width);
                 maxBoxHeight = Math.max(maxBoxHeight, pref.height);

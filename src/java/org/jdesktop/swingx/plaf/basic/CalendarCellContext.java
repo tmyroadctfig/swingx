@@ -39,12 +39,12 @@ import org.jdesktop.swingx.renderer.CellContext;
  * 
  * @author Jeanette Winzenburg
  */
-class MonthViewCellContext extends CellContext<JXMonthView> {
+class CalendarCellContext extends CellContext<JXMonthView> {
 
-    private DayState dayState;
+    private CalendarState dayState;
 
     public void installMonthContext(JXMonthView component, Object value, boolean selected, 
-             DayState dayState) {
+             CalendarState dayState) {
         super.installContext(component, value, -1, -1, selected, false,
                 true, true);
         this.dayState = dayState;
@@ -52,13 +52,13 @@ class MonthViewCellContext extends CellContext<JXMonthView> {
 
     @Override
     protected Color getForeground() {
-        if (DayState.LEADING == dayState) {
+        if (CalendarState.LEADING == dayState) {
             return UIManagerExt.getColor(getUIPrefix() + "leadingDayForeground");
         }
-        if (DayState.TRAILING == dayState) {
+        if (CalendarState.TRAILING == dayState) {
             return UIManagerExt.getColor(getUIPrefix() + "trailingDayForeground");
         }
-        if ((DayState.TITLE == dayState) && (getComponent() != null)) {
+        if ((CalendarState.TITLE == dayState) && (getComponent() != null)) {
             return getComponent().getMonthStringForeground();
         }
         return super.getForeground();
@@ -68,7 +68,7 @@ class MonthViewCellContext extends CellContext<JXMonthView> {
 
     @Override
     protected Color getBackground() {
-        if ((DayState.TITLE == dayState) && (getComponent() != null)) {
+        if ((CalendarState.TITLE == dayState) && (getComponent() != null)) {
             return getComponent().getMonthStringBackground();
         }
         return super.getBackground();
@@ -76,13 +76,13 @@ class MonthViewCellContext extends CellContext<JXMonthView> {
 
     @Override
     protected Color getSelectionBackground() {
-        if (DayState.LEADING == dayState || DayState.TRAILING == dayState) return getBackground();
+        if (CalendarState.LEADING == dayState || CalendarState.TRAILING == dayState) return getBackground();
         return getComponent() != null ? getComponent().getSelectionBackground() : null;
     }
 
     @Override
     protected Color getSelectionForeground() {
-        if (DayState.LEADING == dayState || DayState.TRAILING == dayState) return getForeground();
+        if (CalendarState.LEADING == dayState || CalendarState.TRAILING == dayState) return getForeground();
         return getComponent() != null ? getComponent().getSelectionForeground() : null;
     }
 
@@ -93,7 +93,7 @@ class MonthViewCellContext extends CellContext<JXMonthView> {
         if (getComponent() == null) {
             return super.getBorder();
         }
-        if (DayState.TITLE == dayState) {
+        if (CalendarState.TITLE == dayState) {
             return getTitleBorder();
         }
         if (isToday()) {
@@ -128,7 +128,7 @@ class MonthViewCellContext extends CellContext<JXMonthView> {
      * @return
      */
     protected boolean isToday() {
-        return DayState.TODAY == dayState;
+        return CalendarState.TODAY == dayState;
     }
 
     @Override

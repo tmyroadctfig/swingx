@@ -13,10 +13,8 @@ import javax.swing.BoxLayout;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JRootPane;
-import javax.swing.UIManager;
 import javax.swing.border.TitledBorder;
 
 import org.jdesktop.swingx.action.AbstractActionExt;
@@ -41,14 +39,8 @@ public class JXStatusBarVisualCheck extends InteractiveTestCase {
      * Issue #936-swingx: JXRootPane can't cope with default decoration.
      */
     public void interactiveDefaultDecorated() {
-        if (!UIManager.getLookAndFeel().getSupportsWindowDecorations()) {
-            return;
-        }
         JXTable table = new JXTable(new AncientSwingTeam());
-        boolean old = JFrame.isDefaultLookAndFeelDecorated();
-        JFrame.setDefaultLookAndFeelDecorated(true);
         final JXFrame frame = wrapWithScrollingInFrame(table, "toggle laf decoration");
-        JFrame.setDefaultLookAndFeelDecorated(old);
         Action toggleDecoration = new AbstractAction("toggleDecoration") {
 
             public void actionPerformed(ActionEvent e) {

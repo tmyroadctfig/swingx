@@ -26,7 +26,7 @@ package org.jdesktop.swingx.plaf.basic;
  * 
  * @author Jeanette Winzenburg
  */
-public enum DayState {
+public enum CalendarState {
     TODAY,
     IN_MONTH,
     LEADING,
