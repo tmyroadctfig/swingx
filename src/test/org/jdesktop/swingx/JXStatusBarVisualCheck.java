@@ -16,6 +16,7 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JRootPane;
+import javax.swing.UIManager;
 import javax.swing.border.TitledBorder;
 
 import org.jdesktop.swingx.action.AbstractActionExt;
@@ -38,27 +39,32 @@ public class JXStatusBarVisualCheck extends InteractiveTestCase {
 
     /**
      * Issue #936-swingx: JXRootPane can't cope with default decoration.
-     * Strictly speaking, can be run in isolation only - global state!
-     * To see the misbehaviour, uncomment the decortion settings.
      */
     public void interactiveDefaultDecorated() {
-        JFrame.setDefaultLookAndFeelDecorated(true);
-        setSystemLF(false);
+        if (!UIManager.getLookAndFeel().getSupportsWindowDecorations()) {
+            return;
+        }
         JXTable table = new JXTable(new AncientSwingTeam());
-        final JXFrame frame = wrapWithScrollingInFrame(table, "statusbar in default laf decorated frame");
+        boolean old = JFrame.isDefaultLookAndFeelDecorated();
+        JFrame.setDefaultLookAndFeelDecorated(true);
+        final JXFrame frame = wrapWithScrollingInFrame(table, "toggle laf decoration");
+        JFrame.setDefaultLookAndFeelDecorated(old);
         Action toggleDecoration = new AbstractAction("toggleDecoration") {
 
             public void actionPerformed(ActionEvent e) {
-                int decoration = frame.getRootPane().getWindowDecorationStyle();
-                frame.getRootPane().setWindowDecorationStyle(decoration == JRootPane.NONE ?
-                        JRootPane.FRAME : JRootPane.NONE);
+                boolean wasDecoratedByLAF = frame.isUndecorated();
+                frame.setVisible(false);
+                frame.dispose();
+                frame.setUndecorated(!wasDecoratedByLAF);
+                frame.getRootPane().setWindowDecorationStyle(wasDecoratedByLAF ?
+                         JRootPane.NONE : JRootPane.FRAME );
+                frame.setVisible(true);
             }
             
         };
         addAction(frame, toggleDecoration);
         addStatusMessage(frame, "we must be showing");
         show(frame);
-        JFrame.setDefaultLookAndFeelDecorated(false);
     }
     /**
      * Use-case: mimic win2k explorer status bar.

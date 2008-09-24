@@ -16,6 +16,7 @@ import javax.swing.JLabel;
 import javax.swing.JRootPane;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import javax.swing.table.DefaultTableModel;
 
 import org.jdesktop.swingx.JXRootPane.XRootLayout;
@@ -58,6 +59,10 @@ public class JXRootPaneTest extends InteractiveTestCase {
             LOG.info("cannot run test - headless environment");
             return;
         }
+        if (!UIManager.getLookAndFeel().getSupportsWindowDecorations()) {
+            LOG.info("cannot run test - unsupported laf window decoration");
+            return;
+        }
         JFrame.setDefaultLookAndFeelDecorated(true);
         JXFrame frame = new JXFrame();
         JXRootPane pane = frame.getRootPaneExt();
@@ -79,6 +84,10 @@ public class JXRootPaneTest extends InteractiveTestCase {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
             LOG.info("cannot run testLAFDecorationLayout - headless environment");
+            return;
+        }
+        if (!UIManager.getLookAndFeel().getSupportsWindowDecorations()) {
+            LOG.info("cannot run test - unsupported laf window decoration");
             return;
         }
         
