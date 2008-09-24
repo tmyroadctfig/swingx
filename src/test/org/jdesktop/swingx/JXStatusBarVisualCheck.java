@@ -7,6 +7,7 @@ package org.jdesktop.swingx;
 import java.awt.event.ActionEvent;
 import java.util.logging.Logger;
 
+import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BoxLayout;
 import javax.swing.Icon;
@@ -14,6 +15,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JRootPane;
 import javax.swing.border.TitledBorder;
 
 import org.jdesktop.swingx.action.AbstractActionExt;
@@ -40,12 +42,23 @@ public class JXStatusBarVisualCheck extends InteractiveTestCase {
      * To see the misbehaviour, uncomment the decortion settings.
      */
     public void interactiveDefaultDecorated() {
-//        JFrame.setDefaultLookAndFeelDecorated(true);
+        JFrame.setDefaultLookAndFeelDecorated(true);
         setSystemLF(false);
         JXTable table = new JXTable(new AncientSwingTeam());
-        JXFrame frame = wrapWithScrollingInFrame(table, "statusbar in default laf decorated frame");
+        final JXFrame frame = wrapWithScrollingInFrame(table, "statusbar in default laf decorated frame");
+        Action toggleDecoration = new AbstractAction("toggleDecoration") {
+
+            public void actionPerformed(ActionEvent e) {
+                int decoration = frame.getRootPane().getWindowDecorationStyle();
+                frame.getRootPane().setWindowDecorationStyle(decoration == JRootPane.NONE ?
+                        JRootPane.FRAME : JRootPane.NONE);
+            }
+            
+        };
+        addAction(frame, toggleDecoration);
         addStatusMessage(frame, "we must be showing");
         show(frame);
+        JFrame.setDefaultLookAndFeelDecorated(false);
     }
     /**
      * Use-case: mimic win2k explorer status bar.

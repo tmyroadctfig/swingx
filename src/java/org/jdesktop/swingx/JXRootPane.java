@@ -249,10 +249,18 @@ public class JXRootPane extends JRootPane {
     @Override
     public void setLayout(LayoutManager layout) {
         if (layout instanceof XRootLayout) {
+            // happens if decoration is uninstalled by ui
+            if ((layout != null) && (layout == getLayout())) {
+                ((XRootLayout) layout).setLayoutManager(null);
+            }
             super.setLayout(layout);
         } else {
-            if (layout instanceof LayoutManager2)
-            ((XRootLayout) getLayout()).setLayoutManager((LayoutManager2) layout);
+            if (layout instanceof LayoutManager2) {
+                ((XRootLayout) getLayout()).setLayoutManager((LayoutManager2) layout);
+                if (!isValid()) {
+                    invalidate();
+                }
+            }
         }
     }
 

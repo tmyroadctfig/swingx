@@ -13,10 +13,12 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JRootPane;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 
+import org.jdesktop.swingx.JXRootPane.XRootLayout;
 import org.jdesktop.test.AncientSwingTeam;
 import org.jdesktop.test.PropertyChangeReport;
 
@@ -30,6 +32,44 @@ public class JXRootPaneTest extends InteractiveTestCase {
     private static final Logger LOG = Logger.getLogger(JXRootPaneTest.class
             .getName());
     
+    
+    /**
+     * Issue #936-swingx: JXRootPane cannot cope with default laf decoration. 
+     * 
+     * testing implementation detail: layout's delegate is null by default
+     */
+    public void testLayoutDelegateNull() {
+        JXRootPane pane = new JXRootPane();
+        assertTrue(pane.getLayout() instanceof XRootLayout);
+        assertNull(((XRootLayout) pane.getLayout()).delegate);
+    }
+    
+    /**
+     * Issue #936-swingx: JXRootPane cannot cope with default laf decoration. 
+     * 
+     * testing implementation detail: layout's delegate is not null with laf decoration
+     * 
+     * How-to check if LAF supports laf decoration? Here we rely on default 
+     * laf is metal which does support it
+     */
+    public void testLayoutDelegateLAF() {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.info("cannot run test - headless environment");
+            return;
+        }
+        JFrame.setDefaultLookAndFeelDecorated(true);
+        JXFrame frame = new JXFrame();
+        JXRootPane pane = frame.getRootPaneExt();
+        try {
+            assertTrue(pane.getLayout() instanceof XRootLayout);
+            assertNotNull(((XRootLayout) pane.getLayout()).delegate);
+            pane.setWindowDecorationStyle(JRootPane.NONE);
+            assertNull(((XRootLayout) pane.getLayout()).delegate);
+        } finally {
+            JFrame.setDefaultLookAndFeelDecorated(false);
+        }
+    }
     /**
      * Issue #936-swingx: JXRootPane cannot cope with default laf decoration. 
      * 
