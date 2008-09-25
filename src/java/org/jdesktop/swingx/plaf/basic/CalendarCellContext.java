@@ -43,13 +43,18 @@ class CalendarCellContext extends CellContext<JXMonthView> {
 
     private CalendarState dayState;
 
-    public void installMonthContext(JXMonthView component, Object value, boolean selected, 
+    public void installMonthContext(JXMonthView component, Object value, 
+            boolean selected, boolean focused,
              CalendarState dayState) {
-        super.installContext(component, value, -1, -1, selected, false,
+        super.installContext(component, value, -1, -1, selected, focused,
                 true, true);
         this.dayState = dayState;
     }
 
+    public CalendarState getCalendarState() {
+        return dayState;
+    }
+    
     @Override
     protected Color getForeground() {
         if (CalendarState.LEADING == dayState) {
