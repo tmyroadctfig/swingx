@@ -1561,17 +1561,23 @@ public class BasicMonthViewUI extends MonthViewUI {
         CalendarUtils.startOfWeek(calendar);
         for (int week = 0; week < WEEKS_IN_MONTH; week++) {
             for (int day = 0; day < 7; day++) {
-                CalendarState state;
+                CalendarState state = null;
                 if (calendar.getTime().before(startOfMonth)) {
-                    state = CalendarState.LEADING;
+                    if (monthView.isShowingLeadingDays()) {
+                        state = CalendarState.LEADING;
+                    }
                 } else if (calendar.getTime().after(endOfMonth)) {
-                    state = CalendarState.TRAILING;
+                    if (monthView.isShowingTrailingDays()) {
+                        state = CalendarState.TRAILING;
+                    }
 
                 } else {
                     state = isToday(calendar.getTime()) ? CalendarState.TODAY : CalendarState.IN_MONTH;
                 }
-                Rectangle bounds = getDayBoundsInMonth(startOfMonth, week, day);
-                paintDayOfMonth(g, bounds, calendar, state);
+                if (state != null) {
+                    Rectangle bounds = getDayBoundsInMonth(startOfMonth, week, day);
+                    paintDayOfMonth(g, bounds, calendar, state);
+                }
                 calendar.add(Calendar.DAY_OF_MONTH, 1);
             }
         }
