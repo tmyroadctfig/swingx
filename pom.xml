@@ -4,9 +4,9 @@
   <modelVersion>4.0.0</modelVersion>
 	<groupId>org.swinglabs</groupId>
 	<artifactId>swingx-project</artifactId>
-    <packaging>pom</packaging>
+    <packaging>jar</packaging>
 	<name>SwingX Main Project</name>
-	<version>0.9.3-SNAPSHOT</version>
+	<version>0.9.5-SNAPSHOT</version>
     <url>http://www.swinglabs.org/</url>
     <licenses>
         <license>
@@ -19,22 +19,37 @@
     </scm>
     <description>Contains extensions to the Swing GUI toolkit, including new and enhanced components that provide functionality commonly required by rich client applications.</description>
   <build>
+    <directory>target</directory>
+    <outputDirectory>target/classes</outputDirectory>
+    <finalName>${project.artifactId}-${project.version}</finalName>
+    <testOutputDirectory>target/test-classes</testOutputDirectory>
+    <sourceDirectory>src/java</sourceDirectory>
+    <scriptSourceDirectory>src/main/scripts</scriptSourceDirectory>
+    <testSourceDirectory>src/test</testSourceDirectory>
+    <resources>
+      <resource>
+        <directory>src/java</directory>
+        <excludes>
+          <exclude>**/*.java</exclude>
+        </excludes>
+      </resource>
+    </resources>
+    <testResources>
+      <testResource>
+        <directory>src/test</directory>
+        <excludes>
+          <exclude>**/*.java</exclude>
+        </excludes>
+      </testResource>
+    </testResources>
     <plugins>
-      <plugin>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <includes>
-            <include>**/*Test.java</include>
-          </includes>
-        </configuration>
-      </plugin>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
         <configuration>
           <source>1.5</source>
           <target>1.5</target>
         </configuration>
-        <executions>
+        <!--executions>
           <execution>
             <id>compile-tests</id>
             <phase>process-test-sources</phase>
@@ -46,22 +61,60 @@
               <target>1.5</target>
             </configuration>
           </execution>
-        </executions>
+        </executions-->
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <inherited>true</inherited>
+        <configuration>
+          <includes>
+            <include>**/*Test.java</include>
+          </includes>
+          <forkMode>once</forkMode>
+          <!--reportFormat>xml</reportFormat-->
+          <!--classesDirectory>${project.build.directory}/emma-classes</classesDirectory-->    
+        </configuration>        
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
-        <executions>
+        <!--executions>
           <execution>
             <goals>
               <goal>test-jar</goal>
+            </goals>
+          </execution>
+        </executions-->
+      </plugin>
+      <!--plugin>      
+        <groupId>emma</groupId>
+        <artifactId>maven-emma-plugin</artifactId>
+        <version>0.5</version>
+        <inherited>true</inherited>          
+        <executions>
+          <execution>                
+            <goals>
+              <goal>instr</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin-->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>emma-maven-plugin</artifactId>
+        <version>1.0-SNAPSHOT</version>
+        <inherited>true</inherited>
+        <executions>
+          <execution>
+            <goals>
+              <goal>instrument</goal>
             </goals>
           </execution>
         </executions>
       </plugin>
     </plugins>
   </build>
-  <dependencyManagement>
     <dependencies>
 		<dependency>
 			<groupId>com.jhlabs</groupId>
@@ -73,7 +126,7 @@
             <groupId>org.swinglabs</groupId>
             <artifactId>swing-worker</artifactId>
             <version>1.1</version>
-            <scope>compile</scope>
+            <!--scope>compile</scope-->
         </dependency>
         <dependency>
             <groupId>org.swinglabs</groupId>
@@ -101,7 +154,6 @@
             <scope>test</scope>
         </dependency-->
 	</dependencies>
-  </dependencyManagement>
     <profiles>
 		<profile>
     		<activation>
@@ -135,11 +187,57 @@
       <plugin>
         <artifactId>maven-surefire-report-plugin</artifactId>
       </plugin>
+      <!--plugin>      
+        <groupId>emma</groupId>
+        <artifactId>maven-emma-plugin</artifactId>
+        <version>0.5</version>
+          <!-inherited>true</inherited->          
+      </plugin-->
+      <plugin> 
+        <groupId>org.codehaus.mojo</groupId> 
+        <artifactId>surefire-report-maven-plugin</artifactId> 
+        <inherited>true</inherited>
+      </plugin>       
     </plugins>
   </reporting>
-  <modules>
-    <module>swingx-core</module>
-    <module>swingx-beaninfo</module>
-    <module>swingx-demos</module>
-  </modules>
+  <!--repositories>
+    <repository>
+      <id>ibiblio</id>
+      <name>Ibiblio</name>
+      <layout>default</layout>
+      <url>http://mirrors.ibiblio.org/pub/mirrors/maven2</url>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
+  <pluginRepositories>
+    <pluginRepository>
+      <id>ibiblio</id>
+      <name>Ibiblio Plugin Repository</name>
+      <url>http://mirrors.ibiblio.org/pub/mirrors/maven2</url>
+      <layout>default</layout>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <releases>
+        <updatePolicy>never</updatePolicy>
+      </releases>
+    </pluginRepository>
+  </pluginRepositories-->
+  <pluginRepositories>
+    <pluginRepository>
+      <id>codehaus</id>
+      <name>Codehaus Plugin Repository</name>
+      <url>http://snapshots.repository.codehaus.org</url>
+      <layout>default</layout>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+      <releases>
+        <updatePolicy>never</updatePolicy>
+      </releases>
+    </pluginRepository>
+  </pluginRepositories>
+
 </project>
