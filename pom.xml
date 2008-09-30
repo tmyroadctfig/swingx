@@ -198,6 +198,26 @@
         <artifactId>surefire-report-maven-plugin</artifactId> 
         <inherited>true</inherited>
       </plugin>       
+    <plugin>
+      <groupId>org.codehaus.mojo</groupId>
+      <artifactId>findbugs-maven-plugin</artifactId>
+      <version>1.0-beta-1</version>
+      <configuration>
+        <threshold>Normal</threshold>
+        <effort>Default</effort>
+        <excludeFilterFile>findbugs-exclude.xml</excludeFilterFile>
+        <includeFilterFile>findbugs-include.xml</includeFilterFile>
+        <visitors>FindDeadLocalStores,UnreadFields</visitors>
+        <omitVisitors>FindDeadLocalStores,UnreadFields</omitVisitors>
+        <!--pluginList>/libs/fb-contrib/fb-contrib-2.8.0.jar</pluginList-->
+      </configuration>
+    </plugin>
+    <plugin>      
+      <groupId>org.codehaus.mojo</groupId>
+      <artifactId>emma-maven-plugin</artifactId>
+      <version>1.0-SNAPSHOT</version>
+      <inherited>true</inherited>          
+    </plugin>
     </plugins>
   </reporting>
   <!--repositories>
