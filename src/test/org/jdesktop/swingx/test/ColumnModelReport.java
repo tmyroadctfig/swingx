@@ -106,6 +106,29 @@ public class ColumnModelReport implements TableColumnModelExtListener {
         return addedEvents.isEmpty() ? null : addedEvents.get(0);
      }
 
+    public boolean hasChangeEvent() {
+        return !changeEvents.isEmpty();
+    }
+    
+    public int getChangeEventCount() {
+        return changeEvents.size();
+    }
+    
+    public ChangeEvent getLastChangeEvent() {
+        return hasChangeEvent() ? changeEvents.get(0) : null;
+    }
+    
+    public boolean hasSelectionEvent() {
+        return !selectionEvents.isEmpty();
+    }
+    
+    public int getSelectionEventCount() {
+        return selectionEvents.size();
+    }
+    
+    public ListSelectionEvent getLastSelectionEvent() {
+        return hasSelectionEvent() ? selectionEvents.get(0) : null;
+    }
     //--------------- access reported propertyChangeEvent
     
     public boolean hasColumnPropertyEvent() {
