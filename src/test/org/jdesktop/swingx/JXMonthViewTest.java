@@ -1342,6 +1342,9 @@ public class JXMonthViewTest extends MockObjectTestCase {
      * 
      * This did fail on the server on 31mar2008, us/pacific timezone, en_US
      * locale. Trying to sim the context then.
+     * 
+     * Failed again at Tue Sep 30 10:12:31 PDT 2008, en_US locale. Next
+     * (testTimeZoneChangeOffsetFirstDisplayedDate) failed at the same time, 
      */
     public void testTimeZoneChangeToday() {
         JXMonthView monthView = new JXMonthView();
@@ -1390,6 +1393,28 @@ public class JXMonthViewTest extends MockObjectTestCase {
                         + "\n " + monthViewProps, 
                 (realOffset) / (1000 * 60),
                 (monthView.getFirstDisplayedDay().getTime() - firstDisplayed.getTime()) / (1000 * 60));
+/*
+ * The output of failure:
+ * 
+ * junit.framework.AssertionFailedError: first displayed must be offset by real offset 
+ ********** spurious failure - so try extensiv debug output:
+ server locale: en_US
+ server timezone: sun.util.calendar.ZoneInfo[id="US/Pacific",offset=-28800000,dstSavings=3600000,useDaylight=true,transitions=185,
+lastRule=java.util.SimpleTimeZone[id=US/Pacific,offset=-28800000,dstSavings=3600000,useDaylight=true,startYear=0,startMode=3,startMonth=2,startDay=8,startDayOfWeek=1,startTime=7200000,startTimeMode=0,endMode=3,endMonth=10,endDay=1,endDayOfWeek=1,endTime=7200000,endTimeMode=0]]
+ server local time: Tue Sep 30 10:12:31 PDT 2008
+ first timeZone sun.util.calendar.ZoneInfo[id="GMT+04:00",offset=14400000,dstSavings=0,useDaylight=false,transitions=0,lastRule=null]
+ first timezone offset / min 240
+ second timezone sun.util.calendar.ZoneInfo[id="GMT+07:00",offset=25200000,dstSavings=0,useDaylight=false,transitions=0,lastRule=null]
+ second timezone offset / min 420
+ monthView locale: en_US
+ monthView anchor Tue Sep 30 10:12:31 PDT 2008
+ monthView firstDisplayed Tue Sep 30 10:00:00 PDT 2008 expected:<-180> but was:<43020>
+        at org.jdesktop.swingx.JXMonthViewTest.testTimeZoneChangeToday(JXMonthViewTest.java:1385)
+        at org.jmock.core.VerifyingTestCase.runBare(VerifyingTestCase.java:39)
+
+
+ */
+    
     }   
 
     /**
@@ -1399,6 +1424,11 @@ public class JXMonthViewTest extends MockObjectTestCase {
      * Here: test that the first displayed date is offset by offset diff of 
      * timezones.
      * Configure the monthView with a fixed timezone to clear up the mist ...
+     * 
+     * failed along with previous test, (Tue Sep 30 10:12:31 PDT 2008, en_US locale)
+     * error out:
+     * first displayed must be offset by real offset expected:
+     *  <-10800000> but was:<2581200000>
      * 
      */
     public void testTimeZoneChangeOffsetFirstDisplayedDate() {
