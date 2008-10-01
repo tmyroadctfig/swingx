@@ -1493,10 +1493,11 @@ public class BasicMonthViewUI extends MonthViewUI {
      *   not be null
      */
     protected void paintMonthHeader(Graphics g, Calendar calendar) {
-        JComponent comp = renderingHandler.prepareRenderingComponent(monthView,
-                calendar, CalendarState.TITLE);
         Rectangle page = getMonthHeaderBounds(calendar.getTime(), false);
-        renderComponentAt(g, comp, page);
+        paintDayOfMonth(g, page, calendar, CalendarState.TITLE);
+//        JComponent comp = renderingHandler.prepareRenderingComponent(monthView,
+//                calendar, CalendarState.TITLE);
+//        renderComponentAt(g, comp, page);
     }
 
     /**
@@ -1511,9 +1512,10 @@ public class BasicMonthViewUI extends MonthViewUI {
         Calendar cal = (Calendar) calendar.clone();
         CalendarUtils.startOfWeek(cal);
         for (int i = 0; i < JXMonthView.DAYS_IN_WEEK; i++) {
-            JComponent comp = renderingHandler.prepareRenderingComponent(monthView, cal, CalendarState.DAY_OF_WEEK);
             Rectangle dayBox = getDayBoundsInMonth(calendar.getTime(), DAY_HEADER_ROW, i);
-            renderComponentAt(g, comp, dayBox);
+            paintDayOfMonth(g, dayBox, cal, CalendarState.DAY_OF_WEEK);
+//            JComponent comp = renderingHandler.prepareRenderingComponent(monthView, cal, CalendarState.DAY_OF_WEEK);
+//            renderComponentAt(g, comp, dayBox);
             cal.add(Calendar.DATE, 1);
         }
     }
@@ -1534,9 +1536,10 @@ public class BasicMonthViewUI extends MonthViewUI {
         int weeks = getWeeks(calendar);
         calendar.setTime(cal.getTime());
         for (int week = 0; week <= weeks; week++) {
-            JComponent comp = renderingHandler.prepareRenderingComponent(monthView, calendar, CalendarState.WEEK_OF_YEAR);
             Rectangle dayBox = getDayBoundsInMonth(cal.getTime(), week, WEEK_HEADER_COLUMN);
-            renderComponentAt(g, comp, dayBox);
+            paintDayOfMonth(g, dayBox, calendar, CalendarState.WEEK_OF_YEAR);
+//            JComponent comp = renderingHandler.prepareRenderingComponent(monthView, calendar, CalendarState.WEEK_OF_YEAR);
+//            renderComponentAt(g, comp, dayBox);
             calendar.add(Calendar.WEEK_OF_YEAR, 1);
         }
     }
@@ -1585,7 +1588,13 @@ public class BasicMonthViewUI extends MonthViewUI {
 
 
     /**
-     * Paints a day which is of the current month with the given state
+     * Paints a day which is of the current month with the given state.<p>
+     * 
+     * PENDING JW: mis-nomer - this is in fact called for rendering any day-related
+     * state (including weekOfYear, dayOfWeek headers) and for rendering
+     * the month header as well, that is from everywhere.
+     *  Rename to paintSomethingGeneral. Think about impact for subclasses 
+     *  (what do they really need? feedback please!)
      * 
      * @param g the graphics to paint into.
      * @param bounds the rectangle to paint the day into
@@ -1595,7 +1604,8 @@ public class BasicMonthViewUI extends MonthViewUI {
     protected void paintDayOfMonth(Graphics g, Rectangle bounds, Calendar calendar, CalendarState state) {
         JComponent comp = renderingHandler.prepareRenderingComponent(monthView, calendar, 
                 state);
-        renderComponentAt(g, comp, bounds);
+        rendererPane.paintComponent(g, comp, monthView, bounds.x, bounds.y,
+                bounds.width, bounds.height, true);
     }
 
     /**
@@ -1691,18 +1701,6 @@ public class BasicMonthViewUI extends MonthViewUI {
     private boolean useRenderingHandler() {
         if (Boolean.TRUE.equals(monthView.getClientProperty("disableRendering"))) return false;
         return renderingHandler != null;
-    }
-
-    /**
-     * Renders the component at the given location. 
-     * 
-     * @param g the Graphics to paint into.
-     * @param component the rendering component to paint with.
-     * @param bounds the bounds to render the component into.
-     */
-    private void renderComponentAt(Graphics g, JComponent component, Rectangle bounds) {
-        rendererPane.paintComponent(g, component, monthView, bounds.x, bounds.y,
-                bounds.width, bounds.height, true);
     }
 
     private void traverseMonth(int arrowType) {
