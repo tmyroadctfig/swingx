@@ -188,7 +188,7 @@ public class JXTaskPaneTest extends InteractiveTestCase {
     new JXTaskPane();
     LookAndFeelAddons.setAddon(new MetalLookAndFeelAddons());
     String uiClass = UIManager.getString(JXTaskPane.uiClassID);
-    assertTrue("org.jdesktop.swingx.plaf.metal.MetalTaskPaneUI".equals(uiClass)
+    assertTrue("Failed to locate UI class for " + uiClass, "org.jdesktop.swingx.plaf.metal.MetalTaskPaneUI".equals(uiClass)
       || "org.jdesktop.swingx.plaf.misc.GlossyTaskPaneUI".equals(uiClass));
   }
   
