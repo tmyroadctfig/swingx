@@ -471,6 +471,7 @@ public class HighlighterTest extends InteractiveTestCase {
         // sanity - reset
         h.updateUI();
         assertNotSame(color.getRGB(), h.getBackground().getRGB());
+        assertNotNull(h.getBackground());
         // can be generic grey as well (as per HighLighterFactory treatment of cases with no LAF defined)
         assertTrue(h.getBackground().equals( uiColor) || h.getBackground().equals(HighlighterFactory.GENERIC_GRAY));
     }
