@@ -465,12 +465,14 @@ public class HighlighterTest extends InteractiveTestCase {
             h.updateUI();
             assertEquals(color, h.getBackground());
         } finally {
-            // remove custom setting. DO NOT set th eold uiColor manually!
+            // remove custom setting. DO NOT set the old uiColor manually!
             UIManager.put("UIColorHighlighter.stripingBackground", null);
         }
         // sanity - reset
         h.updateUI();
-        assertEquals(uiColor, h.getBackground());
+        assertNotSame(color.getRGB(), h.getBackground().getRGB());
+        // can be generic grey as well (as per HighLighterFactory treatment of cases with no LAF defined)
+        assertTrue(h.getBackground().equals( uiColor) || h.getBackground().equals(HighlighterFactory.GENERIC_GRAY));
     }
 
     
