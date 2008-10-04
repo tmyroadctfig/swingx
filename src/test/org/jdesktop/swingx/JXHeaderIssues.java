@@ -21,18 +21,12 @@
  */
 package org.jdesktop.swingx;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Font;
-import java.net.URL;
 
-import javax.swing.ImageIcon;
-import javax.swing.JComponent;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
-
-import org.jdesktop.swingx.test.XTestUtils;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 
 /**
  * Test to expose known issues of <code>JXHeader</code>.
@@ -50,22 +44,113 @@ import org.jdesktop.swingx.test.XTestUtils;
  */
 public class JXHeaderIssues extends InteractiveTestCase {
     
+    
+//    private JXHeader header;
+
     /**
+     * Issue #925-swingx: custom properties lost on updateUI.
+     * Header property set to uimanager setting.
+     */
+    public void testUpdateUITitleFont() {
+        Font font = UIManager.getFont("JXHeader.titleFont");
+        assertNotNull("sanity: title font available", font);
+        JXHeader header = new JXHeader();
+        assertEquals(font, header.getTitleFont());
+    }
+
+    
+    /**
+     * Issue #925-swingx: custom properties lost on updateUI.
+     * Test title label property set to UIManager prop
+     */
+    public void testUpdateUITitleLabelFont() {
+        Font font = UIManager.getFont("JXHeader.titleFont");
+        assertNotNull("sanity: title font available", font);
+        JXHeader header = new JXHeader();
+        JLabel label = getTitleLabel(header);
+        assertEquals(font, label.getFont());
+    }
+    
+    /**
+     * Issue #925-swingx: custom properties lost on updateUI.
+     * 
+     * Test title label font kept same as UIManager property after
+     * updateUI
+     */
+    public void testUpdateUITitleLabelFontUpdateUI() {
+        Font font = UIManager.getFont("JXHeader.titleFont");
+        assertNotNull("sanity: title font available", font);
+        JXHeader header = new JXHeader();
+        header.updateUI();
+        JLabel label = getTitleLabel(header);
+        assertEquals(font, label.getFont());
+    }
+
+    /**
+     * Issue #925-swingx: custom properties lost on updateUI.
+     * Test custom header property set on title label and
+     * kept on updateUI
+     */
+    public void testUpdateUICustomTitleLabelFontUpdateUI() {
+        JXHeader header = new JXHeader();
+        Font font = new Font("serif", Font.BOLD, 36);
+        header.setTitleFont(font);
+        JLabel label = getTitleLabel(header);
+        assertEquals(font, label.getFont());
+        header.updateUI();
+        label = getTitleLabel(header);
+        assertEquals(font, label.getFont());
+    }
+    /**
+     * Issue #925-swingx: custom properties lost on updateUI
+     */
+    public void testUpdateUICustomTitleLabelFontUpdateComponentTreeUI() {
+        JXHeader header = new JXHeader();
+        Font font = new Font("serif", Font.BOLD, 36);
+        header.setTitleFont(font);
+        JLabel label = getTitleLabel(header);
+        assertEquals(font, label.getFont());
+        SwingUtilities.updateComponentTreeUI(header);
+        label = getTitleLabel(header);
+        assertEquals(font, label.getFont());
+    }
+    
+    /**
+     * Issue #925-swingx: custom properties lost on updateUI
+      * Test title label font kept same as UIManager property after
+     * updateComponentTreeUI (aka: toggle LAF)
+    */
+    public void testUpdateUITitleLabelFontUpdateComponentTreeUI() {
+        Font font = UIManager.getFont("JXHeader.titleFont");
+        assertNotNull("sanity: title font available", font);
+        JXHeader header = new JXHeader();
+        SwingUtilities.updateComponentTreeUI(header);
+        JLabel label = getTitleLabel(header);
+        assertEquals(font, label.getFont());
+    }
+/**
      * Issue #695-swingx: not-null default values break class invariant.
      * Here initial empty constructor.
      */
     public void testTitleSynchInitialEmpty() {
         JXHeader header = new JXHeader();
         // fishing in the internals ... not really safe, there are 2 labels
-        JLabel label = null;
-        for (int i = 0; i < header.getComponentCount(); i++) {
-           if (header.getComponent(i) instanceof JLabel) {
-               label = (JLabel) header.getComponent(i);
-               break;
-           }
-        }
+        JLabel label = getTitleLabel(header);
         assertEquals(header.getTitle(), label.getText());
     }
+
+    /**
+     * @return
+     */
+    private JLabel getTitleLabel(JXHeader header) {
+        for (int i = 0; i < header.getComponentCount(); i++) {
+            if (header.getComponent(i) instanceof JLabel) {
+                return (JLabel) header.getComponent(i);
+            }
+         }
+        return null;
+    }
+
 
     /**
      * Issue #695-swingx: not-null default values break invariant.
@@ -123,6 +208,8 @@ public class JXHeaderIssues extends InteractiveTestCase {
     @Override
     protected void setUp() throws Exception {
         setSystemLF(true);
+        // forcing load of headerAddon
+        new JXHeader();
     }
     
     /**

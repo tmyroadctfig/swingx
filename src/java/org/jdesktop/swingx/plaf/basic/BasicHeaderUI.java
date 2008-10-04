@@ -219,8 +219,11 @@ public class BasicHeaderUI extends HeaderUI {
         if (titleFont == null || titleFont instanceof FontUIResource) {
         	titleFont = UIManager.getFont("JXHeader.titleFont");
         	// fallback to label font
-        	titleLabel.setFont(titleFont != null ? titleFont : UIManager.getFont("Label.font"));
+        	h.setTitleFont(titleFont != null ? titleFont : UIManager.getFont("Label.font"));
+        	
         }
+        //JW: force a not UIResource
+        titleLabel.setFont(h.getTitleFont().deriveFont(h.getTitleFont().getStyle()));
 
         Color titleForeground = h.getTitleForeground();
         if (titleForeground == null || titleForeground instanceof ColorUIResource) {
