@@ -21,15 +21,23 @@
  */
 package org.jdesktop.swingx;
 
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.GridLayout;
+import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.net.URL;
+import java.util.logging.Logger;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.Box;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -51,11 +59,16 @@ import org.jdesktop.swingx.test.XTestUtils;
  */
 public class JXHeaderVisualCheck extends InteractiveTestCase {
 
+    @SuppressWarnings("unused")
+    private static final Logger LOG = Logger
+            .getLogger(JXHeaderVisualCheck.class.getName());
 
     public static void main(String args[]) {
         JXHeaderVisualCheck test = new JXHeaderVisualCheck();
         try {
           test.runInteractiveTests();
+//          test.runInteractiveTests("interactive.*Label.*");
+//          test.runInteractiveTests("interactive.*Font.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
@@ -68,7 +81,44 @@ public class JXHeaderVisualCheck extends InteractiveTestCase {
     }
 
     // ------------------ interactive
+    
+    /**
+     * Sanity: trying to track default rendering hints
+     */
+    public void interactiveLabel() {
+        JLabel label = new JLabel("JLabel tweaked * tracking, tracking ...") {
 
+            @Override
+            protected void paintComponent(Graphics g) {
+                if (ui != null) {
+                    Graphics scratchGraphics = (g == null) ? null : g.create();
+                    try {
+                        RenderingHints old = ((Graphics2D)scratchGraphics).getRenderingHints();
+                      LOG.info(getText() + ": all hints " + old
+                      + "\n     " + ": aliased " + ((Graphics2D)scratchGraphics).getRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING));
+                      ((Graphics2D) scratchGraphics).setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                              RenderingHints.VALUE_ANTIALIAS_ON);
+                        ui.update(scratchGraphics, this);
+//                        SwingUtilities2.drawStringUnderlineCharAt(this, scratchGraphics, getText(), -1, 0, 10);
+                        RenderingHints after =((Graphics2D)scratchGraphics).getRenderingHints();
+                        LOG.warning(getText() + ": all hints " + after
+                                + "\n     " + ": aliased " + ((Graphics2D)scratchGraphics).getRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING)
+                                + "\n     " + "equals? " + old.equals(after));
+                    }
+                    finally {
+                        scratchGraphics.dispose();
+                    }
+                }
+            }
+            
+        };
+        JComponent box = Box.createVerticalBox();
+        box.add(label);
+        box.add(new JXLabel("JXLabel * tracking ... tracking .."));
+        box.add(new JLabel("JLabel raw * tracking tracking ..."));
+        showInFrame(box, "label");
+    }
+    
     public void interactiveHeaderInTabbedPane() {
         JTabbedPane pane = new JTabbedPane();
         pane.addTab("first", createHeader());
@@ -93,7 +143,7 @@ public class JXHeaderVisualCheck extends InteractiveTestCase {
      * #647-swingx JXLabel looses html rendering on font change.
      */
 	public void interactiveFontLayoutReset() {
-		JFrame f = new JFrame("Header Test");
+		JFrame f = new JFrame("Header Test - html lost on font change");
 		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		final JXHeader header = new JXHeader("My Title",
 				"<html>My short description<br>some text<html>");
@@ -197,7 +247,8 @@ public class JXHeaderVisualCheck extends InteractiveTestCase {
         px.add(new JXHeader("MyTitle", "MyDescription", new ImageIcon(url)));
         p.add(px);
         // added just to better visualize bkg gradient in the JXHeader.
-        p.add(new JLabel("Reference component"), BorderLayout.SOUTH);
+        p.add(new JLabel("Reference component: JLabel"), BorderLayout.SOUTH);
+        p.add(new JXLabel("Reference component: JXLabel"), BorderLayout.NORTH);
         showInFrame(p, "JXHeader with custom properties");
     }
 
@@ -222,17 +273,34 @@ public class JXHeaderVisualCheck extends InteractiveTestCase {
      *
      * All values are passed in the constructor.
      */
-    public void interactiveCustomTitle() {
+    public void interactiveCustomTitleFont() {
         URL url = getClass().getResource("resources/images/wellTop.gif");
         assertNotNull(url);
         JPanel p = new JPanel(new BorderLayout());
-        JXHeader header = new JXHeader("MyBigUglyTitle", "this is a long test with veeeeeeeeeeeeeery looooooong wooooooooooooords", new ImageIcon(url));
+        final JXHeader header = new JXHeader("MyBigUglyTitle", "this is a long test with veeeeeeeeeeeeeery looooooong wooooooooooooords", new ImageIcon(url));
         header.setTitleFont(new Font("serif", Font.BOLD, 36));
         header.setTitleForeground(Color.GREEN);
         p.add(header);
         p.setPreferredSize(new Dimension(400,150));
-        showInFrame(p, "word wrapping JXHeader");
-    }
+        JXFrame frame = wrapInFrame(p, "Titlefont lost on updateUI / word wrapping JXHeader");
+        Action action = new AbstractAction("updateUI") {
+
+            public void actionPerformed(ActionEvent e) {
+                header.updateUI();
+                
+            }};
+        addAction(frame, action);
+        Action tree = new AbstractAction("updateComponentTree") {
+
+            public void actionPerformed(ActionEvent e) {
+                SwingUtilities.updateComponentTreeUI(header);
+                
+            }};
+        addAction(frame, tree);
+        addMessage(frame, "title font set on header");
+        show(frame);
+    } 
+
 
     /**
      * Empty test method to keep the testrunner happy.
