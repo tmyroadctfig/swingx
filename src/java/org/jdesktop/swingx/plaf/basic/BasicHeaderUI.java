@@ -26,9 +26,11 @@ import java.awt.Container;
 import java.awt.Font;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.RenderingHints;
 import java.awt.event.HierarchyBoundsAdapter;
 import java.awt.event.HierarchyBoundsListener;
 import java.awt.event.HierarchyEvent;
@@ -36,12 +38,14 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.logging.Logger;
 
+import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.UIManager;
 import javax.swing.plaf.ColorUIResource;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.FontUIResource;
+import javax.swing.plaf.UIResource;
 import javax.swing.plaf.basic.BasicHTML;
 import javax.swing.text.View;
 
@@ -54,9 +58,19 @@ import org.jdesktop.swingx.plaf.HeaderUI;
 import org.jdesktop.swingx.plaf.PainterUIResource;
 
 /**
- *
+ * Base implementation of <code>Header</code> UI. <p>
+ * 
+ * PENDING JW: This implementation is unusual in that it does not keep a reference
+ * to the component it controls. Typically, such is only the case if the ui is
+ * shared between instances. Historical? A consequence is that the un/install methods 
+ * need to carry the header as parameter. Which looks funny when at the same time 
+ * the children of the header are instance fields in this. Should think about cleanup:
+ * either get rid off the instance fields here, or reference the header and remove
+ * the param (would break subclasses).
+ * 
  * @author rbair
  * @author rah003
+ * @author Jeanette Winzenburg
  */
 public class BasicHeaderUI extends HeaderUI {
     @SuppressWarnings("unused")
@@ -73,17 +87,18 @@ public class BasicHeaderUI extends HeaderUI {
                 // JW: that cost me dearly to track down - it's the default foreground painter
                 // which is an AbstractPainter which has _global_ antialiased on by default
                 // and here the _text_ antialiased is turned off
-//                ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
-//                        RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
+                ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+                        RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
                 super.paint(g);
             }
 
+            @Override
             public MultiLineSupport getMultiLineSupport() {
             	return super.getMultiLineSupport();
             }
 	}
 
-	protected JLabel titleLabel;
+    protected JLabel titleLabel;
     protected DescriptionPane descriptionPane;
     protected JLabel imagePanel;
     private PropertyChangeListener propListener;
@@ -140,16 +155,7 @@ public class BasicHeaderUI extends HeaderUI {
         assert c instanceof JXHeader;
         JXHeader header = (JXHeader)c;
 
-        titleLabel = new JLabel();
-        descriptionPane = new DescriptionPane();
-        descriptionPane.setLineWrap(true);
-        descriptionPane.setOpaque(false);
-
         installDefaults(header);
-        installComponentDefaults(header);
-        imagePanel = new JLabel();
-        imagePanel.setIcon(header.getIcon() == null ? UIManager.getIcon("Header.defaultIcon") : header.getIcon());
-
         installComponents(header);
         installListeners(header);
     }
@@ -184,15 +190,20 @@ public class BasicHeaderUI extends HeaderUI {
         assert c instanceof JXHeader;
         JXHeader header = (JXHeader)c;
 
-        uninstallDefaults(header);
         uninstallListeners(header);
         uninstallComponents(header);
+        uninstallDefaults(header);
 
-        titleLabel = null;
-        descriptionPane = null;
-        imagePanel = null;
     }
 
+    /**
+     * Installs default header properties. <p>
+     * 
+     * NOTE: this method is called before the children are created, so
+     * must not try to access any of those!.
+     * 
+     * @param the header to install.
+     */
     protected void installDefaults(JXHeader h) {
         gradientLightColor = UIManager.getColor("JXHeader.startBackground");
         if (gradientLightColor == null) {
@@ -244,9 +255,60 @@ public class BasicHeaderUI extends HeaderUI {
         	h.setDescriptionForeground(descForeground != null ? descForeground : UIManager.getColor("Label.foreground"));
         }
         
+        Icon icon = h.getIcon();
+        if ((icon == null) || icon instanceof UIResource) {
+            icon = UIManager.getIcon("Header.defaultIcon");
+            h.setIcon(icon);
+        }
+    }
+    
+    /**
+     * Uninstalls the given header's default properties. This implementation
+     * does nothing.
+     * 
+     * 
+     * @param h the header to ininstall the properties from.
+     */
+    protected void uninstallDefaults(JXHeader h) {
     }
 
-    private void installComponentDefaults(JXHeader h) {
+    /**
+     * Creates, configures, adds contained components.
+     * PRE: header's default properties must be set before calling this.
+     * 
+     * @param the header to install the components into.
+     */
+    protected void installComponents(JXHeader h) {
+        titleLabel = new JLabel();
+        descriptionPane = new DescriptionPane();
+        imagePanel = new JLabel();
+        installComponentDefaults(h);
+        h.setLayout(new GridBagLayout());
+        resetLayout(h);
+    }
+
+    /**
+     * Unconfigures, removes and nulls contained components.
+     * 
+     * @param the header to install the components into.
+     */
+    protected void uninstallComponents(JXHeader h) {
+        uninstallComponentDefaults(h);
+        h.remove(titleLabel);
+        h.remove(descriptionPane);
+        h.remove(imagePanel);
+        titleLabel = null;
+        descriptionPane = null;
+        imagePanel = null;
+    }
+
+    /**
+     * Configures the component default properties from the given header.
+     * 
+     * 
+     * @param the header to install the components into.
+     */
+    protected void installComponentDefaults(JXHeader h) {
         //JW: force a not UIResource
         // PENDING JW: correct way to create another font instance?
         titleLabel.setFont(h.getTitleFont().deriveFont(h.getTitleFont().getStyle()));
@@ -258,11 +320,24 @@ public class BasicHeaderUI extends HeaderUI {
         descriptionPane.setFont(h.getDescriptionFont().deriveFont(h.getDescriptionFont().getStyle()));
         rgb = h.getDescriptionForeground().getRGBComponents(null);
         descriptionPane.setForeground(new Color(rgb[0], rgb[1], rgb[2], rgb[3]));
+        descriptionPane.setOpaque(false);
         descriptionPane.setText(h.getDescription());
+        descriptionPane.setLineWrap(true);
+
+        imagePanel.setIcon(h.getIcon());
+
     }
     
-    protected void uninstallDefaults(JXHeader h) {
+    /**
+     * Uninstalls component defaults. This implementation does nothing.
+     * 
+     * @param the header to uninstall from.
+     */
+    protected void uninstallComponentDefaults(JXHeader h) {
+        // TODO Auto-generated method stub
+        
     }
+
 
     protected void installListeners(final JXHeader header) {
         propListener = new PropertyChangeListener() {
@@ -271,12 +346,14 @@ public class BasicHeaderUI extends HeaderUI {
             }
         };
         boundsListener = new HierarchyBoundsAdapter() {
+            @Override
             public void ancestorResized(HierarchyEvent e) {
                 if (header == e.getComponent()) {
                     View v = (View) descriptionPane.getClientProperty(BasicHTML.propertyKey);
                     // view might get lost on LAF change ...
                     if (v == null) {
-                    	descriptionPane.putClientProperty(BasicHTML.propertyKey, descriptionPane.getMultiLineSupport().createView(descriptionPane));
+                    	descriptionPane.putClientProperty(BasicHTML.propertyKey, 
+                    	        descriptionPane.getMultiLineSupport().createView(descriptionPane));
                     	v = (View) descriptionPane.getClientProperty(BasicHTML.propertyKey);
                     }
                     if (v != null) {
@@ -330,11 +407,6 @@ public class BasicHeaderUI extends HeaderUI {
         }
     }
 
-    protected void installComponents(JXHeader h) {
-        h.setLayout(new GridBagLayout());
-        resetLayout(h);
-    }
-
     private void resetLayout(JXHeader h) {
     	h.remove(titleLabel);
     	h.remove(descriptionPane);
@@ -349,12 +421,8 @@ public class BasicHeaderUI extends HeaderUI {
 	        h.add(imagePanel, new GridBagConstraints(0, 0, 1, 2, 0.0, 1.0, GridBagConstraints.FIRST_LINE_END, GridBagConstraints.NONE, new Insets(12, 11, 0, 11), 0, 0));
     	}
 	}
-
-	protected void uninstallComponents(JXHeader h) {
-        h.remove(titleLabel);
-        h.remove(descriptionPane);
-        h.remove(imagePanel);
-    }
+    
+    
 
     protected Painter createBackgroundPainter() {
         MattePainter p = new MattePainter(new GradientPaint(0, 0, gradientLightColor, 1, 0, gradientDarkColor));
