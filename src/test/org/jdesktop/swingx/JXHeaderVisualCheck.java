@@ -66,9 +66,9 @@ public class JXHeaderVisualCheck extends InteractiveTestCase {
     public static void main(String args[]) {
         JXHeaderVisualCheck test = new JXHeaderVisualCheck();
         try {
-          test.runInteractiveTests();
-//          test.runInteractiveTests("interactive.*Label.*");
-//          test.runInteractiveTests("interactive.*Font.*");
+//          test.runInteractiveTests();
+          test.runInteractiveTests("interactive.*Label.*");
+          test.runInteractiveTests("interactive.*Font.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();

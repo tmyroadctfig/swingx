@@ -26,11 +26,9 @@ import java.awt.Container;
 import java.awt.Font;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.RenderingHints;
 import java.awt.event.HierarchyBoundsAdapter;
 import java.awt.event.HierarchyBoundsListener;
 import java.awt.event.HierarchyEvent;
@@ -148,7 +146,7 @@ public class BasicHeaderUI extends HeaderUI {
         descriptionPane.setOpaque(false);
 
         installDefaults(header);
-
+        installComponentDefaults(header);
         imagePanel = new JLabel();
         imagePanel.setIcon(header.getIcon() == null ? UIManager.getIcon("Header.defaultIcon") : header.getIcon());
 
@@ -222,36 +220,47 @@ public class BasicHeaderUI extends HeaderUI {
         	h.setTitleFont(titleFont != null ? titleFont : UIManager.getFont("Label.font"));
         	
         }
-        //JW: force a not UIResource
-        titleLabel.setFont(h.getTitleFont().deriveFont(h.getTitleFont().getStyle()));
 
         Color titleForeground = h.getTitleForeground();
         if (titleForeground == null || titleForeground instanceof ColorUIResource) {
         	titleForeground = UIManager.getColor("JXHeader.titleForeground");
         	// fallback to label foreground
-        	titleLabel.setForeground(titleForeground != null ? titleForeground : UIManager.getColor("Label.foreground"));
+        	h.setTitleForeground(titleForeground != null ? titleForeground : UIManager.getColor("Label.foreground"));
         }
 
-        titleLabel.setText(h.getTitle());
 
         // description properties
         Font descFont = h.getDescriptionFont();
         if (descFont == null || descFont instanceof FontUIResource) {
         	descFont = UIManager.getFont("JXHeader.descriptionFont");
         	// fallback to label font
-        	descriptionPane.setFont(descFont != null ? descFont : UIManager.getFont("Label.font"));
+        	h.setDescriptionFont(descFont != null ? descFont : UIManager.getFont("Label.font"));
         }
 
         Color descForeground = h.getDescriptionForeground();
         if (descForeground == null || descForeground instanceof ColorUIResource) {
         	descForeground = UIManager.getColor("JXHeader.descriptionForeground");
         	// fallback to label foreground
-        	descriptionPane.setForeground(descForeground != null ? descForeground : UIManager.getColor("Label.foreground"));
+        	h.setDescriptionForeground(descForeground != null ? descForeground : UIManager.getColor("Label.foreground"));
         }
-
-        descriptionPane.setText(h.getDescription());
+        
     }
 
+    private void installComponentDefaults(JXHeader h) {
+        //JW: force a not UIResource
+        // PENDING JW: correct way to create another font instance?
+        titleLabel.setFont(h.getTitleFont().deriveFont(h.getTitleFont().getStyle()));
+        // PENDING JW: correct way to create another color instance?
+        float[] rgb = h.getTitleForeground().getRGBComponents(null);
+        titleLabel.setForeground(new Color(rgb[0], rgb[1], rgb[2], rgb[3]));
+        titleLabel.setText(h.getTitle());
+        
+        descriptionPane.setFont(h.getDescriptionFont().deriveFont(h.getDescriptionFont().getStyle()));
+        rgb = h.getDescriptionForeground().getRGBComponents(null);
+        descriptionPane.setForeground(new Color(rgb[0], rgb[1], rgb[2], rgb[3]));
+        descriptionPane.setText(h.getDescription());
+    }
+    
     protected void uninstallDefaults(JXHeader h) {
     }
 

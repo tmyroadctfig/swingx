@@ -21,6 +21,7 @@
  */
 package org.jdesktop.swingx;
 
+import java.awt.Color;
 import java.awt.Font;
 import java.net.URL;
 
@@ -30,6 +31,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import javax.swing.plaf.ColorUIResource;
+import javax.swing.plaf.FontUIResource;
 
 import junit.framework.TestCase;
 
@@ -43,6 +46,197 @@ import junit.framework.TestCase;
  */
 public class JXHeaderTest extends TestCase {
 
+    
+    /**
+     * Issue #925-swingx: custom properties lost on updateUI.
+     * Header property set to uimanager setting.
+     */
+    public void testUpdateUIDescriptionFont() {
+        Font color = UIManager.getFont("JXHeader.descriptionFont");
+        assertNotNull("sanity: title font available", color);
+        JXHeader header = new JXHeader();
+        assertEquals(color, header.getDescriptionFont());
+    }
+
+    /**
+     * Issue #925-swingx: custom properties lost on updateUI.
+     * Description label property set to uimanager setting.
+     */
+    public void testUpdateUIDescriptionLabelFont() {
+        Font color = UIManager.getFont("JXHeader.descriptionFont");
+        assertNotNull("sanity: title font available", color);
+        JXHeader header = new JXHeader();
+        assertEquals(color, getDescriptionLabel(header).getFont());
+    }
+    
+    /**
+     * Issue #925-swingx: custom properties lost on updateUI.
+     * Description label custom foreground kept on LAF change.
+     */
+    public void testUpdateUICustomDescriptionLabelFont() {
+        Font color = new Font("serif", Font.BOLD, 36);
+        JXHeader header = new JXHeader();
+        header.setDescriptionFont(color);
+        assertEquals("sanity: title color taken", color, getDescriptionLabel(header).getFont());
+        SwingUtilities.updateComponentTreeUI(header);
+        assertEquals(color, header.getDescriptionFont());
+        assertEquals(color, getDescriptionLabel(header).getFont());
+    }
+    
+    /**
+     * Issue #925-swingx: custom properties lost on updateUI.
+     * Title label property updated to ui default on laf change.
+     */
+    public void testUpdateUIDefaultDescriptionLabelFont() {
+        Font uiDefault = new FontUIResource("serif", Font.PLAIN, 36);
+        Font color = new FontUIResource("serif", Font.ITALIC, 20);
+        UIManager.put("JXHeader.descriptionFont", uiDefault);
+        JXHeader header = new JXHeader();
+        header.setDescriptionFont(color);
+        try {
+            assertEquals(color, header.getDescriptionFont());
+            assertEquals(color, getDescriptionLabel(header).getFont());
+            SwingUtilities.updateComponentTreeUI(header);
+            
+            assertEquals(uiDefault, header.getDescriptionFont());
+            assertEquals(uiDefault, getDescriptionLabel(header).getFont());
+        } finally {
+            // reset custom property
+           UIManager.put("JXHeader.descriptionFont", null);   
+        }
+    }
+
+
+    
+    
+//--------------    
+    /**
+     * Issue #925-swingx: custom properties lost on updateUI.
+     * Header property set to uimanager setting.
+     */
+    public void testUpdateUIDescriptionForeground() {
+        Color color = UIManager.getColor("JXHeader.titleForeground");
+        assertNotNull("sanity: title font available", color);
+        JXHeader header = new JXHeader();
+        assertEquals(color, header.getDescriptionForeground());
+    }
+
+    /**
+     * Issue #925-swingx: custom properties lost on updateUI.
+     * Description label property set to uimanager setting.
+     */
+    public void testUpdateUIDescriptionLabelForeground() {
+        Color color = UIManager.getColor("JXHeader.titleForeground");
+        assertNotNull("sanity: title font available", color);
+        JXHeader header = new JXHeader();
+        assertEquals(color, getDescriptionLabel(header).getForeground());
+    }
+    
+    /**
+     * Issue #925-swingx: custom properties lost on updateUI.
+     * Description label custom foreground kept on LAF change.
+     */
+    public void testUpdateUICustomDescriptionLabelForeground() {
+        Color color = Color.PINK;
+        JXHeader header = new JXHeader();
+        header.setDescriptionForeground(color);
+        assertEquals("sanity: title color taken", color, getDescriptionLabel(header).getForeground());
+        SwingUtilities.updateComponentTreeUI(header);
+        assertEquals(color, header.getDescriptionForeground());
+        assertEquals(color, getDescriptionLabel(header).getForeground());
+    }
+    
+    /**
+     * Issue #925-swingx: custom properties lost on updateUI.
+     * Title label property updated to ui default on laf change.
+     */
+    public void testUpdateUIDefaultDescriptionLabelForeground() {
+        Color uiDefault = new ColorUIResource(Color.BLUE);
+        Color color = new ColorUIResource(Color.PINK);
+        UIManager.put("JXHeader.descriptionForeground", uiDefault);
+        JXHeader header = new JXHeader();
+        header.setDescriptionForeground(color);
+        SwingUtilities.updateComponentTreeUI(header);
+        try {
+            
+            assertEquals(uiDefault, header.getDescriptionForeground());
+            assertEquals(uiDefault, getDescriptionLabel(header).getForeground());
+        } finally {
+            // reset custom property
+           UIManager.put("JXHeader.descriptionForeground", null);   
+        }
+    }
+
+    /**
+     * @return
+     */
+    private JLabel getDescriptionLabel(JXHeader header) {
+        for (int i = 0; i < header.getComponentCount(); i++) {
+            if (header.getComponent(i) instanceof JXLabel) {
+                return (JLabel) header.getComponent(i);
+            }
+         }
+        return null;
+    }
+
+    
+    /**
+     * Issue #925-swingx: custom properties lost on updateUI.
+     * Header property set to uimanager setting.
+     */
+    public void testUpdateUITitleForeground() {
+        Color color = UIManager.getColor("JXHeader.titleForeground");
+        assertNotNull("sanity: title font available", color);
+        JXHeader header = new JXHeader();
+        assertEquals(color, header.getTitleForeground());
+    }
+
+    /**
+     * Issue #925-swingx: custom properties lost on updateUI.
+     * Title label property set to uimanager setting.
+     */
+    public void testUpdateUITitleLabelForeground() {
+        Color color = UIManager.getColor("JXHeader.titleForeground");
+        assertNotNull("sanity: title font available", color);
+        JXHeader header = new JXHeader();
+        assertEquals(color, getTitleLabel(header).getForeground());
+    }
+    
+    /**
+     * Issue #925-swingx: custom properties lost on updateUI.
+     * Title label custom foreground kept on LAF change.
+     */
+    public void testUpdateUICustomTitleLabelForeground() {
+        Color color = Color.PINK;
+        JXHeader header = new JXHeader();
+        header.setTitleForeground(color);
+        assertEquals("sanity: title color taken", color, getTitleLabel(header).getForeground());
+        SwingUtilities.updateComponentTreeUI(header);
+        assertEquals(color, header.getTitleForeground());
+        assertEquals(color, getTitleLabel(header).getForeground());
+    }
+    
+    /**
+     * Issue #925-swingx: custom properties lost on updateUI.
+     * Title label property updated to ui default on laf change.
+     */
+    public void testUpdateUIDefaultTitleLabelForeground() {
+        Color uiDefault = new ColorUIResource(Color.BLUE);
+        Color color = new ColorUIResource(Color.PINK);
+        UIManager.put("JXHeader.titleForeground", uiDefault);
+        JXHeader header = new JXHeader();
+        header.setTitleForeground(color);
+        SwingUtilities.updateComponentTreeUI(header);
+        try {
+            
+            assertEquals(uiDefault, header.getTitleForeground());
+            assertEquals(uiDefault, getTitleLabel(header).getForeground());
+        } finally {
+            // reset custom property
+           UIManager.put("JXHeader.titleForeground", null);   
+        }
+    }
+    
     /**
      * Issue #925-swingx: custom properties lost on updateUI.
      * Header property set to uimanager setting.
@@ -119,6 +313,23 @@ public class JXHeaderTest extends TestCase {
     
     /**
      * Issue #925-swingx: custom properties lost on updateUI
+     * Simulate update of default font (from ui) on LAF change.
+     */
+    public void testUpdateUIREsourceTitleLabelFontUpdateComponentTreeUI() {
+        JXHeader header = new JXHeader();
+        Font uiDefault = header.getTitleFont();
+        // we set a uiResource which we expect to be overwritten on lafChange
+        // to the default setting 
+        Font font = new FontUIResource("serif", Font.BOLD, 36);
+        header.setTitleFont(font);
+        SwingUtilities.updateComponentTreeUI(header);
+        assertEquals("sanity: header's titleFont updated to default", uiDefault, header.getTitleFont());
+        JLabel label = getTitleLabel(header);
+        assertEquals(uiDefault, label.getFont());
+    }
+    
+    /**
+     * Issue #925-swingx: custom properties lost on updateUI
       * Test title label font kept same as UIManager property after
      * updateComponentTreeUI (aka: toggle LAF)
     */
@@ -131,7 +342,7 @@ public class JXHeaderTest extends TestCase {
         assertEquals(font, label.getFont());
     }
     
-/**
+    /**
      * Issue #695-swingx: not-null default values break class invariant.
      * Here initial empty constructor.
      */
