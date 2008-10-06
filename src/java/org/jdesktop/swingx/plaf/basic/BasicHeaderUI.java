@@ -38,13 +38,10 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.logging.Logger;
 
-import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.UIManager;
-import javax.swing.plaf.ColorUIResource;
 import javax.swing.plaf.ComponentUI;
-import javax.swing.plaf.FontUIResource;
 import javax.swing.plaf.UIResource;
 import javax.swing.plaf.basic.BasicHTML;
 import javax.swing.text.View;
@@ -56,6 +53,7 @@ import org.jdesktop.swingx.painter.MattePainter;
 import org.jdesktop.swingx.painter.Painter;
 import org.jdesktop.swingx.plaf.HeaderUI;
 import org.jdesktop.swingx.plaf.PainterUIResource;
+import org.jdesktop.swingx.plaf.UIManagerExt;
 
 /**
  * Base implementation of <code>Header</code> UI. <p>
@@ -66,7 +64,10 @@ import org.jdesktop.swingx.plaf.PainterUIResource;
  * need to carry the header as parameter. Which looks funny when at the same time 
  * the children of the header are instance fields in this. Should think about cleanup:
  * either get rid off the instance fields here, or reference the header and remove
- * the param (would break subclasses).
+ * the param (would break subclasses).<p>
+ * 
+ * PENDING JW: keys for uidefaults are inconsistent - most have prefix "JXHeader." while
+ * defaultIcon has prefix "Header." <p>
  * 
  * @author rbair
  * @author rah003
@@ -193,79 +194,75 @@ public class BasicHeaderUI extends HeaderUI {
         uninstallListeners(header);
         uninstallComponents(header);
         uninstallDefaults(header);
-
     }
 
     /**
-     * Installs default header properties. <p>
+     * Installs default header properties.
+     * <p>
      * 
-     * NOTE: this method is called before the children are created, so
-     * must not try to access any of those!.
+     * NOTE: this method is called before the children are created, so must not
+     * try to access any of those!.
      * 
      * @param the header to install.
      */
     protected void installDefaults(JXHeader h) {
-        gradientLightColor = UIManager.getColor("JXHeader.startBackground");
+        gradientLightColor = UIManagerExt.getColor("JXHeader.startBackground");
         if (gradientLightColor == null) {
-        	// fallback to white
-        	gradientLightColor = Color.WHITE;
+            // fallback to white
+            gradientLightColor = Color.WHITE;
         }
-        gradientDarkColor = UIManager.getColor("JXHeader.background");
-        //for backwards compatibility (mostly for substance and synthetica,
-        //I suspect) I'll fall back on the "control" color if JXHeader.background
-        //isn't specified.
+        gradientDarkColor = UIManagerExt.getColor("JXHeader.background");
+        // for backwards compatibility (mostly for substance and synthetica,
+        // I suspect) I'll fall back on the "control" color if
+        // JXHeader.background
+        // isn't specified.
         if (gradientDarkColor == null) {
-            gradientDarkColor = UIManager.getColor("control");
+            gradientDarkColor = UIManagerExt.getColor("control");
         }
 
-        Painter p = h.getBackgroundPainter();
-        if (p == null || p instanceof PainterUIResource) {
+        if (isUIInstallable(h.getBackgroundPainter())) {
             h.setBackgroundPainter(createBackgroundPainter());
         }
 
         // title properties
-        Font titleFont = h.getTitleFont();
-        if (titleFont == null || titleFont instanceof FontUIResource) {
-        	titleFont = UIManager.getFont("JXHeader.titleFont");
-        	// fallback to label font
-        	h.setTitleFont(titleFont != null ? titleFont : UIManager.getFont("Label.font"));
-        	
+        if (isUIInstallable(h.getTitleFont())) {
+            Font titleFont = UIManager.getFont("JXHeader.titleFont");
+            // fallback to label font
+            h.setTitleFont(titleFont != null ? titleFont : UIManager
+                    .getFont("Label.font"));
         }
-
-        Color titleForeground = h.getTitleForeground();
-        if (titleForeground == null || titleForeground instanceof ColorUIResource) {
-        	titleForeground = UIManager.getColor("JXHeader.titleForeground");
-        	// fallback to label foreground
-        	h.setTitleForeground(titleForeground != null ? titleForeground : UIManager.getColor("Label.foreground"));
+        if (isUIInstallable(h.getTitleForeground())) {
+            Color titleForeground = UIManagerExt
+                    .getColor("JXHeader.titleForeground");
+            // fallback to label foreground
+            h.setTitleForeground(titleForeground != null ? titleForeground
+                    : UIManagerExt.getColor("Label.foreground"));
         }
-
 
         // description properties
-        Font descFont = h.getDescriptionFont();
-        if (descFont == null || descFont instanceof FontUIResource) {
-        	descFont = UIManager.getFont("JXHeader.descriptionFont");
-        	// fallback to label font
-        	h.setDescriptionFont(descFont != null ? descFont : UIManager.getFont("Label.font"));
+        if (isUIInstallable(h.getDescriptionFont())) {
+            Font descFont = UIManager.getFont("JXHeader.descriptionFont");
+            // fallback to label font
+            h.setDescriptionFont(descFont != null ? descFont : UIManager
+                    .getFont("Label.font"));
         }
-
-        Color descForeground = h.getDescriptionForeground();
-        if (descForeground == null || descForeground instanceof ColorUIResource) {
-        	descForeground = UIManager.getColor("JXHeader.descriptionForeground");
-        	// fallback to label foreground
-        	h.setDescriptionForeground(descForeground != null ? descForeground : UIManager.getColor("Label.foreground"));
+        if (isUIInstallable(h.getDescriptionForeground())) {
+            Color descForeground = UIManagerExt
+                    .getColor("JXHeader.descriptionForeground");
+            // fallback to label foreground
+            h.setDescriptionForeground(descForeground != null ? descForeground
+                    : UIManagerExt.getColor("Label.foreground"));
         }
         
-        Icon icon = h.getIcon();
-        if ((icon == null) || icon instanceof UIResource) {
-            icon = UIManager.getIcon("Header.defaultIcon");
-            h.setIcon(icon);
+        // icon label properties
+        if (isUIInstallable(h.getIcon())) {
+            h.setIcon(UIManager.getIcon("Header.defaultIcon"));
         }
     }
     
     /**
      * Uninstalls the given header's default properties. This implementation
      * does nothing.
-     * 
      * 
      * @param h the header to ininstall the properties from.
      */
@@ -305,21 +302,16 @@ public class BasicHeaderUI extends HeaderUI {
     /**
      * Configures the component default properties from the given header.
      * 
-     * 
      * @param the header to install the components into.
      */
     protected void installComponentDefaults(JXHeader h) {
-        //JW: force a not UIResource
-        // PENDING JW: correct way to create another font instance?
-        titleLabel.setFont(h.getTitleFont().deriveFont(h.getTitleFont().getStyle()));
-        // PENDING JW: correct way to create another color instance?
-        float[] rgb = h.getTitleForeground().getRGBComponents(null);
-        titleLabel.setForeground(new Color(rgb[0], rgb[1], rgb[2], rgb[3]));
+        // JW: force a not UIResource for properties which have ui default values
+        // like color, font, ??
+        titleLabel.setFont(getAsNotUIResource(h.getTitleFont()));
+        titleLabel.setForeground(getAsNotUIResource(h.getTitleForeground()));
         titleLabel.setText(h.getTitle());
-        
-        descriptionPane.setFont(h.getDescriptionFont().deriveFont(h.getDescriptionFont().getStyle()));
-        rgb = h.getDescriptionForeground().getRGBComponents(null);
-        descriptionPane.setForeground(new Color(rgb[0], rgb[1], rgb[2], rgb[3]));
+        descriptionPane.setFont(getAsNotUIResource(h.getDescriptionFont()));
+        descriptionPane.setForeground(getAsNotUIResource(h.getDescriptionForeground()));
         descriptionPane.setOpaque(false);
         descriptionPane.setText(h.getDescription());
         descriptionPane.setLineWrap(true);
@@ -329,13 +321,50 @@ public class BasicHeaderUI extends HeaderUI {
     }
     
     /**
+     * Returns a Font based on the param which is not of type UIResource. 
+     * 
+     * @param font the base font
+     * @return a font not of type UIResource, may be null.
+     */
+    private Font getAsNotUIResource(Font font) {
+        if (!(font instanceof UIResource)) return font;
+        // PENDING JW: correct way to create another font instance?
+       return font.deriveFont(font.getAttributes());
+    }
+    
+    /**
+     * Returns a Color based on the param which is not of type UIResource. 
+     * 
+     * @param color the base color
+     * @return a color not of type UIResource, may be null.
+     */
+    private Color getAsNotUIResource(Color color) {
+        if (!(color instanceof UIResource)) return color;
+        // PENDING JW: correct way to create another color instance?
+        float[] rgb = color.getRGBComponents(null);
+        return new Color(rgb[0], rgb[1], rgb[2], rgb[3]);
+    }
+    
+    /**
+     * Checks and returns whether the given property should be replaced
+     * by the UI's default value.<p>
+     * 
+     * PENDING JW: move as utility method ... where?
+     * 
+     * @param property the property to check.
+     * @return true if the given property should be replaced by the UI#s
+     *   default value, false otherwise. 
+     */
+    private boolean isUIInstallable(Object property) {
+       return (property == null) || (property instanceof UIResource);
+    }
+    
+    /**
      * Uninstalls component defaults. This implementation does nothing.
      * 
      * @param the header to uninstall from.
      */
     protected void uninstallComponentDefaults(JXHeader h) {
-        // TODO Auto-generated method stub
-        
     }
 
 
@@ -429,4 +458,6 @@ public class BasicHeaderUI extends HeaderUI {
         p.setPaintStretched(true);
         return new PainterUIResource(p);
     }
+    
+    
 }

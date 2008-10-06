@@ -54,6 +54,44 @@ public class JXHeaderIssues extends InteractiveTestCase {
         } 
     }
 
+    /**
+     * Sanity: trying to track default rendering hints.
+     * @KEEP until Issue ?? with header antialiased is solved.
+     */
+//    public void interactiveLabel() {
+//        JLabel label = new JLabel("JLabel tweaked * tracking, tracking ...") {
+//
+//            @Override
+//            protected void paintComponent(Graphics g) {
+//                if (ui != null) {
+//                    Graphics scratchGraphics = (g == null) ? null : g.create();
+//                    try {
+//                        RenderingHints old = ((Graphics2D)scratchGraphics).getRenderingHints();
+//                      LOG.info(getText() + ": all hints " + old
+//                      + "\n     " + ": aliased " + ((Graphics2D)scratchGraphics).getRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING));
+//                      ((Graphics2D) scratchGraphics).setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+//                              RenderingHints.VALUE_ANTIALIAS_ON);
+//                        ui.update(scratchGraphics, this);
+////                        SwingUtilities2.drawStringUnderlineCharAt(this, scratchGraphics, getText(), -1, 0, 10);
+//                        RenderingHints after =((Graphics2D)scratchGraphics).getRenderingHints();
+//                        LOG.warning(getText() + ": all hints " + after
+//                                + "\n     " + ": aliased " + ((Graphics2D)scratchGraphics).getRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING)
+//                                + "\n     " + "equals? " + old.equals(after));
+//                    }
+//                    finally {
+//                        scratchGraphics.dispose();
+//                    }
+//                }
+//            }
+//            
+//        };
+//        JComponent box = Box.createVerticalBox();
+//        box.add(label);
+//        box.add(new JXLabel("JXLabel * tracking ... tracking .."));
+//        box.add(new JLabel("JLabel raw * tracking tracking ..."));
+//        showInFrame(box, "label");
+//    }
+
     @Override
     protected void setUp() throws Exception {
         setSystemLF(true);

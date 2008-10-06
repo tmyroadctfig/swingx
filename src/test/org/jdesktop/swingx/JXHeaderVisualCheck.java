@@ -38,6 +38,7 @@ import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Box;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -82,48 +83,14 @@ public class JXHeaderVisualCheck extends InteractiveTestCase {
 
     // ------------------ interactive
     
-    /**
-     * Sanity: trying to track default rendering hints
-     */
-    public void interactiveLabel() {
-        JLabel label = new JLabel("JLabel tweaked * tracking, tracking ...") {
-
-            @Override
-            protected void paintComponent(Graphics g) {
-                if (ui != null) {
-                    Graphics scratchGraphics = (g == null) ? null : g.create();
-                    try {
-                        RenderingHints old = ((Graphics2D)scratchGraphics).getRenderingHints();
-                      LOG.info(getText() + ": all hints " + old
-                      + "\n     " + ": aliased " + ((Graphics2D)scratchGraphics).getRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING));
-                      ((Graphics2D) scratchGraphics).setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                              RenderingHints.VALUE_ANTIALIAS_ON);
-                        ui.update(scratchGraphics, this);
-//                        SwingUtilities2.drawStringUnderlineCharAt(this, scratchGraphics, getText(), -1, 0, 10);
-                        RenderingHints after =((Graphics2D)scratchGraphics).getRenderingHints();
-                        LOG.warning(getText() + ": all hints " + after
-                                + "\n     " + ": aliased " + ((Graphics2D)scratchGraphics).getRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING)
-                                + "\n     " + "equals? " + old.equals(after));
-                    }
-                    finally {
-                        scratchGraphics.dispose();
-                    }
-                }
-            }
-            
-        };
-        JComponent box = Box.createVerticalBox();
-        box.add(label);
-        box.add(new JXLabel("JXLabel * tracking ... tracking .."));
-        box.add(new JLabel("JLabel raw * tracking tracking ..."));
-        showInFrame(box, "label");
-    }
     
     public void interactiveHeaderInTabbedPane() {
         JTabbedPane pane = new JTabbedPane();
         pane.addTab("first", createHeader());
         pane.addTab("second", createHeader());
-        showInFrame(pane, "NPE: header in tabbedPane?");
+        JXFrame frame = wrapInFrame(pane, "NPE: header in tabbedPane?");
+        addComponentOrientationToggle(frame);
+        show(frame);
 
     }
 
@@ -236,15 +203,14 @@ public class JXHeaderVisualCheck extends InteractiveTestCase {
      * All values are passed in the constructor.
      */
     public void interactiveCustomProperties() {
-        URL url = getClass().getResource("resources/images/wellTop.gif");;
-
-        assertNotNull(url);
+        Icon icon = XTestUtils.loadDefaultIcon();
+        assertNotNull("sanity: default icon loaded", icon);
         JPanel p = new JPanel(new BorderLayout());
-        JXHeader header = new JXHeader("MyTitle", "MyDescription", new ImageIcon(url));
+        JXHeader header = new JXHeader("MyTitle", "MyDescription", icon);
         header.setIconPosition(IconPosition.LEFT);
         JPanel px = new JPanel(new GridLayout(2,1));
         px.add(header);
-        px.add(new JXHeader("MyTitle", "MyDescription", new ImageIcon(url)));
+        px.add(new JXHeader("MyTitle", "MyDescription", icon));
         p.add(px);
         // added just to better visualize bkg gradient in the JXHeader.
         p.add(new JLabel("Reference component: JLabel"), BorderLayout.SOUTH);
@@ -259,10 +225,10 @@ public class JXHeaderVisualCheck extends InteractiveTestCase {
      * All values are passed in the constructor.
      */
     public void interactiveWordWrapping() {
-        URL url = getClass().getResource("resources/images/wellTop.gif");
-        assertNotNull(url);
+        Icon icon = XTestUtils.loadDefaultIcon();
+        assertNotNull("sanity: default icon loaded", icon);
         JPanel p = new JPanel(new BorderLayout());
-        JXHeader header = new JXHeader("MyTitle", "this is a long test with veeeeeeeeeeeeeery looooooong wooooooooooooords", new ImageIcon(url));
+        JXHeader header = new JXHeader("MyTitle", "this is a long test with veeeeeeeeeeeeeery looooooong wooooooooooooords", icon);
         p.add(header);
         p.setPreferredSize(new Dimension(200,150));
         showInFrame(p, "word wrapping JXHeader");
@@ -274,10 +240,10 @@ public class JXHeaderVisualCheck extends InteractiveTestCase {
      * All values are passed in the constructor.
      */
     public void interactiveCustomTitleFont() {
-        URL url = getClass().getResource("resources/images/wellTop.gif");
-        assertNotNull(url);
+        Icon icon = XTestUtils.loadDefaultIcon();
+        assertNotNull("sanity: default icon loaded", icon);
         JPanel p = new JPanel(new BorderLayout());
-        final JXHeader header = new JXHeader("MyBigUglyTitle", "this is a long test with veeeeeeeeeeeeeery looooooong wooooooooooooords", new ImageIcon(url));
+        final JXHeader header = new JXHeader("MyBigUglyTitle", "this is a long test with veeeeeeeeeeeeeery looooooong wooooooooooooords", icon);
         header.setTitleFont(new Font("serif", Font.BOLD, 36));
         header.setTitleForeground(Color.GREEN);
         p.add(header);
