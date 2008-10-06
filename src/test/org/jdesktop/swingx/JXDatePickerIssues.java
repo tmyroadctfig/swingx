@@ -477,24 +477,6 @@ public class JXDatePickerIssues extends InteractiveTestCase {
         
     }
 
-    
-    /**
-     * test that selectionListener is uninstalled.
-     * 
-     * Hmm ... missing api or overshooting?
-     */
-    public void testSelectionListening() {
-//        JXMonthView monthView = new JXMonthView();
-//        int selectionListenerCount = monthView.getSelectionModel()).getListeners().length;
-//        JXDatePicker picker = new JXDatePicker();
-//        assertEquals("ui must have installed one listener", selectionListenerCount + 1, 
-//                picker.getMonthView().getSelectionModel().getListeners().length);
-//        picker.getUI().uninstallUI(picker);
-//        assertEquals("", selectionListenerCount, 
-//                picker.getMonthView().getSelectionModel().getListeners().length);
-    }
-    
-
     /**
      * Returns a timezone different from the given.
      * @param defaultZone

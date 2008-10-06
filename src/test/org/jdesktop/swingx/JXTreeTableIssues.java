@@ -1107,6 +1107,7 @@ public class JXTreeTableIssues extends InteractiveTestCase {
         treeTable.setRowSelectionInterval(0, 0);
         assertEquals(treeTable.getSelectionModel().getLeadSelectionIndex(), 
                 treeTable.getTreeSelectionModel().getLeadSelectionRow());
+        fail("lead selection synch passes locally, fails on server");
     }
     
     /**
@@ -1123,7 +1124,7 @@ public class JXTreeTableIssues extends InteractiveTestCase {
         assertEquals(treeTable.getSelectionModel().getLeadSelectionIndex(), 
                 treeTable.getTreeSelectionModel().getLeadSelectionRow());
         assertEquals(0, treeTable.getTreeSelectionModel().getLeadSelectionRow());
-
+        fail("lead selection synch passes locally, fails on server");
     }
 
 

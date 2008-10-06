@@ -32,7 +32,6 @@ import java.io.File;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.logging.Logger;
-import java.util.regex.Pattern;
 
 import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
@@ -628,6 +627,7 @@ public class RendererIssues extends InteractiveTestCase {
        WrappingProvider provider = new WrappingProvider(iv);
        WrappingIconPanel comp = provider.getRendererComponent(context);
        assertEquals(custom, comp.getIcon());
+       fail("feature request: per node type iconValue");
     }
 
     /**

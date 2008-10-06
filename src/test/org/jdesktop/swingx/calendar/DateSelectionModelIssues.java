@@ -44,7 +44,13 @@ public class DateSelectionModelIssues extends InteractiveTestCase {
     @SuppressWarnings("unused")
     private Calendar calendar;
 
-    
+    /**
+     * Hmm ... missing api or overshooting? 
+     */
+    public void testSelectionListening() {
+        fail("DateSelectionModel - missing api: getListeners?");
+    }
+
     public void testUnselectableDatesCleanupOneRemovedEvent() {
         fail("TODO: test that we fire only one remove event");
     }

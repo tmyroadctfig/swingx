@@ -51,10 +51,10 @@ public class JXListIssues extends JXListTest {
      * Expected: plain ol' list does install UIResource (while tree doesn't)
      */
     public void testLAFRendererList() {
-        JList tree = new JList();
-        assertNotNull("default renderer installed", tree.getCellRenderer());
-        assertTrue("expected UIResource, but was: " + tree.getCellRenderer().getClass(), 
-                tree.getCellRenderer() instanceof UIResource);
+        JList list = new JList();
+        assertNotNull("default renderer installed", list.getCellRenderer());
+        assertTrue("expected UIResource, but was: " + list.getCellRenderer().getClass(), 
+                list.getCellRenderer() instanceof UIResource);
     }
 
     /**
@@ -63,10 +63,10 @@ public class JXListIssues extends JXListTest {
      * Expected: plain ol' list does install UIResource (while tree doesn't)
      */
     public void testLAFRendererXList() {
-        JXList tree = new JXList();
-        assertNotNull("default renderer installed", tree.getCellRenderer());
-        assertTrue("expected UIResource, but was: " + tree.getCellRenderer().getClass(), 
-                tree.getCellRenderer() instanceof UIResource);
+        JXList list = new JXList();
+        assertNotNull("default renderer installed", list.getCellRenderer());
+        assertTrue("expected UIResource, but was: " + list.getCellRenderer().getClass(), 
+                list.getCellRenderer() instanceof UIResource);
     }
 
     public void testConvertToViewPreconditions() {

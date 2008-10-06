@@ -236,6 +236,10 @@ public class SelectionIssues extends InteractiveTestCase {
         return dates;
     }
     
-    
-
+    /**
+     * Keep test runner happy.
+     */
+    public void testDummy() {
+        
+    }
 }
