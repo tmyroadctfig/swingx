@@ -21,13 +21,21 @@ import org.jdesktop.swingx.icon.EmptyIcon;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 import org.jdesktop.swingx.plaf.metal.MetalLookAndFeelAddons;
 import org.jdesktop.test.PropertyChangeReport;
+import org.junit.Test;
+import org.junit.internal.runners.JUnit4ClassRunner;
+import org.junit.runner.RunWith;
 
+@RunWith(JUnit4ClassRunner.class)
 public class JXTaskPaneTest extends InteractiveTestCase {
 
   public JXTaskPaneTest(String testTitle) {
     super(testTitle);
   }
 
+  public JXTaskPaneTest() {
+      super(JXTaskPaneTest.class.getName());
+    }
+  @Test
   public void testBean() throws Exception {
     PropertyChangeReport report = new PropertyChangeReport();
     JXTaskPane group = new JXTaskPane();
@@ -101,6 +109,7 @@ public class JXTaskPaneTest extends InteractiveTestCase {
     assertFalse((Boolean) event.getOldValue());
   }
 
+  @Test
   public void testContentPane() {
     JXTaskPane group = new JXTaskPane();
     assertEquals(0, group.getContentPane().getComponentCount());
@@ -125,6 +134,7 @@ public class JXTaskPaneTest extends InteractiveTestCase {
     assertFalse(layout == group.getLayout());
   }
 
+  @Test
   public void testActions() throws Exception {
     JXTaskPane taskPane = new JXTaskPane();
     Action action = new AbstractAction() {
@@ -136,6 +146,7 @@ public class JXTaskPaneTest extends InteractiveTestCase {
     assertEquals(1, taskPane.getContentPane().getComponentCount());
   }
 
+  @Test
   public void testAnimationListeners() throws Exception {
     JXTaskPane taskPane = new JXTaskPane();
     // start with a not expanded or animated taskPane
@@ -179,11 +190,13 @@ public class JXTaskPaneTest extends InteractiveTestCase {
     assertEquals(2, listener.animationStart);
   }
 
+  @Test
   public void testAddon() throws Exception {
     // move around all addons
     TestUtilities.cycleAddons(new JXTaskPane());
   }
 
+  @Test
   public void testIssue344() throws Exception {
     new JXTaskPane();
     LookAndFeelAddons.setAddon(new MetalLookAndFeelAddons());

@@ -30,6 +30,10 @@ import org.jdesktop.swingx.renderer.JRendererLabel;
 import org.jdesktop.swingx.test.XTestUtils;
 import org.jdesktop.test.ChangeReport;
 import org.jdesktop.test.PropertyChangeReport;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.internal.runners.JUnit4ClassRunner;
+import org.junit.runner.RunWith;
 
 /**
  * 
@@ -37,6 +41,7 @@ import org.jdesktop.test.PropertyChangeReport;
  * 
  * @author Jeanette Winzenburg
  */
+@RunWith(JUnit4ClassRunner.class)
 public class HighlighterTest extends InteractiveTestCase {
     private static final Logger LOG = Logger.getLogger(HighlighterTest.class
             .getName());
@@ -60,7 +65,8 @@ public class HighlighterTest extends InteractiveTestCase {
     protected boolean defaultToSystemLF;
 
     @Override
-    protected void setUp() {
+    @Before
+    public void setUp() {
         backgroundNull = new JLabel("test");
         backgroundNull.setForeground(foreground);
         backgroundNull.setBackground(null);
@@ -215,6 +221,7 @@ public class HighlighterTest extends InteractiveTestCase {
     /**
      * highlight every second 
      */
+    @Test
     public void testAlternateStriping() {
         ComponentAdapter adapter = createComponentAdapter(allColored, false);
         Highlighter h = HighlighterFactory.createAlternateStriping(unselectedBackground, selectedBackground);
@@ -229,6 +236,7 @@ public class HighlighterTest extends InteractiveTestCase {
 
 //-------------- IconHighlighter
 
+    @Test
     public void testIconHighlighterNotHighlightUnable() {
         Icon icon = XTestUtils.loadDefaultIcon();
         JTextField allColored = new JTextField();
@@ -238,6 +246,7 @@ public class HighlighterTest extends InteractiveTestCase {
     }
 
 
+    @Test
     public void testIconHighlighterNotHighlight() {
         Icon icon = XTestUtils.loadDefaultIcon();
         allColored.setIcon(icon);
@@ -246,6 +255,7 @@ public class HighlighterTest extends InteractiveTestCase {
         assertEquals(icon, allColored.getIcon());
     }
 
+    @Test
     public void testIconHighlighterHighlight() {
         Icon icon = XTestUtils.loadDefaultIcon();
         IconHighlighter hl = new IconHighlighter(icon);
@@ -253,6 +263,7 @@ public class HighlighterTest extends InteractiveTestCase {
         assertEquals(icon, allColored.getIcon());
     }
     
+    @Test
     public void testIconHighlightIconChangeNotification() {
         IconHighlighter hl = new IconHighlighter();
         Icon icon = XTestUtils.loadDefaultIcon();
@@ -263,6 +274,7 @@ public class HighlighterTest extends InteractiveTestCase {
         assertEquals(1, report.getEventCount());
     }
     
+    @Test
     public void testIconHighlightIconNoChangeNotification() {
         Icon icon = XTestUtils.loadDefaultIcon();
         IconHighlighter hl = new IconHighlighter(icon);
@@ -272,6 +284,7 @@ public class HighlighterTest extends InteractiveTestCase {
         assertEquals(0, report.getEventCount());
     }
     
+    @Test
     public void testIconHighlighterConstructors() {
         IconHighlighter empty = new IconHighlighter();
         assertIconHighlighter(empty, HighlightPredicate.ALWAYS, null);
@@ -293,6 +306,7 @@ public class HighlighterTest extends InteractiveTestCase {
     /**
      * Test that all properties have setters and fire a changeEvent. 
      */
+    @Test
     public void testBorderHighlightSetters() {
         BorderHighlighter hl = new BorderHighlighter();
         ChangeReport report = new ChangeReport();
@@ -308,6 +322,7 @@ public class HighlighterTest extends InteractiveTestCase {
      * Test setBorder and fire a changeEvent.
      * (setter was missing) 
      */
+    @Test
     public void testBorderHighlightSetBorder() {
         BorderHighlighter hl = new BorderHighlighter();
         ChangeReport report = new ChangeReport();
@@ -327,6 +342,7 @@ public class HighlighterTest extends InteractiveTestCase {
     }
     
     
+    @Test
     public void testBorderPaddingNull() {
         BorderHighlighter empty = new BorderHighlighter();
         Border border = allColored.getBorder();
@@ -335,6 +351,7 @@ public class HighlighterTest extends InteractiveTestCase {
                 border, allColored.getBorder());
     }
 
+    @Test
     public void testBorderPaddingCompoundNotInner() {
         Border padding = BorderFactory.createLineBorder(Color.RED, 3);
         BorderHighlighter empty = new BorderHighlighter(padding);
@@ -349,6 +366,7 @@ public class HighlighterTest extends InteractiveTestCase {
                 padding, ((CompoundBorder) compound).getInsideBorder());
     }
 
+    @Test
     public void testBorderPaddingCompoundInner() {
         Border padding = BorderFactory.createLineBorder(Color.RED, 3);
         BorderHighlighter empty = new BorderHighlighter(padding);
@@ -362,6 +380,7 @@ public class HighlighterTest extends InteractiveTestCase {
                 border, ((CompoundBorder) compound).getInsideBorder());
     }
     
+    @Test
     public void testBorderPaddingReplace() {
         Border padding = BorderFactory.createLineBorder(Color.RED, 3);
         BorderHighlighter empty = new BorderHighlighter(null, padding, false);
@@ -370,6 +389,7 @@ public class HighlighterTest extends InteractiveTestCase {
                 padding, allColored.getBorder());
     }
     
+    @Test
     public void testBorderPaddingSetBorderIfComponentBorderNull() {
         Border padding = BorderFactory.createLineBorder(Color.RED, 3);
         BorderHighlighter empty = new BorderHighlighter(padding);
@@ -378,6 +398,7 @@ public class HighlighterTest extends InteractiveTestCase {
         assertEquals("borderHighlighter padding and null component border must set", 
                 padding, allColored.getBorder());
     }
+    @Test
     public void testBorderConstructors() {
         BorderHighlighter empty = new BorderHighlighter();
         assertBorderHLState(empty, HighlightPredicate.ALWAYS, null, true, false);
@@ -404,6 +425,7 @@ public class HighlighterTest extends InteractiveTestCase {
 
 //------------------ ShadingColorHighlighter
     
+    @Test
     public void testShadingConstructors() {
         ShadingColorHighlighter shading = new ShadingColorHighlighter();
         assertColorsAndPredicate(shading, HighlightPredicate.ALWAYS, null, null, null, null);
@@ -419,6 +441,7 @@ public class HighlighterTest extends InteractiveTestCase {
     /**
      * Test constructor of ColorHighlighter.
      */
+    @Test
     public void testConstructors() {
         ColorHighlighter empty = new ColorHighlighter();
         assertColorsAndPredicate(empty, HighlightPredicate.ALWAYS, null, null, null, null);
@@ -450,6 +473,7 @@ public class HighlighterTest extends InteractiveTestCase {
     /**
      * Test ui dependent color is updated.
      */
+    @Test
     public void testCustomUIColorHighlighter() {
         UIColorHighlighter h = new UIColorHighlighter();
         Color uiBackground = h.getBackground();
@@ -479,11 +503,13 @@ public class HighlighterTest extends InteractiveTestCase {
 
     
     
+    @Test
     public void testColorHighlighterChangeNotification() {
         ColorHighlighter highlighter = new ColorHighlighter();
         assertBaseHighlighterChange(highlighter, 1);
     }
 
+    @Test
     public void testColorHighlighterNoChangeNotification() {
         ColorHighlighter highlighter = new ColorHighlighter(HighlightPredicate.NEVER, 
                 Color.RED, Color.RED, Color.RED, Color.RED);
@@ -513,6 +539,7 @@ public class HighlighterTest extends InteractiveTestCase {
      * test that the base implementation is polite and fires only if 
      * the predicate is really changed.
      */
+    @Test
     public void testHighlightPredicateNoChangeNotification() {
         AbstractHighlighter hl = new AbstractHighlighter() {
 
@@ -534,6 +561,7 @@ public class HighlighterTest extends InteractiveTestCase {
     }
 //---------------------- exposing highlighter probs with null component color
     
+    @Test
     public void testLabelSanity() {
         assertNull("foreground must be null", foregroundNull.getForeground());
         assertNotNull("background must not be null", foregroundNull.getBackground());
@@ -550,6 +578,7 @@ public class HighlighterTest extends InteractiveTestCase {
     /**
      * test predicate defaults to always
      */
+    @Test
     public void testDefaultPredicate() {
         ColorHighlighter highlighter = new ColorHighlighter();
         assertSame(HighlightPredicate.ALWAYS, highlighter.getHighlightPredicate());
@@ -559,6 +588,7 @@ public class HighlighterTest extends InteractiveTestCase {
      * test highlight respects predicate never.
      *
      */
+    @Test
     public void testHighlightPredicate() {
         ColorHighlighter highlighter = new ColorHighlighter(unselectedBackground, 
                 unselectedForeground);
@@ -575,6 +605,7 @@ public class HighlighterTest extends InteractiveTestCase {
      * Test ColorHighlighter decorate unselected cell.
      *
      */
+    @Test
     public void testApplyColorHighlighterUnselected() {
         ComponentAdapter adapter = createComponentAdapter(allColored, false);
         ColorHighlighter highlighter = new ColorHighlighter(unselectedBackground, 
@@ -586,6 +617,7 @@ public class HighlighterTest extends InteractiveTestCase {
      * Test ColorHighlighter decorate selected cell.
      *
      */
+    @Test
     public void testApplyColorHighlighterSelected() {
         ComponentAdapter adapter = createComponentAdapter(allColored, true);
         ColorHighlighter highlighter = new ColorHighlighter(unselectedBackground, 
@@ -597,6 +629,7 @@ public class HighlighterTest extends InteractiveTestCase {
      * test that same renderer is returned.
      *
      */
+    @Test
     public void testReturnHighlightedComponent() {
         ComponentAdapter adapter = createComponentAdapter(allColored, false);
         ColorHighlighter highlighter = new ColorHighlighter(unselectedBackground, 
@@ -608,6 +641,7 @@ public class HighlighterTest extends InteractiveTestCase {
      * Issue #178-swingx: Highlighters always change the selection color.
      * sanity test to see if non-selected colors are unchanged.
      */
+    @Test
     public void testUnSelectedDoNothingHighlighter() {
         ComponentAdapter adapter = createComponentAdapter(allColored, false);
         assertApplied(emptyHighlighter, allColored, adapter);
@@ -615,6 +649,7 @@ public class HighlighterTest extends InteractiveTestCase {
     /**
      * Issue #178-swingx: Highlighters always change the selection color.
      */
+    @Test
     public void testSelectedDoNothingHighlighter() {
         ComponentAdapter adapter = createComponentAdapter(allColored, true);
         assertApplied(emptyHighlighter, allColored, adapter);
@@ -665,6 +700,7 @@ public class HighlighterTest extends InteractiveTestCase {
      * test that the ui color highlighter comes up with 
      * the ui-setting.
      */
+    @Test
     public void testInitialUIColorHighlighter() {
         ColorHighlighter h = new UIColorHighlighter();
         Color uiBackground = h.getBackground();

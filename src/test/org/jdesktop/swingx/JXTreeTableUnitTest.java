@@ -58,7 +58,12 @@ import org.jdesktop.test.AncientSwingTeam;
 import org.jdesktop.test.PropertyChangeReport;
 import org.jdesktop.test.TableModelReport;
 import org.jdesktop.test.TreeSelectionReport;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.internal.runners.JUnit4ClassRunner;
+import org.junit.runner.RunWith;
 
+@RunWith(JUnit4ClassRunner.class)
 public class JXTreeTableUnitTest extends InteractiveTestCase {
     @SuppressWarnings ("unused")
     private static final Logger LOG = Logger
@@ -79,6 +84,7 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
      * client property to Boolean.FALSE.
      * 
      */
+    @Test
     public void testDropHack() {
         JXTree tree = new JXTree();
         assertEquals("sanity - default visible", true, tree.isVisible());
@@ -93,6 +99,7 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
      * Issue #862-swingx: JXTree - add api for selection colors.
      * Here: test that the tree in JXTreeTable is kept in synch.
      */
+    @Test
     public void testSelectionBackground() {
         JXTreeTable treeTable = new JXTreeTable(new FileSystemModel());
         treeTable.setSelectionBackground(Color.RED);
@@ -104,6 +111,7 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
      * Issue #862-swingx: JXTree - add api for selection colors.
      * Here: test that the tree in JXTreeTable is kept in synch.
      */
+    @Test
     public void testSelectionForeground() {
         JXTreeTable treeTable = new JXTreeTable(new FileSystemModel());
         treeTable.setSelectionForeground(Color.RED);
@@ -114,6 +122,7 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
      * Issue #853-swingx: tree is not disabled.
      * 
      */
+    @Test
     public void testDisabledTreeColumn() {
         JXTreeTable treeTable = new JXTreeTable(new FileSystemModel());
         treeTable.setEnabled(false);
@@ -124,6 +133,7 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
      * Issue #853-swingx: tree is not disabled.
      * 
      */
+    @Test
     public void testDisabledTreeColumnPrepared() {
         JXTreeTable treeTable = new JXTreeTable(new FileSystemModel());
         treeTable.setEnabled(false);
@@ -134,6 +144,7 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
      * Issue #821-swingx: JXTreeTable broken string rep of hierarchical column
      * Here we test the getStringAt for the hierarchical column.
      */
+    @Test
     public void testGetStringAtHierarchicalColumn() {
         JXTreeTable table = new JXTreeTableT(AncientSwingTeam.createNamedColorTreeTableModel());
         StringValue sv = new StringValue() {
@@ -159,6 +170,7 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
      * 
      * Here: icon on renderer must be respected if overwrite is false.
      */
+    @Test
     public void testIconSetOnRendererFalseOverwrite() {
         JXTreeTable treeTable = new JXTreeTable();
         DefaultTreeCellRenderer renderer = new DefaultTreeCellRenderer();
@@ -173,6 +185,7 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
      * 
      * Here: icon on renderer must be overwritten if overwrite is true.
      */
+    @Test
     public void testIconSetOnRendererTrueOverwrite() {
         JXTreeTable treeTable = new JXTreeTable();
         treeTable.setLeafIcon(null);
@@ -192,6 +205,7 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
      * 
      * Here: set icon on treeTable is passed on to renderer always.
      */
+    @Test
     public void testIconSetOnTreeTableFalseOverwrite() {
         JXTreeTable treeTable = new JXTreeTable();
         DefaultTreeCellRenderer renderer = new DefaultTreeCellRenderer();
@@ -207,6 +221,7 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
      * 
      * Here: set icon on treeTable is passed on to renderer always.
      */
+    @Test
     public void testIconSetOnTreeTableTrueOverwrite() {
         JXTreeTable treeTable = new JXTreeTable();
         treeTable.setOverwriteRendererIcons(true);
@@ -223,6 +238,7 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
      * 
      * Here: default overwriteOnRenderer is false.
      */
+    @Test
     public void testIconOverwriteInitial() {
         JXTreeTable treeTable = new JXTreeTable();
         assertFalse("initial overwriteRendererIcons must be false", 
@@ -235,6 +251,7 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
      * 
      * Here: test that different treetables have different instances of mapper.
      */
+    @Test
     public void testSelectionMapperViewSelectionModel() {
         JXTreeTable one = new JXTreeTable();
         assertSame("mapper's viewselectionModel must be same as the treetable's", 
@@ -251,6 +268,7 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
      * 
      * Here: test that different treetables have different instances of mapper.
      */
+    @Test
     public void testSelectionMapper() {
         JXTreeTable one = new JXTreeTable();
         JXTreeTable two = new JXTreeTable();
@@ -262,6 +280,7 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
      * 
      * Here: test method without event (delegates to event == null)
      */
+    @Test
     public void testEditCellAt() {
         JXTreeTable treeTable = prepareTreeTable(true);
         treeTable.expandAll();
@@ -275,6 +294,7 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
      * 
      * Here: test method taking the event
      */
+    @Test
     public void testEditCellAtByKeyEvent() {
         JXTreeTable treeTable = prepareTreeTable(true);
         treeTable.expandAll();
@@ -290,6 +310,7 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
      * 
      * Here: compare with plain table (in fact plain DefaultCellEditor)
      */
+    @Test
     public void testTableEditCellAtByKeyEvent() {
         JXTable table = new JXTable(10, 20);
         // sanity
@@ -311,6 +332,7 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
      * @throws InvocationTargetException 
      * @throws InterruptedException 
      */
+    @Test
     public void testTableEventOnSetNullRoot() throws InterruptedException, InvocationTargetException {
         TreeTableModel model = createCustomTreeTableModelFromDefault();
         final JXTreeTable table = new JXTreeTable(model);
@@ -341,6 +363,7 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
      * @throws InvocationTargetException 
      * @throws InterruptedException 
      */
+    @Test
     public void testTableEventOnSetRoot() throws InterruptedException, InvocationTargetException {
         TreeTableModel model = createCustomTreeTableModelFromDefault();
         final JXTreeTable table = new JXTreeTable(model);
@@ -371,6 +394,7 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
      * @throws InvocationTargetException 
      * @throws InterruptedException 
      */
+    @Test
     public void testTableEventOnReloadNonRoot() throws InterruptedException, InvocationTargetException {
         DefaultTreeTableModel model = new DefaultTreeTableModel(
                 (TreeTableNode) createCustomTreeTableModelFromDefault().getRoot()) {
@@ -415,6 +439,7 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
      * @throws InvocationTargetException 
      * @throws InterruptedException 
      */
+    @Test
     public void testTableEventOnSetModel() throws InterruptedException, InvocationTargetException {
         TreeTableModel model = createCustomTreeTableModelFromDefault();
         final JXTreeTable table = new JXTreeTable(model);
@@ -438,6 +463,7 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
      * Issue #531-swingx: IllegalArgumentException on setModel.
      *
      */
+    @Test
     public void testSetModel() {
         TreeTableModel model = createCustomTreeTableModelFromDefault();
         JXTreeTable treeTable = new JXTreeTable(model);
@@ -449,6 +475,7 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
      * Issue #531-swingx: IllegalArgumentException on setModel.
      *
      */
+    @Test
     public void testSetModelOnTree() {
         TreeTableModel model = createCustomTreeTableModelFromDefault();
         JXTree treeTable = new JXTree(model);
@@ -459,6 +486,7 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
      * Issue #531-swingx: IllegalArgumentException on setModel.
      *
      */
+    @Test
     public void testSetModelEmptyContructor() {
         JXTreeTable treeTable = new JXTreeTable();
         treeTable.setRootVisible(true);
@@ -475,6 +503,7 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
      * @throws InvocationTargetException 
      * @throws InterruptedException 
      */
+    @Test
     public void testTableEventUpdateOnTreeTableModelSetValue() throws InterruptedException, InvocationTargetException {
         TreeTableModel model = createCustomTreeTableModelFromDefault();
         final JXTreeTable table = new JXTreeTable(model);
@@ -507,6 +536,7 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
      * @throws InvocationTargetException 
      * @throws InterruptedException 
      */
+    @Test
     public void testTableEventDeleteOnTreeTableModel() throws InterruptedException, InvocationTargetException {
         TreeTableModel model = createCustomTreeTableModelFromDefault();
         MutableTreeTableNode root = (MutableTreeTableNode) model.getRoot();
@@ -549,6 +579,7 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
      * @throws InvocationTargetException 
      * @throws InterruptedException 
      */
+    @Test
     public void testTableEventUpdateOnTreeTableSetValue() throws InterruptedException, InvocationTargetException {
         TreeTableModel model = createCustomTreeTableModelFromDefault();
         final JXTreeTable table = new JXTreeTable(model);
@@ -577,6 +608,7 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
     /**
      * Issue #465-swingx: NPE if editing node with null icon.
      */
+    @Test
     public void testNPEEditingNullIcon() {
         JXTreeTable treeTable = new JXTreeTable(new ComponentTreeTableModel(new JXErrorPane()));
         treeTable.setEditable(true);
@@ -592,6 +624,7 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
      * Issue #??-swingx: ComponentAdapter not fully implemented - leaf always true.
      *
      */
+    @Test
     public void testComponentAdapterIsLeaf() {
         // build the test treeTableModel
         JPanel root = new JPanel();
@@ -627,6 +660,7 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
      * Issue #??-swingx: ComponentAdapter not fully implemented - expanded always true.
      *
      */
+    @Test
     public void testComponentAdapterIsExpanded() {
         // build the test treeTableModel
         JPanel root = new JPanel();
@@ -662,6 +696,7 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
      * 0/1 if hiding/showing grid lines. 
      *
      */
+    @Test
     public void testShowGrid() {
         JXTreeTable table = new JXTreeTable(simpleTreeTableModel);
         // sanity: initial margins are (0, 0), grid off
@@ -685,6 +720,7 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
      * Don't know how to test mouse-triggered collapse/expand, "looked"
      * at it in the visualCheck. 
      */
+    @Test
     public void testEditOnCollapse() {
         DefaultMutableTreeTableNode root = new DefaultMutableTreeTableNode("ROOT");
         DefaultMutableTreeTableNode a = new DefaultMutableTreeTableNode("A");
@@ -738,6 +774,7 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
      * Issue #399-swingx: editing terminated by selecting editing row.<p>
      * Assert workaround: setExpandsSelectedPaths(false)
      */
+    @Test
     public void testSelectionKeepsEditingWithExpandsFalse() {
         JXTreeTable treeTable = new JXTreeTable(new FileSystemModel()) {
 
@@ -764,6 +801,7 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
      * 
      * starting from unselected, the event count is 1 as expected 
      */
+    @Test
     public void testSelectionEvents() {
         JXTreeTable treeTable = prepareTreeTable(false);
         TreeSelectionReport report = new TreeSelectionReport();
@@ -780,6 +818,7 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
      * catching isAdjusting listSelectionEvents. The reason is 
      * an intermediate clearSelection which fires the additional.
      */
+    @Test
     public void testSelectionChangedEvents() {
         JXTreeTable treeTable = prepareTreeTable(true);
         TreeSelectionReport report = new TreeSelectionReport();
@@ -793,6 +832,7 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
      * 
      * The old in the event must be the last selected. 
      */
+    @Test
     public void testSelectionChangedHasFirstOldPath() {
         JXTreeTable treeTable = prepareTreeTable(true);
         TreeSelectionReport report = new TreeSelectionReport();
@@ -829,6 +869,7 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
      * set directly via the treeSelectionModel. Characterize normal
      * treeSelection to mimic.
      */
+    @Test
     public void testSelectionChangedOnTreeSelection() {
         JXTreeTable treeTable = prepareTreeTable(true);
         TreePath oldSelected = treeTable.getPathForRow(0);
@@ -848,6 +889,7 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
      * TreeTableModelAdapter.
      *
      */
+    @Test
     public void testConservativeRowForNodeInAdapter() {
         // for testing we need a model which relies on 
         // node != null
@@ -895,6 +937,7 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
      * test if table and tree rowHeights are the same.
      *
      */
+    @Test
     public void testAdjustedRowHeights() {
         JXTreeTable treeTable = new JXTreeTable(simpleTreeTableModel);
         JXTree tree = (JXTree) treeTable.getCellRenderer(0, 0);
@@ -915,6 +958,7 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
      * #321-swingx: missing tree property toggleClickCount, largeModel.
      *
      */
+    @Test
     public void testToggleClickCount() {
         JXTreeTable treeTable = new JXTreeTable(simpleTreeTableModel);
         int clickCount = treeTable.getToggleClickCount();
@@ -935,6 +979,7 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
      * testing auto-detection of dragHackEnabled.
      * 
      */
+    @Test
     public void testDragHackFlagOn() {
         JXTreeTable treeTable = new JXTreeTable(simpleTreeTableModel);
         assertNull(treeTable.getClientProperty(JXTreeTable.DRAG_HACK_FLAG_KEY));
@@ -950,6 +995,7 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
      * testing auto-detection of dragHackEnabled.
      * 
      */
+    @Test
     public void testDragHackFlagOff() {
         System.setProperty("sun.swing.enableImprovedDragGesture", "true");
         JXTreeTable treeTable = new JXTreeTable(simpleTreeTableModel);
@@ -970,6 +1016,7 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
      * is a missing visual update of the table.
      *
      */
+    @Test
     public void testEmptyModelInitiallyInvisibleRoot() {
         final DefaultMutableTreeTableNode root = new DefaultMutableTreeTableNode();
         final InsertTreeTableModel model = new InsertTreeTableModel(root);
@@ -1001,6 +1048,7 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
      * @throws InterruptedException 
      * 
      */
+    @Test
     public void testInsertUnderCollapsedNode() throws InterruptedException, InvocationTargetException {
         final DefaultMutableTreeTableNode root = new DefaultMutableTreeTableNode();
         final InsertTreeTableModel model = new InsertTreeTableModel(root);
@@ -1071,6 +1119,7 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
      * 
      *
      */
+    @Test
     public void testTreeTableModelIsBoundProperty() {
         JXTreeTable treeTable = new JXTreeTable();
         PropertyChangeReport report = new PropertyChangeReport();
@@ -1092,6 +1141,7 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
      * sanity test (make sure nothing evil introduced in treeTable as 
      * compared to table)
      */
+    @Test
     public void testRemoveAllColumsAfterModelChanged() {
         JXTreeTable table = new JXTreeTable(new FileSystemModel());
         TableColumnExt columnX = table.getColumnExt(1);
@@ -1108,6 +1158,7 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
      * Issue #241: treeModelListeners not removed.
      *
      */
+    @Test
     public void testRemoveListeners() {
         JXTreeTable treeTable = new JXTreeTable(treeTableModel);
         treeTable.setTreeTableModel(new FileSystemModel());
@@ -1117,6 +1168,7 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
     /**
      * Clarify contract of isHierarchical.
      */
+    @Test
     public void testIsHierarchical() {
         TreeTableModel model = new DefaultTreeTableModel();
         //sanity
@@ -1133,6 +1185,7 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
         }
     }
     
+    @Test
     public void testRowForPath() {
         JXTreeTable treeTable = new JXTreeTable(simpleTreeTableModel);
         // @todo - make sure we find an expandible row instead of hardcoding
@@ -1149,12 +1202,14 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
         
     }
     
+    @Test
     public void testPathForRowContract() {
         JXTreeTable treeTable = new JXTreeTable(treeTableModel);
         assertNull("row < 0 must return null path", treeTable.getPathForRow(-1));
         assertNull("row >= getRowCount must return null path", treeTable.getPathForRow(treeTable.getRowCount()));
     }
     
+    @Test
     public void testTableRowAtNegativePoint() {
         JXTable treeTable = new JXTable(1, 4);
         int negativeYRowHeight = - treeTable.getRowHeight();
@@ -1170,6 +1225,7 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
     }
 
 
+    @Test
     public void testPathForLocationContract() {
         JXTreeTable treeTable = new JXTreeTable(treeTableModel);
         // this is actually a JTable rowAtPoint bug: falsely calculates
@@ -1190,6 +1246,7 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
      * Issue #151: renderer properties ignored after setting treeTableModel.
      * 
      */
+    @Test
     public void testRendererProperties() {
         JXTreeTable treeTable = new JXTreeTable(treeTableModel);
         // storing negates of properties
@@ -1227,6 +1284,7 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
      * Issue #148: line style client property not respected by renderer.
      * 
      */
+    @Test
     public void testLineStyle() {
         JXTreeTable treeTable = new JXTreeTable(treeTableModel);
         String propertyName = "JTree.lineStyle";
@@ -1240,6 +1298,7 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
      * sanity test: arbitrary client properties not passed to renderer.
      * 
      */
+    @Test
     public void testArbitraryClientProperty() {
         JXTreeTable treeTable = new JXTreeTable(treeTableModel);
         String propertyName = "someproperty";
@@ -1296,7 +1355,8 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
 
     // ------------------ init
     @Override
-    protected void setUp() throws Exception {
+    @Before
+    public void setUp() throws Exception {
         super.setUp();
         simpleTreeTableModel = getDefaultTreeTableModel();
         this.treeTableModel = new FileSystemModel();

@@ -3,7 +3,7 @@
 		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 	<groupId>org.swinglabs</groupId>
-	<artifactId>swingx-project</artifactId>
+	<artifactId>swingx</artifactId>
     <packaging>jar</packaging>
 	<name>SwingX Main Project</name>
 	<version>0.9.5-SNAPSHOT</version>
@@ -49,19 +49,6 @@
           <source>1.5</source>
           <target>1.5</target>
         </configuration>
-        <!--executions>
-          <execution>
-            <id>compile-tests</id>
-            <phase>process-test-sources</phase>
-            <goals>
-              <goal>testCompile</goal>
-            </goals>
-            <configuration>
-              <source>1.5</source>
-              <target>1.5</target>
-            </configuration>
-          </execution>
-        </executions-->
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -79,27 +66,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
-        <!--executions>
-          <execution>
-            <goals>
-              <goal>test-jar</goal>
-            </goals>
-          </execution>
-        </executions-->
       </plugin>
-      <!--plugin>      
-        <groupId>emma</groupId>
-        <artifactId>maven-emma-plugin</artifactId>
-        <version>0.5</version>
-        <inherited>true</inherited>          
-        <executions>
-          <execution>                
-            <goals>
-              <goal>instr</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin-->
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>emma-maven-plugin</artifactId>
@@ -133,18 +100,24 @@
             <artifactId>multiplegradientpaint</artifactId>
             <version>1.0</version>
             <scope>compile</scope>
-        </dependency>    
+        </dependency> 
 		<dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.4</version>
+            <version>4.5</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>jmock</groupId>
             <artifactId>jmock</artifactId>
-            <version>1.1.0</version>
+            <version>1.2.0</version>
             <scope>test</scope>
+            <exclusions>
+              <exclusion>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+              </exclusion>
+            </exclusions>
         </dependency>
         <!-- Preferably we should use this jmock configuration with junit 4 -->
         <!--dependency>
