@@ -500,7 +500,7 @@ public class HighlighterTest extends TestCase {
         assertNotSame(color.getRGB(), h.getBackground().getRGB());
         // can be generic grey as well (as per HighLighterFactory treatment of cases with no LAF defined)
         boolean found = h.getBackground().equals( uiColor) || h.getBackground().equals(HighlighterFactory.GENERIC_GRAY);
-        assertTrue("Failed to locate the background color after updateUI.", found);
+        assertTrue("Found " + h.getBackground() + " while expected " + uiColor, found);
     }
 
     
