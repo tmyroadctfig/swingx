@@ -28,12 +28,17 @@ import org.jdesktop.swingx.renderer.DefaultTreeRenderer;
 import org.jdesktop.test.AncientSwingTeam;
 
 
-public class HighlighterIssues extends HighlighterTest {
+public class HighlighterIssues extends org.jdesktop.swingx.InteractiveTestCase {
     private static final Logger LOG = Logger.getLogger(HighlighterIssues.class
             .getName());
     
     protected Color ledger = new Color(0xF5, 0xFF, 0xF5);
-//    protected boolean systemLF;
+    protected Color background = Color.RED;
+    protected Color foreground = Color.BLUE;
+
+    protected ColorHighlighter emptyHighlighter;
+    // flag used in setup to explicitly choose LF
+    protected boolean defaultToSystemLF;
     
     public static void main(String args[]) {
 //        setSystemLF(true);

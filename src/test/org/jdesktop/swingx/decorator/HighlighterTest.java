@@ -21,6 +21,8 @@ import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.plaf.ColorUIResource;
 
+import junit.framework.TestCase;
+
 import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.decorator.HighlighterFactory.UIColorHighlighter;
 import org.jdesktop.swingx.painter.AbstractAreaPainter;
@@ -32,8 +34,8 @@ import org.jdesktop.test.ChangeReport;
 import org.jdesktop.test.PropertyChangeReport;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.internal.runners.JUnit4ClassRunner;
 import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
 /**
  * 
@@ -41,8 +43,8 @@ import org.junit.runner.RunWith;
  * 
  * @author Jeanette Winzenburg
  */
-@RunWith(JUnit4ClassRunner.class)
-public class HighlighterTest extends InteractiveTestCase {
+@RunWith(JUnit4.class)
+public class HighlighterTest extends TestCase {
     private static final Logger LOG = Logger.getLogger(HighlighterTest.class
             .getName());
     
@@ -89,7 +91,7 @@ public class HighlighterTest extends InteractiveTestCase {
         emptyHighlighter = new ColorHighlighter();
         // make sure we have the same default for each test
         defaultToSystemLF = false;
-        setSystemLF(defaultToSystemLF);
+        InteractiveTestCase.setSystemLF(defaultToSystemLF);
     }
 
 //-------------------PainterHighlighter
@@ -498,7 +500,7 @@ public class HighlighterTest extends InteractiveTestCase {
         assertNotSame(color.getRGB(), h.getBackground().getRGB());
         // can be generic grey as well (as per HighLighterFactory treatment of cases with no LAF defined)
         boolean found = h.getBackground().equals( uiColor) || h.getBackground().equals(HighlighterFactory.GENERIC_GRAY);
-        assertTrue(found);
+        assertTrue("Failed to locate the background color after updateUI.", found);
     }
 
     
