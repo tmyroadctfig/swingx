@@ -87,8 +87,8 @@ import org.jdesktop.test.TestUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.internal.runners.JUnit4ClassRunner;
 import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
 /**
 * Tests of <code>JXTable</code>.
@@ -96,7 +96,7 @@ import org.junit.runner.RunWith;
 * 
 * @author Jeanette Winzenburg
 */
-@RunWith(JUnit4ClassRunner.class)
+@RunWith(JUnit4.class)
 public class JXTableUnitTest extends InteractiveTestCase {
     private static final Logger LOG = Logger.getLogger(JXTableUnitTest.class
             .getName());

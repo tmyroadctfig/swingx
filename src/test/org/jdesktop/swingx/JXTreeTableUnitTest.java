@@ -60,10 +60,10 @@ import org.jdesktop.test.TableModelReport;
 import org.jdesktop.test.TreeSelectionReport;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.internal.runners.JUnit4ClassRunner;
 import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
-@RunWith(JUnit4ClassRunner.class)
+@RunWith(JUnit4.class)
 public class JXTreeTableUnitTest extends InteractiveTestCase {
     @SuppressWarnings ("unused")
     private static final Logger LOG = Logger
