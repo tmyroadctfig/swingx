@@ -17,6 +17,8 @@ import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.UIManager;
 
+import junit.framework.TestCase;
+
 import org.jdesktop.swingx.icon.EmptyIcon;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 import org.jdesktop.swingx.plaf.metal.MetalLookAndFeelAddons;
@@ -26,15 +28,8 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 @RunWith(JUnit4.class)
-public class JXTaskPaneTest extends InteractiveTestCase {
+public class JXTaskPaneTest extends TestCase {
 
-  public JXTaskPaneTest(String testTitle) {
-    super(testTitle);
-  }
-
-  public JXTaskPaneTest() {
-      super(JXTaskPaneTest.class.getName());
-    }
   @Test
   public void testBean() throws Exception {
     PropertyChangeReport report = new PropertyChangeReport();
