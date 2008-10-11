@@ -64,7 +64,7 @@ public class AutoCompleteDocument implements StyledDocument {
     
     ObjectToStringConverter stringConverter;
     
-    private Document delegate;
+    protected final Document delegate;
     
     /**
      * Creates a new AutoCompleteDocument for the given AbstractAutoCompleteAdaptor.
@@ -84,8 +84,8 @@ public class AutoCompleteDocument implements StyledDocument {
         
         // Handle initially selected object
         Object selected = adaptor.getSelectedItem();
-        if (selected!=null) setText(stringConverter.getPreferredStringForItem(selected));
-        adaptor.markEntireText();
+        if (selected!=null) setText(this.stringConverter.getPreferredStringForItem(selected));
+        this.adaptor.markEntireText();
     }
     
     
