@@ -23,13 +23,22 @@ package org.jdesktop.swingx.renderer;
 
 import java.io.File;
 
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
+
+
 import junit.framework.TestCase;
 
 /**
  *
  * @author Karl George Schaefer
  */
+@RunWith(JUnit4.class)
 public class StringValuesTest extends TestCase {
+    @Test
     public void testFileNameWithNonFile() {
         Object o = new Object();
         
@@ -38,6 +47,7 @@ public class StringValuesTest extends TestCase {
     }
     
     //not asserting the output of file name just that it isn't empty
+    @Test
     public void testFileNameWithFile() throws Exception {
         File f = File.createTempFile("svt", "tmp");
         f.deleteOnExit();
@@ -46,6 +56,7 @@ public class StringValuesTest extends TestCase {
                 StringValues.FILE_NAME.getString(f));
     }
     
+    @Test
     public void testFileTypeWithNonFile() {
         Object o = new Object();
         
@@ -54,6 +65,7 @@ public class StringValuesTest extends TestCase {
     }
     
     //not asserting the output of file type just that it isn't empty
+    @Test
     public void testFileTypeWithFile() throws Exception {
         File f = File.createTempFile("svt", "tmp");
         f.deleteOnExit();

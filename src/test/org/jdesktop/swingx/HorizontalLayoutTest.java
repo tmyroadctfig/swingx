@@ -8,16 +8,25 @@ import java.awt.Dimension;
 
 import javax.swing.JPanel;
 
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
+
+
 import junit.framework.TestCase;
 
 /**
  *
  * @author Karl George Schaefer
  */
+@RunWith(JUnit4.class)
 public class HorizontalLayoutTest extends TestCase {
     /**
      * SwingX Issue #666: incorrect calculation of preferred size.
      */
+    @Test
     public void testLayout() {
         JPanel panel = new JPanel(new HorizontalLayout());
         

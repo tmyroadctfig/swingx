@@ -30,10 +30,17 @@ import java.io.Serializable;
 import junit.framework.TestCase;
 
 import org.jdesktop.test.SerializableSupport;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
+
 
 /**
  * @author <a href="mailto:jesse@swank.ca">Jesse Wilson</a>
  */
+@RunWith(JUnit4.class)
 public class AbstractSerializableBeanTest extends TestCase {
     private static class ShoeSizeCap implements VetoableChangeListener, Serializable {
         public void vetoableChange(PropertyChangeEvent event) throws PropertyVetoException {
@@ -76,6 +83,7 @@ public class AbstractSerializableBeanTest extends TestCase {
         }
     }
 
+    @Test
     public void testShoeSerialize() throws Exception {
 
         Shoe leftShoe = new Shoe();

@@ -16,6 +16,12 @@ import junit.framework.TestCase;
 import org.jdesktop.swingx.hyperlink.LinkAction;
 import org.jdesktop.swingx.plaf.basic.BasicHyperlinkUI.BasicHyperlinkListener;
 import org.jdesktop.test.PropertyChangeReport;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
+
 
 /**
  * Test of JXHyperlink. Raw usage and as hyperlinkRenderer.
@@ -23,6 +29,7 @@ import org.jdesktop.test.PropertyChangeReport;
  * 
  * @author Jeanette Winzenburg
  */
+@RunWith(JUnit4.class)
 public class JXHyperlinkTest extends TestCase {
     @SuppressWarnings("all")
     private static final Logger LOG = Logger.getLogger(JXHyperlinkTest.class
@@ -30,6 +37,17 @@ public class JXHyperlinkTest extends TestCase {
     
     private PropertyChangeReport report;
 
+    @Before
+    public void setUpJ4() throws Exception {
+        setUp();
+    }
+    
+    @After
+    public void tearDownJ4() throws Exception {
+        tearDown();
+    }
+    
+    @Test
     public void testHyperlinkButtonListener() {
         JXHyperlink hyperlink = new JXHyperlink();
         MouseListener[] listeners = hyperlink.getMouseListeners();
@@ -46,6 +64,7 @@ public class JXHyperlinkTest extends TestCase {
      * 
      *
      */
+    @Test
     public void testAutoClicked() {
        // no action 
        JXHyperlink hyperlink = new JXHyperlink();
@@ -67,6 +86,7 @@ public class JXHyperlinkTest extends TestCase {
        
     }
     
+    @Test
     public void testOverrulesActionOnClick() {
         JXHyperlink hyperlink = new JXHyperlink();
         assertFalse(hyperlink.getOverrulesActionOnClick());
@@ -80,6 +100,7 @@ public class JXHyperlinkTest extends TestCase {
      * guarantee that hyperlink is updated as expected.
      *
      */
+    @Test
     public void testLinkActionSetTarget() {
         LinkAction<Object> linkAction = createEmptyLinkAction();
         linkAction.setVisited(true);
@@ -93,6 +114,7 @@ public class JXHyperlinkTest extends TestCase {
      * test that hyperlink.setClicked doesn't change action.isVisited();
      *
      */
+    @Test
     public void testSetClickedActionUnchanged() {
         LinkAction<Object> linkAction = createEmptyLinkAction();
         linkAction.setVisited(true);
@@ -108,6 +130,7 @@ public class JXHyperlinkTest extends TestCase {
      * test hyperlink's clicked property.
      *
      */
+    @Test
     public void testClicked() {
         JXHyperlink hyperlink = new JXHyperlink();
         boolean isClicked = hyperlink.isClicked();
@@ -123,6 +146,7 @@ public class JXHyperlinkTest extends TestCase {
      * Was NPE in configureFromAction
      *
      */
+    @Test
     public void testInitNullAction() {
         JXHyperlink hyperlink = new JXHyperlink();
         assertNull(hyperlink.getAction());
@@ -135,6 +159,7 @@ public class JXHyperlinkTest extends TestCase {
      * Was NPE in configureFromAction
      *
      */
+    @Test
     public void testSetNullAction() {
         LinkAction action = createEmptyLinkAction();
         JXHyperlink hyperlink = new JXHyperlink(action);
@@ -148,6 +173,7 @@ public class JXHyperlinkTest extends TestCase {
      * Was NPE in configureFromAction
      *
      */
+    @Test
     public void testSetAction() {
         JXHyperlink hyperlink = new JXHyperlink();
         LinkAction action = createEmptyLinkAction();
@@ -161,6 +187,7 @@ public class JXHyperlinkTest extends TestCase {
      * to LinkAction.
      *
      */
+    @Test
     public void testListeningVisited() {
        LinkAction<Object> linkAction = createEmptyLinkAction();
        JXHyperlink hyperlink = new JXHyperlink(linkAction);
@@ -179,6 +206,7 @@ public class JXHyperlinkTest extends TestCase {
      * Solved by chaining.
      * 
      */
+    @Test
     public void testInitialVisitedSynched() {
         LinkAction<Object> linkAction = createEmptyLinkAction();
        linkAction.setVisited(true);

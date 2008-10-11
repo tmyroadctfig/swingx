@@ -29,12 +29,19 @@ import java.util.TimeZone;
 import java.util.logging.Logger;
 
 import org.jdesktop.swingx.InteractiveTestCase;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
+
 
 /**
  * Tests CalendarUtils.
  * 
  * @author Jeanette Winzenburg
  */
+@RunWith(JUnit4.class)
 public class CalendarUtilsTest extends InteractiveTestCase {
     @SuppressWarnings("unused")
     private static final Logger LOG = Logger.getLogger(CalendarUtilsTest.class
@@ -46,6 +53,17 @@ public class CalendarUtilsTest extends InteractiveTestCase {
     private Calendar todayUS;
     private Calendar midJune;
 
+    @Before
+    public void setUpJ4() throws Exception {
+        setUp();
+    }
+    
+    @After
+    public void tearDownJ4() throws Exception {
+        tearDown();
+    }
+    
+    @Test
     public void testWeekOfYearInFeb() {
         todayGerman.set(2008, Calendar.FEBRUARY, 1);
         Date firstOfFeb = todayGerman.getTime();
@@ -64,6 +82,7 @@ public class CalendarUtilsTest extends InteractiveTestCase {
      * test to characterize startofweek behaviour is we are in a 
      * calendar with minimalDays > 1.
      */
+    @Test
     public void testWeekOfYearInDecember() {
         // a date before the first week of the month
         todayGerman.set(2007, Calendar.DECEMBER, 1);
@@ -80,6 +99,7 @@ public class CalendarUtilsTest extends InteractiveTestCase {
      * test to characterize startofweek behaviour is we are in a 
      * calendar with minimalDays > 1.
      */
+    @Test
     public void testStartOfWeekBeforeFirstWeekOfMonth() {
         // a date before the first week of the month
         todayGerman.set(2008, Calendar.FEBRUARY, 1);
@@ -92,6 +112,7 @@ public class CalendarUtilsTest extends InteractiveTestCase {
      * test to characterize startofweek behaviour is we are in a 
      * calendar with minimalDays > 1.
      */
+    @Test
     public void testStartOfWeekBeforeFirstWeekOfYear() {
         // a date before the first week of the year
         todayGerman.set(2010, Calendar.JANUARY, 1);
@@ -101,6 +122,7 @@ public class CalendarUtilsTest extends InteractiveTestCase {
         assertEquals(Calendar.DECEMBER, todayGerman.get(Calendar.MONTH));
     }
     
+    @Test
     public void testSameDay() {
         Date now = todayGerman.getTime();
         CalendarUtils.endOfDay(todayGerman);
@@ -111,6 +133,7 @@ public class CalendarUtilsTest extends InteractiveTestCase {
         assertFalse(CalendarUtils.isSameDay(todayGerman, now));
     }
     
+    @Test
     public void testAreEqual() {
         assertTrue(CalendarUtils.areEqual(null, null));
         Calendar calendar = Calendar.getInstance();
@@ -121,6 +144,7 @@ public class CalendarUtilsTest extends InteractiveTestCase {
         calendar.add(Calendar.HOUR_OF_DAY, 1);
         assertFalse(CalendarUtils.areEqual(now, calendar.getTime()));
     }
+    @Test
     public void testIsStartOfWeek() {
         CalendarUtils.startOfWeek(midJune);
         assertTrue(CalendarUtils.isStartOfWeek(midJune));
@@ -132,6 +156,7 @@ public class CalendarUtilsTest extends InteractiveTestCase {
  
     /**
      */
+    @Test
     public void testIsEndOfWeek() {
         CalendarUtils.endOfWeek(midJune);
         assertTrue(CalendarUtils.isEndOfWeek(midJune));
@@ -143,6 +168,7 @@ public class CalendarUtilsTest extends InteractiveTestCase {
 
     /**
      */
+    @Test
     public void testEndOfWeek() {
         int week = midJune.get(Calendar.WEEK_OF_YEAR);
         CalendarUtils.endOfWeek(midJune);
@@ -153,6 +179,7 @@ public class CalendarUtilsTest extends InteractiveTestCase {
 
     /**
      */
+    @Test
     public void testEndOfWeekWithReturn() {
         Date date = midJune.getTime();
         Date start = CalendarUtils.endOfWeek(midJune, date);
@@ -161,6 +188,7 @@ public class CalendarUtilsTest extends InteractiveTestCase {
     }
     /**
      */
+    @Test
     public void testStartOfWeekWithReturn() {
         Date date = midJune.getTime();
         Date start = CalendarUtils.startOfWeek(midJune, date);
@@ -168,6 +196,7 @@ public class CalendarUtilsTest extends InteractiveTestCase {
         assertEquals(start, midJune.getTime());
     }
 
+    @Test
     public void testStartOfWeekFromMiddle() {
         int day = Calendar.WEDNESDAY;
         todayGerman.set(Calendar.DAY_OF_WEEK, day);
@@ -177,6 +206,7 @@ public class CalendarUtilsTest extends InteractiveTestCase {
         assertEquals(todayGerman.getFirstDayOfWeek(), todayGerman.get(Calendar.DAY_OF_WEEK));
     }
     
+    @Test
     public void testStartOfWeekFromFirst() {
         todayGerman.set(Calendar.DAY_OF_WEEK, todayGerman.getFirstDayOfWeek());
         int week = todayGerman.get(Calendar.WEEK_OF_YEAR);
@@ -185,6 +215,7 @@ public class CalendarUtilsTest extends InteractiveTestCase {
         assertEquals(todayGerman.getFirstDayOfWeek(), todayGerman.get(Calendar.DAY_OF_WEEK));
     }
     
+    @Test
     public void testStartOfWeekFromLast() {
         todayGerman.set(Calendar.DAY_OF_WEEK, todayGerman.getFirstDayOfWeek());
         int week = todayGerman.get(Calendar.WEEK_OF_YEAR);
@@ -196,6 +227,7 @@ public class CalendarUtilsTest extends InteractiveTestCase {
         assertEquals(todayGerman.getFirstDayOfWeek(), todayGerman.get(Calendar.DAY_OF_WEEK));
     }
     
+    @Test
     public void testStartOfWeekFromFirstJan() {
         todayGerman.set(Calendar.MONTH, Calendar.JANUARY);
         todayGerman.set(Calendar.DATE, 1);
@@ -208,6 +240,7 @@ public class CalendarUtilsTest extends InteractiveTestCase {
         assertEquals(todayGerman.getFirstDayOfWeek(), todayGerman.get(Calendar.DAY_OF_WEEK));
     }
     
+    @Test
     public void testStartOfWeekUS() {
         int day = Calendar.WEDNESDAY;
         assertFalse(day == todayUS.getFirstDayOfWeek());
@@ -217,6 +250,7 @@ public class CalendarUtilsTest extends InteractiveTestCase {
     }
     
     
+    @Test
     public void testIsStartOfMonth() {
         // want to be in the middle of a year
         int month = 5;
@@ -231,6 +265,7 @@ public class CalendarUtilsTest extends InteractiveTestCase {
     }
     
     
+    @Test
     public void testIsEndOfMonth() {
         // want to be in the middle of a year
         int month = 5;
@@ -244,6 +279,7 @@ public class CalendarUtilsTest extends InteractiveTestCase {
         // sanity: calendar must not be changed
     }
     
+    @Test
     public void testEndOfMonth() {
         // want to be in the middle of a year
         int month = midJune.get(Calendar.MONTH);
@@ -253,6 +289,7 @@ public class CalendarUtilsTest extends InteractiveTestCase {
         assertEquals(month + 1, midJune.get(Calendar.MONTH));
     }
 
+    @Test
     public void testStartOfMonth() {
         // want to be in the middle of a year
         int month = midJune.get(Calendar.MONTH);
@@ -262,6 +299,7 @@ public class CalendarUtilsTest extends InteractiveTestCase {
         assertEquals(month - 1, midJune.get(Calendar.MONTH));
     }
     
+    @Test
     public void testEndOfDay() {
         // want to be in the middle of a month
         int day = midJune.get(Calendar.DAY_OF_MONTH);
@@ -271,6 +309,7 @@ public class CalendarUtilsTest extends InteractiveTestCase {
         assertEquals(day + 1, midJune.get(Calendar.DATE));
     }
 
+    @Test
     public void testEndOfDayWithReturn() {
         Date date = midJune.getTime();
         Date start = CalendarUtils.endOfDay(midJune, date);
@@ -278,6 +317,7 @@ public class CalendarUtilsTest extends InteractiveTestCase {
         assertEquals(start, midJune.getTime());
     }
     
+    @Test
     public void testStartOfDay() {
         // want to be in the middle of a month
         int day = midJune.get(Calendar.DAY_OF_MONTH);
@@ -287,6 +327,7 @@ public class CalendarUtilsTest extends InteractiveTestCase {
         assertEquals(day - 1, midJune.get(Calendar.DATE));
     }
 
+    @Test
     public void testStartOfDayWithReturn() {
         Date date = midJune.getTime();
         Date start = CalendarUtils.startOfDay(midJune, date);
@@ -294,6 +335,7 @@ public class CalendarUtilsTest extends InteractiveTestCase {
         assertEquals(start, midJune.getTime());
     }
     
+    @Test
     public void testStartOfDayUnique() {
         Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT+0"));
         CalendarUtils.startOfMonth(calendar);
@@ -310,6 +352,7 @@ public class CalendarUtilsTest extends InteractiveTestCase {
         }
     }
 
+    @Test
     public void testStartOfMonthUnique() {
         Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT+0"));
         CalendarUtils.startOfMonth(calendar);
@@ -328,6 +371,7 @@ public class CalendarUtilsTest extends InteractiveTestCase {
     /**
      * sanity ...
      */
+    @Test
     public void testNextMonthCal() {
         todayGerman.set(Calendar.MONTH, Calendar.JANUARY);
         Date date = todayGerman.getTime();
@@ -349,6 +393,7 @@ public class CalendarUtilsTest extends InteractiveTestCase {
         }
     }
     
+    @Test
     public void testNextMonth() {
         todayGerman.set(Calendar.MONTH, Calendar.JANUARY);
         todayGerman.set(Calendar.DATE, 31);

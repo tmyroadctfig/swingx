@@ -30,12 +30,19 @@ import javax.swing.table.TableColumn;
 
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.table.TableColumnExt;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
+
 
 /**
  * Test JXTable as HighlighterClient.
  * 
  * @author Jeanette Winzenburg
  */
+@RunWith(JUnit4.class)
 public class TableAsHighlighterClientTest extends AbstractTestHighlighterClient {
     @SuppressWarnings("unused")
     private static final Logger LOG = Logger
@@ -44,6 +51,7 @@ public class TableAsHighlighterClientTest extends AbstractTestHighlighterClient 
     /**
      * Test that columnHighlighters are updated.
      */
+    @Test
     public void testUpdateUIColumnHighlighters() {
         // force loading of striping colors
         ColorHighlighter colorHighlighter = (ColorHighlighter) HighlighterFactory.createSimpleStriping();

@@ -26,18 +26,36 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.jdesktop.swingx.calendar.DateSelectionModel.SelectionMode;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
+
 
 /**
  * Test DaySelectionModel.
  * 
  * @author Jeanette Winzenburg
  */
+@RunWith(JUnit4.class)
 public class DaySelectionModelTest extends AbstractTestDateSelectionModel {
 
 
+    @Before
+    public void setUpJ4() throws Exception {
+        setUp();
+    }
+    
+    @After
+    public void tearDownJ4() throws Exception {
+        tearDown();
+    }
+    
     /**
      * DaySelectionModel normalizes to start of day.
      */
+    @Test
     public void testNormalizedDateStartOfDay() {
         assertEquals(startOfDay(today), model.getNormalizedDate(today));
         assertNotSame(startOfDay(today), model.getNormalizedDate(today));
@@ -47,6 +65,7 @@ public class DaySelectionModelTest extends AbstractTestDateSelectionModel {
     /**
      * setSelectionInterval must throw NPE if given date is null
      */
+    @Test
     public void testSetIntervalNulls() {
         try {
             model.setSelectionInterval(null, null);
@@ -61,6 +80,7 @@ public class DaySelectionModelTest extends AbstractTestDateSelectionModel {
     /**
      * setSelectionInterval must throw NPE if given date is null
      */
+    @Test
     public void testAddIntervalNulls() {
         try {
             model.addSelectionInterval(null, null);
@@ -76,6 +96,7 @@ public class DaySelectionModelTest extends AbstractTestDateSelectionModel {
     /**
      * removeSelectionInterval must throw NPE if given date is null
      */
+    @Test
     public void testRemoveIntervalNulls() {
         try {
             model.removeSelectionInterval(null, null);
@@ -93,6 +114,7 @@ public class DaySelectionModelTest extends AbstractTestDateSelectionModel {
     /**
      * Set unselectable and test that all dates of the day are unselectable.
      */
+    @Test
     public void testUnselectableDatesCompleteDay() {
         SortedSet<Date> unselectableDates = new TreeSet<Date>();
         unselectableDates.add(today);
@@ -115,18 +137,21 @@ public class DaySelectionModelTest extends AbstractTestDateSelectionModel {
      * Issue #494-swingx: JXMonthView changed all passed-in dates
      *
      */
+    @Test
     public void testCleanupCopyDate() {
         Date copy = new Date(today.getTime());
         model.setSelectionInterval(today, today);
         assertEquals("the date used for selection must be unchanged", copy, today);
     }
    
+    @Test
     public void testEmptySelectionInitial() {
         assertTrue(model.isSelectionEmpty());
         SortedSet<Date> selection = model.getSelection();
         assertTrue(selection.isEmpty());
     }
     
+    @Test
     public void testEmptySelectionClear() {
         model.setSelectionInterval(today, today);
         // sanity
@@ -137,6 +162,7 @@ public class DaySelectionModelTest extends AbstractTestDateSelectionModel {
         assertTrue(model.getSelection().isEmpty());
     }
 
+    @Test
     public void testSingleSelection() {
         model.setSelectionMode(SelectionMode.SINGLE_SELECTION);
 
@@ -149,6 +175,7 @@ public class DaySelectionModelTest extends AbstractTestDateSelectionModel {
         assertEquals(startOfDay(today), model.getFirstSelectionDate());
     }
     
+    @Test
     public void testSingleIntervalSelection() {
         model.setSelectionMode(SelectionMode.SINGLE_INTERVAL_SELECTION);
 
@@ -163,10 +190,12 @@ public class DaySelectionModelTest extends AbstractTestDateSelectionModel {
         assertEquals(startOfDay(tomorrow), model.getLastSelectionDate());
     }
 
+    @Test
     public void testWeekIntervalSelection() {
         //TODO...
     }
 
+    @Test
     public void testMultipleIntervalSelection() {
         model.setSelectionMode(SelectionMode.MULTIPLE_INTERVAL_SELECTION);
 

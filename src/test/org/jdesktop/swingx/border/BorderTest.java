@@ -37,24 +37,33 @@ import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.icon.SortArrowIcon;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
+
 
 /**
  * Tests related to SwingX Borders.
  * 
  * @author Jeanette Winzenburg
  */
+@RunWith(JUnit4.class)
 public class BorderTest extends InteractiveTestCase {
 
     /**
      * Issue ??-swingx: IconBorder must handle null icon.
      *
      */
+    @Test
     public void testIconBorderNullIcon() {
         IconBorder border = new IconBorder();
         JLabel label = new JLabel("dummy");
         border.getBorderInsets(label);
     }
     
+    @Test
     public void testIconBorderSetNullIcon() {
         IconBorder border = new IconBorder(new SortArrowIcon(true));
         border.setIcon(null);
@@ -65,6 +74,7 @@ public class BorderTest extends InteractiveTestCase {
      * test new padding api.
      *
      */
+    @Test
     public void testPadding() {
         IconBorder border = new IconBorder(new SortArrowIcon(true));
         int oldPadding = border.getPadding();
@@ -73,6 +83,7 @@ public class BorderTest extends InteractiveTestCase {
         assertEquals(padding, border.getPadding());
     }
     
+    @Test
     public void testNotNegativePadding() {
         IconBorder border = new IconBorder(new SortArrowIcon(true),
                 SwingConstants.EAST, - 10);
@@ -86,6 +97,7 @@ public class BorderTest extends InteractiveTestCase {
      * Was hardcoded to 2*4.
      *
      */
+    @Test
     public void testDefaultPadding() {
         Icon icon = new SortArrowIcon(true);
         IconBorder border = new IconBorder(icon, SwingConstants.WEST);

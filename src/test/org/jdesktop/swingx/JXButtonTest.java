@@ -27,6 +27,13 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
+
+
 import junit.framework.TestCase;
 
 /**
@@ -37,12 +44,14 @@ import junit.framework.TestCase;
  * 
  * @author rah003
  */
+@RunWith(JUnit4.class)
 public class JXButtonTest extends TestCase {
 
     /**
      * Issue #621-swingx: JXButton shares default fg/bg painters between instances.
      *
      */
+    @Test
     public void testNonStaticPainters() {
         JXButton b1 = new JXButton();
         JXButton b2 = new JXButton();

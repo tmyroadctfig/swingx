@@ -29,7 +29,14 @@ import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXDatePicker;
 import org.jdesktop.swingx.treetable.DefaultMutableTreeTableNode;
 import org.jdesktop.test.CellEditorReport;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
 
+
+@RunWith(JUnit4.class)
 public class DatePickerCellEditorTest extends InteractiveTestCase {
     public static void main(String[] args) {
         setSystemLF(true);
@@ -51,6 +58,7 @@ public class DatePickerCellEditorTest extends InteractiveTestCase {
      * 
      *
      */
+    @Test
     public void testDateEditorValueAsDate() throws ParseException  {
         DatePickerCellEditor editor = new DatePickerCellEditor();
         Date input = new Date();
@@ -77,6 +85,7 @@ public class DatePickerCellEditorTest extends InteractiveTestCase {
      * 
      *
      */
+    @Test
     public void testDateEditorFireStopMonthAccept()  {
         DatePickerCellEditor editor = new DatePickerCellEditor();
         final CellEditorReport report = new CellEditorReport();
@@ -93,6 +102,7 @@ public class DatePickerCellEditorTest extends InteractiveTestCase {
      * 
      *
      */
+    @Test
     public void testDateEditorFireStopMonthCancel()  {
         DatePickerCellEditor editor = new DatePickerCellEditor();
         final CellEditorReport report = new CellEditorReport();
@@ -109,6 +119,7 @@ public class DatePickerCellEditorTest extends InteractiveTestCase {
      * @throws ParseException 
      *
      */
+    @Test
     public void testDateEditorFireStopPickerCommit() throws ParseException {
         DatePickerCellEditor editor = new DatePickerCellEditor();
         final CellEditorReport report = new CellEditorReport();
@@ -126,6 +137,7 @@ public class DatePickerCellEditorTest extends InteractiveTestCase {
      * @throws ParseException
      * 
      */
+    @Test
     public void testDateEditorFireCancelPickerCancel() throws ParseException {
         DatePickerCellEditor editor = new DatePickerCellEditor();
         final CellEditorReport report = new CellEditorReport();
@@ -143,6 +155,7 @@ public class DatePickerCellEditorTest extends InteractiveTestCase {
      * BasicDatePickerUI to post action event which triggers
      * stop editing again ... that's twice!
      */
+    @Test
     public void testDateEditorFireStop() {
         DatePickerCellEditor editor = new DatePickerCellEditor();
         CellEditorReport report = new CellEditorReport();
@@ -157,6 +170,7 @@ public class DatePickerCellEditorTest extends InteractiveTestCase {
     * test fire cancel after cancelCellEditing
     *
     */ 
+    @Test
    public void testDateEditorFireCancel() {
         DatePickerCellEditor editor = new DatePickerCellEditor();
         CellEditorReport report = new CellEditorReport();
@@ -171,6 +185,7 @@ public class DatePickerCellEditorTest extends InteractiveTestCase {
       * Editor must not fire on getXXComponent()
       *
       */
+    @Test
      public void testDateEditorNotFire() {
         DatePickerCellEditor editor = new DatePickerCellEditor();
         CellEditorReport report = new CellEditorReport();

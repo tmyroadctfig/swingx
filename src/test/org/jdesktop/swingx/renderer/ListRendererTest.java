@@ -39,6 +39,12 @@ import javax.swing.border.Border;
 import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.test.XTestUtils;
 import org.jdesktop.test.SerializableSupport;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
+
 
 import com.sun.java.swing.plaf.motif.MotifLookAndFeel;
 
@@ -48,6 +54,7 @@ import com.sun.java.swing.plaf.motif.MotifLookAndFeel;
  * 
  * @author Jeanette Winzenburg
  */
+@RunWith(JUnit4.class)
 public class ListRendererTest extends InteractiveTestCase {
 
     private static final Logger LOG = Logger.getLogger(ListRendererTest.class
@@ -60,6 +67,16 @@ public class ListRendererTest extends InteractiveTestCase {
 
     private JList list;
 
+    
+    @Before
+    public void setUpJ4() throws Exception {
+        setUp();
+    }
+    
+    @After
+    public void tearDownJ4() throws Exception {
+        tearDown();
+    }
     
     @Override
     protected void setUp() throws Exception {
@@ -74,6 +91,7 @@ public class ListRendererTest extends InteractiveTestCase {
      * Test constructors: here convenience with alignment and converter
      *
      */
+    @Test
     public void testConstructor() {
         FormatStringValue sv = new FormatStringValue(DateFormat.getTimeInstance());
         int align = JLabel.RIGHT;
@@ -87,6 +105,7 @@ public class ListRendererTest extends InteractiveTestCase {
      * is the same as core default. 
       *
      */
+    @Test
     public void testIcon() {
         Icon icon = XTestUtils.loadDefaultIcon();
         String text = "dummy";
@@ -109,6 +128,7 @@ public class ListRendererTest extends InteractiveTestCase {
      * test serializable of default renderer.
      * 
      */
+    @Test
     public void testSerializeListRenderer() {
         ListCellRenderer xListRenderer = new DefaultListRenderer();
         try {
@@ -122,6 +142,7 @@ public class ListRendererTest extends InteractiveTestCase {
     /**
      * base interaction with list: focused, not-selected uses UI border.
      */
+    @Test
     public void testListFocusSelectedBorder() {
         // sanity to see test test validity
 //        UIManager.put("List.focusSelectedCellHighlightBorder", new LineBorder(Color.red));
@@ -163,6 +184,7 @@ public class ListRendererTest extends InteractiveTestCase {
      * as systemLF? - so backing out early. 
      * Still open: Need to think about the validity of this test anway
      */
+    @Test
     public void testListFocusBorder() {
         if (UIManager.getLookAndFeel() instanceof MotifLookAndFeel) {
             LOG.info("can't run test - MotifLF uses the same focusBorder for list and table");
@@ -192,6 +214,7 @@ public class ListRendererTest extends InteractiveTestCase {
      * table color.
      *
      */
+    @Test
     public void testListRendererExtCustomColor() {
         Color background = Color.MAGENTA;
         Color foreground = Color.YELLOW;
@@ -217,6 +240,7 @@ public class ListRendererTest extends InteractiveTestCase {
      * base interaction with list: renderer uses list's selection color.
      *
      */
+    @Test
     public void testListRendererExtSelectedColors() {
         // select first row
         list.setSelectedIndex(0);
@@ -238,6 +262,7 @@ public class ListRendererTest extends InteractiveTestCase {
      * base interaction with list: renderer uses list's custom selection color.
      *
      */
+    @Test
     public void testListRendererExtListSelectedColors() {
         Color background = Color.MAGENTA;
         Color foreground = Color.YELLOW;
@@ -265,6 +290,7 @@ public class ListRendererTest extends InteractiveTestCase {
      * 
      *
      */
+    @Test
     public void testListRendererExtListColors() {
         Color background = Color.MAGENTA;
         Color foreground = Color.YELLOW;
@@ -290,6 +316,7 @@ public class ListRendererTest extends InteractiveTestCase {
      * 
      *
      */
+    @Test
     public void testListRendererExtColors() {
         // prepare standard
         Component coreComponent = coreListRenderer.getListCellRendererComponent(list, 
@@ -308,6 +335,7 @@ public class ListRendererTest extends InteractiveTestCase {
      * characterize opaqueness of rendering components.
      *
      */
+    @Test
     public void testListOpaqueRenderer() {
         // sanity
         assertFalse(new JLabel().isOpaque());
@@ -319,6 +347,7 @@ public class ListRendererTest extends InteractiveTestCase {
      * base existence/type tests while adding DefaultTableCellRendererExt.
      *
      */
+    @Test
     public void testListRendererExt() {
         DefaultListRenderer renderer = new DefaultListRenderer();
         assertTrue(renderer instanceof ListCellRenderer);

@@ -25,11 +25,19 @@ import java.util.logging.Logger;
 
 import javax.swing.tree.TreeModel;
 
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
+
+
 import junit.framework.TestCase;
 
 /**
  * Unit tests around TreeTableModel and related classes.
  */
+@RunWith(JUnit4.class)
 public class TreeTableModelTest extends TestCase {
     private static final Logger LOG = Logger.getLogger(TreeTableModelTest.class
             .getName());
@@ -37,6 +45,7 @@ public class TreeTableModelTest extends TestCase {
      * Issue #??-swingx: FileSystemModel throws NPE in getChildCount.
      *
      */
+    @Test
     public void testFileSystemModelNPE() {
         TreeModel model = new FileSystemModel();
         Object root = model.getRoot();
@@ -52,6 +61,7 @@ public class TreeTableModelTest extends TestCase {
     /**
      * Issue #??-swingx: SimpleFileSystemModel throws NPE in getChildCount.
      */
+    @Test
     public void testFileSystemModelSimple() {
         SimpleFileSystemModel model = new SimpleFileSystemModel();
         Object root = model.getRoot();
@@ -80,6 +90,7 @@ public class TreeTableModelTest extends TestCase {
      * Here: FileSystemModel.
      * 
      */
+    @Test
     public void testFileSystemTTM() {
         TreeTableModel model = new FileSystemModel();
         assertColumnClassAssignableFromValue(model);

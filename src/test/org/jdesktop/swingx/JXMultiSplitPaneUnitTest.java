@@ -11,6 +11,12 @@ import java.util.Map;
 import junit.framework.TestCase;
 
 import org.jdesktop.swingx.multisplitpane.DefaultSplitPaneModel;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
+
 
 /**
  * Submitted on the forums to test for a bug that was since fixed by Hans
@@ -18,9 +24,20 @@ import org.jdesktop.swingx.multisplitpane.DefaultSplitPaneModel;
  * 
  * @author Bruce Alspaugh
  */
+@RunWith(JUnit4.class)
 public class JXMultiSplitPaneUnitTest extends TestCase {
     private JXMultiSplitPane multiSplitPane;
 
+    @Before
+    public void setUpJ4() throws Exception {
+        setUp();
+    }
+    
+    @After
+    public void tearDownJ4() throws Exception {
+        tearDown();
+    }
+    
     protected void setUp() throws Exception {
         DefaultSplitPaneModel model = new DefaultSplitPaneModel();
         MultiSplitLayout layout = new MultiSplitLayout(model);
@@ -44,6 +61,7 @@ public class JXMultiSplitPaneUnitTest extends TestCase {
         return null;
     }
 
+    @Test
     public final void testLayoutAddRemoveComponent() {
         Component testComponent = new Container();
 

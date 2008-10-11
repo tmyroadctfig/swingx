@@ -24,7 +24,14 @@ import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.test.PipelineReport;
 import org.jdesktop.test.AncientSwingTeam;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
 
+
+@RunWith(JUnit4.class)
 public class FilterTest extends InteractiveTestCase {
 
     public FilterTest() {
@@ -35,6 +42,16 @@ public class FilterTest extends InteractiveTestCase {
     protected ComponentAdapter directModelAdapter;
     private PipelineReport pipelineReport;
 
+    @Before
+    public void setUpJ4() throws Exception {
+        setUp();
+    }
+    
+    @After
+    public void tearDownJ4() throws Exception {
+        tearDown();
+    }
+    
 //----------------------- testing sorter notification
 //----------------------- will happen only if in pipeline so we do it here 
     /**
@@ -42,6 +59,7 @@ public class FilterTest extends InteractiveTestCase {
      * Guarantee refresh notification with same direction, columnIndex
      * but different Comparator.
      */
+    @Test
     public void testSorterSortKeyComparatorRefresh() {
         FilterPipeline pipeline = new FilterPipeline();
         pipeline.assign(directModelAdapter);
@@ -63,6 +81,7 @@ public class FilterTest extends InteractiveTestCase {
      * test notification from sorter after setSortkey.
      * Guarantee refresh notification with same columnIndex.
      */
+    @Test
     public void testSorterSortKeyRefresh() {
         FilterPipeline pipeline = new FilterPipeline();
         pipeline.assign(directModelAdapter);
@@ -83,6 +102,7 @@ public class FilterTest extends InteractiveTestCase {
      * test notification from sorter after setSortkey.
      * Guarantee exactly one refresh notification.
      */
+    @Test
     public void testSorterSortKeyOneRefresh() {
         FilterPipeline pipeline = new FilterPipeline();
         pipeline.assign(directModelAdapter);
@@ -102,6 +122,7 @@ public class FilterTest extends InteractiveTestCase {
      * test notification from sorter after setSortkey.
      * Guarantee no refresh notification on same.
      */
+    @Test
     public void testSorterSortKeyNoRefresh() {
         FilterPipeline pipeline = new FilterPipeline();
         pipeline.assign(directModelAdapter);
@@ -144,6 +165,7 @@ public class FilterTest extends InteractiveTestCase {
      * after setting properties of SortController.
      *
      */
+    @Test
     public void testSortControllerToggleUpdatesSameSorter() {
         FilterPipeline pipeline = createAssignedPipeline(false);
         int column = 2;
@@ -167,6 +189,7 @@ public class FilterTest extends InteractiveTestCase {
      * after setting properties of SortController.
      *
      */
+    @Test
     public void testSortControllerToggleUpdatesSorter() {
         FilterPipeline pipeline = createAssignedPipeline(false);
         int column = 2;
@@ -188,6 +211,7 @@ public class FilterTest extends InteractiveTestCase {
      * after setting properties of SortController.
      *
      */
+    @Test
     public void testSortControllerToggleInitSorter() {
         FilterPipeline pipeline = createAssignedPipeline(true);
         int column = 2;
@@ -206,6 +230,7 @@ public class FilterTest extends InteractiveTestCase {
      *
      */
     @SuppressWarnings("unchecked")
+    @Test
     public void testSortControllerResetRemovesSorter() {
         FilterPipeline pipeline = createAssignedPipeline(false);
         int column = 2;
@@ -220,6 +245,7 @@ public class FilterTest extends InteractiveTestCase {
      * after setting properties of SortController.
      *
      */
+    @Test
     public void testSortControllerSortKeysUpdatesSameSorter() {
         FilterPipeline pipeline = createAssignedPipeline(false);
         pipeline.setSorter(new ShuttleSorter());
@@ -237,6 +263,7 @@ public class FilterTest extends InteractiveTestCase {
      * after setting properties of SortController.
      *
      */
+    @Test
     public void testSortControllerSortKeysUpdatesSorter() {
         FilterPipeline pipeline = createAssignedPipeline(false);
         int column = 2;
@@ -255,6 +282,7 @@ public class FilterTest extends InteractiveTestCase {
      * after setting properties of SortController.
      *
      */
+    @Test
     public void testSortControllerSortKeysInitSorter() {
         FilterPipeline pipeline = createAssignedPipeline(true);
         int column = 1;
@@ -272,6 +300,7 @@ public class FilterTest extends InteractiveTestCase {
      * (== basically renamed Jesse's RowSorter).
      * no active sorter.
      */
+    @Test
     public void testSortControllerWithoutSorter() {
         FilterPipeline pipeline = createAssignedPipeline(false);
         SortController controller = pipeline.getSortController();
@@ -285,6 +314,7 @@ public class FilterTest extends InteractiveTestCase {
      * initial addition of SortController 
      * Guarantee that SortController getters are in synch with Sorter.
      */
+    @Test
     public void testSortControllerWithSorter() {
         FilterPipeline pipeline = createAssignedPipeline(false);
         int column = 2;
@@ -303,6 +333,7 @@ public class FilterTest extends InteractiveTestCase {
         assertEquals(SortOrder.UNSORTED, controller.getSortOrder(column - 1));
     }
     
+    @Test
     public void testSortOrderChangedEvent() {
         FilterPipeline pipeline = createAssignedPipeline(true);
         
@@ -325,6 +356,7 @@ public class FilterTest extends InteractiveTestCase {
      * 
      * Hmm, can't reproduce - JW.
      */
+    @Test
     public void testAndFilter() {
         PatternFilter first = new PatternFilter("a", 0, 0);
         PatternFilter second = new PatternFilter("b", 0, 1);
@@ -346,6 +378,7 @@ public class FilterTest extends InteractiveTestCase {
      * pipeline should auto-flush on assigning adapter.
      *
      */
+    @Test
     public void testFlushOnAssign() {
         Filter filter = new PatternFilter(".*", 0, 0);
         FilterPipeline pipeline = new FilterPipeline(new Filter[] { filter });
@@ -362,6 +395,7 @@ public class FilterTest extends InteractiveTestCase {
      * test notification on setSorter: must fire on change only.
      *
      */
+    @Test
     public void testPipelineEventOnSameSorter() {
         FilterPipeline pipeline = new FilterPipeline();
         pipeline.assign(directModelAdapter);
@@ -379,6 +413,7 @@ public class FilterTest extends InteractiveTestCase {
      * test notification on setSorter.
      *
      */
+    @Test
     public void testPipelineEventOnSetSorter() {
         FilterPipeline pipeline = new FilterPipeline();
         pipeline.assign(directModelAdapter);
@@ -395,6 +430,7 @@ public class FilterTest extends InteractiveTestCase {
      * test notification on setSorter: must fire if assigned only.
      *
      */
+    @Test
     public void testPipelineEventOnSetSorterUnassigned() {
         FilterPipeline pipeline = new FilterPipeline();
         pipeline.addPipelineListener(pipelineReport);
@@ -412,6 +448,7 @@ public class FilterTest extends InteractiveTestCase {
      * with a differnt ComponentAdapter.
      *
      */
+    @Test
     public void testSetSorterDiffComponentAdapter() {
         FilterPipeline pipeline = new FilterPipeline();
         pipeline.assign(directModelAdapter);
@@ -446,6 +483,7 @@ public class FilterTest extends InteractiveTestCase {
      * Fixed by adding an pass-all filter internally.
      *
      */
+    @Test
     public void testEmptyPipeline() {
         int sortColumn = 0;
         FilterPipeline pipeline = new FilterPipeline();
@@ -461,6 +499,7 @@ public class FilterTest extends InteractiveTestCase {
      * an identical sorter in the pipeline's filter chain.
      *
      */
+    @Test
     public void testSorterInEmptyPipeline() {
         int sortColumn = 0;
         // prepare the reference pipeline
@@ -482,6 +521,7 @@ public class FilterTest extends InteractiveTestCase {
      * sorter.getValueAt must be same as pipeline.getValueAt.
      *
      */
+    @Test
     public void testSorterInPipeline() {
         Filter filter = createDefaultPatternFilter(0);
         FilterPipeline pipeline = new FilterPipeline(new Filter[] { filter });
@@ -499,6 +539,7 @@ public class FilterTest extends InteractiveTestCase {
      * unassigned filter/-pipeline must have size 0.
      *
      */
+    @Test
     public void testUnassignedFilter() {
         Filter filter = createDefaultPatternFilter(0);
         assertEquals(0, filter.getSize());
@@ -507,6 +548,7 @@ public class FilterTest extends InteractiveTestCase {
         assertEquals(0, pipeline.getOutputSize());
     }
 
+    @Test
     public void testUnassignedEmptyFilter() {
         FilterPipeline filters = new FilterPipeline();
         assertEquals(0, filters.getOutputSize());
@@ -516,6 +558,7 @@ public class FilterTest extends InteractiveTestCase {
      * JW: test paranoia?
      *
      */
+    @Test
     public void testDirectComponentAdapterAccess() {
         FilterPipeline pipeline = createPipeline();
         pipeline.assign(directModelAdapter);
@@ -526,6 +569,7 @@ public class FilterTest extends InteractiveTestCase {
      * order of filters must be retained.
      *
      */
+    @Test
     public void testFilterOrder() {
         Filter filterZero = createDefaultPatternFilter(0);
         Filter filterTwo = createDefaultPatternFilter(2); 
@@ -541,6 +585,7 @@ public class FilterTest extends InteractiveTestCase {
      * FilterPipeline allows maximal one sorter per column. 
      *
      */
+    @Test
     public void testDuplicatedSortColumnException() {
         Filter[] filters = new Filter[] {new ShuttleSorter(), new ShuttleSorter()};
         try {
@@ -558,6 +603,7 @@ public class FilterTest extends InteractiveTestCase {
     /**
      * A filter can be bound to maximally one pipeline.
      */
+    @Test
     public void testAssignFilterPipelineBoundFilterException() {
         Filter filter = createDefaultPatternFilter(0);
         assertEquals("order < 0", -1, filter.order);
@@ -577,6 +623,7 @@ public class FilterTest extends InteractiveTestCase {
      * early binding of pipeline to filters.
      *
      */
+    @Test
     public void testAssignFilterPipeline() {
         Filter filter = createDefaultPatternFilter(0);
         Filter[] filters = new Filter[] {filter};
@@ -632,6 +679,7 @@ public class FilterTest extends InteractiveTestCase {
      * This is a test to ensure that the example in the javadoc actually works.
      * if the javadoc example changes, then those changes should be pasted here.
      */
+    @Test
     public void testJavaDocExample() {
 
         Filter[] filters = new Filter[] {
@@ -789,6 +837,7 @@ public class FilterTest extends InteractiveTestCase {
         frame.setVisible(true);
     }
 
+    @Test
     public void testMultipleFilter() {
         JXTable otherTable = new JXTable(new AncientSwingTeam());
         PatternFilter otherFilter = new PatternFilter(".*eo.*", 0, 0);

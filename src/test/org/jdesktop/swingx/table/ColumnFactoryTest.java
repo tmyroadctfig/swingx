@@ -15,18 +15,26 @@ import javax.swing.table.TableModel;
 import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.test.AncientSwingTeam;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
+
 
 /**
  * Contains unit tests for <code>ColumnFactory</code>.
  * 
  * @author Jeanette Winzenburg
  */
+@RunWith(JUnit4.class)
 public class ColumnFactoryTest extends InteractiveTestCase {
 
     /**
      * Issue #564-swingx: allow custom factories to return null column.
      * Here: test that table can cope with null columns on create.
      */
+    @Test
     public void testTableCopeWithCreateNullColumn() {
         // factory returns null on create
         ColumnFactory factory = new ColumnFactory() {
@@ -50,6 +58,7 @@ public class ColumnFactoryTest extends InteractiveTestCase {
      * Issue #564-swingx: allow custom factories to return null column.
      * Here: test that ColumnFactory can handle null creation.
      */
+    @Test
     public void testCreateNullColumn() {
         // factory returns null on create
         ColumnFactory factory = new ColumnFactory() {
@@ -72,6 +81,7 @@ public class ColumnFactoryTest extends InteractiveTestCase {
      * 
      * PENDING: need additional api? Left to subclasses for now. 
      */
+    @Test
     public void testCreateNullColumnFromModelProperty() {
         // factory returns null on create
         ColumnFactory factory = new ColumnFactory() {
@@ -96,6 +106,7 @@ public class ColumnFactoryTest extends InteractiveTestCase {
      * Issue ??: NPE in pack for null table header.
      *
      */
+    @Test
     public void testPackColumnNullHeader() {
         JXTable table = new JXTable(new AncientSwingTeam());
         table.setTableHeader(null);
@@ -105,6 +116,7 @@ public class ColumnFactoryTest extends InteractiveTestCase {
      * test if max parameter is respected.
      *
      */
+    @Test
     public void testPackColumnWithMax() {
         JXTable table = new JXTable(new AncientSwingTeam());
         TableColumnExt columnExt = table.getColumnExt(0);
@@ -120,6 +132,7 @@ public class ColumnFactoryTest extends InteractiveTestCase {
      * packColumn can't handle hidden columns.
      *
      */
+    @Test
     public void testPackHiddenColumn() {
         JXTable table = new JXTable(10, 4);
         TableColumnExt columnExt = table.getColumnExt(0);
@@ -137,6 +150,7 @@ public class ColumnFactoryTest extends InteractiveTestCase {
      * Here: model index == negative
      *
      */
+    @Test
     public void testConfigureTableColumnDoc() {
         TableModel model = new DefaultTableModel(0, 4);
         TableColumnExt columnExt = new TableColumnExt(-1);
@@ -152,6 +166,7 @@ public class ColumnFactoryTest extends InteractiveTestCase {
      * Here: model index == getColumnCount
      *
      */
+    @Test
     public void testConfigureTableColumnExcessModelIndex() {
         TableModel model = new DefaultTableModel(0, 4);
         TableColumnExt columnExt = new TableColumnExt(model.getColumnCount());
@@ -167,6 +182,7 @@ public class ColumnFactoryTest extends InteractiveTestCase {
      * is used by JXTable.
      *
      */
+    @Test
     public void testSetColumnFactory() {
         ColumnFactory myFactory = new ColumnFactory();
         ColumnFactory.setInstance(myFactory);
@@ -177,6 +193,7 @@ public class ColumnFactoryTest extends InteractiveTestCase {
      * Issue #470-swingx: added getRowCount(table)
      *
      */
+    @Test
     public void testEncapsulateRowCount() {
         final int cutOffRowCount = 10;
         ColumnFactory factory = new ColumnFactory() {
@@ -208,6 +225,7 @@ public class ColumnFactoryTest extends InteractiveTestCase {
      * Issue #315-swingx: pack doesn't pass column index to headerRenderer.
      * This bug shows only if the renderer relies on the column index (default doesn't). 
      */
+    @Test
     public void testPackColumnIndexToHeaderRenderer() {
         final int special = 1;
         TableCellRenderer renderer = new DefaultTableCellRenderer() {
@@ -242,6 +260,7 @@ public class ColumnFactoryTest extends InteractiveTestCase {
      * added property to ColumnFactory. 
      *  
      */
+    @Test
     public void testPackMargin() {
         final int special = 1;
         JXTable table = new JXTable(1, 2);

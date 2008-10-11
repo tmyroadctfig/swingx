@@ -30,6 +30,12 @@ import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 
 import org.jdesktop.swingx.calendar.CalendarUtils;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
+
 
 /**
  * JXMonthView unit tests which are expected to pass and are part of a stable build.
@@ -40,6 +46,7 @@ import org.jdesktop.swingx.calendar.CalendarUtils;
  * 
  * @author Jeanette Winzenburg
  */
+@RunWith(JUnit4.class)
 public class JXMonthViewVisualTest extends InteractiveTestCase {
     @SuppressWarnings("all")
     private static final Logger LOG = Logger.getLogger(JXMonthViewVisualTest.class
@@ -61,6 +68,7 @@ public class JXMonthViewVisualTest extends InteractiveTestCase {
      * @throws InvocationTargetException 
      * @throws InterruptedException 
      */
+    @Test
     public void testLastDisplayedDateInitial() throws InterruptedException, InvocationTargetException {
         if (GraphicsEnvironment.isHeadless()) {
             LOG.info("cannot run lastDisplayedDate - headless");
@@ -90,6 +98,7 @@ public class JXMonthViewVisualTest extends InteractiveTestCase {
      * @throws InvocationTargetException 
      * @throws InterruptedException 
      */
+    @Test
     public void testLastDisplayedDateSizeChanged() throws InterruptedException, InvocationTargetException {
         if (GraphicsEnvironment.isHeadless()) {
             LOG.info("cannot run lastDisplayedDate - headless");
@@ -124,6 +133,7 @@ public class JXMonthViewVisualTest extends InteractiveTestCase {
      * @throws InvocationTargetException 
      * @throws InterruptedException 
      */
+    @Test
     public void testLastDisplayedDateSizeChangedEnsureVisible() throws InterruptedException, InvocationTargetException {
         if (GraphicsEnvironment.isHeadless()) {
             LOG.info("cannot run lastDisplayedDate - headless");

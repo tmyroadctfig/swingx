@@ -7,12 +7,21 @@ import java.util.Enumeration;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
+
+
 import junit.framework.TestCase;
 
 /**
  *
  */
+@RunWith(JUnit4.class)
 public class DefaultMutableTreeTableNodeUnitTest extends TestCase {
+    @Test
      public void testAdd() {
          DefaultMutableTreeTableNode root = new DefaultMutableTreeTableNode("root");
          
@@ -27,6 +36,7 @@ public class DefaultMutableTreeTableNodeUnitTest extends TestCase {
          assertEquals(root.getChildCount(), 2);
      }
      
+    @Test
      public void testAddDoesNotDuplicate() {
          DefaultMutableTreeTableNode root = new DefaultMutableTreeTableNode("root");
          
@@ -42,6 +52,7 @@ public class DefaultMutableTreeTableNodeUnitTest extends TestCase {
          assertEquals(root.getChildCount(), 1);
      }
      
+    @Test
      public void testChildren() {
          DefaultMutableTreeTableNode root = new DefaultMutableTreeTableNode("root");
          
@@ -70,6 +81,7 @@ public class DefaultMutableTreeTableNodeUnitTest extends TestCase {
          assertFalse(children.hasMoreElements());
      }
      
+    @Test
      public void testAllowsChildren() {
          DefaultMutableTreeTableNode empty = new DefaultMutableTreeTableNode();
          assertTrue(empty.getAllowsChildren());
@@ -100,6 +112,7 @@ public class DefaultMutableTreeTableNodeUnitTest extends TestCase {
          assertFalse(b.getAllowsChildren());
      }
      
+    @Test
      public void testGetChildAt() {
          DefaultMutableTreeTableNode root = new DefaultMutableTreeTableNode("root");
          
@@ -140,6 +153,7 @@ public class DefaultMutableTreeTableNodeUnitTest extends TestCase {
          }
      }
      
+    @Test
      public void testGetChildCount() {
          DefaultMutableTreeTableNode root = new DefaultMutableTreeTableNode("root");
          
@@ -174,6 +188,7 @@ public class DefaultMutableTreeTableNodeUnitTest extends TestCase {
          assertEquals(root.getChildCount(), 0);
      }
      
+    @Test
      public void testGetIndex() {
          DefaultMutableTreeTableNode root = new DefaultMutableTreeTableNode("root");
          
@@ -200,6 +215,7 @@ public class DefaultMutableTreeTableNodeUnitTest extends TestCase {
          assertEquals(root.getIndex(d), 3);
      }
      
+    @Test
      public void testGetParent() {
          DefaultMutableTreeTableNode root = new DefaultMutableTreeTableNode("root");
 
@@ -248,6 +264,7 @@ public class DefaultMutableTreeTableNodeUnitTest extends TestCase {
          assertEquals(b.getChildCount(), 0);
      }
      
+    @Test
      public void testSetParent() {
          DefaultMutableTreeTableNode root = new DefaultMutableTreeTableNode("root");
          DefaultMutableTreeTableNode a = new DefaultMutableTreeTableNode("a");
@@ -272,6 +289,7 @@ public class DefaultMutableTreeTableNodeUnitTest extends TestCase {
          }
      }
      
+    @Test
      public void testUserObject() {
          DefaultMutableTreeTableNode empty = new DefaultMutableTreeTableNode();
          assertNull(empty.getUserObject());

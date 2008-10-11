@@ -63,6 +63,12 @@ import org.jdesktop.swingx.hyperlink.LinkModel;
 import org.jdesktop.swingx.test.ActionMapTreeTableModel;
 import org.jdesktop.swingx.test.ComponentTreeTableModel;
 import org.jdesktop.swingx.treetable.FileSystemModel;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
+
 
 /**
  * Tests behaviour of SwingX <code>DefaultTreeRenderer</code>. 
@@ -71,6 +77,7 @@ import org.jdesktop.swingx.treetable.FileSystemModel;
  * 
  * @author Jeanette Winzenburg
  */
+@RunWith(JUnit4.class)
 public class TreeRendererTest extends InteractiveTestCase {
     @SuppressWarnings("all")
     private static final Logger LOG = Logger.getLogger(TreeRendererTest.class
@@ -104,6 +111,7 @@ public class TreeRendererTest extends InteractiveTestCase {
     /**
      * Issue #873-swingx: WrappingIconPanel - delegate font unchanged
      */
+    @Test
     public void testDelegateFont() {
         JXTree tree = new JXTree();
         tree.setCellRenderer(new DefaultTreeRenderer());
@@ -128,6 +136,7 @@ public class TreeRendererTest extends InteractiveTestCase {
      * Wrapping provider: hyperlink foreground must be preserved.
      *
      */
+    @Test
     public void testTreeHyperlinkForeground() {
         JXTree tree = new JXTree(createTreeModelWithLinks(20));
         ComponentProvider<JXHyperlink> context = new HyperlinkProvider();
@@ -142,6 +151,7 @@ public class TreeRendererTest extends InteractiveTestCase {
      * test if background color is moved down to delegate component.
      *
      */
+    @Test
     public void testDelegateBackground() {
         WrappingProvider provider = new WrappingProvider();
         DefaultTreeRenderer renderer = new DefaultTreeRenderer(provider);
@@ -161,6 +171,7 @@ public class TreeRendererTest extends InteractiveTestCase {
      * test if foreground color is moved down to delegate component.
      *
      */
+    @Test
     public void testDelegateForeground() {
         WrappingProvider provider = new WrappingProvider();
         DefaultTreeRenderer renderer = new DefaultTreeRenderer(provider);
@@ -180,6 +191,7 @@ public class TreeRendererTest extends InteractiveTestCase {
      * characterize opaqueness of rendering components.
      * Hmm... tree-magic is different
      */
+    @Test
     public void testTreeOpaqueRenderer() {
         // sanity
         assertFalse(new JLabel().isOpaque());
@@ -192,6 +204,7 @@ public class TreeRendererTest extends InteractiveTestCase {
      * base existence/type tests while adding DefaultTableCellRendererExt.
      *
      */
+    @Test
     public void testTreeRendererExt() {
         DefaultTreeRenderer renderer = new DefaultTreeRenderer();
         assertTrue(renderer instanceof TreeCellRenderer);

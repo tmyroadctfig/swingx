@@ -26,11 +26,15 @@ import org.jdesktop.test.PropertyChangeReport;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
+
 
 @RunWith(JUnit4.class)
 public class JXTaskPaneTest extends TestCase {
 
-  @Test
+    @Test
   public void testBean() throws Exception {
     PropertyChangeReport report = new PropertyChangeReport();
     JXTaskPane group = new JXTaskPane();
@@ -104,7 +108,7 @@ public class JXTaskPaneTest extends TestCase {
     assertFalse((Boolean) event.getOldValue());
   }
 
-  @Test
+    @Test
   public void testContentPane() {
     JXTaskPane group = new JXTaskPane();
     assertEquals(0, group.getContentPane().getComponentCount());
@@ -129,7 +133,7 @@ public class JXTaskPaneTest extends TestCase {
     assertFalse(layout == group.getLayout());
   }
 
-  @Test
+    @Test
   public void testActions() throws Exception {
     JXTaskPane taskPane = new JXTaskPane();
     Action action = new AbstractAction() {
@@ -141,7 +145,7 @@ public class JXTaskPaneTest extends TestCase {
     assertEquals(1, taskPane.getContentPane().getComponentCount());
   }
 
-  @Test
+    @Test
   public void testAnimationListeners() throws Exception {
     JXTaskPane taskPane = new JXTaskPane();
     // start with a not expanded or animated taskPane
@@ -185,13 +189,13 @@ public class JXTaskPaneTest extends TestCase {
     assertEquals(2, listener.animationStart);
   }
 
-  @Test
+    @Test
   public void testAddon() throws Exception {
     // move around all addons
     TestUtilities.cycleAddons(new JXTaskPane());
   }
 
-  @Test
+    @Test
   public void testIssue344() throws Exception {
     new JXTaskPane();
     LookAndFeelAddons.setAddon(new MetalLookAndFeelAddons());
@@ -208,6 +212,7 @@ public class JXTaskPaneTest extends TestCase {
 //     * @deprecated (pre-0.9.3) remove with {@link JXTaskPane#setExpanded(boolean)}
 //     */
 //    @Deprecated
+//    @Test
 //    public void testSingleExpanded() {
 //        JXTaskPane pane = new JXTaskPane();
 //        PropertyChangeReport report = new PropertyChangeReport();

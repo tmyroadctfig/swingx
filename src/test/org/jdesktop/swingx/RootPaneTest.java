@@ -19,6 +19,13 @@ import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
 
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
+
+
 import junit.framework.TestCase;
 
 /**
@@ -26,6 +33,7 @@ import junit.framework.TestCase;
  * or changed once a "status bean" is implemented that provides the functionality
  * originally envisioned for the JXRootPane/JXStatusBar coupling
  */
+@RunWith(JUnit4.class)
 public class RootPaneTest extends TestCase {
 
     private Action[] actions;
@@ -36,6 +44,16 @@ public class RootPaneTest extends TestCase {
     private static final int ARMS = 2;
     private static final int LEGS = 3;
 
+    @Before
+    public void setUpJ4() throws Exception {
+        setUp();
+    }
+    
+    @After
+    public void tearDownJ4() throws Exception {
+        tearDown();
+    }
+    
     @Override
     protected void setUp() {
 	actions =  new Action[4];
@@ -106,6 +124,7 @@ public class RootPaneTest extends TestCase {
      * Test to ensure that all MessageSources in a containment hierarchy
      * are registered.
      */
+    @Test
     public void testAggregateContainerRegistration() {
 	// Create an aggregate.
 	comps[HEAD].add(comps[BODY]);
@@ -147,6 +166,7 @@ public class RootPaneTest extends TestCase {
      * A test to ensure that the status bar is correctly registered with
      * existing components and will be unregistered when removed.
      */
+    @Test
     public void testStatusBar() {
 	JXRootPane rootPane = new JXRootPane();
 	for (int i = 0; i < comps.length; i++) {
@@ -182,6 +202,7 @@ public class RootPaneTest extends TestCase {
      * Given a root pane with a status bar, a toolbar with components
      * should get mouse listeners added to the components when added.
      */
+    @Test
     public void testToolBar() {
 	JXRootPane rootPane = new JXRootPane();
 	rootPane.setStatusBar(new JXStatusBar());
@@ -218,6 +239,7 @@ public class RootPaneTest extends TestCase {
 	}
     }
 
+    @Test
     public void testMenuBar() {
 	JXRootPane rootPane = new JXRootPane();
 	rootPane.setStatusBar(new JXStatusBar());

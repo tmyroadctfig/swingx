@@ -7,6 +7,12 @@
 package org.jdesktop.swingx;
 
 import org.jdesktop.test.PropertyChangeReport;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
+
 
 import javax.swing.*;
 import java.awt.*;
@@ -16,6 +22,8 @@ import java.util.logging.Logger;
 /**
  * @author Jeanette Winzenburg
  */
+import javax.swing.JLabel;
+@RunWith(JUnit4.class)
 public class JXTitledPanelTest extends InteractiveTestCase {
     private static final Logger LOG = Logger.getLogger(JXTitledPanelTest.class
             .getName());
@@ -36,6 +44,7 @@ public class JXTitledPanelTest extends InteractiveTestCase {
     }
 
     
+    @Test
     public void testLayoutOnLFChange() {
         JXTitledPanel titledPanel = new JXTitledPanel();
         assertNotNull(titledPanel.getContentContainer());
@@ -54,6 +63,7 @@ public class JXTitledPanelTest extends InteractiveTestCase {
      * Issue ??: notifications missing on all "title"XX properties.
      *
      */
+    @Test
     public void testTitlePropertiesNotify() {
         String title = "starting title";
         final JXTitledPanel panel = new JXTitledPanel(title);
@@ -78,6 +88,7 @@ public class JXTitledPanelTest extends InteractiveTestCase {
      * happens if a generic property change listener (== one who 
      * wants to get all property changes) is registered.
      */
+    @Test
     public void testTitleNotify() {
         String title = "starting title";
         final JXTitledPanel panel = new JXTitledPanel(title);
@@ -92,6 +103,7 @@ public class JXTitledPanelTest extends InteractiveTestCase {
      * Notification is correct, if a named propertyChangeListener is
      * registered.
      */
+    @Test
     public void testTitleNotifyNamed() {
         String title = "starting title";
         final JXTitledPanel panel = new JXTitledPanel(title);
@@ -106,6 +118,7 @@ public class JXTitledPanelTest extends InteractiveTestCase {
      * incorrect propertyChangeEvent on setTitle(null).
      *
      */
+    @Test
     public void testTitleNotifyPropertyValue() {
         String title = "starting title";
         final JXTitledPanel panel = new JXTitledPanel(title);

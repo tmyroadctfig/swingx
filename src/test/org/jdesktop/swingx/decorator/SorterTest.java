@@ -11,6 +11,13 @@ import java.text.Collator;
 import java.util.Comparator;
 import java.util.Locale;
 
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
+
+
 import junit.framework.TestCase;
 
 /**
@@ -23,6 +30,7 @@ import junit.framework.TestCase;
  * </ul>
  * @author Jeanette Winzenburg
  */
+@RunWith(JUnit4.class)
 public class SorterTest extends TestCase {
 
     /**
@@ -30,6 +38,7 @@ public class SorterTest extends TestCase {
      * synched to internal state.
      *
      */
+    @Test
     public void testSorterSynchedToSortKey() {
         int column = 1;
         Sorter sorter = new ShuttleSorter(column, false, Collator.getInstance());
@@ -41,6 +50,7 @@ public class SorterTest extends TestCase {
      * test that sorter updates internal state from SortKey.
      *
      */
+    @Test
     public void testSorterSynchedFromSortKey() {
         // create a sorter for column 0, ascending, 
         // without explicit comparator
@@ -62,6 +72,7 @@ public class SorterTest extends TestCase {
      * test that sorter.setSortKey(..) throws the documented exceptions.
      *
      */
+    @Test
     public void testSorterSortKeyExceptions() {
         Sorter sorter = new ShuttleSorter();
         try {
@@ -87,6 +98,7 @@ public class SorterTest extends TestCase {
      * initial addition.
      * Testing exceptions thrown in constructors
      */
+    @Test
     public void testSortKeyConstructorExceptions() {
         try {
             new SortKey(null, 2);
@@ -109,6 +121,7 @@ public class SorterTest extends TestCase {
     /**
      * initial addition, test constructors parameters.
      */
+    @Test
     public void testSortKeyConstructor() {
         int column = 3;
         SortOrder sortOrder = SortOrder.ASCENDING;
@@ -129,6 +142,7 @@ public class SorterTest extends TestCase {
      * sanity - SortOrders convenience method state.
      *
      */
+    @Test
     public void testSortOrderConvenience() {
         assertTrue(SortOrder.ASCENDING.isSorted());
         assertTrue(SortOrder.ASCENDING.isAscending());
@@ -151,6 +165,7 @@ public class SorterTest extends TestCase {
      * sorter.isAscending()
      *
      */
+    @Test
     public void testSortOrder() {
         Sorter sorter = new ShuttleSorter();
         assertSame(SortOrder.ASCENDING, sorter.getSortOrder());
@@ -164,6 +179,7 @@ public class SorterTest extends TestCase {
      * Issue #179: make sure to use the correct default collator.
      * 
      */
+    @Test
     public void testCollator() {
         Locale defaultLocale = Locale.getDefault();
         Locale western = Locale.GERMAN;

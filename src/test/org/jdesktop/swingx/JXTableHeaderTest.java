@@ -21,11 +21,28 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 
 import org.jdesktop.swingx.table.TableColumnExt;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
 
+
+@RunWith(JUnit4.class)
 public class JXTableHeaderTest extends InteractiveTestCase {
     private static final Logger LOG = Logger.getLogger(JXTableHeaderTest.class
             .getName());
 
+    
+    @Before
+    public void setUpJ4() throws Exception {
+        setUp();
+    }
+    
+    @After
+    public void tearDownJ4() throws Exception {
+        tearDown();
+    }
     
 
 
@@ -36,6 +53,7 @@ public class JXTableHeaderTest extends InteractiveTestCase {
      * fixed for SwingX.
      *
      */
+    @Test
     public void testHeaderSizeEmptyStringHeaderValue() {
         final String[] alternate = { 
                 "", 
@@ -54,6 +72,7 @@ public class JXTableHeaderTest extends InteractiveTestCase {
      * fixed for Swingx.
      *
      */
+    @Test
     public void testHeaderSizeNullHeaderValue() {
         final String[] alternate = { 
                 null, 
@@ -74,6 +93,7 @@ public class JXTableHeaderTest extends InteractiveTestCase {
      * 
      *
      */
+    @Test
     public void testDraggedColumnRemoved() {
         JXTable table = new JXTable(10, 2);
         TableColumnExt columnExt = table.getColumnExt(0);
@@ -92,6 +112,7 @@ public class JXTableHeaderTest extends InteractiveTestCase {
      * http://forums.java.net/jive/thread.jspa?threadID=18368&tstart=0
      * when hiding column while drag(?) is in process.
      */
+    @Test
     public void testDraggedColumnVisible() {
         JXTable table = new JXTable(10, 2);
         TableColumnExt columnExt = table.getColumnExt(0);
@@ -108,6 +129,7 @@ public class JXTableHeaderTest extends InteractiveTestCase {
      *   all renderere's size requirements.
      *
      */
+    @Test
     public void testPreferredHeight() {
         JXTable table = new JXTable(10, 2);
         TableColumnExt columnExt = table.getColumnExt(1);
@@ -126,6 +148,7 @@ public class JXTableHeaderTest extends InteractiveTestCase {
      * test doc'ed xheader.getToolTipText(MouseEvent) behaviour.
      *
      */
+    @Test
     public void testColumnToolTip() {
         JXTable table = new JXTable(10, 2);
         TableColumnExt columnExt = table.getColumnExt(0);
@@ -153,6 +176,7 @@ public class JXTableHeaderTest extends InteractiveTestCase {
      * 
      *
      */
+    @Test
     public void testHeaderVisibleWithoutColumns() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
@@ -178,6 +202,7 @@ public class JXTableHeaderTest extends InteractiveTestCase {
      * 
      *
      */
+    @Test
     public void testHeaderVisibleWithColumns() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {

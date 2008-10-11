@@ -32,12 +32,19 @@ import org.jdesktop.swingx.plaf.motif.MotifLookAndFeelAddons;
 import org.jdesktop.swingx.plaf.nimbus.NimbusLookAndFeelAddons;
 import org.jdesktop.swingx.plaf.windows.WindowsClassicLookAndFeelAddons;
 import org.jdesktop.swingx.plaf.windows.WindowsLookAndFeelAddons;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
+
 
 /**
  * This test ensures that all values that should be {@code UIResouce}s are.
  * 
  * @author Karl George Schaefer
  */
+@RunWith(JUnit4.class)
 public class UIResourcesTest extends TestCase {
     @SuppressWarnings("unused")
     private static final Logger LOG = Logger.getLogger(UIResourcesTest.class
@@ -72,6 +79,7 @@ public class UIResourcesTest extends TestCase {
      * @throws Exception
      *                 if an error occurs
      */
+    @Test
     public void testBasicLookAndFeelAddonsForUIResources() throws Exception {
         LookAndFeelAddons.setAddon(BasicLookAndFeelAddons.class);
     }
@@ -82,6 +90,7 @@ public class UIResourcesTest extends TestCase {
      * @throws Exception
      *                 if an error occurs
      */
+    @Test
     public void testLinuxLookAndFeelAddonsForUIResources() throws Exception {
         LookAndFeelAddons.setAddon(LinuxLookAndFeelAddons.class);
     }
@@ -92,6 +101,7 @@ public class UIResourcesTest extends TestCase {
      * @throws Exception
      *                 if an error occurs
      */
+    @Test
     public void testMacOSXLookAndFeelAddonsForUIResources() throws Exception {
         LookAndFeelAddons.setAddon(MacOSXLookAndFeelAddons.class);
     }
@@ -102,6 +112,7 @@ public class UIResourcesTest extends TestCase {
     * @throws Exception
     *                 if an error occurs
     */
+    @Test
     public void testMetalLookAndFeelAddonsForUIResources() throws Exception {
         LookAndFeelAddons.setAddon(MetalLookAndFeelAddons.class);
     }
@@ -112,6 +123,7 @@ public class UIResourcesTest extends TestCase {
      * @throws Exception
      *                 if an error occurs
      */
+    @Test
     public void testMotifLookAndFeelAddonsForUIResources() throws Exception {
         LookAndFeelAddons.setAddon(MotifLookAndFeelAddons.class);
     }
@@ -122,6 +134,7 @@ public class UIResourcesTest extends TestCase {
      * @throws Exception
      *                 if an error occurs
      */
+    @Test
     public void testNimbusLookAndFeelAddonsForUIResources() throws Exception {
         LookAndFeelAddons.setAddon(NimbusLookAndFeelAddons.class);
     }
@@ -132,6 +145,7 @@ public class UIResourcesTest extends TestCase {
      * @throws Exception
      *                 if an error occurs
      */
+    @Test
     public void testWindowsLookAndFeelAddonsForUIResources() throws Exception {
         LookAndFeelAddons.setAddon(WindowsLookAndFeelAddons.class);
     }
@@ -142,6 +156,7 @@ public class UIResourcesTest extends TestCase {
      * @throws Exception
      *                 if an error occurs
      */
+    @Test
     public void testWindowsClassicLookAndFeelAddonsForUIResources() throws Exception {
         LookAndFeelAddons.setAddon(WindowsClassicLookAndFeelAddons.class);
     }

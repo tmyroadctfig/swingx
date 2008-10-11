@@ -27,6 +27,12 @@ import org.jdesktop.swingx.search.AbstractSearchable;
 import org.jdesktop.swingx.search.PatternModel;
 import org.jdesktop.swingx.search.SearchFactory;
 import org.jdesktop.swingx.search.Searchable;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
+
 
 /**
  * Contains unit test for search related classes.
@@ -34,6 +40,7 @@ import org.jdesktop.swingx.search.Searchable;
  * 
  * @author Jeanette Winzenburg
  */
+@RunWith(JUnit4.class)
 public class FindTest extends InteractiveTestCase {
     private static final Logger LOG = Logger
             .getLogger(FindTest.class.getName());
@@ -63,6 +70,7 @@ public class FindTest extends InteractiveTestCase {
      * Findbugs: NPE in SearchFactory - showFindDialog for null target component.
      * 
      */
+    @Test
     public void testSearchFactoryNullTarget() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
@@ -78,6 +86,7 @@ public class FindTest extends InteractiveTestCase {
      * 
      * Here: check that dialog is new for different owner and old has been disposed.
      */
+    @Test
     public void testFindDialogNew() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
@@ -110,6 +119,7 @@ public class FindTest extends InteractiveTestCase {
      * side-effect of DefaultListSelectionModel.setSelectionInterval - it backs
      * out silently on negative indices. 
      */
+    @Test
     public void testKeepSelectionOnNotFoundList() {
         JXList list = new JXList(new TestListModel());
         PatternModel model = new PatternModel();
@@ -128,6 +138,7 @@ public class FindTest extends InteractiveTestCase {
      * 
      * assert JXTable behaviour.
      */
+    @Test
     public void testKeepSelectionOnNotFoundTable() {
         JXTable table = new JXTable(new TestTableModel());
         PatternModel model = new PatternModel();
@@ -152,6 +163,7 @@ public class FindTest extends InteractiveTestCase {
      * null paths only as clearSelection as well.
      * 
      */
+    @Test
     public void testKeepSelectionOnNotFoundTree() {
         JXTree tree = new JXTree();
         PatternModel model = new PatternModel();
@@ -169,6 +181,7 @@ public class FindTest extends InteractiveTestCase {
      * Issue #487-swingx: NPE if instantiating with not null Searchable
      */
     @SuppressWarnings("unused")
+    @Test
     public void testFindBarNPEConstructor() {
         JXFindBar findBar = new JXFindBar(new JXTable().getSearchable());
     }
@@ -176,6 +189,7 @@ public class FindTest extends InteractiveTestCase {
      * Issue #487-swingx: NPE if setting a not-null Searchable before 
      * showing
      */
+    @Test
     public void testFindBarNPE() {
         Searchable searchable = new JXTable().getSearchable();
         JXFindBar findBar = new JXFindBar();
@@ -190,6 +204,7 @@ public class FindTest extends InteractiveTestCase {
      * swingx must not try to leave sandbox.
      * 
      */
+    @Test
     public void testSearchKeyStroke() {
         if (System.getSecurityManager() != null) {
             LOG.info("cannot run testSearchKeyStroke - SecurityManager installed");
@@ -205,6 +220,7 @@ public class FindTest extends InteractiveTestCase {
     }
 
     
+    @Test
     public void testWrapFindBar() {
         JXFindBar findBar = new JXFindBar();
         assertTrue("findbar must auto-wrap", findBar.getPatternModel().isWrapping());
@@ -217,6 +233,7 @@ public class FindTest extends InteractiveTestCase {
      * Test SearchHighlight used in incremental search of JXTable.  
      *
      */
+    @Test
     public void testTableIncrementalHighlighter() {
         JXTable table = new JXTable(new TestTableModel());
         table.putClientProperty(AbstractSearchable.MATCH_HIGHLIGHTER, Boolean.TRUE);
@@ -237,6 +254,7 @@ public class FindTest extends InteractiveTestCase {
      * test incremental search in JXTable.
      *
      */
+    @Test
     public void testTableIncremental() {
         JXTable table = new JXTable(new TestTableModel());
         String firstSearchText = "on";
@@ -259,6 +277,7 @@ public class FindTest extends InteractiveTestCase {
      * in not-found state.
      *
      */
+    @Test
     public void testTableInvalidStartIndex() {
         JXTable table = new JXTable(new TestTableModel());
         String firstSearchText = "one";
@@ -277,6 +296,7 @@ public class FindTest extends InteractiveTestCase {
      * search.
      *
      */
+    @Test
     public void testTableFoundPreviousColumnInSameRow() {
         JXTable table = new JXTable(new TestTableModel());
         int lastColumn = table.getColumnCount() -1;
@@ -298,6 +318,7 @@ public class FindTest extends InteractiveTestCase {
      * check if not-wrapping returns not found marker (-1).
      *
      */
+    @Test
     public void testTableNotFoundWithoutWrapping() {
         JXTable table = new JXTable(new TestTableModel());
         int row = 90;
@@ -313,6 +334,7 @@ public class FindTest extends InteractiveTestCase {
      * last found position is the last row.
      *
      */
+    @Test
     public void testTableNotFoundLastRowWithoutWrapping() {
         JXTable table = new JXTable(new TestTableModel());
         int row = table.getRowCount() - 1;
@@ -328,6 +350,7 @@ public class FindTest extends InteractiveTestCase {
      * last found position is the first row.
      *
      */
+    @Test
     public void testTableNotFoundFirstRowWithoutWrapping() {
         JXTable table = new JXTable(new TestTableModel());
         int row = 0;
@@ -347,6 +370,7 @@ public class FindTest extends InteractiveTestCase {
      * 
      *
      */
+    @Test
     public void testEditorResetStateOnEmptySearchString() {
         JXEditorPane editor = new JXEditorPane();
         String text = "fou four";
@@ -368,6 +392,7 @@ public class FindTest extends InteractiveTestCase {
      * 
      *
      */
+    @Test
     public void testEditorResetStateOnNullSearchString() {
         JXEditorPane editor = new JXEditorPane();
         String text = "fou four";
@@ -388,6 +413,7 @@ public class FindTest extends InteractiveTestCase {
      * 
      *
      */
+    @Test
     public void testEditorResetStateOnNullPattern() {
         JXEditorPane editor = new JXEditorPane();
         String text = "fou four";
@@ -406,6 +432,7 @@ public class FindTest extends InteractiveTestCase {
      * Issue #??-swingx: backwards search not implemented in JXEditorPane.
      *
      */
+    @Test
     public void testEditorBackwards() {
         JXEditorPane editor = new JXEditorPane();
         String text = "fou four";
@@ -429,6 +456,7 @@ public class FindTest extends InteractiveTestCase {
      * extended text still matches.
      *
      */
+    @Test
     public void testEditorIncremental() {
         JXEditorPane editor = new JXEditorPane();
         String text = "fou four";
@@ -445,6 +473,7 @@ public class FindTest extends InteractiveTestCase {
     /**
      * NPE on no-match?
      */
+    @Test
     public void testEditorIncrementalNotFound() {
         JXEditorPane editor = new JXEditorPane();
         String text = "fou four";
@@ -466,6 +495,7 @@ public class FindTest extends InteractiveTestCase {
      * test that search moves forward.
      *
      */
+    @Test
     public void testEditorFindNext() {
         JXEditorPane editor = new JXEditorPane();
         String text = "fou four";
@@ -481,6 +511,7 @@ public class FindTest extends InteractiveTestCase {
      * of document size.
      *
      */
+    @Test
     public void testEditorTolerateExceedingStartIndex() {
         JXEditorPane editor = new JXEditorPane();
         editor.setText("fou four");
@@ -493,6 +524,7 @@ public class FindTest extends InteractiveTestCase {
         }
     }
 
+    @Test
     public void testEditorEmptyDocument() {
         JXEditorPane editor = new JXEditorPane();
         int foIndex = editor.getSearchable().search("fo", -1);
@@ -509,6 +541,7 @@ public class FindTest extends InteractiveTestCase {
      * search(xx, 0) if the match is at position 0.
      *
      */
+    @Test
     public void testEditorBoundarySearchIndex() {
         JXEditorPane editor = new JXEditorPane();
         editor.setText("f");
@@ -528,6 +561,7 @@ public class FindTest extends InteractiveTestCase {
      * incremental search.
      *
      */
+    @Test
     public void testEditorFindMatchPosition() {
         JXEditorPane editor = new JXEditorPane();
         editor.setText("fou four");
@@ -542,6 +576,7 @@ public class FindTest extends InteractiveTestCase {
      * searchable.getValueAt(found).contains(text)
      * 
      */
+    @Test
     public void testEditorFindMatch() {
         JXEditorPane editor = new JXEditorPane();
         editor.setText("fou four");
@@ -557,6 +592,7 @@ public class FindTest extends InteractiveTestCase {
     }
     
 
+    @Test
     public void testEditor() {
         URL url = FindTest.class.getResource("resources/test.txt");
         try {
@@ -579,6 +615,7 @@ public class FindTest extends InteractiveTestCase {
         }
     }
 
+    @Test
     public void testTable() {
         JXTable table = new JXTable(new TestTableModel());
         // There are 100 instances of "One" in the test document
@@ -600,6 +637,7 @@ public class FindTest extends InteractiveTestCase {
         }
     }
 
+    @Test
     public void testNullSearchable() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {

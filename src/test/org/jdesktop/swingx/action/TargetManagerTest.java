@@ -7,6 +7,13 @@
 
 package org.jdesktop.swingx.action;
 
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
+
+
 import junit.framework.TestCase;
 
 /**
@@ -14,8 +21,19 @@ import junit.framework.TestCase;
  *
  * @author Mark Davidson
  */
+@RunWith(JUnit4.class)
 public class TargetManagerTest extends TestCase {
 
+    @Before
+    public void setUpJ4() throws Exception {
+        setUp();
+    }
+    
+    @After
+    public void tearDownJ4() throws Exception {
+        tearDown();
+    }
+    
     protected void tearDown() {
         TargetManager manager = TargetManager.getInstance();
         manager.reset();
@@ -24,6 +42,7 @@ public class TargetManagerTest extends TestCase {
     /**
      * By default, there are no targets.
      */
+    @Test
     public void testGetTargets() {
         TargetManager manager = TargetManager.getInstance();
 
@@ -37,6 +56,7 @@ public class TargetManagerTest extends TestCase {
     /**
      * Test Target registration methods.
      */
+    @Test
     public void testAddRemoveTargets() {
         FooTarget foo = new FooTarget();
         BarTarget bar = new BarTarget();
@@ -76,6 +96,7 @@ public class TargetManagerTest extends TestCase {
     /**
      * Tests doCommand for both explicit targets and the targets in the list.
      */
+    @Test
     public void testDoCommand() {
         FooTarget foo = new FooTarget();
         BarTarget bar = new BarTarget();

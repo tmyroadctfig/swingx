@@ -26,8 +26,16 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
+
+
 import junit.framework.TestCase;
 
+@RunWith(JUnit4.class)
 public class AbstractTreeTableModelUnitTest extends TestCase {
     private static class DummyTreeTableModel extends AbstractTreeTableModel {
         public DummyTreeTableModel(Object root) {
@@ -93,6 +101,16 @@ public class AbstractTreeTableModelUnitTest extends TestCase {
     private DefaultMutableTreeNode grandchild5;
     private DefaultMutableTreeNode grandchild6;
     
+    @Before
+    public void setUpJ4() throws Exception {
+        setUp();
+    }
+    
+    @After
+    public void tearDownJ4() throws Exception {
+        tearDown();
+    }
+    
     private TreeNode createTree() {
         root = new DefaultMutableTreeNode("root");
         
@@ -128,6 +146,7 @@ public class AbstractTreeTableModelUnitTest extends TestCase {
         nullModel = new DummyTreeTableModel(null);
     }
     
+    @Test
     public void testModelGetColumnClass() {
         // method returns a constant, but test is useful for ensuring that the
         // method returns the same values over time.
@@ -145,6 +164,7 @@ public class AbstractTreeTableModelUnitTest extends TestCase {
         assertEquals(nullModel.getColumnClass(Integer.MAX_VALUE), Object.class);
     }
     
+    @Test
     public void testModelGetColumnName() {
         assertEquals(dummyModel.getColumnName(Integer.MIN_VALUE), "");
         assertEquals(dummyModel.getColumnName(-1), "");
@@ -164,6 +184,7 @@ public class AbstractTreeTableModelUnitTest extends TestCase {
         assertEquals(nullModel.getColumnName(Integer.MAX_VALUE), "FXSHRXX");
     }
     
+    @Test
     public void testModelGetHierarchicalColumn() {
         // method returns a constant, but test is useful for ensuring that the
         // method returns the same values over time.
@@ -173,6 +194,7 @@ public class AbstractTreeTableModelUnitTest extends TestCase {
         assertEquals(nullModel.getHierarchicalColumn(), -1);
     }
     
+    @Test
     public void testModelGetRoot() {
         // method returns a constant, but test is useful for ensuring that the
         // method returns the same values over time.
@@ -182,6 +204,7 @@ public class AbstractTreeTableModelUnitTest extends TestCase {
         assertNull(nullModel.getRoot());
     }
     
+    @Test
     public void testModelIsCellEditable() {
         // method returns a constant, but test is useful for ensuring that the
         // method returns the same values over time.
@@ -240,6 +263,7 @@ public class AbstractTreeTableModelUnitTest extends TestCase {
     }
     
     //Will only fail if an exception is thrown
+    @Test
     public void testModelListenerMethods() {
         FailingTreeModelListener l = new FailingTreeModelListener();
         
@@ -259,6 +283,7 @@ public class AbstractTreeTableModelUnitTest extends TestCase {
     //TODO test fire methods
     
     //Will only fail if valueForPathChanged ever fire events
+    @Test
     public void testModelValueForPathChanged() {
         FailingTreeModelListener l = new FailingTreeModelListener();
         

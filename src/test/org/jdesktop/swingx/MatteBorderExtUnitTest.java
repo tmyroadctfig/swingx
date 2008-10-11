@@ -17,13 +17,21 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import org.jdesktop.swingx.border.MatteBorderExt;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
 
+
+@RunWith(JUnit4.class)
 public class MatteBorderExtUnitTest extends junit.framework.TestCase {
     public MatteBorderExtUnitTest() {
 	super("MatteBorderExt unit test");
     }
 
     // XXX placeholder
+    @Test
     public void testDummy() { }
 
     public static void main(String[] args) {

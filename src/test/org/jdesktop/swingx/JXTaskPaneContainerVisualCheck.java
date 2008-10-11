@@ -19,9 +19,7 @@
 package org.jdesktop.swingx;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Window;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.util.Locale;
 
@@ -31,12 +29,10 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
-import javax.swing.JPopupMenu;
+import javax.swing.JPanel;
 import javax.swing.JSplitPane;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
-import javax.swing.UIManager.LookAndFeelInfo;
+
+import org.jdesktop.swingx.action.AbstractActionExt;
 
 /**
  * Simple tests to ensure that the {@code JXTaskPane} can be instantiated and
@@ -62,6 +58,43 @@ public class JXTaskPaneContainerVisualCheck extends InteractiveTestCase {
     }
     
     
+    public void interactiveGap() {
+        JXTaskPaneContainer container = new JXTaskPaneContainer();
+//        ((VerticalLayout) container.getLayout()).setGap(0);
+        JXTaskPane first = new JXTaskPane();
+        fillTaskPane(first);
+        container.add(first);
+        JXTaskPane second = new JXTaskPane();
+        fillTaskPane(second);
+        container.add(second);
+        showWithScrollingInFrame(container, "custom gap");
+    }
+
+    public void interactiveGetUINPE() {
+        showWithScrollingInFrame(new AbstractLBContentPanel<Object>("hi") {}, "custom gap");
+
+      }
+
+    private void fillTaskPane(JXTaskPane first) {
+        first.add(new AbstractActionExt("some") {
+
+            public void actionPerformed(ActionEvent e) {
+                // TODO Auto-generated method stub
+
+            }
+
+        });
+
+        first.add(new AbstractActionExt("other") {
+
+            public void actionPerformed(ActionEvent e) {
+                // TODO Auto-generated method stub
+
+            }
+
+        });
+    }
+
     /**
      * Ensure that removing a task pane properly repaints the container.
      * <p>
@@ -163,6 +196,41 @@ public class JXTaskPaneContainerVisualCheck extends InteractiveTestCase {
      */
     public void testDummy() {
         
+    }
+    public abstract class AbstractLBContentPanel<T extends Object>
+    extends JPanel {
+
+    private JXTaskPaneContainer taskPane;
+    private JXTaskPaneContainer jxTaskPaneContainer;
+
+    public AbstractLBContentPanel(T content) {
+        taskPane = getJXTaskPaneContainer(content);
+        this.add(taskPane);
+    }
+
+            /**
+         * This method initializes JXTaskPaneContainer
+         *
+         * @return org.jdesktop.swingx.JXTaskPaneContainer
+         */
+        private JXTaskPaneContainer getJXTaskPaneContainer(T content) {
+            if (jxTaskPaneContainer == null) {
+                try {
+                    JXTaskPane first = new JXTaskPane();
+                    fillTaskPane(first);
+                    JXTaskPane second = new JXTaskPane();
+                    fillTaskPane(second);
+                    jxTaskPaneContainer = new JXTaskPaneContainer();
+                    jxTaskPaneContainer.setSize(new Dimension(200, 220)); // Generated
+                    jxTaskPaneContainer.setOpaque(false);
+                    jxTaskPaneContainer.add(first);
+                    jxTaskPaneContainer.add(second);
+                } catch (java.lang.Throwable e) {
+                    e.printStackTrace();
+                }
+            }
+            return jxTaskPaneContainer;
+        }
     }
 
 }

@@ -23,13 +23,22 @@ package org.jdesktop.swingx.renderer;
 
 import java.io.File;
 
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
+
+
 import junit.framework.TestCase;
 
 /**
  *
  * @author Karl George Schaefer
  */
+@RunWith(JUnit4.class)
 public class IconValuesTest extends TestCase {
+    @Test
     public void testFileIconWithNonFile() {
         Object o = new Object();
         
@@ -38,6 +47,7 @@ public class IconValuesTest extends TestCase {
     }
     
     //not asserting the output of file icon just that it isn't none
+    @Test
     public void testFileIconWithFile() throws Exception {
         File f = File.createTempFile("ivt", "tmp");
         f.deleteOnExit();

@@ -38,6 +38,12 @@ import org.jdesktop.swingx.plaf.UIManagerExt;
 import org.jdesktop.swingx.search.PatternModel;
 import org.jdesktop.test.PropertyChangeReport;
 import org.jdesktop.test.TestUtils;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
+
 
 /**
  * Test to expose known issues around <code>Locale</code> setting.
@@ -48,6 +54,7 @@ import org.jdesktop.test.TestUtils;
  * 
  * @author Jeanette Winzenburg
  */
+@RunWith(JUnit4.class)
 public class XLocalizeTest extends InteractiveTestCase {
     @SuppressWarnings("all")
     private static final Logger LOG = Logger.getLogger(XLocalizeTest.class
@@ -101,6 +108,7 @@ public class XLocalizeTest extends InteractiveTestCase {
      * 
      * Here: test FindPanel
      */
+    @Test
     public void testLocaleDialogPropertyNotificationInListener() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
@@ -151,6 +159,7 @@ public class XLocalizeTest extends InteractiveTestCase {
      * 
      * Here: test FindBar.
      */
+    @Test
     public void testLocaleFindBarPropertyNotificationInListener() {
         final String prefix = PatternModel.SEARCH_PREFIX;
         final JXFindBar findPanel = new JXFindBar();
@@ -194,6 +203,7 @@ public class XLocalizeTest extends InteractiveTestCase {
      * 
      * Here: test FindPanel
      */
+    @Test
     public void testLocaleFindPanelPropertyNotificationInListener() {
         final String prefix = PatternModel.SEARCH_PREFIX;
         final JXFindPanel findPanel = new JXFindPanel();
@@ -236,6 +246,7 @@ public class XLocalizeTest extends InteractiveTestCase {
      * test correct PropertyChangeNotification: must fire after
      * all internal state is set ... dooohhh.
      */
+    @Test
     public void testLocaleTablePropertyNotification() {
         String prefix = "JXTable.";
         JXTable table = new JXTable(10, 2);
@@ -262,6 +273,7 @@ public class XLocalizeTest extends InteractiveTestCase {
      * 
      * Here: test JXTable.
      */
+    @Test
     public void testLocaleTablePropertyNotificationInListener() {
         final String prefix = "JXTable.";
         final JXTable table = new JXTable(10, 2);
@@ -305,6 +317,7 @@ public class XLocalizeTest extends InteractiveTestCase {
      * Issue #635-swingx: find widgets must support dynamic localization
      * Here: test findPanel's actions (incomplete ..)
      */
+    @Test
     public void testLocaleFindPanel() {
         JXFindPanel panel = new JXFindPanel();
         // JW: arrrgghh ... dirty! Consequence of dirty initialization 
@@ -328,6 +341,7 @@ public class XLocalizeTest extends InteractiveTestCase {
      * <li> passes with jdk6 and LookAndFeelAddon addResourceBundle.
      * </ul>
      */
+    @Test
     public void testLocaleColumnControl() {
        String prefix = "JXTable.";
        JXTable table = new JXTable(10, 2);
@@ -376,6 +390,7 @@ public class XLocalizeTest extends InteractiveTestCase {
      * 
      * 
      */
+    @Test
     public void testGetLocaleUIDefaults() {
         String key = "JXTable.column.packAll";
         Object alternativeValue = UIManagerExt.getString(key, OTHER_LOCALE);

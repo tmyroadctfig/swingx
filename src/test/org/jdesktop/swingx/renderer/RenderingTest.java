@@ -51,6 +51,12 @@ import org.jdesktop.swingx.test.ComponentTreeTableModel;
 import org.jdesktop.swingx.test.XTestUtils;
 import org.jdesktop.test.PropertyChangeReport;
 import org.jdesktop.test.TestUtils;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
+
 
 /**
  * Tests swingx rendering infrastructure: ComponentProvider, CellContext, 
@@ -59,6 +65,7 @@ import org.jdesktop.test.TestUtils;
  * 
  * @author Jeanette Winzenburg
  */
+@RunWith(JUnit4.class)
 public class RenderingTest extends TestCase {
     @SuppressWarnings("unused")
     private static final Logger LOG = Logger.getLogger(RenderingTest.class
@@ -69,6 +76,7 @@ public class RenderingTest extends TestCase {
      * 
      * test hack configuration (arrrggg ...)
      */
+    @Test
     public void testWrappingIconPanelDropHackDefault() {
         JXPanel sanity = new JXPanel();
         assertEquals("visible by default", true, sanity.isVisible());
@@ -83,6 +91,7 @@ public class RenderingTest extends TestCase {
      * 
      * test hack configuration (arrrggg ...)
      */
+    @Test
     public void testWrappingIconPanelDropHackConstructor() {
         JXPanel sanity = new JXPanel();
         assertEquals("visible by default", true, sanity.isVisible());
@@ -96,6 +105,7 @@ public class RenderingTest extends TestCase {
      * Issue #863-swingx: SwingX renderering components must be PainterAware.
      * Here: test Hyperlink
      */
+    @Test
     public void testHyperlinkPainterAware() {
         HyperlinkProvider provider = new HyperlinkProvider();
         assertTrue("hyperlink as rendering comp must be PainterAware", provider.getRendererComponent(null) instanceof PainterAware);
@@ -106,6 +116,7 @@ public class RenderingTest extends TestCase {
      * Issue #863-swingx: SwingX renderering components must be PainterAware.
      * Here: test WrappingIconPanel
      */
+    @Test
     public void testWrappingIconPanelPainterAware() {
         DefaultTreeRenderer renderer = new DefaultTreeRenderer();
         JComponent rendererComponent = renderer.getComponentProvider().getRendererComponent(null);
@@ -118,6 +129,7 @@ public class RenderingTest extends TestCase {
      * Test that selected foreground is same as table. 
      * 
      */
+    @Test
     public void testHyperlinkProviderForeground() {
         JXTable table = new JXTable(20, 2);
         HyperlinkProvider provider = new HyperlinkProvider();
@@ -138,6 +150,7 @@ public class RenderingTest extends TestCase {
      * Issue #842-swingx: HyperlinkProvider getString doesn't serve its contract.
      * 
      */
+    @Test
     public void testHyperlinkStringValue() {
         LinkAction linkAction = new LinkAction() {
 
@@ -159,6 +172,7 @@ public class RenderingTest extends TestCase {
     
 
     
+    @Test
     public void testWrappingProviderUnwrapContructor() {
         WrappingProvider provider = new WrappingProvider(new LabelProvider(), false);
         assertFalse(provider.getUnwrapUserObject());
@@ -168,6 +182,7 @@ public class RenderingTest extends TestCase {
      * 
      * Initial default is true.
      */
+    @Test
     public void testWrappingProviderUserObjectUnwrapInitial() {
         WrappingProvider provider = new WrappingProvider();
         assertEquals(true, provider.getUnwrapUserObject());
@@ -177,6 +192,7 @@ public class RenderingTest extends TestCase {
      * Issue ?? swingx: support to configure the auto-unwrap of tree/table/xx/nodes.
      * setter sets
      */
+    @Test
     public void testWrappingProviderUserObjectUnwrapSet() {
         WrappingProvider provider = new WrappingProvider();
         boolean unwrap = !provider.getUnwrapUserObject();
@@ -188,6 +204,7 @@ public class RenderingTest extends TestCase {
      * Issue ?? swingx: support to configure the auto-unwrap of tree/table/xx/nodes.
      * Respect unwrap flag in getString.
      */
+    @Test
     public void testWrappingProviderUserObjectUnwrapRespectString() {
         StringValue sv = new StringValue() {
 
@@ -212,6 +229,7 @@ public class RenderingTest extends TestCase {
      * Issue ?? swingx: support to configure the auto-unwrap of tree/table/xx/nodes.
      * Respect unwrap flag in configuring a renderer.
      */
+    @Test
     public void testWrappingProviderUserObjectUnwrapRespectRenderer() {
         StringValue sv = new StringValue() {
 
@@ -244,6 +262,7 @@ public class RenderingTest extends TestCase {
      * column)
      * 
      */
+    @Test
     public void testToolTipManagerTreeTableTreeRenderer() {
         JXTreeTable treeTable = new JXTreeTable(new ComponentTreeTableModel(new JXPanel()));
         JComponent label = (JComponent) treeTable.prepareRenderer(treeTable.getCellRenderer(0, 0), 0, 0);
@@ -261,6 +280,7 @@ public class RenderingTest extends TestCase {
      * 
      * Here: Hyperlink in provider
      */
+    @Test
     public void testToolTipManagerHyperlinkProvider() {
         LinkAction linkAction = new LinkAction() {
 
@@ -291,6 +311,7 @@ public class RenderingTest extends TestCase {
      * 
      * Here: JRendererCheckBox-
      */
+    @Test
     public void testToolTipManagerRendererCheckBox() {
        JRendererCheckBox label = new JRendererCheckBox();
        assertNull("sanity - no tooltip", label.getToolTipText());
@@ -311,6 +332,7 @@ public class RenderingTest extends TestCase {
      * Here: JRendererLabel.
      * 
      */
+    @Test
     public void testToolTipManagerRendererLabel() {
        JRendererLabel label = new JRendererLabel();
        assertNull("sanity - no tooltip", label.getToolTipText());
@@ -332,6 +354,7 @@ public class RenderingTest extends TestCase {
      * ToolTipManager registers itself as mouseListener with the component.
      * 
      */
+    @Test
     public void testToolTipManagerJLabel() {
        JLabel label = new JLabel();
        assertNull("sanity - no tooltip", label.getToolTipText());
@@ -390,6 +413,7 @@ public class RenderingTest extends TestCase {
      * Issue #768-swingx: cleanup access to string representation of provider.
      * 
      */
+    @Test
     public void testLabelProviderGetString() {
         StringValue sv = new StringValue() {
 
@@ -409,6 +433,7 @@ public class RenderingTest extends TestCase {
      * Issue #768-swingx: cleanup access to string representation of provider.
      * 
      */
+    @Test
     public void testButtonProviderGetString() {
         StringValue sv = new StringValue() {
 
@@ -428,6 +453,7 @@ public class RenderingTest extends TestCase {
      * Issue #768-swingx: cleanup access to string representation of provider.
      * 
      */
+    @Test
     public void testWrappingProviderGetString() {
         StringValue sv = new StringValue() {
 
@@ -448,6 +474,7 @@ public class RenderingTest extends TestCase {
      * WrappingProvider must do the same "unwrapping" magic in getString as in 
      * getRendereringComponent.
      */
+    @Test
     public void testWrappingProviderGetStringFromNode() {
         StringValue sv = new StringValue() {
 
@@ -470,6 +497,7 @@ public class RenderingTest extends TestCase {
      * Issue #768-swingx: cleanup access to string representation of provider.
      * 
      */
+    @Test
     public void testWrappingProviderGetStringNotNullValue() {
         StringValue sv = new StringValue() {
 
@@ -490,6 +518,7 @@ public class RenderingTest extends TestCase {
      * enhance WrappingProvider to allow real null values. 
      * 
      */
+    @Test
     public void testWrappingProviderNullIcon() {
        CellContext context = new TreeCellContext();
        WrappingProvider provider = new WrappingProvider(IconValue.NONE);
@@ -502,6 +531,7 @@ public class RenderingTest extends TestCase {
      * Added pref/min/max size to list of properties which 
      * must be reset by the DefaultVisuals.
      */
+    @Test
     public void testResetPreferredSize() {
         DefaultVisuals<JComponent> visuals = new DefaultVisuals<JComponent>();
         JComponent label = new  JLabel("somevalue");
@@ -522,6 +552,7 @@ public class RenderingTest extends TestCase {
      * PENDING JW: revisit .. Icon.EMPTY vs. Icon.NONE: what exactly is the expected 
      * behaviour?
      */
+    @Test
     public void testLabelProviderRespectStringValueNoIcon() {
         ImageIcon icon = (ImageIcon) XTestUtils.loadDefaultIcon();
         icon.setDescription("description");
@@ -543,6 +574,7 @@ public class RenderingTest extends TestCase {
      * Here: must show the icon and empty text.
      *
      */
+    @Test
     public void testLabelProviderRespectIconValueNoString() {
         ImageIcon icon = (ImageIcon) XTestUtils.loadDefaultIcon();
         icon.setDescription("description");
@@ -561,6 +593,7 @@ public class RenderingTest extends TestCase {
      * Here: must show both description and icon.
      *
      */
+    @Test
     public void testLabelProviderRespectStringIconValueBoth() {
         ImageIcon icon = (ImageIcon) XTestUtils.loadDefaultIcon();
         icon.setDescription("description");
@@ -576,6 +609,7 @@ public class RenderingTest extends TestCase {
     /**
      * WrappingProvider: test custom icon
      */
+    @Test
     public void testWrappingProviderIcon() {
         final Icon icon = XTestUtils.loadDefaultIcon();
         IconValue iv = new IconValue() {
@@ -591,6 +625,7 @@ public class RenderingTest extends TestCase {
     /**
      * WrappingProvider: test custom icon
      */
+    @Test
     public void testWrappingProviderIconAndContent() {
         final Icon icon = XTestUtils.loadDefaultIcon();
         IconValue iv = new IconValue() {
@@ -609,6 +644,7 @@ public class RenderingTest extends TestCase {
      * WrappingProvider: 
      * test wrappee and its state after instantiation.
      */
+    @Test
     public void testWrappingProviderWrappee() {
         WrappingProvider provider = new WrappingProvider();
         // sanity ...
@@ -629,6 +665,7 @@ public class RenderingTest extends TestCase {
      * WrappingProvider: 
      * test provider's own state after instantiation.
      */
+    @Test
     public void testWrappingProviderDefaults() {
         WrappingProvider provider = new WrappingProvider();
         assertTrue("default wrappee must be LabelProvider but was " + 
@@ -641,6 +678,7 @@ public class RenderingTest extends TestCase {
     /**
      * Test text and boolean taken from MappedValue
      */
+    @Test
     public void testButtonProviderCustomValue() {
         // some object to map
         String identifier = "dummyID";
@@ -675,6 +713,7 @@ public class RenderingTest extends TestCase {
      * here: constructor with null stringValue and align
      *
      */
+    @Test
     public void testButtonProviderDefaultsTwoConstructor() {
         CheckBoxProvider provider = new CheckBoxProvider(null, JLabel.RIGHT);
         TableCellContext context = new TableCellContext();
@@ -702,6 +741,7 @@ public class RenderingTest extends TestCase {
      * here: constructor with null stringValue
      *
      */
+    @Test
     public void testButtonProviderDefaultsOneConstructor() {
         CheckBoxProvider provider = new CheckBoxProvider(null);
         TableCellContext context = new TableCellContext();
@@ -729,6 +769,7 @@ public class RenderingTest extends TestCase {
      * here: parameterless constructor
      *
      */
+    @Test
     public void testButtonProviderDefaultsEmptyConstructor() {
         CheckBoxProvider provider = new CheckBoxProvider();
         TableCellContext context = new TableCellContext();
@@ -752,6 +793,7 @@ public class RenderingTest extends TestCase {
      * test ButtonProvider default constructor and properties.
      *
      */
+    @Test
     public void testButtonProviderConstructor() {
         ComponentProvider provider = new CheckBoxProvider();
         assertEquals(JLabel.CENTER, provider.getHorizontalAlignment());
@@ -763,6 +805,7 @@ public class RenderingTest extends TestCase {
      * Test provider property reset: borderPainted.
      *
      */
+    @Test
     public void testButtonProviderBorderPainted() {
         CheckBoxProvider provider = new CheckBoxProvider();
         TableCellContext context = new TableCellContext();
@@ -776,6 +819,7 @@ public class RenderingTest extends TestCase {
      * Test provider property reset: horizontal.
      *
      */
+    @Test
     public void testButtonProviderHorizontalAlignment() {
         CheckBoxProvider provider = new CheckBoxProvider();
         CellContext context = new TableCellContext();
@@ -791,6 +835,7 @@ public class RenderingTest extends TestCase {
      * 
      *
      */
+    @Test
     public void testConstructorClients() {
         JXTable table = new JXTable();
         // Number
@@ -810,6 +855,7 @@ public class RenderingTest extends TestCase {
     /**
      * Test constructors: convenience constructor.
      */
+    @Test
     public void testConstructorConvenience() {
         FormatStringValue sv = new FormatStringValue(DateFormat.getTimeInstance());
         int align = JLabel.RIGHT;
@@ -821,6 +867,7 @@ public class RenderingTest extends TestCase {
     /**
      * Test constructors: parameterless.
      */
+    @Test
     public void testConstructorDefault() {
         LabelProvider provider = new LabelProvider();
         assertEquals(JLabel.LEADING, provider.getHorizontalAlignment());
@@ -830,6 +877,7 @@ public class RenderingTest extends TestCase {
     /**
      * Test constructors: convenience constructor.
      */
+    @Test
     public void testConstructorAlignment() {
         int align = JLabel.RIGHT;
         LabelProvider provider = new LabelProvider(align);
@@ -840,6 +888,7 @@ public class RenderingTest extends TestCase {
     /**
      * Test constructors: convenience constructor.
      */
+    @Test
     public void testConstructorStringValue() {
         FormatStringValue sv = new FormatStringValue(DateFormat.getTimeInstance());
         LabelProvider provider = new LabelProvider(sv);
@@ -851,6 +900,7 @@ public class RenderingTest extends TestCase {
      * test that default visual config clears the tooltip.
      *
      */
+    @Test
     public void testResetTooltip() {
         DefaultVisuals<JComponent> visuals = new DefaultVisuals<JComponent>();
         JComponent label = new  JLabel("somevalue");
@@ -863,6 +913,7 @@ public class RenderingTest extends TestCase {
      * Test if all collaborators can cope with null component on CellContext.
      *
      */
+    @Test
     public void testEmptyContext() {
         // test LabelProvider
         // same for list and table
@@ -887,6 +938,7 @@ public class RenderingTest extends TestCase {
      * Test doc'ed constructor behaviour of default tree renderer.
      *
      */
+    @Test
     public void testDefaultTreeRendererConstructors() {
         DefaultTreeRenderer renderer = new DefaultTreeRenderer();
         assertTrue(renderer.componentController instanceof WrappingProvider);
@@ -904,6 +956,7 @@ public class RenderingTest extends TestCase {
      * Test doc'ed constructor behaviour of default list renderer.
      *
      */
+    @Test
     public void testDefaultListRendererConstructors() {
         DefaultListRenderer renderer = new DefaultListRenderer();
         assertTrue(renderer.componentController instanceof LabelProvider);
@@ -919,6 +972,7 @@ public class RenderingTest extends TestCase {
      * Test doc'ed constructor behaviour of default table renderer.
      *
      */
+    @Test
     public void testDefaultTableRendererConstructors() {
         DefaultTableRenderer renderer = new DefaultTableRenderer();
         assertTrue(renderer.componentController instanceof LabelProvider);
@@ -935,6 +989,7 @@ public class RenderingTest extends TestCase {
      * with null context. Here: test getRenderingComponent in WrappingProvider.
      *
      */
+    @Test
     public void testGetWrappingComponentNullContext() {
         WrappingProvider provider = new WrappingProvider();
         assertEquals(provider.rendererComponent, provider.getRendererComponent(null));
@@ -944,6 +999,7 @@ public class RenderingTest extends TestCase {
      * public methods of <code>ComponentProvider</code> must cope
      * with null context. Here: test getRenderingComponent in LabelProvider.
      */
+    @Test
     public void testGetComponentNullContext() {
         ComponentProvider controller = new LabelProvider();
         assertEquals(controller.rendererComponent, controller.getRendererComponent(null));
@@ -954,6 +1010,7 @@ public class RenderingTest extends TestCase {
      * NPE on null context.
      *
      */
+    @Test
     public void testConfigureVisualsNullContext() {
         DefaultVisuals<JLabel> controller = new DefaultVisuals<JLabel>();
         try {
@@ -970,6 +1027,7 @@ public class RenderingTest extends TestCase {
      * NPE on null component.
      *
      */
+    @Test
     public void testConfigureVisualsNullComponent() {
         DefaultVisuals<JLabel> controller = new DefaultVisuals<JLabel>();
         try {
@@ -987,6 +1045,7 @@ public class RenderingTest extends TestCase {
      * Fail-fast NPE in label.paintComponentWithPainter.
      *
      */
+    @Test
     public void testLabelNPEPaintComponentOpaqueWithPainter() {
         JRendererLabel label = new JRendererLabel();
         label.setOpaque(true);
@@ -1005,6 +1064,7 @@ public class RenderingTest extends TestCase {
      * Fail-fast NPE in paintPainter.
      *
      */
+    @Test
     public void testLabelNPEPaintComponentWithPainter() {
         JRendererLabel label = new JRendererLabel();
         label.setOpaque(false);
@@ -1024,6 +1084,7 @@ public class RenderingTest extends TestCase {
      * NPE in label.paintComponentWithPainter finally block.
      *
      */
+    @Test
     public void testButtonNPEPaintComponentOpaqueWithPainter() {
         JRendererCheckBox  checkBox = new JRendererCheckBox();
         checkBox.setOpaque(true);
@@ -1043,6 +1104,7 @@ public class RenderingTest extends TestCase {
      * label.paintComponentWithPainter finally block.
      * 
      */
+    @Test
     public void testButtonNPEPaintComponentWithPainter() {
         JRendererCheckBox checkBox = new JRendererCheckBox();
         checkBox.setOpaque(false);

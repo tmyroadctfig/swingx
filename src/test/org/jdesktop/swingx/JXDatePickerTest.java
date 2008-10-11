@@ -59,10 +59,17 @@ import org.jdesktop.swingx.test.XTestUtils;
 import org.jdesktop.test.ActionReport;
 import org.jdesktop.test.PropertyChangeReport;
 import org.jdesktop.test.TestUtils;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
+
 
 /**
  * Unit tests for JXDatePicker.
  */
+@RunWith(JUnit4.class)
 public class JXDatePickerTest extends InteractiveTestCase {
     private static final Logger LOG = Logger.getLogger(JXDatePickerTest.class
             .getName());
@@ -70,18 +77,21 @@ public class JXDatePickerTest extends InteractiveTestCase {
     private Calendar calendar;
 
     @Override
-    public void setUp() {
+    @Before
+       public void setUp() {
         calendar = Calendar.getInstance();
     }
 
     @Override
-    public void tearDown() {
+    @After
+       public void tearDown() {
     }
 
     /**
      * Issue #910-swingx: home commit must be disabled if picker not editable.
      * 
      */
+    @Test
     public void testNotEditableNullHomeNavigate() {
         JXDatePicker picker = new JXDatePicker();
         picker.getActionMap().remove(JXDatePicker.HOME_NAVIGATE_KEY);
@@ -92,6 +102,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      * Issue #910-swingx: home commit must be disabled if picker not editable.
      * 
      */
+    @Test
     public void testNotEditableDisabledHomeNavigate() {
         JXDatePicker picker = new JXDatePicker();
         Action delegate = picker.getActionMap().get(JXDatePicker.HOME_NAVIGATE_KEY);
@@ -104,6 +115,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      * Issue #910-swingx: home commit must be disabled if picker not editable.
      * 
      */
+    @Test
     public void testNotEditableNullHomeCommit() {
         JXDatePicker picker = new JXDatePicker();
         picker.getActionMap().remove(JXDatePicker.HOME_COMMIT_KEY);
@@ -114,6 +126,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      * Issue #910-swingx: home commit must be disabled if picker not editable.
      * 
      */
+    @Test
     public void testNotEditableDisabledHomeCommit() {
         JXDatePicker picker = new JXDatePicker();
         Action delegate = picker.getActionMap().get(JXDatePicker.HOME_COMMIT_KEY);
@@ -125,6 +138,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      * Sanity: report in forum that editor not disabled if picker disabled.
      * Looks okay.
      */
+    @Test
     public void testEnabled() {
         JXDatePicker picker = new JXDatePicker();
         picker.setEnabled(false);
@@ -138,6 +152,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      * 
      * editor must respect columns.
      */
+    @Test
     public void testDatePickerColumns50() {
         JXDatePicker picker = new JXDatePicker();
         picker.getEditor().setColumns(50);
@@ -152,6 +167,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      * 
      * editor must respect columns.
      */
+    @Test
     public void testDatePickerColumns5() {
         JXDatePicker picker = new JXDatePicker();
         picker.getEditor().setColumns(5);
@@ -168,6 +184,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      * editors border if it finds a null. 
      * 
      */
+    @Test
     public void testPickerBorder() {
         // force loading of addon
         new JXDatePicker();
@@ -194,6 +211,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      * Here: change the timezone on the monthView - can't guarantee the notification.
      * At least not without hacks...
      */
+    @Test
     public void testTimeZoneChangeNotificationChangeOnMonthView() {
         JXDatePicker picker = new JXDatePicker();
         TimeZone timeZone = picker.getTimeZone();
@@ -208,6 +226,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      * Issue #724-swingx: picker must notify about timezone changes.
      * Here: change the timezon on the picker - can guarantee the notification.
      */
+    @Test
     public void testTimeZoneChangeNotification() {
         JXDatePicker picker = new JXDatePicker();
         TimeZone timeZone = picker.getTimeZone();
@@ -223,6 +242,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      * Here: setMonthView must update the picker's timezone if different and
      *   fire a notification.
      */
+    @Test
     public void testTimeZoneSetMonthView() {
         JXDatePicker picker = new JXDatePicker();
         TimeZone timeZone = picker.getTimeZone();
@@ -249,6 +269,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      * model's calendar coordinates, a SingleDaySelectionModel keeps the date as-is.
      * For now, need to explicitly set. 
      */
+    @Test
     public void testSetDateKeepsTime() {
         JXDatePicker picker = new JXDatePicker();
         DateSelectionModel selectionModel = new SingleDaySelectionModel();
@@ -269,6 +290,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      * The implication is that client code (such as JXDatePicker/UI) is 
      * responsible to do the scrolling.
      */
+    @Test
     public void testVisibleMonthContainsSelectionOpenSet() {
         if (GraphicsEnvironment.isHeadless()) {
             LOG.info("cannot run testLinkPanelNull - headless");
@@ -296,6 +318,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      * The implication is that client code (such as JXDatePicker/UI) is 
      * responsible to do the scrolling.
      */
+    @Test
     public void testVisibleMonthContainsSelectionOpenInitial() {
         if (GraphicsEnvironment.isHeadless()) {
             LOG.info("cannot run testLinkPanelNull - headless");
@@ -321,6 +344,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      * The implication is that client code (such as JXDatePicker/UI) is 
      * responsible to do the scrolling.
      */
+    @Test
     public void testVisibleMonthContainsSelectionIinitial() {
         calendar.set(2008, Calendar.JULY, 15);
         JXDatePicker picker = new JXDatePicker(calendar.getTime());
@@ -336,6 +360,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      * The implication is that client code (such as JXDatePicker/UI) is 
      * responsible to do the scrolling.
      */
+    @Test
     public void testVisibleMonthContainsSelectionSet() {
         JXDatePicker picker = new JXDatePicker();
         calendar.set(2008, Calendar.JULY, 15);
@@ -350,6 +375,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      * Issue #693-swingx: format of custom locale.
      * Here: test constructor with locale parameter.
      */
+    @Test
     public void testCustomLocaleConstructor() {
         Locale german = Locale.GERMAN;
         JXDatePicker picker = new JXDatePicker(german);
@@ -362,6 +388,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      * Issue #693-swingx: format of custom locale.
      * Here: test setLocale.
      */
+    @Test
     public void testCustomLocaleSet() {
         Locale german = Locale.GERMAN;
         JXDatePicker picker = new JXDatePicker();
@@ -376,6 +403,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      * 
      * Here: default formats re-set.
      */
+    @Test
     public void testDefaultFormats() {
         JXDatePicker picker = new JXDatePicker();
         DateFormat[] formats = picker.getFormats();
@@ -389,6 +417,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      * 
      * Sanity test: custom format set as expected.
      */
+    @Test
     public void testCustomFormatsSet() {
         JXDatePicker picker = new JXDatePicker();
         DateFormat format = DateFormat.getDateInstance(DateFormat.MEDIUM,Locale.UK);
@@ -403,6 +432,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      * 
      * Here: test that custom format is unchanged after updateUI
      */
+    @Test
     public void testCustomFormatsKept() {
         JXDatePicker picker = new JXDatePicker();
         DateFormat format = DateFormat.getDateInstance(DateFormat.MEDIUM,Locale.UK);
@@ -423,6 +453,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      * value (and no way to remove which is okay).
      * 
      */
+    @Test
     public void testLinkFormatStringNull() {
         // force loading
         new JXDatePicker();
@@ -443,6 +474,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      * Forum report: NPE under certain initial conditions.
      * 
      */
+    @Test
     public void testPickerFormatSetFormats() {
         JXDatePicker picker = new JXDatePicker();
         picker.setFormats((DateFormat[])null);
@@ -454,6 +486,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      * Forum report: NPE under certain initial conditions.
      * 
      */
+    @Test
     public void testPickerFormatSetFormatsNullElements() {
         JXDatePicker picker = new JXDatePicker();
         try {
@@ -470,6 +503,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      * Forum report: NPE under certain initial conditions.
      * 
      */
+    @Test
     public void testPickerFormatSetFormatStrings() {
         JXDatePicker picker = new JXDatePicker();
         picker.setFormats((String[])null);
@@ -481,6 +515,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      * Forum report: NPE under certain initial conditions.
      * 
      */
+    @Test
     public void testPickerFormatSetFormatStringsNullElements() {
         JXDatePicker picker = new JXDatePicker();
         try {
@@ -497,6 +532,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      * This produced exactly the stacktrace as reported.
      * 
      */
+    @Test
     public void testPickerFormatsNotNull() {
         JXDatePicker picker = new JXDatePicker();
         // trick the picker - no formats
@@ -511,6 +547,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      * 
      * 
      */
+    @Test
     public void testPickerFormatsNotNullUnknownFormatter() {
         JXDatePicker picker = new JXDatePicker();
         // trick the picker - no formats
@@ -530,6 +567,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      * testing internals: need focus listener add/remove
      *
      */
+    @Test
     public void testFocusListenerOnPicker() {
         JXDatePicker picker = new JXDatePicker();
         assertEquals(1, picker.getFocusListeners().length);
@@ -544,6 +582,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      * testing internals: need focus listener add/remove
      *
      */
+    @Test
     public void testFocusListenerOnEditor() {
         JFormattedTextField field = new JFormattedTextField(new DatePickerFormatter());
         int listenerCount = field.getFocusListeners().length;
@@ -557,6 +596,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      * tests LinkPanel set to null after showing.
      * Was: NPE.
      */
+    @Test
     public void testLinkPanelSetNull() {
         if (GraphicsEnvironment.isHeadless()) {
             LOG.info("cannot run testLinkPanelNull - headless");
@@ -576,6 +616,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      * tests initial null linkPanel.
      *
      */
+    @Test
     public void testLinkPanelInitalNull() {
         if (GraphicsEnvironment.isHeadless()) {
             LOG.info("cannot run testLinkPanelNull - headless");
@@ -596,6 +637,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      * - removed/added from parent
      * - bindings initially installed/uninstalled/re-installed
      */
+    @Test
     public void testLinkPanelRemovedAdded() {
         if (GraphicsEnvironment.isHeadless()) {
             LOG.info("cannot run testLinkPanelNull - headless");
@@ -635,6 +677,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      * are removed (no popup)
      *
      */
+    @Test
     public void testLinkPanelBindingUninstalled() {
         JXDatePicker picker = new JXDatePicker();
         JComponent linkPanel = picker.getLinkPanel();
@@ -648,6 +691,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      * for homeCommit/-Cancel (initially, no popup)
      *
      */
+    @Test
     public void testLinkPanelAction() {
         JXDatePicker picker = new JXDatePicker();
         JComponent linkPanel = picker.getLinkPanel();
@@ -718,6 +762,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      * picker's actionMap.
      *
      */
+    @Test
     public void testTogglePopupAction() {
        JXDatePicker picker = new JXDatePicker();
        Action togglePopup = picker.getActionMap().get("TOGGLE_POPUP");
@@ -735,6 +780,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      * Test that set date programmatically (directly or indirectly) 
      * does not fire an actionEvent.
      */
+    @Test
     public void testSetDateSilently() {
         JXDatePicker picker = new JXDatePicker();
         ActionReport report = new ActionReport();
@@ -762,6 +808,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      * cancel in the picker.
      *
      */
+    @Test
     public void testCommitCancelFromMonthViewCancel() {
         JXDatePicker picker = new JXDatePicker();
         final ActionReport report = new ActionReport();
@@ -780,6 +827,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      * commit in the picker.
      *
      */
+    @Test
     public void testCommitCancelFromMonthViewCommit() {
         JXDatePicker picker = new JXDatePicker();
         Action commitAction = picker.getMonthView().getActionMap().get(JXMonthView.COMMIT_KEY);
@@ -796,6 +844,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      * 
      * test that the ui installed a listener.
      */
+    @Test
     public void testCommitCancelListeningToMonthView() {
         JXMonthView monthView = new JXMonthView();
         int standalone = monthView.getListeners(ActionListener.class).length;
@@ -809,6 +858,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      * test wrapping and resetting the editors cancel action.
      * internals ... mostly to be sure about cleanup and re-wire.
      */
+    @Test
     public void testCancelEditorAction() {
         JFormattedTextField field = new JFormattedTextField(new DatePickerFormatter());
         // original action
@@ -841,6 +891,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      * state unchanged and no events fired (except the actionEvent).
      *
      */
+    @Test
     public void testCancelEditRevertsSilently() {
         JXDatePicker picker = new JXDatePicker(new Date());
         String text = picker.getEditor().getText();
@@ -866,6 +917,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      * PENDING: need to invoke ... safe test?
      *
      */
+    @Test
     public void testCommitCancelActionsFireCancel() {
         JXDatePicker picker = new JXDatePicker();
         final ActionReport report = new ActionReport();
@@ -882,6 +934,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      * test that commit fires as expected.
      * PENDING: need to invoke ... safe test?
      */
+    @Test
     public void testCommitCancelActionsFireCommit() {
         JXDatePicker picker = new JXDatePicker();
         Action commitAction = picker.getActionMap().get(JXDatePicker.COMMIT_KEY);
@@ -898,6 +951,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      * test that actions are registered.
      *
      */
+    @Test
     public void testCommitCancelActionExist() {
         JXDatePicker picker = new JXDatePicker();
         assertNotNull(picker.getActionMap().get(JXDatePicker.CANCEL_KEY));
@@ -910,6 +964,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      * 
      * linkDate synced with monthView's today after setting.
      */
+    @Test
     public void testLinkDateSetToday() {
         JXDatePicker picker = new JXDatePicker();
         Calendar cal = picker.getMonthView().getCalendar();
@@ -926,6 +981,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      * 
      * Initial linkDate synced with monthView's today.
      */
+    @Test
     public void testLinkDateInitial() {
         JXDatePicker picker = new JXDatePicker();
         assertEquals(picker.getMonthView().getToday(), picker.getLinkDay());
@@ -936,6 +992,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      * 
      * Here: set timezone in picker.
      */
+    @Test
     public void testSynchTimeZoneLinkFormatOnModified() {
         JXDatePicker picker = new JXDatePicker();
         TimeZone alternative = getSafeAlternativeTimeZone(picker.getTimeZone());
@@ -948,6 +1005,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
 
      * Here: set monthView with alternative timezone
      */
+    @Test
     public void testSynchTimeZoneLinkFormatOnSetMonthView() {
         JXDatePicker picker = new JXDatePicker();
         TimeZone defaultZone = picker.getTimeZone();
@@ -981,6 +1039,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      * Issue #554-swingx: timezone of formats and picker must be synched.
      * Here: set the timezone in the monthView.
      */
+    @Test
     public void testSynchTimeZoneModifiedInMonthView() {
         JXDatePicker picker = new JXDatePicker();
         TimeZone defaultZone = picker.getTimeZone();
@@ -995,6 +1054,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      * 
      * Here: set the timezone in the picker.
      */
+    @Test
     public void testSynchTimeZoneModifiedInPicker() {
         JXDatePicker picker = new JXDatePicker();
         TimeZone defaultZone = picker.getTimeZone();
@@ -1008,6 +1068,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
 
      * Here: set the timezone in the picker.
      */
+    @Test
     public void testSynchTimeZoneOnSetMonthView() {
         JXDatePicker picker = new JXDatePicker();
         TimeZone defaultZone = picker.getTimeZone();
@@ -1023,6 +1084,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      * 
      * Here: initialize the formats with the pickers timezone on setting.
      */
+    @Test
     public void testSynchTimeZoneOnSetFormats() {
         JXDatePicker picker = new JXDatePicker();
         TimeZone defaultZone = picker.getTimeZone();
@@ -1050,6 +1112,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
     /**
      * Issue #554-swingx: timezone of formats and picker must be synched.
      */
+    @Test
     public void testSynchTimeZoneInitial() {
         JXDatePicker picker = new JXDatePicker();
         assertNotNull(picker.getTimeZone());
@@ -1062,6 +1125,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      * setFormats should fire a propertyChange.
      *
      */
+    @Test
     public void testFormatsProperty() {
         JXDatePicker picker = new JXDatePicker();
         PropertyChangeReport report = new PropertyChangeReport();
@@ -1076,6 +1140,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
     /**
      * Test doc'ed behaviour: editor must not be null.
      */
+    @Test
     public void testEditorNull() {
         JXDatePicker picker = new JXDatePicker();
         assertNotNull(picker.getEditor());
@@ -1091,6 +1156,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
     /**
      * Test doc'ed behaviour: editor must not be null.
      */
+    @Test
     public void testMonthViewNull() {
         JXDatePicker picker = new JXDatePicker();
         assertNotNull(picker.getMonthView());
@@ -1108,6 +1174,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      * are up for the DatePickerUI to decide. 
      * 
      */
+    @Test
     public void testSetDateCleansDate() {
         JXDatePicker picker = new JXDatePicker();
         Date date = calendar.getTime();
@@ -1119,6 +1186,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      * Regression testing: make sure the passed-in date is not changed.
      * 
      */
+    @Test
     public void testSetDateDoesNotChangeOriginal() {
         JXDatePicker picker = new JXDatePicker();
         Date date = calendar.getTime();
@@ -1130,6 +1198,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
     /**
      *  date is a bound property of DatePicker.
      */
+    @Test
     public void testDateProperty() {
         JXDatePicker picker = new JXDatePicker();
         Date date = XTestUtils.getStartOfToday(5);
@@ -1143,6 +1212,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      *  date is a bound property of DatePicker. 
      *  test indirect event firing: changed editor value
      */
+    @Test
     public void testDatePropertyThroughEditor() {
         JXDatePicker picker = new JXDatePicker();
         Date date = XTestUtils.getStartOfToday(5);
@@ -1156,6 +1226,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      *  date is a bound property of DatePicker.
      *  test indirect event firing: changed monthView selection 
      */
+    @Test
     public void testDatePropertyThroughSelection() {
         JXDatePicker picker = new JXDatePicker();
         Date date = XTestUtils.getStartOfToday(5);
@@ -1171,6 +1242,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      * @throws ParseException 
      *
      */
+    @Test
     public void testDatePropertyThroughCommit() throws ParseException {
         JXDatePicker picker = new JXDatePicker(new Date());
         Date initialDate = picker.getDate();
@@ -1200,6 +1272,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      * @throws ParseException 
      *
      */
+    @Test
     public void testSynchAllAfterCommit() throws ParseException {
         JXDatePicker picker = new JXDatePicker(new Date());
         String text = picker.getEditor().getText();
@@ -1226,6 +1299,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      * here: initial. 
      * 
      */
+    @Test
     public void testSynchAllInitialDate() {
         Date date = XTestUtils.getStartOfToday(5);
         JXDatePicker picker = new JXDatePicker(date);
@@ -1238,6 +1312,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      * 
      * Note: test uses a cleaned date, do same with uncleaned.
      */
+    @Test
     public void testSynchAllOnDateModified() {
         JXDatePicker picker = new JXDatePicker();
         Date date = XTestUtils.getStartOfToday(5);
@@ -1250,6 +1325,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      * here: set selected date in monthview
      * Note: test uses a cleaned date, do same with uncleaned.
      */
+    @Test
     public void testSynchAllOnSelectionChange()  {
         JXDatePicker picker = new JXDatePicker();
         Date date = XTestUtils.getStartOfToday(5);
@@ -1263,6 +1339,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      * 
      * Note: test uses a cleaned date, do same with uncleaned.
      */
+    @Test
     public void testSynchAllOnEditorSetValue() {
         JXDatePicker picker = new JXDatePicker();
         Date date = XTestUtils.getStartOfToday(5);
@@ -1276,6 +1353,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      * 
      * Note: this started to fail during listener cleanup.
      */
+    @Test
     public void testSynchAllOnEditorSetValueAfterSetEditor() {
         JXDatePicker picker = new JXDatePicker();
         picker.setEditor(new JFormattedTextField(DateFormat.getInstance()));
@@ -1290,6 +1368,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      * 
      * Note: this started to fail during listener cleanup.
      */
+    @Test
     public void testSynchAllOnSelectionChangeAfterSetMonthView() {
         JXDatePicker picker = new JXDatePicker();
         picker.setMonthView(new JXMonthView());
@@ -1307,6 +1386,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      * 
      * Note: this started to fail during listener cleanup.
      */
+    @Test
     public void testSynchAllOnSelectionChangeAfterSetSelectionModel() {
         JXDatePicker picker = new JXDatePicker();
         picker.getMonthView().setSelectionModel(new DefaultDateSelectionModel());
@@ -1342,6 +1422,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
     /**
      * test that input of unselectable dates reverts editors value.
      */
+    @Test
     public void testRejectSetValueUnselectable() {
         JXDatePicker picker = new JXDatePicker();
         Date upperBound = XTestUtils.getStartOfToday(1);
@@ -1366,6 +1447,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      * brittle because done during the notification. 
      * Changed to use dedicated listener.
      */
+    @Test
     public void testSpuriousEditableListening() {
         JXDatePicker picker = new JXDatePicker();
         picker.getEditor().setEditable(false);
@@ -1380,6 +1462,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      * PickerUI listened to enabled of button (meant: datePicker) and resets
      * the buttons property. 
      */
+    @Test
     public void testSpuriousEnabledListening() {
         JXDatePicker picker = new JXDatePicker();
         Component button = null;
@@ -1405,6 +1488,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      * ui listening to picker property changes.
      *
      */
+    @Test
     public void testDatePickerPropertyListening() {
         JXDatePicker picker = new JXDatePicker();
         picker.setEnabled(false);
@@ -1420,6 +1504,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      * uninstallListeners but later in uninstallComponents - at that time
      * the handler is already nulled, removing will actually create a new one.
      */
+    @Test
     public void testEditorListeners() {
         JFormattedTextField field = new JFormattedTextField(DateFormat.getInstance());
         JXDatePicker picker = new JXDatePicker();
@@ -1442,6 +1527,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      * quick&dirty fix: let the picker manually update.
      *
      */
+    @Test
     public void testEditorValueOnSetMonthView() {
         JXDatePicker picker = new JXDatePicker(new Date());
         // set unselected monthView
@@ -1465,6 +1551,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      * 
      * 
      */
+    @Test
     public void testEditorValueOnSetEditor() {
         JXDatePicker picker = new JXDatePicker();
         Object value = picker.getEditor().getValue();
@@ -1480,6 +1567,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      *
      * @see #testEditorValueOnSetEditor
      */
+    @Test
     public void testEditorUpdateOnLF() {
         JXDatePicker picker = new JXDatePicker();
         Object date = picker.getEditor().getValue();
@@ -1497,6 +1585,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      * Here: model with selection.
      *
      */
+    @Test
     public void testSynchAllAfterSetSelectionModelNotEmpty() {
         JXDatePicker picker = new JXDatePicker();
         Date date = XTestUtils.getStartOfToday(5);
@@ -1517,6 +1606,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      * Here: model with empty selection.
      *
      */
+    @Test
     public void testSynchAllAfterSetSelectionModelEmpty() {
         JXDatePicker picker = new JXDatePicker(new Date());
         assertNotNull(picker.getDate());
@@ -1533,6 +1623,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      * Here: monthview with selection.
      *
      */
+    @Test
     public void testSynchAllSetMonthViewWithSelection() {
         JXDatePicker picker = new JXDatePicker();
         JXMonthView monthView = new JXMonthView();
@@ -1551,6 +1642,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      * Here: monthview with empty selection.
      *
      */
+    @Test
     public void testSynchAllSetMonthViewWithEmptySelection() {
         JXDatePicker picker = new JXDatePicker(new Date());
         // sanity
@@ -1568,6 +1660,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
      * If not, the initial size might appear kind of collapsed.
      *
      */
+    @Test
     public void testPrefSizeEmptyEditor() {
         JXDatePicker picker = new JXDatePicker(new Date());
         // sanity 
@@ -1578,11 +1671,13 @@ public class JXDatePickerTest extends InteractiveTestCase {
         assertEquals("pref width must be same for empty/filled", filled.width, empty.width);
     }
     
+    @Test
     public void testDefaultConstructor() {
         JXDatePicker datePicker = new JXDatePicker();
         assertNull(datePicker.getDate());
     }
 
+    @Test
     public void testConstructor() {
         calendar.setTimeInMillis(System.currentTimeMillis());
         calendar.add(Calendar.DAY_OF_MONTH, 5);
@@ -1591,11 +1686,13 @@ public class JXDatePickerTest extends InteractiveTestCase {
         assertTrue(expectedDate.equals(datePicker.getDate()));
     }
 
+    @Test
     public void testNullSelection() {
         JXDatePicker datePicker = new JXDatePicker();
         assertTrue(null == datePicker.getDate());
     }
 
+    @Test
     public void testSetDate() {
         calendar.setTimeInMillis(System.currentTimeMillis());
         calendar.add(Calendar.DAY_OF_MONTH, 5);

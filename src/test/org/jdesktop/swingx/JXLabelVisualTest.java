@@ -14,11 +14,19 @@ import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 
-public class JXLabel2VisualTest extends InteractiveTestCase {
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
+
+
+@RunWith(JUnit4.class)
+public class JXLabelVisualTest extends InteractiveTestCase {
 
     public static void main(String[] args) throws Exception {
         // setSystemLF(true);
-        JXLabel2VisualTest test = new JXLabel2VisualTest();
+        JXLabelVisualTest test = new JXLabelVisualTest();
 
         try {
             test.runInteractiveTests();
@@ -102,6 +110,7 @@ public class JXLabel2VisualTest extends InteractiveTestCase {
      * (would output a warning without a test fixture).
      *
      */
+    @Test
     public void testDummy() {
 
     }

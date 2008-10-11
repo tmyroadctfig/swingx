@@ -21,19 +21,23 @@ import java.util.Properties;
 
 import javax.swing.JTree;
 
+import junit.framework.TestCase;
+
 import org.jdesktop.swingx.icon.EmptyIcon;
 import org.jdesktop.swingx.tips.DefaultTip;
 import org.jdesktop.swingx.tips.DefaultTipOfTheDayModel;
 import org.jdesktop.swingx.tips.TipLoader;
 import org.jdesktop.swingx.tips.TipOfTheDayModel;
 import org.jdesktop.test.PropertyChangeReport;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.junit.Test;
 
-public class JXTipOfTheDayTest extends InteractiveTestCase {
 
-  public JXTipOfTheDayTest(String arg0) {
-    super(arg0);
-  }
+@RunWith(JUnit4.class)
+public class JXTipOfTheDayTest extends TestCase {
 
+    @Test
   public void testBean() {
     PropertyChangeReport report = new PropertyChangeReport();
     JXTipOfTheDay totd = new JXTipOfTheDay();
@@ -100,6 +104,7 @@ public class JXTipOfTheDayTest extends InteractiveTestCase {
     assertEquals(tip.getTipName(), tip.toString());
   }
   
+    @Test
   public void testTipLoader() {
     TipOfTheDayModel model;
     
@@ -142,11 +147,13 @@ public class JXTipOfTheDayTest extends InteractiveTestCase {
     assertEquals(3, model.getTipCount());
   }
   
+    @Test
   public void testAddon() throws Exception {
     // move around all addons
     TestUtilities.cycleAddons(new JXTipOfTheDay());
   }
   
+    @Test
   public void testChoice() throws Exception {
     JXTipOfTheDay.ShowOnStartupChoice noshow = new JXTipOfTheDay.ShowOnStartupChoice() {
       public boolean isShowingOnStartup() { return false; }

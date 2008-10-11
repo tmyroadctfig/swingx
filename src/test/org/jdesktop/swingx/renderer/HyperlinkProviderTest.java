@@ -23,6 +23,12 @@ import org.jdesktop.swingx.hyperlink.LinkModel;
 import org.jdesktop.swingx.hyperlink.LinkModelAction;
 import org.jdesktop.swingx.rollover.RolloverProducer;
 import org.jdesktop.test.AncientSwingTeam;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
+
 
 /**
  * Test around hyperlink rendering.
@@ -32,6 +38,7 @@ import org.jdesktop.test.AncientSwingTeam;
  * 
  * @author Jeanette Winzenburg
  */
+@RunWith(JUnit4.class)
 public class HyperlinkProviderTest extends InteractiveTestCase {
     private static final Logger LOG = Logger.getLogger(HyperlinkProviderTest.class
             .getName());
@@ -45,6 +52,7 @@ public class HyperlinkProviderTest extends InteractiveTestCase {
      * renderers must cope with type mismatch.
      *
      */
+    @Test
     public void testMixedValueTypes() {
         LinkModelAction action = new LinkModelAction(new EditorPaneLinkVisitor());
         TableCellRenderer linkRenderer = new DefaultTableRenderer(
@@ -57,6 +65,7 @@ public class HyperlinkProviderTest extends InteractiveTestCase {
      * sanity: can cope with subclasses.
      * a side-effect: renderers should cope with null table.
      */
+    @Test
     public void testSubclassedValueTypes() {
         LinkModelAction action = new LinkModelAction(new EditorPaneLinkVisitor());
         TableCellRenderer renderer = new DefaultTableRenderer(
@@ -73,6 +82,7 @@ public class HyperlinkProviderTest extends InteractiveTestCase {
      * changing LF.
      * 
      */
+    @Test
     public void testSelectionBackground() {
         JXTable table = new JXTable(2, 2);
         TableCellRenderer linkRenderer = new DefaultTableRenderer(new HyperlinkProvider());
@@ -96,6 +106,7 @@ public class HyperlinkProviderTest extends InteractiveTestCase {
      * changing LF.
      * 
      */
+    @Test
     public void testRendererComponentPropertiesAfterLFChange() {
         JXTable table = new JXTable(2, 2);
         TableCellRenderer linkRenderer = new DefaultTableRenderer(new HyperlinkProvider());
@@ -130,6 +141,7 @@ public class HyperlinkProviderTest extends InteractiveTestCase {
 
     }
 
+    @Test
     public void testRolloverRecognition() {
         JXTable table = new JXTable(2, 2);
         TableCellRenderer linkRenderer = new DefaultTableRenderer(new HyperlinkProvider());

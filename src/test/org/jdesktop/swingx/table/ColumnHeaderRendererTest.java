@@ -30,12 +30,19 @@ import javax.swing.JTextField;
 import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXTable;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
+
 
 /**
  * Test ColumnHeaderRenderer.
  * 
  * @author Jeanette Winzenburg
  */
+@RunWith(JUnit4.class)
 public class ColumnHeaderRendererTest extends InteractiveTestCase {
     @SuppressWarnings("unused")
     private static final Logger LOG = Logger
@@ -84,6 +91,7 @@ public class ColumnHeaderRendererTest extends InteractiveTestCase {
         showWithScrollingInFrame(table, "sortIcon in second column wrong");
     }
  
+    @Test
     public void testDummy() {
         // keep the test framework happy
     }

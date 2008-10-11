@@ -25,6 +25,7 @@ import java.beans.PropertyChangeListener;
 
 import org.jdesktop.swingx.JXList;
 
+
 /**
  * Test JXList as HighlighterClient.
  * 

@@ -44,6 +44,12 @@ import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.test.XTestUtils;
 import org.jdesktop.test.SerializableSupport;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
+
 
 /**
  * Tests behaviour of SwingX renderers. Currently: mostly characterization to
@@ -51,6 +57,7 @@ import org.jdesktop.test.SerializableSupport;
  * 
  * @author Jeanette Winzenburg
  */
+@RunWith(JUnit4.class)
 public class TableRendererTest extends InteractiveTestCase {
 
     private static final Logger LOG = Logger.getLogger(TableRendererTest.class
@@ -62,6 +69,16 @@ public class TableRendererTest extends InteractiveTestCase {
     private int xColumn;
     private DefaultTableRenderer xTableRenderer;
 
+    
+    @Before
+    public void setUpJ4() throws Exception {
+        setUp();
+    }
+    
+    @After
+    public void tearDownJ4() throws Exception {
+        tearDown();
+    }
     
     @Override
     protected void setUp() throws Exception {
@@ -79,6 +96,7 @@ public class TableRendererTest extends InteractiveTestCase {
      * Test constructors: here convenience with alignment and converter
      *
      */
+    @Test
     public void testConstructor() {
         FormatStringValue sv = new FormatStringValue(DateFormat.getTimeInstance());
         int align = JLabel.RIGHT;
@@ -91,6 +109,7 @@ public class TableRendererTest extends InteractiveTestCase {
      * swingx.
      *
      */
+    @Test
     public void testIcon() {
         TableModel model = createTableModelWithDefaultTypes();
         int iconColumn = 4;
@@ -144,6 +163,7 @@ public class TableRendererTest extends InteractiveTestCase {
      * test serializable of default renderer.
      * 
      */
+    @Test
     public void testSerializeTableRenderer() {
         TableCellRenderer xListRenderer = new DefaultTableRenderer();
         try {
@@ -157,6 +177,7 @@ public class TableRendererTest extends InteractiveTestCase {
     /**
      * base interaction with table: focused, selected uses UI border.
      */
+    @Test
     public void testTableFocusSelectedBorder() {
         // sanity to see test test validity
 //        UIManager.put("Table.focusSelectedCellHighlightBorder", new LineBorder(Color.red));
@@ -193,6 +214,7 @@ public class TableRendererTest extends InteractiveTestCase {
      * 
      *
      */
+    @Test
     public void testTableFocusBorder() {
         // access ui colors
         Border focusBorder = UIManager.getBorder("Table.focusCellHighlightBorder");
@@ -215,6 +237,7 @@ public class TableRendererTest extends InteractiveTestCase {
      * uses UI colors.
      *
      */
+    @Test
     public void testTableRendererExtFocusedNotSelectedEditable() {
         // sanity
         assertTrue(table.isCellEditable(0, coreColumn));
@@ -250,6 +273,7 @@ public class TableRendererTest extends InteractiveTestCase {
      * table color.
      *
      */
+    @Test
     public void testTableRendererExtCustomColor() {
         Color background = Color.MAGENTA;
         Color foreground = Color.YELLOW;
@@ -273,6 +297,7 @@ public class TableRendererTest extends InteractiveTestCase {
      * base interaction with table: renderer uses table's selection color.
      *
      */
+    @Test
     public void testTableRendererExtSelectedColors() {
         // select first row
         table.setRowSelectionInterval(0, 0);
@@ -292,6 +317,7 @@ public class TableRendererTest extends InteractiveTestCase {
      * base interaction with table: renderer uses table's custom selection color.
      *
      */
+    @Test
     public void testTableRendererExtTableSelectedColors() {
         Color background = Color.MAGENTA;
         Color foreground = Color.YELLOW;
@@ -315,6 +341,7 @@ public class TableRendererTest extends InteractiveTestCase {
      * base interaction with table: renderer uses table's unselected colors.
      *
      */
+    @Test
     public void testTableRendererExtColors() {
         // prepare standard
         Component coreComponent = table.prepareRenderer(coreTableRenderer, 0, coreColumn);
@@ -333,6 +360,7 @@ public class TableRendererTest extends InteractiveTestCase {
      * 
      *
      */
+    @Test
     public void testTableRendererExtTableColors() {
         Color background = Color.MAGENTA;
         Color foreground = Color.YELLOW;
@@ -354,6 +382,7 @@ public class TableRendererTest extends InteractiveTestCase {
      * characterize opaqueness of rendering components.
      *
      */
+    @Test
     public void testTableOpaqueRenderer() {
         // sanity
         assertFalse(new JLabel().isOpaque());
@@ -366,6 +395,7 @@ public class TableRendererTest extends InteractiveTestCase {
      * 
      * that's useless: the opaque magic only applies if parent != null
      */
+    @Test
     public void testTableOpaqueRendererComponent() {
         // sanity
         assertFalse(new JLabel().isOpaque());
@@ -381,6 +411,7 @@ public class TableRendererTest extends InteractiveTestCase {
      * base existence/type tests while adding DefaultTableCellRendererExt.
      *
      */
+    @Test
     public void testTableRendererExt() {
         DefaultTableRenderer renderer = new DefaultTableRenderer();
         assertTrue(renderer instanceof TableCellRenderer);

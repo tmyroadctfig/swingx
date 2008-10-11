@@ -49,6 +49,12 @@ import org.jdesktop.test.PropertyChangeReport;
 import org.jdesktop.test.TestUtils;
 import org.jmock.Mock;
 import org.jmock.MockObjectTestCase;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
+
 
 /**
  * Test case for <code>JXMonthView</code>
@@ -60,6 +66,7 @@ import org.jmock.MockObjectTestCase;
  * 
  * @author Joshua Outwater
  */
+@RunWith(JUnit4.class)
 public class JXMonthViewTest extends MockObjectTestCase {
     private static final Logger LOG = Logger.getLogger(JXMonthViewTest.class
             .getName());
@@ -75,7 +82,8 @@ public class JXMonthViewTest extends MockObjectTestCase {
     private JXMonthView monthView;
     
     @Override
-    public void setUp() {
+    @Before
+       public void setUp() {
         calendar = Calendar.getInstance();
         calendar.set(Calendar.HOUR_OF_DAY, 5);
         today = calendar.getTime();
@@ -100,7 +108,8 @@ public class JXMonthViewTest extends MockObjectTestCase {
     }
 
     @Override
-    public void tearDown() {
+    @After
+       public void tearDown() {
         JComponent.setDefaultLocale(componentLocale);
     }
 
@@ -109,6 +118,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
      * test daysoftheweekforeground property.
      * 
      */
+    @Test
     public void testDaysOfTheWeekForegroundUpdateUI() {
         Color old = monthView.getDaysOfTheWeekForeground();
         Color color = Color.PINK;
@@ -125,6 +135,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
      * test setting selectionBackground property.
      * 
      */
+    @Test
     public void testDaysOfTheWeekForeground() {
         Color old = monthView.getDaysOfTheWeekForeground();
         Color color = Color.PINK;
@@ -143,6 +154,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
      * test setting selectionBackground property.
      * 
      */
+    @Test
     public void testFlaggedDayForeground() {
         Color old = monthView.getFlaggedDayForeground();
         Color color = Color.PINK;
@@ -161,6 +173,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
      * test setting selectionBackground property.
      * 
      */
+    @Test
     public void testSelectionForeground() {
         Color old = monthView.getSelectionForeground();
         Color color = Color.PINK;
@@ -179,6 +192,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
      * test setting selectionBackground property.
      * 
      */
+    @Test
     public void testSelectionBackground() {
         Color old = monthView.getSelectionBackground();
         Color color = Color.PINK;
@@ -192,10 +206,12 @@ public class JXMonthViewTest extends MockObjectTestCase {
         TestUtils.assertPropertyChangeEvent(report, "selectionBackground", old, color);
     }
     
+    @Test
     public void testInitialOpaque() {
         assertTrue(monthView.isOpaque());
     }
     
+    @Test
     public void testInitialBoxPadding() {
         assertTrue(monthView.getBoxPaddingX() > 0);
         assertEquals(UIManager.getInt("JXMonthView.boxPaddingX"), monthView.getBoxPaddingX());
@@ -208,6 +224,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
     /**
      * Issue #752-swingx: custom daysOfWeek lost in updateUI
      */
+    @Test
     public void testDaysOfWeekUpdateUI() {
         JXMonthView monthView = new JXMonthView();
         String[] days = {"S", "M", "D", "M", "D", "F", "S"};
@@ -220,6 +237,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
     /**
      * Issue #752-swingx: custom daysOfWeek lost in updateUI
      */
+    @Test
     public void testDaysOfWeekUpdateUIAllowNull() {
         JXMonthView monthView = new JXMonthView();
         String[] days = null;
@@ -231,6 +249,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
     /**
      * Issue #752-swingx: custom daysOfWeek lost in updateUI
      */
+    @Test
     public void testDaysOfWeekInitial() {
         JXMonthView monthView = new JXMonthView();
         assertNotNull("daysOfTheWeek must not be null", monthView.getDaysOfTheWeek());
@@ -239,6 +258,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
     /**
      * Issue #752-swingx: custom daysOfWeek lost in updateUI
      */
+    @Test
     public void testDaysOfWeekCopied() {
         JXMonthView monthView = new JXMonthView();
         assertNotSame(monthView.getDaysOfTheWeek(), monthView.getDaysOfTheWeek());
@@ -247,6 +267,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
     /**
      * Issue #752-swingx: custom daysOfWeek lost in updateUI
      */
+    @Test
     public void testDaysOfWeekReset() {
         JXMonthView monthView = new JXMonthView();
         // start off with ui-provided dates
@@ -265,6 +286,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
     /**
      * Issue #751-swingx: property naming violations
      */
+    @Test
     public void testAntialiasedNotification() {
         JXMonthView monthView = new JXMonthView();
         PropertyChangeReport report = new PropertyChangeReport();
@@ -277,6 +299,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
     /**
      * Issue #751-swingx: property naming violations
      */
+    @Test
     public void testAntialiasedNoNotification() {
         JXMonthView monthView = new JXMonthView();
         PropertyChangeReport report = new PropertyChangeReport();
@@ -290,6 +313,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
     /**
      * Issue #751-swingx: property naming violations
      */
+    @Test
     public void testShowingLeadingNotification() {
         JXMonthView monthView = new JXMonthView();
         PropertyChangeReport report = new PropertyChangeReport();
@@ -302,6 +326,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
     /**
      * Issue #751-swingx: property naming violations
      */
+    @Test
     public void testShowingLeadingNoNotification() {
         JXMonthView monthView = new JXMonthView();
         PropertyChangeReport report = new PropertyChangeReport();
@@ -316,6 +341,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
     /**
      * Issue #751-swingx: property naming violations
      */
+    @Test
     public void testShowingTrailingNotification() {
         JXMonthView monthView = new JXMonthView();
         PropertyChangeReport report = new PropertyChangeReport();
@@ -328,6 +354,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
     /**
      * Issue #751-swingx: property naming violations
      */
+    @Test
     public void testShowingTrailingNoNotification() {
         JXMonthView monthView = new JXMonthView();
         PropertyChangeReport report = new PropertyChangeReport();
@@ -340,6 +367,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
     /**
      * Issue #751-swingx: property naming violations
      */
+    @Test
     public void testShowingWeekNumbersNotification() {
         JXMonthView monthView = new JXMonthView();
         PropertyChangeReport report = new PropertyChangeReport();
@@ -352,6 +380,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
     /**
      * Issue #751-swingx: property naming violations
      */
+    @Test
     public void testShowingWeekNumbersNoNotification() {
         JXMonthView monthView = new JXMonthView();
         PropertyChangeReport report = new PropertyChangeReport();
@@ -364,6 +393,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
     /**
      * Issue #751-swingx: property naming violations
      */
+    @Test
     public void testTraversableNotification() {
         JXMonthView monthView = new JXMonthView();
         PropertyChangeReport report = new PropertyChangeReport();
@@ -376,6 +406,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
     /**
      * Issue #751-swingx: property naming violations
      */
+    @Test
     public void testTraversableNoNotification() {
         JXMonthView monthView = new JXMonthView();
         PropertyChangeReport report = new PropertyChangeReport();
@@ -391,6 +422,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
      * 
      * Here: test that model settings are respected in constructor - minimaldays.
      */
+    @Test
     public void testCalendarsContructorUnchangedFirstDayOfWeek() {
         DateSelectionModel model = new DaySelectionModel();
         int first = model.getFirstDayOfWeek() + 1;
@@ -407,6 +439,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
      * 
      * Here: test that monthView is updated to model after setSelectionModel.
      */
+    @Test
     public void testCalendarsSetModel() {
         JXMonthView monthView = new JXMonthView();
         int firstDayOfWeek = monthView.getFirstDayOfWeek();
@@ -444,6 +477,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
      * Here: test that model settings are respected in constructor - minimaldays.
      */
     @SuppressWarnings("unused")
+    @Test
     public void testCalendarsContructorUnchangedMinimalDaysOfModel() {
         DateSelectionModel model = new DaySelectionModel();
         int first = model.getMinimalDaysInFirstWeek() + 1;
@@ -461,6 +495,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
      * Model must not reset minimalDaysInfirstWeek, but Locales with values
      * > 1 confuse the BasicDatePickerUI - need to track down and solve there.
      */
+    @Test
     public void testCalendarsSetModelUnchangedMinimalDaysInFirstWeek() {
         JXMonthView monthView = new JXMonthView();
         DateSelectionModel model = new DaySelectionModel();
@@ -477,6 +512,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
      * 
      * Here: minimal days of first week.
      */
+    @Test
     public void testCalendarsMinimalDaysOfFirstWeekModelChanged() {
         JXMonthView monthView = new JXMonthView();
         int first = monthView.getCalendar().getMinimalDaysInFirstWeek() + 1;
@@ -491,6 +527,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
      *  
      *  Test that the selected is normalized in the monthView's timezone. 
      */
+    @Test
     public void testCalendarsTimeZoneNormalizedDate() {
         JXMonthView monthView = new JXMonthView();
         // config with a known timezone
@@ -512,6 +549,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
      * This was introduced by moving the control of flagged dates into
      * a internal model. Need to synch that model as well.
      */
+    @Test
     public void testFlaggedDatesTimeZone() {
         JXMonthView monthView = new JXMonthView();
         // config with a known timezone and date
@@ -530,6 +568,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
      * 
      * Here: setting the timezone clears the flagged dates, must notify of change.
       */
+    @Test
     public void testFlaggedDatesTimeZoneNotifyOnChange() {
         JXMonthView monthView = new JXMonthView();
         monthView.setFlaggedDates(today);
@@ -551,6 +590,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
      * 
      * Here: setting the timezone clears the flagged dates, must notify of change.
       */
+    @Test
     public void testFlaggedDatesTimeZoneNotNotifyWithoutChange() {
         JXMonthView monthView = new JXMonthView();
         // config with a known timezone and date
@@ -569,6 +609,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
      * 
      * Here: Locale changed in monthView.
      */
+    @Test
     public void testCalendarsLocaleChangedMonthView() {
         JXMonthView monthView = new JXMonthView();
         Locale locale = Locale.UK;
@@ -585,6 +626,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
      * 
      * Here: Locale changed in selection model.
      */
+    @Test
     public void testCalendarsLocaleChangedModel() {
         JXMonthView monthView = new JXMonthView();
         Locale locale = Locale.UK;
@@ -603,6 +645,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
      * 
      * Here: Locale changed in monthView.
      */
+    @Test
     public void testCalendarsLocaleContructor() {
         Locale locale = Locale.UK;
         if (locale.equals(JComponent.getDefaultLocale())) {
@@ -618,6 +661,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
      * 
      * Here: set first day of week in monthView.
      */
+    @Test
     public void testCalendarsFirstDayOfWeekMonthView() {
         JXMonthView monthView = new JXMonthView();
         int first = monthView.getFirstDayOfWeek() + 1;
@@ -634,6 +678,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
      * 
      * Here: set first day of week in model.
      */
+    @Test
     public void testCalendarsFirstDayOfWeekModel() {
         JXMonthView monthView = new JXMonthView();
         int first = monthView.getFirstDayOfWeek() + 1;
@@ -649,6 +694,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
      * 
      * Here: first day of week.
      */
+    @Test
     public void testCalendarsFirstDayOfWeekInitial() {
         JXMonthView monthView = new JXMonthView();
         assertEquals(monthView.getFirstDayOfWeek(), 
@@ -659,6 +705,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
      * 
      * Here: minimal days of first week.
      */
+    @Test
     public void testCalendarsMinimalDaysOfFirstWeekInitial() {
         JXMonthView monthView = new JXMonthView();
         int first = monthView.getCalendar().getMinimalDaysInFirstWeek();
@@ -676,6 +723,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
      * Here: isSelected
      * 
      */
+    @Test
     public void testMonthViewSameAsSelectionModelIsSelected() {
         JXMonthView monthView = new JXMonthView();
         // guard against accidental startofday
@@ -696,6 +744,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
      * Here: isSelected
      * 
      */
+    @Test
     public void testMonthViewSameAsSelectionModelSelectedDate() {
         JXMonthView monthView = new JXMonthView();
         // guard against accidental startofday
@@ -716,6 +765,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
      * Here: isSelected
      * 
      */
+    @Test
     public void testMonthViewSameAsSelectionModelIsUnselectable() {
         JXMonthView monthView = new JXMonthView();
         // guard against accidental startofday
@@ -736,6 +786,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
      * Here: set unselectables on model
      * 
      */
+    @Test
     public void testSelectionModelSameAsMonthViewIsUnselectableDate() {
         JXMonthView monthView = new JXMonthView();
         // guard against accidental startofday
@@ -758,6 +809,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
      * Here: set selected on model
      * 
      */
+    @Test
     public void testSelectionModelSameAsMonthViewIsSelected() {
         JXMonthView monthView = new JXMonthView();
         // guard against accidental startofday
@@ -778,6 +830,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
      * Here: set selected on model, ask for selected date
      * 
      */
+    @Test
     public void testSelectionModelSameAsMonthViewSelectedDate() {
         JXMonthView monthView = new JXMonthView();
         // guard against accidental startofday
@@ -795,6 +848,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
      * Behaviour is consistent with core components, must not update
      * 
      */
+    @Test
     public void testAutoScrollOnSelection() {
         JXMonthView us = new JXMonthView();
         final Calendar today = Calendar.getInstance();
@@ -811,6 +865,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
      * 
      * 
      */
+    @Test
     public void testAutoScrollOnSelectionRevalidate() throws InterruptedException, InvocationTargetException {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
@@ -843,6 +898,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
      * Issue 711-swingx: today is notify-only property.
      * Today is start of day.
      */
+    @Test
     public void testTodayInitial() {
         JXMonthView monthView = new JXMonthView();
         CalendarUtils.startOfDay(calendar);
@@ -853,6 +909,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
      * Issue 711-swingx: today is notify-only property.
      * Increment sets to start of day of tomorrow.
      */
+    @Test
     public void testTodayIncrement() {
         JXMonthView monthView = new JXMonthView();
         calendar.add(Calendar.DAY_OF_MONTH, 1);
@@ -866,6 +923,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
      * Issue 711-swingx: today is notify-only property.
      * SetToday should 
      */
+    @Test
     public void testTodaySetNotification() {
         JXMonthView monthView = new JXMonthView();
         Date today = monthView.getToday();
@@ -884,6 +942,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
      * Issue 711-swingx: today is notify-only property.
      * SetToday should 
      */
+    @Test
     public void testTodaySet() {
         JXMonthView monthView = new JXMonthView();
         // tomorrow
@@ -896,6 +955,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
     /**
      * For safety, getToday should return a clone.
      */
+    @Test
     public void testTodayCopy() {
         JXMonthView monthView = new JXMonthView();
         Date today = monthView.getToday();
@@ -909,6 +969,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
      * 
      * Here: test that today is unchanged.
      */
+    @Test
     public void testUpdateUIToday() {
         JXMonthView monthView = new JXMonthView();
         Date first = monthView.getToday();
@@ -922,6 +983,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
      * 
      * Here: test that ensureVisibleDate fires once only.
      */
+    @Test
     public void testEnsureVisibleDateNofication() {
         JXMonthView monthView = new JXMonthView();
         Date firstDisplayedDate = monthView.getFirstDisplayedDay();
@@ -941,6 +1003,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
      * 
      * Here: test that setFirstDisplayedDate fires once only.
      */
+    @Test
     public void testFirstDisplayedDateNofication() {
         JXMonthView monthView = new JXMonthView();
         Date firstDisplayedDate = monthView.getFirstDisplayedDay();
@@ -959,6 +1022,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
      * 
      * test update of lastDisplayedDate if resized.
      */
+    @Test
     public void testLastDisplayedOnResize() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
@@ -990,6 +1054,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
      * 
      * Here: test that firstDisplayedDate is unchanged.
      */
+    @Test
     public void testUpdateUIFirst() {
         final JXMonthView monthView = new JXMonthView();
         Date first = monthView.getFirstDisplayedDay();
@@ -1003,6 +1068,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
      * 
      * Here: test that lastDisplayedDate is unchanged.
      */
+    @Test
     public void testUpdateUILast() {
         final JXMonthView monthView = new JXMonthView();
         Date first = monthView.getLastDisplayedDay();
@@ -1017,6 +1083,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
      * 
      * This is guaranteed by returning a clone instead of the life object.
      */
+    @Test
     public void testMonthViewCalendarInvariant() {
         JXMonthView monthView = new JXMonthView();
         TimeZone tz = monthView.getTimeZone();
@@ -1035,6 +1102,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
      * expectation before fixing the issue. 
      * Here the context is: select.
      */
+    @Test
    public void testMonthViewCalendarInvariantOnSetSelection() {
       JXMonthView monthView = new JXMonthView();
       assertEquals(1, monthView.getCalendar().get(Calendar.DATE));
@@ -1061,6 +1129,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
     * expectation before fixing the issue. 
     * Here the context is: check for selection.
     */
+    @Test
    public void testMonthViewCalendarInvariantOnQuerySelectioon() {
       JXMonthView monthView = new JXMonthView();
       assertEquals(1, monthView.getCalendar().get(Calendar.DATE));
@@ -1089,6 +1158,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
      * Here the context is: set first displayed date (formerly left
      * the calendar at the last displayed date).
      */
+    @Test
     public void testMonthViewCalendarInvariantOnSetFirstDisplayedDate() {
       JXMonthView monthView = new JXMonthView();
       Date first = monthView.getFirstDisplayedDay();
@@ -1105,6 +1175,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
     /**
      * safety net: add api ensureDateVisible with Date parameter
      */
+    @Test
     public void testEnsureDateVisibleDateParamNextYear() {
         JXMonthView monthView = new JXMonthView();
         Calendar temp = (Calendar) calendar.clone();
@@ -1123,6 +1194,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
     /**
      * safety net: add api ensureDateVisible with Date parameter
      */
+    @Test
     public void testEnsureDateVisibleDateParamNextMonth() {
         JXMonthView monthView = new JXMonthView();
         Calendar temp = (Calendar) calendar.clone();
@@ -1140,6 +1212,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
     /**
      * safety net: add api ensureDateVisible with Date parameter
      */
+    @Test
     public void testEnsureDateVisibleDateParamThisMonth() {
         JXMonthView monthView = new JXMonthView();
         Calendar temp = (Calendar) calendar.clone();
@@ -1157,6 +1230,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
     /**
      * safety net: refactor ensureDateVisible
      */
+    @Test
     public void testEnsureDateVisibleNextYear() {
         JXMonthView monthView = new JXMonthView();
         Calendar temp = (Calendar) calendar.clone();
@@ -1173,6 +1247,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
     /**
      * safety net: refactor ensureDateVisible
      */
+    @Test
     public void testEnsureDateVisibleNextMonth() {
         JXMonthView monthView = new JXMonthView();
         Calendar temp = (Calendar) calendar.clone();
@@ -1190,6 +1265,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
     /**
      * safety net: refactor ensureDateVisible
      */
+    @Test
     public void testEnsureDateVisibleThisMonth() {
         JXMonthView monthView = new JXMonthView();
         Calendar temp = (Calendar) calendar.clone();
@@ -1205,6 +1281,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
     /**
      * safety net: move responsibility for lastDisplayedDate completely into ui.
      */
+    @Test
     public void testLastDisplayedDateInitial() {
         JXMonthView monthView = new JXMonthView();
         calendar.setTime(monthView.getFirstDisplayedDay());
@@ -1220,6 +1297,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
      * selected. As such they make no sense in a new timezone: must
      * either be adjusted or cleared. Currently we clear the selection. 
      */
+    @Test
     public void testTimeZoneChangeClearSelection() {
         JXMonthView monthView = new JXMonthView();
         Date date = new Date();
@@ -1241,6 +1319,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
      * set. As such they make no sense in a new timezone: must
      * either be adjusted or cleared. Currently we clear the bound. 
      */
+    @Test
     public void testTimeZoneChangeResetLowerBound() {
         JXMonthView monthView = new JXMonthView();
         monthView.setLowerBound(yesterday);
@@ -1256,6 +1335,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
      * set. As such they make no sense in a new timezone: must
      * either be adjusted or cleared. Currently we clear the bound. 
      */
+    @Test
     public void testTimeZoneChangeResetUpperBound() {
         JXMonthView monthView = new JXMonthView();
         monthView.setUpperBound(yesterday);
@@ -1271,6 +1351,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
      * set. As such they make no sense in a new timezone: must
      * either be adjusted or cleared. Currently we clear them. 
      */
+    @Test
     public void testTimeZoneChangeResetFlaggedDates() {
         JXMonthView monthView = new JXMonthView();
         monthView.setFlaggedDates(new Date[] {yesterday});
@@ -1291,6 +1372,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
      * set. As such they make no sense in a new timezone: must
      * either be adjusted or cleared. Currently we clear them. 
      */
+    @Test
     public void testTimeZoneChangeResetUnselectableDates() {
         JXMonthView monthView = new JXMonthView();
         monthView.setUnselectableDates(yesterday);
@@ -1306,6 +1388,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
     /**
      * test anchor: set to param as passed int setFirstDisplayedDate
      */
+    @Test
     public void testAnchorDateInitial() {
         JXMonthView monthView = new JXMonthView();
         // sometime next month
@@ -1322,6 +1405,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
      * 
      * Here: test anchor invariant to time zone change
      */
+    @Test
     public void testTimeZoneChangeAnchorInvariant() {
         JXMonthView monthView = new JXMonthView();
         Date anchor = monthView.getAnchorDate();
@@ -1346,6 +1430,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
      * Failed again at Tue Sep 30 10:12:31 PDT 2008, en_US locale. Next
      * (testTimeZoneChangeOffsetFirstDisplayedDate) failed at the same time, 
      */
+    @Test
     public void testTimeZoneChangeToday() {
         JXMonthView monthView = new JXMonthView();
         // config with a known timezone and date
@@ -1431,6 +1516,7 @@ lastRule=java.util.SimpleTimeZone[id=US/Pacific,offset=-28800000,dstSavings=3600
      *  <-10800000> but was:<2581200000>
      * 
      */
+    @Test
     public void testTimeZoneChangeOffsetFirstDisplayedDate() {
         JXMonthView monthView = new JXMonthView();
         // config with a known timezone and date
@@ -1487,6 +1573,7 @@ lastRule=java.util.SimpleTimeZone[id=US/Pacific,offset=-28800000,dstSavings=3600
      * 
      * Here: test timezone fire
      */
+    @Test
     public void testTimeZoneChangeNotification() {
         JXMonthView monthView = new JXMonthView();
         TimeZone timezone = monthView.getTimeZone();
@@ -1510,6 +1597,7 @@ lastRule=java.util.SimpleTimeZone[id=US/Pacific,offset=-28800000,dstSavings=3600
      * Test that the bindings are dynamically installed when
      * shown in popup and de-installed if shown not in popup.
     */
+    @Test
     public void testComponentInputMapEnabledControlsFocusedKeyBindings() {
         JXMonthView monthView = new JXMonthView();
         // initial: no bindings
@@ -1530,6 +1618,7 @@ lastRule=java.util.SimpleTimeZone[id=US/Pacific,offset=-28800000,dstSavings=3600
      * the componentInputMapEnabled property.
      *
      */
+    @Test
     public void testComponentInputMapEnabled() {
         JXMonthView monthView = new JXMonthView();
         assertFalse("the default value must be false", 
@@ -1549,6 +1638,7 @@ lastRule=java.util.SimpleTimeZone[id=US/Pacific,offset=-28800000,dstSavings=3600
      * test doc'ed behaviour: model must not be null.
      *
      */
+    @Test
     public void testSetModelNull() {
         JXMonthView monthView = new JXMonthView();
         assertNotNull(monthView.getSelectionModel());
@@ -1565,6 +1655,7 @@ lastRule=java.util.SimpleTimeZone[id=US/Pacific,offset=-28800000,dstSavings=3600
      * 
      * test that actions resets model.adjusting to false.
      */
+    @Test
     public void testCommitCancelResetsAdjusting() {
         JXMonthView monthView = new JXMonthView();
         monthView.getSelectionModel().setAdjusting(true);
@@ -1583,6 +1674,7 @@ lastRule=java.util.SimpleTimeZone[id=US/Pacific,offset=-28800000,dstSavings=3600
      * test that actions fire as expected.
      *
      */
+    @Test
     public void testCommitCancelAPIFires() {
         JXMonthView picker = new JXMonthView();
         ActionReport report = new ActionReport();
@@ -1602,6 +1694,7 @@ lastRule=java.util.SimpleTimeZone[id=US/Pacific,offset=-28800000,dstSavings=3600
      * test that actions fire as expected.
      *
      */
+    @Test
     public void testCommitCancelActionsFire() {
         JXMonthView picker = new JXMonthView();
         Action commitAction = picker.getActionMap().get(JXMonthView.COMMIT_KEY);
@@ -1624,6 +1717,7 @@ lastRule=java.util.SimpleTimeZone[id=US/Pacific,offset=-28800000,dstSavings=3600
      * test that actions are registered.
      *
      */
+    @Test
     public void testCommitCancelActionExist() {
         JXMonthView picker = new JXMonthView();
         assertNotNull(picker.getActionMap().get(JXMonthView.CANCEL_KEY));
@@ -1636,6 +1730,7 @@ lastRule=java.util.SimpleTimeZone[id=US/Pacific,offset=-28800000,dstSavings=3600
      * test that actions are the same for new/old cancel/accept.
      *
      */
+    @Test
     public void testCommitCancelSameAsOld() {
         JXMonthView picker = new JXMonthView();
         assertSame(picker.getActionMap().get("cancelSelection"),
@@ -1648,6 +1743,7 @@ lastRule=java.util.SimpleTimeZone[id=US/Pacific,offset=-28800000,dstSavings=3600
      * BasicMonthViewUI: use adjusting api in keyboard actions.
      * Here: test reset in cancel action.
      */
+    @Test
     public void testAdjustingResetOnCancel() {
         JXMonthView view = new JXMonthView();
         Action select = view.getActionMap().get("selectNextDay");
@@ -1663,6 +1759,7 @@ lastRule=java.util.SimpleTimeZone[id=US/Pacific,offset=-28800000,dstSavings=3600
      * BasicMonthViewUI: use adjusting api in keyboard actions.
      * Here: test reset in accept action.
      */
+    @Test
     public void testAdjustingResetOnAccept() {
         JXMonthView view = new JXMonthView();
         Action select = view.getActionMap().get("selectNextDay");
@@ -1680,6 +1777,7 @@ lastRule=java.util.SimpleTimeZone[id=US/Pacific,offset=-28800000,dstSavings=3600
      * BasicMonthViewUI: use adjusting api in keyboard actions.
      * Here: test set selection action.
      */
+    @Test
     public void testAdjustingSetOnSelect() {
         JXMonthView view = new JXMonthView();
         DateSelectionReport report = new DateSelectionReport(view.getSelectionModel());
@@ -1696,6 +1794,7 @@ lastRule=java.util.SimpleTimeZone[id=US/Pacific,offset=-28800000,dstSavings=3600
      * BasicMonthViewUI: use adjusting api in keyboard actions.
      * Here: test add selection action.
      */
+    @Test
     public void testAdjustingSetOnAdd() {
         JXMonthView view = new JXMonthView();
         // otherwise the add action isn't called
@@ -1720,6 +1819,7 @@ lastRule=java.util.SimpleTimeZone[id=US/Pacific,offset=-28800000,dstSavings=3600
      * 
      * test fire after accept.
      */
+    @Test
     public void testFireOnKeyboardAccept()  {
         JXMonthView monthView = new JXMonthView();
         Date date = new Date();
@@ -1736,6 +1836,7 @@ lastRule=java.util.SimpleTimeZone[id=US/Pacific,offset=-28800000,dstSavings=3600
      * 
      * test fire after cancel.
      */
+    @Test
     public void testFireOnKeyboardCancel()  {
         JXMonthView monthView = new JXMonthView();
         Date date = new Date();
@@ -1751,6 +1852,7 @@ lastRule=java.util.SimpleTimeZone[id=US/Pacific,offset=-28800000,dstSavings=3600
      * expose more selection constraint methods in JXMonthView
      *
      */
+    @Test
     public void testUpperBound() {
         JXMonthView view = new JXMonthView();
         view.setUpperBound(today);
@@ -1764,6 +1866,7 @@ lastRule=java.util.SimpleTimeZone[id=US/Pacific,offset=-28800000,dstSavings=3600
      * expose more selection constraint methods in JXMonthView
      *
      */
+    @Test
     public void testLowerBound() {
         JXMonthView view = new JXMonthView();
         view.setLowerBound(today);
@@ -1777,6 +1880,7 @@ lastRule=java.util.SimpleTimeZone[id=US/Pacific,offset=-28800000,dstSavings=3600
      * test unselectable: use methods with Date.
      *
      */
+    @Test
     public void testUnselectableDate() {
         JXMonthView monthView = new JXMonthView();
         // initial
@@ -1799,6 +1903,7 @@ lastRule=java.util.SimpleTimeZone[id=US/Pacific,offset=-28800000,dstSavings=3600
      * test unselectable: use methods with Date.
      * test NPE as doc'ed.
      */
+    @Test
     public void testUnselectableDatesNPE() {
         JXMonthView monthView = new JXMonthView();
         try {
@@ -1820,6 +1925,7 @@ lastRule=java.util.SimpleTimeZone[id=US/Pacific,offset=-28800000,dstSavings=3600
      * Issue #494-swingx: JXMonthView changed all passed-in dates
      *
      */
+    @Test
     public void testCleanupCopyDate() {
         JXMonthView monthView = new JXMonthView();
         Date copy = new Date(today.getTime());
@@ -1830,6 +1936,7 @@ lastRule=java.util.SimpleTimeZone[id=US/Pacific,offset=-28800000,dstSavings=3600
      * test cover method: isSelectedDate
      *
      */
+    @Test
     public void testIsSelectedDate() {
         JXMonthView monthView = new JXMonthView();
         monthView.setSelectionDate(today);
@@ -1842,6 +1949,7 @@ lastRule=java.util.SimpleTimeZone[id=US/Pacific,offset=-28800000,dstSavings=3600
      * test cover method: isSelectedDate
      *
      */
+    @Test
     public void testIsSelectedDate494() {
         JXMonthView monthView = new JXMonthView();
         Date copy = new Date(today.getTime());
@@ -1855,6 +1963,7 @@ lastRule=java.util.SimpleTimeZone[id=US/Pacific,offset=-28800000,dstSavings=3600
      * test cover method: setSelectedDate
      *
      */
+    @Test
     public void testSetSelectedDate() {
         JXMonthView monthView = new JXMonthView();
         Date copy = new Date(today.getTime());
@@ -1871,6 +1980,7 @@ lastRule=java.util.SimpleTimeZone[id=US/Pacific,offset=-28800000,dstSavings=3600
      * test new (convenience) api on JXMonthView
      *
      */
+    @Test
     public void testGetSelected() {
         JXMonthView monthView = new JXMonthView();
         assertNull(monthView.getSelectionDate());
@@ -1882,6 +1992,7 @@ lastRule=java.util.SimpleTimeZone[id=US/Pacific,offset=-28800000,dstSavings=3600
     }
     
     
+    @Test
     public void testDefaultConstructor() {
         JXMonthView monthView = new JXMonthView(Locale.US);
         assertTrue(monthView.isSelectionEmpty());
@@ -1889,6 +2000,7 @@ lastRule=java.util.SimpleTimeZone[id=US/Pacific,offset=-28800000,dstSavings=3600
         assertTrue(Calendar.SUNDAY == monthView.getFirstDayOfWeek());
     }
 
+    @Test
     public void testLocale() {
         Locale[] locales = Locale.getAvailableLocales();
 
@@ -1904,6 +2016,7 @@ lastRule=java.util.SimpleTimeZone[id=US/Pacific,offset=-28800000,dstSavings=3600
         }
     }
 
+    @Test
     public void testEmptySelectionInitial() {
         JXMonthView monthView = new JXMonthView();
         assertTrue(monthView.isSelectionEmpty());
@@ -1911,6 +2024,7 @@ lastRule=java.util.SimpleTimeZone[id=US/Pacific,offset=-28800000,dstSavings=3600
         assertTrue(selection.isEmpty());
     }
     
+    @Test
     public void testEmptySelectionClear() {
         JXMonthView monthView = new JXMonthView();
         monthView.setSelectionInterval(today, today);
@@ -1922,6 +2036,7 @@ lastRule=java.util.SimpleTimeZone[id=US/Pacific,offset=-28800000,dstSavings=3600
         assertTrue(monthView.getSelection().isEmpty());
     }
 
+    @Test
     public void testSelectionModes() {
         JXMonthView monthView = new JXMonthView();
         assertEquals(SelectionMode.SINGLE_SELECTION, monthView
@@ -1934,6 +2049,7 @@ lastRule=java.util.SimpleTimeZone[id=US/Pacific,offset=-28800000,dstSavings=3600
 
     }
 
+    @Test
     public void testSingleSelection() {
         JXMonthView monthView = new JXMonthView();
         monthView.setSelectionMode(SelectionMode.SINGLE_SELECTION);
@@ -1947,6 +2063,7 @@ lastRule=java.util.SimpleTimeZone[id=US/Pacific,offset=-28800000,dstSavings=3600
         assertEquals(startOfDay(yesterday), monthView.getFirstSelectionDate());
     }
 
+    @Test
     public void testSingleIntervalSelection() {
         JXMonthView monthView = new JXMonthView();
         monthView.setSelectionMode(SelectionMode.SINGLE_INTERVAL_SELECTION);
@@ -1965,6 +2082,7 @@ lastRule=java.util.SimpleTimeZone[id=US/Pacific,offset=-28800000,dstSavings=3600
 
 
 
+    @Test
     public void testMultipleIntervalSelection() {
         JXMonthView monthView = new JXMonthView();
         monthView.setSelectionMode(SelectionMode.MULTIPLE_INTERVAL_SELECTION);
@@ -1979,6 +2097,7 @@ lastRule=java.util.SimpleTimeZone[id=US/Pacific,offset=-28800000,dstSavings=3600
 
 
 
+    @Test
     public void testDateSelectionListener() {
         JXMonthView monthView = new JXMonthView();
         Mock listenerMock = mock(DateSelectionListener.class);
@@ -1994,6 +2113,7 @@ lastRule=java.util.SimpleTimeZone[id=US/Pacific,offset=-28800000,dstSavings=3600
     /**
      * test setting/checking flagged dates (api with Date)
      */
+    @Test
     public void testFlaggedDateRemoveNotify() {
         JXMonthView monthView = new JXMonthView();
         
@@ -2009,6 +2129,7 @@ lastRule=java.util.SimpleTimeZone[id=US/Pacific,offset=-28800000,dstSavings=3600
     /**
      * test setting/checking flagged dates (api with Date)
      */
+    @Test
     public void testFlaggedDateRemove() {
         JXMonthView monthView = new JXMonthView();
         
@@ -2023,6 +2144,7 @@ lastRule=java.util.SimpleTimeZone[id=US/Pacific,offset=-28800000,dstSavings=3600
     /**
      * test setting/checking flagged dates (api with Date)
      */
+    @Test
     public void testFlaggedDateClear() {
         JXMonthView monthView = new JXMonthView();
         
@@ -2035,6 +2157,7 @@ lastRule=java.util.SimpleTimeZone[id=US/Pacific,offset=-28800000,dstSavings=3600
     /**
      * test setting/checking flagged dates (api with Date)
      */
+    @Test
     public void testFlaggedDateClearNotify() {
         JXMonthView monthView = new JXMonthView();
         
@@ -2050,6 +2173,7 @@ lastRule=java.util.SimpleTimeZone[id=US/Pacific,offset=-28800000,dstSavings=3600
     /**
      * test setting/checking flagged dates (api with Date)
      */
+    @Test
     public void testFlaggedDateAdd() {
         JXMonthView monthView = new JXMonthView();
         
@@ -2062,6 +2186,7 @@ lastRule=java.util.SimpleTimeZone[id=US/Pacific,offset=-28800000,dstSavings=3600
     /**
      * test setting/checking flagged dates (api with Date)
      */
+    @Test
     public void testFlaggedDateAddNotify() {
         JXMonthView monthView = new JXMonthView();
         
@@ -2076,6 +2201,7 @@ lastRule=java.util.SimpleTimeZone[id=US/Pacific,offset=-28800000,dstSavings=3600
     /**
      * test setting/checking flagged dates (api with Date)
      */
+    @Test
     public void testFlaggedDateSet() {
         JXMonthView monthView = new JXMonthView();
         monthView.setFlaggedDates(today);
@@ -2086,6 +2212,7 @@ lastRule=java.util.SimpleTimeZone[id=US/Pacific,offset=-28800000,dstSavings=3600
     /**
      * test setting/checking flagged dates (api with Date)
      */
+    @Test
     public void testFlaggedDateNotification() {
         JXMonthView monthView = new JXMonthView();
         SortedSet<Date> oldFlagged = monthView.getFlaggedDates();
@@ -2099,6 +2226,7 @@ lastRule=java.util.SimpleTimeZone[id=US/Pacific,offset=-28800000,dstSavings=3600
     /**
      * test setting/checking flagged dates (api with Date)
      */
+    @Test
     public void testFlaggedDateGet() {
         JXMonthView monthView = new JXMonthView();
         Date date = new Date();
@@ -2108,6 +2236,7 @@ lastRule=java.util.SimpleTimeZone[id=US/Pacific,offset=-28800000,dstSavings=3600
         assertEquals(set, monthView.getFlaggedDates());
     }
    
+    @Test
     public void testShowLeadingDates() {
         JXMonthView monthView = new JXMonthView();
         assertFalse(monthView.isShowingLeadingDays());
@@ -2115,6 +2244,7 @@ lastRule=java.util.SimpleTimeZone[id=US/Pacific,offset=-28800000,dstSavings=3600
         assertTrue(monthView.isShowingLeadingDays());
     }
 
+    @Test
     public void testShowTrailingDates() {
         JXMonthView monthView = new JXMonthView();
         assertFalse(monthView.isShowingTrailingDays());

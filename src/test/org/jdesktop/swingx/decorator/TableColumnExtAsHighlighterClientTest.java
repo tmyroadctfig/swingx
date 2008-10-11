@@ -27,16 +27,24 @@ import java.beans.PropertyChangeListener;
 import org.jdesktop.swingx.table.TableColumnExt;
 import org.jdesktop.test.PropertyChangeReport;
 import org.jdesktop.test.TestUtils;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
+
 
 /**
  * Test JXTable as HighlighterClient.
  * 
  * @author Jeanette Winzenburg
  */
+@RunWith(JUnit4.class)
 public class TableColumnExtAsHighlighterClientTest extends AbstractTestHighlighterClient {
 
     
 
+    @Test
     public void testHighlighterStateChangeNotification() {
         TableColumnExt columnExt = new TableColumnExt();
         ColorHighlighter hl = new ColorHighlighter();

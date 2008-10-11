@@ -22,11 +22,18 @@ import javax.swing.table.DefaultTableModel;
 import org.jdesktop.swingx.JXRootPane.XRootLayout;
 import org.jdesktop.test.AncientSwingTeam;
 import org.jdesktop.test.PropertyChangeReport;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
+
 
     
 /**
  * @author  Jeanette Winzenburg
  */
+@RunWith(JUnit4.class)
 public class JXRootPaneTest extends InteractiveTestCase {
  
     @SuppressWarnings("unused")
@@ -39,6 +46,7 @@ public class JXRootPaneTest extends InteractiveTestCase {
      * 
      * testing implementation detail: layout's delegate is null by default
      */
+    @Test
     public void testLayoutDelegateNull() {
         JXRootPane pane = new JXRootPane();
         assertTrue(pane.getLayout() instanceof XRootLayout);
@@ -53,6 +61,7 @@ public class JXRootPaneTest extends InteractiveTestCase {
      * How-to check if LAF supports laf decoration? Here we rely on default 
      * laf is metal which does support it
      */
+    @Test
     public void testLayoutDelegateLAF() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
@@ -80,6 +89,7 @@ public class JXRootPaneTest extends InteractiveTestCase {
      * 
      * here the actual test: pref size with laf decoration 
      */
+    @Test
     public void testLayoutWithLAFDecoration() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
@@ -112,6 +122,7 @@ public class JXRootPaneTest extends InteractiveTestCase {
      * Issue #936-swingx: JXRootPane cannot cope with default laf decoration. 
      * Compare: no laf decoration
      */
+    @Test
     public void testLayoutWithOut() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
@@ -138,6 +149,7 @@ public class JXRootPaneTest extends InteractiveTestCase {
      * Issue #566: JXRootPane eats escape from popups (JXDatePicker).
      *
      */
+    @Test
     public void testDefaultCancel() {
         JXRootPane rootPane = new JXRootPane();
         assertNull(rootPane.getCancelButton());
@@ -152,6 +164,7 @@ public class JXRootPaneTest extends InteractiveTestCase {
      * 
      * had not been broken. 
      */
+    @Test
     public void testStatusBarSet() {
         JXRootPane rootPane = new JXRootPane();
         JXStatusBar toolBar = new JXStatusBar();
@@ -170,6 +183,7 @@ public class JXRootPaneTest extends InteractiveTestCase {
      * setStatusBar. 
      * 
      */
+    @Test
     public void testStatusBarFirePropertyChange() {
         JXRootPane rootPane = new JXRootPane();
         JXStatusBar toolBar = new JXStatusBar();
@@ -186,6 +200,7 @@ public class JXRootPaneTest extends InteractiveTestCase {
      * Issue #499-swingx: old toolbar not removed on setting new.
      *
      */
+    @Test
     public void testToolBarSet() {
         JXRootPane rootPane = new JXRootPane();
         JToolBar toolBar = new JToolBar();
@@ -203,6 +218,7 @@ public class JXRootPaneTest extends InteractiveTestCase {
      * 
      * PENDING: similar issue with statusbar?
      */
+    @Test
     public void testToolBarFirePropertyChange() {
         JXRootPane rootPane = new JXRootPane();
         JToolBar toolBar = new JToolBar();
@@ -218,6 +234,7 @@ public class JXRootPaneTest extends InteractiveTestCase {
      * Issue #66-swingx: setStatusBar(null) throws NPE.
      *
      */
+    @Test
     public void testStatusBarNPE() {
         JXRootPane rootPane = new JXRootPane();
         rootPane.setStatusBar(null);

@@ -24,6 +24,12 @@ package org.jdesktop.swingx.decorator;
 import java.beans.PropertyChangeListener;
 
 import org.jdesktop.swingx.JXTree;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
+
 
 /**
  * Test JXTree as HighlighterClient.

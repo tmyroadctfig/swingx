@@ -25,27 +25,38 @@ import junit.framework.TestCase;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
+
+
 /**
  * Test for AbstractPainter
  */
+@RunWith(JUnit4.class)
 public class AbstractPainterTest extends TestCase {
     private Graphics2D g;
     private BufferedImage img;
     private TestablePainter p;
     private TestableFilter filter;
 
-    public void setUp() {
+    @Before
+       public void setUp() {
         p = new TestablePainter();
         img = new BufferedImage(10, 10, BufferedImage.TYPE_INT_ARGB);
         g = img.createGraphics();
         filter = new TestableFilter();
     }
 
-    public void tearDown() {
+    @After
+       public void tearDown() {
         g.dispose();
         img.flush();
     }
 
+    @Test
     public void testPaint() {
         //test that an NPE is thrown if Graphics is null
         try {
@@ -94,6 +105,7 @@ public class AbstractPainterTest extends TestCase {
         assertTrue(p.configureCalledFirst);
     }
 
+    @Test
     public void testCaching() {
         p.setCacheable(true);
         // empty run to fill the cache

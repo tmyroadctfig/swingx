@@ -41,12 +41,19 @@ import org.jdesktop.swingx.renderer.DefaultTreeRenderer;
 import org.jdesktop.swingx.renderer.StringValue;
 import org.jdesktop.swingx.treetable.TreeTableModel;
 import org.jdesktop.test.AncientSwingTeam;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
+
 
 /**
  * Test <code>ComponentAdapter</code>.
  * 
  * @author Jeanette Winzenburg
  */
+@RunWith(JUnit4.class)
 public class ComponentAdapterTest extends TestCase {
     
     /**
@@ -55,11 +62,22 @@ public class ComponentAdapterTest extends TestCase {
      */
     private StringValue sv;
 
+    @Before
+    public void setUpJ4() throws Exception {
+        setUp();
+    }
+    
+    @After
+    public void tearDownJ4() throws Exception {
+        tearDown();
+    }
+    
     /**
      * Issue #791-swingx: complete coordinate transformation methods - missing id --> index
      * 
      * Tree has no columns/identifiers - implement reasonable default.
      */
+    @Test
     public void testColumnIdentifierAtList() {
         JXListT tree = new JXListT(new String[] {"one" });
         ComponentAdapter adapter = tree.getComponentAdapter(0);
@@ -70,6 +88,7 @@ public class ComponentAdapterTest extends TestCase {
      * 
      * Here test contract: must throw IllegalArgumentException if invalid index.
      */
+    @Test
     public void testColumnIdentifierAtListInvalidIndex() {
         JXListT table =  new JXListT(new String[] {"one" });
         ComponentAdapter adapter = table.getComponentAdapter(0);
@@ -88,6 +107,7 @@ public class ComponentAdapterTest extends TestCase {
      * 
      * Here test contract: must throw NPE if nullIdentifier.
      */
+    @Test
     public void testColumnIdentifierReverseListNullIdentifier() {
         JXListT table =  new JXListT(new String[] {"one" });
         ComponentAdapter adapter = table.getComponentAdapter(0);
@@ -105,6 +125,7 @@ public class ComponentAdapterTest extends TestCase {
      * 
      * Tree has no columns/identifiers - implement reasonable default.
      */
+    @Test
     public void testColumnIdentifierListReverse() {
         JXListT tree = new JXListT(new String[] {"one" });
         ComponentAdapter adapter = tree.getComponentAdapter(0);
@@ -116,6 +137,7 @@ public class ComponentAdapterTest extends TestCase {
      * 
      * Tree has no columns/identifiers - implement reasonable default.
      */
+    @Test
     public void testColumnIdentifierListNotFound() {
         JXListT tree = new JXListT(new String[] {"one" });
         ComponentAdapter adapter = tree.getComponentAdapter(0);
@@ -128,6 +150,7 @@ public class ComponentAdapterTest extends TestCase {
      * 
      * Tree has no columns/identifiers - implement reasonable default.
      */
+    @Test
     public void testColumnIdentifierAtTree() {
         JXTreeT tree = new JXTreeT();
         ComponentAdapter adapter = tree.getComponentAdapter(0);
@@ -138,6 +161,7 @@ public class ComponentAdapterTest extends TestCase {
      * 
      * Here test contract: must throw IllegalArgumentException if invalid index.
      */
+    @Test
     public void testColumnIdentifierAtTreeInvalidIndex() {
         JXTreeT table =  new JXTreeT();
         ComponentAdapter adapter = table.getComponentAdapter(0);
@@ -156,6 +180,7 @@ public class ComponentAdapterTest extends TestCase {
      * 
      * Here test contract: must throw NPE if nullIdentifier.
      */
+    @Test
     public void testColumnIdentifierReverseTreeNullIdentifier() {
         JXTreeT table =  new JXTreeT();
         ComponentAdapter adapter = table.getComponentAdapter(0);
@@ -173,6 +198,7 @@ public class ComponentAdapterTest extends TestCase {
      * 
      * Tree has no columns/identifiers - implement reasonable default.
      */
+    @Test
     public void testColumnIdentifierTreeReverse() {
         JXTreeT tree = new JXTreeT();
         ComponentAdapter adapter = tree.getComponentAdapter(0);
@@ -184,6 +210,7 @@ public class ComponentAdapterTest extends TestCase {
      * 
      * Tree has no columns/identifiers - implement reasonable default.
      */
+    @Test
     public void testColumnIdentifierTreeNotFound() {
         JXTreeT tree = new JXTreeT();
         ComponentAdapter adapter = tree.getComponentAdapter(0);
@@ -195,6 +222,7 @@ public class ComponentAdapterTest extends TestCase {
      * 
      * Here: must return model index for hidden columns
      */
+    @Test
     public void testColumnIdentifierReverseHidden() {
         JXTableT table =  new JXTableT(new AncientSwingTeam());
         ComponentAdapter adapter = table.getComponentAdapter(0, 0);
@@ -210,6 +238,7 @@ public class ComponentAdapterTest extends TestCase {
      * 
      * Here: must return model index
      */
+    @Test
     public void testColumnIdentifierReverse() {
         JXTableT table =  new JXTableT(new AncientSwingTeam());
         ComponentAdapter adapter = table.getComponentAdapter(0, 0);
@@ -223,6 +252,7 @@ public class ComponentAdapterTest extends TestCase {
      * 
      * Here: must return model index if identifier not known.
      */
+    @Test
     public void testColumnIdentifierReverseNotFound() {
         JXTableT table =  new JXTableT(new AncientSwingTeam());
         ComponentAdapter adapter = table.getComponentAdapter(0, 0);
@@ -236,6 +266,7 @@ public class ComponentAdapterTest extends TestCase {
      * 
      * Here test contract: must throw IllegalArgumentException if invalid index.
      */
+    @Test
     public void testColumnIdentifierAtInvalidIndex() {
         JXTableT table =  new JXTableT(new AncientSwingTeam());
         ComponentAdapter adapter = table.getComponentAdapter(0, 0);
@@ -254,6 +285,7 @@ public class ComponentAdapterTest extends TestCase {
      * 
      * Here test contract: must throw NPE if Null identifier.
      */
+    @Test
     public void testColumnIdentifierReverseNullIdentifier() {
         JXTableT table =  new JXTableT(new AncientSwingTeam());
         ComponentAdapter adapter = table.getComponentAdapter(0, 0);
@@ -271,6 +303,7 @@ public class ComponentAdapterTest extends TestCase {
      * 
      * 
      */
+    @Test
     public void testColumnIdentifierAt() {
         JXTableT table =  new JXTableT(new AncientSwingTeam());
         ComponentAdapter adapter = table.getComponentAdapter(0, 0);
@@ -287,6 +320,7 @@ public class ComponentAdapterTest extends TestCase {
      * 
      * here: test ComponentAdapter on hidden hierarchical column
      */
+    @Test
     public void testTreeTableGetStringColumnHiddenHierarchicalColumn() {
         JXTreeTableT table = new JXTreeTableT(AncientSwingTeam.createNamedColorTreeTableModel());
         table.setTreeCellRenderer(new DefaultTreeRenderer(sv));
@@ -302,6 +336,7 @@ public class ComponentAdapterTest extends TestCase {
      * 
      * here: test ComponentAdapter on hidden hierarchical column
      */
+    @Test
     public void testTreeTableGetStringAtHiddenHierarchicalColumn() {
         JXTreeTableT table = new JXTreeTableT(AncientSwingTeam.createNamedColorTreeTableModel());
         table.setTreeCellRenderer(new DefaultTreeRenderer(sv));
@@ -318,6 +353,7 @@ public class ComponentAdapterTest extends TestCase {
      * 
      * Here: test api on tree's ComponentAdapter.
      */
+    @Test
     public void testTreeGetStringAt() {
         JXTreeT tree = new JXTreeT(AncientSwingTeam.createNamedColorTreeModel());
         tree.expandAll();
@@ -332,6 +368,7 @@ public class ComponentAdapterTest extends TestCase {
      * 
      * Here: test api on tree's ComponentAdapter.
      */
+    @Test
     public void testTreeGetString() {
         JXTreeT tree = new JXTreeT(AncientSwingTeam.createNamedColorTreeModel());
         tree.expandAll();
@@ -346,6 +383,7 @@ public class ComponentAdapterTest extends TestCase {
      * 
      * Here: test api on tree's ComponentAdapter.
      */
+    @Test
     public void testTreeGetFilteredString() {
         JXTreeT tree = new JXTreeT(AncientSwingTeam.createNamedColorTreeModel());
         tree.expandAll();
@@ -360,6 +398,7 @@ public class ComponentAdapterTest extends TestCase {
      * 
      * Here: test api on tree's ComponentAdapter.
      */
+    @Test
     public void testTreeGetStringColumn() {
         JXTreeT tree = new JXTreeT(AncientSwingTeam.createNamedColorTreeModel());
         tree.expandAll();
@@ -393,6 +432,7 @@ public class ComponentAdapterTest extends TestCase {
      * 
      * Here: test api on list's ComponentAdapter.
      */
+    @Test
     public void testListGetStringAtSorted() {
         JXListT list = new JXListT(AncientSwingTeam.createNamedColorListModel());
         list.setFilterEnabled(true);
@@ -408,6 +448,7 @@ public class ComponentAdapterTest extends TestCase {
      * 
      * Here: test api on list's ComponentAdapter.
      */
+    @Test
     public void testListGetStringAtUnsorted() {
         JXListT list = new JXListT(AncientSwingTeam.createNamedColorListModel());
         list.setCellRenderer(new DefaultListRenderer(sv));
@@ -421,6 +462,7 @@ public class ComponentAdapterTest extends TestCase {
      * 
      * Here: test api on list's ComponentAdapter.
      */
+    @Test
     public void testListGetString() {
         JXListT list = new JXListT(AncientSwingTeam.createNamedColorListModel());
         list.setCellRenderer(new DefaultListRenderer(sv));
@@ -434,6 +476,7 @@ public class ComponentAdapterTest extends TestCase {
      * 
      * Here: test api on list's ComponentAdapter.
      */
+    @Test
     public void testListGetFilteredString() {
         JXListT list = new JXListT(AncientSwingTeam.createNamedColorListModel());
         list.setCellRenderer(new DefaultListRenderer(sv));
@@ -447,6 +490,7 @@ public class ComponentAdapterTest extends TestCase {
      * 
      * Here: test api on list's ComponentAdapter.
      */
+    @Test
     public void testListGetStringColumn() {
         JXListT list = new JXListT(AncientSwingTeam.createNamedColorListModel());
         list.setCellRenderer(new DefaultListRenderer(sv));
@@ -479,6 +523,7 @@ public class ComponentAdapterTest extends TestCase {
      * 
      * Here: test api on table's ComponentAdapter.
      */
+    @Test
     public void testTableGetStringColumnHiddenColumn() {
         JXTableT table = new JXTableT(new AncientSwingTeam());
         table.setDefaultRenderer(Color.class, new DefaultTableRenderer(sv));
@@ -494,6 +539,7 @@ public class ComponentAdapterTest extends TestCase {
      * 
      * Here: test api on table's ComponentAdapter.
      */
+    @Test
     public void testTableGetStringAtHiddenColumn() {
         JXTableT table = new JXTableT(new AncientSwingTeam());
         table.setDefaultRenderer(Color.class, new DefaultTableRenderer(sv));
@@ -509,6 +555,7 @@ public class ComponentAdapterTest extends TestCase {
      * 
      * Here: test api on table's ComponentAdapter.
      */
+    @Test
     public void testTableGetStringAtSorted() {
         JXTableT table = new JXTableT(new AncientSwingTeam());
         table.setDefaultRenderer(Color.class, new DefaultTableRenderer(sv));
@@ -524,6 +571,7 @@ public class ComponentAdapterTest extends TestCase {
      * 
      * Here: test api on table's ComponentAdapter.
      */
+    @Test
     public void testTableGetStringAtUnsorted() {
         JXTableT table = new JXTableT(new AncientSwingTeam());
         table.setDefaultRenderer(Color.class, new DefaultTableRenderer(sv));
@@ -537,6 +585,7 @@ public class ComponentAdapterTest extends TestCase {
      * 
      * Here: test api on table's ComponentAdapter.
      */
+    @Test
     public void testTableGetString() {
         JXTableT table = new JXTableT(new AncientSwingTeam());
         table.setDefaultRenderer(Color.class, new DefaultTableRenderer(sv));
@@ -550,6 +599,7 @@ public class ComponentAdapterTest extends TestCase {
      * 
      * Here: test api on table's ComponentAdapter.
      */
+    @Test
     public void testTableGetFilteredString() {
         JXTableT table = new JXTableT(new AncientSwingTeam());
         table.setDefaultRenderer(Color.class, new DefaultTableRenderer(sv));
@@ -563,6 +613,7 @@ public class ComponentAdapterTest extends TestCase {
      * 
      * Here: test api on table's ComponentAdapter.
      */
+    @Test
     public void testTableGetStringColumn() {
         JXTableT table = new JXTableT(new AncientSwingTeam());
         table.setDefaultRenderer(Color.class, new DefaultTableRenderer(sv));
@@ -616,6 +667,7 @@ public class ComponentAdapterTest extends TestCase {
      * coordinate systems.
      *
      */
+    @Test
     public void testComponentAdapterCoordinates() {
         final JXTable table = new JXTable(createAscendingModel(0, 10));
         Object originalFirstRowValue = table.getValueAt(0,0);

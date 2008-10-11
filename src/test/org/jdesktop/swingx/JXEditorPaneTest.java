@@ -18,11 +18,19 @@ import javax.swing.ActionMap;
 import javax.swing.JEditorPane;
 import javax.swing.text.html.HTMLDocument;
 
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
+
+
 /**
  * A unit test for the JXEditorPane
  *
  * @author Mark Davidson
  */
+@RunWith(JUnit4.class)
 public class JXEditorPaneTest extends InteractiveTestCase {
     @SuppressWarnings("all")
     private static final Logger LOG = Logger.getLogger(JXEditorPaneTest.class
@@ -36,6 +44,7 @@ public class JXEditorPaneTest extends InteractiveTestCase {
      * disabled otherwise.
      * 
      */
+    @Test
     public void testXDisabledUndoAction() {
         JXEditorPane editor = new JXEditorPane();
         editor.setEditable(false);
@@ -52,6 +61,7 @@ public class JXEditorPaneTest extends InteractiveTestCase {
      * disabled otherwise.
      * 
      */
+    @Test
     public void testXDisabledCutActionUnselected() {
         JXEditorPane editor = new JXEditorPane();
         editor.setText("some");
@@ -67,6 +77,7 @@ public class JXEditorPaneTest extends InteractiveTestCase {
      * cut is enabled if there is selected text and editor editable
      * disabled otherwise.
      */
+    @Test
     public void testXDisabledCutActionOnNotEditable() {
         JXEditorPane editor = new JXEditorPane();
         editor.setText("some");
@@ -84,6 +95,7 @@ public class JXEditorPaneTest extends InteractiveTestCase {
     *  disabled otherwise.
      * 
      */
+    @Test
     public void testXDisabledPasteActionOnNotEditable() {
         JXEditorPane editor = new JXEditorPane();
         editor.setEditable(false);
@@ -99,6 +111,7 @@ public class JXEditorPaneTest extends InteractiveTestCase {
     *  paste is enabled if the editor is editable the clipboard isn't empty.
     *  can't really test ... don't want to clear the clipboard as a test side-effect. 
      */
+    @Test
     public void testXDisabledPasteEmptyClipboard() {
         JXEditorPane editor = new JXEditorPane();
         editor.setEditable(true);
@@ -108,6 +121,7 @@ public class JXEditorPaneTest extends InteractiveTestCase {
         
     }
     
+    @Test
     public void testInitialization() throws IOException {
         URL url = JXEditorPaneTest.class.getResource("resources/test.html");
         JXEditorPane editor = new JXEditorPane();
@@ -129,10 +143,12 @@ public class JXEditorPaneTest extends InteractiveTestCase {
         assertNull(editor.getCaretListener());
     }
 
+    @Test
     public void testRegistration() {
 
     }
 
+    @Test
     public void testCutPastePlain() {
         JXEditorPane editor = new JXEditorPane("text/plain", testText);
         editorCutPaste(editor);
@@ -143,6 +159,7 @@ public class JXEditorPaneTest extends InteractiveTestCase {
      * implemented to use only plain text on the clip. This test will fail
      * if the text contains some markup like &lt;b&gt;foo&lt;/b&gt;
      */
+    @Test
     public void testCutPasteHtml() {
         JXEditorPane editor = new JXEditorPane("text/html", testText);
         editorCutPaste(editor);

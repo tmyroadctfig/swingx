@@ -20,6 +20,13 @@
  */
 package org.jdesktop.swingx.plaf;
 
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
+
+
 import junit.framework.TestCase;
 
 /**
@@ -27,11 +34,13 @@ import junit.framework.TestCase;
  * 
  * @author Karl George Schaefer
  */
+@RunWith(JUnit4.class)
 public class DefaultsListTest extends TestCase {
     /**
      * Ensure that "adding" a key with a {@code null} value removes the value
      * from the list.
      */
+    @Test
     public void testRemoval() {
         DefaultsList kvList = new DefaultsList();
         kvList.add("a", "b");

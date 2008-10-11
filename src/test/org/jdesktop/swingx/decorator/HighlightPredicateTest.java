@@ -28,6 +28,12 @@ import org.jdesktop.swingx.decorator.HighlightPredicate.OrHighlightPredicate;
 import org.jdesktop.swingx.decorator.HighlightPredicate.RowGroupHighlightPredicate;
 import org.jdesktop.swingx.decorator.HighlightPredicate.TypeHighlightPredicate;
 import org.jdesktop.swingx.rollover.RolloverProducer;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
+
 
 /**
  * 
@@ -35,6 +41,7 @@ import org.jdesktop.swingx.rollover.RolloverProducer;
  * 
  * @author Jeanette Winzenburg
  */
+@RunWith(JUnit4.class)
 public class HighlightPredicateTest extends InteractiveTestCase {
 
     
@@ -54,6 +61,16 @@ public class HighlightPredicateTest extends InteractiveTestCase {
     
     protected ColorHighlighter emptyHighlighter;
 
+    @Before
+    public void setUpJ4() throws Exception {
+        setUp();
+    }
+    
+    @After
+    public void tearDownJ4() throws Exception {
+        tearDown();
+    }
+    
     @Override
     protected void setUp() {
         backgroundNull = new JLabel("test");
@@ -82,6 +99,7 @@ public class HighlightPredicateTest extends InteractiveTestCase {
      * 
      * Test the HAS_FOCUS predicate
      */
+    @Test
     public void testHasFocus() {
         ComponentAdapter adapter = createComponentAdapter(allColored, true, true);
         assertTrue("sanity", adapter.hasFocus());
@@ -93,6 +111,7 @@ public class HighlightPredicateTest extends InteractiveTestCase {
      * 
      * Test the HAS_FOCUS predicate
      */
+    @Test
     public void testNotHasFocus() {
         ComponentAdapter adapter = createComponentAdapter(allColored, false);
         assertFalse("sanity", adapter.hasFocus());
@@ -103,6 +122,7 @@ public class HighlightPredicateTest extends InteractiveTestCase {
      * test the IS_FOLDER predicate.
      *
      */
+    @Test
     public void testFolder() {
         ComponentAdapter adapter = createComponentAdapter(allColored, false);
         assertTrue(HighlightPredicate.IS_FOLDER.isHighlighted(allColored, adapter));
@@ -112,6 +132,7 @@ public class HighlightPredicateTest extends InteractiveTestCase {
      * test the IS_FOLDER predicate.
      *
      */
+    @Test
     public void testNotFolder() {
         ComponentAdapter adapter = createComponentAdapter(allColored, true);
         assertFalse(HighlightPredicate.IS_FOLDER.isHighlighted(allColored, adapter));
@@ -121,6 +142,7 @@ public class HighlightPredicateTest extends InteractiveTestCase {
      * test the IS_LEAF predicate.
      *
      */
+    @Test
     public void testLeaf() {
         ComponentAdapter adapter = createComponentAdapter(allColored, false);
         assertFalse(HighlightPredicate.IS_LEAF.isHighlighted(allColored, adapter));
@@ -130,6 +152,7 @@ public class HighlightPredicateTest extends InteractiveTestCase {
      * test the IS_LEAF predicate.
      *
      */
+    @Test
     public void testNotLeaf() {
         ComponentAdapter adapter = createComponentAdapter(allColored, true);
         assertTrue(HighlightPredicate.IS_LEAF.isHighlighted(allColored, adapter));
@@ -139,6 +162,7 @@ public class HighlightPredicateTest extends InteractiveTestCase {
      * Can't really test the unconditional predicates.
      *
      */
+    @Test
     public void testAlways() {
         ComponentAdapter adapter = createComponentAdapter(allColored, true);
         assertTrue(HighlightPredicate.ALWAYS.isHighlighted(allColored, adapter));
@@ -148,6 +172,7 @@ public class HighlightPredicateTest extends InteractiveTestCase {
      * Can't really test the unconditional predicates.
      *
      */
+    @Test
     public void testNever() {
         ComponentAdapter adapter = createComponentAdapter(allColored, true);
         assertFalse(HighlightPredicate.NEVER.isHighlighted(allColored, adapter));
@@ -157,6 +182,7 @@ public class HighlightPredicateTest extends InteractiveTestCase {
      * test the Editable predicate.
      *
      */
+    @Test
     public void testEditable() {
         ComponentAdapter adapter = createComponentAdapter(allColored, false, true);
         assertTrue(HighlightPredicate.EDITABLE.isHighlighted(allColored, adapter));
@@ -167,6 +193,7 @@ public class HighlightPredicateTest extends InteractiveTestCase {
      * test the ReadOnly predicate.
      *
      */
+    @Test
     public void testNotEditable() {
         ComponentAdapter adapter = createComponentAdapter(allColored, false, false);
         assertFalse(HighlightPredicate.EDITABLE.isHighlighted(allColored, adapter));
@@ -176,6 +203,7 @@ public class HighlightPredicateTest extends InteractiveTestCase {
     /**
      * test access the contained predicates
      */
+    @Test
     public void testNotProperty() {
         HighlightPredicate inputPredicates = new IdentifierHighlightPredicate("t");
         NotHighlightPredicate predicate = new NotHighlightPredicate(inputPredicates);
@@ -187,6 +215,7 @@ public class HighlightPredicateTest extends InteractiveTestCase {
      * test the NOT predicate.
      *
      */
+    @Test
     public void testNot() {
         ComponentAdapter adapter = createComponentAdapter(allColored, true);
         HighlightPredicate notNever = new NotHighlightPredicate(HighlightPredicate.NEVER);
@@ -198,6 +227,7 @@ public class HighlightPredicateTest extends InteractiveTestCase {
     /**
      * test access the contained predicates
      */
+    @Test
     public void testOrProperty() {
         List<HighlightPredicate> inputPredicates = new ArrayList<HighlightPredicate>();
         inputPredicates.add(HighlightPredicate.NEVER);
@@ -213,6 +243,7 @@ public class HighlightPredicateTest extends InteractiveTestCase {
     /**
      * test that getPredicates return empty array if nothing contained.
      */
+    @Test
     public void testOrEmptyProperty() {
         OrHighlightPredicate predicate = new OrHighlightPredicate();
         HighlightPredicate[] predicates = predicate.getHighlightPredicates();
@@ -223,6 +254,7 @@ public class HighlightPredicateTest extends InteractiveTestCase {
     /**
      * test that empty array doesn't highlight. 
      */
+    @Test
     public void testOrEmpty() {
         ComponentAdapter adapter = createComponentAdapter(allColored, true);
         HighlightPredicate emptyArray = new OrHighlightPredicate();
@@ -234,6 +266,7 @@ public class HighlightPredicateTest extends InteractiveTestCase {
      * test the OR predicate array constructor. Boring as it is, is it complete?
      *
      */
+    @Test
     public void testOr() {
         ComponentAdapter adapter = createComponentAdapter(allColored, true);
         HighlightPredicate oneTrue = new OrHighlightPredicate(HighlightPredicate.ALWAYS);
@@ -252,6 +285,7 @@ public class HighlightPredicateTest extends InteractiveTestCase {
      * test the OR predicate collection constructor. Boring as it is, is it complete?
      *
      */
+    @Test
     public void testOrCollectionConstructor() {
         ComponentAdapter adapter = createComponentAdapter(allColored, true);
         List<HighlightPredicate> containsOneTrue = new ArrayList<HighlightPredicate>();
@@ -282,6 +316,7 @@ public class HighlightPredicateTest extends InteractiveTestCase {
      *   is null.
      *
      */
+    @Test
     public void testOrThrowsOnNullPredicates() {
         try {
             new OrHighlightPredicate((HighlightPredicate[]) null);
@@ -330,6 +365,7 @@ public class HighlightPredicateTest extends InteractiveTestCase {
      *   is null.
      *
      */
+    @Test
     public void testAndThrowsOnNullPredicates() {
         try {
             new AndHighlightPredicate((HighlightPredicate[]) null);
@@ -377,6 +413,7 @@ public class HighlightPredicateTest extends InteractiveTestCase {
     /**
      * test access the contained predicates
      */
+    @Test
     public void testAndProperty() {
         List<HighlightPredicate> inputPredicates = new ArrayList<HighlightPredicate>();
         inputPredicates.add(HighlightPredicate.NEVER);
@@ -392,6 +429,7 @@ public class HighlightPredicateTest extends InteractiveTestCase {
     /**
      * test that getPredicates return empty array if nothing contained.
      */
+    @Test
     public void testAndEmptyProperty() {
         AndHighlightPredicate predicate = new AndHighlightPredicate();
         HighlightPredicate[] predicates = predicate.getHighlightPredicates();
@@ -402,6 +440,7 @@ public class HighlightPredicateTest extends InteractiveTestCase {
     /**
      * test that empty array doesn't highlight. 
      */
+    @Test
     public void testAndEmpty() {
         ComponentAdapter adapter = createComponentAdapter(allColored, true);
         HighlightPredicate emptyArray = new AndHighlightPredicate();
@@ -414,6 +453,7 @@ public class HighlightPredicateTest extends InteractiveTestCase {
      * test the AND predicate array constructor. Boring as it is, is it complete?
      *
      */
+    @Test
     public void testAnd() {
         ComponentAdapter adapter = createComponentAdapter(allColored, true);
         HighlightPredicate oneTrue = new AndHighlightPredicate(HighlightPredicate.ALWAYS);
@@ -432,6 +472,7 @@ public class HighlightPredicateTest extends InteractiveTestCase {
      * test the AND predicate collection constructor. Boring as it is, is it complete?
      *
      */
+    @Test
     public void testAndCollectionConstructor() {
         ComponentAdapter adapter = createComponentAdapter(allColored, true);
         List<HighlightPredicate> containsOneTrue = new ArrayList<HighlightPredicate>();
@@ -462,6 +503,7 @@ public class HighlightPredicateTest extends InteractiveTestCase {
      * test rollover
      *
      */
+    @Test
     public void testRolloverRow() {
         ComponentAdapter adapter = createComponentAdapter(allColored, true);
         // rollover and adapter at 0, 0
@@ -481,6 +523,7 @@ public class HighlightPredicateTest extends InteractiveTestCase {
      * Issue #513-swingx: no rollover highlight for disabled component
      * 
      */
+    @Test
     public void testRolloverDisabledComponent() {
         ComponentAdapter adapter = createComponentAdapter(allColored, true);
         // rollover and adapter at 0, 0
@@ -497,6 +540,7 @@ public class HighlightPredicateTest extends InteractiveTestCase {
      * test the BIG_DECIMAL_NEGATIVE predicate.
      *
      */
+    @Test
     public void testBigDecimalNegative() {
         ComponentAdapter negative = createBigDecimalComponentAdapter(new JLabel("-50.00"));
         assertTrue(HighlightPredicate.BIG_DECIMAL_NEGATIVE.isHighlighted(negative.getComponent(), negative));
@@ -513,6 +557,7 @@ public class HighlightPredicateTest extends InteractiveTestCase {
     /**
      * test doc'ed behaviour
      */
+    @Test
     public void testRowGroupConstructor() {
         try {
             new RowGroupHighlightPredicate(0);
@@ -522,6 +567,7 @@ public class HighlightPredicateTest extends InteractiveTestCase {
         } 
     }
     
+    @Test
     public void testRowGroupProperty() {
         int lines = 5;
         RowGroupHighlightPredicate predicate = new RowGroupHighlightPredicate(5);
@@ -531,6 +577,7 @@ public class HighlightPredicateTest extends InteractiveTestCase {
     /**
      * test equals predicate with null value.
      */
+    @Test
     public void testEqualsNull() {
         HighlightPredicate predicate = new EqualsHighlightPredicate();
         allColored.setText(null);
@@ -547,6 +594,7 @@ public class HighlightPredicateTest extends InteractiveTestCase {
      * test equals predicate with not null value.
      *
      */
+    @Test
     public void testEqualsNotNull() {
         HighlightPredicate predicate = new EqualsHighlightPredicate(allColored
                 .getText());
@@ -560,12 +608,14 @@ public class HighlightPredicateTest extends InteractiveTestCase {
      * test equals predicate with not null value.
      *
      */
+    @Test
     public void testEqualProperty() {
         Object text = new Object();
         EqualsHighlightPredicate predicate = new EqualsHighlightPredicate(text);
         assertEquals(text, predicate.getCompareValue());
     }
     
+    @Test
     public void testColumnProperty() {
         int[] columns = new int[] {2, 7};
         ColumnHighlightPredicate predicate = new ColumnHighlightPredicate(columns);
@@ -576,12 +626,14 @@ public class HighlightPredicateTest extends InteractiveTestCase {
         }
     }
 
+    @Test
     public void testColumnEmptyProperty() {
         ColumnHighlightPredicate predicate = new ColumnHighlightPredicate();
         Integer[] output = predicate.getColumns();
         assertEquals("output must be empty array", 0, output.length);
     }
 
+    @Test
     public void testColumn() {
         HighlightPredicate predicate = new ColumnHighlightPredicate(1);
         ComponentAdapter adapter = createComponentAdapter(allColored, false);
@@ -591,6 +643,7 @@ public class HighlightPredicateTest extends InteractiveTestCase {
     }
 
 
+    @Test
     public void testDepthProperty() {
         int[] columns = new int[] {2, 7};
         DepthHighlightPredicate predicate = new DepthHighlightPredicate(columns);
@@ -601,12 +654,14 @@ public class HighlightPredicateTest extends InteractiveTestCase {
         }
     }
 
+    @Test
     public void testDepthEmptyProperty() {
         DepthHighlightPredicate predicate = new DepthHighlightPredicate();
         Integer[] output = predicate.getDepths();
         assertEquals("output must be empty array", 0, output.length);
     }
 
+    @Test
     public void testIdentifierProperty() {
         Object[] identifiers = new Object[] { "one", "two" };
         IdentifierHighlightPredicate predicate = new IdentifierHighlightPredicate(identifiers);
@@ -617,42 +672,49 @@ public class HighlightPredicateTest extends InteractiveTestCase {
         }
     }
 
+    @Test
     public void testIdentifierEmptyProperty() {
         IdentifierHighlightPredicate predicate = new IdentifierHighlightPredicate();
         Object[] output = predicate.getIdentifiers();
         assertEquals("output must be empty array", 0, output.length);
     }
 
+    @Test
     public void testIdentifierDefault() {
         HighlightPredicate predicate = new IdentifierHighlightPredicate(ComponentAdapter.DEFAULT_COLUMN_IDENTIFIER);
         ComponentAdapter adapter = createComponentAdapter(allColored, false);
         assertTrue("default (single) column must be highlighted", predicate.isHighlighted(allColored, adapter));
     }
 
+    @Test
     public void testIdentifierFalse() {
         HighlightPredicate predicate = new IdentifierHighlightPredicate("unknown");
         ComponentAdapter adapter = createComponentAdapter(allColored, false);
         assertFalse("unknown identifier must not highlight", predicate.isHighlighted(allColored, adapter));
     }
     
+    @Test
     public void testTypeProperty() {
         Class<?> clazz = String.class;
         TypeHighlightPredicate predicate = new TypeHighlightPredicate(clazz);
         assertEquals(clazz, predicate.getType());
     }
     
+    @Test
     public void testTypeExact() {
         HighlightPredicate predicate = new TypeHighlightPredicate(String.class);
         ComponentAdapter adapter = createComponentAdapter(allColored, false);
         assertTrue("string class must be highlighted", predicate.isHighlighted(allColored, adapter));
     }
 
+    @Test
     public void testTypeSubclass() {
         HighlightPredicate predicate = new TypeHighlightPredicate();
         ComponentAdapter adapter = createComponentAdapter(allColored, false);
         assertTrue("string class must be highlighted", predicate.isHighlighted(allColored, adapter));
     }
 
+    @Test
     public void testTypeFalse() {
         HighlightPredicate predicate = new TypeHighlightPredicate(Integer.class);
         ComponentAdapter adapter = createComponentAdapter(allColored, false);
@@ -660,6 +722,7 @@ public class HighlightPredicateTest extends InteractiveTestCase {
     }
     
 // ------ stand-alone predicates    
+    @Test
     public void testPattern() {
         // start with "t"
         Pattern pattern = Pattern.compile("^t", 0);
@@ -671,6 +734,7 @@ public class HighlightPredicateTest extends InteractiveTestCase {
                   predicate.isHighlighted(allColored, adapter));
     }
     
+    @Test
     public void testPatternWithString() {
         // start with "t"
         String regex = "^t";
@@ -684,6 +748,7 @@ public class HighlightPredicateTest extends InteractiveTestCase {
                   predicate.isHighlighted(allColored, adapter));
     }
     
+    @Test
     public void testPatternTwoParamConstructorWithString() {
         // start with "t"
         String regex = "^t";
@@ -695,6 +760,7 @@ public class HighlightPredicateTest extends InteractiveTestCase {
                   predicate.isHighlighted(allColored, adapter));
     }
  
+    @Test
     public void testSearchHighlightConstructorOne() {
         Pattern pattern = Pattern.compile("^t");
         SearchPredicate predicate = new SearchPredicate(pattern);
@@ -703,6 +769,7 @@ public class HighlightPredicateTest extends InteractiveTestCase {
         assertEquals(SearchPredicate.ALL, predicate.getHighlightRow());
     }
 
+    @Test
     public void testSearchHighlightConstructorTwo() {
         Pattern pattern = Pattern.compile("^t");
         int column = 10;
@@ -712,6 +779,7 @@ public class HighlightPredicateTest extends InteractiveTestCase {
         assertEquals(SearchPredicate.ALL, predicate.getHighlightRow());
     }
     
+    @Test
     public void testSearchHighlightConstructorFull() {
         Pattern pattern = Pattern.compile("^t");
         int row = 5;
@@ -725,6 +793,7 @@ public class HighlightPredicateTest extends InteractiveTestCase {
      * test match in all cells.
      *
      */
+    @Test
     public void testSearchHighlightAllMatches() {
         // start with "t"
         Pattern pattern = Pattern.compile("^t");
@@ -742,6 +811,7 @@ public class HighlightPredicateTest extends InteractiveTestCase {
      * test match limited by column.
      *
      */
+    @Test
     public void testSearchHighlightColumn() {
         // start with "t"
         Pattern pattern = Pattern.compile("^t");
@@ -759,6 +829,7 @@ public class HighlightPredicateTest extends InteractiveTestCase {
      * test match limited by row.
      *
      */
+    @Test
     public void testSearchHighlightRow() {
         // start with "t"
         Pattern pattern = Pattern.compile("^t");
@@ -776,6 +847,7 @@ public class HighlightPredicateTest extends InteractiveTestCase {
      * test match limited by row and column.
      *
      */
+    @Test
     public void testSearchHighlightRowAndColumn() {
         // start with "t"
         Pattern pattern = Pattern.compile("^t");
@@ -795,6 +867,7 @@ public class HighlightPredicateTest extends InteractiveTestCase {
      * test match in all cells using regex constructor.
      *
      */
+    @Test
     public void testSearchHighlightAllMatchesWithString() {
         // start with "t"
         String regex = "^t";
@@ -813,6 +886,7 @@ public class HighlightPredicateTest extends InteractiveTestCase {
      * test match limited by column using regex constructor.
      *
      */
+    @Test
     public void testSearchHighlightColumnWithString() {
         // start with "t"
         String regex = "^t";
@@ -830,6 +904,7 @@ public class HighlightPredicateTest extends InteractiveTestCase {
      * test match limited by row using regex constructor.
      *
      */
+    @Test
     public void testSearchHighlightRowWithString() {
         // start with "t"
         String regex = "^t";
@@ -843,6 +918,7 @@ public class HighlightPredicateTest extends InteractiveTestCase {
                 predicate.isHighlighted(allColored, adapter));
     }
 
+    @Test
     public void testSearchHighlightNullString() {
         // start with "t"
         String regex = null;
@@ -852,6 +928,7 @@ public class HighlightPredicateTest extends InteractiveTestCase {
                   predicate.isHighlighted(allColored, adapter));
     }
     
+    @Test
     public void testSearchHighlightEmptyString() {
         // start with "t"
         String regex = "";
@@ -861,6 +938,7 @@ public class HighlightPredicateTest extends InteractiveTestCase {
                   predicate.isHighlighted(allColored, adapter));
     }
     
+    @Test
     public void testSearchHighlightNullPattern() {
         Pattern pattern = null;
         HighlightPredicate predicate = new SearchPredicate(pattern);

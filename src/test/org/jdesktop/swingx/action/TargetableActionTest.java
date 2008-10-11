@@ -36,12 +36,20 @@ import org.jdesktop.swingx.JXEditorPane;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.JXTree;
 import org.jdesktop.swingx.JXTreeTable;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
+
 
 /**
  * A unit test for targetable actions.
  */
+@RunWith(JUnit4.class)
 public class TargetableActionTest extends TestCase {
 
+    @Test
     public void testDummy() {
     }
 

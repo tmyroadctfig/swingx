@@ -26,6 +26,12 @@ import javax.swing.event.ChangeListener;
 import junit.framework.TestCase;
 
 import org.jdesktop.test.ChangeReport;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
+
 
 /**
  * Unit tests for SwingX' EventListenerList. Testing the 
@@ -35,12 +41,14 @@ import org.jdesktop.test.ChangeReport;
  * 
  * @author Jeanette Winzenburg
  */
+@RunWith(JUnit4.class)
 public class WeakEventListenerListTest extends TestCase {
 
     /**
      * Test intial getListenerList
      *
      */
+    @Test
     public void testGetListenerListInitial() {
         WeakEventListenerList list = new WeakEventListenerList();
         // must return empty array
@@ -52,6 +60,7 @@ public class WeakEventListenerListTest extends TestCase {
      * test sequence in array.
      *
      */
+    @Test
     public void testGetListenerListAddRemove() {
         WeakEventListenerList list = new WeakEventListenerList();
         // add one changeListener
@@ -77,6 +86,7 @@ public class WeakEventListenerListTest extends TestCase {
         assertSame("added listener must be at 1", otherReport, removedArray[1]);
     }
     
+    @Test
     public void testGetListenersInitial() {
         WeakEventListenerList list = new WeakEventListenerList();
         // must return empty array
@@ -89,6 +99,7 @@ public class WeakEventListenerListTest extends TestCase {
      * test sequence in array.
      *
      */
+    @Test
     public void testGetListenersAddRemove() {
         WeakEventListenerList list = new WeakEventListenerList();
         // add one changeListener

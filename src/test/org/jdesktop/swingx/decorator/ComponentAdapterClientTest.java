@@ -38,6 +38,12 @@ import org.jdesktop.swingx.renderer.DefaultTableRenderer;
 import org.jdesktop.swingx.renderer.DefaultTreeRenderer;
 import org.jdesktop.swingx.renderer.StringValue;
 import org.jdesktop.test.AncientSwingTeam;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
+
 
 /**
  * Testing clients of ComponentAdapter, mainly clients which rely on uniform string 
@@ -46,6 +52,7 @@ import org.jdesktop.test.AncientSwingTeam;
  * 
  * @author Jeanette Winzenburg
  */
+@RunWith(JUnit4.class)
 public class ComponentAdapterClientTest extends InteractiveTestCase {
 
     public static void main(String[] args) {
@@ -63,6 +70,16 @@ public class ComponentAdapterClientTest extends InteractiveTestCase {
      */
     private StringValue sv;
 
+    @Before
+    public void setUpJ4() throws Exception {
+        setUp();
+    }
+    
+    @After
+    public void tearDownJ4() throws Exception {
+        tearDown();
+    }
+    
     /**
      * Issue #767-swingx: consistent string representation.
      * 
@@ -121,6 +138,7 @@ public class ComponentAdapterClientTest extends InteractiveTestCase {
      * 
      * here: test highlight
      */
+    @Test
     public void testTreeTableGetStringUsedInPatternPredicate() {
         JXTreeTableT table = new JXTreeTableT(AncientSwingTeam.createNamedColorTreeTableModel());
         table.setTreeCellRenderer(new DefaultTreeRenderer(sv));
@@ -137,6 +155,7 @@ public class ComponentAdapterClientTest extends InteractiveTestCase {
      * 
      * here: test search
      */
+    @Test
     public void testTreeTableGetStringUsedInSearch() {
         JXTreeTableT table = new JXTreeTableT(AncientSwingTeam.createNamedColorTreeTableModel());
         table.setTreeCellRenderer(new DefaultTreeRenderer(sv));
@@ -152,6 +171,7 @@ public class ComponentAdapterClientTest extends InteractiveTestCase {
      * 
      * Here: test TableSearchable uses getStringXX
      */
+    @Test
     public void testTreeGetStringAtUsedInSearch() {
         JXTreeT tree = new JXTreeT(AncientSwingTeam.createNamedColorTreeModel());
         tree.expandAll();
@@ -167,6 +187,7 @@ public class ComponentAdapterClientTest extends InteractiveTestCase {
      * 
      * Here: test TableSearchable uses getStringXX
      */
+    @Test
     public void testListGetStringUsedInSearch() {
         JXList table = new JXList(AncientSwingTeam.createNamedColorListModel());
         table.setCellRenderer(new DefaultListRenderer(sv));
@@ -182,6 +203,7 @@ public class ComponentAdapterClientTest extends InteractiveTestCase {
      * 
      * Here: test TableSearchable uses getStringXX
      */
+    @Test
     public void testTableGetStringUsedInSearch() {
         JXTable table = new JXTable(new AncientSwingTeam());
         table.setDefaultRenderer(Color.class, new DefaultTableRenderer(sv));
@@ -196,6 +218,7 @@ public class ComponentAdapterClientTest extends InteractiveTestCase {
      * 
      * Here: test PatternFilter uses getStringXX
      */
+    @Test
     public void testTableGetStringUsedInPatternFilter() {
         JXTableT table = new JXTableT(new AncientSwingTeam());
         table.setDefaultRenderer(Color.class, new DefaultTableRenderer(sv));
@@ -210,6 +233,7 @@ public class ComponentAdapterClientTest extends InteractiveTestCase {
      * 
      * Here: test SearchPredicate uses getStringXX.
      */
+    @Test
     public void testTableGetStringUsedInSearchPredicate() {
         JXTableT table = new JXTableT(new AncientSwingTeam());
         table.setDefaultRenderer(Color.class, new DefaultTableRenderer(sv));
@@ -226,6 +250,7 @@ public class ComponentAdapterClientTest extends InteractiveTestCase {
      * 
      * Here: test PatternPredicate uses getStringxx().
      */
+    @Test
     public void testTableGetStringUsedInPatternPredicate() {
         JXTableT table = new JXTableT(new AncientSwingTeam());
         table.setDefaultRenderer(Color.class, new DefaultTableRenderer(sv));

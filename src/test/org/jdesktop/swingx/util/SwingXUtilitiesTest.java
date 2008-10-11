@@ -36,12 +36,19 @@ import org.jdesktop.swingx.JXDatePicker;
 import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.SwingXUtilities;
 import org.jdesktop.swingx.plaf.basic.BasicDatePickerUI;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
+
 
 /**
  * Test SwingXUtilities.
  * 
  * @author Jeanette Winzenburg
  */
+@RunWith(JUnit4.class)
 public class SwingXUtilitiesTest extends InteractiveTestCase {
 
     @SuppressWarnings("unused")
@@ -57,18 +64,21 @@ public class SwingXUtilitiesTest extends InteractiveTestCase {
         }
     }
     
+    @Test
     public void testDescendingNull() {
         assertFalse("both nulls are not descending", SwingXUtilities.isDescendingFrom(null, null));
         assertFalse("null comp is not descending", SwingXUtilities.isDescendingFrom(null, new JScrollPane()));
         assertFalse("comp is not descending null parent", SwingXUtilities.isDescendingFrom(new JLabel(), null));
     }
     
+    @Test
     public void testDescendingSame() {
         JComponent comp = new JLabel();
         assertTrue("same component must be interpreted as descending", 
                 SwingXUtilities.isDescendingFrom(comp, comp));
     }
     
+    @Test
     public void testDescendingPopup() throws InterruptedException, InvocationTargetException {
         if (GraphicsEnvironment.isHeadless()) {
             LOG.info("cannot run - headless");

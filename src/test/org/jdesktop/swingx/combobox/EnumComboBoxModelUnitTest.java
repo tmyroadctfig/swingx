@@ -5,7 +5,14 @@
 package org.jdesktop.swingx.combobox;
 
 import org.jdesktop.swingx.InteractiveTestCase;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
 
+
+@RunWith(JUnit4.class)
 public class EnumComboBoxModelUnitTest extends InteractiveTestCase {
     enum MyEnum1 {
         GoodStuff, BadStuff
@@ -43,6 +50,7 @@ public class EnumComboBoxModelUnitTest extends InteractiveTestCase {
      * Issue #303-swingx: EnumComboBoxModel getSelectedItem throws
      * ClassCastException. Fixed.
      */
+    @Test
     public void testSetSelectedItem() {
         EnumComboBoxModel<MyEnum1> model1 = new EnumComboBoxModel<MyEnum1>(
                 MyEnum1.class);
@@ -83,6 +91,7 @@ public class EnumComboBoxModelUnitTest extends InteractiveTestCase {
         assertEquals(model2.getSelectedItem(), MyEnum2.EasyStuff);
     }
 
+    @Test
     public void testNonUniqueToString() {
         try {
             new EnumComboBoxModel<MyEnum3>(MyEnum3.class);

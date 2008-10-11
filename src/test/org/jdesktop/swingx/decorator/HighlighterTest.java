@@ -36,6 +36,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
+
 
 /**
  * 
@@ -44,7 +48,7 @@ import org.junit.runners.JUnit4;
  * @author Jeanette Winzenburg
  */
 @RunWith(JUnit4.class)
-public class HighlighterTest extends TestCase {
+public class HighlighterTest extends InteractiveTestCase {
     private static final Logger LOG = Logger.getLogger(HighlighterTest.class
             .getName());
     
@@ -68,7 +72,7 @@ public class HighlighterTest extends TestCase {
 
     @Override
     @Before
-    public void setUp() {
+       public void setUp() {
         backgroundNull = new JLabel("test");
         backgroundNull.setForeground(foreground);
         backgroundNull.setBackground(null);
@@ -96,6 +100,7 @@ public class HighlighterTest extends TestCase {
 
 //-------------------PainterHighlighter
     
+    @Test
      public void testPainterHighlighterConstructors() {
         PainterHighlighter hl = new PainterHighlighter();
         assertEquals(HighlightPredicate.ALWAYS, hl.getHighlightPredicate());
@@ -112,6 +117,7 @@ public class HighlighterTest extends TestCase {
         assertEquals(mattePainter, all.getPainter());
     }
     
+    @Test
     public void testPainterHighlighterSetPainterChangeNotificatioon() {
         PainterHighlighter hl = new PainterHighlighter();
         ChangeReport report = new ChangeReport();
@@ -122,6 +128,7 @@ public class HighlighterTest extends TestCase {
         assertEquals(1, report.getEventCount());
      }
     
+    @Test
     public void testPainterHighlighterSetPainterNoChangeNotificatioon() {
         MattePainter mattePainter = new MattePainter();
         PainterHighlighter hl = new PainterHighlighter(mattePainter);
@@ -133,6 +140,7 @@ public class HighlighterTest extends TestCase {
     /**
      * Issue #851-swingx: Highlighter must notify on painter property change
      */
+    @Test
     public void testPainterHighlighterPainterPropertyChangeNotificatioon() {
         PainterHighlighter hl = new PainterHighlighter();
         Color red = Color.RED;
@@ -155,6 +163,7 @@ public class HighlighterTest extends TestCase {
      * the decoration. Supported in base to ease subclassing and keep
      * backward compatibility
      */
+    @Test
     public void testPainterHighlighterPainterPropertyNotNotifyInternalChange() {
         Color red = Color.RED;
         MattePainter mattePainter = new MattePainter(red);
@@ -177,6 +186,7 @@ public class HighlighterTest extends TestCase {
         assertEquals(0, report.getEventCount());
      }
 
+    @Test
     public void testPainterHighlighterUsePainter() {
         ComponentAdapter adapter = createComponentAdapter(allColored, false);
         MattePainter mattePainter = new MattePainter();
@@ -186,6 +196,7 @@ public class HighlighterTest extends TestCase {
         assertEquals(mattePainter, allColored.getPainter());
     }
     
+    @Test
     public void testPainterHighlighterNotUseNullPainter() {
         ComponentAdapter adapter = createComponentAdapter(allColored, false);
         PainterHighlighter hl = new PainterHighlighter();
@@ -196,6 +207,7 @@ public class HighlighterTest extends TestCase {
         assertEquals(mattePainter, allColored.getPainter());
     }
     
+    @Test
     public void testPainterHighlighterIgnoreNotPainterAware() {
         ComponentAdapter adapter = createComponentAdapter(foregroundNull, false);
         MattePainter mattePainter = new MattePainter();
@@ -208,6 +220,7 @@ public class HighlighterTest extends TestCase {
     /**
      * highlight every second 
      */
+    @Test
     public void testSimpleStriping() {
         ComponentAdapter adapter = createComponentAdapter(allColored, false);
         Highlighter h = HighlighterFactory.createSimpleStriping(unselectedBackground);
@@ -435,6 +448,7 @@ public class HighlighterTest extends TestCase {
         assertColorsAndPredicate(never, HighlightPredicate.NEVER, null, null, null, null);
     }
     
+    @Test
     public void testShadingEffect() {
         
     }

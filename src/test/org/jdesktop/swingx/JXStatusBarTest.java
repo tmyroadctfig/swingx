@@ -13,16 +13,25 @@ import javax.swing.JLabel;
 import javax.swing.LookAndFeel;
 import javax.swing.UIManager;
 
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
+
+
 /**
  *
  * @author rbair
  */
+@RunWith(JUnit4.class)
 public class JXStatusBarTest extends junit.framework.TestCase {
     
     /**
      * This test ensures that after the LAF is switched, the Border and
      * LayoutManager are still in valid states.
      */
+    @Test
     public void testLAFSwitch() throws Exception {
         //create a status bar with a single child, a label.
         //ensure that after switching look and feels, the layout manager

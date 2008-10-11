@@ -21,15 +21,31 @@
  */
 package org.jdesktop.swingx;
 
+import java.io.NotSerializableException;
+import java.util.logging.Logger;
+
+import javax.swing.UIManager;
+import javax.swing.plaf.synth.SynthLookAndFeel;
+
 import org.jdesktop.swingx.calendar.DatePickerFormatter;
 import org.jdesktop.test.SerializableSupport;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
+
 
 /**
  * Test serializable of all SwingX components.
  * 
  * @author Jeanette Winzenburg
  */
+@RunWith(JUnit4.class)
 public class SerializableTest extends InteractiveTestCase {
+    @SuppressWarnings("unused")
+    private static final Logger LOG = Logger
+            .getLogger(SerializableTest.class.getName());
 
     /**
      * Issue #423-swingx: all descendants of JComponent must be 
@@ -37,6 +53,7 @@ public class SerializableTest extends InteractiveTestCase {
      * 
      * Note: this blows as soon as a JXTable is set!
      */
+    @Test
     public void testDatePickerFormatter() {
         DatePickerFormatter component = new DatePickerFormatter();
         try {
@@ -54,11 +71,17 @@ public class SerializableTest extends InteractiveTestCase {
      * 
      * Note: this blows as soon as a JXTable is set!
      */
-    public void testTableHeader() {
+    @Test
+    public void testTableHeader() throws Exception {
         JXTableHeader component = new JXTableHeader();
+        
+        if (javax.swing.plaf.synth.SynthLookAndFeel.class.isAssignableFrom(Class.forName(UIManager.getSystemLookAndFeelClassName()))) {
+            LOG.warning("Table header is not serializable on Linux when using Synth or derived LaFs due to javax.swing.plaf.synth.SynthLabelUI being non serializable.");
+            return;
+        }
         try {
             SerializableSupport.serialize(component);
-        } catch (Exception e) {
+        } catch (NotSerializableException e) {
             fail("not serializable " + e);
         } 
     }
@@ -69,6 +92,7 @@ public class SerializableTest extends InteractiveTestCase {
      * 
      * 
      */
+    @Test
     public void testRadioGroup() {
         JXRadioGroup component = new JXRadioGroup();
         try {
@@ -84,6 +108,7 @@ public class SerializableTest extends InteractiveTestCase {
      * serializable. <p>
      * 
      */
+    @Test
     public void testHyperlink() {
         JXHyperlink component = new JXHyperlink();
         try {

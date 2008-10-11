@@ -18,10 +18,17 @@ import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.decorator.FilterTest.DirectModelAdapter;
 import org.jdesktop.test.AncientSwingTeam;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
+
 
 /**
  * @author Jeanette Winzenburg
  */
+@RunWith(JUnit4.class)
 public class SelectionMapperTest extends InteractiveTestCase {
     public SelectionMapperTest() {
         super("SelectionMapperTest");
@@ -30,7 +37,18 @@ public class SelectionMapperTest extends InteractiveTestCase {
     private TableModel ascendingModel;
     protected ComponentAdapter ascendingModelAdapter;
 
+    @Before
+    public void setUpJ4() throws Exception {
+        setUp();
+    }
     
+    @After
+    public void tearDownJ4() throws Exception {
+        tearDown();
+    }
+    
+    
+    @Test
     public void testLeadRemoveAll() {
         ListSelectionModel selectionModel = new DefaultListSelectionModel();
         FilterPipeline pipeline = new FilterPipeline();
@@ -55,6 +73,7 @@ public class SelectionMapperTest extends InteractiveTestCase {
      * Fixed by guarding against -1 in mapTowardsModel(int, int).
      */
     @SuppressWarnings("all")
+    @Test
     public void testNegativFirstIndex() {
         ListSelectionModel selectionModel = new DefaultListSelectionModel();
         FilterPipeline pipeline = new FilterPipeline();
@@ -72,6 +91,7 @@ public class SelectionMapperTest extends InteractiveTestCase {
      * Related to #186-swingx: Lead/anchor not correctly synched.
      *
      */
+    @Test
     public void testSynchLeadSelection() {
         ListSelectionModel viewSelectionModel = new DefaultListSelectionModel();
         int selected = 0;
@@ -90,6 +110,7 @@ public class SelectionMapperTest extends InteractiveTestCase {
         assertAnchorLeadSynched(anchor, lead, viewSelectionModel, selectionMapper);
     }
     
+    @Test
     public void testAnchorLeadSelection() {
         ListSelectionModel viewSelectionModel = new DefaultListSelectionModel();
         int selected = 0;
@@ -114,6 +135,7 @@ public class SelectionMapperTest extends InteractiveTestCase {
         assertEquals("lead", lead, viewSelection.getLeadSelectionIndex());
         
     }
+    @Test
     public void testSelectionNullPipeline() {
         ListSelectionModel selectionModel = new DefaultListSelectionModel();
         selectionModel.setSelectionInterval(0, 0);
@@ -122,6 +144,7 @@ public class SelectionMapperTest extends InteractiveTestCase {
         assertTrue("selection must be retained", selectionModel.isSelectedIndex(0));
     }
  
+    @Test
     public void testLeadSelectionSetPipeline() {
         ListSelectionModel selectionModel = new DefaultListSelectionModel();
         // select first in "model" coordinates
@@ -142,6 +165,7 @@ public class SelectionMapperTest extends InteractiveTestCase {
                 selectionModel.getLeadSelectionIndex());
     }
 
+    @Test
     public void testSelectionSetPipeline() {
         ListSelectionModel selectionModel = new DefaultListSelectionModel();
         FilterPipeline pipeline = new FilterPipeline();
@@ -165,6 +189,7 @@ public class SelectionMapperTest extends InteractiveTestCase {
      * Issue #187: keep selection on filter change
      *
      */
+    @Test
     public void testKeepSelectionOnFilterChange() {
         JXTable table = new JXTable(ascendingModel);
         int selectedRow = 0;

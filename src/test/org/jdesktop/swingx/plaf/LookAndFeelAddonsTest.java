@@ -22,7 +22,14 @@ import junit.framework.TestCase;
 
 import org.jdesktop.swingx.JXMonthView;
 import org.jdesktop.swingx.plaf.basic.BasicLookAndFeelAddons;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
 
+
+@RunWith(JUnit4.class)
 public class LookAndFeelAddonsTest extends TestCase {
 
 
@@ -33,6 +40,7 @@ public class LookAndFeelAddonsTest extends TestCase {
      * bug report)
      * @throws UnsupportedLookAndFeelException 
      */
+    @Test
     public void testReloadAddons() throws UnsupportedLookAndFeelException {
         // load the addon for a new component
         new JXMonthView();
@@ -45,6 +53,7 @@ public class LookAndFeelAddonsTest extends TestCase {
   /**
    * A look and feel can't override SwingX defaults
    */
+    @Test
   public void testIssue293() throws Exception {
 	  class CustomLF extends BasicLookAndFeel {
 	    @Override
@@ -104,6 +113,7 @@ public class LookAndFeelAddonsTest extends TestCase {
   /**
    * LookAndFeelAddons override entries manually added to UIManager
    */
+    @Test
   public void testIssue144() throws Exception {
     UIManager.put("Addon.title", "customized");
     UIManager.put("Addon.border", new LineBorder(Color.blue));
@@ -119,6 +129,7 @@ public class LookAndFeelAddonsTest extends TestCase {
     assertEquals("my title", UIManager.get("Addon.title"));
   }
 
+    @Test
   public void testContribute() throws Exception {
     Addon addon = new Addon();
     LookAndFeelAddons.contribute(addon);

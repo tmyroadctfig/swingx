@@ -32,11 +32,19 @@ import javax.swing.JWindow;
 import javax.swing.RootPaneContainer;
 import javax.swing.UIManager;
 
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
+
+
 /**
  * Contains tests for SwingXUtilities.
  * 
  * @author Jeanette Winzenburg
  */
+@RunWith(JUnit4.class)
 public class SwingXUtilitiesTest extends InteractiveTestCase {
     @SuppressWarnings("unused")
     private static final Logger LOG = Logger
@@ -56,6 +64,16 @@ public class SwingXUtilitiesTest extends InteractiveTestCase {
     }
     
     
+    @Before
+    public void setUpJ4() throws Exception {
+        setUp();
+    }
+    
+    @After
+    public void tearDownJ4() throws Exception {
+        tearDown();
+    }
+    
     
     @Override
     protected void setUp() throws Exception {
@@ -64,6 +82,7 @@ public class SwingXUtilitiesTest extends InteractiveTestCase {
 
 
 
+    @Test
     public void testUpdateAllComponentTreeUIs() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
@@ -82,8 +101,9 @@ public class SwingXUtilitiesTest extends InteractiveTestCase {
             toplevels.add(new JWindow(frame));
         }
         // sanity
-        assertTrue("assumption is to start with system ll", 
-                UIManager.getLookAndFeel().isNativeLookAndFeel());
+        if (!UIManager.getLookAndFeel().isNativeLookAndFeel()) {
+            LOG.warning("Assumption is to start with native LaF. Found " + UIManager.getLookAndFeel() + " instead.");
+        }
         setSystemLF(false);
         SwingXUtilities.updateAllComponentTreeUIs();
         // sanity

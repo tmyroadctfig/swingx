@@ -33,12 +33,19 @@ import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.decorator.HighlightPredicate.ColumnHighlightPredicate;
 import org.jdesktop.swingx.decorator.HighlighterFactory.UIColorHighlighter;
 import org.jdesktop.test.AncientSwingTeam;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
+
 
 /**
  * TODO add type doc
  * 
  * @author Jeanette Winzenburg
  */
+@RunWith(JUnit4.class)
 public class HighlighterClientVisualCheck extends InteractiveTestCase  {
     
     public static void main(String[] args) {

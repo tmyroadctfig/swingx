@@ -22,6 +22,12 @@ import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.event.TableColumnModelExtListener;
 import org.jdesktop.swingx.test.ColumnModelReport;
 import org.jdesktop.test.TestUtils;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
+
 
 /**
  * Skeleton to unit test DefaultTableColumnExt.
@@ -34,6 +40,7 @@ import org.jdesktop.test.TestUtils;
  * 
  * @author  Jeanette Winzenburg
  */
+@RunWith(JUnit4.class)
 public class TableColumnModelTest extends InteractiveTestCase {
     @SuppressWarnings("all")
     private static final Logger LOG = Logger
@@ -43,6 +50,7 @@ public class TableColumnModelTest extends InteractiveTestCase {
     /**
      * added api to get array of ext listeners
      */
+    @Test
     public void testGetTableColumnModelExtListener() {
         // any tableColumnModelExtListener will do
         JXTable table = new JXTable();
@@ -58,6 +66,7 @@ public class TableColumnModelTest extends InteractiveTestCase {
      *    column propertyChange <p>
      * test the change from visible to hidden.
      */
+    @Test
     public void testTableColumnIgnoreNoPropertyNotificationHide() {
         TableColumnModelExt columnModel = createColumnModel(COLUMN_COUNT);
         ColumnModelReport report = new ColumnModelReport();
@@ -72,6 +81,7 @@ public class TableColumnModelTest extends InteractiveTestCase {
      *    column propertyChange <p>
      * test the change from hidden to visible.
      */
+    @Test
     public void testTableColumnIgnoreNoPropertyNotificationShow() {
         TableColumnModelExt columnModel = createColumnModel(COLUMN_COUNT);
         columnModel.getColumnExt(0).setVisible(false);
@@ -86,6 +96,7 @@ public class TableColumnModelTest extends InteractiveTestCase {
      * Issue #369-swingx: properties of hidden columns are not fired. <p>
      * test the change from visible to hidden.
      */
+    @Test
     public void testHideTableColumnPropertyNotification() {
         TableColumnModelExt columnModel = createColumnModel(COLUMN_COUNT);
         ColumnModelReport report = new ColumnModelReport();
@@ -99,6 +110,7 @@ public class TableColumnModelTest extends InteractiveTestCase {
     /**
      * Issue #846-swingx
      */
+    @Test
     public void testIsAddedFromInvisibleTrue() {
         final DefaultTableColumnModelExt columnModel = (DefaultTableColumnModelExt) createColumnModel(3);
         TableColumnExt columnB = columnModel.getColumnExt(1);
@@ -129,6 +141,7 @@ public class TableColumnModelTest extends InteractiveTestCase {
     /**
      * Issue #846-swingx
      */
+    @Test
     public void testIsRemovedToInvisibleFalse() {
         final DefaultTableColumnModelExt columnModel = (DefaultTableColumnModelExt) createColumnModel(3);
         TableColumnExt columnB = columnModel.getColumnExt(1);
@@ -159,6 +172,7 @@ public class TableColumnModelTest extends InteractiveTestCase {
     /**
      * Issue #846-swingx
      */
+    @Test
     public void testIsRemovedToInvisibleTrue() {
         final DefaultTableColumnModelExt columnModel = 
             (DefaultTableColumnModelExt) createColumnModel(3);
@@ -193,6 +207,7 @@ public class TableColumnModelTest extends InteractiveTestCase {
      * Issue #369-swingx: properties of hidden columns are not fired. <p>
      * test the change from hidden to visible.
      */
+    @Test
     public void testShowTableColumnPropertyNotification() {
         TableColumnModelExt columnModel = createColumnModel(COLUMN_COUNT);
         Object identifier = "0";
@@ -216,6 +231,7 @@ public class TableColumnModelTest extends InteractiveTestCase {
      * test property changes while hidden 
      *
      */
+    @Test
     public void testHiddenTableColumnPropertyNotification() {
         TableColumnModelExt columnModel = createColumnModel(COLUMN_COUNT);
         String identifier = "0";
@@ -238,6 +254,7 @@ public class TableColumnModelTest extends InteractiveTestCase {
      * http://forums.java.net/jive/thread.jspa?threadID=7344.
      *
      */
+    @Test
     public void testHideShowColumns() {
         DefaultTableColumnModelExt model = (DefaultTableColumnModelExt) createColumnModel(10);   
         int[] columnsToHide = new int[] { 4, 7, 6, 8, };
@@ -264,6 +281,7 @@ public class TableColumnModelTest extends InteractiveTestCase {
      * Expected behaviour should be like in Thunderbird.
      *
      */
+    @Test
     public void testMoveColumns() {
         DefaultTableColumnModelExt model = (DefaultTableColumnModelExt) createColumnModel(COLUMN_COUNT);
         TableColumnExt columnExt = model.getColumnExt(1);
@@ -276,6 +294,7 @@ public class TableColumnModelTest extends InteractiveTestCase {
      * test the columnPropertyChangeEvent is fired as expected.
      *
      */
+    @Test
     public void testColumnPropertyChangeNotification() {
         DefaultTableColumnModelExt model = (DefaultTableColumnModelExt) createColumnModel(COLUMN_COUNT);
         ColumnModelReport report = new ColumnModelReport();
@@ -292,6 +311,7 @@ public class TableColumnModelTest extends InteractiveTestCase {
      * added TableColumnModelExtListener: test for add/remove extended listeners.
      *
      */
+    @Test
     public void testAddExtListener() {
         DefaultTableColumnModelExt model = (DefaultTableColumnModelExt) createColumnModel(COLUMN_COUNT);
         ColumnModelReport extListener = new ColumnModelReport();
@@ -314,6 +334,7 @@ public class TableColumnModelTest extends InteractiveTestCase {
      * removing an invisible column. 
      *
      */
+    @Test
     public void testRemoveInvisibleColumn() {
         DefaultTableColumnModelExt model = (DefaultTableColumnModelExt) createColumnModel(COLUMN_COUNT);
         TableColumnExt tableColumnExt = ((TableColumnExt) model.getColumn(0));
@@ -325,6 +346,7 @@ public class TableColumnModelTest extends InteractiveTestCase {
     }
 
     
+    @Test
     public void testGetColumns() {
         TableColumnModelExt model = createColumnModel(COLUMN_COUNT);
         ((TableColumnExt) model.getColumn(0)).setVisible(false);
@@ -336,6 +358,7 @@ public class TableColumnModelTest extends InteractiveTestCase {
      * column visibility.
      *
      */
+    @Test
     public void testColumnCountOnSetInvisible() {
         TableColumnModel model = createColumnModel(COLUMN_COUNT);
         int columnCount = model.getColumnCount();
@@ -351,6 +374,7 @@ public class TableColumnModelTest extends InteractiveTestCase {
      * with selection.
      *
      */
+    @Test
     public void testTotalColumnWidth() {
         TableColumnModel model = createColumnModel(COLUMN_COUNT);
         int totalWidth = model.getTotalColumnWidth();
@@ -366,6 +390,7 @@ public class TableColumnModelTest extends InteractiveTestCase {
      * Issue #157: must fire columnRemoved after setting to invisible.
      *
      */
+    @Test
     public void testRemovedFired() {
         TableColumnModel model = createColumnModel(COLUMN_COUNT);
         ColumnModelReport l = new ColumnModelReport();
@@ -379,6 +404,7 @@ public class TableColumnModelTest extends InteractiveTestCase {
      * Issue #157: must fire columnAdded after setting to invisible.
      *
      */
+    @Test
     public void testAddedFired() {
         TableColumnModel model = createColumnModel(COLUMN_COUNT);
         ColumnModelReport l = new ColumnModelReport();
@@ -394,6 +420,7 @@ public class TableColumnModelTest extends InteractiveTestCase {
      * 
      * 
      */
+    @Test
      public void testAddInvisibleColumn()  {
          TableColumnModel model = createColumnModel(COLUMN_COUNT);
          TableColumnModelListener l = new TableColumnModelListener() {
@@ -436,6 +463,7 @@ public class TableColumnModelTest extends InteractiveTestCase {
      * columnAt must work on visible columns.
      *
      */
+    @Test
     public void testColumnAt() {
         TableColumnModel model = createColumnModel(COLUMN_COUNT);
         int totalWidth = model.getTotalColumnWidth();

@@ -34,6 +34,12 @@ import org.jdesktop.swingx.treetable.TreeTableModel;
 import org.jdesktop.test.AncientSwingTeam;
 import org.jdesktop.test.PropertyChangeReport;
 import org.jdesktop.test.TestUtils;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
+
 
 
 /**
@@ -41,6 +47,7 @@ import org.jdesktop.test.TestUtils;
  * 
  * @author Jeanette Winzenburg
  */
+@RunWith(JUnit4.class)
 public class JXTreeUnitTest extends InteractiveTestCase {
 
     protected TreeTableModel treeTableModel;
@@ -52,6 +59,7 @@ public class JXTreeUnitTest extends InteractiveTestCase {
     /**
      * Issue #862-swingx: JXTree - add api for selection colors.
      */
+    @Test
     public void testSelectionBackground() {
         JXTree tree = new JXTree();
         Color uiColor = UIManager.getColor("Tree.selectionBackground");
@@ -65,6 +73,7 @@ public class JXTreeUnitTest extends InteractiveTestCase {
     /**
      * Issue #862-swingx: JXTree - add api for selection colors.
      */
+    @Test
     public void testSelectionForeground() {
         JXTree tree = new JXTree();
         Color uiColor = UIManager.getColor("Tree.selectionForeground");
@@ -79,6 +88,7 @@ public class JXTreeUnitTest extends InteractiveTestCase {
     /**
      * Issue #862-swingx: JXTree - add api for selection colors.
      */
+    @Test
     public void testSelectionBackgroundChange() {
         JXTree tree = new JXTree();
         Color uiColor = tree.getSelectionBackground();
@@ -92,6 +102,7 @@ public class JXTreeUnitTest extends InteractiveTestCase {
     /**
      * Issue #862-swingx: JXTree - add api for selection colors.
      */
+    @Test
     public void testSelectionForegroundChange() {
         JXTree tree = new JXTree();
         Color uiColor = tree.getSelectionForeground();
@@ -106,6 +117,7 @@ public class JXTreeUnitTest extends InteractiveTestCase {
      * Issue #817-swingx: Delegating renderer must create list's default.
      * Consistent api: expose wrappedRenderer the same way as wrappedModel
      */
+    @Test
     public void testWrappedRendererDefault() {
         JXTree list = new JXTree();
         DelegatingRenderer renderer = (DelegatingRenderer) list.getCellRenderer();
@@ -117,6 +129,7 @@ public class JXTreeUnitTest extends InteractiveTestCase {
      * Issue #817-swingx: Delegating renderer must create list's default.
      * Consistent api: expose wrappedRenderer the same way as wrappedModel
      */
+    @Test
     public void testWrappedRendererCustom() {
         JXTree list = new JXTree();
         DelegatingRenderer renderer = (DelegatingRenderer) list.getCellRenderer();
@@ -130,6 +143,7 @@ public class JXTreeUnitTest extends InteractiveTestCase {
      * Issue #817-swingx: Delegating renderer must create list's default.
      * Delegating uses default on null, here: default default.
      */
+    @Test
     public void testDelegatingRendererUseDefaultSetNull() {
         JXTree list = new JXTree();
         TreeCellRenderer defaultRenderer = list.createDefaultCellRenderer();
@@ -145,6 +159,7 @@ public class JXTreeUnitTest extends InteractiveTestCase {
      * 
      * Note: this test has to be changed once we switch to default to DefaultTreeRenderer.
      */
+    @Test
     public void testDelegatingRendererUseDefault() {
         JXTree list = new JXTree();
         TreeCellRenderer defaultRenderer = list.createDefaultCellRenderer();
@@ -158,6 +173,7 @@ public class JXTreeUnitTest extends InteractiveTestCase {
      * Issue #817-swingx: Delegating renderer must create list's default.
      * Delegating has default from list initially, here: custom default.
      */
+    @Test
     public void testDelegatingRendererUseCustomDefaultSetNull() {
         JXTree list = new JXTree() {
 
@@ -178,6 +194,7 @@ public class JXTreeUnitTest extends InteractiveTestCase {
      * Issue #817-swingx: Delegating renderer must create list's default.
      * Delegating has default from list initially, here: custom default.
      */
+    @Test
     public void testDelegatingRendererUseCustomDefault() {
         JXTree list = new JXTree() {
 
@@ -205,6 +222,7 @@ public class JXTreeUnitTest extends InteractiveTestCase {
      * 
      * Here: test api on JXTable.
      */
+    @Test
     public void testGetStringForRow() {
         JXTree tree = new JXTree(AncientSwingTeam.createNamedColorTreeModel());
         tree.expandAll();
@@ -230,6 +248,7 @@ public class JXTreeUnitTest extends InteractiveTestCase {
      * 
      * Here: test api on JXTable.
      */
+    @Test
     public void testGetStringForPath() {
         JXTree tree = new JXTree(AncientSwingTeam.createNamedColorTreeModel());
         tree.expandAll();
@@ -255,6 +274,7 @@ public class JXTreeUnitTest extends InteractiveTestCase {
      * 
      * Here: icon on renderer must be respected if overwrite is false.
      */
+    @Test
     public void testIconSetOnRendererFalseOverwrite() {
         JXTree tree = new JXTree();
         DefaultTreeCellRenderer renderer = new DefaultTreeCellRenderer();
@@ -269,6 +289,7 @@ public class JXTreeUnitTest extends InteractiveTestCase {
      * 
      * Here: icon on renderer must be overwritten if overwrite is true.
      */
+    @Test
     public void testIconSetOnRendererTrueOverwrite() {
         JXTree tree = new JXTree();
         tree.setLeafIcon(null);
@@ -288,6 +309,7 @@ public class JXTreeUnitTest extends InteractiveTestCase {
      * 
      * Here: set icon on tree is passed on to renderer always.
      */
+    @Test
     public void testIconSetOnTreeFalseOverwrite() {
         JXTree tree = new JXTree();
         DefaultTreeCellRenderer renderer = new DefaultTreeCellRenderer();
@@ -303,6 +325,7 @@ public class JXTreeUnitTest extends InteractiveTestCase {
      * 
      * Here: set icon on tree is passed on to renderer always.
      */
+    @Test
     public void testIconSetOnTreeTrueOverwrite() {
         JXTree tree = new JXTree();
         tree.setOverwriteRendererIcons(true);
@@ -319,6 +342,7 @@ public class JXTreeUnitTest extends InteractiveTestCase {
      * 
      * Here: default overwriteOnRenderer is false.
      */
+    @Test
     public void testIconOverwriteInitial() {
         JXTree tree = new JXTree();
         assertFalse("initial overwriteRendererIcons must be false", tree.isOverwriteRendererIcons());
@@ -330,6 +354,7 @@ public class JXTreeUnitTest extends InteractiveTestCase {
      * custom cellEditorListener.
      *
      */
+    @Test
     public void testEditorListenerRemovedOnEditorStopped() {
         JXTree tree = createEditingTree();
         DefaultTreeCellEditor cellEditor = (DefaultTreeCellEditor) tree.getCellEditor();
@@ -345,6 +370,7 @@ public class JXTreeUnitTest extends InteractiveTestCase {
      * custom cellEditorListener.
      *
      */
+    @Test
     public void testEditorListenerRemovedOnEditorCancel() {
         JXTree tree = createEditingTree();
         DefaultTreeCellEditor cellEditor = (DefaultTreeCellEditor) tree.getCellEditor();
@@ -359,6 +385,7 @@ public class JXTreeUnitTest extends InteractiveTestCase {
      * custom cellEditorListener.
      *
      */
+    @Test
     public void testEditorListenerRemovedOnTreeCancel() {
         JXTree tree = createEditingTree();
         DefaultTreeCellEditor cellEditor = (DefaultTreeCellEditor) tree.getCellEditor();
@@ -373,6 +400,7 @@ public class JXTreeUnitTest extends InteractiveTestCase {
      * custom cellEditorListener.
      *
      */
+    @Test
     public void testEditorListenerRemovedOnTreeStop() {
         JXTree tree = createEditingTree();
         DefaultTreeCellEditor cellEditor = (DefaultTreeCellEditor) tree.getCellEditor();
@@ -387,6 +415,7 @@ public class JXTreeUnitTest extends InteractiveTestCase {
      * custom cellEditorListener.
      *
      */
+    @Test
     public void testEditorListenerOnXTree() {
         JTree core = new JTree();
         int coreCount = getListenerCountAfterStartEditing(core);
@@ -413,6 +442,7 @@ public class JXTreeUnitTest extends InteractiveTestCase {
      * characterization: listeners in core tree.
      *
      */
+    @Test
     public void testEditorListenerOnCoreTree() {
         JTree tree = new JTree();
         int listenerCount = getListenerCountAfterStartEditing(tree);
@@ -452,6 +482,7 @@ public class JXTreeUnitTest extends InteractiveTestCase {
      * invalid ComponentAdapter state. Negative invalid index.
      *
      */
+    @Test
     public void testIllegalNegativeTreeRowIndex() {
         JXTree tree = new JXTree();
         tree.expandAll();
@@ -473,6 +504,7 @@ public class JXTreeUnitTest extends InteractiveTestCase {
      * invalid ComponentAdapter state. Invalid index > valid range.
      *
      */
+    @Test
     public void testIllegalExceedingTreeRowIndex() {
         JXTree tree = new JXTree();
         tree.expandAll();
@@ -489,6 +521,7 @@ public class JXTreeUnitTest extends InteractiveTestCase {
      * test convenience method accessing the configured adapter.
      *
      */
+    @Test
     public void testConfiguredComponentAdapter() {
         JXTree list = new JXTree();
         list.expandAll();
@@ -509,6 +542,7 @@ public class JXTreeUnitTest extends InteractiveTestCase {
      * Issue #254-swingx: expandAll doesn't expand if root not shown?
      *
      */
+    @Test
     public void testExpandAllWithInvisible() {
         final DefaultMutableTreeTableNode root = new DefaultMutableTreeTableNode();
         final InsertTreeTableModel model = new InsertTreeTableModel(root);
@@ -534,6 +568,7 @@ public class JXTreeUnitTest extends InteractiveTestCase {
      * array != null
      *
      */
+    @Test
     public void testNotNullGetSelectedRows() {
         JXTree tree = new JXTree(treeTableModel);
         // sanity: no selection
@@ -546,6 +581,7 @@ public class JXTreeUnitTest extends InteractiveTestCase {
      * array != null
      *
      */
+    @Test
     public void testNotNullGetSelectedPaths() {
         JXTree tree = new JXTree(treeTableModel);
         // sanity: no selection
@@ -559,6 +595,7 @@ public class JXTreeUnitTest extends InteractiveTestCase {
      * PENDING: test all constructors!
      *
      */
+    @Test
     public void testInitInConstructors() {
         assertXTreeInit(new JXTree());
         assertXTreeInit(new JXTree(new Object[] {}));
@@ -587,6 +624,7 @@ public class JXTreeUnitTest extends InteractiveTestCase {
      * learning something new every day :-)
      *
      */
+    @Test
     public void testNullModel() {
         JXTree tree = new JXTree();
         assertNotNull(tree.getModel());

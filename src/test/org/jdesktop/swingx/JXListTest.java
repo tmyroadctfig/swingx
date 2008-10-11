@@ -43,22 +43,40 @@ import org.jdesktop.swingx.rollover.RolloverProducer;
 import org.jdesktop.test.AncientSwingTeam;
 import org.jdesktop.test.ListDataReport;
 import org.jdesktop.test.PropertyChangeReport;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
+
 
 /**
  * Testing JXList.
  * 
  * @author Jeanette Winzenburg
  */
+@RunWith(JUnit4.class)
 public class JXListTest extends InteractiveTestCase {
 
     protected ListModel listModel;
     protected DefaultListModel ascendingListModel;
 
     
+    @Before
+    public void setUpJ4() throws Exception {
+        setUp();
+    }
+    
+    @After
+    public void tearDownJ4() throws Exception {
+        tearDown();
+    }
+    
     /**
      * Issue #855-swingx: throws AIOOB on repeated remove/add.
      * Reason is that the lead/anchor is not removed in removeIndexInterval
      */
+    @Test
     public void testAddRemoveSelect() {
         DefaultListModel model = new DefaultListModel();
         model.addElement("something");
@@ -81,6 +99,7 @@ public class JXListTest extends InteractiveTestCase {
      * cleanup is different.
      * 
      */
+    @Test
     public void testAddRemoveSelectTable() {
         DefaultTableModel model = new DefaultTableModel(0, 1);
         model.addRow(new Object[] {"something"});
@@ -98,6 +117,7 @@ public class JXListTest extends InteractiveTestCase {
      * Issue #816-swingx: Delegating renderer must create list's default.
      * Consistent api: expose wrappedRenderer the same way as wrappedModel
      */
+    @Test
     public void testWrappedRendererDefault() {
         JXList list = new JXList();
         DelegatingRenderer renderer = (DelegatingRenderer) list.getCellRenderer();
@@ -109,6 +129,7 @@ public class JXListTest extends InteractiveTestCase {
      * Issue #816-swingx: Delegating renderer must create list's default.
      * Consistent api: expose wrappedRenderer the same way as wrappedModel
      */
+    @Test
     public void testWrappedRendererCustom() {
         JXList list = new JXList();
         DelegatingRenderer renderer = (DelegatingRenderer) list.getCellRenderer();
@@ -122,6 +143,7 @@ public class JXListTest extends InteractiveTestCase {
      * Issue #816-swingx: Delegating renderer must create list's default.
      * Delegating uses default on null, here: default default.
      */
+    @Test
     public void testDelegatingRendererUseDefaultSetNull() {
         JXList list = new JXList();
         ListCellRenderer defaultRenderer = list.createDefaultCellRenderer();
@@ -135,6 +157,7 @@ public class JXListTest extends InteractiveTestCase {
      * Issue #816-swingx: Delegating renderer must create list's default.
      * Delegating has default from list initially, here: default default.
      */
+    @Test
     public void testDelegatingRendererUseDefault() {
         JXList list = new JXList();
         ListCellRenderer defaultRenderer = list.createDefaultCellRenderer();
@@ -148,6 +171,7 @@ public class JXListTest extends InteractiveTestCase {
      * Issue #816-swingx: Delegating renderer must create list's default.
      * Delegating has default from list initially, here: custom default.
      */
+    @Test
     public void testDelegatingRendererUseCustomDefaultSetNull() {
         JXList list = new JXList() {
 
@@ -168,6 +192,7 @@ public class JXListTest extends InteractiveTestCase {
      * Issue #816-swingx: Delegating renderer must create list's default.
      * Delegating has default from list initially, here: custom default.
      */
+    @Test
     public void testDelegatingRendererUseCustomDefault() {
         JXList list = new JXList() {
 
@@ -194,6 +219,7 @@ public class JXListTest extends InteractiveTestCase {
      * 
      * Here: test api on JXTable.
      */
+    @Test
     public void testGetString() {
         JXList list = new JXList(AncientSwingTeam.createNamedColorListModel());
         StringValue sv = new StringValue() {
@@ -218,6 +244,7 @@ public class JXListTest extends InteractiveTestCase {
      * 
      * Here: test single item remove fires interval removed
      */
+    @Test
     public void testListDataEventRemove() {
         JXList list = new JXList(ascendingListModel, true);
         ListDataReport report = new ListDataReport();
@@ -236,6 +263,7 @@ public class JXListTest extends InteractiveTestCase {
      * 
      * Here: test that a single item removal of a filtered element doesn't fire.
      */
+    @Test
     public void testListDataEventRemoveSingleFiltered() {
         JXList list = new JXList(ascendingListModel, true);
         assertEquals(20, list.getElementCount());
@@ -256,6 +284,7 @@ public class JXListTest extends InteractiveTestCase {
      *   correctly to the visible interval.
      *   
      */
+    @Test
     public void testListDataEventRemoveCutIntervalFiltered() {
         JXList list = new JXList(ascendingListModel, true);
         assertEquals(20, list.getElementCount());
@@ -282,6 +311,7 @@ public class JXListTest extends InteractiveTestCase {
      * Here: a removing a interval including all unfiltered value
      *   
      */
+    @Test
     public void testListDataEventRemoveIntervalFilteredAll() {
         JXList list = new JXList(ascendingListModel, true);
         assertEquals(20, list.getElementCount());
@@ -307,6 +337,7 @@ public class JXListTest extends InteractiveTestCase {
      * 
      * set single item fires contentsChanged with single index.
      */
+    @Test
     public void testListDataEventSingleSet() {
         JXList list = new JXList(ascendingListModel, true);
         ListDataReport report = new ListDataReport();
@@ -327,6 +358,7 @@ public class JXListTest extends InteractiveTestCase {
      * 
      * insert fires intervalAdded.
      */
+    @Test
     public void testListDataEventAdd() {
         JXList list = new JXList(ascendingListModel, true);
         ListDataReport report = new ListDataReport();
@@ -345,6 +377,7 @@ public class JXListTest extends InteractiveTestCase {
      * 
      * event source is the wrapping list model.
      */
+    @Test
     public void testListDataEventSource() {
         JXList list = new JXList(ascendingListModel, true);
         ListDataReport report = new ListDataReport();
@@ -367,6 +400,7 @@ public class JXListTest extends InteractiveTestCase {
      * How to test?
      *
      */
+    @Test
     public void testSetModelFlushFilter() {
         final JXList list = new JXList();
         list.setFilterEnabled(true);
@@ -387,6 +421,7 @@ public class JXListTest extends InteractiveTestCase {
      * super's contract.
      *
      */
+    @Test
     public void testSetModelEmptySelection() {
         final JXList list = new JXList();
         list.setFilterEnabled(true);
@@ -409,6 +444,7 @@ public class JXListTest extends InteractiveTestCase {
      * test that swingx renderer is used by default.
      *
      */
+    @Test
     public void testDefaultListRenderer() {
         JXList list = new JXList();
         ListCellRenderer renderer = ((DelegatingRenderer) list.getCellRenderer()).getDelegateRenderer();
@@ -426,6 +462,7 @@ public class JXListTest extends InteractiveTestCase {
      * invalid ComponentAdapter state. Negative invalid index.
      *
      */
+    @Test
     public void testIllegalNegativeListRowIndex() {
         JXList list = new JXList(new Object[] {1, 2, 3});
         ListCellRenderer renderer = list.getCellRenderer();
@@ -445,6 +482,7 @@ public class JXListTest extends InteractiveTestCase {
      * invalid ComponentAdapter state. Invalid index > valid range.
      *
      */
+    @Test
     public void testIllegalExceedingListRowIndex() {
         JXList list = new JXList(new Object[] {1, 2, 3});
         ListCellRenderer renderer = list.getCellRenderer();
@@ -459,6 +497,7 @@ public class JXListTest extends InteractiveTestCase {
      * test convenience method accessing the configured adapter.
      *
      */
+    @Test
     public void testConfiguredComponentAdapter() {
         JXList list = new JXList(new Object[] {1, 2, 3});
         ComponentAdapter adapter = list.getComponentAdapter();
@@ -479,6 +518,7 @@ public class JXListTest extends InteractiveTestCase {
      * PENDING: the default's getValue() implementation is incorrect!
      *
      */
+    @Test
     public void testComponentAdapterCoordinates() {
         JXList list = new JXList(ascendingListModel, true);
         Object originalFirstRowValue = list.getElementAt(0);
@@ -512,6 +552,7 @@ public class JXListTest extends InteractiveTestCase {
      * test exceptions on null data(model, vector, array).
      *
      */
+    @Test
     public void testNullData() {
         try {
             new JXList((ListModel) null);
@@ -546,6 +587,7 @@ public class JXListTest extends InteractiveTestCase {
      * test filterEnabled property on initialization.
      *
      */
+    @Test
     public void testConstructorFilterEnabled() {
         // 
         assertFilterEnabled(new JXList(), false);
@@ -572,6 +614,7 @@ public class JXListTest extends InteractiveTestCase {
      * added xtable.setSortOrder(int, SortOrder)
      * 
      */
+    @Test
     public void testSetSortOrder() {
         JXList list = new JXList(ascendingListModel, true);
         list.setSortOrder(SortOrder.ASCENDING);
@@ -582,6 +625,7 @@ public class JXListTest extends InteractiveTestCase {
      * JXList has responsibility to guarantee usage of 
      * its comparator: setComparator if already sorted.
      */
+    @Test
     public void testDynamicComparatorToSortController() {
         JXList list = new JXList(listModel, true);
         list.toggleSortOrder();
@@ -595,6 +639,7 @@ public class JXListTest extends InteractiveTestCase {
      * JXList has responsibility to guarantee usage of 
      * its comparator: toggle.
      */
+    @Test
     public void testToggleComparatorToSortController() {
         JXList list = new JXList(listModel, true);
         list.setComparator(Collator.getInstance());
@@ -608,6 +653,7 @@ public class JXListTest extends InteractiveTestCase {
      * JXList has responsibility to guarantee usage of 
      * its comparator: set.
      */
+    @Test
     public void testSetComparatorToSortController() {
         JXList list = new JXList(listModel, true);
         list.setComparator(Collator.getInstance());
@@ -621,6 +667,7 @@ public class JXListTest extends InteractiveTestCase {
      * add and test comparator property.
      * 
      */
+    @Test
     public void testComparator() {
         JXList list = new JXList();
         assertNull(list.getComparator());
@@ -638,6 +685,7 @@ public class JXListTest extends InteractiveTestCase {
      * getSortOrder(), toggleSortOrder(), resetSortOrder().
      *
      */
+    @Test
     public void testToggleSortOrder() {
         JXList list = new JXList(ascendingListModel, true);
         assertSame(SortOrder.UNSORTED, list.getSortOrder());
@@ -652,6 +700,7 @@ public class JXListTest extends InteractiveTestCase {
     /**
      * prepare sort testing: internal probs with SortController?
      */
+    @Test
     public void testSortController() {
         JXList list = new JXList(ascendingListModel, true);
         assertNotNull("sortController must be initialized", list.getSortController());
@@ -661,6 +710,7 @@ public class JXListTest extends InteractiveTestCase {
      * Issue #232-swingx: selection not kept if selectionModel had been changed.
      *
      */
+    @Test
     public void testSelectionMapperUpdatedOnSelectionModelChange() {
         JXList table = new JXList(true);
         // created lazily, to see the failure,
@@ -676,6 +726,7 @@ public class JXListTest extends InteractiveTestCase {
      *
      *  PENDING: selectionMapper shouldn't be available if list not filterable? 
      */
+    @Test
     public void testSelectionMapperFilterDisabled() {
         JXList table = new JXList();
         // created lazily, need to get hold before replacing list's selection
@@ -690,6 +741,7 @@ public class JXListTest extends InteractiveTestCase {
      * setRolloverEnabled.
      *
      */
+    @Test
     public void testLinkControllerListening() {
         JXList table = new JXList();
         table.setRolloverEnabled(true);
@@ -712,6 +764,7 @@ public class JXListTest extends InteractiveTestCase {
         return null;
     }
 
+    @Test
     public void testConvertToModelPreconditions() {
         final JXList list = new JXList(ascendingListModel, true);
         assertEquals(20, list.getElementCount());
@@ -729,6 +782,7 @@ public class JXListTest extends InteractiveTestCase {
     }
  
 
+    @Test
     public void testElementAtPreconditions() {
         final JXList list = new JXList(ascendingListModel, true);
         assertEquals(20, list.getElementCount());
@@ -756,6 +810,7 @@ public class JXListTest extends InteractiveTestCase {
      * http://www.javadesktop.org/forums/thread.jspa?messageID=117814
      *
      */
+    @Test
     public void testSelectionListenerNotification() {
         final JXList list = new JXList(ascendingListModel, true);
         assertEquals(20, list.getElementCount());
@@ -785,6 +840,7 @@ public class JXListTest extends InteractiveTestCase {
      * 
      *
      */
+    @Test
     public void testSetFilterEnabledWithSelection() {
         final JXList list = new JXList(ascendingListModel);
         assertEquals(20, list.getElementCount());
@@ -795,12 +851,14 @@ public class JXListTest extends InteractiveTestCase {
         
     }
 
+    @Test
     public void testEmptyFilter() {
         JXList list = new JXList(ascendingListModel);
         assertEquals(ascendingListModel.getSize(), list.getElementCount());
         assertEquals(ascendingListModel.getElementAt(0), list.getElementAt(0));
     }
     
+    @Test
     public void testFilterEnabled() {
         JXList list = new JXList(ascendingListModel, true);
         assertNotSame(ascendingListModel, list.getModel());
@@ -814,6 +872,7 @@ public class JXListTest extends InteractiveTestCase {
      * it's not allowed to reset filterEnabled property to false again.
      *
      */
+    @Test
     public void testFilterEnabledAndDisabled() {
         JXList list = new JXList(ascendingListModel, true);
         try {
@@ -830,6 +889,7 @@ public class JXListTest extends InteractiveTestCase {
         
     }
     
+    @Test
     public void testSortingFilterEnabled() {
         JXList list = new JXList(ascendingListModel, true);
         FilterPipeline pipeline = list.getFilters();
@@ -840,6 +900,7 @@ public class JXListTest extends InteractiveTestCase {
         
     }
     
+    @Test
     public void testSortingKeepsModelSelection() {
         JXList list = new JXList(ascendingListModel, true);
         list.setSelectedIndex(0);
@@ -857,6 +918,7 @@ public class JXListTest extends InteractiveTestCase {
      *  
      *
      */
+    @Test
     public void testFilterDisabled() {
         JXList list = new JXList();
         list.setModel(ascendingListModel);
@@ -879,6 +941,7 @@ public class JXListTest extends InteractiveTestCase {
      * This fails after quick fix for #370-swingx. 
      *
      */
+    @Test
     public void testSelectionAfterAddAtFirst() {
         JXList list = new JXList(ascendingListModel, true);
         // selecte second row
@@ -898,6 +961,7 @@ public class JXListTest extends InteractiveTestCase {
      * sanity test: compare table with list behaviour (#377-swingx)
      * 
      */
+    @Test
     public void testSelectionAfterAddAtFirstCompareTable() {
         DefaultTableModel ascendingModel = new DefaultTableModel(20, 2);
         JXTable table = new JXTable(ascendingModel);
@@ -917,6 +981,7 @@ public class JXListTest extends InteractiveTestCase {
      * This fails after quick fix for #370-swingx. 
      *
      */
+    @Test
     public void testSelectionAfterAddAbove() {
         JXList list = new JXList(ascendingListModel, true);
         // selecte second row
@@ -937,6 +1002,7 @@ public class JXListTest extends InteractiveTestCase {
      * test if selection is updated on add row above selection.
      *
      */
+    @Test
     public void testAddRowAboveSelectionInvertedOrder() {
         JXList list = new JXList(ascendingListModel, true);
         // select the last row in view coordinates
@@ -963,6 +1029,7 @@ public class JXListTest extends InteractiveTestCase {
      * This fails after quick fix for #370-swingx. 
      *
      */
+    @Test
     public void testSelectionAfterDeleteAbove() {
         JXList list = new JXList(ascendingListModel, true);
         // selecte second row
@@ -977,6 +1044,7 @@ public class JXListTest extends InteractiveTestCase {
      * sanity test: compare table with list behaviour (#370-swingx)
      * 
      */
+    @Test
     public void testSelectionAfterDeleteAboveCompareTable() {
         DefaultTableModel ascendingModel = new DefaultTableModel(20, 2);
         JXTable table = new JXTable(ascendingModel);

@@ -30,12 +30,19 @@ import org.jdesktop.swingx.treetable.DefaultMutableTreeTableNode;
 import org.jdesktop.swingx.treetable.DefaultTreeTableModel;
 import org.jdesktop.swingx.treetable.TreeTableModel;
 import org.jdesktop.test.TreeModelReport;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
+
 
 /**
  * Unit tests around Tree/Table/ModelEvent notification.
  * 
  * @author Jeanette Winzenburg
  */
+@RunWith(JUnit4.class)
 public class TreeModelSupportTest extends TestCase {
 
     /** the treeModelSupport to test */
@@ -48,12 +55,23 @@ public class TreeModelSupportTest extends TestCase {
     // TODO - implement and test precondition failure of added/removed 
     // notification
     
+    @Before
+    public void setUpJ4() throws Exception {
+        setUp();
+    }
+    
+    @After
+    public void tearDownJ4() throws Exception {
+        tearDown();
+    }
+    
     /**
      * test modelSupport pathChanged: 
      * not null path  must not be empty, (checked by TreePath)
      * path elements must not be null (core issue - should be checked
      *   by TreePath but isn't)
      */
+    @Test
     public void testPathChangedNotNullPathElements() {
         TreePath path = new TreePath(new Object[] {null});
         try {
@@ -69,6 +87,7 @@ public class TreeModelSupportTest extends TestCase {
      * test modelSupport pathChanged: 
      * throw on null path
      */
+    @Test
     public void testPathChangedNotNullPath() {
         try {
             support.firePathChanged(null);
@@ -84,6 +103,7 @@ public class TreeModelSupportTest extends TestCase {
      * test modelSupport treeStructureChanged: null path.
      *
      */
+    @Test
     public void testTreeStructureChangedNullPath() {
         support.fireTreeStructureChanged(null);
         assertEquals(1, report.getEventCount());
@@ -103,6 +123,7 @@ public class TreeModelSupportTest extends TestCase {
      *
      *
      */
+    @Test
     public void testTreeStructureChangedNotNullPathElements() {
         TreePath path = new TreePath(new Object[] {null});
         try {
@@ -122,6 +143,7 @@ public class TreeModelSupportTest extends TestCase {
      *
      *
      */
+    @Test
     public void testTreeStructureChangedNotNullPath() {
         Object root = model.getRoot();
         Object child = model.getChild(root, 0);
@@ -138,6 +160,7 @@ public class TreeModelSupportTest extends TestCase {
      * test modelSupport newRoot: not null root.
      *
      */
+    @Test
     public void testNewRootNull() {
         DefaultTreeTableModel model = new DefaultTreeTableModel();
         assertNull(model.getRoot());
@@ -156,6 +179,7 @@ public class TreeModelSupportTest extends TestCase {
      * test modelSupport newRoot: not null root.
      *
      */
+    @Test
     public void testNewRootNotNull() {
         support.fireNewRoot();
         assertEquals(1, report.getEventCount());
@@ -172,6 +196,7 @@ public class TreeModelSupportTest extends TestCase {
      * constructor has null children but empty childIndices.
      *
      */
+    @Test
     public void testTreeStructureChangedConstructor() {
         TreePath path = new TreePath(model.getRoot());
         TreeModelEvent structureChanged = new TreeModelEvent(model, path);
@@ -188,6 +213,7 @@ public class TreeModelSupportTest extends TestCase {
      * changed/inserted/removed. The api doc is not overly clear,
      * but the childIndices/children should not be null?
      */
+    @Test
     public void testTreeModifiedConstructor() {
         TreePath path = new TreePath(model.getRoot());
         int[] childIndices = new int[] { 0 };

@@ -23,14 +23,19 @@ package org.jdesktop.swingx.painter;
 import junit.framework.TestCase;
 
 import java.awt.*;
-import java.awt.image.BufferedImageOp;
 import java.awt.image.BufferedImage;
 
-import org.jdesktop.swingx.image.AbstractFilter;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
+
 
 /**
  * @author rbair
  */
+@RunWith(JUnit4.class)
 public class CompoundPainterTest extends TestCase {
     private Graphics2D g;
     private BufferedImage img;
@@ -48,7 +53,8 @@ public class CompoundPainterTest extends TestCase {
     private TestableCompoundPainter onlyCachedPainters;
     
     @Override
-    public void setUp() {
+    @Before
+       public void setUp() {
         img = new BufferedImage(10, 10, BufferedImage.TYPE_INT_ARGB);
         g = img.createGraphics();
         cp1 = new TestableCompoundPainter();
@@ -74,7 +80,8 @@ public class CompoundPainterTest extends TestCase {
     }
 
     @Override
-    public void tearDown() {
+    @After
+       public void tearDown() {
         g.dispose();
         img.flush();
     }
@@ -82,6 +89,7 @@ public class CompoundPainterTest extends TestCase {
     //tests to make sure the cache is not used on the first pass through
     //the painting routines. That is, a cache shouldn't be used unless
     //something has been painted to the cache first.
+    @Test
     public void testCacheNotUsedFirstPass() {
         cp1.paint(g, null, 10, 10);
         assertTrue(cp1.painted);
@@ -101,6 +109,7 @@ public class CompoundPainterTest extends TestCase {
      * Issue #497-swingx: setPainters can't cope with null.
      * 
      */
+    @Test
     public void testSetNullPainters() {
         CompoundPainter painter = new CompoundPainter();
         painter.setPainters(null);
@@ -109,6 +118,7 @@ public class CompoundPainterTest extends TestCase {
      * Issue #497-swingx: setPainters can't cope with null.
      *
      */
+    @Test
     public void testSetEmptyPainters() {
         CompoundPainter painter = new CompoundPainter();
         // okay
@@ -117,6 +127,7 @@ public class CompoundPainterTest extends TestCase {
         painter.setPainters((Painter[]) null);
     }
 
+    @Test
     public void testCacheNotUsedFirstPass2() {
         onlyCachedPainters.paint(g, null, 10, 10);
         assertTrue(onlyCachedPainters.painted);
@@ -127,6 +138,7 @@ public class CompoundPainterTest extends TestCase {
         assertTrue(f3.filtered);
     }
 
+    @Test
     public void testCacheUsedSecondPass() {
         cp1.paint(g, null, 10, 10);
         reset();
@@ -143,6 +155,7 @@ public class CompoundPainterTest extends TestCase {
         assertFalse(p5.painted);
     }
 
+    @Test
     public void testCacheUsedSecondPass2() {
         onlyCachedPainters.paint(g, null, 10, 10);
         reset();
@@ -155,6 +168,7 @@ public class CompoundPainterTest extends TestCase {
         assertFalse(f3.filtered);
     }
 
+    @Test
     public void testIfChildPainterIsInvalidByBeingDirty() {
         testCacheUsedSecondPass();
         p4.setDirty(true);
@@ -186,6 +200,7 @@ public class CompoundPainterTest extends TestCase {
         onlyCachedPainters.painted = false;
     }
 
+    @Test
     public void testUncachedPainterInvalidation() {
         p1.setCacheable(false);
         p2.setCacheable(false);
@@ -218,6 +233,7 @@ public class CompoundPainterTest extends TestCase {
         assertTrue(p5.painted);
     }
 
+    @Test
     public void testAb5k() {
         TestableCompoundPainter base = new TestableCompoundPainter();
         base.setCacheable(true);

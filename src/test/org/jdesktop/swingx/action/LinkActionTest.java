@@ -12,21 +12,39 @@ import junit.framework.TestCase;
 
 import org.jdesktop.swingx.hyperlink.LinkAction;
 import org.jdesktop.test.PropertyChangeReport;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
+
 
 /**
  * 
  * @author Jeanette Winzenburg, Berlin
  */
+@RunWith(JUnit4.class)
 public class LinkActionTest extends TestCase {
 
     
     private PropertyChangeReport report;
 
+    @Before
+    public void setUpJ4() throws Exception {
+        setUp();
+    }
+    
+    @After
+    public void tearDownJ4() throws Exception {
+        tearDown();
+    }
+    
 
     /**
      * test if auto-installed visited property is respected.
      *
      */
+    @Test
     public void testConstructorsAndCustomTargetInstall() {
         Object target = new Object();
         final boolean visitedIsTrue = true;
@@ -53,6 +71,7 @@ public class LinkActionTest extends TestCase {
      * test constructors with parameters
      *
      */
+    @Test
     public void testConstructors() {
         Object target = new Object();
         LinkAction<Object> linkAction = new LinkAction<Object>(target) {
@@ -70,6 +89,7 @@ public class LinkActionTest extends TestCase {
      * test visited/target properties of LinkAction.
      *
      */
+    @Test
     public void testLinkAction() {
        LinkAction<Object> linkAction = new LinkAction<Object>(null) {
 

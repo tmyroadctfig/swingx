@@ -12,12 +12,19 @@ import junit.framework.TestCase;
 
 import org.jdesktop.swingx.search.PatternModel;
 import org.jdesktop.test.PropertyChangeReport;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
+
 
 /**
  * Testing PatternModel.
  * 
  * @author Jeanette Winzenburg
  */
+@RunWith(JUnit4.class)
 public class PatternModelTest extends TestCase {
 
     final static String startAnchor = "^";
@@ -27,10 +34,21 @@ public class PatternModelTest extends TestCase {
     private PropertyChangeReport propertyReport;
 
 
+    @Before
+    public void setUpJ4() throws Exception {
+        setUp();
+    }
+    
+    @After
+    public void tearDownJ4() throws Exception {
+        tearDown();
+    }
+    
     /**
      * test initial autoAdjust of foundIndex in backward search.
      *
      */
+    @Test
     public void testFoundIndexAutoAdjustBackward() {
         PatternModel model = new PatternModel();
         model.setBackwards(true);
@@ -48,6 +66,7 @@ public class PatternModelTest extends TestCase {
      * test initial autoAdjust of foundIndex in forward search.
      *
      */
+    @Test
     public void testFoundIndexAutoAdjustNotFound() {
         PatternModel model = new PatternModel();
         assertTrue("is autoAdjust by default", model.isAutoAdjustFoundIndex());
@@ -63,6 +82,7 @@ public class PatternModelTest extends TestCase {
      * test initial autoAdjust of foundIndex in forward search.
      *
      */
+    @Test
     public void testFoundIndexAutoAdjustForward() {
         PatternModel model = new PatternModel();
         assertTrue("is autoAdjust by default", model.isAutoAdjustFoundIndex());
@@ -79,6 +99,7 @@ public class PatternModelTest extends TestCase {
      * test initial value and notification of "foundIndex" property.
      *
      */
+    @Test
     public void testFoundIndex() {
         PatternModel model = new PatternModel();
         model.setIncremental(true);
@@ -92,6 +113,7 @@ public class PatternModelTest extends TestCase {
                 propertyReport.hasEvents("foundIndex"));
     }
     
+    @Test
     public void testCaseSensitive() {
         PatternModel model = new PatternModel();
         model.setRawText("tab");
@@ -105,12 +127,14 @@ public class PatternModelTest extends TestCase {
                 propertyReport.hasEvents("pattern"));
         
     }
+    @Test
     public void testAvailableMatchRules() {
         PatternModel model = new PatternModel();
         List rules = model.getMatchRules();
         assertNotNull("rules must not be null", rules);
     }
     
+    @Test
     public void testRegexCreator() {
         PatternModel model = new PatternModel();
         model.addPropertyChangeListener(propertyReport);
@@ -123,6 +147,7 @@ public class PatternModelTest extends TestCase {
 //        model.setSearchStringMode(PatternModel.SEARCH_STRING_EXPLICIT);
     }
     
+    @Test
     public void testMatchRule() {
         PatternModel model = new PatternModel();
         model.addPropertyChangeListener(propertyReport);
@@ -137,6 +162,7 @@ public class PatternModelTest extends TestCase {
         assertTrue("model must have fired " + "matchRule ", propertyReport.hasEvents("matchRule"));
     }
     
+    @Test
     public void testChangeMatchRule() {
         PatternModel model = new PatternModel();
         String contained = "t";
@@ -159,6 +185,7 @@ public class PatternModelTest extends TestCase {
      * test if rawtext is treated as literal.
      *
      */
+    @Test
     public void testRawMiddleAnchorTokens() {
         PatternModel patternModel = new PatternModel();
         patternModel.setRawText(startAnchor);
@@ -173,6 +200,7 @@ public class PatternModelTest extends TestCase {
      * test if rawtext is treated as literal.
      *
      */
+    @Test
     public void testRawStartAnchor() {
         PatternModel patternModel = new PatternModel();
         String anchored = startAnchor + "hap";

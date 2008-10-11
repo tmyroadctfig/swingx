@@ -28,12 +28,19 @@ import java.util.logging.Logger;
 
 import org.jdesktop.swingx.event.DateSelectionEvent;
 import org.jdesktop.swingx.test.DateSelectionReport;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
+
 
 /**
  * Tests for the DefaultDateSelectionModel.
  * 
  * Moved from swingx to calendar package as of version 1.15
  */
+@RunWith(JUnit4.class)
 public class DefaultDateSelectionModelTest extends AbstractTestDateSelectionModel {
     @SuppressWarnings("unused")
     private static final Logger LOG = Logger
@@ -42,6 +49,7 @@ public class DefaultDateSelectionModelTest extends AbstractTestDateSelectionMode
     /**
      * DefaultDateSelectionModel impl doesn't normalize.
      */
+    @Test
     public void testNormalizedDateUnchanged() {
         Date date = calendar.getTime();
         Date normalized = model.getNormalizedDate(date);
@@ -52,6 +60,7 @@ public class DefaultDateSelectionModelTest extends AbstractTestDateSelectionMode
     /**
      * setSelectionInterval must throw NPE if given date is null
      */
+    @Test
     public void testSetIntervalNulls() {
         try {
             model.setSelectionInterval(null, null);
@@ -66,6 +75,7 @@ public class DefaultDateSelectionModelTest extends AbstractTestDateSelectionMode
     /**
      * setSelectionInterval must throw NPE if given date is null
      */
+    @Test
     public void testAddIntervalNulls() {
         try {
             model.addSelectionInterval(null, null);
@@ -81,6 +91,7 @@ public class DefaultDateSelectionModelTest extends AbstractTestDateSelectionMode
     /**
      * removeSelectionInterval must throw NPE if given date is null
      */
+    @Test
     public void testRemoveIntervalNulls() {
         try {
             model.removeSelectionInterval(null, null);
@@ -97,6 +108,7 @@ public class DefaultDateSelectionModelTest extends AbstractTestDateSelectionMode
      * Issue #625-swingx: DateSelectionModel must not fire if unchanged.
      * Here: test setSelection with single mode
      */
+    @Test
     public void testSelectionSetNotFireIfSameSingle() {
         final Date date = calendar.getTime();
         model.setSelectionMode(DateSelectionModel.SelectionMode.SINGLE_SELECTION);
@@ -114,6 +126,7 @@ public class DefaultDateSelectionModelTest extends AbstractTestDateSelectionMode
      * Issue #625-swingx: DateSelectionModel must not fire if unchanged.
      * Here: test addSelection with single mode
      */
+    @Test
     public void testSelectionAddNotFireIfSameSingle() {
         final Date date = calendar.getTime();
         model.setSelectionMode(DateSelectionModel.SelectionMode.SINGLE_SELECTION);
@@ -132,6 +145,7 @@ public class DefaultDateSelectionModelTest extends AbstractTestDateSelectionMode
      * Issue #625-swingx: DateSelectionModel must not fire if unchanged.
      * Here: test setSelection with single interval mode
      */
+    @Test
     public void testSelectionSetNotFireIfSameSingleInterval() {
         final Date date = calendar.getTime();
         calendar.add(Calendar.DATE, 2);
@@ -151,6 +165,7 @@ public class DefaultDateSelectionModelTest extends AbstractTestDateSelectionMode
      * Issue #625-swingx: DateSelectionModel must not fire if unchanged.
      * Here: test addSelection with single interval mode
      */
+    @Test
     public void testSelectionAddNotFireIfSameSingleInterval() {
         final Date date = calendar.getTime();
         calendar.add(Calendar.DATE, 2);
@@ -170,6 +185,7 @@ public class DefaultDateSelectionModelTest extends AbstractTestDateSelectionMode
      * Issue #625-swingx: DateSelectionModel must not fire if unchanged.
      * Here: test setSelection with multiple interval mode
      */
+    @Test
     public void testSelectionSetNotFireIfSameMultipleInterval() {
         final Date date = calendar.getTime();
         calendar.add(Calendar.DATE, 2);
@@ -189,6 +205,7 @@ public class DefaultDateSelectionModelTest extends AbstractTestDateSelectionMode
      * Issue #625-swingx: DateSelectionModel must not fire if unchanged.
      * Here: test addSelection with multiple interval mode
      */
+    @Test
     public void testSelectionAddNotFireIfSameMultipeInterval() {
         final Date date = calendar.getTime();
         calendar.add(Calendar.DATE, 2);
@@ -206,6 +223,7 @@ public class DefaultDateSelectionModelTest extends AbstractTestDateSelectionMode
     /**
      * related to #625-swingx: DateSelectionModel must not fire on clearing empty selection.
      */
+    @Test
     public void testDateSelectionClearSelectionNotFireIfUnselected() {
         // sanity
         assertTrue(model.isSelectionEmpty());
@@ -222,6 +240,7 @@ public class DefaultDateSelectionModelTest extends AbstractTestDateSelectionMode
      * Testing here for sanity reasons ... be sure we didn't prevent the firing
      * altogether while changing.
      */
+    @Test
     public void testDateSelectionClearSelectionFireIfSelected() {
         Date date = new Date();
         model.setSelectionInterval(date, date);
@@ -240,6 +259,7 @@ public class DefaultDateSelectionModelTest extends AbstractTestDateSelectionMode
     /**
      * related to #625-swingx: DateSelectionModel must not fire on clearing empty selection.
      */
+    @Test
     public void testDateSelectionSetSelectionNotFireIfSelected() {
         Date date = new Date();
         model.setSelectionInterval(date, date);
@@ -259,6 +279,7 @@ public class DefaultDateSelectionModelTest extends AbstractTestDateSelectionMode
      * Testing here for sanity reasons ... be sure we didn't prevent the firing
      * altogether while changing.
      */
+    @Test
     public void testDateSelectionSetSelectionFire() {
         Date date = new Date();
         model.setSelectionInterval(date, date);
@@ -286,6 +307,7 @@ public class DefaultDateSelectionModelTest extends AbstractTestDateSelectionMode
      *  a valid selection.
      *
      */
+    @Test
     public void testLowerBoundJustBelow() {
         model.setLowerBound(today);
         // the bound itself is allowed
@@ -299,6 +321,7 @@ public class DefaultDateSelectionModelTest extends AbstractTestDateSelectionMode
      *  a valid selection.
      *
      */
+    @Test
     public void testLowerBoundJustAbove() {
         model.setLowerBound(today);
         // the bound itself is allowed
@@ -314,6 +337,7 @@ public class DefaultDateSelectionModelTest extends AbstractTestDateSelectionMode
      *  a valid selection.
      *
      */
+    @Test
     public void testUpperBoundJustAbove() {
         model.setUpperBound(today);
         // the bound itself is allowed
@@ -327,6 +351,7 @@ public class DefaultDateSelectionModelTest extends AbstractTestDateSelectionMode
      *  a valid selection.
      *
      */
+    @Test
     public void testUpperBoundJustBelow() {
         model.setUpperBound(today);
         // the bound itself is allowed
@@ -337,6 +362,7 @@ public class DefaultDateSelectionModelTest extends AbstractTestDateSelectionMode
     }
     
 
+    @Test
     public void testSingleSelection() {
         model.setSelectionMode(DateSelectionModel.SelectionMode.SINGLE_SELECTION);
         Date today = new Date();
@@ -363,6 +389,7 @@ public class DefaultDateSelectionModelTest extends AbstractTestDateSelectionMode
         assertTrue(tomorrow.equals(selection.first()));
     }
 
+    @Test
     public void testSingleIntervalSelection() {
         model.setSelectionMode(DateSelectionModel.SelectionMode.SINGLE_INTERVAL_SELECTION);
         Date startDate = new Date();
@@ -388,6 +415,7 @@ public class DefaultDateSelectionModelTest extends AbstractTestDateSelectionMode
      * characterize behaviour on setSelectionInterval depending on selection mode.
      * Here: compare singleInterval and multipleInterval - must be same.
      */
+    @Test
     public void testSetIntervalSameForSingleAndMultipleIntervalMode() {
         Date date = new Date();
         // pre-select 
@@ -418,6 +446,7 @@ public class DefaultDateSelectionModelTest extends AbstractTestDateSelectionMode
         assertEquals(selection.last(), model.getSelection().last());
     }
     
+    @Test
     public void testUnselectableDatesMultipleInterval() {
         // Make sure the unselectable dates returns an empty set if it hasn't been
         // used.
@@ -465,7 +494,8 @@ public class DefaultDateSelectionModelTest extends AbstractTestDateSelectionMode
     }
     
     @Override
-    public void setUp() {
+    @Before
+       public void setUp() {
         setUpCalendar();
         model = new DefaultDateSelectionModel();
     }

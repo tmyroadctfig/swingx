@@ -27,7 +27,14 @@ import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.treetable.FileSystemModel;
 import org.jdesktop.test.AncientSwingTeam;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
 
+
+@RunWith(JUnit4.class)
 public class RolloverTest extends InteractiveTestCase {
 
     
@@ -52,6 +59,7 @@ public class RolloverTest extends InteractiveTestCase {
     private ListModel listModel;
     private FileSystemModel treeTableModel;
 
+    @Test
     public void testDummy() {
         
     }

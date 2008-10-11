@@ -6,30 +6,27 @@
  */
 package org.jdesktop.swingx;
 
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 
 import javax.swing.plaf.UIResource;
+import javax.swing.JPanel;
+
+import junit.framework.TestCase;
 
 import org.jdesktop.swingx.action.AbstractActionExt;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
 
 
-public class JXTaskPaneContainerTest extends InteractiveTestCase {
 
-    public static void main(String[] args) throws Exception {
-//      setSystemLF(true);
-      JXTaskPaneContainerTest test = new JXTaskPaneContainerTest("TaskPaneContainer");
-      try {
-          test.runInteractiveTests();
-        } catch (Exception e) {
-            System.err.println("exception when executing interactive tests:");
-            e.printStackTrace();
-        } 
-  }
+@RunWith(JUnit4.class)
+public class JXTaskPaneContainerTest extends TestCase {
 
-  public JXTaskPaneContainerTest(String testTitle) {
-    super(testTitle);
-  }
-
+    @Test
   public void testAddon() throws Exception {
     // move around all addons
     TestUtilities.cycleAddons(new JXTaskPaneContainer());
@@ -38,6 +35,7 @@ public class JXTaskPaneContainerTest extends InteractiveTestCase {
     /**
      * Issue #843-swingx: BasicTaskPaneContainerUI must respect custom Layout.
      */
+    @Test
     public void testRespectCustomLayoutGap() {
         JXTaskPaneContainer container = new JXTaskPaneContainer();
         VerticalLayout layout = (VerticalLayout) container.getLayout();
@@ -51,6 +49,7 @@ public class JXTaskPaneContainerTest extends InteractiveTestCase {
     /**
      * Issue #843-swingx: BasicTaskPaneContainerUI must respect custom Layout.
      */
+    @Test
     public void testRespectCustomLayout() {
         JXTaskPaneContainer container = new JXTaskPaneContainer();
         VerticalLayout layout = (VerticalLayout) container.getLayout();
@@ -63,21 +62,10 @@ public class JXTaskPaneContainerTest extends InteractiveTestCase {
     /**
      * Issue #843-swingx: BasicTaskPaneContainerUI must respect custom Layout.
      */
+    @Test
     public void testLayoutUIResource() {
         JXTaskPaneContainer container = new JXTaskPaneContainer();
         assertTrue(container.getLayout() instanceof UIResource);
-    }
-
-     public void interactiveGap() {
-        JXTaskPaneContainer container = new JXTaskPaneContainer();
-//        ((VerticalLayout) container.getLayout()).setGap(0);
-        JXTaskPane first = new JXTaskPane();
-        fillTaskPane(first);
-        container.add(first);
-        JXTaskPane second = new JXTaskPane();
-        fillTaskPane(second);
-        container.add(second);
-        showWithScrollingInFrame(container, "custom gap");
     }
 
     private void fillTaskPane(JXTaskPane first) {
@@ -99,4 +87,5 @@ public class JXTaskPaneContainerTest extends InteractiveTestCase {
 
         });
     }
+
 }

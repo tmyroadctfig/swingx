@@ -55,10 +55,11 @@
         <artifactId>maven-surefire-plugin</artifactId>
         <inherited>true</inherited>
         <configuration>
+          <!-- useSystemClassLoader>true</useSystemClassLoader-->
           <includes>
             <include>**/*Test.java</include>
           </includes>
-          <forkMode>once</forkMode>
+          <forkMode>always</forkMode>
           <!--reportFormat>xml</reportFormat-->
           <!--classesDirectory>${project.build.directory}/emma-classes</classesDirectory-->    
         </configuration>        

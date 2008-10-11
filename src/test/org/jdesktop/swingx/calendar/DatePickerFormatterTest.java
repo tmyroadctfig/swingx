@@ -33,6 +33,12 @@ import junit.framework.TestCase;
 import org.jdesktop.swingx.JXDatePicker;
 import org.jdesktop.swingx.calendar.DatePickerFormatter.DatePickerFormatterUIResource;
 import org.jdesktop.swingx.plaf.UIManagerExt;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
+
 
 /**
  * Unit tests for <code>DatePickerFormatter</code>.
@@ -41,12 +47,14 @@ import org.jdesktop.swingx.plaf.UIManagerExt;
  * 
  * @author Jeanette Winzenburg
  */
+@RunWith(JUnit4.class)
 public class DatePickerFormatterTest extends TestCase {
 
     /**
      * Issue #691-swingx: locale setting not taken.
      * Here: test contructor with locale.
      */
+    @Test
     public void testPickerFormatterCustomLocale() {
         Locale locale = Locale.FRENCH;
         DatePickerFormatter formatter = new DatePickerFormatter(locale);
@@ -60,6 +68,7 @@ public class DatePickerFormatterTest extends TestCase {
      * Issue #691-swingx: locale setting not taken.
      * Here: test contructor with locale in uiresource.
      */
+    @Test
     public void testPickerFormatterUIResourceCustomLocale() {
         Locale locale = Locale.FRENCH;
         DatePickerFormatter formatter = new DatePickerFormatterUIResource(locale);
@@ -73,6 +82,7 @@ public class DatePickerFormatterTest extends TestCase {
      * Issue #691-swingx: locale setting not taken.
      * Here: test empty contructor == default locale in uiresource.
      */
+    @Test
     public void testPickerFormatterUIResourceDefaultLocale() {
         DatePickerFormatter formatter = new DatePickerFormatterUIResource();
         SimpleDateFormat format = (SimpleDateFormat) formatter.getFormats()[0];
@@ -84,6 +94,7 @@ public class DatePickerFormatterTest extends TestCase {
      * Issue #691-swingx: locale setting not taken.
      * Here: test empty contructor == default locale.
      */
+    @Test
     public void testPickerFormatterDefaultLocale() {
         DatePickerFormatter formatter = new DatePickerFormatter();
         SimpleDateFormat format = (SimpleDateFormat) formatter.getFormats()[0];
@@ -97,6 +108,7 @@ public class DatePickerFormatterTest extends TestCase {
      * here: test formatter constructor with empty formats array
      * 
      */
+    @Test
     public void testPickerFormatterEmptyFormats() {
         DateFormat[] formats = new DateFormat[0];
         DatePickerFormatter formatter = new DatePickerFormatter(formats);
@@ -111,6 +123,7 @@ public class DatePickerFormatterTest extends TestCase {
      * null
      * 
      */
+    @Test
     public void testPickerFormatterConstructorWithNullFormats() {
         DateFormat[] formats = new DateFormat[] { null };
         try {
@@ -128,6 +141,7 @@ public class DatePickerFormatterTest extends TestCase {
      * here: test default constructor
      * 
      */
+    @Test
     public void testPickerFormatterDefaultConstructor() {
         DatePickerFormatter formatter = new DatePickerFormatter();
         assertNotNull(formatter.getFormats());
@@ -141,6 +155,7 @@ public class DatePickerFormatterTest extends TestCase {
      *   as parameterless
      * 
      */
+    @Test
     public void testPickerFormatterConstructorWithParameterNull() {
         DatePickerFormatter defaultFormatter = new DatePickerFormatter();
         DateFormat[] defaultFormats = defaultFormatter.getFormats();
@@ -161,6 +176,7 @@ public class DatePickerFormatterTest extends TestCase {
      *   null formats.
      * 
      */
+    @Test
     public void testPickerFormatterUnsafeGetFormats() {
         DatePickerFormatter picker = new DatePickerFormatter();
         DateFormat[] formats = picker.getFormats();
@@ -182,6 +198,7 @@ public class DatePickerFormatterTest extends TestCase {
      *   empty formats.
      * 
      */
+    @Test
     public void testPickerFormatterEmptyValueToString() {
         DatePickerFormatter picker = new DatePickerFormatter(
                 new DateFormat[0]);
@@ -199,6 +216,7 @@ public class DatePickerFormatterTest extends TestCase {
      * here: picker formatter must protect itself against empty formats.
      * 
      */
+    @Test
     public void testPickerFormatterEmptyStringToValue() {
         DatePickerFormatter picker = new DatePickerFormatter(new DateFormat[0]);
         try {
@@ -213,14 +231,16 @@ public class DatePickerFormatterTest extends TestCase {
     private Calendar cal;
 
     @Override
-    public void setUp() {
+    @Before
+       public void setUp() {
         cal = Calendar.getInstance();
         // force loading of resources
         new JXDatePicker();
     }
 
     @Override
-    public void tearDown() {
+    @After
+       public void tearDown() {
     }
 
 }

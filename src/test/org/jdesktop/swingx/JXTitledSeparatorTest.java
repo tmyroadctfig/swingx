@@ -18,6 +18,14 @@ import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
 
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
+
+
+@RunWith(JUnit4.class)
 public class JXTitledSeparatorTest extends InteractiveTestCase {
     @SuppressWarnings("unused")
     private static final Logger LOG = Logger
@@ -40,6 +48,7 @@ public class JXTitledSeparatorTest extends InteractiveTestCase {
      * (to solve: never-ever call setPrefSize() - override getPrefSize() instead)
      *
      */
+    @Test
     public void testPrefSize() {
         JXTitledSeparator separator = new JXTitledSeparator();
         Dimension dim = separator.getPreferredSize();
@@ -50,6 +59,7 @@ public class JXTitledSeparatorTest extends InteractiveTestCase {
     /**
      * Issue #391-swingx: JXTitledSeparator does not respect getForeground/getFont
      */
+    @Test
     public void testForeground() {
         Color testColor = new Color(10, 213, 123);
         UIManager.put("TitledBorder.titleColor", testColor);

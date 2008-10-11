@@ -19,6 +19,12 @@ import javax.swing.UIManager;
 import javax.swing.plaf.UIResource;
 
 import org.jdesktop.swingx.icon.EmptyIcon;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
+
 
 import junit.framework.TestCase;
 
@@ -27,6 +33,7 @@ import junit.framework.TestCase;
  * 
  * @author Karl George Schaefer
  */
+@RunWith(JUnit4.class)
 public class UIManagerExtTest extends TestCase {
     private static final Logger LOG = Logger.getLogger(UIManagerExtTest.class
             .getName());
@@ -42,6 +49,7 @@ public class UIManagerExtTest extends TestCase {
      * Ensure that the {@code getSafeXXX} methods always return
      * {@code UIResource}.
      */
+    @Test
     public void testGetSafeMethodsReturnUIResource() {
         assertTrue(UIManagerExt.getSafeBorder("", BorderFactory
                 .createEmptyBorder()) instanceof UIResource);
@@ -56,6 +64,7 @@ public class UIManagerExtTest extends TestCase {
     /**
      * test that we get a boolean from the localized resource.
      */
+    @Test
     public void testGetBooleanFromResource() {
         String key = "goodBoolean";
         Locale locale = JComponent.getDefaultLocale();
@@ -72,6 +81,7 @@ public class UIManagerExtTest extends TestCase {
     /**
      * test that a value in the UIManager is not overwritten.
      */
+    @Test
     public void testGetBooleanUIManagerFirst() {
         String key = "goodBoolean";
         Locale locale = JComponent.getDefaultLocale();
@@ -96,6 +106,7 @@ public class UIManagerExtTest extends TestCase {
     /**
      * test that the getBoolean doesn't choke on non-Booleans
      */
+    @Test
     public void testGetBooleanLenientWithUnparseable() {
         String key = "badBoolean";
         Locale locale = JComponent.getDefaultLocale();
@@ -111,6 +122,7 @@ public class UIManagerExtTest extends TestCase {
     /**
      * test that we get a boolean from the localized resource.
      */
+    @Test
     public void testGetColorFromResource() {
         String key = "goodColor";
         Locale locale = JComponent.getDefaultLocale();
@@ -127,6 +139,7 @@ public class UIManagerExtTest extends TestCase {
     /**
      * test that a value in the UIManager is not overwritten.
      */
+    @Test
     public void testGetColorUIManagerFirst() {
         String key = "goodColor";
         Locale locale = JComponent.getDefaultLocale();
@@ -151,6 +164,7 @@ public class UIManagerExtTest extends TestCase {
     /**
      * test that the getBoolean doesn't choke on non-Booleans
      */
+    @Test
     public void testGetColorLenientWithUnparseable() {
         String key = "badColor";
         Locale locale = JComponent.getDefaultLocale();
@@ -235,6 +249,7 @@ public class UIManagerExtTest extends TestCase {
     /**
      * test that we get an int from the localized resource.
      */
+    @Test
     public void testGetIntFromResource() {
         String key = "goodInt";
         Locale locale = JComponent.getDefaultLocale();
@@ -251,6 +266,7 @@ public class UIManagerExtTest extends TestCase {
     /**
      * test that a value in the UIManager is not overwritten.
      */
+    @Test
     public void testGetIntUIManagerFirst() {
         String key = "goodInt";
         Locale locale = JComponent.getDefaultLocale();
@@ -275,6 +291,7 @@ public class UIManagerExtTest extends TestCase {
     /**
      * test that the getInt doesn't choke on non-numbers
      */
+    @Test
     public void testGetIntLenientWithUnparseable() {
         String key = "badInt";
         Locale locale = JComponent.getDefaultLocale();

@@ -6,6 +6,13 @@ package org.jdesktop.swingx;
 
 import java.util.logging.Logger;
 
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
+
+
 import junit.framework.TestCase;
 
 /**
@@ -18,6 +25,7 @@ import junit.framework.TestCase;
  *  
  * 
  */
+@RunWith(JUnit4.class)
 public class SandboxTest extends TestCase {
     private static final Logger LOG = Logger.getLogger(SandboxTest.class
             .getName());
@@ -26,6 +34,7 @@ public class SandboxTest extends TestCase {
      * 
      *
      */
+    @Test
     public void testSecurityManager() {
         if (System.getSecurityManager() == null) {
             LOG.info("cannot run testSecurityManager - no SecurityManager installed");
@@ -45,6 +54,7 @@ public class SandboxTest extends TestCase {
      * Sanity: make sure the second-time-around is reached!
      *
      */
+    @Test
     public void testSecurityManagerAgain() {
         if (System.getSecurityManager() == null) {
             LOG.info("cannot run testSecurityManagerAgain - no SecurityManager installed");

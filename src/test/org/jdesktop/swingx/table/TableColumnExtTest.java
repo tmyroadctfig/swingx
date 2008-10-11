@@ -23,17 +23,25 @@ import org.jdesktop.swingx.decorator.UIDependent;
 import org.jdesktop.swingx.renderer.DefaultTableRenderer;
 import org.jdesktop.test.PropertyChangeReport;
 import org.jdesktop.test.SerializableSupport;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
+
 
 /**
  * Unit test of enhanced <code>TableColumnExt</code>.
  * 
  * @author Jeanette Winzenburg
  */
+@RunWith(JUnit4.class)
 public class TableColumnExtTest extends TestCase {
 
     /**
      * api change: let TableColumnExt implement UIDependent.
      */
+    @Test
     public void testUIDependent() {
         TableColumnExt columnExt = new TableColumnExt();
         assertTrue(columnExt instanceof UIDependent);
@@ -43,6 +51,7 @@ public class TableColumnExtTest extends TestCase {
      * Issue #822-swingx: replace cloneable by copy constructor.
      * Here: test base properties copied.
      */
+    @Test
     public void testCopyConstructor() {
         TableColumnExt columnExt = new TableColumnExt(10, 200, 
                 new DefaultTableRenderer(), new DefaultCellEditor(new JTextField(20)));
@@ -56,6 +65,7 @@ public class TableColumnExtTest extends TestCase {
      * test remove
      *
      */
+    @Test
     public void testPutClientPropertyNullValue() {
         TableColumnExt columnExt = new TableColumnExt();
         Object value = new Object();
@@ -74,6 +84,7 @@ public class TableColumnExtTest extends TestCase {
      * test doc'ed exceptions in putClientProperty.
      *
      */
+    @Test
     public void testPutClientPropertyExc() {
         TableColumnExt columnExt = new TableColumnExt();
         try {
@@ -90,6 +101,7 @@ public class TableColumnExtTest extends TestCase {
      * @throws IOException
      * 
      */
+    @Test
     public void testSerializable() throws IOException, ClassNotFoundException {
         TableColumnExt columnExt = new TableColumnExt();
         Object value = new Date();
@@ -108,6 +120,7 @@ public class TableColumnExtTest extends TestCase {
      * notification, cloned correctly.
      * 
      */
+    @Test
     public void testHeaderTooltip() {
         TableColumnExt columnExt = new TableColumnExt();
         columnExt.setTitle("mytitle");
@@ -129,6 +142,7 @@ public class TableColumnExtTest extends TestCase {
      * be cloned properly 
      *
      */
+    @Test
     public void testSortable() {
         TableColumnExt columnExt = new TableColumnExt();
         boolean sortable = columnExt.isSortable();
@@ -151,6 +165,7 @@ public class TableColumnExtTest extends TestCase {
      *
      * test if setting comparator fires propertyChange. 
      */
+    @Test
     public void testComparatorBoundProperty() {
         TableColumnExt tableColumn = new TableColumnExt();
         PropertyChangeReport report = new PropertyChangeReport();
@@ -168,6 +183,7 @@ public class TableColumnExtTest extends TestCase {
      *
      * test if comparator is cloned. 
      */
+    @Test
     public void testCopyComparator() {
         TableColumnExt tableColumn = new TableColumnExt();
         Comparator comparator = Collator.getInstance();
@@ -180,6 +196,7 @@ public class TableColumnExtTest extends TestCase {
      * putClientProperty.
      * 
      */
+    @Test
     public void testClientPropertyNotification() {
         TableColumnExt tableColumn = new TableColumnExt();
         PropertyChangeReport report = new PropertyChangeReport();
@@ -194,6 +211,7 @@ public class TableColumnExtTest extends TestCase {
      * Issue #279-swingx: getTitle throws NPE.
      *
      */
+    @Test
     public void testTitle() {
         TableColumnExt tableColumn = new TableColumnExt();
         tableColumn.getTitle();
@@ -204,6 +222,7 @@ public class TableColumnExtTest extends TestCase {
      * user friendly resizable flag. 
      * 
      */
+    @Test
     public void testResizable() {
         TableColumnExt column = new TableColumnExt(0);
         //sanity assert
@@ -227,6 +246,7 @@ public class TableColumnExtTest extends TestCase {
      * Client properties not preserved when cloning.
      *
      */
+    @Test
     public void testCopyClientProperty() {
         TableColumnExt column = new TableColumnExt(0);
         String key = "property";
@@ -250,6 +270,7 @@ public class TableColumnExtTest extends TestCase {
     /**
      * Check for setHighlighters portion of #770.
      */
+    @Test
     public void testSetHighlighters() {
         TableColumnExt column = new TableColumnExt(0);
         PropertyChangeReport hcl = new PropertyChangeReport();
@@ -295,6 +316,7 @@ public class TableColumnExtTest extends TestCase {
     /**
      * Check for addHighlighter portion of #770.
      */
+    @Test
     public void testAddHighlighter() {
         TableColumnExt column = new TableColumnExt(0);
         PropertyChangeReport hcl = new PropertyChangeReport();
@@ -342,6 +364,7 @@ public class TableColumnExtTest extends TestCase {
     /**
      * Check for removeHighlighter portion of #770.
      */
+    @Test
     public void testRemoveHighlighter() {
         TableColumnExt column = new TableColumnExt(0);
         PropertyChangeReport hcl = new PropertyChangeReport();
@@ -374,6 +397,7 @@ public class TableColumnExtTest extends TestCase {
     /**
      * Check to ensure that the clone returns the highlighters correctly. Part of #770.
      */
+    @Test
     public void testCopyHighlighters() {
         TableColumnExt column = new TableColumnExt(0);
         Highlighter h1 = new ColorHighlighter();

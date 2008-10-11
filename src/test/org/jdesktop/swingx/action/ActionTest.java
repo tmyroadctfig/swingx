@@ -15,15 +15,33 @@ import javax.swing.JRadioButton;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JToggleButton;
 
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
+
+
 import junit.framework.TestCase;
 
+@RunWith(JUnit4.class)
 public class ActionTest extends TestCase {
     @SuppressWarnings("all")
     private static final Logger LOG = Logger.getLogger(ActionTest.class
             .getName());
     protected ActionContainerFactory factory;
     
+    @Before
+    public void setUpJ4() throws Exception {
+        setUp();
+    }
     
+    @After
+    public void tearDownJ4() throws Exception {
+        tearDown();
+    }
+    
+   
     
     @Override
     protected void setUp() throws Exception {
@@ -38,6 +56,7 @@ public class ActionTest extends TestCase {
      *  custom configure via the ActionContainerFactory.configureSelectableButton.
      * The direction from button to action is broken.
      */
+    @Test
     public void testButtonSelectedSynchAction() {
         AbstractActionExt extAction = createStateAction();
         boolean actionSelected = true;
@@ -67,6 +86,7 @@ public class ActionTest extends TestCase {
      *  ActionContainerFactory.createButton().
      * The direction from button to action is broken.
      */
+    @Test
     public void testCreateButtonSelectedSynchAction() {
         AbstractActionExt extAction = createStateAction();
         boolean actionSelected = true;
@@ -97,6 +117,7 @@ public class ActionTest extends TestCase {
      * action.
      *
      */
+    @Test
     public void testButtonOneActionAsItemListener() {
         AbstractActionExt extAction = createStateAction();
         JToggleButton button = new JToggleButton();
@@ -111,6 +132,7 @@ public class ActionTest extends TestCase {
      * test that configured button is kept in synch with
      *  maximal one action's selected state
      */
+    @Test
     public void testButtonSelectedNullAction() {
         AbstractActionExt extAction = createStateAction();
         JToggleButton button = new JToggleButton();
@@ -132,6 +154,7 @@ public class ActionTest extends TestCase {
      * unregistered from the Action after release.
      *
      */
+    @Test
     public void testButtonReleaseActionReleasePCL() {
         AbstractActionExt extAction = createStateAction();
         JToggleButton button = new JToggleButton();
@@ -150,6 +173,7 @@ public class ActionTest extends TestCase {
      * test that configured button is no longer kept in
      * synch after setting the action to null.
      */
+    @Test
     public void testButtonSelectedReleasedSynchAction() {
         AbstractActionExt extAction = createStateAction();
         JToggleButton button = new JToggleButton();
@@ -169,6 +193,7 @@ public class ActionTest extends TestCase {
      * test that configured button is kept in synch with
      *  maximal one action's selected state
      */
+    @Test
     public void testButtonSelectedMaxOneSynchAction() {
         AbstractActionExt extAction = createStateAction();
         boolean actionSelected = true;
@@ -199,6 +224,7 @@ public class ActionTest extends TestCase {
      * test that button is configured with initial action selected state.
      *
      */
+    @Test
     public void testButtonSelectedInitialSynchAction() {
         AbstractActionExt extAction = createStateAction();
         boolean actionSelected = true;
@@ -217,6 +243,7 @@ public class ActionTest extends TestCase {
      * for non-state action.
      *
      */
+    @Test
     public void testExceptionOnNonStateAction() {
         AbstractActionExt actionExt = createStateAction();
         actionExt.setStateAction(false);
@@ -238,6 +265,7 @@ public class ActionTest extends TestCase {
      * sub-issue: ActionContainerFactory doesn't check if the action is
      * already synchronizing to the same button. 
      */
+    @Test
     public void testToggleButtonConfigure() {
         // this should pass after giving the gc "reasonable" chance to
         // have collected the unreachable...
@@ -251,6 +279,7 @@ public class ActionTest extends TestCase {
      * sub-issue: ActionContainerFactory doesn't check if the action is
      * already synchronizing to the same button. 
      */
+    @Test
     public void testToggleButtonConfigureToggleWithSame() {
         assertToggleButtonConfigureWithSame(new JToggleButton());
         assertToggleButtonConfigureWithSame(new JRadioButton());
@@ -283,6 +312,7 @@ public class ActionTest extends TestCase {
      * sub-issue: ActionContainerFactory registers the action multiple times to
      * the same button as ItemListener
      */
+    @Test
     public void testToggleButtonAddItemListenerToSame() {
         assertAddItemListenerToSame(new JToggleButton());
         assertAddItemListenerToSame(new JRadioButton());
@@ -334,6 +364,7 @@ public class ActionTest extends TestCase {
      * Issue #4-swinglabs: infinite loop when setting long destricption.
      *
      */
+    @Test
     public void testLongDescriptionLoop() {
         AbstractActionExt action = createStateAction();
         action.setLongDescription("some");

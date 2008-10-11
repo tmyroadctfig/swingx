@@ -15,6 +15,13 @@ import java.util.Iterator;
 import javax.swing.Action;
 import javax.swing.JButton;
 
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
+
+
 import junit.framework.TestCase;
 
 /**
@@ -22,10 +29,21 @@ import junit.framework.TestCase;
  *
  * TODO: Should test TargetableActions
  */
+@RunWith(JUnit4.class)
 public class ActionManagerTest extends TestCase {
 
     private ActionManager manager;
 
+    @Before
+    public void setUpJ4() throws Exception {
+        setUp();
+    }
+    
+    @After
+    public void tearDownJ4() throws Exception {
+        tearDown();
+    }
+    
     // TODO: Add more attributes which represent actions and types.
     protected void setUp() {
         // JW: changed on reorg to remove reference to Application 
@@ -86,6 +104,7 @@ public class ActionManagerTest extends TestCase {
     /**
      * Test to see if the types of actions that are created map correctly.
      */
+    @Test
     public void testActionTypes() {
 
         assertTrue(manager.isBoundAction("simple-command"));
@@ -124,6 +143,7 @@ public class ActionManagerTest extends TestCase {
      * A test which registers all the actions with a controller,
      * invokes the actions to see if the registration was correct.
      */
+    @Test
     public void testRegisterMethod() {
         Controller controller = new Controller();
 
@@ -176,6 +196,7 @@ public class ActionManagerTest extends TestCase {
      * Test the composite action. Two simple commands have registered methods.
      * these methods should be executed in the composite action invokation.
      */
+    @Test
     public void testCompositeAction() {
         Controller controller = new Controller();
 
@@ -196,6 +217,7 @@ public class ActionManagerTest extends TestCase {
      * 
      * TODO: It's difficult to test the server action in a firewall/non-controlled
      * network environment. Enable this test when working specifically with ServerActions.
+    @Test
     public void testServerAction() {
         ServerAction action = manager.getServerAction("namefinder-command");
         try {
@@ -213,6 +235,7 @@ public class ActionManagerTest extends TestCase {
     }
     */
 
+    @Test
     public void testEnabled() {
         boolean[] values = new boolean[] { true, false, true, true, false, false };
 
@@ -233,6 +256,7 @@ public class ActionManagerTest extends TestCase {
     }
 
 
+    @Test
     public void testSelected() {
         boolean[] values = new boolean[] { true, false, true, true, false, false };
 

@@ -39,20 +39,38 @@ import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 import org.jdesktop.swingx.table.ColumnControlButton.ColumnVisibilityAction;
 import org.jdesktop.swingx.table.ColumnControlButton.DefaultColumnControlPopup;
 import org.jdesktop.test.AncientSwingTeam;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
+
 
 /**
  * @author Jeanette Winzenburg
  */
+@RunWith(JUnit4.class)
 public class ColumnControlButtonTest extends InteractiveTestCase {
     private static final Logger LOG = Logger
             .getLogger(ColumnControlButtonTest.class.getName());
     
     protected TableModel sortableTableModel;
     
+    @Before
+    public void setUpJ4() throws Exception {
+        setUp();
+    }
+    
+    @After
+    public void tearDownJ4() throws Exception {
+        tearDown();
+    }
+    
     /**
      * Issue #404-swingx: load column control margin from ui.
      * Test that column control configures itself with the icon from the ui.
      */
+    @Test
     public void testColumnControlInitialUpdateInsetsUIResource() {
       ColumnControlButton control = new ColumnControlButton(new JXTable());
       // PENDING JW: why not same? insets can be shared - or not?
@@ -67,6 +85,7 @@ public class ColumnControlButtonTest extends InteractiveTestCase {
      * Test that column control loads the margin.
      */
     @SuppressWarnings("unused")
+    @Test
     public void testColumnControlLoadsMargin() {
         // force loading by instantiating a column control
       ColumnControlButton control = new ColumnControlButton(new JXTable());
@@ -78,6 +97,7 @@ public class ColumnControlButtonTest extends InteractiveTestCase {
      * Issue #404-swingx: load column control margin from ui.
      * Test that addon loads the margin.
      */
+    @Test
     public void testColumnControlAddonLoadsMargin() {
         // direct loading of addon
         LookAndFeelAddons.contribute(new ColumnControlButtonAddon());
@@ -90,6 +110,7 @@ public class ColumnControlButtonTest extends InteractiveTestCase {
      * Issue #404-swingx: load column control icon from ui.
      * Test that table instantiates the column control with ui icon.
      */
+    @Test
     public void testColumnControlInXTable() {
       JXTable table = new JXTable();
       ColumnControlButton control = (ColumnControlButton) table.getColumnControl();
@@ -102,6 +123,7 @@ public class ColumnControlButtonTest extends InteractiveTestCase {
      * Issue #404-swingx: load column control icon from ui.
      * Test that icon is not updated on updateUI if not uiResource
      */
+    @Test
     public void testColumnControlIconNotUpdateNonActionUIResource() {
         ColumnControlButton control = new ColumnControlButton(new JXTable(), new EmptyIcon());
         Icon icon = control.getIcon();
@@ -120,6 +142,7 @@ public class ColumnControlButtonTest extends InteractiveTestCase {
      * Issue #404-swingx: load column control icon from ui.
      * Test that is updated on updateUI
      */
+    @Test
     public void testColumnControlIconUpdateActionUIResource() {
         ColumnControlButton control = new ColumnControlButton(new JXTable());
         Icon icon = control.getIcon();
@@ -140,6 +163,7 @@ public class ColumnControlButtonTest extends InteractiveTestCase {
      * Issue #404-swingx: load column control icon from ui.
      * Test that column control configures itself with the icon from the ui.
      */
+    @Test
     public void testColumnControlInitialUpdateActionUIResource() {
       ColumnControlButton control = new ColumnControlButton(new JXTable());
       assertSame("columnControl must have icon from ui", 
@@ -152,6 +176,7 @@ public class ColumnControlButtonTest extends InteractiveTestCase {
      * Test that column control loads the icon.
      */
     @SuppressWarnings("unused")
+    @Test
     public void testColumnControlLoadsIcon() {
         // force loading by instantiating a column control
       ColumnControlButton control = new ColumnControlButton(new JXTable());
@@ -163,6 +188,7 @@ public class ColumnControlButtonTest extends InteractiveTestCase {
      * Issue #404-swingx: load column control icon from ui.
      * Test that addon loads the icon.
      */
+    @Test
     public void testColumnControlAddonLoadsIcon() {
         // direct loading of addon
         LookAndFeelAddons.contribute(new ColumnControlButtonAddon());
@@ -175,6 +201,7 @@ public class ColumnControlButtonTest extends InteractiveTestCase {
      * String type.
      *
      */
+    @Test
     public void testNonStringIdentifier() {
         JXTable table = new JXTable(0, 2);
         table.getColumn(0).setIdentifier(new Object());
@@ -182,6 +209,7 @@ public class ColumnControlButtonTest extends InteractiveTestCase {
         table.getColumnControl();
     }
     
+    @Test
     public void testNotNullColumnModelListener() {
         JXTable table = new JXTable(0, 2);
         table.setColumnControlVisible(true);
@@ -193,6 +221,7 @@ public class ColumnControlButtonTest extends InteractiveTestCase {
      * user interaction.
      *
      */
+    @Test
     public void testNullVisibilityAction() {
         JXTable table = new JXTable();
         ColumnControlButton columnControl = new ColumnControlButton(table) {
@@ -224,6 +253,7 @@ public class ColumnControlButtonTest extends InteractiveTestCase {
      * but need to further evaluate.
      *
      */
+    @Test
     public void testColumnVisibilityAction() {
         JXTable table = new JXTable(10, 3);
         table.setColumnControlVisible(true);
@@ -243,6 +273,7 @@ public class ColumnControlButtonTest extends InteractiveTestCase {
     /**
      * Tests that enabled property of table and column control is synched dynamically.
      */
+    @Test
     public void testDynamicDisabled() {
         JXTable table = new JXTable(10, 3);
         table.setColumnControlVisible(true);
@@ -256,6 +287,7 @@ public class ColumnControlButtonTest extends InteractiveTestCase {
      * But is (done in ccb.installTable()). 
      *
      */
+    @Test
     public void testInitialDisabled() {
         JXTable table = new JXTable(10, 3);
         table.setEnabled(false);
@@ -268,6 +300,7 @@ public class ColumnControlButtonTest extends InteractiveTestCase {
      * guarantee that at least one column is always visible.
      *
      */
+    @Test
     public void testMinimumColumnCountOne() {
         JXTable table = new JXTable(10, 2);
         table.setColumnControlVisible(true);
@@ -279,6 +312,7 @@ public class ColumnControlButtonTest extends InteractiveTestCase {
      * Issue #229-swingx: increasing listener list in column actions.
      * 
      */
+    @Test
     public void testActionListenerCount() {
         JXTable table = new JXTable(10, 1);
         Action action = table.getActionMap().get(JXTable.HORIZONTALSCROLL_ACTION_COMMAND);
@@ -310,6 +344,7 @@ public class ColumnControlButtonTest extends InteractiveTestCase {
      * Issue #153-swingx: ClassCastException if actionMap key is not a string.
      *
      */
+    @Test
     public void testNonStringActionKeys() {
         JXTable table = new JXTable();
         Action l = new AbstractAction("dummy") {
@@ -325,6 +360,7 @@ public class ColumnControlButtonTest extends InteractiveTestCase {
         table.getColumnControl();
     }
     
+    @Test
     public void testColumnControlReleaseAction() {
         final JXTable table = new JXTable(sortableTableModel);
         final TableColumnExt priorityColumn = table.getColumnExt("First Name");
@@ -360,6 +396,7 @@ public class ColumnControlButtonTest extends InteractiveTestCase {
      * and b) model.count = 2.
      *
      */
+    @Test
     public void testSetAllColumnsToInvisible() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
@@ -382,6 +419,7 @@ public class ColumnControlButtonTest extends InteractiveTestCase {
      * Here we deselect the menuitem.
      * 
      */
+    @Test
     public void testSetLastColumnMenuItemToUnselected() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
@@ -405,6 +443,7 @@ public class ColumnControlButtonTest extends InteractiveTestCase {
     * 
     * 
     */
+    @Test
    public void testColumnControlInvisibleColumns() {
        final JXTable table = new JXTable(sortableTableModel);
        // columns set to invisible before setting the columnControl

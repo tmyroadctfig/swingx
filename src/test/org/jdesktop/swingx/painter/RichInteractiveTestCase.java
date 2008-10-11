@@ -22,6 +22,12 @@ package org.jdesktop.swingx.painter;
 
 import org.jdesktop.swingx.JXHeader;
 import org.jdesktop.swingx.JXFrame;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
+
 
 import javax.swing.*;
 import java.awt.*;
@@ -36,6 +42,7 @@ import junit.framework.TestCase;
 /**
  * @author rbair
  */
+@RunWith(JUnit4.class)
 public class RichInteractiveTestCase extends TestCase {
     private boolean retVal = false;
     private boolean block = true;
@@ -104,6 +111,7 @@ public class RichInteractiveTestCase extends TestCase {
      * (would output a warning without a test fixture).
      *
      */
+    @Test
     public void testDummy() {
         
     }

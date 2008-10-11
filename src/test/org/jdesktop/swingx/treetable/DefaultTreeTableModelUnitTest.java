@@ -4,11 +4,19 @@ import java.util.Vector;
 
 import javax.swing.tree.TreeNode;
 
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
+
+
 import junit.framework.TestCase;
 
 /**
  *
  */
+@RunWith(JUnit4.class)
 public class DefaultTreeTableModelUnitTest extends TestCase {
     private DefaultTreeTableModel model;
     private DefaultMutableTreeTableNode root;
@@ -20,6 +28,16 @@ public class DefaultTreeTableModelUnitTest extends TestCase {
     private DefaultMutableTreeTableNode grandchild4;
     private DefaultMutableTreeTableNode grandchild5;
     private DefaultMutableTreeTableNode grandchild6;
+    
+    @Before
+    public void setUpJ4() throws Exception {
+        setUp();
+    }
+    
+    @After
+    public void tearDownJ4() throws Exception {
+        tearDown();
+    }
     
     private TreeTableNode createTree() {
         root = new DefaultMutableTreeTableNode("root");
@@ -58,6 +76,7 @@ public class DefaultTreeTableModelUnitTest extends TestCase {
         model = new DefaultTreeTableModel(createTree(), names);
     }
     
+    @Test
     public void testModelGetPathToRoot() {
         TreeNode[] testGroup1 = model.getPathToRoot(grandchild3);
         
@@ -82,6 +101,7 @@ public class DefaultTreeTableModelUnitTest extends TestCase {
         }
     }
     
+    @Test
     public void testModelGetValueAt() {
         //Test expected cases
         assertEquals(model.getValueAt(root, 0), "root");
@@ -102,6 +122,7 @@ public class DefaultTreeTableModelUnitTest extends TestCase {
         }
     }
     
+    @Test
     public void testModelIsLeaf() {
         //asksAllowsChildren == false
         //Test exceptional cases
@@ -127,6 +148,7 @@ public class DefaultTreeTableModelUnitTest extends TestCase {
         assertTrue(model.isLeaf(grandchild3));
     }
     
+    @Test
     public void testRemoveFromParent() {
     	try {
     		model.removeNodeFromParent(new DefaultMutableTreeTableNode());
@@ -168,6 +190,7 @@ public class DefaultTreeTableModelUnitTest extends TestCase {
     	//TODO test removing already removed nodes?
     }
     
+    @Test
     public void testSetRoot() {
     	assertEquals(model.getRoot(), root);
     	

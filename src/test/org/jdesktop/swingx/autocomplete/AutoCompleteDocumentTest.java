@@ -21,56 +21,31 @@
 
 package org.jdesktop.swingx.autocomplete;
 
-import static org.jdesktop.swingx.autocomplete.ObjectToStringConverter.DEFAULT_IMPLEMENTATION;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assume.assumeTrue;
-
-import java.awt.GraphicsEnvironment;
 import java.util.Arrays;
-
-import javax.swing.JComboBox;
 import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 
-import org.jdesktop.test.EDTRunner;
-import org.junit.BeforeClass;
-import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
 
-@RunWith(EDTRunner.class)
-public class AutoCompleteDocumentTest {
-    /**
-     * Ensure that Swing can run correctly.
-     */
-    @BeforeClass
-    public static void startUp() {
-        assumeTrue(!GraphicsEnvironment.isHeadless());
-        assumeTrue(SwingUtilities.isEventDispatchThread());
+
+import junit.framework.TestCase;
+
+@RunWith(JUnit4.class)
+public class AutoCompleteDocumentTest extends TestCase {
+
+    @Before
+       public void setUp() {
     }
-    
-    /**
-     * Ensure that adaptor cannot be null. 
-     */
-    @Test(expected = NullPointerException.class)
-    public void testConstructorWithNullAdaptor() {
-        new AutoCompleteDocument(null, true);
+
+    @After
+       public void tearDown() {
     }
-    
-    /**
-     * Ensure that a null converter is the same as the default implementation. 
-     */
-    @Test
-    public void testConstructorWithNullConverter() {
-        AutoCompleteDocument document = new AutoCompleteDocument(
-                new ComboBoxAdaptor(new JComboBox(new String[] {
-                    "A"
-                })), true, null);
-        assertSame(DEFAULT_IMPLEMENTATION, document.stringConverter);
-    }
-    
+
     @Test
     public void testPreferExactMatchOverCurrentlySelected() throws Exception {
         String[] items = new String[]{"exact", "exacter", "exactest"};

@@ -25,17 +25,25 @@ import junit.framework.TestCase;
 
 import org.jdesktop.test.PropertyChangeReport;
 import org.jdesktop.test.TestUtils;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
+
 
 /**
  * Testing AbstractBean.
  * 
  * @author Jeanette Winzenburg
  */
+@RunWith(JUnit4.class)
 public class AbstractBeanTest extends TestCase {
     
     /**
      * test clone: listener on original must not be registered to clone.
      */
+    @Test
     public void testClone() {
         CloneableBean bean = new CloneableBean();
         PropertyChangeReport report = new PropertyChangeReport();

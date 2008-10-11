@@ -31,12 +31,19 @@ import javax.swing.UIManager;
 import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.renderer.JRendererLabel;
 import org.jdesktop.test.ChangeReport;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
+
 
 /**
  * Test CompoundHighlighter.
  * 
  * @author Jeanette Winzenburg
  */
+@RunWith(JUnit4.class)
 public class CompoundHighlighterTest extends InteractiveTestCase {
     
     @SuppressWarnings("unused")
@@ -92,6 +99,7 @@ public class CompoundHighlighterTest extends InteractiveTestCase {
     /**
      * Test that the client is messaged on change to a managed Highlighter.
      */
+    @Test
     public void testUpdateUI() {
         CompoundHighlighter support = new CompoundHighlighter();
         // force loading of striping colors
@@ -118,6 +126,7 @@ public class CompoundHighlighterTest extends InteractiveTestCase {
      * 
      * Test that setting zero highlighter removes all.
      */
+    @Test
     public void testSetHighlightersReset() {
         CompoundHighlighter support = new CompoundHighlighter();
         support.addHighlighter(new ColorHighlighter());
@@ -131,6 +140,7 @@ public class CompoundHighlighterTest extends InteractiveTestCase {
      * 
      * Test that setting zero highlighter removes all.
      */
+    @Test
     public void testSetHighlightersResetRemoveListeners() {
         CompoundHighlighter support = new CompoundHighlighter();
         ColorHighlighter colorHighlighter = new ColorHighlighter();
@@ -151,6 +161,7 @@ public class CompoundHighlighterTest extends InteractiveTestCase {
      * 
      * Test that setting zero highlighter removes all.
      */
+    @Test
     public void testSetHighlightersResetSingleEvent() {
         ColorHighlighter colorHighlighter = new ColorHighlighter();
         CompoundHighlighter support = new CompoundHighlighter(colorHighlighter, new ColorHighlighter());
@@ -167,6 +178,7 @@ public class CompoundHighlighterTest extends InteractiveTestCase {
      * 
      * Test that setting zero highlighter removes all.
      */
+    @Test
     public void testSetHighlightersSingleEvent() {
         ColorHighlighter colorHighlighter = new ColorHighlighter();
         CompoundHighlighter support = new CompoundHighlighter();
@@ -181,6 +193,7 @@ public class CompoundHighlighterTest extends InteractiveTestCase {
      * 
      * Test that setting zero Highlighters on empty compound does not fire.
      */
+    @Test
     public void testSetHighlightersResetEmptyNoEvent() {
         CompoundHighlighter support = new CompoundHighlighter();
         ChangeReport report = new ChangeReport();
@@ -192,6 +205,7 @@ public class CompoundHighlighterTest extends InteractiveTestCase {
     /**
      * Sanity: handles empty array.
      */
+    @Test
     public void testSetHighlightersEmptyArray() {
         CompoundHighlighter support = new CompoundHighlighter();
         support.setHighlighters(new Highlighter[] {});
@@ -203,6 +217,7 @@ public class CompoundHighlighterTest extends InteractiveTestCase {
      * test if removeHighlighter behaves as doc'ed.
      *
      */
+    @Test
     public void testTableRemoveHighlighter() {
         CompoundHighlighter support = new CompoundHighlighter();
         // test cope with null
@@ -225,6 +240,7 @@ public class CompoundHighlighterTest extends InteractiveTestCase {
      * test if addHighlighter behaves as doc'ed.
      *
      */
+    @Test
     public void testTableAddHighlighter() {
         CompoundHighlighter support = new CompoundHighlighter();
         Highlighter presetHighlighter = new ColorHighlighter();
@@ -244,6 +260,7 @@ public class CompoundHighlighterTest extends InteractiveTestCase {
     /**
      * Test strict enforcement of not null allowed in setHighlighters.
      */
+    @Test
     public void testSetHighlightersNull() {
         CompoundHighlighter table = new CompoundHighlighter();
         try {
@@ -259,6 +276,7 @@ public class CompoundHighlighterTest extends InteractiveTestCase {
     /**
      * Test strict enforcement of not null allowed in setHighlighters.
      */
+    @Test
     public void testSetHighlightersWithNullArray() {
         CompoundHighlighter table = new CompoundHighlighter();
         try {
@@ -274,6 +292,7 @@ public class CompoundHighlighterTest extends InteractiveTestCase {
     /**
      * Test strict enforcement of not null allowed in setHighlighters.
      */
+    @Test
     public void testSetHighlightersArrayNullElement() {
         CompoundHighlighter table = new CompoundHighlighter();
         try {
@@ -291,14 +310,17 @@ public class CompoundHighlighterTest extends InteractiveTestCase {
      * there had been exceptions when adding/removing highlighters to/from
      * an initially empty pipeline. 
      */
+    @Test
     public void testAddToEmptyCompoundHiglighter() {
         CompoundHighlighter pipeline = new CompoundHighlighter();
         pipeline.addHighlighter(new ColorHighlighter());
     }
+    @Test
     public void testRemoveFromEmptyCompoundHighlighter() {
         CompoundHighlighter pipeline = new CompoundHighlighter();
         pipeline.removeHighlighter(new ColorHighlighter());
     }
+    @Test
     public void testApplyEmptyCompoundHighlighter() {
         CompoundHighlighter pipeline = new CompoundHighlighter();
         pipeline.highlight(new JLabel(), createComponentAdapter(new JLabel(), false));
@@ -306,6 +328,7 @@ public class CompoundHighlighterTest extends InteractiveTestCase {
 
     /*
      */
+    @Test
     public void testAddRemoveHighlighter() {
         CompoundHighlighter pipeline = new CompoundHighlighter(
                 new ColorHighlighter(Color.white, new Color(0xF0, 0xF0, 0xE0)),
@@ -356,6 +379,7 @@ public class CompoundHighlighterTest extends InteractiveTestCase {
     /**
      * @todo - how to handle same highlighter inserted more than once?
      */
+    @Test
     public void testCompoundHighlighterWithDuplicates() {
         
     }
@@ -364,6 +388,7 @@ public class CompoundHighlighterTest extends InteractiveTestCase {
      * test doc'ed NPE when adding null Highlighter.
      *
      */
+    @Test
     public void testCompoundHighlighterAddNull() {
         CompoundHighlighter pipeline = new CompoundHighlighter();
         try {
@@ -377,6 +402,7 @@ public class CompoundHighlighterTest extends InteractiveTestCase {
         pipeline.highlight(allColored, adapter);
     }
     
+    @Test
     public void testCompoundHighlighterChange() {
         ColorHighlighter highlighter = new ColorHighlighter();
         CompoundHighlighter pipeline = new CompoundHighlighter();
@@ -388,6 +414,7 @@ public class CompoundHighlighterTest extends InteractiveTestCase {
         assertCompoundHighlighterChange(highlighter, pipeline, changeReport);
     }
     
+    @Test
     public void testCompoundHighlighterChangeConstructor() {
         ColorHighlighter highlighter = new ColorHighlighter();
         CompoundHighlighter pipeline = new CompoundHighlighter(highlighter);

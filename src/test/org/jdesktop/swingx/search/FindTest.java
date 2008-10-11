@@ -34,6 +34,12 @@ import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.FindTest.TestTableModel;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
+
 
 /**
  * Unit tests of search related services. <p>
@@ -45,6 +51,7 @@ import org.jdesktop.swingx.FindTest.TestTableModel;
  * 
  * @author Jeanette Winzenburg
  */
+@RunWith(JUnit4.class)
 public class FindTest extends InteractiveTestCase {
 
     @SuppressWarnings("unused")
@@ -63,6 +70,7 @@ public class FindTest extends InteractiveTestCase {
      * Here: check that containing dialog is disposed, old api (no boolean).
      */
     @SuppressWarnings("deprecation")
+    @Test
     public void testFindDialogDisposeDeprecated() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
@@ -86,6 +94,7 @@ public class FindTest extends InteractiveTestCase {
      * 
      * Here: check that containing dialog is disposed, new api with flag.
      */
+    @Test
     public void testFindDialogDispose() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
@@ -109,6 +118,7 @@ public class FindTest extends InteractiveTestCase {
      * 
      * Here: check that containing dialog is not disposed.
      */
+    @Test
     public void testFindDialogHide() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
@@ -135,6 +145,7 @@ public class FindTest extends InteractiveTestCase {
      * passing a null searchstring.
      *
      */
+    @Test
     public void testTableResetStateWithNullSearchString() {
         JXTable table = new JXTable(new TestTableModel());
         int row = 39;
@@ -160,6 +171,7 @@ public class FindTest extends InteractiveTestCase {
      * passing a empty (="") searchstring.
      *
      */
+    @Test
     public void testTableResetStateWithEmptySearchString() {
         JXTable table = new JXTable(new TestTableModel());
         int row = 39;
@@ -186,6 +198,7 @@ public class FindTest extends InteractiveTestCase {
      * Hmm... not testable? 
      * Needed to widen access for lastFoundColumn.
      */
+    @Test
     public void testTableFoundNextColumnInPreviousRow() {
         JXTable table = new JXTable(new TestTableModel());
         int lastColumn = table.getColumnCount() -1;
@@ -218,6 +231,7 @@ public class FindTest extends InteractiveTestCase {
      * Hmm... not testable? 
      * Needed to widen access for lastFoundColumn.
      */
+    @Test
     public void testTableFoundPreviousColumnInNextRow() {
         JXTable table = new JXTable(new TestTableModel());
         int row = 0;
@@ -244,6 +258,7 @@ public class FindTest extends InteractiveTestCase {
      * search.
      *
      */
+    @Test
     public void testTableFoundNextColumnInSameRow() {
         JXTable table = new JXTable(new TestTableModel());
         int row = 90;

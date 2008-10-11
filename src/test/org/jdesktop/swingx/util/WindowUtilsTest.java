@@ -15,7 +15,14 @@ import javax.swing.JTextField;
 
 import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXFrame;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
 
+
+@RunWith(JUnit4.class)
 public class WindowUtilsTest extends InteractiveTestCase {
 
     public static void main(String[] args) {
@@ -61,6 +68,7 @@ public class WindowUtilsTest extends InteractiveTestCase {
      * TODO formally test...
      *
      */
+    @Test
     public void testDummy() {
         
     }
