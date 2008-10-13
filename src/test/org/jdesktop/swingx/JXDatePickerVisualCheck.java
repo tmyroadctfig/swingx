@@ -60,6 +60,8 @@ import javax.swing.text.DateFormatter;
 import javax.swing.text.DefaultFormatterFactory;
 
 import org.jdesktop.swingx.action.AbstractActionExt;
+import org.jdesktop.swingx.calendar.DateSelectionModel;
+import org.jdesktop.swingx.calendar.DaySelectionModel;
 import org.jdesktop.swingx.calendar.SingleDaySelectionModel;
 import org.jdesktop.swingx.calendar.DateSelectionModel.SelectionMode;
 import org.jdesktop.test.VerticalLayoutPref;
@@ -93,13 +95,75 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
 //            test.runInteractiveTests();
 //            test.runInteractiveTests("interactive.*PrefSize.*");
 //            test.runInteractiveTests("interactive.*Keep.*");
-          test.runInteractiveTests("interactive.*Editable.*");
+          test.runInteractiveTests("interactive.*Multiple.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
         }
     }
 
+    /**
+     * Issue #940-swingx: support multiple selection in picker.
+     * Nothing out-off-the-box, trying to implement custom 
+     * dateSelectionModel.
+     */
+    public void interactiveMultipleSelection() {
+        DateSelectionModel model = new AddingDaySelectionModel();
+        model.setSelectionMode(SelectionMode.MULTIPLE_INTERVAL_SELECTION);
+        JXMonthView monthView = new JXMonthView(new Date(), model) {
+
+            @Override
+            public Date getSelectionDate() {
+                if (getSelectionModel() instanceof AddingDaySelectionModel) {
+                    return ((AddingDaySelectionModel) getSelectionModel()).getLastAddedDate();
+                }
+                return super.getSelectionDate();
+            }
+            
+        };
+        JXDatePicker picker = new JXDatePicker();
+        picker.setMonthView(monthView);
+        JXFrame frame = showInFrame(picker, "multiple selection");
+        show(frame);
+    }
+    
+    /**
+     * Custom model which always adds selection dates.
+     */
+    public static class AddingDaySelectionModel extends DaySelectionModel {
+        
+        Date lastAdded;
+        
+        @Override
+        public void setSelectionInterval(Date startDate, Date endDate) {
+            addSelectionInterval(startDate, endDate);
+        }
+        
+        @Override
+        public void addSelectionInterval(Date startDate, Date endDate) {
+            if (endDate.before(startDate)) return;
+            super.addSelectionInterval(startDate, endDate);
+            // PENDING: need to do better to cope with unselectables
+            if (isSelected(endDate)) {
+              lastAdded = endDate;
+            } else if (isSelected(startDate)) {
+                lastAdded = startDate;
+            } else {
+                lastAdded = null;
+            }
+        }
+        
+        
+        @Override
+        public void clearSelection() {
+            lastAdded = null;
+            super.clearSelection();
+        }
+
+        public Date getLastAddedDate() {
+            return lastAdded;
+        }
+    }
     /**
      * Issue #910-swingx: commitToday must not be allowed if field not editable.
      * 
