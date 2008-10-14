@@ -21,6 +21,7 @@
 package org.jdesktop.swingx;
 
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -33,6 +34,7 @@ import java.util.regex.Pattern;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.CellEditor;
 import javax.swing.Icon;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -41,9 +43,12 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JTree;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
+import javax.swing.event.CellEditorListener;
+import javax.swing.event.ChangeEvent;
 import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeExpansionListener;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -72,6 +77,7 @@ import org.jdesktop.swingx.renderer.DefaultTreeRenderer;
 import org.jdesktop.swingx.test.ComponentTreeTableModel;
 import org.jdesktop.swingx.test.XTestUtils;
 import org.jdesktop.swingx.treetable.DefaultMutableTreeTableNode;
+import org.jdesktop.swingx.treetable.DefaultTreeTableModel;
 import org.jdesktop.swingx.treetable.FileSystemModel;
 import org.jdesktop.swingx.treetable.TreeTableModel;
 import org.jdesktop.test.AncientSwingTeam;
@@ -104,6 +110,85 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         }
     }
 
+
+    
+    /**
+     * Issue #730-swingx: editor's stop not always called.
+     * 
+     *  - start edit a cell in the hierarchical column, 
+     *  - click into another cell of the hierarchical column
+     *  - edit sometimes canceled instead of stopped 
+     *  
+     *  seems to happen if click into text of cell, okay if outside.
+     *  Trying to fix in TreeTableHacker: first try to stop editing
+     *  cancel if unsuccessful. 
+     *  
+     *  PENDING JW: why didn't we do that in the first place? Any
+     *  possibility that the edit will end up in the wrong node
+     *  in expand/collapse?
+     *  
+     *  Okay, checked again: the cancel is needed because otherwise
+     *  the edited value might end up in the wrong row, that is the
+     *  one after the currently edited if the parent of the edited
+     *  is collapsed while editing (old issue #120-jdnc).
+     *  
+     *  To fight the regression, the hacker's completeEditing now is
+     *  called before updating renderer's (tree) expansion state. Seems
+     *  to fix both issues now. 
+     */
+    public void interactiveEditingCanceledStopped() {
+        final JTextField field = new JTextField();
+        DefaultMutableTreeTableNode root = new DefaultMutableTreeTableNode("ROOT");
+        DefaultMutableTreeTableNode a = new DefaultMutableTreeTableNode("A");
+        DefaultMutableTreeTableNode a1 = new DefaultMutableTreeTableNode("A1");
+        DefaultMutableTreeTableNode b = new DefaultMutableTreeTableNode("B");
+        a.add(a1);
+        root.add(a);
+        root.add(b);
+        // default table: hack around #120-jdnc introduces #730
+        final JXTreeTable xTable = new JXTreeTable();
+        xTable.setTreeTableModel(new DefaultTreeTableModel(root));
+        xTable.expandAll();
+        xTable.setVisibleColumnCount(10);
+        xTable.packColumn(0, -1);
+        CellEditor editor = xTable.getCellEditor(0, 0);
+        CellEditorListener l =  new CellEditorListener() {
+
+            public void editingCanceled(ChangeEvent e) {
+                field.setText("canceled");
+                LOG.info("canceled");
+            }
+
+            public void editingStopped(ChangeEvent e) {
+                field.setText("stopped");
+                LOG.info("stopped");
+                
+            }};
+        editor.addCellEditorListener(l);
+        JXFrame frame = wrapWithScrollingInFrame(xTable, "#730-swingx: click sometimes cancels");
+        Action toggleExpansion = new AbstractAction("toggle") {
+
+            public void actionPerformed(ActionEvent arg0) {
+                boolean isExpanded = xTable.isExpanded(0);
+                if (isExpanded) {
+                     xTable.collapseRow(0);
+                } else {
+                    xTable.expandRow(0);
+                }
+                
+            }
+            
+        };
+        KeyStroke stroke = KeyStroke.getKeyStroke("F1");
+        xTable.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(stroke, "toggleExpansion");
+        xTable.getActionMap().put("toggleExpansion", toggleExpansion);
+        frame.add(field, BorderLayout.SOUTH);
+        addStatusMessage(frame, "F1 to toggle expansion of first row");
+        show(frame);
+    }
+
+
+    
     /**
      * Issue #862-swingx: JXTree - add api for selection colors.
      * Here: check colors when used in JXTreeTable
