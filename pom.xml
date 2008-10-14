@@ -81,6 +81,26 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>net.sf.jmd</groupId>
+        <artifactId>maven-crap4j-plugin</artifactId>
+        <version>0.1.1-SNAPSHOT</version>
+        <configuration>
+            <projectDir>${basedir}</projectDir>
+            <crap4jHome>lib/build-only/crap4j</crap4jHome>
+            <reportsCrap4j>target/site/crap4j-reports</reportsCrap4j>
+            <libClasspath>lib</libClasspath>
+        </configuration>
+        <executions>
+            <execution>
+                <phase>site</phase>
+                <goals>
+                    <goal>crap4j</goal>
+                    <goal>crap4jAnt</goal>
+                </goals>
+            </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
     <dependencies>
@@ -146,6 +166,10 @@
   <reporting>
     <plugins>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+      </plugin>
+      <plugin>
         <artifactId>maven-changes-plugin</artifactId>
         <configuration>
           <xmlPath>${basedir}/xdocs/changes.xml</xmlPath>
@@ -161,36 +185,34 @@
       <plugin>
         <artifactId>maven-surefire-report-plugin</artifactId>
       </plugin>
-      <!--plugin>      
-        <groupId>emma</groupId>
-        <artifactId>maven-emma-plugin</artifactId>
-        <version>0.5</version>
-          <!-inherited>true</inherited->          
-      </plugin-->
       <plugin> 
         <groupId>org.codehaus.mojo</groupId> 
         <artifactId>surefire-report-maven-plugin</artifactId> 
         <inherited>true</inherited>
       </plugin>       
-    <plugin>
-      <groupId>org.codehaus.mojo</groupId>
-      <artifactId>findbugs-maven-plugin</artifactId>
-      <version>1.0-beta-1</version>
-      <configuration>
-        <threshold>Normal</threshold>
-        <effort>Default</effort>
-        <excludeFilterFile>findbugs-exclude.xml</excludeFilterFile>
-        <includeFilterFile>findbugs-include.xml</includeFilterFile>
-        <visitors>FindDeadLocalStores,UnreadFields</visitors>
-        <omitVisitors>FindDeadLocalStores,UnreadFields</omitVisitors>
-        <!--pluginList>/libs/fb-contrib/fb-contrib-2.8.0.jar</pluginList-->
-      </configuration>
-    </plugin>
     <plugin>      
       <groupId>org.codehaus.mojo</groupId>
       <artifactId>emma-maven-plugin</artifactId>
       <version>1.0-SNAPSHOT</version>
       <inherited>true</inherited>          
+    </plugin>
+    <plugin>
+      <groupId>org.codehaus.mojo</groupId>
+      <artifactId>findbugs-maven-plugin</artifactId>
+      <version>1.2.1</version>
+      <configuration>
+        <xmlOutput>true</xmlOutput>
+        <xmlOutputDirectory>target</xmlOutputDirectory>
+        <threshold>Normal</threshold>
+        <effort>Default</effort>
+        <!--excludeFilterFile>findbugs-exclude.xml</excludeFilterFile>
+        <includeFilterFile>findbugs-include.xml</includeFilterFile-->
+        <visitors>FindDeadLocalStores,UnreadFields</visitors>
+        <onlyAnalyze>org.jdesktop.*</onlyAnalyze>
+        <!-- pluginList>/libs/fb-contrib/fb-contrib-2.8.0.jar</pluginList-->
+        <findbugsXmlOutput>true</findbugsXmlOutput>
+        <findbugsXmlOutputDirectory>target</findbugsXmlOutputDirectory>
+      </configuration>
     </plugin>
     </plugins>
   </reporting>
@@ -231,6 +253,14 @@
       <releases>
         <updatePolicy>never</updatePolicy>
       </releases>
+    </pluginRepository>
+    <!-- crap4j plugin-->
+    <pluginRepository>
+        <id>jmd.sf.net</id>
+        <url>http://jmd.sf.net/m2repository</url>
+        <snapshots>
+          <enabled>true</enabled>
+        </snapshots>
     </pluginRepository>
   </pluginRepositories>
 
