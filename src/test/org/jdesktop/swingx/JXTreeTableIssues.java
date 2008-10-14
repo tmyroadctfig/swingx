@@ -97,10 +97,10 @@ public class JXTreeTableIssues extends InteractiveTestCase {
         JXTreeTableIssues test = new JXTreeTableIssues();
         try {
 //            test.runInteractiveTests();
-            test.runInteractiveTests(".*ColumnSelection.*");
+//            test.runInteractiveTests(".*ColumnSelection.*");
 //            test.runInteractiveTests(".*Text.*");
 //            test.runInteractiveTests(".*TreeExpand.*");
-//            test.runInteractiveTests("interactive.*Blink.*");
+            test.runInteractiveTests("interactive.*Cancel.*");
 //          test.runInteractiveTests("interactive.*CustomColor.*");
               
         } catch (Exception e) {
@@ -210,12 +210,19 @@ public class JXTreeTableIssues extends InteractiveTestCase {
      *  - click into another cell of the hierarchical column
      *  - edit sometimes canceled instead of stopped 
      *  
-     *  seems to happen if click into text of cell, okay if outside
+     *  seems to happen if click into text of cell, okay if outside.
+     *  Trying to fix in TreeTableHacker: first try to stop editing
+     *  cancel if unsuccessful. 
+     *  
+     *  PENDING JW: why didn't we do that in the first place? Any
+     *  possibility that the edit will end up in the wrong node
+     *  in expand/collapse?
      *  
      */
     public void interactiveEditingCanceledStopped() {
         final JTextField field = new JTextField();
-        JXTreeTable xTable = new JXTreeTable(new ComponentTreeTableModel(new JXFrame()));
+        JXTreeTable xTable = new JXTreeTableHack();
+        xTable.setTreeTableModel(new ComponentTreeTableModel(new JXFrame()));
         xTable.expandAll();
         xTable.setVisibleColumnCount(10);
         xTable.packColumn(0, -1);
@@ -236,6 +243,28 @@ public class JXTreeTableIssues extends InteractiveTestCase {
         JXFrame frame = wrapWithScrollingInFrame(xTable, "#730-swingx: click sometimes cancels");
         frame.add(field, BorderLayout.SOUTH);
         frame.setVisible(true);
+    }
+
+    public static class JXTreeTableHack extends JXTreeTable {
+        
+        @Override
+        protected TreeTableHacker createTreeTableHacker() {
+            return new MyTreeTableHacker();
+        }
+
+        public class MyTreeTableHacker extends TreeTableHackerExt {
+
+            @Override
+            protected void completeEditing() {
+                if (isEditing()) {
+                   boolean success = getCellEditor().stopCellEditing();
+                   if (!success) {
+                       getCellEditor().cancelCellEditing();
+                   }
+                }
+            }
+            
+        }
     }
 
     
