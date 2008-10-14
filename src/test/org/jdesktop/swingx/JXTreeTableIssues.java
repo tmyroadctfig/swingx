@@ -218,11 +218,25 @@ public class JXTreeTableIssues extends InteractiveTestCase {
      *  possibility that the edit will end up in the wrong node
      *  in expand/collapse?
      *  
+     *  Okay, checked again: the cancel is needed because otherwise
+     *  the edited value might end up in the wrong row, that is the
+     *  one after the currently edited if the parent of the edited
+     *  is collapsed while editing (old issue #120-jdnc).
      */
     public void interactiveEditingCanceledStopped() {
         final JTextField field = new JTextField();
+        DefaultMutableTreeTableNode root = new DefaultMutableTreeTableNode("ROOT");
+        DefaultMutableTreeTableNode a = new DefaultMutableTreeTableNode("A");
+        DefaultMutableTreeTableNode a1 = new DefaultMutableTreeTableNode("A1");
+        DefaultMutableTreeTableNode b = new DefaultMutableTreeTableNode("B");
+        a.add(a1);
+        root.add(a);
+        root.add(b);
+        // default table: hack around #120-jdnc introduces #730
+//        JXTreeTable xTable = new JXTreeTable();
+        // hacked table: regression of #120-jdnc
         JXTreeTable xTable = new JXTreeTableHack();
-        xTable.setTreeTableModel(new ComponentTreeTableModel(new JXFrame()));
+        xTable.setTreeTableModel(new DefaultTreeTableModel(root));
         xTable.expandAll();
         xTable.setVisibleColumnCount(10);
         xTable.packColumn(0, -1);
