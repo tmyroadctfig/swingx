@@ -461,10 +461,10 @@ public class JXTreeTable extends JXTable {
             if (isEditing()) {
                 boolean success = getCellEditor().stopCellEditing();
                 if (!success) {
-                    getCellEditor().cancelCellEditing();
-                }
-//                getCellEditor().cancelCellEditing();
+                getCellEditor().cancelCellEditing();
              }
+//                getCellEditor().cancelCellEditing();
+        }
         }
 
         /**
@@ -1314,12 +1314,12 @@ public class JXTreeTable extends JXTable {
      *
      * @param parent  the path which is to be examined
      * @return an <code>Enumeration</code> of the descendents of 
-     *		<code>parent</code>, or <code>null</code> if
-     *		<code>parent</code> is not currently expanded
+     *        <code>parent</code>, or <code>null</code> if
+     *        <code>parent</code> is not currently expanded
      */
     
     public Enumeration<?> getExpandedDescendants(TreePath parent) {
-    	return renderer.getExpandedDescendants(parent);
+        return renderer.getExpandedDescendants(parent);
     }
 
     
@@ -2606,7 +2606,7 @@ public class JXTreeTable extends JXTable {
                     // JW: why this? null may be a valid value? 
                     // removed - didn't see it after asking the model
 //                    if (o != null) {
-//                    	val = o;
+//                        val = o;
 //                    }
                     val = o;
                 }
@@ -2679,7 +2679,7 @@ public class JXTreeTable extends JXTable {
          */
         @Override
         public int getDepth() {
-        	return table.getPathForRow(row).getPathCount() - 1;
+            return table.getPathForRow(row).getPathCount() - 1;
         }
         
         /**

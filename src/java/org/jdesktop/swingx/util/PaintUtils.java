@@ -453,9 +453,9 @@ public class PaintUtils {
                 new Point(0,0), new Point(10,0),
                 new float[] {0f, 0.5f, 1f},
                 new Color[] {Color.RED, Color.GREEN, Color.BLUE});
-        System.out.println("in  = " + toString(in));
+        log.fine("in  = " + toString(in));
         Paint out = resizeGradient(in,100,100);
-        System.out.println("out = " + toString((MultipleGradientPaint) out));
+        log.fine(("out = " + toString((MultipleGradientPaint) out));
     }*/
     /*
     private static String toString(MultipleGradientPaint paint) {
@@ -483,7 +483,7 @@ public class PaintUtils {
     }*/
     
 //    private static void p(String string) {
-//        System.out.println(string);
+//        log.fine((string);
 //    }
 
 }

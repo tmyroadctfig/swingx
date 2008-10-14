@@ -50,7 +50,7 @@ import javax.swing.SwingUtilities;
  *    message = info.substituteVariables(message);
  *
  *    //prints out: "An error occured on Mac OS X version 10.4.7" on some systems
- *    System.out.println(message);
+ *    log.info(message);
  * </code></pre></p>
  * 
  * @status REVIEWED

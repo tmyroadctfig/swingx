@@ -131,7 +131,7 @@ public class JXTree extends JTree {
      * used by this tree defines a leaf node as any node without children.
      */
     public JXTree() {
-	init();
+        init();
     }
 
     /**
@@ -146,7 +146,7 @@ public class JXTree extends JTree {
      */
     public JXTree(Object[] value) {
         super(value);
-	init();
+        init();
     }
 
     /**
@@ -161,7 +161,7 @@ public class JXTree extends JTree {
      */
     public JXTree(Vector value) {
         super(value);
-	init();
+        init();
     }
 
     /**
@@ -177,7 +177,7 @@ public class JXTree extends JTree {
      */
     public JXTree(Hashtable value) {
         super(value);
-	init();
+        init();
     }
 
     /**
@@ -210,7 +210,7 @@ public class JXTree extends JTree {
      */
     public JXTree(TreeNode root, boolean asksAllowsChildren) {
         super(root, asksAllowsChildren);
-	init();
+        init();
     }
 
     /**
@@ -368,7 +368,7 @@ public class JXTree extends JTree {
 
         public void actionPerformed(ActionEvent evt) {
             if ("expand-all".equals(getName())) {
-		expandAll();
+                expandAll();
             }
             else if ("collapse-all".equals(getName())) {
                 collapseAll();
@@ -1581,7 +1581,7 @@ public class JXTree extends JTree {
          */
         @Override
         public boolean isCellEditable(int row, int column) {
-            return false;	/** TODO:  */
+            return false;        /** TODO:  */
         }
 
         /**

@@ -23,5 +23,4 @@ package org.jdesktop.swingx.plaf.linux;
 import org.jdesktop.swingx.plaf.basic.BasicLookAndFeelAddons;
 
 public class LinuxLookAndFeelAddons extends BasicLookAndFeelAddons {
-	
 }

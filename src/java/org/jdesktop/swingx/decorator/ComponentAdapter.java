@@ -105,7 +105,7 @@ public abstract class ComponentAdapter {
     public int row = 0;
     /** current column in view coordinates. */
     public int column = 0;
-    protected final JComponent	target;
+    protected final JComponent    target;
 
     /**
      * Constructs a ComponentAdapter, setting the specified component as the
@@ -220,7 +220,7 @@ public abstract class ComponentAdapter {
      * @return the number of columns in the target's data model.
      */
     public int getColumnCount() {
-        return 1;	// default for combo-boxes, lists, and trees
+        return 1;    // default for combo-boxes, lists, and trees
     }
 
     /**
@@ -412,7 +412,7 @@ public abstract class ComponentAdapter {
      * Otherwise, it returns false.
      *
      * @return true if the cell identified by this adapter currently has focus;
-     * 	Otherwise, return false
+     *  Otherwise, return false
      */
     public abstract boolean hasFocus();
 
@@ -421,7 +421,7 @@ public abstract class ComponentAdapter {
      * Otherwise, it returns false.
      *
      * @return true if the cell identified by this adapter is currently selected;
-     * 	Otherwise, return false
+     *  Otherwise, return false
      */
     public abstract boolean isSelected();
 
@@ -440,7 +440,7 @@ public abstract class ComponentAdapter {
      * such components can never be collapsed.
      *
      * @return true if the cell identified by this adapter is currently expanded;
-     * 	Otherwise, return false
+     *     Otherwise, return false
      */
     public boolean isExpanded() {
         return true; // sensible default for JList and JTable
@@ -453,7 +453,7 @@ public abstract class ComponentAdapter {
      * such components can never have children.
      *
      * @return true if the cell identified by this adapter is a leaf node;
-     * 	Otherwise, return false
+     *     Otherwise, return false
      */
     public boolean isLeaf() {
         return true; // sensible default for JList and JTable
@@ -466,7 +466,7 @@ public abstract class ComponentAdapter {
      * such components can never have children.
      *
      * @return true if the cell identified by this adapter displays the hierarchical node;
-     * 	Otherwise, return false
+     *  Otherwise, return false
      */
     public boolean isHierarchical() {
         return false; // sensible default for JList and JTable

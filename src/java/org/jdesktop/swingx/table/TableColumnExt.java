@@ -148,7 +148,7 @@ public class TableColumnExt extends TableColumn implements UIDependent {
      *        is bound.
      */
     public TableColumnExt(int modelIndex) {
-        this(modelIndex, 75);	// default width taken from javax.swing.table.TableColumn
+        this(modelIndex, 75);    // default width taken from javax.swing.table.TableColumn
     }
 
     /**
@@ -476,7 +476,7 @@ public class TableColumnExt extends TableColumn implements UIDependent {
      * @param title String containing the title of this view column
      */
     public void setTitle(String title) {
-        setHeaderValue(title);				// simple wrapper
+        setHeaderValue(title);                // simple wrapper
     }
 
     /**
@@ -487,7 +487,7 @@ public class TableColumnExt extends TableColumn implements UIDependent {
      */
     public String getTitle() {
         Object header = getHeaderValue();
-        return header != null ? header.toString() : null;	// simple wrapper
+        return header != null ? header.toString() : null; // simple wrapper
     }
 
     /**

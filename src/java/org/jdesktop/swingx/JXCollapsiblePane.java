@@ -203,17 +203,17 @@ public class JXCollapsiblePane extends JXPanel {
     }
     
     /**
-	 * Used when generating PropertyChangeEvents for the "animationState"
-	 * property. The PropertyChangeEvent will takes the following different
-	 * values for {@link PropertyChangeEvent#getNewValue()}:
-	 * <ul>
-	 * <li><code>reinit</code> every time the animation starts
-	 * <li><code>expanded</code> when the animation ends and the pane is
-	 * expanded
-	 * <li><code>collapsed</code> when the animation ends and the pane is
-	 * collapsed
-	 * </ul>
-	 */
+     * Used when generating PropertyChangeEvents for the "animationState"
+     * property. The PropertyChangeEvent will takes the following different
+     * values for {@link PropertyChangeEvent#getNewValue()}:
+     * <ul>
+     * <li><code>reinit</code> every time the animation starts
+     * <li><code>expanded</code> when the animation ends and the pane is
+     * expanded
+     * <li><code>collapsed</code> when the animation ends and the pane is
+     * collapsed
+     * </ul>
+     */
     public final static String ANIMATION_STATE_KEY = "animationState";
 
     /**
@@ -283,19 +283,19 @@ public class JXCollapsiblePane extends JXPanel {
         this(Direction.UP, layout);
     }
     
-	/**
-	 * Constructs a new JXCollapsiblePane with a {@link JPanel} as content pane
-	 * and the given LayoutManager and orientation. A vertical orientation
-	 * enables a vertical {@link VerticalLayout} with a gap of 2 pixels as
-	 * layout manager. A horizontal orientation enables a horizontal
-	 * {@link HorizontalLayout} with a gap of 2 pixels as layout manager
-	 * 
-	 * @param direction
-	 *            the direction this pane collapses
-	 * @param layout
-	 *            of this collapsible pane
-	 */
-	public JXCollapsiblePane(Direction direction, LayoutManager layout) {
+    /**
+     * Constructs a new JXCollapsiblePane with a {@link JPanel} as content pane
+     * and the given LayoutManager and orientation. A vertical orientation
+     * enables a vertical {@link VerticalLayout} with a gap of 2 pixels as
+     * layout manager. A horizontal orientation enables a horizontal
+     * {@link HorizontalLayout} with a gap of 2 pixels as layout manager
+     * 
+     * @param direction
+     *            the direction this pane collapses
+     * @param layout
+     *            of this collapsible pane
+     */
+    public JXCollapsiblePane(Direction direction, LayoutManager layout) {
         super.setLayout(layout);
 
         this.direction = direction;
@@ -484,20 +484,20 @@ public class JXCollapsiblePane extends JXPanel {
      *    preferred="true"
      */
     public void setDirection(Direction direction) {
-    	if (animateTimer.isRunning()) {
-    		throw new IllegalStateException("cannot be change direction while collapsing.");
-    	}
-    	
-    	Direction oldValue = getDirection();
-    	this.direction = direction;
-    	
-    	if (direction.isVertical()) {
-    		getContentPane().setLayout(new VerticalLayout(2));
-    	} else {
-    		getContentPane().setLayout(new HorizontalLayout(2));
-    	}
-    	
-    	firePropertyChange("direction", oldValue, getDirection());
+        if (animateTimer.isRunning()) {
+            throw new IllegalStateException("cannot be change direction while collapsing.");
+        }
+        
+        Direction oldValue = getDirection();
+        this.direction = direction;
+        
+        if (direction.isVertical()) {
+            getContentPane().setLayout(new VerticalLayout(2));
+        } else {
+            getContentPane().setLayout(new HorizontalLayout(2));
+        }
+        
+        firePropertyChange("direction", oldValue, getDirection());
     }
     
     /**
@@ -505,7 +505,7 @@ public class JXCollapsiblePane extends JXPanel {
      * @return the current {@link Orientation}
      */
     public Direction getDirection() {
-    	return direction;
+        return direction;
     }
     
     /**
@@ -791,9 +791,9 @@ public class JXCollapsiblePane extends JXPanel {
                     wrapper.setBounds(bounds);
                     
                     if (direction == Direction.DOWN) {
-                    	wrapper.setViewPosition(new Point(0, wrapper.getView().getPreferredSize().height - newDimension));
+                        wrapper.setViewPosition(new Point(0, wrapper.getView().getPreferredSize().height - newDimension));
                     } else {
-                    	wrapper.setViewPosition(new Point(0, newDimension));
+                        wrapper.setViewPosition(new Point(0, newDimension));
                     }
                     
                     bounds = getBounds();
@@ -805,9 +805,9 @@ public class JXCollapsiblePane extends JXPanel {
                     wrapper.setBounds(bounds);
                     
                     if (direction == Direction.RIGHT) {
-                    	wrapper.setViewPosition(new Point(wrapper.getView().getPreferredSize().width - newDimension, 0));
+                        wrapper.setViewPosition(new Point(wrapper.getView().getPreferredSize().width - newDimension, 0));
                     } else {
-                    	wrapper.setViewPosition(new Point(newDimension, 0));
+                        wrapper.setViewPosition(new Point(newDimension, 0));
                     }
                     
                     bounds = getBounds();

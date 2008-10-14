@@ -133,8 +133,8 @@ public class MatteBorderExt extends MatteBorder {
 
         // We now know that we have at least two icons!
 
-        Color oldColor = g.getColor();	// restore before exiting
-        g.translate(x, y);				// restore before exiting
+        Color oldColor = g.getColor(); // restore before exiting
+        g.translate(x, y);    // restore before exiting
 
         for (int i = 0; i < tileIcons.length; i++) {
             // Make sure we have an icon to paint with
@@ -152,8 +152,8 @@ public class MatteBorderExt extends MatteBorder {
         paintBottomLeft(c, g, 0, height - insets.bottom, insets.left, insets.bottom);
         paintLeft(c, g, 0, insets.top, insets.left, height - insets.top - insets.bottom);
 
-        g.translate( -x, -y);	// restore
-        g.setColor(oldColor);	// restore
+        g.translate( -x, -y); // restore
+        g.setColor(oldColor); // restore
 
     }
 

@@ -25,7 +25,7 @@ package org.jdesktop.swingx.auth;
  *  using the <strong>LoginService</strong>. The actual mechanism used
  *  to store the passwords is left up to the implementation.
  *
- *	@author Bino George
+ * @author Bino George
  */
 public abstract class PasswordStore {
     /**

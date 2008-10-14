@@ -49,11 +49,11 @@ public class BoundAction extends AbstractActionExt {
     private EventListenerList listeners;
 
     public BoundAction() {
-	this("BoundAction");
+        this("BoundAction");
     }
 
     public BoundAction(String name) {
-	super(name);
+        super(name);
     }
 
     /**
@@ -61,11 +61,11 @@ public class BoundAction extends AbstractActionExt {
      * @param command the value of the action command key
      */
     public BoundAction(String name, String command) {
-	super(name, command);
+        super(name, command);
     }
 
     public BoundAction(String name, Icon icon) {
-	super(name, icon);
+        super(name, icon);
     }
 
     /**
@@ -74,7 +74,7 @@ public class BoundAction extends AbstractActionExt {
      * @param icon icon to display
      */
     public BoundAction(String name, String command, Icon icon) {
-	super(name, command, icon);
+        super(name, command, icon);
     }
 
     /**
@@ -91,21 +91,21 @@ public class BoundAction extends AbstractActionExt {
      * </pre>
      */
     public void setCallback(String callback) {
-	String[] elems = callback.split("#", 2);
-	if (elems.length == 2) {
-	    try {
-		Class clz = Class.forName(elems[0]);
+        String[] elems = callback.split("#", 2);
+        if (elems.length == 2) {
+            try {
+                Class clz = Class.forName(elems[0]);
 
-		// May throw a security exception in an Applet
-		// context.
-		Object obj = clz.newInstance();
+                // May throw a security exception in an Applet
+                // context.
+                Object obj = clz.newInstance();
 
-		registerCallback(obj, elems[1]);
-	    } catch (Exception ex) {
-		LOG.fine("ERROR: setCallback(" + callback
-				   + ") - " + ex.getMessage());
-	    }
-	}
+                registerCallback(obj, elems[1]);
+            } catch (Exception ex) {
+                LOG.fine("ERROR: setCallback(" + callback
+                                   + ") - " + ex.getMessage());
+            }
+        }
     }
 
     /**
@@ -122,14 +122,14 @@ public class BoundAction extends AbstractActionExt {
      * @param method the name of the method on the handler which will be called.
      */
     public void registerCallback(Object handler, String method) {
-	if (isStateAction()) {
-	    // Create a handler for toogle type actions.
-	    addItemListener(new BooleanInvocationHandler(handler, method));
-	} else {
-	    // Create a new ActionListener using the dynamic proxy api.
-	    addActionListener((ActionListener)EventHandler.create(ActionListener.class,
-								  handler, method));
-	}
+        if (isStateAction()) {
+            // Create a handler for toogle type actions.
+            addItemListener(new BooleanInvocationHandler(handler, method));
+        } else {
+            // Create a new ActionListener using the dynamic proxy api.
+            addActionListener((ActionListener)EventHandler.create(ActionListener.class,
+                                                                  handler, method));
+        }
     }
     
     /**
@@ -140,19 +140,19 @@ public class BoundAction extends AbstractActionExt {
      */
     private class BooleanInvocationHandler implements ItemListener {
 
-	private Statement falseStatement;
-	private Statement trueStatement;
+        private Statement falseStatement;
+        private Statement trueStatement;
 
-	public BooleanInvocationHandler(Object target, String methodName) {
-	    // Create the true and false statements.
-	    falseStatement = new Statement(target, methodName, 
-					   new Object[] { Boolean.FALSE });
-	    
-	    trueStatement = new Statement(target, methodName, 
-					  new Object[] { Boolean.TRUE });
-	}
+        public BooleanInvocationHandler(Object target, String methodName) {
+            // Create the true and false statements.
+            falseStatement = new Statement(target, methodName, 
+                                           new Object[] { Boolean.FALSE });
+            
+            trueStatement = new Statement(target, methodName, 
+                                          new Object[] { Boolean.TRUE });
+        }
 
-	public void itemStateChanged(ItemEvent evt) {
+        public void itemStateChanged(ItemEvent evt) {
             Statement statement = (evt.getStateChange() == ItemEvent.DESELECTED) ? falseStatement
                     : trueStatement;
 
@@ -169,53 +169,53 @@ public class BoundAction extends AbstractActionExt {
     // Listener registration...
 
     private void addListener(Class clz, EventListener listener) {
-	if (listeners == null) {
-	    listeners = new EventListenerList();
-	}
-	listeners.add(clz, listener);	
+        if (listeners == null) {
+            listeners = new EventListenerList();
+        }
+        listeners.add(clz, listener);        
     }
 
     private void removeListener(Class clz, EventListener listener) {
-	if (listeners != null) {
-	    listeners.remove(clz, listener);
-	}
+        if (listeners != null) {
+            listeners.remove(clz, listener);
+        }
     }
 
     private EventListener[] getListeners(Class clz) {
-	if (listeners == null) {
-	    return null;
-	}
-	return listeners.getListeners(clz);
+        if (listeners == null) {
+            return null;
+        }
+        return listeners.getListeners(clz);
     }
 
     /**
      * Add an action listener which will be invoked when this action is invoked.
      */
     public void addActionListener(ActionListener listener) {
-	addListener(ActionListener.class, listener);
+        addListener(ActionListener.class, listener);
     }
 
     public void removeActionListener(ActionListener listener) {
-	removeListener(ActionListener.class, listener);
+        removeListener(ActionListener.class, listener);
     }
 
     public ActionListener[] getActionListeners() {
-	return (ActionListener[])getListeners(ActionListener.class);
+        return (ActionListener[])getListeners(ActionListener.class);
     }
 
     /**
      * Add an item listener which will be invoked for toggle actions.
      */
     public void addItemListener(ItemListener listener) {
-	addListener(ItemListener.class, listener);
+        addListener(ItemListener.class, listener);
     }
 
     public void removeItemListener(ItemListener listener) {
-	removeListener(ItemListener.class, listener);
+        removeListener(ItemListener.class, listener);
     }
 
     public ItemListener[] getItemListeners() {
-	return (ItemListener[])getListeners(ItemListener.class);
+        return (ItemListener[])getListeners(ItemListener.class);
     }
 
     // Callbacks...
@@ -224,12 +224,12 @@ public class BoundAction extends AbstractActionExt {
      * Callback for command actions.
      */
     public void actionPerformed(ActionEvent evt) {
-	ActionListener[] alist = getActionListeners();
-	if (alist != null) {
-	    for (int i = 0 ; i < alist.length; i++) {
-		alist[i].actionPerformed(evt);
-	    }
-	}
+        ActionListener[] alist = getActionListeners();
+        if (alist != null) {
+            for (int i = 0 ; i < alist.length; i++) {
+                alist[i].actionPerformed(evt);
+            }
+        }
     }
 
     /**
@@ -237,22 +237,22 @@ public class BoundAction extends AbstractActionExt {
      */
     public void itemStateChanged(ItemEvent evt) {
         // Update all objects that share this item
-	boolean newValue;
-	boolean oldValue = isSelected();
+        boolean newValue;
+        boolean oldValue = isSelected();
 
         newValue = evt.getStateChange() == ItemEvent.SELECTED;
 
         if (oldValue != newValue) {
-	    setSelected(newValue);
+            setSelected(newValue);
 
-	    // Forward the event to the delgate for handling.
-	    ItemListener[] ilist = getItemListeners();
-	    if (ilist != null) {
-		for (int i = 0; i < ilist.length; i++) {
-		    ilist[i].itemStateChanged(evt);
-		}
-	    }
-	}
+            // Forward the event to the delgate for handling.
+            ItemListener[] ilist = getItemListeners();
+            if (ilist != null) {
+                for (int i = 0; i < ilist.length; i++) {
+                    ilist[i].itemStateChanged(evt);
+                }
+            }
+        }
     }
 
 }

@@ -65,7 +65,7 @@ public class WindowsStatusBarUI extends BasicStatusBarUI {
      */
     public static ComponentUI createUI(JComponent c) {
         return new WindowsStatusBarUI();
-    }	
+    }
     
     @Override protected void paintBackground(Graphics2D g, JXStatusBar statusBar) {
         //if bidi, reverse the image painting order

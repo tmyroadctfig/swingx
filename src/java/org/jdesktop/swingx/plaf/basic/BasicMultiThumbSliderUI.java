@@ -1,4 +1,6 @@
 /*
+ * $Id$
+ *
  * Copyright 2006 Sun Microsystems, Inc., 4150 Network Circle,
  * Santa Clara, California 95054, U.S.A. All rights reserved.
  *
@@ -16,7 +18,6 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-
 package org.jdesktop.swingx.plaf.basic;
 
 import java.awt.Color;
@@ -46,7 +47,7 @@ public class BasicMultiThumbSliderUI extends MultiThumbSliderUI {
     
     public void installUI(JComponent c) {
         slider = (JXMultiThumbSlider)c;
-	slider.setThumbRenderer(new BasicThumbRenderer());
+        slider.setThumbRenderer(new BasicThumbRenderer());
         slider.setTrackRenderer(new BasicTrackRenderer());        
     }
     public void uninstallUI(JComponent c) {

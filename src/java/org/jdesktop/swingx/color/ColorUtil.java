@@ -205,18 +205,18 @@ public class ColorUtil {
         float[] bcomp = b.getRGBComponents(null);
         float[] ccomp = new float[4];
         
-//        System.out.println("a comp ");
+//        log.fine(("a comp ");
 //        for(float f : acomp) {
-//            System.out.println(f);
+//            log.fine((f);
 //        }
 //        for(float f : bcomp) {
-//            System.out.println(f);
+//            log.fine((f);
 //        }
         for(int i=0; i<4; i++) {
             ccomp[i] = acomp[i] + (bcomp[i]-acomp[i])*t;
         }
 //        for(float f : ccomp) {
-//            System.out.println(f);
+//            log.fine((f);
 //        }
         
         return new Color(ccomp[0],ccomp[1],ccomp[2],ccomp[3]);

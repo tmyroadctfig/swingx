@@ -257,12 +257,12 @@ public class JXLabel extends JLabel {
             return;
         }
         // TODO:HAD
-        //System.out.println("resized: " + w + ", " + h);
+        //log.fine("resized: " + w + ", " + h);
         if (oldH == 0) {
-            //System.out.println("BAIL OUT");
+            //log.fine("BAIL OUT");
             return;
         }
-        //System.out.println("res:" + getVisibleRect());
+        //log.fine("res:" + getVisibleRect());
         if (w > getVisibleRect().width) {
             w = getVisibleRect().width;
         }
@@ -332,10 +332,10 @@ public class JXLabel extends JLabel {
     @Override
     public Dimension getPreferredSize() {
         Dimension size = super.getPreferredSize();
-        //System.out.println("GPC!!!: " + size);
+        //log.fine("GPC!!!: " + size);
         //if (true) return size;
         if (isPreferredSizeSet()) {
-            //System.out.println("ret 0");
+            //log.fine("ret 0");
             return size;
         } else if (this.textRotation != NORMAL) {
             // #swingx-680 change the preferred size when rotation is set ... ideally this would be solved in the LabelUI rather then here
@@ -347,14 +347,14 @@ public class JXLabel extends JLabel {
             View view = (View) getClientProperty(BasicHTML.propertyKey);
             Container tla = super.getTopLevelAncestor();
             if (view == null || tla == null || !(view instanceof Renderer)) {
-                //System.out.println("ret 1:" + size + ", " + view + ", " + tla);
+                //log.fine("ret 1:" + size + ", " + view + ", " + tla);
                 return size;
             }
             Insets insets = getInsets();
             int dx = insets.left + insets.right;
             int dy = insets.top + insets.bottom;
-            //System.out.println("INSETS:" + insets);
-            //System.out.println("BORDER:" + this.getBorder());
+            //log.fine("INSETS:" + insets);
+            //log.fine("BORDER:" + this.getBorder());
             Rectangle textR = new Rectangle();
             Rectangle viewR = new Rectangle();
             textR.x = textR.y = textR.width = textR.height = 0;
@@ -388,7 +388,7 @@ public class JXLabel extends JLabel {
                     availTextWidth = viewR.width - (iconR.width + gap);
                 }
                 float xPrefSpan = view.getPreferredSpan(View.X_AXIS);
-                //System.out.println("atw:" + availTextWidth + ", vps:" + xPrefSpan);
+                //log.fine("atw:" + availTextWidth + ", vps:" + xPrefSpan);
                 textR.width = Math.min(availTextWidth, (int) xPrefSpan);
                 if (maxLineSpan > 0) {
                     textR.width = Math.min(textR.width, maxLineSpan);
@@ -400,7 +400,7 @@ public class JXLabel extends JLabel {
                 if (textR.height == 0) {
                     textR.height = getFont().getSize();
                 }
-                //System.out.println("atw:" + availTextWidth + ", vps:" + xPrefSpan + ", h:" + textR.height);
+                //log.fine("atw:" + availTextWidth + ", vps:" + xPrefSpan + ", h:" + textR.height);
 
             }
             // 3) set text xy based on h/v text pos
@@ -486,10 +486,10 @@ public class JXLabel extends JLabel {
 
             rv.width += dx;
             rv.height += dy;
-            //System.out.println("returning: " + rv);
+            //log.fine("returning: " + rv);
             return rv;
         }
-        //System.out.println("ret 3");
+        //log.fine("ret 3");
         return size;
     }
 
@@ -612,7 +612,7 @@ public class JXLabel extends JLabel {
      */
     @Override
     protected void paintComponent(Graphics g) {
-        //System.out.println("in");
+        //log.fine("in");
         // resizing the text view causes recursive callback to the paint down the road. In order to prevent such
         // computationally intensive series of repaints every call to paint is skipped while top most call is being
         // executed.
@@ -659,7 +659,7 @@ public class JXLabel extends JLabel {
                 // g2.setColor(Color.RED);
                 // g2.fillRect(0, 0, getWidth(), getHeight());
                 // g2.setColor(c);
-                //System.out.println("PW:" + pWidth + ", PH:" + pHeight);
+                //log.fine("PW:" + pWidth + ", PH:" + pHeight);
                 foregroundPainter.paint(tmp, this, pWidth, pHeight);
                 tmp.dispose();
                 painting = false;
@@ -1024,7 +1024,7 @@ public class JXLabel extends JLabel {
             view = v;
             view.setParent(this);
             host = c;
-            //System.out.println("vir: " +  host.getVisibleRect());
+            //log.fine("vir: " +  host.getVisibleRect());
             int w;
             if (host.getVisibleRect().width == 0) {
                 invalidated = true;
@@ -1032,7 +1032,7 @@ public class JXLabel extends JLabel {
             } else {
                 w = host.getVisibleRect().width;
             }
-            //System.out.println("w:" + w);
+            //log.fine("w:" + w);
             // initially layout to the preferred size
             //setSize(c.getMaxLineSpan() > -1 ? c.getMaxLineSpan() : view.getPreferredSpan(X_AXIS), view.getPreferredSpan(Y_AXIS));
             setSize(c.getMaxLineSpan() > -1 ? c.getMaxLineSpan() : w, host.getVisibleRect().height);
@@ -1134,7 +1134,7 @@ public class JXLabel extends JLabel {
          * @param height the height
          */
         public void setSize(float width, float height) {
-            //System.out.println("SS:" + width + " (" + host.maxLineSpan + "), " + height);
+            //log.fine("SS:" + width + " (" + host.maxLineSpan + "), " + height);
             if (host.maxLineSpan > 0) {
                 width = Math.min(width, host.maxLineSpan);
             }
@@ -1152,12 +1152,12 @@ public class JXLabel extends JLabel {
         @Override
         public float getPreferredSpan(int axis) {
             if (axis == X_AXIS) {
-                //System.out.println("inv: " + invalidated + ", w:" + width + ", vw:" + host.getVisibleRect());
+                //log.fine("inv: " + invalidated + ", w:" + width + ", vw:" + host.getVisibleRect());
                 // width currently laid out to
                 if (invalidated) {
                     int w = host.getVisibleRect().width;
                     if (w != 0) {
-                        //System.out.println("vrh: " + host.getVisibleRect().height);
+                        //log.fine("vrh: " + host.getVisibleRect().height);
                         invalidated = false;
                         // JXLabelTest4 works
                         setSize(w - (host.getOccupiedWidth()), host.getVisibleRect().height);

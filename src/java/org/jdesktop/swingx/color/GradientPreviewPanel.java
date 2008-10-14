@@ -34,6 +34,7 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * <p><b>Dependency</b>: Because this class relies on LinearGradientPaint and
@@ -97,6 +98,7 @@ public class GradientPreviewPanel extends JXPanel {
     }
 
     private MultiThumbModel model;
+    private Logger log = Logger.getLogger(GradientPreviewPanel.class.getName());
     
     private List<Thumb<Color>> getStops() {
         // calculate the color stops
@@ -112,63 +114,63 @@ public class GradientPreviewPanel extends JXPanel {
             Graphics2D g2 = (Graphics2D)g;
             
             // fill the background with checker first
-	    g2.setPaint(checker_texture);
-	    g.fillRect(0,0,getWidth(),getHeight());
+            g2.setPaint(checker_texture);
+            g.fillRect(0,0,getWidth(),getHeight());
 
         
             Paint paint = getGradient();
-	    // fill the area
-	    if(paint != null) {
-		g2.setPaint(paint);
-	    } else {
-		g2.setPaint(Color.black);
-	    }
+            // fill the area
+            if(paint != null) {
+                g2.setPaint(paint);
+            } else {
+                g2.setPaint(Color.black);
+            }
 
-	    g.fillRect(0,0,getWidth(),getHeight());
+            g.fillRect(0,0,getWidth(),getHeight());
 
-	    drawHandles(g2);
-	} catch (Exception ex) {
-	    System.out.println("ex: " + ex);
-	}
+            drawHandles(g2);
+        } catch (Exception ex) {
+            log .severe("ex: " + ex);
+        }
     }
     
     private MultipleGradientPaint calculateGradient(final float[] fractions, final Color[] colors) {
-	// set up the end points
-	Point2D start = this.start;
-	Point2D end = this.end;
+        // set up the end points
+        Point2D start = this.start;
+        Point2D end = this.end;
         if(isReversed()) {
-	//if(picker.reversedCheck.isSelected()) {
-	    start = this.end;
-	    end = this.start;
-	}
-
-	// set up the cycle type
-	MultipleGradientPaint.CycleMethodEnum cycle = MultipleGradientPaint.NO_CYCLE;
-        if(isRepeated()) {
-	//if(picker.repeatedRadio.isSelected()) {
-	    cycle = MultipleGradientPaint.REPEAT;
-	}
-        if(isReflected()) {
-	//if(picker.reflectedRadio.isSelected()) {
-	    cycle = MultipleGradientPaint.REFLECT;
-	}
-	
-	// create the underlying gradient paint
-	MultipleGradientPaint paint = null;
-	if(isRadial()) { //picker.styleCombo.getSelectedItem().toString().equals("Radial")) {
-	    paint = new org.apache.batik.ext.awt.RadialGradientPaint(
-	    start, (float)start.distance(end),start,
-	    fractions, colors, cycle, MultipleGradientPaint.SRGB
-	    );
-	} else {
-	    paint = new org.apache.batik.ext.awt.LinearGradientPaint(
-	    (float)start.getX(),
-	    (float)start.getY(),
-	    (float)end.getX(),
-	    (float)end.getY(),
-	    fractions,colors,cycle);            
+        //if(picker.reversedCheck.isSelected()) {
+            start = this.end;
+            end = this.start;
         }
-	return paint;
+
+        // set up the cycle type
+        MultipleGradientPaint.CycleMethodEnum cycle = MultipleGradientPaint.NO_CYCLE;
+        if(isRepeated()) {
+        //if(picker.repeatedRadio.isSelected()) {
+            cycle = MultipleGradientPaint.REPEAT;
+        }
+        if(isReflected()) {
+        //if(picker.reflectedRadio.isSelected()) {
+            cycle = MultipleGradientPaint.REFLECT;
+        }
+        
+        // create the underlying gradient paint
+        MultipleGradientPaint paint = null;
+        if(isRadial()) { //picker.styleCombo.getSelectedItem().toString().equals("Radial")) {
+            paint = new org.apache.batik.ext.awt.RadialGradientPaint(
+            start, (float)start.distance(end),start,
+            fractions, colors, cycle, MultipleGradientPaint.SRGB
+            );
+        } else {
+            paint = new org.apache.batik.ext.awt.LinearGradientPaint(
+            (float)start.getX(),
+            (float)start.getY(),
+            (float)end.getX(),
+            (float)end.getY(),
+            fractions,colors,cycle);            
+        }
+        return paint;
     }
     
     private void drawHandles(final Graphics2D g2) {
@@ -195,33 +197,33 @@ public class GradientPreviewPanel extends JXPanel {
     
     private class GradientMouseHandler extends MouseInputAdapter {
 
-	public void mousePressed(MouseEvent evt) {
-	    moving_start = false;
-	    moving_end = false;
-	    if (evt.getPoint().distance(start) < 5) {
-		moving_start = true;
-		start = evt.getPoint();
-		return;
-	    }
+        public void mousePressed(MouseEvent evt) {
+            moving_start = false;
+            moving_end = false;
+            if (evt.getPoint().distance(start) < 5) {
+                moving_start = true;
+                start = evt.getPoint();
+                return;
+            }
             
-	    if (evt.getPoint().distance(end) < 5) {
-		moving_end = true;
-		end = evt.getPoint();
-		return;
-	    }
+            if (evt.getPoint().distance(end) < 5) {
+                moving_end = true;
+                end = evt.getPoint();
+                return;
+            }
 
-	    start = evt.getPoint();
-	}
+            start = evt.getPoint();
+        }
 
-	public void mouseDragged(MouseEvent evt) {
-	    if (moving_start) {
-		start = evt.getPoint();
-	    } else {
-		end = evt.getPoint();
-	    }
+        public void mouseDragged(MouseEvent evt) {
+            if (moving_start) {
+                start = evt.getPoint();
+            } else {
+                end = evt.getPoint();
+            }
             firePropertyChange("gradient",null,getGradient());
-	    repaint();
-	}
+            repaint();
+        }
     }
 
     public boolean isRadial() {

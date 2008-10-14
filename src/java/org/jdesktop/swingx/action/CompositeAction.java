@@ -50,11 +50,11 @@ public class CompositeAction extends AbstractActionExt {
     private static final String LIST_IDS = "action-list-ids";
 
     public CompositeAction() {
-	this("CompositeAction");
+        this("CompositeAction");
     }
 
     public CompositeAction(String name) {
-	super(name);
+        super(name);
     }
 
     /**
@@ -62,11 +62,11 @@ public class CompositeAction extends AbstractActionExt {
      * @param command the value of the action command key
      */
     public CompositeAction(String name, String command) {
-	super(name, command);
+        super(name, command);
     }
 
     public CompositeAction(String name, Icon icon) {
-	super(name, icon);
+        super(name, icon);
     }
 
     /**
@@ -75,7 +75,7 @@ public class CompositeAction extends AbstractActionExt {
      * @param icon icon to display
      */
     public CompositeAction(String name, String command, Icon icon) {
-	super(name, command, icon);
+        super(name, command, icon);
     }
 
     /**
@@ -83,12 +83,12 @@ public class CompositeAction extends AbstractActionExt {
      * when this composite action is invoked.
      */
     public void addAction(String id) {
-	List list = (List)getValue(LIST_IDS);
-	if (list == null) {
-	    list = new ArrayList();
-	    putValue(LIST_IDS, list);
-	}
-	list.add(id);
+        List list = (List)getValue(LIST_IDS);
+        if (list == null) {
+            list = new ArrayList();
+            putValue(LIST_IDS, list);
+        }
+        list.add(id);
     }
 
     /**
@@ -97,39 +97,39 @@ public class CompositeAction extends AbstractActionExt {
      * @return a valid list of action ids or null
      */
     public List getActionIDs() {
-	return (List)getValue(LIST_IDS);
-    }	
+        return (List)getValue(LIST_IDS);
+    }    
 
     /**
      * Callback for composite actions. This method will redispatch the 
      * ActionEvent to all the actions held in the list.
      */
     public void actionPerformed(ActionEvent evt) {
-	ActionManager manager = ActionManager.getInstance();
-	    
-	Iterator iter = getActionIDs().iterator();
-	while (iter.hasNext()) {
-	    String id = (String)iter.next();
-	    Action action = manager.getAction(id);
-	    if (action != null) {
-		action.actionPerformed(evt);
-	    }
-	}
+        ActionManager manager = ActionManager.getInstance();
+            
+        Iterator iter = getActionIDs().iterator();
+        while (iter.hasNext()) {
+            String id = (String)iter.next();
+            Action action = manager.getAction(id);
+            if (action != null) {
+            action.actionPerformed(evt);
+            }
+        }
     }
 
     /**
      * Callback for toggle actions.
      */
     public void itemStateChanged(ItemEvent evt) {
-	ActionManager manager = ActionManager.getInstance();
-	    
-	Iterator iter = getActionIDs().iterator();
-	while (iter.hasNext()) {
-	    String id = (String)iter.next();
-	    Action action = manager.getAction(id);
-	    if (action != null && action instanceof AbstractActionExt) {
-		((AbstractActionExt)action).itemStateChanged(evt);
-	    }
-	}
+        ActionManager manager = ActionManager.getInstance();
+            
+        Iterator iter = getActionIDs().iterator();
+        while (iter.hasNext()) {
+            String id = (String)iter.next();
+            Action action = manager.getAction(id);
+            if (action != null && action instanceof AbstractActionExt) {
+            ((AbstractActionExt)action).itemStateChanged(evt);
+            }
+        }
     }
 }

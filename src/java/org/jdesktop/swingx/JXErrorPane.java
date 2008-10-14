@@ -18,11 +18,9 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-
 package org.jdesktop.swingx;
 
 import java.awt.Component;
-import java.awt.Dimension;
 import java.lang.reflect.InvocationTargetException;
 import javax.swing.Icon;
 import javax.swing.JComponent;
@@ -35,7 +33,6 @@ import org.jdesktop.swingx.error.ErrorInfo;
 import org.jdesktop.swingx.plaf.ErrorPaneUI;
 import org.jdesktop.swingx.plaf.ErrorPaneAddon;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
-import org.jdesktop.swingx.plaf.basic.BasicErrorPaneUI;
 
 /**
  * <p>JXErrorPane is a common error component suitable for displaying errors,
@@ -362,8 +359,8 @@ public class JXErrorPane extends JComponent {
      * block until the error dialog has been shown and hidden on the EDT.</p>
      * 
      * @param owner Owner of this error dialog. Determines the Window in which the dialog
-     *		is displayed; if the <code>owner</code> has
-     *		no <code>Window</code>, a default <code>Frame</code> is used
+     *        is displayed; if the <code>owner</code> has
+     *        no <code>Window</code>, a default <code>Frame</code> is used
      * @param info <code>ErrorInfo</code> that incorporates all the information about the error
      */
     public static void showDialog(Component owner, ErrorInfo info) {
@@ -382,8 +379,8 @@ public class JXErrorPane extends JComponent {
      * block until the error dialog has been shown and hidden on the EDT.</p>
      * 
      * @param owner Owner of this error dialog. Determines the Window in which the dialog
-     *		is displayed; if the <code>owner</code> has
-     *		no <code>Window</code>, a default <code>Frame</code> is used
+     *        is displayed; if the <code>owner</code> has
+     *        no <code>Window</code>, a default <code>Frame</code> is used
      * @param pane <code>JXErrorPane</code> which will form the content area
      *        of the dialog.
      */
@@ -419,8 +416,8 @@ public class JXErrorPane extends JComponent {
      * <code>SwingUtilities.invokeLater()</code>.</p>
      * 
      * @param owner Owner of this error dialog. Determines the Window in which the dialog
-     *		is displayed; if the <code>owner</code> has
-     *		no <code>Window</code>, a default <code>Frame</code> is used
+     *        is displayed; if the <code>owner</code> has
+     *        no <code>Window</code>, a default <code>Frame</code> is used
      * @param pane <code>JXErrorPane</code> which will form the content area
      *        of the dialog.
      * @return a <code>JDialog</code> configured to display the error.
@@ -467,8 +464,8 @@ public class JXErrorPane extends JComponent {
      * block until the error frame has been shown and hidden on the EDT.</p>
      * 
      * @param owner Owner of this error frame. Determines the Window in which the frame
-     *		is displayed; if the <code>owner</code> has
-     *		no <code>Window</code>, a default <code>Frame</code> is used
+     *        is displayed; if the <code>owner</code> has
+     *        no <code>Window</code>, a default <code>Frame</code> is used
      * @param info <code>ErrorInfo</code> that incorporates all the information about the error
      */
     public static void showFrame(Component owner, ErrorInfo info) {
@@ -487,8 +484,8 @@ public class JXErrorPane extends JComponent {
      * block until the error frame has been shown and hidden on the EDT.</p>
      * 
      * @param owner Owner of this error frame. Determines the Window in which the dialog
-     *		is displayed; if the <code>owner</code> has
-     *		no <code>Window</code>, a default <code>Frame</code> is used
+     *        is displayed; if the <code>owner</code> has
+     *        no <code>Window</code>, a default <code>Frame</code> is used
      * @param pane <code>JXErrorPane</code> which will form the content area
      *        of the frame.
      */
@@ -524,8 +521,8 @@ public class JXErrorPane extends JComponent {
      * <code>SwingUtilities.invokeLater()</code>.</p>
      * 
      * @param owner Owner of this error frame. Determines the Window in which the frame
-     *		is displayed; if the <code>owner</code> has
-     *		no <code>Window</code>, a default <code>Frame</code> is used
+     *        is displayed; if the <code>owner</code> has
+     *        no <code>Window</code>, a default <code>Frame</code> is used
      * @param pane <code>JXErrorPane</code> which will form the content area
      *        of the frame.
      * @return a <code>JFrame</code> configured to display the error.
@@ -572,8 +569,8 @@ public class JXErrorPane extends JComponent {
      * block until the error frame has been shown and hidden on the EDT.</p>
      * 
      * @param owner Owner of this error frame. Determines the Window in which the frame
-     *		is displayed; if the <code>owner</code> has
-     *		no <code>Window</code>, a default <code>Frame</code> is used
+     *        is displayed; if the <code>owner</code> has
+     *        no <code>Window</code>, a default <code>Frame</code> is used
      * @param info <code>ErrorInfo</code> that incorporates all the information about the error
      */
     public static void showInternalFrame(Component owner, ErrorInfo info) {
@@ -592,8 +589,8 @@ public class JXErrorPane extends JComponent {
      * block until the error frame has been shown and hidden on the EDT.</p>
      * 
      * @param owner Owner of this error frame. Determines the Window in which the dialog
-     *		is displayed; if the <code>owner</code> has
-     *		no <code>Window</code>, a default <code>Frame</code> is used
+     *        is displayed; if the <code>owner</code> has
+     *        no <code>Window</code>, a default <code>Frame</code> is used
      * @param pane <code>JXErrorPane</code> which will form the content area
      *        of the frame.
      */
@@ -629,10 +626,10 @@ public class JXErrorPane extends JComponent {
      * <code>SwingUtilities.invokeLater()</code>.</p>
      * 
      * @param owner Owner of this error frame. Determines the Window in which the frame
-     *		is displayed; if the <code>owner</code> has
-     *		no <code>Window</code>, a default <code>Frame</code> is used
+     *    is displayed; if the <code>owner</code> has
+     *    no <code>Window</code>, a default <code>Frame</code> is used
      * @param pane <code>JXErrorPane</code> which will form the content area
-     *        of the frame.
+     *    of the frame.
      * @return a <code>JInternalFrame</code> configured to display the error.
      */
     public static JInternalFrame createInternalFrame(Component owner, JXErrorPane pane) {

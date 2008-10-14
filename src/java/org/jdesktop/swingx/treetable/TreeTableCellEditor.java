@@ -152,7 +152,7 @@ public class TreeTableCellEditor extends DefaultCellEditor {
 //            return (((MouseEvent) e).getClickCount() >= clickCountToStart);
 //        }
 //
-//	// e is some other type of event...
+// // e is some other type of event...
 //        return false;
     }
 

@@ -69,7 +69,7 @@ public class JXMultiThumbSlider<E> extends JComponent {
         thumbs = new ArrayList<ThumbComp>();
         setLayout(null);
         
-	tdl = new ThumbHandler();
+        tdl = new ThumbHandler();
         
         setModel(new DefaultMultiThumbModel<E>());
         MultiThumbMouseListener mia = new MultiThumbMouseListener();
@@ -150,12 +150,12 @@ public class JXMultiThumbSlider<E> extends JComponent {
     
     private void clipThumbPosition(ThumbComp thumb) {
         if(getThumbValue(thumb) < getModel().getMinimumValue()) {
-	    getModel().getThumbAt(getThumbIndex(thumb)).setPosition(
-		getModel().getMinimumValue());
+            getModel().getThumbAt(getThumbIndex(thumb)).setPosition(
+                getModel().getMinimumValue());
         }
         if(getThumbValue(thumb) > getModel().getMaximumValue()) {
-	    getModel().getThumbAt(getThumbIndex(thumb)).setPosition(
-	    getModel().getMaximumValue());
+            getModel().getThumbAt(getThumbIndex(thumb)).setPosition(
+            getModel().getMaximumValue());
         }
     }
         
@@ -205,7 +205,7 @@ public class JXMultiThumbSlider<E> extends JComponent {
         float delta = ((float)x)/((float)w);
         int thumb_index = getThumbIndex(selected);
         float value = delta*range;
-	getModel().getThumbAt(thumb_index).setPosition(value);
+        getModel().getThumbAt(thumb_index).setPosition(value);
         //getModel().setPositionAt(thumb_index,value);
         clipThumbPosition(selected);
     }
@@ -220,7 +220,7 @@ public class JXMultiThumbSlider<E> extends JComponent {
     private void recalc() {
         for(ThumbComp th : thumbs) {
             setThumbXByPosition(th,getModel().getThumbAt(getThumbIndex(th)).getPosition());
-	    //getPositionAt(getThumbIndex(th)));
+            //getPositionAt(getThumbIndex(th)));
         }
     }
     
@@ -242,11 +242,11 @@ public class JXMultiThumbSlider<E> extends JComponent {
     }
 
     public void setModel(MultiThumbModel<E> model) {
-	if(this.model != null) {
-	    this.model.removeThumbDataListener(tdl);
-	}
+        if(this.model != null) {
+            this.model.removeThumbDataListener(tdl);
+        }
         this.model = model;
-	this.model.addThumbDataListener(tdl);	
+        this.model.addThumbDataListener(tdl);        
     }
     
     public void addMultiThumbListener(ThumbListener listener) {
@@ -271,9 +271,9 @@ public class JXMultiThumbSlider<E> extends JComponent {
                 }
                 repaint();
             }
-	    for(ThumbListener tl : listeners) {
-		tl.mousePressed(evt);
-	    }
+            for(ThumbListener tl : listeners) {
+                tl.mousePressed(evt);
+            }
         }
 
         public void mouseReleased(MouseEvent evt) {
@@ -281,7 +281,7 @@ public class JXMultiThumbSlider<E> extends JComponent {
                 selected.setSelected(false);
             }
         }
-	    
+            
         public void mouseDragged(MouseEvent evt) {
             if(selected != null) {
                 int nx = (int)evt.getPoint().getX()- selected.getWidth()/2;
@@ -294,10 +294,10 @@ public class JXMultiThumbSlider<E> extends JComponent {
                 selected.setLocation(nx,(int)selected.getLocation().getY());
                 setThumbPositionByX(selected);
                 int thumb_index = getThumbIndex(selected);
-                //System.out.println("still dragging: " + thumb_index);
+                //log.fine("still dragging: " + thumb_index);
                 for(ThumbListener mtl : listeners) {
                     mtl.thumbMoved(thumb_index,getModel().getThumbAt(thumb_index).getPosition());
-		    //getPositionAt(thumb_index));
+                    //getPositionAt(thumb_index));
                 }
                 repaint();
             }

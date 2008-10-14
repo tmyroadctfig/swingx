@@ -167,8 +167,8 @@ public class JXLoginPane extends JXPanel {
     }
 
     /**
-	 * The Logger
-	 */
+     * The Logger
+     */
     private static final Logger LOG = Logger.getLogger(JXLoginPane.class.getName());
     /**
      * Comment for <code>serialVersionUID</code>
@@ -495,7 +495,7 @@ public class JXLoginPane extends JXPanel {
 
         // #732 set all internal components opacity to false in order to allow top level (frame's content pane) background painter to have any effect.
         setOpaque(false);
-      	initComponents();
+          initComponents();
     }
 
     /**
@@ -1157,46 +1157,46 @@ public class JXLoginPane extends JXPanel {
     }
 
     public void removeNotify() {
-    	try {
-	    	// TODO: keep it here until all ui stuff is moved to uidelegate.
-    		if (capsLockSupport)
-    			KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(capsOnListener);
-    	    Container c = getTLA();
-    	    if (c instanceof Window) {
-    	    	Window w = (Window) c;
-    	    	w.removeWindowFocusListener(capsOnWinListener );
-    	    	w.removeWindowListener(capsOnWinListener );
-    	    }
-    	} catch (Exception e) {
-    		// bail out probably in unsigned app distributed over web
-    	}
-    	super.removeNotify();
+        try {
+            // TODO: keep it here until all ui stuff is moved to uidelegate.
+            if (capsLockSupport)
+                KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(capsOnListener);
+            Container c = getTLA();
+            if (c instanceof Window) {
+                Window w = (Window) c;
+                w.removeWindowFocusListener(capsOnWinListener );
+                w.removeWindowListener(capsOnWinListener );
+            }
+        } catch (Exception e) {
+            // bail out probably in unsigned app distributed over web
+        }
+        super.removeNotify();
     }
 
-	private Window getTLA() {
-		Container c = JXLoginPane.this;
-		// #810 bail out on first window found up the hierarchy (modal dialogs)
-		while (!(c.getParent() == null || c instanceof Window)) {
-			c = c.getParent();
-		}
-		return (Window) c;
-	}
+    private Window getTLA() {
+        Container c = JXLoginPane.this;
+        // #810 bail out on first window found up the hierarchy (modal dialogs)
+        while (!(c.getParent() == null || c instanceof Window)) {
+            c = c.getParent();
+        }
+        return (Window) c;
+    }
 
     public void addNotify() {
-    	try {
-    		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(
-    				capsOnListener);
-    	    Container c = getTLA();
-    	    if (c instanceof Window) {
-    	    	Window w = (Window) c;
-    	    	w.addWindowFocusListener(capsOnWinListener );
-    	    	w.addWindowListener(capsOnWinListener);
-    	    }
-    	} catch (Exception e) {
-    		// probably unsigned app over web, disable capslock support and bail out
-    		capsLockSupport = false;
-    	}
-    	super.addNotify();
+        try {
+            KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(
+                    capsOnListener);
+            Container c = getTLA();
+            if (c instanceof Window) {
+                Window w = (Window) c;
+                w.addWindowFocusListener(capsOnWinListener );
+                w.addWindowListener(capsOnWinListener);
+            }
+        } catch (Exception e) {
+            // probably unsigned app over web, disable capslock support and bail out
+            capsLockSupport = false;
+        }
+        super.addNotify();
     }
     //--------------------------------------------- Listener Implementations
     /*
@@ -1643,15 +1643,15 @@ public class JXLoginPane extends JXPanel {
     }
 
     private void setButtonPanel(JXBtnPanel buttonPanel) {
-		this.buttonPanel = buttonPanel;
-	}
-	private static class JXBtnPanel extends JXPanel {
+        this.buttonPanel = buttonPanel;
+    }
+    private static class JXBtnPanel extends JXPanel {
 
         private JButton cancel;
         private JButton ok;
 
         public JXBtnPanel(JButton okButton, JButton cancelButton) {
-        	GridLayout layout = new GridLayout(1,2);
+            GridLayout layout = new GridLayout(1,2);
             layout.setHgap(5);
             setLayout(layout);
             this.ok = okButton;
@@ -1679,7 +1679,7 @@ public class JXLoginPane extends JXPanel {
 
     private class CapsOnTest {
 
-    	RemovableKeyEventDispatcher ked;
+        RemovableKeyEventDispatcher ked;
 
         public void runTest() {
             boolean success = false;
@@ -1687,7 +1687,6 @@ public class JXLoginPane extends JXPanel {
             // TODO: check the progress from time to time
             //try {
             //     java.awt.Toolkit.getDefaultToolkit().getLockingKeyState(java.awt.event.KeyEvent.VK_CAPS_LOCK);
-            //     System.out.println("GOTCHA");
             //} catch (Exception ex) {
             //ex.printStackTrace();
             //success = false;
@@ -1714,17 +1713,17 @@ public class JXLoginPane extends JXPanel {
                     // this can happen for example due to security reasons in unsigned applets
                     // when we can't test caps lock state programatically bail out silently
 
-                	// no matter what's the cause - uninstall
+                    // no matter what's the cause - uninstall
                     ked.uninstall();
                 }
             }
         }
 
-		public void clean() {
-			if (ked != null) {
-				ked.cleanOnBogusFocus();
-			}
-		}
+        public void clean() {
+            if (ked != null) {
+                ked.cleanOnBogusFocus();
+            }
+        }
     }
 
     /**
@@ -1754,10 +1753,10 @@ public class JXLoginPane extends JXPanel {
             }
         }
 
-		@Override
-		public void windowOpened(WindowEvent arg0) {
-        	cot.clean();
-		}
+        @Override
+        public void windowOpened(WindowEvent arg0) {
+            cot.clean();
+        }
 
     }
 

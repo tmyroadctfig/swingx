@@ -1,12 +1,23 @@
 /*
- * OpenBrowserAction.java
+ * $Id$
  *
- * Created on December 11, 2006, 10:33 AM
+ * Copyright 2006 Sun Microsystems, Inc., 4150 Network Circle,
+ * Santa Clara, California 95054, U.S.A. All rights reserved.
  *
- * To change this template, choose Tools | Template Manager
- * and open the template in the editor.
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-
 package org.jdesktop.swingx.action;
 
 import java.awt.event.ActionEvent;
@@ -15,6 +26,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.logging.Logger;
+
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 
@@ -23,6 +36,9 @@ import javax.swing.Action;
  * @author joshy
  */
 public class OpenBrowserAction extends AbstractAction {
+    
+    private static Logger log = Logger.getLogger(OpenBrowserAction.class.getName());
+
     private URL url;
     /** Creates a new instance of OpenBrowserAction */
     public OpenBrowserAction() {
@@ -52,40 +68,37 @@ public class OpenBrowserAction extends AbstractAction {
     private static final boolean win95 = osName.equals("windows 95");
     private static final boolean winAny = osName.startsWith("windows");
     private static final boolean DEBUG = true;
-    private static void dp(String str) {
-        if(DEBUG) { System.out.println(str); }
-    }
     
     public void actionPerformed(ActionEvent e) {
         try {
             if(isApplet()) {
-                dp("trying applet version");
+                log.fine("trying applet version");
                 openApplet(url);
-                dp("succeeded applet version");
+                log.fine("succeeded applet version");
             } else if(isWebStart()) {
-                dp("trying applet version");
+                log.fine("trying applet version");
                 openWebstart(url);
-                dp("succeeded applet version");
+                log.fine("succeeded applet version");
             } else if (macosx) {
-                dp("trying Mac OS X version");
+                log.fine("trying Mac OS X version");
                 openMacOSX(url);
-                dp("succeeded mac os x version");
+                log.fine("succeeded mac os x version");
             } else if (linux) {
-                dp("trying linux version");
+                log.fine("trying linux version");
                 openLinux(url);
-                dp("succeeded linux version");
+                log.fine("succeeded linux version");
             } else if (win95) {
-                dp("trying win95 version");
+                log.fine("trying win95 version");
                 openWin95(url);
-                dp("succeeded win95 version");
+                log.fine("succeeded win95 version");
             } else if (winAny) {
-                dp("trying windows any version");
+                log.fine("trying windows any version");
                 openWindows(url);
-                dp("succeeded windows any version");
+                log.fine("succeeded windows any version");
             } else {
-                dp("trying other version");
+                log.fine("trying other version");
                 openOther(url);
-                dp("succeeded other version");
+                log.fine("succeeded other version");
             }
         } catch (Throwable thr) {
             handleError(thr);
@@ -99,14 +112,14 @@ public class OpenBrowserAction extends AbstractAction {
     
     private static void openMacOSX(URL url) throws IOException {
         try {
-            dp("trying mac version using FileManager class");
+            log.fine("trying mac version using FileManager class");
             // Mac OS X can handle file types itself (thank goodness!)
             Class fileMgr = Class.forName("com.apple.eio.FileManager");
             Method openURL = fileMgr.getDeclaredMethod("openURL",
                     new Class[] {String.class});
             openURL.invoke(null, new Object[] {url.toString()});
         } catch (Throwable thr) {
-            dp("trying 'open' command version");
+            log .fine("trying 'open' command version");
             thr.printStackTrace();
             // if that fails for some reason, try the 'open' commandline command
             Runtime.getRuntime().exec(new String[] {"open", url.toString()});
@@ -183,7 +196,7 @@ public class OpenBrowserAction extends AbstractAction {
     }
     
     public static void main(String ... args) throws MalformedURLException {
-        System.out.println("trying to open a URL on the current platform");
+        //System.out.println("trying to open a URL on the current platform");
         Action action = new OpenBrowserAction("http://sun.com/");
         action.actionPerformed(null);
     }

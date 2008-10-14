@@ -159,7 +159,6 @@ public class BusyPainter<T> extends AbstractPainter<T> {
             if (ret == PathIterator.SEG_QUADTO) {
                 float c = calcLengthOfQuad(coords, cp);
                 totalDist += c;
-                //System.out.println("quad c:" + c);
                 segStack.add(new float[] { c, coords[0], coords[1], 0 ,0 , coords[2],
                         coords[3], ret });
                 cp.x = coords[2];

@@ -30,8 +30,8 @@ import java.util.regex.Pattern;
  * @author Ramesh Gupta
  */
 public class PatternFilter extends Filter implements PatternMatcher {
-    private ArrayList<Integer>	toPrevious;
-    protected Pattern	pattern = null;
+    private ArrayList<Integer> toPrevious;
+    protected Pattern pattern = null;
 
     /**
      * Instantiates a includeAll PatternFilter with matchFlag 0 on

@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
- *
  */
 package org.jdesktop.swingx.decorator;
 
@@ -517,21 +516,21 @@ public interface HighlightPredicate {
      * @author Karl Schaefer
      */
     public static class DepthHighlightPredicate implements HighlightPredicate {
-    	private List<Integer> depthList;
-    	
+        private List<Integer> depthList;
+        
         /**
          * Instantiates a predicate which returns true for the
          * given depths.
          * 
          * @param depths the depths to highlight
          */
-    	public DepthHighlightPredicate(int... depths) {
-    	    depthList = new ArrayList<Integer>();
+        public DepthHighlightPredicate(int... depths) {
+            depthList = new ArrayList<Integer>();
             for (int i = 0; i < depths.length; i++) {
                 depthList.add(depths[i]);
             }
-    	}
-    	
+        }
+        
         /**
          * {@inheritDoc}
          * 
@@ -552,7 +551,7 @@ public interface HighlightPredicate {
             if (depthList.isEmpty()) return EMPTY_INTEGER_ARRAY;
             return depthList.toArray(new Integer[depthList.size()]);
         }
-    	
+        
     }
     
     //--------------------- value testing

@@ -71,11 +71,11 @@ import org.jdesktop.swingx.plaf.LookAndFeelAddons;
  */
 public class JXHeader extends JXPanel {
     /**
-	 * SerialVersionUID.
-	 */
-	private static final long serialVersionUID = 3593838231433068954L;
+     * SerialVersionUID.
+     */
+    private static final long serialVersionUID = 3593838231433068954L;
 
-	/**
+    /**
      * JXHeader pluggable UI key <i>HeaderUI</i>
      */
     public final static String uiClassID = "HeaderUI";
@@ -89,14 +89,14 @@ public class JXHeader extends JXPanel {
      * Specifies desired location of the icon relative to the title/description text.
      */
     public static enum IconPosition {
-    	/**
-    	 * Positions icon left from the text.
-    	 */
-    	LEFT,
-    	/**
-    	 * Positions icon right from the text.
-    	 */
-    	RIGHT
+        /**
+         * Positions icon left from the text.
+         */
+        LEFT,
+        /**
+         * Positions icon right from the text.
+         */
+        RIGHT
     }
     private String title;
     private String description;
@@ -290,65 +290,65 @@ public class JXHeader extends JXPanel {
         return descriptionFont;
     }
 
-	/**
-	 * Gets current title foreground color.
-	 * @return the Color used to paint title. May be null.
-	 */
-	public Color getTitleForeground() {
-		return titleForeground;
-	}
+    /**
+     * Gets current title foreground color.
+     * @return the Color used to paint title. May be null.
+     */
+    public Color getTitleForeground() {
+        return titleForeground;
+    }
 
-	/**
-	 * Sets title foreground color.
-	 * @param titleForeground the Color to be used to paint title.
-	 */
-	public void setTitleForeground(Color titleForeground) {
-		Color old = getTitleForeground();
-		this.titleForeground = titleForeground;
+    /**
+     * Sets title foreground color.
+     * @param titleForeground the Color to be used to paint title.
+     */
+    public void setTitleForeground(Color titleForeground) {
+        Color old = getTitleForeground();
+        this.titleForeground = titleForeground;
         firePropertyChange("titleForeground", old, getTitleForeground());
-	}
+    }
 
-	/**
-	 * Gets current description foreground color.
-	 * @return the Color used to paint description. May be null.
-	 */
-	public Color getDescriptionForeground() {
-		return descriptionForeground;
-	}
+    /**
+     * Gets current description foreground color.
+     * @return the Color used to paint description. May be null.
+     */
+    public Color getDescriptionForeground() {
+        return descriptionForeground;
+    }
 
-	/**
-	 * Sets description foreground color.
-	 * @param descriptionForeground the Color to be used to paint description.
-	 */
-	public void setDescriptionForeground(Color descriptionForeground) {
-		Color old = getDescriptionForeground();
-		this.descriptionForeground = descriptionForeground;
+    /**
+     * Sets description foreground color.
+     * @param descriptionForeground the Color to be used to paint description.
+     */
+    public void setDescriptionForeground(Color descriptionForeground) {
+        Color old = getDescriptionForeground();
+        this.descriptionForeground = descriptionForeground;
         firePropertyChange("descriptionForeground", old, getDescriptionForeground());
-	}
+    }
 
-	/**
-	 * Gets current icon position. Default is RIGHT.
-	 * @return Current Icon position.
-	 */
-	public IconPosition getIconPosition() {
-		return iconPosition;
-	}
+    /**
+     * Gets current icon position. Default is RIGHT.
+     * @return Current Icon position.
+     */
+    public IconPosition getIconPosition() {
+        return iconPosition;
+    }
 
-	/**
-	 * Sets new Icon position. Position is relative to the text. Default value is RIGHT.
-	 * @see #getIconPosition()
-	 * @param iconPosition new desired icon position
-	 */
-	public void setIconPosition(IconPosition iconPosition) {
-		IconPosition old = getIconPosition();
-		this.iconPosition = iconPosition;
-		firePropertyChange("iconPosition", old, getIconPosition());
-	}
+    /**
+     * Sets new Icon position. Position is relative to the text. Default value is RIGHT.
+     * @see #getIconPosition()
+     * @param iconPosition new desired icon position
+     */
+    public void setIconPosition(IconPosition iconPosition) {
+        IconPosition old = getIconPosition();
+        this.iconPosition = iconPosition;
+        firePropertyChange("iconPosition", old, getIconPosition());
+    }
 
-	public Dimension getPreferredSize() {
-	    Dimension s = super.getPreferredSize();
-	    // TODO: hack for JXLabel issue ... see JXHeaderVisualCheck.interactiveCustomProperties();
-	    s.width += 5;
-	    return s;
-	}
+    public Dimension getPreferredSize() {
+        Dimension s = super.getPreferredSize();
+        // TODO: hack for JXLabel issue ... see JXHeaderVisualCheck.interactiveCustomProperties();
+        s.width += 5;
+        return s;
+    }
 }

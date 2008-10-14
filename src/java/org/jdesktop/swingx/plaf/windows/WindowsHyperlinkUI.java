@@ -1,4 +1,4 @@
-/**
+/*
  * $Id$
  *
  * Copyright 2004 Sun Microsystems, Inc., 4150 Network Circle,

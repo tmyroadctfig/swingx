@@ -67,7 +67,7 @@ import org.jdesktop.swingx.plaf.StatusBarUI;
  *      c1.setFixedWidth(100);
  *      bar.add(statusLabel, c1);     // Fixed width of 100 with no inserts
  *      JXStatusBar.Constraint c2 = new JXStatusBarConstraint(
- *      		JXStatusBar.Constraint.ResizeBehavior.FILL) // Fill with no inserts
+ *              JXStatusBar.Constraint.ResizeBehavior.FILL) // Fill with no inserts
  *      JProgressBar pbar = new JProgressBar();
  *      bar.add(pbar, c2);            // Fill with no inserts - will use remaining space
  * </code></pre></p>
@@ -287,7 +287,7 @@ public class JXStatusBar extends JComponent {
          * @return the width of this constraint
          */
         public int getFixedWidth() {
-        	return fixedWidth;
+            return fixedWidth;
         }
     }
     

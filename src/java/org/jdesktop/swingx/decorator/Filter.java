@@ -35,12 +35,12 @@ package org.jdesktop.swingx.decorator;
  */
 public abstract class Filter {
     /** the column the filter is bound to. JW: no need to make it final. */
-    private /** final */ int column;		// in model coordinates
-    protected FilterPipeline		pipeline = null;
-    protected ComponentAdapter	adapter = null;	/** TODO: make private */
+    private /** final */ int column;  // in model coordinates
+    protected FilterPipeline  pipeline = null;
+    protected ComponentAdapter adapter = null; /** TODO: make private */
     protected int[]             fromPrevious = new int[0];
     // TODO: JW... magic number!
-    int order = -1;	// package private
+    int order = -1; // package private
 
     /**
      * Constructs a new filter for the first column of a data model.
@@ -396,7 +396,7 @@ public abstract class Filter {
         if (pipeline == null) {
             throw new IllegalArgumentException("null pipeline");
         }
-		*/
+          */
 
         if ((this.pipeline == null) || (pipeline == null)) {
             this.pipeline = pipeline;

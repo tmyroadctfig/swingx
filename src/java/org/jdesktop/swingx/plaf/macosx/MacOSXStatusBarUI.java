@@ -45,7 +45,7 @@ public class MacOSXStatusBarUI extends BasicStatusBarUI {
      */
     public static ComponentUI createUI(JComponent c) {
         return new MacOSXStatusBarUI();
-    }	
+    }
     
     /**
      * {@inheritDoc}

@@ -232,8 +232,8 @@ public class AutoCompleteDecorator {
                     removeKeyListener(editor.getEditorComponent());
                 }
                 
-              	editor = (ComboBoxEditor) e.getNewValue();
-              	if (editor!=null && editor.getEditorComponent()!=null) {
+                  editor = (ComboBoxEditor) e.getNewValue();
+                  if (editor!=null && editor.getEditorComponent()!=null) {
                     if (!(editor instanceof AutoCompleteComboBoxEditor) 
                         && stringConverter!=ObjectToStringConverter.DEFAULT_IMPLEMENTATION) {
                         comboBox.setEditor(new AutoCompleteComboBoxEditor(editor, stringConverter));
@@ -244,7 +244,7 @@ public class AutoCompleteDecorator {
                         decorate((JTextComponent) editor.getEditorComponent(), document, adaptor);
                         editor.getEditorComponent().addKeyListener(keyListener);
                     }
-              	}
+                  }
             }
         });
     }

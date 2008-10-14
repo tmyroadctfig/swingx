@@ -47,17 +47,17 @@ import java.beans.VetoableChangeSupport;
  * 
  * <pre><code>
  * public class ABean extends AbstractBean {
- * 	private String foo;
+ *     private String foo;
  * 
- * 	public void setFoo(String newFoo) {
- * 		String old = getFoo();
- * 		this.foo = newFoo;
- * 		firePropertyChange(&quot;foo&quot;, old, getFoo());
- * 	}
+ *     public void setFoo(String newFoo) {
+ *         String old = getFoo();
+ *         this.foo = newFoo;
+ *         firePropertyChange(&quot;foo&quot;, old, getFoo());
+ *     }
  * 
- * 	public String getFoo() {
- * 		return foo;
- * 	}
+ *     public String getFoo() {
+ *         return foo;
+ *     }
  * }
  * </code></pre>
  * 
@@ -217,7 +217,7 @@ public abstract class AbstractBean {
      * <pre>
      * PropertyChangeListener[] listeners = bean.getPropertyChangeListeners();
      * for (int i = 0; i < listeners.length; i++) {
-     *	 if (listeners[i] instanceof PropertyChangeListenerProxy) {
+     *     if (listeners[i] instanceof PropertyChangeListenerProxy) {
      *     PropertyChangeListenerProxy proxy = 
      *                    (PropertyChangeListenerProxy)listeners[i];
      *     if (proxy.getPropertyName().equals("foo")) {
@@ -294,12 +294,12 @@ public abstract class AbstractBean {
      * PropertyChangeEvent} value.
      *
      * @param propertyName  The programmatic name of the property
-     *		that was changed.
+     *        that was changed.
      * @param oldValue  The old value of the property.
      * @param newValue  The new value of the property.
      */
     protected final void firePropertyChange(String propertyName, Object oldValue, Object newValue) {
-	pcs.firePropertyChange(propertyName, oldValue, newValue);
+        pcs.firePropertyChange(propertyName, oldValue, newValue);
     }
 
     /**
@@ -331,8 +331,8 @@ public abstract class AbstractBean {
      * @param newValue     The new value of the property.
      */
     protected final void fireIndexedPropertyChange(String propertyName, int index,
-					  Object oldValue, Object newValue) {
-	pcs.fireIndexedPropertyChange(propertyName, index, oldValue, newValue);
+                      Object oldValue, Object newValue) {
+    pcs.fireIndexedPropertyChange(propertyName, index, oldValue, newValue);
     }
 
     /**
@@ -460,16 +460,16 @@ public abstract class AbstractBean {
      * No event is fired if old and new are equal and non-null.
      *
      * @param propertyName  The programmatic name of the property
-     *		that is about to change..
+     *        that is about to change..
      * @param oldValue  The old value of the property.
      * @param newValue  The new value of the property.
      * @exception PropertyVetoException if the recipient wishes the property
      *              change to be rolled back.
      */
     protected final void fireVetoableChange(String propertyName, 
-					Object oldValue, Object newValue)
-					throws PropertyVetoException {
-	vcs.fireVetoableChange(propertyName, oldValue, newValue);
+                    Object oldValue, Object newValue)
+                    throws PropertyVetoException {
+        vcs.fireVetoableChange(propertyName, oldValue, newValue);
     }
 
     /**
@@ -484,8 +484,8 @@ public abstract class AbstractBean {
      *              change to be rolled back.
      */
     protected final void fireVetoableChange(PropertyChangeEvent evt)
-					throws PropertyVetoException {
-	vcs.fireVetoableChange(evt);
+                    throws PropertyVetoException {
+        vcs.fireVetoableChange(evt);
     }
     
     /**

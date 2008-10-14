@@ -368,7 +368,7 @@ public class DateUtils {
     }
 
     private static long getMonth(long date, int increment) {
-		long result;
+        long result;
         Calendar calendar = CALENDAR;
         synchronized(calendar) {
             calendar.setTimeInMillis(date);
@@ -386,7 +386,7 @@ public class DateUtils {
                 result = calendar.getTimeInMillis();
             }
         }
-		return result;
+        return result;
     }
 
     /**

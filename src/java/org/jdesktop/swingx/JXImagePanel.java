@@ -32,13 +32,19 @@ import javax.imageio.ImageIO;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.lang.ref.SoftReference;
+import java.lang.ref.WeakReference;
 import java.net.URL;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.FutureTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.SwingUtilities;
-
 
 /**
  * <p>A panel that draws an image. The standard (and currently only supported)
@@ -69,7 +75,7 @@ public class JXImagePanel extends JXPanel {
     /**
      * The image to draw
      */
-    private Image img;
+    private SoftReference<Image> img = new SoftReference<Image>(null);
     /**
      * If true, then the image can be changed. Perhaps a better name is
      * &quot;readOnly&quot;, but editable was chosen to be more consistent
@@ -90,10 +96,15 @@ public class JXImagePanel extends JXPanel {
      * when drawing
      */
     private Style style = Style.CENTERED;
-    
+    private Image defaultImage;
+    private Callable<Image> imageLoader;
+
+    private static final ExecutorService service = Executors.newFixedThreadPool(5);
+
+
     public JXImagePanel() {
     }
-    
+
     public JXImagePanel(URL imageUrl) {
         try {
             setImage(ImageIO.read(imageUrl));
@@ -102,7 +113,7 @@ public class JXImagePanel extends JXPanel {
             LOG.log(Level.WARNING, "", e);
         }
     }
-    
+
     /**
      * Sets the image to use for the background of this panel. This image is
      * painted whether the panel is opaque or translucent.
@@ -111,22 +122,31 @@ public class JXImagePanel extends JXPanel {
      * then the image dimensions will alter the preferred size of the panel.
      */
     public void setImage(Image image) {
-        if (image != img) {
-            Image oldImage = img;
-            img = image;
+        if (image != img.get()) {
+            Image oldImage = img.get();
+            img = new SoftReference<Image>(image);
             firePropertyChange("image", oldImage, img);
             invalidate();
             repaint();
         }
     }
-    
+
     /**
      * @return the image used for painting the background of this panel
      */
     public Image getImage() {
-        return img;
+        Image image = img.get();
+        if (image == null) {
+            try {
+                image = imageLoader.call();
+                img = new SoftReference<Image>(image);
+            } catch (Exception e) {
+                LOG.log(Level.WARNING, "", e);
+            }
+        }
+        return image;
     }
-    
+
     /**
      * @param editable
      */
@@ -146,7 +166,7 @@ public class JXImagePanel extends JXPanel {
             repaint();
         }
     }
-    
+
     /**
      * @return whether the image for this panel can be changed or not via
      * the UI. setImage may still be called, even if <code>isEditable</code>
@@ -155,7 +175,7 @@ public class JXImagePanel extends JXPanel {
     public boolean isEditable() {
         return editable;
     }
-    
+
     /**
      * Sets what style to use when painting the image
      *
@@ -169,43 +189,68 @@ public class JXImagePanel extends JXPanel {
             repaint();
         }
     }
-    
+
     /**
      * @return the Style used for drawing the image (CENTERED, TILED, etc).
      */
     public Style getStyle() {
         return style;
     }
-    
+
     public void setPreferredSize(Dimension pref) {
         preferredSize = pref;
         super.setPreferredSize(pref);
     }
-    
+
     public Dimension getPreferredSize() {
         if (preferredSize == null && img != null) {
-            //it has not been explicitly set, so return the width/height of the image
-            int width = img.getWidth(null);
-            int height = img.getHeight(null);
-            if (width == -1 || height == -1) {
-                return super.getPreferredSize();
+            Image img = this.img.get();
+            // was img GCed in the mean time?
+            if (img != null) {
+                //it has not been explicitly set, so return the width/height of the image
+                int width = img.getWidth(null);
+                int height = img.getHeight(null);
+                if (width == -1 || height == -1) {
+                    return super.getPreferredSize();
+                }
+                Insets insets = getInsets();
+                width += insets.left + insets.right;
+                height += insets.top + insets.bottom;
+                return new Dimension(width, height);
             }
-            Insets insets = getInsets();
-            width += insets.left + insets.right;
-            height += insets.top + insets.bottom;
-            return new Dimension(width, height);
-        } else {
-            return super.getPreferredSize();
         }
+        return super.getPreferredSize();
     }
-    
+
     /**
      * Overridden to paint the image on the panel
-     * @param g 
+     * @param g
      */
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D)g;
+        Image img = this.img.get();
+        if (img == null && imageLoader != null) {
+            // schedule for loading (will repaint itself once loaded)
+            // have to use new future task every time as it holds strong reference to the object it retrieved and doesn't allow to reset it.
+            service.execute(new FutureTask<Image>(imageLoader
+                    ) {
+
+                @Override
+                protected void done() {
+                    super.done();
+                    try {
+                        JXImagePanel.this.setImage(get());
+                    } catch (InterruptedException e) {
+                        // ignore - canceled image load
+                    } catch (ExecutionException e) {
+                        LOG.log(Level.WARNING, "", e);
+                    }
+                }
+
+            });
+            img = defaultImage;
+        }
         if (img != null) {
             final int imgWidth = img.getWidth(null);
             final int imgHeight = img.getHeight(null);
@@ -213,11 +258,11 @@ public class JXImagePanel extends JXPanel {
                 //image hasn't completed loading, return
                 return;
             }
-            
+
             Insets insets = getInsets();
             final int pw = getWidth() - insets.left - insets.right;
             final int ph = getHeight() - insets.top - insets.bottom;
-            
+
             switch (style) {
                 case CENTERED:
                     Rectangle clipRect = g2.getClipBounds();
@@ -244,20 +289,20 @@ public class JXImagePanel extends JXPanel {
                     g2.translate(insets.left, insets.top);
                     Rectangle clip = g2.getClipBounds();
                     g2.setClip(0, 0, pw, ph);
-                    
+
                     int totalH = 0;
-                    
+
                     while (totalH < ph) {
                         int totalW = 0;
-                        
+
                         while (totalW < pw) {
                             g2.drawImage(img, totalW, totalH, null);
                             totalW += img.getWidth(null);
                         }
-                        
+
                         totalH += img.getHeight(null);
                     }
-                    
+
                     g2.setClip(clip);
                     g2.translate(-insets.left, -insets.top);
                     break;
@@ -269,13 +314,13 @@ public class JXImagePanel extends JXPanel {
                     int h = ph;
                     final float ratioW = ((float) w) / ((float) imgWidth);
                     final float ratioH = ((float) h) / ((float) imgHeight);
-                    
+
                     if (ratioW < ratioH) {
                         h = (int)(imgHeight * ratioW);
                     } else {
                         w = (int)(imgWidth * ratioH);
                     }
-                    
+
                     final int x = (pw - w) / 2 + insets.left;
                     final int y = (ph - h) / 2 + insets.top;
                     g2.drawImage(img, x, y, w, h, null);
@@ -287,14 +332,14 @@ public class JXImagePanel extends JXPanel {
             }
         }
     }
-    
+
     /**
      * Handles click events on the component
      */
     private class MouseHandler extends MouseAdapter {
         private Cursor oldCursor;
         private JFileChooser chooser;
-        
+
         public void mouseClicked(MouseEvent evt) {
             if (chooser == null) {
                 chooser = new JFileChooser();
@@ -308,20 +353,29 @@ public class JXImagePanel extends JXPanel {
                 }
             }
         }
-        
+
         public void mouseEntered(MouseEvent evt) {
             if (oldCursor == null) {
                 oldCursor = getCursor();
                 setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             }
         }
-        
+
         public void mouseExited(MouseEvent evt) {
             if (oldCursor != null) {
                 setCursor(oldCursor);
                 oldCursor = null;
             }
         }
+    }
+
+    public void setDefaultImage(Image def) {
+        this.defaultImage = def;
+    }
+
+    public void setImageLoader(Callable<Image> loadImage) {
+        this.imageLoader = loadImage;
+
     }
 }
 

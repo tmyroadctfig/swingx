@@ -93,7 +93,7 @@ public class DropShadowBorder implements Border, Serializable {
          * 1) Get images for this border
          * 2) Paint the images for each side of the border that should be painted
          */
-       	Map<Position,BufferedImage> images = getImages((Graphics2D)graphics);
+        Map<Position,BufferedImage> images = getImages((Graphics2D)graphics);
         
         Graphics2D g2 = (Graphics2D)graphics.create();
         

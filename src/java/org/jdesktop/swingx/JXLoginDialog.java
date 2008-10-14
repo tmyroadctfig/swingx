@@ -116,7 +116,7 @@ public class JXLoginDialog extends JDialog {
      *
      * @param owner the <code>Frame</code> from which the dialog is displayed
      * @param title  the <code>String</code> to display in the dialog's
-     *			title bar
+     *title bar
      * @exception HeadlessException if GraphicsEnvironment.isHeadless()
      * returns true.
      * @see java.awt.GraphicsEnvironment#isHeadless
@@ -142,7 +142,7 @@ public class JXLoginDialog extends JDialog {
      *
      * @param owner the <code>Frame</code> from which the dialog is displayed
      * @param title  the <code>String</code> to display in the dialog's
-     *			title bar
+     *title bar
      * @param modal  true for a modal dialog, false for one that allows
      *               other windows to be active at the same time
      * @exception HeadlessException if GraphicsEnvironment.isHeadless()
@@ -236,7 +236,7 @@ public class JXLoginDialog extends JDialog {
      *
      * @param owner the non-null <code>Dialog</code> from which the dialog is displayed
      * @param title  the <code>String</code> to display in the dialog's
-     *			title bar
+     *title bar
      * @exception HeadlessException if GraphicsEnvironment.isHeadless()
      * returns true.
      * @see java.awt.GraphicsEnvironment#isHeadless
@@ -256,7 +256,7 @@ public class JXLoginDialog extends JDialog {
      *
      * @param owner the non-null <code>Dialog</code> from which the dialog is displayed
      * @param title  the <code>String</code> to display in the dialog's
-     *			title bar
+     *title bar
      * @param modal  true for a modal dialog, false for one that allows
      *               other windows to be active at the same time
      * @exception HeadlessException if GraphicsEnvironment.isHeadless()
@@ -284,7 +284,7 @@ public class JXLoginDialog extends JDialog {
      *
      * @param owner the <code>Dialog</code> from which the dialog is displayed
      * @param title  the <code>String</code> to display in the dialog's
-     *			title bar
+     *title bar
      * @param modal  true for a modal dialog, false for one that allows
      *               other windows to be active at the same time
      * @param gc the <code>GraphicsConfiguration</code> 

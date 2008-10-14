@@ -280,6 +280,8 @@ public class ImagePainter<T> extends AbstractAreaPainter<T> {
     
     
     private double imageScale = 1.0;
+
+    private Logger log = Logger.getLogger(ImagePainter.class.getName());
     
     /**
      * Sets the scaling factor used when drawing the image
@@ -308,7 +310,7 @@ public class ImagePainter<T> extends AbstractAreaPainter<T> {
                 setImage(ImageIO.read(url));
             }
         } catch (IOException ex) {
-            System.out.println("ex: " + ex.getMessage());
+            log.severe("ex: " + ex.getMessage());
             ex.printStackTrace();
         }
     }
@@ -326,7 +328,7 @@ public class ImagePainter<T> extends AbstractAreaPainter<T> {
      * Used by the persistence mechanism.
      */
     public void setImageString(String imageString) {
-        System.out.println("setting image string to: " + imageString);
+        log.fine("setting image string to: " + imageString);
         String old = this.getImageString();
         this.imageString = imageString;
         loadImage();

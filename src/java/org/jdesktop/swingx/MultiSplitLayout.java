@@ -602,7 +602,7 @@ public class MultiSplitLayout implements LayoutManager
         }
       }
       else {
-    		for(Node splitChild : splitChildren) {
+            for(Node splitChild : splitChildren) {
           if ( !splitChild.isVisible())
             continue;
           Dimension size = preferredNodeSize(splitChild);
@@ -639,7 +639,7 @@ public class MultiSplitLayout implements LayoutManager
       int width = 0;
       int height = 0;
       if (split.isRowLayout()) {
-    		for(Node splitChild : splitChildren) {
+            for(Node splitChild : splitChildren) {
           if ( !splitChild.isVisible())
             continue;
           Dimension size = minimumNodeSize(splitChild);
@@ -648,7 +648,7 @@ public class MultiSplitLayout implements LayoutManager
         }
       }
       else {
-    		for(Node splitChild : splitChildren) {
+            for(Node splitChild : splitChildren) {
           if ( !splitChild.isVisible())
             continue;
           Dimension size = minimumNodeSize(splitChild);
@@ -685,7 +685,7 @@ public class MultiSplitLayout implements LayoutManager
       int width = Integer.MAX_VALUE;
       int height = Integer.MAX_VALUE;
       if (split.isRowLayout()) {
-    	for(Node splitChild : splitChildren) {
+        for(Node splitChild : splitChildren) {
           if ( !splitChild.isVisible())
             continue;
           Dimension size = maximumNodeSize(splitChild);
@@ -694,7 +694,7 @@ public class MultiSplitLayout implements LayoutManager
         }
       }
       else {
-    	for(Node splitChild : splitChildren) {
+        for(Node splitChild : splitChildren) {
           if ( !splitChild.isVisible())
             continue;
           Dimension size = maximumNodeSize(splitChild);
@@ -774,7 +774,7 @@ public class MultiSplitLayout implements LayoutManager
       int totalWidth = 0;          // sum of the children's widths
       int minWeightedWidth = 0;    // sum of the weighted childrens' min widths
       int totalWeightedWidth = 0;  // sum of the weighted childrens' widths
-	    for(Node splitChild : split.getChildren()) {
+        for(Node splitChild : split.getChildren()) {
         if ( !splitChild.isVisible())
             continue;
         int nodeWidth = splitChild.getBounds().width;
@@ -847,7 +847,7 @@ public class MultiSplitLayout implements LayoutManager
       int totalHeight = 0;          // sum of the children's heights
       int minWeightedHeight = 0;    // sum of the weighted childrens' min heights
       int totalWeightedHeight = 0;  // sum of the weighted childrens' heights
-	    for(Node splitChild : split.getChildren()) {
+        for(Node splitChild : split.getChildren()) {
         if ( !splitChild.isVisible())
           continue;
         int nodeHeight = splitChild.getBounds().height;
@@ -1341,7 +1341,7 @@ public class MultiSplitLayout implements LayoutManager
     }
     else if (root instanceof Split) {
       Split split = (Split)root;
-	    for(Node child : split.getChildren()) {
+        for(Node child : split.getChildren()) {
         if ( !child.isVisible())
           continue;
         if (child.getBounds().contains(x, y)) {
@@ -1373,8 +1373,8 @@ public class MultiSplitLayout implements LayoutManager
   
   private List<Divider> dividersThatOverlap(Node root, Rectangle r) {
     if (nodeOverlapsRectangle(root, r) && (root instanceof Split)) {
-	    List<Divider> dividers = new ArrayList();
-	    for(Node child : ((Split)root).getChildren()) {
+        List<Divider> dividers = new ArrayList();
+        for(Node child : ((Split)root).getChildren()) {
         if (child instanceof Divider) {
           if (nodeOverlapsRectangle(child, r)) {
             dividers.add((Divider)child);
@@ -1611,7 +1611,7 @@ public class MultiSplitLayout implements LayoutManager
      * <code>false</code> otherwise
      */
     public boolean isVisible() {
-	    for(Node child : children) {
+        for(Node child : children) {
         if ( child.isVisible() && !( child instanceof Divider ))
           return true;
       }
@@ -1783,26 +1783,26 @@ public class MultiSplitLayout implements LayoutManager
       if (children == null) {
         throw new IllegalArgumentException("children must be a non-null List");
       }
-	    for(Node child : this.children) {
+        for(Node child : this.children) {
         child.setParent(null);
       }
 
       this.children = new ArrayList<Node>(children);
-	    for(Node child : this.children) {
+        for(Node child : this.children) {
         child.setParent(this);
       }
     }
        
-	/**
-	 * Convenience method for setting the children of this Split node.  The parent
-	 * of each new child is set to this Split node, and the parent
-	 * of each old child (if any) is set to null.  This method
-	 * defensively copies the incoming array.
-	 * 
-	 * @param children array of children
-	 * @see #getChildren
-	 * @throws IllegalArgumentException if children is null
-	 */
+    /**
+     * Convenience method for setting the children of this Split node.  The parent
+     * of each new child is set to this Split node, and the parent
+     * of each old child (if any) is set to null.  This method
+     * defensively copies the incoming array.
+     * 
+     * @param children array of children
+     * @see #getChildren
+     * @throws IllegalArgumentException if children is null
+     */
     public void setChildren(Node... children) {
         setChildren(children == null ? null : Arrays.asList(children));
     }
@@ -1818,7 +1818,7 @@ public class MultiSplitLayout implements LayoutManager
     public final Node lastWeightedChild() {
       List<Node> children = getChildren();
       Node weightedChild = null;
-	    for(Node child : children) {
+        for(Node child : children) {
         if ( !child.isVisible())
           continue;
         if (child.getWeight() > 0.0) {
@@ -2131,7 +2131,7 @@ public class MultiSplitLayout implements LayoutManager
     if (root instanceof Split) {
       Split split = (Split)root;
       System.out.println(indent + split);
-	    for(Node child : split.getChildren()) {
+        for(Node child : split.getChildren()) {
         printModel(indent + "  ", child);
       }
     }

@@ -32,22 +32,22 @@ public class ThumbDataEvent extends EventObject {
 
     /** Creates a new instance of ThumbDataEvent */
     public ThumbDataEvent(Object source, int type, int index, Thumb thumb) {
-	super(source);
-	this.type = type;
-	this.thumb = thumb;
-	this.index = index;
+        super(source);
+        this.type = type;
+        this.thumb = thumb;
+        this.index = index;
     }
 
     public int getType() {
-	return type;
+        return type;
     }
     
     public int getIndex() {
-	return index;
+        return index;
     }
 
     public Thumb getThumb() {
-	return thumb;
+        return thumb;
     }
     
     public String toString() {

@@ -199,8 +199,8 @@ public class JDBCLoginService extends LoginService {
     }
 
     /**
-     * @param name	user name
-     * @param password	user password
+     * @param name user name
+     * @param password user password
      * @param server Must be either a valid JDBC URL for the type of JDBC driver you are using,
      * or must be a valid JNDIContext from which to get the database connection
      */

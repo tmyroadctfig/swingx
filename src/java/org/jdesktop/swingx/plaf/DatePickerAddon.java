@@ -1,4 +1,6 @@
 /*
+ * $Id$
+ *
  * Copyright 2005 Sun Microsystems, Inc., 4150 Network Circle,
  * Santa Clara, California 95054, U.S.A. All rights reserved.
  *

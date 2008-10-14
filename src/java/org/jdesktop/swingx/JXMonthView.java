@@ -113,7 +113,7 @@ import org.jdesktop.swingx.util.Contract;
  *    // any changes in the date selection model.
  *    monthView.getSelectionModel().addDateSelectionListener(new DateSelectionListener {
  *        public void valueChanged(DateSelectionEvent e) {
- *            System.out.println(e.getSelection());
+ *            log.info(e.getSelection());
  *        }
  *    });
  * </pre>

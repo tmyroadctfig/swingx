@@ -29,7 +29,7 @@ import java.util.Comparator;
  * @author Ramesh Gupta
  */
 public class ShuttleSorter extends Sorter {
-    private int[]	toPrevious;
+    private int[]    toPrevious;
 
     public ShuttleSorter() {
         this(0, true);
@@ -61,7 +61,7 @@ public class ShuttleSorter extends Sorter {
         toPrevious = new int[inputSize];
         fromPrevious = new int[inputSize];
         for (int i = 0; i < inputSize; i++) {
-            toPrevious[i] = i;	// reset before sorting
+            toPrevious[i] = i;    // reset before sorting
         }
     }
 

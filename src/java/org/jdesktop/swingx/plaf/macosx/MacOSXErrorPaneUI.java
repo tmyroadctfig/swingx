@@ -119,7 +119,6 @@ public class MacOSXErrorPaneUI extends BasicErrorPaneUI {
     public JDialog getErrorDialog(Component owner) {
         JDialog dlg = super.getErrorDialog(owner);
         dlg.setTitle(" ");
-        System.out.println(reportButton.getPreferredSize());
         return dlg;
     }
 

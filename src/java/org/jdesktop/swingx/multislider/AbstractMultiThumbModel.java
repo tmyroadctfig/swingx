@@ -36,19 +36,19 @@ public abstract class AbstractMultiThumbModel<E> implements MultiThumbModel<E> {
     protected float maximumValue = 1.0f;
     protected float minimumValue = 0.0f;
     
-    public float getMaximumValue()	{
+    public float getMaximumValue()    {
         return maximumValue;
     }
     
-    public float getMinimumValue()	{
+    public float getMinimumValue()    {
         return minimumValue;
     }
     
-    public void setMaximumValue(float maximumValue)	{
+    public void setMaximumValue(float maximumValue) {
         this.maximumValue = maximumValue;
     }
     
-    public void setMinimumValue(float minimumValue)	{
+    public void setMinimumValue(float minimumValue) {
         this.minimumValue = minimumValue;
     }
     

@@ -842,18 +842,18 @@ public class BasicErrorPaneUI extends ErrorPaneUI {
             init(p);
         }
 
-    	protected void init(JXErrorPane p) {
+        protected void init(JXErrorPane p) {
             // FYI: info can be null
-    	    setTitle(p.getErrorInfo() == null ? null : p.getErrorInfo().getTitle());
+            setTitle(p.getErrorInfo() == null ? null : p.getErrorInfo().getTitle());
             initWindow(this, p);
-    	}
+        }
     }
 
     private final class JXErrorFrame extends JFrame {
-    	public JXErrorFrame(JXErrorPane p) {
-    	    setTitle(p.getErrorInfo().getTitle());
+        public JXErrorFrame(JXErrorPane p) {
+            setTitle(p.getErrorInfo().getTitle());
                 initWindow(this, p);
-    	}
+        }
     }
 
     private final class JXInternalErrorFrame extends JInternalFrame {

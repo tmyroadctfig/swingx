@@ -77,8 +77,8 @@ public class BasicHeaderUI extends HeaderUI {
     @SuppressWarnings("unused")
     private static final Logger LOG = Logger.getLogger(BasicHeaderUI.class
             .getName());
-	// Implementation detail. Neeeded to expose getMultiLineSupport() method to allow restoring view
-	// lost after LAF switch
+    // Implementation detail. Neeeded to expose getMultiLineSupport() method to allow restoring view
+    // lost after LAF switch
     protected class DescriptionPane extends JXLabel {
             @Override
             public void paint(Graphics g) {
@@ -95,9 +95,9 @@ public class BasicHeaderUI extends HeaderUI {
 
             @Override
             public MultiLineSupport getMultiLineSupport() {
-            	return super.getMultiLineSupport();
+                return super.getMultiLineSupport();
             }
-	}
+    }
 
     protected JLabel titleLabel;
     protected DescriptionPane descriptionPane;
@@ -381,9 +381,9 @@ public class BasicHeaderUI extends HeaderUI {
                     View v = (View) descriptionPane.getClientProperty(BasicHTML.propertyKey);
                     // view might get lost on LAF change ...
                     if (v == null) {
-                    	descriptionPane.putClientProperty(BasicHTML.propertyKey, 
-                    	        descriptionPane.getMultiLineSupport().createView(descriptionPane));
-                    	v = (View) descriptionPane.getClientProperty(BasicHTML.propertyKey);
+                        descriptionPane.putClientProperty(BasicHTML.propertyKey, 
+                                descriptionPane.getMultiLineSupport().createView(descriptionPane));
+                        v = (View) descriptionPane.getClientProperty(BasicHTML.propertyKey);
                     }
                     if (v != null) {
                         Container tla = header.getTopLevelAncestor();
@@ -397,8 +397,8 @@ public class BasicHeaderUI extends HeaderUI {
                         int w = Math.min(tla.getWidth(), header.getParent().getWidth());
                         // 35 = description pane insets, TODO: obtain dynamically
                         w -= 35 + header.getInsets().left + header.getInsets().right + descriptionPane.getInsets().left + descriptionPane.getInsets().right + imagePanel.getInsets().left + imagePanel.getInsets().right + imagePanel.getWidth() + descriptionPane.getBounds().x;
-                    	v.setSize(w, h);
-                    	descriptionPane.setSize(w, (int) Math.ceil(v.getPreferredSpan(View.Y_AXIS)));
+                        v.setSize(w, h);
+                        descriptionPane.setSize(w, (int) Math.ceil(v.getPreferredSpan(View.Y_AXIS)));
                     }
                 }
             }};
@@ -437,19 +437,19 @@ public class BasicHeaderUI extends HeaderUI {
     }
 
     private void resetLayout(JXHeader h) {
-    	h.remove(titleLabel);
-    	h.remove(descriptionPane);
-    	h.remove(imagePanel);
-    	if (h.getIconPosition() == null || h.getIconPosition() == IconPosition.RIGHT) {
-	        h.add(titleLabel, new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0, GridBagConstraints.LINE_START, GridBagConstraints.HORIZONTAL, new Insets(12, 12, 0, 11), 0, 0));
-	        h.add(descriptionPane, new GridBagConstraints(0, 1, 1, 1, 1.0, 1.0, GridBagConstraints.FIRST_LINE_START, GridBagConstraints.BOTH, new Insets(0, 24, 12, 11), 0, 0));
-	        h.add(imagePanel, new GridBagConstraints(1, 0, 1, 2, 0.0, 1.0, GridBagConstraints.FIRST_LINE_END, GridBagConstraints.NONE, new Insets(12, 0, 11, 11), 0, 0));
-    	} else {
-	        h.add(titleLabel, new GridBagConstraints(1, 0, 1, 1, 1.0, 0.0, GridBagConstraints.LINE_START, GridBagConstraints.HORIZONTAL, new Insets(12, 12, 0, 11), 0, 0));
-	        h.add(descriptionPane, new GridBagConstraints(1, 1, 1, 1, 1.0, 1.0, GridBagConstraints.FIRST_LINE_START, GridBagConstraints.BOTH, new Insets(0, 24, 12, 11), 0, 0));
-	        h.add(imagePanel, new GridBagConstraints(0, 0, 1, 2, 0.0, 1.0, GridBagConstraints.FIRST_LINE_END, GridBagConstraints.NONE, new Insets(12, 11, 0, 11), 0, 0));
-    	}
-	}
+        h.remove(titleLabel);
+        h.remove(descriptionPane);
+        h.remove(imagePanel);
+        if (h.getIconPosition() == null || h.getIconPosition() == IconPosition.RIGHT) {
+            h.add(titleLabel, new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0, GridBagConstraints.LINE_START, GridBagConstraints.HORIZONTAL, new Insets(12, 12, 0, 11), 0, 0));
+            h.add(descriptionPane, new GridBagConstraints(0, 1, 1, 1, 1.0, 1.0, GridBagConstraints.FIRST_LINE_START, GridBagConstraints.BOTH, new Insets(0, 24, 12, 11), 0, 0));
+            h.add(imagePanel, new GridBagConstraints(1, 0, 1, 2, 0.0, 1.0, GridBagConstraints.FIRST_LINE_END, GridBagConstraints.NONE, new Insets(12, 0, 11, 11), 0, 0));
+        } else {
+            h.add(titleLabel, new GridBagConstraints(1, 0, 1, 1, 1.0, 0.0, GridBagConstraints.LINE_START, GridBagConstraints.HORIZONTAL, new Insets(12, 12, 0, 11), 0, 0));
+            h.add(descriptionPane, new GridBagConstraints(1, 1, 1, 1, 1.0, 1.0, GridBagConstraints.FIRST_LINE_START, GridBagConstraints.BOTH, new Insets(0, 24, 12, 11), 0, 0));
+            h.add(imagePanel, new GridBagConstraints(0, 0, 1, 2, 0.0, 1.0, GridBagConstraints.FIRST_LINE_END, GridBagConstraints.NONE, new Insets(12, 11, 0, 11), 0, 0));
+        }
+    }
     
     
 

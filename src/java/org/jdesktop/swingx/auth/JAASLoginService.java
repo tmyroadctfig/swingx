@@ -44,14 +44,14 @@ public class JAASLoginService extends LoginService {
     private static final Logger LOG = Logger.getLogger(JAASLoginService.class
             .getName());
 
-	/**
-	 * Constructor for <b>JAASLoginService</b>
-	 * @param server server name that is also used for the JAAS config name
-	 */
-	public JAASLoginService(String server) {
-		super(server);
-	}
-	
+    /**
+     * Constructor for <b>JAASLoginService</b>
+     * @param server server name that is also used for the JAAS config name
+     */
+    public JAASLoginService(String server) {
+        super(server);
+    }
+    
         /**
          * Default JavaBeans constructor
          */
@@ -59,66 +59,64 @@ public class JAASLoginService extends LoginService {
             super();
         }
         
-	
-	/**
-	 * @inheritDoc
-	 * 	 
-	 */
-	public boolean authenticate(String name, char[] password, String server) throws Exception {
-		try {
-			LoginContext loginContext = null;
+    
+    /**
+     * @inheritDoc
+     *      
+     */
+    public boolean authenticate(String name, char[] password, String server) throws Exception {
+        try {
+            LoginContext loginContext = null;
 
-			loginContext = new LoginContext(getServer(),
-					new JAASCallbackHandler(name, password));
-			loginContext.login();
-			return true;
-		} catch (AccountExpiredException e) {
-			// TODO add explanation?
-			LOG.log(Level.WARNING, "", e);
-			return false;
-		} catch (CredentialExpiredException e) {
+            loginContext = new LoginContext(getServer(),
+                    new JAASCallbackHandler(name, password));
+            loginContext.login();
+            return true;
+        } catch (AccountExpiredException e) {
+            // TODO add explanation?
+            LOG.log(Level.WARNING, "", e);
+            return false;
+        } catch (CredentialExpiredException e) {
                         // TODO add explanation?
                         LOG.log(Level.WARNING, "", e);
-			return false;
-		} catch (FailedLoginException e) {
+            return false;
+        } catch (FailedLoginException e) {
                         // TODO add explanation?
                         LOG.log(Level.WARNING, "", e);
-			return false;
-		} catch (LoginException e) {
+            return false;
+        } catch (LoginException e) {
                         // TODO add explanation?
                         LOG.log(Level.WARNING, "", e);
-			return false;
-		} catch (Throwable e) {
+            return false;
+        } catch (Throwable e) {
                         // TODO add explanation?
                         LOG.log(Level.WARNING, "", e);
-			return false;
-		}
-	}
+            return false;
+        }
+    }
 
-	class JAASCallbackHandler implements CallbackHandler {
+    class JAASCallbackHandler implements CallbackHandler {
 
-		private String name;
+        private String name;
 
-		private char[] password;
+        private char[] password;
 
-		public JAASCallbackHandler(String name, char[] passwd) {
-			this.name = name;
-			this.password = passwd;
-		}
+        public JAASCallbackHandler(String name, char[] passwd) {
+            this.name = name;
+            this.password = passwd;
+        }
 
-		public void handle(Callback[] callbacks) throws java.io.IOException {
-			for (int i = 0; i < callbacks.length; i++) {
-				if (callbacks[i] instanceof NameCallback) {
-					NameCallback cb = (NameCallback) callbacks[i];
-					cb.setName(name);
-				} else if (callbacks[i] instanceof PasswordCallback) {
-					PasswordCallback cb = (PasswordCallback) callbacks[i];
-					cb.setPassword(password);
-				}
-			}
-		}
+        public void handle(Callback[] callbacks) throws java.io.IOException {
+            for (int i = 0; i < callbacks.length; i++) {
+                if (callbacks[i] instanceof NameCallback) {
+                    NameCallback cb = (NameCallback) callbacks[i];
+                    cb.setName(name);
+                } else if (callbacks[i] instanceof PasswordCallback) {
+                    PasswordCallback cb = (PasswordCallback) callbacks[i];
+                    cb.setPassword(password);
+                }
+            }
+        }
 
-	}
-
-	
+    }
 }

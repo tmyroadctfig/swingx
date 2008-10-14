@@ -126,8 +126,8 @@ public abstract class AbstractTreeTableModel implements TreeTableModel {
      * {@inheritDoc}
      */
     public boolean isCellEditable(Object node, int column) {
-	// RG: Fix Issue 49 -- Cell not editable, by default.
-	// Subclasses might override this to return true.
+        // RG: Fix Issue 49 -- Cell not editable, by default.
+        // Subclasses might override this to return true.
         return false;
     }
 
