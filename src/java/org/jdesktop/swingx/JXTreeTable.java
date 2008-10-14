@@ -444,21 +444,26 @@ public class JXTreeTable extends JXTable {
         }
 
         /**
-         * complete editing if collapsed/expanded.
-         * Here: any editing is always cancelled.
+         * Complete editing if collapsed/expanded.<p>
+         * 
+         * Is: first try to stop editing before falling back to cancel.<p>
+         * This is part of fix for #730-swingx - editingStopped not always called.
+         * The other part is to call this from the renderer before
+         * expansion related state has changed. <p>
+         * 
+         * Was: any editing is always cancelled. <p>
          * This is a rude fix to #120-jdnc: data corruption on
          * collapse/expand if editing. This is called from 
          * the renderer after expansion related state has changed.
-         * PENDING JW: should it take the old editing path as parameter?
-         * Might be possible to be a bit more polite, and internally
-         * reset the editing coordinates? On the other hand: the rudeness
-         * is the table's usual behaviour - which is often removing the editor
-         * as first reaction to incoming events.
          *
          */
         protected void completeEditing() {
             if (isEditing()) {
-                getCellEditor().cancelCellEditing();
+                boolean success = getCellEditor().stopCellEditing();
+                if (!success) {
+                    getCellEditor().cancelCellEditing();
+                }
+//                getCellEditor().cancelCellEditing();
              }
         }
 
@@ -2398,9 +2403,9 @@ public class JXTreeTable extends JXTable {
 
         @Override
         protected void setExpandedState(TreePath path, boolean state) {
+            treeTable.getTreeTableHacker().completeEditing();
             super.setExpandedState(path, state);
             treeTable.getTreeTableHacker().expansionChanged();
-            treeTable.getTreeTableHacker().completeEditing();
             
         }
 

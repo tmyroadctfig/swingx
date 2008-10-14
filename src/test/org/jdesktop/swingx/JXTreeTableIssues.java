@@ -33,9 +33,11 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.CellEditor;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JTextField;
 import javax.swing.JTree;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.UIManager;
@@ -233,9 +235,7 @@ public class JXTreeTableIssues extends InteractiveTestCase {
         root.add(a);
         root.add(b);
         // default table: hack around #120-jdnc introduces #730
-//        JXTreeTable xTable = new JXTreeTable();
-        // hacked table: regression of #120-jdnc
-        JXTreeTable xTable = new JXTreeTableHack();
+        final JXTreeTable xTable = new JXTreeTable();
         xTable.setTreeTableModel(new DefaultTreeTableModel(root));
         xTable.expandAll();
         xTable.setVisibleColumnCount(10);
@@ -255,30 +255,25 @@ public class JXTreeTableIssues extends InteractiveTestCase {
             }};
         editor.addCellEditorListener(l);
         JXFrame frame = wrapWithScrollingInFrame(xTable, "#730-swingx: click sometimes cancels");
-        frame.add(field, BorderLayout.SOUTH);
-        frame.setVisible(true);
-    }
+        Action toggleExpansion = new AbstractAction("toggle") {
 
-    public static class JXTreeTableHack extends JXTreeTable {
-        
-        @Override
-        protected TreeTableHacker createTreeTableHacker() {
-            return new MyTreeTableHacker();
-        }
-
-        public class MyTreeTableHacker extends TreeTableHackerExt {
-
-            @Override
-            protected void completeEditing() {
-                if (isEditing()) {
-                   boolean success = getCellEditor().stopCellEditing();
-                   if (!success) {
-                       getCellEditor().cancelCellEditing();
-                   }
+            public void actionPerformed(ActionEvent arg0) {
+                boolean isExpanded = xTable.isExpanded(0);
+                if (isExpanded) {
+                     xTable.collapseRow(0);
+                } else {
+                    xTable.expandRow(0);
                 }
+                
             }
             
-        }
+        };
+        KeyStroke stroke = KeyStroke.getKeyStroke("F1");
+        xTable.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(stroke, "toggleExpansion");
+        xTable.getActionMap().put("toggleExpansion", toggleExpansion);
+        frame.add(field, BorderLayout.SOUTH);
+        addStatusMessage(frame, "F1 to toggle expansion of first row");
+        show(frame);
     }
 
     
