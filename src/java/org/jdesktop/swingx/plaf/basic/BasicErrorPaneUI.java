@@ -31,7 +31,6 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.LayoutManager;
 import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.Window;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
@@ -407,12 +406,13 @@ public class BasicErrorPaneUI extends ErrorPaneUI {
         collapsedHeight = 0;
         Window w = WindowUtils.findWindow(owner);
         JXErrorDialog dlg = null;
-        if (w == null) {
-            dlg = new JXErrorDialog((Dialog)null, pane);
-        } else if (w instanceof Dialog) {
+        if (w instanceof Dialog) {
             dlg = new JXErrorDialog((Dialog)w, pane);
         } else if (w instanceof Frame) {
             dlg = new JXErrorDialog((Frame)w, pane);
+        } else {
+            // default fallback to null
+            dlg = new JXErrorDialog((Dialog)null, pane);
         }
         centerWindow(dlg, owner);
         return dlg;
