@@ -308,6 +308,8 @@ public class JXLoginPane extends JXPanel {
      * cursor after authentication ends, or is canceled;
      */
     private Cursor oldCursor;
+    
+    private boolean namePanelEnabled = true;
 
     /**
      * The default login listener used by this panel.
@@ -603,19 +605,33 @@ public class JXLoginPane extends JXPanel {
     private JXPanel createLoginPanel() {
         JXPanel loginPanel = new JXPanel();
 
+        NameComponent oldPanel = namePanel;
         //create the NameComponent
         if (saveMode == SaveMode.NONE) {
             namePanel = new SimpleNamePanel();
         } else {
             namePanel = new ComboNamePanel(userNameStore);
         }
+        if (oldPanel != null) {
+            // need to reset here otherwise value will get lost during LAF change as panel gets recreated.
+            namePanel.setUserName(oldPanel.getUserName());
+            namePanel.setEnabled(oldPanel.isEnabled());
+            namePanel.setEditable(oldPanel.isEditable());
+        } else {
+            namePanel.setEnabled(namePanelEnabled);
+            namePanel.setEditable(namePanelEnabled);
+        }
         JLabel nameLabel = new JLabel(UIManagerExt.getString(CLASS_NAME + ".nameString", getLocale()));
         nameLabel.setLabelFor(namePanel.getComponent());
 
+        JPasswordField oldPwd = passwordField;
         //create the password component
         passwordField = new JPasswordField("", 15);
         JLabel passwordLabel = new JLabel(UIManagerExt.getString(CLASS_NAME + ".passwordString", getLocale()));
         passwordLabel.setLabelFor(passwordField);
+        if (oldPwd != null) {
+            passwordField.setText(new String(oldPwd.getPassword()));
+        }
 
         //create the server combo box if necessary
         JLabel serverLabel = new JLabel(UIManagerExt.getString(CLASS_NAME + ".serverString", getLocale()));
@@ -970,6 +986,27 @@ public class JXLoginPane extends JXPanel {
         if (namePanel != null) {
             namePanel.setUserName(username);
         }
+    }
+
+    /**
+     * Enables or disables <strong>User name</strong> for this panel.
+     *
+     * @param enabled 
+     */
+    public void setUserNameEnabled(boolean enabled) {
+        this.namePanelEnabled = enabled;
+        if (namePanel != null) {
+            namePanel.setEnabled(enabled);
+            namePanel.setEditable(enabled);
+        }
+    }
+    
+    /**
+     * Gets current state of the user name field. Field can be either disabled (false) for editing or enabled (true).
+     * @return True when user name field is enabled and editable, false otherwise.
+     */
+    public boolean isUserNameEnabled() {
+        return this.namePanelEnabled;
     }
 
     /**
@@ -1356,6 +1393,10 @@ public class JXLoginPane extends JXPanel {
     //--------------------------------- Default NamePanel Implementations
     public static interface NameComponent {
         public String getUserName();
+        public boolean isEnabled();
+        public boolean isEditable();
+        public void setEditable(boolean enabled);
+        public void setEnabled(boolean enabled);
         public void setUserName(String userName);
         public JComponent getComponent();
     }
@@ -1377,6 +1418,7 @@ public class JXLoginPane extends JXPanel {
         public JComponent getComponent() {
             return this;
         }
+        
     }
 
     /**
@@ -1405,6 +1447,7 @@ public class JXLoginPane extends JXPanel {
         public JComponent getComponent() {
             return this;
         }
+        
         private final class NameComboBoxModel extends AbstractListModel implements ComboBoxModel {
             private Object selectedItem;
             public void setSelectedItem(Object anItem) {

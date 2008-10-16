@@ -94,6 +94,25 @@ public class JXLoginPaneVisualCheck extends InteractiveTestCase {
      * Issue #538-swingx Failure to set locale at runtime
      *
      */
+    public void interactiveDisplayFixedUser() {
+        sun.awt.AppContext.getAppContext().put("JComponent.defaultLocale", Locale.FRANCE);
+        JXLoginPane panel = new JXLoginPane();
+        JFrame frame = JXLoginPane.showLoginFrame(panel);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setJMenuBar(createAndFillMenuBar(panel));
+
+        panel.setSaveMode(SaveMode.BOTH);
+        panel.setUserName("aGuy");
+        panel.setUserNameEnabled(false);
+
+        frame.pack();
+        frame.setVisible(true);
+    }
+
+    /**
+     * Issue #538-swingx Failure to set locale at runtime
+     *
+     */
     public void interactiveSetBackground() {
         JXLoginPane panel = new JXLoginPane();
         panel.setBackgroundPainter(new MattePainter(Color.RED, true));
