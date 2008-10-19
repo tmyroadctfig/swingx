@@ -61,8 +61,7 @@ public class DefaultTreeTableModel extends AbstractTreeTableModel {
 
     /**
      * Creates a new {@code DefaultTreeTableModel} with the specified
-     * {@code root}. {@code asksAllowsChildren} is disabled and {@code isLeaf}
-     * will provide the same semantics as {@code AbstractTreeTableModel.isLeaf}.
+     * {@code root}.
      * 
      * @param root
      *            the root node of the tree
@@ -73,8 +72,7 @@ public class DefaultTreeTableModel extends AbstractTreeTableModel {
 
     /**
      * Creates a new {@code DefaultTreeTableModel} with the specified {@code
-     * root}. {@code asksAllowsChildren} is disabled and {@code isLeaf} will
-     * provide the same semantics as {@code AbstractTreeTableModel.isLeaf}.
+     * root} and column names.
      * 
      * @param root
      *            the root node of the tree
@@ -414,14 +412,44 @@ public class DefaultTreeTableModel extends AbstractTreeTableModel {
      *            path to the node that has changed
      * @param newValue
      *            the new value
+     * @throws NullPointerException
+     *             if {@code path} is {@code null}
+     * @throws IllegalArgumentException
+     *             if {@code path} is empty or is not a path managed by this
+     *             model
      * @throws ClassCastException
      *             if {@code path.getLastPathComponent()} is not a {@code
      *             TreeTableNode}
      */
+    @Override
     public void valueForPathChanged(TreePath path, Object newValue) {
+        if (path.getPathCount() == 0 || path.getPathComponent(0) != root) {
+            throw new IllegalArgumentException("invalid path");
+        }
+        
         TreeTableNode node = (TreeTableNode) path.getLastPathComponent();
         node.setUserObject(newValue);
         
         modelSupport.firePathChanged(path);
+    }
+
+    /**
+     * Sets the user object for a node. Client code must use this method, so
+     * that the model can notify listeners that a change has occurred.
+     * <p>
+     * This method is a convenient cover for
+     * {@link #valueForPathChanged(TreePath, Object)}.
+     * 
+     * @param node
+     *            the node to modify
+     * @param userObject
+     *            the new user object to set
+     * @throws NullPointerException
+     *             if {@code node} is {@code null}
+     * @throws IllegalArgumentException
+     *             if {@code node} is not a node managed by this model
+     */
+    public void setUserObject(TreeTableNode node, Object userObject) {
+        valueForPathChanged(new TreePath(getPathToRoot(node)), userObject);
     }
 }
