@@ -95,7 +95,8 @@ public class EyeDropperColorChooserPanel extends AbstractColorChooserPanel {
         eyeDropper.addMouseListener(mia);
         eyeDropper.addMouseMotionListener(mia);
         try {
-            eyeDropper.setIcon(new ImageIcon(getClass().getResource("mag.png")));
+            eyeDropper.setIcon(new ImageIcon(
+                    EyeDropperColorChooserPanel.class.getResource("mag.png")));
             eyeDropper.setText("");
         } catch (Exception ex) {
             ex.printStackTrace();
