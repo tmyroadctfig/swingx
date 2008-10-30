@@ -65,15 +65,42 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
       setSystemLF(true);
       JXMonthViewVisualCheck  test = new JXMonthViewVisualCheck();
       try {
-          test.runInteractiveTests();
+//          test.runInteractiveTests();
 //        test.runInteractiveTests(".*TimeZone.*");
-//        test.runInteractiveTests("interactive.*Repaint.*");
+        test.runInteractiveTests("interactive.*Zoomable.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
       }
   }
 
+    public void interactiveRevalidateOnZoomable() {
+        final JXMonthView monthView = new JXMonthView();
+        JXFrame frame = wrapInFrame(monthView, "Revalidate on zoomable");
+        Action toggleBackground = new AbstractAction("toggleZoomable") {
+            
+            public void actionPerformed(ActionEvent e) {
+                monthView.setZoomable(!monthView.isZoomable());
+                        
+            }
+            
+        };
+        addAction(frame, toggleBackground);
+        Action toggleTraversable = new AbstractAction("toggleTraversable") {
+            
+            private boolean traversable;
+
+            public void actionPerformed(ActionEvent e) {
+                traversable = !traversable;
+                monthView.setTraversable(traversable);
+                        
+            }
+            
+        };
+        addAction(frame, toggleTraversable);
+        show(frame);
+
+    }
     /**
      * Issue #931-swingx: JXMonthView not repainted on property change.
      * 

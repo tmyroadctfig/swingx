@@ -66,6 +66,7 @@ import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.UIResource;
 
 import org.jdesktop.swingx.JXMonthView;
+import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.calendar.CalendarUtils;
 import org.jdesktop.swingx.calendar.DateSelectionModel;
 import org.jdesktop.swingx.calendar.DateSelectionModel.SelectionMode;
@@ -316,24 +317,32 @@ public class BasicMonthViewUI extends MonthViewUI {
     private CellRendererPane rendererPane;
 
 
+    private BasicCalendarHeader calendarHeader;
+
+
     @SuppressWarnings({"UnusedDeclaration"})
     public static ComponentUI createUI(JComponent c) {
         return new BasicMonthViewUI();
     }
 
+    /**
+     * Installs the component as appropriate for the current lf.
+     * 
+     * PENDING JW: clarify sequence of installXX methods. 
+     */
     @Override
     public void installUI(JComponent c) {
         monthView = (JXMonthView)c;
         monthView.setLayout(createLayoutManager());
-        isLeftToRight = monthView.getComponentOrientation().isLeftToRight();
-        // PENDING JW: move to installDefaults?
-        LookAndFeel.installProperty(monthView, "opaque", Boolean.TRUE);
-        // PENDING JW: move to installDefaults or installComponets?
+        
+        // PENDING JW: move to installDefaults or installComponents?
         installRenderingHandler();
         
-        installComponents();
         installDefaults();
+        installDelegate();
+        installComponents();
         installKeyboardActions();
+        updateLocale(false);
         installListeners();
     }
 
@@ -350,11 +359,60 @@ public class BasicMonthViewUI extends MonthViewUI {
         monthView = null;
     }
 
-    protected void installComponents() {}
+    /**
+     * Creates and configures the calendar header. Adds to the MonthView if
+     * zoomable.
+     */
+    protected void installComponents() {
+        calendarHeader = createCalendarHeader();
+        calendarHeader.setFont(getAsNotUIResource(createDerivedFont()));
+        calendarHeader.setBackground(getAsNotUIResource(monthView.getMonthStringBackground()));
+        if (isZoomable()) {
+            monthView.add(calendarHeader);
+        }
+    }
 
-    protected void uninstallComponents() {}
+    /**
+     * Returns a Font based on the param which is not of type UIResource. 
+     * 
+     * @param font the base font
+     * @return a font not of type UIResource, may be null.
+     */
+    private Font getAsNotUIResource(Font font) {
+        if (!(font instanceof UIResource)) return font;
+        // PENDING JW: correct way to create another font instance?
+       return font.deriveFont(font.getAttributes());
+    }
+    
+    /**
+     * Returns a Color based on the param which is not of type UIResource. 
+     * 
+     * @param color the base color
+     * @return a color not of type UIResource, may be null.
+     */
+    private Color getAsNotUIResource(Color color) {
+        if (!(color instanceof UIResource)) return color;
+        // PENDING JW: correct way to create another color instance?
+        float[] rgb = color.getRGBComponents(null);
+        return new Color(rgb[0], rgb[1], rgb[2], rgb[3]);
+    }
 
+    protected void uninstallComponents() {
+        monthView.remove(calendarHeader);
+        calendarHeader.setActions(null, null, null);
+        calendarHeader = null;
+    }
+
+    /**
+     * Installs default values. 
+     * 
+     * This is refactored to only install default properties on the monthView.
+     * Extracted install of this delegate's properties into installDelegate. 
+     *  
+     */
     protected void installDefaults() {
+        // PENDING JW: move to installDefaults?
+        LookAndFeel.installProperty(monthView, "opaque", Boolean.TRUE);
         
        // JW: access all properties via the UIManagerExt ..
         //        BasicLookAndFeel.installColorsAndFont(monthView, 
@@ -391,7 +449,13 @@ public class BasicMonthViewUI extends MonthViewUI {
         
         monthView.setBoxPaddingX(UIManagerExt.getInt("JXMonthView.boxPaddingX"));
         monthView.setBoxPaddingY(UIManagerExt.getInt("JXMonthView.boxPaddingY"));
-        
+    }
+
+    /**
+     * Installs this ui delegates properties.
+     */
+    protected void installDelegate() {
+        isLeftToRight = monthView.getComponentOrientation().isLeftToRight();
         // PENDING JW: remove here if rendererHandler takes over control completely
         // as is, some properties are duplicated
         monthDownImage = UIManager.getIcon("JXMonthView.monthDownFileName");
@@ -402,9 +466,8 @@ public class BasicMonthViewUI extends MonthViewUI {
         trailingDayForeground = UIManagerExt.getColor("JXMonthView.trailingDayForeground");
         derivedFont = createDerivedFont();
         
-        // install date/locale related state
+        // install date related state
         setFirstDisplayedDay(monthView.getFirstDisplayedDay());
-        updateLocale();
     }
 
     /**
@@ -782,21 +845,35 @@ public class BasicMonthViewUI extends MonthViewUI {
 
 
    /**
-    * Updates month and day names according to specified locale.
-    */
-   protected void updateLocale() {
+     * Updates internal state according to monthView's locale. Revalidates the
+     * monthView.
+     * 
+     * @deprecated use {@link #updateLocale(boolean)}
+     */
+    @Deprecated
+    protected void updateLocale() {
+        updateLocale(true);
+    }
+
+    /**
+     * Updates internal state according to monthView's locale. Revalidates the
+     * monthView if the boolean parameter is true.
+     * 
+     * @param revalidate a boolean indicating whether the monthView should be 
+     * revalidated after the change.
+     */
+    protected void updateLocale(boolean revalidate) {
         Locale locale = monthView.getLocale();
         if (renderingHandler != null) {
             renderingHandler.setLocale(locale);
         }
         monthsOfTheYear = new DateFormatSymbols(locale).getMonths();
-        
+
         // fixed JW: respect property in UIManager if available
-        // PENDING JW: what to do if weekdays had been set 
+        // PENDING JW: what to do if weekdays had been set
         // with JXMonthView method? how to detect?
-        daysOfTheWeek =
-          (String[])UIManager.get("JXMonthView.daysOfTheWeek");
-        
+        daysOfTheWeek = (String[]) UIManager.get("JXMonthView.daysOfTheWeek");
+
         if (daysOfTheWeek == null) {
             daysOfTheWeek = new String[7];
             String[] dateFormatSymbols = new DateFormatSymbols(locale)
@@ -806,9 +883,11 @@ public class BasicMonthViewUI extends MonthViewUI {
                 daysOfTheWeek[i - 1] = dateFormatSymbols[i];
             }
         }
-//        monthView.setDaysOfTheWeek(daysOfTheWeek);
-        monthView.invalidate();
-        monthView.validate();
+        installHeaderActions();
+        if (revalidate) {
+            monthView.invalidate();
+            monthView.validate();
+        }
     }
 
    @Override
@@ -1415,27 +1494,38 @@ public class BasicMonthViewUI extends MonthViewUI {
         int oldNumCalCols = calendarColumnCount;
         int oldNumCalRows = calendarRowCount;
 
-        // Determine how many columns of calendars we want to paint.
-        calendarColumnCount = 1;
-        int addColumns = (monthView.getWidth() - calendarWidth) /
-                (calendarWidth + CALENDAR_SPACING);
-        // happens if used as renderer in a tree.. don't know yet why
-        if (addColumns > 0) {
-            calendarColumnCount += addColumns;
+        if (isZoomable()) {
+            calendarRowCount = 1;
+            calendarColumnCount = 1;
+        } else {
+            // Determine how many columns of calendars we want to paint.
+            calendarColumnCount = 1;
+            int addColumns = (monthView.getWidth() - calendarWidth) /
+                    (calendarWidth + CALENDAR_SPACING);
+            // happens if used as renderer in a tree.. don't know yet why
+            if (addColumns > 0) {
+                calendarColumnCount += addColumns;
+            }
+    
+            // Determine how many rows of calendars we want to paint.
+            calendarRowCount = 1;
+            int addRows = (monthView.getHeight() - calendarHeight) /
+                    (calendarHeight + CALENDAR_SPACING);
+            if (addRows > 0) {
+                calendarRowCount += addRows;
+            }
         }
-
-        // Determine how many rows of calendars we want to paint.
-        calendarRowCount = 1;
-        int addRows = (monthView.getHeight() - calendarHeight) /
-                (calendarHeight + CALENDAR_SPACING);
-        if (addRows > 0) {
-            calendarRowCount += addRows;
-        }
-
         if (oldNumCalCols != calendarColumnCount ||
                 oldNumCalRows != calendarRowCount) {
             updateLastDisplayedDay(getFirstDisplayedDay());
         }
+    }
+
+    /**
+     * @return
+     */
+    protected boolean isZoomable() {
+        return monthView.isZoomable();
     }
 
 
@@ -1790,10 +1880,13 @@ public class BasicMonthViewUI extends MonthViewUI {
 
     /**
      * Sets the firstDisplayedDate property to the given value. Must update
-     * dependent state as well. 
+     * dependent state as well. <p>
      * 
      * Here: updated lastDisplayedDatefirstDisplayedMonth/Year accordingly.
+     * <p>
      * 
+     * PENDING JW: remove call to repaint() because this method is used
+     * both at install and from propertyChange
      * 
      * @param firstDisplayedDate the firstDisplayedDate to set
      */
@@ -1803,13 +1896,13 @@ public class BasicMonthViewUI extends MonthViewUI {
         this.firstDisplayedMonth = calendar.get(Calendar.MONTH);
         this.firstDisplayedYear = calendar.get(Calendar.YEAR);
         updateLastDisplayedDay(firstDisplayedDate);
-        monthView.repaint();
+//        monthView.repaint();
     }
     /**
      * @return the firstDisplayedDate
      */
     protected Date getFirstDisplayedDay() {
-        return firstDisplayedDate;
+        return firstDisplayedDate != null ? firstDisplayedDate : monthView.getFirstDisplayedDay();
     }
 
     /**
@@ -2080,11 +2173,11 @@ public class BasicMonthViewUI extends MonthViewUI {
             calendarHeight = (fullBoxHeight * 7) + fullMonthBoxHeight;
             fullCalendarHeight = calendarHeight + CALENDAR_SPACING;
             // Calculate minimum width/height for the component.
-            int prefRows = monthView.getPreferredRows();
+            int prefRows = getPreferredRows();
             preferredSize.height = (calendarHeight * prefRows) +
                     (CALENDAR_SPACING * (prefRows - 1));
 
-            int prefCols = monthView.getPreferredCols();
+            int prefCols = getPreferredColumns();
             preferredSize.width = (calendarWidth * prefCols) +
                     (CALENDAR_SPACING * (prefCols - 1));
 
@@ -2094,7 +2187,24 @@ public class BasicMonthViewUI extends MonthViewUI {
             preferredSize.height += insets.top + insets.bottom;
            
             calculateMonthGridLayoutProperties();
+            
+            if (isZoomable()) {
+                calendarHeader.setBounds(getMonthHeaderBounds(monthView.getFirstDisplayedDay(), true));
+            }
+        }
 
+        /**
+         * @return
+         */
+        private int getPreferredColumns() {
+            return isZoomable() ? 1 : monthView.getPreferredCols();
+        }
+
+        /**
+         * @return
+         */
+        private int getPreferredRows() {
+            return isZoomable() ? 1 : monthView.getPreferredRows();
         }
 
         /**
@@ -2211,11 +2321,11 @@ public class BasicMonthViewUI extends MonthViewUI {
             calendarHeight = (fullBoxHeight * 7) + fullMonthBoxHeight;
             fullCalendarHeight = calendarHeight + CALENDAR_SPACING;
             // Calculate minimum width/height for the component.
-            int prefRows = monthView.getPreferredRows();
+            int prefRows = getPreferredRows();
             preferredSize.height = (calendarHeight * prefRows) +
                     (CALENDAR_SPACING * (prefRows - 1));
 
-            int prefCols = monthView.getPreferredCols();
+            int prefCols = getPreferredColumns();
             preferredSize.width = (calendarWidth * prefCols) +
                     (CALENDAR_SPACING * (prefCols - 1));
 
@@ -2241,6 +2351,7 @@ public class BasicMonthViewUI extends MonthViewUI {
                 selectionModel.addDateSelectionListener(getHandler());
             } else if ("firstDisplayedDay".equals(property)) {
                 setFirstDisplayedDay(((Date) evt.getNewValue()));
+                monthView.repaint();
             } else if (JXMonthView.BOX_PADDING_X.equals(property) 
                     || JXMonthView.BOX_PADDING_Y.equals(property) 
                     || JXMonthView.TRAVERSABLE.equals(property) 
@@ -2248,17 +2359,19 @@ public class BasicMonthViewUI extends MonthViewUI {
                     || "border".equals(property) 
                     || "showingWeekNumber".equals(property)
                     || "traversable".equals(property) 
-                    
+                   
                     ) {
                 monthView.revalidate();
                 monthView.repaint();
+            } else if ("zoomable".equals(property)) {
+                updateZoomable();
             } else if ("font".equals(property)) {
                 derivedFont = createDerivedFont();
                 monthView.revalidate();
             } else if ("componentInputMapEnabled".equals(property)) {
                 updateComponentInputMap();
             } else if ("locale".equals(property)) { // "locale" is bound property
-                updateLocale();
+                updateLocale(true);
             } else if ("timeZone".equals(property)) {
                 dayOfMonthFormatter.setTimeZone((TimeZone) evt.getNewValue());
 //            } else if ("flaggedDates".equals(property)
@@ -2493,6 +2606,70 @@ public class BasicMonthViewUI extends MonthViewUI {
     }
     
 
+
+    /**
+     * 
+     */
+    protected void updateZoomable() {
+        if (monthView.isZoomable()) {
+            monthView.add(calendarHeader);
+        } else {
+            monthView.remove(calendarHeader);
+        }
+        monthView.revalidate();
+        monthView.repaint();
+    }
+
+    protected BasicCalendarHeader createCalendarHeader() {
+        BasicCalendarHeader header = new BasicCalendarHeader();
+        return header;
+    }
+
+    /**
+     * @param header
+     */
+    private void installHeaderActions() {
+        final StringValue tsv = new StringValue() {
+
+            public String getString(Object value) {
+                if (value instanceof Calendar) {
+                    String month = monthsOfTheYear[((Calendar) value)
+                            .get(Calendar.MONTH)];
+                    return month + " "
+                            + ((Calendar) value).get(Calendar.YEAR); 
+                }
+                return TO_STRING.getString(value);
+            }
+
+        };
+        final AbstractActionExt zoomOut = new AbstractActionExt(tsv.getString(getCalendar())) {
+
+            public void actionPerformed(ActionEvent e) {
+                // TODO Auto-generated method stub
+                
+            }
+            
+        }; 
+        AbstractActionExt prev = new AbstractActionExt(null, monthDownImage) {
+
+            public void actionPerformed(ActionEvent e) {
+                previousMonth();
+                zoomOut.setName(tsv.getString(getCalendar()));
+                
+            }
+            
+        };
+        AbstractActionExt next = new AbstractActionExt(null, monthUpImage) {
+
+            public void actionPerformed(ActionEvent e) {
+                nextMonth();
+                zoomOut.setName(tsv.getString(getCalendar()));
+                
+            }
+            
+        };
+        calendarHeader.setActions(prev, next, zoomOut);
+    }
 
     /**
      * Paints a month.  It is assumed the given calendar is already set to the

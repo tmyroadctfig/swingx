@@ -250,6 +250,7 @@ public class JXMonthView extends JComponent {
     private Color flaggedDayForeground;
 
     private Color selectedForeground;
+    private boolean zoomable;
 
     /**
      * Create a new instance of the <code>JXMonthView</code> class using the
@@ -1167,10 +1168,14 @@ public class JXMonthView extends JComponent {
     
     /**
      * Returns whether or not the month view supports traversing months.
-     *
+     * If zoomable is enabled, traversable is enabled as well. Otherwise
+     * returns the traversable property as set by client code.
+     * 
      * @return <code>true</code> if month traversing is enabled.
+     * @see #setZoomable(boolean)
      */
     public boolean isTraversable() {
+        if (isZoomable()) return true;
         return traversable;
     }
 
@@ -1180,12 +1185,40 @@ public class JXMonthView extends JComponent {
      * 
      * @param traversable set to true to enable month traversing, false
      *        otherwise.
+     * @see #isTraversable()       
+     * @see #setZoomable(boolean)
      */
     public void setTraversable(boolean traversable) {
         if (traversable == this.traversable)
             return;
         this.traversable = traversable;
         firePropertyChange(TRAVERSABLE, !this.traversable, this.traversable);
+    }
+
+    /**
+     * Returns true if zoomable (through date ranges).
+     * 
+     * @return true if zoomable is enabled.
+     * @see #setZoomable(boolean)
+     */
+    public boolean isZoomable() {
+        return zoomable;
+    }
+
+    /**
+     * Sets the zoomable property. If true, the calendar's date range can
+     * be zoomed. This state implies that the calendar is traversable and
+     * showing exactly one calendar box, effectively ignoring the properties.
+     * 
+     * @param zoomable a boolean indicating whether or not zooming date
+     *    ranges is enabled.
+     *    
+     * @see #setTraversable(boolean)
+     */
+    public void setZoomable(boolean zoomable) {
+        boolean old = isZoomable();
+        this.zoomable = zoomable;
+        firePropertyChange("zoomable", old, isZoomable());
     }
 
     /**
@@ -1862,6 +1895,7 @@ public class JXMonthView extends JComponent {
             modifiedEndDate = cal.getTime();
         }
     }
+
 
 
 

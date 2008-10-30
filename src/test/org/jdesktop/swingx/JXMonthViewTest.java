@@ -113,6 +113,16 @@ public class JXMonthViewTest extends MockObjectTestCase {
         JComponent.setDefaultLocale(componentLocale);
     }
 
+    @Test
+    public void testZoomableProperty() {
+        assertFalse("default zoomable is off", monthView.isZoomable());
+        PropertyChangeReport report = new PropertyChangeReport();
+        monthView.addPropertyChangeListener(report);
+        monthView.setZoomable(true);
+        TestUtils.assertPropertyChangeEvent(report, "zoomable", false, true);
+        assertTrue("traversable follows zoomable", monthView.isTraversable());
+    }
+    
     /**
      * Issue #932-swingx: ui overwrites custom settings.
      * test daysoftheweekforeground property.
