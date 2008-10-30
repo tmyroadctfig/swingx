@@ -115,8 +115,15 @@ import org.jdesktop.swingx.renderer.StringValue;
  * is shown only if the showingWeekNumber property is true.  
  * </ul>
  * 
- *   
- *   
+ * On the road to "zoomable" date range views (Vista-style).<p>
+ * 
+ * Added support (doesn't do anything yet, zoom-logic must yet be defined) 
+ * by way of an active calendar header which is added to the monthView if zoomable. 
+ * It is disabled by default. In this mode, the view is always
+ * traversable and shows exactly one calendar. It is orthogonal to the classic 
+ * mode, that is client code should not be effected in any way as long as the mode 
+ * is not explicitly enabled. <p>
+ * 
  * @author dmouse
  * @author rbair
  * @author rah003
@@ -1485,38 +1492,35 @@ public class BasicMonthViewUI extends MonthViewUI {
     }
 
     /**
-     * Calculates and updates the numCalCols/numCalRows that determine the number of
-     * calendars that can be displayed. Updates the last displayed date if 
-     * appropriate.
+     * Calculates and updates the numCalCols/numCalRows that determine the
+     * number of calendars that can be displayed. Updates the last displayed
+     * date if appropriate.
      * 
      */
     private void calculateMonthGridRowColumnCount() {
         int oldNumCalCols = calendarColumnCount;
         int oldNumCalRows = calendarRowCount;
 
-        if (isZoomable()) {
-            calendarRowCount = 1;
-            calendarColumnCount = 1;
-        } else {
+        calendarRowCount = 1;
+        calendarColumnCount = 1;
+        if (!isZoomable()) {
             // Determine how many columns of calendars we want to paint.
-            calendarColumnCount = 1;
-            int addColumns = (monthView.getWidth() - calendarWidth) /
-                    (calendarWidth + CALENDAR_SPACING);
+            int addColumns = (monthView.getWidth() - calendarWidth)
+                    / (calendarWidth + CALENDAR_SPACING);
             // happens if used as renderer in a tree.. don't know yet why
             if (addColumns > 0) {
                 calendarColumnCount += addColumns;
             }
-    
+
             // Determine how many rows of calendars we want to paint.
-            calendarRowCount = 1;
-            int addRows = (monthView.getHeight() - calendarHeight) /
-                    (calendarHeight + CALENDAR_SPACING);
+            int addRows = (monthView.getHeight() - calendarHeight)
+                    / (calendarHeight + CALENDAR_SPACING);
             if (addRows > 0) {
                 calendarRowCount += addRows;
             }
         }
-        if (oldNumCalCols != calendarColumnCount ||
-                oldNumCalRows != calendarRowCount) {
+        if (oldNumCalCols != calendarColumnCount
+                || oldNumCalRows != calendarRowCount) {
             updateLastDisplayedDay(getFirstDisplayedDay());
         }
     }
@@ -1529,8 +1533,36 @@ public class BasicMonthViewUI extends MonthViewUI {
     }
 
 
+    
 
 //-------------------- painting
+
+    
+    /**
+     * Overridden to extract the background painting for ease-of-use of 
+     * subclasses.
+     */
+    @Override
+    public void update(Graphics g, JComponent c) {
+        paintBackground(g);
+        paint(g, c);
+    }
+
+    /**
+     * Paints the background of the component. This implementation fill the
+     * monthView's area with its background color if opaque, does nothing
+     * if not opaque. Subclasses can override but must comply to opaqueness
+     * contract.
+     * 
+     * @param g the Graphics to fill.
+     * 
+     */
+    protected void paintBackground(Graphics g) {
+        if (monthView.isOpaque()) {
+            g.setColor(monthView.getBackground());
+            g.fillRect(0, 0, monthView.getWidth(), monthView.getHeight());
+        }
+    }
 
     /**
      * {@inheritDoc}
@@ -2189,7 +2221,7 @@ public class BasicMonthViewUI extends MonthViewUI {
             calculateMonthGridLayoutProperties();
             
             if (isZoomable()) {
-                calendarHeader.setBounds(getMonthHeaderBounds(monthView.getFirstDisplayedDay(), true));
+                calendarHeader.setBounds(getMonthHeaderBounds(monthView.getFirstDisplayedDay(), false));
             }
         }
 
@@ -2367,6 +2399,7 @@ public class BasicMonthViewUI extends MonthViewUI {
                 updateZoomable();
             } else if ("font".equals(property)) {
                 derivedFont = createDerivedFont();
+                calendarHeader.setFont(getAsNotUIResource(createDerivedFont()));
                 monthView.revalidate();
             } else if ("componentInputMapEnabled".equals(property)) {
                 updateComponentInputMap();

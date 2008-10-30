@@ -16,6 +16,13 @@ import javax.swing.BoxLayout;
 import org.jdesktop.swingx.JXHyperlink;
 import org.jdesktop.swingx.JXPanel;
 
+/**
+ * Active header for a JXMonthView in zoomable mode.<p>
+ * 
+ *  PENDING JW: very much work-in-progress.
+ * 
+ * @author Jeanette Winzenburg
+ */
 class BasicCalendarHeader extends JXPanel {
 
     private AbstractButton prevButton;
@@ -33,7 +40,6 @@ class BasicCalendarHeader extends JXPanel {
         add(Box.createHorizontalGlue());
         add(nextButton);
         setBorder(BorderFactory.createEmptyBorder(2, 4, 2, 4));
-        setOpaque(true);
     }
 
     /**
@@ -67,6 +73,7 @@ class BasicCalendarHeader extends JXPanel {
         Color textColor = new Color(16, 66, 104);
         zoomOutLink.setUnclickedColor(textColor);
         zoomOutLink.setClickedColor(textColor);
+        zoomOutLink.setFocusable(false);
         return zoomOutLink;
     }
 
@@ -75,6 +82,7 @@ class BasicCalendarHeader extends JXPanel {
         b.setContentAreaFilled(false);
         b.setBorder(BorderFactory.createEmptyBorder());
         b.setRolloverEnabled(true);
+        b.setFocusable(false);
         return b;
     }
 }

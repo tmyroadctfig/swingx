@@ -88,14 +88,16 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
     }
 
     public static void main(String[] args) throws Exception {
+       UIManager.put("JXDatePicker.forceZoomable", Boolean.TRUE);
          setSystemLF(true);
         JXDatePickerVisualCheck test = new JXDatePickerVisualCheck();
         
         try {
-//            test.runInteractiveTests();
+            test.runInteractiveTests();
 //            test.runInteractiveTests("interactive.*PrefSize.*");
 //            test.runInteractiveTests("interactive.*Keep.*");
-          test.runInteractiveTests("interactive.*Multiple.*");
+//          test.runInteractiveTests("interactive.*Multiple.*");
+//            test.runInteractiveTests("interactive.*Event.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
@@ -283,7 +285,7 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
      * 
      * 
      */
-    public void interactiveFocusOnTogglePopup() {
+    public void interactiveFocusEventOnTogglePopup() {
         JXDatePicker picker = new JXDatePicker();
         final Action togglePopup = picker.getActionMap().get("TOGGLE_POPUP");
         JComboBox box = new JComboBox(new String[] {"one", "twos"});

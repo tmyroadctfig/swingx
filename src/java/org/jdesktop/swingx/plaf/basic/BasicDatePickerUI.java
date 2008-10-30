@@ -211,8 +211,15 @@ public class BasicDatePickerUI extends DatePickerUI {
         }
     }
 
+    /**
+     * Installs DatePicker default properties.
+     */
     protected void installDefaults() {
-
+        // PENDING JW: currently this is for testing only. 
+        boolean zoomable = Boolean.TRUE.equals(UIManager.get("JXDatePicker.forceZoomable")); 
+        if (zoomable) {
+            datePicker.getMonthView().setZoomable(true);
+        }
     }
 
     protected void uninstallDefaults() {

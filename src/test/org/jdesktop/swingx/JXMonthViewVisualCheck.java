@@ -62,12 +62,13 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
     private Calendar calendar;
 
     public static void main(String[] args) {
+//        UIManager.put("JXDatePicker.forceZoomable", Boolean.TRUE);
       setSystemLF(true);
       JXMonthViewVisualCheck  test = new JXMonthViewVisualCheck();
       try {
-//          test.runInteractiveTests();
+          test.runInteractiveTests();
 //        test.runInteractiveTests(".*TimeZone.*");
-        test.runInteractiveTests("interactive.*Zoomable.*");
+//        test.runInteractiveTests("interactive.*Zoomable.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
@@ -240,13 +241,6 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
             
         };
         addAction(frame, today);
-        Action antialiased = new AbstractActionExt("antialiased") {
-            public void actionPerformed(ActionEvent e) {
-                monthView.setAntialiased(!monthView.isAntialiased());
-            }
-            
-        };
-        addAction(frame, antialiased);
         Action daysOfWeek = new AbstractActionExt("daysOfWeek") {
             String[] days = {"S", "M", "D", "M", "D", "F", "S"};
             public void actionPerformed(ActionEvent e) {
