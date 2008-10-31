@@ -229,7 +229,7 @@ public class JXFindPanel extends AbstractPatternPanel {
      * Report that no match is found.
      */
     protected void showNotFoundMessage() {
-        JOptionPane.showMessageDialog(this, "Value not found");
+        JOptionPane.showMessageDialog(this, getUIString("notFound"));
     }
 
     
