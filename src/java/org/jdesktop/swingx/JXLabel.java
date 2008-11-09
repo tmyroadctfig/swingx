@@ -21,6 +21,7 @@
 
 package org.jdesktop.swingx;
 
+import java.applet.Applet;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -30,6 +31,9 @@ import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.Shape;
+import java.awt.Window;
+import java.awt.event.HierarchyBoundsAdapter;
+import java.awt.event.HierarchyEvent;
 import java.awt.geom.Point2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -40,9 +44,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.List;
+
 import javax.swing.Icon;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JViewport;
 import javax.swing.SizeRequirements;
+import javax.swing.border.Border;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentEvent.ElementChange;
 import javax.swing.plaf.basic.BasicHTML;
@@ -78,7 +86,7 @@ import org.jdesktop.swingx.painter.Painter;
  * </p>
  *
  * <p>
- * Painter support consists of the <code>foregroundPainter</code> and <code>backgroundpainter</code> properties. The
+ * Painter support consists of the <code>foregroundPainter</code> and <code>backgroundPainter</code> properties. The
  * <code>backgroundPainter</code> refers to a painter responsible for painting <i>beneath</i> the text and icon. This
  * painter, if set, will paint regardless of the <code>opaque</code> property. If the background painter does not
  * fully paint each pixel, then you should make sure the <code>opaque</code> property is set to false.
@@ -103,9 +111,8 @@ import org.jdesktop.swingx.painter.Painter;
  *
  * <p>
  * The text (actually, the entire foreground and background) of the JXLabel may be rotated. Set the
- * <code>rotation</code> property to specify what the rotation should be.
+ * <code>rotation</code> property to specify what the rotation should be. Specify rotation angle in radian units.
  * </p>
- * TODO not yet determined what API this will use.
  *
  * @author joshua.marinacci@sun.com
  * @author rbair
@@ -113,6 +120,7 @@ import org.jdesktop.swingx.painter.Painter;
  * @author mario_cesar
  */
 public class JXLabel extends JLabel {
+    
     // textOrientation value declarations...
     public static final double NORMAL = 0;
 
@@ -237,6 +245,20 @@ public class JXLabel extends JLabel {
         // FYI: no more listening for componentResized. Those events are delivered out
         // of order and without old values are meaningless and forcing us to react when
         // not necessary. Instead overriding reshape() ensures we have control over old AND new size.
+        addHierarchyBoundsListener(new HierarchyBoundsAdapter() {
+            public void ancestorResized(HierarchyEvent e) {
+                // if one of the parents is viewport, resized events will not be propagated down unless viewport is changing visibility of scrollbars.
+                // To make sure Label is able to re-wrap text when viewport size changes, initiate re-wrapping here by changing size of view
+                if (e.getChanged() instanceof JViewport) {
+                    Rectangle viewportBounds = e.getChanged().getBounds();
+                    if (viewportBounds.getWidth() < getWidth()) {
+                        View view = getWrappingView();
+                        if (view != null) {
+                            view.setSize(viewportBounds.width, viewportBounds.height);
+                        }
+                    }
+                }
+            }});
     }
 
     /**
@@ -256,13 +278,9 @@ public class JXLabel extends JLabel {
         if (!isLineWrap()) {
             return;
         }
-        // TODO:HAD
-        //log.fine("resized: " + w + ", " + h);
         if (oldH == 0) {
-            //log.fine("BAIL OUT");
             return;
         }
-        //log.fine("res:" + getVisibleRect());
         if (w > getVisibleRect().width) {
             w = getVisibleRect().width;
         }
@@ -271,10 +289,6 @@ public class JXLabel extends JLabel {
             Insets i = getInsets();
             int dx = i.left + i.right;
             Rectangle iconR = calculateIconRect();
-            int gap = (iconR.width == 0) ? 0 : getIconTextGap();
-
-            //occupiedWidth = dx + iconR.width + gap;
-            //((Renderer) view).invalidated = true;
             view.setSize(w - occupiedWidth, h);
         }
 
@@ -332,7 +346,6 @@ public class JXLabel extends JLabel {
     @Override
     public Dimension getPreferredSize() {
         Dimension size = super.getPreferredSize();
-        //log.fine("GPC!!!: " + size);
         //if (true) return size;
         if (isPreferredSizeSet()) {
             //log.fine("ret 0");
@@ -344,9 +357,8 @@ public class JXLabel extends JLabel {
             theta));
         } else {
             // #swingx-780 preferred size is not set properly when parent container doesn't enforce the width
-            View view = (View) getClientProperty(BasicHTML.propertyKey);
-            Container tla = super.getTopLevelAncestor();
-            if (view == null || tla == null || !(view instanceof Renderer)) {
+            View view = getWrappingView();
+            if (view == null) {
                 //log.fine("ret 1:" + size + ", " + view + ", " + tla);
                 return size;
             }
@@ -381,6 +393,15 @@ public class JXLabel extends JLabel {
                 gap = (iconR.width == 0) ? 0 : getIconTextGap();
 
                 occupiedWidth = dx + iconR.width + gap;
+                Object parent = getParent();
+                if (parent != null && (parent instanceof JPanel)) {
+                    JPanel panel = ((JPanel) parent);
+                    Border b = panel.getBorder();
+                    if (b != null) {
+                        Insets in = b.getBorderInsets(panel);
+                        occupiedWidth += in.left + in.right;
+                    }
+                }
                 if (getHorizontalTextPosition() == CENTER) {
                     availTextWidth = viewR.width;
                 }
@@ -491,6 +512,26 @@ public class JXLabel extends JLabel {
         }
         //log.fine("ret 3");
         return size;
+    }
+
+    private View getWrappingView() {
+        if (super.getTopLevelAncestor() == null) {
+            return null;
+        }
+        View view = (View) getClientProperty(BasicHTML.propertyKey);
+        if (!(view instanceof Renderer)) {
+            return null;
+        }
+        return view;
+    }
+
+    private Container getViewport() {
+        for(Container p = this; p != null; p = p.getParent()) {
+            if(p instanceof Window || p instanceof Applet || p instanceof JViewport) {
+                return p;
+            }
+        }
+        return null;
     }
 
     private Rectangle calculateIconRect() {
@@ -1134,7 +1175,6 @@ public class JXLabel extends JLabel {
          * @param height the height
          */
         public void setSize(float width, float height) {
-            //log.fine("SS:" + width + " (" + host.maxLineSpan + "), " + height);
             if (host.maxLineSpan > 0) {
                 width = Math.min(width, host.maxLineSpan);
             }
