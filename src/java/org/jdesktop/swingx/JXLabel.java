@@ -359,8 +359,14 @@ public class JXLabel extends JLabel {
             // #swingx-780 preferred size is not set properly when parent container doesn't enforce the width
             View view = getWrappingView();
             if (view == null) {
-                //log.fine("ret 1:" + size + ", " + view + ", " + tla);
-                return size;
+                if (isLineWrap() && !MultiLineSupport.isHTML(getText())) {
+                    // view might get lost on LAF change ...
+                    putClientProperty(BasicHTML.propertyKey, 
+                            getMultiLineSupport().createView(this));
+                    view = (View) getClientProperty(BasicHTML.propertyKey);
+                } else {
+                    return size;
+                }
             }
             Insets insets = getInsets();
             int dx = insets.left + insets.right;
@@ -383,7 +389,6 @@ public class JXLabel extends JLabel {
              * the value of textIconGap.
              */
             int gap;
-
             if (textIsEmpty) {
                 textR.width = textR.height = 0;
                 gap = 0;
@@ -910,7 +915,7 @@ public class JXLabel extends JLabel {
                 } else if ("lineWrap".equals(name) && !isHTML(src.getText())) {
                     src.putClientProperty(BasicHTML.propertyKey, createView(src));
                 }
-            } else if ("lineWrap".equals(name)) {
+            } else if ("lineWrap".equals(name) && !((Boolean)evt.getNewValue())) {
                 restoreHtmlRenderer(src);
             }
         }
