@@ -173,7 +173,14 @@ public class ColumnHeaderRenderer extends JComponent
     }
 
     private void initDelegate() {
-        JTableHeader header = new JTableHeader();
+        // JW: hacking around core problems with standalone table header
+        // so we create a core table and use its default header
+        // PENDING: sure about not introducing memory issues? 
+//        JTable table = new JTable();
+        JTableHeader header = null; //table.getTableHeader();
+        if (header == null) {
+            header = new JTableHeader();
+        }
         delegateRenderer = header.getDefaultRenderer();
     }
 

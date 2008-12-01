@@ -55,12 +55,22 @@ public class WrappingIconPanel extends JXPanel implements PainterAware {
     private boolean dropHackEnabled;
     
     
+    /**
+     * Instantiates and configures a WrappingIconPanel with the dropHack
+     * enabled.
+     * 
+     */
     public WrappingIconPanel() {
         this(true);
     }
-     /**
-      * 
-     * @param dropHackEnabled
+    /**
+     * Instantiates and configures a WrappingIconPanel with the dropHack
+     * property set as indicated by the boolean.
+     * 
+     * @param dropHackEnabled a boolean indicating whether the drop hack should
+     *        be enabled.
+     * 
+     * @see #isVisible()
      */
     public WrappingIconPanel(boolean dropHackEnabled) {
         setOpaque(false);
@@ -74,14 +84,20 @@ public class WrappingIconPanel extends JXPanel implements PainterAware {
         setDropHackEnabled(dropHackEnabled);
     }
     
-    
+    /**
+     * {@inheritDoc} <p>
+     * 
+     * Overridden to update the icon position.
+     */
     @Override
     public void setComponentOrientation(ComponentOrientation o) {
         super.setComponentOrientation(o);
         updateIconBorder();
     }
 
-
+    /**
+     * Updates the icon position according to ComponentOrientation.
+     */
     private void updateIconBorder() {
         if (ltorBorder == null) {
             ltorBorder = BorderFactory.createEmptyBorder(0, 0, 0, iconLabelGap);
@@ -102,6 +118,7 @@ public class WrappingIconPanel extends JXPanel implements PainterAware {
     public void setIcon(Icon icon) {
         iconLabel.setIcon(icon);
         iconLabel.setText(null);
+        validate();
     }
  
     /**
@@ -128,6 +145,14 @@ public class WrappingIconPanel extends JXPanel implements PainterAware {
         validate();
     }
 
+    /**
+     * Returns the delegate component.
+     * 
+     * @return the delegate component.
+     */
+    public JComponent getComponent() {
+        return delegate;
+    }
 
     /**
      * {@inheritDoc} <p>
