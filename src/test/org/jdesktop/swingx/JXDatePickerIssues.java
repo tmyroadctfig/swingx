@@ -21,6 +21,7 @@
  */
 package org.jdesktop.swingx;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -49,6 +50,7 @@ import javax.swing.SpinnerDateModel;
 
 import org.jdesktop.swingx.calendar.CalendarUtils;
 import org.jdesktop.swingx.calendar.DatePickerFormatter;
+import org.junit.Test;
 
 /**
  * Known issues of <code>JXDatePicker</code> and picker related 
@@ -61,13 +63,13 @@ public class JXDatePickerIssues extends InteractiveTestCase {
     private static final Logger LOG = Logger.getLogger(JXDatePickerIssues.class
             .getName());
     public static void main(String[] args) {
-        setSystemLF(true);
+//        setSystemLF(true);
 //        Trace14.keyboardFocusManager(true);
         JXDatePickerIssues  test = new JXDatePickerIssues();
         try {
 //            test.runInteractiveTests();
 //          test.runInteractiveTests("interactive.*UpdateUI.*");
-          test.runInteractiveTests("interactive.*Combo.*");
+          test.runInteractiveTests("interactive.*Editor.*");
 //          test.runInteractiveTests("interactive.*Visible.*");
           
         } catch (Exception e) {
@@ -79,6 +81,24 @@ public class JXDatePickerIssues extends InteractiveTestCase {
 
     private Calendar calendar;
 
+    /**
+     * Issue #955-swingx: editor should have same visual props as picker
+     */
+    public void interactivePickerToEditorVisuals() {
+        JXDatePicker picker = new JXDatePicker(calendar.getTime());
+        picker.setBackground(Color.RED);
+        picker.setForeground(Color.BLUE);
+        picker.setToolTipText("Colored editor");
+        JComboBox combo = new JComboBox(new Object[] {"just something", "and something else"});
+        combo.setEditable(true);
+        combo.setBackground(Color.RED);
+        combo.setForeground(Color.BLUE);
+        combo.setToolTipText("Colored combo editor");
+        JComponent box = new JXPanel();
+        box.add(picker);
+        box.add(combo);
+        showInFrame(box, "Colored editor");
+    }
     
     /**
      * Issue #913-swingx: Datepicker looks bad in some LFs (f.i. Nimbus)
@@ -411,6 +431,59 @@ public class JXDatePickerIssues extends InteractiveTestCase {
         frame.setVisible(true);
     }
 //-------------------- unit tests
+    
+    
+    /**
+     * Issue #955-swingx: editor should have same visual props as picker
+     */
+    @Test
+    public void testPickerSynchEditorColorsInitial() {
+        JXDatePicker picker = new JXDatePicker();
+        assertEquals(picker.getForeground(), picker.getEditor().getForeground());
+        assertEquals(picker.getBackground(), picker.getEditor().getBackground());
+    }
+    
+    /**
+     * Issue #955-swingx: editor should have same visual props as picker
+     * for comparison: combobox.
+     */
+    @Test
+    public void testComboSynchEditorColorsInitial() {
+        JComboBox picker = new JComboBox();
+        // make sure we have an editor
+        picker.setEditable(true);
+        assertEquals(picker.getForeground(), picker.getEditor().getEditorComponent().getForeground());
+        assertEquals(picker.getBackground(), picker.getEditor().getEditorComponent().getBackground());
+    }
+    
+    /**
+     * Issue #955-swingx: editor should have same visual props as picker
+     */
+    @Test
+    public void testPickerSynchEditorColors() {
+        JXDatePicker picker = new JXDatePicker();
+        picker.setBackground(Color.RED);
+        picker.setForeground(Color.BLUE);
+       assertEquals(picker.getForeground(), picker.getEditor().getForeground());
+        assertEquals(picker.getBackground(), picker.getEditor().getBackground());
+    }
+    
+    /**
+     * Issue #955-swingx: editor should have same visual props as picker
+     * for comparison: combobox.
+     */
+    @Test
+    public void testComboSynchEditorColors() {
+        JComboBox picker = new JComboBox();
+        // make sure we have an editor
+        picker.setEditable(true);
+        picker.setBackground(Color.RED);
+        picker.setForeground(Color.BLUE);
+        assertEquals(picker.getForeground(), picker.getEditor().getEditorComponent().getForeground());
+        assertEquals(picker.getBackground(), picker.getEditor().getEditorComponent().getBackground());
+    }
+
+    
     /**
      * Issue #764-swingx: picker prefsize too narrow
      */

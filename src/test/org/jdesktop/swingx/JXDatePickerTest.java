@@ -59,11 +59,11 @@ import org.jdesktop.swingx.test.XTestUtils;
 import org.jdesktop.test.ActionReport;
 import org.jdesktop.test.PropertyChangeReport;
 import org.jdesktop.test.TestUtils;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.junit.Test;
-import org.junit.Before;
-import org.junit.After;
 
 
 /**
@@ -87,6 +87,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
        public void tearDown() {
     }
 
+    
     /**
      * Issue #910-swingx: home commit must be disabled if picker not editable.
      * 
