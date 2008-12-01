@@ -20,17 +20,13 @@
  */
 package org.jdesktop.swingx.search;
 
-import java.awt.Color;
 import java.awt.Rectangle;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.decorator.AbstractHighlighter;
-import org.jdesktop.swingx.decorator.ColorHighlighter;
-import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.Highlighter;
-import org.jdesktop.swingx.decorator.SearchPredicate;
 
 public class TableSearchable extends AbstractSearchable {
 
@@ -148,15 +144,6 @@ public class TableSearchable extends AbstractSearchable {
          * @return an appropriate <code>SearchResult</code> if matching or null
          */
         protected SearchResult findMatchAt(Pattern pattern, int row, int column) {
-         // this is pre-767-swingx: consistent string api
-//            Object value = getValueAt(row, column);
-//            if (value != null) {
-//                Matcher matcher = pattern.matcher(value.toString());
-//                if (matcher.find()) {
-//                    return createSearchResult(matcher, row, column);
-//                }
-//            }
-//             @KEEP JW replacement once we have a uniform string representatioon
             String text = table.getStringAt(row, column);
             if ((text != null) && (text.length() > 0 )) {
                 Matcher matcher = pattern.matcher(text);
@@ -232,10 +219,22 @@ public class TableSearchable extends AbstractSearchable {
         }
 
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         protected int getSize() {
             return table.getRowCount();
         }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public JXTable getTarget() {
+            return table;
+        }
+
 
         /**
          * use and move the match highlighter.
@@ -245,43 +244,35 @@ public class TableSearchable extends AbstractSearchable {
         protected void moveMatchByHighlighter() {
             AbstractHighlighter searchHL = getConfiguredMatchHighlighter();
             // no match
-            if (!hasMatch(lastSearchResult)) {
+            if (!hasMatch()) {
                 return;
             } else {
                 ensureInsertedSearchHighlighters(searchHL);
-                Rectangle cellRect = table.getCellRect(lastSearchResult.foundRow, lastSearchResult.foundColumn, true);
-                if (cellRect != null) {
-                    table.scrollRectToVisible(cellRect);
-                }
+                table.scrollCellToVisible(lastSearchResult.foundRow, lastSearchResult.foundColumn);
+//                Rectangle cellRect = table.getCellRect(lastSearchResult.foundRow, lastSearchResult.foundColumn, true);
+//                if (cellRect != null) {
+//                    table.scrollRectToVisible(cellRect);
+//                }
             }
         }
 
         /**
-         * @return a highlighter configured for matching
+         * {@inheritDoc}
+         * Overridden to convert the column index in the table's view coordinate system to
+         * model coordinate. <p>
+         * 
+         * PENDING JW: this is only necessary because the SearchPredicate wants its 
+         * highlight column in model coordinates. But
+         * code comments in the SearchPredicate seem to indicate that we probably want to
+         * revise that (legacy?).
          */
-        protected AbstractHighlighter getConfiguredMatchHighlighter() {
-            AbstractHighlighter searchHL = getMatchHighlighter();
-            HighlightPredicate predicate = HighlightPredicate.NEVER;
-            // no match
-            if (hasMatch(lastSearchResult)) {
-                predicate = new SearchPredicate(lastSearchResult.pattern, lastSearchResult.foundRow, table.convertColumnIndexToModel(lastSearchResult.foundColumn));
-            }
-            searchHL.setHighlightPredicate(predicate);
-            return searchHL;
+        @Override
+        protected int convertColumnIndexToModel(int viewColumn) {
+            return getTarget().convertColumnIndexToModel(viewColumn);
         }
 
-        /**
-         * @param result
-         * @return {@code true} if the {@code result} contains a match;
-         *         {@code false} otherwise
-         */
-        protected boolean hasMatch(SearchResult result) {
-            boolean noMatch =  (result.getFoundRow() < 0) || (result.getFoundColumn() < 0);
-            return !noMatch;
-        }
-        
         protected void moveMatchBySelection() {
-            if (!hasMatch(lastSearchResult)) {
+            if (!hasMatch()) {
                 return;
             }
             int row = lastSearchResult.foundRow;
@@ -306,61 +297,28 @@ public class TableSearchable extends AbstractSearchable {
         }
 
 
-        protected boolean markByHighlighter() {
-            return Boolean.TRUE.equals(table.getClientProperty(MATCH_HIGHLIGHTER));
-        }
-
-
-        private void ensureInsertedSearchHighlighters(Highlighter highlighter) {
-            if (!isInPipeline(highlighter)) {
-                table.addHighlighter(highlighter);
-            }
-        }
-
-        private boolean isInPipeline(Highlighter searchHighlighter) {
-            Highlighter[] inPipeline = table.getHighlighters();
-            if ((inPipeline.length > 0) && 
-               (searchHighlighter.equals(inPipeline[inPipeline.length -1]))) {
-                return true;
-            }
+        /**
+         * @param searchHighlighter
+         */
+        @Override
+        protected void removeHighlighter(Highlighter searchHighlighter) {
             table.removeHighlighter(searchHighlighter);
-            return false;
-        }
-
-        private AbstractHighlighter matchHighlighter;
-        
-        /**
-         * @return a highlighter used for matching
-         */
-        protected AbstractHighlighter getMatchHighlighter() {
-            if (matchHighlighter == null) {
-                matchHighlighter = createMatchHighlighter();
-            }
-            return matchHighlighter;
         }
 
         /**
-         * @return a highlighter used for matching
+         * @return
          */
-        protected AbstractHighlighter createMatchHighlighter() {
-            return new ColorHighlighter(HighlightPredicate.NEVER, Color.YELLOW.brighter(), 
-                    null, Color.YELLOW.brighter(), 
-                    null);
+        @Override
+        protected Highlighter[] getHighlighters() {
+            return table.getHighlighters();
         }
 
+        /**
+         * @param highlighter
+         */
+        @Override
+        protected void addHighlighter(Highlighter highlighter) {
+            table.addHighlighter(highlighter);
+        }
         
-//        private SearchHighlighter searchHighlighter;
-        
-
-//        protected SearchHighlighter getSearchHighlighter() {
-//            if (searchHighlighter == null) {
-//                searchHighlighter = createSearchHighlighter();
-//            }
-//            return searchHighlighter;
-//        }
-//        
-//        protected SearchHighlighter createSearchHighlighter() {
-//            return new SearchHighlighter();
-//        }
-
     }

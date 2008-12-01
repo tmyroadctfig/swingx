@@ -7,6 +7,7 @@
 
 package org.jdesktop.swingx;
 
+import java.awt.Color;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
@@ -21,10 +22,19 @@ import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 
-import org.jdesktop.swingx.FindTest.TestListModel;
-import org.jdesktop.swingx.FindTest.TestTableModel;
 import org.jdesktop.swingx.action.AbstractActionExt;
+import org.jdesktop.swingx.decorator.AbstractHighlighter;
+import org.jdesktop.swingx.decorator.ColorHighlighter;
+import org.jdesktop.swingx.decorator.CompoundHighlighter;
+import org.jdesktop.swingx.decorator.HighlightPredicate;
+import org.jdesktop.swingx.decorator.SearchPredicate;
+import org.jdesktop.swingx.renderer.DefaultTreeRenderer;
+import org.jdesktop.swingx.renderer.IconValues;
+import org.jdesktop.swingx.renderer.StringValues;
 import org.jdesktop.swingx.search.SearchFactory;
+import org.jdesktop.swingx.search.TableSearchable;
+import org.jdesktop.swingx.search.FindTest.TestListModel;
+import org.jdesktop.swingx.search.FindTest.TestTableModel;
 import org.jdesktop.swingx.treetable.FileSystemModel;
 import org.jdesktop.test.AncientSwingTeam;
 
@@ -57,6 +67,60 @@ public class FindVisualCheck extends InteractiveTestCase {
         super("Find Action Test");
     }
 
+    /**
+     * Requirement: mark all matches. Working in incrememtal find mode only
+     */
+    public void interactiveTableMarkAllMatches() {
+        JXTable table = new JXTable();
+        table.setSearchable(new XTableSearchable(table));
+        table.setModel(new TestTableModel());
+//        SearchFactory.getInstance().setUseFindBar(true);
+        showWithScrollingInFrame(table, "mark all matches - must enable incremental find mode");
+    }
+    
+    /**
+     * Searchable which highlights all matches.
+     */
+    public static class XTableSearchable extends TableSearchable {
+        
+        private ColorHighlighter cell;
+        private ColorHighlighter base;
+
+        /**
+         * @param table
+         */
+        public XTableSearchable(JXTable table) {
+            super(table);
+        }
+
+        
+        @Override
+        protected AbstractHighlighter getConfiguredMatchHighlighter() {
+            AbstractHighlighter hl = super.getConfiguredMatchHighlighter();
+            if (hasMatch()) {
+                cell.setHighlightPredicate(super.createMatchPredicate());
+            }
+            return hl;
+        }
+
+
+        @Override
+        protected HighlightPredicate createMatchPredicate() {
+            return hasMatch() ? new SearchPredicate(lastSearchResult.getPattern()) : HighlightPredicate.NEVER;
+        }
+
+        @Override
+        protected AbstractHighlighter createMatchHighlighter() {
+            base = new ColorHighlighter(Color.YELLOW.brighter(), null, 
+                    Color.YELLOW.darker(), null);
+            cell = new ColorHighlighter(Color.YELLOW.darker(), null);
+            CompoundHighlighter match = new CompoundHighlighter(base, cell);
+            return match;
+        }
+
+    }
+
+    
    /**
     * Requirement: hook into close. 
     * 
@@ -162,8 +226,12 @@ public class FindVisualCheck extends InteractiveTestCase {
     
     public void interactiveShowTree() {
         JXTree tree = new JXTree(new FileSystemModel());
+        tree.setCellRenderer(new DefaultTreeRenderer(IconValues.FILE_ICON, StringValues.FILE_NAME));
+        tree.setRowHeight(30);
+        tree.setLargeModel(true);
         showComponent(tree, "Search in XTree");
     }
+    
     public void interactiveShowList() {
         showComponent(new JXList(new TestListModel()), "Search in XList");
     }

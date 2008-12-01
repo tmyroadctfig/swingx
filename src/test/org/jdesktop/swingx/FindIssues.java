@@ -6,19 +6,11 @@
  */
 package org.jdesktop.swingx;
 
-import java.awt.Color;
-
 import javax.swing.AbstractListModel;
 
-import org.jdesktop.swingx.decorator.AbstractHighlighter;
-import org.jdesktop.swingx.decorator.ColorHighlighter;
-import org.jdesktop.swingx.decorator.CompoundHighlighter;
-import org.jdesktop.swingx.decorator.HighlightPredicate;
-import org.jdesktop.swingx.decorator.SearchPredicate;
+import org.jdesktop.swingx.search.FindTest;
 import org.jdesktop.swingx.search.PatternModel;
-import org.jdesktop.swingx.search.SearchFactory;
 import org.jdesktop.swingx.search.Searchable;
-import org.jdesktop.swingx.search.TableSearchable;
 
 
 /**
@@ -85,51 +77,6 @@ public class FindIssues extends FindTest {
 
     // -------------------- interactive tests
 
-    
-    public void interactiveTableMarkAllMatches() {
-        JXTable table = new JXTable();
-        table.setSearchable(new XTableSearchable(table));
-        table.setModel(new TestTableModel());
-        SearchFactory.getInstance().setUseFindBar(true);
-        showWithScrollingInFrame(table, "quick sample for mark all matches");
-    }
-    
-    /**
-     * Searchable which highlights all matches.
-     */
-    public static class XTableSearchable extends TableSearchable {
-        
-        /**
-         * @param table
-         */
-        public XTableSearchable(JXTable table) {
-            super(table);
-        }
-
-        @Override
-        protected AbstractHighlighter getConfiguredMatchHighlighter() {
-            CompoundHighlighter searchHL = (CompoundHighlighter) getMatchHighlighter();
-            if (!hasMatch(lastSearchResult)) {
-                searchHL.setHighlightPredicate(HighlightPredicate.NEVER);
-            } else {
-                searchHL.setHighlightPredicate(new SearchPredicate(lastSearchResult.getPattern()));
-                ((AbstractHighlighter) searchHL.getHighlighters()[1]).setHighlightPredicate(
-                        new SearchPredicate(lastSearchResult.getPattern(), 
-                                lastSearchResult.getFoundRow(), lastSearchResult.getFoundColumn()));
-            }
-            return searchHL;
-        }
-
-        @Override
-        protected AbstractHighlighter createMatchHighlighter() {
-            ColorHighlighter base = new ColorHighlighter(Color.YELLOW.brighter(), null, 
-                    Color.YELLOW.darker(), null);
-            ColorHighlighter cell = new ColorHighlighter(Color.YELLOW.darker(), null);
-            CompoundHighlighter match = new CompoundHighlighter(base, cell);
-            return match;
-        }
-
-    }
 
     /**
      * #463-swingx: batch find and cellSelection don't play nicely.

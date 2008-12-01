@@ -24,6 +24,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.jdesktop.swingx.JXList;
+import org.jdesktop.swingx.decorator.AbstractHighlighter;
+import org.jdesktop.swingx.decorator.Highlighter;
 
 public class ListSearchable extends AbstractSearchable {
 
@@ -67,47 +69,94 @@ public class ListSearchable extends AbstractSearchable {
             if ((text != null) && (text.length() > 0 )) {
                 Matcher matcher = pattern.matcher(text);
                 if (matcher.find()) {
-                    return createSearchResult(matcher, row, -1);
+                    return createSearchResult(matcher, row, 0);
                 }
             }
             return null;
-// this is pre-767-swingx: consistent string api
-//            Object value = getElementAt(row);
-//            if (value != null) {
-//                Matcher matcher = pattern.matcher(value.toString());
-//                if (matcher.find()) {
-//                    return createSearchResult(matcher, row, -1);
-//                }
-//            }
-//            return null;
         }
         
+        /**
+         * {@inheritDoc}
+         */
         @Override
         protected int getSize() {
             return list.getElementCount();
         }
 
-        /**
-         * @param result
-         * @return {@code true} if the {@code result} contains a match;
-         *         {@code false} otherwise
-         */
-        protected boolean hasMatch(SearchResult result) {
-            return result.getFoundRow() >= 0;
-        }
         
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public JXList getTarget() {
+            return list;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
         @Override
         protected void moveMatchMarker() {
-            // PENDING JW: #718-swingx - don't move selection on not found
-            // complying here is accidental, defaultListSelectionModel doesn't
-            // clear on -1 but silently does nothing
-            // isn't doc'ed anywhere - so we back out
-            if (!hasMatch(lastSearchResult)) {
+            if (markByHighlighter()) {
+                moveMatchByHighlighter();
+            } else { // use selection
+                moveMatchBySelection();
+            }
+        }
+        
+        protected void moveMatchBySelection() {
+          // PENDING JW: #718-swingx - don't move selection on not found
+          // complying here is accidental, defaultListSelectionModel doesn't
+          // clear on -1 but silently does nothing
+          // isn't doc'ed anywhere - so we back out
+            if (!hasMatch()) {
                 return;
             }
             list.setSelectedIndex(lastSearchResult.foundRow);
             list.ensureIndexIsVisible(lastSearchResult.foundRow);
+        }
+        
 
+        /**
+         * use and move the match highlighter.
+         * PRE: markByHighlighter
+         *
+         */
+        protected void moveMatchByHighlighter() {
+            AbstractHighlighter searchHL = getConfiguredMatchHighlighter();
+            // no match
+            if (!hasMatch()) {
+                return;
+            } else {
+                ensureInsertedSearchHighlighters(searchHL);
+                list.ensureIndexIsVisible(lastSearchResult.foundRow);
+            }
+        }
+
+
+
+        /**
+         * @param searchHighlighter
+         */
+        @Override
+        protected void removeHighlighter(Highlighter searchHighlighter) {
+            list.removeHighlighter(searchHighlighter);
+        }
+
+        /**
+         * @return
+         */
+        @Override
+        protected Highlighter[] getHighlighters() {
+            return list.getHighlighters();
+        }
+
+        /**
+         * @param highlighter
+         */
+        @Override
+        protected void addHighlighter(Highlighter highlighter) {
+            list.addHighlighter(highlighter);
         }
 
     }

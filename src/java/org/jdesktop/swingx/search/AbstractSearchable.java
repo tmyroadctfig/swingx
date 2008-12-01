@@ -20,9 +20,18 @@
  */
 package org.jdesktop.swingx.search;
 
+import java.awt.Color;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.swing.JComponent;
+
+import org.jdesktop.swingx.decorator.AbstractHighlighter;
+import org.jdesktop.swingx.decorator.ColorHighlighter;
+import org.jdesktop.swingx.decorator.HighlightPredicate;
+import org.jdesktop.swingx.decorator.Highlighter;
+import org.jdesktop.swingx.decorator.SearchPredicate;
 
 /**
  * An abstract implementation of Searchable supporting
@@ -38,13 +47,21 @@ import java.util.regex.Pattern;
 public abstract class AbstractSearchable implements Searchable {
     /**
      * a constant representing not-found state.
+     * 
+     * PENDING JW: this is not entirely safe as it's not immutable.
+     * Not used any longer? Deprecate for safety, waiting for complaints :-)
+     * 
+     * @deprecated no longer used (because a SearchResult is not immutable)
      */
+    @Deprecated
     public static final SearchResult NO_MATCH = new SearchResult();
 
     /**
      * stores the result of the previous search.
      */
-    protected SearchResult lastSearchResult = new SearchResult();
+    protected final SearchResult lastSearchResult = new SearchResult();
+
+    private AbstractHighlighter matchHighlighter;
     
 
     /** key for client property to use SearchHighlighter as match marker. */
@@ -344,6 +361,141 @@ public abstract class AbstractSearchable implements Searchable {
     protected abstract void moveMatchMarker();
 
     /**
+     * It's the responsibility of subclasses to covariant override.
+     * 
+     * @return the target component
+     */
+    public abstract JComponent getTarget();
+
+    /**
+     * @param searchHighlighter
+     */
+    protected abstract void removeHighlighter(Highlighter searchHighlighter);
+
+    /**
+     * @return
+     */
+    protected abstract Highlighter[] getHighlighters();
+
+    /**
+     * @param highlighter
+     */
+    protected abstract void addHighlighter(Highlighter highlighter);
+    
+    protected void ensureInsertedSearchHighlighters(Highlighter highlighter) {
+        if (!isInPipeline(highlighter)) {
+            addHighlighter(highlighter);
+        }
+    }
+
+
+    private boolean isInPipeline(Highlighter searchHighlighter) {
+        Highlighter[] inPipeline = getHighlighters();
+        if ((inPipeline.length > 0) && 
+           (searchHighlighter.equals(inPipeline[inPipeline.length -1]))) {
+            return true;
+        }
+        removeHighlighter(searchHighlighter);
+        return false;
+    }
+
+    /**
+     * Converts and returns the given column index from view coordinates to model
+     * coordinates. This implementation returns the view coordinate, that is assumes
+     * that both coordinate systems are the same. 
+     * 
+     * @param viewColumn the column index in view coordinates, must be a valid index 
+     *   in that system. 
+     * @return the column index in model coordinates. 
+     */
+    protected int convertColumnIndexToModel(int viewColumn) {
+        return viewColumn;
+    }
+    
+    /**
+     * 
+     * @param result
+     * @return {@code true} if the {@code result} contains a match;
+     *         {@code false} otherwise
+     */
+    private boolean hasMatch(SearchResult result) {
+        boolean noMatch =  (result.getFoundRow() < 0) || (result.getFoundColumn() < 0);
+        return !noMatch;
+    }
+
+    protected boolean hasMatch() {
+        return hasMatch(lastSearchResult);
+    }
+    /**
+     * Returns a boolean indicating whether a match should be marked with a Highlighter.
+     * This implementation returns true if the target component has a client property for
+     * key MATCH_HIGHLIGHTER with value Boolean.TRUE, false otherwise.
+     * 
+     * @return a boolean indicating whether a match should be marked by a using a Highlighter.
+     */
+    protected boolean markByHighlighter() {
+        return Boolean.TRUE.equals(getTarget().getClientProperty(MATCH_HIGHLIGHTER));
+    }
+
+    /**
+     * Sets the AbstractHighlighter to use for match marker, if enabled. A null value
+     * will re-install the default.
+     * 
+     * @param hl
+     */
+    public void setMatchHighlighter(AbstractHighlighter hl) {
+        matchHighlighter = hl;
+        if (markByHighlighter()) {
+            getConfiguredMatchHighlighter();
+        }
+    }
+    
+    /**
+     * Returns the Hihglighter to use as match marker, lazyly created if null.
+     * 
+     * @return a highlighter used for matching, guaranteed to be not null.
+     */
+    protected AbstractHighlighter getMatchHighlighter() {
+        if (matchHighlighter == null) {
+            matchHighlighter = createMatchHighlighter();
+        }
+        return matchHighlighter;
+    }
+
+    /**
+     * Creates and returns the Highlighter used as match marker.
+     * @return a highlighter used for matching
+     */
+    protected AbstractHighlighter createMatchHighlighter() {
+        return new ColorHighlighter(HighlightPredicate.NEVER, Color.YELLOW.brighter(), 
+                null, Color.YELLOW.brighter(), 
+                null);
+    }
+
+    
+    /**
+     * @return a highlighter configured for matching
+     */
+    protected AbstractHighlighter getConfiguredMatchHighlighter() {
+        AbstractHighlighter searchHL = getMatchHighlighter();
+        searchHL.setHighlightPredicate(createMatchPredicate());
+        return searchHL;
+    }
+
+    /**
+     * Creates and returns a HighlightPredicate appropriate for the current
+     * search result.
+     * 
+     * @return a HighlightPredicate appropriate for the current search result.
+     */
+    protected HighlightPredicate createMatchPredicate() {
+        return hasMatch() ? 
+                new SearchPredicate(lastSearchResult.pattern, lastSearchResult.foundRow, 
+                        convertColumnIndexToModel(lastSearchResult.foundColumn))
+                : HighlightPredicate.NEVER;
+    }
+
+    /**
      * A convenience class to hold search state.
      * NOTE: this is still in-flow, probably will take more responsibility/
      * or even change altogether on further factoring
@@ -403,4 +555,5 @@ public abstract class AbstractSearchable implements Searchable {
             return pattern;
         }
     }
+
 }

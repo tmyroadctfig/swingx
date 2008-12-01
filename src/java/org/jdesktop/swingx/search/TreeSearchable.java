@@ -24,6 +24,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.jdesktop.swingx.JXTree;
+import org.jdesktop.swingx.decorator.AbstractHighlighter;
+import org.jdesktop.swingx.decorator.Highlighter;
 
 /**
      * A searchable targetting the visible rows of a JXTree.
@@ -84,23 +86,10 @@ import org.jdesktop.swingx.JXTree;
             if ((text != null) && (text.length() > 0 )) {
                 Matcher matcher = pattern.matcher(text);
                 if (matcher.find()) {
-                    return createSearchResult(matcher, row, -1);
+                    return createSearchResult(matcher, row, 0);
                 }
             }
             return null;
-         // this is pre-767-swingx: consistent string api
-//            TreePath path = getPathForRow(row);
-//            Object value = null;
-//            if (path != null) {
-//                value = path.getLastPathComponent();
-//            }
-//            if (value != null) {
-//                Matcher matcher = pattern.matcher(value.toString());
-//                if (matcher.find()) {
-//                    return createSearchResult(matcher, row, -1);
-//                }
-//            }
-//            return null;
         }
 
         @Override
@@ -109,25 +98,77 @@ import org.jdesktop.swingx.JXTree;
         }
 
         /**
-         * @param result
-         * @return {@code true} if the {@code result} contains a match;
-         *         {@code false} otherwise
+         * {@inheritDoc}
          */
-        protected boolean hasMatch(SearchResult result) {
-            return result.getFoundRow() >= 0;
+        @Override
+        public JXTree getTarget() {
+            return tree;
+        }
+
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        protected void moveMatchMarker() {
+            if (markByHighlighter()) {
+                moveMatchByHighlighter();
+            } else { // use selection
+                moveMatchBySelection();
+            }
+        }
+        
+        protected void moveMatchBySelection() {
+//          // the common behaviour (JXList, JXTable) is to not
+//          // move the selection if not found
+            if (!hasMatch()) {
+                return;
+            }
+          tree.setSelectionRow(lastSearchResult.foundRow);
+          tree.scrollRowToVisible(lastSearchResult.foundRow);
         }
         
 
-        @Override
-        protected void moveMatchMarker() {
-            // the common behaviour (JXList, JXTable) is to not
-            // move the selection if not found
-            if (!hasMatch(lastSearchResult)) {
+        /**
+         * use and move the match highlighter.
+         * PRE: markByHighlighter
+         *
+         */
+        protected void moveMatchByHighlighter() {
+            AbstractHighlighter searchHL = getConfiguredMatchHighlighter();
+            // no match
+            if (!hasMatch()) {
                 return;
+            } else {
+                ensureInsertedSearchHighlighters(searchHL);
+                tree.scrollRowToVisible(lastSearchResult.foundRow);
             }
-            tree.setSelectionRow(lastSearchResult.foundRow);
-            tree.scrollRowToVisible(lastSearchResult.foundRow);
+        }
 
+
+
+        /**
+         * @param searchHighlighter
+         */
+        @Override
+        protected void removeHighlighter(Highlighter searchHighlighter) {
+            tree.removeHighlighter(searchHighlighter);
+        }
+
+        /**
+         * @return
+         */
+        @Override
+        protected Highlighter[] getHighlighters() {
+            return tree.getHighlighters();
+        }
+
+        /**
+         * @param highlighter
+         */
+        @Override
+        protected void addHighlighter(Highlighter highlighter) {
+            tree.addHighlighter(highlighter);
         }
 
     }
