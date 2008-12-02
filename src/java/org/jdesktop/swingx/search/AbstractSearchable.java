@@ -444,6 +444,7 @@ public abstract class AbstractSearchable implements Searchable {
      * @param hl
      */
     public void setMatchHighlighter(AbstractHighlighter hl) {
+        removeHighlighter(matchHighlighter);
         matchHighlighter = hl;
         if (markByHighlighter()) {
             getConfiguredMatchHighlighter();

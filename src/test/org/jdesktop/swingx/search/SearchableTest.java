@@ -21,13 +21,15 @@
  */
 package org.jdesktop.swingx.search;
 
+import java.util.Arrays;
+
 import junit.framework.TestCase;
 
 import org.jdesktop.swingx.JXList;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.JXTree;
 import org.jdesktop.swingx.decorator.AbstractHighlighter;
-import org.jdesktop.swingx.decorator.HighlightPredicate;
+import org.jdesktop.swingx.decorator.BorderHighlighter;
 import org.jdesktop.swingx.decorator.SearchPredicate;
 import org.jdesktop.swingx.search.FindTest.TestListModel;
 import org.jdesktop.swingx.search.FindTest.TestTableModel;
@@ -42,6 +44,33 @@ import org.junit.runners.JUnit4;
  */
 @RunWith(JUnit4.class)
 public class SearchableTest extends TestCase {
+
+    /** 
+     * test that any old matchHighlighter is removed from the
+     * target's pipeline.
+     *
+     */
+    @Test
+    public void testSetMatchHighlighterCleanup() {
+        JXTable table = new JXTable(new TestTableModel());
+        table.putClientProperty(AbstractSearchable.MATCH_HIGHLIGHTER, Boolean.TRUE);
+        // move first column to end
+        int firstColumn = 0;
+        int row = 39;
+        String firstSearchText = table.getValueAt(row, firstColumn).toString();
+        PatternModel model = new PatternModel();
+        model.setRawText(firstSearchText);
+        // initialize searchable to "found state"
+        table.getSearchable().search(model.getPattern(), -1);
+        AbstractHighlighter hl = ((AbstractSearchable) table.getSearchable()).getMatchHighlighter();
+        assertSame(hl, table.getHighlighters()[table.getHighlighters().length - 1]);
+        AbstractHighlighter replaceHL = new BorderHighlighter();
+        ((AbstractSearchable) table.getSearchable()).setMatchHighlighter(replaceHL);
+        // initialize searchable to "found state"
+        table.getSearchable().search(model.getPattern(), -1);
+        assertSame(replaceHL, table.getHighlighters()[table.getHighlighters().length - 1]);
+        assertFalse("previous matchhighlighter must be removed", Arrays.asList(table.getHighlighters()).contains(hl));
+    }
 
     
     /** 
