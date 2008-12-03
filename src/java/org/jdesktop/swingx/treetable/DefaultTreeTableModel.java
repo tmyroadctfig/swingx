@@ -272,7 +272,7 @@ public class DefaultTreeTableModel extends AbstractTreeTableModel {
                     "parent must be a TreeTableNode managed by this model");
         }
 
-        if (!isValidTreeTableNode(parent)) {
+        if (!isValidTreeTableNode(child)) {
             throw new IllegalArgumentException(
                     "child must be a TreeTableNode managed by this model");
         }
@@ -415,15 +415,14 @@ public class DefaultTreeTableModel extends AbstractTreeTableModel {
      * @throws NullPointerException
      *             if {@code path} is {@code null}
      * @throws IllegalArgumentException
-     *             if {@code path} is empty or is not a path managed by this
-     *             model
+     *             if {@code path} is not a path managed by this model
      * @throws ClassCastException
      *             if {@code path.getLastPathComponent()} is not a {@code
      *             TreeTableNode}
      */
     @Override
     public void valueForPathChanged(TreePath path, Object newValue) {
-        if (path.getPathCount() == 0 || path.getPathComponent(0) != root) {
+        if (path.getPathComponent(0) != root) {
             throw new IllegalArgumentException("invalid path");
         }
         
