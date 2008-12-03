@@ -32,7 +32,7 @@ public class ActionMapTreeTableModel extends DefaultTreeTableModel {
     public ActionMapTreeTableModel(JComponent comp) {
         super();
         setRoot(createRootNodeExt(comp));
-        Vector names = new Vector();
+        Vector<String> names = new Vector<String>();
         names.add("Key Name");
         names.add("Action Name");
         names.add("Action Command");
@@ -44,7 +44,7 @@ public class ActionMapTreeTableModel extends DefaultTreeTableModel {
         ActionMap map = comp.getActionMap();
         if (map == null)
             throw new IllegalArgumentException("Component must have ActionMap");
-        List actionMaps = new ArrayList();
+        List<ActionMap> actionMaps = new ArrayList<ActionMap>();
         actionMaps.add(map);
         while ((map = map.getParent()) != null) {
             actionMaps.add(0, map);
@@ -52,7 +52,7 @@ public class ActionMapTreeTableModel extends DefaultTreeTableModel {
         return createActionEntryNodes(actionMaps);
     }
 
-    private ActionEntryNode createActionEntryNodes(List actionMaps) {
+    private ActionEntryNode createActionEntryNodes(List<ActionMap> actionMaps) {
         ActionMap topLevel = (ActionMap) actionMaps.get(0);
         ActionEntryNode mapRoot = new ActionEntryNode("topLevel", topLevel, null);
         ActionEntryNode current = mapRoot;
@@ -78,7 +78,7 @@ public class ActionMapTreeTableModel extends DefaultTreeTableModel {
             this.parent = parent;
             this.key = key;
             this.action = action;
-            children = Collections.EMPTY_LIST;
+            children = Collections.emptyList();
         }
 
         public ActionEntryNode(Object key, ActionMap map, ActionEntryNode parent) {
@@ -157,6 +157,10 @@ public class ActionMapTreeTableModel extends DefaultTreeTableModel {
         }
 
         //---------------- implement TreeTableNode
+        
+        public Class<?> getColumnClass(int index) {
+            return Object.class;
+        }
         
         public int getColumnCount() {
             return 2;
