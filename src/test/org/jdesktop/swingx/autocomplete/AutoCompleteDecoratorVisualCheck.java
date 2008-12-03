@@ -48,6 +48,21 @@ public class AutoCompleteDecoratorVisualCheck extends InteractiveTestCase {
     }
     
     /**
+     * SwingX 959: Ensure that {@code null} items are selectable.
+     */
+    public void interactiveCompletionOfNull() {
+        JComboBox combo = new JComboBox(new String[] {
+                "A1", "A2", null, "A4", "A5",
+        });
+        
+        AutoCompleteDecorator.decorate(combo);
+        
+        JFrame frame = wrapInFrame(combo, "combo with null");
+        frame.pack();
+        frame.setVisible(true);
+    }
+    
+    /**
      * do nothing test - keep the testrunner happy.
      */
     public void testDummy() {
