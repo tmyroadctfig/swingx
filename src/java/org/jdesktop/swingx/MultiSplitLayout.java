@@ -237,6 +237,7 @@ public class MultiSplitLayout implements LayoutManager
    * @return the node associated with the component
    * @deprecated please use getNodeForName instead
    */
+  @Deprecated
   public Node getNodeForComponent( String name )
   {   
     return getNodeForName( name );
@@ -292,6 +293,7 @@ public class MultiSplitLayout implements LayoutManager
    * @return the node associated with the component
    * @deprecated please use getNodeForName instead
    */
+  @Deprecated
   public Node getNodeForComponent( Split split, String name )
   {
     return getNodeForName( split, name );
