@@ -60,14 +60,22 @@ public class JXMultiSplitPane extends JPanel {
      * to an empty MultiSplitLayout.
      */
     public JXMultiSplitPane() {
-        super(new MultiSplitLayout());
+        this(new MultiSplitLayout());
+    }
+
+    /**
+     * Creates a MultiSplitPane.
+     * @param layout the new split pane's layout
+     */
+    public JXMultiSplitPane( MultiSplitLayout layout ) {
+        super(layout);
         InputHandler inputHandler = new InputHandler();
         addMouseListener(inputHandler);
         addMouseMotionListener(inputHandler);
         addKeyListener(inputHandler);
         setFocusable(true);
     }
-
+    
     /** 
      * A convenience method that returns the layout manager cast 
      * to MutliSplitLayout.
