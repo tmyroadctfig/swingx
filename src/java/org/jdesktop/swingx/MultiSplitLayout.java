@@ -228,19 +228,29 @@ public class MultiSplitLayout implements LayoutManager
    */
   public Node getNodeForComponent( Component comp )
   {   
-    return getNodeForComponent( getNameForComponent( comp ));
+    return getNodeForName( getNameForComponent( comp ));
   }
 
   /**
    * Get the MultiSplitLayout.Node associated with a component 
    * @param name the name used to associate a component with the layout
    * @return the node associated with the component
+   * @deprecated please use getNodeForName instead
    */
   public Node getNodeForComponent( String name )
   {   
+    return getNodeForName( name );
+  }
+  /**
+   * Get the MultiSplitLayout.Node associated with a component
+   * @param name the name used to associate a component with the layout
+   * @return the node associated with the component
+   */
+  public Node getNodeForName( String name )
+  {
     if ( model instanceof Split ) {
       Split split = ((Split)model);
-      return getNodeForComponent( split, name );
+      return getNodeForName( split, name );
     }
     else
       return null;
@@ -272,16 +282,27 @@ public class MultiSplitLayout implements LayoutManager
    */
   public Node getNodeForComponent( Split split, Component comp )
   {    
-    return getNodeForComponent( split, getNameForComponent( comp ));
+    return getNodeForName( split, getNameForComponent( comp ));
   }
   
+  /**
+   * Get the MultiSplitLayout.Node associated with a component
+   * @param split the layout split that owns the requested node
+   * @param name the name used to associate a component with the layout
+   * @return the node associated with the component
+   * @deprecated please use getNodeForName instead
+   */
+  public Node getNodeForComponent( Split split, String name )
+  {
+    return getNodeForName( split, name );
+  }
   /**
    * Get the MultiSplitLayout.Node associated with a component 
    * @param split the layout split that owns the requested node
    * @param name the name used to associate a component with the layout
    * @return the node associated with the component
    */
-  public Node getNodeForComponent( Split split, String name )
+  public Node getNodeForName( Split split, String name )
   {    
       for(Node n : split.getChildren()) {
         if ( n instanceof Leaf ) {
@@ -289,7 +310,7 @@ public class MultiSplitLayout implements LayoutManager
             return n;
         }
         else if ( n instanceof Split ) {
-          Node n1 = getNodeForComponent( (Split)n, name );
+          Node n1 = getNodeForName( (Split)n, name );
           if ( n1 != null )
             return n1;
         }
@@ -485,7 +506,7 @@ public class MultiSplitLayout implements LayoutManager
       if ( !( model instanceof Split ))
         n = model;
       else
-        n = getNodeForComponent( name );
+        n = getNodeForName( name );
 
       childMap.remove(name);
 
@@ -528,7 +549,7 @@ public class MultiSplitLayout implements LayoutManager
    */
   public void displayNode( String name, boolean visible )
   {
-    Node node = getNodeForComponent( name );
+    Node node = getNodeForName( name );
     if ( node != null ) {
       Component comp = getComponentForNode( node );
       comp.setVisible( visible );      
@@ -584,8 +605,8 @@ public class MultiSplitLayout implements LayoutManager
     else if (root instanceof Divider) {
       if ( !((Divider)root).isVisible()  )
         return new Dimension(0,0);
-      int dividerSize = getDividerSize();
-      return new Dimension(dividerSize, dividerSize);
+      int divSize = getDividerSize();
+      return new Dimension(divSize, divSize);
     }
     else {
       Split split = (Split)root;
@@ -630,8 +651,8 @@ public class MultiSplitLayout implements LayoutManager
     else if (root instanceof Divider) {
       if ( !((Divider)root).isVisible()  )
         return new Dimension(0,0);
-      int dividerSize = getDividerSize();
-      return new Dimension(dividerSize, dividerSize);
+      int divSize = getDividerSize();
+      return new Dimension(divSize, divSize);
     }
     else {
       Split split = (Split)root;
@@ -676,8 +697,8 @@ public class MultiSplitLayout implements LayoutManager
     else if (root instanceof Divider) {
       if ( !((Divider)root).isVisible()  )
         return new Dimension(0,0);
-      int dividerSize = getDividerSize();
-      return new Dimension(dividerSize, dividerSize);
+      int divSize = getDividerSize();
+      return new Dimension(divSize, divSize);
     }
     else {
       Split split = (Split)root;
@@ -1105,8 +1126,8 @@ public class MultiSplitLayout implements LayoutManager
       Split split = (Split)root;
       Iterator<Node> splitChildren = split.getChildren().iterator();
       Rectangle childBounds = null;
-      int dividerSize = getDividerSize();
-       boolean initSplit = false;
+      int divSize = getDividerSize();
+      boolean initSplit = false;
       
       
       /* Layout the Split's child Nodes' along the X axis.  The bounds
@@ -1152,7 +1173,7 @@ public class MultiSplitLayout implements LayoutManager
           if (( initSplit || getFloatingDividers()) && (dividerChild != null) && dividerChild.isVisible()) {
             double dividerX = childBounds.getMaxX();
             Rectangle dividerBounds;
-            dividerBounds = boundsWithXandWidth(bounds, dividerX, dividerSize);
+            dividerBounds = boundsWithXandWidth(bounds, dividerX, divSize);
             dividerChild.setBounds(dividerBounds);
           }
           if ((dividerChild != null) && dividerChild.isVisible()) {
@@ -1201,7 +1222,7 @@ public class MultiSplitLayout implements LayoutManager
           
           if (( initSplit || getFloatingDividers()) && (dividerChild != null) && dividerChild.isVisible()) {
             double dividerY = childBounds.getMaxY();
-            Rectangle dividerBounds = boundsWithYandHeight(bounds, dividerY, dividerSize);
+            Rectangle dividerBounds = boundsWithYandHeight(bounds, dividerY, divSize);
             dividerChild.setBounds(dividerBounds);
           }
           if ((dividerChild != null) && dividerChild.isVisible()) {
@@ -1507,9 +1528,9 @@ public class MultiSplitLayout implements LayoutManager
     }
     
     private Node siblingAtOffset(int offset) {
-      Split parent = getParent();
-      if (parent == null) { return null; }
-      List<Node> siblings = parent.getChildren();
+      Split p = getParent();
+      if (p == null) { return null; }
+      List<Node> siblings = p.getChildren();
       int index = siblings.indexOf(this);
       if (index == -1) { return null; }
       index += offset;
@@ -1560,6 +1581,7 @@ public class MultiSplitLayout implements LayoutManager
      * @return the value of the rowLayout property.
      * @see #setRowLayout
      */
+    @Override
     public final boolean isRowLayout() { return true; }
   }
     
@@ -1580,6 +1602,7 @@ public class MultiSplitLayout implements LayoutManager
      * @return the value of the rowLayout property.
      * @see #setRowLayout
      */
+    @Override
     public final boolean isRowLayout() { return false; }
   }
 
@@ -1610,6 +1633,7 @@ public class MultiSplitLayout implements LayoutManager
      * @return <code>true</code> if the node is visible,
      * <code>false</code> otherwise
      */
+    @Override
     public boolean isVisible() {
         for(Node child : children) {
         if ( child.isVisible() && !( child instanceof Divider ))
@@ -1816,9 +1840,9 @@ public class MultiSplitLayout implements LayoutManager
      * @see Node#getWeight
      */
     public final Node lastWeightedChild() {
-      List<Node> children = getChildren();
+      List<Node> kids = getChildren();
       Node weightedChild = null;
-        for(Node child : children) {
+        for(Node child : kids) {
         if ( !child.isVisible())
           continue;
         if (child.getWeight() > 0.0) {
@@ -1849,6 +1873,7 @@ public class MultiSplitLayout implements LayoutManager
       this.name = name;
     }
         
+    @Override
     public String toString() {
       int nChildren = getChildren().size();
       StringBuffer sb = new StringBuffer("MultiSplitLayout.Split");
@@ -1911,6 +1936,7 @@ public class MultiSplitLayout implements LayoutManager
       this.name = name;
     }
     
+    @Override
     public String toString() {
       StringBuffer sb = new StringBuffer("MultiSplitLayout.Leaf");
       sb.append(" \"");
@@ -1946,10 +1972,12 @@ public class MultiSplitLayout implements LayoutManager
      * Dividers can't have a weight, they don't grow or shrink.
      * @throws UnsupportedOperationException
      */
+    @Override
     public void setWeight(double weight) {
       throw new UnsupportedOperationException();
     }
     
+    @Override
     public String toString() {
       return "MultiSplitLayout.Divider " + getBounds().toString();
     }

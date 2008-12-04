@@ -133,8 +133,8 @@ public class JXMultiSplitPaneVisualIssues extends InteractiveTestCase {
        frame.setVisible(true);
     }
     
-    private JComponent getComponentByConstraint(MultiSplitLayout multiSplitLayout, String string) {
-        Node node = multiSplitLayout.getNodeForComponent(string);
+    private JComponent getComponentByConstraint(MultiSplitLayout multiSplitLayout, String name) {
+        Node node = multiSplitLayout.getNodeForName(name);
         return (JComponent) multiSplitLayout.getComponentForNode(node);
     }
 
