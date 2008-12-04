@@ -2426,14 +2426,21 @@ public class JXTable extends JTable
     }
     // -------------------------- ColumnFactory
 
-
     /**
      * Creates, configures and adds default <code>TableColumn</code>s for
      * columns in this table's <code>TableModel</code>. Removes all currently
      * contained <code>TableColumn</code>s. The exact type and configuration
-     * of the columns is controlled by the <code>ColumnFactory</code>.
+     * of the columns is controlled completely by the <code>ColumnFactory</code>.
+     * Client code can use {@link #setColumnFactory(ColumnFactory)} to plug-in a
+     * custom ColumnFactory implementing their own default column creation and
+     * behaviour.
      * <p>
      * 
+     * <b>Note</b>: this method will probably become final (Issue #961-SwingX)
+     * so it's strongly recommended to not override now (and replace existing
+     * overrides by a custom ColumnFactory)!
+     * 
+     * @see #setColumnFactory(ColumnFactory)
      * @see org.jdesktop.swingx.table.ColumnFactory
      * 
      */
