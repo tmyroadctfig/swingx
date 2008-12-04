@@ -34,7 +34,7 @@ import java.awt.Rectangle;
 import javax.swing.JPanel;
 import javax.swing.RepaintManager;
 import javax.swing.Scrollable;
-import org.jdesktop.swingx.painter.AbstractPainter;
+
 import org.jdesktop.swingx.painter.Painter;
 
 /**
@@ -81,7 +81,6 @@ public class JXPanel extends JPanel implements Scrollable {
      * Creates a new instance of JXPanel
      */
     public JXPanel() {
-        initPainterSupport();
     }
     
     /**
@@ -89,7 +88,6 @@ public class JXPanel extends JPanel implements Scrollable {
      */
     public JXPanel(boolean isDoubleBuffered) {
         super(isDoubleBuffered);
-        initPainterSupport();
     }
     
     /**
@@ -97,7 +95,6 @@ public class JXPanel extends JPanel implements Scrollable {
      */
     public JXPanel(LayoutManager layout) {
         super(layout);
-        initPainterSupport();
     }
     
     /**
@@ -106,17 +103,6 @@ public class JXPanel extends JPanel implements Scrollable {
      */
     public JXPanel(LayoutManager layout, boolean isDoubleBuffered) {
         super(layout, isDoubleBuffered);
-        initPainterSupport();
-    }
-    
-    private void initPainterSupport() {
-        if (backgroundPainter == null) {
-            backgroundPainter = new AbstractPainter<JXPanel>() {
-                protected void doPaint(Graphics2D g, JXPanel component, int width, int height) {
-                    JXPanel.super.paintComponent(g);
-                }
-            };
-        }
     }
     
     /**
