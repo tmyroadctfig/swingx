@@ -6,8 +6,15 @@
  */
 package org.jdesktop.swingx.plaf;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+
 import java.awt.Color;
 
+import javax.swing.JPanel;
 import javax.swing.LookAndFeel;
 import javax.swing.UIDefaults;
 import javax.swing.UIManager;
@@ -18,20 +25,74 @@ import javax.swing.plaf.BorderUIResource;
 import javax.swing.plaf.ColorUIResource;
 import javax.swing.plaf.basic.BasicLookAndFeel;
 
-import junit.framework.TestCase;
-
 import org.jdesktop.swingx.JXMonthView;
+import org.jdesktop.swingx.JXPanel;
+import org.jdesktop.swingx.painter.MattePainter;
+import org.jdesktop.swingx.painter.Painter;
 import org.jdesktop.swingx.plaf.basic.BasicLookAndFeelAddons;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
+import org.jdesktop.test.EDTRunner;
 import org.junit.Test;
-import org.junit.Before;
-import org.junit.After;
+import org.junit.runner.RunWith;
 
 
-@RunWith(JUnit4.class)
-public class LookAndFeelAddonsTest extends TestCase {
+@RunWith(EDTRunner.class)
+public class LookAndFeelAddonsTest {
+    /**
+     * Ensure that an exception is thrown when a component is passed in that does
+     * not contain get/setBackgroundPainter.
+     */
+    @Test(expected = IllegalArgumentException.class)
+    public void testInstallBackgroundPainterWithoutPainterCapable() {
+        LookAndFeelAddons.installBackgroundPainter(new JPanel(), null);
+    }
+    
+    /**
+     * Ensure that an exception is thrown when a {@code null} key is passed in.
+     */
+    @Test(expected = NullPointerException.class)
+    public void testInstallBackgroundPainterWithNullComponent() {
+        LookAndFeelAddons.installBackgroundPainter(null, "test.painter");
+    }
+    
+    /**
+     * Ensure that an exception is thrown when a {@code null} key is passed in.
+     */
+    @Test(expected = NullPointerException.class)
+    public void testInstallBackgroundPainterWithNullPainterKey() {
+        LookAndFeelAddons.installBackgroundPainter(new JXPanel(), null);
+    }
 
+    /**
+     * Ensure that installBackgroundPainter does not overwrite a user-specified
+     * painter.
+     */
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testInstallBackgroundPainter() {
+        Painter plafPainter = new PainterUIResource(null);
+        UIManager.put("test.painter", plafPainter);
+        
+        JXPanel panel = new JXPanel();
+        //overwrite null painter
+        LookAndFeelAddons.installBackgroundPainter(panel, "test.painter");
+        
+        assertThat(panel.getBackgroundPainter(), is(sameInstance(plafPainter)));
+        
+        panel.setBackgroundPainter(new PainterUIResource(null));
+        
+        //overwrite uiresource painter
+        LookAndFeelAddons.installBackgroundPainter(panel, "test.painter");
+        
+        assertThat(panel.getBackgroundPainter(), is(sameInstance(plafPainter)));
+        
+        Painter userPainter = new MattePainter();
+        panel.setBackgroundPainter(userPainter);
+        
+        //do not overwrite user painter
+        LookAndFeelAddons.installBackgroundPainter(panel, "test.painter");
+        
+        assertThat(panel.getBackgroundPainter(), is(sameInstance(userPainter)));
+    }
 
    /**
      * Issue #784-swingx: Frequent NPE in getUI of (new) SwingX components.
