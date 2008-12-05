@@ -622,7 +622,7 @@ public class JXImageView extends JXPanel {
     
     private class ImageTransferable implements Transferable {
         private Image img;
-        private List files;
+        private List<File> files;
         private String exportName, exportFormat;
         public ImageTransferable(Image img, String exportName, String exportFormat) {
             this.img = img;
@@ -649,7 +649,7 @@ public class JXImageView extends JXPanel {
             }
             if(flavor == DataFlavor.javaFileListFlavor) {
                 if(files == null) {
-                    files = new ArrayList();
+                    files = new ArrayList<File>();
                     File file = File.createTempFile(exportName,"."+exportFormat);
                     //log.fine("writing to: " + file);
                     ImageIO.write(PaintUtils.convertToBufferedImage(img),exportFormat,file);

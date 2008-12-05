@@ -867,9 +867,9 @@ public class JXTableIssues extends InteractiveTestCase {
      * A one column table model where all the data is in an Object[] array.
      */
     static class ReallySimpleTableModel extends AbstractTableModel {
-        private List contents = new ArrayList();
-        @SuppressWarnings("unchecked")
-        public void setContents(List contents) {
+        private List<Object> contents = new ArrayList<Object>();
+        
+        public void setContents(List<Object> contents) {
             this.contents.clear();
             this.contents.addAll(contents);
             fireTableDataChanged();

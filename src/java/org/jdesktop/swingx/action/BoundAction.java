@@ -94,7 +94,7 @@ public class BoundAction extends AbstractActionExt {
         String[] elems = callback.split("#", 2);
         if (elems.length == 2) {
             try {
-                Class clz = Class.forName(elems[0]);
+                Class<?> clz = Class.forName(elems[0]);
 
                 // May throw a security exception in an Applet
                 // context.
@@ -168,20 +168,20 @@ public class BoundAction extends AbstractActionExt {
 
     // Listener registration...
 
-    private void addListener(Class clz, EventListener listener) {
+    private <T extends EventListener> void addListener(Class<T> clz, T listener) {
         if (listeners == null) {
             listeners = new EventListenerList();
         }
         listeners.add(clz, listener);        
     }
 
-    private void removeListener(Class clz, EventListener listener) {
+    private <T extends EventListener> void removeListener(Class<T> clz, T listener) {
         if (listeners != null) {
             listeners.remove(clz, listener);
         }
     }
 
-    private EventListener[] getListeners(Class clz) {
+    private EventListener[] getListeners(Class<? extends EventListener> clz) {
         if (listeners == null) {
             return null;
         }

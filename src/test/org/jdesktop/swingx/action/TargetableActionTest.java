@@ -101,7 +101,7 @@ public class TargetableActionTest extends TestCase {
         manager.addAction(createTargetableAction("right-justify", "Right", "R", true,
                                                  "position-group"));
 
-        List list = new ArrayList();
+        List<String> list = new ArrayList<String>();
         list.add("cut-to-clipboard");
         list.add("copy-to-clipboard");
         list.add("paste-from-clipboard");

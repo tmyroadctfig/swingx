@@ -332,7 +332,7 @@ public final class AnimatedRendererDemo {
         }
     }
     
-    public static class Contributor implements Comparable {
+    public static class Contributor implements Comparable<Contributor> {
         private String firstName;
         private String lastName;
         @SuppressWarnings("unused")
@@ -363,9 +363,8 @@ public final class AnimatedRendererDemo {
             
         }
 
-        public int compareTo(Object o) {
-            if (!(o instanceof Contributor)) return -1;
-            return lastName.compareTo(((Contributor) o).lastName);
+        public int compareTo(Contributor o) {
+            return lastName.compareTo(o.lastName);
         }
     }
 

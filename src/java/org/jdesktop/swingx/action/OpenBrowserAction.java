@@ -114,7 +114,7 @@ public class OpenBrowserAction extends AbstractAction {
         try {
             log.fine("trying mac version using FileManager class");
             // Mac OS X can handle file types itself (thank goodness!)
-            Class fileMgr = Class.forName("com.apple.eio.FileManager");
+            Class<?> fileMgr = Class.forName("com.apple.eio.FileManager");
             Method openURL = fileMgr.getDeclaredMethod("openURL",
                     new Class[] {String.class});
             openURL.invoke(null, new Object[] {url.toString()});
@@ -166,7 +166,7 @@ public class OpenBrowserAction extends AbstractAction {
     
     private boolean isWebStart() {
         try {
-            Class svcManager = Class.forName("jnlp.ServiceManager");
+            Class<?> svcManager = Class.forName("jnlp.ServiceManager");
             Method lookup = svcManager.getDeclaredMethod("lookup",
                     new Class[] {String.class});
             lookup.invoke(null, new Object[] {"jnlp.BasicService"});
@@ -177,11 +177,11 @@ public class OpenBrowserAction extends AbstractAction {
     }
     
     private void openWebstart(URL url) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-        Class svcManager = Class.forName("javax.jnlp.ServiceManager");
+        Class<?> svcManager = Class.forName("javax.jnlp.ServiceManager");
         Method lookup = svcManager.getDeclaredMethod("lookup",
                 new Class[] {String.class});
         Object basicSvcInst = lookup.invoke(null, new Object[] {"javax.jnlp.BasicService"});
-        Class basicSvc = Class.forName("javax.jnlp.BasicService");
+        Class<?> basicSvc = Class.forName("javax.jnlp.BasicService");
         Method showDocument = basicSvc.getDeclaredMethod("showDocument",
                 new Class[] {URL.class});
         showDocument.invoke(basicSvcInst, new Object[] {url});

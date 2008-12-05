@@ -292,7 +292,8 @@ public abstract class LookAndFeelAddons {
         Logger logger = Logger.getLogger("LookAndFeelAddons");
         logger.warning("Failed to retrieve UI for " + component.getClass().getName() + " with UIClassID " + component.getUIClassID());
         if (logger.isLoggable(Level.FINE)) {
-            logger.fine("Existing UI defaults keys: " + new ArrayList(UIManager.getDefaults().keySet()));
+            logger.fine("Existing UI defaults keys: "
+                        + new ArrayList<Object>(UIManager.getDefaults().keySet()));
         }
         // really ugly hack. Should be removed as soon as we figure out what is causing the issue
         uiClassname = "org.jdesktop.swingx.plaf.basic.Basic" + expectedUIClass.getSimpleName();
@@ -428,7 +429,7 @@ public abstract class LookAndFeelAddons {
             Method setter = clazz.getMethod("setBackgroundPainter", Painter.class);
 
             Painter<?> p = (Painter<?>) getter.invoke(c);
-
+            
             if (p == null || p instanceof UIResource) {
                 setter.invoke(c, UIManagerExt.getPainter(painter));
             }

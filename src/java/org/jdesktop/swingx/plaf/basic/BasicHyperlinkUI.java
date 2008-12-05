@@ -523,7 +523,7 @@ public class BasicHyperlinkUI extends BasicButtonUI {
          * was created for.
          */
         static class BasicDocument extends HTMLDocument {
-        private static Class clz;
+        private static Class<?> clz;
         private static Method displayPropertiesToCSS;
 
         /** The host, that is where we are rendering. */

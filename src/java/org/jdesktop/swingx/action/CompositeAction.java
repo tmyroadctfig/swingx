@@ -82,10 +82,11 @@ public class CompositeAction extends AbstractActionExt {
      * Add an action id to the action list. This action will be invoked 
      * when this composite action is invoked.
      */
+    @SuppressWarnings("unchecked")
     public void addAction(String id) {
-        List list = (List)getValue(LIST_IDS);
+        List<String> list = (List<String>) getValue(LIST_IDS);
         if (list == null) {
-            list = new ArrayList();
+            list = new ArrayList<String>();
             putValue(LIST_IDS, list);
         }
         list.add(id);
@@ -96,8 +97,9 @@ public class CompositeAction extends AbstractActionExt {
      * action. 
      * @return a valid list of action ids or null
      */
-    public List getActionIDs() {
-        return (List)getValue(LIST_IDS);
+    @SuppressWarnings("unchecked")
+    public List<String> getActionIDs() {
+        return (List<String>) getValue(LIST_IDS);
     }    
 
     /**
@@ -107,9 +109,9 @@ public class CompositeAction extends AbstractActionExt {
     public void actionPerformed(ActionEvent evt) {
         ActionManager manager = ActionManager.getInstance();
             
-        Iterator iter = getActionIDs().iterator();
+        Iterator<String> iter = getActionIDs().iterator();
         while (iter.hasNext()) {
-            String id = (String)iter.next();
+            String id = iter.next();
             Action action = manager.getAction(id);
             if (action != null) {
             action.actionPerformed(evt);
@@ -123,9 +125,9 @@ public class CompositeAction extends AbstractActionExt {
     public void itemStateChanged(ItemEvent evt) {
         ActionManager manager = ActionManager.getInstance();
             
-        Iterator iter = getActionIDs().iterator();
+        Iterator<String> iter = getActionIDs().iterator();
         while (iter.hasNext()) {
-            String id = (String)iter.next();
+            String id = iter.next();
             Action action = manager.getAction(id);
             if (action != null && action instanceof AbstractActionExt) {
             ((AbstractActionExt)action).itemStateChanged(evt);
