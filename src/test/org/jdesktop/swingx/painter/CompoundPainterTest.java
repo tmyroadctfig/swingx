@@ -111,8 +111,10 @@ public class CompoundPainterTest extends TestCase {
      */
     @Test
     public void testSetNullPainters() {
-        CompoundPainter painter = new CompoundPainter();
-        painter.setPainters(null);
+        CompoundPainter<Object> painter = new CompoundPainter<Object>();
+        // changed to cast to Painter, since uncasted it is equivalent to
+        // Painter[], which is checked in the next test
+        painter.setPainters((Painter<?>) null);
     }
     /**
      * Issue #497-swingx: setPainters can't cope with null.
@@ -120,7 +122,7 @@ public class CompoundPainterTest extends TestCase {
      */
     @Test
     public void testSetEmptyPainters() {
-        CompoundPainter painter = new CompoundPainter();
+        CompoundPainter<Object> painter = new CompoundPainter<Object>();
         // okay
         painter.setPainters();
         // fails
@@ -266,7 +268,7 @@ public class CompoundPainterTest extends TestCase {
     }
     
     //tests that compound behaviors, such as caching in compound situations, works
-    private static final class TestableCompoundPainter extends CompoundPainter {
+    private static final class TestableCompoundPainter extends CompoundPainter<Object> {
         boolean painted = false;
         
         @Override
