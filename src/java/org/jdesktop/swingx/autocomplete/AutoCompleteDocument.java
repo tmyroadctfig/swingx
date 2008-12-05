@@ -22,8 +22,6 @@ package org.jdesktop.swingx.autocomplete;
 
 import static org.jdesktop.swingx.autocomplete.ObjectToStringConverter.DEFAULT_IMPLEMENTATION;
 
-import java.awt.Color;
-import java.awt.Font;
 
 import javax.swing.UIManager;
 import javax.swing.event.DocumentListener;
@@ -35,8 +33,6 @@ import javax.swing.text.Element;
 import javax.swing.text.PlainDocument;
 import javax.swing.text.Position;
 import javax.swing.text.Segment;
-import javax.swing.text.Style;
-import javax.swing.text.StyledDocument;
 
 import org.jdesktop.swingx.util.Contract;
 
@@ -44,7 +40,7 @@ import org.jdesktop.swingx.util.Contract;
  * A document that can be plugged into any JTextComponent to enable automatic completion.
  * It finds and selects matching items using any implementation of the AbstractAutoCompleteAdaptor.
  */
-public class AutoCompleteDocument implements StyledDocument {
+public class AutoCompleteDocument implements Document {
     /** Flag to indicate if adaptor.setSelectedItem has been called.
      * Subsequent calls to remove/insertString should be ignored
      * as they are likely have been caused by the adapted Component that
@@ -55,7 +51,7 @@ public class AutoCompleteDocument implements StyledDocument {
      * true, if only items from the adaptors's list can be entered
      * false, otherwise (selected item might not be in the adaptors's list)
      */
-    boolean strictMatching;
+    protected boolean strictMatching;
     
     /**
      * The adaptor that is used to find and select items.
@@ -80,7 +76,7 @@ public class AutoCompleteDocument implements StyledDocument {
         this.adaptor = Contract.asNotNull(adaptor, "adaptor cannot be null");
         this.strictMatching = strictMatching;
         this.stringConverter = stringConverter == null ? DEFAULT_IMPLEMENTATION : stringConverter;
-        this.delegate = delegate == null ? new PlainDocument() : delegate;
+        this.delegate = delegate == null ? createDefaultDocument() : delegate;
         
         // Handle initially selected object
         Object selected = adaptor.getSelectedItem();
@@ -111,13 +107,15 @@ public class AutoCompleteDocument implements StyledDocument {
     public AutoCompleteDocument(AbstractAutoCompleteAdaptor adaptor, boolean strictMatching) {
         this(adaptor, strictMatching, null);
     }
-    
+
     /**
-     * Returns if only items from the adaptor's list should be allowed to be entered.
-     * @return if only items from the adaptor's list should be allowed to be entered
+     * Creates the default backing document when no delegate is passed to this
+     * document.
+     * 
+     * @return the default backing document
      */
-    public boolean isStrictMatching() {
-        return strictMatching;
+    protected Document createDefaultDocument() {
+        return new PlainDocument();
     }
     
     public void remove(int offs, int len) throws BadLocationException {
@@ -263,90 +261,6 @@ public class AutoCompleteDocument implements StyledDocument {
     /**
      * {@inheritDoc}
      */
-    public Style addStyle(String nm, Style parent) {
-        return ((StyledDocument) delegate).addStyle(nm, parent);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public Color getBackground(AttributeSet attr) {
-        return ((StyledDocument) delegate).getBackground(attr);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public Element getCharacterElement(int pos) {
-        return ((StyledDocument) delegate).getCharacterElement(pos);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public Font getFont(AttributeSet attr) {
-        return ((StyledDocument) delegate).getFont(attr);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public Color getForeground(AttributeSet attr) {
-        return ((StyledDocument) delegate).getForeground(attr);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public Style getLogicalStyle(int p) {
-        return ((StyledDocument) delegate).getLogicalStyle(p);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public Element getParagraphElement(int pos) {
-        return ((StyledDocument) delegate).getParagraphElement(pos);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public Style getStyle(String nm) {
-        return ((StyledDocument) delegate).getStyle(nm);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void removeStyle(String nm) {
-        ((StyledDocument) delegate).removeStyle(nm);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void setCharacterAttributes(int offset, int length, AttributeSet s, boolean replace) {
-        ((StyledDocument) delegate).setCharacterAttributes(offset, length, s, replace);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void setLogicalStyle(int pos, Style s) {
-        ((StyledDocument) delegate).setLogicalStyle(pos, s);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void setParagraphAttributes(int offset, int length, AttributeSet s, boolean replace) {
-        ((StyledDocument) delegate).setParagraphAttributes(offset, length, s, replace);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public void addDocumentListener(DocumentListener listener) {
         delegate.addDocumentListener(listener);
     }
@@ -447,5 +361,14 @@ public class AutoCompleteDocument implements StyledDocument {
      */
     public void render(Runnable r) {
         delegate.render(r);
+    }
+
+
+    /**
+     * Returns if only items from the adaptor's list should be allowed to be entered.
+     * @return if only items from the adaptor's list should be allowed to be entered
+     */
+    public boolean isStrictMatching() {
+        return strictMatching;
     }
 }

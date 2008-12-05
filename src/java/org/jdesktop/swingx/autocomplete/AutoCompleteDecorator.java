@@ -39,7 +39,9 @@ import javax.swing.JList;
 import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 import javax.swing.text.DefaultEditorKit;
+import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
+import javax.swing.text.StyledDocument;
 import javax.swing.text.TextAction;
 
 import org.jdesktop.swingx.autocomplete.workarounds.MacOSXPopupLocationFix;
@@ -94,6 +96,18 @@ public class AutoCompleteDecorator {
         }
     }
     
+    private static AutoCompleteDocument createAutoCompleteDocument(
+            AbstractAutoCompleteAdaptor adaptor, boolean strictMatching,
+            ObjectToStringConverter stringConverter, Document delegate) {
+        if (delegate instanceof StyledDocument) {
+            return new AutoCompleteStyledDocument(adaptor, strictMatching,
+                    stringConverter, (StyledDocument) delegate);
+        }
+        
+        return new AutoCompleteDocument(adaptor, strictMatching,
+                stringConverter, delegate);
+    }
+    
     /**
      * Enables automatic completion for the given JTextComponent based on the
      * items contained in the given <tt>List</tt>.
@@ -117,7 +131,7 @@ public class AutoCompleteDecorator {
      */
     public static void decorate(JTextComponent textComponent, List<?> items, boolean strictMatching, ObjectToStringConverter stringConverter) {
         AbstractAutoCompleteAdaptor adaptor = new TextComponentAdaptor(textComponent, items);
-        AutoCompleteDocument document = new AutoCompleteDocument(adaptor, strictMatching, stringConverter, textComponent.getDocument());
+        AutoCompleteDocument document = createAutoCompleteDocument(adaptor, strictMatching, stringConverter, textComponent.getDocument());
         decorate(textComponent, document, adaptor);
     }
     
@@ -144,7 +158,7 @@ public class AutoCompleteDecorator {
      */
     public static void decorate(JList list, JTextComponent textComponent, ObjectToStringConverter stringConverter) {
         AbstractAutoCompleteAdaptor adaptor = new ListAdaptor(list, textComponent, stringConverter);
-        AutoCompleteDocument document = new AutoCompleteDocument(adaptor, true, stringConverter, textComponent.getDocument());
+        AutoCompleteDocument document = createAutoCompleteDocument(adaptor, true, stringConverter, textComponent.getDocument());
         decorate(textComponent, document, adaptor);
     }
     
@@ -191,7 +205,7 @@ public class AutoCompleteDecorator {
         // configure the text component=editor component
         JTextComponent editorComponent = (JTextComponent) comboBox.getEditor().getEditorComponent();
         final AbstractAutoCompleteAdaptor adaptor = new ComboBoxAdaptor(comboBox);
-        final AutoCompleteDocument document = new AutoCompleteDocument(adaptor, strictMatching,
+        final AutoCompleteDocument document = createAutoCompleteDocument(adaptor, strictMatching,
                 stringConverter, editorComponent.getDocument());
         decorate(editorComponent, document, adaptor);
         
