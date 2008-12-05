@@ -78,7 +78,7 @@ public class JXLoginPaneVisualCheck extends InteractiveTestCase {
      *
      */
     public void interactiveDisplay() {
-        sun.awt.AppContext.getAppContext().put("JComponent.defaultLocale", Locale.FRANCE);
+        JComponent.setDefaultLocale(Locale.FRANCE);
         JXLoginPane panel = new JXLoginPane();
         JFrame frame = JXLoginPane.showLoginFrame(panel);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -95,7 +95,7 @@ public class JXLoginPaneVisualCheck extends InteractiveTestCase {
      *
      */
     public void interactiveDisplayFixedUser() {
-        sun.awt.AppContext.getAppContext().put("JComponent.defaultLocale", Locale.FRANCE);
+        JComponent.setDefaultLocale(Locale.FRANCE);
         JXLoginPane panel = new JXLoginPane();
         JFrame frame = JXLoginPane.showLoginFrame(panel);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -115,7 +115,7 @@ public class JXLoginPaneVisualCheck extends InteractiveTestCase {
      */
     public void interactiveSetBackground() {
         JXLoginPane panel = new JXLoginPane();
-        panel.setBackgroundPainter(new MattePainter(Color.RED, true));
+        panel.setBackgroundPainter(new MattePainter<Object>(Color.RED, true));
         JFrame frame = JXLoginPane.showLoginFrame(panel);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setJMenuBar(createAndFillMenuBar(panel));
@@ -147,7 +147,7 @@ public class JXLoginPaneVisualCheck extends InteractiveTestCase {
      *
      */
     public void interactiveError() {
-        sun.awt.AppContext.getAppContext().put("JComponent.defaultLocale", Locale.FRANCE);
+        JComponent.setDefaultLocale(Locale.FRANCE);
         final JXLoginPane panel = new JXLoginPane(new LoginService() {
 
                         public boolean authenticate(String name, char[] password,
@@ -179,7 +179,7 @@ public class JXLoginPaneVisualCheck extends InteractiveTestCase {
      *
      */
     public void interactiveBackground() {
-        sun.awt.AppContext.getAppContext().put("JComponent.defaultLocale", Locale.FRANCE);
+        JComponent.setDefaultLocale(Locale.FRANCE);
         final JXLoginPane panel = new JXLoginPane(new LoginService() {
 
                         public boolean authenticate(String name, char[] password,
@@ -196,7 +196,8 @@ public class JXLoginPaneVisualCheck extends InteractiveTestCase {
         panel.setErrorMessage("TO TO TO TO TO TO TO TO TO TO TO TO TO TO TO TO TO TO TO TO TO TO Unexpected resize on long exception message. Unexpected resize on long exception message.");
 
         panel.setSaveMode(SaveMode.BOTH);
-        frame.getContentPane().setBackgroundPainter(new MattePainter(new GradientPaint(0,0,Color.BLUE, 1,0,Color.YELLOW), true));
+        frame.getContentPane().setBackgroundPainter(new MattePainter<Object>(
+                new GradientPaint(0, 0, Color.BLUE, 1, 0, Color.YELLOW), true));
 
         frame.pack();
         frame.setVisible(true);
