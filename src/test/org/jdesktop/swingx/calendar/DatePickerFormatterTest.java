@@ -82,7 +82,7 @@ public class DatePickerFormatterTest extends TestCase {
      * properties.
      * 
      * LinkFormat pattern in base defaults to DateFormat's default with 
-     * style SHORT.
+     * style DEFAULT.
      */
     @Test
     public void testPickerFormatterDefaultToday() {
@@ -95,7 +95,7 @@ public class DatePickerFormatterTest extends TestCase {
         String pattern = UIManagerExt.getString("JXDatePicker.linkFormat");
         assertNotNull("linkFormat entry is available", pattern);
         MessageFormat format = new MessageFormat(pattern, Locale.getDefault());
-        assertEquals(DateFormat.getDateInstance(DateFormat.SHORT), format
+        assertEquals(DateFormat.getDateInstance(), format
                 .getFormats()[0]);
     }
     
