@@ -31,6 +31,7 @@ import javax.swing.plaf.metal.MetalBorders;
 
 import org.jdesktop.swingx.plaf.windows.WindowsClassicLookAndFeelAddons;
 import org.jdesktop.swingx.table.ColumnHeaderRenderer;
+import org.jdesktop.swingx.util.JVM;
 import org.jdesktop.swingx.util.OS;
 
 /**
@@ -141,7 +142,8 @@ public class ColumnHeaderRendererAddon extends AbstractComponentAddon {
      */
     private void hackVistaHeaderBorder(LookAndFeelAddons addon, DefaultsList defaults) {
         // do nothing if not vista or for classic design under vista
-        if (!OS.isWindowsVista() || (addon instanceof WindowsClassicLookAndFeelAddons))
+        if (!OS.isWindowsVista() || (addon instanceof WindowsClassicLookAndFeelAddons)
+                || !JVM.current().isOneDotFive())
             return;
         defaults.add(ColumnHeaderRenderer.VISTA_BORDER_HACK,
                 new BorderUIResource.EmptyBorderUIResource(5, 5, 5, 5));

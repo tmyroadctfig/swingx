@@ -45,6 +45,7 @@ import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.JXTableHeader;
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.test.XTestUtils;
+import org.jdesktop.swingx.util.JVM;
 import org.jdesktop.swingx.util.OS;
 
 /**
@@ -111,8 +112,9 @@ public class ColumnHeaderRendererIssues extends InteractiveTestCase {
     }
 
     /**
-     * test hack around Vista's tableHeader too big.
-     * ColumnHeaderRendererAddon should install a smaller custom border.
+     * Test hack around Vista's tableHeader too big.
+     * ColumnHeaderRendererAddon should install a smaller custom border on
+     * Vista and jdk5. Core issue is fixed in jdk6 (u10, but as that's final now ...)
      * 
      * Here: test that the addon installs/uninstalls a border as uiresource.
      * 
@@ -124,6 +126,10 @@ public class ColumnHeaderRendererIssues extends InteractiveTestCase {
         if (!OS.isWindowsVista() || 
             !UIManager.getSystemLookAndFeelClassName().contains("Windows")) {
             LOG.info("cannot run VistaHeaderBorder - no Vista system");
+            return;
+        }
+        if (!JVM.current().isOneDotFive()) {
+            LOG.info("cannot run VistaHeaderBorder - no jvm1.5");
             return;
         }
         LookAndFeel old = UIManager.getLookAndFeel();
@@ -160,6 +166,10 @@ public class ColumnHeaderRendererIssues extends InteractiveTestCase {
         if (!OS.isWindowsVista() || 
             !UIManager.getSystemLookAndFeelClassName().contains("Windows")) {
             LOG.info("cannot run VistaHeaderBorder - no Vista system");
+            return;
+        }
+        if (!JVM.current().isOneDotFive()) {
+            LOG.info("cannot run VistaHeaderBorder - no jvm1.5");
             return;
         }
         LookAndFeel old = UIManager.getLookAndFeel();
