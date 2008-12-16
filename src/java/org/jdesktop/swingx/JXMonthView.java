@@ -21,9 +21,7 @@
 package org.jdesktop.swingx;
 
 import java.awt.Color;
-import java.awt.Font;
 import java.awt.Insets;
-import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Calendar;
@@ -567,7 +565,10 @@ public class JXMonthView extends JComponent {
     }
 
     /**
-     * Call back from listening to model firstDayOfWeek change.
+     * Call back from listening to model minimalDaysOfFirstWeek change.
+     * <p>
+     * NOTE: this is not a property as we have no public api to change
+     * it on JXMonthView.
      */
     private void updateMinimalDaysOfFirstWeek() {
         cal.setMinimalDaysInFirstWeek(model.getMinimalDaysInFirstWeek());
@@ -797,7 +798,7 @@ public class JXMonthView extends JComponent {
      */
     public void setSelectionModel(DateSelectionModel model) {
         Contract.asNotNull(model, "date selection model must not be null");
-        DateSelectionModel oldModel = this.model;
+        DateSelectionModel oldModel = getSelectionModel();
         model.removeDateSelectionListener(getDateSelectionListener());
         this.model = model;
         installCalendar();
@@ -805,7 +806,7 @@ public class JXMonthView extends JComponent {
             super.setLocale(model.getLocale());
         }
         model.addDateSelectionListener(getDateSelectionListener());
-        firePropertyChange(SELECTION_MODEL, oldModel, model);
+        firePropertyChange(SELECTION_MODEL, oldModel, getSelectionModel());
     }
 
 //-------------------- delegates to model
@@ -1121,21 +1122,21 @@ public class JXMonthView extends JComponent {
 
 //------------------- visual properties    
     /**
-     * Whether or not to show leading dates for a months displayed by this component.
-     *
+     * Sets a boolean property indicating whether or not to show leading dates
+     * for a months displayed by this component.<p>
+     * 
+     * The default value is false.
+     * 
      * @param value true if leading dates should be displayed, false otherwise.
      */
     public void setShowingLeadingDays(boolean value) {
-        if (leadingDays == value) {
-            return;
-        }
-
+        boolean old = isShowingLeadingDays();
         leadingDays = value;
-        firePropertyChange("showingLeadingDays", !leadingDays, leadingDays);
+        firePropertyChange("showingLeadingDays", old, isShowingLeadingDays());
     }
 
     /**
-     * Whether or not we're showing leading dates.
+     * Returns a boolean indicating whether or not we're showing leading dates.
      *
      * @return true if leading dates are shown, false otherwise.
      */
@@ -1144,21 +1145,21 @@ public class JXMonthView extends JComponent {
     }
 
     /**
-     * Whether or not to show trailing dates for the months displayed by this component.
+     * Sets a boolean property indicating whether or not to show 
+     * trailing dates for the months displayed by this component.<p>
+     * 
+     * The default value is false.
      *
      * @param value true if trailing dates should be displayed, false otherwise.
      */
     public void setShowingTrailingDays(boolean value) {
-        if (trailingDays == value) {
-            return;
-        }
-
+        boolean old = isShowingTrailingDays();
         trailingDays = value;
-        firePropertyChange("showingTrailingDays", !trailingDays, trailingDays);
+        firePropertyChange("showingTrailingDays", old, isShowingTrailingDays());
     }
 
     /**
-     * Whether or not we're showing trailing dates.
+     * Returns a boolean indicating whether or not we're showing trailing dates.
      *
      * @return true if trailing dates are shown, false otherwise.
      */
@@ -1181,7 +1182,11 @@ public class JXMonthView extends JComponent {
 
     /**
      * Set whether or not the month view will display buttons to allow the user
-     * to traverse to previous or next months.
+     * to traverse to previous or next months. <p>
+     * 
+     * The default value is false. <p>
+     * 
+     * PENDING JW: fire the "real" property or the compound with zoomable?
      * 
      * @param traversable set to true to enable month traversing, false
      *        otherwise.
@@ -1189,10 +1194,9 @@ public class JXMonthView extends JComponent {
      * @see #setZoomable(boolean)
      */
     public void setTraversable(boolean traversable) {
-        if (traversable == this.traversable)
-            return;
+        boolean old = isTraversable();
         this.traversable = traversable;
-        firePropertyChange(TRAVERSABLE, !this.traversable, this.traversable);
+        firePropertyChange(TRAVERSABLE, old, isTraversable());
     }
 
     /**
@@ -1239,9 +1243,9 @@ public class JXMonthView extends JComponent {
      *        false otherwise
      */
     public void setShowingWeekNumber(boolean showWeekNumber) {
-        if (this.showWeekNumber == showWeekNumber) return;
+        boolean old = isShowingWeekNumber();
         this.showWeekNumber = showWeekNumber;
-        firePropertyChange("showingWeekNumber", !showWeekNumber, showWeekNumber);
+        firePropertyChange("showingWeekNumber", old, isShowingWeekNumber());
     }
 
     /**
@@ -1298,38 +1302,6 @@ public class JXMonthView extends JComponent {
         return getDaysOfTheWeek()[dayOfWeek - 1];
     }
     
-    /**
-     * Returns true if anti-aliased text is enabled for this component, false
-     * otherwise.
-     *
-     * @return boolean <code>true</code> if anti-aliased text is enabled,
-     * <code>false</code> otherwise.
-     * 
-     * @deprecated will be removed without replacement to align with core Swing 
-     * which api for setting per-instance antialiased property. 
-     */
-    @Deprecated
-    public boolean isAntialiased() {
-        return antialiased;
-    }
-
-    /**
-     * Turns on/off anti-aliased text for this component.
-     *
-     * @param antiAlias <code>true</code> for anti-aliased text,
-     * <code>false</code> to turn it off.
-     * 
-     * @deprecated will be removed without replacement to align with core Swing 
-     * which api for setting per-instance antialiased property. 
-     */
-    @Deprecated
-    public void setAntialiased(boolean antiAlias) {
-        if (this.antialiased == antiAlias) {
-            return;
-        }
-        this.antialiased = antiAlias;
-        firePropertyChange("antialiased", !this.antialiased, this.antialiased);
-    }
 
     /**
      * Returns the padding used between days in the calendar.
@@ -1349,9 +1321,9 @@ public class JXMonthView extends JComponent {
      * @param boxPaddingX Number of pixels applied to both sides of a day
      */
     public void setBoxPaddingX(int boxPaddingX) {
-        int oldBoxPadding = this.boxPaddingX;
+        int oldBoxPadding = getBoxPaddingX();
         this.boxPaddingX = boxPaddingX;
-        firePropertyChange(BOX_PADDING_X, oldBoxPadding, this.boxPaddingX);
+        firePropertyChange(BOX_PADDING_X, oldBoxPadding, getBoxPaddingX());
     }
 
     /**
@@ -1372,9 +1344,9 @@ public class JXMonthView extends JComponent {
      * @param boxPaddingY Number of pixels applied to top and bottom of a day
      */
     public void setBoxPaddingY(int boxPaddingY) {
-        int oldBoxPadding = this.boxPaddingY;
+        int oldBoxPadding = getBoxPaddingY();
         this.boxPaddingY = boxPaddingY;
-        firePropertyChange(BOX_PADDING_Y, oldBoxPadding, this.boxPaddingY);
+        firePropertyChange(BOX_PADDING_Y, oldBoxPadding, getBoxPaddingY());
     }
 
 
@@ -1420,33 +1392,6 @@ public class JXMonthView extends JComponent {
         firePropertyChange("selectionForeground", old, getSelectionForeground());
     }
 
-    /**
-     * Returns the selected background color.
-     *
-     * @return the selected background color.
-     * 
-     * @deprecated use {@link #getSelectionBackground()} renamed for 
-     *   cross-component consistency.
-     */
-    @Deprecated
-    public Color getSelectedBackground() {
-        return getSelectionBackground();
-    }
-
-    /**
-     * Sets the selected background color to <code>c</code>.  The default color
-     * is <code>138, 173, 209 (Blue-ish)</code>
-     *
-     * @param c Selected background.
-     * 
-     * @deprecated use {@link #setSelectionBackground(Color)} renamed for
-     *   cross-component consistency.
-     */
-    @Deprecated
-    public void setSelectedBackground(Color c) {
-        setSelectionBackground(c);
-    }
-
 
     /**
      * Returns the color used when painting the today background.
@@ -1464,7 +1409,10 @@ public class JXMonthView extends JComponent {
      * @param c color to set
      */
     public void setTodayBackground(Color c) {
+        Color oldValue = getTodayBackground();
         todayBackgroundColor = c;
+        firePropertyChange("todayBackground", oldValue, getTodayBackground());
+        // PENDING JW: remove repaint, ui must take care of it
         repaint();
     }
 
@@ -1484,7 +1432,10 @@ public class JXMonthView extends JComponent {
      * @param c color to set
      */
     public void setMonthStringBackground(Color c) {
+        Color old = getMonthStringBackground();
         monthStringBackground = c;
+        firePropertyChange("monthStringBackground", old, getMonthStringBackground());
+        // PENDING JW: remove repaint, ui must take care of it
         repaint();
     }
 
@@ -1504,7 +1455,10 @@ public class JXMonthView extends JComponent {
      * @param c color to set
      */
     public void setMonthStringForeground(Color c) {
+        Color old = getMonthStringForeground();
         monthStringForeground = c;
+        firePropertyChange("monthStringForeground", old, getMonthStringForeground());
+        // PENDING JW: remove repaint, ui must take care of it
         repaint();
     }
 
@@ -1529,12 +1483,20 @@ public class JXMonthView extends JComponent {
 
     /**
      * Set the color to be used for painting the specified day of the week.
-     * Acceptable values are Calendar.SUNDAY - Calendar.SATURDAY.
+     * Acceptable values are Calendar.SUNDAY - Calendar.SATURDAY. <p>
+     * 
+     * PENDING JW: this is not a property - should it be and 
+     * fire a change notification? If so, how?
+     * 
      *
      * @param dayOfWeek constant value defining the day of the week.
      * @param c         The color to be used for painting the numeric day of the week.
      */
     public void setDayForeground(int dayOfWeek, Color c) {
+        if ((dayOfWeek < Calendar.SUNDAY) || (dayOfWeek > Calendar.SATURDAY)) {
+            throw new IllegalArgumentException("dayOfWeek must be in [Calendar.SUNDAY ... " +
+            		"Calendar.SATURDAY] but was " + dayOfWeek);
+        }
         dayToColorTable.put(dayOfWeek, c);
         repaint();
     }
@@ -1592,6 +1554,7 @@ public class JXMonthView extends JComponent {
      * @param insets Insets
      */
     public void setMonthStringInsets(Insets insets) {
+        Insets old = getMonthStringInsets();
         if (insets == null) {
             _monthStringInsets.top = 0;
             _monthStringInsets.left = 0;
@@ -1603,92 +1566,75 @@ public class JXMonthView extends JComponent {
             _monthStringInsets.bottom = insets.bottom;
             _monthStringInsets.right = insets.right;
         }
+        firePropertyChange("monthStringInsets", old, getMonthStringInsets());
+        // PENDING JW: remove repaint, ui must take care of it
         repaint();
     }
 
     /**
      * Returns the preferred number of columns to paint calendars in. 
      * <p>
-     * PENDING JW: rename to a "full" name preferredColumnCount
-     * @return int Columns of calendars.
+     * @return int preferred number of columns of calendars.
+     * 
+     * @see #setPreferredColumnCount(int)
      */
-    public int getPreferredCols() {
+    public int getPreferredColumnCount() {
         return minCalCols;
     }
 
     /**
-     * The preferred number of columns to paint calendars.
+     * Sets the preferred number of columns of calendars. Does nothing if cols
+     * <= 0. The default value is 1.
      * <p>
-     * PENDING JW: rename to a "full" name preferredColumnCount
-     *   and make bound property
      * @param cols The number of columns of calendars.
+     * 
+     * @see #getPreferredColumnCount()
      */
-    public void setPreferredCols(int cols) {
+    public void setPreferredColumnCount(int cols) {
         if (cols <= 0) {
             return;
         }
+        int old = getPreferredColumnCount();
         minCalCols = cols;
+        firePropertyChange("preferredColumnCount", old, getPreferredColumnCount());
+        // PENDING JW: remove revalidate/repaint, ui must take care of it
         revalidate();
         repaint();
     }
+    
 
     /**
      * Returns the preferred number of rows to paint calendars in.
      * <p>
-     * PENDING JW: rename to a "full" name preferredRowCount
-     *  or maybe visibleRowCount to be consistent with JXTable/JXList 
      * @return int Rows of calendars.
+     * 
+     * @see #setPreferredRowCount(int)
      */
-    public int getPreferredRows() {
+    public int getPreferredRowCount() {
         return minCalRows;
     }
 
     /**
-     * Sets the preferred number of rows to paint calendars.
+     * Sets the preferred number of rows to paint calendars.Does nothing if rows
+     * <= 0. The default value is 1.
      * <p>
-     * PENDING JW: rename to a "full" name preferredRowCount
-     *   and make bound property
      *
      * @param rows The number of rows of calendars.
+     * 
+     * @see #getPreferredRowCount()
      */
-    public void setPreferredRows(int rows) {
+    public void setPreferredRowCount(int rows) {
         if (rows <= 0) {
             return;
         }
+        int old = getPreferredRowCount();
         minCalRows = rows;
+        firePropertyChange("preferredRowCount", old, getPreferredRowCount());
+        // PENDING JW: remove revalidate/repaint, ui must take care of it
         revalidate();
         repaint();
     }
 
-
-    /**
-     * Moves and resizes this component to conform to the new bounding
-     * rectangle r. This component's new position is specified by r.x and
-     * r.y, and its new size is specified by r.width and r.height <p>
-     * 
-     * PENDING JW: why ovrridden? super is identical
-     *
-     * @param r The new bounding rectangle for this component
-     */
-    @Override
-    public void setBounds(Rectangle r) {
-        setBounds(r.x, r.y, r.width, r.height);
-    }
-
-    /**
-     * Sets the font of this component.
-     *
-     * PENDING JW: why override?
-     *  
-     * @param font The font to become this component's font; if this parameter
-     *             is null then this component will inherit the font of its parent.
-     */
-    @Override
-    public void setFont(Font font) {
-        Font old = getFont();
-        super.setFont(font);
-        firePropertyChange("font", old, font);
-    }
 
     /**
      * {@inheritDoc}
@@ -1779,9 +1725,9 @@ public class JXMonthView extends JComponent {
      * @see #isComponentInputMapEnabled()  
      */
     public void setComponentInputMapEnabled(boolean enabled) {
-        if (isComponentInputMapEnabled() == enabled) return;
+        boolean old = isComponentInputMapEnabled();
         this.componentInputMapEnabled = enabled;
-        firePropertyChange("componentInputMapEnabled", !enabled, isComponentInputMapEnabled());
+        firePropertyChange("componentInputMapEnabled", old, isComponentInputMapEnabled());
     }
 
     /**
@@ -1854,6 +1800,135 @@ public class JXMonthView extends JComponent {
 
 
 //--- deprecated code - NOTE: these methods will be removed soon! 
+
+    /**
+     * Returns true if anti-aliased text is enabled for this component, false
+     * otherwise.
+     *
+     * @return boolean <code>true</code> if anti-aliased text is enabled,
+     * <code>false</code> otherwise.
+     * 
+     * @deprecated will be removed without replacement to align with core Swing 
+     * which api for setting per-instance antialiased property. No longer used
+     * by the ui delegate.
+     */
+    @Deprecated
+    public boolean isAntialiased() {
+        return antialiased;
+    }
+
+    /**
+     * Turns on/off anti-aliased text for this component.
+     *
+     * @param antiAlias <code>true</code> for anti-aliased text,
+     * <code>false</code> to turn it off.
+     * 
+     * @deprecated will be removed without replacement to align with core Swing 
+     * which api for setting per-instance antialiased property. 
+     */
+    @Deprecated
+    public void setAntialiased(boolean antiAlias) {
+        if (this.antialiased == antiAlias) {
+            return;
+        }
+        this.antialiased = antiAlias;
+        firePropertyChange("antialiased", !this.antialiased, this.antialiased);
+    }
+
+    /**
+     * Returns the selected background color.
+     *
+     * @return the selected background color.
+     * 
+     * @deprecated use {@link #getSelectionBackground()} renamed for 
+     *   cross-component consistency.
+     */
+    @Deprecated
+    public Color getSelectedBackground() {
+        return getSelectionBackground();
+    }
+
+    /**
+     * Sets the selected background color to <code>c</code>.  The default color
+     * is <code>138, 173, 209 (Blue-ish)</code>
+     *
+     * @param c Selected background.
+     * 
+     * @deprecated use {@link #setSelectionBackground(Color)} renamed for
+     *   cross-component consistency.
+     */
+    @Deprecated
+    public void setSelectedBackground(Color c) {
+        setSelectionBackground(c);
+    }
+
+
+    /**
+     * Returns the preferred number of columns to paint calendars in. 
+     * <p>
+     * PENDING JW: rename to a "full" name preferredColumnCount
+     * @return int Columns of calendars.
+     * 
+     * @deprecated use {@link #getPreferredColumnCount()}
+     */
+    @Deprecated
+    public int getPreferredCols() {
+        return minCalCols;
+    }
+
+    /**
+     * The preferred number of columns to paint calendars.
+     * <p>
+     * PENDING JW: rename to a "full" name preferredColumnCount
+     *   and make bound property
+     * @param cols The number of columns of calendars.
+     * 
+     * @deprecated use {@link #setPreferredColumnCount(int)}
+     */
+    @Deprecated
+    public void setPreferredCols(int cols) {
+        if (cols <= 0) {
+            return;
+        }
+        minCalCols = cols;
+        revalidate();
+        repaint();
+    }
+
+    /**
+     * Returns the preferred number of rows to paint calendars in.
+     * <p>
+     * PENDING JW: rename to a "full" name preferredRowCount
+     *  or maybe visibleRowCount to be consistent with JXTable/JXList 
+     * @return int Rows of calendars.
+     * 
+     * @deprecated use {@link #getPreferredRowCount()}
+     */
+    @Deprecated
+    public int getPreferredRows() {
+        return minCalRows;
+    }
+
+    /**
+     * Sets the preferred number of rows to paint calendars.
+     * <p>
+     * PENDING JW: rename to a "full" name preferredRowCount
+     *   and make bound property
+     *
+     * @param rows The number of rows of calendars.
+     * 
+     * @deprecated use {@link #setPreferredRowCount(int)}
+     */
+    @Deprecated
+    public void setPreferredRows(int rows) {
+        if (rows <= 0) {
+            return;
+        }
+        minCalRows = rows;
+        revalidate();
+        repaint();
+    }
+
 
     /**
      * @deprecated - this is kept as a reminder only, <b>don't use</b>!

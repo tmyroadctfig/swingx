@@ -136,8 +136,8 @@ public class BasicMonthViewUIIssues extends InteractiveTestCase {
     private BasicMonthViewUI getRealizedMonthViewUI(ComponentOrientation co,
             boolean isShowingWeekNumbers) {
         JXMonthView monthView = new JXMonthView();
-        monthView.setPreferredCols(2);
-        monthView.setPreferredRows(2);
+        monthView.setPreferredColumnCount(2);
+        monthView.setPreferredRowCount(2);
         monthView.setComponentOrientation(co);
         monthView.setShowingWeekNumber(isShowingWeekNumbers);
         Calendar calendar = monthView.getCalendar();

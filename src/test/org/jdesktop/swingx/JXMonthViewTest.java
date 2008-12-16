@@ -21,7 +21,9 @@
 package org.jdesktop.swingx;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.GraphicsEnvironment;
+import java.awt.Insets;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -49,11 +51,11 @@ import org.jdesktop.test.PropertyChangeReport;
 import org.jdesktop.test.TestUtils;
 import org.jmock.Mock;
 import org.jmock.MockObjectTestCase;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.junit.Test;
-import org.junit.Before;
-import org.junit.After;
 
 
 /**
@@ -138,6 +140,184 @@ public class JXMonthViewTest extends MockObjectTestCase {
         monthView.setDaysOfTheWeekForeground(color);
         monthView.updateUI();
         assertEquals(color, monthView.getDaysOfTheWeekForeground());
+    }
+
+    /**
+     * Issue #??-swingx: test accaptable values in setDayForeground.
+     * Doc'ed to accept Calendar.SUNDAY - Calendar.SATURDAY, but not 
+     * enforced.
+     * 
+     */
+    @Test(expected=IllegalArgumentException.class)
+    public void testDayForegroundBeforeSunday() {
+        monthView.setDayForeground(Calendar.SUNDAY - 1, Color.RED);
+    }
+
+    /**
+     * Issue #??-swingx: test accaptable values in setDayForeground.
+     * Doc'ed to accept Calendar.SUNDAY - Calendar.SATURDAY, but not 
+     * enforced.
+     * 
+     */
+    @Test(expected=IllegalArgumentException.class)
+    public void testDayForegroundAfterSaturday() {
+        monthView.setDayForeground(Calendar.SATURDAY + 1, Color.RED);
+    }
+
+ 
+    /**
+     * Issue #931-swingx: missing change notification.
+     * test setting monthStringInsets property.
+     * 
+     */
+    @Test
+    public void testPreferredRowCount() {
+        int old = monthView.getPreferredRowCount();
+        int color = old + 20;
+        PropertyChangeReport report = new PropertyChangeReport();
+        monthView.addPropertyChangeListener(report);
+        monthView.setPreferredRowCount(color);
+        assertEquals(color, monthView.getPreferredRowCount());
+        TestUtils.assertPropertyChangeEvent(report, "preferredRowCount", old, color);
+    }
+
+    /**
+     * Issue #931-swingx: missing change notification.
+     * test setting monthStringInsets property.
+     * 
+     */
+    @Test
+    public void testPreferredColumnCount() {
+        int old = monthView.getPreferredColumnCount();
+        int color = old + 20;
+        PropertyChangeReport report = new PropertyChangeReport();
+        monthView.addPropertyChangeListener(report);
+        monthView.setPreferredColumnCount(color);
+        assertEquals(color, monthView.getPreferredColumnCount());
+        TestUtils.assertPropertyChangeEvent(report, "preferredColumnCount", old, color);
+    }
+
+    /**
+     * Issue #931-swingx: missing change notification.
+     * test setting monthStringInsets property.
+     * 
+     */
+    @Test
+    public void testMonthStringInsets() {
+        Insets old = monthView.getMonthStringInsets();
+        Insets color = new Insets(21, 22, 23, 24);
+        assertFalse("sanity: the new insets are not equals", color.equals(old));
+        PropertyChangeReport report = new PropertyChangeReport();
+        monthView.addPropertyChangeListener(report);
+        monthView.setMonthStringInsets(color);
+        assertEquals(color, monthView.getMonthStringInsets());
+        TestUtils.assertPropertyChangeEvent(report, "monthStringInsets", old, color);
+    }
+
+    /**
+     * Issue #931-swingx: missing change notification.
+     * test setting monthStringBackground property.
+     * 
+     */
+    @Test
+    public void testTodayBackground() {
+        Color old = monthView.getTodayBackground();
+        Color color = Color.PINK;
+        if (color.equals(old)) {
+            color = Color.MAGENTA;
+        }
+        PropertyChangeReport report = new PropertyChangeReport();
+        monthView.addPropertyChangeListener(report);
+        monthView.setTodayBackground(color);
+        assertEquals(color, monthView.getTodayBackground());
+        TestUtils.assertPropertyChangeEvent(report, "todayBackground", old, color);
+    }
+
+    
+    /**
+     * Issue #931-swingx: missing change notification.
+     * test setting monthStringBackground property.
+     * 
+     */
+    @Test
+    public void testMonthStringBackground() {
+        Color old = monthView.getMonthStringBackground();
+        Color color = Color.PINK;
+        if (color.equals(old)) {
+            color = Color.MAGENTA;
+        }
+        PropertyChangeReport report = new PropertyChangeReport();
+        monthView.addPropertyChangeListener(report);
+        monthView.setMonthStringBackground(color);
+        assertEquals(color, monthView.getMonthStringBackground());
+        TestUtils.assertPropertyChangeEvent(report, "monthStringBackground", old, color);
+    }
+
+    /**
+     * Issue #931-swingx: missing change notification.
+     * test setting monthStringForeground property.
+     * 
+     */
+    @Test
+    public void testMonthStringForeground() {
+        Color old = monthView.getMonthStringForeground();
+        Color color = Color.PINK;
+        if (color.equals(old)) {
+            color = Color.MAGENTA;
+        }
+        PropertyChangeReport report = new PropertyChangeReport();
+        monthView.addPropertyChangeListener(report);
+        monthView.setMonthStringForeground(color);
+        assertEquals(color, monthView.getMonthStringForeground());
+        TestUtils.assertPropertyChangeEvent(report, "monthStringForeground", old, color);
+    }
+    /**
+     * Issue #931-swingx: missing change notification.
+     * test setting font property - was fired twice due to unneeded 
+     * override of setFont (removed).
+     * 
+     */
+    @Test
+    public void testFont() {
+        Font old = monthView.getFont();
+        Font padding = old.deriveFont(old.getSize2D() * 2);
+        PropertyChangeReport report = new PropertyChangeReport();
+        monthView.addPropertyChangeListener(report);
+        monthView.setFont(padding);
+        assertEquals(padding, monthView.getFont());
+        TestUtils.assertPropertyChangeEvent(report, "font", old, padding);
+    }
+
+    /**
+     * Issue #931-swingx: missing change notification.
+     * test setting boxPaddingY property.
+     * 
+     */
+    @Test
+    public void testBoxPaddingY() {
+        int old = monthView.getBoxPaddingY();
+        int padding = old + 2;
+        PropertyChangeReport report = new PropertyChangeReport();
+        monthView.addPropertyChangeListener(report);
+        monthView.setBoxPaddingY(padding);
+        assertEquals(padding, monthView.getBoxPaddingY());
+        TestUtils.assertPropertyChangeEvent(report, "boxPaddingY", old, padding);
+    }
+
+    /**
+     * Issue #931-swingx: missing change notification.
+     * test setting boxPaddingX property.
+     * 
+     */
+    @Test
+    public void testBoxPaddingX() {
+        int old = monthView.getBoxPaddingX();
+        int padding = old + 2;
+        PropertyChangeReport report = new PropertyChangeReport();
+        monthView.addPropertyChangeListener(report);
+        monthView.setBoxPaddingX(padding);
+        assertEquals(padding, monthView.getBoxPaddingX());
+        TestUtils.assertPropertyChangeEvent(report, "boxPaddingX", old, padding);
     }
 
     /**

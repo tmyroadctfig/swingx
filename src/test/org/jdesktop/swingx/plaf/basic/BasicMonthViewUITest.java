@@ -132,8 +132,8 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
         monthView.setShowingLeadingDays(true);
         monthView.setShowingTrailingDays(true);
         monthView.setSelectionMode(SelectionMode.SINGLE_INTERVAL_SELECTION);
-        monthView.setPreferredCols(2);
-        monthView.setPreferredRows(2);
+        monthView.setPreferredColumnCount(2);
+        monthView.setPreferredRowCount(2);
         final JXFrame frame = wrapInFrame(monthView, frameTitle);
         addComponentOrientationToggle(frame);
         Action toggleTraversable = new AbstractAction("toggle traversable") {
@@ -205,8 +205,8 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
         monthView.setShowingLeadingDays(true);
         monthView.setShowingTrailingDays(true);
         monthView.setSelectionMode(SelectionMode.SINGLE_INTERVAL_SELECTION);
-        monthView.setPreferredCols(2);
-        monthView.setPreferredRows(2);
+        monthView.setPreferredColumnCount(2);
+        monthView.setPreferredRowCount(2);
         final BasicMonthViewUI ui = ((BasicMonthViewUI) monthView.getUI());
         monthView.addMouseListener(new MouseAdapter() {
 
@@ -1131,8 +1131,8 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
     private BasicMonthViewUI getRealizedMonthViewUI(ComponentOrientation co,
             boolean isShowingWeekNumbers) {
         JXMonthView monthView = new JXMonthView();
-        monthView.setPreferredCols(2);
-        monthView.setPreferredRows(2);
+        monthView.setPreferredColumnCount(2);
+        monthView.setPreferredRowCount(2);
         monthView.setComponentOrientation(co);
         monthView.setShowingWeekNumber(isShowingWeekNumbers);
         Calendar calendar = monthView.getCalendar();

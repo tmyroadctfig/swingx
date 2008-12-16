@@ -2229,14 +2229,14 @@ public class BasicMonthViewUI extends MonthViewUI {
          * @return
          */
         private int getPreferredColumns() {
-            return isZoomable() ? 1 : monthView.getPreferredCols();
+            return isZoomable() ? 1 : monthView.getPreferredColumnCount();
         }
 
         /**
          * @return
          */
         private int getPreferredRows() {
-            return isZoomable() ? 1 : monthView.getPreferredRows();
+            return isZoomable() ? 1 : monthView.getPreferredRowCount();
         }
 
         /**
