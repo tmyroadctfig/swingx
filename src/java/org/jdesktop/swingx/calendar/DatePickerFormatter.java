@@ -168,7 +168,10 @@ public class DatePickerFormatter extends
     }
     
     /**
-     * Creates and returns the localized default formats.
+     * Creates and returns the localized default formats. First tries to 
+     * add formats created using the patterns stored in the UIManager. If
+     * there are no patterns, use the DateFormat's instance with style
+     * DateFormat.SHORT.
      * 
      * @return the localized default formats.
      */
@@ -177,7 +180,21 @@ public class DatePickerFormatter extends
         addFormat(f, "JXDatePicker.longFormat", locale);
         addFormat(f, "JXDatePicker.mediumFormat", locale);
         addFormat(f, "JXDatePicker.shortFormat", locale);
+        if (f.size() == 0) {
+           addSystemDefaultFormat(f, locale); 
+        }
         return f.toArray(new DateFormat[f.size()]);
+    }
+
+    /**
+     * Adds the system's default DateFormat. This implementation adds a
+     * dateInstance of style DateFormat.SHORT.
+     * 
+     * @param f the List of formats to add to
+     * @param locale the Locale to use for the formatter.
+     */
+    private void addSystemDefaultFormat(List<DateFormat> f, Locale locale) {
+        f.add(DateFormat.getDateInstance(DateFormat.SHORT, locale));
     }
 
     /**
@@ -191,10 +208,8 @@ public class DatePickerFormatter extends
      * @param key the key for getting the pattern from the UI
      */
     private void addFormat(List<DateFormat> f, String key, Locale locale) {
-        // FIXME: PeS: UIManagerExt.getString(key) always seems to return same 
-        // pattern (as for default locale) no matter what locale we pass as parameter.
-        // JW: no wonder - you forgot to pass-on the locale parameter :-)
         String pattern = UIManagerExt.getString(key, locale);
+        if (pattern == null) return;
         try {
             SimpleDateFormat format = new SimpleDateFormat(pattern, locale);
             f.add(format);

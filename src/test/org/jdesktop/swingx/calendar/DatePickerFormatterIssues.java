@@ -22,10 +22,14 @@
 package org.jdesktop.swingx.calendar;
 
 import java.util.Calendar;
+import java.util.Locale;
+import java.util.logging.Logger;
 
 import junit.framework.TestCase;
 
 import org.jdesktop.swingx.JXDatePicker;
+import org.junit.After;
+import org.junit.Before;
 
 /**
  * Unit tests for <code>DatePickerFormatter</code>.
@@ -33,19 +37,29 @@ import org.jdesktop.swingx.JXDatePicker;
  * @author Jeanette Winzenburg
  */
 public class DatePickerFormatterIssues extends TestCase {
-
+    @SuppressWarnings("unused")
+    private static final Logger LOG = Logger
+            .getLogger(DatePickerFormatterIssues.class.getName());
+    
     @SuppressWarnings("unused")
     private Calendar cal;
+    private Locale originalLocale;
+
+    
 
     @Override
+    @Before
     public void setUp() {
+        originalLocale = Locale.getDefault();
         cal = Calendar.getInstance();
         // force loading of resources
         new JXDatePicker();
     }
 
     @Override
+    @After
     public void tearDown() {
+        Locale.setDefault(originalLocale);
     }
     
     /**

@@ -27,17 +27,18 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.logging.Logger;
 
 import junit.framework.TestCase;
 
 import org.jdesktop.swingx.JXDatePicker;
 import org.jdesktop.swingx.calendar.DatePickerFormatter.DatePickerFormatterUIResource;
 import org.jdesktop.swingx.plaf.UIManagerExt;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.junit.Test;
-import org.junit.Before;
-import org.junit.After;
 
 
 /**
@@ -49,6 +50,36 @@ import org.junit.After;
  */
 @RunWith(JUnit4.class)
 public class DatePickerFormatterTest extends TestCase {
+    @SuppressWarnings("unused")
+    private static final Logger LOG = Logger
+            .getLogger(DatePickerFormatterTest.class.getName());
+    
+    /**
+     * Issue #945-swingx: don't force default format for Locales without
+     * properties.
+     * 
+     * Instead, use the system's default date format instance.
+     */
+    @Test
+    public void testPickerFormatterNoDefaults() {
+        Locale original = Locale.getDefault();
+        Locale.setDefault(Locale.JAPAN);
+        if (UIManagerExt.getString("JXDatePicker.longFormat", Locale
+                .getDefault()) != null) {
+            LOG.info("can't run formatter fallback - has format entry");
+            Locale.setDefault(original);
+            return;
+        }
+        DatePickerFormatter formatter = new DatePickerFormatter();
+        try {
+            assertNotNull(formatter.getFormats());
+            assertTrue("must have formats:  " + formatter.getFormats().length,
+                    formatter.getFormats().length > 0);
+            assertEquals(DateFormat.getDateInstance(DateFormat.SHORT), formatter.getFormats()[0]);
+        } finally {
+            Locale.setDefault(original);
+        }
+    }
 
     /**
      * Issue #691-swingx: locale setting not taken.
