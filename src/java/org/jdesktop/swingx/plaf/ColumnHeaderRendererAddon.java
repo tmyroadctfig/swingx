@@ -132,7 +132,7 @@ public class ColumnHeaderRendererAddon extends AbstractComponentAddon {
     /**
      * Hack around the oversized vista header border installed by core.
      * Registers a (5,5,5,5) empty border for vista themes. Does nothing if the
-     * OS is not Vista or the addon is classic windows. 
+     * OS is not Vista or the addon is classic windows or the JVM isn't 1.5. 
      * 
      * PENDING: can we have XP themes under vista? If so, this needs to be changed - 
      * most probably the xp border is okay.
