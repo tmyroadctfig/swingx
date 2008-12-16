@@ -22,6 +22,7 @@
 package org.jdesktop.swingx.calendar;
 
 import java.text.DateFormat;
+import java.text.MessageFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -62,25 +63,42 @@ public class DatePickerFormatterTest extends TestCase {
      */
     @Test
     public void testPickerFormatterNoDefaults() {
-        Locale original = Locale.getDefault();
         Locale.setDefault(Locale.JAPAN);
         if (UIManagerExt.getString("JXDatePicker.longFormat", Locale
                 .getDefault()) != null) {
             LOG.info("can't run formatter fallback - has format entry");
-            Locale.setDefault(original);
             return;
         }
         DatePickerFormatter formatter = new DatePickerFormatter();
-        try {
-            assertNotNull(formatter.getFormats());
-            assertTrue("must have formats:  " + formatter.getFormats().length,
-                    formatter.getFormats().length > 0);
-            assertEquals(DateFormat.getDateInstance(DateFormat.SHORT), formatter.getFormats()[0]);
-        } finally {
-            Locale.setDefault(original);
-        }
+        assertNotNull(formatter.getFormats());
+        assertTrue("must have formats:  " + formatter.getFormats().length,
+                formatter.getFormats().length > 0);
+        assertEquals(DateFormat.getDateInstance(DateFormat.SHORT), formatter
+                .getFormats()[0]);
     }
 
+    /**
+     * Issue #945-swingx: don't force default format for Locales without
+     * properties.
+     * 
+     * LinkFormat pattern in base defaults to DateFormat's default with 
+     * style SHORT.
+     */
+    @Test
+    public void testPickerFormatterDefaultToday() {
+        Locale.setDefault(Locale.JAPAN);
+        if (UIManagerExt.getString("JXDatePicker.longFormat", Locale
+                .getDefault()) != null) {
+            LOG.info("can't run formatter fallback - has format entry");
+            return;
+        }
+        String pattern = UIManagerExt.getString("JXDatePicker.linkFormat");
+        assertNotNull("linkFormat entry is available", pattern);
+        MessageFormat format = new MessageFormat(pattern, Locale.getDefault());
+        assertEquals(DateFormat.getDateInstance(DateFormat.SHORT), format
+                .getFormats()[0]);
+    }
+    
     /**
      * Issue #691-swingx: locale setting not taken.
      * Here: test contructor with locale.
@@ -260,10 +278,12 @@ public class DatePickerFormatterTest extends TestCase {
     
     @SuppressWarnings("unused")
     private Calendar cal;
+    private Locale originalLocale;
 
     @Override
     @Before
-       public void setUp() {
+    public void setUp() {
+        originalLocale = Locale.getDefault();
         cal = Calendar.getInstance();
         // force loading of resources
         new JXDatePicker();
@@ -271,7 +291,8 @@ public class DatePickerFormatterTest extends TestCase {
 
     @Override
     @After
-       public void tearDown() {
+    public void tearDown() {
+        Locale.setDefault(originalLocale);
     }
 
 }
