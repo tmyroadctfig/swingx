@@ -80,11 +80,29 @@ import org.jdesktop.swingx.tree.DefaultXTreeCellEditor;
  * 
  * <h2>Rendering and Highlighting</h2>
  * 
+ * As all SwingX collection views, a JXTree is a HighlighterClient (PENDING JW: formally
+ * define and implement, like in AbstractTestHighlighter), that is it provides consistent 
+ * api to add and remove Highlighters which can visually decorate the rendering component.
+ * <p>
  * 
+ * <i>Note:</i> to support the highlighting this implementation must wrap the TreeCellRenderer 
+ * set by client code with a DelegatingRenderer which applies the Highlighter after 
+ * delegating the default configuration to the wrappee. As a side-effect, getCellRenderer does
+ * return the wrapper instead of the custom renderer. To access the latter, client code
+ * must call getWrappedCellRenderer.
+ * <p>
  * 
- * <b>NOTE:</b> for full functionality, a DefaultTreeRenderer must be installed
+ * <i>Note:</i> for full functionality, a DefaultTreeRenderer must be installed
  * as TreeCellRenderer. This is not done by default, because there are
  * unresolved issues when editing. PENDING JW: still? Check!
+ * 
+ * <h2>Rollover</h2>
+ * 
+ * As all SwingX collection views, a JXTree supports per-cell rollover. If enabled, the 
+ * component fires rollover events on enter/exit of a cell which by default is promoted to
+ * the renderer if it implements RolloverRenderer, that is has simulates live behaviour. 
+ * The rollover events can be used by client code as well, f.i. to decorate the rollover row
+ * using a Highlighter. 
  * 
  * <h2>Search</h2>
  * 
@@ -97,19 +115,18 @@ import org.jdesktop.swingx.tree.DefaultXTreeCellEditor;
  * <p>
  * 
  * JXTree provides api to vend a renderer-controlled String representation of
- * cell content. This allows the default Searchable to use WYSIWYM
+ * cell content. This allows the Searchable and Highlighters to use WYSIWYM
  * (What-You-See-Is-What-You-Match), that is pattern matching against the actual
  * string as seen by the user.
  * 
- * <h2>Miscallenous</h2>
+ * <h2>Miscellaneous</h2>
  * 
  * <ul>
- * <li> Improved usuabilty for editing: guarantees that the tree is the focusOwner
+ * <li> Improved usabilty for editing: guarantees that the tree is the focusOwner
  *   if editing terminated by user gesture and guards against data corruption if focusLost 
  *   while editing
  * <li> Access methods for selection colors, for consistency with JXTable, JXList
  * <li> Convenience methods and actions to expand, collapse all nodes
- * <li> 
  * </ul>
  * 
  * @author Ramesh Gupta
