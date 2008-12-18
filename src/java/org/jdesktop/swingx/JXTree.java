@@ -62,7 +62,6 @@ import javax.swing.tree.TreePath;
 
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.CompoundHighlighter;
-import org.jdesktop.swingx.decorator.FilterPipeline;
 import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.renderer.StringValue;
 import org.jdesktop.swingx.rollover.RolloverProducer;
@@ -75,31 +74,43 @@ import org.jdesktop.swingx.tree.DefaultXTreeCellEditor;
 
 
 /**
- * Enhanced Tree component with support for SwingX rendering, 
- * highlighting, rollover and search functionality. <p>
+ * Enhanced Tree component with support for SwingX rendering, highlighting,
+ * rollover and search functionality.
+ * <p>
  * 
  * <h2>Rendering and Highlighting</h2>
  * 
  * 
  * 
- * <b>NOTE:</b> for full functionality, a DefaultTreeRenderer must be 
- * installed as TreeCellRenderer. This is not done by default, because
- * there are unresolved issues when editing. PENDING JW: still? Check!
+ * <b>NOTE:</b> for full functionality, a DefaultTreeRenderer must be installed
+ * as TreeCellRenderer. This is not done by default, because there are
+ * unresolved issues when editing. PENDING JW: still? Check!
  * 
  * <h2>Search</h2>
  * 
- * As all SwingX collection views, a JXTree is searchable. A 
- * search action is registered in its ActionMap under the key "find". 
- * The default behaviour is to ask the SearchFactory to open a search
- * component on this component. The default keybinding is retrieved from the
- * SearchFactory, typically ctrl-f (or cmd-f for Mac). Client code
- * can register custom actions and/or bindings as appropriate.
+ * As all SwingX collection views, a JXTree is searchable. A search action is
+ * registered in its ActionMap under the key "find". The default behaviour is to
+ * ask the SearchFactory to open a search component on this component. The
+ * default keybinding is retrieved from the SearchFactory, typically ctrl-f (or
+ * cmd-f for Mac). Client code can register custom actions and/or bindings as
+ * appropriate.
  * <p>
  * 
- * JXTree provides api to vend a renderer-controlled String representation
- * of cell content. This allows the default Searchable to use
- *  WYSIWYM (What-You-See-Is-What-You-Match), that is pattern matching against
- *  the actual string as seen by the user.
+ * JXTree provides api to vend a renderer-controlled String representation of
+ * cell content. This allows the default Searchable to use WYSIWYM
+ * (What-You-See-Is-What-You-Match), that is pattern matching against the actual
+ * string as seen by the user.
+ * 
+ * <h2>Miscallenous</h2>
+ * 
+ * <ul>
+ * <li> Improved usuabilty for editing: guarantees that the tree is the focusOwner
+ *   if editing terminated by user gesture and guards against data corruption if focusLost 
+ *   while editing
+ * <li> Access methods for selection colors, for consistency with JXTable, JXList
+ * <li> Convenience methods and actions to expand, collapse all nodes
+ * <li> 
+ * </ul>
  * 
  * @author Ramesh Gupta
  * @author Jeanette Winzenburg
@@ -114,29 +125,35 @@ import org.jdesktop.swingx.tree.DefaultXTreeCellEditor;
  */
 public class JXTree extends JTree {
     private static final Logger LOG = Logger.getLogger(JXTree.class.getName());
+    
+    /** outdated stuff around string conversion from model. */
     private Method conversionMethod = null;
     private final static Class[] methodSignature = new Class[] {Object.class};
     private final static Object[] methodArgs = new Object[] {null};
+    
+    /** Empty int array used in getSelectedRows(). */
     private static final int[] EMPTY_INT_ARRAY = new int[0];
+    /** Empty TreePath used in getSelectedPath() if selection empty. */
     private static final TreePath[] EMPTY_TREEPATH_ARRAY = new TreePath[0];
 
-    protected FilterPipeline filters;
+    /** Collection of active Highlighters. */
     protected CompoundHighlighter compoundHighlighter;
+    /** Listener to changes of Highlighters in collection. */
     private ChangeListener highlighterChangeListener;
 
+    /** Wrapper around the installed renderer, needed to support Highlighters. */
     private DelegatingRenderer delegatingRenderer;
 
     /**
-     * Mouse/Motion/Listener keeping track of mouse moved in
-     * cell coordinates.
+     * The RolloverProducer used if rollover is enabled.
      */
     private RolloverProducer rolloverProducer;
 
     /**
-     * RolloverController: listens to cell over events and
-     * repaints entered/exited rows.
+     * The RolloverController used if rollover is enabled.
      */
     private TreeRolloverController<JXTree> linkController;
+    
     private boolean overwriteIcons;
     private Searchable searchable;
     
@@ -151,7 +168,10 @@ public class JXTree extends JTree {
      * focus back to the tree after terminating edits.
      */
     private CellEditorListener editorListener;
+    
+    /** Color of selected foreground. Added for consistent api across collection components. */
     private Color selectionForeground;
+    /** Color of selected background. Added for consistent api across collection components. */
     private Color selectionBackground;
     
     
@@ -258,65 +278,12 @@ public class JXTree extends JTree {
         init();
     }
 
-    @Override
-    public void setModel(TreeModel newModel) {
-        // To support delegation of convertValueToText() to the model...
-        // JW: method needs to be set before calling super
-        // otherwise there are size caching problems
-        conversionMethod = getValueConversionMethod(newModel);
-        super.setModel(newModel);
-    }
-
     /**
-     * Tries to find and return a method for Object --> to String conversion on the
-     * model by reflection. Looks for a signature:
+     * Instantiats JXTree state which is new compared to super. Installs the
+     * Delegating renderer and editor, registers actions and keybindings.
      * 
-     * <pre> <code>
-     *   String convertValueToText(Object);
-     * </code> </pre>
-     * 
-     * 
-     * 
-     * PENDING JW: check - does this work with restricted permissions?
-     * JW: widened access for testing - do test!
-     * 
-     * @param model the model to detect the method
-     * @return the <code> Method </code> or null if the model has no method with
-     *   the expected signature 
+     * This must be called from each constructor.
      */
-    protected Method getValueConversionMethod(TreeModel model) {
-        try {
-            return model == null ? null : model.getClass().getMethod(
-                    "convertValueToText", methodSignature);
-        } catch (NoSuchMethodException ex) {
-            LOG.finer("ex " + ex);
-            LOG.finer("no conversionMethod in " + model.getClass());
-        }
-        return null;
-    }
-
-    
-    @Override
-    public String convertValueToText(Object value, boolean selected,
-            boolean expanded, boolean leaf, int row, boolean hasFocus) {
-        // Delegate to model, if possible. Otherwise fall back to superclass...
-        if (value != null) {
-            if (conversionMethod == null) {
-                return value.toString();
-            } else {
-                try {
-                    methodArgs[0] = value;
-                    return (String) conversionMethod.invoke(getModel(),
-                            methodArgs);
-                } catch (Exception ex) {
-                    LOG.finer("ex " + ex);
-                    LOG.finer("can't invoke " + conversionMethod);
-                }
-            }
-        }
-        return "";
-    }
-
     private void init() {
         // To support delegation of convertValueToText() to the model...
         // JW: need to set again (is done in setModel, but at call
@@ -409,6 +376,11 @@ public class JXTree extends JTree {
 
 //-------------------- search support
     
+    /**
+     * Creates and returns the action to invoke on a find request.
+     * 
+     * @return the action to invoke on a find request.
+     */
     private Action createFindAction() {
         return new UIAction("find") {
             public void actionPerformed(ActionEvent e) {
@@ -417,13 +389,23 @@ public class JXTree extends JTree {
         };
     }
 
+    /**
+     * Starts a search on this Tree's visible nodes. This implementation asks the
+     * SearchFactory to open a find widget on itself.
+     */
     protected void doFind() {
         SearchFactory.getInstance().showFindInput(this, getSearchable());
     }
 
     /**
+     * Returns a Searchable for this component, guaranteed to be not null. This 
+     * implementation lazyly creates a TreeSearchable if necessary.
+     *  
      * 
-     * @return a not-null Searchable for this editor.
+     * @return a not-null Searchable for this component.
+     * 
+     * @see #setSearchable(Searchable)
+     * @see org.jdesktop.swingx.search.TreeSearchable
      */
     public Searchable getSearchable() {
         if (searchable == null) {
@@ -433,18 +415,49 @@ public class JXTree extends JTree {
     }
 
     /**
-     * sets the Searchable for this editor. If null, a default 
-     * searchable will be used.
+     * Sets the Searchable for this component. If null, a default 
+     * Searchable will be created and used.
      * 
-     * @param searchable
+     * @param searchable the Searchable to use for this component.
+     * 
+     * @see #getSearchable()
      */
     public void setSearchable(Searchable searchable) {
         this.searchable = searchable;
     }
     
- 
     /**
-     * Collapses all nodes in the tree table.
+     * Returns the string representation of the cell value at the given position. 
+     * 
+     * @param row the row index of the cell in view coordinates
+     * @return the string representation of the cell value as it will appear in the 
+     *   table. 
+     */
+    public String getStringAt(int row) {
+        return getStringAt(getPathForRow(row));
+    }
+
+    /**
+     * Returns the string representation of the cell value at the given position. 
+     * 
+     * @param path the TreePath representing the node.
+     * @return the string representation of the cell value as it will appear in the 
+     *   table, or null if the path is not visible. 
+     */
+    public String getStringAt(TreePath path) {
+        if (path == null) return null;
+        TreeCellRenderer renderer = getDelegatingRenderer().getDelegateRenderer();
+        if (renderer instanceof StringValue) {
+            return ((StringValue) renderer).getString(path.getLastPathComponent());
+        }
+        return StringValue.TO_STRING.getString(path.getLastPathComponent());
+    }
+
+    
+//--------------------- misc. new api and super overrides
+    
+    /**
+     * Collapses all nodes in this tree.
      */
     public void collapseAll() {
         for (int i = getRowCount() - 1; i >= 0 ; i--) {
@@ -453,7 +466,7 @@ public class JXTree extends JTree {
     }
 
     /**
-     * Expands all nodes in the tree table.
+     * Expands all nodes in this tree.
      */
     public void expandAll() {
         if (getRowCount() == 0) {
@@ -465,22 +478,22 @@ public class JXTree extends JTree {
     }
 
     /**
-     * Expands the root path if the current TreeModel has been set, does nothing
-     * if not.
+     * Expands the root path if a TreeModel has been set, does nothing if not.
      * 
      */
     private void expandRoot() {
-        TreeModel              model = getModel();
-        if(model != null && model.getRoot() != null) {
+        TreeModel model = getModel();
+        if (model != null && model.getRoot() != null) {
             expandPath(new TreePath(model.getRoot()));
         }
     }
 
     /**
-     * {@inheritDoc} <p>
+     * {@inheritDoc}
+     * <p>
      * 
-     * Overridden to always return a not-null array 
-     * (following SwingX convention).
+     * Overridden to always return a not-null array (following SwingX
+     * convention).
      */
     @Override
     public int[] getSelectionRows() {
@@ -488,134 +501,170 @@ public class JXTree extends JTree {
         return rows != null ? rows : EMPTY_INT_ARRAY; 
     }
     
-    
-
     /**
-     * {@inheritDoc} <p>
+     * {@inheritDoc}
+     * <p>
      * 
-     * Overridden to always return a not-null array 
-     * (following SwingX convention).
+     * Overridden to always return a not-null array (following SwingX
+     * convention).
      */
     @Override
     public TreePath[] getSelectionPaths() {
-        // TODO Auto-generated method stub
         TreePath[] paths = super.getSelectionPaths();
         return paths != null ? paths : EMPTY_TREEPATH_ARRAY; 
     }
 
-//----------------------- Highlighter api
-    
     /**
-     * Sets the <code>Highlighter</code>s to the table, replacing any old settings.
-     * None of the given Highlighters must be null.<p>
-     * 
-     * This is a bound property. <p> 
-     * 
-     * Note: as of version #1.257 the null constraint is enforced strictly. To remove
-     * all highlighters use this method without param.
-     * 
-     * @param highlighters zero or more not null highlighters to use for renderer decoration.
-     * @throws NullPointerException if array is null or array contains null values.
-     * 
-     * @see #getHighlighters()
-     * @see #addHighlighter(Highlighter)
-     * @see #removeHighlighter(Highlighter)
-     * 
+     * Returns the background color for selected cells.
+     *
+     * @return the <code>Color</code> used for the background of
+     * selected list items
+     * @see #setSelectionBackground
+     * @see #setSelectionForeground
      */
-    public void setHighlighters(Highlighter... highlighters) {
-        Highlighter[] old = getHighlighters();
-        getCompoundHighlighter().setHighlighters(highlighters);
-        firePropertyChange("highlighters", old, getHighlighters());
-    }
-
-    /**
-     * Returns the <code>Highlighter</code>s used by this table.
-     * Maybe empty, but guarantees to be never null.
-     * 
-     * @return the Highlighters used by this table, guaranteed to never null.
-     * @see #setHighlighters(Highlighter[])
-     */
-    public Highlighter[] getHighlighters() {
-        return getCompoundHighlighter().getHighlighters();
-    }
-    /**
-     * Appends a <code>Highlighter</code> to the end of the list of used
-     * <code>Highlighter</code>s. The argument must not be null. 
-     * <p>
-     * 
-     * @param highlighter the <code>Highlighter</code> to add, must not be null.
-     * @throws NullPointerException if <code>Highlighter</code> is null.
-     * 
-     * @see #removeHighlighter(Highlighter)
-     * @see #setHighlighters(Highlighter[])
-     */
-    public void addHighlighter(Highlighter highlighter) {
-        Highlighter[] old = getHighlighters();
-        getCompoundHighlighter().addHighlighter(highlighter);
-        firePropertyChange("highlighters", old, getHighlighters());
-    }
-
-    /**
-     * Removes the given Highlighter. <p>
-     * 
-     * Does nothing if the Highlighter is not contained.
-     * 
-     * @param highlighter the Highlighter to remove.
-     * @see #addHighlighter(Highlighter)
-     * @see #setHighlighters(Highlighter...)
-     */
-    public void removeHighlighter(Highlighter highlighter) {
-        Highlighter[] old = getHighlighters();
-        getCompoundHighlighter().removeHighlighter(highlighter);
-        firePropertyChange("highlighters", old, getHighlighters());
+    public Color getSelectionBackground() {
+        return selectionBackground;
     }
     
     /**
-     * Returns the CompoundHighlighter assigned to the table, null if none.
-     * PENDING: open up for subclasses again?.
-     * 
-     * @return the CompoundHighlighter assigned to the table.
-     * @see #setCompoundHighlighter(CompoundHighlighter)
+     * Returns the selection foreground color.
+     *
+     * @return the <code>Color</code> object for the foreground property
+     * @see #setSelectionForeground
+     * @see #setSelectionBackground
      */
-    protected CompoundHighlighter getCompoundHighlighter() {
-        if (compoundHighlighter == null) {
-            compoundHighlighter = new CompoundHighlighter();
-            compoundHighlighter.addChangeListener(getHighlighterChangeListener());
-        }
-        return compoundHighlighter;
+    public Color getSelectionForeground() {
+        return selectionForeground;
     }
-
+   
     /**
-     * Returns the <code>ChangeListener</code> to use with highlighters. Lazily 
-     * creates the listener.
-     * 
-     * @return the ChangeListener for observing changes of highlighters, 
-     *   guaranteed to be <code>not-null</code>
-     */
-    protected ChangeListener getHighlighterChangeListener() {
-        if (highlighterChangeListener == null) {
-            highlighterChangeListener = createHighlighterChangeListener();
-        }
-        return highlighterChangeListener;
-    }
-
-    /**
-     * Creates and returns the ChangeListener observing Highlighters.
+     * Sets the foreground color for selected cells.  Cell renderers
+     * can use this color to render text and graphics for selected
+     * cells.
      * <p>
-     * Here: repaints the table on receiving a stateChanged.
-     * 
-     * @return the ChangeListener defining the reaction to changes of
-     *         highlighters.
+     * The default value of this property is defined by the look
+     * and feel implementation.
+     * <p>
+     * This is a JavaBeans bound property.
+     *
+     * @param selectionForeground  the <code>Color</code> to use in the foreground
+     *                             for selected list items
+     * @see #getSelectionForeground
+     * @see #setSelectionBackground
+     * @see #setForeground
+     * @see #setBackground
+     * @see #setFont
+     * @beaninfo
+     *       bound: true
+     *   attribute: visualUpdate true
+     * description: The foreground color of selected cells.
      */
-    protected ChangeListener createHighlighterChangeListener() {
-        return new ChangeListener() {
-            public void stateChanged(ChangeEvent e) {
-                repaint();
-            }
-        };
+    public void setSelectionForeground(Color selectionForeground) {
+        Object oldValue = getSelectionForeground();
+        this.selectionForeground = selectionForeground;
+        firePropertyChange("selectionForeground", oldValue, getSelectionForeground());
+        repaint();
+    }
+
+    /**
+     * Sets the background color for selected cells.  Cell renderers
+     * can use this color to the fill selected cells.
+     * <p>
+     * The default value of this property is defined by the look
+     * and feel implementation.
+     * <p>
+     * This is a JavaBeans bound property.
+     *
+     * @param selectionBackground  the <code>Color</code> to use for the 
+     *                             background of selected cells
+     * @see #getSelectionBackground
+     * @see #setSelectionForeground
+     * @see #setForeground
+     * @see #setBackground
+     * @see #setFont
+     * @beaninfo
+     *       bound: true
+     *   attribute: visualUpdate true
+     * description: The background color of selected cells.
+     */
+    public void setSelectionBackground(Color selectionBackground) {
+        Object oldValue = getSelectionBackground();
+        this.selectionBackground = selectionBackground;
+        firePropertyChange("selectionBackground", oldValue, getSelectionBackground());
+        repaint();
+    }
+
+    
+//------------------------- update ui 
+    
+    /**
+     * {@inheritDoc} <p>
+     * 
+     * Overridden to update selection background/foreground. Mimicking behaviour of 
+     * ui-delegates for JTable, JList.
+     */
+    @Override
+    public void updateUI() {
+        uninstallSelectionColors();
+        super.updateUI();
+        installSelectionColors();
+        updateHighlighterUI();
+    }
+
+    /**
+     * Installs selection colors from UIManager. <p>
+     * 
+     * <b>Note:</b> this should be done in the UI delegate.
+     */
+    private void installSelectionColors() {
+        if (isUIResource(getSelectionBackground())) {
+            setSelectionBackground(UIManager.getColor("Tree.selectionBackground"));
+        }
+        if (isUIResource(getSelectionForeground())) {
+            setSelectionForeground(UIManager.getColor("Tree.selectionForeground"));
+        }
+        
+    }
+
+    /**
+     * Uninstalls selection colors. <p>
+     * 
+     * <b>Note:</b> this should be done in the UI delegate.
+     */
+    private void uninstallSelectionColors() {
+        if (isUIResource(getSelectionBackground())) {
+            setSelectionBackground(null);
+        }
+        if (isUIResource(getSelectionForeground())) {
+            setSelectionForeground(null);
+        }
+    }
+
+    /**
+     * Updates highlighter after <code>updateUI</code> changes.
+     * 
+     * @see org.jdesktop.swingx.decorator.UIDependent
+     */
+    protected void updateHighlighterUI() {
+        if (compoundHighlighter == null) return;
+        compoundHighlighter.updateUI();
+    }
+
+    /**
+     * Checks if the given value should be set by the LAF. <p>
+     * 
+     * PENDING JW: extract as utility method to ??
+     * 
+     * @param value the value to check
+     * @return true if the value is null or of type UIResource, false otherwise.
+     */
+    private boolean isUIResource(Object value) {
+        return (value == null) || (value instanceof UIResource);
     }
 
 
+//------------------------ Rollover support
+    
     /**
      * Sets a boolean to enable/disable rollover support. 
      * Installs or uninstalls the RolloverProducer/-Controller and appropriate
@@ -658,9 +707,7 @@ public class JXTree extends JTree {
     public boolean isRolloverEnabled() {
         return rolloverProducer != null;
     }
-
-
-
+    
     /**
      * Returns the RolloverController for this component. Lazyly creates the 
      * controller if necessary, that is the return value is guaranteed to be 
@@ -756,174 +803,118 @@ public class JXTree extends JTree {
     }
 
   
-   
+//----------------------- Highlighter api
+    
     /**
-     * Returns the background color for selected cells.
-     *
-     * @return the <code>Color</code> used for the background of
-     * selected list items
-     * @see #setSelectionBackground
-     * @see #setSelectionForeground
+     * Sets the <code>Highlighter</code>s to the table, replacing any old settings.
+     * None of the given Highlighters must be null.<p>
+     * 
+     * This is a bound property. <p> 
+     * 
+     * Note: as of version #1.257 the null constraint is enforced strictly. To remove
+     * all highlighters use this method without param.
+     * 
+     * @param highlighters zero or more not null highlighters to use for renderer decoration.
+     * @throws NullPointerException if array is null or array contains null values.
+     * 
+     * @see #getHighlighters()
+     * @see #addHighlighter(Highlighter)
+     * @see #removeHighlighter(Highlighter)
+     * 
      */
-    public Color getSelectionBackground() {
-        return selectionBackground;
+    public void setHighlighters(Highlighter... highlighters) {
+        Highlighter[] old = getHighlighters();
+        getCompoundHighlighter().setHighlighters(highlighters);
+        firePropertyChange("highlighters", old, getHighlighters());
+    }
+
+    /**
+     * Returns the <code>Highlighter</code>s used by this table.
+     * Maybe empty, but guarantees to be never null.
+     * 
+     * @return the Highlighters used by this table, guaranteed to never null.
+     * @see #setHighlighters(Highlighter[])
+     */
+    public Highlighter[] getHighlighters() {
+        return getCompoundHighlighter().getHighlighters();
     }
     
     /**
-     * Returns the selection foreground color.
-     *
-     * @return the <code>Color</code> object for the foreground property
-     * @see #setSelectionForeground
-     * @see #setSelectionBackground
-     */
-    public Color getSelectionForeground() {
-        return selectionForeground;
-    }
-    
-    
-    /**
-     * Sets the foreground color for selected cells.  Cell renderers
-     * can use this color to render text and graphics for selected
-     * cells.
+     * Appends a <code>Highlighter</code> to the end of the list of used
+     * <code>Highlighter</code>s. The argument must not be null. 
      * <p>
-     * The default value of this property is defined by the look
-     * and feel implementation.
-     * <p>
-     * This is a JavaBeans bound property.
-     *
-     * @param selectionForeground  the <code>Color</code> to use in the foreground
-     *                             for selected list items
-     * @see #getSelectionForeground
-     * @see #setSelectionBackground
-     * @see #setForeground
-     * @see #setBackground
-     * @see #setFont
-     * @beaninfo
-     *       bound: true
-     *   attribute: visualUpdate true
-     * description: The foreground color of selected cells.
-     */
-    public void setSelectionForeground(Color selectionForeground) {
-        Object oldValue = getSelectionForeground();
-        this.selectionForeground = selectionForeground;
-        firePropertyChange("selectionForeground", oldValue, getSelectionForeground());
-        repaint();
-    }
-
-    /**
-     * Sets the background color for selected cells.  Cell renderers
-     * can use this color to the fill selected cells.
-     * <p>
-     * The default value of this property is defined by the look
-     * and feel implementation.
-     * <p>
-     * This is a JavaBeans bound property.
-     *
-     * @param selectionBackground  the <code>Color</code> to use for the 
-     *                             background of selected cells
-     * @see #getSelectionBackground
-     * @see #setSelectionForeground
-     * @see #setForeground
-     * @see #setBackground
-     * @see #setFont
-     * @beaninfo
-     *       bound: true
-     *   attribute: visualUpdate true
-     * description: The background color of selected cells.
-     */
-    public void setSelectionBackground(Color selectionBackground) {
-        Object oldValue = getSelectionBackground();
-        this.selectionBackground = selectionBackground;
-        firePropertyChange("selectionBackground", oldValue, getSelectionBackground());
-        repaint();
-    }
-
-    /**
-     * {@inheritDoc} <p>
      * 
-     * Overridden to update selection background/foreground. Mimicking behaviour of 
-     * ui-delegates for JTable, JList.
-     */
-    @Override
-    public void updateUI() {
-        uninstallSelectionColors();
-        super.updateUI();
-        installSelectionColors();
-        updateHighlighterUI();
-    }
-
-    /**
-     * Installs selection colors from UIManager.
-     */
-    private void installSelectionColors() {
-        if (isUIResource(getSelectionBackground())) {
-            setSelectionBackground(UIManager.getColor("Tree.selectionBackground"));
-        }
-        if (isUIResource(getSelectionForeground())) {
-            setSelectionForeground(UIManager.getColor("Tree.selectionForeground"));
-        }
-        
-    }
-
-    /**
-     * Uninstalls selection colors.
-     */
-    private void uninstallSelectionColors() {
-        if (isUIResource(getSelectionBackground())) {
-            setSelectionBackground(null);
-        }
-        if (isUIResource(getSelectionForeground())) {
-            setSelectionForeground(null);
-        }
-    }
-
-    /**
-     * Updates highlighter after <code>updateUI</code> changes.
+     * @param highlighter the <code>Highlighter</code> to add, must not be null.
+     * @throws NullPointerException if <code>Highlighter</code> is null.
      * 
-     * @see org.jdesktop.swingx.decorator.UIDependent
+     * @see #removeHighlighter(Highlighter)
+     * @see #setHighlighters(Highlighter[])
      */
-    protected void updateHighlighterUI() {
-        if (compoundHighlighter == null) return;
-        compoundHighlighter.updateUI();
+    public void addHighlighter(Highlighter highlighter) {
+        Highlighter[] old = getHighlighters();
+        getCompoundHighlighter().addHighlighter(highlighter);
+        firePropertyChange("highlighters", old, getHighlighters());
     }
 
     /**
-     * Checks if the given value should be set by the LAF.
+     * Removes the given Highlighter. <p>
      * 
-     * @param value the value to check
-     * @return true if the value is null or of type UIResource, false otherwise.
+     * Does nothing if the Highlighter is not contained.
+     * 
+     * @param highlighter the Highlighter to remove.
+     * @see #addHighlighter(Highlighter)
+     * @see #setHighlighters(Highlighter...)
      */
-    private boolean isUIResource(Object value) {
-        return (value == null) || (value instanceof UIResource);
+    public void removeHighlighter(Highlighter highlighter) {
+        Highlighter[] old = getHighlighters();
+        getCompoundHighlighter().removeHighlighter(highlighter);
+        firePropertyChange("highlighters", old, getHighlighters());
     }
     
     /**
-     * Returns the string representation of the cell value at the given position. 
+     * Returns the CompoundHighlighter assigned to the table, null if none.
+     * PENDING: open up for subclasses again?.
      * 
-     * @param row the row index of the cell in view coordinates
-     * @return the string representation of the cell value as it will appear in the 
-     *   table. 
+     * @return the CompoundHighlighter assigned to the table.
+     * @see #setCompoundHighlighter(CompoundHighlighter)
      */
-    public String getStringAt(int row) {
-        return getStringAt(getPathForRow(row));
+    protected CompoundHighlighter getCompoundHighlighter() {
+        if (compoundHighlighter == null) {
+            compoundHighlighter = new CompoundHighlighter();
+            compoundHighlighter.addChangeListener(getHighlighterChangeListener());
+        }
+        return compoundHighlighter;
     }
 
     /**
-     * Returns the string representation of the cell value at the given position. 
+     * Returns the <code>ChangeListener</code> to use with highlighters. Lazily 
+     * creates the listener.
      * 
-     * @param path the TreePath representing the node.
-     * @return the string representation of the cell value as it will appear in the 
-     *   table, or null if the path is not visible. 
+     * @return the ChangeListener for observing changes of highlighters, 
+     *   guaranteed to be <code>not-null</code>
      */
-    public String getStringAt(TreePath path) {
-        if (path == null) return null;
-        TreeCellRenderer renderer = getDelegatingRenderer().getDelegateRenderer();
-        if (renderer instanceof StringValue) {
-            return ((StringValue) renderer).getString(path.getLastPathComponent());
+    protected ChangeListener getHighlighterChangeListener() {
+        if (highlighterChangeListener == null) {
+            highlighterChangeListener = createHighlighterChangeListener();
         }
-        return StringValue.TO_STRING.getString(path.getLastPathComponent());
+        return highlighterChangeListener;
     }
 
+    /**
+     * Creates and returns the ChangeListener observing Highlighters.
+     * <p>
+     * Here: repaints the table on receiving a stateChanged.
+     * 
+     * @return the ChangeListener defining the reaction to changes of
+     *         highlighters.
+     */
+    protected ChangeListener createHighlighterChangeListener() {
+        return new ChangeListener() {
+            public void stateChanged(ChangeEvent e) {
+                repaint();
+            }
+        };
+    }
     
     /**
      * Sets the Icon to use for the handle of an expanded node.<p>
@@ -1067,7 +1058,6 @@ public class JXTree extends JTree {
     protected TreeCellRenderer createDefaultCellRenderer() {
         return new DefaultTreeCellRenderer();
     }
-
 
     /**
      * {@inheritDoc} <p>
@@ -1473,7 +1463,92 @@ public class JXTree extends JTree {
         }
     }
 
+// ------------------ oldish String conversion api, no longer recommended
     
+    /**
+     * {@inheritDoc} <p>
+     * 
+     * Overridden to initialize the String conversion method of the model, if any.<p>
+     * PENDING JW: remove - that is an outdated approach?
+     */
+    @Override
+    public void setModel(TreeModel newModel) {
+        // To support delegation of convertValueToText() to the model...
+        // JW: method needs to be set before calling super
+        // otherwise there are size caching problems
+        conversionMethod = getValueConversionMethod(newModel);
+        super.setModel(newModel);
+    }
+
+    /**
+     * Tries to find and return a method for Object --> to String conversion on the
+     * model by reflection. Looks for a signature:
+     * 
+     * <pre> <code>
+     *   String convertValueToText(Object);
+     * </code> </pre>
+     * 
+     * 
+     * 
+     * PENDING JW:
+     * <ul> 
+     * <li>check - does this work with restricted permissions?
+     * <li> widened access for testing - do test!
+     * <li> remove - no longer recommended.
+     * </ul>
+     * @param model the model to detect the method
+     * @return the <code> Method </code> or null if the model has no method with
+     *   the expected signature 
+     */
+    protected Method getValueConversionMethod(TreeModel model) {
+        try {
+            return model == null ? null : model.getClass().getMethod(
+                    "convertValueToText", methodSignature);
+        } catch (NoSuchMethodException ex) {
+            LOG.finer("ex " + ex);
+            LOG.finer("no conversionMethod in " + model.getClass());
+        }
+        return null;
+    }
+
+    /**
+     * {@inheritDoc} <p>
+     * 
+     * Overridden to use the TreeModel's String conversion method instead of super.
+     * 
+     * PENDING JW: remove - that's an oldish approach no longer recommended, superceded
+     * by this Tree's getStringAt methods. But note: the call direction is inverted. The
+     * ol' way was to call this method from the DefaultTreeCellRenderer (which was a bad 
+     * idea to start with). The new way is to give the renderer complete control and expose 
+     * the renderer's conversion via the getStringAt(..) api to arbitrary client code.
+     * 
+     * @see #getStringAt(int)
+     * @see #getStringAt(TreePath)
+     */
+    @Override
+    public String convertValueToText(Object value, boolean selected,
+            boolean expanded, boolean leaf, int row, boolean hasFocus) {
+        // Delegate to model, if possible. Otherwise fall back to superclass...
+        if (value != null) {
+            if (conversionMethod == null) {
+                return value.toString();
+            } else {
+                try {
+                    methodArgs[0] = value;
+                    return (String) conversionMethod.invoke(getModel(),
+                            methodArgs);
+                } catch (Exception ex) {
+                    LOG.finer("ex " + ex);
+                    LOG.finer("can't invoke " + conversionMethod);
+                }
+            }
+        }
+        return "";
+    }
+
+
+    
+//------------------------------- ComponentAdapter    
     /**
      * @return the unconfigured ComponentAdapter.
      */
