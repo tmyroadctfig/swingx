@@ -75,12 +75,42 @@ import org.jdesktop.swingx.tree.DefaultXTreeCellEditor;
 
 
 /**
- * JXTree.
- *
- * PENDING: support filtering/sorting.
+ * Enhanced Tree component with support for SwingX rendering, 
+ * highlighting, rollover and search functionality. <p>
+ * 
+ * <h2>Rendering and Highlighting</h2>
+ * 
+ * 
+ * 
+ * <b>NOTE:</b> for full functionality, a DefaultTreeRenderer must be 
+ * installed as TreeCellRenderer. This is not done by default, because
+ * there are unresolved issues when editing. PENDING JW: still? Check!
+ * 
+ * <h2>Search</h2>
+ * 
+ * As all SwingX collection views, a JXTree is searchable. A 
+ * search action is registered in its ActionMap under the key "find". 
+ * The default behaviour is to ask the SearchFactory to open a search
+ * component on this component. The default keybinding is retrieved from the
+ * SearchFactory, typically ctrl-f (or cmd-f for Mac). Client code
+ * can register custom actions and/or bindings as appropriate.
+ * <p>
+ * 
+ * JXTree provides api to vend a renderer-controlled String representation
+ * of cell content. This allows the default Searchable to use
+ *  WYSIWYM (What-You-See-Is-What-You-Match), that is pattern matching against
+ *  the actual string as seen by the user.
  * 
  * @author Ramesh Gupta
  * @author Jeanette Winzenburg
+ * 
+ * @see org.jdesktop.swingx.renderer.DefaultTreeRenderer
+ * @see org.jdesktop.swingx.renderer.ComponentProvider
+ * @see org.jdesktop.swingx.decorator.Highlighter
+ * @see org.jdesktop.swingx.decorator.HighlightPredicate
+ * @see org.jdesktop.swingx.search.SearchFactory
+ * @see org.jdesktop.swingx.search.Searchable
+ * 
  */
 public class JXTree extends JTree {
     private static final Logger LOG = Logger.getLogger(JXTree.class.getName());
@@ -435,7 +465,9 @@ public class JXTree extends JTree {
     }
 
     /**
-     * Expands the root path, assuming the current TreeModel has been set.
+     * Expands the root path if the current TreeModel has been set, does nothing
+     * if not.
+     * 
      */
     private void expandRoot() {
         TreeModel              model = getModel();
@@ -445,7 +477,9 @@ public class JXTree extends JTree {
     }
 
     /**
-     * overridden to always return a not-null array 
+     * {@inheritDoc} <p>
+     * 
+     * Overridden to always return a not-null array 
      * (following SwingX convention).
      */
     @Override
@@ -457,7 +491,9 @@ public class JXTree extends JTree {
     
 
     /**
-     * overridden to always return a not-null array 
+     * {@inheritDoc} <p>
+     * 
+     * Overridden to always return a not-null array 
      * (following SwingX convention).
      */
     @Override
@@ -581,10 +617,21 @@ public class JXTree extends JTree {
 
 
     /**
-     * Property to enable/disable rollover support. This can be enabled
-     * to show "live" rollover behaviour, f.i. the cursor over LinkModel cells. 
-     * Default is disabled.
-     * @param rolloverEnabled
+     * Sets a boolean to enable/disable rollover support. 
+     * Installs or uninstalls the RolloverProducer/-Controller and appropriate
+     * listeners if enable or disabled, respectively. 
+     * If enabled, renderers of implementing RolloverRenderer  
+     * show "live" rollover behaviour, f.i. the cursor over LinkModel cells. <p>
+     * 
+     * The default value is false.
+     * 
+     * @param rolloverEnabled a boolean indicating whether or not the rollover
+     *   functionality should be enabled.
+     * 
+     * @see #isRolloverEnabled()
+     * @see #getLinkController()
+     * @see #createRolloverProducer()
+     * @see org.jdesktop.swingx.rollover.RolloverRenderer  
      */
     public void setRolloverEnabled(boolean rolloverEnabled) {
         boolean old = isRolloverEnabled();
@@ -603,6 +650,30 @@ public class JXTree extends JTree {
         firePropertyChange("rolloverEnabled", old, isRolloverEnabled());
     }
 
+    /**
+     * Returns a boolean indicating whether or not rollover behaviour is enabled. 
+     *
+     * @return a boolean indicating whether or not rollover behaviour is enabled. 
+     */
+    public boolean isRolloverEnabled() {
+        return rolloverProducer != null;
+    }
+
+
+
+    /**
+     * Returns the RolloverController for this component. Lazyly creates the 
+     * controller if necessary, that is the return value is guaranteed to be 
+     * not null. <p>
+     * 
+     * PENDING JW: rename to getRolloverController
+     * 
+     * @return the RolloverController for this tree, guaranteed to be not null.
+     * 
+     * @see #setRolloverEnabled(boolean)
+     * @see #createLinkController()
+     * @see org.jdesktop.swingx.rollover.RolloverController
+     */
     protected TreeRolloverController<JXTree> getLinkController() {
         if (linkController == null) {
             linkController = createLinkController();
@@ -610,18 +681,32 @@ public class JXTree extends JTree {
         return linkController;
     }
 
+    /**
+     * Creates and returns a RolloverController appropriate for this tree.
+     * 
+     * @return a RolloverController appropriate for this tree.
+     * 
+     * @see #getLinkController()
+     * @see org.jdesktop.swingx.rollover.RolloverController
+     */
     protected TreeRolloverController<JXTree> createLinkController() {
         return new TreeRolloverController<JXTree>();
     }
 
     /**
-     * creates and returns the RolloverProducer to use with this tree.
-     * A "hit" for rollover is covering the total width of the tree.
-     * Additionally, a pressed to the right (but outside of the label bounds)
-     * is re-dispatched as a pressed just inside the label bounds. This 
-     * is a first go for #166-swingx.
+     * Creates and returns the RolloverProducer to use with this tree.
+     * <p>
+     * 
+     * This implementation assumes a "hit" for rollover if the mouse is anywhere
+     * in the total width of the tree. Additionally, a pressed to the right (but
+     * outside of the label bounds) is re-dispatched as a pressed just inside
+     * the label bounds. This is a first go for #166-swingx.<p>
+     * 
+     * PENDING JW: bidi-compliance of pressed?
      * 
      * @return <code>RolloverProducer</code> to use with this tree
+     * 
+     * @see #setRolloverEnabled(boolean)
      */
     protected RolloverProducer createRolloverProducer() {
         return new RolloverProducer() {
@@ -672,18 +757,6 @@ public class JXTree extends JTree {
 
   
    
-    /**
-     * returns the rolloverEnabled property.
-     *
-     * TODO: Why doesn't this just return rolloverEnabled???
-     *
-     * @return if rollober is enabled.
-     */
-    public boolean isRolloverEnabled() {
-        return rolloverProducer != null;
-    }
-
-
     /**
      * Returns the background color for selected cells.
      *
@@ -980,11 +1053,14 @@ public class JXTree extends JTree {
     }
 
     /**
-     * Creates and returns the default cell renderer to use. Subclasses
-     * may override to use a different type. Here: returns a <code>DefaultTreeCellRenderer</code>.
+     * Creates and returns the default cell renderer to use. Subclasses may
+     * override to use a different type.
      * <p>
-     * Note: this implementation will be changed to return <code>DefaultTreeRenderer</code>, once
-     * WrappingProvider is reasonably stable. 
+     * 
+     * This implementation returns a renderer of type
+     * <code>DefaultTreeCellRenderer</code>. <b>Note:</b> Will be changed to
+     * return a renderer of type <code>DefaultTreeRenderer</code>,
+     * once WrappingProvider is reasonably stable.
      * 
      * @return the default cell renderer to use with this tree.
      */
@@ -1199,7 +1275,7 @@ public class JXTree extends JTree {
      * {@inheritDoc} <p>
      * Overridden to fix focus issues with editors. 
      * This method installs and updates the internal CellEditorRemover which
-     * to terminates ongoing edits if appropriate. Additionally, it
+     * terminates ongoing edits if appropriate. Additionally, it
      * registers a CellEditorListener with the cell editor to grab the 
      * focus back to tree, if appropriate.
      * 
@@ -1252,8 +1328,7 @@ public class JXTree extends JTree {
      * editing component is removed.
      */
     protected void analyseFocus() {
-        final boolean isFocusOwnerInTheTable = isFocusOwnerDescending();    
-        if (isFocusOwnerInTheTable) {
+        if (isFocusOwnerDescending()) {
             requestFocusInWindow();
         }
     }
@@ -1284,28 +1359,6 @@ public class JXTree extends JTree {
         return SwingXUtilities.isDescendingFrom(permanent, this);
     }
 
-    /**
-     * PENDING: copied from JXTable ... should be somewhere in a utility
-     * class?
-     * 
-     * @param focusOwner
-     * @return
-     */
-//    private boolean isDescending(Component focusOwner) {
-//        while (focusOwner !=  null) {
-//            if (focusOwner instanceof JPopupMenu) {
-//                focusOwner = ((JPopupMenu) focusOwner).getInvoker();
-//                if (focusOwner == null) {
-//                    return false;
-//                }
-//            }
-//            if (focusOwner == this) {
-//                return true;
-//            }
-//            focusOwner = focusOwner.getParent();
-//        }
-//        return false;
-//    }
 
 
     /**
