@@ -29,45 +29,94 @@
       
       <h2>New or Enhanced Functionality</h2>
       
-      <h3>Auto-completion for textfields</h3>
+      <h3>Auto-completion for Textfields and ComboBoxes</h3>
       
       <h3>Enhanced Rendering Support for Collection Components</h3>
       
       <h3>Built-In Search Support for Collection Components and JXEditorPane</h3>
       
-      <h3>Filtering/Sorting for Table and List</h3>
+      <h3>Filtering/Sorting for Tables and Lists</h3>
       
-      <b>NOTE:</b> this is incompatible with core (table) sorting/filtering in JDK 6+.
+      <b>NOTE:</b> this is incompatible with core (table) sorting/filtering in JDK 6+. 
+      Will be replaced by core functionality after switching the target jdk version 
+      from 5 to 6.
       
       <h3>Login/Authentication Framework</h3>
       
-      <h2>Enhanced components</h2>
+      <h2>New and Enhanced components</h2>
+      
+      <h3>Buttons and Labels</h3>
       <ul>
-      <li> {@link JXButton}
-      <li> {@link JXDialog}
-      <li> {@link JXEditorPane}
-      <li> {@link JXFrame}
-      <li> ...
+      <li> {@link org.jdesktop.swingx.JXButton}
+      <li> {@link org.jdesktop.swingx.JXHyperLink Hyperlink}
+      <li> {@link org.jdesktop.swingx.JXLabel}
+      <li> {@link org.jdesktop.swingx.JXBusyLabel}
+      <li> {@link org.jdesktop.swingx.JXRadioGroup}
       </ul>
-            
-      <h2>New components</h2>
+      
+     
+      <h3>Collection Components</h3>
+      
+      These are sortable/filterable (with the exception of hierarchical components) with
+      consistent and uniform SwingX rendering, highlighting, searching and rollover support.
+      <ul>
+      <li> {@link org.jdesktop.swingx.JXTable Table} uses the enhanced  
+          {@link org.jdesktop.swingx.JXTableHeader TableHeader}
+      <li> {@link org.jdesktop.swingx.JXList List} - rollover and sort/filter functionality is
+         disabled by default
+      <li> {@link org.jdesktop.swingx.JXTree Tree}
+      <li> {@link org.jdesktop.swingx.JXTreeTable TreeTable} - a new hierarchical component with
+         support of tabular node properties
+      </ul>
+      
+      <h3>Top-level Windows, General and Special Purpose Containers</h3>
+      <ul>
+      <li> Enhanced {@link org.jdesktop.swingx.JXFrame Frame} using an extended
+       {@link org.jdesktop.swingx.JXRootPane RootPane RootPane} to support a 
+       {@link org.jdesktop.swingx.JXStatusBar StatusBar}
+      <li> {@link org.jdesktop.swingx.JXDialog Dialog}
+      <li> {@link org.jdesktop.swingx.JXPanel Panel}
+      <li> {@link org.jdesktop.swingx.JXErrorPane ErrorPane}
+      <li> {@link org.jdesktop.swingx.JXLoginPane LoginPane}
+
+      <li> Search components: {@link org.jdesktop.swingx.JXFindBar FindBar} used for
+          incremental search (similar to FireFox),  
+          {@link org.jdesktop.swingx.JXFindPanel FindPanel} used in a find dialog,
+          and {@link org.jdesktop.swingx.JXSearchPanel SearchPanel} used for what was it?
+      <li> Nested SplitPane {@link org.jdesktop.swingx.JXMultiSplitPane MultiSplitPane} 
+      <li> Vertical collapsing/expansion functionality is provided by a 
+           {@link org.jdesktop.swingx.JXCollapsiblePane CollapsiblePane}. A special 
+           purpose collapsible is the {@link org.jdesktop.swingx.JXTaskPane TaskPane}
+           which typically is used to group buttons/hyperlinks which perform related
+           tasks.  A special {@link org.jdesktop.swingx.JXTaskPaneContainer TaskPaneContainer} 
+           is responsible for the layout of several TaskPanes. 
+       <li> Easily configurable {@link org.jdesktop.swingx.JXTipOfTheDay TipOfTheDay}    
+      <li> {@link org.jdesktop.swingx.JXTitledPanel TitledPanel}
+    
+      </ul>
+      
+      <h3>Miscallenous Components</h3>
       
       <ul>
-      <li> {@link JXBusyLabel}
-      <li> {@link JXTreeTable}
-      <li> {@link JXCollapsiblePane}
-      <li> Calendar components: {@link JXDatePicker} and {@link JXMonthView}
-      <li> {@link JXColorSelectionButton}
-      <li> {@link JXErrorPane}
-      <li> Search components: {@link JXFindBar} and {@link JXFindPanel}
-      <li> {@link JXGlassBox} (PENDING JW: remove?)
-      <li> {@link JXGradientChooser}
-      <li> {@link JXGraph}
-      <li> {@link JXHeader}
-      <li> {@link JXHyperLink}
-      <li> ....
+      <li> New calendar components: the {@link org.jdesktop.swingx.JXDatePicker DatePicker}
+           allows to select a single Date 
+          and a {@link org.jdesktop.swingx.JXMonthView MonthView} showing the overview of
+          one or more months. 
+          
+      <li> {@link org.jdesktop.swingx.JXHeader Header}
+      <li> {@link org.jdesktop.swingx.JXTitledSeparator TitledSeparator}
+          
+      <li> {@link org.jdesktop.swingx.JXColorSelectionButton}
+      <li> {@link org.jdesktop.swingx.JXEditorPane}
+      <li> {@link org.jdesktop.swingx.JXGlassBox} (PENDING JW: remove?)
+      <li> {@link org.jdesktop.swingx.JXGradientChooser}
+      <li> {@link org.jdesktop.swingx.JXGraph}
+      <li> Image containers {@link org.jdesktop.swingx.JXImageView ImageView} and
+             {@link org.jdesktop.swingx.JXImagePanel ImagePanel} (PENDING JW: merge/remove one?)
+      <li> {@link org.jdesktop.swingx.JXMultThumbSlider MultiThumbSlider}
 
       </ul>
+      
  */
 package org.jdesktop.swingx;
 
