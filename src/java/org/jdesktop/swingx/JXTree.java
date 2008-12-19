@@ -175,8 +175,11 @@ public class JXTree extends JTree {
     private static final Logger LOG = Logger.getLogger(JXTree.class.getName());
     
     /** outdated stuff around string conversion from model. */
+    @Deprecated
     private Method conversionMethod = null;
+    @Deprecated
     private final static Class[] methodSignature = new Class[] {Object.class};
+    @Deprecated
     private final static Object[] methodArgs = new Object[] {null};
     
     /** Empty int array used in getSelectedRows(). */
