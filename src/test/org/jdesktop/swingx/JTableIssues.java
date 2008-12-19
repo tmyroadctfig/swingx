@@ -12,6 +12,8 @@ import java.awt.GraphicsEnvironment;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.lang.reflect.InvocationTargetException;
 import java.util.logging.Logger;
@@ -32,6 +34,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableColumn;
 
+import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.test.AncientSwingTeam;
 import org.jdesktop.test.CellEditorReport;
 import org.jdesktop.test.ListSelectionReport;
@@ -47,8 +50,9 @@ public class JTableIssues extends InteractiveTestCase {
 //      setSystemLF(true);
       JTableIssues test = new JTableIssues();
       try {
-        test.runInteractiveTests();
+//        test.runInteractiveTests();
 //          test.runInteractiveTests("interactive.*ColumnControl.*");
+          test.runInteractiveTests("interactive.*Edit.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
@@ -238,6 +242,26 @@ public class JTableIssues extends InteractiveTestCase {
     
 //----------------------- interactive
  
+    
+    public void interactiveAutoStartsEdit() {
+        final String autoKey = "JTable.autoStartsEdit";
+        final JTable table = new JTable(new AncientSwingTeam());
+        table.putClientProperty(autoKey, Boolean.TRUE);
+        final String autoStartName = "toggle AutoStart ";
+        boolean isAuto = Boolean.TRUE.equals(table.getClientProperty(autoKey));
+        Action autoStart = new AbstractActionExt(autoStartName + isAuto) {
+
+            public void actionPerformed(ActionEvent e) {
+                boolean isAuto = Boolean.TRUE.equals(table.getClientProperty(autoKey));
+                table.putClientProperty(autoKey, isAuto ? Boolean.FALSE : Boolean.TRUE);
+                setName(autoStartName + !isAuto);
+            }
+            
+        };
+        JXFrame frame = wrapWithScrollingInFrame(table, "autostart-edit behaviour");
+        addAction(frame, autoStart);
+        show(frame);
+    }
     
     /**
      * Core Issue ??: standalone table header throws NPE on mouse

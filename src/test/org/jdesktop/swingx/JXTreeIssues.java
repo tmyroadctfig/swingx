@@ -33,8 +33,9 @@ import org.jdesktop.swingx.renderer.ComponentProvider;
 import org.jdesktop.swingx.renderer.DefaultListRenderer;
 import org.jdesktop.swingx.renderer.DefaultTreeRenderer;
 import org.jdesktop.swingx.renderer.IconValue;
-import org.jdesktop.swingx.renderer.MappedValue;
+import org.jdesktop.swingx.renderer.IconValues;
 import org.jdesktop.swingx.renderer.StringValue;
+import org.jdesktop.swingx.renderer.StringValues;
 import org.jdesktop.swingx.renderer.WrappingIconPanel;
 import org.jdesktop.swingx.renderer.WrappingProvider;
 import org.jdesktop.swingx.test.XTestUtils;
@@ -66,7 +67,7 @@ public class JXTreeIssues extends JXTreeUnitTest {
 //          test.runInteractiveTests();
 //          test.runInteractiveTests("interactive.*RToL.*");
 //          test.runInteractiveTests("interactive.*Edit.*");
-        test.runInteractiveTests("interactive.*UpdateUI.*");
+        test.runInteractiveTests("interactive.*Icons.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
@@ -298,16 +299,7 @@ public class JXTreeIssues extends JXTreeUnitTest {
         final JXTree tree = new JXTree(treeTableModel);
         final Icon downIcon = XTestUtils.loadDefaultIcon("wellbottom.gif");
         final Icon upIcon = XTestUtils.loadDefaultIcon("welltop.gif");
-        final StringValue sv = new StringValue() {
-
-            public String getString(Object value) {
-                if (value instanceof File) {
-                    return ((File) value).getName();
-                }
-                return TO_STRING.getString(value);
-            }
-            
-        };
+        final StringValue sv = StringValues.FILE_NAME;
         IconValue iv = new IconValue() {
 
             public Icon getIcon(Object value) {
@@ -320,9 +312,7 @@ public class JXTreeIssues extends JXTreeUnitTest {
             }
             
         };
-        WrappingProvider provider = new WrappingProvider(sv);
-        provider.setStringValue(new MappedValue(null, iv));
-        tree.setCellRenderer(new DefaultTreeRenderer(provider));
+        tree.setCellRenderer(new DefaultTreeRenderer(iv, sv));
         tree.setRowHeight(22);
         JXFrame frame = wrapWithScrollingInFrame(tree,
                 "IconValue on WrappingProvider");

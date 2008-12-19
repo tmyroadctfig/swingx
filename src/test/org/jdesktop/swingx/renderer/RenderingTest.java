@@ -51,11 +51,9 @@ import org.jdesktop.swingx.test.ComponentTreeTableModel;
 import org.jdesktop.swingx.test.XTestUtils;
 import org.jdesktop.test.PropertyChangeReport;
 import org.jdesktop.test.TestUtils;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.junit.Test;
-import org.junit.Before;
-import org.junit.After;
 
 
 /**
@@ -172,10 +170,16 @@ public class RenderingTest extends TestCase {
     
 
     
+    /**
+     * Issue ?? swingx: support to configure the auto-unwrap of tree/table/xx/nodes.
+     * 
+     * Initial default is true.
+     */
     @Test
     public void testWrappingProviderUnwrapContructor() {
-        WrappingProvider provider = new WrappingProvider(new LabelProvider(), false);
-        assertFalse(provider.getUnwrapUserObject());
+        LabelProvider delegate = new LabelProvider();
+        WrappingProvider provider = new WrappingProvider(delegate, false);
+        assertWrappingProviderState(provider, null, null, delegate, false);
     }
     /**
      * Issue ?? swingx: support to configure the auto-unwrap of tree/table/xx/nodes.
@@ -620,6 +624,8 @@ public class RenderingTest extends TestCase {
         CellContext context = new TreeCellContext();
         WrappingIconPanel iconPanel = provider.getRendererComponent(context);
         assertEquals(icon, iconPanel.getIcon());
+        // NOTE: do not test type of wrapper's stringValue - it's a mappedValue if icon present!
+        assertEquals("", provider.getStringValue().getString(icon));
     }
     
     /**
@@ -637,7 +643,8 @@ public class RenderingTest extends TestCase {
         CellContext context = new TreeCellContext();
         WrappingIconPanel iconPanel = provider.getRendererComponent(context);
         assertEquals(icon, iconPanel.getIcon());
-        
+        // NOTE: do not test type of wrapper's stringValue - it's a mappedValue if icon present!
+        assertEquals("", provider.getStringValue().getString(icon));
     }
     
     /**
@@ -645,36 +652,82 @@ public class RenderingTest extends TestCase {
      * test wrappee and its state after instantiation.
      */
     @Test
-    public void testWrappingProviderWrappee() {
-        WrappingProvider provider = new WrappingProvider();
-        // sanity ...
-        assertTrue(provider.getWrappee() instanceof LabelProvider);
-        assertEquals("wrappee's StringValue must be default", 
-                new LabelProvider().getStringValue(),
-                provider.getWrappee().getStringValue()); 
+    public void testWrappingProviderWrappeeConstructors() {
+        IconValue iv = IconValues.FILE_ICON;
+        LabelProvider delegate = new LabelProvider(FormatStringValue.DATE_TO_STRING);
+        assertWrappingProviderState(new WrappingProvider(delegate),
+                null, null, delegate, true);
+        assertWrappingProviderState(new WrappingProvider(delegate, false), 
+                null, null, delegate, false);
+        assertWrappingProviderState(new WrappingProvider(iv, delegate, false), 
+                iv, null, delegate, false);
+        assertWrappingProviderState(new WrappingProvider(iv, (ComponentProvider) null, false), 
+                iv, null, null, false);
+        assertWrappingProviderState(new WrappingProvider(null, (ComponentProvider) null, false), 
+                null, null, null, false);
+    }
+   
+    /**
+     * WrappingProvider: 
+     * test wrappee and its state after instantiation.
+     */
+    @Test
+    public void testWrappingProviderWrappeeStringValueConstructors() {
+        IconValue iv = IconValues.FILE_ICON;
         StringValue sv = FormatStringValue.DATE_TO_STRING;
-        WrappingProvider customStringValue = new WrappingProvider(sv);
-        assertEquals("wrappee's StringValue must be configured to given", sv, 
-                customStringValue.getWrappee().getStringValue());
-        WrappingProvider iconValueAndCustomStringValue = new WrappingProvider(null, sv);
-        assertEquals("wrappee's StringValue must be configured to given", sv, 
-                iconValueAndCustomStringValue.getWrappee().getStringValue());
+        assertWrappingProviderState(new WrappingProvider(iv),
+                iv, null, null, true);
+        assertWrappingProviderState(new WrappingProvider(iv, sv), 
+                iv, sv, null, true);
+        assertWrappingProviderState(new WrappingProvider(sv), 
+                null, sv, null, true);
+        assertWrappingProviderState(new WrappingProvider(null, sv), 
+                null, sv, null, true);
+        assertWrappingProviderState(new WrappingProvider(iv, null), 
+                iv, null, null, true);
+        assertWrappingProviderState(new WrappingProvider(null, null), 
+                null, null, null, true);
+//        assertWrappingProviderState(new WrappingProvider(false, iv), 
+//                iv, null, null, false);
     }
     
     /**
      * WrappingProvider: 
-     * test provider's own state after instantiation.
+     * test provider's state after instantiation with empty constructor.
      */
     @Test
-    public void testWrappingProviderDefaults() {
-        WrappingProvider provider = new WrappingProvider();
-        assertTrue("default wrappee must be LabelProvider but was " + 
-                     provider.getWrappee().getClass(), 
-                provider.getWrappee() instanceof LabelProvider);
-        assertEquals("default StringValue must be empty", StringValue.EMPTY, 
-                provider.getStringValue());
+    public void testWrappingProviderEmptyConstructor() {
+        assertWrappingProviderState(new WrappingProvider(), 
+                null, null, null, true);
+//        assertWrappingProviderState(new WrappingProvider(false), 
+//                null, null, null, false);
     }
     
+    private void assertWrappingProviderState(WrappingProvider provider, 
+            IconValue iv, StringValue sv, ComponentProvider delegate, boolean unwrap) {
+        if (iv == null) {
+            assertEquals("default StringValue must be empty", StringValue.EMPTY, 
+                    provider.getStringValue());
+        } else {
+            assertTrue("provider's StringValue must be a MappedValue containing the IconValue, but" +
+            		"was " + provider.getStringValue().getClass(),
+                    provider.getStringValue() instanceof MappedValue);
+            // can't access MappedValue's delegates - usually don't need to
+//            assertEquals(iv, ((MappedValue) provider.getStringValue()).iconDelegate);
+        }
+        if (delegate == null) {
+            assertTrue("default wrappee must be LabelProvider but was " + 
+                    provider.getWrappee().getClass(), 
+               provider.getWrappee() instanceof LabelProvider);
+        } else {
+            assertEquals("wrappee must be set", delegate, provider.getWrappee());
+        }
+        if (sv != null) {
+            assertEquals("wrappee's StringValue must be configured to given", 
+                    sv, provider.getWrappee().getStringValue());
+        }
+        assertEquals(unwrap, provider.getUnwrapUserObject());
+    }
     /**
      * Test text and boolean taken from MappedValue
      */

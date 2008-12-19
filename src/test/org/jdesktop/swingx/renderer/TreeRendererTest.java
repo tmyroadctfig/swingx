@@ -63,11 +63,9 @@ import org.jdesktop.swingx.hyperlink.LinkModel;
 import org.jdesktop.swingx.test.ActionMapTreeTableModel;
 import org.jdesktop.swingx.test.ComponentTreeTableModel;
 import org.jdesktop.swingx.treetable.FileSystemModel;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.junit.Test;
-import org.junit.Before;
-import org.junit.After;
 
 
 /**
@@ -107,6 +105,7 @@ public class TreeRendererTest extends InteractiveTestCase {
             e.printStackTrace();
         }
     }
+    
     
     /**
      * Issue #873-swingx: WrappingIconPanel - delegate font unchanged

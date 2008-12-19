@@ -75,7 +75,7 @@ public class WrappingProvider extends
     private boolean unwrapUserObject;
 
     /**
-     * Instantiates a WrappingProvider with default LabelProvider.
+     * Instantiates a WrappingProvider with default delegate provider.
      * 
      */
     public WrappingProvider() {
@@ -83,14 +83,15 @@ public class WrappingProvider extends
     }
 
     /**
-     * Instantiates a WrappingProvider with default wrappee. Uses the 
+     * Instantiates a WrappingProvider with default wrappee, configured
+     * to use the wrappeeStringValue. Uses the 
      * given IconValue to configure the icon. 
      * 
      * @param iconValue the IconValue to use for configuring the icon.
+     * @param wrappeeStringValue the StringValue to use in the wrappee.
      */
     public WrappingProvider(IconValue iconValue, StringValue wrappeeStringValue) {
-        this(wrappeeStringValue);
-        setStringValue(new MappedValue(null, iconValue));
+        this(iconValue, wrappeeStringValue, true);
     }
 
     /**
@@ -100,8 +101,7 @@ public class WrappingProvider extends
      * @param iconValue the IconValue to use for configuring the icon.
      */
     public WrappingProvider(IconValue iconValue) {
-        this();
-        setStringValue(new MappedValue(null, iconValue));
+        this(iconValue, null);
     }
    
     /**
@@ -115,7 +115,7 @@ public class WrappingProvider extends
      * @param wrappeeStringValue the StringValue to use in the wrappee.
      */
     public WrappingProvider(StringValue wrappeeStringValue) {
-        this(new LabelProvider(wrappeeStringValue));
+        this(null, wrappeeStringValue);
     }
 
     /**
@@ -139,14 +139,40 @@ public class WrappingProvider extends
      * should auto-unwrap the userObject from the context value. 
      */
     public WrappingProvider(ComponentProvider delegate, boolean unwrapUserObject) {
-         super();
-        // PENDING JW: this is inherently unsafe - must not call 
-        // non-final methods from constructor
-        setWrappee(delegate);
-        setStringValue(StringValue.EMPTY);
-        setUnwrapUserObject(unwrapUserObject);
+        this(null, delegate, unwrapUserObject);
     }
 
+    /**
+     * Instantiates a WrappingProvider with the given delegate
+     * provider for the node content and unwrapUserObject property. 
+     * If the delegate is null, a default LabelProvider will be used. 
+     * 
+     * @param iv the icon converter to use for this provider
+     * @param delegate the provider to use as delegate
+     * @param unwrapUserObject a flag indicating whether this provider
+     *          should auto-unwrap the userObject from the context value. 
+     */
+    public WrappingProvider(IconValue iv, ComponentProvider delegate, boolean unwrapUserObject) {
+        super(iv != null ? (new MappedValue(null, iv)) : StringValue.EMPTY);
+        setWrappee(delegate);
+        setUnwrapUserObject(unwrapUserObject);
+    }
+    
+    /**
+     * Instantiates a WrappingProvider with the given delegate
+     * provider for the node content and unwrapUserObject property. 
+     * If the delegate is null, a default LabelProvider will be used. 
+     * 
+     * @param iv the icon converter to use for this provider
+     * @param delegateStringValue the StringValue to use in the wrappee.
+     * @param unwrapUserObject a flag indicating whether this provider
+     *          should auto-unwrap the userObject from the context value. 
+     */
+    public WrappingProvider(IconValue iv, StringValue delegateStringValue, boolean unwrapUserObject) {
+        this(iv, (ComponentProvider) null, unwrapUserObject);
+        getWrappee().setStringValue(delegateStringValue);
+    }
+    
     /**
      * Sets the given provider as delegate for the node content. 
      * If the delegate is null, a default LabelProvider is set.<p>
@@ -160,7 +186,6 @@ public class WrappingProvider extends
             delegate = new LabelProvider();
         }
         this.wrappee = delegate;
-//        rendererComponent.setComponent(delegate.rendererComponent);
     }
 
     /**

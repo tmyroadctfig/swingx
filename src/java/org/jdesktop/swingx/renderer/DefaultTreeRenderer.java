@@ -106,6 +106,24 @@ public class DefaultTreeRenderer extends AbstractRenderer
         this(new WrappingProvider(iv, sv));
     }
 
+    /**
+     * Instantiates a default tree renderer with the default
+     * wrapping provider, using the given IconValue for 
+     * customizing the icons and the given StringValue for
+     * node content.
+     * 
+     * @param iv the IconValue to use for mapping a custom icon 
+     *    for a given value
+     * @param sv the converter to use for mapping the
+     *   content value to a String representation.
+     * @param unwrapUserObject a flag indicating whether this provider
+     *     should auto-unwrap the userObject from the context value. 
+     *   
+     */
+    public DefaultTreeRenderer(IconValue iv, StringValue sv, boolean unwrapUserObject) {
+        this(new WrappingProvider(iv, sv, unwrapUserObject));
+    }
+    
     // -------------- implements javax.swing.table.TableCellRenderer
     /**
      * 

@@ -125,14 +125,25 @@ public abstract class ComponentProvider<T extends JComponent>
     protected StringValue formatter;
     
     /**
-     * Instantiates a default component provider with LEADING
+     * Instantiates a component provider with LEADING
      * horizontal alignment and default to-String converter. <p> 
      *
      */
     public ComponentProvider() {
         this(null, JLabel.LEADING);
     }
-    
+
+    /**
+     * Instantiates a component provider with LEADING
+     * horizontal alignment and the given converter. <p> 
+     *
+     * @param converter the converter to use for mapping the cell value to a
+     *        String representation.
+     */
+    public ComponentProvider(StringValue converter) {
+        this(converter, JLabel.LEADING);
+    }
+
     /**
      * Instantiates a LabelProvider with given to-String converter and given
      * horizontal alignment. If the converter is null, the default TO_STRING is

@@ -165,14 +165,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
             }
             
         };
-        IconValue iv = new IconValue() {
-
-            public Icon getIcon(Object value) {
-                if (value instanceof File) {
-                    return  FileSystemView.getFileSystemView().getSystemIcon((File) value);
-                } 
-                return null;
-            }};
+        IconValue iv = IconValues.FILE_ICON;
         table.setCellRenderer(new DefaultListRenderer(new MappedValue(sv, iv)));
         final JXTree tree = new JXTree(createFileNodeModel());
         final DefaultTreeRenderer treeRenderer = new DefaultTreeRenderer(iv, sv);
