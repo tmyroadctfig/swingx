@@ -80,29 +80,59 @@ import org.jdesktop.swingx.tree.DefaultXTreeCellEditor;
  * 
  * <h2>Rendering and Highlighting</h2>
  * 
- * As all SwingX collection views, a JXTree is a HighlighterClient (PENDING JW: formally
- * define and implement, like in AbstractTestHighlighter), that is it provides consistent 
- * api to add and remove Highlighters which can visually decorate the rendering component.
+ * As all SwingX collection views, a JXTree is a HighlighterClient (PENDING JW:
+ * formally define and implement, like in AbstractTestHighlighter), that is it
+ * provides consistent api to add and remove Highlighters which can visually
+ * decorate the rendering component.
  * <p>
  * 
- * <i>Note:</i> to support the highlighting this implementation must wrap the TreeCellRenderer 
- * set by client code with a DelegatingRenderer which applies the Highlighter after 
- * delegating the default configuration to the wrappee. As a side-effect, getCellRenderer does
- * return the wrapper instead of the custom renderer. To access the latter, client code
- * must call getWrappedCellRenderer.
- * <p>
+ * <pre><code>
+ * 
+ * JXTree tree = new JXTree(new FileSystemModel());
+ * // use system file icons and name to render
+ * tree.setCellRenderer(new DefaultTreeRenderer(IconValues.FILE_ICON, 
+ *      StringValues.FILE_NAME));
+ * // highlight condition: file modified after a date     
+ * HighlightPredicate predicate = new HighlightPredicate() {
+ *    public boolean isHighlighted(Component renderer,
+ *                     ComponentAdapter adapter) {
+ *       File file = getUserObject(adapter.getValue());
+ *       return file != null ? lastWeek < file.lastModified : false;
+ *    }
+ * };
+ * // highlight with foreground color 
+ * tree.addHighlighter(new ColorHighlighter(predicate, null, Color.RED);      
+ * 
+ * </code></pre>
  * 
  * <i>Note:</i> for full functionality, a DefaultTreeRenderer must be installed
  * as TreeCellRenderer. This is not done by default, because there are
  * unresolved issues when editing. PENDING JW: still? Check!
  * 
+ * <i>Note:</i> to support the highlighting this implementation wraps the
+ * TreeCellRenderer set by client code with a DelegatingRenderer which applies
+ * the Highlighter after delegating the default configuration to the wrappee. As
+ * a side-effect, getCellRenderer does return the wrapper instead of the custom
+ * renderer. To access the latter, client code must call getWrappedCellRenderer.
+ * <p>
  * <h2>Rollover</h2>
  * 
- * As all SwingX collection views, a JXTree supports per-cell rollover. If enabled, the 
- * component fires rollover events on enter/exit of a cell which by default is promoted to
- * the renderer if it implements RolloverRenderer, that is has simulates live behaviour. 
- * The rollover events can be used by client code as well, f.i. to decorate the rollover row
- * using a Highlighter. 
+ * As all SwingX collection views, a JXTree supports per-cell rollover. If
+ * enabled, the component fires rollover events on enter/exit of a cell which by
+ * default is promoted to the renderer if it implements RolloverRenderer, that
+ * is simulates live behaviour. The rollover events can be used by client code
+ * as well, f.i. to decorate the rollover row using a Highlighter.
+ * 
+ * <pre><code>
+ * 
+ * JXTree tree = new JXTree();
+ * tree.setRolloverEnabled(true);
+ * tree.setCellRenderer(new DefaultTreeRenderer());
+ * tree.addHighlighter(new ColorHighlighter(HighlightPredicate.ROLLOVER_ROW, 
+ *      null, Color.RED);      
+ * 
+ * </code></pre>
+ * 
  * 
  * <h2>Search</h2>
  * 
@@ -122,10 +152,11 @@ import org.jdesktop.swingx.tree.DefaultXTreeCellEditor;
  * <h2>Miscellaneous</h2>
  * 
  * <ul>
- * <li> Improved usabilty for editing: guarantees that the tree is the focusOwner
- *   if editing terminated by user gesture and guards against data corruption if focusLost 
- *   while editing
- * <li> Access methods for selection colors, for consistency with JXTable, JXList
+ * <li> Improved usabilty for editing: guarantees that the tree is the
+ * focusOwner if editing terminated by user gesture and guards against data
+ * corruption if focusLost while editing
+ * <li> Access methods for selection colors, for consistency with JXTable,
+ * JXList
  * <li> Convenience methods and actions to expand, collapse all nodes
  * </ul>
  * 
@@ -1516,7 +1547,11 @@ public class JXTree extends JTree {
      * @param model the model to detect the method
      * @return the <code> Method </code> or null if the model has no method with
      *   the expected signature 
+     *   
+     * @deprecated no longer supported, client code should use {@link #getStringAt(int)} or
+     *    {@link #getStringAt(TreePath)}   
      */
+    @Deprecated
     protected Method getValueConversionMethod(TreeModel model) {
         try {
             return model == null ? null : model.getClass().getMethod(
@@ -1539,9 +1574,16 @@ public class JXTree extends JTree {
      * idea to start with). The new way is to give the renderer complete control and expose 
      * the renderer's conversion via the getStringAt(..) api to arbitrary client code.
      * 
+     * @see #getValueConversionMethod(TreeModel)
      * @see #getStringAt(int)
      * @see #getStringAt(TreePath)
+     * 
+     * @deprecated the implementation will change to call super as soon as the reflexive 
+     *    call to the conversion method will be dropped. So deprecate now to draw attention
+     *    to the pending drop.
+     * 
      */
+    @Deprecated
     @Override
     public String convertValueToText(Object value, boolean selected,
             boolean expanded, boolean leaf, int row, boolean hasFocus) {
