@@ -216,7 +216,7 @@ public class RenderingTest extends TestCase {
                 if (value instanceof Point) {
                     return "x of Point: " + ((Point) value).x;
                 }
-                return TO_STRING.getString(value);
+                return StringValues.TO_STRING.getString(value);
             }
             
         };
@@ -241,7 +241,7 @@ public class RenderingTest extends TestCase {
                 if (value instanceof Point) {
                     return "x of Point: " + ((Point) value).x;
                 }
-                return TO_STRING.getString(value);
+                return StringValues.TO_STRING.getString(value);
             }
             
         };
@@ -486,7 +486,7 @@ public class RenderingTest extends TestCase {
                 if (value instanceof Point) {
                     return "x of Point: " + ((Point) value).x;
                 }
-                return TO_STRING.getString(value);
+                return StringValues.TO_STRING.getString(value);
             }
             
         };
@@ -525,7 +525,7 @@ public class RenderingTest extends TestCase {
     @Test
     public void testWrappingProviderNullIcon() {
        CellContext context = new TreeCellContext();
-       WrappingProvider provider = new WrappingProvider(IconValue.NONE);
+       WrappingProvider provider = new WrappingProvider(IconValues.NONE);
        WrappingIconPanel comp = provider.getRendererComponent(context);
        assertEquals(null, comp.getIcon());
     }
@@ -561,7 +561,7 @@ public class RenderingTest extends TestCase {
         ImageIcon icon = (ImageIcon) XTestUtils.loadDefaultIcon();
         icon.setDescription("description");
         LabelProvider provider = new LabelProvider(
-                new MappedValue(StringValue.TO_STRING, IconValue.NONE));
+                new MappedValue(StringValues.TO_STRING, IconValues.NONE));
         TableCellContext context = new TableCellContext();
         context.value = icon;
         JLabel label = provider.getRendererComponent(context);
@@ -569,7 +569,7 @@ public class RenderingTest extends TestCase {
         assertTrue("icon must be empty", i instanceof EmptyIcon);
         assertEquals("icon must have no width", 0, i.getIconWidth());
         assertEquals("icon must have no height", 0, i.getIconHeight());
-        assertEquals("label text must be default to-string", StringValue.TO_STRING.getString(icon), label.getText());
+        assertEquals("label text must be default to-string", StringValues.TO_STRING.getString(icon), label.getText());
     }
     
     /**
@@ -583,12 +583,12 @@ public class RenderingTest extends TestCase {
         ImageIcon icon = (ImageIcon) XTestUtils.loadDefaultIcon();
         icon.setDescription("description");
         LabelProvider provider = new LabelProvider(
-                new MappedValue(StringValue.EMPTY, IconValue.ICON));
+                new MappedValue(StringValues.EMPTY, IconValues.ICON));
         TableCellContext context = new TableCellContext();
         context.value = icon;
         JLabel label = provider.getRendererComponent(context);
         assertEquals(icon, label.getIcon());
-        assertEquals("label text must be empty", StringValue.EMPTY.getString(icon), label.getText());
+        assertEquals("label text must be empty", StringValues.EMPTY.getString(icon), label.getText());
     }
     
     /**
@@ -602,12 +602,12 @@ public class RenderingTest extends TestCase {
         ImageIcon icon = (ImageIcon) XTestUtils.loadDefaultIcon();
         icon.setDescription("description");
         LabelProvider provider = new LabelProvider(
-                new MappedValue(StringValue.TO_STRING, IconValue.ICON));
+                new MappedValue(StringValues.TO_STRING, IconValues.ICON));
         TableCellContext context = new TableCellContext();
         context.value = icon;
         JLabel label = provider.getRendererComponent(context);
         assertEquals(icon, label.getIcon());
-        assertEquals(StringValue.TO_STRING.getString(icon), label.getText());
+        assertEquals(StringValues.TO_STRING.getString(icon), label.getText());
     }
 
     /**
@@ -639,7 +639,7 @@ public class RenderingTest extends TestCase {
                 return icon;
             }};
             
-        WrappingProvider provider = new WrappingProvider(iv, FormatStringValue.DATE_TO_STRING);
+        WrappingProvider provider = new WrappingProvider(iv, StringValues.DATE_TO_STRING);
         CellContext context = new TreeCellContext();
         WrappingIconPanel iconPanel = provider.getRendererComponent(context);
         assertEquals(icon, iconPanel.getIcon());
@@ -850,7 +850,7 @@ public class RenderingTest extends TestCase {
     public void testButtonProviderConstructor() {
         ComponentProvider provider = new CheckBoxProvider();
         assertEquals(JLabel.CENTER, provider.getHorizontalAlignment());
-        assertEquals(StringValue.EMPTY, provider.getStringValue());
+        assertEquals(StringValues.EMPTY, provider.getStringValue());
        
     }
 
@@ -895,7 +895,7 @@ public class RenderingTest extends TestCase {
         DefaultTableRenderer numberRenderer = (DefaultTableRenderer) table.getDefaultRenderer(Number.class);
         JLabel label = (JLabel) numberRenderer.getTableCellRendererComponent(table, null, false, false, 0, 0);
         assertEquals(JLabel.RIGHT, label.getHorizontalAlignment());
-        assertEquals(FormatStringValue.NUMBER_TO_STRING, numberRenderer.componentController.getStringValue());
+        assertEquals(StringValues.NUMBER_TO_STRING, numberRenderer.componentController.getStringValue());
         // icon
         DefaultTableRenderer iconRenderer = (DefaultTableRenderer) table.getDefaultRenderer(Icon.class);
         JLabel iconLabel = (JLabel) iconRenderer.getTableCellRendererComponent(table, null, false, false, 0, 0);
@@ -924,7 +924,7 @@ public class RenderingTest extends TestCase {
     public void testConstructorDefault() {
         LabelProvider provider = new LabelProvider();
         assertEquals(JLabel.LEADING, provider.getHorizontalAlignment());
-        assertEquals(StringValue.TO_STRING, provider.getStringValue());
+        assertEquals(StringValues.TO_STRING, provider.getStringValue());
     }
     
     /**
@@ -935,7 +935,7 @@ public class RenderingTest extends TestCase {
         int align = JLabel.RIGHT;
         LabelProvider provider = new LabelProvider(align);
         assertEquals(align, provider.getHorizontalAlignment());
-        assertEquals(StringValue.TO_STRING, provider.getStringValue());
+        assertEquals(StringValues.TO_STRING, provider.getStringValue());
     }
     
     /**
@@ -995,11 +995,11 @@ public class RenderingTest extends TestCase {
     public void testDefaultTreeRendererConstructors() {
         DefaultTreeRenderer renderer = new DefaultTreeRenderer();
         assertTrue(renderer.componentController instanceof WrappingProvider);
-        renderer = new DefaultTreeRenderer(FormatStringValue.DATE_TO_STRING);
+        renderer = new DefaultTreeRenderer(StringValues.DATE_TO_STRING);
         assertTrue(renderer.componentController instanceof WrappingProvider);
         // wrong assumption - we are wrapping...
 //        assertSame(FormatStringValue.DATE_TO_STRING, renderer.componentController.formatter);
-        assertSame(FormatStringValue.DATE_TO_STRING, ((WrappingProvider) renderer.componentController).wrappee.formatter);
+        assertSame(StringValues.DATE_TO_STRING, ((WrappingProvider) renderer.componentController).wrappee.formatter);
         ComponentProvider controller = new CheckBoxProvider();
         renderer = new DefaultTreeRenderer(controller);
         assertSame(controller, renderer.componentController);
@@ -1013,9 +1013,9 @@ public class RenderingTest extends TestCase {
     public void testDefaultListRendererConstructors() {
         DefaultListRenderer renderer = new DefaultListRenderer();
         assertTrue(renderer.componentController instanceof LabelProvider);
-        renderer = new DefaultListRenderer(FormatStringValue.DATE_TO_STRING);
+        renderer = new DefaultListRenderer(StringValues.DATE_TO_STRING);
         assertTrue(renderer.componentController instanceof LabelProvider);
-        assertSame(FormatStringValue.DATE_TO_STRING, renderer.componentController.formatter);
+        assertSame(StringValues.DATE_TO_STRING, renderer.componentController.formatter);
         ComponentProvider controller = new CheckBoxProvider();
         renderer = new DefaultListRenderer(controller);
         assertSame(controller, renderer.componentController);
@@ -1029,9 +1029,9 @@ public class RenderingTest extends TestCase {
     public void testDefaultTableRendererConstructors() {
         DefaultTableRenderer renderer = new DefaultTableRenderer();
         assertTrue(renderer.componentController instanceof LabelProvider);
-        renderer = new DefaultTableRenderer(FormatStringValue.DATE_TO_STRING);
+        renderer = new DefaultTableRenderer(StringValues.DATE_TO_STRING);
         assertTrue(renderer.componentController instanceof LabelProvider);
-        assertSame(FormatStringValue.DATE_TO_STRING, renderer.componentController.formatter);
+        assertSame(StringValues.DATE_TO_STRING, renderer.componentController.formatter);
         ComponentProvider controller = new CheckBoxProvider();
         renderer = new DefaultTableRenderer(controller);
         assertSame(controller, renderer.componentController);

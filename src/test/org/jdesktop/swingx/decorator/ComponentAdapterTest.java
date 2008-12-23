@@ -39,6 +39,7 @@ import org.jdesktop.swingx.renderer.DefaultListRenderer;
 import org.jdesktop.swingx.renderer.DefaultTableRenderer;
 import org.jdesktop.swingx.renderer.DefaultTreeRenderer;
 import org.jdesktop.swingx.renderer.StringValue;
+import org.jdesktop.swingx.renderer.StringValues;
 import org.jdesktop.swingx.treetable.TreeTableModel;
 import org.jdesktop.test.AncientSwingTeam;
 import org.junit.runner.RunWith;
@@ -784,7 +785,7 @@ public class ComponentAdapterTest extends TestCase {
                     Color color = (Color) value;
                     return "R/G/B: " + color.getRGB();
                 }
-                return TO_STRING.getString(value);
+                return StringValues.TO_STRING.getString(value);
             }
             
         };

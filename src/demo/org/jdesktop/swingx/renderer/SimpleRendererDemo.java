@@ -108,7 +108,7 @@ public final class SimpleRendererDemo {
         StringValue stringValue = new StringValue() {
             
             public String getString(Object value) {
-                if (!(value instanceof Contributor)) return TO_STRING.getString(value);
+                if (!(value instanceof Contributor)) return StringValues.TO_STRING.getString(value);
                 Contributor contributor = (Contributor) value;
                 return contributor.lastName + ", " + contributor.firstName;
             }

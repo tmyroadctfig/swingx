@@ -227,7 +227,7 @@ public class RendererIssues extends InteractiveTestCase {
                        + FileSystemView.getFileSystemView().getSystemTypeDescription((File) value)
                     ; 
                 } 
-                return TO_STRING.getString(value);
+                return StringValues.TO_STRING.getString(value);
             }
             
         };
@@ -516,7 +516,7 @@ public class RendererIssues extends InteractiveTestCase {
         MattePainter painter = new MattePainter(Color.YELLOW);
         Highlighter hl = new PainterHighlighter(HighlightPredicate.ROLLOVER_ROW, painter);
         tree.addHighlighter(hl);
-        ComponentProvider provider = new NormalButtonProvider(StringValue.TO_STRING, JLabel.LEADING);
+        ComponentProvider provider = new NormalButtonProvider(StringValues.TO_STRING, JLabel.LEADING);
         tree.setCellRenderer(new DefaultTreeRenderer(provider));
         tree.setRolloverEnabled(true);
         showWithScrollingInFrame(tree, "Fancy..");

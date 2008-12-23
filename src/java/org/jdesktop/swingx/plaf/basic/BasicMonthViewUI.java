@@ -80,6 +80,7 @@ import org.jdesktop.swingx.renderer.FormatStringValue;
 import org.jdesktop.swingx.renderer.LabelProvider;
 import org.jdesktop.swingx.renderer.PainterAware;
 import org.jdesktop.swingx.renderer.StringValue;
+import org.jdesktop.swingx.renderer.StringValues;
 
 /**
  * Base implementation of the <code>JXMonthView</code> UI.<p>
@@ -672,7 +673,7 @@ public class BasicMonthViewUI extends MonthViewUI {
                     if (value instanceof Calendar) {
                         value = ((Calendar) value).get(Calendar.WEEK_OF_YEAR);
                     }
-                    return TO_STRING.getString(value);
+                    return StringValues.TO_STRING.getString(value);
                 }
 
             };
@@ -706,7 +707,7 @@ public class BasicMonthViewUI extends MonthViewUI {
                         return month + " "
                                 + ((Calendar) value).get(Calendar.YEAR); 
                     }
-                    return TO_STRING.getString(value);
+                    return StringValues.TO_STRING.getString(value);
                 }
 
             };
@@ -2671,7 +2672,7 @@ public class BasicMonthViewUI extends MonthViewUI {
                     return month + " "
                             + ((Calendar) value).get(Calendar.YEAR); 
                 }
-                return TO_STRING.getString(value);
+                return StringValues.TO_STRING.getString(value);
             }
 
         };

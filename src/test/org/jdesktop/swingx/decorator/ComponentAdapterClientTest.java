@@ -37,6 +37,7 @@ import org.jdesktop.swingx.renderer.DefaultListRenderer;
 import org.jdesktop.swingx.renderer.DefaultTableRenderer;
 import org.jdesktop.swingx.renderer.DefaultTreeRenderer;
 import org.jdesktop.swingx.renderer.StringValue;
+import org.jdesktop.swingx.renderer.StringValues;
 import org.jdesktop.test.AncientSwingTeam;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -276,7 +277,7 @@ public class ComponentAdapterClientTest extends InteractiveTestCase {
                     Color color = (Color) value;
                     return "R/G/B: " + color.getRGB();
                 }
-                return TO_STRING.getString(value);
+                return StringValues.TO_STRING.getString(value);
             }
             
         };

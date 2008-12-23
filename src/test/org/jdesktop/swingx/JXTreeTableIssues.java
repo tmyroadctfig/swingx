@@ -56,6 +56,7 @@ import org.jdesktop.swingx.renderer.DefaultTreeRenderer;
 import org.jdesktop.swingx.renderer.HyperlinkProvider;
 import org.jdesktop.swingx.renderer.LabelProvider;
 import org.jdesktop.swingx.renderer.StringValue;
+import org.jdesktop.swingx.renderer.StringValues;
 import org.jdesktop.swingx.renderer.WrappingIconPanel;
 import org.jdesktop.swingx.renderer.WrappingProvider;
 import org.jdesktop.swingx.renderer.RendererVisualCheck.TextAreaProvider;
@@ -726,7 +727,7 @@ public class JXTreeTableIssues extends InteractiveTestCase {
         StringValue sv = new StringValue( ){
 
             public String getString(Object value) {
-                return "..." + TO_STRING.getString(value);
+                return "..." + StringValues.TO_STRING.getString(value);
             }
             
         };
@@ -839,7 +840,7 @@ public class JXTreeTableIssues extends InteractiveTestCase {
                 if (value instanceof Action) {
                     return ((Action) value).getValue(Action.NAME) + "xx";
                 }
-                return StringValue.TO_STRING.getString(value);
+                return StringValues.TO_STRING.getString(value);
             }
 
         };
@@ -969,7 +970,7 @@ public class JXTreeTableIssues extends InteractiveTestCase {
      */
     public void interactiveTreeTableGetValueRenderer() {
         JXTreeTable tree = new JXTreeTable(new ComponentTreeTableModel(new JXFrame()));
-        ComponentProvider provider = new CheckBoxProvider(StringValue.TO_STRING) {
+        ComponentProvider provider = new CheckBoxProvider(StringValues.TO_STRING) {
             
             @Override
             protected String getValueAsString(CellContext context) {

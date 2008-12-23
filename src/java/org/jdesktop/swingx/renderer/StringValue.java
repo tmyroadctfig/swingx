@@ -65,39 +65,23 @@ import java.io.Serializable;
  * @see DefaultTreeRenderer
  */
 public interface StringValue extends Serializable {
-    
+
     /**
      * Default converter using the toString.
+     * 
+     * @deprecated Use {@link StringValues#TO_STRING} instead
      */
-    public final static StringValue TO_STRING = new StringValue() {
+    @Deprecated
+    public final static StringValue TO_STRING = StringValues.TO_STRING;
 
-        /**
-         * {@inheritDoc} <p>
-         * 
-         * Implemented to return the values toString if value not-null. Otherwise,
-         * returns an empty string.
-         */
-        public String getString(Object value) {
-            return (value != null) ? value.toString() : "";
-        }
-        
-    };
-    
     /**
      * Converter returning an empty String always.
+     * 
+     * @deprecated Use {@link StringValues#EMPTY} instead
      */
-    public final static StringValue EMPTY = new StringValue() {
-
-        /**
-         * {@inheritDoc} <p>
-         * 
-         * Implemented to return an empty string.
-         */
-        public String getString(Object value) {
-            return "";
-        }
-        
-    };
+    @Deprecated
+    public final static StringValue EMPTY = StringValues.EMPTY;
+    
     /**
      * Returns a string representation of the given value. <p>
      * 

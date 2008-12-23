@@ -38,6 +38,7 @@ import org.jdesktop.swingx.decorator.SortOrder;
 import org.jdesktop.swingx.hyperlink.LinkModel;
 import org.jdesktop.swingx.renderer.DefaultListRenderer;
 import org.jdesktop.swingx.renderer.StringValue;
+import org.jdesktop.swingx.renderer.StringValues;
 import org.jdesktop.swingx.rollover.ListRolloverController;
 import org.jdesktop.swingx.rollover.RolloverProducer;
 import org.jdesktop.test.AncientSwingTeam;
@@ -229,7 +230,7 @@ public class JXListTest extends InteractiveTestCase {
                     Color color = (Color) value;
                     return "R/G/B: " + color.getRGB();
                 }
-                return TO_STRING.getString(value);
+                return StringValues.TO_STRING.getString(value);
             }
             
         };

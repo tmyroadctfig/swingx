@@ -45,6 +45,7 @@ import javax.swing.tree.TreePath;
 import org.jdesktop.swingx.decorator.ComponentAdapterTest.JXTreeTableT;
 import org.jdesktop.swingx.renderer.DefaultTreeRenderer;
 import org.jdesktop.swingx.renderer.StringValue;
+import org.jdesktop.swingx.renderer.StringValues;
 import org.jdesktop.swingx.table.TableColumnExt;
 import org.jdesktop.swingx.test.ComponentTreeTableModel;
 import org.jdesktop.swingx.test.TreeTableUtils;
@@ -158,7 +159,7 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
                     Color color = (Color) value;
                     return "R/G/B: " + color.getRGB();
                 }
-                return TO_STRING.getString(value);
+                return StringValues.TO_STRING.getString(value);
             }
             
         };

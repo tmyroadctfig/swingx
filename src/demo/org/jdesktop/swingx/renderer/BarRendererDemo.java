@@ -92,7 +92,7 @@ public class BarRendererDemo {
      * Note: this method is extracted for emphasis only :-)
      */
     private void configureRendering(JXTable table, JXList list, JXTree tree) {
-        StringValue stringValue = FormatStringValue.NUMBER_TO_STRING;
+        StringValue stringValue = StringValues.NUMBER_TO_STRING;
         IconValue iconValue = new IconValue() {
             BarIcon icon = new BarIcon();
             double upperBound = 1000;

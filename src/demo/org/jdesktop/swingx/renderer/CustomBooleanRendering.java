@@ -61,7 +61,7 @@ public class CustomBooleanRendering {
             
         };
         table.setDefaultRenderer(Boolean.class, 
-                new DefaultTableRenderer(new MappedValue(StringValue.EMPTY, iv), JLabel.CENTER));
+                new DefaultTableRenderer(new MappedValue(StringValues.EMPTY, iv), JLabel.CENTER));
     }
     
     /**
@@ -85,7 +85,7 @@ public class CustomBooleanRendering {
         table.setHighlighters(yesHighlighter, noHighlighter, undecidedHighlighter);
         
         table.setDefaultRenderer(Boolean.class, 
-                new DefaultTableRenderer(StringValue.EMPTY));
+                new DefaultTableRenderer(StringValues.EMPTY));
     }
 
 

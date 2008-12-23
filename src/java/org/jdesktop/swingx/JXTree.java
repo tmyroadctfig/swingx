@@ -64,6 +64,7 @@ import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.CompoundHighlighter;
 import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.renderer.StringValue;
+import org.jdesktop.swingx.renderer.StringValues;
 import org.jdesktop.swingx.rollover.RolloverProducer;
 import org.jdesktop.swingx.rollover.RolloverRenderer;
 import org.jdesktop.swingx.rollover.TreeRolloverController;
@@ -501,7 +502,7 @@ public class JXTree extends JTree {
         if (renderer instanceof StringValue) {
             return ((StringValue) renderer).getString(path.getLastPathComponent());
         }
-        return StringValue.TO_STRING.getString(path.getLastPathComponent());
+        return StringValues.TO_STRING.getString(path.getLastPathComponent());
     }
 
     

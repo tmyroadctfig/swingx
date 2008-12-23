@@ -20,9 +20,7 @@
  */
 package org.jdesktop.swingx.renderer;
 
-import java.text.DateFormat;
 import java.text.Format;
-import java.text.NumberFormat;
 
 /**
  * Base type for <code>Format</code>-backed <code>StringValue</code>. Has
@@ -50,40 +48,18 @@ public class FormatStringValue implements StringValue {
     /**
      * Default converter for <code>Date</code> types. Uses the default format
      * as returned from <code>DateFormat</code>.
+     * @deprecated Use {@link StringValues#DATE_TO_STRING} instead
      */
-    public final static FormatStringValue DATE_TO_STRING = new FormatStringValue() {
-        
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public String getString(Object value) {
-            if (format == null) {
-                format = DateFormat.getDateInstance();
-            }
-            return super.getString(value);
-        }
-        
-    };
+    @Deprecated
+    public final static FormatStringValue DATE_TO_STRING = StringValues.DATE_TO_STRING;
     
     /**
      * Default converter for <code>Number</code> types. Uses the default format
      * as returned from <code>NumberFormat</code>.
+     * @deprecated Use {@link StringValues#NUMBER_TO_STRING} instead
      */
-    public final static FormatStringValue NUMBER_TO_STRING = new FormatStringValue() {
-        
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public String getString(Object value) {
-            if (format == null) {
-                format = NumberFormat.getNumberInstance();
-            }
-            return super.getString(value);
-        }
-        
-    };
+    @Deprecated
+    public final static FormatStringValue NUMBER_TO_STRING = StringValues.NUMBER_TO_STRING;
 
     /** the format used in creating the String representation. */
     protected Format format;

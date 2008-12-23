@@ -218,7 +218,7 @@ public class TreeRendererTest extends InteractiveTestCase {
      */
     public void interactiveCustomIconPerNodeType() {
         JTree tree = new JTree();
-        tree.setCellRenderer(new DefaultTreeRenderer(IconValue.NONE));
+        tree.setCellRenderer(new DefaultTreeRenderer(IconValues.NONE));
         final JXFrame frame = wrapWithScrollingInFrame(tree, "tree - no icons");
         frame.setVisible(true);
     }
@@ -268,7 +268,7 @@ public class TreeRendererTest extends InteractiveTestCase {
                 if (value instanceof Component) {
                     return "Name: " + ((Component) value).getName();
                 }
-                return TO_STRING.getString(value);
+                return StringValues.TO_STRING.getString(value);
             }
             
         };
@@ -353,7 +353,7 @@ public class TreeRendererTest extends InteractiveTestCase {
                 if (value instanceof Component) {
                     return ((Component) value).getName();
                 }
-                return StringValue.TO_STRING.getString(value);
+                return StringValues.TO_STRING.getString(value);
             }};
         xtree.setCellRenderer(new DefaultTreeRenderer(componentFormat));
         xtree.setEditable(true);
@@ -364,7 +364,7 @@ public class TreeRendererTest extends InteractiveTestCase {
                 if (value instanceof File) {
                     return ((File) value).getName();
                 }
-                return StringValue.TO_STRING.getString(value);
+                return StringValues.TO_STRING.getString(value);
             }
             
         };

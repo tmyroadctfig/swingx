@@ -73,6 +73,7 @@ import org.jdesktop.swingx.decorator.Sorter;
 import org.jdesktop.swingx.hyperlink.LinkModel;
 import org.jdesktop.swingx.renderer.DefaultTableRenderer;
 import org.jdesktop.swingx.renderer.StringValue;
+import org.jdesktop.swingx.renderer.StringValues;
 import org.jdesktop.swingx.rollover.RolloverController;
 import org.jdesktop.swingx.rollover.RolloverProducer;
 import org.jdesktop.swingx.rollover.TableRolloverController;
@@ -379,7 +380,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
                     Color color = (Color) value;
                     return "R/G/B: " + color.getRGB();
                 }
-                return TO_STRING.getString(value);
+                return StringValues.TO_STRING.getString(value);
             }
             
         };

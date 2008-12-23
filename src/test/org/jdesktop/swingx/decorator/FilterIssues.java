@@ -12,6 +12,7 @@ import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.renderer.DefaultTableRenderer;
 import org.jdesktop.swingx.renderer.StringValue;
+import org.jdesktop.swingx.renderer.StringValues;
 import org.jdesktop.test.AncientSwingTeam;
 
 
@@ -40,7 +41,7 @@ public class FilterIssues extends FilterTest {
         StringValue sv = new StringValue() {
 
             public String getString(Object arg0) {
-                return "x" + TO_STRING.getString(arg0);
+                return "x" + StringValues.TO_STRING.getString(arg0);
             }
             
         };

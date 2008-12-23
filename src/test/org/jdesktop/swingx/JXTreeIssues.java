@@ -107,7 +107,7 @@ public class JXTreeIssues extends JXTreeUnitTest {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        provider = new CheckBoxProvider(StringValue.TO_STRING);
+        provider = new CheckBoxProvider(StringValues.TO_STRING);
         sharedRenderer = new DefaultTreeRenderer(new WrappingProvider(provider));
     }
 
@@ -331,7 +331,7 @@ public class JXTreeIssues extends JXTreeUnitTest {
                 if (value instanceof File) {
                     return ((File) value).getName();
                 }
-                return TO_STRING.getString(value);
+                return StringValues.TO_STRING.getString(value);
             }
             
         };

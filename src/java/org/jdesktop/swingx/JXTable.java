@@ -106,10 +106,10 @@ import org.jdesktop.swingx.plaf.UIManagerExt;
 import org.jdesktop.swingx.renderer.AbstractRenderer;
 import org.jdesktop.swingx.renderer.CheckBoxProvider;
 import org.jdesktop.swingx.renderer.DefaultTableRenderer;
-import org.jdesktop.swingx.renderer.FormatStringValue;
-import org.jdesktop.swingx.renderer.IconValue;
+import org.jdesktop.swingx.renderer.IconValues;
 import org.jdesktop.swingx.renderer.MappedValue;
 import org.jdesktop.swingx.renderer.StringValue;
+import org.jdesktop.swingx.renderer.StringValues;
 import org.jdesktop.swingx.rollover.RolloverProducer;
 import org.jdesktop.swingx.rollover.TableRolloverController;
 import org.jdesktop.swingx.search.AbstractSearchable;
@@ -3325,7 +3325,7 @@ public class JXTable extends JTable
         if (renderer instanceof StringValue) {
             return ((StringValue) renderer).getString(getValueAt(row, column));
         }
-        return StringValue.TO_STRING.getString(getValueAt(row, column));
+        return StringValues.TO_STRING.getString(getValueAt(row, column));
     }
     
     /**
@@ -3549,12 +3549,12 @@ public class JXTable extends JTable
         // configured default table renderer (internally LabelProvider)
         setDefaultRenderer(Object.class, new DefaultTableRenderer());
         setDefaultRenderer(Number.class, new DefaultTableRenderer(
-                FormatStringValue.NUMBER_TO_STRING, JLabel.RIGHT));
+                StringValues.NUMBER_TO_STRING, JLabel.RIGHT));
         setDefaultRenderer(Date.class, new DefaultTableRenderer(
-                FormatStringValue.DATE_TO_STRING));
+                StringValues.DATE_TO_STRING));
         // use the same center aligned default for Image/Icon
         TableCellRenderer renderer  = new DefaultTableRenderer(
-                new MappedValue(StringValue.EMPTY, IconValue.ICON), 
+                new MappedValue(StringValues.EMPTY, IconValues.ICON), 
                 JLabel.CENTER);
         setDefaultRenderer(Icon.class, renderer);
         setDefaultRenderer(ImageIcon.class, renderer);

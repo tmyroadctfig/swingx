@@ -94,7 +94,7 @@ public class CheckBoxProvider extends ComponentProvider<AbstractButton> {
      * @param alignment the horizontalAlignment.
      */
     public CheckBoxProvider(StringValue stringValue, int alignment) {
-        super(stringValue == null ? StringValue.EMPTY : stringValue, alignment);
+        super(stringValue == null ? StringValues.EMPTY : stringValue, alignment);
         setBorderPainted(true);
     }
 

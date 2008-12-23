@@ -187,7 +187,7 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
         // number
         JXList listn = new JXList(createListModel(source, 3));
         listn.setCellRenderer(new DefaultListRenderer(
-                FormatStringValue.NUMBER_TO_STRING, JLabel.RIGHT));
+                StringValues.NUMBER_TO_STRING, JLabel.RIGHT));
         listn.setHighlighters(simpleStriping, gradient);
         lists.add(listn);
 

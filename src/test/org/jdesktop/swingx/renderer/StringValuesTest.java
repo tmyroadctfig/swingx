@@ -42,7 +42,7 @@ public class StringValuesTest extends TestCase {
     public void testFileNameWithNonFile() {
         Object o = new Object();
         
-        assertEquals(StringValue.EMPTY.getString(o),
+        assertEquals(StringValues.EMPTY.getString(o),
                 StringValues.FILE_NAME.getString(o));
     }
     
@@ -52,7 +52,7 @@ public class StringValuesTest extends TestCase {
         File f = File.createTempFile("svt", "tmp");
         f.deleteOnExit();
         
-        assertNotSame(StringValue.EMPTY.getString(f),
+        assertNotSame(StringValues.EMPTY.getString(f),
                 StringValues.FILE_NAME.getString(f));
     }
     
@@ -60,7 +60,7 @@ public class StringValuesTest extends TestCase {
     public void testFileTypeWithNonFile() {
         Object o = new Object();
         
-        assertEquals(StringValue.EMPTY.getString(o),
+        assertEquals(StringValues.EMPTY.getString(o),
                 StringValues.FILE_TYPE.getString(o));
     }
     
@@ -70,7 +70,7 @@ public class StringValuesTest extends TestCase {
         File f = File.createTempFile("svt", "tmp");
         f.deleteOnExit();
         
-        assertNotSame(StringValue.EMPTY.getString(f),
+        assertNotSame(StringValues.EMPTY.getString(f),
                 StringValues.FILE_TYPE.getString(f));
     }
 }

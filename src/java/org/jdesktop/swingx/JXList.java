@@ -60,6 +60,7 @@ import org.jdesktop.swingx.decorator.SortOrder;
 import org.jdesktop.swingx.renderer.AbstractRenderer;
 import org.jdesktop.swingx.renderer.DefaultListRenderer;
 import org.jdesktop.swingx.renderer.StringValue;
+import org.jdesktop.swingx.renderer.StringValues;
 import org.jdesktop.swingx.rollover.ListRolloverController;
 import org.jdesktop.swingx.rollover.RolloverProducer;
 import org.jdesktop.swingx.rollover.RolloverRenderer;
@@ -1069,7 +1070,7 @@ public class JXList extends JList {
             if (renderer instanceof StringValue) {
                 return ((StringValue) renderer).getString(getValueAt(row, column));
             }
-            return StringValue.TO_STRING.getString(getValueAt(row, column));
+            return StringValues.TO_STRING.getString(getValueAt(row, column));
         }
         
         
@@ -1252,7 +1253,7 @@ public class JXList extends JList {
         if (renderer instanceof StringValue) {
             return ((StringValue) renderer).getString(getElementAt(row));
         }
-        return StringValue.TO_STRING.getString(getElementAt(row));
+        return StringValues.TO_STRING.getString(getElementAt(row));
     }
 
     private DelegatingRenderer getDelegatingRenderer() {

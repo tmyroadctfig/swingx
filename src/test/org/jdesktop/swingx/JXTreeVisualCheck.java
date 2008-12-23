@@ -55,8 +55,9 @@ import org.jdesktop.swingx.decorator.SearchPredicate;
 import org.jdesktop.swingx.decorator.HighlightPredicate.DepthHighlightPredicate;
 import org.jdesktop.swingx.renderer.DefaultListRenderer;
 import org.jdesktop.swingx.renderer.DefaultTreeRenderer;
-import org.jdesktop.swingx.renderer.IconValue;
+import org.jdesktop.swingx.renderer.IconValues;
 import org.jdesktop.swingx.renderer.StringValue;
+import org.jdesktop.swingx.renderer.StringValues;
 import org.jdesktop.swingx.renderer.WrappingProvider;
 import org.jdesktop.swingx.test.ActionMapTreeTableModel;
 import org.jdesktop.swingx.treetable.TreeTableNode;
@@ -154,11 +155,11 @@ public class JXTreeVisualCheck extends JXTreeUnitTest {
                         && ((TreeTableNode) value).getColumnCount() > 0) {
                     value = ((TreeTableNode) value).getValueAt(0);
                 }
-                return TO_STRING.getString(value);
+                return StringValues.TO_STRING.getString(value);
             }
             
         };
-        DefaultTreeRenderer renderer = new DefaultTreeRenderer(IconValue.NONE, sv);
+        DefaultTreeRenderer renderer = new DefaultTreeRenderer(IconValues.NONE, sv);
         ((WrappingProvider) renderer.getComponentProvider()).setUnwrapUserObject(false);
         tree.setCellRenderer(renderer);
         JXFrame frame = wrapWithScrollingInFrame(tree, "WrappingProvider: no icons, no unwrapped userObject");

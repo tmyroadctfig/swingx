@@ -161,7 +161,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
                        + " Type: " 
                        + FileSystemView.getFileSystemView().getSystemTypeDescription((File) value); 
                 } 
-                return TO_STRING.getString(value);
+                return StringValues.TO_STRING.getString(value);
             }
             
         };
@@ -316,7 +316,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
                        + FileSystemView.getFileSystemView().getSystemTypeDescription((File) value)
                     ; 
                 } 
-                return TO_STRING.getString(value);
+                return StringValues.TO_STRING.getString(value);
             }
             
         };
@@ -763,7 +763,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
         public String getString(Object value) {
             try {
                 PropertyDescriptor desc = getPropertyDescriptor(value.getClass(), property);
-                return TO_STRING.getString(getValue(value, desc));
+                return StringValues.TO_STRING.getString(getValue(value, desc));
             } catch (Exception e) {
                 // nothing much we can do here...
                 
@@ -875,7 +875,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
                 if (value instanceof AbstractActionExt) {
                     return ((AbstractActionExt) value).getName();
                 }
-                return TO_STRING.getString(value);
+                return StringValues.TO_STRING.getString(value);
             }
             
         };

@@ -180,11 +180,11 @@ public class DefaultListRenderer extends AbstractRenderer
                 if (value instanceof Icon) {
                     return "";
                 }
-                return StringValue.TO_STRING.getString(value);
+                return StringValues.TO_STRING.getString(value);
             }
 
         };
-        return new MappedValue(sv, IconValue.ICON);
+        return new MappedValue(sv, IconValues.ICON);
     }
 
 

@@ -23,7 +23,7 @@ package org.jdesktop.swingx.decorator;
 
 import javax.swing.JComponent;
 
-import org.jdesktop.swingx.renderer.StringValue;
+import org.jdesktop.swingx.renderer.StringValues;
 
 /**
  * Abstract base class for all component data adapter classes. A
@@ -297,7 +297,7 @@ public abstract class ComponentAdapter {
      * @see #getValue(int)
      */
     public String getString() {
-        return StringValue.TO_STRING.getString(getValue());
+        return StringValues.TO_STRING.getString(getValue());
     }
 
     /**
@@ -337,7 +337,7 @@ public abstract class ComponentAdapter {
      * in view coordinate and the column in model coordiantes
      */
     public String getFilteredStringAt(int row, int column) {
-        return StringValue.TO_STRING.getString(getFilteredValueAt(row, column));
+        return StringValues.TO_STRING.getString(getFilteredValueAt(row, column));
     }
     
     /**
@@ -353,7 +353,7 @@ public abstract class ComponentAdapter {
      *          specified row and column
      */
     public String getStringAt(int row, int column) {
-        return StringValue.TO_STRING.getString(getValueAt(row, column));
+        return StringValues.TO_STRING.getString(getValueAt(row, column));
     }
     
     /**

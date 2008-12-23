@@ -211,7 +211,7 @@ public abstract class ComponentProvider<T extends JComponent>
      */
     public void setStringValue(StringValue formatter) {
         if (formatter == null) {
-            formatter = StringValue.TO_STRING;
+            formatter = StringValues.TO_STRING;
         }
         this.formatter = formatter;
     }

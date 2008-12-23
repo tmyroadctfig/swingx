@@ -21,22 +21,44 @@
 package org.jdesktop.swingx.renderer;
 
 import java.io.File;
+import java.text.DateFormat;
+import java.text.NumberFormat;
 
 import javax.swing.filechooser.FileSystemView;
 
 /**
  * A collection of common {@code StringValue} implementations.
- * <p>
- * TODO potentially move {@link StringValue#TO_STRING} and
- * {@link StringValue#EMPTY} here
  * 
  * @author Karl George Schaefer
+ * @author Jeanette Winzenburg
  */
 public final class StringValues {
     /**
+     * A {@code StringValue} that always presents an empty string.
+     */
+    @SuppressWarnings("serial")
+    public final static StringValue EMPTY = new StringValue() {
+        public String getString(Object value) {
+            return "";
+        }
+    };
+    
+    /**
+     * A {@code StringValue} that presents a {@link Object#toString() toString}
+     * value for the given object. If the value passed is {@code null}, this has
+     * the same effect as {@link StringValues#EMPTY}.
+     */
+    @SuppressWarnings("serial")
+    public final static StringValue TO_STRING = new StringValue() {
+        public String getString(Object value) {
+            return (value != null) ? value.toString() : StringValues.EMPTY.getString(value);
+        }
+    };
+
+    /**
      * A {@code StringValue} that presents the current L&F display name for a
      * given file. If the value passed to {@code FILE_NAME} is not a
-     * {@link File}, this has the same effect as {@link StringValue#EMPTY}.
+     * {@link File}, this has the same effect as {@link StringValues#EMPTY}.
      */
     @SuppressWarnings("serial")
     public static final StringValue FILE_NAME = new StringValue() {
@@ -47,14 +69,14 @@ public final class StringValues {
                 return fsv.getSystemDisplayName((File) value);
             }
 
-            return EMPTY.getString(value);
+            return StringValues.EMPTY.getString(value);
         }
     };
 
     /**
      * A {@code StringValue} that presents the current L&F type name for a
      * given file. If the value passed to {@code FILE_TYPE} is not a
-     * {@link File}, this has the same effect as {@link StringValue#EMPTY}.
+     * {@link File}, this has the same effect as {@link StringValues#EMPTY}.
      */
     @SuppressWarnings("serial")
     public static final StringValue FILE_TYPE = new StringValue() {
@@ -65,8 +87,48 @@ public final class StringValues {
                 return fsv.getSystemTypeDescription((File) value);
             }
             
-            return EMPTY.getString(value);
+            return StringValues.EMPTY.getString(value);
         }
+    };
+
+    /**
+     * Default converter for <code>Date</code> types. Uses the default format
+     * as returned from <code>DateFormat</code>.
+     */
+    @SuppressWarnings("serial")
+    public final static FormatStringValue DATE_TO_STRING = new FormatStringValue() {
+        
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String getString(Object value) {
+            if (format == null) {
+                format = DateFormat.getDateInstance();
+            }
+            return super.getString(value);
+        }
+        
+    };
+
+    /**
+     * Default converter for <code>Number</code> types. Uses the default format
+     * as returned from <code>NumberFormat</code>.
+     */
+    @SuppressWarnings("serial")
+    public final static FormatStringValue NUMBER_TO_STRING = new FormatStringValue() {
+        
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String getString(Object value) {
+            if (format == null) {
+                format = NumberFormat.getNumberInstance();
+            }
+            return super.getString(value);
+        }
+        
     };
     
     private StringValues() {
