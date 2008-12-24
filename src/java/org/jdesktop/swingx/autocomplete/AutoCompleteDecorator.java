@@ -223,7 +223,7 @@ public class AutoCompleteDecorator {
                     // don't popup when the user hits shift,ctrl or alt
                     if (keyCode==KeyEvent.VK_SHIFT || keyCode==KeyEvent.VK_CONTROL || keyCode==KeyEvent.VK_ALT) return;
                     // don't popup when the user hits escape (see issue #311)
-                    if (keyCode==KeyEvent.VK_ESCAPE) return;
+                    if (keyCode==KeyEvent.VK_ENTER || keyCode==KeyEvent.VK_ESCAPE) return;
                     comboBox.setPopupVisible(true);
                 }
             }
