@@ -24,6 +24,9 @@ package org.jdesktop.swingx.plaf.windows;
 import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.image.BufferedImage;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import javax.imageio.ImageIO;
 import javax.swing.JComponent;
 import javax.swing.plaf.ComponentUI;
@@ -36,9 +39,11 @@ import org.jdesktop.swingx.plaf.basic.BasicStatusBarUI;
  * @author rbair
  */
 public class WindowsStatusBarUI extends BasicStatusBarUI {
+    private static final Logger log = Logger.getLogger(WindowsStatusBarUI.class.getName());
     private BufferedImage leftImage;
     private BufferedImage middleImage;
     private BufferedImage rightImage;
+    
     
     /** Creates a new instance of BasicStatusBarUI */
     public WindowsStatusBarUI() {
@@ -49,7 +54,8 @@ public class WindowsStatusBarUI extends BasicStatusBarUI {
             middleImage = ImageIO.read(WindowsStatusBarUI.class.getResource(UIManagerExt.getString("StatusBar.middleImage")));
             rightImage = ImageIO.read(WindowsStatusBarUI.class.getResource(UIManagerExt.getString("StatusBar.rightImage")));
         } catch (Exception e) {
-            //hmmmm... should log this I guess
+            // log the message in case of init failure
+            log.log(Level.FINE, e.getLocalizedMessage(), e);
         }
     }
     
@@ -68,6 +74,9 @@ public class WindowsStatusBarUI extends BasicStatusBarUI {
     }
     
     @Override protected void paintBackground(Graphics2D g, JXStatusBar statusBar) {
+        if (leftImage == null || middleImage == null || rightImage == null) {
+            log.severe("Failed to initialize necessary assets. Set logging to FINE to see more details.");
+        }
         //if bidi, reverse the image painting order
         //TODO need to handle vertical stretching better
         g.drawImage(leftImage, 0, 0, leftImage.getWidth(), statusBar.getHeight(), null);
