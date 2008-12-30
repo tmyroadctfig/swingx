@@ -21,12 +21,14 @@
 package org.jdesktop.swingx;
 
 import java.awt.BorderLayout;
+import java.awt.CardLayout;
 import java.awt.Component;
 import java.awt.ComponentOrientation;
 import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.Dialog;
 import java.awt.Dimension;
+import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Frame;
@@ -333,6 +335,11 @@ public class JXLoginPane extends JXPanel {
      * focus changes.
      */
     private final CapsOnWinListener capsOnWinListener;
+    
+    /**
+     * Card pane holding user/pwd fields view and the progress view.
+     */
+    private JPanel contentCardPane;
 
     /**
      * Creates a default JXLoginPane instance
@@ -799,6 +806,7 @@ public class JXLoginPane extends JXPanel {
 
         //create the progress panel
         progressPanel = new JXPanel(new GridBagLayout());
+        progressPanel.setOpaque(false);
         progressMessageLabel = new JLabel(UIManagerExt.getString(CLASS_NAME + ".pleaseWait", getLocale()));
         progressMessageLabel.setFont(UIManager.getFont(CLASS_NAME +".pleaseWaitFont", getLocale()));
         JProgressBar pb = new JProgressBar();
@@ -811,7 +819,11 @@ public class JXLoginPane extends JXPanel {
         //layout the panel
         setLayout(new BorderLayout());
         add(banner, BorderLayout.NORTH);
-        add(contentPanel, BorderLayout.CENTER);
+        contentCardPane = new JPanel(new CardLayout());
+        contentCardPane.setOpaque(false);
+        contentCardPane.add(contentPanel, "0");
+        contentCardPane.add(progressPanel, "1");
+        add(contentCardPane, BorderLayout.CENTER);
 
     }
 
@@ -1157,6 +1169,7 @@ public class JXLoginPane extends JXPanel {
             char[] password = getPassword();
             String server = servers.size() == 1 ? servers.get(0) : serverCombo == null ? null : (String)serverCombo.getSelectedItem();
             loginService.startAuthentication(name, password, server);
+            
         } catch(Exception ex) {
         //The status is set via the loginService listener, so no need to set
         //the status here. Just log the error.
@@ -1287,18 +1300,22 @@ public class JXLoginPane extends JXPanel {
         }
 
         public void loginStarted(LoginEvent source) {
+            assert EventQueue.isDispatchThread();
             getActionMap().get(LOGIN_ACTION_COMMAND).setEnabled(false);
             getActionMap().get(CANCEL_LOGIN_ACTION_COMMAND).setEnabled(true);
-            remove(contentPanel);
-            add(progressPanel, BorderLayout.CENTER);
+//            remove(contentPanel);
+//            add(progressPanel, BorderLayout.CENTER);
+            ((CardLayout) contentCardPane.getLayout()).last(contentCardPane);
             revalidate();
             repaint();
             setStatus(Status.IN_PROGRESS);
         }
 
         public void loginFailed(LoginEvent source) {
-            remove(progressPanel);
-            add(contentPanel, BorderLayout.CENTER);
+            assert EventQueue.isDispatchThread();
+//            remove(progressPanel);
+//            add(contentPanel, BorderLayout.CENTER);
+            ((CardLayout) contentCardPane.getLayout()).first(contentCardPane);
             getActionMap().get(LOGIN_ACTION_COMMAND).setEnabled(true);
             errorMessageLabel.setVisible(true);
             revalidate();
@@ -1307,8 +1324,10 @@ public class JXLoginPane extends JXPanel {
         }
 
         public void loginCanceled(LoginEvent source) {
-            remove(progressPanel);
-            add(contentPanel, BorderLayout.CENTER);
+            assert EventQueue.isDispatchThread();
+//            remove(progressPanel);
+//            add(contentPanel, BorderLayout.CENTER);
+            ((CardLayout) contentCardPane.getLayout()).first(contentCardPane);
             getActionMap().get(LOGIN_ACTION_COMMAND).setEnabled(true);
             errorMessageLabel.setVisible(false);
             revalidate();

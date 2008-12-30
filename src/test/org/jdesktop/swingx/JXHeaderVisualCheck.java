@@ -22,24 +22,22 @@
 package org.jdesktop.swingx;
 
 
+import java.awt.AWTEvent;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.GridLayout;
-import java.awt.RenderingHints;
+import java.awt.Toolkit;
+import java.awt.event.AWTEventListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.net.URL;
+import java.awt.event.MouseEvent;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.Box;
 import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -67,7 +65,7 @@ public class JXHeaderVisualCheck extends InteractiveTestCase {
     public static void main(String args[]) {
         JXHeaderVisualCheck test = new JXHeaderVisualCheck();
         try {
-          test.runInteractiveTests();
+          test.runInteractiveTests("interactiveHTMLTextWrapLong");
 //          test.runInteractiveTests("interactive.*Label.*");
 //          test.runInteractiveTests("interactive.*Font.*");
         } catch (Exception e) {
@@ -85,6 +83,11 @@ public class JXHeaderVisualCheck extends InteractiveTestCase {
     
     
     public void interactiveHeaderInTabbedPane() {
+//        Toolkit.getDefaultToolkit().addAWTEventListener(new AWTEventListener() {
+//
+//            public void eventDispatched(AWTEvent event) {
+//                System.out.println("e:" + event);
+//            }}, Long.MAX_VALUE);
         JTabbedPane pane = new JTabbedPane();
         pane.addTab("first", createHeader());
         pane.addTab("second", createHeader());
@@ -174,6 +177,13 @@ public class JXHeaderVisualCheck extends InteractiveTestCase {
      * context.
      */
     public void interactiveHTMLTextWrapLong() {
+//      Toolkit.getDefaultToolkit().addAWTEventListener(new AWTEventListener() {
+//        
+//                    public void eventDispatched(AWTEvent event) {
+//                        if (event.getID() != MouseEvent.MOUSE_MOVED) {
+//                            System.out.println("e:" + event);
+//                        }
+//                    }}, Long.MAX_VALUE);
         JXHeader header = createHeader();
         JXHeader footer = new JXHeader();
         footer.setTitle("Notes:");
@@ -191,9 +201,12 @@ public class JXHeaderVisualCheck extends InteractiveTestCase {
         panel.add(header, BorderLayout.NORTH);
 //        panel.add(new JScrollPane(table));
         panel.add(footer, BorderLayout.SOUTH);
-        JXFrame frame = new JXFrame("html wrapping in SOUTh: long text in NORTH");
-        frame.add(panel);
+//      JXFrame frame = new JXFrame("html wrapping in SOUTH: long text in NORTH");
+//      frame.add(panel);
+        JXFrame frame = wrapInFrame(panel, "html wrapping in SOUTH: long text in NORTH");
+//        addComponentOrientationToggle(frame);
         frame.setSize(800, 600);
+//        show(frame);
         frame.setVisible(true);
     }
     /**
