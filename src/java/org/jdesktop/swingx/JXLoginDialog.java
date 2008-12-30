@@ -34,7 +34,23 @@ import org.jdesktop.swingx.plaf.UIManagerExt;
 
 /**
  * A standard login dialog that provides a reasonable amount of flexibility
- * while also providing ease of use and a professional look.
+ * while also providing ease of use and a professional look. The dialog is intended for simple cases or 
+ * when modality is required. The implementation of login service needs to be set for the dialog to verify user provided credentials.
+ * <code><pre>
+ * JXLoginDialog dialog = new JXLoginDialog(new LoginService() {
+ *      public boolean authenticate(String name, char[] password,
+ *                      String server) throws Exception {
+ *              //verify user credentials and return true on success or false on failure.
+ *              return success;
+ *      }}, null, null); 
+ * dialog.setVisible(true);
+ * </pre></code>
+ * When other constructors are used to create the dialog, proper login service can be provided by calling
+ * <code><pre>
+ * dialog.getPanel.setLoginService(service);
+ * </pre></code>
+ * In case no login service is provided whatsoever, the default login service implementation will be used. 
+ * This implementation allows access to everyone! 
  *
  * @author rbair
  */
