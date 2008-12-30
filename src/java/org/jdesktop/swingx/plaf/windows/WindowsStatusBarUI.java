@@ -76,6 +76,7 @@ public class WindowsStatusBarUI extends BasicStatusBarUI {
     @Override protected void paintBackground(Graphics2D g, JXStatusBar statusBar) {
         if (leftImage == null || middleImage == null || rightImage == null) {
             log.severe("Failed to initialize necessary assets. Set logging to FINE to see more details.");
+            return;
         }
         //if bidi, reverse the image painting order
         //TODO need to handle vertical stretching better
