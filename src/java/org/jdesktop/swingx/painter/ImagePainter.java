@@ -249,7 +249,25 @@ public class ImagePainter<T> extends AbstractAreaPainter<T> {
                             sw = width;
                             sh = height;
                         }
-                        g.drawImage(img, 0, 0, sw, sh, null);
+                        int x=0;
+                        int y=0;
+                        switch(getHorizontalAlignment()) {
+                            case CENTER:
+                                x=(width/2)-(sw/2);
+                                break;
+                            case RIGHT:
+                                x=width-sw;
+                                break;
+                        }
+                        switch(getVerticalAlignment()) {
+                            case CENTER:
+                                y=(height/2)-(sh/2);
+                                break;
+                            case BOTTOM:
+                                y=height-sh;
+                                break;
+                        }
+                        g.drawImage(img, x, y, sw, sh, null);
                     } else {
                         int sw = rect.width;
                         int sh = rect.height;
