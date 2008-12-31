@@ -158,7 +158,7 @@ public class JXLoginPaneVisualCheck extends InteractiveTestCase {
                                 return false;
                         }});
         final JXLoginFrame frame = JXLoginPane.showLoginFrame(panel);
-        // if uncomented dialog will disappear immediatelly dou to invocation of login action
+        // if uncommented dialog will disappear immediately due to invocation of login action
         //frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setJMenuBar(createAndFillMenuBar(panel));
         panel.setErrorMessage("TO TO TO TO TO TO TO TO TO TO TO TO TO TO TO TO TO TO TO TO TO TO Unexpected resize on long exception message. Unexpected resize on long exception message.");
@@ -258,7 +258,6 @@ public class JXLoginPaneVisualCheck extends InteractiveTestCase {
 
         public DummyLoginPaneUI(JXLoginPane dlg) {
             super(dlg);
-            // TODO Auto-generated constructor stub
         }
 
         @Override
@@ -280,6 +279,8 @@ public class JXLoginPaneVisualCheck extends InteractiveTestCase {
         JMenu menu = new JMenu("Locales");
         menu.add(new AbstractAction("Change Locale") {
 
+            private static final long serialVersionUID = 1L;
+
             public void actionPerformed(ActionEvent e) {
                 if (component.getLocale() == Locale.FRANCE) {
                     component.setLocale(Locale.ENGLISH);
@@ -292,7 +293,6 @@ public class JXLoginPaneVisualCheck extends InteractiveTestCase {
 
     /**
      * swingx-917
-     * TODO: this test works only when not run together with the others
      * @throws Exception
      */
     public void interactiveBrokenLayoutAfterFailedLogin() throws Exception {

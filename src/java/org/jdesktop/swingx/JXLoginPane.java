@@ -340,6 +340,7 @@ public class JXLoginPane extends JXPanel {
      * Card pane holding user/pwd fields view and the progress view.
      */
     private JPanel contentCardPane;
+    private boolean isErrorMessageSet;
 
     /**
      * Creates a default JXLoginPane instance
@@ -357,8 +358,9 @@ public class JXLoginPane extends JXPanel {
         // as this probably (?) should be called before super.setLocale
         setBannerText(UIManagerExt.getString(CLASS_NAME + ".bannerString", getLocale()));
         banner.setImage(createLoginBanner());
-        // TODO: Can't change the error message since it might have been already changed by the user!
-        //errorMessageLabel.setText(UIManager.getString(CLASS_NAME + ".errorMessage", getLocale()));
+        if (!isErrorMessageSet) {
+            errorMessageLabel.setText(UIManager.getString(CLASS_NAME + ".errorMessage", getLocale()));
+        }
         progressMessageLabel.setText(UIManagerExt.getString(CLASS_NAME + ".pleaseWait", getLocale()));
         recreateLoginPanel();
         Window w = SwingUtilities.getWindowAncestor(this);
@@ -473,7 +475,7 @@ public class JXLoginPane extends JXPanel {
                         setCapsLock(!isCapsLockOn());
                     }
                     return false;
-                        }};
+                }};
             capsOnWinListener = new CapsOnWinListener(capsOnTest);
         } else {
             capsOnTest = null;
@@ -504,7 +506,7 @@ public class JXLoginPane extends JXPanel {
 
         // #732 set all internal components opacity to false in order to allow top level (frame's content pane) background painter to have any effect.
         setOpaque(false);
-          initComponents();
+        initComponents();
     }
 
     /**
@@ -652,7 +654,8 @@ public class JXLoginPane extends JXPanel {
         //create the save check box. By default, it is not selected
         saveCB = new JCheckBox(UIManagerExt.getString(CLASS_NAME + ".rememberPasswordString", getLocale()));
         saveCB.setIconTextGap(10);
-        saveCB.setSelected(false); //TODO should get this from prefs!!! And, it should be based on the user
+        //TODO should get this from preferences!!! And, it should be based on the user
+        saveCB.setSelected(false); 
         //determine whether to show/hide the save check box based on the SaveMode
         saveCB.setVisible(saveMode == SaveMode.PASSWORD || saveMode == SaveMode.BOTH);
         saveCB.setOpaque(false);
@@ -789,7 +792,7 @@ public class JXLoginPane extends JXPanel {
         errorMessageLabel.setVerticalTextPosition(SwingConstants.TOP);
         errorMessageLabel.setLineWrap(true);
         errorMessageLabel.setPaintBorderInsets(false);
-        errorMessageLabel.setBackgroundPainter(new MattePainter(UIManager.getColor(CLASS_NAME + ".errorBackground", getLocale()), true));
+        errorMessageLabel.setBackgroundPainter(new MattePainter<JXLabel>(UIManager.getColor(CLASS_NAME + ".errorBackground", getLocale()), true));
         errorMessageLabel.setMaxLineSpan(320);
         errorMessageLabel.setVisible(false);
 
@@ -850,7 +853,7 @@ public class JXLoginPane extends JXPanel {
     }
 
     //------------------------------------------------------ Bean Properties
-    //TODO need to fire property change events!!!
+    //REMEMBER: when adding new methods, they need to fire property change events!!!
     /**
      * @return Returns the saveMode.
      */
@@ -1126,6 +1129,7 @@ public class JXLoginPane extends JXPanel {
      * Sets the error message for this login panel
      */
     public void setErrorMessage(String errorMessage) {
+        isErrorMessageSet = true;
         errorMessageLabel.setText(errorMessage);
     }
 
@@ -1218,7 +1222,7 @@ public class JXLoginPane extends JXPanel {
                 w.removeWindowListener(capsOnWinListener );
             }
         } catch (Exception e) {
-            // bail out probably in unsigned app distributed over web
+            // bail out; probably running unsigned app distributed over web
         }
         super.removeNotify();
     }
@@ -1341,24 +1345,25 @@ public class JXLoginPane extends JXPanel {
      * Action that initiates a login procedure. Delegates to JXLoginPane.startLogin
      */
     private static final class LoginAction extends AbstractActionExt {
-    private JXLoginPane panel;
-    public LoginAction(JXLoginPane p) {
-        super(UIManagerExt.getString(CLASS_NAME + ".loginString", p.getLocale()), LOGIN_ACTION_COMMAND);
-        this.panel = p;
-    }
-    public void actionPerformed(ActionEvent e) {
-        panel.startLogin();
-    }
-    public void itemStateChanged(ItemEvent e) {}
+        private static final long serialVersionUID = 7256761187925982485L;
+        private JXLoginPane panel;
+        public LoginAction(JXLoginPane p) {
+            super(UIManagerExt.getString(CLASS_NAME + ".loginString", p.getLocale()), LOGIN_ACTION_COMMAND);
+            this.panel = p;
+        }
+        public void actionPerformed(ActionEvent e) {
+            panel.startLogin();
+        }
+        public void itemStateChanged(ItemEvent e) {}
     }
 
     /**
      * Action that cancels the login procedure.
      */
     private static final class CancelAction extends AbstractActionExt {
+        private static final long serialVersionUID = 4040029973355439229L;
         private JXLoginPane panel;
         public CancelAction(JXLoginPane p) {
-            //TODO localize
             super(UIManagerExt.getString(CLASS_NAME + ".cancelLogin", p.getLocale()), CANCEL_LOGIN_ACTION_COMMAND);
             this.panel = p;
             this.setEnabled(false);
@@ -1425,6 +1430,7 @@ public class JXLoginPane extends JXPanel {
      * to simply enter their user name
      */
     public static final class SimpleNamePanel extends JTextField implements NameComponent {
+        private static final long serialVersionUID = 6513437813612641002L;
         public SimpleNamePanel() {
             super("", 15);
         }
@@ -1445,6 +1451,7 @@ public class JXLoginPane extends JXPanel {
      * to select a previous login name, or type in a new login name
      */
     public static final class ComboNamePanel extends JComboBox implements NameComponent {
+        private static final long serialVersionUID = 2511649075486103959L;
         private UserNameStore userNameStore;
         public ComboNamePanel(UserNameStore userNameStore) {
             super();
@@ -1468,6 +1475,7 @@ public class JXLoginPane extends JXPanel {
         }
         
         private final class NameComboBoxModel extends AbstractListModel implements ComboBoxModel {
+            private static final long serialVersionUID = 7097674687536018633L;
             private Object selectedItem;
             public void setSelectedItem(Object anItem) {
                 selectedItem = anItem;
@@ -1558,6 +1566,7 @@ public class JXLoginPane extends JXPanel {
     }
 
     public static final class JXLoginDialog extends JDialog {
+        private static final long serialVersionUID = -3185639594267828103L;
         private JXLoginPane panel;
 
         public JXLoginDialog(Frame parent, JXLoginPane p) {
@@ -1570,18 +1579,19 @@ public class JXLoginPane extends JXPanel {
             init(p);
         }
 
-    protected void init(JXLoginPane p) {
-        setTitle(UIManagerExt.getString(CLASS_NAME + ".titleString", getLocale()));
-        this.panel = p;
-        initWindow(this, panel);
-    }
-
-    public JXLoginPane.Status getStatus() {
-        return panel.getStatus();
-    }
+        protected void init(JXLoginPane p) {
+            setTitle(UIManagerExt.getString(CLASS_NAME + ".titleString", getLocale()));
+            this.panel = p;
+            initWindow(this, panel);
+        }
+    
+        public JXLoginPane.Status getStatus() {
+            return panel.getStatus();
+        }
     }
 
     public static final class JXLoginFrame extends JXFrame {
+        private static final long serialVersionUID = -9016407314342050807L;
         private JXLoginPane panel;
 
         public JXLoginFrame(JXLoginPane p) {
@@ -1604,7 +1614,6 @@ public class JXLoginPane extends JXPanel {
         public JXLoginPane getPanel() {
             return panel;
         }
-
     }
 
     /**
@@ -1624,7 +1633,7 @@ public class JXLoginPane extends JXPanel {
                 UIManagerExt.getString(CLASS_NAME + ".cancelString", panel.getLocale()));
         cancelButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                //change panel status to cancelled!
+                //change panel status to canceled!
                 panel.status = JXLoginPane.Status.CANCELLED;
                 w.setVisible(false);
                 w.dispose();
@@ -1707,8 +1716,9 @@ public class JXLoginPane extends JXPanel {
     private void setButtonPanel(JXBtnPanel buttonPanel) {
         this.buttonPanel = buttonPanel;
     }
+    
     private static class JXBtnPanel extends JXPanel {
-
+        private static final long serialVersionUID = 4136611099721189372L;
         private JButton cancel;
         private JButton ok;
 
@@ -1724,14 +1734,14 @@ public class JXLoginPane extends JXPanel {
         }
 
         /**
-         * @return the cancel
+         * @return the cancel button.
          */
         public JButton getCancel() {
             return cancel;
         }
 
         /**
-         * @return the ok
+         * @return the ok button.
          */
         public JButton getOk() {
             return ok;
