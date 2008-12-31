@@ -636,6 +636,11 @@ public class JXLabel extends JLabel {
     public boolean isPaintBorderInsets() {
         return paintBorderInsets;
     }
+    
+    @Override
+    public boolean isOpaque() {
+        return painting ? false : super.isOpaque();
+    }
 
     /**
      * Sets the paintBorderInsets property.
