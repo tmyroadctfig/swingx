@@ -24,8 +24,11 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImageOp;
+import java.io.IOException;
 
+import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
@@ -51,6 +54,11 @@ public class JXLabelDemo {
                 " <code>backgroundpainter</code> properties. The <code>backgroundPainter</code>" + 
                 " refers to a painter responsible for painting <i>beneath</i> the text and icon." + 
                 "</p>");
+        try {
+            label.setIcon(new ImageIcon(ImageIO.read(JXLabelDemo.class.getResourceAsStream("/org/jdesktop/swingx/renderer/resources/exit.png"))));
+        } catch (IOException e1) {
+            // ignore
+        }
         label.setLineWrap(true);
         label.setHorizontalAlignment(SwingConstants.CENTER);
         label.setVerticalAlignment(SwingConstants.CENTER);
