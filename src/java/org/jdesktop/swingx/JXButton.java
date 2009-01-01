@@ -234,11 +234,15 @@ public class JXButton extends JButton {
             Icon tmpIcon = b.getIcon();
             b.setIcon(null);
             b.text = "";
-            b.paint(g);
-            b.opaque = op;
-            b.text = tmp;
-            b.setIcon(tmpIcon);
-            b.setPainting(false);
+            try {
+                b.paint(g);
+            } finally {
+                // restore original values no matter what
+                b.opaque = op;
+                b.text = tmp;
+                b.setIcon(tmpIcon);
+                b.setPainting(false);
+            }
         }
 
         //if any of the state of the JButton that affects the background has changed,
@@ -258,12 +262,15 @@ public class JXButton extends JButton {
             b.borderPainted = false;
             b.contentAreaFilled = false;
             b.opaque = false;
-            b.paint(g);
-            b.opaque = op;
-            b.borderPainted = t1;
-            b.contentAreaFilled = t2;
-            b.setPainting(false);
-
+            try {
+                b.paint(g);
+            } finally {
+                // restore original values no matter what
+                b.opaque = op;
+                b.borderPainted = t1;
+                b.contentAreaFilled = t2;
+                b.setPainting(false);
+            }
         }
 
         //if any of the state of the JButton that affects the foreground has changed,
