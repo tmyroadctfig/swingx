@@ -1245,7 +1245,7 @@ public class MultiSplitLayout implements LayoutManager
 
   /**
    * Get the layout mode
-   * @param layoutMode
+   * @return current layout mode
    */
   public int getLayoutMode()
   {

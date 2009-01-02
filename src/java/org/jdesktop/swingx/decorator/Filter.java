@@ -86,7 +86,7 @@ public abstract class Filter {
     /**
      * TODO: PENDING: not tested!
      * 
-     * @param column column index in absolute model coordinates
+     * @param modelColumn column index in absolute model coordinates
      */
     public void setColumnIndex(int modelColumn) {
         if (getColumnIndex() == modelColumn) return;

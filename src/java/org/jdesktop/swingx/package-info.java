@@ -48,7 +48,7 @@
       <h3>Buttons and Labels</h3>
       <ul>
       <li> {@link org.jdesktop.swingx.JXButton}
-      <li> {@link org.jdesktop.swingx.JXHyperLink Hyperlink}
+      <li> {@link org.jdesktop.swingx.JXHyperlink Hyperlink}
       <li> {@link org.jdesktop.swingx.JXLabel}
       <li> {@link org.jdesktop.swingx.JXBusyLabel}
       <li> {@link org.jdesktop.swingx.JXRadioGroup}
@@ -113,7 +113,7 @@
       <li> {@link org.jdesktop.swingx.JXGraph}
       <li> Image containers {@link org.jdesktop.swingx.JXImageView ImageView} and
              {@link org.jdesktop.swingx.JXImagePanel ImagePanel} (PENDING JW: merge/remove one?)
-      <li> {@link org.jdesktop.swingx.JXMultThumbSlider MultiThumbSlider}
+      <li> {@link org.jdesktop.swingx.JXMultiThumbSlider MultiThumbSlider}
 
       </ul>
       

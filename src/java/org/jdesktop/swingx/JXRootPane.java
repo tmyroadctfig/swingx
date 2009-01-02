@@ -44,13 +44,10 @@ import javax.swing.KeyStroke;
 
 /**
  * Extends the JRootPane by supporting specific placements for a toolbar and a
- * status bar. If a status bar exists, then toolbars, menus and any
- * MessageSource components will be registered with the status bar.
+ * status bar. If a status bar exists, then toolbars, menus will be registered 
+ * with the status bar.
  * 
  * @see JXStatusBar
- * @see org.jdesktop.swingx.event.MessageEvent
- * @see org.jdesktop.swingx.event.MessageSource
- * @see org.jdesktop.swingx.event.ProgressSource
  * @author Mark Davidson
  */
 public class JXRootPane extends JRootPane {
@@ -401,10 +398,7 @@ public class JXRootPane extends JRootPane {
 //    private MouseMessagingHandler handler;
 
     /**
-     * Set the toolbar bar for this root pane. If the status bar exists, then
-     * all components will be registered with a
-     * <code>MouseMessagingHandler</code> so that mouse over messages will be
-     * sent to the status bar. If a tool bar is currently registered with this
+     * Set the toolbar bar for this root pane. If a tool bar is currently registered with this
      * {@code JXRootPane}, then it is removed prior to setting the new tool
      * bar. If an implementation needs to handle more than one tool bar, a
      * subclass will need to override the singleton logic used here or manually
@@ -412,7 +406,6 @@ public class JXRootPane extends JRootPane {
      * 
      * @param toolBar
      *            the toolbar to register
-     * @see MouseMessagingHandler
      */
     public void setToolBar(JToolBar toolBar) {
         JToolBar oldToolBar = getToolBar();
@@ -443,13 +436,10 @@ public class JXRootPane extends JRootPane {
     }
 
     /**
-     * Set the menu bar for this root pane. If the status bar exists, then all
-     * components will be registered with a <code>MouseMessagingHandler</code>
-     * so that mouse over messages will be sent to the status bar.
+     * Set the menu bar for this root pane.
      * 
      * @param menuBar
      *            the menu bar to register
-     * @see MouseMessagingHandler
      */
     @Override
     public void setJMenuBar(JMenuBar menuBar) {
@@ -476,7 +466,7 @@ public class JXRootPane extends JRootPane {
      * the root pane which consumes the activation event,
      * such as a <code>JTextPane</code>).
      * For default activation to work, the button must be an enabled
-     * descendent of the root pane when activation occurs.
+     * descendant of the root pane when activation occurs.
      * To remove a cancel button from this root pane, set this
      * property to <code>null</code>.
      *

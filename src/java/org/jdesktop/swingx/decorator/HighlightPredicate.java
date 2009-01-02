@@ -372,7 +372,7 @@ public interface HighlightPredicate {
             return false;
         }
         /**
-         * @return 
+         * @return all registered predicates
          */
         public HighlightPredicate[] getHighlightPredicates() {
             if (predicate.isEmpty()) return EMPTY_PREDICATE_ARRAY;
@@ -545,7 +545,7 @@ public interface HighlightPredicate {
         }
 
         /**
-         * @return
+         * @return array of numbers representing different depths
          */
         public Integer[] getDepths() {
             if (depthList.isEmpty()) return EMPTY_INTEGER_ARRAY;
@@ -640,7 +640,7 @@ public interface HighlightPredicate {
                     clazz.isAssignableFrom(adapter.getValue().getClass()) : false;
         }
         /**
-         * @return
+         * @return type of predicate compare class
          */
         public Class<?> getType() {
             return clazz;

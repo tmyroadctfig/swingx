@@ -501,8 +501,8 @@ public class JXCollapsiblePane extends JXPanel {
     }
     
     /**
-     * @see #setOrientation(Orientation)
-     * @return the current {@link Orientation}
+     * @return the current {@link Direction}.
+     * @see #setDirection(Direction)
      */
     public Direction getDirection() {
         return direction;

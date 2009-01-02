@@ -1,10 +1,26 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
-  <head>
-  </head>
-
-  <body>
-    Contains classes related to the JDNC actions architecture. The Actions 
+/*
+ * $Id$
+ *
+ * Copyright 2009 Sun Microsystems, Inc., 4150 Network Circle,
+ * Santa Clara, California 95054, U.S.A. All rights reserved.
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ */
+/**
+ *  Contains classes related to the JDNC actions architecture. The Actions 
     architecture maintains the set of user initiated commands (referred to as 
     <i>user actions</i>) in an application. These commands are represented as an 
     {@link javax.swing.Action} and have properties like name and icon. The 
@@ -83,9 +99,5 @@
 
     <hr>
     <address><a href="mailto:richard.bair@sun.com">Richard Bair</a></address>
-    <!-- Created: Thu Dec 11 15:15:06 PST 2003 -->
-    <!-- hhmts start -->
-Last modified: Tue Sep  7 11:10:01 PDT 2004
-<!-- hhmts end -->
-  </body>
-</html>
+    */
+package org.jdesktop.swingx.action;

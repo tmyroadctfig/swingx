@@ -631,7 +631,7 @@ public class JXMonthView extends JComponent {
      * probably be deprecated.
      * 
      * @param date Date to make visible, must not be null.
-     * @see #ensureDateVisible(long)
+     * @see #ensureDateVisible(Date)
      */
     public void ensureDateVisible(Date date) {
         if (date.before(firstDisplayedDay)) {
@@ -1296,7 +1296,7 @@ public class JXMonthView extends JComponent {
     /**
      * 
      * @param dayOfWeek
-     * @return
+     * @return String representation of day of week.
      */
     public String getDayOfTheWeek(int dayOfWeek) {
         return getDaysOfTheWeek()[dayOfWeek - 1];

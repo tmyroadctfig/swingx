@@ -126,7 +126,7 @@ public class SearchPredicate implements HighlightPredicate {
      * current adapter state which is view always, so could use view
      * only? 
      * 
-     * @param pattern the Pattern to test the cell value against
+     * @param regex the Pattern to test the cell value against
      * @param row the row index in view coordinates to limit the 
      *    highlight.
      * @param column the column in model coordinates 

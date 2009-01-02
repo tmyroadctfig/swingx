@@ -123,8 +123,7 @@ import org.jdesktop.swingx.plaf.LookAndFeelAddons;
  * <p><code>JXErrorPane</code> may also be configured with a "Report" button which allows
  * the user to send a bug report, typically through email. This is done through
  * the pluggable {@link org.jdesktop.swingx.error.ErrorReporter} class. Simply instantiate
- * {@link org.jdesktop.swingx.error.EmailErrorReporter} or some custom
- * subclass of <code>ErrorReporter</code> and pass the instance into the
+ * some custom subclass of <code>ErrorReporter</code> and pass the instance into the
  * {@link #setErrorReporter} method.</p>
  *
  * <p><code>JXErrorPane</code> can also be used for displaying fatal error messages to

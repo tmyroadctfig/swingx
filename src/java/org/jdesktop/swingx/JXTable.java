@@ -1475,7 +1475,7 @@ public class JXTable extends JTable
      * column configuration is applied.
      * 
      * @see #tableChanged(TableModelEvent)
-     * @see org.jdesktop.table.ColumnFactory
+     * @see org.jdesktop.swingx.table.ColumnFactory
      * 
      */
     @Override
@@ -3272,7 +3272,6 @@ public class JXTable extends JTable
      * PENDING: open up for subclasses again?.
      * 
      * @return the CompoundHighlighter assigned to the table.
-     * @see #setCompoundHighlighter(CompoundHighlighter)
      */
     protected CompoundHighlighter getCompoundHighlighter() {
         if (compoundHighlighter == null) {
@@ -3905,10 +3904,10 @@ public class JXTable extends JTable
         return SwingXUtilities.isDescendingFrom(permanent, this);
     }
 
-    /**
-     * @param focusOwner
-     * @return
-     */
+//    /**
+//     * @param focusOwner
+//     * @return
+//     */
 //    private boolean isDescending(Component focusOwner) {
 //        while (focusOwner !=  null) {
 //            if (focusOwner instanceof JPopupMenu) {

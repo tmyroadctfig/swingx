@@ -408,7 +408,6 @@ public class JXMultiSplitPane extends JPanel {
      * @param msl the MultiSplitLayout used by this pane
      * @param n the node being resized
      * @return the maximum size or null (by default) to ignore the maximum size.
-     * @see #getMaxNodeSize(MultiSplitLayout, Node)
      */
     protected Dimension getMinNodeSize( MultiSplitLayout msl, Node n ) {
       return msl.minimumNodeSize(n);

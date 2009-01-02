@@ -286,9 +286,6 @@ public class JXLabel extends JLabel {
         }
         View view = (View) getClientProperty(BasicHTML.propertyKey);
         if (view != null && view instanceof Renderer) {
-            Insets i = getInsets();
-            int dx = i.left + i.right;
-            Rectangle iconR = calculateIconRect();
             view.setSize(w - occupiedWidth, h);
         }
 

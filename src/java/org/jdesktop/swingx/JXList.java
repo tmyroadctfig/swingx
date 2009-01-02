@@ -1200,7 +1200,6 @@ public class JXList extends JList {
      * PENDING: open up for subclasses again?.
      * 
      * @return the CompoundHighlighter assigned to the table.
-     * @see #setCompoundHighlighter(CompoundHighlighter)
      */
     protected CompoundHighlighter getCompoundHighlighter() {
         if (compoundHighlighter == null) {
