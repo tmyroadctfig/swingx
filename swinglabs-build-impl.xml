@@ -237,10 +237,18 @@ ${build.branch} ${RELEASE_DSTAMP_LONG} ${projectname}</concat>
             <taglet name="org.jdesktop.swinglabs.javadoc.DemoTaglet">
                 <path path="${demo.taglet.jar}" />
             </taglet>
+            <tag name="status" description="Review status:"/>
+            <tag name="beaninfo" description="This class has associated bean info for instrumenting visual editors named " scope="methods"/>
+            <tag name="javabean.property" scope="methods"/>
+            <tag name="javabean.attribute" scope="types"/>
+            <tag name="javabean.class" scope="types"/>
+            <tag name="javabean.icons" scope="types"/>
+            <tag name="impl" scope="methods"/>
+            <tag name="Override" scope="methods"/>
+            <tag name="status.target" scope="types"/>
         </javadoc>
         <copy todir="${dist.javadoc.dir}" file="${demo.taglet.jar}" />
-        <copy todir="${dist.javadoc.dir}" file="dist/swingx.jar" />
-        <rename src="${dist.javadoc.dir}/swingx.jar" dest="${dist.javadoc.dir}/demos.jar" />
+        <copy tofile="${dist.javadoc.dir}/demos.jar" file="dist/swingx.jar" />
     </target>
 
     <target name="grok" depends="init,jar">
