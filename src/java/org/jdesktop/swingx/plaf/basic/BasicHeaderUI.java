@@ -203,9 +203,9 @@ public class BasicHeaderUI extends HeaderUI {
      * NOTE: this method is called before the children are created, so must not
      * try to access any of those!.
      * 
-     * @param the header to install.
+     * @param header the header to install.
      */
-    protected void installDefaults(JXHeader h) {
+    protected void installDefaults(JXHeader header) {
         gradientLightColor = UIManagerExt.getColor("JXHeader.startBackground");
         if (gradientLightColor == null) {
             // fallback to white
@@ -220,43 +220,43 @@ public class BasicHeaderUI extends HeaderUI {
             gradientDarkColor = UIManagerExt.getColor("control");
         }
 
-        if (isUIInstallable(h.getBackgroundPainter())) {
-            h.setBackgroundPainter(createBackgroundPainter());
+        if (isUIInstallable(header.getBackgroundPainter())) {
+            header.setBackgroundPainter(createBackgroundPainter());
         }
 
         // title properties
-        if (isUIInstallable(h.getTitleFont())) {
+        if (isUIInstallable(header.getTitleFont())) {
             Font titleFont = UIManager.getFont("JXHeader.titleFont");
             // fallback to label font
-            h.setTitleFont(titleFont != null ? titleFont : UIManager
+            header.setTitleFont(titleFont != null ? titleFont : UIManager
                     .getFont("Label.font"));
         }
-        if (isUIInstallable(h.getTitleForeground())) {
+        if (isUIInstallable(header.getTitleForeground())) {
             Color titleForeground = UIManagerExt
                     .getColor("JXHeader.titleForeground");
             // fallback to label foreground
-            h.setTitleForeground(titleForeground != null ? titleForeground
+            header.setTitleForeground(titleForeground != null ? titleForeground
                     : UIManagerExt.getColor("Label.foreground"));
         }
 
         // description properties
-        if (isUIInstallable(h.getDescriptionFont())) {
+        if (isUIInstallable(header.getDescriptionFont())) {
             Font descFont = UIManager.getFont("JXHeader.descriptionFont");
             // fallback to label font
-            h.setDescriptionFont(descFont != null ? descFont : UIManager
+            header.setDescriptionFont(descFont != null ? descFont : UIManager
                     .getFont("Label.font"));
         }
-        if (isUIInstallable(h.getDescriptionForeground())) {
+        if (isUIInstallable(header.getDescriptionForeground())) {
             Color descForeground = UIManagerExt
                     .getColor("JXHeader.descriptionForeground");
             // fallback to label foreground
-            h.setDescriptionForeground(descForeground != null ? descForeground
+            header.setDescriptionForeground(descForeground != null ? descForeground
                     : UIManagerExt.getColor("Label.foreground"));
         }
         
         // icon label properties
-        if (isUIInstallable(h.getIcon())) {
-            h.setIcon(UIManager.getIcon("Header.defaultIcon"));
+        if (isUIInstallable(header.getIcon())) {
+            header.setIcon(UIManager.getIcon("Header.defaultIcon"));
         }
     }
     
@@ -273,27 +273,27 @@ public class BasicHeaderUI extends HeaderUI {
      * Creates, configures, adds contained components.
      * PRE: header's default properties must be set before calling this.
      * 
-     * @param the header to install the components into.
+     * @param header the header to install the components into.
      */
-    protected void installComponents(JXHeader h) {
+    protected void installComponents(JXHeader header) {
         titleLabel = new JLabel();
         descriptionPane = new DescriptionPane();
         imagePanel = new JLabel();
-        installComponentDefaults(h);
-        h.setLayout(new GridBagLayout());
-        resetLayout(h);
+        installComponentDefaults(header);
+        header.setLayout(new GridBagLayout());
+        resetLayout(header);
     }
 
     /**
      * Unconfigures, removes and nulls contained components.
      * 
-     * @param the header to install the components into.
+     * @param header the header to install the components into.
      */
-    protected void uninstallComponents(JXHeader h) {
-        uninstallComponentDefaults(h);
-        h.remove(titleLabel);
-        h.remove(descriptionPane);
-        h.remove(imagePanel);
+    protected void uninstallComponents(JXHeader header) {
+        uninstallComponentDefaults(header);
+        header.remove(titleLabel);
+        header.remove(descriptionPane);
+        header.remove(imagePanel);
         titleLabel = null;
         descriptionPane = null;
         imagePanel = null;
@@ -302,21 +302,21 @@ public class BasicHeaderUI extends HeaderUI {
     /**
      * Configures the component default properties from the given header.
      * 
-     * @param the header to install the components into.
+     * @param header the header to install the components into.
      */
-    protected void installComponentDefaults(JXHeader h) {
+    protected void installComponentDefaults(JXHeader header) {
         // JW: force a not UIResource for properties which have ui default values
         // like color, font, ??
-        titleLabel.setFont(getAsNotUIResource(h.getTitleFont()));
-        titleLabel.setForeground(getAsNotUIResource(h.getTitleForeground()));
-        titleLabel.setText(h.getTitle());
-        descriptionPane.setFont(getAsNotUIResource(h.getDescriptionFont()));
-        descriptionPane.setForeground(getAsNotUIResource(h.getDescriptionForeground()));
+        titleLabel.setFont(getAsNotUIResource(header.getTitleFont()));
+        titleLabel.setForeground(getAsNotUIResource(header.getTitleForeground()));
+        titleLabel.setText(header.getTitle());
+        descriptionPane.setFont(getAsNotUIResource(header.getDescriptionFont()));
+        descriptionPane.setForeground(getAsNotUIResource(header.getDescriptionForeground()));
         descriptionPane.setOpaque(false);
-        descriptionPane.setText(h.getDescription());
+        descriptionPane.setText(header.getDescription());
         descriptionPane.setLineWrap(true);
 
-        imagePanel.setIcon(h.getIcon());
+        imagePanel.setIcon(header.getIcon());
 
     }
     
@@ -362,9 +362,9 @@ public class BasicHeaderUI extends HeaderUI {
     /**
      * Uninstalls component defaults. This implementation does nothing.
      * 
-     * @param the header to uninstall from.
+     * @param header the header to uninstall from.
      */
-    protected void uninstallComponentDefaults(JXHeader h) {
+    protected void uninstallComponentDefaults(JXHeader header) {
     }
 
 

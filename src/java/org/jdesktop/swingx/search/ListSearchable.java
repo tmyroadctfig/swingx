@@ -144,7 +144,7 @@ public class ListSearchable extends AbstractSearchable {
         }
 
         /**
-         * @return
+         * @return all registered highlighters
          */
         @Override
         protected Highlighter[] getHighlighters() {

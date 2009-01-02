@@ -41,7 +41,7 @@ public interface CalendarRenderingHandler {
      * 
      * @param monthView the JXMonthView to render onto
      * @param calendar the cell value
-     * @param dayState the DayState of the cell
+     * @param state the DayState of the cell
      * @return a component configured for rendering the given cell
      */
     public JComponent prepareRenderingComponent(JXMonthView monthView,

@@ -219,13 +219,13 @@ public class CompoundPainter<T> extends AbstractPainter<T> {
      * <p>This <code>CompoundPainter</code> is dirty if it, or (optionally)
      * any of its children, are dirty. If the super implementation returns
      * <code>true</code>, we return <code>true</code>.  Otherwise, if
-     * {@link #isCheckForDirtyChildPainters()} is <code>true</code>, we iterate
+     * {@link #isCheckingDirtyChildPainters()} is <code>true</code>, we iterate
      * over all child <code>Painter</code>s and query them to see
      * if they are dirty. If so, then <code>true</code> is returned. 
      * Otherwise, we return <code>false</code>.</p>
      *
-     * @see #isCheckingDirtyChildPainters()
      * @inheritDoc
+     * {@see #isCheckingDirtyChildPainters()}
      */
     @Override
     protected boolean isDirty() {

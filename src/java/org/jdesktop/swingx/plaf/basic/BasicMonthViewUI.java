@@ -1527,7 +1527,7 @@ public class BasicMonthViewUI extends MonthViewUI {
     }
 
     /**
-     * @return
+     * @return true if the month view can be zoomed, false otherwise
      */
     protected boolean isZoomable() {
         return monthView.isZoomable();
@@ -1650,20 +1650,20 @@ public class BasicMonthViewUI extends MonthViewUI {
      * @param calendar the calendar representing the the month to paint, must
      *   not be null
      */
-    protected void paintWeekHeader(Graphics g, Calendar cal) {
+    protected void paintWeekHeader(Graphics g, Calendar calendar) {
         if (!monthView.isShowingWeekNumber())
             return;
-        paintWeekOfYearSeparator(g, cal);
+        paintWeekOfYearSeparator(g, calendar);
     
-        Calendar calendar = (Calendar) cal.clone();
-        int weeks = getWeeks(calendar);
-        calendar.setTime(cal.getTime());
+        Calendar clonedCal = (Calendar) calendar.clone();
+        int weeks = getWeeks(clonedCal);
+        clonedCal.setTime(calendar.getTime());
         for (int week = 0; week <= weeks; week++) {
-            Rectangle dayBox = getDayBoundsInMonth(cal.getTime(), week, WEEK_HEADER_COLUMN);
-            paintDayOfMonth(g, dayBox, calendar, CalendarState.WEEK_OF_YEAR);
+            Rectangle dayBox = getDayBoundsInMonth(calendar.getTime(), week, WEEK_HEADER_COLUMN);
+            paintDayOfMonth(g, dayBox, clonedCal, CalendarState.WEEK_OF_YEAR);
 //            JComponent comp = renderingHandler.prepareRenderingComponent(monthView, calendar, CalendarState.WEEK_OF_YEAR);
 //            renderComponentAt(g, comp, dayBox);
-            calendar.add(Calendar.WEEK_OF_YEAR, 1);
+            clonedCal.add(Calendar.WEEK_OF_YEAR, 1);
         }
     }
 
@@ -1674,37 +1674,37 @@ public class BasicMonthViewUI extends MonthViewUI {
      * @param calendar the calendar representing the the month to paint, must
      *   not be null
      */
-    protected void paintDays(Graphics g, Calendar cal) {
-        Calendar calendar = (Calendar) cal.clone();
-        CalendarUtils.startOfMonth(calendar);
-        Date startOfMonth = calendar.getTime();
-        CalendarUtils.endOfMonth(calendar);
-        Date endOfMonth = calendar.getTime();
+    protected void paintDays(Graphics g, Calendar calendar) {
+        Calendar clonedCal = (Calendar) calendar.clone();
+        CalendarUtils.startOfMonth(clonedCal);
+        Date startOfMonth = clonedCal.getTime();
+        CalendarUtils.endOfMonth(clonedCal);
+        Date endOfMonth = clonedCal.getTime();
         // reset the clone
-        calendar.setTime(cal.getTime());
+        clonedCal.setTime(calendar.getTime());
         // adjust to start of week
-        calendar.setTime(cal.getTime());
-        CalendarUtils.startOfWeek(calendar);
+        clonedCal.setTime(calendar.getTime());
+        CalendarUtils.startOfWeek(clonedCal);
         for (int week = 0; week < WEEKS_IN_MONTH; week++) {
             for (int day = 0; day < 7; day++) {
                 CalendarState state = null;
-                if (calendar.getTime().before(startOfMonth)) {
+                if (clonedCal.getTime().before(startOfMonth)) {
                     if (monthView.isShowingLeadingDays()) {
                         state = CalendarState.LEADING;
                     }
-                } else if (calendar.getTime().after(endOfMonth)) {
+                } else if (clonedCal.getTime().after(endOfMonth)) {
                     if (monthView.isShowingTrailingDays()) {
                         state = CalendarState.TRAILING;
                     }
 
                 } else {
-                    state = isToday(calendar.getTime()) ? CalendarState.TODAY : CalendarState.IN_MONTH;
+                    state = isToday(clonedCal.getTime()) ? CalendarState.TODAY : CalendarState.IN_MONTH;
                 }
                 if (state != null) {
                     Rectangle bounds = getDayBoundsInMonth(startOfMonth, week, day);
-                    paintDayOfMonth(g, bounds, calendar, state);
+                    paintDayOfMonth(g, bounds, clonedCal, state);
                 }
-                calendar.add(Calendar.DAY_OF_MONTH, 1);
+                clonedCal.add(Calendar.DAY_OF_MONTH, 1);
             }
         }
     }
@@ -2753,7 +2753,6 @@ public class BasicMonthViewUI extends MonthViewUI {
      * @param x x location of month
      * @param y y location of month
      * @param width width of month
-     * @param height height of month
      * @param calendar the calendar specifying the the first day of the month to
      *        paint, must not be null
      * @deprecated no longer used in paint/layout with renderer.
@@ -2992,7 +2991,7 @@ public class BasicMonthViewUI extends MonthViewUI {
      * @deprecated no longer used in paint/layout with renderer.
      */
     @Deprecated
-    protected void paintDayOfTheWeekBackground(Graphics g, int x, int y, int width, int height, Calendar cal) {
+    protected void paintDayOfTheWeekBackground(Graphics g, int x, int y, int width, int height, Calendar calendar) {
         int boxPaddingX = monthView.getBoxPaddingX();
         g.setColor(monthView.getForeground());
         g.drawLine(x + boxPaddingX, y + height - 1, x + width - boxPaddingX, y + height - 1);
@@ -3256,7 +3255,7 @@ public class BasicMonthViewUI extends MonthViewUI {
      * @param width width of bounding box for the day
      * @param height height of bounding box for the day
      * @param cal the calendar specifying the day to paint, must not be null
-     * @see  org.jdesktop.swingx.JXMonthView#isSelectedDate
+     * @see  org.jdesktop.swingx.JXMonthView#isSelected(Date)
      * @see  #isToday
      * 
      * @deprecated no longer used in paint/layout with renderer.

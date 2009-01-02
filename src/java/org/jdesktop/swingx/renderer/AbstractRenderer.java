@@ -45,16 +45,16 @@ public abstract class AbstractRenderer
     /**
      * Returns the ComponentProvider used by this renderer.
      * 
-     * @return the ComponentProvider used by this renderer.
+     * @return the ComponentProvider used by this renderer
      */
     public ComponentProvider getComponentProvider() {
         return componentController;
     }
 
     /**
-     * The default ComponentProvider to use if no special .
+     * The default ComponentProvider to use if no special.
      * 
-     * @return
+     * @return the default <code>ComponentProvider</code>
      */
     protected abstract ComponentProvider createDefaultComponentProvider();
     

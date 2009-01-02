@@ -306,7 +306,7 @@ public class TableSearchable extends AbstractSearchable {
         }
 
         /**
-         * @return
+         * @return all registered highlighters
          */
         @Override
         protected Highlighter[] getHighlighters() {

@@ -156,7 +156,7 @@ import org.jdesktop.swingx.decorator.Highlighter;
         }
 
         /**
-         * @return
+         * @return all registered highlighters
          */
         @Override
         protected Highlighter[] getHighlighters() {

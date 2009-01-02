@@ -373,7 +373,7 @@ public abstract class AbstractSearchable implements Searchable {
     protected abstract void removeHighlighter(Highlighter searchHighlighter);
 
     /**
-     * @return
+     * @return all registered highlighters
      */
     protected abstract Highlighter[] getHighlighters();
 

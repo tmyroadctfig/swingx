@@ -141,7 +141,7 @@ public class NeonBorderEffect extends AbstractAreaEffect {
     
     /**
      * 
-     * @return 
+     * @return color in the center of the effect
      */
     public Color getCenterColor() {
         return centerColor;
@@ -149,7 +149,8 @@ public class NeonBorderEffect extends AbstractAreaEffect {
     
     /**
      * 
-     * @param centerColor 
+     * @param centerColor color in the center of the effect.
+     * @see #getCenterColor()
      */
     public void setCenterColor(Color centerColor) {
         this.centerColor = centerColor;
@@ -157,7 +158,8 @@ public class NeonBorderEffect extends AbstractAreaEffect {
     
     /**
      * 
-     * @return 
+     * @return position of the border relative to the edge of painter covered area.
+     * @see BorderPosition
      */
     public BorderPosition getBorderPosition() {
         return borderPosition;
@@ -165,7 +167,9 @@ public class NeonBorderEffect extends AbstractAreaEffect {
     
     /**
      * 
-     * @param borderPosition 
+     * @param borderPosition position of the border relative to the edge of painter covered area.
+     * @see #getBorderPosition()
+     * @see BorderPosition
      */
     public void setBorderPosition(BorderPosition borderPosition) {
         this.borderPosition = borderPosition;

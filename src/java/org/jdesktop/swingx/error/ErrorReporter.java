@@ -24,8 +24,8 @@ package org.jdesktop.swingx.error;
 /**
  * <p>ErrorReporter is used by {@link org.jdesktop.swingx.JXErrorPane} to
  * implement a pluggable error reporting API. For example, a
- * <code>JXErrorPane</code> may use an {@link EmailErrorReporter}, or a 
- * {@link LogErrorReporter}, or perhaps even an
+ * <code>JXErrorPane</code> may use an <code>EmailErrorReporter</code>, or a 
+ * {@code LogErrorReporter}, or perhaps even an
  * <code>RSSErrorReporter</code>.</p>
  *
  * @status REVIEWED
