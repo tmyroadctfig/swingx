@@ -56,7 +56,7 @@ import org.jdesktop.swingx.plaf.LookAndFeelAddons;
  * fixed, but could be brittle. Won't do more about it, Mustang will take care once
  * SwingLabs is switched over to 1.6.
  * 
- * @targeted_status: jdk15-glue
+ * @status.target jdk15-glue
  * 
  * @author Amy Fowler
  * @author Ramesh Gupta

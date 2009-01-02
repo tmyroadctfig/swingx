@@ -102,7 +102,7 @@ import org.jdesktop.swingx.renderer.AbstractRenderer;
  * 
  * @see TableColumnModelExt
  * @see ColumnFactory
- * @see org.jdesktop.swingx.UIDependent
+ * @see org.jdesktop.swingx.decorator.UIDependent
  * @see javax.swing.JComponent#putClientProperty
  */
 public class TableColumnExt extends TableColumn implements UIDependent {
@@ -266,7 +266,6 @@ public class TableColumnExt extends TableColumn implements UIDependent {
      * PENDING: open up for subclasses again?.
      * 
      * @return the CompoundHighlighter assigned to the table.
-     * @see #setCompoundHighlighter(CompoundHighlighter)
      */
     protected CompoundHighlighter getCompoundHighlighter() {
         if (compoundHighlighter == null) {
@@ -615,7 +614,7 @@ public class TableColumnExt extends TableColumn implements UIDependent {
       * Copies all clientProperties of this <code>TableColumnExt</code>
       * to the target column.
       * 
-      * @param copy the target column.
+      * @param original the target column.
       */
      protected void copyClientPropertiesFrom(TableColumnExt original) {
         if (original.clientProperties == null) return;

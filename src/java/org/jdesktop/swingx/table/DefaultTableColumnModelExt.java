@@ -303,7 +303,7 @@ public class DefaultTableColumnModelExt extends DefaultTableColumnModel
     
     /**
      * Exposed for testing only - don't use! Will be removed again!
-     * @return super's listenerlist
+     * @return super's listener list
      */
     protected EventListenerList getEventListenerList() {
         return listenerList;
@@ -322,7 +322,7 @@ public class DefaultTableColumnModelExt extends DefaultTableColumnModel
 
     /**
      * Notifies <code>TableColumnModelExtListener</code>s about property
-     * changes of contained columns.  The event instance
+     * changes of contained columns. The event instance
      * is the original as fired by the <code>TableColumn</code>.
      * @param  evt the event received
      * @see EventListenerList
@@ -346,7 +346,7 @@ public class DefaultTableColumnModelExt extends DefaultTableColumnModel
      * {@inheritDoc} <p>
      * 
      * 
-     * Overridden to install enhanced notification of listeners of type 
+     * Overridden to install enhanced notification of listeners of type.
      * TableColumnModelListenerExt about property changes of contained columns.
      *  
      */
@@ -361,7 +361,7 @@ public class DefaultTableColumnModelExt extends DefaultTableColumnModel
     /**
      * {@inheritDoc} <p>
      * 
-     * Overridden to uninstall enhanced notification of listeners of type 
+     * Overridden to uninstall enhanced notification of listeners of type.
      * TableColumnModelListenerExt about property changes of contained columns.
      */
     @Override
@@ -373,7 +373,7 @@ public class DefaultTableColumnModelExt extends DefaultTableColumnModel
     }
 
     /**
-     * @return
+     * @return array of all registered listeners 
      */
     public TableColumnModelExtListener[] getTableColumnModelExtListeners() {
         return listenerList.getListeners(TableColumnModelExtListener.class);
