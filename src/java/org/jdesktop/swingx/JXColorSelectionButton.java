@@ -141,11 +141,11 @@ public class JXColorSelectionButton extends JButton {
             
             try {
                 g2.setRenderingHint(KEY_ANTIALIASING, VALUE_ANTIALIAS_ON);
-                g.setColor(Color.LIGHT_GRAY);
+                g2.setColor(Color.LIGHT_GRAY);
                 final int DIAM = Math.min(getWidth(), getHeight());
                 final int inset = 3;
                 g2.fill(new Ellipse2D.Float(inset, inset, DIAM-2*inset, DIAM-2*inset));
-                g.setColor(FILL_COLOR);
+                g2.setColor(FILL_COLOR);
                 final int border = 1;
                 g2.fill(new Ellipse2D.Float(inset+border, inset+border, DIAM-2*inset-2*border, DIAM-2*inset-2*border));
             } finally {
@@ -160,13 +160,13 @@ public class JXColorSelectionButton extends JButton {
 //     * @param args not used
 //     */
 //    public static void main(String[] args) {
-//        JFrame frame = new JFrame("Color Button Test");
-//        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-//        JPanel panel = new JPanel();
-//        JComponent btn = new JXColorSelectionButton();
+//        javax.swing.JFrame frame = new javax.swing.JFrame("Color Button Test");
+//        frame.setDefaultCloseOperation(javax.swing.JFrame.EXIT_ON_CLOSE);
+//        javax.swing.JPanel panel = new javax.swing.JPanel();
+//        javax.swing.JComponent btn = new JXColorSelectionButton();
 //        btn.setEnabled(true);
-//        panel.add(btn).setEnabled(false);
-//        panel.add(new JLabel("ColorSelectionButton test"));
+//        panel.add(btn);
+//        panel.add(new javax.swing.JLabel("ColorSelectionButton test"));
 //        
 //        frame.add(panel);
 //        frame.pack();
