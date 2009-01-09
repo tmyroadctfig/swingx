@@ -26,6 +26,9 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -69,7 +72,7 @@ public class JXDatePickerIssues extends InteractiveTestCase {
         try {
 //            test.runInteractiveTests();
 //          test.runInteractiveTests("interactive.*UpdateUI.*");
-          test.runInteractiveTests("interactive.*Editor.*");
+          test.runInteractiveTests("interactive.*Format.*");
 //          test.runInteractiveTests("interactive.*Visible.*");
           
         } catch (Exception e) {
@@ -81,6 +84,34 @@ public class JXDatePickerIssues extends InteractiveTestCase {
 
     private Calendar calendar;
 
+    /**
+     * Issue #??-swingx: first week of year in year-week format invalid?
+     * 
+     * Same problem for formattedTextField.
+     */
+    public void interactiveYearWeekFormat() {
+        JComponent box = Box.createVerticalBox();
+        calendar.set(2009, Calendar.JANUARY, 1);
+        JXDatePicker picker = new JXDatePicker(calendar.getTime());
+        SimpleDateFormat format = new SimpleDateFormat("yyww");
+        format.setLenient(false);
+        picker.setFormats(format);
+        picker.getMonthView().setShowingWeekNumber(true);
+        box.add(picker);
+        JFormattedTextField field = new JFormattedTextField(format);
+        field.setValue(picker.getDate());
+        box.add(field);
+        PropertyChangeListener l = new PropertyChangeListener() {
+
+            public void propertyChange(PropertyChangeEvent evt) {
+                LOG.info(evt.getPropertyName() + evt.getSource().getClass().getSimpleName() + evt.getNewValue());
+                
+            }};
+        field.addPropertyChangeListener(l);
+        picker.addPropertyChangeListener(l);
+        showInFrame(box, "yearweek format");
+    }
+    
     /**
      * Issue #955-swingx: editor should have same visual props as picker
      */
