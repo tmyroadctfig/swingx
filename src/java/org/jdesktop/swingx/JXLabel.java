@@ -44,6 +44,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.List;
+//import java.util.logging.Level;
+//import java.util.logging.Logger;
 
 import javax.swing.Icon;
 import javax.swing.JLabel;
@@ -121,6 +123,27 @@ import org.jdesktop.swingx.painter.Painter;
  */
 public class JXLabel extends JLabel {
     
+    /**
+     * Text alignment enums. Controls alignment of the text when line wrapping is enabled.
+     */
+    public enum TextAlignment implements IValue {
+        LEFT(StyleConstants.ALIGN_LEFT), CENTER(StyleConstants.ALIGN_CENTER), RIGHT(StyleConstants.ALIGN_RIGHT), JUSTIFY(StyleConstants.ALIGN_JUSTIFIED);
+        
+        private int value;
+        private TextAlignment(int val) {
+            value = val;
+        }
+        
+        public int getValue() {
+            return value;
+        }
+
+    }
+    
+    protected interface IValue {
+        int getValue();
+    }
+
     // textOrientation value declarations...
     public static final double NORMAL = 0;
 
@@ -150,6 +173,11 @@ public class JXLabel extends JLabel {
     private int occupiedWidth;
 
     private static final String oldRendererKey = "was" + BasicHTML.propertyKey;
+    
+//    private static final Logger log = Logger.getAnonymousLogger();
+//    static {
+//        log.setLevel(Level.FINEST);
+//    }
 
     /**
      * Create a new JXLabel. This has the same semantics as creating a new JLabel.
@@ -238,7 +266,7 @@ public class JXLabel extends JLabel {
     }
 
     /**
-     * Helper method for initializing multiline support.
+     * Helper method for initializing multi line support.
      */
     private void initLineWrapSupport() {
         addPropertyChangeListener(new MultiLineSupport());
@@ -619,9 +647,30 @@ public class JXLabel extends JLabel {
 
     private boolean paintBorderInsets = true;
 
-        private int maxLineSpan = -1;
+    private int maxLineSpan = -1;
 
     public boolean painted;
+
+    private TextAlignment textAlignment = TextAlignment.LEFT;
+
+    /**
+     * Gets current text wrapping style.
+     * @return
+     */
+    public TextAlignment getTextAlignment() {
+        return textAlignment;
+    }
+
+    /**
+     * Sets style of wrapping the text.
+     * @see TextAlignment for accepted values.
+     * @param alignment
+     */
+    public void setTextAlignment(TextAlignment alignment) {
+        TextAlignment old = getTextAlignment();
+        this.textAlignment = alignment;
+        firePropertyChange("textAlignment", old, getTextAlignment());
+    }
 
     /**
      * Returns true if the background painter should paint where the border is
@@ -893,7 +942,7 @@ public class JXLabel extends JLabel {
                 src.dontIgnoreRepaint = true;
             }
             if (src.isLineWrap()) {
-                if ("font".equals(name) || "foreground".equals(name) || "maxLineSpan".equals(name)) {
+                if ("font".equals(name) || "foreground".equals(name) || "maxLineSpan".equals(name)|| "textAlignment".equals(name)) {
                     if (evt.getOldValue() != null && !isHTML(src.getText())) {
                         updateRenderer(src);
                     }
@@ -935,7 +984,7 @@ public class JXLabel extends JLabel {
 
         public static View createView(JXLabel c) {
             BasicEditorKit kit = getFactory();
-            Document doc = kit.createDefaultDocument(c.getFont(), c.getForeground());
+            Document doc = kit.createDefaultDocument(c.getFont(), c.getForeground(), c.getTextAlignment());
             Reader r = new StringReader(c.getText() == null ? "" : c.getText());
             try {
                 kit.read(r, doc, 0);
@@ -970,8 +1019,8 @@ public class JXLabel extends JLabel {
         }
 
         private static class BasicEditorKit extends StyledEditorKit {
-            public Document createDefaultDocument(Font defaultFont, Color foreground) {
-                BasicDocument doc = new BasicDocument(defaultFont, foreground);
+            public Document createDefaultDocument(Font defaultFont, Color foreground, TextAlignment textAlignment) {
+                BasicDocument doc = new BasicDocument(defaultFont, foreground, textAlignment);
                 doc.setAsynchronousLoadPriority(Integer.MAX_VALUE);
                 return doc;
             }
@@ -1006,8 +1055,13 @@ public class JXLabel extends JLabel {
     }
 
     static class BasicDocument extends DefaultStyledDocument {
-        BasicDocument(Font defaultFont, Color foreground) {
+        BasicDocument(Font defaultFont, Color foreground, TextAlignment textAlignment) {
             setFontAndColor(defaultFont, foreground);
+
+            MutableAttributeSet attr = new SimpleAttributeSet();
+            StyleConstants.setAlignment(attr, textAlignment.getValue());
+            getStyle("default").addAttributes(attr);
+
         }
 
         private void setFontAndColor(Font font, Color fg) {
@@ -1042,13 +1096,15 @@ public class JXLabel extends JLabel {
 
             // TODO: add rest of the style stuff
             // ... if anyone ever want's this (stuff like justification, etc.)
-            // attr = new SimpleAttributeSet();
-            // StyleConstants.setLeftIndent(attr,5f);
-            // getStyle("default").addAttributes(attr);
+//            attr = new SimpleAttributeSet();
+//            StyleConstants.setLeftIndent(attr,5f);
+//            getStyle("default").addAttributes(attr);
+//
+//
+//            attr = new SimpleAttributeSet();
+//            StyleConstants.setRightIndent(attr,20f);
+//            getStyle("default").addAttributes(attr);
 
-            // MutableAttributeSet attr = new SimpleAttributeSet();
-            // StyleConstants.setAlignment(attr, StyleConstants.ALIGN_JUSTIFIED);
-            // getStyle("default").addAttributes(attr);
 
         }
     }
@@ -1085,7 +1141,7 @@ public class JXLabel extends JLabel {
             //setSize(c.getMaxLineSpan() > -1 ? c.getMaxLineSpan() : view.getPreferredSpan(X_AXIS), view.getPreferredSpan(Y_AXIS));
             setSize(c.getMaxLineSpan() > -1 ? c.getMaxLineSpan() : w, host.getVisibleRect().height);
         }
-
+        
         @Override
         protected void updateLayout(ElementChange ec, DocumentEvent e, Shape a) {
             if ( (a != null)) {
@@ -1122,6 +1178,7 @@ public class JXLabel extends JLabel {
          */
         public void paint(Graphics g, Shape allocation) {
             Rectangle alloc = allocation.getBounds();
+            //log.fine("aloc:" + alloc + "::" + host.getVisibleRect() + "::" + host.getBounds());
             //view.setSize(alloc.width, alloc.height);
             //this.width = alloc.width;
             //this.height = alloc.height;
@@ -1889,7 +1946,7 @@ public class JXLabel extends JLabel {
         }
     }
 
-    protected int getOccupiedWidth() {
+   protected int getOccupiedWidth() {
         return occupiedWidth;
     }
 }
