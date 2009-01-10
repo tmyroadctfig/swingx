@@ -20,25 +20,38 @@
  */
 package org.jdesktop.swingx;
 
+import java.awt.BasicStroke;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.image.BufferedImageOp;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.jdesktop.swingx.painter.Painter;
+import org.jdesktop.swingx.JXLabel.TextAlignment;
 import org.jdesktop.swingx.image.FastBlurFilter;
 import org.jdesktop.swingx.painter.AbstractPainter;
+import org.jdesktop.swingx.painter.CompoundPainter;
 import org.jdesktop.swingx.painter.MattePainter;
 import org.jdesktop.swingx.util.PaintUtils;
 
@@ -47,6 +60,11 @@ import org.jdesktop.swingx.util.PaintUtils;
  * painter, and a custom background painter.
  */
 public class JXLabelDemo {
+    private static final Logger log = Logger.getAnonymousLogger();
+    static {
+        log.setLevel(Level.FINEST);
+    }
+
     public static void main(String[] args) {
         final JXFrame f = new JXFrame("JXLabel Demo", true);
 
@@ -56,6 +74,7 @@ public class JXLabelDemo {
                 "</p>");
         try {
             label.setIcon(new ImageIcon(ImageIO.read(JXLabelDemo.class.getResourceAsStream("/org/jdesktop/swingx/renderer/resources/exit.png"))));
+            System.out.println("Icon:" + label.getIcon().getIconWidth() + ", " + label.getIconTextGap());
         } catch (IOException e1) {
             // ignore
         }
@@ -68,7 +87,18 @@ public class JXLabelDemo {
         final AbstractPainter ap = (AbstractPainter)standardPainter;
         
         MattePainter bkground = new MattePainter(PaintUtils.BLUE_EXPERIENCE, true);
-        label.setBackgroundPainter(bkground);
+        CompoundPainter cp = new CompoundPainter(bkground, new AbstractPainter() {
+
+            @Override
+            protected void doPaint(Graphics2D g, Object object, int width, int height) {
+                System.out.println("painter area: " + width + ", " + height);
+                g.setStroke(new BasicStroke(10));
+                g.setColor(Color.RED);
+                g.drawLine(0, 220, 20, 220);
+                g.setColor(Color.GREEN);
+                g.drawLine(20, 220, 498, 220);
+            }});
+        label.setBackgroundPainter(cp);
         
         final JSlider slider = new JSlider();
         slider.getModel().setMinimum(0);
@@ -98,13 +128,27 @@ public class JXLabelDemo {
                 label.setLineWrap(lineWrap.isSelected());
                 f.repaint();
             }});
+
+        Object[] items = new Object[] {"Left", "Center", "Right","Justified"};
+        final List itemList = new ArrayList();
+        itemList.addAll(Arrays.asList(items));
+        JComboBox combo = new JComboBox(items);
+        combo.addItemListener(new ItemListener() {
+            public void itemStateChanged(ItemEvent e) {
+                if (e.getStateChange() == ItemEvent.DESELECTED) {
+                    return;
+                }
+                System.out.println(itemList.indexOf(e.getItem()) + "" + TextAlignment.values()[itemList.indexOf(e.getItem())]);
+                label.setTextAlignment(TextAlignment.values()[itemList.indexOf(e.getItem())]);
+            }});
+        control.add(combo);
         control.add(new JButton(new AbstractAction("Rotate text") {
             
             public void actionPerformed(ActionEvent e) {
                 label.setTextRotation((label.getTextRotation() + Math.PI/16 ) % (2* Math.PI));
                 f.repaint();
             }}));
-        //f.setSize(450, 300);
+        //f.setSize(500, 500);
         f.pack();
         f.setVisible(true);
     }
