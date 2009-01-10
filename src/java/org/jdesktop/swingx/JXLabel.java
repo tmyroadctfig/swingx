@@ -46,6 +46,7 @@ import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JViewport;
+import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentEvent.ElementChange;
@@ -931,7 +932,7 @@ public class JXLabel extends JLabel {
                 src.dontIgnoreRepaint = true;
             }
             if (src.isLineWrap()) {
-                if ("font".equals(name) || "foreground".equals(name) || "maxLineSpan".equals(name)|| "textAlignment".equals(name)) {
+                if ("font".equals(name) || "foreground".equals(name) || "maxLineSpan".equals(name) || "textAlignment".equals(name) || "icon".equals(name) || "iconTextGap".equals(name)) {
                     if (evt.getOldValue() != null && !isHTML(src.getText())) {
                         updateRenderer(src);
                     }
@@ -973,7 +974,11 @@ public class JXLabel extends JLabel {
 
         public static View createView(JXLabel c) {
             BasicEditorKit kit = getFactory();
-            Document doc = kit.createDefaultDocument(c.getFont(), c.getForeground(), c.getTextAlignment());
+            float rightIndent = 0;
+            if (c.getIcon() != null && c.getHorizontalTextPosition() != SwingConstants.CENTER) {
+                rightIndent = c.getIcon().getIconWidth() + c.getIconTextGap(); 
+            }
+            Document doc = kit.createDefaultDocument(c.getFont(), c.getForeground(), c.getTextAlignment(), rightIndent);
             Reader r = new StringReader(c.getText() == null ? "" : c.getText());
             try {
                 kit.read(r, doc, 0);
@@ -1008,8 +1013,8 @@ public class JXLabel extends JLabel {
         }
 
         private static class BasicEditorKit extends StyledEditorKit {
-            public Document createDefaultDocument(Font defaultFont, Color foreground, TextAlignment textAlignment) {
-                BasicDocument doc = new BasicDocument(defaultFont, foreground, textAlignment);
+            public Document createDefaultDocument(Font defaultFont, Color foreground, TextAlignment textAlignment, float rightIndent) {
+                BasicDocument doc = new BasicDocument(defaultFont, foreground, textAlignment, rightIndent);
                 doc.setAsynchronousLoadPriority(Integer.MAX_VALUE);
                 return doc;
             }
@@ -1044,13 +1049,16 @@ public class JXLabel extends JLabel {
     }
 
     static class BasicDocument extends DefaultStyledDocument {
-        BasicDocument(Font defaultFont, Color foreground, TextAlignment textAlignment) {
+        BasicDocument(Font defaultFont, Color foreground, TextAlignment textAlignment, float rightIndent) {
             setFontAndColor(defaultFont, foreground);
 
             MutableAttributeSet attr = new SimpleAttributeSet();
             StyleConstants.setAlignment(attr, textAlignment.getValue());
             getStyle("default").addAttributes(attr);
 
+            attr = new SimpleAttributeSet();
+            StyleConstants.setRightIndent(attr, rightIndent);
+            getStyle("default").addAttributes(attr);
         }
 
         private void setFontAndColor(Font font, Color fg) {
@@ -1082,18 +1090,6 @@ public class JXLabel extends JLabel {
             MutableAttributeSet attr = new SimpleAttributeSet();
             StyleConstants.setSpaceAbove(attr, 0f);
             getStyle("default").addAttributes(attr);
-
-            // TODO: add rest of the style stuff
-            // ... if anyone ever want's this (stuff like justification, etc.)
-//            attr = new SimpleAttributeSet();
-//            StyleConstants.setLeftIndent(attr,5f);
-//            getStyle("default").addAttributes(attr);
-//
-//
-//            attr = new SimpleAttributeSet();
-//            StyleConstants.setRightIndent(attr,20f);
-//            getStyle("default").addAttributes(attr);
-
 
         }
     }
