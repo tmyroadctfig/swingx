@@ -20,11 +20,8 @@
  */
 package org.jdesktop.swingx;
 
-import java.awt.BasicStroke;
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
@@ -51,7 +48,6 @@ import org.jdesktop.swingx.painter.Painter;
 import org.jdesktop.swingx.JXLabel.TextAlignment;
 import org.jdesktop.swingx.image.FastBlurFilter;
 import org.jdesktop.swingx.painter.AbstractPainter;
-import org.jdesktop.swingx.painter.CompoundPainter;
 import org.jdesktop.swingx.painter.MattePainter;
 import org.jdesktop.swingx.util.PaintUtils;
 
@@ -74,7 +70,7 @@ public class JXLabelDemo {
                 "</p>");
         try {
             label.setIcon(new ImageIcon(ImageIO.read(JXLabelDemo.class.getResourceAsStream("/org/jdesktop/swingx/renderer/resources/exit.png"))));
-            System.out.println("Icon:" + label.getIcon().getIconWidth() + ", " + label.getIconTextGap());
+            log.fine("Icon:" + label.getIcon().getIconWidth() + ", " + label.getIconTextGap());
         } catch (IOException e1) {
             // ignore
         }
@@ -87,18 +83,7 @@ public class JXLabelDemo {
         final AbstractPainter ap = (AbstractPainter)standardPainter;
         
         MattePainter bkground = new MattePainter(PaintUtils.BLUE_EXPERIENCE, true);
-        CompoundPainter cp = new CompoundPainter(bkground, new AbstractPainter() {
-
-            @Override
-            protected void doPaint(Graphics2D g, Object object, int width, int height) {
-                System.out.println("painter area: " + width + ", " + height);
-                g.setStroke(new BasicStroke(10));
-                g.setColor(Color.RED);
-                g.drawLine(0, 220, 20, 220);
-                g.setColor(Color.GREEN);
-                g.drawLine(20, 220, 498, 220);
-            }});
-        label.setBackgroundPainter(cp);
+        label.setBackgroundPainter(bkground);
         
         final JSlider slider = new JSlider();
         slider.getModel().setMinimum(0);
@@ -138,7 +123,7 @@ public class JXLabelDemo {
                 if (e.getStateChange() == ItemEvent.DESELECTED) {
                     return;
                 }
-                System.out.println(itemList.indexOf(e.getItem()) + "" + TextAlignment.values()[itemList.indexOf(e.getItem())]);
+                log.fine(itemList.indexOf(e.getItem()) + "" + TextAlignment.values()[itemList.indexOf(e.getItem())]);
                 label.setTextAlignment(TextAlignment.values()[itemList.indexOf(e.getItem())]);
             }});
         control.add(combo);
