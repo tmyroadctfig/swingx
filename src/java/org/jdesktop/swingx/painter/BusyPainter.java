@@ -213,7 +213,7 @@ public class BusyPainter<T> extends AbstractPainter<T> {
      * Gets value of centering hint. If true, shape will be positioned in the center of painted area.
      * @return Whether shape will be centered over painting area or not.
      */
-    private boolean isPaintCentered() {
+    public boolean isPaintCentered() {
         return this.paintCentered;
     }
 
@@ -468,7 +468,9 @@ public class BusyPainter<T> extends AbstractPainter<T> {
      * @param frame Current frame.
      */
     public void setFrame(int frame) {
+        int old = getFrame();
         this.frame = frame;
+        firePropertyChange("frame", old, getFrame());
     }
 
     /**
@@ -615,7 +617,9 @@ public class BusyPainter<T> extends AbstractPainter<T> {
      * @param paintCentered Centering hint.
      */
     public void setPaintCentered(boolean paintCentered) {
+        boolean old = isPaintCentered();
         this.paintCentered = paintCentered;
+        firePropertyChange("paintCentered", old, isPaintCentered());
     }
 
 }

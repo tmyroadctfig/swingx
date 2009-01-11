@@ -9,12 +9,19 @@
 
 package org.jdesktop.test;
 
+import java.awt.Color;
+import java.awt.Rectangle;
+import java.awt.Shape;
+import java.awt.geom.Ellipse2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.logging.Logger;
+
+import org.jdesktop.beans.AbstractBean;
+import org.jdesktop.swingx.painter.BusyPainter;
 
 import junit.framework.Assert;
 
@@ -160,6 +167,54 @@ public final class TestUtils extends Assert {
             assertEquals(originalValue, rpt.getLastOldValue());
             //assert that the expected value is the new value of the event
             assertEquals(expected, rpt.getLastNewValue());
+        }
+    }
+
+    public static void assertPCEFiring(AbstractBean bean) {
+        // add property listener
+        PropertyChangeReport report = new PropertyChangeReport();
+        bean.addPropertyChangeListener(report);
+
+        //fire all props
+        Method[] mets = bean.getClass().getDeclaredMethods();
+        for (Method met: mets) {
+            String name = met.getName();
+            if (name.startsWith("set") && name.length() > 3 && Character.isUpperCase(name.charAt(3)) && met.getParameterTypes().length == 1) {
+                Class c = met.getParameterTypes()[0];
+                Object newVal;
+                Object val;
+                try {
+                    String getterPrefix = boolean.class.equals(c) || Boolean.class.equals(c) ? "is" : "get";
+                    val = bean.getClass().getMethod(getterPrefix + name.substring(3)).invoke(bean);
+
+                    if (c.equals(int.class) || c.equals(Integer.class)) {
+                        newVal = (Integer) val + 1;
+                    } else if (c.equals(Color.class)) {
+                        newVal = Color.RED.equals(val) ? Color.RED.darker() : Color.RED;
+                    } else if (c.equals(Boolean.class) || c.equals(boolean.class)) {
+                        newVal = !(Boolean) val;
+                    } else if (c.equals(Double.class) || c.equals(double.class)) {
+                        newVal = (Double) val + .5d;
+                    } else if (c.equals(Shape.class)) {
+                        newVal = val instanceof Rectangle ? new Ellipse2D.Double(2,2,5,5) : new Rectangle(0,0,50,50);
+                    } else if (c.isEnum()) {
+                        Object[] enums = c.getEnumConstants();
+                        newVal = val.equals(enums[0]) ? enums[1] : enums[0];
+                    } else {
+                        System.err.println("Handling for type " + met.getParameterTypes()[0] + " not handled yet ... if you got this message, please implement the support for objects used by bean you are testing.");
+                        newVal = null;
+                        continue;
+                    }
+                    //the test itself
+                    met.invoke(bean, newVal);
+                    // verify the result
+                    TestUtils.assertPropertyChangeEvent(report, Character.toLowerCase(name.charAt(3)) + name.substring(4), val, newVal);
+                    // clear test report
+                    report.clear();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 }

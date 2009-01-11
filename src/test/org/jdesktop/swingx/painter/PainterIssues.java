@@ -24,7 +24,12 @@ package org.jdesktop.swingx.painter;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
+import java.awt.Shape;
 import java.awt.event.ActionEvent;
+import java.awt.geom.Ellipse2D;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 import javax.swing.Action;
 import javax.swing.BorderFactory;
@@ -54,29 +59,25 @@ import org.jdesktop.test.TestUtils;
 public class PainterIssues extends InteractiveTestCase {
     public static void main(String args[]) {
 //      setSystemLF(true);
-      PainterIssues test = new PainterIssues();
-      try {
-        test.runInteractiveTests();
-//         test.runInteractiveTests(".*Label.*");
-      } catch (Exception e) {
-          System.err.println("exception when executing interactive tests:");
-          e.printStackTrace();
-      }
-  }
+        PainterIssues test = new PainterIssues();
+        try {
+            test.runInteractiveTests();
+//            test.runInteractiveTests(".*Label.*");
+        } catch (Exception e) {
+            System.err.println("exception when executing interactive tests:");
+            e.printStackTrace();
+        }
+    }
 
     /**
-     * Issue #861-swingx: must fire PCE on property change.
      * Here: issue examplified for frame property, need to check others as well.
      */
     public void testBusyPainterChangeNotification() {
-        BusyPainter painter = new BusyPainter();
-        int frame = painter.getFrame();
-        PropertyChangeReport report = new PropertyChangeReport();
-        painter.addPropertyChangeListener(report);
-        painter.setFrame(frame + 1);
-        TestUtils.assertPropertyChangeEvent(report, "frame", frame, frame + 1);
+        // create class
+        ImagePainter painter = new ImagePainter();
+        TestUtils.assertPCEFiring(painter);
     }
-    
+
     /**
      * Issue #??-swingx: default foreground painter not guaranteed after change.
      *
