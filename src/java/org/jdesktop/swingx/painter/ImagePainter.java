@@ -297,6 +297,11 @@ public class ImagePainter<T> extends AbstractAreaPainter<T> {
     }
     
     
+    public boolean isScaleToFit() {
+        return scaleToFit;
+    }
+
+
     private double imageScale = 1.0;
 
     private Logger log = Logger.getLogger(ImagePainter.class.getName());
