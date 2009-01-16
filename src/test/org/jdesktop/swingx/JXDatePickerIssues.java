@@ -66,13 +66,13 @@ public class JXDatePickerIssues extends InteractiveTestCase {
     private static final Logger LOG = Logger.getLogger(JXDatePickerIssues.class
             .getName());
     public static void main(String[] args) {
-//        setSystemLF(true);
+        setSystemLF(true);
 //        Trace14.keyboardFocusManager(true);
         JXDatePickerIssues  test = new JXDatePickerIssues();
         try {
 //            test.runInteractiveTests();
 //          test.runInteractiveTests("interactive.*UpdateUI.*");
-          test.runInteractiveTests("interactive.*Format.*");
+          test.runInteractiveTests("interactive.*Null.*");
 //          test.runInteractiveTests("interactive.*Visible.*");
           
         } catch (Exception e) {
@@ -238,7 +238,7 @@ public class JXDatePickerIssues extends InteractiveTestCase {
         comp.add(new JLabel("setDate(null)"));
         JXDatePicker picker = new JXDatePicker();
         comp.add(picker);
-        comp.add(new JLabel("initial -1"));
+        comp.add(new JTextField("initial -1"));
         showInFrame(comp, "null date");
     }
 

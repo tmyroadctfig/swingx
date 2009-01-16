@@ -32,7 +32,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.lang.reflect.Method;
 import java.util.Hashtable;
 import java.util.Vector;
 import java.util.logging.Logger;
@@ -173,15 +172,9 @@ import org.jdesktop.swingx.tree.DefaultXTreeCellEditor;
  * 
  */
 public class JXTree extends JTree {
+    @SuppressWarnings("unused")
     private static final Logger LOG = Logger.getLogger(JXTree.class.getName());
     
-    /** outdated stuff around string conversion from model. */
-    @Deprecated
-    private Method conversionMethod = null;
-    @Deprecated
-    private final static Class[] methodSignature = new Class[] {Object.class};
-    @Deprecated
-    private final static Object[] methodArgs = new Object[] {null};
     
     /** Empty int array used in getSelectedRows(). */
     private static final int[] EMPTY_INT_ARRAY = new int[0];
@@ -337,10 +330,6 @@ public class JXTree extends JTree {
      * This must be called from each constructor.
      */
     private void init() {
-        // To support delegation of convertValueToText() to the model...
-        // JW: need to set again (is done in setModel, but at call
-        // in super constructor the field is not yet valid)
-        conversionMethod = getValueConversionMethod(getModel());
         // Issue #233-swingx: default editor not bidi-compliant 
         // manually install an enhanced TreeCellEditor which 
         // behaves slightly better in RtoL orientation.
@@ -1524,88 +1513,7 @@ public class JXTree extends JTree {
      */
     @Override
     public void setModel(TreeModel newModel) {
-        // To support delegation of convertValueToText() to the model...
-        // JW: method needs to be set before calling super
-        // otherwise there are size caching problems
-        conversionMethod = getValueConversionMethod(newModel);
         super.setModel(newModel);
-    }
-
-    /**
-     * Tries to find and return a method for Object --> to String conversion on the
-     * model by reflection. Looks for a signature:
-     * 
-     * <pre> <code>
-     *   String convertValueToText(Object);
-     * </code> </pre>
-     * 
-     * 
-     * 
-     * PENDING JW:
-     * <ul> 
-     * <li>check - does this work with restricted permissions?
-     * <li> widened access for testing - do test!
-     * <li> remove - no longer recommended.
-     * </ul>
-     * @param model the model to detect the method
-     * @return the <code> Method </code> or null if the model has no method with
-     *   the expected signature 
-     *   
-     * @deprecated no longer supported, client code should use {@link #getStringAt(int)} or
-     *    {@link #getStringAt(TreePath)}   
-     */
-    @Deprecated
-    protected Method getValueConversionMethod(TreeModel model) {
-        try {
-            return model == null ? null : model.getClass().getMethod(
-                    "convertValueToText", methodSignature);
-        } catch (NoSuchMethodException ex) {
-            LOG.finer("ex " + ex);
-            LOG.finer("no conversionMethod in " + model.getClass());
-        }
-        return null;
-    }
-
-    /**
-     * {@inheritDoc} <p>
-     * 
-     * Overridden to use the TreeModel's String conversion method instead of super.
-     * 
-     * PENDING JW: remove - that's an oldish approach no longer recommended, superceded
-     * by this Tree's getStringAt methods. But note: the call direction is inverted. The
-     * ol' way was to call this method from the DefaultTreeCellRenderer (which was a bad 
-     * idea to start with). The new way is to give the renderer complete control and expose 
-     * the renderer's conversion via the getStringAt(..) api to arbitrary client code.
-     * 
-     * @see #getValueConversionMethod(TreeModel)
-     * @see #getStringAt(int)
-     * @see #getStringAt(TreePath)
-     * 
-     * @deprecated the implementation will change to call super as soon as the reflexive 
-     *    call to the conversion method will be dropped. So deprecate now to draw attention
-     *    to the pending drop.
-     * 
-     */
-    @Deprecated
-    @Override
-    public String convertValueToText(Object value, boolean selected,
-            boolean expanded, boolean leaf, int row, boolean hasFocus) {
-        // Delegate to model, if possible. Otherwise fall back to superclass...
-        if (value != null) {
-            if (conversionMethod == null) {
-                return value.toString();
-            } else {
-                try {
-                    methodArgs[0] = value;
-                    return (String) conversionMethod.invoke(getModel(),
-                            methodArgs);
-                } catch (Exception ex) {
-                    LOG.finer("ex " + ex);
-                    LOG.finer("can't invoke " + conversionMethod);
-                }
-            }
-        }
-        return "";
     }
 
 

@@ -229,11 +229,7 @@ public class JXMonthView extends JComponent {
      * localizable day column headers. Default typically installed by the uidelegate.
      */
     private String[] _daysOfTheWeek;
-    /**
-     * Insets used in determining the rectangle for the month string
-     * background.
-     */
-    private boolean antialiased;
+
     protected Insets _monthStringInsets = new Insets(0, 0, 0, 0);
     private int boxPaddingX;
     private int boxPaddingY;
@@ -1800,134 +1796,6 @@ public class JXMonthView extends JComponent {
 
 
 //--- deprecated code - NOTE: these methods will be removed soon! 
-
-    /**
-     * Returns true if anti-aliased text is enabled for this component, false
-     * otherwise.
-     *
-     * @return boolean <code>true</code> if anti-aliased text is enabled,
-     * <code>false</code> otherwise.
-     * 
-     * @deprecated will be removed without replacement to align with core Swing 
-     * which api for setting per-instance antialiased property. No longer used
-     * by the ui delegate.
-     */
-    @Deprecated
-    public boolean isAntialiased() {
-        return antialiased;
-    }
-
-    /**
-     * Turns on/off anti-aliased text for this component.
-     *
-     * @param antiAlias <code>true</code> for anti-aliased text,
-     * <code>false</code> to turn it off.
-     * 
-     * @deprecated will be removed without replacement to align with core Swing 
-     * which api for setting per-instance antialiased property. 
-     */
-    @Deprecated
-    public void setAntialiased(boolean antiAlias) {
-        if (this.antialiased == antiAlias) {
-            return;
-        }
-        this.antialiased = antiAlias;
-        firePropertyChange("antialiased", !this.antialiased, this.antialiased);
-    }
-
-    /**
-     * Returns the selected background color.
-     *
-     * @return the selected background color.
-     * 
-     * @deprecated use {@link #getSelectionBackground()} renamed for 
-     *   cross-component consistency.
-     */
-    @Deprecated
-    public Color getSelectedBackground() {
-        return getSelectionBackground();
-    }
-
-    /**
-     * Sets the selected background color to <code>c</code>.  The default color
-     * is <code>138, 173, 209 (Blue-ish)</code>
-     *
-     * @param c Selected background.
-     * 
-     * @deprecated use {@link #setSelectionBackground(Color)} renamed for
-     *   cross-component consistency.
-     */
-    @Deprecated
-    public void setSelectedBackground(Color c) {
-        setSelectionBackground(c);
-    }
-
-
-    /**
-     * Returns the preferred number of columns to paint calendars in. 
-     * <p>
-     * PENDING JW: rename to a "full" name preferredColumnCount
-     * @return int Columns of calendars.
-     * 
-     * @deprecated use {@link #getPreferredColumnCount()}
-     */
-    @Deprecated
-    public int getPreferredCols() {
-        return minCalCols;
-    }
-
-    /**
-     * The preferred number of columns to paint calendars.
-     * <p>
-     * PENDING JW: rename to a "full" name preferredColumnCount
-     *   and make bound property
-     * @param cols The number of columns of calendars.
-     * 
-     * @deprecated use {@link #setPreferredColumnCount(int)}
-     */
-    @Deprecated
-    public void setPreferredCols(int cols) {
-        if (cols <= 0) {
-            return;
-        }
-        minCalCols = cols;
-        revalidate();
-        repaint();
-    }
-
-    /**
-     * Returns the preferred number of rows to paint calendars in.
-     * <p>
-     * PENDING JW: rename to a "full" name preferredRowCount
-     *  or maybe visibleRowCount to be consistent with JXTable/JXList 
-     * @return int Rows of calendars.
-     * 
-     * @deprecated use {@link #getPreferredRowCount()}
-     */
-    @Deprecated
-    public int getPreferredRows() {
-        return minCalRows;
-    }
-
-    /**
-     * Sets the preferred number of rows to paint calendars.
-     * <p>
-     * PENDING JW: rename to a "full" name preferredRowCount
-     *   and make bound property
-     *
-     * @param rows The number of rows of calendars.
-     * 
-     * @deprecated use {@link #setPreferredRowCount(int)}
-     */
-    @Deprecated
-    public void setPreferredRows(int rows) {
-        if (rows <= 0) {
-            return;
-        }
-        minCalRows = rows;
-        revalidate();
-        repaint();
-    }
 
 
     /**

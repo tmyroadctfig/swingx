@@ -102,9 +102,9 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
 //           test.runInteractiveTests("interactive.*DnD.*");
 //             test.runInteractiveTests("interactive.*Compare.*");
 //             test.runInteractiveTests("interactive.*RowHeightCompare.*");
-//             test.runInteractiveTests("interactive.*RToL.*");
+             test.runInteractiveTests("interactive.*RToL.*");
 //             test.runInteractiveTests("interactive.*Insert.*");
-             test.runInteractiveTests("interactive.*Selection.*");
+//             test.runInteractiveTests("interactive.*Edit.*");
         } catch (Exception ex) {
 
         }

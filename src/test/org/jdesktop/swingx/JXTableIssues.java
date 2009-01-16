@@ -29,10 +29,12 @@ import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Vector;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
@@ -78,6 +80,7 @@ import org.jdesktop.test.CellEditorReport;
 import org.jdesktop.test.PropertyChangeReport;
 import org.jdesktop.test.SerializableSupport;
 import org.jdesktop.test.TestUtils;
+import org.junit.Test;
 
 /**
  * Test to exposed known issues of <code>JXTable</code>.
@@ -99,14 +102,14 @@ public class JXTableIssues extends InteractiveTestCase {
           test.runInteractiveTests();
 //            test.runInteractiveTests("interactive.*Scroll.*");
          //   test.runInteractiveTests("interactive.*Render.*");
-//            test.runInteractiveTests("interactive.*Sort.*");
+            test.runInteractiveTests("interactive.*ExtendOnRemoveAdd.*");
 //            test.runInteractiveTests("interactive.*Repaint.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
         } 
     }
-    
+
     /**
      * Quick check for a forum report:
      * getValueAt called on init for each cell (even the invisible).

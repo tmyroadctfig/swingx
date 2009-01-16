@@ -84,18 +84,7 @@ public class JXMonthViewIssues extends InteractiveTestCase {
     protected Date yesterday;
     // the calendar to use, its date is initialized with the today-field in setUpCalendar
     protected Calendar calendar;
-
-    
-    public void interactiveMonthViewAntialised() {
-        final JXMonthView monthView = new JXMonthView();
-        monthView.setAntialiased(true);
-        JComponent comp = Box.createHorizontalBox();
-        comp.add(monthView);
-        comp.add(new JXMonthView());
-        JXFrame frame = wrapInFrame(comp, "antialiased left (1.5)");
-        show(frame);
-    }
-   
+  
     public void interactiveMonthViewAntialisedPaint() {
         JXMonthView custom =  new JXMonthView() {
             

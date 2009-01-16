@@ -35,7 +35,7 @@ import org.jdesktop.swingx.plaf.basic.BasicHyperlinkUI;
  * Extends BasicHyperlinkUI and paints the text with an offset when mouse
  * pressed.<br>
  * 
- * @deprecated pre-0.9.4
+ * @deprecated pre-0.9.4 PENDING JW: why is this deprecated? What to use instead?
  */
 @Deprecated
 public class WindowsHyperlinkUI extends BasicHyperlinkUI {

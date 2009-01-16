@@ -45,16 +45,6 @@ import org.jdesktop.swingx.decorator.SearchPredicate;
  * @author Jeanette Winzenburg
  */
 public abstract class AbstractSearchable implements Searchable {
-    /**
-     * a constant representing not-found state.
-     * 
-     * PENDING JW: this is not entirely safe as it's not immutable.
-     * Not used any longer? Deprecate for safety, waiting for complaints :-)
-     * 
-     * @deprecated no longer used (because a SearchResult is not immutable)
-     */
-    @Deprecated
-    public static final SearchResult NO_MATCH = new SearchResult();
 
     /**
      * stores the result of the previous search.

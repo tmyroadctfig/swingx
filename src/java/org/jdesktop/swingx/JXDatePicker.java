@@ -147,9 +147,7 @@ public class JXDatePicker extends JComponent {
 
     public static final String EDITOR = "editor";
     public static final String MONTH_VIEW = "monthView";
-    /** @deprecated pre-0.9.4 no longer used - all "millis" are replaced by date */ 
-    @Deprecated
-    public static final String DATE_IN_MILLIS = "dateInMillis";
+
     public static final String LINK_PANEL = "linkPanel";
 
     /** action command used for commit actionEvent. */

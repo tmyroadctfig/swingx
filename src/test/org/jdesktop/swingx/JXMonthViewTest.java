@@ -473,32 +473,6 @@ public class JXMonthViewTest extends MockObjectTestCase {
     }
 
 
-    /**
-     * Issue #751-swingx: property naming violations
-     */
-    @Test
-    public void testAntialiasedNotification() {
-        JXMonthView monthView = new JXMonthView();
-        PropertyChangeReport report = new PropertyChangeReport();
-        monthView.addPropertyChangeListener(report);
-        boolean showing = monthView.isAntialiased();
-        monthView.setAntialiased(!showing);
-        TestUtils.assertPropertyChangeEvent(report, "antialiased", showing, !showing);
-    }
-
-    /**
-     * Issue #751-swingx: property naming violations
-     */
-    @Test
-    public void testAntialiasedNoNotification() {
-        JXMonthView monthView = new JXMonthView();
-        PropertyChangeReport report = new PropertyChangeReport();
-        monthView.addPropertyChangeListener(report);
-        boolean showing = monthView.isAntialiased();
-        monthView.setAntialiased(showing);
-        assertEquals(0, report.getEventCount("antialiased"));
-    }
-
 
     /**
      * Issue #751-swingx: property naming violations
@@ -1221,7 +1195,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
         }
         // get a reference width so we can simulate a one-month resize
         JXMonthView compare = new JXMonthView();
-        compare.setPreferredCols(2);
+        compare.setPreferredColumnCount(2);
         JXMonthView monthView = new JXMonthView();
         JXFrame frame = new JXFrame();
         frame.add(monthView);
