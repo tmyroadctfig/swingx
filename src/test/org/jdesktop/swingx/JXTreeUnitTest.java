@@ -530,6 +530,8 @@ public class JXTreeUnitTest extends InteractiveTestCase {
         ComponentAdapter adapter = list.getComponentAdapter();
         assertEquals(0, adapter.column);
         assertEquals(0, adapter.row);
+        assertTrue(adapter.isHierarchical());
+        
         adapter.row = 1;
         // corrupt adapter
         adapter.column = 1;

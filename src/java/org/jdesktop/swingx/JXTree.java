@@ -152,7 +152,7 @@ import org.jdesktop.swingx.tree.DefaultXTreeCellEditor;
  * <h2>Miscellaneous</h2>
  * 
  * <ul>
- * <li> Improved usabilty for editing: guarantees that the tree is the
+ * <li> Improved usability for editing: guarantees that the tree is the
  * focusOwner if editing terminated by user gesture and guards against data
  * corruption if focusLost while editing
  * <li> Access methods for selection colors, for consistency with JXTable,
@@ -1666,6 +1666,14 @@ public class JXTree extends JTree {
             return tree.getPathForRow(row).getPathCount() - 1;
         }
         
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public boolean isHierarchical() {
+            return true;
+        }
+
         /**
          * {@inheritDoc}
          */
