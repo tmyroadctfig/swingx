@@ -22,6 +22,7 @@
 package org.jdesktop.swingx;
 
 import java.awt.AlphaComposite;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Composite;
 import java.awt.Dimension;
@@ -34,8 +35,11 @@ import java.awt.Rectangle;
 import javax.swing.JPanel;
 import javax.swing.RepaintManager;
 import javax.swing.Scrollable;
+import javax.swing.plaf.UIResource;
 
+import org.jdesktop.swingx.painter.MattePainter;
 import org.jdesktop.swingx.painter.Painter;
+import org.jdesktop.swingx.plaf.PainterUIResource;
 
 /**
  * A simple JPanel extension that adds translucency support.
@@ -225,14 +229,41 @@ public class JXPanel extends JPanel implements Scrollable {
     public void setScrollableTracksViewportWidth(boolean scrollableTracksViewportWidth) {
         this.scrollableTracksViewportWidth = scrollableTracksViewportWidth;
     }
-    
+
+    /**
+     * Sets the background color for this component by
+     * 
+     * @param bg
+     *            the desired background <code>Color</code>
+     * @see java.swing.JComponent#getBackground
+     * @see #setOpaque
+     * 
+    * @beaninfo
+    *    preferred: true
+    *        bound: true
+    *    attribute: visualUpdate true
+    *  description: The background color of the component.
+     */
+    @Override
+    public void setBackground(Color bg) {
+        super.setBackground(bg);
+        
+        if (canInstallBackgroundUIResourceAsPainter(bg)) {
+            setBackgroundPainter(new PainterUIResource(new MattePainter<JXPanel>(bg)));
+        } else {
+            setBackgroundPainter(new MattePainter<JXPanel>(bg));
+        }
+    }
+
+    private boolean canInstallBackgroundUIResourceAsPainter(Color bg) {
+        Painter<?> p = getBackgroundPainter();
+        
+        return bg instanceof UIResource && (p == null || p instanceof UIResource);
+    }
     
     /**
      * Sets a Painter to use to paint the background of this JXPanel.
-     * By default a JXPanel
-     * already has a single painter installed which draws the normal background for a panel
-     * according to the current Look and Feel. Calling
-     * <CODE>setBackgroundPainter</CODE> will replace that existing painter.
+     * 
      * @param p the new painter
      * @see #getBackgroundPainter()
      */
