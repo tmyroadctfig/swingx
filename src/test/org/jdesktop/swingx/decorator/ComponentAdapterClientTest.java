@@ -22,6 +22,7 @@
 package org.jdesktop.swingx.decorator;
 
 import java.awt.Color;
+import java.util.logging.Logger;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
@@ -39,11 +40,11 @@ import org.jdesktop.swingx.renderer.DefaultTreeRenderer;
 import org.jdesktop.swingx.renderer.StringValue;
 import org.jdesktop.swingx.renderer.StringValues;
 import org.jdesktop.test.AncientSwingTeam;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.junit.Test;
-import org.junit.Before;
-import org.junit.After;
 
 
 /**
@@ -56,6 +57,9 @@ import org.junit.After;
 @RunWith(JUnit4.class)
 public class ComponentAdapterClientTest extends InteractiveTestCase {
 
+    @SuppressWarnings("unused")
+    private static final Logger LOG = Logger
+            .getLogger(ComponentAdapterClientTest.class.getName());
     public static void main(String[] args) {
         ComponentAdapterClientTest test = new ComponentAdapterClientTest();
         try {
@@ -133,6 +137,36 @@ public class ComponentAdapterClientTest extends InteractiveTestCase {
     
 //--------------- unit tests
 
+    /**
+     * Issue #979-swingx: JXTreeTable broken string rep of hierarchical column
+     * 
+     * here: test search
+     */
+    @Test
+    public void testTreeTableGetStringUsedInSearchClippedTextRenderer() {
+        JXTreeTableT table = new JXTreeTableT(AncientSwingTeam.createNamedColorTreeTableModel());
+        String text = table.getValueAt(2, 0).toString();
+        int matchRow = table.getSearchable().search(text);
+        assertEquals(2, matchRow);
+    }
+
+
+    /**
+     * Issue #979-swingx: JXTreeTable broken string rep of hierarchical column
+     * 
+     * here: test highlight
+     */
+    @Test
+    public void testTreeTableGetStringUsedInPatternPredicateClippedTextRenderer() {
+        JXTreeTableT table = new JXTreeTableT(AncientSwingTeam.createNamedColorTreeTableModel());
+        int matchRow = 2;
+        int matchColumn = 0;
+        String text = table.getValueAt(matchRow, matchColumn).toString();
+        LOG.info(text);
+        ComponentAdapter adapter = table.getComponentAdapter(matchRow, matchColumn);
+        HighlightPredicate predicate = new PatternPredicate(text, matchColumn, PatternPredicate.ALL);
+        assertTrue(predicate.isHighlighted(null, adapter));
+    }
 
     /**
      * Issue #821-swingx: JXTreeTable broken string rep of hierarchical column

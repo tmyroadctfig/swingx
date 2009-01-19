@@ -22,12 +22,12 @@
 package org.jdesktop.swingx.decorator;
 
 import java.awt.Color;
+import java.util.logging.Logger;
 
 import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXTree;
 import org.jdesktop.swingx.JXTreeTable;
-import org.jdesktop.swingx.renderer.DefaultTreeRenderer;
 import org.jdesktop.swingx.renderer.StringValue;
 import org.jdesktop.swingx.renderer.StringValues;
 import org.jdesktop.swingx.treetable.TreeTableModel;
@@ -45,6 +45,9 @@ import org.jdesktop.test.AncientSwingTeam;
  */
 public class ComponentAdapterIssues extends InteractiveTestCase {
 
+    @SuppressWarnings("unused")
+    private static final Logger LOG = Logger
+            .getLogger(ComponentAdapterIssues.class.getName());
     public static void main(String[] args) {
         ComponentAdapterIssues test = new ComponentAdapterIssues();
         try {
@@ -67,9 +70,9 @@ public class ComponentAdapterIssues extends InteractiveTestCase {
         TreeTableModel model = AncientSwingTeam.createNamedColorTreeTableModel();
         JXTreeTable treeTable = new JXTreeTable(model);
         treeTable.setRootVisible(true);
-        treeTable.setTreeCellRenderer(new DefaultTreeRenderer(sv));
+//        treeTable.setTreeCellRenderer(new DefaultTreeRenderer(sv));
         JXTree tree =  new JXTree(model);
-        tree.setCellRenderer(new DefaultTreeRenderer(sv));
+//        tree.setCellRenderer(new DefaultTreeRenderer(sv));
         HighlightPredicate predicate = new PatternPredicate("R/G/B: -2", 0, PatternPredicate.ALL);
         ColorHighlighter hl = new ColorHighlighter(predicate, null, Color.RED);
         treeTable.addHighlighter(hl);

@@ -98,6 +98,18 @@ public class AncientSwingTeam extends AbstractTableModel {
             public Object getUserObject() {
                 return getValueAt(0);
             }
+
+            @Override
+            public boolean isEditable(int column) {
+                return true;
+            }
+
+            @Override
+            public String toString() {
+                if (getUserObject() == null) return "";
+                return getUserObject().toString();
+            }
+            
             
             
         };
