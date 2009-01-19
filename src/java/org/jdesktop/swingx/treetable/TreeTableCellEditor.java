@@ -117,6 +117,22 @@ public class TreeTableCellEditor extends DefaultCellEditor {
         TreeCellRenderer tcr = tree.getCellRenderer();
         Component treeComponent = tcr.getTreeCellRendererComponent(tree, node,
                 isSelected, expanded, leaf, row, false);
+        // start patch from armond
+//        int boundsWidth = bounds.width;
+//        if (treeComponent instanceof JLabel) {
+//            JLabel label = (JLabel) treeComponent;
+// 
+//            Icon icon = label.getIcon();
+//            if (icon != null) {
+//                if( table.getComponentOrientation().isLeftToRight())
+//                    offset += icon.getIconWidth() + label.getIconTextGap();
+// 
+//                boundsWidth -= icon.getIconWidth();
+//            }
+//        }
+//        ((TreeTableTextField) getComponent()).init(offset, column, boundsWidth, table);
+
+        // start old version
         if ((treeComponent instanceof JLabel)
         // adjust the offset to account for the icon - at least
                 // in LToR orientation. RToL is hard to tackle anyway...
@@ -178,9 +194,12 @@ public class TreeTableCellEditor extends DefaultCellEditor {
         @Override
         public void reshape(int x, int y, int width, int height) {
             // Allows precise positioning of text field in the tree cell.
+            // following three lines didn't work out
             //Border border = this.getBorder(); // get this text field's border
             //Insets insets = border == null ? null : border.getBorderInsets(this);
             //int newOffset = offset - (insets == null ? 0 : insets.left);
+            
+            // start of old version
             if(table.getComponentOrientation().isLeftToRight()) {
                 int newOffset = offset - getInsets().left;
                 // this is LtR version
@@ -193,6 +212,19 @@ public class TreeTableCellEditor extends DefaultCellEditor {
                 width = width - (width - newOffset - this.width);
                 super.reshape(pos, y, width, height);
             }
+            
+            // start of patch from armond
+//            if(table.getComponentOrientation().isLeftToRight()) {
+//                int newOffset = offset - getInsets().left;
+//                // this is LtR version
+//                super.reshape(x + newOffset, y, width - newOffset, height);
+//            } else {
+//                // right to left version
+//                int newWidth = width + offset + this.width;
+// 
+//                super.reshape(x, y, newWidth, height);
+//            }
+
         }
         
         /**

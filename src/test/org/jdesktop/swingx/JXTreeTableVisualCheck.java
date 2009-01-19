@@ -34,8 +34,10 @@ import java.util.regex.Pattern;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.Box;
 import javax.swing.CellEditor;
 import javax.swing.Icon;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -341,8 +343,6 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
      *
      */
     public void interactiveLargeModel() {
-//        final JXTreeTable treeTable = new JXTreeTable(treeTableModel); 
-
         final JXTreeTable treeTable = new JXTreeTable(createMutableVisualizeModel());
         treeTable.setRootVisible(true);
         ToolTipManager.sharedInstance().unregisterComponent(treeTable);
@@ -365,9 +365,17 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         JTextField textField = new JTextField();
         textField.setName("firstchild");
         frame.add(textField);
-        frame.add(textField);
+        JComponent box = Box.createVerticalBox();
+        box.setName("dumyybox");
+        frame.add(box);
+        JComponent inner = Box.createHorizontalBox();
+        inner.setName("inner");
+        box.add(inner);
+        inner.add(new JButton());
+        inner.add(new JXFindPanel());
         frame.add(new JComboBox());
         frame.add(new JXDatePicker());
+        
         return new ComponentTreeTableModel(frame);
     }
 
