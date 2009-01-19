@@ -254,7 +254,7 @@ public class PinstripePainter<T> extends AbstractPainter<T> {
     public void setStripeWidth(double stripeWidth) {
         double oldSripeWidth = getStripeWidth();
         this.stripeWidth = stripeWidth;
-        firePropertyChange("stripWidth",new Double(oldSripeWidth),new Double(stripeWidth));
+        firePropertyChange("stripeWidth",new Double(oldSripeWidth),new Double(stripeWidth));
     }
     
 }

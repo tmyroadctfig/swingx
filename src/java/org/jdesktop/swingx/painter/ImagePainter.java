@@ -292,8 +292,10 @@ public class ImagePainter<T> extends AbstractAreaPainter<T> {
     }
     
     public void setScaleToFit(boolean scaleToFit) {
+        boolean old = isScaleToFit(); 
         this.scaleToFit = scaleToFit;
         setDirty(true);
+        firePropertyChange("scaleToFit", old, isScaleToFit());
     }
     
     
@@ -427,8 +429,10 @@ public class ImagePainter<T> extends AbstractAreaPainter<T> {
     }
     
     public void setScaleType(ScaleType scaleType) {
+        ScaleType old = getScaleType();
         this.scaleType = scaleType;
         setDirty(true);
+        firePropertyChange("scaleType", old, getScaleType());
     }
     
 }

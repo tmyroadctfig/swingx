@@ -84,7 +84,9 @@ public class CompoundPainter<T> extends AbstractPainter<T> {
     
     /**
      * Sets the array of Painters to use. These painters will be executed in
-     * order. A null value will be treated as an empty array.
+     * order. A null value will be treated as an empty array. To prevent unexpected 
+     * behavior all values in provided array are copied to internally held array. 
+     * Any changes to the original array will not be reflected.
      *
      * @param painters array of painters, which will be painted in order
      */
@@ -133,7 +135,7 @@ public class CompoundPainter<T> extends AbstractPainter<T> {
         boolean oldShouldRestoreState = isClipPreserved();
         this.clipPreserved = shouldRestoreState;
         setDirty(true);
-        firePropertyChange("shouldRestoreState",oldShouldRestoreState,shouldRestoreState);
+        firePropertyChange("clipPreserved",oldShouldRestoreState,shouldRestoreState);
     }
 
     /**
@@ -212,7 +214,9 @@ public class CompoundPainter<T> extends AbstractPainter<T> {
      * @see #isDirty()
      */
     public void setCheckingDirtyChildPainters(boolean b) {
+        boolean old = isCheckingDirtyChildPainters();
         this.checkForDirtyChildPainters = b;
+        firePropertyChange("checkingDirtyChildPainters",old, isCheckingDirtyChildPainters());
     }
 
     /**
