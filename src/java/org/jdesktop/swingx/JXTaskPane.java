@@ -31,7 +31,6 @@ import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
@@ -422,19 +421,18 @@ public class JXTaskPane extends JPanel implements
   }
 
     /**
-     * Returns the keyboard mnemonic from the the current model.
+     * Returns the keyboard mnemonic for the task pane.
      * 
-     * @return the keyboard mnemonic from the model
+     * @return the keyboard mnemonic for the task pane
      */
     public int getMnemonic() {
         return mnemonic;
     }
 
     /**
-     * Sets the keyboard mnemonic on the current model. The mnemonic is the key
+     * Sets the keyboard mnemonic on the task pane. The mnemonic is the key
      * which when combined with the look and feel's mouseless modifier (usually
-     * Alt) will activate this button if focus is contained somewhere within
-     * this button's ancestor window.
+     * Alt) will toggle this task pane.
      * <p>
      * A mnemonic must correspond to a single key on the keyboard and should be
      * specified using one of the <code>VK_XXX</code> keycodes defined in
@@ -442,8 +440,8 @@ public class JXTaskPane extends JPanel implements
      * therefore a key event with the corresponding keycode would cause the
      * button to be activated whether or not the Shift modifier was pressed.
      * <p>
-     * If the character defined by the mnemonic is found within the button's
-     * label string, the first occurrence of it will be underlined to indicate
+     * If the character defined by the mnemonic is found within the task pane's 
+     * text string, the first occurrence of it will be underlined to indicate
      * the mnemonic to the user.
      * 
      * @param mnemonic
