@@ -60,6 +60,7 @@ import javax.swing.plaf.basic.BasicGraphicsUtils;
 import org.jdesktop.swingx.JXCollapsiblePane;
 import org.jdesktop.swingx.JXHyperlink;
 import org.jdesktop.swingx.JXTaskPane;
+import org.jdesktop.swingx.SwingXUtilities;
 import org.jdesktop.swingx.icon.EmptyIcon;
 import org.jdesktop.swingx.plaf.TaskPaneUI;
 
@@ -253,6 +254,8 @@ public class BasicTaskPaneUI extends TaskPaneUI {
 
         Border groupBorder = group.getBorder();
         if (groupBorder instanceof PaneBorder) {
+            ((PaneBorder) groupBorder).label.setDisplayedMnemonic(group
+                    .getMnemonic());
             Dimension border = ((PaneBorder) groupBorder)
                     .getPreferredSize(group);
             dim.width = Math.max(dim.width, border.width);
@@ -351,6 +354,15 @@ public class BasicTaskPaneUI extends TaskPaneUI {
                             .getPropertyName())) {
                 // icon, title, special must lead to a repaint()
                 group.repaint();
+            } else if ("mnemonic".equals(evt.getPropertyName())) {
+                SwingXUtilities.updateMnemonicBinding(group, "toggleCollapsed");
+                
+                Border b = group.getBorder();
+                
+                if (b instanceof PaneBorder) {
+                    int key = (Integer) evt.getNewValue();
+                    ((PaneBorder) b).label.setDisplayedMnemonic(key);
+                }
             }
         }
     }

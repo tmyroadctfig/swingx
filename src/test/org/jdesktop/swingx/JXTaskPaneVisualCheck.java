@@ -21,6 +21,7 @@ package org.jdesktop.swingx;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.util.Locale;
 
 import javax.swing.AbstractAction;
@@ -47,12 +48,26 @@ public class JXTaskPaneVisualCheck extends InteractiveTestCase {
         JXTaskPaneVisualCheck test = new JXTaskPaneVisualCheck();
         
         try {
-            test.runInteractiveTests();
+//            test.runInteractiveTests();
 //            test.runInteractiveTests("interactiveDisplay");
+            test.runInteractiveTests("interactiveMnemonic");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
         }
+    }
+    
+    public void interactiveMnemonic() {
+        JXTaskPane pane = new JXTaskPane();
+        pane.setTitle("Use Me");
+        pane.setMnemonic(KeyEvent.VK_U);
+        pane.setForeground(Color.RED);
+        pane.setBackground(Color.YELLOW);
+        pane.add(new JLabel("another"));
+        pane.add(new JButton("wow!!"));
+        JXTaskPaneContainer container = new JXTaskPaneContainer();
+        container.add(pane);
+        showInFrame(container, "Mnemonic Test", true);
     }
     
     public void interactiveColors() {

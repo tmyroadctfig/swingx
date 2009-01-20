@@ -24,11 +24,17 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Frame;
 import java.awt.Window;
+import java.awt.event.InputEvent;
+import java.lang.reflect.Method;
 import java.util.Locale;
 
+import javax.swing.InputMap;
+import javax.swing.JComponent;
 import javax.swing.JPopupMenu;
+import javax.swing.KeyStroke;
 import javax.swing.MenuElement;
 import javax.swing.SwingUtilities;
+import javax.swing.plaf.ComponentInputMapUIResource;
 
 /**
  * A collection of utility methods for Swing(X) classes.
@@ -46,8 +52,90 @@ public final class SwingXUtilities {
     private SwingXUtilities() {
         //does nothing
     }
+
+
+    /**
+     * A helper for creating and updating key bindings for components with
+     * mnemonics. The {@code pressed} action will be invoked when the mnemonic
+     * is activated.
+     * <p>
+     * TODO establish an interface for the mnemonic properties, such as {@code
+     * MnemonicEnabled} and change signature to {@code public static <T extends
+     * JComponent & MnemonicEnabled> void updateMnemonicBinding(T c, String
+     * pressed)}
+     * 
+     * @param c
+     *            the component bindings to update
+     * @param pressed
+     *            the name of the action in the action map to invoke when the
+     *            mnemonic is pressed
+     * @throws NullPointerException
+     *             if the component is {@code null}
+     */
+    public static void updateMnemonicBinding(JComponent c, String pressed) {
+        updateMnemonicBinding(c, pressed, null);
+    }
     
-    
+    /**
+     * A helper for creating and updating key bindings for components with
+     * mnemonics. The {@code pressed} action will be invoked when the mnemonic
+     * is activated and the {@code released} action will be invoked when the
+     * mnemonic is deactivated.
+     * <p>
+     * TODO establish an interface for the mnemonic properties, such as {@code
+     * MnemonicEnabled} and change signature to {@code public static <T extends
+     * JComponent & MnemonicEnabled> void updateMnemonicBinding(T c, String
+     * pressed, String released)}
+     * 
+     * @param c
+     *            the component bindings to update
+     * @param pressed
+     *            the name of the action in the action map to invoke when the
+     *            mnemonic is pressed
+     * @param released
+     *            the name of the action in the action map to invoke when the
+     *            mnemonic is released (if the action is a toggle style, then
+     *            this parameter should be {@code null})
+     * @throws NullPointerException
+     *             if the component is {@code null}
+     */
+    public static void updateMnemonicBinding(JComponent c, String pressed, String released) {
+        Class<?> clazz = c.getClass();
+        int m = -1;
+        
+        try {
+            Method mtd = clazz.getMethod("getMnemonic");
+            m = (Integer) mtd.invoke(c);
+        } catch (RuntimeException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new IllegalArgumentException("unable to access mnemonic", e);
+        }
+        
+        InputMap map = SwingUtilities.getUIInputMap(c,
+                JComponent.WHEN_IN_FOCUSED_WINDOW);
+        
+        if (m != 0) {
+            if (map == null) {
+                map = new ComponentInputMapUIResource(c);
+                SwingUtilities.replaceUIInputMap(c,
+                        JComponent.WHEN_IN_FOCUSED_WINDOW, map);
+            }
+            
+            map.clear();
+            
+            //TODO is ALT_MASK right for all platforms?
+            map.put(KeyStroke.getKeyStroke(m, InputEvent.ALT_MASK, false),
+                    pressed);
+            map.put(KeyStroke.getKeyStroke(m, InputEvent.ALT_MASK, true),
+                    released);
+            map.put(KeyStroke.getKeyStroke(m, 0, true), released);
+        } else {
+            if (map != null) {
+                map.clear();
+            }
+        }
+    }
     
     private static Component[] getChildren(Component c) {
         Component[] children = null;
@@ -74,7 +162,7 @@ public final class SwingXUtilities {
      * @param enabled
      *                {@code true} if the component is to enabled; {@code false} otherwise
      */
-    public void setComponentTreeEnabled(Component c, boolean enabled) {
+    public static void setComponentTreeEnabled(Component c, boolean enabled) {
         c.setEnabled(enabled);
         
         Component[] children = getChildren(c);
@@ -95,7 +183,7 @@ public final class SwingXUtilities {
      * @param locale
      *                the locale to set
      */
-    public void setComponentTreeLocale(Component c, Locale locale) {
+    public static void setComponentTreeLocale(Component c, Locale locale) {
         c.setLocale(locale);
         
         Component[] children = getChildren(c);
@@ -110,7 +198,7 @@ public final class SwingXUtilities {
 
 
     /**
-     * Updates the componentTreeUI of all toplevel windows of the 
+     * Updates the componentTreeUI of all top-level windows of the 
      * current application.
      * 
      */
@@ -147,7 +235,7 @@ public final class SwingXUtilities {
      * @param focusOwner
      * @param parent
      * @return true if the component is contained under the parent's 
-     *    hierachy, coping with JPopupMenus.
+     *    hierarchy, coping with JPopupMenus.
      */
     public static boolean isDescendingFrom(Component focusOwner, Component parent) {
         while (focusOwner !=  null) {
