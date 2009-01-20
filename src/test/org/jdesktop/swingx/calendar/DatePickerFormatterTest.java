@@ -130,25 +130,37 @@ public class DatePickerFormatterTest extends TestCase {
     /**
      * Issue #691-swingx: locale setting not taken.
      * Here: test empty contructor == default locale in uiresource.
+     * Adjusted to fix of Issue ??-swingx: use system default format
+     * if resources for Locale have no JXDatePicker entry
      */
     @Test
     public void testPickerFormatterUIResourceDefaultLocale() {
         DatePickerFormatter formatter = new DatePickerFormatterUIResource();
         SimpleDateFormat format = (SimpleDateFormat) formatter.getFormats()[0];
         String pattern = UIManagerExt.getString("JXDatePicker.longFormat");
-        assertEquals(pattern, format.toPattern());
+        if (pattern != null) {
+            assertEquals(pattern, format.toPattern()); 
+        } else {
+            LOG.info("can't run test, no datePicker resource entries for Locale " + Locale.getDefault());
+        }
     }
 
     /**
      * Issue #691-swingx: locale setting not taken.
      * Here: test empty contructor == default locale.
+     * Adjusted to fix of Issue ??-swingx: use system default format
+     * if resources for Locale have no JXDatePicker entry
      */
     @Test
     public void testPickerFormatterDefaultLocale() {
         DatePickerFormatter formatter = new DatePickerFormatter();
         SimpleDateFormat format = (SimpleDateFormat) formatter.getFormats()[0];
         String pattern = UIManagerExt.getString("JXDatePicker.longFormat");
-        assertEquals(pattern, format.toPattern());
+        if (pattern != null) {
+            assertEquals(pattern, format.toPattern()); 
+        } else {
+            LOG.info("can't run test, no datePicker resource entries for Locale " + Locale.getDefault());
+        }
     }
 
     /**
@@ -188,13 +200,27 @@ public class DatePickerFormatterTest extends TestCase {
      * Issue #584-swingx: need to clarify null handling.
      * 
      * here: test default constructor
-     * 
+     * Adjusted to fix of Issue ??-swingx: use system default format
+     * if resources for Locale have no JXDatePicker entry
      */
     @Test
     public void testPickerFormatterDefaultConstructor() {
         DatePickerFormatter formatter = new DatePickerFormatter();
         assertNotNull(formatter.getFormats());
-        assertEquals(3, formatter.getFormats().length);
+        int uiFormats = 0;
+        if (UIManagerExt.getString("JXDatePicker.longFormat") != null) {
+            uiFormats++;
+        }
+        if (UIManagerExt.getString("JXDatePicker.mediumFormat") != null) {
+            uiFormats++;
+        }
+        if (UIManagerExt.getString("JXDatePicker.shortFormat") != null) {
+            uiFormats++;
+        }
+        if (uiFormats == 0) {
+            uiFormats = 1;
+        }
+        assertEquals(uiFormats, formatter.getFormats().length);
     }
 
     /**
