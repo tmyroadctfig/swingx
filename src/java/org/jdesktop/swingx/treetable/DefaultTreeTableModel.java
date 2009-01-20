@@ -267,14 +267,8 @@ public class DefaultTreeTableModel extends AbstractTreeTableModel {
      * {@inheritDoc}
      */
     public int getIndexOfChild(Object parent, Object child) {
-        if (!isValidTreeTableNode(parent)) {
-            throw new IllegalArgumentException(
-                    "parent must be a TreeTableNode managed by this model");
-        }
-
-        if (!isValidTreeTableNode(child)) {
-            throw new IllegalArgumentException(
-                    "child must be a TreeTableNode managed by this model");
+        if (!isValidTreeTableNode(parent) || !isValidTreeTableNode(child)) {
+            return -1;
         }
 
         return ((TreeTableNode) parent).getIndex((TreeTableNode) child);
