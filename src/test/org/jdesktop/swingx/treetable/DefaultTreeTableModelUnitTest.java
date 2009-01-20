@@ -247,6 +247,9 @@ public class DefaultTreeTableModelUnitTest extends TestCase {
         }
     }
     
+    /**
+     * PENDING JW: replace by methods in xxIssues once #984-swingx is solved.
+     */
     @Test
     public void testGetIndexOfChild() {
         assertEquals(model.getIndexOfChild(root,child1), 0);
