@@ -153,7 +153,7 @@ public class WrappingProvider extends
      *          should auto-unwrap the userObject from the context value. 
      */
     public WrappingProvider(IconValue iv, ComponentProvider delegate, boolean unwrapUserObject) {
-        super(iv != null ? (new MappedValue(null, iv)) : StringValue.EMPTY);
+        super(iv != null ? (new MappedValue(null, iv)) : StringValues.EMPTY);
         setWrappee(delegate);
         setUnwrapUserObject(unwrapUserObject);
     }

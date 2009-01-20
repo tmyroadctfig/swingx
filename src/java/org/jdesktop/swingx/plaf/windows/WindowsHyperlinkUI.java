@@ -35,7 +35,11 @@ import org.jdesktop.swingx.plaf.basic.BasicHyperlinkUI;
  * Extends BasicHyperlinkUI and paints the text with an offset when mouse
  * pressed.<br>
  * 
- * @deprecated pre-0.9.4 PENDING JW: why is this deprecated? What to use instead?
+ * @deprecated pre-0.9.4 PENDING JW: why is this deprecated? What to use
+ *             instead? kgs: clearly installDefaults can go away, but I
+ *             distinctly recall that setTextShiftOffset was at one point
+ *             uncommented in parent, leaving no differences with child. That is
+ *             no longer the case.
  */
 @Deprecated
 public class WindowsHyperlinkUI extends BasicHyperlinkUI {

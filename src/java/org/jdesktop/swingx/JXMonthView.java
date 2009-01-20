@@ -1797,9 +1797,10 @@ public class JXMonthView extends JComponent {
 
 //--- deprecated code - NOTE: these methods will be removed soon! 
 
-
     /**
-     * @deprecated - this is kept as a reminder only, <b>don't use</b>!
+     * @deprecated pre-0.9.5 - this is kept as a reminder only, <b>don't
+     *             use</b>! we can make this private or comment it out after
+     *             next version
      */
      @Deprecated
     protected void cleanupWeekSelectionDates(Date startDate, Date endDate) {

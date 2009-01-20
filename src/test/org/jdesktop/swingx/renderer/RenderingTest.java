@@ -654,7 +654,7 @@ public class RenderingTest extends TestCase {
     @Test
     public void testWrappingProviderWrappeeConstructors() {
         IconValue iv = IconValues.FILE_ICON;
-        LabelProvider delegate = new LabelProvider(FormatStringValue.DATE_TO_STRING);
+        LabelProvider delegate = new LabelProvider(StringValues.DATE_TO_STRING);
         assertWrappingProviderState(new WrappingProvider(delegate),
                 null, null, delegate, true);
         assertWrappingProviderState(new WrappingProvider(delegate, false), 
@@ -674,7 +674,7 @@ public class RenderingTest extends TestCase {
     @Test
     public void testWrappingProviderWrappeeStringValueConstructors() {
         IconValue iv = IconValues.FILE_ICON;
-        StringValue sv = FormatStringValue.DATE_TO_STRING;
+        StringValue sv = StringValues.DATE_TO_STRING;
         assertWrappingProviderState(new WrappingProvider(iv),
                 iv, null, null, true);
         assertWrappingProviderState(new WrappingProvider(iv, sv), 
@@ -706,7 +706,7 @@ public class RenderingTest extends TestCase {
     private void assertWrappingProviderState(WrappingProvider provider, 
             IconValue iv, StringValue sv, ComponentProvider delegate, boolean unwrap) {
         if (iv == null) {
-            assertEquals("default StringValue must be empty", StringValue.EMPTY, 
+            assertEquals("default StringValue must be empty", StringValues.EMPTY, 
                     provider.getStringValue());
         } else {
             assertTrue("provider's StringValue must be a MappedValue containing the IconValue, but" +

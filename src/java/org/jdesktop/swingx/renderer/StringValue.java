@@ -69,7 +69,7 @@ public interface StringValue extends Serializable {
     /**
      * Default converter using the toString.
      * 
-     * @deprecated Use {@link StringValues#TO_STRING} instead
+     * @deprecated pre-0.9.5 Use {@link StringValues#TO_STRING} instead
      */
     @Deprecated
     public final static StringValue TO_STRING = StringValues.TO_STRING;
@@ -77,7 +77,7 @@ public interface StringValue extends Serializable {
     /**
      * Converter returning an empty String always.
      * 
-     * @deprecated Use {@link StringValues#EMPTY} instead
+     * @deprecated pre-0.9.5 Use {@link StringValues#EMPTY} instead
      */
     @Deprecated
     public final static StringValue EMPTY = StringValues.EMPTY;
