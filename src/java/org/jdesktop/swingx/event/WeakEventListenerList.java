@@ -30,7 +30,7 @@ import java.util.List;
 /**
  * A class that holds a list of EventListeners.  A single instance
  * can be used to hold all listeners (of all types) for the instance
- * using the list.  It is the responsiblity of the class using the
+ * using the list.  It is the responsibility of the class using the
  * EventListenerList to provide type-safe API (preferably conforming
  * to the JavaBeans spec) and methods which dispatch event notification
  * methods to appropriate Event Listeners on the list.
@@ -99,8 +99,9 @@ import java.util.List;
  */
 public class WeakEventListenerList implements Serializable {
 
-    protected transient List<WeakReference> weakReferences;
-    protected transient List<Class> classes;
+    protected transient List<WeakReference<? extends EventListener>> weakReferences;
+    protected transient List<Class<? extends EventListener>> classes;
+    
     /**
      * Passes back the event listener list as an array
      * of ListenerType-listener pairs.  
@@ -110,7 +111,7 @@ public class WeakEventListenerList implements Serializable {
      * @return a array of listenerType-listener pairs.
      */
     public Object[] getListenerList() {
-        List listeners = cleanReferences();
+        List<? extends EventListener> listeners = cleanReferences();
         Object[] result = new Object[listeners.size() * 2];
         for (int i = 0; i < listeners.size(); i++) {
             result[2*i + 1] = listeners.get(i);
@@ -125,6 +126,7 @@ public class WeakEventListenerList implements Serializable {
      * 
      * @return
      */
+    @SuppressWarnings("unchecked")
     private synchronized <T extends EventListener> List<T> cleanReferences() {
         List<T> listeners = new ArrayList<T>();
         for (int i = getReferences().size() - 1; i >= 0; i--) {
@@ -140,16 +142,16 @@ public class WeakEventListenerList implements Serializable {
         return listeners;
     }
     
-    private List<WeakReference> getReferences() {
+    private List<WeakReference<? extends EventListener>> getReferences() {
         if (weakReferences == null) {
-            weakReferences = new ArrayList<WeakReference>();
+            weakReferences = new ArrayList<WeakReference<? extends EventListener>>();
         }
         return weakReferences;
     }
     
-    private List<Class> getClasses() {
+    private List<Class<? extends EventListener>> getClasses() {
         if (classes == null) {
-            classes = new ArrayList<Class>();
+            classes = new ArrayList<Class<? extends EventListener>>();
             
         }
         return classes;
@@ -164,6 +166,7 @@ public class WeakEventListenerList implements Serializable {
      * 
      * @since 1.3
      */
+    @SuppressWarnings("unchecked")
     public <T extends EventListener> T[] getListeners(Class<T> t) {
         List<T> liveListeners = cleanReferences();
         List<T> listeners = new ArrayList<T>();
@@ -194,7 +197,7 @@ public class WeakEventListenerList implements Serializable {
             throw new IllegalArgumentException("Listener " + l +
                                          " is not of type " + t);
         }
-        List listeners = cleanReferences();
+        cleanReferences();
         getReferences().add(new WeakReference<T>(l));
         getClasses().add(t);
     }
