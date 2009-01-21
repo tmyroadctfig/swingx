@@ -349,12 +349,12 @@ public class JXEditorPane extends JEditorPane implements /*Searchable, */Targeta
      */
     private class ParagraphSelector extends JComboBox implements ItemListener {
 
-        private Map itemMap;
+        private Map<HTML.Tag, String> itemMap;
 
         public ParagraphSelector() {
 
             // The item map is for rendering
-            itemMap = new HashMap();
+            itemMap = new HashMap<HTML.Tag, String>();
             itemMap.put(HTML.Tag.P, "Paragraph");
             itemMap.put(HTML.Tag.H1, "Heading 1");
             itemMap.put(HTML.Tag.H2, "Heading 2");
@@ -365,7 +365,7 @@ public class JXEditorPane extends JEditorPane implements /*Searchable, */Targeta
             itemMap.put(HTML.Tag.PRE, "Preformatted");
 
             // The list of items
-            Vector items = new Vector();
+            Vector<HTML.Tag> items = new Vector<HTML.Tag>();
             items.addElement(HTML.Tag.P);
             items.addElement(HTML.Tag.H1);
             items.addElement(HTML.Tag.H2);
