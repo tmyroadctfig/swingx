@@ -587,13 +587,29 @@ public class JXCollapsiblePane extends JXPanel {
             ((JComponent) getContentPane()).setBorder(border);
         }
     }
-    
+
     /**
-     * {@inheritDoc}
+     * A collapsible pane always returns its preferred size for the minimum size
+     * to ensure that the collapsing happens correctly.
+     * <p>
+     * To query the minimum size of the contents user {@code
+     * getContentPane().getMinimumSize()}.
+     * 
+     * @return the preferred size of the component
      */
     @Override
     public Dimension getMinimumSize() {
         return getPreferredSize();
+    }
+
+    /**
+     * Forwards to the content pane.
+     * 
+     * @param minimumSize
+     *            the size to set on the content pane
+     */
+    public void setMinimumSize(Dimension minimumSize) {
+        getContentPane().setMinimumSize(minimumSize);
     }
 
     /**
