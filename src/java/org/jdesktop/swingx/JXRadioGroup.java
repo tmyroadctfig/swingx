@@ -272,8 +272,8 @@ public class JXRadioGroup<T> extends JPanel {
     @Override
     public void setEnabled(boolean enabled) {
         super.setEnabled(enabled);
-        for (Enumeration en = buttonGroup.getElements(); en.hasMoreElements();) {
-            final AbstractButton button = (AbstractButton) en.nextElement();
+        for (Enumeration<AbstractButton> en = buttonGroup.getElements(); en.hasMoreElements();) {
+            final AbstractButton button = en.nextElement();
             /* We don't want to enable a button where the action does not
              * permit it. */
             if (enabled && button.getAction() != null

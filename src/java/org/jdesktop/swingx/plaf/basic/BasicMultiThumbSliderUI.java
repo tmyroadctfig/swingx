@@ -39,14 +39,14 @@ import org.jdesktop.swingx.plaf.MultiThumbSliderUI;
  */
 public class BasicMultiThumbSliderUI extends MultiThumbSliderUI {
     
-    protected JXMultiThumbSlider slider;
+    protected JXMultiThumbSlider<?> slider;
     
     public static ComponentUI createUI(JComponent c) {
         return new BasicMultiThumbSliderUI();
     }
     
     public void installUI(JComponent c) {
-        slider = (JXMultiThumbSlider)c;
+        slider = (JXMultiThumbSlider<?>)c;
         slider.setThumbRenderer(new BasicThumbRenderer());
         slider.setTrackRenderer(new BasicTrackRenderer());        
     }
@@ -70,13 +70,13 @@ public class BasicMultiThumbSliderUI extends MultiThumbSliderUI {
             g.fillPolygon(poly);
         }
 
-        public JComponent getThumbRendererComponent(JXMultiThumbSlider slider, int index, boolean selected) {
+        public JComponent getThumbRendererComponent(JXMultiThumbSlider<?> slider, int index, boolean selected) {
             return this;
         }
     }
 
     private class BasicTrackRenderer extends JComponent implements TrackRenderer {
-        private JXMultiThumbSlider slider;
+        private JXMultiThumbSlider<?> slider;
         public void paintComponent(Graphics g) {
             g.setColor(slider.getBackground());
             g.fillRect(0, 0, slider.getWidth(), slider.getHeight());
@@ -85,7 +85,7 @@ public class BasicMultiThumbSliderUI extends MultiThumbSliderUI {
             g.drawLine(0,slider.getHeight()/2+1,slider.getWidth(),slider.getHeight()/2+1);
         }
 
-        public JComponent getRendererComponent(JXMultiThumbSlider slider) {
+        public JComponent getRendererComponent(JXMultiThumbSlider<?> slider) {
             this.slider = slider;
             return this;
         }

@@ -173,7 +173,7 @@ public class HighlighterTest extends InteractiveTestCase {
             @Override
             protected Component doHighlight(Component component,
                     ComponentAdapter adapter) {
-                ((AbstractAreaPainter) getPainter()).setFillPaint(Color.BLUE);
+                ((AbstractAreaPainter<?>) getPainter()).setFillPaint(Color.BLUE);
                 return super.doHighlight(component, adapter);
             }
             

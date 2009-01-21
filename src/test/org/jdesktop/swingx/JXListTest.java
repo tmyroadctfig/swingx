@@ -565,7 +565,7 @@ public class JXListTest extends InteractiveTestCase {
         }
         
         try {
-           new JXList((Vector) null);
+           new JXList((Vector<?>) null);
             fail("JXList contructor must throw on null data");
         } catch (IllegalArgumentException e) {
             // expected
@@ -593,17 +593,17 @@ public class JXListTest extends InteractiveTestCase {
         // 
         assertFilterEnabled(new JXList(), false);
         assertFilterEnabled(new JXList(new DefaultListModel()), false);
-        assertFilterEnabled(new JXList(new Vector()), false);
+        assertFilterEnabled(new JXList(new Vector<Object>()), false);
         assertFilterEnabled(new JXList(new Object[] { }), false);
         
         assertFilterEnabled(new JXList(false), false);
         assertFilterEnabled(new JXList(new DefaultListModel(), false), false);
-        assertFilterEnabled(new JXList(new Vector(), false), false);
+        assertFilterEnabled(new JXList(new Vector<Object>(), false), false);
         assertFilterEnabled(new JXList(new Object[] { }, false), false);
 
         assertFilterEnabled(new JXList(true), true);
         assertFilterEnabled(new JXList(new DefaultListModel(), true), true);
-        assertFilterEnabled(new JXList(new Vector(), true), true);
+        assertFilterEnabled(new JXList(new Vector<Object>(), true), true);
         assertFilterEnabled(new JXList(new Object[] { }, true), true);
     }
     

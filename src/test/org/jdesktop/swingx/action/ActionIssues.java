@@ -162,8 +162,8 @@ public class ActionIssues extends ActionTest implements Serializable {
         //create test object
         Object testObject = new Object();
         // create queue and weak reference
-        ReferenceQueue queue = new ReferenceQueue();
-        WeakReference ref = new WeakReference(testObject, queue);
+        ReferenceQueue<Object> queue = new ReferenceQueue<Object>();
+        WeakReference<Object> ref = new WeakReference<Object>(testObject, queue);
         // set hard reference to null
         testObject = null;
 //        force garbage collection
