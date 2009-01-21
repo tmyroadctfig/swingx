@@ -65,7 +65,7 @@ public abstract class AbstractActionExt extends AbstractAction
         // default constructor
     }
     /**
-     * Copy constuctor copies the state.
+     * Copy constructor copies the state.
      */
     public AbstractActionExt(AbstractActionExt action) {
         Object[] keys = action.getKeys();
@@ -111,7 +111,7 @@ public abstract class AbstractActionExt extends AbstractAction
         setActionCommand(command);
     }
     /**
-     * Returns a short desciption of the action.
+     * Returns a short description of the action.
      *
      * @return the short description or null
      */
@@ -120,7 +120,7 @@ public abstract class AbstractActionExt extends AbstractAction
     }
 
     /**
-     * Sets the short desciption of the action. This will also
+     * Sets the short description of the action. This will also
      * set the long description value is it is null.
      * <p>
      * This is a convenience method for <code>putValue</code> with the
@@ -138,7 +138,7 @@ public abstract class AbstractActionExt extends AbstractAction
     }
 
     /**
-     * Returns a long desciption of the action.
+     * Returns a long description of the action.
      *
      * @return the long description or null
      */
@@ -147,7 +147,7 @@ public abstract class AbstractActionExt extends AbstractAction
     }
 
     /**
-     * Sets the long desciption of the action. This will also set the
+     * Sets the long description of the action. This will also set the
      * value of the short description if that value is null.
      * <p>
      * This is a convenience method for <code>putValue</code> with the
@@ -348,7 +348,7 @@ public abstract class AbstractActionExt extends AbstractAction
     // Properties etc....
 
     /**
-     * Inicates if this action has states. If this method returns
+     * Indicates if this action has states. If this method returns
      * true then the this will send ItemEvents to ItemListeners
      * when the control constructed with this action in invoked.
      *

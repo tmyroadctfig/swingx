@@ -105,11 +105,12 @@ public class ServerAction extends AbstractAction {
         return (String)getValue(URL);
     }
 
-    private Map getParams() {
+    @SuppressWarnings("unchecked")
+    private Map<String, String> getParams() {
         return (Map)getValue(PARAMS);
     }
 
-    private void setParams(Map params) {
+    private void setParams(Map<String, String> params) {
         putValue(PARAMS, params);
     }
 
@@ -118,9 +119,9 @@ public class ServerAction extends AbstractAction {
      * POST request.
      */
     public void addParam(String name, String value) {
-        Map params = getParams();
+        Map<String, String> params = getParams();
         if (params == null) {
-            params = new HashMap();
+            params = new HashMap<String, String>();
             setParams(params);
         }
         params.put(name, value);
@@ -130,23 +131,24 @@ public class ServerAction extends AbstractAction {
      * Return a parameter value corresponding to name or null if it doesn't exist.
      */
     public String getParamValue(String name) {
-        Map params = getParams();
-        return params == null ? null : (String)params.get(name);
+        Map<String, String> params = getParams();
+        return params == null ? null : params.get(name);
     }
 
     /**
      * Return a set of parameter names or null if there are no params
      */
-    public Set getParamNames() {
-        Map params = getParams();
+    public Set<String> getParamNames() {
+        Map<String, String> params = getParams();
         return params == null ? null : params.keySet();
     }
 
-    private Map getHeaders() {
+    @SuppressWarnings("unchecked")
+    private Map<String, String> getHeaders() {
         return (Map)getValue(HEADERS);
     }
 
-    private void setHeaders(Map headers) {
+    private void setHeaders(Map<String, String> headers) {
         putValue(HEADERS, headers);
     }
 
@@ -156,9 +158,9 @@ public class ServerAction extends AbstractAction {
      * "application/x-www-form-urlencoded"
      */
     public void addHeader(String name, String value) {
-        Map map = getHeaders();
+        Map<String, String> map = getHeaders();
         if (map == null) {
-            map = new HashMap();
+            map = new HashMap<String, String>();
             setHeaders(map);
         }
         map.put(name, value);
@@ -168,15 +170,15 @@ public class ServerAction extends AbstractAction {
      * Return a header value corresponding to name or null if it doesn't exist.
      */
     public String getHeaderValue(String name) {
-        Map headers = getHeaders();
-        return headers == null ? null : (String)headers.get(name);
+        Map<String, String> headers = getHeaders();
+        return headers == null ? null : headers.get(name);
     }
 
     /**
      * Return a set of parameter names or null if there are no params
      */
-    public Set getHeaderNames() {
-        Map headers = getHeaders();
+    public Set<String> getHeaderNames() {
+        Map<String, String> headers = getHeaders();
         return headers == null ? null : headers.keySet();
     }
 
@@ -209,9 +211,9 @@ public class ServerAction extends AbstractAction {
             URLConnection uc = execURL.openConnection();
 
             // Get all the header name/value pairs ans set the request headers
-            Set headerNames = getHeaderNames();
+            Set<String> headerNames = getHeaderNames();
             if (headerNames != null && !headerNames.isEmpty()) {
-                Iterator iter = headerNames.iterator();
+                Iterator<String> iter = headerNames.iterator();
                 while (iter.hasNext()) {
                     String name = (String)iter.next();
                     uc.setRequestProperty(name, getHeaderValue(name));
@@ -284,12 +286,12 @@ public class ServerAction extends AbstractAction {
         // TODO: the action should be configured to retrieve the data.
 
         // Get all the param name/value pairs and build the data string
-        Set paramNames = getParamNames();
+        Set<String> paramNames = getParamNames();
         if (paramNames != null && !paramNames.isEmpty()) {
-            Iterator iter = paramNames.iterator();
+            Iterator<String> iter = paramNames.iterator();
         try {
             while (iter.hasNext()) {
-                String name = (String) iter.next();
+                String name = iter.next();
                 postData.append('&').append(name).append('=');
                 postData.append(getParamValue(name));
             }

@@ -85,7 +85,7 @@ import javax.swing.JComponent;
 public class TargetManager {
 
     private static TargetManager INSTANCE;
-    private List targetList;
+    private List<Targetable> targetList;
     private Targetable target;
     private PropertyChangeSupport propertySupport;
 
@@ -121,7 +121,7 @@ public class TargetManager {
      */
     public void addTarget(Targetable target, boolean prepend) {
         if (targetList == null) {
-            targetList = new ArrayList();
+            targetList = new ArrayList<Targetable>();
         }
         if (prepend) {
             targetList.add(0, target);
@@ -226,9 +226,9 @@ public class TargetManager {
 
         // The target list has the next chance to handle the command.
         if (targetList != null) {
-            Iterator iter = targetList.iterator();
+            Iterator<Targetable> iter = targetList.iterator();
             while (iter.hasNext()) {
-                Targetable target = (Targetable)iter.next();
+                Targetable target = iter.next();
                 if (target.hasCommand(command) &&
                     target.doCommand(command, value)) {
                     return true;

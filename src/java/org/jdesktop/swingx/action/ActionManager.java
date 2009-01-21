@@ -134,13 +134,13 @@ public class ActionManager extends ActionMap {
      *
      * @return a set which represents all the action ids
      */
-    public Set getActionIDs() {
+    public Set<Object> getActionIDs() {
         Object[] keys = keys();
         if (keys == null) {
             return null;
         }
 
-        return new HashSet(Arrays.asList(keys));
+        return new HashSet<Object>(Arrays.asList(keys));
     }
 
     public Action addAction(Action action) {
