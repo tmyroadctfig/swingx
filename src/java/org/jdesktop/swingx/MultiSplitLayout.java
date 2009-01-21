@@ -1396,7 +1396,7 @@ public class MultiSplitLayout implements LayoutManager
   
   private List<Divider> dividersThatOverlap(Node root, Rectangle r) {
     if (nodeOverlapsRectangle(root, r) && (root instanceof Split)) {
-        List<Divider> dividers = new ArrayList();
+        List<Divider> dividers = new ArrayList<Divider>();
         for(Node child : ((Split)root).getChildren()) {
         if (child instanceof Divider) {
           if (nodeOverlapsRectangle(child, r)) {
@@ -1773,9 +1773,9 @@ public class MultiSplitLayout implements LayoutManager
      */
     public void restoreDividers( Split split ) { 
       boolean nextDividerVisible = false;
-      ListIterator splitChildren = split.getChildren().listIterator();
+      ListIterator<Node> splitChildren = split.getChildren().listIterator();
       while( splitChildren.hasNext()) {
-        Node splitChild = (Node)splitChildren.next();
+        Node splitChild = splitChildren.next();
         if ( splitChild instanceof Divider ) {
           Node prev = splitChild.previousSibling();
           if ( prev.isVisible()) { 
@@ -2024,7 +2024,7 @@ public class MultiSplitLayout implements LayoutManager
   }
   
   private static void addSplitChild(Split parent, Node child) {
-    List<Node> children = new ArrayList(parent.getChildren());
+    List<Node> children = new ArrayList<Node>(parent.getChildren());
     if (children.size() == 0) {
       children.add(child);
     }
