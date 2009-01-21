@@ -38,7 +38,7 @@ import org.jdesktop.swingx.decorator.SearchPredicate;
  * incremental search.
  * 
  * Keeps internal state to represent the previous search result.
- * For all methods taking a string as parameter: compiles the String 
+ * For all methods taking a String as parameter: compiles the String 
  * to a Pattern as-is and routes to the central method taking a Pattern.
  * 
  * 
@@ -61,6 +61,7 @@ public abstract class AbstractSearchable implements Searchable {
      * Performs a forward search starting at the beginning 
      * across the Searchable using String that represents a
      * regex pattern; {@link java.util.regex.Pattern}. 
+     * 
      * @param searchString <code>String</code> that we will try to locate
      * @return the position of the match in appropriate coordinates or -1 if
      *   no match found.
@@ -73,6 +74,7 @@ public abstract class AbstractSearchable implements Searchable {
      * Performs a forward search starting at the given startIndex
      * using String that represents a regex
      * pattern; {@link java.util.regex.Pattern}. 
+     * 
      * @param searchString <code>String</code> that we will try to locate
      * @param startIndex position in the document in the appropriate coordinates
      * from which we will start search or -1 to start from the beginning
@@ -88,6 +90,7 @@ public abstract class AbstractSearchable implements Searchable {
      * using String that represents a regex
      * pattern; {@link java.util.regex.Pattern}. The search direction 
      * depends on the boolean parameter: forward/backward if false/true, respectively.
+     * 
      * @param searchString <code>String</code> that we will try to locate
      * @param startIndex position in the document in the appropriate coordinates
      * from which we will start search or -1 to start from the beginning
@@ -106,6 +109,7 @@ public abstract class AbstractSearchable implements Searchable {
     /**
      * Performs a forward search starting at the beginning 
      * across the Searchable using the pattern; {@link java.util.regex.Pattern}. 
+     * 
      * @param pattern <code>Pattern</code> that we will try to locate
      * @return the position of the match in appropriate coordinates or -1 if
      *   no match found.
@@ -132,7 +136,7 @@ public abstract class AbstractSearchable implements Searchable {
      * Performs a  search starting at the given startIndex
      * using the pattern; {@link java.util.regex.Pattern}. 
      * The search direction depends on the boolean parameter: 
-     * forward/backward if false/true, respectively.
+     * forward/backward if false/true, respectively.<p>
      * 
      * Updates visible and internal search state.
      * 
@@ -153,7 +157,7 @@ public abstract class AbstractSearchable implements Searchable {
      * Performs a  search starting at the given startIndex
      * using the pattern; {@link java.util.regex.Pattern}. 
      * The search direction depends on the boolean parameter: 
-     * forward/backward if false/true, respectively.
+     * forward/backward if false/true, respectively.<p>
      * 
      * Updates internal search state.
      * 
@@ -205,8 +209,11 @@ public abstract class AbstractSearchable implements Searchable {
     protected abstract void findMatchAndUpdateState(Pattern pattern, int startRow, boolean backwards);
 
     /**
-     * Checks and returns if it can be trivially decided to not match.
-     * Here: pattern is null or startIndex exceeds the upper size limit.
+     * Returns a boolean indicating if it can be trivially decided to not match.
+     * <p>
+     * 
+     * This implementation returns true if pattern is null or startIndex 
+     * exceeds the upper size limit.<p>
      * 
      * @param pattern <code>Pattern</code> that we will try to locate
      * @param startIndex position in the document in the appropriate coordinates
@@ -220,7 +227,8 @@ public abstract class AbstractSearchable implements Searchable {
     /**
      * Called if <code>startIndex</code> is different from last search
      * and make sure a backwards/forwards search starts at last/first row,
-     * respectively.
+     * respectively.<p>
+     * 
      * @param startIndex position in the document in the appropriate coordinates
      * from which we will start search or -1 to start from the beginning
      * @param backwards <code>true</code> if we should perform search from towards the beginning
@@ -239,9 +247,13 @@ public abstract class AbstractSearchable implements Searchable {
 
     /**
      * Moves the internal start position for matching as appropriate and returns
-     * the new startIndex to use.
-     * Called if search was messaged with the same startIndex as previously.
+     * the new startIndex to use. Called if search was messaged with the same 
+     * startIndex as previously.
+     * <p>
      * 
+     * This implementation returns a by 1 decremented/incremented startIndex 
+     * depending on backwards true/false, respectively. 
+     *   
      * @param startIndex position in the document in the appropriate coordinates
      * from which we will start search or -1 to start from the beginning
      * @param backwards <code>true</code> if we should perform search towards the beginning
@@ -260,8 +272,8 @@ public abstract class AbstractSearchable implements Searchable {
     /**
      * Checks if the given Pattern should be considered as the same as 
      * in a previous search.
-     * 
-     * Here: compares the patterns' regex.
+     * <p>
+     * This implementation compares the patterns' regex.
      * 
      * @param pattern <code>Pattern</code> that we will compare with last request
      * @return if provided <code>Pattern</code> is the same as the stored from 
@@ -284,8 +296,9 @@ public abstract class AbstractSearchable implements Searchable {
     }
     
     /**
-     * checks if the searchString should be interpreted as empty.
-     * here: returns true if string is null or has zero length.
+     * Checks if the searchString should be interpreted as empty.
+     * <p>
+     * This implementation returns true if string is null or has zero length.
      * 
      * @param searchString <code>String</code> that we should evaluate
      * @return true if the provided <code>String</code> should be interpreted as empty
@@ -296,8 +309,8 @@ public abstract class AbstractSearchable implements Searchable {
 
 
     /**
-     * called if sameRowIndex && !hasEqualRegEx.
      * Matches the cell at row/lastFoundColumn against the pattern.
+     * Called if sameRowIndex && !hasEqualRegEx.
      * PRE: lastFoundColumn valid.
      * 
      * @param pattern <code>Pattern</code> that we will try to match
@@ -320,7 +333,8 @@ public abstract class AbstractSearchable implements Searchable {
     }
 
    /** 
-    * checks if index is in range: 0 <= index < getSize().
+    * Checks if index is in range: 0 <= index < getSize().
+    * 
     * @param index possible start position that we will check for validity
     * @return <code>true</code> if given parameter is valid index
     */ 
@@ -329,14 +343,14 @@ public abstract class AbstractSearchable implements Searchable {
     }
 
    /**
-    * returns the size of this searchable.
+    * Returns the size of this searchable.
     * 
     * @return size of this searchable
     */
    protected abstract int getSize();
    
     /**
-     * Update inner searchable state based on provided search result
+     * Updates inner searchable state based on provided search result
      *
      * @param searchResult <code>SearchResult</code> that represents the new state 
      *  of this <code>AbstractSearchable</code>
@@ -358,27 +372,46 @@ public abstract class AbstractSearchable implements Searchable {
     public abstract JComponent getTarget();
 
     /**
-     * @param searchHighlighter
+     * Removes the highlighter.
+     * 
+     * @param searchHighlighter the Highlighter to remove.
      */
     protected abstract void removeHighlighter(Highlighter searchHighlighter);
 
     /**
+     * Returns the highlighters registered on the search target.
+     * 
      * @return all registered highlighters
      */
     protected abstract Highlighter[] getHighlighters();
 
     /**
-     * @param highlighter
+     * Adds the highlighter to the target.
+     * 
+     * @param highlighter the Highlighter to add.
      */
     protected abstract void addHighlighter(Highlighter highlighter);
     
+    /**
+     * Ensure that the given Highlighter is the last in the list of 
+     * the highlighters registered on the target.
+     * 
+     * @param highlighter the Highlighter to be inserted as last.
+     */
     protected void ensureInsertedSearchHighlighters(Highlighter highlighter) {
         if (!isInPipeline(highlighter)) {
             addHighlighter(highlighter);
         }
     }
 
-
+    /**
+     * Returns a flag indicating if the given highlighter is last in the
+     * list of highlighters registered on the target. If so returns true. 
+     * If not, it has the side-effect of removing the highlighter and returns false. 
+     * 
+     * @param searchHighlighter the highlighter to check for being last
+     * @return a boolean indicating whether the highlighter is last.
+     */
     private boolean isInPipeline(Highlighter searchHighlighter) {
         Highlighter[] inPipeline = getHighlighters();
         if ((inPipeline.length > 0) && 
@@ -391,7 +424,9 @@ public abstract class AbstractSearchable implements Searchable {
 
     /**
      * Converts and returns the given column index from view coordinates to model
-     * coordinates. This implementation returns the view coordinate, that is assumes
+     * coordinates. 
+     * <p>
+     * This implementation returns the view coordinate, that is assumes
      * that both coordinate systems are the same. 
      * 
      * @param viewColumn the column index in view coordinates, must be a valid index 
@@ -413,11 +448,18 @@ public abstract class AbstractSearchable implements Searchable {
         return !noMatch;
     }
 
+    /**
+     * Returns a boolean indicating whether the current search result is a match.
+     * <p>
+     * PENDING JW: move to SearchResult?
+     * @return a boolean indicating whether the current search result is a match.
+     */
     protected boolean hasMatch() {
         return hasMatch(lastSearchResult);
     }
     /**
      * Returns a boolean indicating whether a match should be marked with a Highlighter.
+     * <p>
      * This implementation returns true if the target component has a client property for
      * key MATCH_HIGHLIGHTER with value Boolean.TRUE, false otherwise.
      * 
@@ -428,10 +470,10 @@ public abstract class AbstractSearchable implements Searchable {
     }
 
     /**
-     * Sets the AbstractHighlighter to use for match marker, if enabled. A null value
+     * Sets the AbstractHighlighter to use as match marker, if enabled. A null value
      * will re-install the default.
      * 
-     * @param hl
+     * @param hl the Highlighter to use as match marker.
      */
     public void setMatchHighlighter(AbstractHighlighter hl) {
         removeHighlighter(matchHighlighter);
@@ -455,6 +497,7 @@ public abstract class AbstractSearchable implements Searchable {
 
     /**
      * Creates and returns the Highlighter used as match marker.
+     * 
      * @return a highlighter used for matching
      */
     protected AbstractHighlighter createMatchHighlighter() {
@@ -465,6 +508,8 @@ public abstract class AbstractSearchable implements Searchable {
 
     
     /**
+     * Configures and returns the match highlighter for the current match.
+     * 
      * @return a highlighter configured for matching
      */
     protected AbstractHighlighter getConfiguredMatchHighlighter() {
@@ -487,7 +532,8 @@ public abstract class AbstractSearchable implements Searchable {
     }
 
     /**
-     * A convenience class to hold search state.
+     * A convenience class to hold search state.<p>
+     * 
      * NOTE: this is still in-flow, probably will take more responsibility/
      * or even change altogether on further factoring
      */
@@ -497,10 +543,21 @@ public abstract class AbstractSearchable implements Searchable {
         MatchResult matchResult;
         Pattern pattern;
 
+        /**
+         * Instantiates an empty SearchResult.
+         */
         public SearchResult() {
             reset();
         }
         
+        /**
+         * Instantiates a SearchResult with the given state.
+         * 
+         * @param ex the Pattern used for matching
+         * @param result the current MatchResult
+         * @param row the row index of the current match
+         * @param column  the column index of the current match
+         */
         public SearchResult(Pattern ex, MatchResult result, int row, int column) {
             pattern = ex;
             matchResult = result;
@@ -508,6 +565,12 @@ public abstract class AbstractSearchable implements Searchable {
             foundColumn = column;
         }
         
+        /**
+         * Sets internal state to the same as the given SearchResult. Resets internals
+         * if the param is null.
+         * 
+         * @param searchResult the SearchResult to copy internal state from.
+         */
         public void updateFrom(SearchResult searchResult) {
             if (searchResult == null) {
                 reset();
@@ -519,10 +582,18 @@ public abstract class AbstractSearchable implements Searchable {
             pattern = searchResult.pattern;
         }
 
+        /**
+         * Returns the regex of the Pattern used for matching.
+         * 
+         * @return the regex of the Pattern used for matching.
+         */
         public String getRegEx() {
             return pattern != null ? pattern.pattern() : null;
         }
       
+        /**
+         * Resets all internal state to no-match.
+         */
         public void reset() {
             foundRow= -1;
             foundColumn = -1;
@@ -530,21 +601,49 @@ public abstract class AbstractSearchable implements Searchable {
             pattern = null;
         } 
         
+        /**
+         * Resets the column to OFF.
+         */
+        public void resetFoundColumn() {
+            foundColumn = -1;
+        }
+        
+        /**
+         * Returns the column index of the match position.
+         * 
+         * @return the column index of the match position.
+         */
         public int getFoundColumn() {
             return foundColumn;
         }
         
+        /**
+         * Returns the row index of the match position.
+         * 
+         * @return the row index of the match position.
+         */
         public int getFoundRow() {
             return foundRow;
         }
         
+        /**
+         * Returns the MatchResult representing the current match.
+         * 
+         * @return the MatchResult representing the current match.
+         */
         public MatchResult getMatchResult() {
             return matchResult;
         }
         
+        /**
+         * Returns the Pattern used for matching.
+         * 
+         * @return the Pattern used for the matching.
+         */
         public Pattern getPattern() {
             return pattern;
         }
+
     }
 
 }
