@@ -70,6 +70,8 @@ import javax.swing.tree.TreeSelectionModel;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.FilterPipeline;
 import org.jdesktop.swingx.decorator.SelectionMapper;
+import org.jdesktop.swingx.renderer.StringValue;
+import org.jdesktop.swingx.renderer.StringValues;
 import org.jdesktop.swingx.rollover.RolloverProducer;
 import org.jdesktop.swingx.rollover.RolloverRenderer;
 import org.jdesktop.swingx.treetable.DefaultTreeTableModel;
@@ -2543,7 +2545,8 @@ public class JXTreeTable extends JXTable {
             return this;
         }
 
-        private class ClippedTreeCellRenderer extends DefaultTreeCellRenderer {
+        private class ClippedTreeCellRenderer extends DefaultTreeCellRenderer 
+            implements StringValue {
             @SuppressWarnings("unused")
             private boolean inpainting;
             private String shortText;
@@ -2613,6 +2616,17 @@ public class JXTreeTable extends JXTable {
                 
                 return super.getTreeCellRendererComponent(tree, val, sel, expanded, leaf,
                         row, hasFocus);
+            }
+
+            /**
+             * {@inheritDoc} <p>
+             */
+            public String getString(Object value) {
+                int treeColumn = treeTable.getTreeTableModel().getHierarchicalColumn();
+                if (treeColumn >= 0) {
+                    return StringValues.TO_STRING.getString(treeTable.getTreeTableModel().getValueAt(value, treeColumn));
+                }
+                return StringValues.TO_STRING.getString(value);
             }
 
             // Rectangles filled in by SwingUtilities.layoutCompoundLabel();

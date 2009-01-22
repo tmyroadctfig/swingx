@@ -24,6 +24,8 @@ package org.jdesktop.swingx.decorator;
 import java.awt.Color;
 import java.util.logging.Logger;
 
+import javax.swing.JButton;
+import javax.swing.JPanel;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.jdesktop.swingx.InteractiveTestCase;
@@ -39,6 +41,8 @@ import org.jdesktop.swingx.renderer.DefaultTableRenderer;
 import org.jdesktop.swingx.renderer.DefaultTreeRenderer;
 import org.jdesktop.swingx.renderer.StringValue;
 import org.jdesktop.swingx.renderer.StringValues;
+import org.jdesktop.swingx.test.ComponentTreeTableModel;
+import org.jdesktop.swingx.treetable.TreeTableModel;
 import org.jdesktop.test.AncientSwingTeam;
 import org.junit.After;
 import org.junit.Before;
@@ -140,12 +144,35 @@ public class ComponentAdapterClientTest extends InteractiveTestCase {
     /**
      * Issue #979-swingx: JXTreeTable broken string rep of hierarchical column
      * 
-     * here: test search
+     * The breakage is visible in models with 
+     * (node.toString) != (value for hierarchical column). 
+     */
+    @Test
+    public void testTreeTableGetStringAtClippedTextRenderer() {
+        JPanel panel = new JPanel();
+        JButton button = new JButton();
+        String buttonName = "buttonName";
+        button.setName(buttonName);
+        panel.add(button);
+        TreeTableModel model = new ComponentTreeTableModel(panel);
+        JXTreeTableT table = new JXTreeTableT(model);
+        table.setRootVisible(true);
+        table.expandAll();
+        assertEquals("string rep must be button name", table.getValueAt(1, 0),  table.getStringAt(1, 0));
+    }
+    
+    /**
+     * Issue #979-swingx: JXTreeTable broken string rep of hierarchical column
+     * 
+     * here: test search (accidentally passing because node is instanceof NamedColor
+     * with its toString the same as the value returned for the hierarchical column)
      */
     @Test
     public void testTreeTableGetStringUsedInSearchClippedTextRenderer() {
         JXTreeTableT table = new JXTreeTableT(AncientSwingTeam.createNamedColorTreeTableModel());
-        String text = table.getValueAt(2, 0).toString();
+        table.expandAll();
+        LOG.info(table.getStringAt(2, 0));
+        String text = table.getStringAt(2, 0);
         int matchRow = table.getSearchable().search(text);
         assertEquals(2, matchRow);
     }
@@ -154,15 +181,15 @@ public class ComponentAdapterClientTest extends InteractiveTestCase {
     /**
      * Issue #979-swingx: JXTreeTable broken string rep of hierarchical column
      * 
-     * here: test highlight
+     * here: test highlight (accidentally passing because node is instanceof NamedColor
+     * with its toString the same as the value returned for the hierarchical column)
      */
     @Test
     public void testTreeTableGetStringUsedInPatternPredicateClippedTextRenderer() {
         JXTreeTableT table = new JXTreeTableT(AncientSwingTeam.createNamedColorTreeTableModel());
         int matchRow = 2;
         int matchColumn = 0;
-        String text = table.getValueAt(matchRow, matchColumn).toString();
-        LOG.info(text);
+        String text = table.getStringAt(matchRow, matchColumn);
         ComponentAdapter adapter = table.getComponentAdapter(matchRow, matchColumn);
         HighlightPredicate predicate = new PatternPredicate(text, matchColumn, PatternPredicate.ALL);
         assertTrue(predicate.isHighlighted(null, adapter));
