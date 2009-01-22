@@ -171,7 +171,6 @@ public class ComponentAdapterClientTest extends InteractiveTestCase {
     public void testTreeTableGetStringUsedInSearchClippedTextRenderer() {
         JXTreeTableT table = new JXTreeTableT(AncientSwingTeam.createNamedColorTreeTableModel());
         table.expandAll();
-        LOG.info(table.getStringAt(2, 0));
         String text = table.getStringAt(2, 0);
         int matchRow = table.getSearchable().search(text);
         assertEquals(2, matchRow);
