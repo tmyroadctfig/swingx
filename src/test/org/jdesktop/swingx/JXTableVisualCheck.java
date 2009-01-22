@@ -98,7 +98,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
       JXTableVisualCheck test = new JXTableVisualCheck();
       try {
 //        test.runInteractiveTests();
-          test.runInteractiveTests("interactive.*ColumnControl.*");
+          test.runInteractiveTests("interactive.*Grid.*");
 //          test.runInteractiveTests("interactive.*Header.*");
 //          test.runInteractiveTests("interactive.*ColumnProp.*");
 //          test.runInteractiveTests("interactive.*Multiple.*");
@@ -108,7 +108,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
           
 //          test.runInteractiveTests("interactive.*Policy.*");
 //        test.runInteractiveTests("interactive.*Rollover.*");
-        test.runInteractiveTests("interactive.*UpdateUI.*");
+//        test.runInteractiveTests("interactive.*UpdateUI.*");
 //        test.runInteractiveTests("interactiveColumnHighlighting");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
@@ -124,6 +124,20 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         setSystemLF(true);
     }
 
+    /**
+     * Possible problem: table without gridlines has header mis-aligned.
+     * Looks okay for me.
+     */
+    public void interactiveNoGridlines() {
+        JXTable table = new JXTable(20, 100);
+        for (int i = 0; i < table.getColumnCount(); i++) {
+            table.setValueAt("col: " + i, 0, i);
+        }
+        table.setHorizontalScrollEnabled(true);
+        table.setShowGrid(true, false);
+        showWithScrollingInFrame(table, "align header without gridlines?");
+    }
+    
     /**
      * Issue #908-swingx: move updateUI responsibility into column.
      * 
