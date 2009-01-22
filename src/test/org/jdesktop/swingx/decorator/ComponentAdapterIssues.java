@@ -31,6 +31,7 @@ import org.jdesktop.swingx.JXTreeTable;
 import org.jdesktop.swingx.renderer.DefaultTreeRenderer;
 import org.jdesktop.swingx.renderer.StringValue;
 import org.jdesktop.swingx.renderer.StringValues;
+import org.jdesktop.swingx.search.SearchFactory;
 import org.jdesktop.swingx.test.ComponentTreeTableModel;
 import org.jdesktop.swingx.treetable.TreeTableModel;
 import org.jdesktop.test.AncientSwingTeam;
@@ -51,6 +52,7 @@ public class ComponentAdapterIssues extends InteractiveTestCase {
     private static final Logger LOG = Logger
             .getLogger(ComponentAdapterIssues.class.getName());
     public static void main(String[] args) {
+        SearchFactory.getInstance().setUseFindBar(true);
         ComponentAdapterIssues test = new ComponentAdapterIssues();
         try {
             test.runInteractiveTests();
@@ -107,6 +109,29 @@ public class ComponentAdapterIssues extends InteractiveTestCase {
         show(frame);
     }
 
+    /**
+     * Issue ??-swingx: TreeTable doesn't return correct string value for hierarchical column.
+     * 
+     * This is probably a variant of not using the table's renderer (at least I expect it 
+     * to be solved then at the latest). In the meantime, might want to do something special
+     * for the hierarchical column?
+     */
+    public void interactiveTreeStringValueComponent() {
+        TreeTableModel model = new ComponentTreeTableModel(new JXFrame());
+        JXTreeTable treeTable = new JXTreeTable(model);
+        treeTable.setRootVisible(true);
+        treeTable.expandAll();
+        LOG.info(treeTable.getStringAt(3, 0));
+//        treeTable.setTreeCellRenderer(new DefaultTreeRenderer(sv));
+        JXTree tree =  new JXTree(model);
+//        tree.setCellRenderer(new DefaultTreeRenderer(sv));
+        HighlightPredicate predicate = new PatternPredicate("null", 0, PatternPredicate.ALL);
+        ColorHighlighter hl = new ColorHighlighter(predicate, null, Color.RED);
+        treeTable.addHighlighter(hl);
+        tree.addHighlighter(hl);
+        JXFrame frame = wrapWithScrollingInFrame( tree, "string rep in hierarchical column");
+        show(frame);
+    }
 
     /**
      * Creates and returns a StringValue which maps a Color to it's R/G/B rep, 

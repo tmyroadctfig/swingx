@@ -2546,15 +2546,14 @@ public class JXTreeTable extends JXTable {
         }
 
         private class ClippedTreeCellRenderer extends DefaultTreeCellRenderer 
-            implements StringValue {
+            implements StringValue 
+            {
             @SuppressWarnings("unused")
             private boolean inpainting;
             private String shortText;
             @Override
             public void paint(Graphics g) {
                 String fullText = super.getText();
-                // getText() calls tree.convertValueToText();
-                // tree.convertValueToText() should call treeModel.convertValueToText(), if possible
         
                  shortText = SwingUtilities.layoutCompoundLabel(
                     this, g.getFontMetrics(), fullText, getIcon(),
@@ -2589,12 +2588,22 @@ public class JXTreeTable extends JXTable {
 
             @Override
             public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
-                Object val = value;
+                return super.getTreeCellRendererComponent(tree, getHierarchicalTableValue(value), sel, expanded, leaf,
+                        row, hasFocus);
+            }
+
+
+            /**
+             * 
+             * @param node the node in the treeModel as passed into the TreeCellRenderer
+             * @return the corresponding value of the hierarchical cell in the TreeTableModel
+             */
+            private Object getHierarchicalTableValue(Object node) {
+                Object val = node;
                 
                 if (treeTable != null) {
                     int treeColumn = treeTable.getTreeTableModel().getHierarchicalColumn();
                     Object o = null; 
-//                    LOG.info("value ? " + value);
                     if (treeColumn >= 0) {
                         // following is unreliable during a paint cycle
                         // somehow interferes with BasicTreeUIs painting cache
@@ -2603,30 +2612,22 @@ public class JXTreeTable extends JXTable {
                         // might blow if the TreeTableModel is strict in
                         // checking the containment of the value and 
                         // this renderer is called for sizing with a prototype
-                        o = treeTable.getTreeTableModel().getValueAt(value, treeColumn);
+                        o = treeTable.getTreeTableModel().getValueAt(node, treeColumn);
                     }
-//                    LOG.info("value ? " + value);
-                    // JW: why this? null may be a valid value? 
-                    // removed - didn't see it after asking the model
-//                    if (o != null) {
-//                        val = o;
-//                    }
                     val = o;
                 }
-                
-                return super.getTreeCellRendererComponent(tree, val, sel, expanded, leaf,
-                        row, hasFocus);
+                return val;
             }
 
             /**
              * {@inheritDoc} <p>
              */
-            public String getString(Object value) {
-                int treeColumn = treeTable.getTreeTableModel().getHierarchicalColumn();
-                if (treeColumn >= 0) {
-                    return StringValues.TO_STRING.getString(treeTable.getTreeTableModel().getValueAt(value, treeColumn));
-                }
-                return StringValues.TO_STRING.getString(value);
+            public String getString(Object node) {
+//                int treeColumn = treeTable.getTreeTableModel().getHierarchicalColumn();
+//                if (treeColumn >= 0) {
+//                    return StringValues.TO_STRING.getString(treeTable.getTreeTableModel().getValueAt(value, treeColumn));
+//                }
+                return StringValues.TO_STRING.getString(getHierarchicalTableValue(node));
             }
 
             // Rectangles filled in by SwingUtilities.layoutCompoundLabel();
