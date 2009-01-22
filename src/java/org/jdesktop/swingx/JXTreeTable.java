@@ -446,27 +446,30 @@ public class JXTreeTable extends JXTable {
         }
 
         /**
-         * Complete editing if collapsed/expanded.<p>
+         * Complete editing if collapsed/expanded.
+         * <p>
          * 
-         * Is: first try to stop editing before falling back to cancel.<p>
-         * This is part of fix for #730-swingx - editingStopped not always called.
-         * The other part is to call this from the renderer before
-         * expansion related state has changed. <p>
+         * Is: first try to stop editing before falling back to cancel.
+         * <p>
+         * This is part of fix for #730-swingx - editingStopped not always
+         * called. The other part is to call this from the renderer before
+         * expansion related state has changed.
+         * <p>
          * 
-         * Was: any editing is always cancelled. <p>
-         * This is a rude fix to #120-jdnc: data corruption on
-         * collapse/expand if editing. This is called from 
-         * the renderer after expansion related state has changed.
-         *
+         * Was: any editing is always cancelled.
+         * <p>
+         * This is a rude fix to #120-jdnc: data corruption on collapse/expand
+         * if editing. This is called from the renderer after expansion related
+         * state has changed.
+         * 
          */
         protected void completeEditing() {
             if (isEditing()) {
                 boolean success = getCellEditor().stopCellEditing();
                 if (!success) {
-                getCellEditor().cancelCellEditing();
-             }
-//                getCellEditor().cancelCellEditing();
-        }
+                    getCellEditor().cancelCellEditing();
+                }
+            }
         }
 
         /**
@@ -629,8 +632,7 @@ public class JXTreeTable extends JXTable {
                     || me.getModifiers() == InputEvent.BUTTON1_MASK) {
                 // compute where the mouse point is relative to the tree
                 // renderer
-                Point treeMousePoint = new Point(me.getX()
-                        - getCellRect(0, column, false).x, me.getY());
+                Point treeMousePoint = getTreeMousePoint(column, me);
                 int treeRow = renderer.getRowForLocation(treeMousePoint.x,
                         treeMousePoint.y);
                 int row = 0;
@@ -673,6 +675,28 @@ public class JXTreeTable extends JXTable {
             }
             expansionChangedFlag = false;
             return changedExpansion;
+        }
+
+        /**
+         * This is a patch provided for Issue #980-swingx which should
+         * improve the bidi-compliance. Still doesn't work in our 
+         * visual tests...
+         * 
+         * @param column the column index under the event, if any.
+         * @param e the event which might trigger a expand/collapse.
+         * @return the Point adjusted for bidi
+         */
+        protected Point getTreeMousePoint(int column, MouseEvent me) {
+//            return new Point(me.getX()
+//                    - getCellRect(0, column, false).x, me.getY());
+            Rectangle tableCellRect = getCellRect(0, column, false);
+           
+            if( getComponentOrientation().isLeftToRight() ) {
+                return new Point(me.getX() - tableCellRect.x, me.getY());
+            }
+ 
+            int x = (me.getX() - tableCellRect.x) - tableCellRect.width - 10;
+            return new Point(x, me.getY());
         }
     }
     
