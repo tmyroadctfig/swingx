@@ -21,24 +21,25 @@
  */
 package org.jdesktop.swingx.treetable;
 
+import java.awt.event.ActionEvent;
 import java.util.logging.Logger;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.JTree;
 import javax.swing.tree.TreeModel;
 
+import org.jdesktop.swingx.InteractiveTestCase;
+import org.jdesktop.swingx.JXFrame;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.junit.Test;
-import org.junit.Before;
-import org.junit.After;
-
-
-import junit.framework.TestCase;
 
 /**
  * Unit tests around TreeTableModel and related classes.
  */
 @RunWith(JUnit4.class)
-public class TreeTableModelTest extends TestCase {
+public class TreeTableModelTest extends InteractiveTestCase {
     private static final Logger LOG = Logger.getLogger(TreeTableModelTest.class
             .getName());
     /**
@@ -116,6 +117,58 @@ public class TreeTableModelTest extends TestCase {
             }
         }
     }
+
+//---------------------- interactive    
+    
+    /**
+     * Issue #984-swingx: IllegalArgumentException if removing selected node.
+     * 
+     * base reason: DefaultTreeTableModel getIndexOfChild violates super's 
+     * contract.
+     * 
+     */
+    public void interactiveRemoveLargeModel() {
+        final ClearableTreeTableModel model = new ClearableTreeTableModel();
+        model.addToRoot("dummy");
+        JTree tree = new JTree(model);
+        tree.expandRow(0);
+        tree.setSelectionInterval(1, 1);
+        tree.setLargeModel(true);
+        JXFrame frame = wrapWithScrollingInFrame(tree, "remove and large");
+        Action remove = new AbstractAction("remove selected") {
+
+            public void actionPerformed(ActionEvent e) {
+                model.clear();
+                setEnabled(false);
+            }
+            
+        };
+        addAction(frame, remove);
+        show(frame, 400, 200);
+    }
+    
+    
+    // Model that allows to remove all nodes except the root node
+    public static class ClearableTreeTableModel extends DefaultTreeTableModel {
+        public ClearableTreeTableModel() {
+            super(new DefaultMutableTreeTableNode("Root"));
+
+        }
+
+        public void addToRoot(Object userObject) {
+            DefaultMutableTreeTableNode node = new DefaultMutableTreeTableNode(
+                    userObject);
+            insertNodeInto(node, (MutableTreeTableNode) getRoot(), 0);
+        }
+        
+        public void clear() {
+            // remove all nodes except the root node
+            for (int i = this.getChildCount(getRoot()) - 1; i >= 0; i--) {
+                this.removeNodeFromParent((MutableTreeTableNode) this.getChild(
+                        getRoot(), i));
+            }
+        }
+    };
 
 
 }

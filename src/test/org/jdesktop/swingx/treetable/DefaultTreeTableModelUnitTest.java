@@ -248,7 +248,7 @@ public class DefaultTreeTableModelUnitTest extends TestCase {
     }
     
     /**
-     * PENDING JW: replace by methods in xxIssues once #984-swingx is solved.
+     * Testing that indexOfChild returns -1 for uncontained parent/child nodes.
      */
     @Test
     public void testGetIndexOfChild() {
@@ -256,33 +256,38 @@ public class DefaultTreeTableModelUnitTest extends TestCase {
         
         assertEquals(model.getIndexOfChild(root,child2), 1);
         
-        //Test exceptional cases
-        try {
-            model.getIndexOfChild(null, child1);
-            fail("expected IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //success
-        }
-        
-        try {
-            model.getIndexOfChild(new Object(), child1);
-            fail("expected IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //success
-        }
-        try {
-            model.getIndexOfChild(child1, null);
-            fail("expected IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //success
-        }
-        
-        try {
-            model.getIndexOfChild(child1, new Object());
-            fail("expected IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //success
-        }
+        assertEquals(-1, model.getIndexOfChild(null, child1));
+        assertEquals(-1, model.getIndexOfChild(new Object(), child1));
+        assertEquals(-1, model.getIndexOfChild(child1, null));
+        assertEquals(-1, model.getIndexOfChild(child1, new Object()));
+
+//        //Test exceptional cases
+//        try {
+//            model.getIndexOfChild(null, child1);
+//            fail("expected IllegalArgumentException");
+//        } catch (IllegalArgumentException e) {
+//            //success
+//        }
+//        
+//        try {
+//            model.getIndexOfChild(new Object(), child1);
+//            fail("expected IllegalArgumentException");
+//        } catch (IllegalArgumentException e) {
+//            //success
+//        }
+//        try {
+//            model.getIndexOfChild(child1, null);
+//            fail("expected IllegalArgumentException");
+//        } catch (IllegalArgumentException e) {
+//            //success
+//        }
+//        
+//        try {
+//            model.getIndexOfChild(child1, new Object());
+//            fail("expected IllegalArgumentException");
+//        } catch (IllegalArgumentException e) {
+//            //success
+//        }
     }
     
     @Test
