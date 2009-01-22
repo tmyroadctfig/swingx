@@ -4277,7 +4277,7 @@ public class JXTable extends JTable
      * margins - which may lead to visual artefacts, as f.i. not showing the lines at all or
      * showing normal table background in selected state where the lines should have been.
      * 
-     * @see #setShowGrid(boolean, boolean) for an alternative
+     * @see #setShowGrid(boolean, boolean)
      */
     @Override
     public void setShowGrid(boolean showGrid) {
