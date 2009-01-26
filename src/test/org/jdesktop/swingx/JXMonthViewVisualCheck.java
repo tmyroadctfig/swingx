@@ -22,6 +22,8 @@
 package org.jdesktop.swingx;
 
 import java.awt.Color;
+import java.awt.ComponentOrientation;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -66,17 +68,20 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
       setSystemLF(true);
       JXMonthViewVisualCheck  test = new JXMonthViewVisualCheck();
       try {
-          test.runInteractiveTests();
+//          test.runInteractiveTests();
 //        test.runInteractiveTests(".*TimeZone.*");
-//        test.runInteractiveTests("interactive.*Zoomable.*");
+//          test.runInteractiveTests("interactive.*Zoomable.*");
+        test.runInteractiveTests("interactive.*Property.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
       }
   }
 
+    
     public void interactiveRevalidateOnZoomable() {
         final JXMonthView monthView = new JXMonthView();
+        final Font font = monthView.getFont();
         JXFrame frame = wrapInFrame(monthView, "Revalidate on zoomable");
         Action toggleBackground = new AbstractAction("toggleZoomable") {
             
@@ -99,6 +104,19 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
             
         };
         addAction(frame, toggleTraversable);
+        Action toggleFont = new AbstractAction("toggleFont") {
+            
+            public void actionPerformed(ActionEvent e) {
+                
+                if (monthView.getFont().isItalic()) {
+                    monthView.setFont(font);
+                } else {
+                    monthView.setFont(font.deriveFont(Font.ITALIC));
+                }
+            }
+            
+        };
+        addAction(frame, toggleFont);
         show(frame);
 
     }
@@ -108,11 +126,13 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
      * look for
      * - selectionBackground
      * - selectionForeground (not taken?)
-     * 
+     * - flaggedDateForeground
+     * - componentOrientation (duplicate #996-swingx)
      * 
      */
     public void interactiveRepaintOnPropertyChange() {
         final JXMonthView monthView = new JXMonthView();
+        final Font font = monthView.getFont();
         monthView.setSelectionDate(CalendarUtils.startOfWeek(calendar, new Date()));
         monthView.setFlaggedDates(CalendarUtils.endOfWeek(calendar, new Date()));
         final Color selectionBackground = monthView.getSelectionBackground();
@@ -151,6 +171,34 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
             
         };
         addAction(frame, toggleFlaggedForeground);
+        
+        Action toggleCO = new AbstractAction("toggleCO") {
+            
+            public void actionPerformed(ActionEvent e) {
+                
+                if (monthView.getComponentOrientation().isLeftToRight()) {
+                    monthView.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+                } else {
+                    monthView.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+                    
+                }
+            }
+            
+        };
+        addAction(frame, toggleCO);
+        Action toggleFont = new AbstractAction("toggleFont") {
+            
+            public void actionPerformed(ActionEvent e) {
+                
+                if (monthView.getFont().isItalic()) {
+                    monthView.setFont(font);
+                } else {
+                    monthView.setFont(font.deriveFont(Font.ITALIC));
+                }
+            }
+            
+        };
+        addAction(frame, toggleFont);
         show(frame);
         
     }

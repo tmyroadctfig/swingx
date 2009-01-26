@@ -2135,6 +2135,7 @@ public class BasicMonthViewUI extends MonthViewUI {
             if ("componentOrientation".equals(property)) {
                 isLeftToRight = monthView.getComponentOrientation().isLeftToRight();
                 monthView.revalidate();
+                monthView.repaint();
             } else if (JXMonthView.SELECTION_MODEL.equals(property)) {
                 DateSelectionModel selectionModel = (DateSelectionModel) evt.getOldValue();
                 selectionModel.removeDateSelectionListener(getHandler());
