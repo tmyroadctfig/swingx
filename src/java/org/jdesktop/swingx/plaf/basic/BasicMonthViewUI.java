@@ -2236,7 +2236,8 @@ public class BasicMonthViewUI extends MonthViewUI {
                 monthView.getSelectionModel().setAdjusting(true);
                 pivotDate = null;
                 traverse(action);
-            } else if (action >= ADJUST_SELECTION_PREVIOUS_DAY
+            } else if (isIntervalMode()
+                    && action >= ADJUST_SELECTION_PREVIOUS_DAY
                     && action <= ADJUST_SELECTION_NEXT_WEEK) {
                 setUsingKeyboard(true);
                 monthView.getSelectionModel().setAdjusting(true);
@@ -2244,6 +2245,13 @@ public class BasicMonthViewUI extends MonthViewUI {
             }
         }
 
+
+        /**
+         * @return
+         */
+        private boolean isIntervalMode() {
+            return !(monthView.getSelectionMode() == SelectionMode.SINGLE_SELECTION);
+        }
 
         private void traverse(int action) {
             Date oldStart = monthView.isSelectionEmpty() ? 
@@ -2297,79 +2305,164 @@ public class BasicMonthViewUI extends MonthViewUI {
                 pivotDate = newStartDate;
             }
 
-            boolean isForward = true;
             // want a copy to play with - each branch sets and reads the time
             // actually don't care about the pre-set time.
             Calendar cal = getCalendar();
+            boolean isStartMoved;
             switch (action) {
-                case ADJUST_SELECTION_PREVIOUS_DAY:
-                    if (!newEndDate.after(pivotDate)) {
-                        cal.setTime(newStartDate);
-                        cal.add(Calendar.DAY_OF_MONTH, -1);
-                        newStartDate = cal.getTime();
+            case ADJUST_SELECTION_PREVIOUS_DAY:
+                if (newEndDate.after(pivotDate)) {
+                    newEndDate = previousDay(cal, newEndDate);
+                    isStartMoved = false;
+                } else {
+                    newStartDate = previousDay(cal, newStartDate);
+                    newEndDate = pivotDate;
+                    isStartMoved = true;
+                }
+                break;
+            case ADJUST_SELECTION_NEXT_DAY:
+                if (newStartDate.before(pivotDate)) {
+                    newStartDate = nextDay(cal, newStartDate);
+                    isStartMoved = true;
+                } else {
+                    newEndDate = nextDay(cal, newEndDate);
+                    isStartMoved = false;
+                    newStartDate = pivotDate;
+                }
+                break;
+            case ADJUST_SELECTION_PREVIOUS_WEEK:
+                if (newEndDate.after(pivotDate)) {
+                    Date newTime = previousWeek(cal, newEndDate);
+                    if (newTime.after(pivotDate)) {
+                        newEndDate = newTime;
+                        isStartMoved = false;
                     } else {
-                        cal.setTime(newEndDate);
-                        cal.add(Calendar.DAY_OF_MONTH, -1);
-                        newEndDate = cal.getTime();
+                        newStartDate = newTime;
+                        newEndDate = pivotDate;
+                        isStartMoved = true;
                     }
-                    isForward = false;
-                    break;
-                case ADJUST_SELECTION_NEXT_DAY:
-                    if (!newStartDate.before(pivotDate)) {
-                        cal.setTime(newEndDate);
-                        cal.add(Calendar.DAY_OF_MONTH, 1);
+                } else {
+                    newStartDate = previousWeek(cal, newStartDate);
+                    isStartMoved = true;
+                }
+                break;
+            case ADJUST_SELECTION_NEXT_WEEK:
+                if (newStartDate.before(pivotDate)) {
+                    Date newTime = nextWeek(cal, newStartDate);
+                    if (newTime.before(pivotDate)) {
+                        newStartDate = newTime;
+                        isStartMoved = true;
+                    } else {
                         newStartDate = pivotDate;
-                        newEndDate = cal.getTime();
-                    } else {
-                        cal.setTime(newStartDate);
-                        cal.add(Calendar.DAY_OF_MONTH, 1);
-                        newStartDate = cal.getTime();
+                        newEndDate = newTime;
+                        isStartMoved = false;
                     }
-                    break;
-                case ADJUST_SELECTION_PREVIOUS_WEEK:
-                    if (!newEndDate.after(pivotDate)) {
-                        cal.setTime(newStartDate);
-                        cal.add(Calendar.DAY_OF_MONTH, -JXMonthView.DAYS_IN_WEEK);
-                        newStartDate = cal.getTime();
-                    } else {
-                        cal.setTime(newEndDate);
-                        cal.add(Calendar.DAY_OF_MONTH, -JXMonthView.DAYS_IN_WEEK);
-                        Date newTime = cal.getTime();
-                        if (!newTime.after(pivotDate)) {
-                            newStartDate = newTime;
-                            newEndDate = pivotDate;
-                        } else {
-                            newEndDate = cal.getTime();
-                        }
-
-                    }
-                    isForward = false;
-                    break;
-                case ADJUST_SELECTION_NEXT_WEEK:
-                    if (!newStartDate.before(pivotDate)) {
-                        cal.setTime(newEndDate);
-                        cal.add(Calendar.DAY_OF_MONTH, JXMonthView.DAYS_IN_WEEK);
-                        newEndDate = cal.getTime();
-                    } else {
-                        cal.setTime(newStartDate);
-                        cal.add(Calendar.DAY_OF_MONTH, JXMonthView.DAYS_IN_WEEK);
-                        Date newTime = cal.getTime();
-                        if (!newTime.before(pivotDate)) {
-                            newStartDate = pivotDate;
-                            newEndDate = newTime;
-                        } else {
-                            newStartDate = cal.getTime();
-                        }
-                    }
-                    break;
+                } else {
+                    newEndDate = nextWeek(cal, newEndDate);
+                    isStartMoved = false;
+                }
+                break;
+            default : throw new IllegalArgumentException("invalid adjustment action: " + action);
             }
+            
+            // PENDING JW: old way to calculate the navigation #998
+            // KEEP - just a short while for quickly comparing old vs. new behaviour
+//            boolean isStartMoved = true;
+//            switch (action) {
+//                case ADJUST_SELECTION_PREVIOUS_DAY:
+//                    if (!newEndDate.after(pivotDate)) {
+//                        newStartDate = previousDay(cal, newStartDate);
+//                    } else {
+//                        newEndDate = previousDay(cal, newEndDate);
+//                    }
+//                    isStartMoved = false;
+//                    break;
+//                case ADJUST_SELECTION_NEXT_DAY:
+//                    if (!newStartDate.before(pivotDate)) {
+//                        newEndDate = nextDay(cal, newEndDate);
+//                        newStartDate = pivotDate;
+//                    } else {
+//                        newStartDate = nextDay(cal, newStartDate);
+//                    }
+//                    break;
+//                case ADJUST_SELECTION_PREVIOUS_WEEK:
+//                    if (!newEndDate.after(pivotDate)) {
+//                        newStartDate = previousWeek(cal, newStartDate);
+//                    } else {
+//                        Date newTime = previousWeek(cal, newEndDate);
+//                        if (!newTime.after(pivotDate)) {
+//                            newStartDate = newTime;
+//                            newEndDate = pivotDate;
+//                        } else {
+//                            newEndDate = cal.getTime();
+//                        }
+//
+//                    }
+//                    isStartMoved = false;
+//                    break;
+//                case ADJUST_SELECTION_NEXT_WEEK:
+//                    if (!newStartDate.before(pivotDate)) {
+//                        newEndDate = nextWeek(cal, newEndDate);
+//                    } else {
+//                        Date newTime = nextWeek(cal, newStartDate);
+//                        if (!newTime.before(pivotDate)) {
+//                            newStartDate = pivotDate;
+//                            newEndDate = newTime;
+//                        } else {
+//                            newStartDate = cal.getTime();
+//                        }
+//                    }
+//                    break;
+//            }
             if (!newStartDate.equals(selectionStart) || !newEndDate.equals(selectionEnd)) {
                 monthView.setSelectionInterval(newStartDate, newEndDate);
-                // PENDING JW: wrong logic - we want to have the "moving edge" visible
-                // which is != "direction of change"
-                monthView.ensureDateVisible(isForward ? newEndDate  : newStartDate);
+                monthView.ensureDateVisible(isStartMoved ? newStartDate  : newEndDate);
             }
 
+        }
+
+        /**
+         * @param cal
+         * @param date
+         * @return
+         */
+        private Date nextWeek(Calendar cal, Date date) {
+            cal.setTime(date);
+            cal.add(Calendar.DAY_OF_MONTH, JXMonthView.DAYS_IN_WEEK);
+            return cal.getTime();
+        }
+
+        /**
+         * @param cal
+         * @param date
+         * @return
+         */
+        private Date previousWeek(Calendar cal, Date date) {
+            cal.setTime(date);
+            cal.add(Calendar.DAY_OF_MONTH, -JXMonthView.DAYS_IN_WEEK);
+            return cal.getTime();
+        }
+
+        /**
+         * @param cal
+         * @param date
+         * @return
+         */
+        private Date nextDay(Calendar cal, Date date) {
+            cal.setTime(date);
+            cal.add(Calendar.DAY_OF_MONTH, 1);
+            return cal.getTime();
+        }
+
+        /**
+         * @param cal
+         * @param date
+         * @return
+         */
+        private Date previousDay(Calendar cal, Date date) {
+            cal.setTime(date);
+            cal.add(Calendar.DAY_OF_MONTH, -1);
+            return cal.getTime();
         }
         
 
