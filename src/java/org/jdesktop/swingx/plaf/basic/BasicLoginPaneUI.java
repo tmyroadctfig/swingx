@@ -132,7 +132,7 @@ public class BasicLoginPaneUI extends LoginPaneUI {
 
         originalGraphics.setColor(UIManager.getColor("JXLoginPane.bannerForeground"));
         originalGraphics.drawString(dlg.getBannerText(), loginStringX, loginStringY);
-        
+        originalGraphics.dispose();
         return img;
     }
 }
