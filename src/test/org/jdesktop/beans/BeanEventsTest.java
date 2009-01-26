@@ -21,6 +21,7 @@
  */
 package org.jdesktop.beans;
 
+import java.awt.HeadlessException;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -179,6 +180,12 @@ public class BeanEventsTest extends InteractiveTestCase {
                         // ignore
                     } catch (NoClassDefFoundError e) {
                             //ignore too
+                    } catch (ExceptionInInitializerError e) {
+                        if (e.getCause() instanceof HeadlessException) {
+                            // running in headless env ... ignore 
+                        } else {
+                            throw e;
+                        }
                     }
                 }
                 // search recursively.
