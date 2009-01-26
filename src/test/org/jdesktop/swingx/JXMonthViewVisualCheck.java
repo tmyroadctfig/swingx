@@ -71,7 +71,8 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
 //          test.runInteractiveTests();
 //        test.runInteractiveTests(".*TimeZone.*");
 //          test.runInteractiveTests("interactive.*Zoomable.*");
-        test.runInteractiveTests("interactive.*Property.*");
+          test.runInteractiveTests("interactive.*Select.*");
+//        test.runInteractiveTests("interactive.*Property.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
@@ -790,6 +791,13 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
      * 
      * Fixed as a side-effect of cleanup of input map bindings. 
      * 
+     * Regression #555 
+     * 
+     * Issue #996-swingx: NPE while dragging 
+     * 
+     * to reproduce: first click into a empty (leading/trailing) day then
+     * drag into month. Fixed (brutish? - not entirely sure as the user
+     * interaction is suboptimal anyway ..)
      */
     public void interactiveMultipleSelectionWithKeyboard() {
         JXMonthView interval = new JXMonthView();
@@ -799,14 +807,14 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
         // for comparison: single interval in popup is working
         JXDatePicker picker = new JXDatePicker();
         JXMonthView intervalForPicker = new JXMonthView();
-        intervalForPicker.setSelectionMode(SelectionMode.SINGLE_INTERVAL_SELECTION);
+        intervalForPicker.setSelectionMode(SelectionMode.MULTIPLE_INTERVAL_SELECTION);
         picker.setMonthView(intervalForPicker);
         
         JComponent comp = new JPanel();
         comp.add(interval);
         comp.add(multiple);
         comp.add(picker);
-        showInFrame(comp, "select interval with keyboard");
+        showInFrame(comp, "select interval with keyboard: singleInt vs. multipleInt");
         
     }
     /**

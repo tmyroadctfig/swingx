@@ -1998,7 +1998,7 @@ public class BasicMonthViewUI extends MonthViewUI {
                 }
                 startDate = selected;
                 endDate = selected;
-            } else {
+            } else  if (pivotDate != null){
                 if (selected.before(pivotDate)) {
                     startDate = selected;
                     endDate = pivotDate;
@@ -2006,6 +2006,12 @@ public class BasicMonthViewUI extends MonthViewUI {
                     startDate = pivotDate;
                     endDate = selected;
                 }
+            } else { // pivotDate had not yet been initialiased
+                // might happen on first click into leading/trailing dates
+                // JW: fix of #996-swingx: NPE when dragging 
+                startDate = selected;
+                endDate = selected;
+                pivotDate = selected;
             }
 
             if (startDate.equals(oldStart) && endDate.equals(oldEnd)) {
@@ -2367,24 +2373,7 @@ public class BasicMonthViewUI extends MonthViewUI {
 
     }
 
-//--------------------- deprecated painting api
-//--------------------- this is still serviced (if a ui doesn't install a renderingHandler)
-//--------------------- but no longer actively maintained    
-
-
-    /**
-     * Create a derived font used to when painting various pieces of the
-     * month view component.  This method will be called whenever
-     * the font on the component is set so a new derived font can be created.
-     * @deprecated KEEP re-added usage in preliminary zoomable support
-     *    no longer used in paint/layout with renderer.
-     */
-    @Deprecated
-    protected Font createDerivedFont() {
-        return monthView.getFont().deriveFont(Font.BOLD);
-    }
-    
-
+//--------------------- zoomable    
 
     /**
      * 
@@ -2449,5 +2438,25 @@ public class BasicMonthViewUI extends MonthViewUI {
         };
         calendarHeader.setActions(prev, next, zoomOut);
     }
+
+    
+//--------------------- deprecated painting api
+//--------------------- this is still serviced (if a ui doesn't install a renderingHandler)
+//--------------------- but no longer actively maintained    
+
+
+    /**
+     * Create a derived font used to when painting various pieces of the
+     * month view component.  This method will be called whenever
+     * the font on the component is set so a new derived font can be created.
+     * @deprecated KEEP re-added usage in preliminary zoomable support
+     *    no longer used in paint/layout with renderer.
+     */
+    @Deprecated
+    protected Font createDerivedFont() {
+        return monthView.getFont().deriveFont(Font.BOLD);
+    }
+    
+
 
 }
