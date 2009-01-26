@@ -71,14 +71,26 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
 //          test.runInteractiveTests();
 //        test.runInteractiveTests(".*TimeZone.*");
 //          test.runInteractiveTests("interactive.*Zoomable.*");
-          test.runInteractiveTests("interactive.*Select.*");
-//        test.runInteractiveTests("interactive.*Property.*");
+//          test.runInteractiveTests("interactive.*Select.*");
+        test.runInteractiveTests("interactive.*Property.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
       }
   }
 
+    /**
+     * Issue 807-swingx: JXMonthView must have visual clue if enabled.
+     */
+    public void interactiveDisabled() {
+        JXMonthView monthView = new JXMonthView();
+        monthView.setEnabled(false);
+        JComponent comp = Box.createHorizontalBox();
+        comp.add(monthView);
+        comp.add(new JXMonthView());
+        showInFrame(comp, "disabled <--> enabled");
+    }
+    
     
     public void interactiveRevalidateOnZoomable() {
         final JXMonthView monthView = new JXMonthView();
@@ -200,6 +212,14 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
             
         };
         addAction(frame, toggleFont);
+        Action toggleEnabled = new AbstractAction("toggleEnabled") {
+            
+            public void actionPerformed(ActionEvent e) {
+                monthView.setEnabled(!monthView.isEnabled());
+            }
+            
+        };
+        addAction(frame, toggleEnabled);
         show(frame);
         
     }

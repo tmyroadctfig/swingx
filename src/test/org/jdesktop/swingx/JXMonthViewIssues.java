@@ -67,10 +67,10 @@ public class JXMonthViewIssues extends InteractiveTestCase {
       setSystemLF(true);
       InteractiveTestCase  test = new JXMonthViewIssues();
       try {
-//          test.runInteractiveTests();
+          test.runInteractiveTests();
 //        test.runInteractiveTests("interactive.*Locale.*");
 //          test.runInteractiveTests("interactive.*AutoScroll.*");
-        test.runInteractiveTests("interactive.*Repaint.*");
+//        test.runInteractiveTests("interactive.*Repaint.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
@@ -108,19 +108,6 @@ public class JXMonthViewIssues extends InteractiveTestCase {
         comp.add(monthView);
         JXFrame frame = wrapInFrame(comp, "antialiased 1.6paint left");
         show(frame);
-    }
-    
-    /**
-     * Issue ??-swingx: JXMonthView must have visual clue if enabled.
-     */
-    public void interactiveDisabled() {
-        JXMonthView monthView = new JXMonthView();
-        monthView.setEnabled(false);
-        JComponent comp = Box.createHorizontalBox();
-        comp.add(monthView);
-        comp.add(new JXMonthView());
-        showInFrame(comp, "disabled <--> enabled");
-        
     }
     
     /**
