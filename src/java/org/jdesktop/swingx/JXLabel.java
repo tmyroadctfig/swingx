@@ -69,6 +69,7 @@ import javax.swing.text.View;
 import javax.swing.text.ViewFactory;
 import javax.swing.text.WrappedPlainView;
 import org.jdesktop.swingx.painter.AbstractPainter;
+import org.jdesktop.swingx.painter.MattePainter;
 import org.jdesktop.swingx.painter.Painter;
 
 /**
@@ -252,6 +253,11 @@ public class JXLabel extends JLabel {
             protected boolean shouldUseCache() {
                 return false;
             }
+            
+            @Override
+            public boolean equals(Object obj) {
+                return obj != null && this.getClass().equals(obj.getClass());
+            }
         };
     }
 
@@ -317,7 +323,12 @@ public class JXLabel extends JLabel {
      */
     public void setForegroundPainter(Painter painter) {
         Painter old = this.getForegroundPainter();
-        this.foregroundPainter = painter;
+        if (painter == null) {
+            //restore default painter
+            initPainterSupport();
+        } else {
+            this.foregroundPainter = painter;
+        }
         firePropertyChange("foregroundPainter", old, getForegroundPainter());
         repaint();
     }
@@ -347,7 +358,7 @@ public class JXLabel extends JLabel {
     public final Painter getBackgroundPainter() {
         return backgroundPainter;
     }
-
+    
     /**
      * Gets current value of text rotation in rads.
      *
