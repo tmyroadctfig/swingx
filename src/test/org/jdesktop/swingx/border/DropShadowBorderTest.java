@@ -40,17 +40,15 @@ import org.jdesktop.swingx.icon.SortArrowIcon;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import org.junit.Test;
-import org.junit.Before;
-import org.junit.After;
 
 
 /**
- * Tests related to SwingX Borders.
+ * Tests related to DropShadowBorders.
  * 
  * @author Jeanette Winzenburg
  */
 @RunWith(JUnit4.class)
-public class BorderTest extends InteractiveTestCase {
+public class DropShadowBorderTest extends InteractiveTestCase {
 
     /**
      * Issue ??-swingx: IconBorder must handle null icon.
@@ -164,7 +162,7 @@ public class BorderTest extends InteractiveTestCase {
     }
 
     public static void main(String args[]) {
-        BorderTest test = new BorderTest();
+        DropShadowBorderTest test = new DropShadowBorderTest();
         try {
           test.runInteractiveTests();
 //            test.runInteractiveTests("interactive.*Mark.*");
