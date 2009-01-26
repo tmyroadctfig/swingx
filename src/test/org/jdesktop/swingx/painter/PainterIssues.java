@@ -24,12 +24,17 @@ package org.jdesktop.swingx.painter;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Rectangle;
-import java.awt.Shape;
 import java.awt.event.ActionEvent;
-import java.awt.geom.Ellipse2D;
-import java.lang.reflect.InvocationTargetException;
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.StringTokenizer;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
+import java.util.logging.Logger;
 
 import javax.swing.Action;
 import javax.swing.BorderFactory;
@@ -39,11 +44,11 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.border.Border;
 
+import org.jdesktop.beans.AbstractBean;
 import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXLabel;
 import org.jdesktop.swingx.action.AbstractActionExt;
-import org.jdesktop.test.PropertyChangeReport;
 import org.jdesktop.test.TestUtils;
 
 /**
@@ -51,12 +56,14 @@ import org.jdesktop.test.TestUtils;
  * 
  * Ideally, there would be at least one failing test method per open
  * Issue in the issue tracker. Plus additional failing test methods for
- * not fully specified or not yet decided upon features/behaviour.
+ * not fully specified or not yet decided upon features/behavior.
  * 
  * 
  * @author Jeanette Winzenburg
  */
 public class PainterIssues extends InteractiveTestCase {
+    
+    static Logger log = Logger.getAnonymousLogger();
     public static void main(String args[]) {
 //      setSystemLF(true);
         PainterIssues test = new PainterIssues();
@@ -69,75 +76,13 @@ public class PainterIssues extends InteractiveTestCase {
         }
     }
 
-    /**
-     * Here: issue examplified for frame property, need to check others as well.
-     */
-    public void testBusyPainterChangeNotification() {
-        // create class
-        ImagePainter painter = new ImagePainter();
-        TestUtils.assertPCEFiring(painter);
-    }
-
-    /**
-     * Issue #??-swingx: default foreground painter not guaranteed after change.
-     *
-     */
-    public void testDefaultForegroundPainter() {
-        JXLabel label =  new JXLabel();
-        Painter defaultForeground = label.getForegroundPainter();
-        // sanity
-        assertNotNull(defaultForeground);
-        label.setForegroundPainter(null);
-        assertEquals(defaultForeground, label.getForegroundPainter());
-    }
-    
-
     // ------------------ visual tests
   
-    /**
-     * JXLabel restore default foreground painter.
-     * Sequence: 
-     *   compose the default with a transparent overlay
-     *   try to reset to default
-     *   try to compose the overlay again.
-     */
-    public void interactiveRestoreDefaultForegroundPainter() {
-        JComponent box = Box.createVerticalBox();
-        final JXLabel foreground = new JXLabel(
-                "setup: compound - default and overlay ");
-        ShapePainter shapePainter = new ShapePainter();
-        final AlphaPainter alpha = new AlphaPainter();
-        alpha.setAlpha(0.2f);
-        alpha.setPainters(shapePainter);
-        CompoundPainter compound = new CompoundPainter(foreground
-                .getForegroundPainter(), alpha);
-        foreground.setForegroundPainter(compound);
-        box.add(foreground);
-        Action action = new AbstractActionExt("reset default foreground") {
-            boolean reset;
-            public void actionPerformed(ActionEvent e) {
-                if (reset) {
-                    CompoundPainter painter = new CompoundPainter(alpha, foreground.getForegroundPainter());
-                    foreground.setForegroundPainter(painter);
-                } else {
-                  // try to reset to default
-                    foreground.setForegroundPainter(null);
-                }
-                reset = !reset;
-
-            }
-
-        };
-        JXFrame frame = wrapInFrame(box, "foreground painters");
-        addAction(frame, action);
-        frame.pack();
-        frame.setVisible(true);
-    }
-    
     
     /**
      * JXLabel default foreground painter - share between labels.
-     * Probably illegal :-)
+     * Probably illegal :-) 
+     * IMHO not illegal and sometimes even desirable (Jan).
      * 
      */
     public void interactiveXLabelSharedDefaultForegroundPainter() {
@@ -172,7 +117,7 @@ public class PainterIssues extends InteractiveTestCase {
         box.add(opaqueTrue);
         JXLabel opaqueFalse = new JXLabel("setup: backgroundPainter, opaque = false");
         opaqueFalse.setOpaque(false);
-        opaqueTrue.setBackgroundPainter(shapePainter);
+        opaqueFalse.setBackgroundPainter(shapePainter);
         box.add(opaqueFalse);
         JXLabel opaqueUnchanged = new JXLabel("setup: backgroundPainter, opaque = unchanged");
         opaqueUnchanged.setBackgroundPainter(shapePainter);
@@ -344,5 +289,4 @@ public class PainterIssues extends InteractiveTestCase {
         frame.pack();
         frame.setVisible(true);
     }
-
 }
