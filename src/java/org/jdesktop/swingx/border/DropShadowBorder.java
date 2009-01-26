@@ -40,25 +40,67 @@ import java.util.Map;
  * DropShadowBorder works wonderfully with JPanel, but horribly with JComboBox.
  * <p>
  * Note: {@code DropShadowBorder} should usually be added to non-opaque
- * components, otherwise the background is likely to bleed through.
- * 
+ * components, otherwise the background is likely to bleed through.</p>
+ * <p>Note: Since generating drop shadows is relatively expensive operation, 
+ * {@code DropShadowBorder} keeps internal static cache that allows sharing 
+ * same border for multiple re-rendering and between different instances of the 
+ * class. Since this cache is shared at class level and never reset, it might 
+ * bleed your app memory in case you tend to create many different borders 
+ * rapidly.</p>
  * @author rbair
  */
 public class DropShadowBorder implements Border, Serializable {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 715287754750604058L;
+
     private static enum Position {TOP, TOP_LEFT, LEFT, BOTTOM_LEFT,
                     BOTTOM, BOTTOM_RIGHT, RIGHT, TOP_RIGHT}
                     
     private static final Map<Double,Map<Position,BufferedImage>> CACHE 
             = new HashMap<Double,Map<Position,BufferedImage>>();
                         
-    private final Color shadowColor;
-    private final int shadowSize;
-    private final float shadowOpacity;
-    private final int cornerSize;
-    private final boolean showTopShadow;
-    private final boolean showLeftShadow;
-    private final boolean showBottomShadow;
-    private final boolean showRightShadow;
+    private Color shadowColor;
+    public void setShadowColor(Color shadowColor) {
+        this.shadowColor = shadowColor;
+    }
+
+    public void setShadowSize(int shadowSize) {
+        this.shadowSize = shadowSize;
+    }
+
+    public void setShadowOpacity(float shadowOpacity) {
+        this.shadowOpacity = shadowOpacity;
+    }
+
+    public void setCornerSize(int cornerSize) {
+        this.cornerSize = cornerSize;
+    }
+
+    public void setShowTopShadow(boolean showTopShadow) {
+        this.showTopShadow = showTopShadow;
+    }
+
+    public void setShowLeftShadow(boolean showLeftShadow) {
+        this.showLeftShadow = showLeftShadow;
+    }
+
+    public void setShowBottomShadow(boolean showBottomShadow) {
+        this.showBottomShadow = showBottomShadow;
+    }
+
+    public void setShowRightShadow(boolean showRightShadow) {
+        this.showRightShadow = showRightShadow;
+    }
+
+    private int shadowSize;
+    private float shadowOpacity;
+    private int cornerSize;
+    private boolean showTopShadow;
+    private boolean showLeftShadow;
+    private boolean showBottomShadow;
+    private boolean showRightShadow;
     
     public DropShadowBorder() {
         this(Color.BLACK, 5);
