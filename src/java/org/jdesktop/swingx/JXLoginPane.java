@@ -792,7 +792,7 @@ public class JXLoginPane extends JXPanel {
         errorMessageLabel.setVerticalTextPosition(SwingConstants.TOP);
         errorMessageLabel.setLineWrap(true);
         errorMessageLabel.setPaintBorderInsets(false);
-        errorMessageLabel.setBackgroundPainter(new MattePainter<JXLabel>(UIManager.getColor(CLASS_NAME + ".errorBackground", getLocale()), true));
+        errorMessageLabel.setBackgroundPainter(new MattePainter(UIManager.getColor(CLASS_NAME + ".errorBackground", getLocale()), true));
         errorMessageLabel.setMaxLineSpan(320);
         errorMessageLabel.setVisible(false);
 
