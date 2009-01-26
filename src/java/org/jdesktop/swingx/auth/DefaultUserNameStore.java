@@ -169,8 +169,8 @@ public class DefaultUserNameStore extends UserNameStore {
      * or undefined, then they are stored in /org/jdesktop/swingx/auth/DefaultUserNameStore.
      */
     public void setPreferences(Preferences prefs) {
-        initPrefs();
         Preferences old = getPreferences();
+        initPrefs();
         this.prefs = prefs;
         firePropertyChange("preferences", old, getPreferences());
         if (this.prefs != old) {
