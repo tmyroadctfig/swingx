@@ -248,11 +248,13 @@ public class JXPanel extends JPanel implements Scrollable {
     public void setBackground(Color bg) {
         super.setBackground(bg);
         
-        if (canInstallBackgroundUIResourceAsPainter(bg)) {
-            setBackgroundPainter(new PainterUIResource(new MattePainter<JXPanel>(bg)));
-        } else {
-            setBackgroundPainter(new MattePainter<JXPanel>(bg));
-        }
+        //TODO problem with SwingX #964.  Had to undo changes.
+        //Change causes background to be painter when using setOpaque=false hack
+//        if (canInstallBackgroundUIResourceAsPainter(bg)) {
+//            setBackgroundPainter(new PainterUIResource(new MattePainter<JXPanel>(bg)));
+//        } else {
+//            setBackgroundPainter(new MattePainter<JXPanel>(bg));
+//        }
     }
 
     private boolean canInstallBackgroundUIResourceAsPainter(Color bg) {
