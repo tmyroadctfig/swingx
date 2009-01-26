@@ -2236,14 +2236,14 @@ public class BasicMonthViewUI extends MonthViewUI {
                 monthView.getSelectionModel().setAdjusting(true);
                 pivotDate = null;
                 traverse(action);
-            } else if (monthView.getSelectionMode() == SelectionMode.SINGLE_INTERVAL_SELECTION
-                    && action >= ADJUST_SELECTION_PREVIOUS_DAY
+            } else if (action >= ADJUST_SELECTION_PREVIOUS_DAY
                     && action <= ADJUST_SELECTION_NEXT_WEEK) {
                 setUsingKeyboard(true);
                 monthView.getSelectionModel().setAdjusting(true);
                 addToSelection(action);
             }
         }
+
 
         private void traverse(int action) {
             Date oldStart = monthView.isSelectionEmpty() ? 
@@ -2365,6 +2365,8 @@ public class BasicMonthViewUI extends MonthViewUI {
             }
             if (!newStartDate.equals(selectionStart) || !newEndDate.equals(selectionEnd)) {
                 monthView.setSelectionInterval(newStartDate, newEndDate);
+                // PENDING JW: wrong logic - we want to have the "moving edge" visible
+                // which is != "direction of change"
                 monthView.ensureDateVisible(isForward ? newEndDate  : newStartDate);
             }
 

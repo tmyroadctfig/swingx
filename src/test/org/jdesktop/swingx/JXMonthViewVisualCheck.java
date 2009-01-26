@@ -71,8 +71,8 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
 //          test.runInteractiveTests();
 //        test.runInteractiveTests(".*TimeZone.*");
 //          test.runInteractiveTests("interactive.*Zoomable.*");
-//          test.runInteractiveTests("interactive.*Select.*");
-        test.runInteractiveTests("interactive.*Property.*");
+          test.runInteractiveTests("interactive.*Select.*");
+//        test.runInteractiveTests("interactive.*Property.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
@@ -820,6 +820,8 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
      * interaction is suboptimal anyway ..)
      */
     public void interactiveMultipleSelectionWithKeyboard() {
+        JXMonthView single = new JXMonthView();
+        single.setSelectionMode(SelectionMode.SINGLE_SELECTION);
         JXMonthView interval = new JXMonthView();
         interval.setSelectionMode(SelectionMode.SINGLE_INTERVAL_SELECTION);
         JXMonthView multiple = new JXMonthView();
@@ -831,10 +833,11 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
         picker.setMonthView(intervalForPicker);
         
         JComponent comp = new JPanel();
+        comp.add(single);
         comp.add(interval);
         comp.add(multiple);
         comp.add(picker);
-        showInFrame(comp, "select interval with keyboard: singleInt vs. multipleInt");
+        showInFrame(comp, "select interval with keyboard: single vs. singleInt vs. multipleInt");
         
     }
     /**
