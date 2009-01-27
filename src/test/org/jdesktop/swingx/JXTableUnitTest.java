@@ -90,9 +90,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.junit.Test;
-import org.junit.Before;
-import org.junit.After;
 
 
 /**
@@ -146,6 +143,26 @@ public class JXTableUnitTest extends InteractiveTestCase {
        public void tearDown() throws Exception {
         UIManager.put("JXTable.rowHeight", uiTableRowHeight);
         super.tearDown();
+    }
+
+
+    /**
+     * Issue #847-swingx: JXTable respect custom corner if columnControl not visible
+     * 
+     *  LAF provided corners are handled in core since jdk6u10. 
+     */
+    @Test
+    public void testCornerRespectLAF() {
+        Object corner = UIManager.get("Table.scrollPaneCornerComponent");
+        if (!(corner instanceof Class)) {
+            LOG.info("cannont run - LAF doesn't provide corner component");
+            return;
+        }
+        final JXTable table = new JXTable(10, 2);
+        final JScrollPane scrollPane = new JScrollPane(table);
+        table.addNotify();
+        assertNotNull(scrollPane.getCorner(JScrollPane.UPPER_TRAILING_CORNER));
+        assertEquals(corner, scrollPane.getCorner(JScrollPane.UPPER_TRAILING_CORNER).getClass());
     }
 
     

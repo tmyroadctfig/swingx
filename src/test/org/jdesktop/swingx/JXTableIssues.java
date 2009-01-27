@@ -29,12 +29,10 @@ import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Vector;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
@@ -54,7 +52,6 @@ import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
-import javax.swing.UIManager;
 import javax.swing.event.CellEditorListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.TableModelEvent;
@@ -80,7 +77,6 @@ import org.jdesktop.test.CellEditorReport;
 import org.jdesktop.test.PropertyChangeReport;
 import org.jdesktop.test.SerializableSupport;
 import org.jdesktop.test.TestUtils;
-import org.junit.Test;
 
 /**
  * Test to exposed known issues of <code>JXTable</code>.
@@ -178,23 +174,6 @@ public class JXTableIssues extends InteractiveTestCase {
         TestUtils.assertPropertyChangeEvent(report, "filters", pipeline, other, false);
     }
 
-    /**
-     * Issue #847-swingx: JXTable respect custom corner if columnControl not visible
-     * 
-     *  LAF provided corners are handled in core since jdk6u10. 
-     */
-    public void testCornerRespectLAF() {
-        Object corner = UIManager.get("Table.scrollPaneCornerComponent");
-        if (!(corner instanceof Class)) {
-            LOG.info("cannont run - LAF doesn't provide corner component");
-            return;
-        }
-        final JXTable table = new JXTable(10, 2);
-        final JScrollPane scrollPane = new JScrollPane(table);
-        table.addNotify();
-        assertNotNull(scrollPane.getCorner(JScrollPane.UPPER_TRAILING_CORNER));
-        assertEquals(corner, scrollPane.getCorner(JScrollPane.UPPER_TRAILING_CORNER).getClass());
-    }
 
 
      /**

@@ -26,6 +26,8 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.BeanInfo;
@@ -46,6 +48,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.AbstractListModel;
@@ -69,6 +72,10 @@ import javax.swing.ListModel;
 import javax.swing.SwingConstants;
 import javax.swing.UIDefaults;
 import javax.swing.border.Border;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.TableColumnModelEvent;
+import javax.swing.event.TableColumnModelListener;
 import javax.swing.filechooser.FileSystemView;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableModel;
@@ -116,13 +123,17 @@ import org.jdesktop.test.AncientSwingTeam;
  * @author Jeanette Winzenburg
  */
 public class RendererVisualCheck extends InteractiveTestCase {
+    @SuppressWarnings("unused")
+    private static final Logger LOG = Logger
+            .getLogger(RendererVisualCheck.class.getName());
+    
     public static void main(String[] args) {
         setSystemLF(true);
         RendererVisualCheck test = new RendererVisualCheck();
         try {
 //            test.runInteractiveTests();
-          test.runInteractiveTests(".*CustomIcons.*");
-//          test.runInteractiveTests(".*XLabel.*");
+//          test.runInteractiveTests(".*CustomIcons.*");
+          test.runInteractiveTests(".*TextArea.*");
 //          test.runInteractiveTests(".*Color.*");
 //          test.runInteractiveTests("interactive.*ColumnControl.*");
         } catch (Exception e) {
@@ -405,30 +416,158 @@ public class RendererVisualCheck extends InteractiveTestCase {
         showWithScrollingInFrame(table, "normal/sql date formatting"); 
     }
     
+
+    public void interactiveTextAreaRendererList() {
+        final DefaultTableModel model = new DefaultTableModel(0, 2);
+        model.addRow(new String[]{"some really, maybe really really long text -  "
+                + "wrappit .... where needed ", "some really, maybe really really long text -  " +
+                "wrappit .... where needed "});
+        model.addRow(new String[]{"another really, maybe really really long text -  "
+                + "with nothing but junk. wrappit .... where needed", "some really, maybe really really long text -  " +
+                "wrappit .... where needed "});
+        final AbstractListModel listModel = new AbstractListModel() {
+
+            public Object getElementAt(int index) {
+                return model.getValueAt(index, 0);
+            }
+
+            public int getSize() {
+                return model.getRowCount();
+            }};
+        final JXList list = new JXList(listModel);
+        list.setCellRenderer(new DefaultListRenderer(new TextAreaProvider()));
+        LOG.info("get fixed " + list.getFixedCellWidth());
+        list.addComponentListener(new ComponentListener() {
+        
+            public void componentShown(ComponentEvent e) {
+                // TODO Auto-generated method stub
+        
+            }
+        
+            public void componentResized(ComponentEvent e) {
+                // invalidate the layout cache - not really working
+               list.setFixedCellWidth(75);
+               list.setFixedCellHeight(20);
+               list.setFixedCellWidth(-1);
+               list.setFixedCellHeight(-1);
+               list.revalidate();
+               list.repaint();
+        
+            }
+        
+            public void componentMoved(ComponentEvent e) {
+                // TODO Auto-generated method stub
+        
+            }
+        
+            public void componentHidden(ComponentEvent e) {
+                // TODO Auto-generated method stub
+        
+            }
+        });
+        showWithScrollingInFrame(list, "list with textArea");
+    }
     /**
-     * Quick example of using a JTextArea as rendering component.
+     * Quick example of using a JTextArea as rendering component and 
+     * dynamically adjust table row height to max pref height of the
+     * cells in a row.
      *
      */
-    public void interactiveTextAreaRenderer() {
-        DefaultTableModel model = new DefaultTableModel(0, 1);
-        model.addRow(new String[] {"some really, maybe really really long text -  "
-                + "wrappit .... where needed "});
-        model.addRow(new String[] {"another really, maybe really really long text -  "
-                + "with nothing but junk. wrappit .... where needed"});
+    public void interactiveTextAreaRendererTable() {
+//        DefaultTableModel model = new DefaultTableModel(0, 2);
+//        model.addRow(new String[]{"some really, maybe really really long text -  "
+//                + "wrappit .... where needed ", "some really, maybe really really long text -  " +
+//                "wrappit .... where needed "});
+//        model.addRow(new String[]{"another really, maybe really really long text -  "
+//                + "with nothing but junk. wrappit .... where needed", "some really, maybe really really long text -  " +
+//                "wrappit .... where needed "});
+
+        Object[][] rows = new Object[3000][];
+        
+        for (int i = 0; i < rows.length; i++) {
+            rows[i] = new Object[]{
+                    "some really, maybe really really long text -  wrappit .... where needed ", "some really, maybe really really long text -  wrappit .... where needed ",
+                    "some really, maybe really really long text -  wrappit .... where needed ", "some really, maybe really really long text -  wrappit .... where needed ",
+                    "some really, maybe really really long text -  wrappit .... where needed ", "some really, maybe really really long text -  wrappit .... where needed ",
+                    "some really, maybe really really long text -  wrappit .... where needed ", "some really, maybe really really long text -  wrappit .... where needed ",
+                    "some really, maybe really really long text -  wrappit .... where needed ", "some really, maybe really really long text -  wrappit .... where needed ",
+                    "some really, maybe really really long text -  wrappit .... where needed ", "some really, maybe really really long text -  wrappit .... where needed "};
+        }
+ 
+        DefaultTableModel model = new DefaultTableModel(rows,
+                new String[]{
+                        "Title 1", "Title 2",
+                        "Title 3", "Title 4",
+                        "Title 5", "Title 6",
+                });
+
         JXTable table = new JXTable(model);
-        table.setVisibleRowCount(4);
-        table.setVisibleColumnCount(2);
         table.setColumnControlVisible(true);
-        table.getColumnExt(0).setCellRenderer(new DefaultTableRenderer(new TextAreaProvider()));
-        table.addHighlighter(
-                HighlighterFactory.createAlternateStriping());
-        // simulate some means to get a reasonable rowheight
-        table.packColumn(0, -1);
-        JTextArea textArea = (JTextArea) table.prepareRenderer(table.getCellRenderer(0, 0), 0, 0);
-        table.setRowHeight(textArea.getPreferredSize().height);
+        table.setDefaultRenderer(Object.class, new DefaultTableRenderer(new TextAreaProvider()));
+        table.addHighlighter(HighlighterFactory.createSimpleStriping());
+        installDynamicRowHeights(table);
         showWithScrollingInFrame(table, "textArea as rendering comp");
     }
+
+    /**
+     * Configures the table to allow individual row heights based on rendering components
+     * pref size and inits the sizes. Installs an extended column model listener to 
+     * update the rowHeights on changes to the column widths.
+     * 
+     * NOTE: this is not complete - real-world methods must 
+     * - listen to the TableModel to update the rowHeight 
+     * - listen to table's property changes for its Table/ColumnModel to 
+     *   re-wire the appropriate listeners.
+     * 
+     * @param table
+     */
+    private void installDynamicRowHeights(final JXTable table) {
+        table.setRowHeightEnabled(true);
+        updateRowHeight(table);
+        TableColumnModelListener columnListener = new TableColumnModelListener() {
+
+            public void columnAdded(TableColumnModelEvent e) {
+                updateRowHeight(table);
+            }
+
+            public void columnMarginChanged(ChangeEvent e) {
+                // here we rely on an implementation detail of DefaultTableColumnModel:
+                // which fires a marginChanged is column widths are changed
+                updateRowHeight(table);
+            }
+
+            public void columnMoved(TableColumnModelEvent e) {
+            }
+
+            public void columnRemoved(TableColumnModelEvent e) {
+                updateRowHeight(table);
+            }
+
+            public void columnSelectionChanged(ListSelectionEvent e) {
+            }
+            
+        };
+        table.getColumnModel().addColumnModelListener(columnListener);
+    }
     
+    /**
+     * Sets per-row rowHeight based on the rendering component's preferred height.
+     * 
+     * @param table
+     */
+    private void updateRowHeight(final JXTable table) {
+        for (int row = 0; row < table.getRowCount(); row++) {
+            int rowHeight = 0;
+            for (int column = 0; column < table.getColumnCount(); column++) {
+                Component comp = table.prepareRenderer(table
+                        .getCellRenderer(row, column), row, column);
+                rowHeight = Math.max(rowHeight,
+                        comp.getPreferredSize().height);
+            }
+            table.setRowHeight(row, rowHeight); 
+        }
+    }
+
     /**
      * use a JTextArea as rendering component.
      */
@@ -436,11 +575,37 @@ public class RendererVisualCheck extends InteractiveTestCase {
 
         @Override
         protected void configureState(CellContext context) {
+            int columnWidth = getPreferredAreaWidth(context);
+            if (columnWidth > 0) {
+                rendererComponent.setSize(columnWidth, Short.MAX_VALUE);
+            }
+        }
+
+        /**
+         * @param context
+         * @return
+         */
+        private int getPreferredAreaWidth(CellContext context) {
+            if (context.getComponent() instanceof JXTable) {
+                JXTable table = (JXTable) context.getComponent();
+                return table.getColumn(context.getColumn()).getWidth();
+            }
+            if (context.getComponent() instanceof JTree) {
+                // TODO: implement width and depth based initial width
+            }
+            if (context.getComponent() != null) {
+                // pending: accont for insets
+                // doesn't really work for a JList in a scrollPane
+                // need to track..
+                return context.getComponent().getWidth();
+            }
+            // comp is null - not much we can do
+            return -1;
         }
 
         @Override
         protected JTextArea createRendererComponent() {
-            JTextArea area = new JTextArea(3, 20);
+            JTextArea area = new JTextArea();
             area.setLineWrap(true);
             area.setWrapStyleWord(true);
             area.setOpaque(true);

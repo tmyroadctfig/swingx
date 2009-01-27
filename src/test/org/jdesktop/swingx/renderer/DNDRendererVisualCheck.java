@@ -163,4 +163,9 @@ public class DNDRendererVisualCheck extends InteractiveTestCase {
 
         xTable.setTransferHandler(tableTransfer);
     }
+    
+    public void testDummy() {
+        // do nothing - placeholder for empty issues
+    }
+
 }
