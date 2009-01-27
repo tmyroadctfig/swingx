@@ -21,17 +21,10 @@
  */
 package org.jdesktop.swingx;
 
-import java.net.URL;
-
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import org.junit.Test;
-import org.junit.Before;
-import org.junit.After;
 
 
 import junit.framework.TestCase;
