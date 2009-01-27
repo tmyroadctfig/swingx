@@ -6,11 +6,9 @@
  */
 package org.jdesktop.swingx;
 
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 
 import javax.swing.plaf.UIResource;
-import javax.swing.JPanel;
 
 import junit.framework.TestCase;
 
@@ -18,8 +16,6 @@ import org.jdesktop.swingx.action.AbstractActionExt;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import org.junit.Test;
-import org.junit.Before;
-import org.junit.After;
 
 
 

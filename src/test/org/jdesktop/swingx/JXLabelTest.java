@@ -25,12 +25,16 @@ import java.util.logging.Logger;
 
 import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.painter.Painter;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
 /**
  * Base test class for JXLabel related code and issues.
  * 
  * @author rah003
  */
+@RunWith(JUnit4.class)
 public class JXLabelTest extends InteractiveTestCase {
     
     static Logger log = Logger.getAnonymousLogger();
@@ -39,6 +43,7 @@ public class JXLabelTest extends InteractiveTestCase {
      * Issue #??-swingx: default foreground painter not guaranteed after change.
      *
      */
+    @Test
     public void testDefaultForegroundPainter() {
         JXLabel label =  new JXLabel();
         Painter defaultForeground = label.getForegroundPainter();
