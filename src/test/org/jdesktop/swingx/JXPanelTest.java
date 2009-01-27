@@ -99,6 +99,7 @@ public class JXPanelTest {
      */
     @Test
     @SuppressWarnings("unchecked")
+    @Ignore("reactivate with #964")
     public void testSetBackgroundWithUIResourceSetsPainterWithUIResource() {
         JXPanel panel = new JXPanel();
         
