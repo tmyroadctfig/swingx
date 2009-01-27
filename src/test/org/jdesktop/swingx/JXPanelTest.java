@@ -25,6 +25,7 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 
 import java.awt.Color;
@@ -36,6 +37,7 @@ import org.jdesktop.swingx.painter.MattePainter;
 import org.jdesktop.swingx.painter.Painter;
 import org.jdesktop.swingx.plaf.PainterUIResource;
 import org.jdesktop.test.EDTRunner;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -49,11 +51,25 @@ public class JXPanelTest {
     /**
      * SwingX #962: ensure that background painter is initially {@code null}.
      * <p>
+     * Added this test with the rollback of changes for SwingX #964. Remove when
+     * #964 is solved.
+     */
+    @Test
+    public void testBackgroundPainterIsNull() {
+        Painter<?> painter = new JXPanel().getBackgroundPainter();
+        
+        assertThat(painter, is(nullValue()));
+    }
+    
+    /**
+     * SwingX #962: ensure that background painter is initially {@code null}.
+     * <p>
      * SwingX #964: UI-delegate Painters can hide user-specified background
      * color. No longer return {@code null}, we now pass the background color to
      * the painter. Painter should start as {@code UIResource}.
      */
     @Test
+    @Ignore("reactivate with #964")
     public void testBackgroundPainterIsUIResource() {
         Painter<?> painter = new JXPanel().getBackgroundPainter();
         
@@ -64,6 +80,7 @@ public class JXPanelTest {
      * SwingX #964: ensure setting background color sets painter.
      */
     @Test
+    @Ignore("reactivate with #964")
     public void testSetBackgroundSetsPainter() {
         JXPanel panel = new JXPanel();
         
