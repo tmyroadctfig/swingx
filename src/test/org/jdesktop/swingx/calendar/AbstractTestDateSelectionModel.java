@@ -34,6 +34,9 @@ import org.jdesktop.swingx.calendar.DateSelectionModel.SelectionMode;
 import org.jdesktop.swingx.event.DateSelectionEvent;
 import org.jdesktop.swingx.event.DateSelectionEvent.EventType;
 import org.jdesktop.swingx.test.DateSelectionReport;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
 /**
  * Contains test for functionality implemeted on the AbstractDateXX level. <p>
@@ -45,6 +48,7 @@ import org.jdesktop.swingx.test.DateSelectionReport;
  * 
  * @author Jeanette Winzenburg
  */
+@RunWith(JUnit4.class)
 public class AbstractTestDateSelectionModel extends TestCase {
 
     protected DateSelectionModel model;
@@ -61,6 +65,7 @@ public class AbstractTestDateSelectionModel extends TestCase {
      * Issue #808-swingx: setLowerBound doesn't clear selection after.
      * Not fire if upper bound set to same
      */
+    @Test
     public void testSetLowerBoundSameNotFire() {
         model.setLowerBound(today);
         DateSelectionReport report = new DateSelectionReport(model);
@@ -72,6 +77,7 @@ public class AbstractTestDateSelectionModel extends TestCase {
      * Issue #808-swingx: setLowerBound doesn't clear selection after.
      * Fire if upper bound is removed.
      */
+    @Test
     public void testSetLowerBoundFireRemove() {
         model.setLowerBound(today);
         DateSelectionReport report = new DateSelectionReport(model);
@@ -83,6 +89,7 @@ public class AbstractTestDateSelectionModel extends TestCase {
      * Issue #808-swingx: setLowerBound doesn't clear selection after.
      * Fire if upper bound is set.
      */
+    @Test
     public void testSetLowerBoundFireSet() {
         DateSelectionReport report = new DateSelectionReport(model);
         model.setLowerBound(today);
@@ -93,6 +100,7 @@ public class AbstractTestDateSelectionModel extends TestCase {
      * Issue #808-swingx: setUpperBound doesn't clear selection after.
      * Not fire if upper bound set to same
      */
+    @Test
     public void testSetUpperBoundSameNotFire() {
         model.setUpperBound(today);
         DateSelectionReport report = new DateSelectionReport(model);
@@ -104,6 +112,7 @@ public class AbstractTestDateSelectionModel extends TestCase {
      * Issue #808-swingx: setUpperBound doesn't clear selection after.
      * Fire if upper bound is removed.
      */
+    @Test
     public void testSetUpperBoundFireRemove() {
         model.setUpperBound(today);
         DateSelectionReport report = new DateSelectionReport(model);
@@ -115,6 +124,7 @@ public class AbstractTestDateSelectionModel extends TestCase {
      * Issue #808-swingx: setUpperBound doesn't clear selection after.
      * Fire if upper bound is set.
      */
+    @Test
     public void testSetUpperBoundFireSet() {
         DateSelectionReport report = new DateSelectionReport(model);
         model.setUpperBound(today);
@@ -125,6 +135,7 @@ public class AbstractTestDateSelectionModel extends TestCase {
      * Issue #808-swingx: setUpperBound doesn't clear selection after.
      *  NPE on removing upper bound when there is a selection.
      */
+    @Test
     public void testSetUpperBoundNPE() {
         model.setUpperBound(today);
         model.setSelectionInterval(yesterday, yesterday);
@@ -135,6 +146,7 @@ public class AbstractTestDateSelectionModel extends TestCase {
      * Issue #808-swingx: setUpperBound doesn't clear selection after.
      * NPE on removing lower bound when there is a selection.
      */
+    @Test
     public void testSetLowerBoundNPE() {
         model.setLowerBound(yesterday);
         model.setSelectionInterval(today, today);
@@ -143,6 +155,7 @@ public class AbstractTestDateSelectionModel extends TestCase {
     /**
      * Issue #808-swingx: setUpperBound doesn't clear selection after
      */
+    @Test
     public void testSetUpperBoundClearsSelectionAfter() {
         model.setSelectionInterval(tomorrow, tomorrow);
         model.setUpperBound(today);
@@ -152,6 +165,7 @@ public class AbstractTestDateSelectionModel extends TestCase {
     /**
      * Issue #808-swingx: setUpperBound doesn't clear selection after.
      */
+    @Test
     public void testSetLowerBoundClearsSelectionBefore() {
         model.setSelectionInterval(yesterday, yesterday);
         model.setLowerBound(today);
@@ -163,6 +177,7 @@ public class AbstractTestDateSelectionModel extends TestCase {
      * 
      * Add api to access first/last.
      */
+    @Test
     public void testFirstSelectionDate() {
         model.setSelectionMode(SelectionMode.SINGLE_INTERVAL_SELECTION);
         model.setSelectionInterval(today, tomorrow);
@@ -174,6 +189,7 @@ public class AbstractTestDateSelectionModel extends TestCase {
      * 
      * Add api to access first/last.
      */
+    @Test
     public void testLastSelectionDate() {
         model.setSelectionMode(SelectionMode.SINGLE_INTERVAL_SELECTION);
         model.setSelectionInterval(today, tomorrow);
@@ -185,6 +201,7 @@ public class AbstractTestDateSelectionModel extends TestCase {
      * 
      * Add api to access first/last.
      */
+    @Test
     public void testFirstSelectionDateEmpty() {
         assertEquals(null, model.getFirstSelectionDate());
     }
@@ -194,6 +211,7 @@ public class AbstractTestDateSelectionModel extends TestCase {
      * 
      * Add api to access first/last.
      */
+    @Test
     public void testLastSelectionDateEmpty() {
         assertEquals(null, model.getLastSelectionDate());
     }
@@ -206,6 +224,7 @@ public class AbstractTestDateSelectionModel extends TestCase {
      * set. As such they make no sense in a new timezone: must
      * either be adjusted or cleared. Currently we clear them. 
      */
+    @Test
     public void testTimeZoneChangeResetUnselectableDates() {
         TimeZone tz = TimeZone.getTimeZone("GMT+4");
         if (model.getTimeZone().equals(tz)) {
@@ -231,6 +250,7 @@ public class AbstractTestDateSelectionModel extends TestCase {
      * selected. As such they make no sense in a new timezone: must
      * either be adjusted or cleared. Currently we clear the selection. 
      */
+    @Test
     public void testTimeZoneChangeClearSelection() {
         TimeZone tz = TimeZone.getTimeZone("GMT+4");
         if (model.getTimeZone().equals(tz)) {
@@ -255,6 +275,7 @@ public class AbstractTestDateSelectionModel extends TestCase {
      * set. As such they make no sense in a new timezone: must
      * either be adjusted or cleared. Currently we clear the bound. 
      */
+    @Test
     public void testTimeZoneChangeResetLowerBound() {
         TimeZone tz = TimeZone.getTimeZone("GMT+4");
         if (model.getTimeZone().equals(tz)) {
@@ -273,6 +294,7 @@ public class AbstractTestDateSelectionModel extends TestCase {
      * set. As such they make no sense in a new timezone: must
      * either be adjusted or cleared. Currently we clear the bound. 
      */
+    @Test
     public void testTimeZoneChangeResetUpperBound() {
         TimeZone tz = TimeZone.getTimeZone("GMT+4");
         if (model.getTimeZone().equals(tz)) {
@@ -289,6 +311,7 @@ public class AbstractTestDateSelectionModel extends TestCase {
      * 
      * test that locale update respects timezone.
      */
+    @Test
     public void testCalendarTimeZoneLocale() {
         TimeZone tz = TimeZone.getTimeZone("GMT+4");
         if (model.getTimeZone().equals(tz)) {
@@ -306,6 +329,7 @@ public class AbstractTestDateSelectionModel extends TestCase {
      * test synch of model properties with its calendar's properties.
      * Here: null locale falls back to Locale.default.
      */
+    @Test
     public void testCalendarLocaleNull() {
         // config with a known timezone and date
         Locale tz = Locale.GERMAN;
@@ -322,6 +346,7 @@ public class AbstractTestDateSelectionModel extends TestCase {
      * test synch of model properties with its calendar's properties.
      * Here: null locale falls back to Locale.default, no fire if had.
      */
+    @Test
     public void testCalendarLocaleNullNoNofify() {
         DateSelectionReport report = new DateSelectionReport(model);
         model.setLocale(null);
@@ -332,6 +357,7 @@ public class AbstractTestDateSelectionModel extends TestCase {
      * test synch of model properties with its calendar's properties.
      * Here: changed timeZone.
      */
+    @Test
     public void testCalendarLocaleNoChangeNoNotify() {
         // config with a known timezone and date
         Locale tz = model.getLocale();
@@ -344,6 +370,7 @@ public class AbstractTestDateSelectionModel extends TestCase {
      * test synch of model properties with its calendar's properties.
      * Here: changed timeZone.
      */
+    @Test
     public void testCalendarLocaleChangedNotify() {
         // config with a known timezone and date
         Locale tz = Locale.GERMAN;
@@ -360,6 +387,7 @@ public class AbstractTestDateSelectionModel extends TestCase {
      * test synch of model properties with its calendar's properties.
      * Here: changed timeZone.
      */
+    @Test
     public void testCalendarLocaleChanged() {
         // config with a known timezone and date
         Locale tz = Locale.GERMAN;
@@ -374,6 +402,7 @@ public class AbstractTestDateSelectionModel extends TestCase {
      * test synch of model properties with its calendar's properties.
      * Here: initial timeZone.
      */
+    @Test
     public void testCalendarLocaleInitial() {
         assertEquals(Locale.getDefault(), model.getLocale());
     }
@@ -384,6 +413,7 @@ public class AbstractTestDateSelectionModel extends TestCase {
      * test synch of model properties with its calendar's properties.
      * Here: changed timeZone.
      */
+    @Test
     public void testCalendarTimeZoneNoChangeNoNotify() {
         // config with a known timezone and date
         TimeZone tz = model.getTimeZone();
@@ -396,6 +426,7 @@ public class AbstractTestDateSelectionModel extends TestCase {
      * test synch of model properties with its calendar's properties.
      * Here: changed timeZone.
      */
+    @Test
     public void testCalendarTimeZoneChangedNotify() {
         // config with a known timezone and date
         TimeZone tz = TimeZone.getTimeZone("GMT+4");
@@ -411,6 +442,7 @@ public class AbstractTestDateSelectionModel extends TestCase {
      * test synch of model properties with its calendar's properties.
      * Here: changed timeZone.
      */
+    @Test
     public void testCalendarTimeZoneChanged() {
         // config with a known timezone and date
         TimeZone tz = TimeZone.getTimeZone("GMT+4");
@@ -426,6 +458,7 @@ public class AbstractTestDateSelectionModel extends TestCase {
      * test synch of model properties with its calendar's properties.
      * Here: initial timeZone.
      */
+    @Test
     public void testCalendarTimeZoneInitial() {
         assertEquals(calendar.getTimeZone(), model.getTimeZone());
         assertEquals(model.getTimeZone(), model.getCalendar().getTimeZone());
@@ -435,6 +468,7 @@ public class AbstractTestDateSelectionModel extends TestCase {
      * test synch of model properties with its calendar's properties.
      * Here: no change notification if not changed minimalDaysInFirstWeek.
      */
+    @Test
     public void testCalendarMinimalDaysInFirstWeekNoChangeNoNotify() {
         int first = model.getMinimalDaysInFirstWeek();
         DateSelectionReport report = new DateSelectionReport(model);
@@ -446,6 +480,7 @@ public class AbstractTestDateSelectionModel extends TestCase {
      * test synch of model properties with its calendar's properties.
      * Here: change notification of minimalDaysInFirstWeek.
      */
+    @Test
     public void testCalendarMinimalDaysInFirstWeekNotify() {
         int first = model.getMinimalDaysInFirstWeek() + 1;
         //sanity
@@ -460,6 +495,7 @@ public class AbstractTestDateSelectionModel extends TestCase {
      * test synch of model properties with its calendar's properties.
      * Here: modified minimalDaysInFirstWeek.
      */
+    @Test
     public void testCalendarMinimalDaysInFirstWeekChanged() {
         int first = model.getMinimalDaysInFirstWeek() + 1;
         //sanity
@@ -473,6 +509,7 @@ public class AbstractTestDateSelectionModel extends TestCase {
      * test synch of model properties with its calendar's properties.
      * Here: initial minimalDaysInFirstWeek.
      */
+    @Test
     public void testCalendarMinimalDaysInFirstWeekInitial() {
         assertEquals(calendar.getMinimalDaysInFirstWeek(), model.getMinimalDaysInFirstWeek());
         assertEquals(model.getMinimalDaysInFirstWeek(), model.getCalendar().getMinimalDaysInFirstWeek());
@@ -482,6 +519,7 @@ public class AbstractTestDateSelectionModel extends TestCase {
      * test synch of model properties with its calendar's properties.
      * Here: no change notification of if no change of firstDayOfWeek.
      */
+    @Test
     public void testCalendarFirstDayOfWeekNoChangeNoNotify() {
         int first = model.getFirstDayOfWeek();
         DateSelectionReport report = new DateSelectionReport(model);
@@ -493,6 +531,7 @@ public class AbstractTestDateSelectionModel extends TestCase {
      * test synch of model properties with its calendar's properties.
      * Here: change notification of firstDayOfWeek.
      */
+    @Test
     public void testCalendarFirstDayOfWeekNotify() {
         int first = model.getFirstDayOfWeek() + 1;
         //sanity
@@ -507,6 +546,7 @@ public class AbstractTestDateSelectionModel extends TestCase {
      * test synch of model properties with its calendar's properties.
      * Here: modified firstDayOfWeek.
      */
+    @Test
     public void testCalendarFirstDayOfWeekChanged() {
         int first = model.getFirstDayOfWeek() + 1;
         //sanity
@@ -520,6 +560,7 @@ public class AbstractTestDateSelectionModel extends TestCase {
      * test synch of model properties with its calendar's properties.
      * Here: initial firstDayOfWeek.
      */
+    @Test
     public void testCalendarFirstDayOfWeekInitial() {
         assertEquals(calendar.getFirstDayOfWeek(), model.getFirstDayOfWeek());
         assertEquals(model.getFirstDayOfWeek(), model.getCalendar().getFirstDayOfWeek());
@@ -530,6 +571,7 @@ public class AbstractTestDateSelectionModel extends TestCase {
     /**
      * test the contract as doc'ed 
      */
+    @Test
     public void testNormalizedDateContract() {
         model.setSelectionInterval(today, today);
         assertEquals(model.getNormalizedDate(today), model.getFirstSelectionDate());
@@ -538,6 +580,7 @@ public class AbstractTestDateSelectionModel extends TestCase {
     /**
      * Normalized must throw NPE if given date is null
      */
+    @Test
     public void testNormalizedDateNull() {
         try {
             model.getNormalizedDate(null);
@@ -552,6 +595,7 @@ public class AbstractTestDateSelectionModel extends TestCase {
     /**
      * Test that the date is cloned (for safety)
      */
+    @Test
     public void testNormalizedDateCloned() {
         assertNotSame(today, model.getNormalizedDate(today));
     }
@@ -562,6 +606,7 @@ public class AbstractTestDateSelectionModel extends TestCase {
      * test that the bounds are normalized as expected.
      * Here: upper bound.
      */
+    @Test
     public void testNormalizeUpperBound() {
         model.setUpperBound(today);
         assertEquals(model.getNormalizedDate(today), model.getUpperBound());
@@ -573,6 +618,7 @@ public class AbstractTestDateSelectionModel extends TestCase {
      * test that the bounds are normalized as expected. 
      * Here: lower bound.
      */
+    @Test
     public void testNormalizeLowerBound() {
         model.setLowerBound(today);
         assertEquals(model.getNormalizedDate(today), model.getLowerBound());
@@ -586,6 +632,7 @@ public class AbstractTestDateSelectionModel extends TestCase {
      * after is not. Remove bound allows the day after again.
      * 
      */
+    @Test
     public void testUpperBoundAllowedFutureBlocked() {
         model.setUpperBound(today);
         // the bound itself is allowed
@@ -608,6 +655,7 @@ public class AbstractTestDateSelectionModel extends TestCase {
      * before is not. Remove bound allows the day before again.
      * 
      */
+    @Test
     public void testLowerBoundAllowedPastBlocked() {
         model.setLowerBound(today);
         // the bound itself is allowed
@@ -629,6 +677,7 @@ public class AbstractTestDateSelectionModel extends TestCase {
      * respect both bounds - overlapping: no selection.
      *
      */
+    @Test
     public void testBothBoundsOverlap() {
         model.setLowerBound(today);
         model.setUpperBound(yesterday);
@@ -642,6 +691,7 @@ public class AbstractTestDateSelectionModel extends TestCase {
      * respect both bounds - same date: single selection allowed.
      *
      */
+    @Test
     public void testBothBoundsSame() {
         model.setLowerBound(today);
         model.setUpperBound(today);
@@ -656,6 +706,7 @@ public class AbstractTestDateSelectionModel extends TestCase {
      * first set the unselectables then set the selection to it must not change
      * the selection state (still empty).
      */
+    @Test
     public void testUnselectableDates() {
         SortedSet<Date> unselectableDates = new TreeSet<Date>();
         unselectableDates.add(today);
@@ -669,6 +720,7 @@ public class AbstractTestDateSelectionModel extends TestCase {
      * adding api: adjusting
      *
      */
+    @Test
     public void testEventsCarryAdjustingFlagTrue() {
         Date date = calendar.getTime();
         model.setAdjusting(true);
@@ -687,6 +739,7 @@ public class AbstractTestDateSelectionModel extends TestCase {
      * adding api: adjusting
      *
      */
+    @Test
     public void testEventsCarryAdjustingFlagFalse() {
         Date date = calendar.getTime();
         DateSelectionReport report = new DateSelectionReport(model);
@@ -698,6 +751,7 @@ public class AbstractTestDateSelectionModel extends TestCase {
      * adding api: adjusting.
      *
      */
+    @Test
     public void testAdjusting() {
         // default value
         assertFalse(model.isAdjusting());
@@ -721,6 +775,7 @@ public class AbstractTestDateSelectionModel extends TestCase {
     /**
      * test that isSelected with null date throws NPE
      */
+    @Test
     public void testIsSelectedNull() {
 //        model.setSelectionInterval(today, today);
         try {
@@ -736,6 +791,7 @@ public class AbstractTestDateSelectionModel extends TestCase {
     /**
      * null unselectables not allowed.
      */
+    @Test
     public void testUnselectableDatesNull() {
         try {
             model.setUnselectableDates(null);

@@ -31,6 +31,9 @@ import junit.framework.TestCase;
 
 import org.jdesktop.test.PropertyChangeReport;
 import org.jdesktop.test.TestUtils;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
 /**
  * Contains tests around Highlighter client api for collection components.
@@ -50,6 +53,7 @@ import org.jdesktop.test.TestUtils;
  * 
  * @author Jeanette Winzenburg
  */
+@RunWith(JUnit4.class)
 public abstract class AbstractTestHighlighterClient extends TestCase {
 
     @SuppressWarnings("unused")
@@ -69,6 +73,7 @@ public abstract class AbstractTestHighlighterClient extends TestCase {
     /**
      * Test that the client is messaged on change to a managed Highlighter.
      */
+    @Test
     public void testUpdateUI() {
         HighlighterClient client = createHighlighterClient();
         // force loading of striping colors
@@ -90,6 +95,7 @@ public abstract class AbstractTestHighlighterClient extends TestCase {
         }
     }
 
+    @Test
     public void testSetHighlighters() {
         HighlighterClient client = createHighlighterClient();
         Highlighter[] highlighters = new Highlighter[] {new ColorHighlighter(), new ColorHighlighter()};
@@ -100,6 +106,7 @@ public abstract class AbstractTestHighlighterClient extends TestCase {
     /**
      * Test property change event on setHighlighters for JXTable.
      */
+    @Test
     public void testSetHighlightersChangeEvent() {
         HighlighterClient client = createHighlighterClient();
         PropertyChangeReport report = new PropertyChangeReport();
@@ -113,6 +120,7 @@ public abstract class AbstractTestHighlighterClient extends TestCase {
     /**
      * Sanity: handles empty array.
      */
+    @Test
     public void testSetHighlightersEmptyArray() {
         HighlighterClient client = createHighlighterClient();
         client.setHighlighters(new Highlighter[] {});
@@ -123,6 +131,7 @@ public abstract class AbstractTestHighlighterClient extends TestCase {
      * 
      * Test that setting zero highlighter removes all.
      */
+    @Test
     public void testSetHighlightersNoArgument() {
         HighlighterClient client = createHighlighterClient();
         client.addHighlighter(new ColorHighlighter());
@@ -137,6 +146,7 @@ public abstract class AbstractTestHighlighterClient extends TestCase {
      * 
      * Here: null highlighter.
      */
+    @Test
     public void testSetHighlightersNullHighlighter() {
         try {
             createHighlighterClient().setHighlighters((Highlighter) null);
@@ -151,6 +161,7 @@ public abstract class AbstractTestHighlighterClient extends TestCase {
      * 
      * Here: null array
      */
+    @Test
     public void testSetHighlightersNullArray() {
         try {
             createHighlighterClient().setHighlighters((Highlighter[]) null);
@@ -166,6 +177,7 @@ public abstract class AbstractTestHighlighterClient extends TestCase {
      * 
      * Here: null array element.
      */
+    @Test
     public void testSetHighlightersArrayNullElement() {
         try {
             createHighlighterClient().setHighlighters(new Highlighter[] {null});
@@ -180,6 +192,7 @@ public abstract class AbstractTestHighlighterClient extends TestCase {
      * test if removeHighlighter behaves as doc'ed.
      *
      */
+    @Test
     public void testRemoveHighlighterTable() {
         HighlighterClient client = createHighlighterClient();
         // test cope with null
@@ -200,6 +213,7 @@ public abstract class AbstractTestHighlighterClient extends TestCase {
     /**
      * Test property change event on removeHighlighter for JXTable.
      */
+    @Test
     public void testRemoveHighlightersChangeEvent() {
         HighlighterClient table = createHighlighterClient();
         Highlighter highlighter = new ColorHighlighter();
@@ -215,6 +229,7 @@ public abstract class AbstractTestHighlighterClient extends TestCase {
      * test if addHighlighter behaves as doc'ed for JXTable.
      *
      */
+    @Test
     public void testAddHighlighter() {
         HighlighterClient client = createHighlighterClient();
         Highlighter presetHighlighter = new ColorHighlighter();
@@ -234,6 +249,7 @@ public abstract class AbstractTestHighlighterClient extends TestCase {
     /**
      * Test property change event on addHighlighter for JXTable.
      */
+    @Test
     public void testAddHighlighterChangeEvent() {
         HighlighterClient table = createHighlighterClient();
         PropertyChangeReport report = new PropertyChangeReport();
@@ -248,6 +264,7 @@ public abstract class AbstractTestHighlighterClient extends TestCase {
      * test choking on precondition failure (highlighter must not be null) for JTXTable.
      *
      */
+    @Test
     public void testAddNullHighlighter() {
         try {
             createHighlighterClient().addHighlighter(null);
