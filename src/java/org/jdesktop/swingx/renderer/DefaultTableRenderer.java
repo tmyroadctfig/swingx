@@ -120,6 +120,30 @@ public class DefaultTableRenderer extends AbstractRenderer
         this(new LabelProvider(converter, alignment));
     }
 
+    /**
+     * Intantiates a default table renderer with default component provider
+     * using both converters.
+     * 
+     * @param stringValue the converter to use for the string representation
+     * @param iconValue the converter to use for the icon representation
+     */
+    public DefaultTableRenderer(StringValue stringValue, IconValue iconValue) {
+        this(new MappedValue(stringValue, iconValue));
+    }
+
+    /**
+     * Intantiates a default table renderer with default component provider
+     * using both converters and the given alignment.
+     * 
+     * @param stringValue the converter to use for the string representation
+     * @param iconValue the converter to use for the icon representation
+     * @param alignment the rendering component's horizontal alignment
+     */
+    public DefaultTableRenderer(StringValue stringValue, IconValue iconValue,
+            int alignment) {
+        this(new MappedValue(stringValue, iconValue), alignment);
+    }
+
     // -------------- implements javax.swing.table.TableCellRenderer
     /**
      * 

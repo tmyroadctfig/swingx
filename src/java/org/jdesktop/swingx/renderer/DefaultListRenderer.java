@@ -137,6 +137,30 @@ public class DefaultListRenderer extends AbstractRenderer
     }
 
     
+    /**
+     * Intantiates a default list renderer with default component provider
+     * using both converters.
+     * 
+     * @param stringValue the converter to use for the string representation
+     * @param iconValue the converter to use for the icon representation
+     */
+    public DefaultListRenderer(StringValue stringValue, IconValue iconValue) {
+        this(new MappedValue(stringValue, iconValue));
+    }
+
+    /**
+     * Intantiates a default list renderer with default component provider
+     * using both converters and the given alignment.
+     * 
+     * @param stringValue the converter to use for the string representation
+     * @param iconValue the converter to use for the icon representation
+     * @param alignment the rendering component's horizontal alignment
+     */
+    public DefaultListRenderer(StringValue stringValue, IconValue iconValue,
+            int alignment) {
+        this(new MappedValue(stringValue, iconValue), alignment);
+    }
+
     // -------------- implements javax.swing.table.ListCellRenderer
     /**
      * 

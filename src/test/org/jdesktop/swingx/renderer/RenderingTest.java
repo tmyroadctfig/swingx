@@ -1022,6 +1022,44 @@ public class RenderingTest extends TestCase {
     }
 
     /**
+     * Issue 970-swingx: add convenience constructors with IconValues
+     * Test doc'ed constructor behaviour of default list renderer.
+     *
+     */
+    @Test
+    public void testDefaultListRendererConstructorWithIconValue() {
+        DefaultListRenderer renderer = new DefaultListRenderer(StringValues.TO_STRING, IconValues.ICON);
+        assertTrue(renderer.componentController instanceof LabelProvider);
+        LabelProvider provider = (LabelProvider) renderer.componentController;
+        ImageIcon icon = (ImageIcon) XTestUtils.loadDefaultIcon();
+        icon.setDescription("description");
+        TableCellContext context = new TableCellContext();
+        context.value = icon;
+        JLabel label = provider.getRendererComponent(context);
+        assertEquals(icon, label.getIcon());
+        assertEquals(StringValues.TO_STRING.getString(icon), label.getText());
+    }
+
+    /**
+     * Issue #970-swingx: add convenience constructors with IconValues
+     * Test doc'ed constructor behaviour of default list renderer.
+     *
+     */
+    @Test
+    public void testDefaultListRendererConstructorWithIconValueAndAlign() {
+        DefaultListRenderer renderer = new DefaultListRenderer(StringValues.TO_STRING, IconValues.ICON, JLabel.TRAILING);
+        assertTrue(renderer.componentController instanceof LabelProvider);
+        LabelProvider provider = (LabelProvider) renderer.componentController;
+        ImageIcon icon = (ImageIcon) XTestUtils.loadDefaultIcon();
+        icon.setDescription("description");
+        TableCellContext context = new TableCellContext();
+        context.value = icon;
+        JLabel label = provider.getRendererComponent(context);
+        assertEquals(icon, label.getIcon());
+        assertEquals(StringValues.TO_STRING.getString(icon), label.getText());
+        assertEquals(JLabel.TRAILING, label.getHorizontalAlignment());
+    }
+    /**
      * Test doc'ed constructor behaviour of default table renderer.
      *
      */
@@ -1035,6 +1073,45 @@ public class RenderingTest extends TestCase {
         ComponentProvider controller = new CheckBoxProvider();
         renderer = new DefaultTableRenderer(controller);
         assertSame(controller, renderer.componentController);
+    }
+
+    /**
+     * Issue #970-swingx: text constructors with IconValues
+     * Test doc'ed constructor behaviour of default table renderer.
+     *
+     */
+    @Test
+    public void testDefaultTableRendererConstructorWithIconValue() {
+        DefaultTableRenderer renderer = new DefaultTableRenderer(StringValues.TO_STRING, IconValues.ICON);
+        assertTrue(renderer.componentController instanceof LabelProvider);
+        LabelProvider provider = (LabelProvider) renderer.componentController;
+        ImageIcon icon = (ImageIcon) XTestUtils.loadDefaultIcon();
+        icon.setDescription("description");
+        TableCellContext context = new TableCellContext();
+        context.value = icon;
+        JLabel label = provider.getRendererComponent(context);
+        assertEquals(icon, label.getIcon());
+        assertEquals(StringValues.TO_STRING.getString(icon), label.getText());
+    }
+
+    /**
+     * Issue #970-swingx: text constructors with IconValues
+     * Test doc'ed constructor behaviour of default table renderer.
+     *
+     */
+    @Test
+    public void testDefaultTableRendererConstructorWithIconValueAndAlign() {
+        DefaultTableRenderer renderer = new DefaultTableRenderer(StringValues.TO_STRING, IconValues.ICON, JLabel.TRAILING);
+        assertTrue(renderer.componentController instanceof LabelProvider);
+        LabelProvider provider = (LabelProvider) renderer.componentController;
+        ImageIcon icon = (ImageIcon) XTestUtils.loadDefaultIcon();
+        icon.setDescription("description");
+        TableCellContext context = new TableCellContext();
+        context.value = icon;
+        JLabel label = provider.getRendererComponent(context);
+        assertEquals(icon, label.getIcon());
+        assertEquals(StringValues.TO_STRING.getString(icon), label.getText());
+        assertEquals(JLabel.TRAILING, label.getHorizontalAlignment());
     }
 
     /**
