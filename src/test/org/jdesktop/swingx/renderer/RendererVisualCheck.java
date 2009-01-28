@@ -26,8 +26,6 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.BeanInfo;
@@ -416,57 +414,6 @@ public class RendererVisualCheck extends InteractiveTestCase {
         showWithScrollingInFrame(table, "normal/sql date formatting"); 
     }
     
-
-    public void interactiveTextAreaRendererList() {
-        final DefaultTableModel model = new DefaultTableModel(0, 2);
-        model.addRow(new String[]{"some really, maybe really really long text -  "
-                + "wrappit .... where needed ", "some really, maybe really really long text -  " +
-                "wrappit .... where needed "});
-        model.addRow(new String[]{"another really, maybe really really long text -  "
-                + "with nothing but junk. wrappit .... where needed", "some really, maybe really really long text -  " +
-                "wrappit .... where needed "});
-        final AbstractListModel listModel = new AbstractListModel() {
-
-            public Object getElementAt(int index) {
-                return model.getValueAt(index, 0);
-            }
-
-            public int getSize() {
-                return model.getRowCount();
-            }};
-        final JXList list = new JXList(listModel);
-        list.setCellRenderer(new DefaultListRenderer(new TextAreaProvider()));
-        LOG.info("get fixed " + list.getFixedCellWidth());
-        list.addComponentListener(new ComponentListener() {
-        
-            public void componentShown(ComponentEvent e) {
-                // TODO Auto-generated method stub
-        
-            }
-        
-            public void componentResized(ComponentEvent e) {
-                // invalidate the layout cache - not really working
-               list.setFixedCellWidth(75);
-               list.setFixedCellHeight(20);
-               list.setFixedCellWidth(-1);
-               list.setFixedCellHeight(-1);
-               list.revalidate();
-               list.repaint();
-        
-            }
-        
-            public void componentMoved(ComponentEvent e) {
-                // TODO Auto-generated method stub
-        
-            }
-        
-            public void componentHidden(ComponentEvent e) {
-                // TODO Auto-generated method stub
-        
-            }
-        });
-        showWithScrollingInFrame(list, "list with textArea");
-    }
     /**
      * Quick example of using a JTextArea as rendering component and 
      * dynamically adjust table row height to max pref height of the
@@ -474,32 +421,14 @@ public class RendererVisualCheck extends InteractiveTestCase {
      *
      */
     public void interactiveTextAreaRendererTable() {
-//        DefaultTableModel model = new DefaultTableModel(0, 2);
-//        model.addRow(new String[]{"some really, maybe really really long text -  "
-//                + "wrappit .... where needed ", "some really, maybe really really long text -  " +
-//                "wrappit .... where needed "});
-//        model.addRow(new String[]{"another really, maybe really really long text -  "
-//                + "with nothing but junk. wrappit .... where needed", "some really, maybe really really long text -  " +
-//                "wrappit .... where needed "});
+        DefaultTableModel model = new DefaultTableModel(0, 2);
+        model.addRow(new String[]{"some really, maybe really really long text -  "
+                + "wrappit .... where needed ", "some really, maybe really really long text -  " +
+                "wrappit .... where needed "});
+        model.addRow(new String[]{"another really, maybe really really long text -  "
+                + "with nothing but junk. wrappit .... where needed", "some really, maybe really really long text -  " +
+                "wrappit .... where needed "});
 
-        Object[][] rows = new Object[3000][];
-        
-        for (int i = 0; i < rows.length; i++) {
-            rows[i] = new Object[]{
-                    "some really, maybe really really long text -  wrappit .... where needed ", "some really, maybe really really long text -  wrappit .... where needed ",
-                    "some really, maybe really really long text -  wrappit .... where needed ", "some really, maybe really really long text -  wrappit .... where needed ",
-                    "some really, maybe really really long text -  wrappit .... where needed ", "some really, maybe really really long text -  wrappit .... where needed ",
-                    "some really, maybe really really long text -  wrappit .... where needed ", "some really, maybe really really long text -  wrappit .... where needed ",
-                    "some really, maybe really really long text -  wrappit .... where needed ", "some really, maybe really really long text -  wrappit .... where needed ",
-                    "some really, maybe really really long text -  wrappit .... where needed ", "some really, maybe really really long text -  wrappit .... where needed "};
-        }
- 
-        DefaultTableModel model = new DefaultTableModel(rows,
-                new String[]{
-                        "Title 1", "Title 2",
-                        "Title 3", "Title 4",
-                        "Title 5", "Title 6",
-                });
 
         JXTable table = new JXTable(model);
         table.setColumnControlVisible(true);
@@ -518,6 +447,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
      * - listen to the TableModel to update the rowHeight 
      * - listen to table's property changes for its Table/ColumnModel to 
      *   re-wire the appropriate listeners.
+     * - be prepared to handle performance problems for large models
      * 
      * @param table
      */
@@ -618,7 +548,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
         }
         
     }
-
+ 
     /**
      * Quick example of using a JXLabel as rendering component.
      * Looks funny .. wrapping jumps?
