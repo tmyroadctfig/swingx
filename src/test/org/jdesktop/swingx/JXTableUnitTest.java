@@ -3763,42 +3763,6 @@ public class JXTableUnitTest extends InteractiveTestCase {
         assertEquals("default Double editor", NumberEditorExt.class, table.getDefaultEditor(Double.class).getClass());
     }
 
-    /**
-     * Issue #134: JXTable - default renderers not loaded. To fix the issue the
-     * JXTable internal renderers' access scope was changed to public. Note: if
-     * the _JTable_ internal renderers access scope were to be widened then this
-     * test has to be changed (the comparing class are hardcoded). <p>
-     * 
-     * This test is obsolete for swingx renderer: the renderer type is
-     * always a DefaultTableRenderer, the difference is its configuration.
-     * 
-     */
-    @Test
-    public void testLazyRenderersByClass() {
-//        JXTable table = new JXTable();
-        // testing against extended renderers
-//        assertEquals("default Boolean renderer", BooleanRendererExt.class,
-//                table.getDefaultRenderer(Boolean.class).getClass());
-//        assertEquals("default Number renderer", NumberRendererExt.class, table
-//                .getDefaultRenderer(Number.class).getClass());
-//        assertEquals("default Double renderer", DoubleRendererExt.class, table
-//                .getDefaultRenderer(Double.class).getClass());
-//        assertEquals("default Date renderer", DateRendererExt.class, table
-//                .getDefaultRenderer(Date.class).getClass());
-//        assertEquals("default Icon renderer", IconRendererExt.class, table
-//                .getDefaultRenderer(Icon.class).getClass());
-        // testing against standard renderers
-//        assertEquals("default Boolean renderer", JXTable.BooleanRenderer.class,
-//                table.getDefaultRenderer(Boolean.class).getClass());
-//        assertEquals("default Number renderer", JXTable.NumberRenderer.class,
-//                table.getDefaultRenderer(Number.class).getClass());
-//        assertEquals("default Double renderer", JXTable.DoubleRenderer.class,
-//                table.getDefaultRenderer(Double.class).getClass());
-//        assertEquals("default Date renderer", JXTable.DateRenderer.class, table
-//                .getDefaultRenderer(Date.class).getClass());
-//        assertEquals("default Icon renderer", JXTable.IconRenderer.class, table
-//                .getDefaultRenderer(Icon.class).getClass());
-    }
     
     /** 
      * Issue #150: setting filters must not re-create columns.
