@@ -27,7 +27,6 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
@@ -39,9 +38,6 @@ import javax.swing.JComponent;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
-
-
-
 
 /**
  * Component used to display transluscent user-interface content.
@@ -57,9 +53,9 @@ import javax.swing.Timer;
  * on the glasspane.</p>
  *
  * @author Amy Fowler
+ * @author Karl George Schaefer
  * @version 1.0
  */
-
 public class JXGlassBox extends JXPanel {
     private static final int SHOW_DELAY = 30; // ms
     private static final int TIMER_INCREMENT = 10; // ms
@@ -96,19 +92,54 @@ public class JXGlassBox extends JXPanel {
         this.alphaIncrement = (alphaEnd - alphaStart)/(SHOW_DELAY/TIMER_INCREMENT);
     }
 
+    /**
+     * Dismisses this glass box. This causes the glass box to be removed from
+     * it's parent and ensure that the display is correctly updated.
+     */
+    public void dismiss() {
+        JComponent parent = (JComponent) getParent();
+        
+        if (parent != null) {
+            Container toplevel = parent.getTopLevelAncestor();
+            parent.remove(this);
+            toplevel.validate();
+            toplevel.repaint();
+        }
+    }
+
+    /**
+     * Determines if the glass box if dismissed when a user clicks on it.
+     * 
+     * @return {@code true} if the glass box can be dismissed with a click;
+     *         {@code false} otherwise
+     * @see #setDismissOnClick(boolean)
+     * @see #dismiss()
+     */
+    public boolean isDismissOnClick() {
+        return dismissOnClick;
+    }
+
+    /**
+     * Configures the glass box to dismiss (or not) when clicked.
+     * 
+     * @param dismissOnClick
+     *            {@code true} if the glass box should dismiss when clicked;
+     *            {@code false} otherwise
+     * @see #isDismissOnClick()
+     * @see #dismiss()
+     */
     public void setDismissOnClick(boolean dismissOnClick) {
         boolean oldDismissOnClick = this.dismissOnClick;
         this.dismissOnClick = dismissOnClick;
+        
+        firePropertyChange("dismissOnClick", oldDismissOnClick, isDismissOnClick());
+        
+        //TODO do this as a reaction to the property change?
         if (dismissOnClick && !oldDismissOnClick) {
             if (dismissListener == null) {
                 dismissListener = new MouseAdapter() {
                     public void mouseClicked(MouseEvent e) {
-                        JComponent glassBox = JXGlassBox.this;
-                        JComponent parent = (JComponent) glassBox.getParent();
-                        Container toplevel = parent.getTopLevelAncestor();
-                        parent.remove(glassBox);
-                        toplevel.validate();
-                        toplevel.repaint();
+                        dismiss();
                     }
                 };
             }
@@ -142,77 +173,98 @@ public class JXGlassBox extends JXPanel {
         return p;
     }
 
-    public void showOnGlassPane(Container glassPane, Component component,
-                                int componentX, int componentY, int positionHint) {
-        Dimension boxPrefSize = getPreferredSize();
-        Dimension glassSize = glassPane.getSize();
-        Rectangle compRect = component.getBounds();
-        int boxX = 0;
-        int boxY = 0;
-        int boxWidth = Math.min(boxPrefSize.width, glassSize.width);
-        int boxHeight = Math.min(boxPrefSize.height, glassSize.height);
-
-        Point compLocation = SwingUtilities.convertPoint(component.getParent(),
-                                                compRect.x, compRect.y,
-                                                glassPane);
-
-        if (positionHint == SwingConstants.TOP) {
-            if (compLocation.x + componentX + boxWidth <= glassSize.width) {
-                boxX = compLocation.x + componentX;
-            } else {
-                boxX = glassSize.width - boxWidth;
-            }
-            boxY = compLocation.y - boxHeight;
-            if (boxY < 0) {
-                if (compLocation.y + compRect.height <= glassSize.height) {
-                    boxY = compLocation.y + compRect.height;
-                }
-                else {
-                    boxY = 0;
-                }
-            }
+    /**
+     * Shows this glass box on the glass pane. The position of the box is
+     * relative to the supplied component and offsets.
+     * 
+     * @param glassPane
+     *            the glass pane
+     * @param origin
+     *            the component representing the origin location
+     * @param offsetX
+     *            the offset on the X-axis from the origin
+     * @param offsetY
+     *            the offset on the Y-axis from the origin
+     * @param positionHint
+     *            a {@code SwingConstants} box position hint ({@code CENTER},
+     *            {@code TOP}, {@code BOTTOM}, {@code LEFT}, or {@code RIGHT})
+     * @throws NullPointerException
+     *             if {@code glassPane} or {@code origin} is {@code null}
+     * @throws IllegalArgumentException
+     *             if {@code positionHint} is not a valid hint
+     */
+    //TODO replace SwingConstant with enum other non-int
+    //TODO this method places the box outside of the origin component
+    // that continues the implementation approach that Amy used.  I
+    // think it would be a useful poll to determine whether the box
+    // should be place inside or outside of the origin (by default).
+    public void showOnGlassPane(Container glassPane, Component origin,
+                                int offsetX, int offsetY, int positionHint) {
+        Rectangle r = SwingUtilities.convertRectangle(origin, 
+                origin.getBounds(), glassPane);
+        Dimension d = getPreferredSize();
+        
+        int originX = offsetX + r.x;
+        int originY = offsetY + r.y;
+        
+        switch (positionHint) {
+        case SwingConstants.TOP:
+            originX += (r.width - d.width) / 2; 
+            originY -= d.height;
+            break;
+        case SwingConstants.BOTTOM:
+            originX += (r.width - d.width) / 2; 
+            originY += r.height;
+            break;
+        case SwingConstants.LEFT:
+            originX -= d.width; 
+            originY += (r.height - d.height) / 2;
+            break;
+        case SwingConstants.RIGHT:
+            originX += r.width; 
+            originY += (r.height - d.height) / 2;
+            break;
+        case SwingConstants.CENTER:
+            originX += (r.width - d.width) / 2; 
+            originY += (r.height - d.height) / 2;
+            break;
+        default:
+            throw new IllegalArgumentException("inavlid position hint");
         }
-
-        glassPane.setLayout(null);
-        setBounds(boxX, boxY, boxWidth, boxHeight);
-        glassPane.add(this);
-        glassPane.setVisible(true);
-
-        Container topLevel = getTopLevel();
-        topLevel.validate();
-        topLevel.repaint();
-
+        
+        showOnGlassPane(glassPane, originX, originY);
     }
 
+    /**
+     * Shows this glass box on the glass pane.
+     * 
+     * @param glassPane
+     *            the glass pane
+     * @param originX
+     *            the location on the X-axis to position the glass box
+     * @param originY
+     *            the location on the Y-axis to position the glass box
+     */
     public void showOnGlassPane(Container glassPane, int originX, int originY) {
-        Dimension boxPrefSize = getPreferredSize();
-        Dimension glassSize = glassPane.getSize();
-        int boxX = 0;
-        int boxY = 0;
-        int boxWidth = 0;
-        int boxHeight = 0;
-
-        boxWidth = Math.min(boxPrefSize.width, glassSize.width);
-        boxHeight = Math.min(boxPrefSize.height, glassSize.height);
-
-        if (originY - boxHeight >= 0) {
-            boxY = originY - boxHeight;
-        } else if (originY + boxHeight <= glassSize.height) {
-            boxY = originY;
-        } else {
-            boxY = glassSize.height - boxHeight;
+        Dimension gd = glassPane.getSize();
+        Dimension bd = getPreferredSize();
+        
+        int x = Math.min(originX, gd.width - bd.width);
+        int y = Math.min(originY, gd.height - bd.height);
+        
+        if (x < 0) {
+            x = 0;
         }
-
-        if (originX + boxWidth <= glassSize.width) {
-            boxX = originX;
-        } else if (originX >= boxWidth) {
-            boxX = originX - boxWidth;
-        } else {
-            boxX = glassSize.width - boxWidth;
+        
+        if (y < 0) {
+            y = 0;
         }
-
+        
+        int width = x + bd.width < gd.width ? bd.width : gd.width;
+        int height = y + bd.height < gd.height ? bd.height : gd.height;
+        
         glassPane.setLayout(null);
-        setBounds(boxX, boxY, boxWidth, boxHeight);
+        setBounds(x, y, width, height);
         glassPane.add(this);
         glassPane.setVisible(true);
 
