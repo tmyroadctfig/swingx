@@ -21,8 +21,14 @@
 package org.jdesktop.swingx.treetable;
 
 /**
- *
- *@author Karl Schaefer
+ * A default implementation of an {@code AbstractMutableTreeTableNode} that
+ * returns {@code getUserObject().toString()} for all value queries. This
+ * implementation is designed mainly for testing. It is NOT recommended to use
+ * this implementation. Any user that needs to create {@code TreeTableNode}s
+ * should consider directly extending {@code AbstractMutableTreeTableNode} or
+ * directly implementing the interface.
+ * 
+ * @author Karl Schaefer
  */
 public class DefaultMutableTreeTableNode extends AbstractMutableTreeTableNode {
     
@@ -77,7 +83,4 @@ public class DefaultMutableTreeTableNode extends AbstractMutableTreeTableNode {
     public void setValueAt(Object aValue, int column) {
         setUserObject(aValue);
     }
-
-    
-    
 }
