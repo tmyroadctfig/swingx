@@ -24,6 +24,7 @@ import java.awt.Color;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeListener;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.EventListener;
@@ -226,7 +227,7 @@ public class JXMonthView extends JComponent {
     //------------- visuals
     
     /**
-     * localizable day column headers. Default typically installed by the uidelegate.
+     * Localizable day column headers. Default typically installed by the uidelegate.
      */
     private String[] _daysOfTheWeek;
 
@@ -610,11 +611,8 @@ public class JXMonthView extends JComponent {
         cal.setTime(anchor.getTime());
         CalendarUtils.startOfMonth(cal);
         firstDisplayedDay = cal.getTime();
-
         firePropertyChange("firstDisplayedDay", oldDate, getFirstDisplayedDay() );
     }
-
-
 
     /**
      * Moves the <code>date</code> into the visible region of the calendar. If
@@ -1039,14 +1037,14 @@ public class JXMonthView extends JComponent {
      */
     public void setFlaggedDates(Date... flagged) {
 //        Contract.asNotNull(flagged, "must not be null");
-        SortedSet<Date> oldFlagged = flaggedDates.getSelection();
+        SortedSet<Date> oldFlagged = getFlaggedDates();
         flaggedDates.clearSelection();
         if (flagged != null) {
             for (Date date : flagged) {
                 flaggedDates.addSelectionInterval(date, date);
             }
         }
-        firePropertyChange("flaggedDates", oldFlagged, flaggedDates.getSelection());
+        firePropertyChange("flaggedDates", oldFlagged, getFlaggedDates());
    }
     /**
      * Adds the dates to the flags. 

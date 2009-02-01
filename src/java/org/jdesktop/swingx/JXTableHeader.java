@@ -317,7 +317,10 @@ public class JXTableHeader extends JTableHeader
      */
     @Override
     public void setDraggedDistance(int distance) {
+        int old = getDraggedDistance();
         super.setDraggedDistance(distance);
+        // fire because super doesn't
+        firePropertyChange("draggedDistance", old, getDraggedDistance());
         if (!getAutoscrolls() || (getXTable() == null)) return;
         TableColumn column = getDraggedColumn();
         // fix for #788-swingx: don't try to scroll if we have no dragged column
@@ -394,7 +397,9 @@ public class JXTableHeader extends JTableHeader
      * @param recognizer the recognizer to use in HeaderListener.
      */
     public void setSortGestureRecognizer(SortGestureRecognizer recognizer) {
+        SortGestureRecognizer old = getSortGestureRecognizer();
         this.sortGestureRecognizer = recognizer;
+        firePropertyChange("sortGestureRecognizer", old, getSortGestureRecognizer());
     }
     
     /**

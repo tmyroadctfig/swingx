@@ -266,26 +266,49 @@ public class ColumnHeaderRenderer extends JComponent
     public void setBackground(Color background) {
         // this is called somewhere along initialization of super?
         if (label != null) {
+            Color old = getBackground();
             label.setBackground(background);
+            firePropertyChange("background", old, getBackground());
         }
+    }
+    
+    @Override
+    public Color getBackground() {
+        return label.getBackground();
     }
 
     @Override
     public void setForeground(Color foreground) {
          if (label != null) {
-            label.setForeground(foreground);
+             Color old = getForeground();
+             label.setForeground(foreground);
+             firePropertyChange("foreground", old, getForeground());
         }
+    }
+    
+    @Override
+    public Color getForeground() {
+        return label.getForeground();
     }
 
     @Override
     public void setFont(Font font) {
         if (label != null) {
+            Font old = getFont();
             label.setFont(font);
+            firePropertyChange("font", old, getFont());
         }
+    }
+    
+    @Override
+    public Font getFont() {
+        return label.getFont();
     }
 
     public void setDownIcon(Icon icon) {
+        Icon old = getDownIcon();
         this.downIcon = icon;
+        firePropertyChange("downIcon", old, getDownIcon());
     }
 
     public Icon getDownIcon() {
@@ -293,7 +316,9 @@ public class ColumnHeaderRenderer extends JComponent
     }
 
     public void setUpIcon(Icon icon) {
+        Icon old = getUpIcon();
         this.upIcon = icon;
+        firePropertyChange("upIcon", old, getUpIcon());
     }
 
     public Icon getUpIcon() {
@@ -301,7 +326,9 @@ public class ColumnHeaderRenderer extends JComponent
     }
 
     public void setHorizontalAlignment(int alignment) {
+        int old = getHorizontalAlignment();
         label.setHorizontalAlignment(alignment);
+        firePropertyChange("horizontalAlignment", old, getHorizontalAlignment());
     }
 
     public int getHorizontalAlignment() {
@@ -309,7 +336,9 @@ public class ColumnHeaderRenderer extends JComponent
     }
 
     public void setHorizontalTextPosition(int textPosition) {
+        int old = getHorizontalTextPosition();
         label.setHorizontalTextPosition(textPosition);
+        firePropertyChange("horizontalTextPosition", old, getHorizontalTextPosition());
     }
 
     public int getHorizontalTextPosition() {
@@ -317,7 +346,9 @@ public class ColumnHeaderRenderer extends JComponent
     }
 
     public void setIcon(Icon icon) {
+        Icon old = getIcon();
         label.setIcon(icon);
+        firePropertyChange("icon", old, getIcon());
     }
 
     public Icon getIcon() {
@@ -325,7 +356,9 @@ public class ColumnHeaderRenderer extends JComponent
     }
 
     public void setIconTextGap(int iconTextGap) {
+        int old = getIconTextGap();
         label.setIconTextGap(iconTextGap);
+        firePropertyChange("iconTextGap", old, getIconTextGap());
     }
 
     public int getIconTextGap() {
@@ -333,7 +366,9 @@ public class ColumnHeaderRenderer extends JComponent
     }
 
     public void setVerticalAlignment(int alignment) {
+        int old = getVerticalAlignment();
         label.setVerticalAlignment(alignment);
+        firePropertyChange("verticalAlignment", old, getVerticalAlignment());
     }
 
     public int getVerticalAlignment() {
@@ -341,7 +376,9 @@ public class ColumnHeaderRenderer extends JComponent
     }
 
     public void setVerticalTextPosition(int textPosition) {
+        int old = getVerticalTextPosition();
         label.setVerticalTextPosition(textPosition);
+        firePropertyChange("verticalTextPosition", old, getVerticalTextPosition());
     }
 
     public int getVerticalTextPosition() {

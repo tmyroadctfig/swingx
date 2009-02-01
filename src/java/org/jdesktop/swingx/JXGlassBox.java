@@ -161,8 +161,10 @@ public class JXGlassBox extends JXPanel {
     }
 
     public void setVisible(boolean visible) {
+        boolean old = isVisible();
         setAlpha(alphaStart);
         super.setVisible(visible);
+        firePropertyChange("visible", old, isVisible());
     }
 
     private Container getTopLevel() {

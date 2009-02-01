@@ -135,9 +135,9 @@ public class JXMultiSplitPane extends JPanel {
      * @see #isContinuousLayout
      */
     public void setContinuousLayout(boolean continuousLayout) {
-        boolean oldContinuousLayout = continuousLayout;
+        boolean oldContinuousLayout = isContinuousLayout();
         this.continuousLayout = continuousLayout;
-        firePropertyChange("continuousLayout", oldContinuousLayout, continuousLayout);
+        firePropertyChange("continuousLayout", oldContinuousLayout, isContinuousLayout());
     }
 
     /**
@@ -206,7 +206,9 @@ public class JXMultiSplitPane extends JPanel {
      * @see #activeDivider
      */
     public void setDividerPainter(DividerPainter dividerPainter) {
-    this.dividerPainter = dividerPainter;
+        DividerPainter old = getDividerPainter();
+        this.dividerPainter = dividerPainter;
+        firePropertyChange("dividerPainter", old, getDividerPainter());
     }
 
     /**

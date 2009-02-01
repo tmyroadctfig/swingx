@@ -598,9 +598,10 @@ public class JXLoginPane extends JXPanel {
      * Recreates the login panel, and replaces the current one with the new one
      */
     protected void recreateLoginPanel() {
-        contentPanel.remove(loginPanel);
+        JXPanel old = loginPanel;
         loginPanel = createLoginPanel();
         loginPanel.setBorder(BorderFactory.createEmptyBorder(0, 36, 7, 11));
+        contentPanel.remove(old);
         contentPanel.add(loginPanel, 1);
     }
 
@@ -884,7 +885,7 @@ public class JXLoginPane extends JXPanel {
     }
 
     /**
-     * Sets the list of servers. See the servers field javadoc for more info
+     * Sets the list of servers. See the servers field javadoc for more info.
      */
     public void setServers(List<String> servers) {
         //only at startup
@@ -999,7 +1000,9 @@ public class JXLoginPane extends JXPanel {
      */
     public void setUserName(String username) {
         if (namePanel != null) {
+            String old = getUserName();
             namePanel.setUserName(username);
+            firePropertyChange("userName", old, getUserName());
         }
     }
 
@@ -1009,11 +1012,13 @@ public class JXLoginPane extends JXPanel {
      * @param enabled 
      */
     public void setUserNameEnabled(boolean enabled) {
+        boolean old = isUserNameEnabled();
         this.namePanelEnabled = enabled;
         if (namePanel != null) {
             namePanel.setEnabled(enabled);
             namePanel.setEditable(enabled);
         }
+        firePropertyChange("userNameEnabled", old, isUserNameEnabled());
     }
     
     /**
@@ -1115,7 +1120,9 @@ public class JXLoginPane extends JXPanel {
      * Sets a custom message for this login panel
      */
     public void setMessage(String message) {
+        String old = messageLabel.getText();
         messageLabel.setText(message);
+        firePropertyChange("message", old, messageLabel.getText());
     }
 
     /**
@@ -1130,7 +1137,9 @@ public class JXLoginPane extends JXPanel {
      */
     public void setErrorMessage(String errorMessage) {
         isErrorMessageSet = true;
+        String old = errorMessageLabel.getText();
         errorMessageLabel.setText(errorMessage);
+        firePropertyChange("errorMessage", old, errorMessageLabel.getText());
     }
 
     /**

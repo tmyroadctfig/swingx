@@ -137,12 +137,14 @@ public class WrappingIconPanel extends JXPanel implements PainterAware {
      * @param comp the component to add as delegate.
      */
     public void setComponent(JComponent comp) {
+        JComponent old = getComponent();
         if (delegate != null) {
             remove(delegate);
         }
         delegate = comp;
         add(delegate, labelPosition);
         validate();
+        firePropertyChange("component", old, getComponent());
     }
 
     /**

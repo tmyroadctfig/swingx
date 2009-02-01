@@ -1000,7 +1000,7 @@ public class JXGraph extends JXPanel {
      *   <li><i>maxX</i>: bounds.getMaxY() (minY + bounds.getHeight())</li>
      * </ul>
      *
-     * <p>If the specificed view is null, nothing happens.</p>
+     * <p>If the specified view is null, nothing happens.</p>
      *
      * <p>Calling this method leaves the origin intact.</p>
      *
@@ -1012,7 +1012,7 @@ public class JXGraph extends JXPanel {
         if (bounds == null) {
             return;
         }
-
+        Rectangle2D old = getView();
         defaultView = new Rectangle2D.Double(bounds.getX(), bounds.getY(),
             bounds.getWidth(), bounds.getHeight());
                 
@@ -1023,7 +1023,7 @@ public class JXGraph extends JXPanel {
         
         majorX = defaultMajorX;
         majorY = defaultMajorY;
-        
+        firePropertyChange("view", old, getView());
         repaint();
     }
 
@@ -1064,7 +1064,7 @@ public class JXGraph extends JXPanel {
      * <p>Sets the origin of the graph. The coordinates of the origin are
      * defined by the coordinates of the point passed as parameter.</p>
      *
-     * <p>If the specificed view is null, nothing happens.</p>
+     * <p>If the specified view is null, nothing happens.</p>
      *
      * <p>Calling this method leaves the view intact.</p>
      *
@@ -1077,9 +1077,10 @@ public class JXGraph extends JXPanel {
             return;
         }
 
+        Point2D old = getOrigin();
         originX = origin.getX();
         originY = origin.getY();
-
+        firePropertyChange("origin", old, getOrigin());
         repaint();
     }
 

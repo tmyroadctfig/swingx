@@ -118,7 +118,9 @@ public class JXSearchPanel extends AbstractPatternPanel {
      * @param name
      */
     public void setFieldName(String name) {
+        String old = searchLabel.getText();
         searchLabel.setText(name);
+        firePropertyChange("fieldName", old, searchLabel.getText());
     }
 
     /**

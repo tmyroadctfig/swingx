@@ -43,6 +43,7 @@ public class JXRendererHyperlink extends JXHyperlink implements PainterAware {
      * {@inheritDoc}
      */
     public void setPainter(Painter painter) {
+        Painter old = getPainter();
         this.painter = painter;
         if (painter != null) {
             // ui maps to !opaque
@@ -50,6 +51,7 @@ public class JXRendererHyperlink extends JXHyperlink implements PainterAware {
             // "real" contentfilled property
             setContentAreaFilled(false);
         }
+        firePropertyChange("painter", old, getPainter());
     }
 
     /**

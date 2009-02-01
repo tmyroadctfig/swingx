@@ -345,7 +345,9 @@ public class JXTitledSeparator extends JXPanel {
      */
     @Override
     public void setComponentOrientation(ComponentOrientation o) {
+        ComponentOrientation old = label.getComponentOrientation();
         label.setComponentOrientation(o);
+        firePropertyChange("componentOrientation", old, label.getComponentOrientation());
     }
 
     /**

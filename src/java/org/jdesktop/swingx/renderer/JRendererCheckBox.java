@@ -40,11 +40,6 @@ import org.jdesktop.swingx.painter.Painter;
 public class JRendererCheckBox extends JCheckBox implements PainterAware {
     protected Painter painter;
 
-//    public JRendererCheckBox() {
-//        super();
-//        setContentAreaFilled(true);
-//        setOpaque(true);
-//    }
     /**
      * {@inheritDoc}
      */
@@ -57,6 +52,7 @@ public class JRendererCheckBox extends JCheckBox implements PainterAware {
      * {@inheritDoc}
      */
     public void setPainter(Painter painter) {
+        Painter old = getPainter();
         this.painter = painter;
         if (painter != null) {
             // ui maps to !opaque
@@ -68,6 +64,7 @@ public class JRendererCheckBox extends JCheckBox implements PainterAware {
 //        else {
 //            setContentAreaFilled(true);
 //        }
+        firePropertyChange("painter", old, getPainter());
     }
 
     /**

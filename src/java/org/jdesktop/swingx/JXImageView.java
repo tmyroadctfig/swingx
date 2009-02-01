@@ -119,7 +119,9 @@ public class JXImageView extends JXPanel {
      * @param imageLocation The new image location.
      */
     public void setImageLocation(Point2D imageLocation) {
+        Point2D old = getImageLocation();
         this.imageLocation = imageLocation;
+        firePropertyChange("imageLocation", old, getImageLocation());
         repaint();
     }
     
@@ -204,6 +206,7 @@ public class JXImageView extends JXPanel {
      * @param editable whether or not the user can drag images
      */
     public void setEditable(boolean editable) {
+        boolean old = isEditable();
         this.editable = editable;
         if(editable) {
             addMouseMotionListener(moveHandler);
@@ -221,6 +224,7 @@ public class JXImageView extends JXPanel {
             this.setCursor(Cursor.getDefaultCursor());
             setTransferHandler(null);
         }
+        firePropertyChange("editable", old, isEditable());
     }
     
     /**
@@ -232,7 +236,9 @@ public class JXImageView extends JXPanel {
      * @param dragEnabled the value to set the dragEnabled property to.
      */
     public void setDragEnabled(boolean dragEnabled) {
+        boolean old = isDragEnabled();
         this.dragEnabled = dragEnabled;
+        firePropertyChange("dragEnabled", old, isDragEnabled());
     }
 
     /**
@@ -667,7 +673,9 @@ public class JXImageView extends JXPanel {
     }
 
     public void setExportName(String exportName) {
+        String old = getExportName();
         this.exportName = exportName;
+        firePropertyChange("exportName", old, getExportName());
     }
 
     public String getExportFormat() {
@@ -675,7 +683,9 @@ public class JXImageView extends JXPanel {
     }
 
     public void setExportFormat(String exportFormat) {
+        String old = getExportFormat();
         this.exportFormat = exportFormat;
+        firePropertyChange("exportFormat", old, getExportFormat());
     }
 
     public URL getImageURL() {
@@ -683,7 +693,9 @@ public class JXImageView extends JXPanel {
     }
 
     public void setImageURL(URL imageURL) throws IOException {
+        URL old = getImageURL();
         this.imageURL = imageURL;
+        firePropertyChange("imageURL", old, getImageURL());
         setImage(ImageIO.read(getImageURL()));
     }
     

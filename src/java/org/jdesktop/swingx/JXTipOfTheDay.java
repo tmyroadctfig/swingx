@@ -232,7 +232,7 @@ public class JXTipOfTheDay extends JXPanel {
     if (currentTip < 0 || currentTip >= getModel().getTipCount()) {
       throw new IllegalArgumentException(
       "Current tip must be within the bounds [0, " + getModel().getTipCount()
-        + "[");
+        + "]");
     }
 
     int oldTip = this.currentTip;

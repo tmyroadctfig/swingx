@@ -87,8 +87,10 @@ public class PainterGlasspane extends JComponent {
         return painter;
     }
 
-    public void setPainter(Painter painter) {        
+    public void setPainter(Painter painter) {
+        Painter old = getPainter();
         this.painter = painter;
+        firePropertyChange("painter", old, getPainter());
         repaint();
     }
 }

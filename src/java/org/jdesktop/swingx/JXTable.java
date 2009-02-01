@@ -1121,8 +1121,10 @@ public class JXTable extends JTable
          * a bound property. 
          * 
          */
-        if (enabled == (isHorizontalScrollEnabled()))
+        if (enabled == (isHorizontalScrollEnabled())) {
             return;
+        }
+        boolean old = isHorizontalScrollEnabled();
         if (enabled) {
             // remember the resizeOn mode if any
             if (getAutoResizeMode() != AUTO_RESIZE_OFF) {
@@ -1136,6 +1138,7 @@ public class JXTable extends JTable
         } else {
             setAutoResizeMode(oldAutoResizeMode);
         }
+        firePropertyChange("horizontalScrollEnabled", old, isHorizontalScrollEnabled());
     }
 
     /** 
@@ -2694,7 +2697,9 @@ public class JXTable extends JTable
      */
     @Override
     public void setPreferredScrollableViewportSize(Dimension size) {
+        Dimension old = getPreferredScrollableViewportSize();
         super.setPreferredScrollableViewportSize(size);
+        firePropertyChange("preferredScrollableViewportSize", old, getPreferredScrollableViewportSize());
     }
 
     /**

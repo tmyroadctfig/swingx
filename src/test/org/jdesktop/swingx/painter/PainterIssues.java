@@ -180,7 +180,9 @@ public class PainterIssues extends InteractiveTestCase {
         }
         
         public void setPainter(Painter<JComponent> painter) {
+            Painter<JComponent> old = getPainter();
             this.painter = painter;
+            firePropertyChange("painter", old, getPainter());
             repaint();
         }
     }

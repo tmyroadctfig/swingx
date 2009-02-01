@@ -578,6 +578,7 @@ public class JXList extends JList {
         filterEnabled = enabled;
         wrappingModel = new WrappingListModel(getModel());
         super.setModel(wrappingModel);
+        firePropertyChange("filterEnabled", old, isFilterEnabled());
     }
 
     /**

@@ -105,56 +105,57 @@ public class JXGradientChooser extends JXPanel {
      * @param mgrad The desired gradient.
      */
     public void setGradient(MultipleGradientPaint mgrad) {
-        if(gradient != mgrad) {
-            float[] fracts = mgrad.getFractions();
-            Color[] colors = mgrad.getColors();
-
-            if(!thumbsMoving) {
-                // update the slider properly
-                if(slider.getModel().getThumbCount() !=
-                        mgrad.getColors().length) {
-                    // removing all thumbs;
-                    while(slider.getModel().getThumbCount() > 0) {
-                        slider.getModel().removeThumb(0);
-                    }
-                    // add them back
-                    for(int i=0; i<fracts.length; i++) {
-                        slider.getModel().addThumb(fracts[i],colors[i]);
-                    }
-                } else {
-                    for(int i=0; i<fracts.length; i++) {
-                        slider.getModel().getThumbAt(i).setObject(colors[i]);
-                        slider.getModel().getThumbAt(i).setPosition(fracts[i]);
-                    }
-                }
-            } else {
-                log.fine("not updating because it's moving");
-            }
-            if(mgrad instanceof RadialGradientPaint) {
-                if(styleCombo.getSelectedItem() != GradientStyle.Radial) {
-                    styleCombo.setSelectedItem(GradientStyle.Radial);
-                }
-            } else {
-                if(styleCombo.getSelectedItem() != GradientStyle.Linear) {
-                    styleCombo.setSelectedItem(GradientStyle.Linear);
-                }
-            }
-            
-            if(mgrad.getCycleMethod() == MultipleGradientPaint.REFLECT) {
-                this.reflectedRadio.setSelected(true);
-                gradientPreview.setReflected(true);
-            }
-            if(mgrad.getCycleMethod() == MultipleGradientPaint.REPEAT) {
-                this.repeatedRadio.setSelected(true);
-                gradientPreview.setRepeated(true);
-            }
-            gradientPreview.setGradient(mgrad);
-            //reflectedRadio.setSelected()
-            MultipleGradientPaint old = this.getGradient();
-            gradient = mgrad;
-            firePropertyChange("gradient",old,getGradient());
-            repaint();
+        if(gradient == mgrad) {
+            return;
         }
+        float[] fracts = mgrad.getFractions();
+        Color[] colors = mgrad.getColors();
+
+        if(!thumbsMoving) {
+            // update the slider properly
+            if(slider.getModel().getThumbCount() !=
+                    mgrad.getColors().length) {
+                // removing all thumbs;
+                while(slider.getModel().getThumbCount() > 0) {
+                    slider.getModel().removeThumb(0);
+                }
+                // add them back
+                for(int i=0; i<fracts.length; i++) {
+                    slider.getModel().addThumb(fracts[i],colors[i]);
+                }
+            } else {
+                for(int i=0; i<fracts.length; i++) {
+                    slider.getModel().getThumbAt(i).setObject(colors[i]);
+                    slider.getModel().getThumbAt(i).setPosition(fracts[i]);
+                }
+            }
+        } else {
+            log.fine("not updating because it's moving");
+        }
+        if(mgrad instanceof RadialGradientPaint) {
+            if(styleCombo.getSelectedItem() != GradientStyle.Radial) {
+                styleCombo.setSelectedItem(GradientStyle.Radial);
+            }
+        } else {
+            if(styleCombo.getSelectedItem() != GradientStyle.Linear) {
+                styleCombo.setSelectedItem(GradientStyle.Linear);
+            }
+        }
+        
+        if(mgrad.getCycleMethod() == MultipleGradientPaint.REFLECT) {
+            this.reflectedRadio.setSelected(true);
+            gradientPreview.setReflected(true);
+        }
+        if(mgrad.getCycleMethod() == MultipleGradientPaint.REPEAT) {
+            this.repeatedRadio.setSelected(true);
+            gradientPreview.setRepeated(true);
+        }
+        gradientPreview.setGradient(mgrad);
+        //reflectedRadio.setSelected()
+        MultipleGradientPaint old = this.getGradient();
+        gradient = mgrad;
+        firePropertyChange("gradient",old,getGradient());
+        repaint();
     }
 
     private void recalcGradientFromStops() {
@@ -201,13 +202,6 @@ public class JXGradientChooser extends JXPanel {
             deleteThumbButton.setEnabled(false);
         }
     }
-    
-    /*
-    private void updateGradientProperty() {
-        firePropertyChange("gradient",null,getGradient());
-        gradientPreview.repaint();
-    }
-     */
     
     private void updateGradientProperty() {
         firePropertyChange("gradient",null,getGradient());
