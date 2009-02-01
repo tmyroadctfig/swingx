@@ -85,7 +85,7 @@ public class Morphing2D implements Shape {
     /**
      * <p>Sets the morphing value between the two shapes. This value controls
      * the transformation from the start shape to the end shape. A value of 0.0
-     * is the start shap. A value of 1.0 is the end shape. A value of 0.5 is a
+     * is the start shape. A value of 1.0 is the end shape. A value of 0.5 is a
      * new shape, morphed half way from the start shape to the end shape.</p>
      * <p>The specified value should be between 0.0 and 1.0. If not, the value
      * is clamped in the appropriate range.</p>
