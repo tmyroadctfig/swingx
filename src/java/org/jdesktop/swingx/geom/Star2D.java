@@ -78,7 +78,7 @@ public class Star2D implements Shape {
     public Star2D(double x, double y,
                   double innerRadius, double outerRadius,
                   int branchesCount) {
-        if (branchesCount <= 2) {
+        if (branchesCount < 3) {
             throw new IllegalArgumentException("The number of branches must" +
                                                " be >= 3.");
         } else if (innerRadius >= outerRadius) {
@@ -104,9 +104,6 @@ public class Star2D implements Shape {
 
         double outerAngle = branchesCount % 2 == 0 ? 0.0 : -(Math.PI / 2.0);
         double innerAngle = (outerAngleIncrement / 2.0) + outerAngle;
-
-        x += outerRadius;
-        y += outerRadius;
 
         float x1 = (float) (Math.cos(outerAngle) * outerRadius + x);
         float y1 = (float) (Math.sin(outerAngle) * outerRadius + y);
