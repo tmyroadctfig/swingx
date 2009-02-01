@@ -18,8 +18,6 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-
-
 package org.jdesktop.swingx.painter.effects;
 
 import java.awt.Graphics2D;
@@ -34,7 +32,7 @@ public interface AreaEffect {
      * Applies the shape effect. This effect will be drawn on top of the graphics context.
      */
     /**
-     * Draws an effect on the specifed graphics and path using the specified width and height.
+     * Draws an effect on the specified graphics and path using the specified width and height.
      * @param g 
      * @param clipShape 
      * @param width 
