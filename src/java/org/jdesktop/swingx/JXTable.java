@@ -2697,9 +2697,10 @@ public class JXTable extends JTable
      */
     @Override
     public void setPreferredScrollableViewportSize(Dimension size) {
-        Dimension old = getPreferredScrollableViewportSize();
+        // TODO: figure out why firing the event screws the JXTableUnitTest.testPrefScrollableUpdatedOnStructureChanged
+//        Dimension old = getPreferredScrollableViewportSize();
         super.setPreferredScrollableViewportSize(size);
-        firePropertyChange("preferredScrollableViewportSize", old, getPreferredScrollableViewportSize());
+//        firePropertyChange("preferredScrollableViewportSize", old, getPreferredScrollableViewportSize());
     }
 
     /**
