@@ -22,6 +22,7 @@ package org.jdesktop.swingx.painter;
 
 import junit.framework.TestCase;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.jdesktop.test.TestUtils;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -38,6 +39,6 @@ public class BusyPainterTest extends TestCase {
      */
     @Test
     public void testPaint() {
-        TestUtils.assertPCEFiring(new BusyPainter());
+        TestUtils.assertPCEFiring(new BusyPainter(), CollectionUtils.EMPTY_COLLECTION);
     }
 }
