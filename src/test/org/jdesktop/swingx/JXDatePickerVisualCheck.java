@@ -97,7 +97,7 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
 //            test.runInteractiveTests("interactive.*PrefSize.*");
 //            test.runInteractiveTests("interactive.*Keep.*");
 //          test.runInteractiveTests("interactive.*Multiple.*");
-            test.runInteractiveTests("interactive.*Event.*");
+            test.runInteractiveTests("interactive.*Popup.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
@@ -238,13 +238,16 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
      * clicking into other focus-tricksing component (like
      * picker, combo).
      * 
+     * Issue #1011-swingx: popup of first picker opened on click on second
+     * (mac only?)
+     * 
      * And: Compare picker and combo behaviour on toggle lf.
      * 
      * Not really comparable: the combo has complete control over the popup, re-creates
      * both popup and content on install.
      * 
      */
-    public void interactiveUpdateUIPickerCompareCombo() {
+    public void interactivePopupPickerCompareCombo() {
 //      Trace14.keyboardFocusManager(true);
        final JXDatePicker picker = new JXDatePicker();
        picker.getEditor().setName("first DateField");
@@ -254,11 +257,27 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
         comp.add(picker);
         comp.add(new JXDatePicker(new Date()));
         comp.add(box);
-        JXFrame frame = wrapInFrame(comp, "compare combo <-> picker", true);
+        JXFrame frame = wrapInFrame(comp, "compare combo <-> picker, picker <-> picker", true);
         addMessage(frame, "open popup, click in other picker/combo - popup must close and other focused");
         show(frame);
     }
     
+    /**
+     * Issue #1011-swingx: popup of first picker opened on click on second
+     * (mac only?)
+     * 
+     */
+    public void interactivePopupTwoPickers() {
+//      Trace14.keyboardFocusManager(true);
+       final JXDatePicker picker = new JXDatePicker();
+       picker.getEditor().setName("first DateField");
+        JComponent comp = new JPanel();
+        comp.add(picker);
+        comp.add(new JXDatePicker(new Date()));
+        JXFrame frame = wrapInFrame(comp, "popup: picker <-> picker", true);
+        addMessage(frame, "click on second opens popup of first (mac only?)");
+        show(frame);
+    }
 
     
     /**

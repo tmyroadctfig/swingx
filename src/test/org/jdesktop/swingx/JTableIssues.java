@@ -12,10 +12,9 @@ import java.awt.GraphicsEnvironment;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Date;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
@@ -32,6 +31,7 @@ import javax.swing.UIManager;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellEditor;
+import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 
 import org.jdesktop.swingx.action.AbstractActionExt;
@@ -59,7 +59,20 @@ public class JTableIssues extends InteractiveTestCase {
       }
   }
 
-    
+    public void testFormatDefaultRenderer() {
+        DefaultTableModel model = new DefaultTableModel(1, 1) {
+
+            @Override
+            public Class<?> getColumnClass(int columnIndex) {
+                return Date.class;
+            }
+            
+        };
+        model.setValueAt("definitely not a date", 0, 0);
+        JTable table = new JTable(model);
+        TableCellRenderer renderer = table.getCellRenderer(0, 0);
+        table.prepareRenderer(renderer , 0, 0);
+    }
     
     /**
      * test that all transferFocus methods stop edits and 
