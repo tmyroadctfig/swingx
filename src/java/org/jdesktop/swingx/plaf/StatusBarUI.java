@@ -21,11 +21,12 @@
 
 package org.jdesktop.swingx.plaf;
 
-import javax.swing.plaf.PanelUI;
+import javax.swing.plaf.ComponentUI;
 
 /**
+ * Pluggable look and feel interface for StatusBar.
  *
  * @author rbair
  */
-public abstract class StatusBarUI extends PanelUI {
+public abstract class StatusBarUI extends ComponentUI {
 }
