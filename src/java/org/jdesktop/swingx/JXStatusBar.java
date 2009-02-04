@@ -59,7 +59,7 @@ import org.jdesktop.swingx.plaf.StatusBarUI;
  * is that left over after allowing for all FIXED component and the preferred 
  * width of FILL components, plus insets  
  * 
- * <p>Constructing a <code>JXStatusBar</code> is very straitforward:
+ * <p>Constructing a <code>JXStatusBar</code> is very straightforward:
  * <pre><code>
  *      JXStatusBar bar = new JXStatusBar();
  *      JLabel statusLabel = new JLabel("Ready");
@@ -96,6 +96,7 @@ import org.jdesktop.swingx.plaf.StatusBarUI;
  *
  * @author pdoubleya
  * @author rbair
+ * @author Karl George Schaefer
  */
 public class JXStatusBar extends JComponent {
     /**
@@ -103,6 +104,9 @@ public class JXStatusBar extends JComponent {
      * @see #readObject
      */
     public static final String uiClassID = "StatusBarUI";
+    
+    //TODO how to handle UI delegate setting of primitive?
+    private boolean resizeHandleEnabled;
     
     /**
      * Initialization that would ideally be moved into various look and feel
@@ -118,6 +122,22 @@ public class JXStatusBar extends JComponent {
     public JXStatusBar() {
         super();
         updateUI();
+    }
+
+    /**
+     * @param resizeHandleEnabled the resizeHandleEnabled to set
+     */
+    public void setResizeHandleEnabled(boolean resizeHandleEnabled) {
+        boolean oldValue = isResizeHandleEnabled();
+        this.resizeHandleEnabled = resizeHandleEnabled;
+        firePropertyChange("resizeHandleEnabled", oldValue, isResizeHandleEnabled());
+    }
+
+    /**
+     * @return the resizeHandleEnabled
+     */
+    public boolean isResizeHandleEnabled() {
+        return resizeHandleEnabled;
     }
 
     /**

@@ -35,7 +35,6 @@ import org.jdesktop.swingx.plaf.UIManagerExt;
 import org.jdesktop.swingx.plaf.basic.BasicStatusBarUI;
 
 /**
- * TODO: Need to add listener to resize handle
  * @author rbair
  */
 public class WindowsStatusBarUI extends BasicStatusBarUI {
@@ -45,7 +44,7 @@ public class WindowsStatusBarUI extends BasicStatusBarUI {
     private BufferedImage rightImage;
     
     
-    /** Creates a new instance of BasicStatusBarUI */
+    /** Creates a new instance of WindowsStatusBarUI */
     public WindowsStatusBarUI() {
         //SwingX #827: must create these here or size is incorrect
         //TODO need to determine a better way to handle these images
@@ -81,8 +80,13 @@ public class WindowsStatusBarUI extends BasicStatusBarUI {
         //if bidi, reverse the image painting order
         //TODO need to handle vertical stretching better
         g.drawImage(leftImage, 0, 0, leftImage.getWidth(), statusBar.getHeight(), null);
-        g.drawImage(middleImage, leftImage.getWidth(), 0, statusBar.getWidth() - leftImage.getWidth() - rightImage.getWidth(), statusBar.getHeight(), null);
-        g.drawImage(rightImage, statusBar.getWidth() - rightImage.getWidth(), 0, rightImage.getWidth(), statusBar.getHeight(), null);
+        
+        if (statusBar.isResizeHandleEnabled()) {
+            g.drawImage(middleImage, leftImage.getWidth(), 0, statusBar.getWidth() - leftImage.getWidth() - rightImage.getWidth(), statusBar.getHeight(), null);
+            g.drawImage(rightImage, statusBar.getWidth() - rightImage.getWidth(), 0, rightImage.getWidth(), statusBar.getHeight(), null);
+        } else {
+            g.drawImage(middleImage, leftImage.getWidth(), 0, statusBar.getWidth() - leftImage.getWidth(), statusBar.getHeight(), null);
+        }
     }
     
     @Override protected Insets getSeparatorInsets(Insets insets) {

@@ -71,7 +71,7 @@ public class BasicStatusBarUI extends StatusBarUI {
         private int getHandleBoundary() {
             Border border = statusBar.getBorder();
             
-            if (border == null) {
+            if (border == null || !statusBar.isResizeHandleEnabled()) {
                 return 0;
             }
             
@@ -191,9 +191,18 @@ public class BasicStatusBarUI extends StatusBarUI {
         public void propertyChange(PropertyChangeEvent evt) {
             if ("ancestor".equals(evt.getPropertyName())) {
                 window = SwingUtilities.getWindowAncestor(statusBar);
+                
+                boolean useResizeHandle = statusBar.getParent() != null
+                        && statusBar.getRootPane() != null
+                        && (statusBar.getParent() == statusBar.getRootPane()
+                        || statusBar.getParent() == statusBar.getRootPane().getContentPane());
+                statusBar.setResizeHandleEnabled(useResizeHandle);
             } else if ("border".equals(evt.getPropertyName())) {
                 handleBoundary = getHandleBoundary();
             } else if ("componentOrientation".equals(evt.getPropertyName())) {
+                handleBoundary = getHandleBoundary();
+            } else if ("resizeHandleEnabled".equals(evt.getPropertyName())) {
+                //TODO disable handle display
                 handleBoundary = getHandleBoundary();
             }
         }
