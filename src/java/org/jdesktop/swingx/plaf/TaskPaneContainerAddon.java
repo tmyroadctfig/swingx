@@ -112,9 +112,11 @@ public class TaskPaneContainerAddon extends AbstractComponentAddon {
         }
       }      
       
-      defaults.add("TaskPaneContainer.backgroundPainter", new PainterUIResource(
-              new MattePainter<JXTaskPaneContainer>(new GradientPaint(0f, 0f,
-                      backgroundGradientStart, 0f, 1f, backgroundGradientEnd), true)));
+      defaults.add("TaskPaneContainer.backgroundPainter", new PainterUIResource<JXTaskPaneContainer>(
+              new MattePainter<JXTaskPaneContainer>(new GradientPaint(
+                      0f, 0f, backgroundGradientStart,
+                      0f, 1f, backgroundGradientEnd),
+                      true)));
       defaults.add("TaskPaneContainer.background", background);
     }
   }

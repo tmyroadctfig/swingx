@@ -27,20 +27,31 @@ import javax.swing.plaf.UIResource;
 import org.jdesktop.swingx.painter.Painter;
 
 /**
- * An impl of Painter that implements UIResource.  UI
- * classes that create Painters should use this class.
- *
+ * An implementation of Painter as a UIResource. UI classes that create Painters
+ * should use this class.
+ * 
  * @author rbair
+ * @author Karl George Schaefer
+ * @param <T> a subclass of JComponent
  */
-public class PainterUIResource implements Painter<JComponent>, UIResource {
-    private Painter p;
-    
-    /** Creates a new instance of PainterUIResource */
-    public PainterUIResource(Painter p) {
+public class PainterUIResource<T extends JComponent> implements Painter<T>, UIResource {
+    private Painter<? super T> p;
+
+    /**
+     * Creates a new instance of PainterUIResource with the specified delegate
+     * painter.
+     * 
+     * @param p
+     *            the delegate painter
+     */
+    public PainterUIResource(Painter<? super T> p) {
         this.p = p;
     }
     
-    public void paint(Graphics2D g, JComponent component, int width, int height) {
+    /**
+     * {@inheritDoc}
+     */
+    public void paint(Graphics2D g, T component, int width, int height) {
         if (p != null) {
             p.paint(g, component, width, height);
         }
