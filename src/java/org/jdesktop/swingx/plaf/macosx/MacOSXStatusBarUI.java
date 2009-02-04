@@ -53,6 +53,6 @@ public class MacOSXStatusBarUI extends BasicStatusBarUI {
     protected void installDefaults(JXStatusBar sb) {
         super.installDefaults(sb);
         
-        LookAndFeel.installProperty(statusBar, "opaque", false);
+        LookAndFeel.installProperty(statusBar, "opaque", Boolean.FALSE);
     }
 }

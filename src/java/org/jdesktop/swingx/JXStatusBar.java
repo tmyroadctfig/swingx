@@ -117,7 +117,6 @@ public class JXStatusBar extends JComponent {
      */
     public JXStatusBar() {
         super();
-        setOpaque(true);
         updateUI();
     }
 
@@ -136,9 +135,11 @@ public class JXStatusBar extends JComponent {
      * @param ui
      *            the StatusBarUI L&F object
      * @see javax.swing.UIDefaults#getUI
-     * @beaninfo bound: true hidden: true attribute: visualUpdate true
-     *           description: The UI object that implements the Component's
-     *           LookAndFeel.
+     * @beaninfo
+     *        bound: true
+     *       hidden: true
+     *    attribute: visualUpdate true
+     *  description: The component's look and feel delegate.
      */
     public void setUI(StatusBarUI ui) {
         super.setUI(ui);

@@ -44,8 +44,8 @@ import java.util.Map;
 
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
+import javax.swing.LookAndFeel;
 import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.plaf.BorderUIResource;
 import javax.swing.plaf.ComponentUI;
@@ -54,6 +54,7 @@ import javax.swing.plaf.UIResource;
 import org.jdesktop.swingx.JXStatusBar;
 import org.jdesktop.swingx.JXStatusBar.Constraint;
 import org.jdesktop.swingx.plaf.StatusBarUI;
+import org.jdesktop.swingx.plaf.UIManagerExt;
 
 /**
  *
@@ -245,11 +246,10 @@ public class BasicStatusBarUI extends StatusBarUI {
         installDefaults(statusBar);
         installListeners(statusBar);
         
-        //only set the layout manager if the layout manager of the component is null.
-        //do not replace custom layout managers. it is not necessary to replace this layout
-        //manager.
+        // only set the layout manager if the layout manager of the component is
+        // null or a UIResource. Do not replace custom layout managers.
         LayoutManager m = statusBar.getLayout();
-        if (m == null) {
+        if (m == null || m instanceof UIResource) {
             statusBar.setLayout(createLayout());
         }
     }
@@ -263,6 +263,8 @@ public class BasicStatusBarUI extends StatusBarUI {
         if (b == null || b instanceof UIResource) {
             statusBar.setBorder(createBorder());
         }
+        
+        LookAndFeel.installProperty(sb, "opaque", Boolean.TRUE);
     }
     
     private Handler getHandler() {
@@ -342,10 +344,17 @@ public class BasicStatusBarUI extends StatusBarUI {
 
         uninstallDefaults(statusBar);
         uninstallListeners(statusBar);
-        //TODO remove the border and layout if a UI resource?
+        
+        if (statusBar.getLayout() instanceof UIResource) {
+            statusBar.setLayout(null);
+        }
     }
     
-    protected void uninstallDefaults(JXStatusBar sb) { }
+    protected void uninstallDefaults(JXStatusBar sb) {
+        if (sb.getBorder() instanceof UIResource) {
+            sb.setBorder(null);
+        }
+    }
     
     /**
      * Remove the installed listeners from the status bar.
@@ -398,8 +407,8 @@ public class BasicStatusBarUI extends StatusBarUI {
     }
     
     protected void paintSeparator(Graphics2D g, JXStatusBar bar, int x, int y, int w, int h) {
-        Color fg = UIManager.getColor("Separator.foreground");
-        Color bg = UIManager.getColor("Separator.background");
+        Color fg = UIManagerExt.getSafeColor("Separator.foreground", Color.BLACK);
+        Color bg = UIManagerExt.getSafeColor("Separator.background", Color.WHITE);
         
         x += w / 2;
         g.setColor(fg);
