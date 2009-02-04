@@ -97,7 +97,7 @@ public class JXMultiThumbSlider<E> extends JComponent {
     }
     
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     @Override
     public String getUIClassID() {

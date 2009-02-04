@@ -25,7 +25,7 @@ import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 
 /**
- * <p>A {@link Painter} implemention composed of an array of <code>Painter</code>s.
+ * <p>A {@link Painter} implementation composed of an array of <code>Painter</code>s.
  * <code>CompoundPainter</code> provides a means for combining several individual
  * <code>Painter</code>s, or groups of them, into one logical unit. Each of the
  * <code>Painter</code>s are executed in order. BufferedImageOp filter effects can
@@ -162,7 +162,7 @@ public class CompoundPainter<T> extends AbstractPainter<T> {
      * to validate themselves. If any of the child painters are dirty, then
      * this <code>CompoundPainter</code> marks itself as dirty.</p>
      *
-     * @inheritDoc
+     * {@inheritDoc}
      */
     @Override
     protected void validate(T object) {
@@ -228,7 +228,7 @@ public class CompoundPainter<T> extends AbstractPainter<T> {
      * if they are dirty. If so, then <code>true</code> is returned. 
      * Otherwise, we return <code>false</code>.</p>
      *
-     * @inheritDoc
+     * {@inheritDoc}
      * {@see #isCheckingDirtyChildPainters()}
      */
     @Override
@@ -259,7 +259,7 @@ public class CompoundPainter<T> extends AbstractPainter<T> {
      * <p>Call #clearLocalCache if you only want to clear the cache of this
      * <code>CompoundPainter</code>
      *
-     * @inheritDoc
+     * {@inheritDoc}
      */
     @Override
     public void clearCache() {
@@ -282,7 +282,7 @@ public class CompoundPainter<T> extends AbstractPainter<T> {
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     @Override
     protected void doPaint(Graphics2D g, T component, int width, int height) {
@@ -297,7 +297,7 @@ public class CompoundPainter<T> extends AbstractPainter<T> {
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     @Override
     protected void configureGraphics(Graphics2D g) {
@@ -309,7 +309,7 @@ public class CompoundPainter<T> extends AbstractPainter<T> {
     }
     
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     @Override
     protected boolean shouldUseCache() {
