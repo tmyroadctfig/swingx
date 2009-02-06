@@ -90,6 +90,7 @@ public class MultiSplitLayout implements LayoutManager
   private boolean floatingDividers = true;
 
   private boolean removeDividers = true;
+  private boolean layoutByWeight = false;
 
   private int layoutMode;
   private int userMinSize = 20;
@@ -104,6 +105,20 @@ public class MultiSplitLayout implements LayoutManager
   {
     this(new Leaf("default"));
   }
+
+  /**
+   * Create a MultiSplitLayout with a default model with a single
+   * Leaf node named "default".
+   *
+   * @param layoutByWeight if true the layout is initialized in proportion to
+   * the node weights rather than the component preferred sizes.
+   * #see setModel
+   */
+  public MultiSplitLayout(boolean layoutByWeight)
+  {
+    this(new Leaf("default"));
+    this.layoutByWeight = layoutByWeight;
+  }
   
   /**
    * Set the size of the child components to match the weights of the children.
@@ -112,21 +127,31 @@ public class MultiSplitLayout implements LayoutManager
    */
   public void layoutByWeight( Container parent )
   {    
+    doLayoutByWeight( parent );
+    
+    layoutContainer( parent );
+  }
+
+  /**
+   * Set the size of the child components to match the weights of the children.
+   * If the components to not all specify a weight then the available layout
+   * space is divided equally between the components.
+   */
+  private void doLayoutByWeight( Container parent )
+  {
     Dimension size = parent.getSize();
     Insets insets = parent.getInsets();
     int width = size.width - (insets.left + insets.right);
     int height = size.height - (insets.top + insets.bottom);
     Rectangle bounds = new Rectangle(insets.left, insets.top, width, height);
-    
-    if (model instanceof Leaf) 
+
+    if (model instanceof Leaf)
       model.setBounds(bounds);
-    else if (model instanceof Split) 
-      layoutByWeight( model, bounds );
-    
-    layoutContainer( parent );
+    else if (model instanceof Split)
+      doLayoutByWeight( model, bounds );
   }
   
-  private void layoutByWeight( Node node, Rectangle bounds ) 
+  private void doLayoutByWeight( Node node, Rectangle bounds )
   {
     int width = bounds.width;
     int height = bounds.height;
@@ -171,7 +196,7 @@ public class MultiSplitLayout implements LayoutManager
         splitChild.setBounds( splitChildBounds );
         
         if ( splitChild instanceof Split )
-          layoutByWeight( splitChild, splitChildBounds );
+          doLayoutByWeight( splitChild, splitChildBounds );
         else {
           Component comp = getComponentForNode( splitChild );
           if ( comp != null )
@@ -200,7 +225,7 @@ public class MultiSplitLayout implements LayoutManager
         splitChild.setBounds( splitChildBounds );
         
         if ( splitChild instanceof Split )
-          layoutByWeight( splitChild, splitChildBounds );
+          doLayoutByWeight( splitChild, splitChildBounds );
         else {
           Component comp = getComponentForNode( splitChild );
           if ( comp != null )
@@ -591,11 +616,17 @@ public class MultiSplitLayout implements LayoutManager
   
   
   private Dimension preferredComponentSize(Node node) {
+    if ( layoutMode == NO_MIN_SIZE_LAYOUT )
+      return new Dimension(0, 0);
+
     Component child = childForNode(node);
     return ((child != null) && child.isVisible() ) ? child.getPreferredSize() : new Dimension(0, 0);
   }
   
   private Dimension minimumComponentSize(Node node) {
+    if ( layoutMode == NO_MIN_SIZE_LAYOUT )
+      return new Dimension(0, 0);
+
     Component child = childForNode(node);
     return ((child != null) && child.isVisible() ) ? child.getMinimumSize() : new Dimension(0, 0);
   }
@@ -605,7 +636,7 @@ public class MultiSplitLayout implements LayoutManager
       return preferredComponentSize(root);
     }
     else if (root instanceof Divider) {
-      if ( !((Divider)root).isVisible()  )
+      if ( !((Divider)root).isVisible())
         return new Dimension(0,0);
       int divSize = getDividerSize();
       return new Dimension(divSize, divSize);
@@ -647,6 +678,9 @@ public class MultiSplitLayout implements LayoutManager
   public Dimension minimumNodeSize(Node root) {
     assert( root.isVisible );
     if (root instanceof Leaf) {
+      if ( layoutMode == NO_MIN_SIZE_LAYOUT )
+        return new Dimension(0, 0);
+
       Component child = childForNode(root);
       return ((child != null) && child.isVisible() ) ? child.getMinimumSize() : new Dimension(0, 0);
     }
@@ -1285,6 +1319,26 @@ public class MultiSplitLayout implements LayoutManager
   {
     userMinSize = minSize;
   }
+
+  /**
+   * Get the layoutByWeight falg. If the flag is true the layout initializes
+   * itself using the model weights
+   * @return the layoutByWeight
+   */
+  public boolean getLayoutByWeight()
+  {
+    return layoutByWeight;
+  }
+
+  /**
+   * Sset the layoutByWeight falg. If the flag is true the layout initializes
+   * itself using the model weights
+   * @param state the new layoutByWeight to set
+   */
+  public void setLayoutByWeight( boolean state )
+  {
+    layoutByWeight = state;
+  }
   
   /**
    * The specified Node is either the wrong type or was configured
@@ -1345,7 +1399,11 @@ public class MultiSplitLayout implements LayoutManager
    * the layout model, and then set the bounds of each child component
    * with a matching Leaf Node.
    */
-  public void layoutContainer(Container parent) {
+  public void layoutContainer(Container parent)
+  {
+    if ( layoutByWeight && floatingDividers )
+      doLayoutByWeight( parent );
+
     checkLayout(getModel());
     Insets insets = parent.getInsets();
     Dimension size = parent.getSize();
