@@ -56,6 +56,7 @@ import javax.swing.SwingConstants;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.Border;
 
+import org.jdesktop.swingx.SwingXUtilities;
 import org.jdesktop.swingx.graphics.GraphicsUtilities;
 
 /**
@@ -117,6 +118,10 @@ public class PaintUtils {
     private PaintUtils() {
     }
     
+    /**
+     * @deprecated (pre 0.9.6) no replacement
+     */
+    @Deprecated
     public static Border getDefaultBorder() {
         return defaultBorder;
     }
@@ -177,47 +182,35 @@ public class PaintUtils {
     
     /**
      * Sets the background color for a containment hierarchy.
+     * 
+     * @deprecated (pre 0.9.6) use
+     *             {@link SwingXUtilities#setComponentTreeBackground(Component, Color)}
      */
+    @Deprecated
     public static void setBackgroundColor(Container cont, Color color) {
-        cont.setBackground(color);
-        Component[] children = cont.getComponents();
-        for (Component aChildren : children) {
-            if (aChildren instanceof Container) {
-                setBackgroundColor((Container) aChildren, color);
-            } else {
-                aChildren.setBackground(color);
-            }
-        }
+        SwingXUtilities.setComponentTreeBackground(cont, color);
     }
-    
+
     /**
      * Sets the foreground color for a containment hierarchy.
+     * 
+     * @deprecated (pre 0.9.6) use
+     *             {@link SwingXUtilities#setComponentTreeForeground(Component, Color)}
      */
+    @Deprecated
     public static void setForegroundColor(Container cont, Color color) {
-        cont.setForeground(color);
-        Component[] children = cont.getComponents();
-        for (Component aChildren : children) {
-            if (aChildren instanceof Container) {
-                setForegroundColor((Container) aChildren, color);
-            } else {
-                aChildren.setForeground(color);
-            }
-        }
+        SwingXUtilities.setComponentTreeForeground(cont, color);
     }
     
     /**
      * Sets the font for a containment hierarchy.
+     * 
+     * @deprecated (pre 0.9.6) use
+     *             {@link SwingXUtilities#setComponentTreeFont(Component, Font)}
      */
+    @Deprecated
     public static void setFont(Container cont, Font font) {
-        cont.setFont(font);
-        Component[] children = cont.getComponents();
-        for (Component aChildren : children) {
-            if (aChildren instanceof Container) {
-                setFont((Container) aChildren, font);
-            } else {
-                aChildren.setFont(font);
-            }
-        }
+        SwingXUtilities.setComponentTreeFont(cont, font);
     }
     
     /**

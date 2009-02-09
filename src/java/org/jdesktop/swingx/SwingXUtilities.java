@@ -20,8 +20,10 @@
  */
 package org.jdesktop.swingx;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Font;
 import java.awt.Frame;
 import java.awt.Window;
 import java.awt.event.InputEvent;
@@ -195,7 +197,67 @@ public final class SwingXUtilities {
         }
     }
 
+    /**
+     * Sets the background for an entire component hierarchy to the specified
+     * color.
+     * 
+     * @param c
+     *                the starting component
+     * @param color
+     *                the color to set
+     */
+    public static void setComponentTreeBackground(Component c, Color color) {
+        c.setBackground(color);
+        
+        Component[] children = getChildren(c);
+        
+        if (children != null) {
+            for(int i = 0; i < children.length; i++) {
+                setComponentTreeBackground(children[i], color);
+            }
+        }
+    }
 
+    /**
+     * Sets the foreground for an entire component hierarchy to the specified
+     * color.
+     * 
+     * @param c
+     *                the starting component
+     * @param color
+     *                the color to set
+     */
+    public static void setComponentTreeForeground(Component c, Color color) {
+        c.setForeground(color);
+        
+        Component[] children = getChildren(c);
+        
+        if (children != null) {
+            for(int i = 0; i < children.length; i++) {
+                setComponentTreeForeground(children[i], color);
+            }
+        }
+    }
+
+    /**
+     * Sets the font for an entire component hierarchy to the specified font.
+     * 
+     * @param c
+     *            the starting component
+     * @param font
+     *            the font to set
+     */
+    public static void setComponentTreeFont(Component c, Font font) {
+        c.setFont(font);
+        
+        Component[] children = getChildren(c);
+        
+        if (children != null) {
+            for(int i = 0; i < children.length; i++) {
+                setComponentTreeFont(children[i], font);
+            }
+        }
+    }
 
     /**
      * Updates the componentTreeUI of all top-level windows of the 
