@@ -472,6 +472,8 @@ public class JXTaskPane extends JPanel implements
     private void updateDisplayedMnemonicIndex(String text, int mnemonic) {
         if (text == null || mnemonic == '\0') {
             mnemonicIndex = -1;
+            
+            return;
         }
 
         char uc = Character.toUpperCase((char)mnemonic);
