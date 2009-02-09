@@ -56,6 +56,8 @@ import javax.swing.SwingConstants;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.Border;
 
+import org.jdesktop.swingx.graphics.GraphicsUtilities;
+
 /**
  * A collection of utilties for painting visual effects.
  *
@@ -224,7 +226,9 @@ public class PaintUtils {
      *
      * @return Creates and returns a BufferedImage that is "compatible" with this machines
      *         video card and subsystem
+     * @deprecated (pre-0.9.6) use {@link GraphicsUtilities#createCompatibleImage(int, int)}
      */
+    @Deprecated
     public static BufferedImage createCompatibleImage(int width, int height) {
         GraphicsEnvironment environment =
                 GraphicsEnvironment.getLocalGraphicsEnvironment();
@@ -253,7 +257,7 @@ public class PaintUtils {
     }
     
     public static BufferedImage convertToBufferedImage(Image img) {
-        BufferedImage buff = createCompatibleImage(img.getWidth(null),img.getHeight(null));
+        BufferedImage buff = GraphicsUtilities.createCompatibleImage(img.getWidth(null),img.getHeight(null));
         Graphics2D g2 = buff.createGraphics();
         g2.drawImage(img,0,0,null);
         g2.dispose();
@@ -264,19 +268,26 @@ public class PaintUtils {
      * Loads the image at the URL and makes it compatible with the screen.
      * If loading the url fails then this method will either throw an IOException
      * or return null.
+     * 
+     * @deprecated (pre-0.9.6) use {@link GraphicsUtilities#loadCompatibleImage(URL)}
      */
+    @Deprecated
     public static BufferedImage loadCompatibleImage(URL resource) throws IOException {
         BufferedImage image = ImageIO.read(resource);
         if(image == null) return null;
-        return toCompatibleImage(image);
+        return GraphicsUtilities.toCompatibleImage(image);
     }
     
     public static BufferedImage loadCompatibleImage(InputStream in) throws IOException {
         BufferedImage image = ImageIO.read(in);
         if(image == null) return null;
-        return toCompatibleImage(image);
+        return GraphicsUtilities.toCompatibleImage(image);
     }
     
+    /**
+     * @deprecated (pre-0.9.6) use {@link GraphicsUtilities#toCompatibleImage(BufferedImage)}
+     */
+    @Deprecated
     public static BufferedImage toCompatibleImage(BufferedImage image) {
         BufferedImage compatibleImage = configuration.createCompatibleImage(image.getWidth(),
                 image.getHeight(), Transparency.TRANSLUCENT);

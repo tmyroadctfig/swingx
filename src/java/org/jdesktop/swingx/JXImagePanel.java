@@ -28,12 +28,10 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Insets;
 import java.awt.Rectangle;
-import javax.imageio.ImageIO;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.lang.ref.SoftReference;
-import java.lang.ref.WeakReference;
 import java.net.URL;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -42,6 +40,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.SwingUtilities;
@@ -56,7 +56,7 @@ import javax.swing.SwingUtilities;
  * 
  * <p>
  * In the future, the JXImagePanel will also support tiling of images, scaling,
- * resizing, cropping, segways etc.
+ * resizing, cropping, segues etc.
  * </p>
  * 
  * <p>
@@ -68,6 +68,11 @@ import javax.swing.SwingUtilities;
  * 
  * <p>
  * Images to be displayed can be set based on URL, Image, etc.
+ * </p>
+ * <p>
+ * TODO other than the image loading this component can be replicated by a
+ * JXPanel with the appropriate Painter. What's the point?
+ * </p>
  * 
  * @author rbair
  */
@@ -100,12 +105,6 @@ public class JXImagePanel extends JXPanel {
      * The mouse handler that is used if the component is editable
      */
     private MouseHandler mhandler = new MouseHandler();
-
-    /**
-     * If not null, then the user has explicitly set the preferred size of this
-     * component, and this should be honored
-     */
-    private Dimension preferredSize;
 
     /**
      * Specifies how to draw the image, i.e. what kind of Style to use when
@@ -214,11 +213,6 @@ public class JXImagePanel extends JXPanel {
      */
     public Style getStyle() {
         return style;
-    }
-
-    public void setPreferredSize(Dimension pref) {
-        preferredSize = pref;
-        super.setPreferredSize(pref);
     }
 
     /**

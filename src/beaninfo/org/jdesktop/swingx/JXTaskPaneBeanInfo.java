@@ -44,8 +44,8 @@ public class JXTaskPaneBeanInfo extends BeanInfoSupport {
         bd.setValue("containerDelegate", "getContentPane");
         
         setPreferred(true, "title", "icon", "special");
-        setPreferred(true, "animated", "scrollOnExpand", "expanded", "font");
-        setBound(true, "title", "icon", "special", "scrollOnExpand", "expanded");
+        setPreferred(true, "animated", "scrollOnExpand", "collapsed", "font");
+        setBound(true, "title", "icon", "special", "scrollOnExpand", "collapsed");
         setPreferred(false, "border");
     }
 }

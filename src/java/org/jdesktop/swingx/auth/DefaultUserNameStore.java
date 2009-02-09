@@ -18,14 +18,9 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-
-
 package org.jdesktop.swingx.auth;
 
-import java.beans.PropertyChangeSupport;
 import java.util.prefs.Preferences;
-
-import org.jdesktop.swingx.JXLoginPane;
 
 /**
  * Saves the user names in Preferences. Because any string could be part
@@ -43,12 +38,6 @@ public class DefaultUserNameStore extends UserNameStore {
     /**
      */
     private static final String NUM_KEY = "usernames.length";
-    /**
-     * A name that is used when retrieving preferences. By default, the
-     * app name is &quot;default&quot. This should be set by the application
-     * if the application wants it&apos;s own list of user names.
-     */
-    private static final String DEFAULT_APP_NAME = "default";
     /**
      * The preferences node
      */
@@ -96,14 +85,17 @@ public class DefaultUserNameStore extends UserNameStore {
     }
     
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public String[] getUserNames() {
-        return userNames;
+        String[] copy = new String[userNames.length];
+        System.arraycopy(userNames, 0, copy, 0, userNames.length);
+        
+        return copy;
     }
     
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public void setUserNames(String[] userNames) {
         userNames = userNames == null ? new String[0] : userNames;
@@ -146,7 +138,7 @@ public class DefaultUserNameStore extends UserNameStore {
     }
     
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public boolean containsUserName(String name) {
         for (String s : userNames) {

@@ -82,8 +82,7 @@ public class MattePainter<T> extends AbstractAreaPainter<T> {
     }
     
     /**
-     * 
-     * @inheritDoc 
+     * {@inheritDoc}
      */
     public void doPaint(Graphics2D g, T component, int width, int height) {
         Paint p = getFillPaint();

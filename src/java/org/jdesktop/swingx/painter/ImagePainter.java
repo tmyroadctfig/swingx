@@ -52,7 +52,7 @@ import java.util.logging.Logger;
  *contain a point with the x and y values between 0 and 1. 0,0 will put the image in the
  *upper left hand corner, 1,1 in the lower right, and 0.5,0.5 in the center. All other values
  *will be interpolated accordingly. For a more
- * complete defintion of the positioning algorithm see the
+ * complete definition of the positioning algorithm see the
  * <a href="http://www.w3.org/TR/CSS21/colors.html#propdef-background-position">CSS 2.1 spec</a>.
  * </li>
  * </ul>
@@ -147,7 +147,7 @@ public class ImagePainter<T> extends AbstractAreaPainter<T> {
     }
     
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public void doPaint(Graphics2D g, T component, int width, int height) {
         if (img == null && imageURL != null) {
@@ -221,7 +221,7 @@ public class ImagePainter<T> extends AbstractAreaPainter<T> {
                     if(scaleToFit) {
                         int sw = imgWidth;
                         int sh = imgHeight;
-                        if(scaleType == scaleType.InsideFit) {
+                        if(scaleType == ScaleType.InsideFit) {
                             if(sw > width) {
                                 float scale = (float)width/(float)sw;
                                 sw = (int)(sw * scale);

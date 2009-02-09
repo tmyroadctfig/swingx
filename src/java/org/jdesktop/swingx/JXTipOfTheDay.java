@@ -55,7 +55,7 @@ import org.jdesktop.swingx.tips.TipOfTheDayModel.Tip;
  * </dl>
  * 
  * <p>
- * <code>JXTipOfTheDay<code> finds its tips in its {@link org.jdesktop.swingx.tips.TipOfTheDayModel}.
+ * <code>JXTipOfTheDay</code> finds its tips in its {@link org.jdesktop.swingx.tips.TipOfTheDayModel}.
  * Such model can be programmatically built using {@link org.jdesktop.swingx.tips.DefaultTipOfTheDayModel}
  * and {@link org.jdesktop.swingx.tips.DefaultTip} but
  * the {@link org.jdesktop.swingx.tips.TipLoader} provides a convenient method to

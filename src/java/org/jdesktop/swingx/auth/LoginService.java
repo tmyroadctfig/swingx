@@ -52,7 +52,7 @@ public abstract class LoginService extends AbstractBean {
 
     private EventListenerList listenerList = new EventListenerList();
 
-    private SwingWorker loginWorker;
+    private SwingWorker<Boolean, Void> loginWorker;
 
     /*
      * Controls the authentication behaviour to be either synchronous or
@@ -136,8 +136,8 @@ public abstract class LoginService extends AbstractBean {
                 fireLoginFailed(new LoginEvent(this, e));
             }
         } else {
-            loginWorker = new SwingWorker() {
-                protected Object doInBackground() throws Exception {
+            loginWorker = new SwingWorker<Boolean, Void>() {
+                protected Boolean doInBackground() throws Exception {
                     try {
                         final boolean result = authenticate(user, password,
                                 server);

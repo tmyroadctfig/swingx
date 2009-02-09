@@ -30,7 +30,7 @@ import java.awt.geom.Ellipse2D;
 
 /**
  * <p>A Painter implementation that simulates a gloss effect. The gloss can
- * be positionned at the top or bottom of the drawing area. To fill the gloss,
+ * be positioned at the top or bottom of the drawing area. To fill the gloss,
  * this painter uses a Paint instance which can be used to fill with a color
  * (opaque or translucent), a texture, a gradient...</p>
  * <p>The following example creates a white gloss at the top of the drawing
@@ -58,7 +58,7 @@ public class GlossPainter<T> extends AbstractPainter<T> {
     private GlossPosition position;
     
     /**
-     * <p>Creates a new gloss painter positionned at the top of the painted
+     * <p>Creates a new gloss painter positioned at the top of the painted
      * area with a 20% translucent white color.</p>
      */
     public GlossPainter() {
@@ -66,7 +66,7 @@ public class GlossPainter<T> extends AbstractPainter<T> {
     }
     
     /**
-     * <p>Creates a new gloss painter positionned at the top of the painted
+     * <p>Creates a new gloss painter positioned at the top of the painted
      * area with the specified paint.</p>
      *
      * @param paint The paint to be used when filling the gloss
@@ -76,7 +76,7 @@ public class GlossPainter<T> extends AbstractPainter<T> {
     }
     
     /**
-     * <p>Creates a new gloss painter positionned at the specified position
+     * <p>Creates a new gloss painter positioned at the specified position
      * and using a white, 20% translucent paint.</p>
      *
      * @param position The position of the gloss on the painted area
@@ -86,7 +86,7 @@ public class GlossPainter<T> extends AbstractPainter<T> {
     }
     
     /**
-     * <p>Creates a new gloss painter positionned at the specified position
+     * <p>Creates a new gloss painter positioned at the specified position
      * and painted with the specified paint.</p>
      *
      * @param paint The paint to be used when filling the gloss
