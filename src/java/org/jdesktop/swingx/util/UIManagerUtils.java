@@ -35,8 +35,10 @@ import javax.swing.text.html.HTMLDocument;
 /**
  * Utility for working with the UIManager
  * @author Richard Bair
+ * @deprecated (pre-0.9.6) see method descriptions for replacements
  */
 // PENDING: JW - is this still used? Yes, by BasicTipOfTheDayUI
+@Deprecated
 public final class UIManagerUtils {
     
     private static final Logger LOG = Logger.getLogger(UIManagerUtils.class
@@ -52,7 +54,9 @@ public final class UIManagerUtils {
          * the key is not already in the UIDefaults.
          * @param key
          * @param defaultObj
+         * @deprecated (pre-0.9.6) no replacement
          */
+        @Deprecated
         public static void initDefault(String key, Object defaultObj) {
                 Object obj = UIManager.get(key);
                 if (obj == null) {
@@ -66,7 +70,9 @@ public final class UIManagerUtils {
          * @param key
          * @param defaultMetalObjName
          * @param defaultObj
+         * @deprecated (pre-0.9.6) no replacement
          */
+        @Deprecated
         public static void initDefault(String key, String defaultMetalObjName, Object defaultObj) {
                 Object obj = UIManager.get(key);
                 if (obj == null) {
@@ -85,7 +91,9 @@ public final class UIManagerUtils {
    * 
    * @param component
    * @param font
+   * @deprecated (pre-0.9.6) use {@link org.jdesktop.swingx.SwingXUtilities#setHtmlFont(HTMLDocument, Font)}
    */
+  @Deprecated
   public static void htmlize(JComponent component, Font font) {    
     String stylesheet = "body { margin-top: 0; margin-bottom: 0; margin-left: 0; margin-right: 0; font-family: "
       + font.getName()

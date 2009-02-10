@@ -27,6 +27,8 @@ import java.awt.Font;
 import java.awt.Frame;
 import java.awt.Window;
 import java.awt.event.InputEvent;
+import java.io.IOException;
+import java.io.StringReader;
 import java.lang.reflect.Method;
 import java.util.Locale;
 
@@ -37,6 +39,7 @@ import javax.swing.KeyStroke;
 import javax.swing.MenuElement;
 import javax.swing.SwingUtilities;
 import javax.swing.plaf.ComponentInputMapUIResource;
+import javax.swing.text.html.HTMLDocument;
 
 /**
  * A collection of utility methods for Swing(X) classes.
@@ -259,6 +262,38 @@ public final class SwingXUtilities {
         }
     }
 
+    private static String STYLESHEET = 
+        "body { margin-top: 0; margin-bottom: 0; margin-left: 0; margin-right: 0;"
+        + " font-family: %s; font-size: %dpt;  }"
+        + "a, p, li { margin-top: 0; margin-bottom: 0; margin-left: 0;"
+        + " margin-right: 0; font-family: %s; font-size: %dpt;  }";
+    
+    /**
+     * Sets the font used for HTML displays to the specified font. Components
+     * that display HTML do not necessarily honor font properties, since the
+     * HTML document can override these values. Calling {@code setHtmlFont}
+     * after the data is set will force the HTML display to use the font
+     * specified to this method.
+     * 
+     * @param doc
+     *            the HTML document to update
+     * @param font
+     *            the font to use
+     * @throws NullPointerException
+     *             if any parameter is {@code null}
+     */
+    public static void setHtmlFont(HTMLDocument doc, Font font) {
+        String stylesheet = String.format(STYLESHEET, font.getName(),
+                font.getSize(), font.getName(), font.getSize());
+        
+        try {
+            doc.getStyleSheet().loadRules(new StringReader(stylesheet), null);
+        } catch (IOException e) {
+            //this should never happen with our sheet
+            throw new IllegalStateException(e);
+        }
+    }
+    
     /**
      * Updates the componentTreeUI of all top-level windows of the 
      * current application.
