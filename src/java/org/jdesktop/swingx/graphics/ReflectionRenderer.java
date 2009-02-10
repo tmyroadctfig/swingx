@@ -436,11 +436,16 @@ public class ReflectionRenderer {
                 reflection.getWidth(), image.getHeight() + reflection.getHeight());
         Graphics2D g2 = buffer.createGraphics();
 
-        int effectiveRadius = isBlurEnabled() ? stackBlurFilter.getEffectiveRadius() : 0;
-        g2.drawImage(image, effectiveRadius, 0, null);
-        g2.drawImage(reflection, 0, image.getHeight() - effectiveRadius, null);
-
-        g2.dispose();
+        try {
+            int effectiveRadius = isBlurEnabled() ? stackBlurFilter
+                    .getEffectiveRadius() : 0;
+            g2.drawImage(image, effectiveRadius, 0, null);
+            g2.drawImage(reflection, 0, image.getHeight() - effectiveRadius,
+                    null);
+        } finally {
+            g2.dispose();
+        }
+        
         reflection.flush();
 
         return buffer;
@@ -485,22 +490,24 @@ public class ReflectionRenderer {
                         height + blurOffset * 2);
         Graphics2D g2 = buffer.createGraphics();
 
-        g2.translate(0, image.getHeight());
-        g2.scale(1.0, -1.0);
+        try {
+            g2.translate(0, image.getHeight());
+            g2.scale(1.0, -1.0);
 
-        g2.drawImage(image, blurOffset, -blurOffset, null);
+            g2.drawImage(image, blurOffset, -blurOffset, null);
 
-        g2.scale(1.0, -1.0);
-        g2.translate(0, -image.getHeight());
+            g2.scale(1.0, -1.0);
+            g2.translate(0, -image.getHeight());
 
-        g2.setComposite(AlphaComposite.DstIn);
-        g2.setPaint(new GradientPaint(0.0f, 0.0f,
-                                      new Color(0.0f, 0.0f, 0.0f, getOpacity()),
-                                      0.0f, buffer.getHeight(),
-                                      new Color(0.0f, 0.0f, 0.0f, 0.0f), true));
-        g2.fillRect(0, 0, buffer.getWidth(), buffer.getHeight());
-
-        g2.dispose();
+            g2.setComposite(AlphaComposite.DstIn);
+            g2.setPaint(new GradientPaint(0.0f, 0.0f, new Color(0.0f, 0.0f,
+                    0.0f, getOpacity()), 0.0f, buffer.getHeight(), new Color(
+                    0.0f, 0.0f, 0.0f, 0.0f), true));
+            g2.fillRect(0, 0, buffer.getWidth(), buffer.getHeight());
+        } finally {
+            g2.dispose();
+        }
+        
         return isBlurEnabled() ? stackBlurFilter.filter(buffer, null) :
                 buffer;
     }

@@ -106,12 +106,17 @@ public class ColorUtil {
     public static Paint getCheckerPaint(Color c1, Color c2, int size) {
         BufferedImage img = new BufferedImage(size,size,BufferedImage.TYPE_INT_ARGB);
         Graphics g = img.getGraphics();
-        g.setColor(c1);
-        g.fillRect(0,0,size,size);
-        g.setColor(c2);
-        g.fillRect(0,0,size/2,size/2);
-        g.fillRect(size/2,size/2,size/2,size/2);
-        g.dispose();
+        
+        try {
+            g.setColor(c1);
+            g.fillRect(0, 0, size, size);
+            g.setColor(c2);
+            g.fillRect(0, 0, size / 2, size / 2);
+            g.fillRect(size / 2, size / 2, size / 2, size / 2);
+        } finally {
+            g.dispose();
+        }
+        
         return new TexturePaint(img,new Rectangle(0,0,size,size));
     }
     

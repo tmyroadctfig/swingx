@@ -95,44 +95,66 @@ public class BasicLoginPaneUI extends LoginPaneUI {
 
         BufferedImage img = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
         Graphics2D g2 = img.createGraphics();
-        Font font = UIManager.getFont("JXLoginPane.bannerFont");
-        g2.setFont(font);
-        Graphics2D originalGraphics = g2;
-        if(!dlg.getComponentOrientation().isLeftToRight()) {
-            originalGraphics = (Graphics2D)g2.create();
-            g2.scale(-1, 1);
-            g2.translate(-w, 0);
-            loginStringX = w - (((float)font.getStringBounds(dlg.getBannerText(), 
-                    originalGraphics.getFontRenderContext()).getWidth()) + w * .05f);
-        } 
+        try {
+            Font font = UIManager.getFont("JXLoginPane.bannerFont");
+            g2.setFont(font);
+            Graphics2D originalGraphics = g2;
 
-        g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-        g2.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);
+            try {
+                if (!dlg.getComponentOrientation().isLeftToRight()) {
+                    originalGraphics = (Graphics2D) g2.create();
+                    g2.scale(-1, 1);
+                    g2.translate(-w, 0);
+                    loginStringX = w
+                            - (((float) font.getStringBounds(
+                                    dlg.getBannerText(),
+                                    originalGraphics.getFontRenderContext())
+                                    .getWidth()) + w * .05f);
+                }
 
-        //draw a big square
-        g2.setColor(UIManager.getColor("JXLoginPane.bannerDarkBackground"));
-        g2.fillRect(0, 0, w, h);
+                g2.setRenderingHint(RenderingHints.KEY_RENDERING,
+                        RenderingHints.VALUE_RENDER_QUALITY);
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                        RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+                        RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+                g2.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS,
+                        RenderingHints.VALUE_FRACTIONALMETRICS_ON);
 
-        //create the curve shape
-        GeneralPath curveShape = new GeneralPath(GeneralPath.WIND_NON_ZERO);
-        curveShape.moveTo(0, h * .6f);
-        curveShape.curveTo(w * .167f, h * 1.2f, w * .667f, h * -.5f, w, h * .75f);
-        curveShape.lineTo(w, h);
-        curveShape.lineTo(0, h);
-        curveShape.lineTo(0, h * .8f);
-        curveShape.closePath();
+                // draw a big square
+                g2.setColor(UIManager
+                        .getColor("JXLoginPane.bannerDarkBackground"));
+                g2.fillRect(0, 0, w, h);
 
-        //draw into the buffer a gradient (bottom to top), and the text "Login"
-        GradientPaint gp = new GradientPaint(0, h, UIManager.getColor("JXLoginPane.bannerDarkBackground"),
-                0, 0, UIManager.getColor("JXLoginPane.bannerLightBackground"));
-        g2.setPaint(gp);
-        g2.fill(curveShape);
+                // create the curve shape
+                GeneralPath curveShape = new GeneralPath(
+                        GeneralPath.WIND_NON_ZERO);
+                curveShape.moveTo(0, h * .6f);
+                curveShape.curveTo(w * .167f, h * 1.2f, w * .667f, h * -.5f, w,
+                        h * .75f);
+                curveShape.lineTo(w, h);
+                curveShape.lineTo(0, h);
+                curveShape.lineTo(0, h * .8f);
+                curveShape.closePath();
 
-        originalGraphics.setColor(UIManager.getColor("JXLoginPane.bannerForeground"));
-        originalGraphics.drawString(dlg.getBannerText(), loginStringX, loginStringY);
-        originalGraphics.dispose();
+                // draw into the buffer a gradient (bottom to top), and the text
+                // "Login"
+                GradientPaint gp = new GradientPaint(0, h, UIManager
+                        .getColor("JXLoginPane.bannerDarkBackground"), 0, 0,
+                        UIManager.getColor("JXLoginPane.bannerLightBackground"));
+                g2.setPaint(gp);
+                g2.fill(curveShape);
+
+                originalGraphics.setColor(UIManager
+                        .getColor("JXLoginPane.bannerForeground"));
+                originalGraphics.drawString(dlg.getBannerText(), loginStringX,
+                        loginStringY);
+            } finally {
+                originalGraphics.dispose();
+            }
+        } finally {
+            g2.dispose();
+        }
         return img;
     }
 }

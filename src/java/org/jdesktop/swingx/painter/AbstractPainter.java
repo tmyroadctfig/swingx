@@ -381,21 +381,25 @@ public abstract class AbstractPainter<T> extends AbstractBean implements Painter
                     cache = GraphicsUtilities.createCompatibleTranslucentImage(width, height);
                 }
                 Graphics2D gfx = cache.createGraphics();
-                gfx.setClip(0, 0, width, height);
+                
+                try {
+                    gfx.setClip(0, 0, width, height);
 
-                if (!invalidCache) {
-                    // If we are doing a repaint, but we didn't have to
-                    // recreate the image, we need to clear it back
-                    // to a fully transparent background.
-                    Composite composite = gfx.getComposite();
-                    gfx.setComposite(AlphaComposite.Clear);
-                    gfx.fillRect(0, 0, width, height);
-                    gfx.setComposite(composite);
+                    if (!invalidCache) {
+                        // If we are doing a repaint, but we didn't have to
+                        // recreate the image, we need to clear it back
+                        // to a fully transparent background.
+                        Composite composite = gfx.getComposite();
+                        gfx.setComposite(AlphaComposite.Clear);
+                        gfx.fillRect(0, 0, width, height);
+                        gfx.setComposite(composite);
+                    }
+
+                    configureGraphics(gfx);
+                    doPaint(gfx, obj, width, height);
+                } finally {
+                    gfx.dispose();
                 }
-
-                configureGraphics(gfx);
-                doPaint(gfx, obj, width, height);
-                gfx.dispose();
 
                 for (BufferedImageOp f : getFilters()) {
                     cache = f.filter(cache, null);

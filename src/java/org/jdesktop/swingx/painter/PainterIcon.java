@@ -46,10 +46,14 @@ public class PainterIcon implements Icon {
     public void paintIcon(Component c, Graphics g, int x, int y) {
         if (getPainter() != null && g instanceof Graphics2D) {
             g = g.create();
-            g.translate(x,y);
-            getPainter().paint((Graphics2D) g, c, size.width, size.height);
-            g.translate(-x,-y);
-            g.dispose();
+            
+            try {
+                g.translate(x, y);
+                getPainter().paint((Graphics2D) g, c, size.width, size.height);
+                g.translate(-x, -y);
+            } finally {
+                g.dispose();
+            }
         }
     }
 

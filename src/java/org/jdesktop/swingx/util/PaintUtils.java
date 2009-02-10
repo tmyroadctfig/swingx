@@ -250,10 +250,16 @@ public class PaintUtils {
     }
     
     public static BufferedImage convertToBufferedImage(Image img) {
-        BufferedImage buff = GraphicsUtilities.createCompatibleImage(img.getWidth(null),img.getHeight(null));
+        BufferedImage buff = GraphicsUtilities
+                .createCompatibleImage(img.getWidth(null),img.getHeight(null));
         Graphics2D g2 = buff.createGraphics();
-        g2.drawImage(img,0,0,null);
-        g2.dispose();
+        
+        try {
+            g2.drawImage(img, 0, 0, null);
+        } finally {
+            g2.dispose();
+        }
+        
         return buff;
     }
     
@@ -282,12 +288,7 @@ public class PaintUtils {
      */
     @Deprecated
     public static BufferedImage toCompatibleImage(BufferedImage image) {
-        BufferedImage compatibleImage = configuration.createCompatibleImage(image.getWidth(),
-                image.getHeight(), Transparency.TRANSLUCENT);
-        Graphics g = compatibleImage.getGraphics();
-        g.drawImage(image, 0, 0, null);
-        g.dispose();
-        return compatibleImage;
+        return GraphicsUtilities.toCompatibleImage(image);
     }
     
     

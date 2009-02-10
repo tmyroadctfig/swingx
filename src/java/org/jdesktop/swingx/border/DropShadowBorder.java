@@ -139,130 +139,132 @@ public class DropShadowBorder implements Border, Serializable {
         
         Graphics2D g2 = (Graphics2D)graphics.create();
         
-        //The location and size of the shadows depends on which shadows are being
-        //drawn. For instance, if the left & bottom shadows are being drawn, then
-        //the left shadow extends all the way down to the corner, a corner is drawn,
-        //and then the bottom shadow begins at the corner. If, however, only the
-        //bottom shadow is drawn, then the bottom-left corner is drawn to the
-        //right of the corner, and the bottom shadow is somewhat shorter than before.
-        
-        int shadowOffset = 2; //the distance between the shadow and the edge
-        
-        Point topLeftShadowPoint = null;
-        if (showLeftShadow || showTopShadow) {
-            topLeftShadowPoint = new Point();
-            if (showLeftShadow && !showTopShadow) {
-                topLeftShadowPoint.setLocation(x, y + shadowOffset);
-            } else if (showLeftShadow && showTopShadow) {
-                topLeftShadowPoint.setLocation(x, y);
-            } else if (!showLeftShadow && showTopShadow) {
-                topLeftShadowPoint.setLocation(x + shadowSize, y);
+        try {
+            //The location and size of the shadows depends on which shadows are being
+            //drawn. For instance, if the left & bottom shadows are being drawn, then
+            //the left shadow extends all the way down to the corner, a corner is drawn,
+            //and then the bottom shadow begins at the corner. If, however, only the
+            //bottom shadow is drawn, then the bottom-left corner is drawn to the
+            //right of the corner, and the bottom shadow is somewhat shorter than before.
+            
+            int shadowOffset = 2; //the distance between the shadow and the edge
+            
+            Point topLeftShadowPoint = null;
+            if (showLeftShadow || showTopShadow) {
+                topLeftShadowPoint = new Point();
+                if (showLeftShadow && !showTopShadow) {
+                    topLeftShadowPoint.setLocation(x, y + shadowOffset);
+                } else if (showLeftShadow && showTopShadow) {
+                    topLeftShadowPoint.setLocation(x, y);
+                } else if (!showLeftShadow && showTopShadow) {
+                    topLeftShadowPoint.setLocation(x + shadowSize, y);
+                }
             }
-        }
-  
-        Point bottomLeftShadowPoint = null;
-        if (showLeftShadow || showBottomShadow) {
-            bottomLeftShadowPoint = new Point();
-            if (showLeftShadow && !showBottomShadow) {
-                bottomLeftShadowPoint.setLocation(x, y + height - shadowSize - shadowSize);
-            } else if (showLeftShadow && showBottomShadow) {
-                bottomLeftShadowPoint.setLocation(x, y + height - shadowSize);
-            } else if (!showLeftShadow && showBottomShadow) {
-                bottomLeftShadowPoint.setLocation(x + shadowSize, y + height - shadowSize);
+      
+            Point bottomLeftShadowPoint = null;
+            if (showLeftShadow || showBottomShadow) {
+                bottomLeftShadowPoint = new Point();
+                if (showLeftShadow && !showBottomShadow) {
+                    bottomLeftShadowPoint.setLocation(x, y + height - shadowSize - shadowSize);
+                } else if (showLeftShadow && showBottomShadow) {
+                    bottomLeftShadowPoint.setLocation(x, y + height - shadowSize);
+                } else if (!showLeftShadow && showBottomShadow) {
+                    bottomLeftShadowPoint.setLocation(x + shadowSize, y + height - shadowSize);
+                }
             }
-        }
-        
-        Point bottomRightShadowPoint = null;
-        if (showRightShadow || showBottomShadow) {
-            bottomRightShadowPoint = new Point();
-            if (showRightShadow && !showBottomShadow) {
-                bottomRightShadowPoint.setLocation(x + width - shadowSize, y + height - shadowSize - shadowSize);
-            } else if (showRightShadow && showBottomShadow) {
-                bottomRightShadowPoint.setLocation(x + width - shadowSize, y + height - shadowSize);
-            } else if (!showRightShadow && showBottomShadow) {
-                bottomRightShadowPoint.setLocation(x + width - shadowSize - shadowSize, y + height - shadowSize);
+            
+            Point bottomRightShadowPoint = null;
+            if (showRightShadow || showBottomShadow) {
+                bottomRightShadowPoint = new Point();
+                if (showRightShadow && !showBottomShadow) {
+                    bottomRightShadowPoint.setLocation(x + width - shadowSize, y + height - shadowSize - shadowSize);
+                } else if (showRightShadow && showBottomShadow) {
+                    bottomRightShadowPoint.setLocation(x + width - shadowSize, y + height - shadowSize);
+                } else if (!showRightShadow && showBottomShadow) {
+                    bottomRightShadowPoint.setLocation(x + width - shadowSize - shadowSize, y + height - shadowSize);
+                }
             }
-        }
-        
-        Point topRightShadowPoint = null;
-        if (showRightShadow || showTopShadow) {
-            topRightShadowPoint = new Point();
-            if (showRightShadow && !showTopShadow) {
-                topRightShadowPoint.setLocation(x + width - shadowSize, y + shadowOffset);
-            } else if (showRightShadow && showTopShadow) {
-                topRightShadowPoint.setLocation(x + width - shadowSize, y);
-            } else if (!showRightShadow && showTopShadow) {
-                topRightShadowPoint.setLocation(x + width - shadowSize - shadowSize, y);
+            
+            Point topRightShadowPoint = null;
+            if (showRightShadow || showTopShadow) {
+                topRightShadowPoint = new Point();
+                if (showRightShadow && !showTopShadow) {
+                    topRightShadowPoint.setLocation(x + width - shadowSize, y + shadowOffset);
+                } else if (showRightShadow && showTopShadow) {
+                    topRightShadowPoint.setLocation(x + width - shadowSize, y);
+                } else if (!showRightShadow && showTopShadow) {
+                    topRightShadowPoint.setLocation(x + width - shadowSize - shadowSize, y);
+                }
             }
+     
+            g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+                                RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+            g2.setRenderingHint(RenderingHints.KEY_RENDERING,
+                                RenderingHints.VALUE_RENDER_SPEED);
+            
+            if (showLeftShadow) {
+                Rectangle leftShadowRect =
+                    new Rectangle(x,
+                                  topLeftShadowPoint.y + shadowSize,
+                                  shadowSize,
+                                  bottomLeftShadowPoint.y - topLeftShadowPoint.y - shadowSize);
+                g2.drawImage(images.get(Position.LEFT),
+                             leftShadowRect.x, leftShadowRect.y,
+                             leftShadowRect.width, leftShadowRect.height, null);
+            }
+    
+            if (showBottomShadow) {
+                Rectangle bottomShadowRect =
+                    new Rectangle(bottomLeftShadowPoint.x + shadowSize,
+                                  y + height - shadowSize,
+                                  bottomRightShadowPoint.x - bottomLeftShadowPoint.x - shadowSize,
+                                  shadowSize);
+                g2.drawImage(images.get(Position.BOTTOM),
+                             bottomShadowRect.x, bottomShadowRect.y,
+                             bottomShadowRect.width, bottomShadowRect.height, null);
+            }
+            
+            if (showRightShadow) {
+                Rectangle rightShadowRect =
+                    new Rectangle(x + width - shadowSize,
+                                  topRightShadowPoint.y + shadowSize,
+                                  shadowSize,
+                                  bottomRightShadowPoint.y - topRightShadowPoint.y - shadowSize);
+                g2.drawImage(images.get(Position.RIGHT),
+                             rightShadowRect.x, rightShadowRect.y,
+                             rightShadowRect.width, rightShadowRect.height, null);
+            }
+            
+            if (showTopShadow) {
+                Rectangle topShadowRect =
+                    new Rectangle(topLeftShadowPoint.x + shadowSize,
+                                  y,
+                                  topRightShadowPoint.x - topLeftShadowPoint.x - shadowSize,
+                                  shadowSize);
+                g2.drawImage(images.get(Position.TOP),
+                             topShadowRect.x, topShadowRect.y,
+                             topShadowRect.width, topShadowRect.height, null);
+            }
+            
+            if (showLeftShadow || showTopShadow) {
+                g2.drawImage(images.get(Position.TOP_LEFT),
+                             topLeftShadowPoint.x, topLeftShadowPoint.y, null);
+            }
+            if (showLeftShadow || showBottomShadow) {
+                g2.drawImage(images.get(Position.BOTTOM_LEFT),
+                             bottomLeftShadowPoint.x, bottomLeftShadowPoint.y, null);
+            }
+            if (showRightShadow || showBottomShadow) {
+                g2.drawImage(images.get(Position.BOTTOM_RIGHT),
+                             bottomRightShadowPoint.x, bottomRightShadowPoint.y, null);
+            }
+            if (showRightShadow || showTopShadow) {
+                g2.drawImage(images.get(Position.TOP_RIGHT),
+                             topRightShadowPoint.x, topRightShadowPoint.y, null);
+            }
+        } finally {
+            g2.dispose();
         }
- 
-        g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
-                            RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-        g2.setRenderingHint(RenderingHints.KEY_RENDERING,
-                            RenderingHints.VALUE_RENDER_SPEED);
-        
-        if (showLeftShadow) {
-            Rectangle leftShadowRect =
-                new Rectangle(x,
-                              topLeftShadowPoint.y + shadowSize,
-                              shadowSize,
-                              bottomLeftShadowPoint.y - topLeftShadowPoint.y - shadowSize);
-            g2.drawImage(images.get(Position.LEFT),
-                         leftShadowRect.x, leftShadowRect.y,
-                         leftShadowRect.width, leftShadowRect.height, null);
-        }
-
-        if (showBottomShadow) {
-            Rectangle bottomShadowRect =
-                new Rectangle(bottomLeftShadowPoint.x + shadowSize,
-                              y + height - shadowSize,
-                              bottomRightShadowPoint.x - bottomLeftShadowPoint.x - shadowSize,
-                              shadowSize);
-            g2.drawImage(images.get(Position.BOTTOM),
-                         bottomShadowRect.x, bottomShadowRect.y,
-                         bottomShadowRect.width, bottomShadowRect.height, null);
-        }
-        
-        if (showRightShadow) {
-            Rectangle rightShadowRect =
-                new Rectangle(x + width - shadowSize,
-                              topRightShadowPoint.y + shadowSize,
-                              shadowSize,
-                              bottomRightShadowPoint.y - topRightShadowPoint.y - shadowSize);
-            g2.drawImage(images.get(Position.RIGHT),
-                         rightShadowRect.x, rightShadowRect.y,
-                         rightShadowRect.width, rightShadowRect.height, null);
-        }
-        
-        if (showTopShadow) {
-            Rectangle topShadowRect =
-                new Rectangle(topLeftShadowPoint.x + shadowSize,
-                              y,
-                              topRightShadowPoint.x - topLeftShadowPoint.x - shadowSize,
-                              shadowSize);
-            g2.drawImage(images.get(Position.TOP),
-                         topShadowRect.x, topShadowRect.y,
-                         topShadowRect.width, topShadowRect.height, null);
-        }
-        
-        if (showLeftShadow || showTopShadow) {
-            g2.drawImage(images.get(Position.TOP_LEFT),
-                         topLeftShadowPoint.x, topLeftShadowPoint.y, null);
-        }
-        if (showLeftShadow || showBottomShadow) {
-            g2.drawImage(images.get(Position.BOTTOM_LEFT),
-                         bottomLeftShadowPoint.x, bottomLeftShadowPoint.y, null);
-        }
-        if (showRightShadow || showBottomShadow) {
-            g2.drawImage(images.get(Position.BOTTOM_RIGHT),
-                         bottomRightShadowPoint.x, bottomRightShadowPoint.y, null);
-        }
-        if (showRightShadow || showTopShadow) {
-            g2.drawImage(images.get(Position.TOP_RIGHT),
-                         topRightShadowPoint.x, topRightShadowPoint.y, null);
-        }
-        
-        g2.dispose();
     }
     
     private Map<Position,BufferedImage> getImages(Graphics2D g2) {
@@ -291,11 +293,16 @@ public class DropShadowBorder implements Border, Serializable {
             int imageWidth = rectWidth + shadowSize * 2;
             BufferedImage image = GraphicsUtilities.createCompatibleTranslucentImage(imageWidth, imageWidth);
             Graphics2D buffer = (Graphics2D)image.getGraphics();
-            buffer.setPaint(new Color(shadowColor.getRed(), shadowColor.getGreen(), shadowColor.getBlue(), (int)(shadowOpacity * 255)));
-//            buffer.setColor(new Color(0.0f, 0.0f, 0.0f, shadowOpacity));
-            buffer.translate(shadowSize, shadowSize);
-            buffer.fill(rect);
-            buffer.dispose();
+            
+            try {
+                buffer.setPaint(new Color(shadowColor.getRed(), shadowColor.getGreen(),
+                        shadowColor.getBlue(), (int)(shadowOpacity * 255)));
+//                buffer.setColor(new Color(0.0f, 0.0f, 0.0f, shadowOpacity));
+                buffer.translate(shadowSize, shadowSize);
+                buffer.fill(rect);
+            } finally {
+                buffer.dispose();
+            }
             
             float blurry = 1.0f / (float)(shadowSize * shadowSize);
             float[] blurKernel = new float[shadowSize * shadowSize];
@@ -363,11 +370,16 @@ public class DropShadowBorder implements Border, Serializable {
                                       int x, int y, int w, int h) {
         BufferedImage ret = GraphicsUtilities.createCompatibleTranslucentImage(w, h);
         Graphics2D g2 = ret.createGraphics();
-        g2.drawImage(img,
-                     0, 0, w, h,
-                     x, y, x+w, y+h,
-                     null);
-        g2.dispose();
+        
+        try {
+            g2.drawImage(img,
+                         0, 0, w, h,
+                         x, y, x+w, y+h,
+                         null);
+        } finally {
+            g2.dispose();
+        }
+        
         return ret;
     }
     

@@ -182,24 +182,27 @@ public class CheckerboardPainter<T> extends AbstractPainter<T> {
             int length = (int)(sqlength * 2);
             BufferedImage image = new BufferedImage(length, length, BufferedImage.TYPE_INT_ARGB);
             Graphics2D gfx = image.createGraphics();
-            Paint p = getLightPaint();
-            if (p == null) {
-                if(c instanceof JComponent) {
-                    p = ((JComponent)c).getForeground();
+            
+            try {
+                Paint p = getLightPaint();
+                if (p == null && c instanceof JComponent) {
+                    p = ((JComponent) c).getForeground();
                 }
-            }
-            gfx.setPaint(p);
-            gfx.fillRect(0, 0, length, length);
-            p = getDarkPaint();
-            if (p == null) {
-                if(c instanceof JComponent) {
-                    p = ((JComponent)c).getBackground();
+                gfx.setPaint(p);
+                gfx.fillRect(0, 0, length, length);
+                p = getDarkPaint();
+                if (p == null) {
+                    if (c instanceof JComponent) {
+                        p = ((JComponent) c).getBackground();
+                    }
                 }
+                gfx.setPaint(p);
+                gfx.fillRect(0, 0, (int) (sqlength - 1), (int) (sqlength - 1));
+                gfx.fillRect((int) sqlength, (int) sqlength,
+                        (int) sqlength - 1, (int) sqlength - 1);
+            } finally {
+                gfx.dispose();
             }
-            gfx.setPaint(p);
-            gfx.fillRect(0, 0, (int)(sqlength - 1), (int)(sqlength - 1));
-            gfx.fillRect((int)sqlength, (int)sqlength, (int)sqlength - 1, (int)sqlength - 1);
-            gfx.dispose();
             
             checkerPaint = new TexturePaint(image, new Rectangle(0, 0, image.getWidth(), image.getHeight()));
         }

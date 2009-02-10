@@ -345,11 +345,15 @@ public class JXImageView extends JXPanel {
                             img.getHeight(null), 
                             BufferedImage.TYPE_INT_ARGB);
                 Graphics2D g = (Graphics2D)dst.getGraphics();
-                // smooth scaling
-                g.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
-                                   RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-                g.drawImage(img,0,0,null);
-                g.dispose();
+                
+                try {
+                    // smooth scaling
+                    g.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+                            RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+                    g.drawImage(img, 0, 0, null);
+                } finally {
+                    g.dispose();
+                }
                 FileDialog fd = new FileDialog((Frame)SwingUtilities.windowForComponent(JXImageView.this));
                 fd.setMode(FileDialog.SAVE);
                 fd.setVisible(true);
@@ -398,9 +402,14 @@ public class JXImageView extends JXPanel {
                             img.getWidth(null),
                             BufferedImage.TYPE_INT_ARGB);
                 Graphics2D g = (Graphics2D)src.getGraphics();
-                // smooth scaling
-                g.drawImage(img,0,0,null);
-                g.dispose();
+                
+                try {
+                    // smooth scaling
+                    g.drawImage(img, 0, 0, null);
+                } finally {
+                    g.dispose();
+                }
+                
                 AffineTransform trans = AffineTransform.getRotateInstance(Math.PI/2,0,0);
                 trans.translate(0,-src.getHeight());
                 BufferedImageOp op = new AffineTransformOp(trans, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
@@ -429,9 +438,13 @@ public class JXImageView extends JXPanel {
                             img.getWidth(null),
                             BufferedImage.TYPE_INT_ARGB);
                 Graphics2D g = (Graphics2D)src.getGraphics();
-                // smooth scaling
-                g.drawImage(img,0,0,null);
-                g.dispose();
+                
+                try {
+                    // smooth scaling
+                    g.drawImage(img, 0, 0, null);
+                } finally {
+                    g.dispose();
+                }
                 AffineTransform trans = AffineTransform.getRotateInstance(-Math.PI/2,0,0);
                 trans.translate(-src.getWidth(),0);
                 BufferedImageOp op = new AffineTransformOp(trans, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);

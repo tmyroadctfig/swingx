@@ -127,7 +127,7 @@ public class ShapePainter<T> extends AbstractAreaPainter<T> {
     }
     
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public void doPaint(Graphics2D g, T component, int w, int h) {
         //set the stroke if it is not null
@@ -140,10 +140,12 @@ public class ShapePainter<T> extends AbstractAreaPainter<T> {
             Rectangle rect = calculateLayout(bounds.width, bounds.height, w, h);
             //u.p("rect = " + rect);
             g = (Graphics2D)g.create();
-            g.translate(rect.x, rect.y);
-            //draw/fill the shape
-            drawPathEffects(g, shape, rect.width, rect.height);
-            switch (getStyle()) {
+            
+            try {
+                g.translate(rect.x, rect.y);
+                // draw/fill the shape
+                drawPathEffects(g, shape, rect.width, rect.height);
+                switch (getStyle()) {
                 case BOTH:
                     drawShape(g, shape, component, rect.width, rect.height);
                     fillShape(g, shape, component, rect.width, rect.height);
@@ -154,10 +156,10 @@ public class ShapePainter<T> extends AbstractAreaPainter<T> {
                 case OUTLINE:
                     drawShape(g, shape, component, rect.width, rect.height);
                     break;
+                }
+            } finally {
+                g.dispose();
             }
-            
-            
-            g.dispose();
         }
     }
     

@@ -221,9 +221,16 @@ public final class AnimatedRendererDemo {
                       image.getWidth(), 
                       image.getHeight());
             Graphics2D g = mod.createGraphics();
-            g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.8f));
-            g.drawImage(image, 0, 0, image.getWidth(), image.getHeight(), null);
-            g.dispose();
+            
+            try {
+                g.setComposite(AlphaComposite.getInstance(
+                        AlphaComposite.SRC_OVER, 0.8f));
+                g.drawImage(image, 0, 0, image.getWidth(), image.getHeight(),
+                        null);
+            } finally {
+                g.dispose();
+            }
+            
             imagePainter = new ImagePainter<Component>(mod);
             imagePainter.setHorizontalAlignment(HorizontalAlignment.RIGHT);
         } catch (IOException e) {

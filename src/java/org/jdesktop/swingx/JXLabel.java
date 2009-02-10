@@ -244,8 +244,12 @@ public class JXLabel extends JLabel {
             protected void doPaint(Graphics2D g, JXLabel label, int width, int height) {
                 Insets i = getInsets();
                 g = (Graphics2D) g.create(-i.left, -i.top, width, height);
-                label.paint(g);
-                g.dispose();
+                
+                try {
+                    label.paint(g);
+                } finally {
+                    g.dispose();
+                }
             }
             //if any of the state of the JButton that affects the foreground has changed,
             //then I must clear the cache. This is really hard to get right, there are
@@ -726,13 +730,17 @@ public class JXLabel extends JLabel {
             Insets i = getInsets();
             if (backgroundPainter != null) {
                 Graphics2D tmp = (Graphics2D) g.create();
-                if(!isPaintBorderInsets()) {
-                    tmp.translate(i.left, i.top);
-                    pWidth = pWidth - i.left - i.right;
-                    pHeight = pHeight - i.top - i.bottom;
+                
+                try {
+                    if (!isPaintBorderInsets()) {
+                        tmp.translate(i.left, i.top);
+                        pWidth = pWidth - i.left - i.right;
+                        pHeight = pHeight - i.top - i.bottom;
+                    }
+                    backgroundPainter.paint(tmp, this, pWidth, pHeight);
+                } finally {
+                    tmp.dispose();
                 }
-                backgroundPainter.paint(tmp, this, pWidth, pHeight);
-                tmp.dispose();
             }
             if (foregroundPainter != null) {
                 pWidth = getWidth() - i.left - i.right;

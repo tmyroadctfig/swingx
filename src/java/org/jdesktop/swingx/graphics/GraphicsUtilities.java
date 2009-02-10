@@ -267,8 +267,12 @@ public class GraphicsUtilities {
                     image.getWidth(), image.getHeight(),
                     image.getTransparency());
         Graphics g = compatibleImage.getGraphics();
-        g.drawImage(image, 0, 0, null);
-        g.dispose();
+        
+        try {
+            g.drawImage(image, 0, 0, null);
+        } finally {
+            g.dispose();
+        }
 
         return compatibleImage;
     }
@@ -329,10 +333,14 @@ public class GraphicsUtilities {
 
         BufferedImage temp = createCompatibleImage(image, width, height);
         Graphics2D g2 = temp.createGraphics();
-        g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
-                            RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-        g2.drawImage(image, 0, 0, temp.getWidth(), temp.getHeight(), null);
-        g2.dispose();
+        
+        try {
+            g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+                    RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+            g2.drawImage(image, 0, 0, temp.getWidth(), temp.getHeight(), null);
+        } finally {
+            g2.dispose();
+        }
 
         return temp;
     }
@@ -373,10 +381,14 @@ public class GraphicsUtilities {
 
         BufferedImage temp = createCompatibleImage(image, newWidth, newHeight);
         Graphics2D g2 = temp.createGraphics();
-        g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
-                            RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-        g2.drawImage(image, 0, 0, temp.getWidth(), temp.getHeight(), null);
-        g2.dispose();
+        
+        try {
+            g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+                    RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+            g2.drawImage(image, 0, 0, temp.getWidth(), temp.getHeight(), null);
+        } finally {
+            g2.dispose();
+        }
 
         return temp;
     }
@@ -433,51 +445,61 @@ public class GraphicsUtilities {
 
         Graphics2D g2 = null;
 
-        int previousWidth = width;
-        int previousHeight = height;
-
-        do {
-            if (isWidthGreater) {
-                width /= 2;
-                if (width < newSize) {
-                    width = newSize;
+        try {
+            int previousWidth = width;
+            int previousHeight = height;
+    
+            do {
+                if (isWidthGreater) {
+                    width /= 2;
+                    if (width < newSize) {
+                        width = newSize;
+                    }
+                    height = (int) (width / ratioWH);
+                } else {
+                    height /= 2;
+                    if (height < newSize) {
+                        height = newSize;
+                    }
+                    width = (int) (height / ratioHW);
                 }
-                height = (int) (width / ratioWH);
-            } else {
-                height /= 2;
-                if (height < newSize) {
-                    height = newSize;
+    
+                if (temp == null || isTranslucent) {
+                    if (g2 != null) {
+                        //do not need to wrap with finally
+                        //outer finally block will ensure
+                        //that resources are properly reclaimed
+                        g2.dispose();
+                    }
+                    temp = createCompatibleImage(image, width, height);
+                    g2 = temp.createGraphics();
+                    g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+                                    RenderingHints.VALUE_INTERPOLATION_BILINEAR);
                 }
-                width = (int) (height / ratioHW);
-            }
-
-            if (temp == null || isTranslucent) {
-                if (g2 != null) {
-                    g2.dispose();
-                }
-                temp = createCompatibleImage(image, width, height);
-                g2 = temp.createGraphics();
-                g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
-                                RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-            }
-            g2.drawImage(thumb, 0, 0, width, height,
-                    0, 0, previousWidth, previousHeight, null);
-
-            previousWidth = width;
-            previousHeight = height;
-
-            thumb = temp;
-        } while (newSize != (isWidthGreater ? width : height));
-
-        g2.dispose();
+                g2.drawImage(thumb, 0, 0, width, height,
+                        0, 0, previousWidth, previousHeight, null);
+    
+                previousWidth = width;
+                previousHeight = height;
+    
+                thumb = temp;
+            } while (newSize != (isWidthGreater ? width : height));
+        } finally {
+            g2.dispose();
+        }
 
         if (width != thumb.getWidth() || height != thumb.getHeight()) {
             temp = createCompatibleImage(image, width, height);
             g2 = temp.createGraphics();
-            g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
-                                RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-            g2.drawImage(thumb, 0, 0, width, height, 0, 0, width, height, null);
-            g2.dispose();
+            
+            try {
+                g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+                                    RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+                g2.drawImage(thumb, 0, 0, width, height, 0, 0, width, height, null);
+            } finally {
+                g2.dispose();
+            }
+            
             thumb = temp;
         }
 
@@ -525,51 +547,61 @@ public class GraphicsUtilities {
 
         Graphics2D g2 = null;
 
-        int previousWidth = width;
-        int previousHeight = height;
-
-        do {
-            if (width > newWidth) {
-                width /= 2;
-                if (width < newWidth) {
-                    width = newWidth;
+        try {
+            int previousWidth = width;
+            int previousHeight = height;
+    
+            do {
+                if (width > newWidth) {
+                    width /= 2;
+                    if (width < newWidth) {
+                        width = newWidth;
+                    }
                 }
-            }
-
-            if (height > newHeight) {
-                height /= 2;
-                if (height < newHeight) {
-                    height = newHeight;
+    
+                if (height > newHeight) {
+                    height /= 2;
+                    if (height < newHeight) {
+                        height = newHeight;
+                    }
                 }
-            }
-
-            if (temp == null || isTranslucent) {
-                if (g2 != null) {
-                    g2.dispose();
+    
+                if (temp == null || isTranslucent) {
+                    if (g2 != null) {
+                        //do not need to wrap with finally
+                        //outer finally block will ensure
+                        //that resources are properly reclaimed
+                        g2.dispose();
+                    }
+                    temp = createCompatibleImage(image, width, height);
+                    g2 = temp.createGraphics();
+                    g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+                                    RenderingHints.VALUE_INTERPOLATION_BILINEAR);
                 }
-                temp = createCompatibleImage(image, width, height);
-                g2 = temp.createGraphics();
-                g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
-                                RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-            }
-            g2.drawImage(thumb, 0, 0, width, height,
-                         0, 0, previousWidth, previousHeight, null);
-
-            previousWidth = width;
-            previousHeight = height;
-
-            thumb = temp;
-        } while (width != newWidth || height != newHeight);
-
-        g2.dispose();
+                g2.drawImage(thumb, 0, 0, width, height,
+                             0, 0, previousWidth, previousHeight, null);
+    
+                previousWidth = width;
+                previousHeight = height;
+    
+                thumb = temp;
+            } while (width != newWidth || height != newHeight);
+        } finally {
+            g2.dispose();
+        }
 
         if (width != thumb.getWidth() || height != thumb.getHeight()) {
             temp = createCompatibleImage(image, width, height);
             g2 = temp.createGraphics();
-            g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
-                                RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-            g2.drawImage(thumb, 0, 0, width, height, 0, 0, width, height, null);
-            g2.dispose();
+            
+            try {
+                g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+                                    RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+                g2.drawImage(thumb, 0, 0, width, height, 0, 0, width, height, null);
+            } finally {
+                g2.dispose();
+            }
+            
             thumb = temp;
         }
 

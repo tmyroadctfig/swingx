@@ -160,16 +160,20 @@ public class MatteBorderExt extends MatteBorder {
     protected void paint(Icon icon, Component c, Graphics g, int x, int y,
                              int width, int height) {
         Graphics cg = g.create();
-        cg.setClip(x, y, width, height);
-        int tileW = icon.getIconWidth();
-        int tileH = icon.getIconHeight();
-        int xpos, ypos, startx, starty;
-        for (ypos = 0; height - ypos > 0; ypos += tileH) {
-            for (xpos = 0; width - xpos > 0; xpos += tileW) {
-                icon.paintIcon(c, cg, x+xpos, y+ypos);
+        
+        try {
+            cg.setClip(x, y, width, height);
+            int tileW = icon.getIconWidth();
+            int tileH = icon.getIconHeight();
+            int xpos, ypos, startx, starty;
+            for (ypos = 0; height - ypos > 0; ypos += tileH) {
+                for (xpos = 0; width - xpos > 0; xpos += tileW) {
+                    icon.paintIcon(c, cg, x + xpos, y + ypos);
+                }
             }
+        } finally {
+            cg.dispose();
         }
-        cg.dispose();
     }
 
     /**
@@ -177,9 +181,13 @@ public class MatteBorderExt extends MatteBorder {
      */
     protected void paintTopLeft(Component c, Graphics g, int x, int y, int width, int height) {
         Graphics cg = g.create();
-        cg.setClip(x, y, width, height);
-        tileIcons[0].paintIcon(c, cg, x, y);
-        cg.dispose();
+        
+        try {
+            cg.setClip(x, y, width, height);
+            tileIcons[0].paintIcon(c, cg, x, y);
+        } finally {
+            cg.dispose();
+        }
     }
 
     /**

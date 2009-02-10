@@ -244,12 +244,15 @@ public class JXMultiSplitPane extends JPanel {
     {
       if (backgroundPainter != null) {
           Graphics2D g2 = (Graphics2D)g.create();
-          Insets ins = this.getInsets();
-          g2.translate(ins.left, ins.top);
-          backgroundPainter.paint(g2, this, 
-                  this.getWidth()  - ins.left - ins.right,
-                  this.getHeight() - ins.top  - ins.bottom);
-          g2.dispose();
+          
+            try {
+                Insets ins = this.getInsets();
+                g2.translate(ins.left, ins.top);
+                backgroundPainter.paint(g2, this, this.getWidth() - ins.left
+                        - ins.right, this.getHeight() - ins.top - ins.bottom);
+            } finally {
+                g2.dispose();
+            }
       } else {
           super.paintComponent(g);
       }

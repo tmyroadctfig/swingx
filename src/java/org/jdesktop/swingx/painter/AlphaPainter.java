@@ -39,21 +39,30 @@ public class AlphaPainter<T> extends CompoundPainter<T> {
     @Override
     public void doPaint(Graphics2D g, T component, int width, int height) {
         Graphics2D g2 = (Graphics2D) g.create();
-        if(getTransform() != null) {
-            g2.setTransform(getTransform());
-        }
-        if(alpha < 1) {
-            g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,alpha));
-        }
-        for (Painter p : getPainters()) {
-            Graphics2D g3 = (Graphics2D) g2.create();
-            p.paint(g3, component, width, height);
-            if(isClipPreserved()) {
-                g2.setClip(g3.getClip());
+        
+        try {
+            if (getTransform() != null) {
+                g2.setTransform(getTransform());
             }
-            g3.dispose();
+            if (alpha < 1) {
+                g2.setComposite(AlphaComposite.getInstance(
+                        AlphaComposite.SRC_OVER, alpha));
+            }
+            for (Painter p : getPainters()) {
+                Graphics2D g3 = (Graphics2D) g2.create();
+                
+                try {
+                    p.paint(g3, component, width, height);
+                    if (isClipPreserved()) {
+                        g2.setClip(g3.getClip());
+                    }
+                } finally {
+                    g3.dispose();
+                }
+            }
+        } finally {
+            g2.dispose();
         }
-        g2.dispose();
     }
     /*
     public static void main(String ... args) {

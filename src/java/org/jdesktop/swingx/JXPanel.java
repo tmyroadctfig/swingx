@@ -340,17 +340,21 @@ public class JXPanel extends JPanel implements Scrollable {
             if (isOpaque()) super.paintComponent(g);
             
             Graphics2D g2 = (Graphics2D)g.create();
-            // account for the insets
-            if(isPaintBorderInsets()) {
-                backgroundPainter.paint(g2, this, this.getWidth(), this.getHeight());
-            } else {
-                Insets ins = this.getInsets();
-                g2.translate(ins.left, ins.top);            
-                backgroundPainter.paint(g2, this,
-                                        this.getWidth() - ins.left - ins.right,
-                                        this.getHeight() - ins.top - ins.bottom);
+            
+            try {
+                // account for the insets
+                if(isPaintBorderInsets()) {
+                    backgroundPainter.paint(g2, this, this.getWidth(), this.getHeight());
+                } else {
+                    Insets ins = this.getInsets();
+                    g2.translate(ins.left, ins.top);            
+                    backgroundPainter.paint(g2, this,
+                                            this.getWidth() - ins.left - ins.right,
+                                            this.getHeight() - ins.top - ins.bottom);
+                }
+            } finally {
+                g2.dispose();
             }
-            g2.dispose();
         } else {
             super.paintComponent(g);
         }

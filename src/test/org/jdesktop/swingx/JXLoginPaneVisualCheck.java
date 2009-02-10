@@ -265,9 +265,14 @@ public class JXLoginPaneVisualCheck extends InteractiveTestCase {
             Image banner = super.getBanner();
             BufferedImage im = GraphicsUtilities.createCompatibleTranslucentImage(banner.getWidth(null), banner.getHeight(null));
             Graphics2D g = im.createGraphics();
-            g.setComposite(AlphaComposite.Src);
-            g.drawImage(banner, 0, 0, 100, 100, null);
-            g.dispose();
+            
+            try {
+                g.setComposite(AlphaComposite.Src);
+                g.drawImage(banner, 0, 0, 100, 100, null);
+            } finally {
+                g.dispose();
+            }
+            
             return im;
         }
     }
