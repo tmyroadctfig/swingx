@@ -22,9 +22,11 @@ package org.jdesktop.swingx.autocomplete;
 
 import static org.jdesktop.swingx.autocomplete.ObjectToStringConverter.DEFAULT_IMPLEMENTATION;
 
-
 import javax.swing.UIManager;
+import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.event.EventListenerList;
+import javax.swing.event.UndoableEditEvent;
 import javax.swing.event.UndoableEditListener;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
@@ -41,6 +43,112 @@ import org.jdesktop.swingx.util.Contract;
  * It finds and selects matching items using any implementation of the AbstractAutoCompleteAdaptor.
  */
 public class AutoCompleteDocument implements Document {
+    private class Handler implements DocumentListener, UndoableEditListener {
+        private final EventListenerList listenerList = new EventListenerList();
+
+        public void addDocumentListener(DocumentListener listener) {
+            listenerList.add(DocumentListener.class, listener);
+        }
+
+        public void addUndoableEditListener(UndoableEditListener listener) {
+            listenerList.add(UndoableEditListener.class, listener);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public void removeDocumentListener(DocumentListener listener) {
+            listenerList.remove(DocumentListener.class, listener);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public void removeUndoableEditListener(UndoableEditListener listener) {
+            listenerList.remove(UndoableEditListener.class, listener);
+        }
+        
+        /**
+         * {@inheritDoc}
+         */
+        public void changedUpdate(DocumentEvent e) {
+            e = new DelegatingDocumentEvent(AutoCompleteDocument.this, e);
+            
+            // Guaranteed to return a non-null array
+            Object[] listeners = listenerList.getListenerList();
+            // Process the listeners last to first, notifying
+            // those that are interested in this event
+            for (int i = listeners.length-2; i>=0; i-=2) {
+                if (listeners[i]==DocumentListener.class) {
+                    // Lazily create the event:
+                    // if (e == null)
+                    // e = new ListSelectionEvent(this, firstIndex, lastIndex);
+                    ((DocumentListener)listeners[i+1]).changedUpdate(e);
+                }          
+            }
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public void insertUpdate(DocumentEvent e) {
+            e = new DelegatingDocumentEvent(AutoCompleteDocument.this, e);
+            
+            // Guaranteed to return a non-null array
+            Object[] listeners = listenerList.getListenerList();
+            // Process the listeners last to first, notifying
+            // those that are interested in this event
+            for (int i = listeners.length-2; i>=0; i-=2) {
+                if (listeners[i]==DocumentListener.class) {
+                    // Lazily create the event:
+                    // if (e == null)
+                    // e = new ListSelectionEvent(this, firstIndex, lastIndex);
+                    ((DocumentListener)listeners[i+1]).insertUpdate(e);
+                }          
+            }
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public void removeUpdate(DocumentEvent e) {
+            e = new DelegatingDocumentEvent(AutoCompleteDocument.this, e);
+            
+            // Guaranteed to return a non-null array
+            Object[] listeners = listenerList.getListenerList();
+            // Process the listeners last to first, notifying
+            // those that are interested in this event
+            for (int i = listeners.length-2; i>=0; i-=2) {
+                if (listeners[i]==DocumentListener.class) {
+                    // Lazily create the event:
+                    // if (e == null)
+                    // e = new ListSelectionEvent(this, firstIndex, lastIndex);
+                    ((DocumentListener)listeners[i+1]).removeUpdate(e);
+                }          
+            }
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public void undoableEditHappened(UndoableEditEvent e) {
+            e = new UndoableEditEvent(AutoCompleteDocument.this, e.getEdit());
+            
+            // Guaranteed to return a non-null array
+            Object[] listeners = listenerList.getListenerList();
+            // Process the listeners last to first, notifying
+            // those that are interested in this event
+            for (int i = listeners.length-2; i>=0; i-=2) {
+                if (listeners[i]==UndoableEditListener.class) {
+                // Lazily create the event:
+                // if (e == null)
+                // e = new ListSelectionEvent(this, firstIndex, lastIndex);
+                ((UndoableEditListener)listeners[i+1]).undoableEditHappened(e);
+                }          
+            }
+        }
+    }
+    
     /** Flag to indicate if adaptor.setSelectedItem has been called.
      * Subsequent calls to remove/insertString should be ignored
      * as they are likely have been caused by the adapted Component that
@@ -60,6 +168,8 @@ public class AutoCompleteDocument implements Document {
     
     ObjectToStringConverter stringConverter;
     
+    private final Handler handler;
+    
     protected final Document delegate;
     
     /**
@@ -77,6 +187,9 @@ public class AutoCompleteDocument implements Document {
         this.strictMatching = strictMatching;
         this.stringConverter = stringConverter == null ? DEFAULT_IMPLEMENTATION : stringConverter;
         this.delegate = delegate == null ? createDefaultDocument() : delegate;
+        
+        handler = new Handler();
+        delegate.addDocumentListener(handler);
         
         // Handle initially selected object
         Object selected = adaptor.getSelectedItem();
@@ -262,14 +375,14 @@ public class AutoCompleteDocument implements Document {
      * {@inheritDoc}
      */
     public void addDocumentListener(DocumentListener listener) {
-        delegate.addDocumentListener(listener);
+        handler.addDocumentListener(listener);
     }
 
     /**
      * {@inheritDoc}
      */
     public void addUndoableEditListener(UndoableEditListener listener) {
-        delegate.addUndoableEditListener(listener);
+        handler.addUndoableEditListener(listener);
     }
 
     /**
@@ -346,14 +459,14 @@ public class AutoCompleteDocument implements Document {
      * {@inheritDoc}
      */
     public void removeDocumentListener(DocumentListener listener) {
-        delegate.removeDocumentListener(listener);
+        handler.removeDocumentListener(listener);
     }
 
     /**
      * {@inheritDoc}
      */
     public void removeUndoableEditListener(UndoableEditListener listener) {
-        delegate.removeUndoableEditListener(listener);
+        handler.removeUndoableEditListener(listener);
     }
 
     /**
@@ -362,7 +475,6 @@ public class AutoCompleteDocument implements Document {
     public void render(Runnable r) {
         delegate.render(r);
     }
-
 
     /**
      * Returns if only items from the adaptor's list should be allowed to be entered.
