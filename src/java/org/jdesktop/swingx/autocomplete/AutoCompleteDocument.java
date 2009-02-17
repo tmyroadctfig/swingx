@@ -189,7 +189,7 @@ public class AutoCompleteDocument implements Document {
         this.delegate = delegate == null ? createDefaultDocument() : delegate;
         
         handler = new Handler();
-        delegate.addDocumentListener(handler);
+        this.delegate.addDocumentListener(handler);
         
         // Handle initially selected object
         Object selected = adaptor.getSelectedItem();
