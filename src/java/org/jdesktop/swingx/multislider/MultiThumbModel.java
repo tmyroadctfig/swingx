@@ -42,8 +42,8 @@ public interface MultiThumbModel<E> extends Iterable<Thumb<E>> {
     public Thumb<E> getThumbAt(int index);
     public int getThumbIndex(Thumb<E> thumb);
     public List<Thumb<E>> getSortedThumbs();
-    public void thumbPositionChanged(Thumb thumb);
-    public void thumbValueChanged(Thumb thumb);
+    public void thumbPositionChanged(Thumb<E> thumb);
+    public void thumbValueChanged(Thumb<E> thumb);
     
     public void addThumbDataListener(ThumbDataListener listener);
     public void removeThumbDataListener(ThumbDataListener listener);

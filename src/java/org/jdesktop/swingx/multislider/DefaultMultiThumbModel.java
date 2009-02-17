@@ -56,7 +56,7 @@ public class DefaultMultiThumbModel<E> extends AbstractMultiThumbModel<E> implem
     }
 
     public void insertThumb(float value, E obj, int index) {
-        Thumb thumb = new Thumb(this);
+        Thumb<E> thumb = new Thumb<E>(this);
         thumb.setPosition(value);
         thumb.setObject(obj);
         thumbs.add(index,thumb);
@@ -67,7 +67,7 @@ public class DefaultMultiThumbModel<E> extends AbstractMultiThumbModel<E> implem
     }
 
     public void removeThumb(int index) {
-        Thumb thumb = thumbs.remove(index);
+        Thumb<E> thumb = thumbs.remove(index);
         ThumbDataEvent evt = new ThumbDataEvent(this,-1,index,thumb);
         for(ThumbDataListener tdl : thumbDataListeners) {
             tdl.thumbRemoved(evt);
@@ -78,7 +78,7 @@ public class DefaultMultiThumbModel<E> extends AbstractMultiThumbModel<E> implem
         return thumbs.size();
     }
 
-    public Thumb getThumbAt(int index) {
+    public Thumb<E> getThumbAt(int index) {
         return thumbs.get(index);
     }
 

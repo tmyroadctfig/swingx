@@ -64,11 +64,11 @@ public abstract class AbstractMultiThumbModel<E> implements MultiThumbModel<E> {
     
     
     
-    public void thumbPositionChanged(Thumb thumb) {
+    public void thumbPositionChanged(Thumb<E> thumb) {
         fireThumbPositionChanged(thumb);
     }
     
-    protected void fireThumbPositionChanged(Thumb thumb) {
+    protected void fireThumbPositionChanged(Thumb<E> thumb) {
         if(getThumbIndex(thumb) >= 0) {
             ThumbDataEvent evt = new ThumbDataEvent(this,-1,getThumbIndex(thumb),thumb);
             for(ThumbDataListener l : thumbDataListeners) {
@@ -76,11 +76,11 @@ public abstract class AbstractMultiThumbModel<E> implements MultiThumbModel<E> {
             }
         }
     }
-    public void thumbValueChanged(Thumb thumb) {
+    public void thumbValueChanged(Thumb<E> thumb) {
         fireThumbValueChanged(thumb);
     }
     
-    protected void fireThumbValueChanged(Thumb thumb) {
+    protected void fireThumbValueChanged(Thumb<E> thumb) {
         ThumbDataEvent evt = new ThumbDataEvent(this,-1,getThumbIndex(thumb),thumb);
         for(ThumbDataListener l : thumbDataListeners) {
             l.valueChanged(evt);

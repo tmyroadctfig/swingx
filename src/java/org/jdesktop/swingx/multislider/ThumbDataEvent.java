@@ -28,10 +28,10 @@ import java.util.EventObject;
  */
 public class ThumbDataEvent extends EventObject {
     private int type, index;
-    private Thumb thumb;
+    private Thumb<?> thumb;
 
     /** Creates a new instance of ThumbDataEvent */
-    public ThumbDataEvent(Object source, int type, int index, Thumb thumb) {
+    public ThumbDataEvent(Object source, int type, int index, Thumb<?> thumb) {
         super(source);
         this.type = type;
         this.thumb = thumb;
@@ -46,7 +46,7 @@ public class ThumbDataEvent extends EventObject {
         return index;
     }
 
-    public Thumb getThumb() {
+    public Thumb<?> getThumb() {
         return thumb;
     }
     

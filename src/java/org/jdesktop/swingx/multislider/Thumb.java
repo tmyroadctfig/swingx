@@ -28,10 +28,10 @@ package org.jdesktop.swingx.multislider;
 public class Thumb<E> {
     private float position;
     private E object;
-    private MultiThumbModel model;
+    private MultiThumbModel<E> model;
 
     /** Creates a new instance of Thumb */
-    public Thumb(MultiThumbModel model) {
+    public Thumb(MultiThumbModel<E> model) {
         this.model = model;
     }
 
