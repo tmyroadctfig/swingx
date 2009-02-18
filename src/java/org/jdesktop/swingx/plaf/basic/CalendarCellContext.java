@@ -40,6 +40,18 @@ import org.jdesktop.swingx.renderer.CellContext;
  */
 class CalendarCellContext extends CellContext<JXMonthView> {
 
+    /**
+     * The padding for month traversal icons.
+     * PENDING JW: decouple rendering and hit-detection. As is, these are 
+     * hard-coded "magic numbers" which must be the same in both 
+     * the ui-delegate (which does the hit-detection) and here (which
+     * returns the default title border)
+     * 
+     * Added as preliminary fix for #1028-swingx: title border incorrect if box-padding 0
+     */
+    private int arrowPaddingX = 3;
+    private int arrowPaddingY = 3;
+
     private CalendarState dayState;
 
     public void installMonthContext(JXMonthView component, Object value, 
@@ -118,10 +130,14 @@ class CalendarCellContext extends CellContext<JXMonthView> {
             Icon downIcon = UIManager.getIcon("JXMonthView.monthDownFileName");
             Icon upIcon = UIManager.getIcon("JXMonthView.monthUpFileName");
 
-            IconBorder up = new IconBorder(upIcon, SwingConstants.EAST, getComponent().getBoxPaddingX());
-            IconBorder down = new IconBorder(downIcon, SwingConstants.WEST, getComponent().getBoxPaddingX());
+            // fix for #1028-swingx: title border whacky for boxpadding 0
+            // in fact there had been a deeper issue - without using the arrowPadding here
+            // the hit-detection of the buttons is slightly off target
+            IconBorder up = new IconBorder(upIcon, SwingConstants.EAST, arrowPaddingX); //getComponent().getBoxPaddingX());
+            IconBorder down = new IconBorder(downIcon, SwingConstants.WEST, arrowPaddingX); //getComponent().getBoxPaddingX());
             Border compound = BorderFactory.createCompoundBorder(up, down);
-            Border empty = BorderFactory.createEmptyBorder(2* getComponent().getBoxPaddingY(), 0, 2*getComponent().getBoxPaddingY(), 0);
+            Border empty = BorderFactory.createEmptyBorder(2* arrowPaddingY, 0, 2*arrowPaddingY, 0);
+//            Border empty = BorderFactory.createEmptyBorder(2* getComponent().getBoxPaddingY(), 0, 2*getComponent().getBoxPaddingY(), 0);
             return BorderFactory.createCompoundBorder(compound, empty);
         }
         

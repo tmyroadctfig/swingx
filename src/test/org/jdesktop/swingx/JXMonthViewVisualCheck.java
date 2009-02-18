@@ -71,13 +71,30 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
 //          test.runInteractiveTests();
 //        test.runInteractiveTests(".*TimeZone.*");
 //          test.runInteractiveTests("interactive.*Zoomable.*");
-          test.runInteractiveTests("interactive.*Select.*");
+          test.runInteractiveTests("interactive.*Title.*");
 //        test.runInteractiveTests("interactive.*Property.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
       }
   }
+    
+    /**
+     * Issue #1028-swingx: monthView title looks wrong if box paddings = 0
+     */
+    public void interactiveTitleBorder() {
+        JXMonthView monthView = new JXMonthView();
+        monthView.setBoxPaddingX(0);
+        monthView.setBoxPaddingY(0);
+        monthView.setTraversable(true);
+        JComponent comp = Box.createHorizontalBox();
+        comp.add(monthView);
+        JXMonthView other = new JXMonthView();
+        other.setTraversable(true);
+        comp.add(other);
+        showInFrame(comp, "monthView title border");
+        
+    }
 
     /**
      * Issue 807-swingx: JXMonthView must have visual clue if enabled.

@@ -2083,9 +2083,22 @@ public class BasicMonthViewUI extends MonthViewUI {
                 calendar.add(Calendar.DATE, 1);
             }
             
-            // PENDING JW: currently doesn't handle monthHeader pref > sum of box widths
+            int dayColumns = JXMonthView.DAYS_IN_WEEK;
+            if (monthView.isShowingWeekNumber()) {
+                dayColumns++;
+            }
+            
+            if (maxMonthWidth > maxBoxWidth * dayColumns) {
+                // PENDING JW: currently doesn't handle monthHeader pref > sum of box widths
+                // handle here: increase day box width accordingly
+                double diff = maxMonthWidth - (maxBoxWidth * dayColumns);
+                maxBoxWidth += Math.ceil(diff/(double) dayColumns);
+                
+            }
+            
             fullBoxWidth = maxBoxWidth;
             fullBoxHeight = maxBoxHeight;
+            // PENDING JW: huuh? what we doing here?
             int boxHeight = maxBoxHeight - 2 * monthView.getBoxPaddingY();
             fullMonthBoxHeight = Math.max(boxHeight, maxMonthHeight) ; 
 
