@@ -762,13 +762,14 @@ public class JXDatePickerTest extends InteractiveTestCase {
      * test that the toggle popup is registered in the 
      * picker's actionMap.
      *
+     * Issue #596-swingx: don't use space to open popup.
      */
     @Test
     public void testTogglePopupAction() {
        JXDatePicker picker = new JXDatePicker();
        Action togglePopup = picker.getActionMap().get("TOGGLE_POPUP");
        assertNotNull(togglePopup);
-       KeyStroke space = KeyStroke.getKeyStroke("SPACE");
+       KeyStroke space = KeyStroke.getKeyStroke("alt DOWN");
        Object actionKey = picker.getInputMap(
                JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
                .get(space);

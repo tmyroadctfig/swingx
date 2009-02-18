@@ -273,10 +273,13 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
        picker.getEditor().setName("first DateField");
         JComponent comp = new JPanel();
         comp.add(picker);
-        comp.add(new JXDatePicker(new Date()));
+        JXDatePicker other = new JXDatePicker(new Date());
+        comp.add(other);
+//        other.setFocusable(false);
+//        picker.setFocusable(false);
         JXFrame frame = wrapInFrame(comp, "popup: picker <-> picker", true);
         addMessage(frame, "click on second opens popup of first (mac only?)");
-        show(frame);
+        show(frame, 400, 400);
     }
 
     

@@ -124,6 +124,19 @@ import org.jdesktop.swingx.util.Contract;
  * binding to a property of a custom bean when using a binding framework.
  * <p>
  * 
+ * Keybindings (as installed by the UI-Delegate)
+ * <ul>
+ * <li> ENTER commits the edited or selected value
+ * <li> ESCAPE reverts the edited or selected value
+ * <li> alt-DOWN opens the monthView popup
+ * <li> shift-F5 if monthView is visible, navigates the monthView to today 
+ *    (no effect otherwise)
+ * <li> F5 commits today 
+ * </ul>
+ * 
+ * PENDNG JW: support per-OS keybindings to be installed, currently they are 
+ * hardcoded in our (single) BasicDatePickerUI. 
+ * 
  * @author Joshua Outwater
  * @author Jeanette Winzenburg
  * 
