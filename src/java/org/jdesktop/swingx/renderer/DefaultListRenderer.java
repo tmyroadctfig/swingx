@@ -178,7 +178,10 @@ public class DefaultListRenderer extends AbstractRenderer
             int index, boolean isSelected, boolean cellHasFocus) {
         cellContext.installContext(list, value, index, 0, isSelected,
                 cellHasFocus, true, true);
-        return componentController.getRendererComponent(cellContext);
+        Component comp = componentController.getRendererComponent(cellContext);
+        // fix issue #1040-swingx: memory leak if value not released
+        cellContext.replaceValue(null);
+        return comp;
     }
 
     /**

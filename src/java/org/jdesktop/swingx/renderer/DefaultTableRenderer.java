@@ -163,7 +163,10 @@ public class DefaultTableRenderer extends AbstractRenderer
             boolean isSelected, boolean hasFocus, int row, int column) {
         cellContext.installContext(table, value, row, column, isSelected, hasFocus,
                 true, true);
-        return componentController.getRendererComponent(cellContext);
+        Component comp = componentController.getRendererComponent(cellContext);
+        // fix issue #1040-swingx: memory leak if value not released
+        cellContext.replaceValue(null);
+        return comp;
     }
 
     /**
