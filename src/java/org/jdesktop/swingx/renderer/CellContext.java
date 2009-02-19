@@ -81,8 +81,10 @@ public class CellContext<T extends JComponent> implements Serializable {
         }
     }
 
+    /** PENDING JW: maybe make this a WeakReference? Would be a more robust fix for Issue #1040-swingx. */
     protected transient T component;
 
+    /** PENDING JW: maybe make this a WeakReference? Would be a more robust fix for Issue #1040-swingx. */
     protected transient Object value;
 
     protected transient int row;
