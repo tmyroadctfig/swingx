@@ -48,18 +48,8 @@ public class AlphaPainter<T> extends CompoundPainter<T> {
                 g2.setComposite(AlphaComposite.getInstance(
                         AlphaComposite.SRC_OVER, alpha));
             }
-            for (Painter p : getPainters()) {
-                Graphics2D g3 = (Graphics2D) g2.create();
-                
-                try {
-                    p.paint(g3, component, width, height);
-                    if (isClipPreserved()) {
-                        g2.setClip(g3.getClip());
-                    }
-                } finally {
-                    g3.dispose();
-                }
-            }
+            
+            super.doPaint(g2, component, width, height);
         } finally {
             g2.dispose();
         }
