@@ -29,7 +29,7 @@ import javax.swing.ListCellRenderer;
 
 
 /**
- * Adapter to glue SwingX renderer support to core api. It has convenience
+ * Adapter to glue SwingX renderer support to core API. It has convenience
  * constructors to create a LabelProvider, optionally configured with a
  * StringValue and horizontal alignment. Typically, client code does not
  * interact with this class except at instantiation time.
@@ -138,7 +138,7 @@ public class DefaultListRenderer extends AbstractRenderer
 
     
     /**
-     * Intantiates a default list renderer with default component provider
+     * Instantiates a default list renderer with default component provider
      * using both converters.
      * 
      * @param stringValue the converter to use for the string representation
@@ -149,7 +149,7 @@ public class DefaultListRenderer extends AbstractRenderer
     }
 
     /**
-     * Intantiates a default list renderer with default component provider
+     * Instantiates a default list renderer with default component provider
      * using both converters and the given alignment.
      * 
      * @param stringValue the converter to use for the string representation
