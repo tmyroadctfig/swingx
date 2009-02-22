@@ -28,8 +28,7 @@ import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.geom.Area;
 import java.awt.geom.Line2D;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
+
 import javax.swing.JComponent;
 
 /**
@@ -197,7 +196,7 @@ public class PinstripePainter<T> extends AbstractPainter<T> {
     }
     
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public void doPaint(Graphics2D g, T component, int width, int height) {
         //draws pinstripes at the angle specified in this class
