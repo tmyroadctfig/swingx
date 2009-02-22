@@ -20,6 +20,9 @@
  */
 package org.jdesktop.swingx.util;
 
+import javax.swing.UIManager;
+import javax.swing.UIManager.LookAndFeelInfo;
+
 /**
  * Deals with the different version of the Java Virtual Machine. <br>
  */
@@ -32,6 +35,8 @@ public class JVM {
   public final static int JDK1_4 = 14;
   public final static int JDK1_5 = 15;
   public final static int JDK1_6 = 16;
+  public final static int JDK1_6N = 1610;
+  public final static int JDK1_7 = 17;
 
   private static JVM current;
   static {
@@ -60,8 +65,17 @@ public class JVM {
    * Constructor for the OS object
    */
   public JVM(String p_JavaVersion) {
-    if (p_JavaVersion.startsWith("1.6.")) {
-      jdkVersion = JDK1_6;
+    if (p_JavaVersion.startsWith("1.7.")) {
+      jdkVersion = JDK1_7;
+    } else if (p_JavaVersion.startsWith("1.6.")) {
+      for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+          if ("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel".equals(info.getClassName())) {
+              jdkVersion = JDK1_6N;
+              break;
+          }
+      }
+      
+      jdkVersion = jdkVersion == 0 ? JDK1_6 : jdkVersion;
     } else if (p_JavaVersion.startsWith("1.5.")) {
       jdkVersion = JDK1_5;
     } else if (p_JavaVersion.startsWith("1.4.")) {
@@ -106,6 +120,20 @@ public class JVM {
 
   public boolean isOneDotSix() {
     return jdkVersion == JDK1_6;
+  }
+
+    /**
+     * Determines if the version of JDK1_6 has Nimbus Look and Feel installed.
+     * 
+     * @return {@code true} if Nimbus is available and the version is 1.6;
+     *         {@code false} otherwise
+     */
+  public boolean isOneDotSixUpdateN() {
+      return jdkVersion == JDK1_6N;
+  }
+  
+  public boolean isOneDotSeven() {
+      return jdkVersion == JDK1_7;
   }
 
 }
