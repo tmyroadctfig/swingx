@@ -22,6 +22,9 @@
 package org.jdesktop.swingx.util;
 
 import javax.swing.*;
+
+import org.jdesktop.swingx.SwingXUtilities;
+
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentListener;
@@ -182,13 +185,17 @@ public final class WindowUtils {
     }
 
     /**
-     * Get a <code>Rectangle</code> object representing the given window's position and
-     * magnitude in space.
-     *
-     * @param win The window to get a Rectangle object for
-     *
-     * @return a Rectangle object.  @see com.jgui.Rectangle
+     * Get a <code>Rectangle</code> object representing the given window's
+     * position and magnitude in space.
+     * 
+     * @param win
+     *            The window to get a Rectangle object for
+     * 
+     * @return a Rectangle object.
+     * @see com.jgui.Rectangle
+     * @deprecated (pre-0.9.6) use {@code Window#getBounds()}.
      */
+    @Deprecated
     public static Rectangle getRectangle(Window win) {
         return new Rectangle(win.getY(), win.getX(), win.getWidth(), win.getHeight());
     }
@@ -199,8 +206,11 @@ public final class WindowUtils {
      *
      * @param comp The JComponent to get a Rectangle object for
      *
-     * @return a Rectangle object.  @see com.jgui.Rectangle
+     * @return a Rectangle object.
+     * @see com.jgui.Rectangle
+     * @deprecated (pre-0.9.6) use {@code JComponent#getBounds()}.
      */
+    @Deprecated
     public static Rectangle getRectangle(JComponent comp) {
         return new Rectangle(comp.getY(), comp.getX(), comp.getWidth(), comp.getHeight());
     }
@@ -278,10 +288,13 @@ public final class WindowUtils {
         return compList;
     }
 
+    /**
+     * @deprecated (pre-0.9.6) use
+     *             {@link SwingXUtilities#setComponentTreeFont(Component, Font)}
+     */
+    @Deprecated
     public static void setFontRecursively(Container c, Font font) {
-        for (Component comp : getAllComponents(c)) {
-            comp.setFont(font);
-        }
+        SwingXUtilities.setComponentTreeFont(c, font);
     }
 
     /**

@@ -36,7 +36,6 @@ import java.awt.Image;
 import java.awt.Paint;
 import java.awt.Rectangle;
 import java.awt.Shape;
-import java.awt.Transparency;
 import java.awt.geom.Area;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -65,8 +64,6 @@ import org.jdesktop.swingx.graphics.GraphicsUtilities;
  * @author Mark Davidson
  */
 public class PaintUtils {
-    private static GraphicsConfiguration configuration = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
-    
     //  Utility methods.
     private static Border defaultBorder =
             BorderFactory.createBevelBorder(BevelBorder.RAISED);
