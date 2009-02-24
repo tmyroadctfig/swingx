@@ -1206,7 +1206,9 @@ public class JXMonthView extends JComponent {
     /**
      * Sets the zoomable property. If true, the calendar's date range can
      * be zoomed. This state implies that the calendar is traversable and
-     * showing exactly one calendar box, effectively ignoring the properties.
+     * showing exactly one calendar box, effectively ignoring the properties.<p>
+     * 
+     * <b>Note</b>: The actual zoomable behaviour is not yet implemented.
      * 
      * @param zoomable a boolean indicating whether or not zooming date
      *    ranges is enabled.

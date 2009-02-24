@@ -69,6 +69,7 @@ import org.jdesktop.swingx.calendar.DateSelectionModel;
 import org.jdesktop.swingx.calendar.DateSelectionModel.SelectionMode;
 import org.jdesktop.swingx.event.DateSelectionEvent;
 import org.jdesktop.swingx.event.DateSelectionListener;
+import org.jdesktop.swingx.hyperlink.LinkAction;
 import org.jdesktop.swingx.plaf.MonthViewUI;
 import org.jdesktop.swingx.plaf.UIManagerExt;
 import org.jdesktop.swingx.renderer.CellContext;
@@ -155,7 +156,7 @@ public class BasicMonthViewUI extends MonthViewUI {
      * protected for testing only!
      * PENDING: JW - should be property on JXMonthView, for symmetry with
      *   daysOfTheWeek? 
-     * @deprecated KEEP for now: re-added as quick hack in zoomable
+     * @deprecated pre-0.9.6
      *    no longer used in paint/layout with renderer. 
      */
     @Deprecated
@@ -280,13 +281,13 @@ public class BasicMonthViewUI extends MonthViewUI {
         installComponents();
         installKeyboardActions();
         updateLocale(false);
+        updateZoomable();
         installListeners();
     }
 
 
     @Override
     public void uninstallUI(JComponent c) {
-        
         uninstallRenderingHandler();
         uninstallListeners();
         uninstallKeyboardActions();
@@ -304,9 +305,9 @@ public class BasicMonthViewUI extends MonthViewUI {
         calendarHeader = createCalendarHeader();
         calendarHeader.setFont(getAsNotUIResource(createDerivedFont()));
         calendarHeader.setBackground(getAsNotUIResource(monthView.getMonthStringBackground()));
-        if (isZoomable()) {
-            monthView.add(calendarHeader);
-        }
+//        if (isZoomable()) {
+//            monthView.add(calendarHeader);
+//        }
     }
 
     /**
@@ -438,10 +439,38 @@ public class BasicMonthViewUI extends MonthViewUI {
         actionMap.put("adjustSelectionPreviousWeek", new KeyboardAction(KeyboardAction.ADJUST_SELECTION_PREVIOUS_WEEK));
         actionMap.put("adjustSelectionNextWeek", new KeyboardAction(KeyboardAction.ADJUST_SELECTION_NEXT_WEEK));
 
+        
         actionMap.put(JXMonthView.COMMIT_KEY, acceptAction);
         actionMap.put(JXMonthView.CANCEL_KEY, cancelAction);
+        
+        installZoomActions();
     }
 
+    /**
+     * 
+     */
+    private void installZoomActions() {
+        ZoomOutAction zoomOutAction = new ZoomOutAction();
+        zoomOutAction.setTarget(monthView);
+        monthView.getActionMap().put("zoomOut", zoomOutAction);
+        AbstractActionExt prev = new AbstractActionExt(null, monthDownImage) {
+
+            public void actionPerformed(ActionEvent e) {
+                previousMonth();
+            }
+            
+        };
+        monthView.getActionMap().put("scrollToPreviousMonth", prev);
+        AbstractActionExt next = new AbstractActionExt(null, monthUpImage) {
+
+            public void actionPerformed(ActionEvent e) {
+                nextMonth();
+            }
+            
+        };
+        monthView.getActionMap().put("scrollToNextMonth", next);
+    }
+    
     /**
      * @param inputMap
      */
@@ -804,7 +833,6 @@ public class BasicMonthViewUI extends MonthViewUI {
                 daysOfTheWeek[i - 1] = dateFormatSymbols[i];
             }
         }
-        installHeaderActions();
         if (revalidate) {
             monthView.invalidate();
             monthView.validate();
@@ -2488,9 +2516,13 @@ public class BasicMonthViewUI extends MonthViewUI {
      */
     protected void updateZoomable() {
         if (monthView.isZoomable()) {
+            calendarHeader.setActions(monthView.getActionMap().get("scrollToPreviousMonth"),
+                    monthView.getActionMap().get("scrollToNextMonth"),
+                    monthView.getActionMap().get("zoomOut"));
             monthView.add(calendarHeader);
         } else {
             monthView.remove(calendarHeader);
+            calendarHeader.setActions(null, null, null);
         }
         monthView.revalidate();
         monthView.repaint();
@@ -2502,49 +2534,101 @@ public class BasicMonthViewUI extends MonthViewUI {
     }
 
     /**
-     * @param header
+     * Quick fix for Issue #1046-swingx: header text not updated if zoomable.
+     * 
      */
-    private void installHeaderActions() {
-        final StringValue tsv = new StringValue() {
+    protected static class ZoomOutAction extends LinkAction<JXMonthView> {
 
-            public String getString(Object value) {
-                if (value instanceof Calendar) {
-                    String month = monthsOfTheYear[((Calendar) value)
-                            .get(Calendar.MONTH)];
-                    return month + " "
-                            + ((Calendar) value).get(Calendar.YEAR); 
+        private PropertyChangeListener linkListener;
+        // Formatters/state used by Providers. 
+        /** Localized month strings used in title. */
+        private String[] monthNames;
+        private StringValue tsv ;
+
+        public ZoomOutAction() {
+            super();
+            tsv = new StringValue() {
+                
+                public String getString(Object value) {
+                    if (value instanceof Calendar) {
+                        String month = monthNames[((Calendar) value)
+                                                  .get(Calendar.MONTH)];
+                        return month + " "
+                        + ((Calendar) value).get(Calendar.YEAR); 
+                    }
+                    return StringValues.TO_STRING.getString(value);
                 }
-                return StringValues.TO_STRING.getString(value);
-            }
-
-        };
-        final AbstractActionExt zoomOut = new AbstractActionExt(tsv.getString(getCalendar())) {
-
-            public void actionPerformed(ActionEvent e) {
-                // TODO Auto-generated method stub
                 
-            }
+            };
+        }
+        
+        public void actionPerformed(ActionEvent e) {
+            // TODO Auto-generated method stub
             
-        }; 
-        AbstractActionExt prev = new AbstractActionExt(null, monthDownImage) {
+        }
 
-            public void actionPerformed(ActionEvent e) {
-                previousMonth();
-                zoomOut.setName(tsv.getString(getCalendar()));
-                
+        
+        /**
+         * installs a propertyChangeListener on the target and
+         * updates the visual properties from the target.
+         */
+        @Override
+        protected void installTarget() {
+            if (getTarget() != null) {
+                getTarget().addPropertyChangeListener(getTargetListener());
             }
-            
-        };
-        AbstractActionExt next = new AbstractActionExt(null, monthUpImage) {
+            updateLocale();
+            updateFromTarget();
+        }
 
-            public void actionPerformed(ActionEvent e) {
-                nextMonth();
-                zoomOut.setName(tsv.getString(getCalendar()));
+        /**
+         * 
+         */
+        private void updateLocale() {
+            Locale current = getTarget() != null ? getTarget().getLocale() : Locale.getDefault();
+            monthNames = new DateFormatSymbols(current).getMonths();
+        }
+
+        /**
+         * removes the propertyChangeListener. <p>
+         * 
+         * Implementation NOTE: this does not clean-up internal state! There is
+         * no need to because updateFromTarget handles both null and not-null
+         * targets. Hmm...
+         * 
+         */
+        @Override
+        protected void uninstallTarget() {
+            if (getTarget() == null) return;
+            getTarget().removePropertyChangeListener(getTargetListener());
+        }
+
+        protected void updateFromTarget() {
+            // this happens on construction with null target
+            if (tsv == null) return;
+            Calendar calendar = getTarget() != null ? getTarget().getCalendar() : null;
+            setName(tsv.getString(calendar));
+        }
+
+        private PropertyChangeListener getTargetListener() {
+            if (linkListener == null) {
+             linkListener = new PropertyChangeListener() {
+
+                public void propertyChange(PropertyChangeEvent evt) {
+                    if ("firstDisplayedDay".equals(evt.getPropertyName())) {
+                        updateFromTarget();
+                    } else if ("locale".equals(evt.getPropertyName())) {
+                        updateLocale();
+                        updateFromTarget();
+                    }
+                }
                 
+            };
             }
-            
-        };
-        calendarHeader.setActions(prev, next, zoomOut);
+            return linkListener;
+        }
+
+        
     }
 
     

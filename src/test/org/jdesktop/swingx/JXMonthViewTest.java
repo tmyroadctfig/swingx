@@ -25,6 +25,7 @@ import java.awt.Font;
 import java.awt.GraphicsEnvironment;
 import java.awt.Insets;
 import java.lang.reflect.InvocationTargetException;
+import java.text.DateFormatSymbols;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
@@ -45,6 +46,7 @@ import org.jdesktop.swingx.calendar.DaySelectionModel;
 import org.jdesktop.swingx.calendar.DateSelectionModel.SelectionMode;
 import org.jdesktop.swingx.event.DateSelectionListener;
 import org.jdesktop.swingx.event.DateSelectionEvent.EventType;
+import org.jdesktop.swingx.hyperlink.LinkAction;
 import org.jdesktop.swingx.test.DateSelectionReport;
 import org.jdesktop.test.ActionReport;
 import org.jdesktop.test.PropertyChangeReport;
@@ -114,6 +116,77 @@ public class JXMonthViewTest extends MockObjectTestCase {
        public void tearDown() {
         JComponent.setDefaultLocale(componentLocale);
     }
+
+    /**
+     * Issue #1046-swingx: month title not updated when traversing months
+     * (programatically or by navigating in monthView)
+     */
+    @Test
+    public void testZoomableNameOnMonthChange() {
+        JXMonthView monthView = new JXMonthView();
+        LinkAction<?> action = (LinkAction<?>) monthView.getActionMap().get("zoomOut");
+        assertSame(monthView, action.getTarget());
+        String[] monthNames = new DateFormatSymbols(monthView.getLocale()).getMonths();
+        Calendar calendar = monthView.getCalendar();
+        int month = calendar.get(Calendar.MONTH);
+        assertTrue(action.getName().startsWith(monthNames[month]));
+        calendar.add(Calendar.MONTH, 1);
+        monthView.setFirstDisplayedDay(calendar.getTime());
+        int nextMonth = calendar.get(Calendar.MONTH);
+        assertTrue("month changed: old/new " + month + "/" + nextMonth, nextMonth != month);
+        assertTrue("name must be updated, expected: " + monthNames[nextMonth] + " was: " + action.getName()
+                , action.getName().startsWith(monthNames[nextMonth]));
+    }
+
+    /**
+     * Issue #1046-swingx: month title not updated when traversing months
+     * (programatically or by navigating in monthView)
+     */
+    @Test
+    public void testZoomableNameOnLocaleChange() {
+        JXMonthView monthView = new JXMonthView();
+        LinkAction<?> action = (LinkAction<?>) monthView.getActionMap().get("zoomOut");
+        assertSame(monthView, action.getTarget());
+        Locale locale = Locale.FRENCH;
+        if (locale.equals(monthView.getLocale())) {
+            locale = Locale.GERMAN;
+        }
+        monthView.setLocale(locale);
+        String[] monthNames = new DateFormatSymbols(monthView.getLocale()).getMonths();
+        Calendar calendar = monthView.getCalendar();
+        int month = calendar.get(Calendar.MONTH);
+        assertTrue("name must be updated with locale, expected: " + monthNames[month] + " was: " + action.getName(), 
+                action.getName().startsWith(monthNames[month]));
+    }
+
+    /**
+     * Issue #1046-swingx: month title not updated when traversing months
+     * (programatically or by navigating in monthView)
+     * 
+     * Test that zoomOutActin is installed for zoomable.
+     */
+    @Test
+    public void testZoomableZoomOutAction() {
+        JXMonthView monthView = new JXMonthView();
+        assertNotNull("monthView must have zoomOutAction", monthView.getActionMap().get("zoomOut"));
+        monthView.setZoomable(true);
+        assertNotNull("monthView must have zoomOutAction", monthView.getActionMap().get("zoomOut"));
+    }
+    
+    
+    /**
+     * Issue #1046-swingx: month title not updated when traversing months
+     * (programatically or by navigating in monthView)
+     * 
+     * Test that block navigation actions are installed
+     */
+    @Test
+    public void testNavigationActions() {
+        JXMonthView monthView = new JXMonthView();
+        assertNotNull("monthView must have scrollToNextMonth action", monthView.getActionMap().get("scrollToNextMonth"));
+        assertNotNull("monthView must have scrollToPreviousMonth action", monthView.getActionMap().get("scrollToPreviousMonth"));
+    }
+
 
     @Test
     public void testZoomableProperty() {

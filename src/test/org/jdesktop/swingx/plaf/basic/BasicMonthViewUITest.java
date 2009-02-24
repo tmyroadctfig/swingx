@@ -23,7 +23,9 @@ package org.jdesktop.swingx.plaf.basic;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.ComponentOrientation;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
 import java.awt.Point;
@@ -41,6 +43,7 @@ import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Box;
+import javax.swing.CellRendererPane;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -291,6 +294,36 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
     }
 
 //------------------------------
+    /**
+     * Issue #1046-swingx: month title not updated when traversing months
+     * (programatically or by navigating in monthView)
+     */
+    public void testZoomableAddsCalendarHeader() {
+        JXMonthView monthView = new JXMonthView();
+        monthView.setZoomable(true);
+        // digging into internals
+        Container header = (Container) monthView.getComponent(0);
+        if (header instanceof CellRendererPane) {
+            header = (Container) monthView.getComponent(1);
+        }
+        assertTrue("expected BasicCalendarHeader but was " + header.getClass(), header instanceof BasicCalendarHeader);
+    }
+    
+    /**
+     * Issue #1046-swingx: month title not updated when traversing months
+     * (programatically or by navigating in monthView)
+     */
+    public void testZoomableUpdateUIKeepsCalendarHeader() {
+        JXMonthView monthView = new JXMonthView();
+        monthView.setZoomable(true);
+        monthView.updateUI();
+        // digging into internals
+        Component header = monthView.getComponent(0);
+        if (header instanceof CellRendererPane) {
+            header = (Container) monthView.getComponent(1);
+        }
+        assertTrue("expected BasicCalendarHeader but was " + header.getClass(), header instanceof BasicCalendarHeader);
+    }
 
     /**
      * Test that day position in details day-of-week header returns null date
