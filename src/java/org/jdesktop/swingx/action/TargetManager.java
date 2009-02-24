@@ -59,14 +59,14 @@ import javax.swing.JComponent;
  * If none of the Targetable objects can handle the command then the default
  * behaviour is to retrieve an Action from the {@link javax.swing.ActionMap} of
  * the permanent focus owner with a key that matches the command key. If an
- * Action can be found thenthe <code>actionPerformed</code>
+ * Action can be found then the <code>actionPerformed</code>
  * method is invoked using an <code>ActionEvent</code> that was constructed
  * using the command string.
  * <p>
  * If the Action is not found on the focus order then the ActionMaps of the ancestor
  * hierarchy of the focus owner is searched until a matching Action can be found.
  *  Finally, if none
- * of the components can handle the command then it is dispatche to the ActionMap
+ * of the components can handle the command then it is dispatched to the ActionMap
  * of the current Application instance.
  * <p>
  * The order of command dispatch is as follows:

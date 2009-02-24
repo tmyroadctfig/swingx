@@ -377,7 +377,7 @@ public class JXTable extends JTable
     private boolean inLayout;
 
     /**
-     * Flag to distinguish internal settings of rowheight from client code
+     * Flag to distinguish internal settings of row height from client code
      * settings. The rowHeight will be internally adjusted to font size on
      * instantiation and in updateUI if the height has not been set explicitly
      * by the application.
@@ -425,7 +425,7 @@ public class JXTable extends JTable
      * selection model.
      * 
      * @param dm The table model to use.
-     * @param cm The colomn model to use.
+     * @param cm The column model to use.
      * @param sm The list selection model to use.
      */
     public JXTable(TableModel dm, TableColumnModel cm, ListSelectionModel sm) {
@@ -436,8 +436,8 @@ public class JXTable extends JTable
     /**
      * Instantiates a JXTable for a given number of columns and rows.
      * 
-     * @param numRows Count of rows to accomodate.
-     * @param numColumns Count of columns to accomodate.
+     * @param numRows Count of rows to accommodate.
+     * @param numColumns Count of columns to accommodate.
      */
     public JXTable(int numRows, int numColumns) {
         super(numRows, numColumns);
@@ -2349,22 +2349,22 @@ public class JXTable extends JTable
         /* 
          * JW: not properly tested (not in all in fact) ... 
          */
-        List columns = getColumns(true);
+        List<TableColumn> columns = getColumns(true);
         Map<Object, TableColumn> map = new HashMap<Object, TableColumn>();
-        for (Iterator iter = columns.iterator(); iter.hasNext();) {
+        for (Iterator<TableColumn> iter = columns.iterator(); iter.hasNext();) {
             // PENDING: handle duplicate identifiers ...
-            TableColumn column = (TableColumn) iter.next();
+            TableColumn column = iter.next();
             map.put(column.getIdentifier(), column);
             getColumnModel().removeColumn(column);
         }
         for (int i = 0; i < identifiers.length; i++) {
-            TableColumn column = (TableColumn) map.get(identifiers[i]);
+            TableColumn column = map.get(identifiers[i]);
             if (column != null) {
                 getColumnModel().addColumn(column);
                 columns.remove(column);
             }
         }
-        for (Iterator iter = columns.iterator(); iter.hasNext();) {
+        for (Iterator<TableColumn> iter = columns.iterator(); iter.hasNext();) {
             TableColumn column = (TableColumn) iter.next();
             getColumnModel().addColumn(column);
         }
@@ -2962,9 +2962,9 @@ public class JXTable extends JTable
 //            if ((modelColumn < 0) || (modelColumn >= getColumnCount())) {
 //                throw new IllegalArgumentException("invalid column index: " + modelColumn);
 //            }
-            List columns = table.getColumns(true);
-            for (Iterator iter = columns.iterator(); iter.hasNext();) {
-                TableColumn column = (TableColumn) iter.next();
+            List<TableColumn> columns = table.getColumns(true);
+            for (Iterator<TableColumn> iter = columns.iterator(); iter.hasNext();) {
+                TableColumn column = iter.next();
                 if (column.getModelIndex() == modelColumn) {
                     return column;
                 }
@@ -3510,7 +3510,7 @@ public class JXTable extends JTable
      *         type
      * @see #getDefaultRenderer(Class)
      */
-    public TableCellRenderer getNewDefaultRenderer(Class columnClass) {
+    public TableCellRenderer getNewDefaultRenderer(Class<?> columnClass) {
         TableCellRenderer renderer = getDefaultRenderer(columnClass);
         if (renderer != null) {
             try {
@@ -3606,7 +3606,7 @@ public class JXTable extends JTable
 
 
     /** c&p'ed from super */
-    private void setLazyEditor(Class c, String s) {
+    private void setLazyEditor(Class<?> c, String s) {
         setLazyValue(defaultEditorsByColumnClass, c, s);
     }
 
@@ -3661,8 +3661,8 @@ public class JXTable extends JTable
      */
     public static class GenericEditor extends DefaultCellEditor {
 
-        Class[] argTypes = new Class[]{String.class};
-        java.lang.reflect.Constructor constructor;
+        Class<?>[] argTypes = new Class<?>[]{String.class};
+        java.lang.reflect.Constructor<?> constructor;
         Object value;
 
         public GenericEditor() {
@@ -3707,7 +3707,7 @@ public class JXTable extends JTable
             this.value = null;
             ((JComponent)getComponent()).setBorder(new LineBorder(Color.black));
             try {
-                Class type = table.getColumnClass(column);
+                Class<?> type = table.getColumnClass(column);
                 // Since our obligation is to produce a value which is
                 // assignable for the required type it is OK to use the
                 // String constructor for columns which are declared
@@ -4111,12 +4111,12 @@ public class JXTable extends JTable
     public void updateUI() {
         super.updateUI();
         updateColumnControlUI();
-        for (Enumeration defaultEditors = defaultEditorsByColumnClass
+        for (Enumeration<?> defaultEditors = defaultEditorsByColumnClass
                 .elements(); defaultEditors.hasMoreElements();) {
             updateEditorUI(defaultEditors.nextElement());
         }
 
-        for (Enumeration defaultRenderers = defaultRenderersByColumnClass
+        for (Enumeration<?> defaultRenderers = defaultRenderersByColumnClass
                 .elements(); defaultRenderers.hasMoreElements();) {
             updateRendererUI(defaultRenderers.nextElement());
         }

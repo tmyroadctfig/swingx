@@ -127,7 +127,7 @@ public class JXList extends JList {
 
     private Searchable searchable;
 
-    private Comparator comparator;
+    private Comparator<?> comparator;
 
     /**
     * Constructs a <code>JXList</code> with an empty model and filters disabled.
@@ -442,7 +442,7 @@ public class JXList extends JList {
      * @return the comparator used.
      * @see #setComparator(Comparator)
      */
-    public Comparator getComparator() {
+    public Comparator<?> getComparator() {
         return comparator;
     }
     
@@ -453,8 +453,8 @@ public class JXList extends JList {
      * 
      * @param comparator the comparator to use.
      */
-    public void setComparator(Comparator comparator) {
-        Comparator old = getComparator();
+    public void setComparator(Comparator<?> comparator) {
+        Comparator<?> old = getComparator();
         this.comparator = comparator;
         updateSortAfterComparatorChange();
         firePropertyChange("comparator", old, getComparator());
