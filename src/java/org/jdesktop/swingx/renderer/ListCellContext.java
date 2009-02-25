@@ -25,7 +25,7 @@ import java.awt.Color;
 import javax.swing.JList;
 
 /**
- * List specific cellContext.
+ * List specific <code>CellContext</code>.
  */
 public class ListCellContext extends CellContext<JList> {
 

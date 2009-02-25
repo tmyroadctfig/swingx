@@ -34,7 +34,7 @@ import org.jdesktop.swingx.plaf.UIManagerExt;
 import org.jdesktop.swingx.renderer.CellContext;
 
 /**
- * CellContext internally used by BasisMonthViewUI rendering.
+ * MonthView specific CellContext. This is internally used by BasisMonthViewUI rendering.
  * 
  * @author Jeanette Winzenburg
  */
@@ -133,11 +133,10 @@ class CalendarCellContext extends CellContext<JXMonthView> {
             // fix for #1028-swingx: title border whacky for boxpadding 0
             // in fact there had been a deeper issue - without using the arrowPadding here
             // the hit-detection of the buttons is slightly off target
-            IconBorder up = new IconBorder(upIcon, SwingConstants.EAST, arrowPaddingX); //getComponent().getBoxPaddingX());
-            IconBorder down = new IconBorder(downIcon, SwingConstants.WEST, arrowPaddingX); //getComponent().getBoxPaddingX());
+            IconBorder up = new IconBorder(upIcon, SwingConstants.EAST, arrowPaddingX); 
+            IconBorder down = new IconBorder(downIcon, SwingConstants.WEST, arrowPaddingX); 
             Border compound = BorderFactory.createCompoundBorder(up, down);
             Border empty = BorderFactory.createEmptyBorder(2* arrowPaddingY, 0, 2*arrowPaddingY, 0);
-//            Border empty = BorderFactory.createEmptyBorder(2* getComponent().getBoxPaddingY(), 0, 2*getComponent().getBoxPaddingY(), 0);
             return BorderFactory.createCompoundBorder(compound, empty);
         }
         

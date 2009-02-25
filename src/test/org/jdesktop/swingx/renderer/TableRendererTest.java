@@ -44,11 +44,11 @@ import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.test.XTestUtils;
 import org.jdesktop.test.SerializableSupport;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.junit.Test;
-import org.junit.Before;
-import org.junit.After;
 
 
 /**
@@ -90,6 +90,22 @@ public class TableRendererTest extends InteractiveTestCase {
         xColumn = 1;
         xTableRenderer = new DefaultTableRenderer();
         table.getColumnModel().getColumn(xColumn).setCellRenderer(xTableRenderer);
+    }
+    
+    /**
+     * Issue ??-swingx: getEditable throws if cell coordinates invalid
+     */
+    @Test
+    public void testCellContextEditable() {
+        TableCellContext cellContext = new TableCellContext();
+        cellContext.installContext(null, "whatever", 0, 0, false, true, false, false);
+        assertFalse("context must cope with null component", cellContext.isEditable());
+        JXTable table = new JXTable();
+        cellContext.installContext(table, "whatever", 0, 0, false, true, false, false);
+        // KEEP commented lines is real-world example that'll blow
+//        DefaultVisuals visuals = new DefaultVisuals();
+//        visuals.configureVisuals(new JLabel(), cellContext);
+        assertFalse("context must cope with invalid coordinates", cellContext.isEditable());
     }
     
     /**

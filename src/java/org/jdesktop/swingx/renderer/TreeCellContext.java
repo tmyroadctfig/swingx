@@ -35,15 +35,16 @@ import javax.swing.tree.TreePath;
 import org.jdesktop.swingx.JXTree;
 
 /**
- * Tree specific cellContext.
+ * Tree specific <code>CellContext</code>. 
+ * 
  * <ul>
- * <li>PENDING: setters for icons?
  * <li>PENDING: use focus border as returned from list or table instead of
  * rolling its own? The missing ui-border probably is a consequence of the
  * border hacking as implemented in core default renderer. SwingX has a
  * composite default which should use the "normal" border.
  * <li> PENDING: selection colors couple explicitly to SwingX - should we go JXTree as
  *   generic type?
+ * <li> PENDING: for a JXTree use the icons as returned by the xtree api?
  * </ul>
  */
 public class TreeCellContext extends CellContext<JTree> {

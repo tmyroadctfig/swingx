@@ -37,8 +37,10 @@ public class TableCellContext extends CellContext<JTable> {
      */
     @Override
     public boolean isEditable() {
-        return getComponent() != null ? getComponent().isCellEditable(
-                getRow(), getColumn()) : false;
+        if ((getComponent() == null) || !isValidRow() || !isValidColumn()) {
+            return false;
+        }
+        return getComponent().isCellEditable(getRow(), getColumn());
     }
 
     /**
@@ -66,5 +68,24 @@ public class TableCellContext extends CellContext<JTable> {
     protected String getUIPrefix() {
         return "Table.";
     }
+
+    /**
+     * PRE getComponent != null
+     * 
+     * @return whether the column coordinate is valid in this context
+     */
+    protected boolean isValidColumn() {
+        return getColumn() >= 0 && getColumn() < getComponent().getColumnCount() ;
+    }
+
+    /**
+     * PRE getComponent != null
+     * 
+     * @return whether the row coordinate is valid in this context
+     */
+    protected boolean isValidRow() {
+        return getRow() >= 0 && getRow() < getComponent().getRowCount() ;
+    }
+
 
 }
