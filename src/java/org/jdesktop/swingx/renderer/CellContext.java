@@ -30,23 +30,47 @@ import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 
 /**
- * Encapsulates the display context passed into the getXXRendererComponent.
+ * Encapsulates a snapshop of cell content and default display context 
+ * for usage by a ComponentProvider.
  * <p>
  * 
- * Introduced to extract common state on which renderer configuration might
- * rely. Similar to the view part of ComponentAdapter - difference is that the
- * properties are not "live" dependent on the component but those passed-in are
- * used.
+ * One part is the super-set of properties that's traditionally passed into the 
+ * core renderers' (Table-, List-, Tree-) getXXCellRendererComponent. Raw 
+ * properties which define the context are 
+ * 
+ * <ul>
+ * <li> selected
+ * <li> focused
+ * <li> expanded
+ * <li> leaf
+ * </ul>
+ * 
+ * Similarl to a ComponentAdapter, the properties are a super-set of those for 
+ * a concrete component type. It's up to sub-classes (once the generics will be removed, until
+ * then the DefaultXXRenderers) fill any reasonable defaults for those not applicable
+ * to the specific component context.
+ * 
+ * With those raw properties given, a CellContext looks up and returns dependent visual
+ * properties as appropriate for the concrete component. Typically, they are taken
+ * from the component if supported, or requested from the UIManager.
+ * Dependent properties are
+ * 
+ * <ul>
+ * <li> foreground and background color
+ * <li> border
+ * <li> icon (relevant for trees only)
+ * <li> editable
+ * </ul>
+ *
+ * For a backdoor, the cell location (in horizontal and vertical view coordinates) 
+ * and the originating component is accessible as well. Note that they are not necessarily
+ * valid for the "life" component. It's not recommened to actually use them. If needed,
+ * that's probably a sign the api is lacking :-)
  * <p>
  * 
- * Additionally, provides lookup services to accessing state-dependent
- * ui-specific default visual properties (like colors, borders, icons).
- * Typically, they are taken from the UIManager or from the component, if
- * supported in the component api.
- * <p>
- * 
- * NOTE: the generic parameterization is useful to have a type-safe
- * installContext. Reason enough?
+ * PENDING JW: the generic parameterization is useful to have a type-safe
+ * installContext but introduces a bunch of generic warnings. Not enough reason to
+ * go for, so will be removed in future versions (see Issue 1042-swingx)
  * 
  * <ul>
  * 
