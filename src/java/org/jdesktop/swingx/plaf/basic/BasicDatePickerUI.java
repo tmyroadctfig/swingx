@@ -684,7 +684,6 @@ public class BasicDatePickerUI extends DatePickerUI {
      * PENDING: currently this resets at once - but it's a no-no,
      * because it happens during notification
      * 
-     * 
      * @param oldDate the old date to revert to
      */
     private void revertValue(Date oldDate) {
@@ -696,6 +695,8 @@ public class BasicDatePickerUI extends DatePickerUI {
      * selection.
      * 
      * Here: does nothing if the change is intermediate.
+     * 
+     * PENDNG JW: shouldn't we listen to actionEvents then?
      * 
      * @param eventType the type of the selection change
      * @param adjusting flag to indicate whether the the selection change
