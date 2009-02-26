@@ -80,8 +80,8 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
 //      setSystemLF(true);
       BasicMonthViewUITest  test = new BasicMonthViewUITest();
       try {
-          test.runInteractiveTests();
-//        test.runInteractiveTests(".*Simple.*");
+//          test.runInteractiveTests();
+        test.runInteractiveTests(".*Rendering.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
@@ -96,32 +96,21 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
     public void interactiveRenderingOn() {
         // force default loading
         new JXMonthView();
-        // this is global state - uncomment for debug painting completely
-//        UIManager.put("JXMonthView.trailingDayForeground", Color.YELLOW);
-//        UIManager.put("JXMonthView.leadingDayForeground", Color.ORANGE);
-//        UIManager.put("JXMonthView.weekOfTheYearForeground", Color.GREEN);
-//        UIManager.put("JXMonthView.unselectableDayForeground", Color.MAGENTA);
+        // KEEP this is global state - uncomment for debug painting completely
+        UIManager.put("JXMonthView.trailingDayForeground", Color.YELLOW);
+        UIManager.put("JXMonthView.leadingDayForeground", Color.ORANGE);
+        UIManager.put("JXMonthView.weekOfTheYearForeground", Color.GREEN);
+        UIManager.put("JXMonthView.unselectableDayForeground", Color.MAGENTA);
         String frameTitle = "Debug painting: rendering on";
-        showDebugMonthView(frameTitle, null);
+        showDebugMonthView(frameTitle);
     }
 
-    /**
-     * Issue #750-swingx: use rendering to side-step antialiase probs.
-     * 
-     * Debugging ...
-     */
-    public void interactiveRenderingOff() {
-        String frameTitle = "Debug painting: rendering off";
-        Boolean disableRendering = Boolean.TRUE;
-        showDebugMonthView(frameTitle, disableRendering);
-    }
     /**
      * @param frameTitle
      * @param disableRendering
      */
-    private void showDebugMonthView(String frameTitle, Boolean disableRendering) {
+    private void showDebugMonthView(String frameTitle) {
         final JXMonthView monthView = new JXMonthView();
-        monthView.putClientProperty("disableRendering", disableRendering);
         monthView.setDayForeground(Calendar.SUNDAY, Color.BLUE);
         monthView.setDaysOfTheWeekForeground(Color.RED);
         monthView.setFlaggedDayForeground(Color.CYAN);
@@ -147,7 +136,6 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
         };
         addAction(frame, toggleTraversable);
         final JXDatePicker picker = new JXDatePicker();
-        picker.getMonthView().putClientProperty("disableRendering", disableRendering);
         picker.addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
@@ -158,7 +146,6 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
             
         });
         final JXDatePicker unselectable = new JXDatePicker();
-        unselectable.getMonthView().putClientProperty("disableRendering", disableRendering);
         unselectable.addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {

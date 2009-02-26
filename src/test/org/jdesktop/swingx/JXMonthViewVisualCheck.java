@@ -42,6 +42,7 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.UIManager;
 
 import org.jdesktop.swingx.action.AbstractActionExt;
@@ -69,10 +70,10 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
       JXMonthViewVisualCheck  test = new JXMonthViewVisualCheck();
       try {
 //          test.runInteractiveTests();
-        test.runInteractiveTests(".*Event.*");
-//          test.runInteractiveTests("interactive.*Zoomable.*");
+//        test.runInteractiveTests(".*Event.*");
+          test.runInteractiveTests("interactive.*Zoomable.*");
 //          test.runInteractiveTests("interactive.*Title.*");
-//        test.runInteractiveTests("interactive.*Property.*");
+        test.runInteractiveTests("interactive.*Propert.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
@@ -272,7 +273,16 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
         final JXMonthView monthView = new JXMonthView(); 
         monthView.setTraversable(true);
         final JXFrame frame = showInFrame(monthView, "MonthView - click property and see the change");
-        Action action = new AbstractActionExt("today flag") {
+        final Calendar calendar = monthView.getCalendar();
+        calendar.add(Calendar.DATE, 5);
+        Action unselectable = new AbstractActionExt("lowerbound") {
+            public void actionPerformed(ActionEvent e) {
+                monthView.setLowerBound(monthView.getLowerBound() == null ? calendar.getTime() : null);
+            }
+            
+        };
+        addAction(frame, unselectable);
+       Action action = new AbstractActionExt("today flag") {
             public void actionPerformed(ActionEvent e) {
                 if (monthView.hasFlaggedDates()) {
                     monthView.clearFlaggedDates();

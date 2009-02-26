@@ -578,8 +578,6 @@ public class BasicMonthViewUI extends MonthViewUI {
         private TextCrossingPainter textCross;
         /** The foreground color for unselectable date highlight. */
         private Color unselectableDayForeground;
-        /** The foreground color for week of year column. */
-        private Color weekOfTheYearForeground;
 
         /**
          * Instantiates a RenderingHandler and installs default state.
@@ -589,7 +587,6 @@ public class BasicMonthViewUI extends MonthViewUI {
         }
         
         private void install() {
-            weekOfTheYearForeground = UIManagerExt.getColor("JXMonthView.weekOfTheYearForeground");
             unselectableDayForeground = UIManagerExt.getColor("JXMonthView.unselectableDayForeground");
             textCross = new TextCrossingPainter<JLabel>();
             cellContext = new CalendarCellContext();
@@ -698,6 +695,10 @@ public class BasicMonthViewUI extends MonthViewUI {
 
         /**
          * 
+         * NOTE: it's the responsibility of the CalendarCellContext to detangle
+         * all "default" (that is: which could be queried from the comp and/or UIManager)
+         * foreground/background colors based on the given state! Moved out off here.
+         * 
          * PENDING JW: replace hard-coded logic by giving over to highlighters.
          * 
          * @param monthView the JXMonthView to render onto
@@ -707,34 +708,20 @@ public class BasicMonthViewUI extends MonthViewUI {
          */
         private JComponent highlight(JComponent comp, JXMonthView monthView,
                 Calendar calendar, CalendarState dayState) {
-            if ((CalendarState.LEADING == dayState) || (CalendarState.TRAILING == dayState)) return comp;
-            if (CalendarState.WEEK_OF_YEAR == dayState) {
-                if (weekOfTheYearForeground != null) {
-                    comp.setForeground(weekOfTheYearForeground);
-                } 
-                return comp;
-            }
+            
+            if ((CalendarState.LEADING == dayState) 
+                    || (CalendarState.TRAILING == dayState)
+                    || (CalendarState.WEEK_OF_YEAR == dayState)
+                    ) return comp;
             if (CalendarState.TITLE == dayState) {
                 comp.setFont(getDerivedFont(comp.getFont()));
                 return comp;
             }
             if (CalendarState.DAY_OF_WEEK == dayState) {
                 comp.setFont(getDerivedFont(comp.getFont()));
-                if (monthView.getDaysOfTheWeekForeground() != null) {
-                    comp.setForeground(monthView.getDaysOfTheWeekForeground());
-                }
                 return comp;
             }
-            if (monthView.isFlaggedDate(calendar.getTime())) {
-                comp.setForeground(monthView.getFlaggedDayForeground());
-            } else {
-                Color perDay = monthView.getDayForeground(calendar.get(Calendar.DAY_OF_WEEK));
-                if ((perDay != null) && (perDay != monthView.getForeground())) {
-                    // PENDING JW: this here prevents selection foreground on all
-                    // if not checked for "normal" foreground
-                    comp.setForeground(perDay);
-                }
-            }
+            // state left is TO_DAY or IN_MONTH 
             if (monthView.isUnselectableDate(calendar.getTime()) 
                     && (comp instanceof PainterAware )) {
                 textCross.setForeground(unselectableDayForeground);

@@ -265,7 +265,7 @@ public class CellContext<T extends JComponent> implements Serializable {
      * 
      * PENDING: fallback to UI properties if comp == null?
      * 
-     * @return the background color of the rendered component.
+     * @return the foreground color of the rendered component.
      */
     protected Color getForeground() {
         return getComponent() != null ? getComponent().getForeground() : null;

@@ -1514,6 +1514,16 @@ public class JXMonthView extends JComponent {
     }
 
     /**
+     * Return the color that should be used for painting the numerical day of the week.
+     *
+     * @param dayOfWeek The day of week to get the color for.
+     * @return The color to be used for painting the numeric day of the week or null
+     *         If no color has yet been defined.
+     */
+    public Color getPerDayOfWeekForeground(int dayOfWeek) {
+        return dayToColorTable.get(dayOfWeek);
+    }
+    /**
      * Set the color to be used for painting the foreground of a flagged day.
      *
      * @param c The color to be used for painting.

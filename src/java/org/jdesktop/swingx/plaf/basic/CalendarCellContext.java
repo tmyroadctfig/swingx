@@ -21,6 +21,7 @@
 package org.jdesktop.swingx.plaf.basic;
 
 import java.awt.Color;
+import java.util.Calendar;
 
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
@@ -54,7 +55,7 @@ class CalendarCellContext extends CellContext<JXMonthView> {
 
     private CalendarState dayState;
 
-    public void installMonthContext(JXMonthView component, Object value, 
+    public void installMonthContext(JXMonthView component, Calendar value, 
             boolean selected, boolean focused,
              CalendarState dayState) {
         super.installContext(component, value, -1, -1, selected, focused,
@@ -66,21 +67,69 @@ class CalendarCellContext extends CellContext<JXMonthView> {
         return dayState;
     }
     
+    
+    public Calendar getCalendar() {
+        return (getValue() instanceof Calendar) ? (Calendar) getValue() : null;
+    }
+
     @Override
     protected Color getForeground() {
         if (CalendarState.LEADING == dayState) {
-            return UIManagerExt.getColor(getUIPrefix() + "leadingDayForeground");
+            return getUIColor("leadingDayForeground");
         }
         if (CalendarState.TRAILING == dayState) {
-            return UIManagerExt.getColor(getUIPrefix() + "trailingDayForeground");
+            return getUIColor("trailingDayForeground");
         }
         if ((CalendarState.TITLE == dayState) && (getComponent() != null)) {
             return getComponent().getMonthStringForeground();
         }
-        return super.getForeground();
+        if (CalendarState.WEEK_OF_YEAR == dayState) {
+            Color weekOfTheYearForeground = getUIColor("weekOfTheYearForeground");
+            if (weekOfTheYearForeground != null) {
+                return weekOfTheYearForeground;
+            }
+        }
+        if (CalendarState.DAY_OF_WEEK == dayState) {
+            Color daysOfTheWeekForeground = getComponent() != null 
+                ? getComponent().getDaysOfTheWeekForeground() : null;
+            if (daysOfTheWeekForeground != null) {
+                return daysOfTheWeekForeground;
+            }
+        }
+
+        Color flaggedOrPerDayForeground = getFlaggedOrPerDayForeground();
+        return flaggedOrPerDayForeground != null ? flaggedOrPerDayForeground : super.getForeground();
     }
 
-    
+    /**
+     * @param key
+     * @return
+     */
+    private Color getUIColor(String key) {
+        return UIManagerExt.getColor(getUIPrefix() + key);
+    }
+
+    /**
+     * Returns the special color used for flagged days or per weekday or null if none is
+     * set, the component or the calendar are null.
+     * 
+     * @return the special foreground color for flagged days or per dayOfWeek.
+     */
+    protected Color getFlaggedOrPerDayForeground() {
+        
+        if (getComponent() != null && (getCalendar() != null)) {
+            if (getComponent().isFlaggedDate(getCalendar().getTime())) {
+                return getComponent().getFlaggedDayForeground();
+            } else {
+                Color perDay = getComponent().getPerDayOfWeekForeground(getCalendar().get(Calendar.DAY_OF_WEEK));
+                if (perDay != null) {
+                    return perDay;
+                }
+                
+            }
+        }
+        return null;
+    }
 
     @Override
     protected Color getBackground() {
@@ -99,6 +148,10 @@ class CalendarCellContext extends CellContext<JXMonthView> {
     @Override
     protected Color getSelectionForeground() {
         if (CalendarState.LEADING == dayState || CalendarState.TRAILING == dayState) return getForeground();
+        Color flaggedOrPerDayForeground = getFlaggedOrPerDayForeground();
+        if (flaggedOrPerDayForeground != null) {
+            return flaggedOrPerDayForeground;
+        }
         return getComponent() != null ? getComponent().getSelectionForeground() : null;
     }
 
