@@ -67,6 +67,12 @@ import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.calendar.CalendarUtils;
 import org.jdesktop.swingx.calendar.DateSelectionModel;
 import org.jdesktop.swingx.calendar.DateSelectionModel.SelectionMode;
+import org.jdesktop.swingx.decorator.AbstractHighlighter;
+import org.jdesktop.swingx.decorator.ComponentAdapter;
+import org.jdesktop.swingx.decorator.CompoundHighlighter;
+import org.jdesktop.swingx.decorator.HighlightPredicate;
+import org.jdesktop.swingx.decorator.Highlighter;
+import org.jdesktop.swingx.decorator.PainterHighlighter;
 import org.jdesktop.swingx.event.DateSelectionEvent;
 import org.jdesktop.swingx.event.DateSelectionListener;
 import org.jdesktop.swingx.hyperlink.LinkAction;
@@ -701,6 +707,11 @@ public class BasicMonthViewUI extends MonthViewUI {
          */
         private JComponent highlight(JComponent comp, JXMonthView monthView,
                 Calendar calendar, CalendarState dayState) {
+//            CalendarAdapter adapter = getCalendarAdapter(monthView, calendar, dayState);
+//            
+//            if (true) {
+//                return (JComponent) getHighlighter().highlight(comp, adapter);
+//            }
             
             if ((CalendarState.LEADING == dayState) 
                     || (CalendarState.TRAILING == dayState)
@@ -725,6 +736,78 @@ public class BasicMonthViewUI extends MonthViewUI {
             
         }
 
+//        /**
+//         * @return
+//         */
+//        private Highlighter getHighlighter() {
+//            if (highlighter == null) {
+//                highlighter = new CompoundHighlighter();
+//                installHighlighters();
+//            }
+//            return highlighter;
+//        }
+//
+//        /**
+//         * 
+//         */
+//        private void installHighlighters() {
+//            HighlightPredicate boldPredicate = new HighlightPredicate() {
+//
+//                public boolean isHighlighted(Component renderer,
+//                        ComponentAdapter adapter) {
+//                    if (!(adapter instanceof CalendarAdapter))
+//                        return false;
+//                    CalendarAdapter ca = (CalendarAdapter) adapter;
+//                    return CalendarState.DAY_OF_WEEK == ca.getCalendarState() || 
+//                        CalendarState.TITLE == ca.getCalendarState();
+//                }
+//                
+//            };
+//            Highlighter font = new AbstractHighlighter(boldPredicate) {
+//
+//                @Override
+//                protected Component doHighlight(Component component,
+//                        ComponentAdapter adapter) {
+//                    component.setFont(getDerivedFont(component.getFont()));
+//                    return component;
+//                }
+//                
+//            };
+//            highlighter.addHighlighter(font);
+//            
+//            HighlightPredicate unselectable = new HighlightPredicate() {
+//
+//                public boolean isHighlighted(Component renderer,
+//                        ComponentAdapter adapter) {
+//                    if (!(adapter instanceof CalendarAdapter)) 
+//                        return false;
+//                    return ((CalendarAdapter) adapter).isUnselectable();
+//                }
+//                
+//            };
+//            textCross.setForeground(unselectableDayForeground);
+//            Highlighter painterHL = new PainterHighlighter(unselectable, textCross);
+//            highlighter.addHighlighter(painterHL);
+//            
+//        }
+//
+//        /**
+//         * @param monthView
+//         * @param calendar
+//         * @param dayState
+//         * @return
+//         */
+//        private CalendarAdapter getCalendarAdapter(JXMonthView monthView,
+//                Calendar calendar, CalendarState dayState) {
+//            if (calendarAdapter == null) {
+//                calendarAdapter = new CalendarAdapter(monthView);
+//            }
+//            return calendarAdapter.install(calendar, dayState);
+//        }
+//
+//        private CalendarAdapter calendarAdapter;
+//        private CompoundHighlighter highlighter;
+//        
         /**
          * @param font
          * @return
@@ -907,11 +990,11 @@ public class BasicMonthViewUI extends MonthViewUI {
     protected Point getDayGridPositionAtLocation(int x, int y) {
         Rectangle days = getMonthDetailsBoundsAtLocation(x, y);
         if ((days == null) ||(!days.contains(x, y))) return null;
-        int calendarRow = (y - days.y) / fullBoxHeight;
-        int calendarColumn = (x - days.x) / fullBoxWidth;
+        int calendarRow = (y - days.y) / fullBoxHeight + FIRST_WEEK_ROW;
+        int calendarColumn = (x - days.x) / fullBoxWidth + FIRST_DAY_COLUMN;
         if (!isLeftToRight) {
             int start = days.x + days.width;
-            calendarColumn = (start - x) / fullBoxWidth;
+            calendarColumn = (start - x) / fullBoxWidth + FIRST_DAY_COLUMN;
         }
         if (monthView.isShowingWeekNumber()) {
             calendarColumn -= 1;
@@ -986,10 +1069,11 @@ public class BasicMonthViewUI extends MonthViewUI {
         if (!isVisible(date)) return null;
         Point position = getDayGridPosition(date);
         Rectangle monthBounds = getMonthBounds(date);
-        monthBounds.y += getMonthHeaderHeight() + (position.y + 1) * fullBoxHeight;
+        monthBounds.y += getMonthHeaderHeight() + (position.y - DAY_HEADER_ROW) * fullBoxHeight;
         if (monthView.isShowingWeekNumber()) {
             position.x++;
         }
+        position.x -= FIRST_DAY_COLUMN;
         if (isLeftToRight) {
            monthBounds.x += position.x * fullBoxWidth; 
         } else {
@@ -1018,7 +1102,7 @@ public class BasicMonthViewUI extends MonthViewUI {
         Rectangle monthBounds = getMonthBounds(month);
         if (monthBounds == null) return null;
         // PENDING JW: row + 1 relies on DAY_HEADER_ROw == -1 
-        monthBounds.y += getMonthHeaderHeight() + (row + 1) * fullBoxHeight;
+        monthBounds.y += getMonthHeaderHeight() + (row - DAY_HEADER_ROW) * fullBoxHeight;
         if (monthView.isShowingWeekNumber()) {
             column++;
         }
@@ -1084,7 +1168,8 @@ public class BasicMonthViewUI extends MonthViewUI {
         CalendarUtils.startOfWeek(calendar);
         // PENDING JW: adjust coordinates to be independent of FIRST... (this here still assumes
         // first == 0
-        calendar.add(Calendar.DAY_OF_MONTH, row * JXMonthView.DAYS_IN_WEEK + column);
+        calendar.add(Calendar.DAY_OF_MONTH, 
+                (row - FIRST_WEEK_ROW) * DAYS_IN_WEEK + (column - FIRST_DAY_COLUMN));
         if (calendar.get(Calendar.MONTH) == monthField) {
             return calendar.getTime();
         } 
@@ -1153,7 +1238,7 @@ public class BasicMonthViewUI extends MonthViewUI {
      * @return the bounds of the details grid in the month at
      *   location or null if outside.
      */
-    private Rectangle getMonthDetailsBoundsAtLocation(int x, int y) {
+    protected Rectangle getMonthDetailsBoundsAtLocation(int x, int y) {
         Rectangle month = getMonthBoundsAtLocation(x, y);
         if (month == null) return null;
         int startOfDaysY = month.y + getMonthHeaderHeight();

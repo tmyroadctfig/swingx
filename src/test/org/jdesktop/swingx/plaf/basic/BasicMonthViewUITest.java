@@ -351,7 +351,8 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
         BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.LEFT_TO_RIGHT);
         // get a date in the first month
         Date month = ui.getMonth(1, 0);
-        assertEquals("header grid position must return null date", null, ui.getDayInMonth(month, -1, 6));
+        assertEquals("header grid position must return null date", null, ui.getDayInMonth(month, 
+                BasicMonthViewUI.DAY_HEADER_ROW, BasicMonthViewUI.LAST_DAY_COLUMN));
      }
 
     /**
@@ -367,7 +368,8 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
         BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.LEFT_TO_RIGHT, true);
         // get a date in the first month
         Date month = ui.getMonth(0, 0);
-        assertEquals("header grid position must return null date", null, ui.getDayInMonth(month, 3, -1));
+        assertEquals("header grid position must return null date", null, ui.getDayInMonth(month, 
+                BasicMonthViewUI.FIRST_WEEK_ROW + 3, BasicMonthViewUI.WEEK_HEADER_COLUMN));
      }
 
     /**
@@ -384,7 +386,8 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
         BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.LEFT_TO_RIGHT);
         // get a date in the first month
         Date month = ui.getMonth(0, 0);
-        assertEquals("leading date grid position must return null date", null, ui.getDayInMonth(month, 0, 0));
+        assertEquals("leading date grid position must return null date", null, 
+                ui.getDayInMonth(month, BasicMonthViewUI.FIRST_WEEK_ROW, BasicMonthViewUI.FIRST_DAY_COLUMN));
      }
     
     /**
@@ -402,7 +405,8 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
         // get a date in the first month
         Date month = ui.getMonth(1, 0);
         // this fails because 
-        assertEquals("leading date grid position must return null date", null, ui.getDayInMonth(month, 0, 0));
+        assertEquals("leading date grid position must return null date", null, 
+                ui.getDayInMonth(month, BasicMonthViewUI.FIRST_WEEK_ROW, BasicMonthViewUI.FIRST_DAY_COLUMN));
      }
     
     /**
@@ -423,7 +427,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
         // second month should behave the same way as first 
         // first is outside and returns null.
         int row = ui.getDayGridPositionAtLocation(monthBounds.x + 2, firstDay).y;
-        assertEquals(0, row);
+        assertEquals(BasicMonthViewUI.FIRST_WEEK_ROW, row);
         Rectangle dayBounds = ui.getDayBoundsAtLocation(monthBounds.x + 2, firstDay);
         assertNotNull(dayBounds);
     }
@@ -444,7 +448,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
         Rectangle monthBounds = ui.getMonthBoundsAtLocation(20, 20);
         int firstDayY = monthBounds.y + ui.getMonthHeaderHeight() + ui.getDaySize().height + 2;
         int row = ui.getDayGridPositionAtLocation(monthBounds.x + 2, firstDayY).y;
-        assertEquals(0, row);
+        assertEquals(BasicMonthViewUI.FIRST_WEEK_ROW, row);
         Rectangle dayBounds = ui.getDayBoundsAtLocation(monthBounds.x + 2, firstDayY);
         assertNotNull(dayBounds);
     }
@@ -503,8 +507,15 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
         int locationX = bounds.x + 2;
         // second non-header row
         int locationY = bounds.y + ui.getMonthHeaderHeight() + 2 * daySize.height + 2;
+//        LOG.info("day in grid: (expected first day column, second non-header row) " + ui.getDayGridPositionAtLocation(locationX, locationY));
+//        Rectangle details = ui.getMonthDetailsBoundsAtLocation(locationX, locationY);
+//        LOG.info("details bounds: " + details);
+//        int row = (locationY - details.y) / daySize.height;
+//        LOG.info("" + row + "/" + daySize);
         Rectangle dayBounds = ui.getDayBoundsAtLocation(locationX, locationY);
+//        LOG.info("daybounds " + dayBounds);
         Date date = ui.getDayAtLocation(locationX, locationY); 
+//        LOG.info("date " + date + " gridPosisiton: " + ui.getDayGridPosition(date));
         assertEquals(dayBounds, ui.getDayBounds(date));
      }
 
@@ -525,8 +536,8 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
         // 6th April was sunday ... it is a last day of the first week, but only at places where first day is Monday.
         // so using this obsure notation we get last day of first week depending on when the week really starts.
         cal.set(2008, Calendar.APRIL, 4 + cal.getFirstDayOfWeek()); 
-        assertEquals(6, ui.getDayGridPosition(cal.getTime()).x);
-        assertEquals(0, ui.getDayGridPosition(cal.getTime()).y);
+        assertEquals(BasicMonthViewUI.LAST_DAY_COLUMN, ui.getDayGridPosition(cal.getTime()).x);
+        assertEquals(BasicMonthViewUI.FIRST_WEEK_ROW, ui.getDayGridPosition(cal.getTime()).y);
         
      }
 
@@ -544,7 +555,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
         // get a date in the first month
         Date month = ui.getMonth(0, 0);
         // second row - cant be a leading date
-        assertDateToDayGrid(ui, month, 1, 0);
+        assertDateToDayGrid(ui, month, BasicMonthViewUI.FIRST_WEEK_ROW + 1, BasicMonthViewUI.FIRST_DAY_COLUMN);
      }
 
     /**
@@ -560,7 +571,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
         BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.LEFT_TO_RIGHT);
         // get a date in the first month
         Date month = ui.getMonth(0, 0);
-        assertDateToDayGrid(ui, month, 2, 4);
+        assertDateToDayGrid(ui, month, BasicMonthViewUI.FIRST_WEEK_ROW + 3, BasicMonthViewUI.FIRST_DAY_COLUMN);
      }
     
     /**
@@ -626,7 +637,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
             return;
         }
         BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.LEFT_TO_RIGHT);
-        assertDateToMonthGrid(ui, 0, 0);
+        assertDateToMonthGrid(ui, BasicMonthViewUI.FIRST_WEEK_ROW, BasicMonthViewUI.FIRST_DAY_COLUMN);
      }
     /**
      * Test full circle: getMonthGridPosition(Date) - had problems with first row?
@@ -653,7 +664,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
             return;
         }
         BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.LEFT_TO_RIGHT);
-        assertDateToMonthGrid(ui, 1, 1);
+        assertDateToMonthGrid(ui, 1,  1);
      }
 
     /**
@@ -945,7 +956,8 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
         // first row below month header == days of week header 
         Point dayGridRToL = uiRToL.getDayGridPositionAtLocation(
                 monthBounds.x + 2, monthBounds.y + uiRToL.getMonthHeaderHeight() + 2); 
-        assertEquals("first row below header must be day column header", -1, dayGridRToL.y);
+        assertEquals("first row below header must be day column header", 
+                BasicMonthViewUI.DAY_HEADER_ROW, dayGridRToL.y);
      }
 
     /**
@@ -968,7 +980,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
                 monthBounds.x + 2, 
                 monthBounds.y + ui.getMonthHeaderHeight() + dayBounds.height + 2); 
        
-        assertEquals("first row", 0, dayInGrid.y);
+        assertEquals("first row", BasicMonthViewUI.FIRST_WEEK_ROW, dayInGrid.y);
      }
  
     /**
@@ -988,12 +1000,12 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
         Point dayGridRToL = uiRToL.getDayGridPositionAtLocation(
                 monthBounds.x + 2, 
                 monthBounds.y + uiRToL.getMonthHeaderHeight() + 2); 
-        assertEquals("last logical column in RToL", JXMonthView.DAYS_IN_WEEK - 1, 
+        assertEquals("last logical column in RToL", BasicMonthViewUI.LAST_DAY_COLUMN, 
                 dayGridRToL.x);
         // same for LToR
         Point dayGridLToR = uiLToR.getDayGridPositionAtLocation(
                 monthBounds.x + 2, monthBounds.y + monthBounds.height - 20); 
-        assertEquals("first logical column in LToR", 0, dayGridLToR.x);
+        assertEquals("first logical column in LToR", BasicMonthViewUI.FIRST_DAY_COLUMN, dayGridLToR.x);
      }
 
     @Test
@@ -1010,13 +1022,13 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
         Point dayGridRToL = uiRToL.getDayGridPositionAtLocation(
                 monthBounds.x + monthBounds.width - 2, 
                 monthBounds.y + uiRToL.getMonthHeaderHeight() + 2); 
-        assertEquals("weeks of year column in RTL", -1, 
+        assertEquals("weeks of year column in RTL", BasicMonthViewUI.WEEK_HEADER_COLUMN, 
                 dayGridRToL.x);
         // same for LToR
         Point dayGridLToR = uiLToR.getDayGridPositionAtLocation(
                 monthBounds.x + 2, 
                 monthBounds.y + uiRToL.getMonthHeaderHeight() + 2); 
-        assertEquals("first logical column in LToR", -1, dayGridLToR.x);
+        assertEquals("first logical column in LToR", BasicMonthViewUI.WEEK_HEADER_COLUMN, dayGridLToR.x);
      }
     
     /**
@@ -1195,7 +1207,6 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
      * cleanup date representation as long: new api getDayAtLocation. will
      * replace getDayAt which is deprecated as a first step.
      */
-    @SuppressWarnings("deprecation")
     @Test
     public void testGetDayAtLocation() {
         // This test will not work in a headless configuration.
@@ -1320,18 +1331,6 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
         assertEquals(first, monthView.getUI().getLastDisplayedDay());
     };
 
-    /**
-     * Issue #708-swingx: updateUI changes state.
-     * 
-     * Here: test that firstDisplayedDate is unchanged.
-     */
-    @Test
-    public void testUpdateUIFirstDate() {
-        final JXMonthView monthView = new JXMonthView();
-        Date first = ((BasicMonthViewUI) monthView.getUI()).getFirstDisplayedDay();
-        monthView.updateUI();
-        assertEquals(first, ((BasicMonthViewUI) monthView.getUI()).getFirstDisplayedDay());
-    };
     
     /**
      * Issue #708-swingx: updateUI changes state.
