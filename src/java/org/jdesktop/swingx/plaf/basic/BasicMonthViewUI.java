@@ -134,7 +134,6 @@ public class BasicMonthViewUI extends MonthViewUI {
             .getName());
 
     
-    private static final int WEEKS_IN_MONTH = 6;
     private static final int CALENDAR_SPACING = 10;
 
     
@@ -143,14 +142,18 @@ public class BasicMonthViewUI extends MonthViewUI {
     /** Return value used to identify when the month up button is pressed. */
     public static final int MONTH_UP = 2;
 
+    // constants for day columns
+    protected static final int WEEK_HEADER_COLUMN = -1;
+    protected static final int DAYS_IN_WEEK = 7;
+    protected static final int FIRST_DAY_COLUMN = WEEK_HEADER_COLUMN + 1;
+    protected static final int LAST_DAY_COLUMN = FIRST_DAY_COLUMN + DAYS_IN_WEEK -1;
 
-    private static final int WEEK_HEADER_COLUMN = -1;
+    // constants for day rows (aka: weeks)
+    protected static final int DAY_HEADER_ROW = -1;
+    protected static final int WEEKS_IN_MONTH = 6;
+    protected static final int FIRST_WEEK_ROW = DAY_HEADER_ROW + 1;
+    protected static final int LAST_WEEK_ROW = FIRST_WEEK_ROW + WEEKS_IN_MONTH - 1;
 
-
-    private static final int DAYS_IN_WEEK = 7;
-
-
-    private static final int DAY_HEADER_ROW = -1;
 
     /** localized names of all months.
      * protected for testing only!
@@ -913,6 +916,7 @@ public class BasicMonthViewUI extends MonthViewUI {
         if (monthView.isShowingWeekNumber()) {
             calendarColumn -= 1;
         }
+        // PENDING JW: hard-coded instead of using FIRST... constants
         return new Point(calendarColumn, calendarRow - 1);
     }
 
@@ -930,7 +934,7 @@ public class BasicMonthViewUI extends MonthViewUI {
         // there must be a less ugly way?
         // columns
         CalendarUtils.startOfWeek(calendar);
-        int column = 0;
+        int column = FIRST_DAY_COLUMN;
         while (calendar.getTime().before(startOfDay)) {
             column++;
             calendar.add(Calendar.DAY_OF_MONTH, 1);
@@ -939,7 +943,7 @@ public class BasicMonthViewUI extends MonthViewUI {
         Date startOfWeek = CalendarUtils.startOfWeek(calendar, date);
         calendar.setTime(date);
         CalendarUtils.startOfMonth(calendar);
-        int row = 0;
+        int row = FIRST_WEEK_ROW;
         while (calendar.getTime().before(startOfWeek)) {
             row++;
             calendar.add(Calendar.WEEK_OF_YEAR, 1);
@@ -962,7 +966,8 @@ public class BasicMonthViewUI extends MonthViewUI {
     @Override
     public Date getDayAtLocation(int x, int y) {
         Point dayInGrid = getDayGridPositionAtLocation(x, y);
-        if ((dayInGrid == null) || (dayInGrid.x < 0) || (dayInGrid.y < 0)) return null;
+        if ((dayInGrid == null) 
+                || (dayInGrid.x == WEEK_HEADER_COLUMN) || (dayInGrid.y == DAY_HEADER_ROW)) return null;
         Date month = getMonthAtLocation(x, y);
         return getDayInMonth(month, dayInGrid.y, dayInGrid.x);
     }
@@ -1012,10 +1017,13 @@ public class BasicMonthViewUI extends MonthViewUI {
         if ((WEEK_HEADER_COLUMN == column) && !monthView.isShowingWeekNumber()) return null;
         Rectangle monthBounds = getMonthBounds(month);
         if (monthBounds == null) return null;
+        // PENDING JW: row + 1 relies on DAY_HEADER_ROw == -1 
         monthBounds.y += getMonthHeaderHeight() + (row + 1) * fullBoxHeight;
         if (monthView.isShowingWeekNumber()) {
             column++;
         }
+        // PENDING JW: doesn nothing beforte coordinate change as first == 0
+        column -= FIRST_DAY_COLUMN;
         if (isLeftToRight) {
            monthBounds.x += column * fullBoxWidth; 
         } else {
@@ -1031,9 +1039,9 @@ public class BasicMonthViewUI extends MonthViewUI {
      * @param row
      */
     private void checkValidRow(int row, int column) {
-        if ((column < WEEK_HEADER_COLUMN) || (column >= DAYS_IN_WEEK)) 
+        if ((column < WEEK_HEADER_COLUMN) || (column > LAST_DAY_COLUMN)) 
             throw new IllegalArgumentException("illegal column in day grid " + column);
-        if ((row < DAY_HEADER_ROW) || (row >= WEEKS_IN_MONTH)) 
+        if ((row < DAY_HEADER_ROW) || (row > LAST_WEEK_ROW)) 
             throw new IllegalArgumentException("illegal row in day grid" + row);
     }
 
@@ -1068,12 +1076,14 @@ public class BasicMonthViewUI extends MonthViewUI {
      * @throws IllegalStateException if the month is not the start of the month.   
      */
     protected Date getDayInMonth(Date month, int row, int column) {
-        if ((row < 0) || (column < 0)) return null;
+        if ((row == DAY_HEADER_ROW) || (column == WEEK_HEADER_COLUMN)) return null;
         Calendar calendar = getCalendar(month);
         int monthField = calendar.get(Calendar.MONTH);
         if (!CalendarUtils.isStartOfMonth(calendar))
             throw new IllegalStateException("calendar must be start of month but was: " + month.getTime());
         CalendarUtils.startOfWeek(calendar);
+        // PENDING JW: adjust coordinates to be independent of FIRST... (this here still assumes
+        // first == 0
         calendar.add(Calendar.DAY_OF_MONTH, row * JXMonthView.DAYS_IN_WEEK + column);
         if (calendar.get(Calendar.MONTH) == monthField) {
             return calendar.getTime();
@@ -1542,7 +1552,7 @@ public class BasicMonthViewUI extends MonthViewUI {
         paintDaysOfWeekSeparator(g, calendar);
         Calendar cal = (Calendar) calendar.clone();
         CalendarUtils.startOfWeek(cal);
-        for (int i = 0; i < JXMonthView.DAYS_IN_WEEK; i++) {
+        for (int i = FIRST_DAY_COLUMN; i <= LAST_DAY_COLUMN; i++) {
             Rectangle dayBox = getDayBoundsInMonth(calendar.getTime(), DAY_HEADER_ROW, i);
             paintDayOfMonth(g, dayBox, cal, CalendarState.DAY_OF_WEEK);
             cal.add(Calendar.DATE, 1);
@@ -1564,7 +1574,7 @@ public class BasicMonthViewUI extends MonthViewUI {
         Calendar clonedCal = (Calendar) calendar.clone();
         int weeks = getWeeks(clonedCal);
         clonedCal.setTime(calendar.getTime());
-        for (int week = 0; week <= weeks; week++) {
+        for (int week = FIRST_WEEK_ROW; week <= FIRST_WEEK_ROW + weeks; week++) {
             Rectangle dayBox = getDayBoundsInMonth(calendar.getTime(), week, WEEK_HEADER_COLUMN);
             paintDayOfMonth(g, dayBox, clonedCal, CalendarState.WEEK_OF_YEAR);
             clonedCal.add(Calendar.WEEK_OF_YEAR, 1);
@@ -1589,8 +1599,8 @@ public class BasicMonthViewUI extends MonthViewUI {
         // adjust to start of week
         clonedCal.setTime(calendar.getTime());
         CalendarUtils.startOfWeek(clonedCal);
-        for (int week = 0; week < WEEKS_IN_MONTH; week++) {
-            for (int day = 0; day < 7; day++) {
+        for (int week = FIRST_WEEK_ROW; week <= LAST_WEEK_ROW; week++) {
+            for (int day = FIRST_DAY_COLUMN; day <= LAST_DAY_COLUMN; day++) {
                 CalendarState state = null;
                 if (clonedCal.getTime().before(startOfMonth)) {
                     if (monthView.isShowingLeadingDays()) {
@@ -1642,7 +1652,7 @@ public class BasicMonthViewUI extends MonthViewUI {
      * @param cal the calendar representing the month
      */
     protected void paintWeekOfYearSeparator(Graphics g, Calendar cal) {
-        Rectangle r = getSeparatorBounds(cal, 0, WEEK_HEADER_COLUMN);
+        Rectangle r = getSeparatorBounds(cal, FIRST_WEEK_ROW, WEEK_HEADER_COLUMN);
         if (r == null) return;
         g.setColor(monthView.getForeground());
         g.drawLine(r.x, r.y, r.x, r.y + r.height);
@@ -1655,7 +1665,7 @@ public class BasicMonthViewUI extends MonthViewUI {
      * @param cal the calendar representing the month
      */
     protected void paintDaysOfWeekSeparator(Graphics g, Calendar cal) {
-        Rectangle r = getSeparatorBounds(cal, DAY_HEADER_ROW, 0);
+        Rectangle r = getSeparatorBounds(cal, DAY_HEADER_ROW, FIRST_DAY_COLUMN);
         if (r == null) return;
         g.setColor(monthView.getForeground());
         g.drawLine(r.x, r.y, r.x + r.width, r.y);
@@ -1670,13 +1680,13 @@ public class BasicMonthViewUI extends MonthViewUI {
     private Rectangle getSeparatorBounds(Calendar cal, int row, int column) {
         Rectangle separator = getDayBoundsInMonth(cal.getTime(), row, column);
         if (separator == null) return null;
-        if (column < 0) {
+        if (column == WEEK_HEADER_COLUMN) {
             separator.height *= WEEKS_IN_MONTH;
             if (isLeftToRight) {
                 separator.x += separator.width - 1;
             }
             separator.width = 1;
-        } else if (row < 0) {
+        } else if (row == DAY_HEADER_ROW) {
             int oldWidth = separator.width;
             separator.width *= DAYS_IN_WEEK;
             if (!isLeftToRight) {

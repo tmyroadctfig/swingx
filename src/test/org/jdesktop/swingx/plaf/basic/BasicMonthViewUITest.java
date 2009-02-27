@@ -136,6 +136,16 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
         };
         addAction(frame, toggleTraversable);
         final JXDatePicker picker = new JXDatePicker();
+        picker.getMonthView().setShowingWeekNumber(monthView.isShowingWeekNumber());
+        Action toggleShowingWeekNumbers = new AbstractAction("toggle weekNumbers") {
+            
+            public void actionPerformed(ActionEvent e) {
+                monthView.setShowingWeekNumber(!monthView.isShowingWeekNumber());
+                picker.getMonthView().setShowingWeekNumber(monthView.isShowingWeekNumber());
+            }
+            
+        };
+        addAction(frame, toggleShowingWeekNumbers);
         picker.addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
