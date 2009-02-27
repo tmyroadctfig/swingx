@@ -171,12 +171,6 @@ public class BasicMonthViewUI extends MonthViewUI {
     private Handler handler;
 
     // fields related to visible date range
-    /** start of day of the first visible month. */
-    private Date firstDisplayedDate;
-    /** first visible month. */
-    private int firstDisplayedMonth;
-    /** first visible year. */
-    private int firstDisplayedYear;
     /** end of day of the last visible month. */
     private Date lastDisplayedDate;
     /** 
@@ -298,16 +292,12 @@ public class BasicMonthViewUI extends MonthViewUI {
     }
 
     /**
-     * Creates and configures the calendar header. Adds to the MonthView if
-     * zoomable.
+     * Creates and configures the calendar header. 
      */
     protected void installComponents() {
         calendarHeader = createCalendarHeader();
         calendarHeader.setFont(getAsNotUIResource(createDerivedFont()));
         calendarHeader.setBackground(getAsNotUIResource(monthView.getMonthStringBackground()));
-//        if (isZoomable()) {
-//            monthView.add(calendarHeader);
-//        }
     }
 
     /**
@@ -1499,9 +1489,6 @@ public class BasicMonthViewUI extends MonthViewUI {
     @Override
     public void paint(Graphics g, JComponent c) {
         Rectangle clip = g.getClipBounds();
-//        if (!useRenderingHandler()) {
-//            paintBackground(clip, g);
-//        }
         // Get a calender set to the first displayed date
         Calendar cal = getCalendar();
         // loop through grid of months
@@ -1511,11 +1498,7 @@ public class BasicMonthViewUI extends MonthViewUI {
                 Rectangle bounds = getMonthBounds(row, column);
                 // Check if this row falls in the clip region.
                 if (bounds.intersects(clip)) {
-//                    if (!useRenderingHandler()) {
-//                        paintMonth(g, bounds.x, bounds.y, bounds.width, bounds.height, cal);
-//                    } else {
-                        paintMonth(g, cal);
-//                    }
+                    paintMonth(g, cal);
                 }
                 cal.add(Calendar.MONTH, 1);
             }
@@ -1546,9 +1529,6 @@ public class BasicMonthViewUI extends MonthViewUI {
     protected void paintMonthHeader(Graphics g, Calendar calendar) {
         Rectangle page = getMonthHeaderBounds(calendar.getTime(), false);
         paintDayOfMonth(g, page, calendar, CalendarState.TITLE);
-//        JComponent comp = renderingHandler.prepareRenderingComponent(monthView,
-//                calendar, CalendarState.TITLE);
-//        renderComponentAt(g, comp, page);
     }
 
     /**
@@ -1565,8 +1545,6 @@ public class BasicMonthViewUI extends MonthViewUI {
         for (int i = 0; i < JXMonthView.DAYS_IN_WEEK; i++) {
             Rectangle dayBox = getDayBoundsInMonth(calendar.getTime(), DAY_HEADER_ROW, i);
             paintDayOfMonth(g, dayBox, cal, CalendarState.DAY_OF_WEEK);
-//            JComponent comp = renderingHandler.prepareRenderingComponent(monthView, cal, CalendarState.DAY_OF_WEEK);
-//            renderComponentAt(g, comp, dayBox);
             cal.add(Calendar.DATE, 1);
         }
     }
@@ -1589,8 +1567,6 @@ public class BasicMonthViewUI extends MonthViewUI {
         for (int week = 0; week <= weeks; week++) {
             Rectangle dayBox = getDayBoundsInMonth(calendar.getTime(), week, WEEK_HEADER_COLUMN);
             paintDayOfMonth(g, dayBox, clonedCal, CalendarState.WEEK_OF_YEAR);
-//            JComponent comp = renderingHandler.prepareRenderingComponent(monthView, calendar, CalendarState.WEEK_OF_YEAR);
-//            renderComponentAt(g, comp, dayBox);
             clonedCal.add(Calendar.WEEK_OF_YEAR, 1);
         }
     }
@@ -1684,6 +1660,7 @@ public class BasicMonthViewUI extends MonthViewUI {
         g.setColor(monthView.getForeground());
         g.drawLine(r.x, r.y, r.x + r.width, r.y);
     }
+    
     /**
      * @param cal
      * @param row
@@ -1823,37 +1800,33 @@ public class BasicMonthViewUI extends MonthViewUI {
      */
 
     /**
-     * Sets the firstDisplayedDate property to the given value. Must update
-     * dependent state as well. <p>
+     * Updates internal state that depends on the MonthView's firstDisplayedDay
+     * property. <p>
      * 
-     * Here: updated lastDisplayedDatefirstDisplayedMonth/Year accordingly.
+     * Here: updates lastDisplayedDay.
      * <p>
      * 
-     * PENDING JW: remove call to repaint() because this method is used
-     * both at install and from propertyChange
      * 
-     * @param firstDisplayedDate the firstDisplayedDate to set
+     * @param firstDisplayedDay the firstDisplayedDate to set
      */
-    protected void setFirstDisplayedDay(Date firstDisplayedDate) {
-        Calendar calendar = getCalendar(firstDisplayedDate);
-        this.firstDisplayedDate = firstDisplayedDate;
-        this.firstDisplayedMonth = calendar.get(Calendar.MONTH);
-        this.firstDisplayedYear = calendar.get(Calendar.YEAR);
-        updateLastDisplayedDay(firstDisplayedDate);
-//        monthView.repaint();
+    protected void setFirstDisplayedDay(Date firstDisplayedDay) {
+        updateLastDisplayedDay(firstDisplayedDay);
     }
+    
     /**
-     * @return the firstDisplayedDate
+     * Returns the first displayed day. Convenience delegate to 
+     * 
+     * @return the firstDisplayed
      */
     protected Date getFirstDisplayedDay() {
-        return firstDisplayedDate != null ? firstDisplayedDate : monthView.getFirstDisplayedDay();
+        return monthView.getFirstDisplayedDay();
     }
 
     /**
      * @return the firstDisplayedMonth
      */
     protected int getFirstDisplayedMonth() {
-        return firstDisplayedMonth;
+        return getCalendar().get(Calendar.MONTH);
     }
 
 
@@ -1861,7 +1834,7 @@ public class BasicMonthViewUI extends MonthViewUI {
      * @return the firstDisplayedYear
      */
     protected int getFirstDisplayedYear() {
-        return firstDisplayedYear;
+        return getCalendar().get(Calendar.YEAR);
     }
 
 
@@ -2104,7 +2077,7 @@ public class BasicMonthViewUI extends MonthViewUI {
             }
             
             if (maxMonthWidth > maxBoxWidth * dayColumns) {
-                // PENDING JW: currently doesn't handle monthHeader pref > sum of box widths
+                //  monthHeader pref > sum of box widths
                 // handle here: increase day box width accordingly
                 double diff = maxMonthWidth - (maxBoxWidth * dayColumns);
                 maxBoxWidth += Math.ceil(diff/(double) dayColumns);
@@ -2393,55 +2366,6 @@ public class BasicMonthViewUI extends MonthViewUI {
             default : throw new IllegalArgumentException("invalid adjustment action: " + action);
             }
             
-            // PENDING JW: old way to calculate the navigation #998
-            // KEEP - just a short while for quickly comparing old vs. new behaviour
-//            boolean isStartMoved = true;
-//            switch (action) {
-//                case ADJUST_SELECTION_PREVIOUS_DAY:
-//                    if (!newEndDate.after(pivotDate)) {
-//                        newStartDate = previousDay(cal, newStartDate);
-//                    } else {
-//                        newEndDate = previousDay(cal, newEndDate);
-//                    }
-//                    isStartMoved = false;
-//                    break;
-//                case ADJUST_SELECTION_NEXT_DAY:
-//                    if (!newStartDate.before(pivotDate)) {
-//                        newEndDate = nextDay(cal, newEndDate);
-//                        newStartDate = pivotDate;
-//                    } else {
-//                        newStartDate = nextDay(cal, newStartDate);
-//                    }
-//                    break;
-//                case ADJUST_SELECTION_PREVIOUS_WEEK:
-//                    if (!newEndDate.after(pivotDate)) {
-//                        newStartDate = previousWeek(cal, newStartDate);
-//                    } else {
-//                        Date newTime = previousWeek(cal, newEndDate);
-//                        if (!newTime.after(pivotDate)) {
-//                            newStartDate = newTime;
-//                            newEndDate = pivotDate;
-//                        } else {
-//                            newEndDate = cal.getTime();
-//                        }
-//
-//                    }
-//                    isStartMoved = false;
-//                    break;
-//                case ADJUST_SELECTION_NEXT_WEEK:
-//                    if (!newStartDate.before(pivotDate)) {
-//                        newEndDate = nextWeek(cal, newEndDate);
-//                    } else {
-//                        Date newTime = nextWeek(cal, newStartDate);
-//                        if (!newTime.before(pivotDate)) {
-//                            newStartDate = pivotDate;
-//                            newEndDate = newTime;
-//                        } else {
-//                            newStartDate = cal.getTime();
-//                        }
-//                    }
-//                    break;
-//            }
             if (!newStartDate.equals(selectionStart) || !newEndDate.equals(selectionEnd)) {
                 monthView.setSelectionInterval(newStartDate, newEndDate);
                 monthView.ensureDateVisible(isStartMoved ? newStartDate  : newEndDate);
@@ -2516,8 +2440,7 @@ public class BasicMonthViewUI extends MonthViewUI {
     }
 
     protected BasicCalendarHeader createCalendarHeader() {
-        BasicCalendarHeader header = new BasicCalendarHeader();
-        return header;
+        return new BasicCalendarHeader();
     }
 
     /**

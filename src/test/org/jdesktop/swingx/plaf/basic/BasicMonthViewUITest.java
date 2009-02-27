@@ -281,10 +281,25 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
     }
 
 //------------------------------
+    
+    /**
+     * Sanity during internal alias cleanup.
+     */
+    @Test
+    public void testFirstDisplayedInternal() {
+        JXMonthView monthView = new JXMonthView();
+        BasicMonthViewUI ui = (BasicMonthViewUI) monthView.getUI();
+        assertEquals(monthView.getFirstDisplayedDay(), ui.getFirstDisplayedDay());
+        Calendar calendar = monthView.getCalendar();
+        assertEquals(calendar.get(Calendar.MONTH), ui.getFirstDisplayedMonth());
+        assertEquals(calendar.get(Calendar.YEAR), ui.getFirstDisplayedYear());
+    }
+    
     /**
      * Issue #1046-swingx: month title not updated when traversing months
      * (programatically or by navigating in monthView)
      */
+    @Test
     public void testZoomableAddsCalendarHeader() {
         JXMonthView monthView = new JXMonthView();
         monthView.setZoomable(true);
@@ -300,6 +315,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
      * Issue #1046-swingx: month title not updated when traversing months
      * (programatically or by navigating in monthView)
      */
+    @Test
     public void testZoomableUpdateUIKeepsCalendarHeader() {
         JXMonthView monthView = new JXMonthView();
         monthView.setZoomable(true);
