@@ -184,24 +184,24 @@ public class CheckerboardPainter<T> extends AbstractPainter<T> {
             Graphics2D gfx = image.createGraphics();
             
             try {
-                Paint p = getLightPaint();
+            Paint p = getLightPaint();
                 if (p == null && c instanceof JComponent) {
-                    p = ((JComponent) c).getForeground();
+                    p = ((JComponent)c).getForeground();
                 }
-                gfx.setPaint(p);
-                gfx.fillRect(0, 0, length, length);
-                p = getDarkPaint();
-                if (p == null) {
-                    if (c instanceof JComponent) {
-                        p = ((JComponent) c).getBackground();
-                    }
+            gfx.setPaint(p);
+            gfx.fillRect(0, 0, length, length);
+            p = getDarkPaint();
+            if (p == null) {
+                if(c instanceof JComponent) {
+                    p = ((JComponent)c).getBackground();
                 }
-                gfx.setPaint(p);
-                gfx.fillRect(0, 0, (int) (sqlength - 1), (int) (sqlength - 1));
+            }
+            gfx.setPaint(p);
+            gfx.fillRect(0, 0, (int)(sqlength - 1), (int)(sqlength - 1));
                 gfx.fillRect((int) sqlength, (int) sqlength,
                         (int) sqlength - 1, (int) sqlength - 1);
             } finally {
-                gfx.dispose();
+            gfx.dispose();
             }
             
             checkerPaint = new TexturePaint(image, new Rectangle(0, 0, image.getWidth(), image.getHeight()));
@@ -213,7 +213,7 @@ public class CheckerboardPainter<T> extends AbstractPainter<T> {
      * @inheritDoc
      */
     @Override
-    public void doPaint(Graphics2D g, T t, int width, int height) {
+    protected void doPaint(Graphics2D g, T t, int width, int height) {
         g.setPaint(getCheckerPaint(t));
         g.fillRect(0, 0, width, height);
     }

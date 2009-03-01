@@ -207,7 +207,7 @@ public class RectanglePainter<T> extends AbstractAreaPainter<T> {
 
 
 
-    public void doPaint(Graphics2D g, T component, int width, int height) {
+    protected void doPaint(Graphics2D g, T component, int width, int height) {
         RectangularShape shape = calculateShape(width, height);
         switch (getStyle()) {
         case BOTH:
