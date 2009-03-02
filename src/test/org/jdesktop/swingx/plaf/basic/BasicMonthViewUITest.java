@@ -501,21 +501,11 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
             return;
         }
         BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.LEFT_TO_RIGHT);
-        Rectangle bounds = ui.getMonthBoundsAtLocation(20, 20);
-        Dimension daySize = ui.getDaySize();
-        // first day column
-        int locationX = bounds.x + 2;
         // second non-header row
-        int locationY = bounds.y + ui.getMonthHeaderHeight() + 2 * daySize.height + 2;
-//        LOG.info("day in grid: (expected first day column, second non-header row) " + ui.getDayGridPositionAtLocation(locationX, locationY));
-//        Rectangle details = ui.getMonthDetailsBoundsAtLocation(locationX, locationY);
-//        LOG.info("details bounds: " + details);
-//        int row = (locationY - details.y) / daySize.height;
-//        LOG.info("" + row + "/" + daySize);
-        Rectangle dayBounds = ui.getDayBoundsAtLocation(locationX, locationY);
-//        LOG.info("daybounds " + dayBounds);
-        Date date = ui.getDayAtLocation(locationX, locationY); 
-//        LOG.info("date " + date + " gridPosisiton: " + ui.getDayGridPosition(date));
+        // first day column
+        Point location = getLocationInGrid(ui, 2, 0);
+        Rectangle dayBounds = ui.getDayBoundsAtLocation(location.x, location.y);
+        Date date = ui.getDayAtLocation(location.x, location.y); 
         assertEquals(dayBounds, ui.getDayBounds(date));
      }
 
@@ -856,14 +846,9 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
             return;
         }
         BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.LEFT_TO_RIGHT);
-        Rectangle monthBounds = ui.getMonthBoundsAtLocation(20, 20);
-        Rectangle dayBounds = ui.getDayBoundsAtLocation(
-                monthBounds.x + 2, 
-                monthBounds.y + ui.getMonthHeaderHeight() + 2); 
         // first column in second non-header row
-        Date date = ui.getDayAtLocation(
-                monthBounds.x + 2, 
-                monthBounds.y + ui.getMonthHeaderHeight() + 2 * dayBounds.height + 2);
+        Point location = getLocationInGrid(ui, 2, 0);
+        Date date = ui.getDayAtLocation(location.x, location.y);
         // the ui's calendar is configured to the first displayed day
         Calendar uiCalendar = ui.getCalendar();
         uiCalendar.add(Calendar.WEEK_OF_YEAR, 1);
@@ -882,14 +867,9 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
             return;
         }
         BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.RIGHT_TO_LEFT);
-        Rectangle monthBounds = ui.getMonthBoundsAtLocation(20, 20);
-        Rectangle dayBounds = ui.getDayBoundsAtLocation(
-                monthBounds.x + 2, 
-                monthBounds.y + ui.getMonthHeaderHeight() + 2); 
         // first column in second non-header row
-        Date date = ui.getDayAtLocation(
-                monthBounds.x + 2, 
-                monthBounds.y + ui.getMonthHeaderHeight() + 2 * dayBounds.height + 2); 
+        Point location = getLocationInGrid(ui, 2, 0);
+        Date date = ui.getDayAtLocation(location.x, location.y);
         Date endOfWeek = CalendarUtils.endOfWeek(ui.getCalendar(), date);
         Calendar uiCalendar = ui.getCalendar(ui.getMonthAtLocation(20, 20));
         uiCalendar.add(Calendar.WEEK_OF_YEAR, 1);
@@ -941,126 +921,334 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
         assertEquals(monthBounds.y + uiLToR.getMonthHeaderHeight(), dayBoundsLToR.y);
     }
  
+//------------------------ methods to test getDayGridPositionAtLocation (bulk)
+// PENDING JW:  should we test the corner cases separatedly? Had been historical
+    
     /**
-     * days of week is mapped to row index -1.
+     * Map pixel to logical grid, test rows. 
      */
     @Test
-    public void testDayGridPositionColumnHeader() {
-        // This test will not work in a headless configuration.
-        if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run test - headless environment");
-            return;
-        }
-        BasicMonthViewUI uiRToL = getRealizedMonthViewUI(ComponentOrientation.RIGHT_TO_LEFT);
-        Rectangle monthBounds = uiRToL.getMonthBoundsAtLocation(20, 20);
-        // first row below month header == days of week header 
-        Point dayGridRToL = uiRToL.getDayGridPositionAtLocation(
-                monthBounds.x + 2, monthBounds.y + uiRToL.getMonthHeaderHeight() + 2); 
-        assertEquals("first row below header must be day column header", 
-                BasicMonthViewUI.DAY_HEADER_ROW, dayGridRToL.y);
-     }
-
-    /**
-     * day grid rows >= 0
-     */
-    @Test
-    public void testDayGridPositionRow() {
+    public void testDayGridPositionAtLocationRows() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
             LOG.info("cannot run test - headless environment");
             return;
         }
         BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.RIGHT_TO_LEFT);
-        Rectangle monthBounds = ui.getMonthBoundsAtLocation(20, 20);
-        Rectangle dayBounds = ui.getDayBoundsAtLocation(
-                monthBounds.x + 2, monthBounds.y + ui.getMonthHeaderHeight() +2); 
-
-        // first column near bottom
-        Point dayInGrid = ui.getDayGridPositionAtLocation(
-                monthBounds.x + 2, 
-                monthBounds.y + ui.getMonthHeaderHeight() + dayBounds.height + 2); 
-       
-        assertEquals("first row", BasicMonthViewUI.FIRST_WEEK_ROW, dayInGrid.y);
-     }
- 
-    /**
-     * Screen location mapped to logical day columns.
-     */
-    @Test
-    public void testDayGridPositionColumn() {
-        // This test will not work in a headless configuration.
-        if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run test - headless environment");
-            return;
+        int calendarRow = BasicMonthViewUI.DAY_HEADER_ROW;
+        for (int row = 0; row <= BasicMonthViewUI.WEEKS_IN_MONTH; row++) {
+            Point location = getLocationInRow(ui, row);
+            // first row below month header == days of week header 
+            Point dayGridPosition = ui.getDayGridPositionAtLocation(location.x, location.y); 
+            assertEquals("calendarRow at absolute row " + row, 
+                    calendarRow, dayGridPosition.y);
+            calendarRow++;
         }
-        BasicMonthViewUI uiRToL = getRealizedMonthViewUI(ComponentOrientation.RIGHT_TO_LEFT);
-        BasicMonthViewUI uiLToR = getRealizedMonthViewUI(ComponentOrientation.LEFT_TO_RIGHT);
-        Rectangle monthBounds = uiRToL.getMonthBoundsAtLocation(20, 20);
-        // first column in first non-header row
-        Point dayGridRToL = uiRToL.getDayGridPositionAtLocation(
-                monthBounds.x + 2, 
-                monthBounds.y + uiRToL.getMonthHeaderHeight() + 2); 
-        assertEquals("last logical column in RToL", BasicMonthViewUI.LAST_DAY_COLUMN, 
-                dayGridRToL.x);
-        // same for LToR
-        Point dayGridLToR = uiLToR.getDayGridPositionAtLocation(
-                monthBounds.x + 2, monthBounds.y + monthBounds.height - 20); 
-        assertEquals("first logical column in LToR", BasicMonthViewUI.FIRST_DAY_COLUMN, dayGridLToR.x);
      }
 
-    @Test
-    public void testDayGridPositionWeekHeader() {
-        // This test will not work in a headless configuration.
-        if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run test - headless environment");
-            return;
-        }
-        BasicMonthViewUI uiRToL = getRealizedMonthViewUI(ComponentOrientation.RIGHT_TO_LEFT, true);
-        BasicMonthViewUI uiLToR = getRealizedMonthViewUI(ComponentOrientation.LEFT_TO_RIGHT, true);
-        Rectangle monthBounds = uiRToL.getMonthBoundsAtLocation(20, 20);
-        // first column near bottom
-        Point dayGridRToL = uiRToL.getDayGridPositionAtLocation(
-                monthBounds.x + monthBounds.width - 2, 
-                monthBounds.y + uiRToL.getMonthHeaderHeight() + 2); 
-        assertEquals("weeks of year column in RTL", BasicMonthViewUI.WEEK_HEADER_COLUMN, 
-                dayGridRToL.x);
-        // same for LToR
-        Point dayGridLToR = uiLToR.getDayGridPositionAtLocation(
-                monthBounds.x + 2, 
-                monthBounds.y + uiRToL.getMonthHeaderHeight() + 2); 
-        assertEquals("first logical column in LToR", BasicMonthViewUI.WEEK_HEADER_COLUMN, dayGridLToR.x);
-     }
-    
     /**
-     * day grid returns null for hitting month header.
+     * Map pixel to logical grid, test columns in LToR. 
+     * 
      */
     @Test
-    public void testDayGridPositionMonthHeaderHitLToR() {
+    public void testDayGridPositionAtLocationColumnsLToR() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
             LOG.info("cannot run test - headless environment");
             return;
         }
         BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.LEFT_TO_RIGHT);
-        Rectangle monthBounds = ui.getMonthBoundsAtLocation(20, 20);
-        assertNull("hit in header must return null grid position", 
-                ui.getDayGridPositionAtLocation(monthBounds.x + 2, monthBounds.y + 2));
-    }
+        int calendarColumn = BasicMonthViewUI.FIRST_DAY_COLUMN;
+        for (int column = 0; column < BasicMonthViewUI.DAYS_IN_WEEK; column++) {
+            Point location = getLocationInColumn(ui, column);
+            // first row below month header == days of week header 
+            Point dayGridPosition = ui.getDayGridPositionAtLocation(location.x, location.y); 
+            assertEquals("calendarColumn at absolute column " + column, 
+                    calendarColumn, dayGridPosition.x);
+            calendarColumn++;
+        }
+     }
     
     /**
-     * day grid returns null for hitting month header.
+     * Map pixel to logical grid, test columns with weekNumbers in LToR. 
      */
     @Test
-    public void testDayGridPositionMonthHeaderHitRToL() {
+    public void testDayGridPositionAtLocationColumnsLToRWithWeekNumber() {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.info("cannot run test - headless environment");
+            return;
+        }
+        BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.LEFT_TO_RIGHT, true);
+        int calendarColumn = BasicMonthViewUI.WEEK_HEADER_COLUMN;
+        for (int column = 0; column <= BasicMonthViewUI.DAYS_IN_WEEK; column++) {
+            Point location = getLocationInColumn(ui, column);
+            // first row below month header == days of week header 
+            Point dayGridPosition = ui.getDayGridPositionAtLocation(location.x, location.y); 
+            assertEquals("calendarColumn at absolute column " + column, 
+                    calendarColumn, dayGridPosition.x);
+            calendarColumn++;
+        }
+     }
+
+    /**
+     * Map pixel to logical grid, test columns in RToL. 
+     */
+    @Test
+    public void testDayGridPositionAtLocationColumnsRToL() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
             LOG.info("cannot run test - headless environment");
             return;
         }
         BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.RIGHT_TO_LEFT);
-        Rectangle monthBounds = ui.getMonthBoundsAtLocation(20, 20);
+        int calendarColumn = BasicMonthViewUI.LAST_DAY_COLUMN;
+        for (int column = 0; column < BasicMonthViewUI.DAYS_IN_WEEK; column++) {
+            Point location = getLocationInColumn(ui, column);
+            // first row below month header == days of week header 
+            Point dayGridPosition = ui.getDayGridPositionAtLocation(location.x, location.y); 
+            assertEquals("calendarColumn at absolute column " + column, 
+                    calendarColumn, dayGridPosition.x);
+            calendarColumn--;
+        }
+     }
+    
+    /**
+     * Map pixel to logical grid, test columns with weekNubmers in RToL. 
+     */
+    @Test
+    public void testDayGridPositionAtLocationColumnsRToLWithWeekNumber() {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.info("cannot run test - headless environment");
+            return;
+        }
+        BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.RIGHT_TO_LEFT, true);
+        int calendarColumn = BasicMonthViewUI.LAST_DAY_COLUMN;
+        for (int column = 0; column <= BasicMonthViewUI.DAYS_IN_WEEK; column++) {
+            Point location = getLocationInColumn(ui, column);
+            // first row below month header == days of week header 
+            Point dayGridPosition = ui.getDayGridPositionAtLocation(location.x, location.y); 
+            assertEquals("calendarColumn at absolute column " + column, 
+                    calendarColumn, dayGridPosition.x);
+            calendarColumn--;
+        }
+     }
+
+//----------------- test get DayGridPositionAtLocation (special boundary points)
+    
+    /**
+     * Map pixel to logical grid. 
+     * day grid row == DAY_HEADER_ROW.
+     */
+    @Test
+    public void testDayGridPositionAtLocationDayHeader() {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.info("cannot run test - headless environment");
+            return;
+        }
+        BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.RIGHT_TO_LEFT);
+        Point location = getLocationInRow(ui, 0);
+        // first row below month header == days of week header 
+        Point dayGridPosition = ui.getDayGridPositionAtLocation(location.x, location.y); 
+        assertEquals("first row below header must be day column header", 
+                BasicMonthViewUI.DAY_HEADER_ROW, dayGridPosition.y);
+     }
+
+    /**
+     * Map pixel to logical grid. 
+     * day grid rows == FIRST_WEEK_ROW
+     */
+    @Test
+    public void testDayGridPositionAtLocationFirstWeekRow() {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.info("cannot run test - headless environment");
+            return;
+        }
+        BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.RIGHT_TO_LEFT);
+        // location in second (geometrical, calculated from day size) grid row
+        Point location = getLocationInRow(ui, 1);
+        Point dayInGrid = ui.getDayGridPositionAtLocation(location.x, location.y); 
+       
+        assertEquals("first row", BasicMonthViewUI.FIRST_WEEK_ROW, dayInGrid.y);
+     }
+ 
+    /**
+     * Map pixel to logical grid. 
+     * day grid rows == LAST_WEEK_ROW
+     */
+    @Test
+    public void testDayGridPositionAtLocationLastWeekRow() {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.info("cannot run test - headless environment");
+            return;
+        }
+        BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.RIGHT_TO_LEFT);
+        Point location = getLocationInRow(ui, BasicMonthViewUI.WEEKS_IN_MONTH); 
+        Point dayInGrid = ui.getDayGridPositionAtLocation(location.x, location.y);
+       
+        assertEquals("first row", BasicMonthViewUI.LAST_WEEK_ROW, dayInGrid.y);
+     }
+
+    
+    /**
+     * Map pixel to logical grid. 
+     * day grid column == LAST_DAY_COLUMN in RToL and FIRST_DAY_COLUMN in LToR
+     */
+    @Test
+    public void testDayGridPositionAtLocationLastColumnRToL() {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.info("cannot run test - headless environment");
+            return;
+        }
+        BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.RIGHT_TO_LEFT);
+        Point location = getLocationInColumn(ui, 0);
+        Point dayGridPosition = ui.getDayGridPositionAtLocation(location.x, location.y); 
+        assertEquals("last logical column in RToL", BasicMonthViewUI.LAST_DAY_COLUMN, 
+                dayGridPosition.x);
+     }
+
+    /**
+     * Map pixel to logical grid. 
+     * day grid column == LAST_DAY_COLUMN in RToL and FIRST_DAY_COLUMN in LToR
+     */
+    @Test
+    public void testDayGridPositionAtLocationFirstColumnRToL() {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.info("cannot run test - headless environment");
+            return;
+        }
+        BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.RIGHT_TO_LEFT);
+        Point location = getLocationInColumn(ui, BasicMonthViewUI.DAYS_IN_WEEK - 1);
+        Point dayGridPosition = ui.getDayGridPositionAtLocation(location.x, location.y); 
+        assertEquals("last logical column in RToL", BasicMonthViewUI.FIRST_DAY_COLUMN, 
+                dayGridPosition.x);
+     }
+
+    /**
+     * Map pixel to logical grid. 
+     * day grid column == LAST_DAY_COLUMN in RToL and FIRST_DAY_COLUMN in LToR
+     */
+    @Test
+    public void testDayGridPositionAtLocationFirstColumnRToLWithWeekNumber() {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.info("cannot run test - headless environment");
+            return;
+        }
+        BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.RIGHT_TO_LEFT, true);
+        Point location = getLocationInColumn(ui, BasicMonthViewUI.DAYS_IN_WEEK - 1);
+        Point dayGridPosition = ui.getDayGridPositionAtLocation(location.x, location.y); 
+        assertEquals("last logical column in RToL", BasicMonthViewUI.FIRST_DAY_COLUMN, 
+                dayGridPosition.x);
+     }
+
+    /**
+     * Map pixel to logical grid. 
+     * day grid column == LAST_DAY_COLUMN in RToL and FIRST_DAY_COLUMN in LToR
+     */
+    @Test
+    public void testDayGridPositionAtLocationFirstColumnLToR() {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.info("cannot run test - headless environment");
+            return;
+        }
+        BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.LEFT_TO_RIGHT);
+        Point location = getLocationInColumn(ui, 0);
+        Point dayGridPosition = ui.getDayGridPositionAtLocation(location.x, location.y);
+        assertEquals("first logical column in LToR", BasicMonthViewUI.FIRST_DAY_COLUMN, dayGridPosition.x);
+     }
+    
+    /**
+     * Map pixel to logical grid. 
+     * day grid column == LAST_DAY_COLUMN in RToL and FIRST_DAY_COLUMN in LToR
+     */
+    @Test
+    public void testDayGridPositionAtLocationLastColumnLToR() {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.info("cannot run test - headless environment");
+            return;
+        }
+        BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.LEFT_TO_RIGHT);
+        Point location = getLocationInColumn(ui, BasicMonthViewUI.DAYS_IN_WEEK - 1);
+        Point dayGridPosition = ui.getDayGridPositionAtLocation(location.x, location.y);
+        assertEquals("first logical column in LToR", BasicMonthViewUI.LAST_DAY_COLUMN, dayGridPosition.x);
+     }
+    /**
+     * Map pixel to logical grid. 
+     * day grid column == LAST_DAY_COLUMN in RToL and FIRST_DAY_COLUMN in LToR
+     */
+    @Test
+    public void testDayGridPositionAtLocationWeekHeaderRToL() {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.info("cannot run test - headless environment");
+            return;
+        }
+        BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.RIGHT_TO_LEFT, true);
+        // right == week header
+        Point location = getLocationInColumn(ui, BasicMonthViewUI.DAYS_IN_WEEK); 
+        Point dayGridPosition = ui.getDayGridPositionAtLocation(location.x, location.y);
+        assertEquals("weeks of year column in RTL", BasicMonthViewUI.WEEK_HEADER_COLUMN, 
+                dayGridPosition.x);
+     }
+
+    
+    /**
+     * Map pixel to logical grid. 
+     * day grid column == LAST_DAY_COLUMN in RToL and FIRST_DAY_COLUMN in LToR
+     */
+    @Test
+    public void testDayGridPositionAtLocationWeekHeaderLToR() {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.info("cannot run test - headless environment");
+            return;
+        }
+        BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.LEFT_TO_RIGHT, true);
+        // left == week header
+        Point location = getLocationInColumn(ui, 0);
+        Point dayGridPosition = ui.getDayGridPositionAtLocation(location.x, location.y); 
+        assertEquals("first logical column in LToR", BasicMonthViewUI.WEEK_HEADER_COLUMN, dayGridPosition.x);
+     }
+
+    /**
+     * day grid returns null for hitting month header.
+     */
+    @Test
+    public void testDayGridPositionAtLocationMonthHeaderHitLToR() {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.info("cannot run test - headless environment");
+            return;
+        }
+        BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.LEFT_TO_RIGHT);
+        Point location = getLocationInMonthHeader(ui);
         assertNull("hit in header must return null grid position", 
-                ui.getDayGridPositionAtLocation(monthBounds.x + 2, monthBounds.y + 2));
+                ui.getDayGridPositionAtLocation(location.x, location.y));
+    }
+    
+    /**
+     * day grid returns null for hitting month header.
+     */
+    @Test
+    public void testDayGridPositionAtLocationMonthHeaderHitRToL() {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.info("cannot run test - headless environment");
+            return;
+        }
+        BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.RIGHT_TO_LEFT);
+        Point location = getLocationInMonthHeader(ui);
+        assertNull("hit in header must return null grid position", 
+                ui.getDayGridPositionAtLocation(location.x, location.y));
     }
     
     /**
@@ -1155,6 +1343,70 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
         assertEquals("", ui.getMonthHeaderHeight(), monthBoundsLToR.height);
     }
 
+    
+    
+    /**
+     * @param ui
+     * @return
+     */
+    private Point getLocationInMonthHeader(BasicMonthViewUI ui) {
+         Rectangle monthBounds = ui.getMonthBoundsAtLocation(20, 20);
+        return new Point(monthBounds.x + 2, monthBounds.y + 2);
+    }
+
+    /**
+     * Returns a location in the given day grid row/column (absolute coordinates)
+     * 
+     * @param ui the ui to get the location from
+     * @param columnOfDayBoxes the absolute grid column
+     * @return a location in pixel, calcualated from the month location and
+     *    day size.
+     */
+    private Point getLocationInGrid(BasicMonthViewUI ui, int rowOfDayBoxes, int columnOfDayBoxes) {
+        Rectangle monthBounds = ui.getMonthBoundsAtLocation(20, 20);
+        Dimension dayBounds = ui.getDaySize();
+        Point location = new Point(
+                monthBounds.x + columnOfDayBoxes * dayBounds.width + 2, 
+                monthBounds.y + ui.getMonthHeaderHeight() + rowOfDayBoxes * dayBounds.height + 2);
+        return location;
+    }
+
+    /**
+     * Returns a location in the given day grid column (absolute coordinates)
+     * 
+     * @param ui the ui to get the location from
+     * @param columnOfDayBoxes the absolute grid column
+     * @return a location in pixel, calcualated from the month location and
+     *    day size.
+     */
+    private Point getLocationInColumn(BasicMonthViewUI ui, int columnOfDayBoxes) {
+        Rectangle monthBounds = ui.getMonthBoundsAtLocation(20, 20);
+        Dimension dayBounds = ui.getDaySize();
+        Point location = new Point(
+                monthBounds.x + columnOfDayBoxes * dayBounds.width + 2, 
+                monthBounds.y + ui.getMonthHeaderHeight() + 2);
+        return location;
+    }
+    
+    /**
+     * Returns a location in the given day grid row (absolute coordinates)
+     * 
+     * @param ui
+     * @param rowOfDayBoxes the absolute grid row
+     * @return a location in pixel, calcualated from the month location and
+     *    day size.
+     */
+    private Point getLocationInRow(BasicMonthViewUI ui, int rowOfDayBoxes) {
+        Rectangle monthBounds = ui.getMonthBoundsAtLocation(20, 20);
+        Dimension dayBounds = ui.getDaySize();
+        Point location = new Point(
+            monthBounds.x + 2, 
+            monthBounds.y + ui.getMonthHeaderHeight() + rowOfDayBoxes * dayBounds.height + 2);
+        return location;
+    }
+
+   
+
     /**
      * Returns the ui of a realized JXMonthView with 2 columns and the 
      * given componentOrientation without showingWeekNumbers.
@@ -1176,8 +1428,6 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
      * 
      * The frame is packed and it's size extended by 40, 40 to
      * give a slight off-position (!= 0) of the months shown. 
-     * 
-     * 
      * 
      * NOTE: this must not be used in a headless environment.
      * 

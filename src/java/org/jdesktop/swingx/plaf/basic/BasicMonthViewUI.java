@@ -67,12 +67,6 @@ import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.calendar.CalendarUtils;
 import org.jdesktop.swingx.calendar.DateSelectionModel;
 import org.jdesktop.swingx.calendar.DateSelectionModel.SelectionMode;
-import org.jdesktop.swingx.decorator.AbstractHighlighter;
-import org.jdesktop.swingx.decorator.ComponentAdapter;
-import org.jdesktop.swingx.decorator.CompoundHighlighter;
-import org.jdesktop.swingx.decorator.HighlightPredicate;
-import org.jdesktop.swingx.decorator.Highlighter;
-import org.jdesktop.swingx.decorator.PainterHighlighter;
 import org.jdesktop.swingx.event.DateSelectionEvent;
 import org.jdesktop.swingx.event.DateSelectionListener;
 import org.jdesktop.swingx.hyperlink.LinkAction;
@@ -114,9 +108,10 @@ import org.jdesktop.swingx.renderer.StringValues;
  * coordinates are adjusted to ComponentOrientation. 
  * <li> The grid of days in a month with logical row/column coordinates. The logical 
  * coordinates are adjusted to ComponentOrientation. The columns 
- * are the days of the week, the rows are the weeks in a month. The column header shows
- * the localized names of the days and has the row coordinate -1. It is shown always.
- * The row header shows the week number in the year and has the column coordinate -1. It
+ * are the (optional) week header and the days of the week. The rows are the day header  
+ * and the weeks in a month. The day header shows  the localized names of the days and 
+ * has the row coordinate DAY_HEADER_ROW. It is shown always.
+ * The row header shows the week number in the year and has the column coordinate WEEK_HEADER_COLUMN. It
  * is shown only if the showingWeekNumber property is true.  
  * </ul>
  * 
@@ -962,23 +957,63 @@ public class BasicMonthViewUI extends MonthViewUI {
      *         outside
      */
     protected Rectangle getDayBoundsAtLocation(int x, int y) {
-        Rectangle days = getMonthDetailsBoundsAtLocation(x, y);
-        if ((days == null) || (!days.contains(x, y)))
+        Rectangle monthDetails = getMonthDetailsBoundsAtLocation(x, y);
+        if ((monthDetails == null) || (!monthDetails.contains(x, y)))
             return null;
-        int calendarRow = (y - days.y) / fullBoxHeight;
-        int calendarColumn = (x - days.x) / fullBoxWidth;
-        return new Rectangle(days.x + calendarColumn * fullBoxWidth, days.y
-                + calendarRow * fullBoxHeight, fullBoxWidth, fullBoxHeight);
+        // calculate row/column in absolute grid coordinates
+        int row = (y - monthDetails.y) / fullBoxHeight;
+        int column = (x - monthDetails.x) / fullBoxWidth;
+        return new Rectangle(monthDetails.x + column * fullBoxWidth, monthDetails.y
+                + row * fullBoxHeight, fullBoxWidth, fullBoxHeight);
+    }
+
+    /**
+     * Returns the bounds of the day box at logical coordinates in the given month.
+     * The row's range is from DAY_HEADER_ROW to LAST_WEEK_ROW. Column's range is from
+     * WEEK_HEADER_COLUMN to LAST_DAY_COLUMN.
+     * 
+     * @param month the month containing the day box  
+     * @param row the logical row (== week) coordinate in the day grid 
+     * @param column the logical column (== day) coordinate in the day grid
+     * @return the bounds of the daybox or null if not showing
+     * @throws IllegalArgumentException if row or column are out off range.
+     * 
+     * @see #getDayGridPositionAtLocation(int, int)
+     */
+    protected Rectangle getDayBoundsInMonth(Date month, int row, final int column) {
+        checkValidRow(row, column);
+        if ((WEEK_HEADER_COLUMN == column) && !monthView.isShowingWeekNumber()) return null;
+        Rectangle monthBounds = getMonthBounds(month);
+        if (monthBounds == null) return null;
+        // dayOfWeek header is shown always
+        monthBounds.y += getMonthHeaderHeight() + (row - DAY_HEADER_ROW) * fullBoxHeight;
+        // PENDING JW: still looks fishy ... 
+        int absoluteColumn = column - FIRST_DAY_COLUMN;
+        if (monthView.isShowingWeekNumber()) {
+            absoluteColumn++;
+        }
+        if (isLeftToRight) {
+           monthBounds.x += absoluteColumn * fullBoxWidth; 
+        } else {
+            int leading = monthBounds.x + monthBounds.width - fullBoxWidth; 
+            monthBounds.x = leading - absoluteColumn * fullBoxWidth;
+        }
+        monthBounds.width = fullBoxWidth;
+        monthBounds.height = fullBoxHeight;
+        return monthBounds;
     }
     
+
     /**
      * Returns the logical coordinates of the day which contains the given
-     * location. The p.x of the returned value represents the day of week, the
-     * p.y represents the week of the month. The transformation takes care of
+     * location. The p.x of the returned value represents the week header or the 
+     * day of week, ranging from WEEK_HEADER_COLUMN to LAST_DAY_COLUMN. The
+     * p.y represents the day header or week of the month, ranging from DAY_HEADER_ROW
+     * to LAST_WEEK_ROW. The transformation takes care of
      * ComponentOrientation.
      * <p>
      * 
-     * Note: this is a pure geometric mapping. The returned grid position need not
+     * Note: The returned grid position need not
      * necessarily map to a date in the month which contains the location, it
      * can represent a week-number/column header or a leading/trailing date.
      * 
@@ -986,29 +1021,70 @@ public class BasicMonthViewUI extends MonthViewUI {
      * @param y the y position of the location in pixel
      * @return the logical coordinates of the day in the grid of days in a month
      *         or null if outside.
+     *         
+     * @see #getDayBoundsInMonth(Date, int, int)     
      */
     protected Point getDayGridPositionAtLocation(int x, int y) {
-        Rectangle days = getMonthDetailsBoundsAtLocation(x, y);
-        if ((days == null) ||(!days.contains(x, y))) return null;
-        int calendarRow = (y - days.y) / fullBoxHeight + FIRST_WEEK_ROW;
-        int calendarColumn = (x - days.x) / fullBoxWidth + FIRST_DAY_COLUMN;
+        Rectangle monthDetailsBounds = getMonthDetailsBoundsAtLocation(x, y);
+        if ((monthDetailsBounds == null) ||(!monthDetailsBounds.contains(x, y))) return null;
+        int calendarRow = (y - monthDetailsBounds.y) / fullBoxHeight + DAY_HEADER_ROW; 
+        int absoluteColumn = (x - monthDetailsBounds.x) / fullBoxWidth;
+        int calendarColumn = absoluteColumn + FIRST_DAY_COLUMN;
         if (!isLeftToRight) {
-            int start = days.x + days.width;
-            calendarColumn = (start - x) / fullBoxWidth + FIRST_DAY_COLUMN;
+            int leading = monthDetailsBounds.x + monthDetailsBounds.width;
+            calendarColumn = (leading - x) / fullBoxWidth + FIRST_DAY_COLUMN;
         }
         if (monthView.isShowingWeekNumber()) {
             calendarColumn -= 1;
         }
-        // PENDING JW: hard-coded instead of using FIRST... constants
-        return new Point(calendarColumn, calendarRow - 1);
+        return new Point(calendarColumn, calendarRow);
     }
 
+    /**
+     * Returns the Date defined by the logical 
+     * grid coordinates relative to the given month. May be null if the
+     * logical coordinates represent a header in the day grid or is outside of the
+     * given month.
+     * 
+     * Mapping logical day grid coordinates to Date.<p>
+     * 
+     * PENDING JW: relax the startOfMonth pre? Why did I require it?
+     * 
+     * @param month a calendar representing the first day of the month, must not
+     *   be null.
+     * @param row the logical row index in the day grid of the month
+     * @param column the logical column index in the day grid of the month
+     * @return the day at the logical grid coordinates in the given month or null
+     *    if the coordinates are day/week header or leading/trailing dates 
+     * @throws IllegalStateException if the month is not the start of the month. 
+     * 
+     * @see #getDayGridPosition(Date)  
+     */
+    protected Date getDayInMonth(Date month, int row, int column) {
+        if ((row == DAY_HEADER_ROW) || (column == WEEK_HEADER_COLUMN)) return null;
+        Calendar calendar = getCalendar(month);
+        int monthField = calendar.get(Calendar.MONTH);
+        if (!CalendarUtils.isStartOfMonth(calendar))
+            throw new IllegalStateException("calendar must be start of month but was: " + month.getTime());
+        CalendarUtils.startOfWeek(calendar);
+        // PENDING JW: correctly mapped now?
+        calendar.add(Calendar.DAY_OF_MONTH, 
+                (row - FIRST_WEEK_ROW) * DAYS_IN_WEEK + (column - FIRST_DAY_COLUMN));
+        if (calendar.get(Calendar.MONTH) == monthField) {
+            return calendar.getTime();
+        } 
+        return null;
+        
+    }
+    
     /**
      * Returns the given date's position in the grid of the month it is contained in.
      * 
      * @param date the Date to get the logical position for, must not be null.
      * @return the logical coordinates of the day in the grid of days in a
      *   month or null if the Date is not visible. 
+     *   
+     *  @see #getDayInMonth(Date, int, int)  
      */
     protected Point getDayGridPosition(Date date) {
         if (!isVisible(date)) return null;
@@ -1034,6 +1110,7 @@ public class BasicMonthViewUI extends MonthViewUI {
         return new Point(column, row);
     }
     
+
     /**
      * Returns the Date at the given location. May be null if the
      * coordinates don't map to a day in the month which contains the 
@@ -1045,6 +1122,8 @@ public class BasicMonthViewUI extends MonthViewUI {
      * @param y the y position of the location in pixel
      * @return the day at the given location or null if the location
      *   doesn't map to a day in the month which contains the coordinates.
+     *   
+     * @see #getDayBounds(Date)  
      */ 
     @Override
     public Date getDayAtLocation(int x, int y) {
@@ -1064,6 +1143,8 @@ public class BasicMonthViewUI extends MonthViewUI {
      * 
      * @param date the Date to return the bounds for. Must not be null.
      * @return the bounds of the given date or null if not visible.
+     * 
+     * @see #getDayAtLocation(int, int)
      */
     protected Rectangle getDayBounds(Date date) {
         if (!isVisible(date)) return null;
@@ -1079,40 +1160,6 @@ public class BasicMonthViewUI extends MonthViewUI {
         } else {
             int start = monthBounds.x + monthBounds.width - fullBoxWidth; 
             monthBounds.x = start - position.x * fullBoxWidth;
-        }
-        monthBounds.width = fullBoxWidth;
-        monthBounds.height = fullBoxHeight;
-        return monthBounds;
-    }
-    
-    /**
-     * Returns the bounds of the day box at logical coordinates in the given month.
-     * The row's range is from DAY_HEADER to WEEKS_IN_MONTH - 1. Column's range is from
-     * WEEK_HEADER to DAYS_IN_WEEK - 1.
-     * 
-     * @param month the month containing the day box  
-     * @param row the logical row (== week) coordinate in the day grid 
-     * @param column the logical column (== day) coordinate in the day grid
-     * @return the bounds of the daybox or null if not showing
-     * @throws IllegalArgumentException if row or column are out off range.
-     */
-    protected Rectangle getDayBoundsInMonth(Date month, int row, int column) {
-        checkValidRow(row, column);
-        if ((WEEK_HEADER_COLUMN == column) && !monthView.isShowingWeekNumber()) return null;
-        Rectangle monthBounds = getMonthBounds(month);
-        if (monthBounds == null) return null;
-        // PENDING JW: row + 1 relies on DAY_HEADER_ROw == -1 
-        monthBounds.y += getMonthHeaderHeight() + (row - DAY_HEADER_ROW) * fullBoxHeight;
-        if (monthView.isShowingWeekNumber()) {
-            column++;
-        }
-        // PENDING JW: doesn nothing beforte coordinate change as first == 0
-        column -= FIRST_DAY_COLUMN;
-        if (isLeftToRight) {
-           monthBounds.x += column * fullBoxWidth; 
-        } else {
-            int start = monthBounds.x + monthBounds.width - fullBoxWidth; 
-            monthBounds.x = start - column * fullBoxWidth;
         }
         monthBounds.width = fullBoxWidth;
         monthBounds.height = fullBoxHeight;
@@ -1141,42 +1188,6 @@ public class BasicMonthViewUI extends MonthViewUI {
         return true;
     }
 
-    /**
-     * Returns the Date defined by the logical 
-     * grid coordinates relative to the given month. May be null if the
-     * logical coordinates represent a header in the day grid or is outside of the
-     * given month.
-     * 
-     * Mapping logical day grid coordinates to Date.<p>
-     * 
-     * PENDING JW: relax the startOfMonth pre? Why did I require it?
-     * 
-     * @param month a calendar representing the first day of the month, must not
-     *   be null.
-     * @param row the logical row index in the day grid of the month
-     * @param column the logical column index in the day grid of the month
-     * @return the day at the logical grid coordinates in the given month or null
-     *    if the coordinates 
-     * @throws IllegalStateException if the month is not the start of the month.   
-     */
-    protected Date getDayInMonth(Date month, int row, int column) {
-        if ((row == DAY_HEADER_ROW) || (column == WEEK_HEADER_COLUMN)) return null;
-        Calendar calendar = getCalendar(month);
-        int monthField = calendar.get(Calendar.MONTH);
-        if (!CalendarUtils.isStartOfMonth(calendar))
-            throw new IllegalStateException("calendar must be start of month but was: " + month.getTime());
-        CalendarUtils.startOfWeek(calendar);
-        // PENDING JW: adjust coordinates to be independent of FIRST... (this here still assumes
-        // first == 0
-        calendar.add(Calendar.DAY_OF_MONTH, 
-                (row - FIRST_WEEK_ROW) * DAYS_IN_WEEK + (column - FIRST_DAY_COLUMN));
-        if (calendar.get(Calendar.MONTH) == monthField) {
-            return calendar.getTime();
-        } 
-        return null;
-        
-    }
-    
     
     // ------------------- mapping month parts 
  
