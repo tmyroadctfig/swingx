@@ -46,7 +46,7 @@ public class ActionIssues extends ActionTest implements Serializable {
     /**
      * core issue: 
      * set enabled via putValue leads to inconsistent state.
-     *
+     * fixed in jdk6
      */
     public void testFireEnabled() {
         Action action = new AbstractAction("dummy") {
