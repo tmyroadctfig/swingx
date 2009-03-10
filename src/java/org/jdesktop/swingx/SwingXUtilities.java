@@ -322,7 +322,37 @@ public final class SwingXUtilities {
         }
     }
 
+    /**
+     * An improved version of
+     * {@link SwingUtilities#getAncestorOfClass(Class, Component)}. This method
+     * traverses {@code JPopupMenu} invoker and uses generics to return an
+     * appropriately typed object.
+     * 
+     * @param <T>
+     *            the type of ancestor to find
+     * @param clazz
+     *            the class instance of the ancestor to find
+     * @param c
+     *            the component to start the search from
+     * @return an ancestor of the correct type or {@code null} if no such
+     *         ancestor exists. This method also returns {@code null} if any
+     *         parameter is {@code null}.
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> T getAncestor(Class<T> clazz, Component c) {
+        if (clazz == null || c == null) {
+            return null;
+        }
+        
+        Component parent = c.getParent();
 
+        while (parent != null && !(clazz.isInstance(parent))) {
+            parent = c instanceof JPopupMenu
+                    ? ((JPopupMenu) c).getInvoker() : c.getParent();
+        }
+        
+        return (T) parent;
+    }
 
     /**
      * Returns whether the component is part of the parent's

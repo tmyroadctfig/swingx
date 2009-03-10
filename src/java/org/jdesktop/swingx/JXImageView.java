@@ -24,7 +24,7 @@ package org.jdesktop.swingx;
 import org.jdesktop.swingx.color.ColorUtil;
 import org.jdesktop.swingx.error.ErrorListener;
 import org.jdesktop.swingx.error.ErrorSupport;
-import org.jdesktop.swingx.util.PaintUtils;
+import org.jdesktop.swingx.graphics.GraphicsUtilities;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -685,7 +685,7 @@ public class JXImageView extends JXPanel {
                     files = new ArrayList<File>();
                     File file = File.createTempFile(exportName,"."+exportFormat);
                     //log.fine("writing to: " + file);
-                    ImageIO.write(PaintUtils.convertToBufferedImage(img),exportFormat,file);
+                    ImageIO.write(GraphicsUtilities.convertToBufferedImage(img),exportFormat,file);
                     files.add(file);
                 }
                 //log.fine("returning: " + files);

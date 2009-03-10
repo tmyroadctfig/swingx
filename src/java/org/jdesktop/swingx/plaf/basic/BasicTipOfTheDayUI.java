@@ -58,13 +58,14 @@ import javax.swing.UIManager;
 import javax.swing.plaf.ActionMapUIResource;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.basic.BasicHTML;
+import javax.swing.text.html.HTMLDocument;
 
 import org.jdesktop.swingx.JXTipOfTheDay;
+import org.jdesktop.swingx.SwingXUtilities;
 import org.jdesktop.swingx.JXTipOfTheDay.ShowOnStartupChoice;
 import org.jdesktop.swingx.plaf.TipOfTheDayUI;
 import org.jdesktop.swingx.plaf.UIManagerExt;
 import org.jdesktop.swingx.tips.TipOfTheDayModel.Tip;
-import org.jdesktop.swingx.util.UIManagerUtils;
 
 /**
  * Base implementation of the <code>JXTipOfTheDay</code> UI.
@@ -293,7 +294,8 @@ public class BasicTipOfTheDayUI extends TipOfTheDayUI {
           JEditorPane editor = new JEditorPane("text/html", text);
           editor.setFont(tipPane.getFont());
 //          BasicHTML.updateRenderer(editor, text);
-          UIManagerUtils.htmlize(editor, tipPane.getFont());
+          SwingXUtilities.setHtmlFont(
+                  (HTMLDocument) editor.getDocument(), tipPane.getFont());
           editor.setEditable(false);
           editor.setBorder(null);
           editor.setMargin(null);

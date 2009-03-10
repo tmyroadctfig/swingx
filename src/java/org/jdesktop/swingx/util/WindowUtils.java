@@ -167,7 +167,10 @@ public final class WindowUtils {
      * assignments by hand, and also allows you to reuse the same GridBagConstraints
      * object reducing temporary object creating (at the expense of a method call.
      * Go figure).
+     * 
+     * @deprecated (pre 0.9.6) no replacement
      */
+    @Deprecated
     public static void setConstraints(GridBagConstraints gbc, int gridx,
                                       int gridy, int gridwidth, int gridheight,
                                       double weightx, double weighty,
@@ -221,15 +224,11 @@ public final class WindowUtils {
      * @param c
      *
      * @return the RootPaneContainer to which the component belongs to
+     * @deprecated (pre-0.9.6) use {@code SwingXUtilities#getAncestor(Class, Component)}.
      */
+    @Deprecated
     public static RootPaneContainer findRootPaneContainer(Component c) {
-        if (c == null) {
-            return null;
-        } else if (c instanceof RootPaneContainer) {
-            return (RootPaneContainer) c;
-        } else {
-            return findRootPaneContainer(c.getParent());
-        }
+        return SwingXUtilities.getAncestor(RootPaneContainer.class, c);
     }
 
     /**
@@ -238,15 +237,11 @@ public final class WindowUtils {
      * @param c
      *
      * @return the JFrame to which the component belongs to
+     * @deprecated (pre-0.9.6) use {@code SwingXUtilities#getAncestor(Class, Component)}.
      */
+    @Deprecated
     public static JFrame findJFrame(Component c) {
-        if (c == null) {
-            return null;
-        } else if (c instanceof RootPaneContainer) {
-            return (JFrame) c;
-        } else {
-            return findJFrame(c.getParent());
-        }
+        return SwingXUtilities.getAncestor(JFrame.class, c);
     }
 
     /**
@@ -255,15 +250,11 @@ public final class WindowUtils {
      * @param c
      *
      * @return the JDialog to which the component belongs to
+     * @deprecated (pre-0.9.6) use {@code SwingXUtilities#getAncestor(Class, Component)}.
      */
+    @Deprecated
     public static JDialog findJDialog(Component c) {
-        if (c == null) {
-            return null;
-        } else if (c instanceof JDialog) {
-            return (JDialog) c;
-        } else {
-            return findJDialog(c.getParent());
-        }
+        return SwingXUtilities.getAncestor(JDialog.class, c);
     }
 
     public static Window findWindow(Component c) {

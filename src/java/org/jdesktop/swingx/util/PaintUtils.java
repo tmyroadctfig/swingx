@@ -36,7 +36,6 @@ import java.awt.Image;
 import java.awt.Paint;
 import java.awt.Rectangle;
 import java.awt.Shape;
-import java.awt.geom.Area;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
@@ -47,7 +46,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
 
-import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -227,15 +225,23 @@ public class PaintUtils {
                 screenDevice.getDefaultConfiguration();
         return configuration.createCompatibleImage(width, height);
     }
-    
+
     /**
-     * @param width         the width of the new BufferedImage
-     * @param height        the height of the new BufferedImage
-     * @param transparency  one of the values in the Transparency interface
-     *
-     * @return Creates and returns a BufferedImage that is "compatible" with this machines
-     *         video card and subsystem with the given Transparency.
+     * @param width
+     *            the width of the new BufferedImage
+     * @param height
+     *            the height of the new BufferedImage
+     * @param transparency
+     *            one of the values in the Transparency interface
+     * 
+     * @return Creates and returns a BufferedImage that is "compatible" with
+     *         this machines video card and subsystem with the given
+     *         Transparency.
+     * @deprecated (pre-0.9.6) use
+     *             {@link GraphicsUtilities#createCompatibleImage(int, int)} or
+     *             {@link GraphicsUtilities#createCompatibleTranslucentImage(int, int)}
      */
+    @Deprecated
     public static BufferedImage createCompatibleImage(int width, int height,
             int transparency) {
         GraphicsEnvironment environment =
@@ -246,18 +252,11 @@ public class PaintUtils {
         return configuration.createCompatibleImage(width, height, transparency);
     }
     
+    /**
+     * @deprecated Use {@link GraphicsUtilities#convertToBufferedImage(Image)} instead
+     */
     public static BufferedImage convertToBufferedImage(Image img) {
-        BufferedImage buff = GraphicsUtilities
-                .createCompatibleImage(img.getWidth(null),img.getHeight(null));
-        Graphics2D g2 = buff.createGraphics();
-        
-        try {
-            g2.drawImage(img, 0, 0, null);
-        } finally {
-            g2.dispose();
-        }
-        
-        return buff;
+        return GraphicsUtilities.convertToBufferedImage(img);
     }
     
     /**
@@ -269,15 +268,14 @@ public class PaintUtils {
      */
     @Deprecated
     public static BufferedImage loadCompatibleImage(URL resource) throws IOException {
-        BufferedImage image = ImageIO.read(resource);
-        if(image == null) return null;
-        return GraphicsUtilities.toCompatibleImage(image);
+        return GraphicsUtilities.loadCompatibleImage(resource);
     }
     
+    /**
+     * @deprecated Use {@link GraphicsUtilities#loadCompatibleImage(InputStream)} instead
+     */
     public static BufferedImage loadCompatibleImage(InputStream in) throws IOException {
-        BufferedImage image = ImageIO.read(in);
-        if(image == null) return null;
-        return GraphicsUtilities.toCompatibleImage(image);
+        return GraphicsUtilities.loadCompatibleImage(in);
     }
     
     /**
@@ -289,21 +287,15 @@ public class PaintUtils {
     }
     
     
-    /** Sets then clip on a graphics object by merging with the existing
+    /** Sets the clip on a graphics object by merging with the existing
      * clip instead of replacing it. The new clip will be an intersection of
      * the old clip and the passed in clip shape.   The old clip shape will
      * be returned
+     * @deprecated (pre-0.9.6) Use {@link GraphicsUtilities#mergeClip(Graphics,Shape)} instead
      */
-    public static Shape setMergedClip(Graphics2D g, Shape newClip) {
-        Shape oldClip = g.getClip();
-        if(oldClip == null) {
-            g.setClip(newClip);
-            return null;
-        }
-        Area area = new Area(oldClip);
-        area.intersect(new Area(newClip));//new Rectangle(0,0,width,height)));
-        g.setClip(area);
-        return oldClip;
+    @Deprecated
+    public static Shape setMergedClip(Graphics g, Shape newClip) {
+        return GraphicsUtilities.mergeClip(g, newClip);
     }
     
     
