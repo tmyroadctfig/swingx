@@ -47,8 +47,9 @@ import javax.swing.border.EmptyBorder;
  * 
  * Similarl to a ComponentAdapter, the properties are a super-set of those for 
  * a concrete component type. It's up to sub-classes (once the generics will be removed, until
- * then the DefaultXXRenderers) fill any reasonable defaults for those not applicable
- * to the specific component context.
+ * then the DefaultXXRenderers - PENDING JW: undecided - even after the generics removal, the
+ * param list in the subclasses are the same) fill any reasonable 
+ * defaults for those not applicable to the specific component context.
  * 
  * With those raw properties given, a CellContext looks up and returns dependent visual
  * properties as appropriate for the concrete component. Typically, they are taken
@@ -125,25 +126,6 @@ public class CellContext implements Serializable {
 
     // --------------------------- install context
 
-//    /**
-//     * Sets state of the cell's context. Note that the component might be null
-//     * to indicate a cell without a concrete context. All accessors must cope
-//     * with.
-//     * 
-//     * @param component the component the cell resides on, might be null
-//     * @param value the content value of the cell
-//     * @param row the cell's row index in view coordinates
-//     * @param column the cell's column index in view coordinates
-//     * @param selected the cell's selected state
-//     * @param focused the cell's focused state
-//     * @param expanded the cell's expanded state
-//     * @param leaf the cell's leaf state
-//     */
-//    public void installContext(JComponent component, Object value, int row, int column,
-//            boolean selected, boolean focused, boolean expanded, boolean leaf) {
-//        this.component = component;
-//        installState(value, row, column, selected, focused, expanded, leaf);
-//    }
 
     /**
      * Sets the state of the cell's context. Convenience method for subclasses. 
@@ -167,18 +149,26 @@ public class CellContext implements Serializable {
         this.leaf = leaf;
     }
 
+    /**
+     * Replaces the value of this cell context with the given parameter and returns 
+     * the replaced value.
+     * 
+     * @param value the new value of the cell context
+     * @return the replaced value of the cell context
+     */
     public Object replaceValue(Object value) {
         Object old = getValue();
         this.value = value;
         return old;
     }
+    
     // -------------------- accessors of installed state
 
     /**
      * Returns the component the cell resides on, may be null. Subclasses are
-     * expected to override with componentType they are handling.
+     * expected to override and return the component type they are handling.
      * 
-     * @return the component the cell resides on.
+     * @return the component the cell resides on, may be null.
      */
     public JComponent getComponent() {
         return component;
