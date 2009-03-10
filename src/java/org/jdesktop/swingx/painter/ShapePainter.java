@@ -45,7 +45,7 @@ import java.awt.geom.Ellipse2D;
  * </code></pre>
  * @author rbair
  */
-public class ShapePainter<T> extends AbstractAreaPainter<T> {
+public class ShapePainter extends AbstractAreaPainter<Object> {
     /**
      * The Shape to fillPaint. If null, nothing is painted.
      */
@@ -129,7 +129,7 @@ public class ShapePainter<T> extends AbstractAreaPainter<T> {
     /**
      * {@inheritDoc}
      */
-    protected void doPaint(Graphics2D g, T component, int w, int h) {
+    protected void doPaint(Graphics2D g, Object component, int w, int h) {
         //set the stroke if it is not null
         Stroke s = new BasicStroke(this.getBorderWidth());
         g.setStroke(s);
@@ -163,22 +163,22 @@ public class ShapePainter<T> extends AbstractAreaPainter<T> {
     }
     }
     
-    private void drawShape(Graphics2D g, Shape shape, T component, int w, int h) {
+    private void drawShape(Graphics2D g, Shape shape, Object component, int w, int h) {
         g.setPaint(calculateStrokePaint(component, w, h));
         g.draw(shape);
     }
     
-    private void fillShape(Graphics2D g, Shape shape, T component, int w, int h) {
+    private void fillShape(Graphics2D g, Shape shape, Object component, int w, int h) {
         g.setPaint(calculateFillPaint(component, w, h));
         g.fill(shape);
     }
     
     // shape effect stuff
-    public Shape provideShape(Graphics2D g, T comp, int width, int height) {
+    protected Shape provideShape(Graphics2D g, Object comp, int width, int height) {
         return getShape();
     }
     
-    private Paint calculateStrokePaint(T component, int width, int height) {
+    private Paint calculateStrokePaint(Object component, int width, int height) {
         Paint p = getBorderPaint();
         if (p == null) {
             if(component instanceof JComponent) {
@@ -191,7 +191,7 @@ public class ShapePainter<T> extends AbstractAreaPainter<T> {
         return p;
     }
     
-    private Paint calculateFillPaint(T component, int width, int height) {
+    private Paint calculateFillPaint(Object component, int width, int height) {
         //set the fillPaint
         Paint p = getFillPaint();
         if(isPaintStretched()) {

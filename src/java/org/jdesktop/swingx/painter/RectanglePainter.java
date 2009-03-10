@@ -32,8 +32,8 @@ import java.awt.geom.Rectangle2D;
 import java.awt.geom.RectangularShape;
 import java.awt.geom.RoundRectangle2D;
 
+import org.jdesktop.swingx.graphics.GraphicsUtilities;
 import org.jdesktop.swingx.painter.effects.AreaEffect;
-import org.jdesktop.swingx.util.PaintUtils;
 
 
 
@@ -227,7 +227,7 @@ public class RectanglePainter<T> extends AbstractAreaPainter<T> {
         // background
         // border
         // leave the clip to support masking other painters
-        PaintUtils.setMergedClip(g,shape);
+        GraphicsUtilities.mergeClip(g,shape);
         /*
         Area area = new Area(g.getClip());
         area.intersect(new Area(shape));//new Rectangle(0,0,width,height)));

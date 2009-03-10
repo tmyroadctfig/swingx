@@ -145,7 +145,7 @@ public final class AnimatedRendererDemo {
     private PainterHighlighter getRangeHighlighter(String gifName, int start,
             int end) {
         HighlightPredicate meritPredicate = getRangePredicate(start, end);
-        Painter<Component> bronze = getImagePainter(gifName);
+        Painter<? super Component> bronze = getImagePainter(gifName);
         PainterHighlighter painterHighlighter = new PainterHighlighter(meritPredicate, 
                 new RelativePainter<Component>(bronze));
         return painterHighlighter;
@@ -210,8 +210,8 @@ public final class AnimatedRendererDemo {
      * @param string
      * @return
      */
-    private Painter<Component> getImagePainter(String string) {
-        ImagePainter<Component> imagePainter = null;
+    private Painter<? super Component> getImagePainter(String string) {
+        ImagePainter imagePainter = null;
         BufferedImage image = null;
         try {
             image = ImageIO.read(getClass()
@@ -231,7 +231,7 @@ public final class AnimatedRendererDemo {
                 g.dispose();
             }
             
-            imagePainter = new ImagePainter<Component>(mod);
+            imagePainter = new ImagePainter(mod);
             imagePainter.setHorizontalAlignment(HorizontalAlignment.RIGHT);
         } catch (IOException e) {
             // TODO Auto-generated catch block
@@ -379,7 +379,7 @@ public final class AnimatedRendererDemo {
     
     public static class RelativePainter<T> extends AbstractLayoutPainter<T> {
 
-        private Painter<T> painter;
+        private Painter<? super T> painter;
         private double xFactor;
         private double yFactor;
 
@@ -387,18 +387,18 @@ public final class AnimatedRendererDemo {
             this(null);
         }
         
-        public RelativePainter(Painter<T> delegate) {
+        public RelativePainter(Painter<? super T> delegate) {
             setPainter(delegate);
         }
         
         
-        public void setPainter(Painter<T> painter) {
+        public void setPainter(Painter<? super T> painter) {
             Object old = getPainter();
             this.painter = painter;
             firePropertyChange("painter", old, getPainter());
         }
         
-        public Painter<T> getPainter() {
+        public Painter<? super T> getPainter() {
             return painter;
         }
         public void setXFactor(double xPercent) {

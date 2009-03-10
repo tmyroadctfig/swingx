@@ -56,7 +56,7 @@ import javax.swing.JComponent;
  * 
  * @author rbair
  */
-public class CheckerboardPainter<T> extends AbstractPainter<T> {
+public class CheckerboardPainter extends AbstractPainter<Object> {
     private transient Paint checkerPaint;
     
     private Paint darkPaint = new Color(204, 204, 204);
@@ -176,7 +176,7 @@ public class CheckerboardPainter<T> extends AbstractPainter<T> {
      * sizes and light and dark Paints in one TexturePaint. I may want to cache
      * this value in the future for performance reasons
      */
-    private Paint getCheckerPaint(T c) {
+    private Paint getCheckerPaint(Object c) {
         if (checkerPaint == null) {
             double sqlength = getSquareSize();
             int length = (int)(sqlength * 2);
@@ -210,10 +210,10 @@ public class CheckerboardPainter<T> extends AbstractPainter<T> {
     }
     
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     @Override
-    protected void doPaint(Graphics2D g, T t, int width, int height) {
+    protected void doPaint(Graphics2D g, Object t, int width, int height) {
         g.setPaint(getCheckerPaint(t));
         g.fillRect(0, 0, width, height);
     }

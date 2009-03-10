@@ -47,7 +47,7 @@ import java.awt.Shape;
  * <p>If no paint is specified, then nothing is painted</p>
  * @author rbair
  */
-public class MattePainter<T> extends AbstractAreaPainter<T> {
+public class MattePainter extends AbstractAreaPainter<Object> {
     
     /**
      * Creates a new MattePainter with "null" as the paint used
@@ -84,7 +84,7 @@ public class MattePainter<T> extends AbstractAreaPainter<T> {
     /**
      * {@inheritDoc}
      */
-    protected void doPaint(Graphics2D g, T component, int width, int height) {
+    protected void doPaint(Graphics2D g, Object component, int width, int height) {
         Paint p = getFillPaint();
         if (p != null) {
             if(isPaintStretched()) {
@@ -95,7 +95,7 @@ public class MattePainter<T> extends AbstractAreaPainter<T> {
         }
     }
 
-    public Shape provideShape(Graphics2D g, T comp, int width, int height) {
+    public Shape provideShape(Graphics2D g, Object comp, int width, int height) {
         return new Rectangle(0,0,width,height);
     }
     

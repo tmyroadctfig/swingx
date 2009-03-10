@@ -115,7 +115,7 @@ public class JXLoginPaneVisualCheck extends InteractiveTestCase {
      */
     public void interactiveSetBackground() {
         JXLoginPane panel = new JXLoginPane();
-        panel.setBackgroundPainter(new MattePainter<Object>(Color.RED, true));
+        panel.setBackgroundPainter(new MattePainter(Color.RED, true));
         JFrame frame = JXLoginPane.showLoginFrame(panel);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setJMenuBar(createAndFillMenuBar(panel));
@@ -196,7 +196,7 @@ public class JXLoginPaneVisualCheck extends InteractiveTestCase {
         panel.setErrorMessage("TO TO TO TO TO TO TO TO TO TO TO TO TO TO TO TO TO TO TO TO TO TO Unexpected resize on long exception message. Unexpected resize on long exception message.");
 
         panel.setSaveMode(SaveMode.BOTH);
-        frame.getContentPane().setBackgroundPainter(new MattePainter<Object>(
+        frame.getContentPane().setBackgroundPainter(new MattePainter(
                 new GradientPaint(0, 0, Color.BLUE, 1, 0, Color.YELLOW), true));
 
         frame.pack();
