@@ -75,7 +75,7 @@ import javax.swing.ListCellRenderer;
 public class DefaultListRenderer extends AbstractRenderer
     implements ListCellRenderer {
 
-    protected CellContext<JList> cellContext;
+    protected ListCellContext cellContext;
 
     /**
      * Instantiates a default list renderer with the default component

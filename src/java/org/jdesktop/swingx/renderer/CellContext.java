@@ -31,7 +31,7 @@ import javax.swing.border.EmptyBorder;
 
 /**
  * Encapsulates a snapshop of cell content and default display context 
- * for usage by a ComponentProvider.
+ * for usage by a <code>ComponentProvider</code>.
  * <p>
  * 
  * One part is the super-set of properties that's traditionally passed into the 
@@ -81,7 +81,7 @@ import javax.swing.border.EmptyBorder;
  * 
  * @author Jeanette Winzenburg
  */
-public class CellContext<T extends JComponent> implements Serializable {
+public class CellContext implements Serializable {
 
     /** the default border for unfocused cells. */
     protected static Border noFocusBorder = new EmptyBorder(1, 1, 1, 1);
@@ -106,7 +106,7 @@ public class CellContext<T extends JComponent> implements Serializable {
     }
 
     /** PENDING JW: maybe make this a WeakReference? Would be a more robust fix for Issue #1040-swingx. */
-    protected transient T component;
+    protected transient JComponent component;
 
     /** PENDING JW: maybe make this a WeakReference? Would be a more robust fix for Issue #1040-swingx. */
     protected transient Object value;
@@ -125,12 +125,29 @@ public class CellContext<T extends JComponent> implements Serializable {
 
     // --------------------------- install context
 
+//    /**
+//     * Sets state of the cell's context. Note that the component might be null
+//     * to indicate a cell without a concrete context. All accessors must cope
+//     * with.
+//     * 
+//     * @param component the component the cell resides on, might be null
+//     * @param value the content value of the cell
+//     * @param row the cell's row index in view coordinates
+//     * @param column the cell's column index in view coordinates
+//     * @param selected the cell's selected state
+//     * @param focused the cell's focused state
+//     * @param expanded the cell's expanded state
+//     * @param leaf the cell's leaf state
+//     */
+//    public void installContext(JComponent component, Object value, int row, int column,
+//            boolean selected, boolean focused, boolean expanded, boolean leaf) {
+//        this.component = component;
+//        installState(value, row, column, selected, focused, expanded, leaf);
+//    }
+
     /**
-     * Sets state of the cell's context. Note that the component might be null
-     * to indicate a cell without a concrete context. All accessors must cope
-     * with.
+     * Sets the state of the cell's context. Convenience method for subclasses. 
      * 
-     * @param component the component the cell resides on, might be null
      * @param value the content value of the cell
      * @param row the cell's row index in view coordinates
      * @param column the cell's column index in view coordinates
@@ -139,9 +156,8 @@ public class CellContext<T extends JComponent> implements Serializable {
      * @param expanded the cell's expanded state
      * @param leaf the cell's leaf state
      */
-    public void installContext(T component, Object value, int row, int column,
+    protected void installState(Object value, int row, int column,
             boolean selected, boolean focused, boolean expanded, boolean leaf) {
-        this.component = component;
         this.value = value;
         this.row = row;
         this.column = column;
@@ -159,11 +175,12 @@ public class CellContext<T extends JComponent> implements Serializable {
     // -------------------- accessors of installed state
 
     /**
-     * Returns the component the cell resides on, may be null.
+     * Returns the component the cell resides on, may be null. Subclasses are
+     * expected to override with componentType they are handling.
      * 
      * @return the component the cell resides on.
      */
-    public T getComponent() {
+    public JComponent getComponent() {
         return component;
     }
 

@@ -67,7 +67,7 @@ import javax.swing.table.TableCellRenderer;
 public class DefaultTableRenderer extends AbstractRenderer
         implements TableCellRenderer {
 
-    private CellContext<JTable> cellContext;
+    private TableCellContext cellContext;
     
     
     /**

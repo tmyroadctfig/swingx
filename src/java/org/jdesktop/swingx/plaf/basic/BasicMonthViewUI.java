@@ -678,7 +678,7 @@ public class BasicMonthViewUI extends MonthViewUI {
          * @return a component configured for rendering the given cell
          */
         public JComponent prepareRenderingComponent(JXMonthView monthView, Calendar calendar, CalendarState dayState) {
-            cellContext.installMonthContext(monthView, calendar, 
+            cellContext.installContext(monthView, calendar, 
                     isSelected(monthView, calendar, dayState), 
                     isFocused(monthView, calendar, dayState),
                     dayState);

@@ -39,7 +39,7 @@ import javax.swing.tree.TreeCellRenderer;
 public class DefaultTreeRenderer extends AbstractRenderer
         implements TreeCellRenderer {
 
-    private CellContext<JTree> cellContext;
+    private TreeCellContext cellContext;
     
     /**
      * Instantiates a default tree renderer with the default component

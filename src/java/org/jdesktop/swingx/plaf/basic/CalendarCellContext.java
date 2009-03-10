@@ -39,7 +39,7 @@ import org.jdesktop.swingx.renderer.CellContext;
  * 
  * @author Jeanette Winzenburg
  */
-class CalendarCellContext extends CellContext<JXMonthView> {
+class CalendarCellContext extends CellContext {
 
     /**
      * The padding for month traversal icons.
@@ -55,13 +55,19 @@ class CalendarCellContext extends CellContext<JXMonthView> {
 
     private CalendarState dayState;
 
-    public void installMonthContext(JXMonthView component, Calendar value, 
-            boolean selected, boolean focused,
-             CalendarState dayState) {
-        super.installContext(component, value, -1, -1, selected, focused,
-                true, true);
+    public void installContext(JXMonthView component, Calendar value,
+            boolean selected, boolean focused, CalendarState dayState) {
+        this.component = component;
         this.dayState = dayState;
+        installState(value, -1, -1, selected, focused, true, true);
     }
+
+    
+    @Override
+    public JXMonthView getComponent() {
+        return (JXMonthView) super.getComponent();
+    }
+
 
     public CalendarState getCalendarState() {
         return dayState;
