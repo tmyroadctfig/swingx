@@ -37,6 +37,7 @@ import javax.swing.JComponent;
 import javax.swing.JPopupMenu;
 import javax.swing.KeyStroke;
 import javax.swing.MenuElement;
+import javax.swing.RepaintManager;
 import javax.swing.SwingUtilities;
 import javax.swing.plaf.ComponentInputMapUIResource;
 import javax.swing.text.html.HTMLDocument;
@@ -378,5 +379,30 @@ public final class SwingXUtilities {
             focusOwner = focusOwner.getParent();
         }
         return false;
+    }
+
+    /**
+     * Obtains a {@code TranslucentRepaintManager} from the specified manager.
+     * If the current manager is a {@code TranslucentRepaintManager} or a
+     * {@code ForwardingRepaintManager} that contains a {@code
+     * TranslucentRepaintManager}, then the passed in manager is returned.
+     * Otherwise a new repaint manager is created and returned.
+     * 
+     * @param delegate
+     *            the current repaint manager
+     * @return a non-{@code null} {@code TranslucentRepaintManager}
+     */
+    static RepaintManager getTranslucentRepaintManager(RepaintManager delegate) {
+        RepaintManager manager = delegate;
+        
+        while (!manager.getClass().isAnnotationPresent(TranslucentRepaintManager.class)) {
+            if (manager instanceof ForwardingRepaintManager) {
+                manager = ((ForwardingRepaintManager) manager).getDelegateManager();
+            } else {
+                manager = new RepaintManagerX(delegate);
+            }
+        }
+        
+        return manager;
     }
 }

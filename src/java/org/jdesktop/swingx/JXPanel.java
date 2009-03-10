@@ -37,9 +37,7 @@ import javax.swing.RepaintManager;
 import javax.swing.Scrollable;
 import javax.swing.plaf.UIResource;
 
-import org.jdesktop.swingx.painter.MattePainter;
 import org.jdesktop.swingx.painter.Painter;
-import org.jdesktop.swingx.plaf.PainterUIResource;
 
 /**
  * A simple JPanel extension that adds translucency support.
@@ -128,10 +126,10 @@ public class JXPanel extends JPanel implements Scrollable {
                     oldOpaque = isOpaque();
                     setOpaque(false);
                 }
+                
                 RepaintManager manager = RepaintManager.currentManager(this);
-                if (!manager.getClass().isAnnotationPresent(TranslucentRepaintManager.class)) {
-                    RepaintManager.setCurrentManager(new RepaintManagerX());
-                }
+                RepaintManager trm = SwingXUtilities.getTranslucentRepaintManager(manager);
+                RepaintManager.setCurrentManager(trm);
             } else if (alpha == 1) {
                 //restore the oldOpaque if it was true (since opaque is false now)
                 if (oldOpaque) {

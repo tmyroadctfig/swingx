@@ -38,7 +38,26 @@ import javax.swing.RepaintManager;
  * @author rbair
  */
 @TranslucentRepaintManager
-public class RepaintManagerX extends RepaintManager {
+public class RepaintManagerX extends ForwardingRepaintManager {
+    /**
+     * @param delegate
+     */
+    public RepaintManagerX(RepaintManager delegate) {
+        super(delegate);
+    }
+
+    /** 
+     * Add a component in the list of components that should be refreshed.
+     * If <i>c</i> already has a dirty region, the rectangle <i>(x,y,w,h)</i> 
+     * will be unioned with the region that should be redrawn. 
+     * 
+     * @param c Component to repaint, null results in nothing happening.
+     * @param x X coordinate of the region to repaint
+     * @param y Y coordinate of the region to repaint
+     * @param w Width of the region to repaint
+     * @param h Height of the region to repaint
+     * @see JComponent#repaint
+     */
     public void addDirtyRegion(JComponent c, int x, int y, int w, int h) {
         Rectangle dirtyRegion = getDirtyRegion(c);
         if (dirtyRegion.width == 0 && dirtyRegion.height == 0) {
