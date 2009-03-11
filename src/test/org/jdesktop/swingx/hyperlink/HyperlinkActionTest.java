@@ -2,7 +2,7 @@
  * Created on 28.03.2006
  *
  */
-package org.jdesktop.swingx.action;
+package org.jdesktop.swingx.hyperlink;
 
 import java.awt.event.ActionEvent;
 
@@ -24,7 +24,7 @@ import org.junit.After;
  * @author Jeanette Winzenburg, Berlin
  */
 @RunWith(JUnit4.class)
-public class LinkActionTest extends TestCase {
+public class HyperlinkActionTest extends TestCase {
 
     
     private PropertyChangeReport report;
