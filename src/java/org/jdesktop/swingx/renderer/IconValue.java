@@ -67,20 +67,6 @@ public interface IconValue extends Serializable {
      */
     public final static Icon NULL_ICON = new EmptyIcon();
     
-    /**
-     * Returns the value as Icon if possible or null.
-     * @deprecated pre-0.9.5 Use {@link IconValues#ICON} instead
-     */
-    @Deprecated
-    public static final IconValue ICON = IconValues.ICON;
-    
-    /**
-     * Always NULL_ICON. This is useful to indicate that we really want
-     * no icon instead of f.i. a default provided by the CellContext. 
-     * @deprecated pre-0.9.5 Use {@link IconValues#NONE} instead
-     */
-    @Deprecated
-    public static final IconValue NONE = IconValues.NONE;
     
     /**
      * Returns a icon representation of the given value.
