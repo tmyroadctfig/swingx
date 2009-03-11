@@ -45,21 +45,6 @@ import java.text.Format;
  * @author Jeanette Winzenburg
  */
 public class FormatStringValue implements StringValue {
-    /**
-     * Default converter for <code>Date</code> types. Uses the default format
-     * as returned from <code>DateFormat</code>.
-     * @deprecated pre-0.9.5 Use {@link StringValues#DATE_TO_STRING} instead
-     */
-    @Deprecated
-    public final static FormatStringValue DATE_TO_STRING = StringValues.DATE_TO_STRING;
-    
-    /**
-     * Default converter for <code>Number</code> types. Uses the default format
-     * as returned from <code>NumberFormat</code>.
-     * @deprecated pre-0.9.5 Use {@link StringValues#NUMBER_TO_STRING} instead
-     */
-    @Deprecated
-    public final static FormatStringValue NUMBER_TO_STRING = StringValues.NUMBER_TO_STRING;
 
     /** the format used in creating the String representation. */
     protected Format format;

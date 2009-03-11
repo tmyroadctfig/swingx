@@ -23,14 +23,11 @@ package org.jdesktop.swingx.renderer;
 
 import java.io.File;
 
+import junit.framework.TestCase;
+
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.junit.Test;
-import org.junit.Before;
-import org.junit.After;
-
-
-import junit.framework.TestCase;
 
 /**
  *
@@ -42,11 +39,13 @@ public class StringValuesTest extends TestCase {
     public void testFileNameWithNonFile() {
         Object o = new Object();
         
-        assertEquals(StringValues.EMPTY.getString(o),
+        assertEquals(StringValues.TO_STRING.getString(o),
                 StringValues.FILE_NAME.getString(o));
     }
     
     //not asserting the output of file name just that it isn't empty
+    // PENDING JW: don't quite understand what we are testing here - need to update to 
+    // TO_STRING as of fixing #972?
     @Test
     public void testFileNameWithFile() throws Exception {
         File f = File.createTempFile("svt", "tmp");
@@ -60,7 +59,7 @@ public class StringValuesTest extends TestCase {
     public void testFileTypeWithNonFile() {
         Object o = new Object();
         
-        assertEquals(StringValues.EMPTY.getString(o),
+        assertEquals(StringValues.TO_STRING.getString(o),
                 StringValues.FILE_TYPE.getString(o));
     }
     
