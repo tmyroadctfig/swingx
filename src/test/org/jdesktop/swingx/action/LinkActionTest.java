@@ -10,7 +10,7 @@ import javax.swing.Action;
 
 import junit.framework.TestCase;
 
-import org.jdesktop.swingx.hyperlink.LinkAction;
+import org.jdesktop.swingx.hyperlink.AbstractHyperlinkAction;
 import org.jdesktop.test.PropertyChangeReport;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -48,7 +48,7 @@ public class LinkActionTest extends TestCase {
     public void testConstructorsAndCustomTargetInstall() {
         Object target = new Object();
         final boolean visitedIsTrue = true;
-        LinkAction linkAction = new LinkAction<Object>(target) {
+        AbstractHyperlinkAction linkAction = new AbstractHyperlinkAction<Object>(target) {
 
             public void actionPerformed(ActionEvent e) {
                 // TODO Auto-generated method stub
@@ -74,7 +74,7 @@ public class LinkActionTest extends TestCase {
     @Test
     public void testConstructors() {
         Object target = new Object();
-        LinkAction<Object> linkAction = new LinkAction<Object>(target) {
+        AbstractHyperlinkAction<Object> linkAction = new AbstractHyperlinkAction<Object>(target) {
 
             public void actionPerformed(ActionEvent e) {
                 // TODO Auto-generated method stub
@@ -91,7 +91,7 @@ public class LinkActionTest extends TestCase {
      */
     @Test
     public void testLinkAction() {
-       LinkAction<Object> linkAction = new LinkAction<Object>(null) {
+       AbstractHyperlinkAction<Object> linkAction = new AbstractHyperlinkAction<Object>(null) {
 
         public void actionPerformed(ActionEvent e) {
             // TODO Auto-generated method stub
@@ -105,7 +105,7 @@ public class LinkActionTest extends TestCase {
        assertFalse(visited);
        linkAction.setVisited(!visited);
        assertEquals(!visited, linkAction.isVisited());
-       assertEquals(1, report.getEventCount(LinkAction.VISITED_KEY));
+       assertEquals(1, report.getEventCount(AbstractHyperlinkAction.VISITED_KEY));
        
        report.clear();
        // testing target property
@@ -118,7 +118,7 @@ public class LinkActionTest extends TestCase {
        assertEquals(target.toString(), linkAction.getName());
        assertFalse(linkAction.isVisited());
        assertEquals(1, report.getEventCount(Action.NAME));
-       assertEquals(1, report.getEventCount(LinkAction.VISITED_KEY));
+       assertEquals(1, report.getEventCount(AbstractHyperlinkAction.VISITED_KEY));
        // fired the expected events only.
        assertEquals(3, report.getEventCount());
     }

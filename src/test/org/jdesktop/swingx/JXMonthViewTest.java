@@ -46,7 +46,7 @@ import org.jdesktop.swingx.calendar.DaySelectionModel;
 import org.jdesktop.swingx.calendar.DateSelectionModel.SelectionMode;
 import org.jdesktop.swingx.event.DateSelectionListener;
 import org.jdesktop.swingx.event.DateSelectionEvent.EventType;
-import org.jdesktop.swingx.hyperlink.LinkAction;
+import org.jdesktop.swingx.hyperlink.AbstractHyperlinkAction;
 import org.jdesktop.swingx.test.DateSelectionReport;
 import org.jdesktop.test.ActionReport;
 import org.jdesktop.test.PropertyChangeReport;
@@ -124,7 +124,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
     @Test
     public void testZoomableNameOnMonthChange() {
         JXMonthView monthView = new JXMonthView();
-        LinkAction<?> action = (LinkAction<?>) monthView.getActionMap().get("zoomOut");
+        AbstractHyperlinkAction<?> action = (AbstractHyperlinkAction<?>) monthView.getActionMap().get("zoomOut");
         assertSame(monthView, action.getTarget());
         String[] monthNames = new DateFormatSymbols(monthView.getLocale()).getMonths();
         Calendar calendar = monthView.getCalendar();
@@ -145,7 +145,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
     @Test
     public void testZoomableNameOnLocaleChange() {
         JXMonthView monthView = new JXMonthView();
-        LinkAction<?> action = (LinkAction<?>) monthView.getActionMap().get("zoomOut");
+        AbstractHyperlinkAction<?> action = (AbstractHyperlinkAction<?>) monthView.getActionMap().get("zoomOut");
         assertSame(monthView, action.getTarget());
         Locale locale = Locale.FRENCH;
         if (locale.equals(monthView.getLocale())) {

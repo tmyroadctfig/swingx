@@ -30,7 +30,7 @@ import javax.swing.table.TableModel;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
 import org.jdesktop.swingx.decorator.SortOrder;
 import org.jdesktop.swingx.hyperlink.EditorPaneLinkVisitor;
-import org.jdesktop.swingx.hyperlink.LinkAction;
+import org.jdesktop.swingx.hyperlink.AbstractHyperlinkAction;
 import org.jdesktop.swingx.hyperlink.LinkModel;
 import org.jdesktop.swingx.hyperlink.LinkModelAction;
 import org.jdesktop.swingx.renderer.DefaultListRenderer;
@@ -125,11 +125,11 @@ public class JXHyperlinkVisualCheck extends InteractiveTestCase {
         JXHyperlink noActionHyperlink = new JXHyperlink();
         noActionHyperlink.setText("have no action - auto-click");
         box.add(noActionHyperlink);
-        LinkAction doNothingAction = createEmptyLinkAction("have do nothing action - follow action");
+        AbstractHyperlinkAction doNothingAction = createEmptyLinkAction("have do nothing action - follow action");
         JXHyperlink doNothingActionHyperlink = new JXHyperlink(doNothingAction);
         box.add(doNothingActionHyperlink);
         
-        LinkAction doNothingAction2 = createEmptyLinkAction("have do nothing action - overrule");
+        AbstractHyperlinkAction doNothingAction2 = createEmptyLinkAction("have do nothing action - overrule");
         JXHyperlink overruleActionHyperlink = new JXHyperlink(doNothingAction2);
         overruleActionHyperlink.setOverrulesActionOnClick(true);
         box.add(overruleActionHyperlink);
@@ -179,7 +179,7 @@ public class JXHyperlinkVisualCheck extends InteractiveTestCase {
 
 //---------------------- interactive test: JXTree
     public void interactiveTreeLinkRendererSimpleText() {
-        LinkAction simpleAction = new LinkAction<Object>(null) {
+        AbstractHyperlinkAction simpleAction = new AbstractHyperlinkAction<Object>(null) {
 
             public void actionPerformed(ActionEvent e) {
                 LOG.info("hit: " + getTarget());
@@ -245,7 +245,7 @@ public class JXHyperlinkVisualCheck extends InteractiveTestCase {
         // table.setDefaultEditor(LinkModel.class, new LinkRenderer(action2, LinkModel.class));
 
         // simple activatable action on the target in the first column
-        LinkAction simpleAction = new LinkAction<Object>(null) {
+        AbstractHyperlinkAction simpleAction = new AbstractHyperlinkAction<Object>(null) {
             
             public void actionPerformed(ActionEvent e) {
                 LOG.info("hit: " + getTarget());
@@ -299,7 +299,7 @@ public class JXHyperlinkVisualCheck extends InteractiveTestCase {
      * Custom link target action in JXList.
      */
     public void interactiveListHyperlikPlayer() {
-        LinkAction<Player> linkAction = new LinkAction<Player>() {
+        AbstractHyperlinkAction<Player> linkAction = new AbstractHyperlinkAction<Player>() {
 
             public void actionPerformed(ActionEvent e) {
                 LOG.info("hit: " + getTarget());
@@ -352,7 +352,7 @@ public class JXHyperlinkVisualCheck extends InteractiveTestCase {
      *
      */
     public void interactiveListHyperlinkSimpleText() {
-        LinkAction linkAction = new LinkAction<Object>(null) {
+        AbstractHyperlinkAction linkAction = new AbstractHyperlinkAction<Object>(null) {
 
             public void actionPerformed(ActionEvent e) {
                 LOG.info("hit: " + getTarget());
@@ -464,8 +464,8 @@ public class JXHyperlinkVisualCheck extends InteractiveTestCase {
     }
 
     
-    protected LinkAction<Object> createEmptyLinkAction() {
-        LinkAction<Object> linkAction = new LinkAction<Object>(null) {
+    protected AbstractHyperlinkAction<Object> createEmptyLinkAction() {
+        AbstractHyperlinkAction<Object> linkAction = new AbstractHyperlinkAction<Object>(null) {
 
             public void actionPerformed(ActionEvent e) {
                 // TODO Auto-generated method stub
@@ -476,8 +476,8 @@ public class JXHyperlinkVisualCheck extends InteractiveTestCase {
         return linkAction;
     }
 
-    protected LinkAction createEmptyLinkAction(String name) {
-        LinkAction linkAction = createEmptyLinkAction();
+    protected AbstractHyperlinkAction createEmptyLinkAction(String name) {
+        AbstractHyperlinkAction linkAction = createEmptyLinkAction();
         linkAction.setName(name);
         return linkAction;
     }

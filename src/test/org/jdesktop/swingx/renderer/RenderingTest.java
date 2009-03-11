@@ -43,7 +43,7 @@ import org.jdesktop.swingx.JXHyperlink;
 import org.jdesktop.swingx.JXPanel;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.JXTreeTable;
-import org.jdesktop.swingx.hyperlink.LinkAction;
+import org.jdesktop.swingx.hyperlink.AbstractHyperlinkAction;
 import org.jdesktop.swingx.icon.EmptyIcon;
 import org.jdesktop.swingx.painter.ShapePainter;
 import org.jdesktop.swingx.table.TableColumnExt;
@@ -150,7 +150,7 @@ public class RenderingTest extends TestCase {
      */
     @Test
     public void testHyperlinkStringValue() {
-        LinkAction linkAction = new LinkAction() {
+        AbstractHyperlinkAction linkAction = new AbstractHyperlinkAction() {
 
             public void actionPerformed(ActionEvent e) {
                 // nothing
@@ -286,7 +286,7 @@ public class RenderingTest extends TestCase {
      */
     @Test
     public void testToolTipManagerHyperlinkProvider() {
-        LinkAction linkAction = new LinkAction() {
+        AbstractHyperlinkAction linkAction = new AbstractHyperlinkAction() {
 
             public void actionPerformed(ActionEvent e) {
                 // do nothing

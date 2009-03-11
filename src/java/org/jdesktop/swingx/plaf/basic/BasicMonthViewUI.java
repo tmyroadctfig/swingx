@@ -69,7 +69,7 @@ import org.jdesktop.swingx.calendar.DateSelectionModel;
 import org.jdesktop.swingx.calendar.DateSelectionModel.SelectionMode;
 import org.jdesktop.swingx.event.DateSelectionEvent;
 import org.jdesktop.swingx.event.DateSelectionListener;
-import org.jdesktop.swingx.hyperlink.LinkAction;
+import org.jdesktop.swingx.hyperlink.AbstractHyperlinkAction;
 import org.jdesktop.swingx.plaf.MonthViewUI;
 import org.jdesktop.swingx.plaf.UIManagerExt;
 import org.jdesktop.swingx.renderer.CellContext;
@@ -2553,7 +2553,7 @@ public class BasicMonthViewUI extends MonthViewUI {
      * Quick fix for Issue #1046-swingx: header text not updated if zoomable.
      * 
      */
-    protected static class ZoomOutAction extends LinkAction<JXMonthView> {
+    protected static class ZoomOutAction extends AbstractHyperlinkAction<JXMonthView> {
 
         private PropertyChangeListener linkListener;
         // Formatters/state used by Providers. 

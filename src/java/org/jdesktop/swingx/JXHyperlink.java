@@ -20,7 +20,7 @@
  */
 package org.jdesktop.swingx;
 
-import org.jdesktop.swingx.hyperlink.LinkAction;
+import org.jdesktop.swingx.hyperlink.AbstractHyperlinkAction;
 import org.jdesktop.swingx.plaf.HyperlinkAddon;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 
@@ -43,7 +43,7 @@ import java.beans.PropertyChangeListener;
  * "clicked" state to an action value with key LinkAction.VISITED_KEY. 
  * Synchronization happens on setAction() and on propertyChange notification
  * from the action. JXHyperlink accepts any type of action - 
- * {@link LinkAction} is a convenience implementation to
+ * {@link AbstractHyperlinkAction} is a convenience implementation to
  * simplify clicked control.
  * <p>
  * 
@@ -272,7 +272,7 @@ public class JXHyperlink extends JButton {
         return new PropertyChangeListener() {
 
             public void propertyChange(PropertyChangeEvent evt) {
-                if (LinkAction.VISITED_KEY.equals(evt.getPropertyName())) {
+                if (AbstractHyperlinkAction.VISITED_KEY.equals(evt.getPropertyName())) {
                     configureClickedPropertyFromAction(a);
                 } else {
                     superListener.propertyChange(evt);
@@ -296,7 +296,7 @@ public class JXHyperlink extends JButton {
     private void configureClickedPropertyFromAction(Action a) {
         boolean clicked = false;
         if (a != null) {
-            clicked = Boolean.TRUE.equals(a.getValue(LinkAction.VISITED_KEY));
+            clicked = Boolean.TRUE.equals(a.getValue(AbstractHyperlinkAction.VISITED_KEY));
             
         }
         setClicked(clicked);
