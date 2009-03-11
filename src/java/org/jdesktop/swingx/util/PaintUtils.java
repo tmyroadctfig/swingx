@@ -255,6 +255,7 @@ public class PaintUtils {
     /**
      * @deprecated Use {@link GraphicsUtilities#convertToBufferedImage(Image)} instead
      */
+    @Deprecated
     public static BufferedImage convertToBufferedImage(Image img) {
         return GraphicsUtilities.convertToBufferedImage(img);
     }
@@ -274,6 +275,7 @@ public class PaintUtils {
     /**
      * @deprecated Use {@link GraphicsUtilities#loadCompatibleImage(InputStream)} instead
      */
+    @Deprecated
     public static BufferedImage loadCompatibleImage(InputStream in) throws IOException {
         return GraphicsUtilities.loadCompatibleImage(in);
     }
