@@ -37,12 +37,10 @@ import javax.swing.JComponent;
  * Note: this implementation is stateful, it can't be shared across different 
  * instances of a target component.<p>
  * 
- * PENDING JW: why isn't this abstract? Subclasses should be forced to implement
- * the mapping? <p>
  * 
  * @author Jeanette Winzenburg
  */
-public class RolloverProducer implements MouseListener, MouseMotionListener {
+public abstract class RolloverProducer implements MouseListener, MouseMotionListener {
 
     /** 
      * Key for client property mapped from mouse-triggered action.
@@ -158,17 +156,14 @@ public class RolloverProducer implements MouseListener, MouseMotionListener {
     }
 
     /**
-     * Subclasses must override to map the given mouse coordinates into
+     * Subclasses must implement to map the given mouse coordinates into
      * appropriate client coordinates. The result must be stored in the 
      * rollover field. 
      * 
-     * Here: does nothing.
-     * 
-     * @param component
-     * @param mousePoint
+     * @param component the target component which received a mouse event
+     * @param mousePoint the mouse position of the event, coordinates are 
+     *    component pixels
      */
-    protected void updateRolloverPoint(JComponent component, Point mousePoint) {
-
-    }
+    protected abstract void updateRolloverPoint(JComponent component, Point mousePoint);
 
 }

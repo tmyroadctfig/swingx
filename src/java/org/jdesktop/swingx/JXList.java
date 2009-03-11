@@ -23,7 +23,6 @@ package org.jdesktop.swingx;
 
 import java.awt.Component;
 import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -62,6 +61,7 @@ import org.jdesktop.swingx.renderer.DefaultListRenderer;
 import org.jdesktop.swingx.renderer.StringValue;
 import org.jdesktop.swingx.renderer.StringValues;
 import org.jdesktop.swingx.rollover.ListRolloverController;
+import org.jdesktop.swingx.rollover.ListRolloverProducer;
 import org.jdesktop.swingx.rollover.RolloverProducer;
 import org.jdesktop.swingx.rollover.RolloverRenderer;
 import org.jdesktop.swingx.search.ListSearchable;
@@ -320,34 +320,15 @@ public class JXList extends JList {
 
 
     /**
-     * creates and returns the RolloverProducer to use with this tree.
+     * Creates and returns the RolloverProducer to use with this tree.
      * 
      * @return <code>RolloverProducer</code> to use with this tree
      */
     protected RolloverProducer createRolloverProducer() {
-        return new RolloverProducer() {
-            @Override
-            protected void updateRolloverPoint(JComponent component,
-                    Point mousePoint) {
-                JList list = (JList) component;
-                int row = list.locationToIndex(mousePoint);
-                if (row >= 0) {
-                    Rectangle cellBounds = list.getCellBounds(row, row);
-                    if (!cellBounds.contains(mousePoint)) {
-                        row = -1;
-                    }
-                }
-                int col = row < 0 ? -1 : 0;
-                rollover.x = col;
-                rollover.y = row;
-            }
-
-        };
+        return new ListRolloverProducer();
     }
     /**
      * returns the rolloverEnabled property.
-     *
-     * TODO: why doesn't this just return rolloverEnabled???
      *
      * @return true if rollover is enabled
      */

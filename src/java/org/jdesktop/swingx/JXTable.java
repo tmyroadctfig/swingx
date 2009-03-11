@@ -112,6 +112,7 @@ import org.jdesktop.swingx.renderer.StringValue;
 import org.jdesktop.swingx.renderer.StringValues;
 import org.jdesktop.swingx.rollover.RolloverProducer;
 import org.jdesktop.swingx.rollover.TableRolloverController;
+import org.jdesktop.swingx.rollover.TableRolloverProducer;
 import org.jdesktop.swingx.search.AbstractSearchable;
 import org.jdesktop.swingx.search.SearchFactory;
 import org.jdesktop.swingx.search.Searchable;
@@ -537,22 +538,7 @@ public class JXTable extends JTable
      * @return <code>RolloverProducer</code>
      */
     protected RolloverProducer createRolloverProducer() {
-        return new RolloverProducer() {
-            @Override
-            protected void updateRolloverPoint(JComponent component,
-                    Point mousePoint) {
-                JTable table = (JTable) component;
-                int col = table.columnAtPoint(mousePoint);
-                int row = table.rowAtPoint(mousePoint);
-                if ((col < 0) || (row < 0)) {
-                    row = -1;
-                    col = -1;
-                }
-                rollover.x = col;
-                rollover.y = row;
-            }
-
-        };
+        return new TableRolloverProducer();
     }
 
     /**

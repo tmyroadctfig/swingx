@@ -67,6 +67,7 @@ import org.jdesktop.swingx.renderer.StringValues;
 import org.jdesktop.swingx.rollover.RolloverProducer;
 import org.jdesktop.swingx.rollover.RolloverRenderer;
 import org.jdesktop.swingx.rollover.TreeRolloverController;
+import org.jdesktop.swingx.rollover.TreeRolloverProducer;
 import org.jdesktop.swingx.search.SearchFactory;
 import org.jdesktop.swingx.search.Searchable;
 import org.jdesktop.swingx.search.TreeSearchable;
@@ -785,62 +786,12 @@ public class JXTree extends JTree {
      * Creates and returns the RolloverProducer to use with this tree.
      * <p>
      * 
-     * This implementation assumes a "hit" for rollover if the mouse is anywhere
-     * in the total width of the tree. Additionally, a pressed to the right (but
-     * outside of the label bounds) is re-dispatched as a pressed just inside
-     * the label bounds. This is a first go for #166-swingx.<p>
-     * 
-     * PENDING JW: bidi-compliance of pressed?
-     * 
      * @return <code>RolloverProducer</code> to use with this tree
      * 
      * @see #setRolloverEnabled(boolean)
      */
     protected RolloverProducer createRolloverProducer() {
-        return new RolloverProducer() {
-            @Override
-            public void mousePressed(MouseEvent e) {
-                JXTree tree = (JXTree) e.getComponent();
-                Point mousePoint = e.getPoint();
-              int labelRow = tree.getRowForLocation(mousePoint.x, mousePoint.y);
-              // default selection
-              if (labelRow >= 0) return;
-              int row = tree.getClosestRowForLocation(mousePoint.x, mousePoint.y);
-              Rectangle bounds = tree.getRowBounds(row);
-              if (bounds == null) {
-                  row = -1;
-              } else {
-                  if ((bounds.y + bounds.height < mousePoint.y) || 
-                       bounds.x > mousePoint.x)   {
-                      row = -1;
-                  }
-              }
-              // no hit
-              if (row < 0) return;
-              tree.dispatchEvent(new MouseEvent(tree, e.getID(), e.getWhen(), 
-                      e.getModifiers(), bounds.x + bounds.width - 2, mousePoint.y,
-                      e.getClickCount(), e.isPopupTrigger(), e.getButton()));
-            }
-
-            @Override
-            protected void updateRolloverPoint(JComponent component,
-                    Point mousePoint) {
-                JXTree tree = (JXTree) component;
-                int row = tree.getClosestRowForLocation(mousePoint.x, mousePoint.y);
-                Rectangle bounds = tree.getRowBounds(row);
-                if (bounds == null) {
-                    row = -1;
-                } else {
-                    if ((bounds.y + bounds.height < mousePoint.y) || 
-                            bounds.x > mousePoint.x)   {
-                           row = -1;
-                       }
-                }
-                int col = row < 0 ? -1 : 0;
-                rollover.x = col;
-                rollover.y = row;
-            }
-        };
+        return new TreeRolloverProducer();
     }
 
   
