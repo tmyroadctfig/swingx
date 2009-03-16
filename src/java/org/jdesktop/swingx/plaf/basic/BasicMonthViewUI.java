@@ -67,6 +67,12 @@ import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.calendar.CalendarUtils;
 import org.jdesktop.swingx.calendar.DateSelectionModel;
 import org.jdesktop.swingx.calendar.DateSelectionModel.SelectionMode;
+import org.jdesktop.swingx.decorator.AbstractHighlighter;
+import org.jdesktop.swingx.decorator.ComponentAdapter;
+import org.jdesktop.swingx.decorator.CompoundHighlighter;
+import org.jdesktop.swingx.decorator.HighlightPredicate;
+import org.jdesktop.swingx.decorator.Highlighter;
+import org.jdesktop.swingx.decorator.PainterHighlighter;
 import org.jdesktop.swingx.event.DateSelectionEvent;
 import org.jdesktop.swingx.event.DateSelectionListener;
 import org.jdesktop.swingx.hyperlink.AbstractHyperlinkAction;
@@ -144,13 +150,13 @@ public class BasicMonthViewUI extends MonthViewUI {
     public static final int MONTH_UP = 2;
 
     // constants for day columns
-    protected static final int WEEK_HEADER_COLUMN = -1;
+    protected static final int WEEK_HEADER_COLUMN = 0;
     protected static final int DAYS_IN_WEEK = 7;
     protected static final int FIRST_DAY_COLUMN = WEEK_HEADER_COLUMN + 1;
     protected static final int LAST_DAY_COLUMN = FIRST_DAY_COLUMN + DAYS_IN_WEEK -1;
 
     // constants for day rows (aka: weeks)
-    protected static final int DAY_HEADER_ROW = -1;
+    protected static final int DAY_HEADER_ROW = 0;
     protected static final int WEEKS_IN_MONTH = 6;
     protected static final int FIRST_WEEK_ROW = DAY_HEADER_ROW + 1;
     protected static final int LAST_WEEK_ROW = FIRST_WEEK_ROW + WEEKS_IN_MONTH - 1;
@@ -702,12 +708,13 @@ public class BasicMonthViewUI extends MonthViewUI {
          */
         private JComponent highlight(JComponent comp, JXMonthView monthView,
                 Calendar calendar, CalendarState dayState) {
-//            CalendarAdapter adapter = getCalendarAdapter(monthView, calendar, dayState);
-//            
-//            if (true) {
-//                return (JComponent) getHighlighter().highlight(comp, adapter);
-//            }
+            CalendarAdapter adapter = getCalendarAdapter(monthView, calendar, dayState);
             
+            if (true) {
+                return (JComponent) getHighlighter().highlight(comp, adapter);
+            }
+            // PENDING JW: never reach this - taken over by formally adding Highlighters
+            // keep the code here for debugging until we are sure that the switch went okay
             if ((CalendarState.LEADING == dayState) 
                     || (CalendarState.TRAILING == dayState)
                     || (CalendarState.WEEK_OF_YEAR == dayState)
@@ -731,78 +738,78 @@ public class BasicMonthViewUI extends MonthViewUI {
             
         }
 
-//        /**
-//         * @return
-//         */
-//        private Highlighter getHighlighter() {
-//            if (highlighter == null) {
-//                highlighter = new CompoundHighlighter();
-//                installHighlighters();
-//            }
-//            return highlighter;
-//        }
-//
-//        /**
-//         * 
-//         */
-//        private void installHighlighters() {
-//            HighlightPredicate boldPredicate = new HighlightPredicate() {
-//
-//                public boolean isHighlighted(Component renderer,
-//                        ComponentAdapter adapter) {
-//                    if (!(adapter instanceof CalendarAdapter))
-//                        return false;
-//                    CalendarAdapter ca = (CalendarAdapter) adapter;
-//                    return CalendarState.DAY_OF_WEEK == ca.getCalendarState() || 
-//                        CalendarState.TITLE == ca.getCalendarState();
-//                }
-//                
-//            };
-//            Highlighter font = new AbstractHighlighter(boldPredicate) {
-//
-//                @Override
-//                protected Component doHighlight(Component component,
-//                        ComponentAdapter adapter) {
-//                    component.setFont(getDerivedFont(component.getFont()));
-//                    return component;
-//                }
-//                
-//            };
-//            highlighter.addHighlighter(font);
-//            
-//            HighlightPredicate unselectable = new HighlightPredicate() {
-//
-//                public boolean isHighlighted(Component renderer,
-//                        ComponentAdapter adapter) {
-//                    if (!(adapter instanceof CalendarAdapter)) 
-//                        return false;
-//                    return ((CalendarAdapter) adapter).isUnselectable();
-//                }
-//                
-//            };
-//            textCross.setForeground(unselectableDayForeground);
-//            Highlighter painterHL = new PainterHighlighter(unselectable, textCross);
-//            highlighter.addHighlighter(painterHL);
-//            
-//        }
-//
-//        /**
-//         * @param monthView
-//         * @param calendar
-//         * @param dayState
-//         * @return
-//         */
-//        private CalendarAdapter getCalendarAdapter(JXMonthView monthView,
-//                Calendar calendar, CalendarState dayState) {
-//            if (calendarAdapter == null) {
-//                calendarAdapter = new CalendarAdapter(monthView);
-//            }
-//            return calendarAdapter.install(calendar, dayState);
-//        }
-//
-//        private CalendarAdapter calendarAdapter;
-//        private CompoundHighlighter highlighter;
-//        
+        /**
+         * @return
+         */
+        private Highlighter getHighlighter() {
+            if (highlighter == null) {
+                highlighter = new CompoundHighlighter();
+                installHighlighters();
+            }
+            return highlighter;
+        }
+
+        /**
+         * 
+         */
+        private void installHighlighters() {
+            HighlightPredicate boldPredicate = new HighlightPredicate() {
+
+                public boolean isHighlighted(Component renderer,
+                        ComponentAdapter adapter) {
+                    if (!(adapter instanceof CalendarAdapter))
+                        return false;
+                    CalendarAdapter ca = (CalendarAdapter) adapter;
+                    return CalendarState.DAY_OF_WEEK == ca.getCalendarState() || 
+                        CalendarState.TITLE == ca.getCalendarState();
+                }
+                
+            };
+            Highlighter font = new AbstractHighlighter(boldPredicate) {
+
+                @Override
+                protected Component doHighlight(Component component,
+                        ComponentAdapter adapter) {
+                    component.setFont(getDerivedFont(component.getFont()));
+                    return component;
+                }
+                
+            };
+            highlighter.addHighlighter(font);
+            
+            HighlightPredicate unselectable = new HighlightPredicate() {
+
+                public boolean isHighlighted(Component renderer,
+                        ComponentAdapter adapter) {
+                    if (!(adapter instanceof CalendarAdapter)) 
+                        return false;
+                    return ((CalendarAdapter) adapter).isUnselectable();
+                }
+                
+            };
+            textCross.setForeground(unselectableDayForeground);
+            Highlighter painterHL = new PainterHighlighter(unselectable, textCross);
+            highlighter.addHighlighter(painterHL);
+            
+        }
+
+        /**
+         * @param monthView
+         * @param calendar
+         * @param dayState
+         * @return
+         */
+        private CalendarAdapter getCalendarAdapter(JXMonthView monthView,
+                Calendar calendar, CalendarState dayState) {
+            if (calendarAdapter == null) {
+                calendarAdapter = new CalendarAdapter(monthView);
+            }
+            return calendarAdapter.install(calendar, dayState);
+        }
+
+        private CalendarAdapter calendarAdapter;
+        private CompoundHighlighter highlighter;
+        
         /**
          * @param font
          * @return
