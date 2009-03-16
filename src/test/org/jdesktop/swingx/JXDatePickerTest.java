@@ -46,6 +46,7 @@ import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
+import javax.swing.plaf.UIResource;
 import javax.swing.text.DefaultFormatterFactory;
 
 import org.jdesktop.swingx.calendar.CalendarUtils;
@@ -1577,7 +1578,17 @@ public class JXDatePickerTest extends InteractiveTestCase {
         assertEquals(date, picker.getEditor().getValue());
     }
 
-
+    @Test
+    public void testEditorUIResource() {
+        JXDatePicker picker = new JXDatePicker();
+        // this is safe: ui must install an editor and it must be of type UIResource
+        assertEquals("default editor is UIResource ", true, picker.getEditor() instanceof UIResource);
+        JFormattedTextField editor = new JFormattedTextField();
+        picker.setEditor(editor);
+        assertEquals("sanity: custom editor not UIResource ", false, picker.getEditor() instanceof UIResource);
+        picker.updateUI();
+        assertSame("updateUI must not touch custom editor", editor, picker.getEditor()); 
+    }
 
     /**
      * Characterization: setting the monthview's selection model updates

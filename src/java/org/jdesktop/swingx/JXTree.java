@@ -659,10 +659,10 @@ public class JXTree extends JTree {
      * <b>Note:</b> this should be done in the UI delegate.
      */
     private void installSelectionColors() {
-        if (isUIResource(getSelectionBackground())) {
+        if (SwingXUtilities.isUIInstallable(getSelectionBackground())) {
             setSelectionBackground(UIManager.getColor("Tree.selectionBackground"));
         }
-        if (isUIResource(getSelectionForeground())) {
+        if (SwingXUtilities.isUIInstallable(getSelectionForeground())) {
             setSelectionForeground(UIManager.getColor("Tree.selectionForeground"));
         }
         
@@ -674,10 +674,10 @@ public class JXTree extends JTree {
      * <b>Note:</b> this should be done in the UI delegate.
      */
     private void uninstallSelectionColors() {
-        if (isUIResource(getSelectionBackground())) {
+        if (SwingXUtilities.isUIInstallable(getSelectionBackground())) {
             setSelectionBackground(null);
         }
-        if (isUIResource(getSelectionForeground())) {
+        if (SwingXUtilities.isUIInstallable(getSelectionForeground())) {
             setSelectionForeground(null);
         }
     }
@@ -692,17 +692,6 @@ public class JXTree extends JTree {
         compoundHighlighter.updateUI();
     }
 
-    /**
-     * Checks if the given value should be set by the LAF. <p>
-     * 
-     * PENDING JW: extract as utility method to ??
-     * 
-     * @param value the value to check
-     * @return true if the value is null or of type UIResource, false otherwise.
-     */
-    private boolean isUIResource(Object value) {
-        return (value == null) || (value instanceof UIResource);
-    }
 
 
 //------------------------ Rollover support

@@ -11,16 +11,20 @@ import java.awt.event.ActionEvent;
 import java.awt.event.MouseListener;
 import java.util.logging.Logger;
 
+import javax.swing.border.Border;
+import javax.swing.border.EmptyBorder;
+import javax.swing.plaf.UIResource;
+
 import junit.framework.TestCase;
 
 import org.jdesktop.swingx.hyperlink.AbstractHyperlinkAction;
 import org.jdesktop.swingx.plaf.basic.BasicHyperlinkUI.BasicHyperlinkListener;
 import org.jdesktop.test.PropertyChangeReport;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.junit.Test;
-import org.junit.Before;
-import org.junit.After;
 
 
 /**
@@ -45,6 +49,19 @@ public class JXHyperlinkTest extends TestCase {
     @After
     public void tearDownJ4() throws Exception {
         tearDown();
+    }
+    
+    @Test
+    public void testBorderUIResource() {
+        JXHyperlink hyperlink = new JXHyperlink();
+        if (!(hyperlink.getBorder() instanceof UIResource)) {
+            LOG.info("not running test, LAF doesn't install hyperlink border");
+            return;
+        }
+        Border border = new EmptyBorder(1, 2, 3, 4);
+        hyperlink.setBorder(border);
+        hyperlink.updateUI();
+        assertSame("border untouched in updateUI ", border, hyperlink.getBorder());
     }
     
     @Test

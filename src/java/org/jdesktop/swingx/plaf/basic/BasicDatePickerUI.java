@@ -154,7 +154,7 @@ public class BasicDatePickerUI extends DatePickerUI {
     protected void installComponents() {
         
         JFormattedTextField editor = datePicker.getEditor();
-        if (editor == null || editor instanceof UIResource) {
+        if (SwingXUtilities.isUIInstallable(editor)) {
             DateFormat[] formats = getCustomFormats(editor);
             // we are not yet listening ...
             datePicker.setEditor(createEditor());

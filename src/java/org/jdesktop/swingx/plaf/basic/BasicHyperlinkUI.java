@@ -48,7 +48,6 @@ import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.plaf.BorderUIResource;
 import javax.swing.plaf.ComponentUI;
-import javax.swing.plaf.UIResource;
 import javax.swing.plaf.basic.BasicButtonListener;
 import javax.swing.plaf.basic.BasicButtonUI;
 import javax.swing.plaf.basic.BasicGraphicsUtils;
@@ -64,6 +63,8 @@ import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.ImageView;
 import javax.swing.text.html.StyleSheet;
+
+import org.jdesktop.swingx.SwingXUtilities;
 
 /**
  * Basic implementation of the <code>JXHyperlink</code> UI. <br>
@@ -115,7 +116,7 @@ public class BasicHyperlinkUI extends BasicButtonUI {
         b.setOpaque(false);
         b.setBorderPainted(false);
         b.setRolloverEnabled(true);
-        if (b.getBorder() == null || b.getBorder() instanceof UIResource) {
+        if (SwingXUtilities.isUIInstallable(b.getBorder())) {
             b.setBorder(new BorderUIResource(BorderFactory.createEmptyBorder(0, 1, 0, 0)));
         }
 
