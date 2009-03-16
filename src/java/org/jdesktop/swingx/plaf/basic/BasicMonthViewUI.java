@@ -63,6 +63,7 @@ import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.UIResource;
 
 import org.jdesktop.swingx.JXMonthView;
+import org.jdesktop.swingx.SwingXUtilities;
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.calendar.CalendarUtils;
 import org.jdesktop.swingx.calendar.DateSelectionModel;
@@ -90,7 +91,6 @@ import org.jdesktop.swingx.renderer.StringValues;
  * Base implementation of the <code>JXMonthView</code> UI.<p>
  *
  * <b>Note</b>: The api changed considerably between releases 0.9.4 and 0.9.5.  
- * The old methods are still available but deprecated and are no longer maintained. 
  * <p>
  * 
  * The general drift of the change was to delegate all text rendering to a dedicated
@@ -99,10 +99,6 @@ import org.jdesktop.swingx.renderer.StringValues;
  * the rendering components. Plus updating on property changes received from the 
  * monthView. <p>
  * 
- * The rendering approach is used by default. Subclass providers can turn it off
- * by overriding createRenderingHandler to return null. This is recommended until
- * the change has stabilized. In future, custom painting will be achieved by 
- * implementing custom RenderingHandlers.
  * 
  * <p>   
  * Painting: coordinate systems.
@@ -139,10 +135,8 @@ public class BasicMonthViewUI extends MonthViewUI {
     @SuppressWarnings("all")
     private static final Logger LOG = Logger.getLogger(BasicMonthViewUI.class
             .getName());
-
     
     private static final int CALENDAR_SPACING = 10;
-
     
     /** Return value used to identify when the month down button is pressed. */
     public static final int MONTH_DOWN = 1;
@@ -342,46 +336,46 @@ public class BasicMonthViewUI extends MonthViewUI {
     }
 
     /**
-     * Installs default values. 
+     * Installs default values. <p>
      * 
      * This is refactored to only install default properties on the monthView.
      * Extracted install of this delegate's properties into installDelegate. 
      *  
      */
     protected void installDefaults() {
-        // PENDING JW: move to installDefaults?
         LookAndFeel.installProperty(monthView, "opaque", Boolean.TRUE);
         
-       // JW: access all properties via the UIManagerExt ..
+       // @KEEP JW: do not use the core install methods (might have classloader probs)
+        // instead access all properties via the UIManagerExt ..
         //        BasicLookAndFeel.installColorsAndFont(monthView, 
 //                "JXMonthView.background", "JXMonthView.foreground", "JXMonthView.font");
         
-        if (isUIInstallable(monthView.getBackground())) {
+        if (SwingXUtilities.isUIInstallable(monthView.getBackground())) {
             monthView.setBackground(UIManagerExt.getColor("JXMonthView.background"));
         }
-        if (isUIInstallable(monthView.getForeground())) {
+        if (SwingXUtilities.isUIInstallable(monthView.getForeground())) {
             monthView.setForeground(UIManagerExt.getColor("JXMonthView.foreground"));
         }
-        if (isUIInstallable(monthView.getFont())) {
+        if (SwingXUtilities.isUIInstallable(monthView.getFont())) {
             // PENDING JW: missing in managerExt? Or not applicable anyway?
             monthView.setFont(UIManager.getFont("JXMonthView.font"));
         }
-        if (isUIInstallable(monthView.getMonthStringBackground())) {
+        if (SwingXUtilities.isUIInstallable(monthView.getMonthStringBackground())) {
             monthView.setMonthStringBackground(UIManagerExt.getColor("JXMonthView.monthStringBackground"));
         }
-        if (isUIInstallable(monthView.getMonthStringForeground())) {
+        if (SwingXUtilities.isUIInstallable(monthView.getMonthStringForeground())) {
             monthView.setMonthStringForeground(UIManagerExt.getColor("JXMonthView.monthStringForeground"));
         }
-        if (isUIInstallable(monthView.getDaysOfTheWeekForeground())) {
+        if (SwingXUtilities.isUIInstallable(monthView.getDaysOfTheWeekForeground())) {
             monthView.setDaysOfTheWeekForeground(UIManagerExt.getColor("JXMonthView.daysOfTheWeekForeground"));
         }
-        if (isUIInstallable(monthView.getSelectionBackground())) {
+        if (SwingXUtilities.isUIInstallable(monthView.getSelectionBackground())) {
             monthView.setSelectionBackground(UIManagerExt.getColor("JXMonthView.selectedBackground"));
         }
-        if (isUIInstallable(monthView.getSelectionForeground())) {
+        if (SwingXUtilities.isUIInstallable(monthView.getSelectionForeground())) {
             monthView.setSelectionForeground(UIManagerExt.getColor("JXMonthView.selectedForeground"));
         }
-        if (isUIInstallable(monthView.getFlaggedDayForeground())) {
+        if (SwingXUtilities.isUIInstallable(monthView.getFlaggedDayForeground())) {
             monthView.setFlaggedDayForeground(UIManagerExt.getColor("JXMonthView.flaggedDayForeground"));
         }
         
@@ -390,7 +384,7 @@ public class BasicMonthViewUI extends MonthViewUI {
     }
 
     /**
-     * Installs this ui delegates properties.
+     * Installs this ui delegate's properties.
      */
     protected void installDelegate() {
         isLeftToRight = monthView.getComponentOrientation().isLeftToRight();
@@ -409,7 +403,10 @@ public class BasicMonthViewUI extends MonthViewUI {
      * @param property the property to check.
      * @return true if the given property should be replaced by the UI#s
      *   default value, false otherwise. 
+     *   
+     * @deprecated pre-0.9.6 use {@link org.jdesktop.swingx.SwingXUtilities#isUIInstallable(Object)}
      */
+    @Deprecated
     protected boolean isUIInstallable(Object property) {
        return (property == null) || (property instanceof UIResource);
     }
@@ -418,9 +415,9 @@ public class BasicMonthViewUI extends MonthViewUI {
 
     protected void installKeyboardActions() {
         // Setup the keyboard handler.
-        // PENDING JW: change to when-ancestor? just to be on the safe side
-        // if we make the title contain active comps
-        installKeyBindings(JComponent.WHEN_FOCUSED);
+        // JW: changed (0.9.6) to when-ancestor just to be on the safe side
+        // if the title contain active comps
+        installKeyBindings(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
         // JW: removed the automatic keybindings in WHEN_IN_FOCUSED
         // which caused #555-swingx (binding active if not focused)
         ActionMap actionMap = monthView.getActionMap();
@@ -546,13 +543,12 @@ public class BasicMonthViewUI extends MonthViewUI {
     }
 
     /**
-     * Returns the RenderingHandler to use. May return null to indicate that
-     * the "old" painting mechanism should be used.
+     * Returns the <code>CalendarRenderingHandler</code> to use. Subclasses may override to 
+     * plug-in custom implementations. <p>
      * 
      * This implementation returns an instance of RenderingHandler.
      * 
-     * @return the renderingHandler to use for painting the day boxes or
-     *   null if the old painting mechanism should be used.
+     * @return the endering handler to use for painting, must not be null
      */
     protected CalendarRenderingHandler createRenderingHandler() {
         return new RenderingHandler();

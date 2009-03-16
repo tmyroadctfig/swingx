@@ -40,6 +40,7 @@ import javax.swing.MenuElement;
 import javax.swing.RepaintManager;
 import javax.swing.SwingUtilities;
 import javax.swing.plaf.ComponentInputMapUIResource;
+import javax.swing.plaf.UIResource;
 import javax.swing.text.html.HTMLDocument;
 
 /**
@@ -405,4 +406,17 @@ public final class SwingXUtilities {
         
         return manager;
     }
+    
+    /**
+     * Checks and returns whether the given property should be replaced
+     * by the UI's default value. 
+     * 
+     * @param property the property to check.
+     * @return true if the given property should be replaced by the UI's
+     *   default value, false otherwise. 
+     */
+    public static boolean isUIInstallable(Object property) {
+       return (property == null) || (property instanceof UIResource);
+    }
+
 }

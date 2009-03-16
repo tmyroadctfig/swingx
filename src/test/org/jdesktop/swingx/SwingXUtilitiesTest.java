@@ -21,6 +21,7 @@
  */
 package org.jdesktop.swingx;
 
+import java.awt.Color;
 import java.awt.GraphicsEnvironment;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,12 +32,14 @@ import javax.swing.JRootPane;
 import javax.swing.JWindow;
 import javax.swing.RootPaneContainer;
 import javax.swing.UIManager;
+import javax.swing.plaf.ColorUIResource;
+import javax.swing.plaf.UIResource;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.junit.Test;
-import org.junit.Before;
-import org.junit.After;
 
 
 /**
@@ -63,25 +66,23 @@ public class SwingXUtilitiesTest extends InteractiveTestCase {
         }
     }
     
-    
-    @Before
-    public void setUpJ4() throws Exception {
-        setUp();
-    }
-    
-    @After
-    public void tearDownJ4() throws Exception {
-        tearDown();
-    }
-    
-    
-    @Override
-    protected void setUp() throws Exception {
-        setSystemLF(true);
+    /**
+     * Test doc'ed contract of isUIInstallable.
+     */
+    @Test
+    public void testUIInstallable() {
+        assertEquals("null must be uiInstallable ", true, SwingXUtilities.isUIInstallable(null));
+        assertUIInstallable(new Color(10, 10, 10));
+        assertUIInstallable(new ColorUIResource(10, 10, 10));
     }
 
-
-
+    /**
+     * @param color
+     */
+    private void assertUIInstallable(Object color) {
+        assertEquals("uiInstallabe must be same ", color instanceof UIResource, SwingXUtilities.isUIInstallable(color));
+    }
+    
     @Test
     public void testUpdateAllComponentTreeUIs() {
         // This test will not work in a headless configuration.
@@ -124,5 +125,25 @@ public class SwingXUtilitiesTest extends InteractiveTestCase {
         return UIManager.getCrossPlatformLookAndFeelClassName().equals(
                 UIManager.getSystemLookAndFeelClassName());
     }
+
+    
+    @Before
+    public void setUpJ4() throws Exception {
+        setUp();
+    }
+    
+    @After
+    public void tearDownJ4() throws Exception {
+        tearDown();
+    }
+    
+    
+    @Override
+    protected void setUp() throws Exception {
+        setSystemLF(true);
+    }
+
+
+
 
 }
