@@ -74,6 +74,7 @@ import org.jdesktop.swingx.renderer.StringValue;
 import org.jdesktop.swingx.renderer.StringValues;
 import org.jdesktop.swingx.rollover.RolloverProducer;
 import org.jdesktop.swingx.rollover.RolloverRenderer;
+import org.jdesktop.swingx.tree.DefaultXTreeCellRenderer;
 import org.jdesktop.swingx.treetable.DefaultTreeTableModel;
 import org.jdesktop.swingx.treetable.TreeTableCellEditor;
 import org.jdesktop.swingx.treetable.TreeTableModel;
@@ -1676,6 +1677,23 @@ public class JXTreeTable extends JXTable {
         return super.getCellEditor(row, column);
     }
     
+    
+    @Override
+    public void updateUI() {
+        super.updateUI();
+        updateHierarchicalRendererEditor();
+    }
+
+    /**
+     * Updates Ui of renderer/editor for the hierarchical column. Need to do so
+     * manually, as not accessible by the default lookup.
+     */
+    protected void updateHierarchicalRendererEditor() {
+        if (renderer != null) {
+           SwingUtilities.updateComponentTreeUI(renderer);
+        }
+    }
+
     /**
      * {@inheritDoc} <p>
      * 
@@ -2569,7 +2587,7 @@ public class JXTreeTable extends JXTable {
             return this;
         }
 
-        private class ClippedTreeCellRenderer extends DefaultTreeCellRenderer 
+        private class ClippedTreeCellRenderer extends DefaultXTreeCellRenderer 
             implements StringValue 
             {
             @SuppressWarnings("unused")
