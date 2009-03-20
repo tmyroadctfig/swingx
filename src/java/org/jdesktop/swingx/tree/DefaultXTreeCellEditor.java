@@ -59,6 +59,10 @@ public class DefaultXTreeCellEditor extends DefaultTreeCellEditor {
         this.renderer = renderer;
     }
     
+    public DefaultTreeCellRenderer getRenderer() {
+        return renderer;
+    }
+    
     public class XEditorContainer extends EditorContainer {
 
         @Override
