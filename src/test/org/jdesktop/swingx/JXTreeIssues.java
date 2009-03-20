@@ -33,7 +33,6 @@ import org.jdesktop.swingx.renderer.ComponentProvider;
 import org.jdesktop.swingx.renderer.DefaultListRenderer;
 import org.jdesktop.swingx.renderer.DefaultTreeRenderer;
 import org.jdesktop.swingx.renderer.IconValue;
-import org.jdesktop.swingx.renderer.IconValues;
 import org.jdesktop.swingx.renderer.StringValue;
 import org.jdesktop.swingx.renderer.StringValues;
 import org.jdesktop.swingx.renderer.WrappingIconPanel;
@@ -65,9 +64,8 @@ public class JXTreeIssues extends JXTreeUnitTest {
       JXTreeIssues test = new JXTreeIssues();
       try {
 //          test.runInteractiveTests();
-//          test.runInteractiveTests("interactive.*RToL.*");
-//          test.runInteractiveTests("interactive.*Edit.*");
-        test.runInteractiveTests("interactive.*Icons.*");
+          test.runInteractiveTests("interactive.*UpdateUI.*");
+//        test.runInteractiveTests("interactive.*Icons.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
@@ -142,20 +140,58 @@ public class JXTreeIssues extends JXTreeUnitTest {
     }
 
     /**
-     * Issue ??-swingx: JXTree must update renderer
+     * Issue #1060-swingx: JXTree must update renderer
      * 
      * tree renderer not updated if set on the tree (as opposed to using the 
      * default set by the ui-delegate)
      */
-    public void interactiveUpdateUICoreDefaultRenderer() {
+    public void interactiveUpdateUICoreTreeDefaultRenderer() {
         JTree tree = new JTree();
-        DefaultTreeCellRenderer renderer = new DefaultTreeCellRenderer();
-//        renderer.setClosedIcon(XTestUtils.loadDefaultIcon());
-        tree.setCellRenderer(renderer);
-        showWithScrollingInFrame(tree, "JTree/core renderer: updateUI must update renderer");
+        tree.getModel().valueForPathChanged(tree.getPathForRow(0), "core with ui providede renderer");
+        tree.setEditable(true);
+        JTree treeSetRenderer = new JTree();
+        treeSetRenderer.getModel().valueForPathChanged(treeSetRenderer.getPathForRow(0), "core with renderer set");
+        treeSetRenderer.setCellRenderer(new DefaultTreeCellRenderer());
+        treeSetRenderer.setEditable(true);
+        JXFrame frame = wrapWithScrollingInFrame(tree, treeSetRenderer, "JTree/core renderer: updateUI must update renderer");
+        addComponentOrientationToggle(frame);
+        show(frame);
     }
 
+    /**
+     * Issue #1060-swingx: JXTree must update renderer
+     * 
+     * tree renderer not updated if set on the tree (as opposed to using the 
+     * default set by the ui-delegate)
+     */
+    public void interactiveUpdateUIXTreeDefaultRenderer() {
+        JXTree tree = new JXTree();
+        tree.getModel().valueForPathChanged(tree.getPathForRow(0), "x with ui provided renderer");
+        tree.setEditable(true);
+        JXTree treeSetRenderer = new JXTree();
+        treeSetRenderer.getModel().valueForPathChanged(treeSetRenderer.getPathForRow(0), "x with renderer set");
+        treeSetRenderer.setCellRenderer(new DefaultTreeCellRenderer());
+        treeSetRenderer.setEditable(true);
+        JXFrame frame = wrapWithScrollingInFrame(tree, treeSetRenderer, "JXTree/core renderer: updateUI must update renderer");
+        addComponentOrientationToggle(frame);
+        show(frame);
+    }
     
+    /**
+     * Issue #1060-swingx: JXTree must update renderer
+     * 
+     * tree renderer not updated if set on the tree (as opposed to using the 
+     * default set by the ui-delegate)
+     */
+    public void interactiveUpdateUIXTreeXRenderer() {
+        JXTree treeSetRenderer = new JXTree();
+        treeSetRenderer.getModel().valueForPathChanged(treeSetRenderer.getPathForRow(0), "x with renderer set");
+        treeSetRenderer.setCellRenderer(new DefaultTreeRenderer());
+        treeSetRenderer.setEditable(true);
+        JXFrame frame = wrapWithScrollingInFrame(treeSetRenderer, "JXTree/x renderer: updateUI must update renderer/editor");
+        addComponentOrientationToggle(frame);
+        show(frame);
+    }
 
     /**
      * Size effecting decoration vs. initial config (in provider).
