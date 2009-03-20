@@ -25,11 +25,8 @@ import java.applet.Applet;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.KeyboardFocusManager;
-import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
-import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Hashtable;
@@ -51,7 +48,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
-import javax.swing.plaf.UIResource;
 import javax.swing.plaf.basic.BasicTreeUI;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeCellRenderer;
@@ -62,6 +58,7 @@ import javax.swing.tree.TreePath;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.CompoundHighlighter;
 import org.jdesktop.swingx.decorator.Highlighter;
+import org.jdesktop.swingx.decorator.UIDependent;
 import org.jdesktop.swingx.renderer.StringValue;
 import org.jdesktop.swingx.renderer.StringValues;
 import org.jdesktop.swingx.rollover.RolloverProducer;
@@ -72,6 +69,7 @@ import org.jdesktop.swingx.search.SearchFactory;
 import org.jdesktop.swingx.search.Searchable;
 import org.jdesktop.swingx.search.TreeSearchable;
 import org.jdesktop.swingx.tree.DefaultXTreeCellEditor;
+import org.jdesktop.swingx.tree.DefaultXTreeCellRenderer;
 
 
 /**
@@ -331,6 +329,9 @@ public class JXTree extends JTree {
      * This must be called from each constructor.
      */
     private void init() {
+        // Issue #1061-swingx: renderer inconsistencies
+        // force setting of renderer
+        setCellRenderer(createDefaultCellRenderer());
         // Issue #233-swingx: default editor not bidi-compliant 
         // manually install an enhanced TreeCellEditor which 
         // behaves slightly better in RtoL orientation.
@@ -343,14 +344,9 @@ public class JXTree extends JTree {
         // setup.
         // JW PENDING need to mimic ui-delegate default re-set?
         // JW PENDING alternatively, cleanup and use DefaultXXTreeCellEditor in incubator
-        TreeCellRenderer xRenderer = getCellRenderer();
-        if (xRenderer instanceof JXTree.DelegatingRenderer) {
-            TreeCellRenderer delegate = ((JXTree.DelegatingRenderer) xRenderer).getDelegateRenderer();
-            if (delegate instanceof DefaultTreeCellRenderer) { 
-                setCellEditor(new DefaultXTreeCellEditor(this, (DefaultTreeCellRenderer) delegate));
-            }   
+        if (getWrappedCellRenderer() instanceof DefaultTreeCellRenderer) {
+            setCellEditor(new DefaultXTreeCellEditor(this, (DefaultTreeCellRenderer) getWrappedCellRenderer()));
         }
-
         // Register the actions that this class can handle.
         ActionMap map = getActionMap();
         map.put("expand-all", new Actions("expand-all"));
@@ -651,6 +647,24 @@ public class JXTree extends JTree {
         super.updateUI();
         installSelectionColors();
         updateHighlighterUI();
+        updateRendererEditorUI();
+    }
+
+    
+    /**
+     * Quick fix for #1060-swingx: icons lost on toggling LAF
+     */
+    protected void updateRendererEditorUI() {
+        if (getCellEditor() instanceof UIDependent) {
+            ((UIDependent) getCellEditor()).updateUI();
+        }
+        // PENDING JW: here we get the DelegationRenderer which is not (yet) UIDependent
+        // need to think about how to handle the per-tree icons
+        // anyway, the "real" renderer usually is updated accidentally 
+        // don't know exactly why, added to the comp hierarchy?
+//        if (getCellRenderer() instanceof UIDependent) {
+//            ((UIDependent) getCellRenderer()).updateUI();
+//        }
     }
 
     /**
@@ -1036,7 +1050,8 @@ public class JXTree extends JTree {
      * @return the default cell renderer to use with this tree.
      */
     protected TreeCellRenderer createDefaultCellRenderer() {
-        return new DefaultTreeCellRenderer();
+//        return new DefaultTreeCellRenderer();
+        return new DefaultXTreeCellRenderer();
     }
 
     /**
@@ -1051,6 +1066,9 @@ public class JXTree extends JTree {
      */
     @Override
     public TreeCellRenderer getCellRenderer() {
+        // PENDING JW: something wrong here - why exactly can't we return super? 
+        // not even if we force the initial setting in init?
+//        return super.getCellRenderer();
         return getDelegatingRenderer();
     }
 
@@ -1084,8 +1102,14 @@ public class JXTree extends JTree {
         // == multiple delegation...
         getDelegatingRenderer().setDelegateRenderer(renderer);
         super.setCellRenderer(delegatingRenderer);
+        // quick hack for #1061: renderer/editor inconsistent
+        if ((renderer instanceof DefaultTreeCellRenderer) && 
+                (getCellEditor() instanceof DefaultXTreeCellEditor)) {
+           ((DefaultXTreeCellEditor) getCellEditor()).setRenderer((DefaultTreeCellRenderer) renderer); 
+        }
     }
 
+    
     /**
      * A decorator for the original TreeCellRenderer. Needed to hook highlighters
      * after messaging the delegate.<p>
