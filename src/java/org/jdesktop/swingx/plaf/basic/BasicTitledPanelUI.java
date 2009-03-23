@@ -41,6 +41,7 @@ import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.LookAndFeel;
 import javax.swing.UIManager;
 import javax.swing.plaf.BorderUIResource;
 import javax.swing.plaf.ComponentUI;
@@ -141,6 +142,7 @@ public class BasicTitledPanelUI extends TitledPanelUI {
         installProperty(titledPanel, "titlePainter", UIManager.get("JXTitledPanel.titlePainter"));
         installProperty(titledPanel, "titleForeground", UIManager.getColor("JXTitledPanel.titleForeground"));
         installProperty(titledPanel, "titleFont", UIManager.getFont("JXTitledPanel.titleFont"));
+        LookAndFeel.installProperty(titledPanel, "opaque", false);
     }
 
     protected void uninstallDefaults(JXTitledPanel titledPanel) {
@@ -166,7 +168,6 @@ public class BasicTitledPanelUI extends TitledPanelUI {
             // old was: BorderFactory.createRaisedBevelBorder());
             titledPanel.setBorder(BorderUIResource.getRaisedBevelBorderUIResource());
         }
-        titledPanel.setOpaque(false);
     }
     
     protected void uninstallComponents(JXTitledPanel titledPanel) {

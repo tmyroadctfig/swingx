@@ -51,6 +51,19 @@ public class JXTitledPanelTest extends InteractiveTestCase {
     }
 
     /**
+     * Sanity: changed ui-delegate to install the opaqueness via LookAndFeel. Doing so
+     * is the equivalent of UIResource for primitive types.
+     */
+    @Test
+    public void testOpaque() {
+        JXTitledPanel titledPanel = new JXTitledPanel();
+        boolean opaque = titledPanel.isOpaque(); 
+        titledPanel.setOpaque(!opaque);
+        assertEquals("sanity: opaqueness toggled: ", !opaque, titledPanel.isOpaque());
+        titledPanel.updateUI();
+        assertEquals("ui must not overwrite custom setting: ", !opaque, titledPanel.isOpaque());
+    }
+    /**
      * Issue #1063-swingx: JXTitledPanel must not overwrite custom border
      */
     @Test
