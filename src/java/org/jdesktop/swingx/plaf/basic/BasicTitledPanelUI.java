@@ -42,11 +42,13 @@ import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.UIManager;
+import javax.swing.plaf.BorderUIResource;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.UIResource;
 
 import org.jdesktop.swingx.JXPanel;
 import org.jdesktop.swingx.JXTitledPanel;
+import org.jdesktop.swingx.SwingXUtilities;
 import org.jdesktop.swingx.plaf.TitledPanelUI;
 
 
@@ -122,6 +124,7 @@ public class BasicTitledPanelUI extends TitledPanelUI {
      * @see javax.swing.JComponent#setUI
      * @see javax.swing.JComponent#updateUI
      */
+    @Override
     public void installUI(JComponent c) {
         assert c instanceof JXTitledPanel;
         JXTitledPanel titledPanel = (JXTitledPanel)c;
@@ -157,7 +160,12 @@ public class BasicTitledPanelUI extends TitledPanelUI {
             titledPanel.setLayout(new BorderLayout());
         }
         titledPanel.add(topPanel, BorderLayout.NORTH);
-        titledPanel.setBorder(BorderFactory.createRaisedBevelBorder());
+        // fix #1063-swingx: must respect custom border
+        if (SwingXUtilities.isUIInstallable(titledPanel.getBorder())) {
+            // use uiresource border 
+            // old was: BorderFactory.createRaisedBevelBorder());
+            titledPanel.setBorder(BorderUIResource.getRaisedBevelBorderUIResource());
+        }
         titledPanel.setOpaque(false);
     }
     
@@ -218,6 +226,7 @@ public class BasicTitledPanelUI extends TitledPanelUI {
      * @see #installUI
      * @see javax.swing.JComponent#updateUI
      */
+    @Override
     public void uninstallUI(JComponent c) {
         assert c instanceof JXTitledPanel;
         JXTitledPanel titledPanel = (JXTitledPanel) c;
@@ -280,7 +289,9 @@ public class BasicTitledPanelUI extends TitledPanelUI {
      * This method is invoked from the <code>ComponentUI.update</code> method when
      * the specified component is being painted.  Subclasses should override
      * this method and use the specified <code>Graphics</code> object to
-     * render the content of the component.
+     * render the content of the component.<p>
+     * 
+     * PENDING JW: we don't need this, do we - remove!
      *
      * @param g the <code>Graphics</code> context in which to paint
      * @param c the component being painted;
@@ -290,6 +301,7 @@ public class BasicTitledPanelUI extends TitledPanelUI {
      *
      * @see #update
      */
+    @Override
     public void paint(Graphics g, JComponent c) {
         super.paint(g, c);
     }
@@ -298,6 +310,7 @@ public class BasicTitledPanelUI extends TitledPanelUI {
      * Adds the given JComponent as a decoration on the right of the title
      * @param decoration
      */
+    @Override
     public void setRightDecoration(JComponent decoration) {
         if (right != null) topPanel.remove(right);
         right = decoration;
@@ -307,6 +320,7 @@ public class BasicTitledPanelUI extends TitledPanelUI {
         }
     }
     
+    @Override
     public JComponent getRightDecoration() {
         return right;
     }
@@ -315,6 +329,7 @@ public class BasicTitledPanelUI extends TitledPanelUI {
      * Adds the given JComponent as a decoration on the left of the title
      * @param decoration
      */
+    @Override
     public void setLeftDecoration(JComponent decoration) {
         if (left != null) topPanel.remove(left);
         left = decoration;
@@ -323,6 +338,7 @@ public class BasicTitledPanelUI extends TitledPanelUI {
         }
     }
     
+    @Override
     public JComponent getLeftDecoration() {
         return left;
     }
@@ -330,6 +346,7 @@ public class BasicTitledPanelUI extends TitledPanelUI {
     /**
      * @return the Container acting as the title bar for this component
      */
+    @Override
     public Container getTitleBar() {
         return topPanel;
     }
