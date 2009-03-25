@@ -38,14 +38,10 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.text.DateFormat;
 import java.text.DateFormatSymbols;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 import java.util.SortedSet;
 import java.util.logging.Logger;
 
@@ -55,7 +51,6 @@ import javax.swing.CellRendererPane;
 import javax.swing.Icon;
 import javax.swing.InputMap;
 import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.KeyStroke;
 import javax.swing.LookAndFeel;
 import javax.swing.UIManager;
@@ -68,22 +63,11 @@ import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.calendar.CalendarUtils;
 import org.jdesktop.swingx.calendar.DateSelectionModel;
 import org.jdesktop.swingx.calendar.DateSelectionModel.SelectionMode;
-import org.jdesktop.swingx.decorator.AbstractHighlighter;
-import org.jdesktop.swingx.decorator.ComponentAdapter;
-import org.jdesktop.swingx.decorator.CompoundHighlighter;
-import org.jdesktop.swingx.decorator.HighlightPredicate;
-import org.jdesktop.swingx.decorator.Highlighter;
-import org.jdesktop.swingx.decorator.PainterHighlighter;
 import org.jdesktop.swingx.event.DateSelectionEvent;
 import org.jdesktop.swingx.event.DateSelectionListener;
 import org.jdesktop.swingx.hyperlink.AbstractHyperlinkAction;
 import org.jdesktop.swingx.plaf.MonthViewUI;
 import org.jdesktop.swingx.plaf.UIManagerExt;
-import org.jdesktop.swingx.renderer.CellContext;
-import org.jdesktop.swingx.renderer.ComponentProvider;
-import org.jdesktop.swingx.renderer.FormatStringValue;
-import org.jdesktop.swingx.renderer.LabelProvider;
-import org.jdesktop.swingx.renderer.PainterAware;
 import org.jdesktop.swingx.renderer.StringValue;
 import org.jdesktop.swingx.renderer.StringValues;
 
@@ -555,301 +539,16 @@ public class BasicMonthViewUI extends MonthViewUI {
     }
     
     /**
-     * The RenderingHandler responsible for text rendering. It provides 
-     * and configures a rendering component for the given cell of
-     * a JXMonthView. <p>
      * 
-     * 
+     * Empty wrapper for backward compatibility: refactored the original implementation by
+     * - extracted as standalone class
+     * - renamed to BasicCalendarRenderingHandler
+     * @deprecated extend #BasicCalendarRenderingHandler directly
      */
-    protected  static class RenderingHandler implements CalendarRenderingHandler {
-        /** The CellContext for content and default visual config. */
-        private CalendarCellContext cellContext;
-        /** The providers to use per DayState. */
-        private Map<CalendarState, ComponentProvider<?>> providers;
-        // Formatters/state used by Providers. 
-        /** Localized month strings used in title. */
-        private String[] monthNames;
-        //-------- Highlight properties
-        /** The Painter used for highlighting unselectable dates. */
-        private TextCrossingPainter textCross;
-        /** The foreground color for unselectable date highlight. */
-        private Color unselectableDayForeground;
-
-        /**
-         * Instantiates a RenderingHandler and installs default state.
-         */
-        public RenderingHandler() {
-            install();
-        }
+    @Deprecated
+    protected static class RenderingHandler extends BasicCalendarRenderingHandler {
         
-        private void install() {
-            unselectableDayForeground = UIManagerExt.getColor("JXMonthView.unselectableDayForeground");
-            textCross = new TextCrossingPainter<JLabel>();
-            cellContext = new CalendarCellContext();
-            installProviders();
-        }
-
-        /**
-         * Creates and stores ComponentProviders for all DayStates.
-         */
-        private void installProviders() {
-            providers = new HashMap<CalendarState, ComponentProvider<?>>();
-            FormatStringValue sv = new FormatStringValue(new SimpleDateFormat("d")) {
-
-                @Override
-                public String getString(Object value) {
-                    if (value instanceof Calendar) {
-                        ((DateFormat) getFormat()).setTimeZone(((Calendar) value).getTimeZone());
-                        value = ((Calendar) value).getTime();
-                    }
-                    return super.getString(value);
-                }
-
-            };
-            ComponentProvider<?> provider = new LabelProvider(sv, JLabel.RIGHT);
-            providers.put(CalendarState.IN_MONTH, provider);
-            providers.put(CalendarState.TODAY, provider);
-            providers.put(CalendarState.TRAILING, provider);
-            providers.put(CalendarState.LEADING, provider);
-
-            StringValue wsv = new StringValue() {
-
-                public String getString(Object value) {
-                    if (value instanceof Calendar) {
-                        value = ((Calendar) value).get(Calendar.WEEK_OF_YEAR);
-                    }
-                    return StringValues.TO_STRING.getString(value);
-                }
-
-            };
-            ComponentProvider<?> weekOfYearProvider = new LabelProvider(wsv,
-                    JLabel.RIGHT);
-            providers.put(CalendarState.WEEK_OF_YEAR, weekOfYearProvider);
-
-            ComponentProvider<?> dayOfWeekProvider = new LabelProvider(JLabel.CENTER) {
-
-                @Override
-                protected String getValueAsString(CellContext context) {
-                    Object value = context.getValue();
-                    // PENDING JW: this is breaking provider's contract in its
-                    // role as StringValue! Don't in the general case.
-                    if (value instanceof Calendar) {
-                        int day = ((Calendar) value).get(Calendar.DAY_OF_WEEK);
-                        return ((JXMonthView) context.getComponent()).getDayOfTheWeek(day);
-                    }
-                    return super.getValueAsString(context);
-                }
-                
-            };
-            providers.put(CalendarState.DAY_OF_WEEK, dayOfWeekProvider);
-
-            StringValue tsv = new StringValue() {
-
-                public String getString(Object value) {
-                    if (value instanceof Calendar) {
-                        String month = monthNames[((Calendar) value)
-                                .get(Calendar.MONTH)];
-                        return month + " "
-                                + ((Calendar) value).get(Calendar.YEAR); 
-                    }
-                    return StringValues.TO_STRING.getString(value);
-                }
-
-            };
-            ComponentProvider<?> titleProvider = new LabelProvider(tsv,
-                    JLabel.CENTER);
-            providers.put(CalendarState.TITLE, titleProvider);
-        }
-        
-
-        /**
-         * Updates internal state to the given Locale.
-         * 
-         * @param locale the new Locale.
-         */
-        public void setLocale(Locale locale) {
-            monthNames = new DateFormatSymbols(locale).getMonths();
-        }
-
-        /**
-         * Configures and returns a component for rendering of the given monthView cell.
-         * 
-         * @param monthView the JXMonthView to render onto
-         * @param calendar the cell value
-         * @param dayState the DayState of the cell
-         * @return a component configured for rendering the given cell
-         */
-        public JComponent prepareRenderingComponent(JXMonthView monthView, Calendar calendar, CalendarState dayState) {
-            cellContext.installContext(monthView, calendar, 
-                    isSelected(monthView, calendar, dayState), 
-                    isFocused(monthView, calendar, dayState),
-                    dayState);
-            JComponent comp = providers.get(dayState).getRendererComponent(cellContext);
-            return highlight(comp, monthView, calendar, dayState);
-        }
-
-
-        /**
-         * 
-         * NOTE: it's the responsibility of the CalendarCellContext to detangle
-         * all "default" (that is: which could be queried from the comp and/or UIManager)
-         * foreground/background colors based on the given state! Moved out off here.
-         * 
-         * PENDING JW: replace hard-coded logic by giving over to highlighters.
-         * 
-         * @param monthView the JXMonthView to render onto
-         * @param calendar the cell value
-         * @param dayState the DayState of the cell
-         * @param dayState
-         */
-        private JComponent highlight(JComponent comp, JXMonthView monthView,
-                Calendar calendar, CalendarState dayState) {
-            CalendarAdapter adapter = getCalendarAdapter(monthView, calendar, dayState);
-            
-            if (true) {
-                return (JComponent) getHighlighter().highlight(comp, adapter);
-            }
-            // PENDING JW: never reach this - taken over by formally adding Highlighters
-            // keep the code here for debugging until we are sure that the switch went okay
-            if ((CalendarState.LEADING == dayState) 
-                    || (CalendarState.TRAILING == dayState)
-                    || (CalendarState.WEEK_OF_YEAR == dayState)
-                    ) return comp;
-            if (CalendarState.TITLE == dayState) {
-                comp.setFont(getDerivedFont(comp.getFont()));
-                return comp;
-            }
-            if (CalendarState.DAY_OF_WEEK == dayState) {
-                comp.setFont(getDerivedFont(comp.getFont()));
-                return comp;
-            }
-            // state left is TO_DAY or IN_MONTH 
-            if (monthView.isUnselectableDate(calendar.getTime()) 
-                    && (comp instanceof PainterAware )) {
-                textCross.setForeground(unselectableDayForeground);
-                ((PainterAware) comp).setPainter(textCross);
-            }
-            
-            return comp;
-            
-        }
-
-        /**
-         * @return
-         */
-        private Highlighter getHighlighter() {
-            if (highlighter == null) {
-                highlighter = new CompoundHighlighter();
-                installHighlighters();
-            }
-            return highlighter;
-        }
-
-        /**
-         * 
-         */
-        private void installHighlighters() {
-            HighlightPredicate boldPredicate = new HighlightPredicate() {
-
-                public boolean isHighlighted(Component renderer,
-                        ComponentAdapter adapter) {
-                    if (!(adapter instanceof CalendarAdapter))
-                        return false;
-                    CalendarAdapter ca = (CalendarAdapter) adapter;
-                    return CalendarState.DAY_OF_WEEK == ca.getCalendarState() || 
-                        CalendarState.TITLE == ca.getCalendarState();
-                }
-                
-            };
-            Highlighter font = new AbstractHighlighter(boldPredicate) {
-
-                @Override
-                protected Component doHighlight(Component component,
-                        ComponentAdapter adapter) {
-                    component.setFont(getDerivedFont(component.getFont()));
-                    return component;
-                }
-                
-            };
-            highlighter.addHighlighter(font);
-            
-            HighlightPredicate unselectable = new HighlightPredicate() {
-
-                public boolean isHighlighted(Component renderer,
-                        ComponentAdapter adapter) {
-                    if (!(adapter instanceof CalendarAdapter)) 
-                        return false;
-                    return ((CalendarAdapter) adapter).isUnselectable();
-                }
-                
-            };
-            textCross.setForeground(unselectableDayForeground);
-            Highlighter painterHL = new PainterHighlighter(unselectable, textCross);
-            highlighter.addHighlighter(painterHL);
-            
-        }
-
-        /**
-         * @param monthView
-         * @param calendar
-         * @param dayState
-         * @return
-         */
-        private CalendarAdapter getCalendarAdapter(JXMonthView monthView,
-                Calendar calendar, CalendarState dayState) {
-            if (calendarAdapter == null) {
-                calendarAdapter = new CalendarAdapter(monthView);
-            }
-            return calendarAdapter.install(calendar, dayState);
-        }
-
-        private CalendarAdapter calendarAdapter;
-        private CompoundHighlighter highlighter;
-        
-        /**
-         * @param font
-         * @return
-         */
-        private Font getDerivedFont(Font font) {
-            return font.deriveFont(Font.BOLD);
-        }
-
-        /**
-         * @param monthView
-         * @param calendar
-         * @param dayState
-         * @return
-         */
-        private boolean isFocused(JXMonthView monthView, Calendar calendar,
-                CalendarState dayState) {
-            return false;
-        }
-        
-        /**
-         * @param monthView the JXMonthView to render onto
-         * @param calendar the cell value
-         * @param dayState the DayState of the cell
-         * @return
-         */
-        private boolean isSelected(JXMonthView monthView, Calendar calendar,
-                CalendarState dayState) {
-            if (!isSelectable(dayState)) return false;
-            return monthView.isSelected(calendar.getTime());
-        }
-
-        
-        /**
-         * @param dayState
-         * @return
-         */
-        private boolean isSelectable(CalendarState dayState) {
-            return (CalendarState.IN_MONTH == dayState) || (CalendarState.TODAY == dayState);
-        }
-
     }
-
-    //----------------------- controller
-    
     /**
      * Binds/clears the keystrokes in the component input map, 
      * based on the monthView's componentInputMap enabled property.

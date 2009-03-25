@@ -34,7 +34,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.text.DateFormat;
 import java.text.DateFormatSymbols;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -48,6 +53,7 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.UIManager;
+import javax.swing.plaf.ComponentUI;
 
 import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXDatePicker;
@@ -56,6 +62,10 @@ import org.jdesktop.swingx.JXMonthView;
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.calendar.CalendarUtils;
 import org.jdesktop.swingx.calendar.DateSelectionModel.SelectionMode;
+import org.jdesktop.swingx.plaf.basic.BasicMonthViewUI.RenderingHandler;
+import org.jdesktop.swingx.renderer.FormatStringValue;
+import org.jdesktop.swingx.renderer.StringValue;
+import org.jdesktop.swingx.renderer.StringValues;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -88,13 +98,93 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
       }
   }
  
+    public static class MyMonthViewUI extends BasicMonthViewUI {
+
+        @SuppressWarnings({"UnusedDeclaration"})
+        public static ComponentUI createUI(JComponent c) {
+            return new MyMonthViewUI();
+        }
+
+        @Override
+        protected CalendarRenderingHandler createRenderingHandler() {
+            return new MyCalendarRenderingHandler();
+        }
+        
+        
+    }
+    
+    /**
+     * Issue #1062-swingx: core formats don't use arabic digits. Opened rendering 
+     */
+    public static class MyCalendarRenderingHandler extends RenderingHandler {
+
+        @Override
+        protected StringValue createDayStringValue(Locale locale) {
+            if (locale == null) {
+                locale = Locale.getDefault();
+            }
+            SimpleDateFormat dateFormat = new SimpleDateFormat("d", locale);
+            LOG.info("got here? " + locale.getCountry() + "-" + locale.getLanguage());
+            adjustFormatSymbols(locale, (DecimalFormat) dateFormat.getNumberFormat());
+            FormatStringValue sv = new FormatStringValue(dateFormat) {
+
+                @Override
+                public String getString(Object value) {
+                    if (value instanceof Calendar) {
+                        ((DateFormat) getFormat()).setTimeZone(((Calendar) value).getTimeZone());
+                        value = ((Calendar) value).getTime();
+                    }
+                    return super.getString(value);
+                }
+
+            };
+            return sv;
+        }
+
+        /**
+         * @param locale
+         * @param df
+         */
+        private void adjustFormatSymbols(Locale locale, DecimalFormat df) {
+            if ("ar".equals(locale.getLanguage())) {
+                DecimalFormatSymbols dfs = df.getDecimalFormatSymbols();
+                // set the beginning of the range to Arabic digits
+                dfs.setZeroDigit('\u0660');
+                df.setDecimalFormatSymbols(dfs);
+            }
+        }
+
+        @Override
+        protected StringValue createWeekOfYearStringValue(Locale locale) {
+            if (locale == null) {
+                locale = Locale.getDefault();
+            }
+            DecimalFormat format = (DecimalFormat) NumberFormat.getInstance(locale);
+            adjustFormatSymbols(locale, format);
+            StringValue wsv = new FormatStringValue(format) {
+
+                public String getString(Object value) {
+                    if (value instanceof Calendar) {
+                        value = ((Calendar) value).get(Calendar.WEEK_OF_YEAR);
+                    }
+                    return super.getString(value);
+                }
+
+            };
+            return wsv;
+        }
+
+        
+        
+    }
     /**
      * Issue #750-swingx: use rendering to side-step antialiase probs.
      * 
      * Debugging ...
      */
     public void interactiveRenderingOn() {
-        // force default loading
+        // KEEP this is global state - uncomment for debug painting completely
+        UIManager.put(JXMonthView.uiClassID, "org.jdesktop.swingx.plaf.basic.BasicMonthViewUITest$MyMonthViewUI");
         new JXMonthView();
         // KEEP this is global state - uncomment for debug painting completely
         UIManager.put("JXMonthView.trailingDayForeground", Color.YELLOW);
@@ -111,6 +201,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
      */
     private void showDebugMonthView(String frameTitle) {
         final JXMonthView monthView = new JXMonthView();
+//        monthView.setUI(new MyMonthViewUI());
         monthView.setDayForeground(Calendar.SUNDAY, Color.BLUE);
         monthView.setDaysOfTheWeekForeground(Color.RED);
         monthView.setFlaggedDayForeground(Color.CYAN);
