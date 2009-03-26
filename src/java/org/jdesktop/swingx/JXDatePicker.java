@@ -108,6 +108,23 @@ import org.jdesktop.swingx.util.Contract;
  * picker.addActionListener(l);
  * </code></pre>
  * 
+ * Note that  ActionListener will <b>not</b> be notified if the user 
+ * edits the date text without hitting the Enter key afterwards. To detect both kinds of
+ * date change, interested client code can add a PropertyChangeListener.
+ * 
+ * <pre><code>
+ * JXDatePicker picker = new JXDatePicker(new Date());
+ * PropertyChangeListener listener = new PropertyChangeListener() {
+ *     public void propertyChange(PropertyChangeEvent e) {
+ *         if ("date".equals(e.getPropertyName()) {
+ *              saveDate(picker.getDate());
+ *         }
+ *     }
+ * };
+ * picker.addPropertyChangeListener(listener);
+ * </code></pre>
+
+ * 
  * <p>
  * The DateFormats used in the JXDatePicker's are initialized to the default
  * formats of the DatePickerFormatter, as defined by the picker's resourceBundle
