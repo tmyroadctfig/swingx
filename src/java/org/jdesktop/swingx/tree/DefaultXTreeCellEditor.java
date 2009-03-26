@@ -27,6 +27,7 @@ import java.awt.Graphics;
 import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JTree;
+import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultTreeCellEditor;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeCellEditor;
@@ -169,10 +170,10 @@ public class DefaultXTreeCellEditor extends DefaultTreeCellEditor implements UID
      */
     public void updateUI() {
         if (getRenderer() != null) {
-            getRenderer().updateUI();
+            SwingUtilities.updateComponentTreeUI(getRenderer());
         }
         if (realEditor instanceof JComponent) {
-            ((JComponent) realEditor).updateUI();
+            SwingUtilities.updateComponentTreeUI((JComponent) realEditor);
         } else if (realEditor instanceof UIDependent) {
             ((UIDependent) realEditor).updateUI();
         }

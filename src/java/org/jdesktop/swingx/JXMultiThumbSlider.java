@@ -91,6 +91,7 @@ public class JXMultiThumbSlider<E> extends JComponent {
         super.setUI(ui);
     }
     
+    @Override
     public void updateUI() {
         setUI((MultiThumbSliderUI)LookAndFeelAddons.getUI(this, MultiThumbSliderUI.class));
         invalidate();
@@ -118,6 +119,7 @@ public class JXMultiThumbSlider<E> extends JComponent {
         
     private ThumbComp selected;
     
+    @Override
     protected void paintComponent(Graphics g) {
         if(isVisible()) {
             if(trackRenderer != null) {
@@ -224,6 +226,7 @@ public class JXMultiThumbSlider<E> extends JComponent {
         }
     }
     
+    @Override
     public void setBounds(int x, int y, int w, int h) {
         super.setBounds(x,y,w,h);
         recalc();
@@ -254,6 +257,7 @@ public class JXMultiThumbSlider<E> extends JComponent {
     }
 
     private class MultiThumbMouseListener extends MouseInputAdapter {
+        @Override
         public void mousePressed(MouseEvent evt) {
             ThumbComp handle = findHandle(evt);
             if(handle != null) {
@@ -276,12 +280,14 @@ public class JXMultiThumbSlider<E> extends JComponent {
             }
         }
 
+        @Override
         public void mouseReleased(MouseEvent evt) {
             if(selected != null) {
                 selected.setSelected(false);
             }
         }
             
+        @Override
         public void mouseDragged(MouseEvent evt) {
             if(selected != null) {
                 int nx = (int)evt.getPoint().getX()- selected.getWidth()/2;
@@ -335,6 +341,7 @@ public class JXMultiThumbSlider<E> extends JComponent {
             setBackground(Color.white);
         }
         
+        @Override
         public void paintComponent(Graphics g) {
             if(slider.getThumbRenderer() != null) {
                 JComponent comp = getRenderer();

@@ -52,6 +52,7 @@ import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.JFormattedTextField.AbstractFormatter;
 import javax.swing.JFormattedTextField.AbstractFormatterFactory;
@@ -406,9 +407,8 @@ public class JXDatePicker extends JComponent {
     public void updateUI() {
         setUI((DatePickerUI) LookAndFeelAddons.getUI(this, DatePickerUI.class));
         // JW: quick hack around #706-swingx - monthView not updated
-        // not sure if this here is the correct place nor 
-        // the correct method - SwingUtilities.updateComponentTree might be better
-        getMonthView().updateUI();
+        // is this complete? how about editor (if not uiResource), linkPanel?
+        SwingUtilities.updateComponentTreeUI(getMonthView());
         invalidate();
     }
 
