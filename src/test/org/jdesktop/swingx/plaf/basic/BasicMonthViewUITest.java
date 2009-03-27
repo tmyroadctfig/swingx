@@ -59,13 +59,13 @@ import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXDatePicker;
 import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXMonthView;
+import org.jdesktop.swingx.SwingXUtilities;
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.calendar.CalendarUtils;
 import org.jdesktop.swingx.calendar.DateSelectionModel.SelectionMode;
 import org.jdesktop.swingx.plaf.basic.BasicMonthViewUI.RenderingHandler;
 import org.jdesktop.swingx.renderer.FormatStringValue;
 import org.jdesktop.swingx.renderer.StringValue;
-import org.jdesktop.swingx.renderer.StringValues;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -183,9 +183,9 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
      * Debugging ...
      */
     public void interactiveRenderingOn() {
+        new JXMonthView();
         // KEEP this is global state - uncomment for debug painting completely
         UIManager.put(JXMonthView.uiClassID, "org.jdesktop.swingx.plaf.basic.BasicMonthViewUITest$MyMonthViewUI");
-        new JXMonthView();
         // KEEP this is global state - uncomment for debug painting completely
         UIManager.put("JXMonthView.trailingDayForeground", Color.YELLOW);
         UIManager.put("JXMonthView.leadingDayForeground", Color.ORANGE);
@@ -264,7 +264,8 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
         zoneSelector.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
                 Locale zone = (Locale) zoneSelector.getSelectedItem();
-                monthView.setLocale(zone);
+                SwingXUtilities.setComponentTreeLocale(frame, zone);
+//                monthView.setLocale(zone);
 //                monthView.revalidate();
             }
         });
