@@ -45,6 +45,8 @@ import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -82,6 +84,8 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
 import javax.swing.plaf.basic.BasicHTML;
 import javax.swing.text.View;
 
@@ -614,13 +618,22 @@ public class JXLoginPane extends JXPanel {
      */
     private JXPanel createLoginPanel() {
         JXPanel loginPanel = new JXPanel();
+        
+        JPasswordField oldPwd = passwordField;
+        //create the password component
+        passwordField = new JPasswordField("", 15);
+        JLabel passwordLabel = new JLabel(UIManagerExt.getString(CLASS_NAME + ".passwordString", getLocale()));
+        passwordLabel.setLabelFor(passwordField);
+        if (oldPwd != null) {
+            passwordField.setText(new String(oldPwd.getPassword()));
+        }
 
         NameComponent oldPanel = namePanel;
         //create the NameComponent
         if (saveMode == SaveMode.NONE) {
-            namePanel = new SimpleNamePanel();
+            namePanel = new SimpleNamePanel(passwordStore, passwordField);
         } else {
-            namePanel = new ComboNamePanel(userNameStore);
+            namePanel = new ComboNamePanel(userNameStore, passwordStore, passwordField);
         }
         if (oldPanel != null) {
             // need to reset here otherwise value will get lost during LAF change as panel gets recreated.
@@ -633,15 +646,6 @@ public class JXLoginPane extends JXPanel {
         }
         JLabel nameLabel = new JLabel(UIManagerExt.getString(CLASS_NAME + ".nameString", getLocale()));
         nameLabel.setLabelFor(namePanel.getComponent());
-
-        JPasswordField oldPwd = passwordField;
-        //create the password component
-        passwordField = new JPasswordField("", 15);
-        JLabel passwordLabel = new JLabel(UIManagerExt.getString(CLASS_NAME + ".passwordString", getLocale()));
-        passwordLabel.setLabelFor(passwordField);
-        if (oldPwd != null) {
-            passwordField.setText(new String(oldPwd.getPassword()));
-        }
 
         //create the server combo box if necessary
         JLabel serverLabel = new JLabel(UIManagerExt.getString(CLASS_NAME + ".serverString", getLocale()));
@@ -875,6 +879,10 @@ public class JXLoginPane extends JXPanel {
             recreateLoginPanel();
             firePropertyChange("saveMode", oldMode, getSaveMode());
         }
+    }
+    
+    public boolean isRememberPassword() {
+	return saveCB.isSelected();
     }
 
     /**
@@ -1440,9 +1448,26 @@ public class JXLoginPane extends JXPanel {
      */
     public static final class SimpleNamePanel extends JTextField implements NameComponent {
         private static final long serialVersionUID = 6513437813612641002L;
+
         public SimpleNamePanel() {
-            super("", 15);
-        }
+            this(null, null);
+	}
+
+	public SimpleNamePanel(final PasswordStore passwordStore, final JPasswordField passwordField) {
+	    super("", 15);
+
+	    // listen to text input, and offer password suggestion based on current
+	    // text
+	    if (passwordStore != null && passwordField!=null) {
+		addKeyListener(new KeyAdapter() {
+		    @Override
+		    public void keyReleased(KeyEvent e) {
+			updatePassword(getText(), passwordStore, passwordField);
+		    }
+		});
+	    }
+	}
+        
         public String getUserName() {
             return getText();
         }
@@ -1453,6 +1478,15 @@ public class JXLoginPane extends JXPanel {
             return this;
         }
         
+        private void updatePassword(final String username, final PasswordStore passwordStore, final JPasswordField passwordField) {
+            String password = "";
+            if (username != null) {
+        	char[] pw = passwordStore.get(username, null);
+        	password = pw == null ? "" : new String(pw);
+            }
+            
+            passwordField.setText(password);
+        }
     }
 
     /**
@@ -1462,13 +1496,47 @@ public class JXLoginPane extends JXPanel {
     public static final class ComboNamePanel extends JComboBox implements NameComponent {
         private static final long serialVersionUID = 2511649075486103959L;
         private UserNameStore userNameStore;
-        public ComboNamePanel(UserNameStore userNameStore) {
+
+        public ComboNamePanel(final UserNameStore userNameStore) {
+            this(userNameStore, null,null);
+        }
+
+        public ComboNamePanel(final UserNameStore userNameStore, final PasswordStore passwordStore, final JPasswordField passwordField) {
             super();
             this.userNameStore = userNameStore;
             setModel(new NameComboBoxModel());
             setEditable(true);
 
+            // listen to selection or text input, and offer password suggestion based on current
+            // text
+            if (passwordStore != null && passwordField!=null) {
+        	final JTextField textfield = (JTextField) getEditor().getEditorComponent();
+        	textfield.addKeyListener(new KeyAdapter() {
+        	    @Override
+        	    public void keyReleased(KeyEvent e) {
+        		updatePassword(textfield.getText(), passwordStore, passwordField);
+        	    }
+        	});
+        	
+        	super.addItemListener(new ItemListener() {
+        	    @Override
+        	    public void itemStateChanged(ItemEvent e) {
+        		updatePassword((String)getSelectedItem(), passwordStore, passwordField);
+        	    }
+        	});
+            }
         }
+        
+        private void updatePassword(final String username, final PasswordStore passwordStore, final JPasswordField passwordField) {
+            String password = "";
+            if (username != null) {
+        	char[] pw = passwordStore.get(username, null);
+        	password = pw == null ? "" : new String(pw);
+            }
+            
+            passwordField.setText(password);
+        }
+        
         public String getUserName() {
             Object item = getModel().getSelectedItem();
             return item == null ? null : item.toString();
