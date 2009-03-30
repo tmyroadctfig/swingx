@@ -377,6 +377,10 @@ public class BasicMonthViewUI extends MonthViewUI {
      */
     protected void installDelegate() {
         isLeftToRight = monthView.getComponentOrientation().isLeftToRight();
+        // PENDING JW: remove here if rendererHandler takes over control completely
+        // as is, some properties are duplicated
+        monthDownImage = UIManager.getIcon("JXMonthView.monthDownFileName");
+        monthUpImage = UIManager.getIcon("JXMonthView.monthUpFileName");
         // install date related state
         setFirstDisplayedDay(monthView.getFirstDisplayedDay());
     }
