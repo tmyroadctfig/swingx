@@ -26,10 +26,7 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.text.DateFormatSymbols;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
+import java.util.logging.Logger;
 
 import javax.swing.Action;
 import javax.swing.Icon;
@@ -39,89 +36,214 @@ import javax.swing.plaf.UIResource;
 
 import org.jdesktop.swingx.JXMonthView;
 import org.jdesktop.swingx.action.AbstractActionExt;
-import org.jdesktop.swingx.hyperlink.AbstractHyperlinkAction;
-import org.jdesktop.swingx.renderer.StringValue;
-import org.jdesktop.swingx.renderer.StringValues;
 
 /**
- * Provides and wires a component appropriate as a calendar navigation header.
+ * Provides and wires a component appropriate as a calendar navigation header. The 
+ * design idea is to support a pluggable header for a zoomable (PENDING JW: naming!)
+ * JXMonthView. Then custom implementations can be tailored to exactly fit their needs.<p>
  * 
+ * Basic navigation action should be defined by the ui delegate itself (PENDING JW: still
+ * incomplete in BasicMonthViewUI). This handler 
+ * can modify/enhance them as appropriate for its context.<p>
+ *   
+ * PENDING JW: those icons ... who's responsible? Shouldn't we use any of the default arrows
+ *   as defined in the laf anyway (are there any?)<p>
+ *   
+ * <b>Note</b>: this is work-in-progress, be prepared to change if subclassing for custom
+ * requirements!   
  * 
  * @author Jeanette Winzenburg
  */
-abstract class CalendarHeaderHandler {
+public abstract class CalendarHeaderHandler {
 
-    JXMonthView monthView;
-    protected JComponent calendarHeader;
-    private Icon monthDownImage;
-    private Icon monthUpImage;
+    @SuppressWarnings("unused")
+    private static final Logger LOG = Logger
+            .getLogger(CalendarHeaderHandler.class.getName());
     
+    protected JXMonthView monthView;
+    private JComponent calendarHeader;
+    protected Icon monthDownImage;
+    protected Icon monthUpImage;
+    
+    private PropertyChangeListener monthViewPropertyChangeListener;
+    
+    /**
+     * Installs this handler to the given month view.
+     * 
+     * @param monthView the target month view to install to.
+     */
     public void install(JXMonthView monthView) {
         this.monthView = monthView;
-        calendarHeader = createCalendarHeader();
-        calendarHeader.setFont(getAsNotUIResource(createDerivedFont()));
-        calendarHeader.setBackground(getAsNotUIResource(monthView.getMonthStringBackground()));
         // PENDING JW: remove here if rendererHandler takes over control completely
         // as is, some properties are duplicated
         monthDownImage = UIManager.getIcon("JXMonthView.monthDownFileName");
         monthUpImage = UIManager.getIcon("JXMonthView.monthUpFileName");
-        installZoomActions();
+        installNavigationActions();
+        installListeners();
+        componentOrientationChanged();
+        monthStringBackgroundChanged();
+        fontChanged();
     }
     
-    
+    /**
+     * Uninstalls this handler from the given target month view.
+     * 
+     * @param monthView the target month view to install from.
+     */
     public void uninstall(JXMonthView monthView) {
-          monthView.remove(getHeaderComponent());
+        this.monthView.remove(getHeaderComponent());
+        uninstallListeners();
+        this.monthView = null;
     }
     
+    /**
+     * Returns a component to be used as header in a zoomable month view, guaranteed
+     * to be not null.
+     * 
+     * @return a component to be used as header in a zoomable JXMonthView
+     */
     public JComponent getHeaderComponent(){
+        if (calendarHeader == null) {
+            calendarHeader = createCalendarHeader();
+        }
         return calendarHeader;
     }
     
+    /**
+     * Creates and registered listeners on the monthView as appropriate. This 
+     * implementation registers a PropertyChangeListener which synchronizes
+     * internal state on changes of componentOrientation, font and monthStringBackground.
+     */
+    protected void installListeners() {
+        monthView.addPropertyChangeListener(getMonthViewPropertyChangeListener());
+    }
+
+    /**
+     * Unregisters listeners which had been installed to the monthView.
+     */
+    protected void uninstallListeners() {
+        monthView.removePropertyChangeListener(monthViewPropertyChangeListener);
+    }
+    
+    /**
+     * Returns the propertyChangelistener for the monthView. Lazily created. 
+     * @return the propertyChangeListener for the monthView.
+     */
+    private PropertyChangeListener getMonthViewPropertyChangeListener() {
+        if (monthViewPropertyChangeListener == null) {
+            monthViewPropertyChangeListener = new PropertyChangeListener() {
+
+                public void propertyChange(PropertyChangeEvent evt) {
+                    if ("componentOrientation".equals(evt.getPropertyName())) {
+                        componentOrientationChanged();
+                    } else if ("font".equals(evt.getPropertyName())) {
+                        fontChanged();
+                    } else if ("monthStringBackground".equals(evt.getPropertyName())) {
+                        monthStringBackgroundChanged();
+                    }
+                    
+                }};
+        }
+        return monthViewPropertyChangeListener;
+    }
+
+
+
+
+    /**
+     * Synchronizes internal state which depends on the month view's monthStringBackground.
+     */
+    protected void monthStringBackgroundChanged() {
+        getHeaderComponent().setBackground(monthView.getMonthStringBackground());
+        
+    }
+
+    /**
+     * Synchronizes internal state which depends on the month view's font.
+     */
+    protected void fontChanged() {
+        getHeaderComponent().setFont(getAsNotUIResource(createDerivedFont()));
+        monthView.revalidate();
+    }
+
+    /**
+     * Synchronizes internal state which depends on the month view's componentOrientation.
+     * 
+     * This implementation updates the month navigation icons and the header 
+     * component's orientation.
+     */
+    protected void componentOrientationChanged() {
+        getHeaderComponent().applyComponentOrientation(monthView.getComponentOrientation());
+        if (monthView.getComponentOrientation().isLeftToRight()) {
+            updateMonthNavigationIcons(monthDownImage, monthUpImage);
+        } else {
+            updateMonthNavigationIcons(monthUpImage, monthDownImage);
+        }
+    }
+
+
+    /**
+     * @param previous the icon to use in the previousMonth action
+     * @param next the icon to use on the nextMonth action
+     */
+    private void updateMonthNavigationIcons(Icon previous, Icon next) {
+        updateActionIcon("previousMonth", previous);
+        updateActionIcon("nextMonth", next);
+    }
+
+
+    /**
+     * @param previousKey
+     * @param previous
+     */
+    private void updateActionIcon(String previousKey, Icon previous) {
+        Action action = monthView.getActionMap().get(previousKey);
+        if (action != null) {
+            action.putValue(Action.SMALL_ICON, previous);
+        }
+    }
+
+    /**
+     * Creates and returns the component used as header in a zoomable monthView.
+     * 
+     * @return the component used as header in a zoomable monthView, guaranteed to 
+     *   be not null.
+     */
     protected abstract JComponent createCalendarHeader();
     
     /**
+     * Installs and configures navigational actions.<p>
      * 
+     * This implementation creates and installs wrappers around the scrollToPrevious/-NextMonth
+     * actions installed by the ui and configures them with the appropriate next/previous icons.
      */
-    private void installZoomActions() {
-        ZoomOutAction zoomOutAction = new ZoomOutAction();
-        zoomOutAction.setTarget(monthView);
-        monthView.getActionMap().put("zoomOut", zoomOutAction);
-        AbstractActionExt prev = new AbstractActionExt(null, monthDownImage) {
-
-            public void actionPerformed(ActionEvent e) {
-                previousMonth();
-            }
-            
-        };
-        monthView.getActionMap().put("scrollToPreviousMonth", prev);
-        AbstractActionExt next = new AbstractActionExt(null, monthUpImage) {
-
-            public void actionPerformed(ActionEvent e) {
-                nextMonth();
-            }
-            
-        };
-        monthView.getActionMap().put("scrollToNextMonth", next);
+    protected void installNavigationActions() {
+        installWrapper("scrollToPreviousMonth", "previousMonth", 
+                monthView.getComponentOrientation().isLeftToRight() ? monthDownImage : monthUpImage);
+        installWrapper("scrollToNextMonth", "nextMonth", 
+                monthView.getComponentOrientation().isLeftToRight() ? monthUpImage : monthDownImage);
     }
 
-    private void nextMonth() {
-        Date upperBound = monthView.getUpperBound();
-        if (upperBound == null
-                || upperBound.after(monthView.getLastDisplayedDay()) ){
-            Calendar cal = monthView.getCalendar();
-            cal.add(Calendar.MONTH, 1);
-            monthView.setFirstDisplayedDay(cal.getTime());
-        }
-    }
+    /**
+     * Creates an life action wrapper around the action registered with actionKey, sets its
+     * SMALL_ICON property to the given icon and installs itself with the newActionKey.
+     * 
+     * @param actionKey the key of the action to wrap around
+     * @param newActionKey the key of the wrapper action
+     * @param icon the icon to use in the wrapper action
+     */
+    private void installWrapper(final String actionKey, String newActionKey, Icon icon) {
+            AbstractActionExt wrapper = new AbstractActionExt(null, icon) {
 
-    private void previousMonth() {
-        Date lowerBound = monthView.getLowerBound();
-        if (lowerBound == null
-                || lowerBound.before(monthView.getFirstDisplayedDay())){
-            Calendar cal = monthView.getCalendar();
-            cal.add(Calendar.MONTH, -1);
-            monthView.setFirstDisplayedDay(cal.getTime());
-        }
+                public void actionPerformed(ActionEvent e) {
+                    Action action = monthView.getActionMap().get(actionKey);
+                    if (action != null) {
+                        action.actionPerformed(e);
+                    }
+                }
+                
+            };
+        monthView.getActionMap().put(newActionKey, wrapper);
     }
 
     /**
@@ -151,110 +273,10 @@ abstract class CalendarHeaderHandler {
 
 
     /**
-     * Quick fix for Issue #1046-swingx: header text not updated if zoomable.
-     * 
-     */
-    protected static class ZoomOutAction extends AbstractHyperlinkAction<JXMonthView> {
-
-        private PropertyChangeListener linkListener;
-        // Formatters/state used by Providers. 
-        /** Localized month strings used in title. */
-        private String[] monthNames;
-        private StringValue tsv ;
-
-        public ZoomOutAction() {
-            super();
-            tsv = new StringValue() {
-                
-                public String getString(Object value) {
-                    if (value instanceof Calendar) {
-                        String month = monthNames[((Calendar) value)
-                                                  .get(Calendar.MONTH)];
-                        return month + " "
-                        + ((Calendar) value).get(Calendar.YEAR); 
-                    }
-                    return StringValues.TO_STRING.getString(value);
-                }
-                
-            };
-        }
-        
-        public void actionPerformed(ActionEvent e) {
-            // TODO Auto-generated method stub
-            
-        }
-
-        
-        /**
-         * installs a propertyChangeListener on the target and
-         * updates the visual properties from the target.
-         */
-        @Override
-        protected void installTarget() {
-            if (getTarget() != null) {
-                getTarget().addPropertyChangeListener(getTargetListener());
-            }
-            updateLocale();
-            updateFromTarget();
-        }
-
-        /**
-         * 
-         */
-        private void updateLocale() {
-            Locale current = getTarget() != null ? getTarget().getLocale() : Locale.getDefault();
-            monthNames = new DateFormatSymbols(current).getMonths();
-        }
-
-        /**
-         * removes the propertyChangeListener. <p>
-         * 
-         * Implementation NOTE: this does not clean-up internal state! There is
-         * no need to because updateFromTarget handles both null and not-null
-         * targets. Hmm...
-         * 
-         */
-        @Override
-        protected void uninstallTarget() {
-            if (getTarget() == null) return;
-            getTarget().removePropertyChangeListener(getTargetListener());
-        }
-
-        protected void updateFromTarget() {
-            // this happens on construction with null target
-            if (tsv == null) return;
-            Calendar calendar = getTarget() != null ? getTarget().getCalendar() : null;
-            setName(tsv.getString(calendar));
-        }
-
-        private PropertyChangeListener getTargetListener() {
-            if (linkListener == null) {
-             linkListener = new PropertyChangeListener() {
-
-                public void propertyChange(PropertyChangeEvent evt) {
-                    if ("firstDisplayedDay".equals(evt.getPropertyName())) {
-                        updateFromTarget();
-                    } else if ("locale".equals(evt.getPropertyName())) {
-                        updateLocale();
-                        updateFromTarget();
-                    }
-                }
-                
-            };
-            }
-            return linkListener;
-        }
-
-        
-    }
-    /**
      * Create a derived font used to when painting various pieces of the
      * month view component.  This method will be called whenever
      * the font on the component is set so a new derived font can be created.
-     * @deprecated KEEP re-added usage in preliminary zoomable support
-     *    no longer used in paint/layout with renderer.
      */
-    @Deprecated
     protected Font createDerivedFont() {
         return monthView.getFont().deriveFont(Font.BOLD);
     }

@@ -20,7 +20,6 @@
  */
 package org.jdesktop.swingx.plaf.basic;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -65,11 +64,8 @@ import org.jdesktop.swingx.calendar.DateSelectionModel;
 import org.jdesktop.swingx.calendar.DateSelectionModel.SelectionMode;
 import org.jdesktop.swingx.event.DateSelectionEvent;
 import org.jdesktop.swingx.event.DateSelectionListener;
-import org.jdesktop.swingx.hyperlink.AbstractHyperlinkAction;
 import org.jdesktop.swingx.plaf.MonthViewUI;
 import org.jdesktop.swingx.plaf.UIManagerExt;
-import org.jdesktop.swingx.renderer.StringValue;
-import org.jdesktop.swingx.renderer.StringValues;
 
 /**
  * Base implementation of the <code>JXMonthView</code> UI.<p>
@@ -239,9 +235,9 @@ public class BasicMonthViewUI extends MonthViewUI {
      */
     private CellRendererPane rendererPane;
 
-
-//    private BasicCalendarHeader calendarHeader;
-
+    /**
+     * The CalendarHeaderHandler which provides the header component if zoomable.
+     */
     private CalendarHeaderHandler calendarHeaderHandler;
     
 
@@ -265,8 +261,8 @@ public class BasicMonthViewUI extends MonthViewUI {
         
         installDefaults();
         installDelegate();
-        installComponents();
         installKeyboardActions();
+        installComponents();
         updateLocale(false);
         updateZoomable();
         installListeners();
@@ -285,42 +281,18 @@ public class BasicMonthViewUI extends MonthViewUI {
     }
 
     /**
-     * Creates and configures the calendar header. 
+     * Creates and installs the calendar header handler. 
      */
     protected void installComponents() {
-        calendarHeaderHandler = createCalendarHeader();
+        calendarHeaderHandler = createCalendarHeaderHandler();
         calendarHeaderHandler.install(monthView);
     }
 
     /**
-     * Returns a Font based on the param which is not of type UIResource. 
-     * 
-     * @param font the base font
-     * @return a font not of type UIResource, may be null.
+     * Uninstalls the calendar header handler.
      */
-    private Font getAsNotUIResource(Font font) {
-        if (!(font instanceof UIResource)) return font;
-        // PENDING JW: correct way to create another font instance?
-       return font.deriveFont(font.getAttributes());
-    }
-    
-    /**
-     * Returns a Color based on the param which is not of type UIResource. 
-     * 
-     * @param color the base color
-     * @return a color not of type UIResource, may be null.
-     */
-    private Color getAsNotUIResource(Color color) {
-        if (!(color instanceof UIResource)) return color;
-        // PENDING JW: correct way to create another color instance?
-        float[] rgb = color.getRGBComponents(null);
-        return new Color(rgb[0], rgb[1], rgb[2], rgb[3]);
-    }
-
     protected void uninstallComponents() {
         calendarHeaderHandler.uninstall(monthView);
-//        monthView.remove(calendarHeader);
-//        calendarHeader.setActions(null, null, null);
         calendarHeaderHandler = null;
     }
 
@@ -429,6 +401,25 @@ public class BasicMonthViewUI extends MonthViewUI {
         actionMap.put(JXMonthView.COMMIT_KEY, acceptAction);
         actionMap.put(JXMonthView.CANCEL_KEY, cancelAction);
         
+        // PENDING JW: complete (year-, decade-, ?? ) and consolidate with KeyboardAction
+        // additional navigation actions
+        AbstractActionExt prev = new AbstractActionExt() {
+
+            public void actionPerformed(ActionEvent e) {
+                previousMonth();
+            }
+            
+        };
+        monthView.getActionMap().put("scrollToPreviousMonth", prev);
+        AbstractActionExt next = new AbstractActionExt() {
+
+            public void actionPerformed(ActionEvent e) {
+                nextMonth();
+            }
+            
+        };
+        monthView.getActionMap().put("scrollToNextMonth", next);
+        
     }
 
     
@@ -520,12 +511,12 @@ public class BasicMonthViewUI extends MonthViewUI {
     
     /**
      * 
-     * Empty wrapper for backward compatibility: refactored the original implementation by
-     * - extracted as standalone class
-     * - renamed to BasicCalendarRenderingHandler
-     * @deprecated extend #BasicCalendarRenderingHandler directly
+     * Empty subclass for backward compatibility. The original implementation was 
+     * extracted as standalone class and renamed to BasicCalendarRenderingHandler. <p>
+     * 
+     * This will be available for extension by LAF providers until all collaborators 
+     * in the new rendering pipeline are ready for public exposure.
      */
-    @Deprecated
     protected static class RenderingHandler extends BasicCalendarRenderingHandler {
         
     }
@@ -1952,9 +1943,9 @@ public class BasicMonthViewUI extends MonthViewUI {
                 monthView.repaint();
             } else if ("zoomable".equals(property)) {
                 updateZoomable();
-            } else if ("font".equals(property)) {
-                calendarHeaderHandler.getHeaderComponent().setFont(getAsNotUIResource(createDerivedFont()));
-                monthView.revalidate();
+//            } else if ("font".equals(property)) {
+//                calendarHeaderHandler.getHeaderComponent().setFont(getAsNotUIResource(createDerivedFont()));
+//                monthView.revalidate();
             } else if ("componentInputMapEnabled".equals(property)) {
                 updateComponentInputMap();
             } else if ("locale".equals(property)) { // "locale" is bound property
@@ -2211,23 +2202,34 @@ public class BasicMonthViewUI extends MonthViewUI {
 //--------------------- zoomable    
 
     /**
-     * 
+     * Updates state after the monthView's zoomable property has been changed.
+     * This implementation adds/removes the header component if zoomable is true/false
+     * respectively.
      */
     protected void updateZoomable() {
         if (monthView.isZoomable()) {
-//            calendarHeaderHandler.setActions(monthView.getActionMap().get("scrollToPreviousMonth"),
-//                    monthView.getActionMap().get("scrollToNextMonth"),
-//                    monthView.getActionMap().get("zoomOut"));
             monthView.add(calendarHeaderHandler.getHeaderComponent());
         } else {
             monthView.remove(calendarHeaderHandler.getHeaderComponent());
-//            calendarHeaderHandler.setActions(null, null, null);
         }
         monthView.revalidate();
         monthView.repaint();
     }
 
-    protected CalendarHeaderHandler createCalendarHeader() {
+    /**
+     * Creates and returns a calendar header handler which provides and configures
+     * a component for use in a zoomable monthView. Subclasses may override to return
+     * a custom handler.<p>
+     * 
+     * This implementation returns a BasicCalendarHeaderHandler.
+     * 
+     * @return a calendar header handler providing a component for use in zoomable
+     *   monthView.
+     *   
+     * @see CalendarHeaderHandler
+     * @see BasicCalendarHeaderHandler  
+     */
+    protected CalendarHeaderHandler createCalendarHeaderHandler() {
         return new BasicCalendarHeaderHandler();
     }
 

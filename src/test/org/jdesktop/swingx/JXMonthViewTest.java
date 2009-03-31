@@ -21,6 +21,7 @@
 package org.jdesktop.swingx;
 
 import java.awt.Color;
+import java.awt.ComponentOrientation;
 import java.awt.Font;
 import java.awt.GraphicsEnvironment;
 import java.awt.Insets;
@@ -36,6 +37,7 @@ import java.util.TreeSet;
 import java.util.logging.Logger;
 
 import javax.swing.Action;
+import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
@@ -118,6 +120,24 @@ public class JXMonthViewTest extends MockObjectTestCase {
     }
 
     /**
+     * Issue #1072-swingx: nav icons incorrect for RToL if zoomable
+     */
+    @Test
+    public void testNavigationIconsUpdatedWithCO() {
+       Action action = monthView.getActionMap().get("nextMonth"); 
+       if (monthView.getComponentOrientation().isLeftToRight()) {
+           Icon icon = (Icon) action.getValue(Action.SMALL_ICON);
+           assertNotNull("sanity: the decorated month nav action has an icon", icon);
+           assertEquals(UIManager.getIcon("JXMonthView.monthUpFileName"), icon);
+           monthView.applyComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+//           assertNotSame(icon, action.getValue(Action.SMALL_ICON));
+           assertEquals(action.getValue(Action.SMALL_ICON), UIManager.getIcon("JXMonthView.monthDownFileName"));
+       } else {
+           
+       }
+    }
+    
+    /**
      * Issue #1046-swingx: month title not updated when traversing months
      * (programatically or by navigating in monthView)
      */
@@ -175,16 +195,43 @@ public class JXMonthViewTest extends MockObjectTestCase {
     
     
     /**
-     * Issue #1046-swingx: month title not updated when traversing months
-     * (programatically or by navigating in monthView)
-     * 
-     * Test that block navigation actions are installed
+     * Test that navigational actions are installed
      */
     @Test
-    public void testNavigationActions() {
+    public void testNavigationActionsInstalled() {
         JXMonthView monthView = new JXMonthView();
-        assertNotNull("monthView must have scrollToNextMonth action", monthView.getActionMap().get("scrollToNextMonth"));
-        assertNotNull("monthView must have scrollToPreviousMonth action", monthView.getActionMap().get("scrollToPreviousMonth"));
+        assertActionInstalled(monthView, "scrollToNextMonth");
+        assertActionInstalled(monthView, "scrollToPreviousMonth");
+        // actions mapped by CalendarHeaderHandler
+        assertActionInstalled(monthView, "nextMonth");
+        assertActionInstalled(monthView, "previousMonth");
+    }
+    
+    /**
+     * @param monthView
+     * @param actionKey
+     */
+    private void assertActionInstalled(JXMonthView monthView, String actionKey) {
+        assertNotNull("ui must have installed action for " + actionKey, monthView.getActionMap().get(actionKey));
+    }
+
+    /**
+     * Test that navigational actions are working as expected.
+     */
+    @Test
+    public void testNavigationActionsWorking() {
+        assertActionPerformed(new JXMonthView(), "scrollToNextMonth", Calendar.MONTH, 1);
+        assertActionPerformed(new JXMonthView(), "nextMonth", Calendar.MONTH, 1);
+        assertActionPerformed(new JXMonthView(), "scrollToPreviousMonth", Calendar.MONTH, -1);
+        assertActionPerformed(new JXMonthView(), "previousMonth", Calendar.MONTH, -1);
+    }
+    
+    private void assertActionPerformed(JXMonthView monthView, String actionKey, int calendarField, int amount) {
+        Calendar calendar = monthView.getCalendar();
+        calendar.add(calendarField, amount);
+        Action action = monthView.getActionMap().get(actionKey);
+        action.actionPerformed(null);
+        assertEquals(calendar.getTime(), monthView.getFirstDisplayedDay());
     }
 
 

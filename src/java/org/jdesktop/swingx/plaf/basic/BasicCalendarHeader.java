@@ -24,7 +24,10 @@ import org.jdesktop.swingx.JXPanel;
  *  PENDING JW: when used in picker dropdown not CO not updated
  *      
  * @author Jeanette Winzenburg
+ * 
+ * @deprecated moved into BasicCalendarHeaderHandler
  */
+@Deprecated
 class BasicCalendarHeader extends JXPanel {
 
     protected AbstractButton prevButton;

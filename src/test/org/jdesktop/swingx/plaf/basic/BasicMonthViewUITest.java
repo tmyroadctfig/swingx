@@ -21,6 +21,8 @@
  */
 package org.jdesktop.swingx.plaf.basic;
 
+import static org.junit.Assert.*;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -163,6 +165,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
             adjustFormatSymbols(locale, format);
             StringValue wsv = new FormatStringValue(format) {
 
+                @Override
                 public String getString(Object value) {
                     if (value instanceof Calendar) {
                         value = ((Calendar) value).get(Calendar.WEEK_OF_YEAR);
@@ -185,7 +188,8 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
     public void interactiveRenderingOn() {
         new JXMonthView();
         // KEEP this is global state - uncomment for debug painting completely
-        UIManager.put(JXMonthView.uiClassID, "org.jdesktop.swingx.plaf.basic.BasicMonthViewUITest$MyMonthViewUI");
+//        UIManager.put(JXMonthView.uiClassID, "org.jdesktop.swingx.plaf.basic.BasicMonthViewUITest$MyMonthViewUI");
+//        UIManager.put("JXDatePicker.forceZoomable", Boolean.TRUE);
         // KEEP this is global state - uncomment for debug painting completely
         UIManager.put("JXMonthView.trailingDayForeground", Color.YELLOW);
         UIManager.put("JXMonthView.leadingDayForeground", Color.ORANGE);
@@ -201,7 +205,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
      */
     private void showDebugMonthView(String frameTitle) {
         final JXMonthView monthView = new JXMonthView();
-//        monthView.setUI(new MyMonthViewUI());
+//        monthView.setZoomable(true);
         monthView.setDayForeground(Calendar.SUNDAY, Color.BLUE);
         monthView.setDaysOfTheWeekForeground(Color.RED);
         monthView.setFlaggedDayForeground(Color.CYAN);
@@ -217,10 +221,10 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
         monthView.setPreferredRowCount(2);
         final JXFrame frame = wrapInFrame(monthView, frameTitle);
         addComponentOrientationToggle(frame);
-        Action toggleTraversable = new AbstractAction("toggle traversable") {
+        Action toggleTraversable = new AbstractAction("toggle zoomable") {
 
             public void actionPerformed(ActionEvent e) {
-                monthView.setTraversable(!monthView.isTraversable());
+                monthView.setZoomable(!monthView.isZoomable());
                 
             }
             
@@ -228,6 +232,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
         addAction(frame, toggleTraversable);
         final JXDatePicker picker = new JXDatePicker();
         picker.getMonthView().setShowingWeekNumber(monthView.isShowingWeekNumber());
+        picker.getMonthView().setZoomable(true);
         Action toggleShowingWeekNumbers = new AbstractAction("toggle weekNumbers") {
             
             public void actionPerformed(ActionEvent e) {
@@ -384,6 +389,8 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
 
 //------------------------------
     
+    
+
     /**
      * Sanity during internal alias cleanup.
      */
@@ -410,7 +417,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
         if (header instanceof CellRendererPane) {
             header = (Container) monthView.getComponent(1);
         }
-        assertTrue("expected BasicCalendarHeader but was " + header.getClass(), header instanceof BasicCalendarHeader);
+        assertTrue("expected BasicCalendarHeader but was " + header.getClass(), header instanceof BasicCalendarHeaderHandler.BasicCalendarHeader);
     }
     
     /**
@@ -427,7 +434,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
         if (header instanceof CellRendererPane) {
             header = (Container) monthView.getComponent(1);
         }
-        assertTrue("expected BasicCalendarHeader but was " + header.getClass(), header instanceof BasicCalendarHeader);
+        assertTrue("expected BasicCalendarHeader but was " + header.getClass(), header instanceof BasicCalendarHeaderHandler.BasicCalendarHeader);
     }
 
     /**
