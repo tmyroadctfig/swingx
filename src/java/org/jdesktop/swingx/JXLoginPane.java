@@ -1519,7 +1519,6 @@ public class JXLoginPane extends JXPanel {
         	});
         	
         	super.addItemListener(new ItemListener() {
-        	    @Override
         	    public void itemStateChanged(ItemEvent e) {
         		updatePassword((String)getSelectedItem(), passwordStore, passwordField);
         	    }
