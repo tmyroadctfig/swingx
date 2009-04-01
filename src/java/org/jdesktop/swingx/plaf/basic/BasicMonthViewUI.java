@@ -284,16 +284,16 @@ public class BasicMonthViewUI extends MonthViewUI {
      * Creates and installs the calendar header handler. 
      */
     protected void installComponents() {
-        calendarHeaderHandler = createCalendarHeaderHandler();
-        calendarHeaderHandler.install(monthView);
+        setCalendarHeaderHandler(createCalendarHeaderHandler());
+        getCalendarHeaderHandler().install(monthView);
     }
 
     /**
      * Uninstalls the calendar header handler.
      */
     protected void uninstallComponents() {
-        calendarHeaderHandler.uninstall(monthView);
-        calendarHeaderHandler = null;
+        getCalendarHeaderHandler().uninstall(monthView);
+        setCalendarHeaderHandler(null);
     }
 
     /**
@@ -480,21 +480,24 @@ public class BasicMonthViewUI extends MonthViewUI {
     }
 
     /**
-     * 
+     * Creates and installs the renderingHandler and infrastructure to use it.
      */
-    private void installRenderingHandler() {
-        renderingHandler = createRenderingHandler();
-        if (renderingHandler != null) {
+    protected void installRenderingHandler() {
+        setRenderingHandler(createRenderingHandler());
+        if (getRenderingHandler() != null) {
             rendererPane = new CellRendererPane();
             monthView.add(rendererPane);
         }
     }
     
-    private void uninstallRenderingHandler() {
-        if (renderingHandler == null) return;
+    /**
+     * Uninstalls the renderingHandler and infrastructure that used it.
+     */
+    protected void uninstallRenderingHandler() {
+        if (getRenderingHandler() == null) return;
         monthView.remove(rendererPane);
         rendererPane = null;
-        renderingHandler = null;
+        setRenderingHandler(null);
     }
 
     /**
@@ -509,6 +512,20 @@ public class BasicMonthViewUI extends MonthViewUI {
         return new RenderingHandler();
     }
     
+    /**
+     * @param renderingHandler the renderingHandler to set
+     */
+    protected void setRenderingHandler(CalendarRenderingHandler renderingHandler) {
+        this.renderingHandler = renderingHandler;
+    }
+
+    /**
+     * @return the renderingHandler
+     */
+    protected CalendarRenderingHandler getRenderingHandler() {
+        return renderingHandler;
+    }
+
     /**
      * 
      * Empty subclass for backward compatibility. The original implementation was 
@@ -545,8 +562,8 @@ public class BasicMonthViewUI extends MonthViewUI {
      */
     protected void updateLocale(boolean revalidate) {
         Locale locale = monthView.getLocale();
-        if (renderingHandler != null) {
-            renderingHandler.setLocale(locale);
+        if (getRenderingHandler() != null) {
+            getRenderingHandler().setLocale(locale);
         }
         monthsOfTheYear = new DateFormatSymbols(locale).getMonths();
 
@@ -1408,7 +1425,7 @@ public class BasicMonthViewUI extends MonthViewUI {
      * @param state the calendar state
      */
     protected void paintDayOfMonth(Graphics g, Rectangle bounds, Calendar calendar, CalendarState state) {
-        JComponent comp = renderingHandler.prepareRenderingComponent(monthView, calendar, 
+        JComponent comp = getRenderingHandler().prepareRenderingComponent(monthView, calendar, 
                 state);
         rendererPane.paintComponent(g, comp, monthView, bounds.x, bounds.y,
                 bounds.width, bounds.height, true);
@@ -1823,7 +1840,7 @@ public class BasicMonthViewUI extends MonthViewUI {
             for (int i = calendar.getMinimum(Calendar.MONTH); i <= calendar.getMaximum(Calendar.MONTH); i++) {
                 calendar.set(Calendar.MONTH, i);
                 CalendarUtils.startOfMonth(calendar);
-                JComponent comp = renderingHandler.prepareRenderingComponent(monthView, calendar, CalendarState.TITLE);
+                JComponent comp = getRenderingHandler().prepareRenderingComponent(monthView, calendar, CalendarState.TITLE);
                 Dimension pref = comp.getPreferredSize();
                 maxMonthWidth = Math.max(maxMonthWidth, pref.width);
                 maxMonthHeight = Math.max(maxMonthHeight, pref.height);
@@ -1834,7 +1851,7 @@ public class BasicMonthViewUI extends MonthViewUI {
             calendar = getCalendar();
             CalendarUtils.startOfWeek(calendar);
             for (int i = 0; i < JXMonthView.DAYS_IN_WEEK; i++) {
-                JComponent comp = renderingHandler.prepareRenderingComponent(monthView, calendar, CalendarState.DAY_OF_WEEK);
+                JComponent comp = getRenderingHandler().prepareRenderingComponent(monthView, calendar, CalendarState.DAY_OF_WEEK);
                 Dimension pref = comp.getPreferredSize();
                 maxBoxWidth = Math.max(maxBoxWidth, pref.width);
                 maxBoxHeight = Math.max(maxBoxHeight, pref.height);
@@ -1843,7 +1860,7 @@ public class BasicMonthViewUI extends MonthViewUI {
             
             calendar = getCalendar();
             for (int i = 0; i < calendar.getMaximum(Calendar.DAY_OF_MONTH); i++) {
-                JComponent comp = renderingHandler.prepareRenderingComponent(monthView, calendar, CalendarState.IN_MONTH);
+                JComponent comp = getRenderingHandler().prepareRenderingComponent(monthView, calendar, CalendarState.IN_MONTH);
                 Dimension pref = comp.getPreferredSize();
                 maxBoxWidth = Math.max(maxBoxWidth, pref.width);
                 maxBoxHeight = Math.max(maxBoxHeight, pref.height);
@@ -1895,7 +1912,7 @@ public class BasicMonthViewUI extends MonthViewUI {
             calculateMonthGridLayoutProperties();
             
             if (isZoomable()) {
-                calendarHeaderHandler.getHeaderComponent().setBounds(getMonthHeaderBounds(monthView.getFirstDisplayedDay(), false));
+                getCalendarHeaderHandler().getHeaderComponent().setBounds(getMonthHeaderBounds(monthView.getFirstDisplayedDay(), false));
             }
         }
 
@@ -2208,9 +2225,9 @@ public class BasicMonthViewUI extends MonthViewUI {
      */
     protected void updateZoomable() {
         if (monthView.isZoomable()) {
-            monthView.add(calendarHeaderHandler.getHeaderComponent());
+            monthView.add(getCalendarHeaderHandler().getHeaderComponent());
         } else {
-            monthView.remove(calendarHeaderHandler.getHeaderComponent());
+            monthView.remove(getCalendarHeaderHandler().getHeaderComponent());
         }
         monthView.revalidate();
         monthView.repaint();
@@ -2233,6 +2250,20 @@ public class BasicMonthViewUI extends MonthViewUI {
         return new BasicCalendarHeaderHandler();
     }
 
+    
+    /**
+     * @param calendarHeaderHandler the calendarHeaderHandler to set
+     */
+    protected void setCalendarHeaderHandler(CalendarHeaderHandler calendarHeaderHandler) {
+        this.calendarHeaderHandler = calendarHeaderHandler;
+    }
+    
+    /**
+     * @return the calendarHeaderHandler
+     */
+    protected CalendarHeaderHandler getCalendarHeaderHandler() {
+        return calendarHeaderHandler;
+    }
     
 //--------------------- deprecated painting api
 //--------------------- this is still serviced (if a ui doesn't install a renderingHandler)
