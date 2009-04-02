@@ -30,6 +30,7 @@ import java.util.logging.Logger;
 import javax.swing.JDialog;
 import javax.swing.JRootPane;
 import javax.swing.JWindow;
+import javax.swing.RepaintManager;
 import javax.swing.RootPaneContainer;
 import javax.swing.UIManager;
 import javax.swing.plaf.ColorUIResource;
@@ -143,7 +144,43 @@ public class SwingXUtilitiesTest extends InteractiveTestCase {
         setSystemLF(true);
     }
 
-
-
-
+    @Test(expected = NullPointerException.class)
+    public void testGetTranslucentRepaintManagerWithNull() {
+        SwingXUtilities.getTranslucentRepaintManager(null);
+    }
+    
+    @Test
+    public void testGetTranslucentRepaintManagerWithTranslucent() {
+        RepaintManagerX rmx = new RepaintManagerX(new RepaintManager());
+        RepaintManager rm = SwingXUtilities.getTranslucentRepaintManager(rmx);
+        
+        assertSame(rmx, rm);
+    }
+    
+    @Test
+    public void testGetTranslucentRepaintManagerWithNonTranslucent() {
+        RepaintManager rm = new RepaintManager();
+        RepaintManager rmx = SwingXUtilities.getTranslucentRepaintManager(rm);
+        
+        assertNotSame(rm, rmx);
+        assertTrue(rmx.getClass().isAnnotationPresent(TranslucentRepaintManager.class));
+    }
+    
+    @Test
+    public void testGetTranslucentRepaintManagerWithForwardingAndTranslucent() {
+        RepaintManagerX rmx = new RepaintManagerX(new RepaintManager());
+        ForwardingRepaintManager frm = new ForwardingRepaintManager(rmx);
+        RepaintManager rm = SwingXUtilities.getTranslucentRepaintManager(frm);
+        
+        assertSame(frm, rm);
+    }
+    
+    @Test
+    public void testGetTranslucentRepaintManagerWithForwardingAndNonTranslucent() {
+        ForwardingRepaintManager frm = new ForwardingRepaintManager(new RepaintManager());
+        RepaintManager rm = SwingXUtilities.getTranslucentRepaintManager(frm);
+        
+        assertNotSame(frm, rm);
+        assertTrue(rm.getClass().isAnnotationPresent(TranslucentRepaintManager.class));
+    }
 }

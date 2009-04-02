@@ -392,19 +392,20 @@ public final class SwingXUtilities {
      * @param delegate
      *            the current repaint manager
      * @return a non-{@code null} {@code TranslucentRepaintManager}
+     * @throws NullPointerException if {@code delegate} is {@code null}
      */
     static RepaintManager getTranslucentRepaintManager(RepaintManager delegate) {
         RepaintManager manager = delegate;
         
-        while (!manager.getClass().isAnnotationPresent(TranslucentRepaintManager.class)) {
+        while (manager != null && !manager.getClass().isAnnotationPresent(TranslucentRepaintManager.class)) {
             if (manager instanceof ForwardingRepaintManager) {
                 manager = ((ForwardingRepaintManager) manager).getDelegateManager();
             } else {
-                manager = new RepaintManagerX(delegate);
+                manager = null;
             }
         }
         
-        return manager;
+        return manager == null ? new RepaintManagerX(delegate) : delegate;
     }
     
     /**
