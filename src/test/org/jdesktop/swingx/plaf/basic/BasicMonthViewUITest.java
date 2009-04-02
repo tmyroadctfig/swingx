@@ -21,8 +21,6 @@
  */
 package org.jdesktop.swingx.plaf.basic;
 
-import static org.junit.Assert.*;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -54,6 +52,7 @@ import javax.swing.CellRendererPane;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.plaf.ComponentUI;
 
@@ -389,7 +388,19 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
 
 //------------------------------
     
-    
+    /**
+     * Issue #1074-swingx: Regression - monthView header background lost on updateUI.
+     */
+    @Test
+    public void testZoomableKeepsMonthStringBackground() {
+        JXMonthView monthView = new JXMonthView();
+        monthView.setZoomable(true);
+        assertEquals(monthView.getMonthStringBackground(), 
+                ((BasicMonthViewUI) monthView.getUI()).getCalendarHeaderHandler().getHeaderComponent().getBackground());
+        SwingUtilities.updateComponentTreeUI(monthView);
+        assertEquals(monthView.getMonthStringBackground(), 
+                ((BasicMonthViewUI) monthView.getUI()).getCalendarHeaderHandler().getHeaderComponent().getBackground());
+    }
 
     /**
      * Sanity during internal alias cleanup.
