@@ -154,7 +154,7 @@ public abstract class CalendarHeaderHandler {
      * Synchronizes internal state which depends on the month view's monthStringBackground.
      */
     protected void monthStringBackgroundChanged() {
-        getHeaderComponent().setBackground(monthView.getMonthStringBackground());
+        getHeaderComponent().setBackground(getAsNotUIResource(monthView.getMonthStringBackground()));
         
     }
 
