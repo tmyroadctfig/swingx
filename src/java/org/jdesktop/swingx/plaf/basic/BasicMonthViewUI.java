@@ -1348,27 +1348,27 @@ public class BasicMonthViewUI extends MonthViewUI {
     /**
      * Paints the day column header.
      * 
+     * Note: the given calendar must not be changed.
      * @param g the graphics to paint into
-     * @param calendar the calendar representing the the month to paint, must
-     *   not be null
+     * @param month the calendar specifying the the first day of the month to
+     *        paint, must not be null
      */
     protected void paintWeekHeader(Graphics g, Calendar calendar) {
         if (!monthView.isShowingWeekNumber())
             return;
         paintWeekOfYearSeparator(g, calendar);
     
-        Calendar clonedCal = (Calendar) calendar.clone();
-        int weeks = getWeeks(clonedCal);
-//        CalendarUtils.endOfMonth(clonedCal);
-//        clonedCal.setTime(calendar.getTime());
-//        CalendarUtils.startOfWeek(clonedCal);
+        int weeks = getWeeks(calendar);
+        // the calendar passed to the renderers
+        Calendar weekCalendar = (Calendar) calendar.clone();
+        // we loop by logical row (== week in month) coordinates 
         for (int week = FIRST_WEEK_ROW; week < FIRST_WEEK_ROW + weeks; week++) {
+            // get the day bounds based on logical row/column coordinates
             Rectangle dayBox = getDayBoundsInMonth(calendar.getTime(), week, WEEK_HEADER_COLUMN);
-            paintDayOfMonth(g, dayBox, clonedCal, CalendarState.WEEK_OF_YEAR);
-            clonedCal.add(Calendar.WEEK_OF_YEAR, 1);
-//            if (clonedCal.getTime().after(endOfMonth)) {
-//                break;
-//            }
+            // NOTE: this can be set to any day in the week to render the weeknumber of
+            // categorized by CalendarState
+            paintDayOfMonth(g, dayBox, weekCalendar, CalendarState.WEEK_OF_YEAR);
+            weekCalendar.add(Calendar.WEEK_OF_YEAR, 1);
         }
     }
 
@@ -1491,7 +1491,8 @@ public class BasicMonthViewUI extends MonthViewUI {
 
     /**
      * Returns the number of weeks to paint in the current month, as represented
-     * by the given calendar.
+     * by the given calendar. The calendar is expected to be set to the first
+     * of the month. 
      * 
      * Note: the given calendar must not be changed.
      * 
@@ -1514,20 +1515,6 @@ public class BasicMonthViewUI extends MonthViewUI {
             cloned.add(Calendar.WEEK_OF_MONTH, 1);
         }
         return weeks;
-//        Date old = month.getTime();
-//        CalendarUtils.startOfWeek(month);
-//        
-//        int firstWeek = month.get(Calendar.WEEK_OF_YEAR);
-//        month.setTime(old);
-//        CalendarUtils.endOfMonth(month);
-//        int lastWeek = month.get(Calendar.WEEK_OF_YEAR);
-//        if (lastWeek < firstWeek) {
-//            lastWeek = month.getActualMaximum(Calendar.WEEK_OF_YEAR) + 1;
-////            month.setTime(old);
-////            return lastWeek;
-//        }
-//        month.setTime(old);
-//        return lastWeek - firstWeek + 1;
     }
 
 
