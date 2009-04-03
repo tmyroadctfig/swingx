@@ -387,7 +387,80 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
     }
 
 //------------------------------
+
+    /**
+     * Issue #1068-swingx: week numbering broken for some years and locales
+     * 
+     * f.i. Jan, 2011 in de: first of Jan is week 52
+     */
+    @Test
+    public void testWeekNumbersWrapBack() {
+        assertWeekNumbers(Locale.GERMAN, 2011, Calendar.JANUARY, Calendar.SATURDAY, 52, 6);
+    }
     
+    /**
+     * Issue #1068-swingx: week numbering broken for some years and locales
+     * 
+     * f.i. Dec, 2008 in de: last of dec is first week of next year
+     */
+    @Test
+    public void testWeekNumbersWrapForward() {
+        assertWeekNumbers(Locale.GERMAN, 2008, Calendar.DECEMBER, Calendar.MONDAY, 49, 5);
+    }
+
+    /**
+     * Issue #1068-swingx: week numbering broken for some years and locales
+     * 
+     * f.i. Oct, 2008 in de: must frequent case, days spread across 5 weeks
+     */
+    @Test
+    public void testWeekNumbersNormal() {
+        assertWeekNumbers(Locale.GERMAN, 2008, Calendar.OCTOBER, Calendar.WEDNESDAY, 40, 5);
+    }
+
+    /**
+     * Creates a monthView with the given locale, sets the firstDisplayedDate to the 
+     * first of the given year and month (sanity asserts dayOfWeek and weekofYear) and 
+     * asserts the number of weeks in that month.
+     * 
+     * @param locale
+     * @param year 
+     * @param month
+     * @param expectedDay day of week (sanity)
+     * @param expectedWeek week of year of the day (sanity)
+     * @param expectedWeekNumber number of weeks in the month
+     */
+    private void assertWeekNumbers(Locale locale, int year, int month, int expectedDay, int expectedWeek, int expectedWeekNumber) {
+        JXMonthView monthView = new JXMonthView(locale);
+        Calendar calendar = monthView.getCalendar();
+        calendar.set(year, month, 1);
+        assertEquals("sanity - day", expectedDay, calendar.get(Calendar.DAY_OF_WEEK));
+        assertEquals("sanity - weekOfYear", expectedWeek, calendar.get(Calendar.WEEK_OF_YEAR));
+        monthView.setFirstDisplayedDay(calendar.getTime());
+        assertEquals("number of weeks in month", expectedWeekNumber, 
+                ((BasicMonthViewUI) monthView.getUI()).getWeeks(monthView.getCalendar()));
+    }
+    /**
+     * Issue #1068-swingx: week numbering broken for some years and locales
+     * 
+     * month with fully six weeks: April 2010
+     */
+    @Test
+    public void testWeekNumbersFull6() {
+        assertWeekNumbers(Locale.GERMAN, 2012, Calendar.APRIL, Calendar.SUNDAY, 13, 6);
+    }
+
+    /**
+     * Issue #1068-swingx: week numbering broken for some years and locales
+     * 
+     * month with minimal 4 weeks: Feb 2010
+     */
+    @Test
+    public void testWeekNumbersMinimum4() {
+        assertWeekNumbers(Locale.GERMAN, 2010, Calendar.FEBRUARY, Calendar.MONDAY, 5, 4);
+    }
+    
+
     /**
      * Issue #1074-swingx: Regression - monthView header background lost on updateUI.
      */

@@ -1359,11 +1359,16 @@ public class BasicMonthViewUI extends MonthViewUI {
     
         Calendar clonedCal = (Calendar) calendar.clone();
         int weeks = getWeeks(clonedCal);
-        clonedCal.setTime(calendar.getTime());
-        for (int week = FIRST_WEEK_ROW; week <= FIRST_WEEK_ROW + weeks; week++) {
+//        CalendarUtils.endOfMonth(clonedCal);
+//        clonedCal.setTime(calendar.getTime());
+//        CalendarUtils.startOfWeek(clonedCal);
+        for (int week = FIRST_WEEK_ROW; week < FIRST_WEEK_ROW + weeks; week++) {
             Rectangle dayBox = getDayBoundsInMonth(calendar.getTime(), week, WEEK_HEADER_COLUMN);
             paintDayOfMonth(g, dayBox, clonedCal, CalendarState.WEEK_OF_YEAR);
             clonedCal.add(Calendar.WEEK_OF_YEAR, 1);
+//            if (clonedCal.getTime().after(endOfMonth)) {
+//                break;
+//            }
         }
     }
 
@@ -1495,17 +1500,34 @@ public class BasicMonthViewUI extends MonthViewUI {
      * @return the number of weeks of this month.
      */
     protected int getWeeks(Calendar month) {
-        Date old = month.getTime();
-        CalendarUtils.startOfWeek(month);
-        int firstWeek = month.get(Calendar.WEEK_OF_YEAR);
-        month.setTime(old);
-        CalendarUtils.endOfMonth(month);
-        int lastWeek = month.get(Calendar.WEEK_OF_YEAR);
-        if (lastWeek < firstWeek) {
-            lastWeek = month.getActualMaximum(Calendar.WEEK_OF_YEAR) + 1;
+        Calendar cloned = (Calendar) month.clone();
+        // the calendar is set to the first of month, get date for last
+        CalendarUtils.endOfMonth(cloned);
+        // marker for end
+        Date last = cloned.getTime();
+        // start again
+        cloned.setTime(month.getTime());
+        CalendarUtils.startOfWeek(cloned);
+        int weeks = 0;
+        while (last.after(cloned.getTime())) {
+            weeks++;
+            cloned.add(Calendar.WEEK_OF_MONTH, 1);
         }
-        month.setTime(old);
-        return lastWeek - firstWeek;
+        return weeks;
+//        Date old = month.getTime();
+//        CalendarUtils.startOfWeek(month);
+//        
+//        int firstWeek = month.get(Calendar.WEEK_OF_YEAR);
+//        month.setTime(old);
+//        CalendarUtils.endOfMonth(month);
+//        int lastWeek = month.get(Calendar.WEEK_OF_YEAR);
+//        if (lastWeek < firstWeek) {
+//            lastWeek = month.getActualMaximum(Calendar.WEEK_OF_YEAR) + 1;
+////            month.setTime(old);
+////            return lastWeek;
+//        }
+//        month.setTime(old);
+//        return lastWeek - firstWeek + 1;
     }
 
 
