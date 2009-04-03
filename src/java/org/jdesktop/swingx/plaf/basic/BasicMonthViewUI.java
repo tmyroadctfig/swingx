@@ -1305,41 +1305,45 @@ public class BasicMonthViewUI extends MonthViewUI {
     /**
      * Paints the month represented by the given Calendar.
      * 
+     * Note: the given calendar must not be changed.
      * @param g the graphics to paint into
-     * @param calendar the calendar representing the month to paint.
+     * @param month the calendar specifying the first day of the month to
+     *        paint, must not be null
      */
-    protected void paintMonth(Graphics g, Calendar calendar) {
-        paintMonthHeader(g, calendar);
-        paintDayHeader(g, calendar);
-        paintWeekHeader(g, calendar);
-        paintDays(g, calendar);
+    protected void paintMonth(Graphics g, Calendar month) {
+        paintMonthHeader(g, month);
+        paintDayHeader(g, month);
+        paintWeekHeader(g, month);
+        paintDays(g, month);
     }
 
     /**
      * Paints the header of a month.
      * 
+     * Note: the given calendar must not be changed.
      * @param g the graphics to paint into
-     * @param calendar the calendar representing the the month to paint, must
-     *   not be null
+     * @param month the calendar specifying the first day of the month to
+     *        paint, must not be null
      */
-    protected void paintMonthHeader(Graphics g, Calendar calendar) {
-        Rectangle page = getMonthHeaderBounds(calendar.getTime(), false);
-        paintDayOfMonth(g, page, calendar, CalendarState.TITLE);
+    protected void paintMonthHeader(Graphics g, Calendar month) {
+        Rectangle page = getMonthHeaderBounds(month.getTime(), false);
+        paintDayOfMonth(g, page, month, CalendarState.TITLE);
     }
 
     /**
      * Paints the day column header.
      * 
+     * Note: the given calendar must not be changed.
      * @param g the graphics to paint into
-     * @param calendar the calendar representing the the month to paint, must
-     *   not be null
+     * @param month the calendar specifying the first day of the month to
+     *        paint, must not be null
      */
-    protected void paintDayHeader(Graphics g, Calendar calendar) {
-        paintDaysOfWeekSeparator(g, calendar);
-        Calendar cal = (Calendar) calendar.clone();
+    protected void paintDayHeader(Graphics g, Calendar month) {
+        paintDaysOfWeekSeparator(g, month);
+        Calendar cal = (Calendar) month.clone();
         CalendarUtils.startOfWeek(cal);
         for (int i = FIRST_DAY_COLUMN; i <= LAST_DAY_COLUMN; i++) {
-            Rectangle dayBox = getDayBoundsInMonth(calendar.getTime(), DAY_HEADER_ROW, i);
+            Rectangle dayBox = getDayBoundsInMonth(month.getTime(), DAY_HEADER_ROW, i);
             paintDayOfMonth(g, dayBox, cal, CalendarState.DAY_OF_WEEK);
             cal.add(Calendar.DATE, 1);
         }
@@ -1350,21 +1354,21 @@ public class BasicMonthViewUI extends MonthViewUI {
      * 
      * Note: the given calendar must not be changed.
      * @param g the graphics to paint into
-     * @param month the calendar specifying the the first day of the month to
+     * @param month the calendar specifying the first day of the month to
      *        paint, must not be null
      */
-    protected void paintWeekHeader(Graphics g, Calendar calendar) {
+    protected void paintWeekHeader(Graphics g, Calendar month) {
         if (!monthView.isShowingWeekNumber())
             return;
-        paintWeekOfYearSeparator(g, calendar);
+        paintWeekOfYearSeparator(g, month);
     
-        int weeks = getWeeks(calendar);
+        int weeks = getWeeks(month);
         // the calendar passed to the renderers
-        Calendar weekCalendar = (Calendar) calendar.clone();
+        Calendar weekCalendar = (Calendar) month.clone();
         // we loop by logical row (== week in month) coordinates 
         for (int week = FIRST_WEEK_ROW; week < FIRST_WEEK_ROW + weeks; week++) {
             // get the day bounds based on logical row/column coordinates
-            Rectangle dayBox = getDayBoundsInMonth(calendar.getTime(), week, WEEK_HEADER_COLUMN);
+            Rectangle dayBox = getDayBoundsInMonth(month.getTime(), week, WEEK_HEADER_COLUMN);
             // NOTE: this can be set to any day in the week to render the weeknumber of
             // categorized by CalendarState
             paintDayOfMonth(g, dayBox, weekCalendar, CalendarState.WEEK_OF_YEAR);
@@ -1375,20 +1379,21 @@ public class BasicMonthViewUI extends MonthViewUI {
     /**
      * Paints the days of the given month.
      * 
+     * Note: the given calendar must not be changed.
      * @param g the graphics to paint into
-     * @param calendar the calendar representing the the month to paint, must
-     *   not be null
+     * @param month the calendar specifying the first day of the month to
+     *        paint, must not be null
      */
-    protected void paintDays(Graphics g, Calendar calendar) {
-        Calendar clonedCal = (Calendar) calendar.clone();
+    protected void paintDays(Graphics g, Calendar month) {
+        Calendar clonedCal = (Calendar) month.clone();
         CalendarUtils.startOfMonth(clonedCal);
         Date startOfMonth = clonedCal.getTime();
         CalendarUtils.endOfMonth(clonedCal);
         Date endOfMonth = clonedCal.getTime();
         // reset the clone
-        clonedCal.setTime(calendar.getTime());
+        clonedCal.setTime(month.getTime());
         // adjust to start of week
-        clonedCal.setTime(calendar.getTime());
+        clonedCal.setTime(month.getTime());
         CalendarUtils.startOfWeek(clonedCal);
         for (int week = FIRST_WEEK_ROW; week <= LAST_WEEK_ROW; week++) {
             for (int day = FIRST_DAY_COLUMN; day <= LAST_DAY_COLUMN; day++) {
@@ -1439,11 +1444,13 @@ public class BasicMonthViewUI extends MonthViewUI {
     /**
      * Paints the separator between row header (weeks of year) and days.
      * 
-     * @param g the Graphics to paint into
-     * @param cal the calendar representing the month
+     * Note: the given calendar must not be changed.
+     * @param g the graphics to paint into
+     * @param month the calendar specifying the first day of the month to
+     *        paint, must not be null
      */
-    protected void paintWeekOfYearSeparator(Graphics g, Calendar cal) {
-        Rectangle r = getSeparatorBounds(cal, FIRST_WEEK_ROW, WEEK_HEADER_COLUMN);
+    protected void paintWeekOfYearSeparator(Graphics g, Calendar month) {
+        Rectangle r = getSeparatorBounds(month, FIRST_WEEK_ROW, WEEK_HEADER_COLUMN);
         if (r == null) return;
         g.setColor(monthView.getForeground());
         g.drawLine(r.x, r.y, r.x, r.y + r.height);
@@ -1452,24 +1459,26 @@ public class BasicMonthViewUI extends MonthViewUI {
     /**
      * Paints the separator between column header (days of week) and days.
      * 
-     * @param g the Graphics to paint into
-     * @param cal the calendar representing the month
+     * Note: the given calendar must not be changed.
+     * @param g the graphics to paint into
+     * @param month the calendar specifying the the first day of the month to
+     *        paint, must not be null
      */
-    protected void paintDaysOfWeekSeparator(Graphics g, Calendar cal) {
-        Rectangle r = getSeparatorBounds(cal, DAY_HEADER_ROW, FIRST_DAY_COLUMN);
+    protected void paintDaysOfWeekSeparator(Graphics g, Calendar month) {
+        Rectangle r = getSeparatorBounds(month, DAY_HEADER_ROW, FIRST_DAY_COLUMN);
         if (r == null) return;
         g.setColor(monthView.getForeground());
         g.drawLine(r.x, r.y, r.x + r.width, r.y);
     }
     
     /**
-     * @param cal
+     * @param month
      * @param row
      * @param column
      * @return
      */
-    private Rectangle getSeparatorBounds(Calendar cal, int row, int column) {
-        Rectangle separator = getDayBoundsInMonth(cal.getTime(), row, column);
+    private Rectangle getSeparatorBounds(Calendar month, int row, int column) {
+        Rectangle separator = getDayBoundsInMonth(month.getTime(), row, column);
         if (separator == null) return null;
         if (column == WEEK_HEADER_COLUMN) {
             separator.height *= WEEKS_IN_MONTH;
