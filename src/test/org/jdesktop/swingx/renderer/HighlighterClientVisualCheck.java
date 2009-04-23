@@ -89,7 +89,7 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
 //         test.runInteractiveTests();
 //         test.runInteractiveTests(".*Tool.*");
 //         test.runInteractiveTests("interactive.*Search.*");
-         test.runInteractiveTests("interactiveTreeBorderHighlighter");
+         test.runInteractiveTests("interactive.*BorderHighlighter");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
@@ -125,7 +125,8 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
         JXTree tree = new JXTree();
         tree.expandAll();
         tree.setVisibleRowCount(tree.getRowCount());
-        
+        // need SwingX highlighter
+        tree.setCellRenderer(new DefaultTreeRenderer());
         tree.setHighlighters(new BorderHighlighter(BorderFactory.createLineBorder(Color.GREEN, 1)));
         showWithScrollingInFrame(tree, "Border Highlighters");
     }
