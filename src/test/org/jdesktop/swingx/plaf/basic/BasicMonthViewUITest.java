@@ -21,8 +21,6 @@
  */
 package org.jdesktop.swingx.plaf.basic;
 
-import static org.junit.Assert.*;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
