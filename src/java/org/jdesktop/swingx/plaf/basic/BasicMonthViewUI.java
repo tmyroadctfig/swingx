@@ -37,6 +37,8 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.text.DateFormatSymbols;
 import java.util.Calendar;
 import java.util.Date;
@@ -2256,19 +2258,84 @@ public class BasicMonthViewUI extends MonthViewUI {
      * a component for use in a zoomable monthView. Subclasses may override to return
      * a custom handler.<p>
      * 
-     * This implementation returns a BasicCalendarHeaderHandler.
+     * This implementation first queries the UIManager for class to use and returns 
+     * that if available, returns a BasicCalendarHeaderHandler if not.
      * 
      * @return a calendar header handler providing a component for use in zoomable
      *   monthView.
-     *   
+     * 
+     * @see #getHeaderFromUIManager()  
      * @see CalendarHeaderHandler
      * @see BasicCalendarHeaderHandler  
      */
     protected CalendarHeaderHandler createCalendarHeaderHandler() {
-        return new BasicCalendarHeaderHandler();
+        CalendarHeaderHandler handler = getHeaderFromUIManager();
+        return handler != null ? handler : new BasicCalendarHeaderHandler();
     }
 
     
+    /**
+     * Returns a CalendarHeaderHandler looked up in the UIManager. This implementation 
+     * looks for a String registered with a key of CalendarHeaderHandler.uiControllerID. If
+     * found it assumes that the value is the class name of the handler and tries 
+     * to instantiate the handler. 
+     * 
+     * @return a CalendarHeaderHandler from the UIManager or null if none 
+     *   available or instantiation failed.
+     */
+    protected CalendarHeaderHandler getHeaderFromUIManager() {
+        Object handlerClass = UIManager.get(CalendarHeaderHandler.uiControllerID);
+        if (handlerClass instanceof String) {
+            return instantiateClass((String) handlerClass);
+        }
+        return null;
+    }
+
+    /**
+     * @param handlerClassName
+     * @return
+     */
+    private CalendarHeaderHandler instantiateClass(String handlerClassName) {
+        Class<?> handler = null;
+        try {
+            handler = Class.forName(handlerClassName);
+            return instantiateClass(handler);
+        } catch (ClassNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+         return null;
+    }
+
+    /**
+     * @param handlerClass
+     * @return
+     */
+    private CalendarHeaderHandler instantiateClass(Class<?> handlerClass) {
+        Constructor constructor = null; 
+        try {
+            constructor = handlerClass.getConstructor();
+        } catch (SecurityException e) {
+            LOG.finer("cant instantiate CalendarHeaderHandler (security) " + handlerClass);
+        } catch (NoSuchMethodException e) {
+            LOG.finer("cant instantiate CalendarHeaderHandler (missing parameterless constructo?)" + handlerClass);
+        }
+        if (constructor != null) {
+            try {
+                return (CalendarHeaderHandler) constructor.newInstance();
+            } catch (IllegalArgumentException e) {
+                LOG.finer("cant instantiate CalendarHeaderHandler (missing parameterless constructo?)" + handlerClass);
+            } catch (InstantiationException e) {
+                LOG.finer("cant instantiate CalendarHeaderHandler (not instantiable) " + handlerClass);
+            } catch (IllegalAccessException e) {
+                LOG.finer("cant instantiate CalendarHeaderHandler (constructor not public) " + handlerClass);
+            } catch (InvocationTargetException e) {
+                LOG.finer("cant instantiate CalendarHeaderHandler (Invocation target)" + handlerClass);
+            }
+        }
+        return null;
+    }
+
     /**
      * @param calendarHeaderHandler the calendarHeaderHandler to set
      */

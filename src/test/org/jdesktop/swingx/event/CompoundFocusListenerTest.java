@@ -4,20 +4,15 @@
  */
 package org.jdesktop.swingx.event;
 
-import static org.junit.Assert.*;
-
 import java.awt.Component;
-import java.awt.DefaultKeyboardFocusManager;
 import java.awt.GraphicsEnvironment;
 import java.awt.KeyboardFocusManager;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.lang.ref.WeakReference;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Date;
 import java.util.logging.Logger;
 
-import javax.swing.AbstractButton;
 import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JComboBox;

@@ -21,6 +21,8 @@
  */
 package org.jdesktop.swingx.plaf.basic;
 
+import static org.junit.Assert.*;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -187,8 +189,11 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
     public void interactiveRenderingOn() {
         new JXMonthView();
         // KEEP this is global state - uncomment for debug painting completely
-//        UIManager.put(JXMonthView.uiClassID, "org.jdesktop.swingx.plaf.basic.BasicMonthViewUITest$MyMonthViewUI");
-//        UIManager.put("JXDatePicker.forceZoomable", Boolean.TRUE);
+        UIManager.put(CalendarHeaderHandler.uiControllerID, "org.jdesktop.swingx.plaf.basic.SpinningCalendarHeaderHandler");
+        UIManager.put(SpinningCalendarHeaderHandler.ARROWS_SURROUND_MONTH, Boolean.TRUE);
+        UIManager.put(SpinningCalendarHeaderHandler.FOCUSABLE_SPINNER_TEXT, Boolean.TRUE);
+        UIManager.put(JXMonthView.uiClassID, "org.jdesktop.swingx.plaf.basic.BasicMonthViewUITest$MyMonthViewUI");
+        UIManager.put("JXDatePicker.forceZoomable", Boolean.TRUE);
         // KEEP this is global state - uncomment for debug painting completely
         UIManager.put("JXMonthView.trailingDayForeground", Color.YELLOW);
         UIManager.put("JXMonthView.leadingDayForeground", Color.ORANGE);
@@ -488,6 +493,37 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
         assertEquals(calendar.get(Calendar.YEAR), ui.getFirstDisplayedYear());
     }
     
+    /**
+     * Issue #77-swingx: support year-wise navigation.
+     * Alleviate the problem by allowing custom calendar headers.
+     * 
+     * Here: test that the monthViewUI uses the custom header if available.
+     */
+    @Test
+    public void testZoomableCustomHeader() {
+        UIManager.put(CalendarHeaderHandler.uiControllerID, "org.jdesktop.swingx.plaf.basic.SpinningCalendarHeaderHandler");
+        JXMonthView monthView = new JXMonthView();
+        monthView.setZoomable(true);
+        // digging into internals
+        Container header = (Container) monthView.getComponent(0);
+        if (header instanceof CellRendererPane) {
+            header = (Container) monthView.getComponent(1);
+        }
+        try {
+            assertTrue("expected SpinningCalendarHeader but was " + header.getClass(), header instanceof SpinningCalendarHeaderHandler.SpinningCalendarHeader);
+        } finally {
+            UIManager.put(CalendarHeaderHandler.uiControllerID, null);
+        }
+        
+    }
+    
+    /**
+     * Sanity: uiClassID alike on CalendarHeaderHandler
+     */
+    @Test
+    public void testCalendarHeaderHandlerID() {
+        assertEquals("CalendarHeaderHandler", CalendarHeaderHandler.uiControllerID);
+    }
     /**
      * Issue #1046-swingx: month title not updated when traversing months
      * (programatically or by navigating in monthView)
