@@ -39,12 +39,12 @@ import javax.swing.table.TableCellRenderer;
  * <pre><code>
  * setDefaultRenderer(Object.class, new DefaultTableRenderer());
  * setDefaultRenderer(Number.class, new DefaultTableRenderer(
- *         FormatStringValue.NUMBER_TO_STRING, JLabel.RIGHT));
+ *         FormatStringValues.NUMBER_TO_STRING, JLabel.RIGHT));
  * setDefaultRenderer(Date.class, new DefaultTableRenderer(
- *         FormatStringValue.DATE_TO_STRING));
+ *         FormatStringValues.DATE_TO_STRING));
  * // use the same center aligned default for Image/Icon
  * TableCellRenderer renderer = new DefaultTableRenderer(new MappedValue(
- *         StringValue.EMPTY, IconValue.ICON), JLabel.CENTER);
+ *         StringValues.EMPTY, IconValues.ICON), JLabel.CENTER);
  * setDefaultRenderer(Icon.class, renderer);
  * setDefaultRenderer(ImageIcon.class, renderer);
  * // use a CheckBoxProvider for booleans

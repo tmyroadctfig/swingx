@@ -124,6 +124,17 @@ import org.jdesktop.swingx.table.TableColumnExt;
 import org.jdesktop.swingx.table.TableColumnModelExt;
 
 /**
+ * Enhanced Table component with support for general SwingX sorting/filtering,
+ * rendering, highlighting, rollover and search functionality. Table specific
+ * enhancements include runtime configuration options like toggle column
+ * visibility, column sizing, PENDING JW ...
+ * 
+ * <h2>Sorting and Filtering</h2>
+ * 
+ * <b>NOTE:</b> this is incompatible with core (table) sorting/filtering in JDK
+ * 6+. Will be replaced by core functionality after switching the target jdk
+ * version from 5 to 6.
+ * 
  * <p>
  * A JXTable is a JTable with built-in support for row sorting, filtering, and
  * highlighting, column visibility and a special popup control on the column
@@ -145,6 +156,99 @@ import org.jdesktop.swingx.table.TableColumnModelExt;
  * <code>getColumnExt("column").setComparator(customComparator)</code>
  * 
  * <p>
+ * Rows can be filtered from a JXTable using a Filter class and a
+ * FilterPipeline. One assigns a FilterPipeline to the table using
+ * {@link #setFilters(FilterPipeline)}. Filtering hides, but does not delete or
+ * permanently remove rows from a JXTable. Filters are used to provide sorting
+ * to the table--rows are not removed, but the table is made to believe rows in
+ * the model are in a sorted order.
+ * 
+ * <h2>Rendering and Highlighting</h2>
+ * 
+ * As all SwingX collection views, a JXTable is a HighlighterClient (PENDING JW:
+ * formally define and implement, like in AbstractTestHighlighter), that is it
+ * provides consistent api to add and remove Highlighters which can visually
+ * decorate the rendering component.
+ * 
+ * <p>
+ * An example multiple highlighting (default striping as appropriate for the
+ * current LookAndFeel, cell foreground on matching pattern, and shading a
+ * column):
+ * 
+ * <pre><code>
+ * 
+ *         Highlighter simpleStriping = HighlighterFactory.createSimpleStriping();
+ *         PatternPredicate patternPredicate = new PatternPredicate(&quot;&circ;M&quot;, 1);
+ *         ColorHighlighter magenta = new ColorHighlighter(patternPredicate, null,
+ *                 Color.MAGENTA, null, Color.MAGENTA);
+ *         Highlighter shading = new ShadingColorHighlighter(
+ *                 new HighlightPredicate.ColumnHighlightPredicate(1));
+ * 
+ *         table.setHighlighters(simpleStriping,
+ *                 magenta,
+ *                 shading);
+ * </code></pre>
+ * 
+ * <p>
+ * To fully support, JXTable registers SwingX default table renderers instead of
+ * core defaults (see {@link DefaultTableRenderer}) The recommended approach for
+ * customizing rendered content it to intall a DefaultTableRenderer configured
+ * with a custom String- and/or IconValue. F.i. assuming the cell value is a
+ * File and should be rendered by showing its name followed and date of last
+ * change:
+ * 
+ * <pre><code>
+ * StringValue sv = new StringValue() {
+ *      public String getString(Object value) {
+ *        if (!(value instanceof File)) return StringValues.TO_STRING.getString(value);
+ *        return StringValues.FILE_NAME.getString(value) + &quot;, &quot; 
+ *           + StringValues.DATE_TO_STRING.getString(((File) value).lastModified());
+ * }};
+ * </code></pre>
+ * 
+ * 
+ * 
+ * <p>
+ * <b>Note</b>: DefaultTableCellRenderer and subclasses require a hack to play
+ * nicely with Highlighters because it has an internal "color memory" in
+ * setForeground/setBackground. The hack is applied by default which might lead
+ * to unexpected side-effects in custom renderers subclassing DTCR. See
+ * {@link #resetDefaultTableCellRendererHighlighter} for details.
+ * 
+ * 
+ * <h2>Rollover</h2>
+ * 
+ * As all SwingX collection views, a JXTable supports per-cell rollover which is
+ * enabled by default. If enabled, the component fires rollover events on
+ * enter/exit of a cell which by default is promoted to the renderer if it
+ * implements RolloverRenderer, that is simulates live behaviour. The rollover
+ * events can be used by client code as well, f.i. to decorate the rollover row
+ * using a Highlighter.
+ * 
+ * <pre><code>
+ * JXTable tree = new JXTable();
+ * table.addHighlighter(new ColorHighlighter(HighlightPredicate.ROLLOVER_ROW, 
+ *      null, Color.RED);      
+ * </code></pre>
+ * 
+ * <h2>Search</h2>
+ * 
+ * As all SwingX collection views, a JXTable is searchable. A search action is
+ * registered in its ActionMap under the key "find". The default behaviour is to
+ * ask the SearchFactory to open a search component on this component. The
+ * default keybinding is retrieved from the SearchFactory, typically ctrl-f (or
+ * cmd-f for Mac). Client code can register custom actions and/or bindings as
+ * appropriate.
+ * <p>
+ * 
+ * JXTable provides api to vend a renderer-controlled String representation of
+ * cell content. This allows the Searchable and Highlighters to use WYSIWYM
+ * (What-You-See-Is-What-You-Match), that is pattern matching against the actual
+ * string as seen by the user.
+ * 
+ * <h2>Column Configuration</h2>
+ * 
+ * <p>
  * Columns can be hidden or shown by setting the visible property on the
  * TableColumnExt using {@link TableColumnExt#setVisible(boolean)}. Columns can
  * also be shown or hidden from the column control popup.
@@ -158,23 +262,6 @@ import org.jdesktop.swingx.table.TableColumnModelExt;
  * {@link #setColumnControlVisible(boolean show)}method.
  * 
  * <p>
- * Rows can be filtered from a JXTable using a Filter class and a
- * FilterPipeline. One assigns a FilterPipeline to the table using
- * {@link #setFilters(FilterPipeline)}. Filtering hides, but does not delete or
- * permanently remove rows from a JXTable. Filters are used to provide sorting
- * to the table--rows are not removed, but the table is made to believe rows in
- * the model are in a sorted order.
- * 
- * <p>
- * One can automatically highlight certain rows in a JXTable by attaching
- * Highlighters with setHighlighters(Highlighter) method. An
- * example would be a Highlighter that colors alternate rows in the table for
- * readability. The HighlighterFactory has several methods to return appropriate
- * Highlighters for this use-case.s Again, like Filters,
- * Highlighters can be chained together in a CompoundHighlighter to achieve more
- * interesting effects.
- * 
- * <p>
  * You can resize all columns, selected columns, or a single column using the
  * methods like {@link #packAll()}. Packing combines several other aspects of a
  * JXTable. If horizontal scrolling is enabled using
@@ -182,33 +269,32 @@ import org.jdesktop.swingx.table.TableColumnModelExt;
  * the table to scroll right-left, and columns will be sized to their preferred
  * size. To control the preferred sizing of a column, you can provide a
  * prototype value for the column in the TableColumnExt using
- * {@link TableColumnExt#setPrototypeValue(Object)}. The prototype is used as
- * an indicator of the preferred size of the column. This can be useful if some
+ * {@link TableColumnExt#setPrototypeValue(Object)}. The prototype is used as an
+ * indicator of the preferred size of the column. This can be useful if some
  * data in a given column is very long, but where the resize algorithm would
  * normally not pick this up.
  * 
  * <p>
- * JXTable guarantees to delegate creation and configuration of TableColumnExt 
- * to a ColumnFactory. By default, the application-wide shared ColumnFactory is used.
- * You can install a custom ColumnFactory, either application-wide by 
- * {@link ColumnFactory#setInstance(ColumnFactory)} or per table instance by 
- * {@link #setColumnFactory(ColumnFactory)}. 
+ * JXTable guarantees to delegate creation and configuration of TableColumnExt
+ * to a ColumnFactory. By default, the application-wide shared ColumnFactory is
+ * used. You can install a custom ColumnFactory, either application-wide by
+ * {@link ColumnFactory#setInstance(ColumnFactory)} or per table instance by
+ * {@link #setColumnFactory(ColumnFactory)}.
  * 
- * <p>
- * Last, you can also provide searches on a JXTable using the Searchable property.
  * 
  * <p>
  * Keys/Actions registered with this component:
  * 
  * <ul>
- * <li> "find" - open an appropriate search widget for searching cell content. The
- *   default action registeres itself with the SearchFactory as search target.
- * <li> "print" - print the table
- * <li> {@link JXTable#HORIZONTALSCROLL_ACTION_COMMAND} - toggle the horizontal scrollbar
- * <li> {@link JXTable#PACKSELECTED_ACTION_COMMAND} - resize the selected column to fit the widest
- *  cell content 
- * <li> {@link JXTable#PACKALL_ACTION_COMMAND} - resize all columns to fit the widest
- *  cell content in each column
+ * <li>"find" - open an appropriate search widget for searching cell content.
+ * The default action registeres itself with the SearchFactory as search target.
+ * <li>"print" - print the table
+ * <li> {@link JXTable#HORIZONTALSCROLL_ACTION_COMMAND} - toggle the horizontal
+ * scrollbar
+ * <li> {@link JXTable#PACKSELECTED_ACTION_COMMAND} - resize the selected column
+ * to fit the widest cell content
+ * <li> {@link JXTable#PACKALL_ACTION_COMMAND} - resize all columns to fit the
+ * widest cell content in each column
  * 
  * </ul>
  * 
@@ -216,15 +302,15 @@ import org.jdesktop.swingx.table.TableColumnModelExt;
  * Key bindings.
  * 
  * <ul>
- * <li> "control F" - bound to actionKey "find".
+ * <li>"control F" - bound to actionKey "find".
  * </ul>
  * 
  * <p>
  * Client Properties.
  * 
  * <ul>
- * <li> {@link JXTable#MATCH_HIGHLIGHTER} - set to Boolean.TRUE to 
- *  use a SearchHighlighter to mark a cell as matching.
+ * <li> {@link JXTable#MATCH_HIGHLIGHTER} - set to Boolean.TRUE to use a
+ * SearchHighlighter to mark a cell as matching.
  * </ul>
  * 
  * @author Ramesh Gupta
@@ -232,9 +318,8 @@ import org.jdesktop.swingx.table.TableColumnModelExt;
  * @author Mark Davidson
  * @author Jeanette Winzenburg
  */
-public class JXTable extends JTable 
-    implements TableColumnModelExtListener    {
-    
+public class JXTable extends JTable implements TableColumnModelExtListener {
+
     /**
      * 
      */
@@ -246,30 +331,32 @@ public class JXTable extends JTable
     public static final String FOCUS_NEXT_COMPONENT = "focusNextComponent";
 
     private static final Logger LOG = Logger.getLogger(JXTable.class.getName());
-    
-     /**
-     * Identifier of show horizontal scroll action, 
-     * used in JXTable's <code>ActionMap</code>.
-     * 
-     */
-    public static final String HORIZONTALSCROLL_ACTION_COMMAND = 
-        ColumnControlButton.COLUMN_CONTROL_MARKER + "horizontalScroll";
-
-    /** 
-     * Identifier of pack table action, used in JXTable's <code>ActionMap</code>.
-     */
-    public static final String PACKALL_ACTION_COMMAND = 
-        ColumnControlButton.COLUMN_CONTROL_MARKER + "packAll";
 
     /**
-     * Identifier of pack selected column action, used in JXTable's <code>ActionMap</code>.
+     * Identifier of show horizontal scroll action, used in JXTable's
+     * <code>ActionMap</code>.
+     * 
      */
-    public static final String PACKSELECTED_ACTION_COMMAND = 
-        ColumnControlButton.COLUMN_CONTROL_MARKER + "packSelected";
+    public static final String HORIZONTALSCROLL_ACTION_COMMAND = ColumnControlButton.COLUMN_CONTROL_MARKER
+            + "horizontalScroll";
 
-    /** 
-     * The prefix marker to find table related properties 
-     * in the <code>ResourceBundle</code>. 
+    /**
+     * Identifier of pack table action, used in JXTable's <code>ActionMap</code>
+     * .
+     */
+    public static final String PACKALL_ACTION_COMMAND = ColumnControlButton.COLUMN_CONTROL_MARKER
+            + "packAll";
+
+    /**
+     * Identifier of pack selected column action, used in JXTable's
+     * <code>ActionMap</code>.
+     */
+    public static final String PACKSELECTED_ACTION_COMMAND = ColumnControlButton.COLUMN_CONTROL_MARKER
+            + "packSelected";
+
+    /**
+     * The prefix marker to find table related properties in the
+     * <code>ResourceBundle</code>.
      */
     public static final String UIPREFIX = "JXTable.";
 
@@ -288,23 +375,25 @@ public class JXTable extends JTable
     protected CompoundHighlighter compoundHighlighter;
 
     /**
-     * The key for the client property deciding about whether 
-     * the color memory hack for DefaultTableCellRenderer should be used.
+     * The key for the client property deciding about whether the color memory
+     * hack for DefaultTableCellRenderer should be used.
+     * 
      * @see #resetDefaultTableCellRendererHighlighter
      */
     public static final String USE_DTCR_COLORMEMORY_HACK = "useDTCRColorMemoryHack";
 
-
     /**
-     * The Highlighter used to hack around DefaultTableCellRenderer's color memory. 
+     * The Highlighter used to hack around DefaultTableCellRenderer's color
+     * memory.
      */
     protected Highlighter resetDefaultTableCellRendererHighlighter;
 
     /** The ComponentAdapter for model data access. */
     protected ComponentAdapter dataAdapter;
 
-    /** The handler for mapping view/model coordinates of row selection. 
-     *  Widened access to allow lazy instantiation in subclasses (#746-swingx).
+    /**
+     * The handler for mapping view/model coordinates of row selection. Widened
+     * access to allow lazy instantiation in subclasses (#746-swingx).
      */
     protected SelectionMapper selectionMapper;
 
@@ -336,6 +425,7 @@ public class JXTable extends JTable
      * Flag to indicate if the column control is visible.
      */
     private boolean columnControlVisible;
+
     /**
      * ScrollPane's original vertical scroll policy. If the column control is
      * visible the policy is set to ALWAYS.
@@ -343,8 +433,8 @@ public class JXTable extends JTable
     private int verticalScrollPolicy;
 
     /**
-     * The component used a column control in the upper trailing corner of 
-     * an enclosing <code>JScrollPane</code>.
+     * The component used a column control in the upper trailing corner of an
+     * enclosing <code>JScrollPane</code>.
      */
     private JComponent columnControlButton;
 
@@ -359,21 +449,24 @@ public class JXTable extends JTable
      */
     private TableRolloverController<JXTable> linkController;
 
-    /** field to store the autoResizeMode while interactively setting 
-     *  horizontal scrollbar to visible.
+    /**
+     * field to store the autoResizeMode while interactively setting horizontal
+     * scrollbar to visible.
      */
     private int oldAutoResizeMode;
 
     /** property to control the tracksViewportHeight behaviour. */
     private boolean fillsViewportHeight;
 
-    /** flag to indicate enhanced auto-resize-off behaviour is on. 
-     *  This is set/reset in setHorizontalScrollEnabled.
+    /**
+     * flag to indicate enhanced auto-resize-off behaviour is on. This is
+     * set/reset in setHorizontalScrollEnabled.
      */
     private boolean intelliMode;
 
-    /** internal flag indicating that we are in super.doLayout().
-     *  (used in columnMarginChanged to not update the resizingCol's prefWidth).
+    /**
+     * internal flag indicating that we are in super.doLayout(). (used in
+     * columnMarginChanged to not update the resizingCol's prefWidth).
      */
     private boolean inLayout;
 
@@ -382,6 +475,7 @@ public class JXTable extends JTable
      * settings. The rowHeight will be internally adjusted to font size on
      * instantiation and in updateUI if the height has not been set explicitly
      * by the application.
+     * 
      * @see #adminSetRowHeight(int)
      * @see #setRowHeight(int)
      */
@@ -394,7 +488,6 @@ public class JXTable extends JTable
     private boolean editable;
 
     private Dimension calculatedPrefScrollableViewportSize;
-
 
     /** Instantiates a JXTable with a default table model, no data. */
     public JXTable() {
@@ -468,9 +561,9 @@ public class JXTable extends JTable
         init();
     }
 
-    /** 
+    /**
      * Initializes the table for use.
-     *  
+     * 
      */
     private void init() {
         putClientProperty(USE_DTCR_COLORMEMORY_HACK, Boolean.TRUE);
@@ -484,7 +577,7 @@ public class JXTable extends JTable
         initFocusBindings();
         // instantiate row height depending ui setting or font size.
         updateRowHeightUI(false);
-        // set to null -  don't want hard-coded pixel sizes.
+        // set to null - don't want hard-coded pixel sizes.
         setPreferredScrollableViewportSize(null);
         // PENDING: need to duplicate here..
         // why doesn't the call in tableChanged work?
@@ -496,7 +589,7 @@ public class JXTable extends JTable
     /**
      * Property to enable/disable rollover support. This can be enabled to show
      * "live" rollover behaviour, f.i. the cursor over LinkModel cells. Default
-     * is enabled. If rollover effects are not used, this property should be 
+     * is enabled. If rollover effects are not used, this property should be
      * disabled.
      * 
      * @param rolloverEnabled
@@ -531,7 +624,6 @@ public class JXTable extends JTable
         return new TableRolloverController<JXTable>();
     }
 
-
     /**
      * creates and returns the RolloverProducer to use.
      * 
@@ -549,7 +641,6 @@ public class JXTable extends JTable
     public boolean isRolloverEnabled() {
         return rolloverProducer != null;
     }
-
 
     /**
      * Returns the column control visible property.
@@ -596,10 +687,9 @@ public class JXTable extends JTable
 
     }
 
-
     /**
-     * Returns the component used as column control. Lazily creates the 
-     * control to the default if it is <code>null</code>.
+     * Returns the component used as column control. Lazily creates the control
+     * to the default if it is <code>null</code>.
      * 
      * @return component for column control, guaranteed to be != null.
      * @see #setColumnControl(JComponent)
@@ -618,18 +708,17 @@ public class JXTable extends JTable
      * parameter restores the column control to the default.
      * <p>
      * The component is automatically visible only if the
-     * <code>columnControlVisible</code> property is <code>true</code> and
-     * the table is contained in a <code>JScrollPane</code>.
+     * <code>columnControlVisible</code> property is <code>true</code> and the
+     * table is contained in a <code>JScrollPane</code>.
      * 
      * <p>
      * NOTE: from the table's perspective, the column control is simply a
-     * <code>JComponent</code> to add to and keep in the trailing corner of
-     * the scrollpane. (if any). It's up the concrete control to configure
-     * itself from and keep synchronized to the columns' states.
+     * <code>JComponent</code> to add to and keep in the trailing corner of the
+     * scrollpane. (if any). It's up the concrete control to configure itself
+     * from and keep synchronized to the columns' states.
      * <p>
      * 
-     * @param columnControl the <code>JComponent</code> to use as
-     *        columnControl.
+     * @param columnControl the <code>JComponent</code> to use as columnControl.
      * @see #getColumnControl()
      * @see #createDefaultColumnControl()
      * @see #setColumnControlVisible(boolean)
@@ -643,12 +732,12 @@ public class JXTable extends JTable
         configureColumnControl();
         firePropertyChange("columnControl", old, getColumnControl());
     }
-    
+
     /**
-     * Creates the default column control used by this table.
-     * This implementation returns a <code>ColumnControlButton</code> configured
-     * with default <code>ColumnControlIcon</code>.
-     *   
+     * Creates the default column control used by this table. This
+     * implementation returns a <code>ColumnControlButton</code> configured with
+     * default <code>ColumnControlIcon</code>.
+     * 
      * @return the default component used as column control.
      * @see #setColumnControl(JComponent)
      * @see org.jdesktop.swingx.table.ColumnControlButton
@@ -658,15 +747,15 @@ public class JXTable extends JTable
         return new ColumnControlButton(this);
     }
 
- 
     /**
-     * Sets the language-sensitive orientation that is to be used to order
-     * the elements or text within this component. <p>
+     * Sets the language-sensitive orientation that is to be used to order the
+     * elements or text within this component.
+     * <p>
      * 
-     * Overridden to work around a core bug: 
-     * <code>JScrollPane</code> can't cope with
-     * corners when changing component orientation at runtime.
-     * This method explicitly re-configures the column control. <p>
+     * Overridden to work around a core bug: <code>JScrollPane</code> can't cope
+     * with corners when changing component orientation at runtime. This method
+     * explicitly re-configures the column control.
+     * <p>
      * 
      * @param o the ComponentOrientation for this table.
      * @see java.awt.Component#setComponentOrientation(ComponentOrientation)
@@ -677,12 +766,12 @@ public class JXTable extends JTable
         configureColumnControl();
     }
 
-   
     /**
-     * Configures the enclosing <code>JScrollPane</code>. <p>
-     *  
-     * Overridden to addionally configure the upper trailing corner 
-     * with the column control.
+     * Configures the enclosing <code>JScrollPane</code>.
+     * <p>
+     * 
+     * Overridden to addionally configure the upper trailing corner with the
+     * column control.
      * 
      * @see #configureColumnControl()
      * 
@@ -693,13 +782,12 @@ public class JXTable extends JTable
         configureColumnControl();
     }
 
-
-    
     /**
-     * Unconfigures the enclosing <code>JScrollPane</code>. <p>
-     *  
-     * Overridden to addionally unconfigure the upper trailing corner 
-     * with the column control.
+     * Unconfigures the enclosing <code>JScrollPane</code>.
+     * <p>
+     * 
+     * Overridden to addionally unconfigure the upper trailing corner with the
+     * column control.
      * 
      * @see #unconfigureColumnControl()
      * 
@@ -742,7 +830,8 @@ public class JXTable extends JTable
                     verticalScrollPolicy = 0;
                 }
                 if (isColumnControlVisible()) {
-                    scrollPane.setCorner(JScrollPane.UPPER_TRAILING_CORNER, null);
+                    scrollPane.setCorner(JScrollPane.UPPER_TRAILING_CORNER,
+                            null);
                 }
             }
         }
@@ -750,11 +839,12 @@ public class JXTable extends JTable
     }
 
     /**
-     * Configures the upper trailing corner of an enclosing 
+     * Configures the upper trailing corner of an enclosing
      * <code>JScrollPane</code>.
      * 
-     * Adds the <code>ColumnControl</code> if the 
-     * <code>columnControlVisible</code> property is true.<p>
+     * Adds the <code>ColumnControl</code> if the
+     * <code>columnControlVisible</code> property is true.
+     * <p>
      * 
      * @see #setColumnControlVisible(boolean)
      * @see #setColumnControl(JComponent)
@@ -775,36 +865,37 @@ public class JXTable extends JTable
                 if (isColumnControlVisible()) {
                     if (verticalScrollPolicy == 0) {
                         verticalScrollPolicy = scrollPane
-                            .getVerticalScrollBarPolicy();
+                                .getVerticalScrollBarPolicy();
                     }
                     scrollPane.setCorner(JScrollPane.UPPER_TRAILING_CORNER,
                             getColumnControl());
 
                     scrollPane
                             .setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-                } 
-//                else {
-//                    if (verticalScrollPolicy != 0) {
-//                        // Fix #155-swingx: reset only if we had force always before
-//                        // PENDING: JW - doesn't cope with dynamically changing the policy
-//                        // shouldn't be much of a problem because doesn't happen too often?? 
-//                        scrollPane.setVerticalScrollBarPolicy(verticalScrollPolicy);
-//                    }
-//                    try {
-//                        scrollPane.setCorner(JScrollPane.UPPER_TRAILING_CORNER,
-//                                null);
-//                    } catch (Exception ex) {
-//                        // Ignore spurious exception thrown by JScrollPane. This
-//                        // is a Swing bug!
-//                    }
-//
-//                }
+                }
+                // else {
+                // if (verticalScrollPolicy != 0) {
+                // // Fix #155-swingx: reset only if we had force always before
+                // // PENDING: JW - doesn't cope with dynamically changing the
+                // policy
+                // // shouldn't be much of a problem because doesn't happen too
+                // often??
+                // scrollPane.setVerticalScrollBarPolicy(verticalScrollPolicy);
+                // }
+                // try {
+                // scrollPane.setCorner(JScrollPane.UPPER_TRAILING_CORNER,
+                // null);
+                // } catch (Exception ex) {
+                // // Ignore spurious exception thrown by JScrollPane. This
+                // // is a Swing bug!
+                // }
+                //
+                // }
             }
         }
     }
 
-    
-//--------------------- actions
+    // --------------------- actions
     /**
      * Take over ctrl-tab.
      * 
@@ -813,36 +904,39 @@ public class JXTable extends JTable
         setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS,
                 new TreeSet<KeyStroke>());
         setFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS,
-                   new TreeSet<KeyStroke>());
+                new TreeSet<KeyStroke>());
         getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(
                 KeyStroke.getKeyStroke("ctrl TAB"), FOCUS_NEXT_COMPONENT);
         getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(
-                KeyStroke.getKeyStroke("shift ctrl TAB"), FOCUS_PREVIOUS_COMPONENT);
-        getActionMap().put(FOCUS_NEXT_COMPONENT, createFocusTransferAction(true));
-        getActionMap().put(FOCUS_PREVIOUS_COMPONENT, createFocusTransferAction(false));
+                KeyStroke.getKeyStroke("shift ctrl TAB"),
+                FOCUS_PREVIOUS_COMPONENT);
+        getActionMap().put(FOCUS_NEXT_COMPONENT,
+                createFocusTransferAction(true));
+        getActionMap().put(FOCUS_PREVIOUS_COMPONENT,
+                createFocusTransferAction(false));
     }
 
-
     /**
-     * Creates and returns an action for forward/backward focus 
-     * transfer, depending on the given flag. 
+     * Creates and returns an action for forward/backward focus transfer,
+     * depending on the given flag.
      * 
-     * @param forward a boolean indicating the direction of the
-     *   required focus transfer
+     * @param forward a boolean indicating the direction of the required focus
+     *        transfer
      * @return the action bound to focusTraversal.
      */
     private Action createFocusTransferAction(final boolean forward) {
-        BoundAction action = new BoundAction(null, forward ? 
-                FOCUS_NEXT_COMPONENT : FOCUS_PREVIOUS_COMPONENT);
-        action.registerCallback(this, forward ? 
-                "transferFocus" : "transferFocusBackward");
+        BoundAction action = new BoundAction(null,
+                forward ? FOCUS_NEXT_COMPONENT : FOCUS_PREVIOUS_COMPONENT);
+        action.registerCallback(this, forward ? "transferFocus"
+                : "transferFocusBackward");
         return action;
     }
 
     /**
-     * A small class which dispatches actions. <p>
-     * TODO (?): Is there a way that we can
-     * make this static? <p>
+     * A small class which dispatches actions.
+     * <p>
+     * TODO (?): Is there a way that we can make this static?
+     * <p>
      * 
      * PENDING JW: don't use UIAction ... we are in OO-land!
      */
@@ -862,18 +956,17 @@ public class JXTable extends JTable
                 }
             } else if ("find".equals(getName())) {
                 find();
-            } 
+            }
         }
 
     }
 
-
     /**
-     * Registers additional, per-instance <code>Action</code>s to the 
-     * this table's ActionMap. Binds the search accelerator (as returned
-     * by the SearchFactory) to the find action.
+     * Registers additional, per-instance <code>Action</code>s to the this
+     * table's ActionMap. Binds the search accelerator (as returned by the
+     * SearchFactory) to the find action.
      * 
-     *
+     * 
      */
     private void initActionsAndBindings() {
         // Register the actions that this class can handle.
@@ -885,18 +978,22 @@ public class JXTable extends JTable
         map.put("cancel", createCancelAction());
         map.put(PACKALL_ACTION_COMMAND, createPackAllAction());
         map.put(PACKSELECTED_ACTION_COMMAND, createPackSelectedAction());
-        map.put(HORIZONTALSCROLL_ACTION_COMMAND, createHorizontalScrollAction());
-        
-        KeyStroke findStroke = SearchFactory.getInstance().getSearchAccelerator();
-        getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(findStroke, "find");
-    }
+        map
+                .put(HORIZONTALSCROLL_ACTION_COMMAND,
+                        createHorizontalScrollAction());
 
+        KeyStroke findStroke = SearchFactory.getInstance()
+                .getSearchAccelerator();
+        getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(
+                findStroke, "find");
+    }
 
     /**
      * Creates and returns an Action which cancels an ongoing edit correctly.
-     * Note: the correct thing to do is to call the editor's cancelEditing, the wrong
-     * thing to do is to call table removeEditor (as core JTable does...). So this
-     * is a quick hack around a core bug, reported against SwingX in #610-swingx.
+     * Note: the correct thing to do is to call the editor's cancelEditing, the
+     * wrong thing to do is to call table removeEditor (as core JTable does...).
+     * So this is a quick hack around a core bug, reported against SwingX in
+     * #610-swingx.
      * 
      * @return an Action which cancels an edit.
      */
@@ -904,7 +1001,8 @@ public class JXTable extends JTable
         Action action = new AbstractActionExt() {
 
             public void actionPerformed(ActionEvent e) {
-                if (!isEditing()) return;
+                if (!isEditing())
+                    return;
                 getCellEditor().cancelCellEditing();
             }
 
@@ -912,15 +1010,14 @@ public class JXTable extends JTable
             public boolean isEnabled() {
                 return isEditing();
             }
-            
-            
+
         };
         return action;
     }
 
-    /** 
-     * Creates and returns the default <code>Action</code> for toggling
-     * the horizontal scrollBar. 
+    /**
+     * Creates and returns the default <code>Action</code> for toggling the
+     * horizontal scrollBar.
      */
     private Action createHorizontalScrollAction() {
         BoundAction action = new BoundAction(null,
@@ -945,23 +1042,23 @@ public class JXTable extends JTable
     }
 
     /**
-     * Returns a potentially localized value from the UIManager for the 
-     * given locale. The given key
-     * is prefixed by this table's <code>UIPREFIX</code> before doing the
-     * lookup. Returns the key, if no value is found.
+     * Returns a potentially localized value from the UIManager for the given
+     * locale. The given key is prefixed by this table's <code>UIPREFIX</code>
+     * before doing the lookup. Returns the key, if no value is found.
      * 
      * @param key the bare key to look up in the UIManager.
      * @param locale the locale use for lookup
-     * @return the value mapped to UIPREFIX + key in the given locale,
-     *    or key if no value is found.
+     * @return the value mapped to UIPREFIX + key in the given locale, or key if
+     *         no value is found.
      */
     protected String getUIString(String key, Locale locale) {
         String text = UIManagerExt.getString(UIPREFIX + key, locale);
         return text != null ? text : key;
     }
-    /** 
-     * Creates and returns the default <code>Action</code>
-     * for packing the selected column. 
+
+    /**
+     * Creates and returns the default <code>Action</code> for packing the
+     * selected column.
      */
     private Action createPackSelectedAction() {
         BoundAction action = new BoundAction(null, PACKSELECTED_ACTION_COMMAND);
@@ -970,9 +1067,8 @@ public class JXTable extends JTable
         return action;
     }
 
-    /** 
-     * Creates and returns the default <b>Action </b> 
-     * for packing all columns. 
+    /**
+     * Creates and returns the default <b>Action </b> for packing all columns.
      */
     private Action createPackAllAction() {
         BoundAction action = new BoundAction(null, PACKALL_ACTION_COMMAND);
@@ -981,17 +1077,18 @@ public class JXTable extends JTable
     }
 
     /**
-     * {@inheritDoc} <p>
-     * Overridden to update locale-dependent properties. 
+     * {@inheritDoc}
+     * <p>
+     * Overridden to update locale-dependent properties.
      * 
-     * @see #updateLocaleState(Locale) 
+     * @see #updateLocaleState(Locale)
      */
     @Override
     public void setLocale(Locale locale) {
         updateLocaleState(locale);
         super.setLocale(locale);
     }
-    
+
     /**
      * Updates locale-dependent state to the given <code>Locale</code>.
      * 
@@ -1010,31 +1107,32 @@ public class JXTable extends JTable
         updateLocaleActionState(PACKALL_ACTION_COMMAND, locale);
         updateLocaleActionState(PACKSELECTED_ACTION_COMMAND, locale);
     }
-    
+
     /**
-     * Updates locale-dependent state of action registered with key in 
-     * <code>ActionMap</code>. Does nothing if no action with key is found. <p>
+     * Updates locale-dependent state of action registered with key in
+     * <code>ActionMap</code>. Does nothing if no action with key is found.
+     * <p>
      * 
-     * Here: updates the <code>Action</code>'s name property. 
+     * Here: updates the <code>Action</code>'s name property.
      * 
      * @param key the string for lookup in this table's ActionMap
      * @see #updateLocaleState(Locale)
      */
     protected void updateLocaleActionState(String key, Locale locale) {
         Action action = getActionMap().get(key);
-        if (action == null) return;
+        if (action == null)
+            return;
         action.putValue(Action.NAME, getUIString(key, locale));
     }
-    
-//------------------ bound action callback methods
-    
 
+    // ------------------ bound action callback methods
 
     /**
-     * Resizes all columns to fit their content. <p> 
+     * Resizes all columns to fit their content.
+     * <p>
      * 
      * By default this method is bound to the pack all columns
-     * <code>Action</code> and registered in the table's <code>ActionMap</code>. 
+     * <code>Action</code> and registered in the table's <code>ActionMap</code>.
      * 
      */
     public void packAll() {
@@ -1042,23 +1140,26 @@ public class JXTable extends JTable
     }
 
     /**
-     * Resizes the lead column to fit its content. <p>
+     * Resizes the lead column to fit its content.
+     * <p>
      * 
      * By default this method is bound to the pack selected column
-     * <code>Action</code> and registered in the table's <code>ActionMap</code>. 
+     * <code>Action</code> and registered in the table's <code>ActionMap</code>.
      */
     public void packSelected() {
-        int selected = getColumnModel().getSelectionModel().getLeadSelectionIndex();
+        int selected = getColumnModel().getSelectionModel()
+                .getLeadSelectionIndex();
         if (selected >= 0) {
             packColumn(selected, -1);
         }
     }
 
-    /** 
-     * {@inheritDoc} <p>
+    /**
+     * {@inheritDoc}
+     * <p>
      * 
-     *  Overridden to update the enabled state of the pack selected column
-     *  <code>Action</code>.
+     * Overridden to update the enabled state of the pack selected column
+     * <code>Action</code>.
      */
     @Override
     public void columnSelectionChanged(ListSelectionEvent e) {
@@ -1072,8 +1173,8 @@ public class JXTable extends JTable
         }
     }
 
-//----------------------- scrollable control
-    
+    // ----------------------- scrollable control
+
     /**
      * Sets the enablement of enhanced horizontal scrolling. If enabled, it
      * toggles an auto-resize mode which always fills the <code>JViewport</code>
@@ -1084,10 +1185,10 @@ public class JXTable extends JTable
      * <p>
      * 
      * Note: this is <strong>not</strong> a bound property, though it follows
-     * bean naming conventions. 
+     * bean naming conventions.
      * 
-     * PENDING: Probably should be... If so, could be taken by a
-     * listening Action as in the app-framework.
+     * PENDING: Probably should be... If so, could be taken by a listening
+     * Action as in the app-framework.
      * <p>
      * PENDING JW: the name is mis-leading?
      * 
@@ -1097,15 +1198,14 @@ public class JXTable extends JTable
      */
     public void setHorizontalScrollEnabled(boolean enabled) {
         /*
-         * PENDING JW: add a "real" mode? Problematic because there are several 
-         * places in core which check for #AUTO_RESIZE_OFF, can't use different 
-         * value without unwanted side-effects. The current solution with tagging
-         * the #AUTO_RESIZE_OFF by a boolean flag #intelliMode is brittle - need 
-         * to be very careful to turn off again ... Another problem is to keep the
-         * horizontalScrollEnabled toggling action in synch with this property. 
-         * Yet another problem is the change notification: currently this is _not_
-         * a bound property. 
-         * 
+         * PENDING JW: add a "real" mode? Problematic because there are several
+         * places in core which check for #AUTO_RESIZE_OFF, can't use different
+         * value without unwanted side-effects. The current solution with
+         * tagging the #AUTO_RESIZE_OFF by a boolean flag #intelliMode is
+         * brittle - need to be very careful to turn off again ... Another
+         * problem is to keep the horizontalScrollEnabled toggling action in
+         * synch with this property. Yet another problem is the change
+         * notification: currently this is _not_ a bound property.
          */
         if (enabled == (isHorizontalScrollEnabled())) {
             return;
@@ -1124,11 +1224,12 @@ public class JXTable extends JTable
         } else {
             setAutoResizeMode(oldAutoResizeMode);
         }
-        firePropertyChange("horizontalScrollEnabled", old, isHorizontalScrollEnabled());
+        firePropertyChange("horizontalScrollEnabled", old,
+                isHorizontalScrollEnabled());
     }
 
-    /** 
-     * Returns the current setting for horizontal scrolling. 
+    /**
+     * Returns the current setting for horizontal scrolling.
      * 
      * @return the enablement of enhanced horizontal scrolling.
      * @see #setHorizontalScrollEnabled(boolean)
@@ -1141,8 +1242,8 @@ public class JXTable extends JTable
      * {@inheritDoc}
      * <p>
      * 
-     * Overridden for internal bookkeeping related to the enhanced
-     * auto-resize behaviour.
+     * Overridden for internal bookkeeping related to the enhanced auto-resize
+     * behaviour.
      * <p>
      * 
      * Note: to enable/disable the enhanced auto-resize mode use exclusively
@@ -1163,7 +1264,7 @@ public class JXTable extends JTable
 
     /**
      * Synchs selected state of horizontal scrolling <code>Action</code> to
-     * enablement of enhanced auto-resize behaviour. 
+     * enablement of enhanced auto-resize behaviour.
      */
     protected void updateHorizontalAction() {
         Action showHorizontal = getActionMap().get(
@@ -1174,11 +1275,11 @@ public class JXTable extends JTable
         }
     }
 
-
     /**
-     *{@inheritDoc} <p>
-     *
-     * Overridden to support enhanced auto-resize behaviour enabled and 
+     *{@inheritDoc}
+     * <p>
+     * 
+     * Overridden to support enhanced auto-resize behaviour enabled and
      * necessary.
      * 
      * @see #setHorizontalScrollEnabled(boolean)
@@ -1187,15 +1288,16 @@ public class JXTable extends JTable
     public boolean getScrollableTracksViewportWidth() {
         boolean shouldTrack = super.getScrollableTracksViewportWidth();
         if (isHorizontalScrollEnabled()) {
-             return hasExcessWidth();
-         }
-         return shouldTrack;
+            return hasExcessWidth();
+        }
+        return shouldTrack;
     }
 
     /**
-     * Layouts column width. The exact behaviour depends on the 
-     * <code>autoResizeMode</code> property. <p> 
-     * Overridden to support enhanced auto-resize behaviour enabled and 
+     * Layouts column width. The exact behaviour depends on the
+     * <code>autoResizeMode</code> property.
+     * <p>
+     * Overridden to support enhanced auto-resize behaviour enabled and
      * necessary.
      * 
      * @see #setAutoResizeMode(int)
@@ -1205,8 +1307,9 @@ public class JXTable extends JTable
     public void doLayout() {
         int resizeMode = getAutoResizeMode();
         // fool super...
-        if (isHorizontalScrollEnabled() && hasRealizedParent() && hasExcessWidth()) {
-           autoResizeMode = oldAutoResizeMode;
+        if (isHorizontalScrollEnabled() && hasRealizedParent()
+                && hasExcessWidth()) {
+            autoResizeMode = oldAutoResizeMode;
         }
         inLayout = true;
         super.doLayout();
@@ -1220,23 +1323,24 @@ public class JXTable extends JTable
      */
     private boolean hasRealizedParent() {
         return (getWidth() > 0) && (getParent() != null)
-            && (getParent().getWidth() > 0);
+                && (getParent().getWidth() > 0);
     }
 
     /**
      * PRE: hasRealizedParent()
      * 
-     * @return boolean to indicate whether the table has widths excessing parent's width
+     * @return boolean to indicate whether the table has widths excessing
+     *         parent's width
      */
     private boolean hasExcessWidth() {
-        return getPreferredSize().width  < getParent().getWidth();
+        return getPreferredSize().width < getParent().getWidth();
     }
 
-    
     /**
-     * {@inheritDoc}<p>
+     * {@inheritDoc}
+     * <p>
      * 
-     * Overridden to support enhanced auto-resize behaviour enabled and 
+     * Overridden to support enhanced auto-resize behaviour enabled and
      * necessary.
      * 
      * @see #setHorizontalScrollEnabled(boolean)
@@ -1249,7 +1353,8 @@ public class JXTable extends JTable
         TableColumn resizingColumn = getResizingColumn();
         // Need to do this here, before the parent's
         // layout manager calls getPreferredSize().
-        if (resizingColumn != null && autoResizeMode == AUTO_RESIZE_OFF && !inLayout) {
+        if (resizingColumn != null && autoResizeMode == AUTO_RESIZE_OFF
+                && !inLayout) {
             resizingColumn.setPreferredWidth(resizingColumn.getWidth());
         }
         resizeAndRepaint();
@@ -1262,8 +1367,7 @@ public class JXTable extends JTable
      * @return the resizing column.
      */
     private TableColumn getResizingColumn() {
-        return (tableHeader == null) ? null
-                                     : tableHeader.getResizingColumn();
+        return (tableHeader == null) ? null : tableHeader.getResizingColumn();
     }
 
     /**
@@ -1284,47 +1388,48 @@ public class JXTable extends JTable
      * @see #getScrollableTracksViewportHeight()
      */
     public void setFillsViewportHeight(boolean fillsViewportHeight) {
-        if (fillsViewportHeight == getFillsViewportHeight()) return;
+        if (fillsViewportHeight == getFillsViewportHeight())
+            return;
         boolean old = getFillsViewportHeight();
         this.fillsViewportHeight = fillsViewportHeight;
         firePropertyChange("fillsViewportHeight", old, getFillsViewportHeight());
         revalidate();
     }
-    
+
     /**
      * Returns the flag which controls the scrollableTracksViewportHeight
-     * property. 
+     * property.
      * 
-     * @return true if the table's height will always be at least as large
-     * as the containing parent, false if it is independent
+     * @return true if the table's height will always be at least as large as
+     *         the containing parent, false if it is independent
      * @see #setFillsViewportHeight(boolean)
      * @see #getScrollableTracksViewportHeight()
      */
     public boolean getFillsViewportHeight() {
         return fillsViewportHeight;
-}
+    }
 
     /**
-     * {@inheritDoc} <p>
+     * {@inheritDoc}
+     * <p>
      * 
-     * Overridden to control the tracksHeight property depending on 
+     * Overridden to control the tracksHeight property depending on
      * fillsViewportHeight and relative size to containing parent.
      * 
-     * @return true if the control flag is true and the containing parent
-     *          height > prefHeight, else returns false.
+     * @return true if the control flag is true and the containing parent height
+     *         > prefHeight, else returns false.
      * @see #setFillsViewportHeight(boolean)
      * 
      */
     @Override
     public boolean getScrollableTracksViewportHeight() {
         return getFillsViewportHeight()
-        && getParent() instanceof JViewport
-        && (((JViewport)getParent()).getHeight() > getPreferredSize().height);
+                && getParent() instanceof JViewport
+                && (((JViewport) getParent()).getHeight() > getPreferredSize().height);
     }
 
+    // ------------------------ override super because of filter-awareness
 
-//------------------------ override super because of filter-awareness
-    
     /**
      * Returns the row count in the table; if filters are applied, this is the
      * filtered row count.
@@ -1333,73 +1438,74 @@ public class JXTable extends JTable
     public int getRowCount() {
         // RG: If there are no filters, call superclass version rather than
         // accessing model directly
-        return filters == null ?
-                super.getRowCount() : filters.getOutputSize();
+        return filters == null ? super.getRowCount() : filters.getOutputSize();
     }
 
     /**
      * Convert row index from view coordinates to model coordinates accounting
      * for the presence of sorters and filters.
      * 
-     * @param row
-     *            row index in view coordinates
+     * @param row row index in view coordinates
      * @return row index in model coordinates
      */
     public int convertRowIndexToModel(int row) {
-        return getFilters() != null ?  getFilters().convertRowIndexToModel(row): row;
+        return getFilters() != null ? getFilters().convertRowIndexToModel(row)
+                : row;
     }
 
     /**
      * Convert row index from model coordinates to view coordinates accounting
      * for the presence of sorters and filters.
      * 
-     * @param row
-     *            row index in model coordinates
+     * @param row row index in model coordinates
      * @return row index in view coordinates
      */
     public int convertRowIndexToView(int row) {
-        return getFilters() != null ? getFilters().convertRowIndexToView(row): row;
+        return getFilters() != null ? getFilters().convertRowIndexToView(row)
+                : row;
     }
 
     /**
-     * Overridden to account for row index mapping. 
-     * {@inheritDoc}
+     * Overridden to account for row index mapping. {@inheritDoc}
      */
     @Override
     public Object getValueAt(int row, int column) {
-        return getModel().getValueAt(convertRowIndexToModel(row), 
+        return getModel().getValueAt(convertRowIndexToModel(row),
                 convertColumnIndexToModel(column));
     }
 
     /**
-     * Overridden to account for row index mapping. This implementation 
-     * respects the cell's editability, that is it has no effect if 
+     * Overridden to account for row index mapping. This implementation respects
+     * the cell's editability, that is it has no effect if
      * <code>!isCellEditable(row, column)</code>.
      * 
      * {@inheritDoc}
+     * 
      * @see #isCellEditable(int, int)
      */
     @Override
     public void setValueAt(Object aValue, int row, int column) {
-        if (!isCellEditable(row, column)) return;
+        if (!isCellEditable(row, column))
+            return;
         getModel().setValueAt(aValue, convertRowIndexToModel(row),
                 convertColumnIndexToModel(column));
     }
 
     /**
-     * Returns true if the cell at <code>row</code> and <code>column</code>
-     * is editable. Otherwise, invoking <code>setValueAt</code> on the cell
-     * will have no effect.
+     * Returns true if the cell at <code>row</code> and <code>column</code> is
+     * editable. Otherwise, invoking <code>setValueAt</code> on the cell will
+     * have no effect.
      * <p>
      * Overridden to account for row index mapping and to support a layered
      * editability control:
      * <ul>
-     * <li> per-table: <code>JXTable.isEditable()</code>
-     * <li> per-column: <code>TableColumnExt.isEditable()</code>
-     * <li> per-cell: controlled by the model
+     * <li>per-table: <code>JXTable.isEditable()</code>
+     * <li>per-column: <code>TableColumnExt.isEditable()</code>
+     * <li>per-cell: controlled by the model
      * <code>TableModel.isCellEditable()</code>
      * </ul>
-     * The view cell is considered editable only if all three layers are enabled. 
+     * The view cell is considered editable only if all three layers are
+     * enabled.
      * 
      * @param row the row index in view coordinates
      * @param column the column index in view coordinates
@@ -1412,9 +1518,10 @@ public class JXTable extends JTable
      */
     @Override
     public boolean isCellEditable(int row, int column) {
-        if (!isEditable()) return false;
-        boolean editable = getModel().isCellEditable(convertRowIndexToModel(row),
-                convertColumnIndexToModel(column));
+        if (!isEditable())
+            return false;
+        boolean editable = getModel().isCellEditable(
+                convertRowIndexToModel(row), convertColumnIndexToModel(column));
         if (editable) {
             TableColumnExt tableColumn = getColumnExt(column);
             if (tableColumn != null) {
@@ -1424,11 +1531,10 @@ public class JXTable extends JTable
         return editable;
     }
 
-    
     /**
      * Overridden to update selectionMapper
      */
-    @Override 
+    @Override
     public void setSelectionModel(ListSelectionModel newModel) {
         super.setSelectionModel(newModel);
         getSelectionMapper().setViewSelectionModel(getSelectionModel());
@@ -1439,29 +1545,31 @@ public class JXTable extends JTable
      */
     @Override
     public void setModel(TableModel newModel) {
-        // JW: need to look here? is done in tableChanged as well. 
+        // JW: need to look here? is done in tableChanged as well.
         boolean wasEnabled = getSelectionMapper().isEnabled();
         getSelectionMapper().setEnabled(false);
         try {
-        super.setModel(newModel);
+            super.setModel(newModel);
         } finally {
             getSelectionMapper().setEnabled(wasEnabled);
         }
     }
 
     /**
-     * {@inheritDoc} <p>
+     * {@inheritDoc}
+     * <p>
      * 
      * Overridden for documentation clarification. The property has the same
-     * meaning as super, that is if true to re-create all table columns on either 
-     * setting a new TableModel or receiving a structureChanged from the existing. 
-     * The most obvious visual effect is that custom column properties appear to
-     * be "lost". <p> 
+     * meaning as super, that is if true to re-create all table columns on
+     * either setting a new TableModel or receiving a structureChanged from the
+     * existing. The most obvious visual effect is that custom column properties
+     * appear to be "lost".
+     * <p>
      * 
-     * JXTable does support additonal custom configuration (via a custom 
+     * JXTable does support additonal custom configuration (via a custom
      * ColumnFactory) which can (and incorrectly was) called independently from
-     * the creation. Setting this property to false guarantees that no
-     * column configuration is applied.
+     * the creation. Setting this property to false guarantees that no column
+     * configuration is applied.
      * 
      * @see #tableChanged(TableModelEvent)
      * @see org.jdesktop.swingx.table.ColumnFactory
@@ -1508,16 +1616,17 @@ public class JXTable extends JTable
         }
     }
 
-    
     /**
-     * Sets super's rowModel to the given SizeSequence if not null,
-     * does nothing if null.
+     * Sets super's rowModel to the given SizeSequence if not null, does nothing
+     * if null.
      * 
      * Hack around #924-swingx.
+     * 
      * @param rowModel the SizeSequence to set super's rowModel to.
      */
     private void retoreSuperRowModel(SizeSequence rowModel) {
-        if (rowModel == null) return;
+        if (rowModel == null)
+            return;
         setSuperRowModel(rowModel);
     }
 
@@ -1529,7 +1638,7 @@ public class JXTable extends JTable
      * Hack around #924-swingx.
      * 
      * @param e the TableModelEvent used to decide whether a nulling is needed.
-     * @return super's old SizeSequence or null 
+     * @return super's old SizeSequence or null
      */
     private SizeSequence nullSuperRowModel(TableModelEvent e) {
         if (!isRowHeightEnabled())
@@ -1546,48 +1655,51 @@ public class JXTable extends JTable
      * @return
      */
     private boolean isInsertRemove(TableModelEvent e) {
-        if (isStructureChanged(e)) return false;
-        if ((e.getType() == TableModelEvent.INSERT) || (e.getType() == TableModelEvent.DELETE)) return true;
+        if (isStructureChanged(e))
+            return false;
+        if ((e.getType() == TableModelEvent.INSERT)
+                || (e.getType() == TableModelEvent.DELETE))
+            return true;
         return false;
     }
 
     /**
-     * Returns a boolean to indicate whether the table should be
-     * resorted after receiving the given event. This implementation 
-     * returns true always. <p>
+     * Returns a boolean to indicate whether the table should be resorted after
+     * receiving the given event. This implementation returns true always.
+     * <p>
      * 
-     * NOTE: this is a quick hack to give subclasses a hook to
-     * experiment with conditional keeping the view unsorted, f.i.
-     * after edits. It's untested ... and will not receive much
-     * work because in Mustang the DefaultRowSorter has the functionality.
+     * NOTE: this is a quick hack to give subclasses a hook to experiment with
+     * conditional keeping the view unsorted, f.i. after edits. It's untested
+     * ... and will not receive much work because in Mustang the
+     * DefaultRowSorter has the functionality.
      * 
      * @param e the event which might trigger a resort.
-     * @return a boolean indicating whether the event should 
-     *   trigger a re-sort, here true always.
+     * @return a boolean indicating whether the event should trigger a re-sort,
+     *         here true always.
      */
     protected boolean shouldSortOnChange(TableModelEvent e) {
         return true;
     }
 
     /**
-     * reset model selection coordinates in SelectionMapper after
-     * model events.
+     * reset model selection coordinates in SelectionMapper after model events.
      * 
      * @param e
      */
     private void updateSelectionAndRowModel(TableModelEvent e) {
         if (isStructureChanged(e) || isDataChanged(e)) {
-        
+
             // JW fixing part of #172 - trying to adjust lead/anchor to valid
-            // indices (at least in model coordinates) after super's default clearSelection
-            // in dataChanged/structureChanged. 
+            // indices (at least in model coordinates) after super's default
+            // clearSelection
+            // in dataChanged/structureChanged.
             hackLeadAnchor(e);
 
             getSelectionMapper().clearModelSelection();
             getRowModelMapper().clearModelSizes();
             updateViewSizeSequence();
-             
-        // JW: c&p from JTable
+
+            // JW: c&p from JTable
         } else if (e.getType() == TableModelEvent.INSERT) {
             int start = e.getFirstRow();
             int end = e.getLastRow();
@@ -1601,7 +1713,8 @@ public class JXTable extends JTable
             // Adjust the selectionMapper to account for the new rows.
             int length = end - start + 1;
             getSelectionMapper().insertIndexInterval(start, length, true);
-            getRowModelMapper().insertIndexInterval(start, length, getRowHeight());
+            getRowModelMapper().insertIndexInterval(start, length,
+                    getRowHeight());
 
         } else if (e.getType() == TableModelEvent.DELETE) {
             int start = e.getFirstRow();
@@ -1618,7 +1731,7 @@ public class JXTable extends JTable
             getSelectionMapper().removeIndexInterval(start, end);
             getRowModelMapper().removeIndexInterval(start, deletedCount);
 
-        }  
+        }
         // nothing to do on TableEvent.updated
 
     }
@@ -1626,44 +1739,47 @@ public class JXTable extends JTable
     /**
      * Convenience method to detect dataChanged table event type.
      * 
-     * @param e the event to examine. 
+     * @param e the event to examine.
      * @return true if the event is of type dataChanged, false else.
      */
     protected boolean isDataChanged(TableModelEvent e) {
-        if (e == null) return false;
-        return e.getType() == TableModelEvent.UPDATE && 
-            e.getFirstRow() == 0 &&
-            e.getLastRow() == Integer.MAX_VALUE;
+        if (e == null)
+            return false;
+        return e.getType() == TableModelEvent.UPDATE && e.getFirstRow() == 0
+                && e.getLastRow() == Integer.MAX_VALUE;
     }
-    
+
     /**
      * Convenience method to detect update table event type.
      * 
-     * @param e the event to examine. 
-     * @return true if the event is of type update and not dataChanged, false else.
+     * @param e the event to examine.
+     * @return true if the event is of type update and not dataChanged, false
+     *         else.
      */
     protected boolean isUpdate(TableModelEvent e) {
-        if (isStructureChanged(e)) return false;
-        return e.getType() == TableModelEvent.UPDATE && 
-            e.getLastRow() < Integer.MAX_VALUE;
+        if (isStructureChanged(e))
+            return false;
+        return e.getType() == TableModelEvent.UPDATE
+                && e.getLastRow() < Integer.MAX_VALUE;
     }
 
     /**
      * Convenience method to detect a structureChanged table event type.
+     * 
      * @param e the event to examine.
-     * @return true if the event is of type structureChanged or null, false else.
+     * @return true if the event is of type structureChanged or null, false
+     *         else.
      */
     protected boolean isStructureChanged(TableModelEvent e) {
         return e == null || e.getFirstRow() == TableModelEvent.HEADER_ROW;
     }
 
-
     /**
-     * Trying to hack around #172-swingx: lead/anchor of row selection model
-     * is not adjusted to valid (not even model indices!) in the 
-     * usual clearSelection after dataChanged/structureChanged.
+     * Trying to hack around #172-swingx: lead/anchor of row selection model is
+     * not adjusted to valid (not even model indices!) in the usual
+     * clearSelection after dataChanged/structureChanged.
      * 
-     * Note: as of jdk1.5U6 the anchor/lead of the view selectionModel is 
+     * Note: as of jdk1.5U6 the anchor/lead of the view selectionModel is
      * unconditionally set to -1 after data/structureChanged.
      * 
      * @param e
@@ -1680,9 +1796,9 @@ public class JXTable extends JTable
     }
 
     /**
-     * Called if individual row height mapping need to be updated.
-     * This implementation guards against unnessary access of 
-     * super's private rowModel field.
+     * Called if individual row height mapping need to be updated. This
+     * implementation guards against unnessary access of super's private
+     * rowModel field.
      */
     protected void updateViewSizeSequence() {
         SizeSequence sizeSequence = null;
@@ -1691,24 +1807,24 @@ public class JXTable extends JTable
         }
         getRowModelMapper().setViewSizeSequence(sizeSequence, getRowHeight());
     }
-    
+
     /**
      * @return <code>SelectionMapper</code>
      */
     public SelectionMapper getSelectionMapper() {
         // JW: why is this public? Probably made so accidentally?
         // maybe not: was introduced in version 1.148 when applying
-        // Jesse's patch to #386-swingx (added functionality to 
+        // Jesse's patch to #386-swingx (added functionality to
         // turn off the mapping
         if (selectionMapper == null) {
-            selectionMapper = new DefaultSelectionMapper(filters, getSelectionModel());
+            selectionMapper = new DefaultSelectionMapper(filters,
+                    getSelectionModel());
         }
         return selectionMapper;
     }
 
+    // ----------------------------- filters
 
-//----------------------------- filters
-    
     /** Returns the FilterPipeline for the table. */
     public FilterPipeline getFilters() {
         // PENDING: this is guaranteed to be != null because
@@ -1738,7 +1854,8 @@ public class JXTable extends JTable
      * @return true is not yet used in this JXTable, false otherwise
      */
     private boolean initialUse(FilterPipeline pipeline) {
-        if (pipelineListener == null) return true;
+        if (pipelineListener == null)
+            return true;
         PipelineListener[] l = pipeline.getPipelineListeners();
         for (int i = 0; i < l.length; i++) {
             if (pipelineListener.equals(l[i]))
@@ -1747,15 +1864,15 @@ public class JXTable extends JTable
         return true;
     }
 
-    /** 
-     *  Sets the FilterPipeline for filtering table rows, maybe null
-     *  to remove all previously applied filters. 
-     *  
-     *  Note: the current "interactive" sortState is preserved (by 
-     *  internally copying the old sortKeys to the new pipeline, if any).
+    /**
+     * Sets the FilterPipeline for filtering table rows, maybe null to remove
+     * all previously applied filters.
      * 
-     * @param pipeline the <code>FilterPipeline</code> to use, null removes
-     *   all filters.
+     * Note: the current "interactive" sortState is preserved (by internally
+     * copying the old sortKeys to the new pipeline, if any).
+     * 
+     * @param pipeline the <code>FilterPipeline</code> to use, null removes all
+     *        filters.
      */
     public void setFilters(FilterPipeline pipeline) {
         FilterPipeline old = getFilters();
@@ -1777,7 +1894,6 @@ public class JXTable extends JTable
         repaint();
     }
 
-
     /** returns the listener for changes in filters. */
     protected PipelineListener getFilterPipelineListener() {
         if (pipelineListener == null) {
@@ -1795,54 +1911,51 @@ public class JXTable extends JTable
         };
     }
 
-
-    /** 
+    /**
      * method called on change notification from filterpipeline.
      */
     protected void updateOnFilterContentChanged() {
         revalidate();
         repaint();
-        // this is a quick fix for #445-swingx: sort icon not updated on 
+        // this is a quick fix for #445-swingx: sort icon not updated on
         // programatic sorts
         if (getTableHeader() != null) {
             getTableHeader().repaint();
         }
     }
 
-
-//-------------------------------- sorting 
+    // -------------------------------- sorting
 
     /**
      * Sets &quot;sortable&quot; property indicating whether or not this table
-     * supports sortable columns. If <code>sortable</code> is
-     * <code>true</code> then sorting will be enabled on all columns whose
-     * <code>sortable</code> property is <code>true</code>. If
-     * <code>sortable</code> is <code>false</code> then sorting will be
-     * disabled for all columns, regardless of each column's individual
-     * <code>sorting</code> property. The default is <code>true</code>.
+     * supports sortable columns. If <code>sortable</code> is <code>true</code>
+     * then sorting will be enabled on all columns whose <code>sortable</code>
+     * property is <code>true</code>. If <code>sortable</code> is
+     * <code>false</code> then sorting will be disabled for all columns,
+     * regardless of each column's individual <code>sorting</code> property. The
+     * default is <code>true</code>.
      * 
      * @see TableColumnExt#isSortable()
-     * @param sortable
-     *            boolean indicating whether or not this table supports sortable
-     *            columns
+     * @param sortable boolean indicating whether or not this table supports
+     *        sortable columns
      */
     public void setSortable(boolean sortable) {
         if (sortable == isSortable())
             return;
         this.sortable = sortable;
-        if (!isSortable()) resetSortOrder();
+        if (!isSortable())
+            resetSortOrder();
         firePropertyChange("sortable", !sortable, sortable);
     }
 
-    /** 
+    /**
      * Returns the table's sortable property.
      * 
-     * @return true if the table is sortable. 
+     * @return true if the table is sortable.
      */
     public boolean isSortable() {
         return sortable;
     }
-
 
     /**
      * Resets sorting of all columns.
@@ -1863,17 +1976,16 @@ public class JXTable extends JTable
      * 
      * Toggles the sort order of the column at columnIndex.
      * <p>
-     * The exact behaviour is defined by the SortController's
-     * toggleSortOrder implementation. Typically a unsorted 
-     * column is sorted in ascending order, a sorted column's
-     * order is reversed. 
+     * The exact behaviour is defined by the SortController's toggleSortOrder
+     * implementation. Typically a unsorted column is sorted in ascending order,
+     * a sorted column's order is reversed.
      * <p>
-     * Respects the tableColumnExt's sortable and comparator 
-     * properties: routes the column's comparator to the SortController
-     * and does nothing if !isSortable(column). 
+     * Respects the tableColumnExt's sortable and comparator properties: routes
+     * the column's comparator to the SortController and does nothing if
+     * !isSortable(column).
      * <p>
      * 
-     * PRE: 0 <= columnIndex < getColumnCount() 
+     * PRE: 0 <= columnIndex < getColumnCount()
      * 
      * @param columnIndex the columnIndex in view coordinates.
      * 
@@ -1890,14 +2002,14 @@ public class JXTable extends JTable
     }
 
     /**
-     * Decides if the column at columnIndex can be interactively sorted. 
+     * Decides if the column at columnIndex can be interactively sorted.
      * <p>
      * Here: true if both this table and the column sortable property is
      * enabled, false otherwise.
      * 
      * @param columnIndex column in view coordinates
-     * @return boolean indicating whether or not the column is sortable
-     *            in this table.
+     * @return boolean indicating whether or not the column is sortable in this
+     *         table.
      */
     protected boolean isSortable(int columnIndex) {
         boolean sortable = isSortable();
@@ -1909,33 +2021,34 @@ public class JXTable extends JTable
     }
 
     /**
-     * Sorts the table by the given column using SortOrder. 
+     * Sorts the table by the given column using SortOrder.
      * 
      * 
-     * Respects the tableColumnExt's sortable and comparator 
-     * properties: routes the column's comparator to the SortController
-     * and does nothing if !isSortable(column). 
+     * Respects the tableColumnExt's sortable and comparator properties: routes
+     * the column's comparator to the SortController and does nothing if
+     * !isSortable(column).
      * <p>
      * 
-     * PRE: 0 <= columnIndex < getColumnCount() 
+     * PRE: 0 <= columnIndex < getColumnCount()
      * <p>
      * 
      * 
      * @param columnIndex the column index in view coordinates.
-     * @param sortOrder the sort order to use. If null or SortOrder.UNSORTED, 
-     *   this method has the same effect as resetSortOrder();
-     *    
+     * @param sortOrder the sort order to use. If null or SortOrder.UNSORTED,
+     *        this method has the same effect as resetSortOrder();
+     * 
      */
     public void setSortOrder(int columnIndex, SortOrder sortOrder) {
         if ((sortOrder == null) || !sortOrder.isSorted()) {
             resetSortOrder();
             return;
         }
-        if (!isSortable(columnIndex)) return;
+        if (!isSortable(columnIndex))
+            return;
         SortController sortController = getSortController();
         if (sortController != null) {
             TableColumnExt columnExt = getColumnExt(columnIndex);
-            SortKey sortKey = new SortKey(sortOrder, 
+            SortKey sortKey = new SortKey(sortOrder,
                     convertColumnIndexToModel(columnIndex),
                     columnExt != null ? columnExt.getComparator() : null);
             sortController.setSortKeys(Collections.singletonList(sortKey));
@@ -1943,17 +2056,18 @@ public class JXTable extends JTable
     }
 
     /**
-     * Returns the SortOrder of the given column. 
+     * Returns the SortOrder of the given column.
      * 
      * @param columnIndex the column index in view coordinates.
-     * @return the interactive sorter's SortOrder if matches the column 
-     *  or SortOrder.UNSORTED 
+     * @return the interactive sorter's SortOrder if matches the column or
+     *         SortOrder.UNSORTED
      */
     public SortOrder getSortOrder(int columnIndex) {
         SortController sortController = getSortController();
-        if (sortController == null) return SortOrder.UNSORTED;
-        SortKey sortKey = SortKey.getFirstSortKeyForColumn(sortController.getSortKeys(), 
-                convertColumnIndexToModel(columnIndex));
+        if (sortController == null)
+            return SortOrder.UNSORTED;
+        SortKey sortKey = SortKey.getFirstSortKeyForColumn(sortController
+                .getSortKeys(), convertColumnIndexToModel(columnIndex));
         return sortKey != null ? sortKey.getSortOrder() : SortOrder.UNSORTED;
     }
 
@@ -1961,20 +2075,19 @@ public class JXTable extends JTable
      * 
      * Toggles the sort order of the column with identifier.
      * <p>
-     * The exact behaviour is defined by the SortController's
-     * toggleSortOrder implementation. Typically a unsorted 
-     * column is sorted in ascending order, a sorted column's
-     * order is reversed. 
+     * The exact behaviour is defined by the SortController's toggleSortOrder
+     * implementation. Typically a unsorted column is sorted in ascending order,
+     * a sorted column's order is reversed.
      * <p>
-     * Respects the tableColumnExt's sortable and comparator 
-     * properties: routes the column's comparator to the SortController
-     * and does nothing if !isSortable(column). 
+     * Respects the tableColumnExt's sortable and comparator properties: routes
+     * the column's comparator to the SortController and does nothing if
+     * !isSortable(column).
      * <p>
      * 
-     * PENDING: JW - define the behaviour if the identifier is not found.
-     *   This can happen if either there's no column at all with the identifier
-     *   or if there's no column of type TableColumnExt.
-     *   Currently does nothing, that is does not change sort state.
+     * PENDING: JW - define the behaviour if the identifier is not found. This
+     * can happen if either there's no column at all with the identifier or if
+     * there's no column of type TableColumnExt. Currently does nothing, that is
+     * does not change sort state.
      * 
      * @param identifier the column identifier.
      * 
@@ -1985,80 +2098,84 @@ public class JXTable extends JTable
         SortController controller = getSortController();
         if (controller != null) {
             TableColumnExt columnExt = getColumnExt(identifier);
-            if (columnExt == null) return;
-            controller.toggleSortOrder(columnExt.getModelIndex(),
-                    columnExt.getComparator());
+            if (columnExt == null)
+                return;
+            controller.toggleSortOrder(columnExt.getModelIndex(), columnExt
+                    .getComparator());
         }
     }
 
     /**
-     * Sorts the table by the given column using the SortOrder. 
+     * Sorts the table by the given column using the SortOrder.
      * 
      * 
-     * Respects the tableColumnExt's sortable and comparator 
-     * properties: routes the column's comparator to the SortController
-     * and does nothing if !isSortable(column). 
+     * Respects the tableColumnExt's sortable and comparator properties: routes
+     * the column's comparator to the SortController and does nothing if
+     * !isSortable(column).
      * <p>
      * 
-     * PENDING: JW - define the behaviour if the identifier is not found.
-     *   This can happen if either there's no column at all with the identifier
-     *   or if there's no column of type TableColumnExt.
-     *   Currently does nothing, that is does not change sort state.
+     * PENDING: JW - define the behaviour if the identifier is not found. This
+     * can happen if either there's no column at all with the identifier or if
+     * there's no column of type TableColumnExt. Currently does nothing, that is
+     * does not change sort state.
      * 
      * @param identifier the column's identifier.
-     * @param sortOrder the sort order to use. If null or SortOrder.UNSORTED, 
-     *   this method has the same effect as resetSortOrder();
-     *    
+     * @param sortOrder the sort order to use. If null or SortOrder.UNSORTED,
+     *        this method has the same effect as resetSortOrder();
+     * 
      */
     public void setSortOrder(Object identifier, SortOrder sortOrder) {
         if ((sortOrder == null) || !sortOrder.isSorted()) {
             resetSortOrder();
             return;
         }
-        if (!isSortable(identifier)) return;
+        if (!isSortable(identifier))
+            return;
         SortController sortController = getSortController();
         if (sortController != null) {
             TableColumnExt columnExt = getColumnExt(identifier);
-            if (columnExt == null) return;
-            SortKey sortKey = new SortKey(sortOrder, 
-                    columnExt.getModelIndex(),
+            if (columnExt == null)
+                return;
+            SortKey sortKey = new SortKey(sortOrder, columnExt.getModelIndex(),
                     columnExt.getComparator());
             sortController.setSortKeys(Collections.singletonList(sortKey));
         }
     }
 
     /**
-     * Returns the SortOrder of the given column. 
+     * Returns the SortOrder of the given column.
      * 
-     * PENDING: JW - define the behaviour if the identifier is not found.
-     *   This can happen if either there's no column at all with the identifier
-     *   or if there's no column of type TableColumnExt.
-     *   Currently returns SortOrder.UNSORTED.
-     *   
+     * PENDING: JW - define the behaviour if the identifier is not found. This
+     * can happen if either there's no column at all with the identifier or if
+     * there's no column of type TableColumnExt. Currently returns
+     * SortOrder.UNSORTED.
+     * 
      * @param identifier the column's identifier.
-     * @return the interactive sorter's SortOrder if matches the column 
-     *  or SortOrder.UNSORTED 
+     * @return the interactive sorter's SortOrder if matches the column or
+     *         SortOrder.UNSORTED
      */
     public SortOrder getSortOrder(Object identifier) {
         SortController sortController = getSortController();
-        if (sortController == null) return SortOrder.UNSORTED;
+        if (sortController == null)
+            return SortOrder.UNSORTED;
         TableColumnExt columnExt = getColumnExt(identifier);
-        if (columnExt == null) return SortOrder.UNSORTED;
-        int  modelIndex = columnExt.getModelIndex();
-        SortKey sortKey = SortKey.getFirstSortKeyForColumn(sortController.getSortKeys(), 
-                modelIndex);
+        if (columnExt == null)
+            return SortOrder.UNSORTED;
+        int modelIndex = columnExt.getModelIndex();
+        SortKey sortKey = SortKey.getFirstSortKeyForColumn(sortController
+                .getSortKeys(), modelIndex);
         return sortKey != null ? sortKey.getSortOrder() : SortOrder.UNSORTED;
     }
 
     /**
-     * Decides if the column with identifier can be interactively sorted. 
+     * Decides if the column with identifier can be interactively sorted.
      * <p>
      * Here: true if both this table and the column sortable property is
      * enabled, false otherwise.
      * 
      * @param identifier the column's identifier
-     * @return boolean indicating whether or not the column is sortable
-     *            in this table.
+     * @return boolean indicating whether or not the column is sortable in this
+     *         table.
      */
     protected boolean isSortable(Object identifier) {
         boolean sortable = isSortable();
@@ -2070,48 +2187,51 @@ public class JXTable extends JTable
     }
 
     /**
-     * returns the currently active SortController. Can be null
-     * on the very first call after instantiation.
+     * returns the currently active SortController. Can be null on the very
+     * first call after instantiation.
+     * 
      * @return the currently active <code>SortController</code> may be null
      */
     protected SortController getSortController() {
-//      // this check is for the sake of the very first call after instantiation
-        if (filters == null) return null;
+        // // this check is for the sake of the very first call after
+        // instantiation
+        if (filters == null)
+            return null;
         return getFilters().getSortController();
     }
 
     /**
      * 
-     * @return the currently interactively sorted TableColumn or null
-     *   if there is not sorter active or if the sorted column index 
-     *   does not correspond to any column in the TableColumnModel.
+     * @return the currently interactively sorted TableColumn or null if there
+     *         is not sorter active or if the sorted column index does not
+     *         correspond to any column in the TableColumnModel.
      */
     public TableColumn getSortedColumn() {
-        // bloody hack: get primary SortKey and 
+        // bloody hack: get primary SortKey and
         // check if there's a column with it available
         SortController controller = getSortController();
         if (controller != null) {
-            SortKey sortKey = SortKey.getFirstSortingKey(controller.getSortKeys());
+            SortKey sortKey = SortKey.getFirstSortingKey(controller
+                    .getSortKeys());
             if (sortKey != null) {
-              int sorterColumn = sortKey.getColumn();
-              List<TableColumn> columns = getColumns(true);
-              for (Iterator<TableColumn> iter = columns.iterator(); iter.hasNext();) {
-                  TableColumn column = iter.next();
-                  if (column.getModelIndex() == sorterColumn) {
-                      return column;
-                  }
-              }
-                
+                int sorterColumn = sortKey.getColumn();
+                List<TableColumn> columns = getColumns(true);
+                for (Iterator<TableColumn> iter = columns.iterator(); iter
+                        .hasNext();) {
+                    TableColumn column = iter.next();
+                    if (column.getModelIndex() == sorterColumn) {
+                        return column;
+                    }
+                }
+
             }
         }
         return null;
     }
 
-
-
     /**
-     * overridden to remove the interactive sorter if the
-     * sorted column is no longer contained in the ColumnModel.
+     * overridden to remove the interactive sorter if the sorted column is no
+     * longer contained in the ColumnModel.
      */
     @Override
     public void columnRemoved(TableColumnModelEvent e) {
@@ -2125,8 +2245,8 @@ public class JXTable extends JTable
     }
 
     /**
-     * guarantee that the interactive sorter is removed if its column
-     * is removed.
+     * guarantee that the interactive sorter is removed if its column is
+     * removed.
      * 
      */
     private void updateSorterAfterColumnRemoved() {
@@ -2152,11 +2272,10 @@ public class JXTable extends JTable
      * 
      * @param viewColumnIndex index of the column with the object in question
      * 
-     * @return the <code>TableColumn</code> object that matches the column
-     *         index
+     * @return the <code>TableColumn</code> object that matches the column index
      * @throws ArrayIndexOutOfBoundsException if viewColumnIndex out of allowed
      *         range.
-     *         
+     * 
      * @see #getColumn(Object)
      * @see #getColumnExt(int)
      * @see TableColumnModel#getColumn(int)
@@ -2206,14 +2325,14 @@ public class JXTable extends JTable
         getColumnModel().setColumnMargin(value);
     }
 
-    
-// ----------------- enhanced column support: delegation to TableColumnModelExt
-    
+    // ----------------- enhanced column support: delegation to
+    // TableColumnModelExt
+
     /**
-     * Returns the number of contained columns. The count includes or excludes invisible
-     * columns, depending on whether the <code>includeHidden</code> is true or
-     * false, respectively. If false, this method returns the same count as
-     * <code>getColumnCount()</code>. If the columnModel is not of type
+     * Returns the number of contained columns. The count includes or excludes
+     * invisible columns, depending on whether the <code>includeHidden</code> is
+     * true or false, respectively. If false, this method returns the same count
+     * as <code>getColumnCount()</code>. If the columnModel is not of type
      * <code>TableColumnModelExt</code>, the parameter value has no effect.
      * 
      * @param includeHidden a boolean to indicate whether invisible columns
@@ -2221,7 +2340,7 @@ public class JXTable extends JTable
      * @return the number of contained columns, including or excluding the
      *         invisible as specified.
      * @see #getColumnCount()
-     * @see TableColumnModelExt#getColumnCount(boolean)        
+     * @see TableColumnModelExt#getColumnCount(boolean)
      */
     public int getColumnCount(boolean includeHidden) {
         if (getColumnModel() instanceof TableColumnModelExt) {
@@ -2230,15 +2349,15 @@ public class JXTable extends JTable
         }
         return getColumnCount();
     }
-    
+
     /**
      * Returns a <code>List</code> of contained <code>TableColumn</code>s.
      * Includes or excludes invisible columns, depending on whether the
      * <code>includeHidden</code> is true or false, respectively. If false, an
      * <code>Iterator</code> over the List is equivalent to the
-     * <code>Enumeration</code> returned by <code>getColumns()</code>. 
-     * If the columnModel is not of type
-     * <code>TableColumnModelExt</code>, the parameter value has no effect.
+     * <code>Enumeration</code> returned by <code>getColumns()</code>. If the
+     * columnModel is not of type <code>TableColumnModelExt</code>, the
+     * parameter value has no effect.
      * <p>
      * 
      * NOTE: the order of columns in the List depends on whether or not the
@@ -2262,18 +2381,18 @@ public class JXTable extends JTable
 
     /**
      * Returns the first <code>TableColumnExt</code> with the given
-     * <code>identifier</code>. The return value is null if there is no contained
-     * column with <b>identifier</b> or if the column with <code>identifier</code> is not 
-     * of type <code>TableColumnExt</code>. The returned column
-     * may be visible or hidden.
+     * <code>identifier</code>. The return value is null if there is no
+     * contained column with <b>identifier</b> or if the column with
+     * <code>identifier</code> is not of type <code>TableColumnExt</code>. The
+     * returned column may be visible or hidden.
      * 
      * @param identifier the object used as column identifier
      * @return first <code>TableColumnExt</code> with the given identifier or
      *         null if none is found
-     *         
+     * 
      * @see #getColumnExt(int)
      * @see #getColumn(Object)
-     * @see TableColumnModelExt#getColumnExt(Object)        
+     * @see TableColumnModelExt#getColumnExt(Object)
      */
     public TableColumnExt getColumnExt(Object identifier) {
         if (getColumnModel() instanceof TableColumnModelExt) {
@@ -2304,7 +2423,8 @@ public class JXTable extends JTable
      *         index
      * @throws ArrayIndexOutOfBoundsException if columnIndex out of allowed
      *         range, that is if
-     *         <code> (columnIndex < 0) || (columnIndex >= getColumnCount())</code>.
+     *         <code> (columnIndex < 0) || (columnIndex >= getColumnCount())</code>
+     *         .
      * 
      * @see #getColumnExt(Object)
      * @see #getColumn(int)
@@ -2325,15 +2445,15 @@ public class JXTable extends JTable
      * not correspond to any column in the model will be ignored. Columns with
      * logical names not contained are added at the end.
      * 
-     * PENDING JW - do we want this? It's used by JNTable. 
+     * PENDING JW - do we want this? It's used by JNTable.
      * 
      * @param identifiers array of logical column names
      * 
      * @see #getColumns(boolean)
      */
     public void setColumnSequence(Object[] identifiers) {
-        /* 
-         * JW: not properly tested (not in all in fact) ... 
+        /*
+         * JW: not properly tested (not in all in fact) ...
          */
         List<TableColumn> columns = getColumns(true);
         Map<Object, TableColumn> map = new HashMap<Object, TableColumn>();
@@ -2356,8 +2476,8 @@ public class JXTable extends JTable
         }
     }
 
-//--------------- implement TableColumnModelExtListener
-    
+    // --------------- implement TableColumnModelExtListener
+
     /**
      * {@inheritDoc}
      * 
@@ -2366,60 +2486,69 @@ public class JXTable extends JTable
      */
     public void columnPropertyChange(PropertyChangeEvent event) {
         if (event.getPropertyName().equals("editable")) {
-            updateEditingAfterColumnChanged((TableColumn) event.getSource(), 
+            updateEditingAfterColumnChanged((TableColumn) event.getSource(),
                     (Boolean) event.getNewValue());
         } else if (event.getPropertyName().equals("sortable")) {
-            updateSortingAfterColumnChanged((TableColumn) event.getSource(), 
+            updateSortingAfterColumnChanged((TableColumn) event.getSource(),
                     (Boolean) event.getNewValue());
         } else if (event.getPropertyName().startsWith("highlighter")) {
-            if (event.getSource() instanceof TableColumnExt && getRowCount() > 0) {
+            if (event.getSource() instanceof TableColumnExt
+                    && getRowCount() > 0) {
                 TableColumnExt column = (TableColumnExt) event.getSource();
-                
-                Rectangle r = getCellRect(0,
-                        convertColumnIndexToView(column.getModelIndex()), true);
+
+                Rectangle r = getCellRect(0, convertColumnIndexToView(column
+                        .getModelIndex()), true);
                 r.height = getHeight();
                 repaint(r);
             } else {
                 repaint();
             }
         }
-        
+
     }
 
     /**
      * Adjusts editing state after column's property change. Cancels ongoing
-     * editing if the sending column is the editingColumn and the 
-     * column's editable changed to <code>false</code>, otherwise does nothing.
-     *  
-     * @param column the <code>TableColumn</code> which sent the change notifcation
+     * editing if the sending column is the editingColumn and the column's
+     * editable changed to <code>false</code>, otherwise does nothing.
+     * 
+     * @param column the <code>TableColumn</code> which sent the change
+     *        notifcation
      * @param editable the new value of the column's editable property
      */
-    private void updateEditingAfterColumnChanged(TableColumn column, boolean editable) {
-        if (!isEditing()) return;
+    private void updateEditingAfterColumnChanged(TableColumn column,
+            boolean editable) {
+        if (!isEditing())
+            return;
         int viewIndex = convertColumnIndexToView(column.getModelIndex());
-        if ((viewIndex < 0) || (viewIndex != getEditingColumn())) return;
+        if ((viewIndex < 0) || (viewIndex != getEditingColumn()))
+            return;
         getCellEditor().cancelCellEditing();
     }
 
     /**
-     * @param column the <code>TableColumn</code> which sent the change notifcation
+     * @param column the <code>TableColumn</code> which sent the change
+     *        notifcation
      * @param sortable the new value of the column's sortable property
      */
-    private void updateSortingAfterColumnChanged(TableColumn column, boolean sortable) {
+    private void updateSortingAfterColumnChanged(TableColumn column,
+            boolean sortable) {
         TableColumn sortedColumn = getSortedColumn();
-        if ((sortedColumn == null) || (sortedColumn != column)) return;
+        if ((sortedColumn == null) || (sortedColumn != column))
+            return;
         // here we assume that there's only one sorted column
         // nothing is done to enforce at-least-one sorted column
         // todo: search forum for when that was problem
         resetSortOrder();
     }
+
     // -------------------------- ColumnFactory
 
     /**
      * Creates, configures and adds default <code>TableColumn</code>s for
      * columns in this table's <code>TableModel</code>. Removes all currently
-     * contained <code>TableColumn</code>s. The exact type and configuration
-     * of the columns is controlled completely by the <code>ColumnFactory</code>.
+     * contained <code>TableColumn</code>s. The exact type and configuration of
+     * the columns is controlled completely by the <code>ColumnFactory</code>.
      * Client code can use {@link #setColumnFactory(ColumnFactory)} to plug-in a
      * custom ColumnFactory implementing their own default column creation and
      * behaviour.
@@ -2444,27 +2573,27 @@ public class JXTable extends JTable
     }
 
     /**
-     * Creates and adds <code>TableColumn</code>s for each
-     * column of the table model. <p>
+     * Creates and adds <code>TableColumn</code>s for each column of the table
+     * model.
+     * <p>
      * 
-     *
+     * 
      */
     private void createAndAddColumns() {
         /*
          * PENDING: go the whole distance and let the factory decide which model
          * columns to map to view columns? That would introduce an collection
-         * managing operation into the factory, sprawling? Can't (and probably 
+         * managing operation into the factory, sprawling? Can't (and probably
          * don't want to) move all collection related operations over - the
-         * ColumnFactory relies on TableColumnExt type columns, while
-         * the JXTable has to cope with all the base types.
-         * 
+         * ColumnFactory relies on TableColumnExt type columns, while the
+         * JXTable has to cope with all the base types.
          */
         for (int i = 0; i < getModel().getColumnCount(); i++) {
             // add directly to columnModel - don't go through this.addColumn
             // to guarantee full control of ColumnFactory
             // addColumn has the side-effect to set the header!
-            TableColumnExt tableColumn = getColumnFactory().createAndConfigureTableColumn(
-                    getModel(), i);
+            TableColumnExt tableColumn = getColumnFactory()
+                    .createAndConfigureTableColumn(getModel(), i);
             if (tableColumn != null) {
                 getColumnModel().addColumn(tableColumn);
             }
@@ -2478,7 +2607,7 @@ public class JXTable extends JTable
     private void removeColumns() {
         /*
          * TODO: promote this method to superclass, and change
-         *       createDefaultColumnsFromModel() to call this method
+         * createDefaultColumnsFromModel() to call this method
          */
         List<TableColumn> columns = getColumns(true);
         for (Iterator<TableColumn> iter = columns.iterator(); iter.hasNext();) {
@@ -2488,59 +2617,58 @@ public class JXTable extends JTable
     }
 
     /**
-     * Returns the ColumnFactory. <p>
+     * Returns the ColumnFactory.
+     * <p>
      * 
-     * @return the columnFactory to use for column creation and
-     *   configuration, guaranteed to not be null.
-     *   
+     * @return the columnFactory to use for column creation and configuration,
+     *         guaranteed to not be null.
+     * 
      * @see #setColumnFactory(ColumnFactory)
      * @see org.jdesktop.swingx.table.ColumnFactory
      */
     public ColumnFactory getColumnFactory() {
         /*
-        * TODO JW: think about implications of not/ copying the reference 
-        *  to the shared instance into the table's field? Better 
-        *  access the getInstance() on each call? We are on single thread 
-        *  anyway...
-        *  Furthermore, we don't expect the instance to change often, typically
-        *  it is configured on startup. So we don't really have to worry about
-        *  changes which would destabilize column state?
-        */
+         * TODO JW: think about implications of not/ copying the reference to
+         * the shared instance into the table's field? Better access the
+         * getInstance() on each call? We are on single thread anyway...
+         * Furthermore, we don't expect the instance to change often, typically
+         * it is configured on startup. So we don't really have to worry about
+         * changes which would destabilize column state?
+         */
         if (columnFactory == null) {
             return ColumnFactory.getInstance();
-//            columnFactory = ColumnFactory.getInstance();
+            // columnFactory = ColumnFactory.getInstance();
         }
         return columnFactory;
     }
 
     /**
-     * Sets the <code>ColumnFactory</code> to use for column creation and 
-     * configuration. The default value is the shared application
-     * ColumnFactory.<p>
+     * Sets the <code>ColumnFactory</code> to use for column creation and
+     * configuration. The default value is the shared application ColumnFactory.
+     * <p>
      * 
-     * Note: this method has no side-effect, that is existing columns are 
+     * Note: this method has no side-effect, that is existing columns are
      * <b>not</b> re-created automatically, client code must trigger it
-     * manually.  
+     * manually.
      * 
-     * @param columnFactory the factory to use, <code>null</code> indicates
-     *    to use the shared application factory.
-     *    
+     * @param columnFactory the factory to use, <code>null</code> indicates to
+     *        use the shared application factory.
+     * 
      * @see #getColumnFactory()
      * @see org.jdesktop.swingx.table.ColumnFactory
      */
     public void setColumnFactory(ColumnFactory columnFactory) {
         /*
          * 
-         * TODO auto-configure columns on set? or add public table api to
-         * do so? Mostly, this is meant to be done once in the lifetime
-         * of the table, preferably before a model is set ... overshoot?
-         * 
+         * TODO auto-configure columns on set? or add public table api to do so?
+         * Mostly, this is meant to be done once in the lifetime of the table,
+         * preferably before a model is set ... overshoot?
          */
         ColumnFactory old = getColumnFactory();
         this.columnFactory = columnFactory;
         firePropertyChange("columnFactory", old, getColumnFactory());
     }
-    
+
     // -------------------------------- enhanced sizing support
 
     /**
@@ -2558,7 +2686,7 @@ public class JXTable extends JTable
     }
 
     /**
-     * Packs an indivudal column in the table. 
+     * Packs an indivudal column in the table.
      * 
      * @param column The Column index to pack in View Coordinates
      * @param margin The Margin to apply to the column width.
@@ -2573,11 +2701,12 @@ public class JXTable extends JTable
     /**
      * Packs an indivual column in the table to less than or equal to the
      * maximum witdth. If maximum is -1 then the column is made as wide as it
-     * needs. 
+     * needs.
      * 
      * @param column the column index to pack in view coordinates
      * @param margin the margin to apply to the column
-     * @param max the maximum width the column can be resized to, -1 means no limit
+     * @param max the maximum width the column can be resized to, -1 means no
+     *        limit
      * 
      * @see #packColumn(int, int)
      * @see #packTable(int)
@@ -2597,24 +2726,28 @@ public class JXTable extends JTable
     public int getVisibleRowCount() {
         return visibleRowCount;
     }
-    
+
     /**
      * Sets the preferred number of rows to show in a <code>JScrollPane</code>.
      * <p>
      * 
-     * This is a bound property. The default value is 20. <p>
+     * This is a bound property. The default value is 20.
+     * <p>
      * 
      * PENDING: allow negative for use-all? Analogous to visColumnCount.
      * 
-     * @param visibleRowCount number of rows to show in a <code>JScrollPane</code>
+     * @param visibleRowCount number of rows to show in a
+     *        <code>JScrollPane</code>
      * @throws IllegalArgumentException if given count is negative.
      * 
      * @see #getVisibleRowCount()
      */
     public void setVisibleRowCount(int visibleRowCount) {
-        if (visibleRowCount < 0) throw 
-           new IllegalArgumentException("visible row count must not be negative " + visibleRowCount);
-        if (getVisibleRowCount() == visibleRowCount) return;
+        if (visibleRowCount < 0)
+            throw new IllegalArgumentException(
+                    "visible row count must not be negative " + visibleRowCount);
+        if (getVisibleRowCount() == visibleRowCount)
+            return;
         int old = getVisibleRowCount();
         this.visibleRowCount = visibleRowCount;
         resetCalculatedScrollableSize(false);
@@ -2632,31 +2765,34 @@ public class JXTable extends JTable
     public int getVisibleColumnCount() {
         return visibleColumnCount;
     }
-    
+
     /**
-     * Sets the preferred number of Columns to show in a <code>JScrollPane</code>.
-     * A negative number is interpreted as use-all available visible columns.
-     * <p> 
+     * Sets the preferred number of Columns to show in a
+     * <code>JScrollPane</code>. A negative number is interpreted as use-all
+     * available visible columns.
+     * <p>
      * 
      * This is a bound property. The default value is -1 (effectively the same
      * as before the introduction of this property).
      * 
-     * @param visibleColumnCount number of rows to show in a <code>JScrollPane</code>
+     * @param visibleColumnCount number of rows to show in a
+     *        <code>JScrollPane</code>
      * @see #getVisibleColumnCount()
      */
     public void setVisibleColumnCount(int visibleColumnCount) {
-        if (getVisibleColumnCount() == visibleColumnCount) return;
+        if (getVisibleColumnCount() == visibleColumnCount)
+            return;
         int old = getVisibleColumnCount();
         this.visibleColumnCount = visibleColumnCount;
         resetCalculatedScrollableSize(true);
         firePropertyChange("visibleColumnCount", old, getVisibleColumnCount());
     }
-    
+
     /**
      * Resets the calculated scrollable size in one dimension, if appropriate.
      * 
-     * @param isColumn flag to denote which dimension to reset, true
-     *   for width, false for height
+     * @param isColumn flag to denote which dimension to reset, true for width,
+     *        false for height
      * 
      */
     private void resetCalculatedScrollableSize(boolean isColumn) {
@@ -2669,13 +2805,12 @@ public class JXTable extends JTable
         }
     }
 
-    
     /**
-     * {@inheritDoc} <p>
+     * {@inheritDoc}
+     * <p>
      * 
-     * If the given dimension is null, the auto-calculation of 
-     * the pref scrollable size is enabled, otherwise the behaviour
-     * is the same as super. 
+     * If the given dimension is null, the auto-calculation of the pref
+     * scrollable size is enabled, otherwise the behaviour is the same as super.
      * 
      * The default is auto-calc enabled on.
      * 
@@ -2683,10 +2818,12 @@ public class JXTable extends JTable
      */
     @Override
     public void setPreferredScrollableViewportSize(Dimension size) {
-        // TODO: figure out why firing the event screws the JXTableUnitTest.testPrefScrollableUpdatedOnStructureChanged
-//        Dimension old = getPreferredScrollableViewportSize();
+        // TODO: figure out why firing the event screws the
+        // JXTableUnitTest.testPrefScrollableUpdatedOnStructureChanged
+        // Dimension old = getPreferredScrollableViewportSize();
         super.setPreferredScrollableViewportSize(size);
-//        firePropertyChange("preferredScrollableViewportSize", old, getPreferredScrollableViewportSize());
+        // firePropertyChange("preferredScrollableViewportSize", old,
+        // getPreferredScrollableViewportSize());
     }
 
     /**
@@ -2717,7 +2854,7 @@ public class JXTable extends JTable
             // JW: hmm... fishy ... shouldn't be necessary here?
             // maybe its the "early init" in super's tableChanged();
             // moved to init which looks okay so far
-//            initializeColumnPreferredWidths();
+            // initializeColumnPreferredWidths();
         }
         // the width is reset to -1 in setVisibleColumnCount
         if (calculatedPrefScrollableViewportSize.width <= 0) {
@@ -2733,18 +2870,19 @@ public class JXTable extends JTable
     }
 
     /**
-     * Initialize the width related properties of all contained
-     * TableColumns, both visible and hidden. <p>
+     * Initialize the width related properties of all contained TableColumns,
+     * both visible and hidden.
+     * <p>
      * <ul>
-     * <li>PENDING: move into ColumnFactory? 
+     * <li>PENDING: move into ColumnFactory?
      * <li>PENDING: what to do if autoCreateColumn off?
-     * <li>PENDING: public? to allow manual setting of column
-     *   properties which might effect their default sizing. Needed
-     *   in testing - but real-world? the factory is meant to 
-     *   do the property setting, based on tableModel and meta-data (from where?).
-     *   But leads to funny call sequence for per-table factory (new JXTable(), 
-     *   table.setColumnFactory(..), table.setModel(...))
+     * <li>PENDING: public? to allow manual setting of column properties which
+     * might effect their default sizing. Needed in testing - but real-world?
+     * the factory is meant to do the property setting, based on tableModel and
+     * meta-data (from where?). But leads to funny call sequence for per-table
+     * factory (new JXTable(), table.setColumnFactory(..), table.setModel(...))
      * </ul>
+     * 
      * @see #initializeColumnPreferredWidth(TableColumn)
      */
     protected void initializeColumnWidths() {
@@ -2752,12 +2890,12 @@ public class JXTable extends JTable
             initializeColumnPreferredWidth(column);
         }
     }
-    
+
     /**
      * Initialize the width related properties of the specified column. The
-     * details are specified by the current <code>ColumnFactory</code>
-     * if the column is of type <code>TableColumnExt</code>. Otherwise
-     * nothing is changed.
+     * details are specified by the current <code>ColumnFactory</code> if the
+     * column is of type <code>TableColumnExt</code>. Otherwise nothing is
+     * changed.
      * <p>
      * 
      * TODO JW - need to cleanup getScrollablePreferred (refactor and inline)
@@ -2771,7 +2909,6 @@ public class JXTable extends JTable
                     (TableColumnExt) column);
         }
     }
-
 
     // ----------------- scrolling support
     /**
@@ -2817,7 +2954,6 @@ public class JXTable extends JTable
         cellRect.height = visibleRect.height;
         scrollRectToVisible(cellRect);
     }
-    
 
     /**
      * Scrolls to make the cell at row and column visible. This might not have
@@ -2839,8 +2975,7 @@ public class JXTable extends JTable
         scrollRectToVisible(cellRect);
     }
 
-    
-//----------------------- delegating methods?? from super    
+    // ----------------------- delegating methods?? from super
     /**
      * Returns the selection mode used by this table's selection model.
      * <p>
@@ -2853,8 +2988,7 @@ public class JXTable extends JTable
         return getSelectionModel().getSelectionMode();
     }
 
-//----------------------- Search support 
-
+    // ----------------------- Search support
 
     /** Opens the find widget for the table. */
     private void find() {
@@ -2873,8 +3007,8 @@ public class JXTable extends JTable
     }
 
     /**
-     * sets the Searchable for this editor. If null, a default 
-     * searchable will be used.
+     * sets the Searchable for this editor. If null, a default searchable will
+     * be used.
      * 
      * @param searchable
      */
@@ -2907,7 +3041,6 @@ public class JXTable extends JTable
         return adapter;
     }
 
-    
     protected static class TableAdapter extends ComponentAdapter {
         private final JXTable table;
 
@@ -2915,8 +3048,7 @@ public class JXTable extends JTable
          * Constructs a <code>TableDataAdapter</code> for the specified target
          * component.
          * 
-         * @param component
-         *            the target component
+         * @param component the target component
          */
         public TableAdapter(JXTable component) {
             super(component);
@@ -2932,7 +3064,6 @@ public class JXTable extends JTable
             return table;
         }
 
-
         /**
          * {@inheritDoc}
          */
@@ -2945,11 +3076,13 @@ public class JXTable extends JTable
         protected TableColumn getColumnByModelIndex(int modelColumn) {
             // throwing here makes a filter test fail .. it's probably an issue
             // but don't want to touch (swingx filters will be gone soon)
-//            if ((modelColumn < 0) || (modelColumn >= getColumnCount())) {
-//                throw new IllegalArgumentException("invalid column index: " + modelColumn);
-//            }
+            // if ((modelColumn < 0) || (modelColumn >= getColumnCount())) {
+            // throw new IllegalArgumentException("invalid column index: " +
+            // modelColumn);
+            // }
             List<TableColumn> columns = table.getColumns(true);
-            for (Iterator<TableColumn> iter = columns.iterator(); iter.hasNext();) {
+            for (Iterator<TableColumn> iter = columns.iterator(); iter
+                    .hasNext();) {
                 TableColumn column = iter.next();
                 if (column.getModelIndex() == modelColumn) {
                     return column;
@@ -2957,23 +3090,24 @@ public class JXTable extends JTable
             }
             return null;
         }
-        
-//        @Override
-//        public String getColumnIdentifier(int columnIndex) {
-////            TableColumn column = getColumnByModelIndex(columnIndex);
-////            Object identifier = column != null ? column.getIdentifier() : null;
-//            Object identifier = getColumnIdentifierAt(columnIndex);
-//            return identifier != null ? identifier.toString() : null;
-//        }
-        
-        
+
+        // @Override
+        // public String getColumnIdentifier(int columnIndex) {
+        // // TableColumn column = getColumnByModelIndex(columnIndex);
+        // // Object identifier = column != null ? column.getIdentifier() :
+        // null;
+        // Object identifier = getColumnIdentifierAt(columnIndex);
+        // return identifier != null ? identifier.toString() : null;
+        // }
+
         /**
          * {@inheritDoc}
          */
         @Override
         public Object getColumnIdentifierAt(int columnIndex) {
             if ((columnIndex < 0) || (columnIndex >= getColumnCount())) {
-                throw new ArrayIndexOutOfBoundsException("invalid column index: " + columnIndex);
+                throw new ArrayIndexOutOfBoundsException(
+                        "invalid column index: " + columnIndex);
             }
             TableColumn column = getColumnByModelIndex(columnIndex);
             Object identifier = column != null ? column.getIdentifier() : null;
@@ -3029,8 +3163,6 @@ public class JXTable extends JTable
             return table.getModel().isCellEditable(row, column);
         }
 
-        
-        
         /**
          * {@inheritDoc}
          */
@@ -3038,10 +3170,9 @@ public class JXTable extends JTable
         public boolean isTestable(int column) {
             return getColumnByModelIndex(column) != null;
         }
-//-------------------------- accessing view state/values
-        
 
-        
+        // -------------------------- accessing view state/values
+
         /**
          * {@inheritDoc}
          */
@@ -3058,14 +3189,14 @@ public class JXTable extends JTable
             return table.getValueAt(row, column);
         }
 
-        
         /**
-         * {@inheritDoc}<p>
+         * {@inheritDoc}
+         * <p>
          * 
-         * PENDING JW: this is implemented to duplicate this table's lookup code if 
-         * the column is not visible. That's not good enough
-         * if subclasses implemented a different strategy! We do it anyway for now,
-         * mostly we will be lucky and improve the situation against using toString
+         * PENDING JW: this is implemented to duplicate this table's lookup code
+         * if the column is not visible. That's not good enough if subclasses
+         * implemented a different strategy! We do it anyway for now, mostly we
+         * will be lucky and improve the situation against using toString
          * always.
          * 
          */
@@ -3075,11 +3206,12 @@ public class JXTable extends JTable
             if (viewColumn >= 0) {
                 return table.getStringAt(row, viewColumn);
             }
-            // PENDING JW: how to get a String rep for invisible cells? 
+            // PENDING JW: how to get a String rep for invisible cells?
             // rows may be filtered, columns hidden.
             TableCellRenderer renderer = getRendererByModelColumn(column);
             if (renderer instanceof StringValue) {
-                return ((StringValue) renderer).getString(getFilteredValueAt(row, column));
+                return ((StringValue) renderer).getString(getFilteredValueAt(
+                        row, column));
             }
             return super.getFilteredStringAt(row, column);
         }
@@ -3089,61 +3221,65 @@ public class JXTable extends JTable
          */
         @Override
         public String getString() {
-             return table.getStringAt(row, column);
+            return table.getStringAt(row, column);
         }
 
         /**
          * {@inheritDoc}
          * 
-         * PENDING JW: this is implemented to duplicate this table's lookup code if 
-         * either the row or the column is not visible. That's not good enough
-         * if subclasses implemented a different strategy! We do it anyway for now,
-         * mostly we will be lucky and improve the situation against using toString
-         * always.
+         * PENDING JW: this is implemented to duplicate this table's lookup code
+         * if either the row or the column is not visible. That's not good
+         * enough if subclasses implemented a different strategy! We do it
+         * anyway for now, mostly we will be lucky and improve the situation
+         * against using toString always.
          * 
          */
         @Override
         public String getStringAt(int row, int column) {
             int viewRow = table.convertRowIndexToView(row);
             int viewColumn = table.convertColumnIndexToView(column);
-            if ((viewRow >= 0) && (viewColumn >= 0)) { 
+            if ((viewRow >= 0) && (viewColumn >= 0)) {
                 return table.getStringAt(viewRow, viewColumn);
             }
-            
+
             TableCellRenderer renderer = getRendererByModelColumn(column);
             if (renderer instanceof StringValue) {
-                return ((StringValue) renderer).getString(getValueAt(row, column));
+                return ((StringValue) renderer).getString(getValueAt(row,
+                        column));
             }
             // no luck - return default
             return super.getStringAt(row, column);
         }
 
         /**
-         * Returns a suitable renderer for the column index in model coordinates.
+         * Returns a suitable renderer for the column index in model
+         * coordinates.
          * 
-         * PENDING JW: this duplicates this table's lookup code if 
-         * column is not visible. That's not good enough
-         * if subclasses implemented a different strategy! We do it anyway for now,
-         * mostly we will be lucky and improve the situation against using toString
-         * always.
+         * PENDING JW: this duplicates this table's lookup code if column is not
+         * visible. That's not good enough if subclasses implemented a different
+         * strategy! We do it anyway for now, mostly we will be lucky and
+         * improve the situation against using toString always.
          * 
          * @param column the columnIndex in model coordinates
          * @return a renderer suitable for rendering cells in the given column
          */
         private TableCellRenderer getRendererByModelColumn(int column) {
-            // PENDING JW: here we are tricksing - duplicating JXTable renderer lookup strategy
-            // that's inherently unsafe, as subclasses may decide to do it differently
+            // PENDING JW: here we are tricksing - duplicating JXTable renderer
+            // lookup strategy
+            // that's inherently unsafe, as subclasses may decide to do it
+            // differently
             TableColumn tableColumn = getColumnByModelIndex(column);
             TableCellRenderer renderer = tableColumn.getCellRenderer();
             if (renderer == null) {
-                renderer = table.getDefaultRenderer(table.getModel().getColumnClass(column));
+                renderer = table.getDefaultRenderer(table.getModel()
+                        .getColumnClass(column));
             }
             if (renderer == null) {
                 renderer = table.getDefaultRenderer(Object.class);
             }
             return renderer;
         }
-        
+
         /**
          * {@inheritDoc}
          */
@@ -3151,7 +3287,7 @@ public class JXTable extends JTable
         public boolean isEditable() {
             return table.isCellEditable(row, column);
         }
-        
+
         /**
          * {@inheritDoc}
          */
@@ -3159,6 +3295,7 @@ public class JXTable extends JTable
         public boolean isSelected() {
             return table.isCellSelected(row, column);
         }
+
         /**
          * {@inheritDoc}
          */
@@ -3187,24 +3324,25 @@ public class JXTable extends JTable
             return table.convertColumnIndexToModel(columnIndex);
         }
 
-
     }
 
- 
-   // --------------------- managing renderers/editors
+    // --------------------- managing renderers/editors
 
-    
     /**
-     * Sets the <code>Highlighter</code>s to the table, replacing any old settings.
-     * None of the given Highlighters must be null.<p>
+     * Sets the <code>Highlighter</code>s to the table, replacing any old
+     * settings. None of the given Highlighters must be null.
+     * <p>
      * 
-     * This is a bound property. <p> 
+     * This is a bound property.
+     * <p>
      * 
-     * Note: as of version #1.257 the null constraint is enforced strictly. To remove
-     * all highlighters use this method without param.
+     * Note: as of version #1.257 the null constraint is enforced strictly. To
+     * remove all highlighters use this method without param.
      * 
-     * @param highlighters zero or more not null highlighters to use for renderer decoration.
-     * @throws NullPointerException if array is null or array contains null values.
+     * @param highlighters zero or more not null highlighters to use for
+     *        renderer decoration.
+     * @throws NullPointerException if array is null or array contains null
+     *         values.
      * 
      * @see #getHighlighters()
      * @see #addHighlighter(Highlighter)
@@ -3218,8 +3356,8 @@ public class JXTable extends JTable
     }
 
     /**
-     * Returns the <code>Highlighter</code>s used by this table.
-     * Maybe empty, but guarantees to be never null.
+     * Returns the <code>Highlighter</code>s used by this table. Maybe empty,
+     * but guarantees to be never null.
      * 
      * @return the Highlighters used by this table, guaranteed to never null.
      * @see #setHighlighters(Highlighter[])
@@ -3227,9 +3365,10 @@ public class JXTable extends JTable
     public Highlighter[] getHighlighters() {
         return getCompoundHighlighter().getHighlighters();
     }
+
     /**
      * Appends a <code>Highlighter</code> to the end of the list of used
-     * <code>Highlighter</code>s. The argument must not be null. 
+     * <code>Highlighter</code>s. The argument must not be null.
      * <p>
      * 
      * @param highlighter the <code>Highlighter</code> to add, must not be null.
@@ -3245,7 +3384,8 @@ public class JXTable extends JTable
     }
 
     /**
-     * Removes the given Highlighter. <p>
+     * Removes the given Highlighter.
+     * <p>
      * 
      * Does nothing if the Highlighter is not contained.
      * 
@@ -3258,7 +3398,7 @@ public class JXTable extends JTable
         getCompoundHighlighter().removeHighlighter(highlighter);
         firePropertyChange("highlighters", old, getHighlighters());
     }
-    
+
     /**
      * Returns the CompoundHighlighter assigned to the table, null if none.
      * PENDING: open up for subclasses again?.
@@ -3268,17 +3408,18 @@ public class JXTable extends JTable
     protected CompoundHighlighter getCompoundHighlighter() {
         if (compoundHighlighter == null) {
             compoundHighlighter = new CompoundHighlighter();
-            compoundHighlighter.addChangeListener(getHighlighterChangeListener());
+            compoundHighlighter
+                    .addChangeListener(getHighlighterChangeListener());
         }
         return compoundHighlighter;
     }
 
     /**
-     * Returns the <code>ChangeListener</code> to use with highlighters. Lazily 
+     * Returns the <code>ChangeListener</code> to use with highlighters. Lazily
      * creates the listener.
      * 
-     * @return the ChangeListener for observing changes of highlighters, 
-     *   guaranteed to be <code>not-null</code>
+     * @return the ChangeListener for observing changes of highlighters,
+     *         guaranteed to be <code>not-null</code>
      */
     protected ChangeListener getHighlighterChangeListener() {
         if (highlighterChangeListener == null) {
@@ -3304,12 +3445,13 @@ public class JXTable extends JTable
     }
 
     /**
-     * Returns the string representation of the cell value at the given position. 
+     * Returns the string representation of the cell value at the given
+     * position.
      * 
      * @param row the row index of the cell in view coordinates
      * @param column the column index of the cell in view coordinates.
-     * @return the string representation of the cell value as it will appear in the 
-     *   table. 
+     * @return the string representation of the cell value as it will appear in
+     *         the table.
      */
     public String getStringAt(int row, int column) {
         TableCellRenderer renderer = getCellRenderer(row, column);
@@ -3318,7 +3460,7 @@ public class JXTable extends JTable
         }
         return StringValues.TO_STRING.getString(getValueAt(row, column));
     }
-    
+
     /**
      * {@inheritDoc}
      * <p>
@@ -3382,29 +3524,29 @@ public class JXTable extends JTable
         adjustComponentOrientation(stamp);
         // #258-swingx: hacking around DefaultTableCellRenderer color memory.
         resetDefaultTableCellRendererColors(stamp, row, column);
-        
+
         ComponentAdapter adapter = getComponentAdapter(row, column);
         // a very slight optimization: if this instance never had a highlighter
         // added then don't create a compound here.
         if (compoundHighlighter != null) {
             stamp = compoundHighlighter.highlight(stamp, adapter);
         }
-        
+
         TableColumnExt columnExt = getColumnExt(column);
-        
+
         if (columnExt != null) {
             // JW: fix for #838 - artificial compound installs listener
             // PENDING JW: instead of doing the looping ourselves, how
             // about adding a method prepareRenderer to the TableColumnExt
             for (Highlighter highlighter : columnExt.getHighlighters()) {
                 stamp = highlighter.highlight(stamp, adapter);
-                
+
             }
-//            CompoundHighlighter columnHighlighters
-//                    = new CompoundHighlighter(columnExt.getHighlighters());
-            
+            // CompoundHighlighter columnHighlighters
+            // = new CompoundHighlighter(columnExt.getHighlighters());
+
         }
-        
+
         return stamp;
     }
 
@@ -3413,8 +3555,8 @@ public class JXTable extends JTable
      * Method to apply a hack around DefaultTableCellRenderer "color memory"
      * (Issue #258-swingx). Applies the hack if the client property
      * <code>USE_DTCR_COLORMEMORY_HACK</code> having the value of
-     * <code>Boolean.TRUE</code>, does nothing otherwise. The property is
-     * true by default.
+     * <code>Boolean.TRUE</code>, does nothing otherwise. The property is true
+     * by default.
      * <p>
      * 
      * The hack consists of applying a specialized <code>Highlighter</code> to
@@ -3424,8 +3566,9 @@ public class JXTable extends JTable
      * <p>
      * 
      * Client code which solves the problem at the core (that is in a
-     * well-behaved <code>DefaultTableCellRenderer</code>) can disable the hack by removing
-     * the client property or by subclassing and override this to do nothing.
+     * well-behaved <code>DefaultTableCellRenderer</code>) can disable the hack
+     * by removing the client property or by subclassing and override this to do
+     * nothing.
      * 
      * @param renderer the <code>TableCellRenderer</code> to hack
      * @param row the row of the cell to render
@@ -3447,15 +3590,15 @@ public class JXTable extends JTable
         resetDefaultTableCellRendererHighlighter.highlight(renderer, adapter);
     }
 
-
     /**
-     * {@inheritDoc} <p>
+     * {@inheritDoc}
+     * <p>
      * 
      * Overridden to adjust the editor's component orientation.
      */
     @Override
     public Component prepareEditor(TableCellEditor editor, int row, int column) {
-        Component comp =  super.prepareEditor(editor, row, column);
+        Component comp = super.prepareEditor(editor, row, column);
         // JW: might be null if generic editor barks about constructor
         // super silently backs out - we do the same here
         if (comp != null) {
@@ -3472,8 +3615,8 @@ public class JXTable extends JTable
      * 
      * This implementation synchs the CO always.
      * 
-     * @param stamp the <code>Component</code> who's CO may need to be synched, 
-     *    must not be <code>null</code>.
+     * @param stamp the <code>Component</code> who's CO may need to be synched,
+     *        must not be <code>null</code>.
      */
     protected void adjustComponentOrientation(Component stamp) {
         if (stamp.getComponentOrientation().equals(getComponentOrientation()))
@@ -3483,9 +3626,10 @@ public class JXTable extends JTable
 
     /**
      * Returns a new instance of the default renderer for the specified class.
-     * This differs from <code>getDefaultRenderer()</code> in that it returns
-     * a <b>new </b> instance each time so that the renderer may be set and
-     * customized on a particular column. <p>
+     * This differs from <code>getDefaultRenderer()</code> in that it returns a
+     * <b>new </b> instance each time so that the renderer may be set and
+     * customized on a particular column.
+     * <p>
      * 
      * NOTE: this doesn't work with swingx renderers! Do we really need it? It
      * had been used in JNTable which is practically obsolete. If needed, we
@@ -3510,11 +3654,12 @@ public class JXTable extends JTable
     }
 
     /**
-     * Creates default cell renderers for <code>Object</code>s, <code>Number</code>s,  
-     * <code>Date</code>s, <code>Boolean</code>s, and <code>Icon/Image/</code>s.
+     * Creates default cell renderers for <code>Object</code>s,
+     * <code>Number</code>s, <code>Date</code>s, <code>Boolean</code>s, and
+     * <code>Icon/Image/</code>s.
      * <p>
-     * Overridden to install SwingX renderers plus hacking around
-     * huge memory consumption of UIDefaults (see #6345050 in core Bug parade)
+     * Overridden to install SwingX renderers plus hacking around huge memory
+     * consumption of UIDefaults (see #6345050 in core Bug parade)
      * <p>
      * {@inheritDoc}
      * 
@@ -3544,52 +3689,50 @@ public class JXTable extends JTable
         setDefaultRenderer(Date.class, new DefaultTableRenderer(
                 StringValues.DATE_TO_STRING));
         // use the same center aligned default for Image/Icon
-        TableCellRenderer renderer  = new DefaultTableRenderer(
-                new MappedValue(StringValues.EMPTY, IconValues.ICON), 
-                JLabel.CENTER);
+        TableCellRenderer renderer = new DefaultTableRenderer(new MappedValue(
+                StringValues.EMPTY, IconValues.ICON), JLabel.CENTER);
         setDefaultRenderer(Icon.class, renderer);
         setDefaultRenderer(ImageIcon.class, renderer);
         // use a ButtonProvider for booleans
         setDefaultRenderer(Boolean.class, new DefaultTableRenderer(
                 new CheckBoxProvider()));
 
-
-//        // standard renderers
-//        // Objects
-//        setLazyRenderer(Object.class,
-//                "javax.swing.table.DefaultTableCellRenderer");
-//
-//        // Numbers
-//        setLazyRenderer(Number.class,
-//                "org.jdesktop.swingx.JXTable$NumberRenderer");
-//
-//        // Doubles and Floats
-//        setLazyRenderer(Float.class,
-//                "org.jdesktop.swingx.JXTable$DoubleRenderer");
-//        setLazyRenderer(Double.class,
-//                "org.jdesktop.swingx.JXTable$DoubleRenderer");
-//
-//        // Dates
-//        setLazyRenderer(Date.class, "org.jdesktop.swingx.JXTable$DateRenderer");
-//
-//        // Icons and ImageIcons
-//        setLazyRenderer(Icon.class, "org.jdesktop.swingx.JXTable$IconRenderer");
-//        setLazyRenderer(ImageIcon.class,
-//                "org.jdesktop.swingx.JXTable$IconRenderer");
-//
-//        // Booleans
-//        setLazyRenderer(Boolean.class,
-//                "org.jdesktop.swingx.JXTable$BooleanRenderer");
+        // // standard renderers
+        // // Objects
+        // setLazyRenderer(Object.class,
+        // "javax.swing.table.DefaultTableCellRenderer");
+        //
+        // // Numbers
+        // setLazyRenderer(Number.class,
+        // "org.jdesktop.swingx.JXTable$NumberRenderer");
+        //
+        // // Doubles and Floats
+        // setLazyRenderer(Float.class,
+        // "org.jdesktop.swingx.JXTable$DoubleRenderer");
+        // setLazyRenderer(Double.class,
+        // "org.jdesktop.swingx.JXTable$DoubleRenderer");
+        //
+        // // Dates
+        // setLazyRenderer(Date.class,
+        // "org.jdesktop.swingx.JXTable$DateRenderer");
+        //
+        // // Icons and ImageIcons
+        // setLazyRenderer(Icon.class,
+        // "org.jdesktop.swingx.JXTable$IconRenderer");
+        // setLazyRenderer(ImageIcon.class,
+        // "org.jdesktop.swingx.JXTable$IconRenderer");
+        //
+        // // Booleans
+        // setLazyRenderer(Boolean.class,
+        // "org.jdesktop.swingx.JXTable$BooleanRenderer");
 
     }
 
-
     /** c&p'ed from super */
-    @SuppressWarnings("unchecked")    
+    @SuppressWarnings("unchecked")
     private void setLazyValue(Hashtable h, Class c, String s) {
         h.put(c, new UIDefaults.ProxyLazyValue(s));
     }
-
 
     /** c&p'ed from super */
     private void setLazyEditor(Class<?> c, String s) {
@@ -3599,56 +3742,52 @@ public class JXTable extends JTable
     /**
      * Creates default cell editors for objects, numbers, and boolean values.
      * <p>
-     * Overridden to hook enhanced editors (f.i. <code>NumberEditorExt</code>)plus
-     * hacking around huge memory consumption of UIDefaults (see #6345050 in
-     * core Bug parade)
+     * Overridden to hook enhanced editors (f.i. <code>NumberEditorExt</code>
+     * )plus hacking around huge memory consumption of UIDefaults (see #6345050
+     * in core Bug parade)
      * 
      * @see DefaultCellEditor
      */
     @Override
     protected void createDefaultEditors() {
-        Object[] dummies = new Object[] {
-                1, 0,
-                2, 0,
-                3, 0,
-                4, 0,
-                5, 0,
-                6, 0,
-                7, 0,
-                8, 0,
-                9, 0,
-                10, 0,
-                
-          };
-          defaultEditorsByColumnClass = new UIDefaults(dummies);
-          defaultEditorsByColumnClass.clear();
-//        defaultEditorsByColumnClass = new UIDefaults();
+        Object[] dummies = new Object[] { 1, 0, 2, 0, 3, 0, 4, 0, 5, 0, 6, 0,
+                7, 0, 8, 0, 9, 0, 10, 0,
+
+        };
+        defaultEditorsByColumnClass = new UIDefaults(dummies);
+        defaultEditorsByColumnClass.clear();
+        // defaultEditorsByColumnClass = new UIDefaults();
 
         // Objects
         setLazyEditor(Object.class, "org.jdesktop.swingx.JXTable$GenericEditor");
 
         // Numbers
-//        setLazyEditor(Number.class, "org.jdesktop.swingx.JXTable$NumberEditor");
+        // setLazyEditor(Number.class,
+        // "org.jdesktop.swingx.JXTable$NumberEditor");
         setLazyEditor(Number.class, "org.jdesktop.swingx.table.NumberEditorExt");
 
         // Booleans
-        setLazyEditor(Boolean.class, "org.jdesktop.swingx.JXTable$BooleanEditor");
+        setLazyEditor(Boolean.class,
+                "org.jdesktop.swingx.JXTable$BooleanEditor");
 
     }
 
     /**
-     * Default editor registered for <code>Object</code>. The editor tries
-     * to create a new instance of the column's class by reflection. It
-     * assumes that the class has a constructor taking a single <code>String</code>
-     * parameter. <p>
+     * Default editor registered for <code>Object</code>. The editor tries to
+     * create a new instance of the column's class by reflection. It assumes
+     * that the class has a constructor taking a single <code>String</code>
+     * parameter.
+     * <p>
      * 
      * The editor can be configured with a custom <code>JTextField</code>.
      * 
      */
     public static class GenericEditor extends DefaultCellEditor {
 
-        Class<?>[] argTypes = new Class<?>[]{String.class};
+        Class<?>[] argTypes = new Class<?>[] { String.class };
+
         java.lang.reflect.Constructor<?> constructor;
+
         Object value;
 
         public GenericEditor() {
@@ -3662,7 +3801,7 @@ public class JXTable extends JTable
 
         @Override
         public boolean stopCellEditing() {
-            String s = (String)super.getCellEditorValue();
+            String s = (String) super.getCellEditorValue();
             // Here we are dealing with the case where a user
             // has deleted the string value in a cell, possibly
             // after a failed validation. Return null, so that
@@ -3677,21 +3816,21 @@ public class JXTable extends JTable
             }
 
             try {
-                value = constructor.newInstance(new Object[]{s});
-            }
-            catch (Exception e) {
-                ((JComponent)getComponent()).setBorder(new LineBorder(Color.red));
+                value = constructor.newInstance(new Object[] { s });
+            } catch (Exception e) {
+                ((JComponent) getComponent()).setBorder(new LineBorder(
+                        Color.red));
                 return false;
             }
             return super.stopCellEditing();
         }
 
         @Override
-        public Component getTableCellEditorComponent(JTable table, Object value,
-                                                 boolean isSelected,
-                                                 int row, int column) {
+        public Component getTableCellEditorComponent(JTable table,
+                Object value, boolean isSelected, int row, int column) {
             this.value = null;
-            ((JComponent)getComponent()).setBorder(new LineBorder(Color.black));
+            ((JComponent) getComponent())
+                    .setBorder(new LineBorder(Color.black));
             try {
                 Class<?> type = table.getColumnClass(column);
                 // Since our obligation is to produce a value which is
@@ -3702,11 +3841,11 @@ public class JXTable extends JTable
                     type = String.class;
                 }
                 constructor = type.getConstructor(argTypes);
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 return null;
             }
-            return super.getTableCellEditorComponent(table, value, isSelected, row, column);
+            return super.getTableCellEditorComponent(table, value, isSelected,
+                    row, column);
         }
 
         @Override
@@ -3717,16 +3856,18 @@ public class JXTable extends JTable
 
     /**
      * 
-     * Editor for <code>Number</code>s. <p>
-     * Note: this is no longer registered by default. 
-     * The current default is <code>NumberEditorExt</code>
-     * which differs from this in being locale-aware.
+     * Editor for <code>Number</code>s.
+     * <p>
+     * Note: this is no longer registered by default. The current default is
+     * <code>NumberEditorExt</code> which differs from this in being
+     * locale-aware.
      * 
      */
     public static class NumberEditor extends GenericEditor {
 
         public NumberEditor() {
-            ((JTextField)getComponent()).setHorizontalAlignment(JTextField.RIGHT);
+            ((JTextField) getComponent())
+                    .setHorizontalAlignment(JTextField.RIGHT);
         }
     }
 
@@ -3736,7 +3877,7 @@ public class JXTable extends JTable
     public static class BooleanEditor extends DefaultCellEditor {
         public BooleanEditor() {
             super(new JCheckBox());
-            JCheckBox checkBox = (JCheckBox)getComponent();
+            JCheckBox checkBox = (JCheckBox) getComponent();
             checkBox.setHorizontalAlignment(JCheckBox.CENTER);
         }
     }
@@ -3752,13 +3893,13 @@ public class JXTable extends JTable
     public boolean isEditable() {
         return editable;
     }
-    
+
     /**
      * Sets the editable property. This property allows to mark all cells in a
      * table as read-only, independent of their per-column editability as
      * returned by <code>TableColumnExt.isEditable</code> and their per-cell
-     * editability as returned by the <code>TableModel.isCellEditable</code>.
-     * If a cell is read-only in its column or model layer, this property has no
+     * editability as returned by the <code>TableModel.isCellEditable</code>. If
+     * a cell is read-only in its column or model layer, this property has no
      * effect.
      * <p>
      * 
@@ -3773,6 +3914,7 @@ public class JXTable extends JTable
         this.editable = editable;
         firePropertyChange("editable", old, isEditable());
     }
+
     /**
      * Returns the property which determines the edit termination behaviour on
      * focus lost.
@@ -3806,7 +3948,7 @@ public class JXTable extends JTable
         // putClientProperty - the key and method name are the same
         putClientProperty("terminateEditOnFocusLost", terminate);
     }
-    
+
     /**
      * Returns the autoStartsEdit property.
      * 
@@ -3818,7 +3960,7 @@ public class JXTable extends JTable
         return !Boolean.FALSE
                 .equals(getClientProperty("JTable.autoStartsEdit"));
     }
-    
+
     /**
      * Sets the autoStartsEdit property. If true, keystrokes are passed-on to
      * the cellEditor of the lead cell to let it decide whether to start an
@@ -3843,7 +3985,8 @@ public class JXTable extends JTable
     }
 
     /**
-     * {@inheritDoc} <p>
+     * {@inheritDoc}
+     * <p>
      * 
      * overridden to install a custom editor remover.
      */
@@ -3855,80 +3998,83 @@ public class JXTable extends JTable
         }
         return started;
     }
-    
-    
+
     /**
      * Overridden with backport from Mustang fix for #4684090, #4887999.
      */
     @Override
     public void removeEditor() {
-//        if (editorRemover != null) {
-//            editorRemover.uninstall();
-//            editorRemover = null;
-//        }
-        boolean isFocusOwnerInTheTable = isFocusOwnerDescending();    
+        // if (editorRemover != null) {
+        // editorRemover.uninstall();
+        // editorRemover = null;
+        // }
+        boolean isFocusOwnerInTheTable = isFocusOwnerDescending();
         // let super do its stuff
         super.removeEditor();
-        if(isFocusOwnerInTheTable) {
+        if (isFocusOwnerInTheTable) {
             requestFocusInWindow();
         }
     }
 
     /**
-     * Returns a boolean to indicate if the current focus owner 
-     * is descending from this table. 
-     * Returns false if not editing, otherwise walks the focusOwner
-     * hierarchy, taking popups into account.
+     * Returns a boolean to indicate if the current focus owner is descending
+     * from this table. Returns false if not editing, otherwise walks the
+     * focusOwner hierarchy, taking popups into account.
      * 
-     * @return a boolean to indicate if the current focus
-     *   owner is contained.
+     * @return a boolean to indicate if the current focus owner is contained.
      */
     private boolean isFocusOwnerDescending() {
-        if (!isEditing()) return false;
-        Component focusOwner = 
-            KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
+        if (!isEditing())
+            return false;
+        Component focusOwner = KeyboardFocusManager
+                .getCurrentKeyboardFocusManager().getFocusOwner();
         // PENDING JW: special casing to not fall through ... really wanted?
-        if (focusOwner == null) return false;
-        if (SwingXUtilities.isDescendingFrom(focusOwner, this)) return true;
+        if (focusOwner == null)
+            return false;
+        if (SwingXUtilities.isDescendingFrom(focusOwner, this))
+            return true;
         // same with permanent focus owner
-        Component permanent = 
-            KeyboardFocusManager.getCurrentKeyboardFocusManager().getPermanentFocusOwner();
+        Component permanent = KeyboardFocusManager
+                .getCurrentKeyboardFocusManager().getPermanentFocusOwner();
         return SwingXUtilities.isDescendingFrom(permanent, this);
     }
 
-//    /**
-//     * @param focusOwner
-//     * @return
-//     */
-//    private boolean isDescending(Component focusOwner) {
-//        while (focusOwner !=  null) {
-//            if (focusOwner instanceof JPopupMenu) {
-//                focusOwner = ((JPopupMenu) focusOwner).getInvoker();
-//                if (focusOwner == null) {
-//                    return false;
-//                }
-//            }
-//            if (focusOwner == this) {
-//                return true;
-//            }
-//            focusOwner = focusOwner.getParent();
-//        }
-//        return false;
-//    }
+    // /**
+    // * @param focusOwner
+    // * @return
+    // */
+    // private boolean isDescending(Component focusOwner) {
+    // while (focusOwner != null) {
+    // if (focusOwner instanceof JPopupMenu) {
+    // focusOwner = ((JPopupMenu) focusOwner).getInvoker();
+    // if (focusOwner == null) {
+    // return false;
+    // }
+    // }
+    // if (focusOwner == this) {
+    // return true;
+    // }
+    // focusOwner = focusOwner.getParent();
+    // }
+    // return false;
+    // }
 
     protected transient CellEditorRemover editorRemover;
 
     /**
-     * removes the standard editor remover and adds the custom
-     * remover.
-     *
+     * removes the standard editor remover and adds the custom remover.
+     * 
      */
     private void hackEditorRemover() {
-        KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
-        PropertyChangeListener[] listeners = manager.getPropertyChangeListeners("permanentFocusOwner");
+        KeyboardFocusManager manager = KeyboardFocusManager
+                .getCurrentKeyboardFocusManager();
+        PropertyChangeListener[] listeners = manager
+                .getPropertyChangeListeners("permanentFocusOwner");
         for (int i = listeners.length - 1; i >= 0; i--) {
-            if (listeners[i].getClass().getName().startsWith("javax.swing.JTable")) {
-                manager.removePropertyChangeListener("permanentFocusOwner", listeners[i]);
+            if (listeners[i].getClass().getName().startsWith(
+                    "javax.swing.JTable")) {
+                manager.removePropertyChangeListener("permanentFocusOwner",
+                        listeners[i]);
                 break;
             }
         }
@@ -3937,9 +4083,9 @@ public class JXTable extends JTable
         }
     }
 
-
     /**
-     * {@inheritDoc}<p>
+     * {@inheritDoc}
+     * <p>
      * 
      * Overridden to uninstall the custom editor remover.
      */
@@ -3953,11 +4099,11 @@ public class JXTable extends JTable
     }
 
     /**
-     * {@inheritDoc}<p>
+     * {@inheritDoc}
+     * <p>
      * 
-     * Overridden to prevent spurious focus loss to outside
-     * of table while removing the editor. This is essentially 
-     * a hack around core bug #6210779.
+     * Overridden to prevent spurious focus loss to outside of table while
+     * removing the editor. This is essentially a hack around core bug #6210779.
      * 
      * PENDING: add link to wiki!
      */
@@ -3970,37 +4116,37 @@ public class JXTable extends JTable
     }
 
     /**
-     * {@inheritDoc} <p>
-     * Overridden to try to stop the edit, if appropriate. Calls super
-     * if succeeded, does not yield otherwise.
-     *  
+     * {@inheritDoc}
+     * <p>
+     * Overridden to try to stop the edit, if appropriate. Calls super if
+     * succeeded, does not yield otherwise.
+     * 
      */
     @Override
     public void transferFocus() {
-        if (isEditingFocusCycleRoot() && 
-                !getCellEditor().stopCellEditing()) return;
+        if (isEditingFocusCycleRoot() && !getCellEditor().stopCellEditing())
+            return;
         super.transferFocus();
     }
 
     /**
-     * {@inheritDoc} <p>
-     * Overridden to try to stop the edit, if appropiate. Calls super
-     * if succeeded, does not yield otherwise.
-     *  
+     * {@inheritDoc}
+     * <p>
+     * Overridden to try to stop the edit, if appropiate. Calls super if
+     * succeeded, does not yield otherwise.
+     * 
      */
     @Override
     public void transferFocusBackward() {
-        if (isEditingFocusCycleRoot() && 
-                !getCellEditor().stopCellEditing()) return;
+        if (isEditingFocusCycleRoot() && !getCellEditor().stopCellEditing())
+            return;
         super.transferFocusBackward();
     }
 
-
-
     /**
      * 
-     * @return a boolean to indicate whether the table needs
-     * to fake being focus cycle root. 
+     * @return a boolean to indicate whether the table needs to fake being focus
+     *         cycle root.
      */
     private boolean isEditingFocusCycleRoot() {
         return isEditing() && isTerminateEditOnFocusLost();
@@ -4011,8 +4157,8 @@ public class JXTable extends JTable
      * the JTable is editing to determine when to cancel the edit. If focus
      * switches to a component outside of the jtable, but in the same window,
      * this will cancel editing.
-     */ 
-   class  CellEditorRemover implements PropertyChangeListener {
+     */
+    class CellEditorRemover implements PropertyChangeListener {
         KeyboardFocusManager focusManager;
 
         public CellEditorRemover() {
@@ -4020,23 +4166,26 @@ public class JXTable extends JTable
         }
 
         private void install() {
-            focusManager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
+            focusManager = KeyboardFocusManager
+                    .getCurrentKeyboardFocusManager();
             focusManager.addPropertyChangeListener("permanentFocusOwner", this);
             focusManager.addPropertyChangeListener("managingFocus", this);
         }
 
         /**
          * remove all listener registrations.
-         *
+         * 
          */
         public void uninstall() {
-            focusManager.removePropertyChangeListener("permanentFocusOwner", this);
+            focusManager.removePropertyChangeListener("permanentFocusOwner",
+                    this);
             focusManager.removePropertyChangeListener("managingFocus", this);
             focusManager = null;
         }
-        
+
         public void propertyChange(PropertyChangeEvent ev) {
-            if (ev == null) return;
+            if (ev == null)
+                return;
             if ("permanentFocusOwner".equals(ev.getPropertyName())) {
                 permanentFocusOwnerChange();
             } else if ("managingFocus".equals(ev.getPropertyName())) {
@@ -4064,8 +4213,8 @@ public class JXTable extends JTable
                     } else if (c instanceof JPopupMenu) {
                         // PENDING JW: left-over? we should never reach this ...
                         // need to switch the hierarchy to a popups invoker
-                    } else if ((c instanceof Window) ||
-                               (c instanceof Applet && c.getParent() == null)) {
+                    } else if ((c instanceof Window)
+                            || (c instanceof Applet && c.getParent() == null)) {
                         if (c == SwingUtilities.getRoot(JXTable.this)) {
                             if (!getCellEditor().stopCellEditing()) {
                                 getCellEditor().cancelCellEditing();
@@ -4078,10 +4227,6 @@ public class JXTable extends JTable
             }
         }
     }
-
-
-
-
 
     // ---------------------------- updateUI support
 
@@ -4117,7 +4262,8 @@ public class JXTable extends JTable
      * Updates the ui of the columnControl if appropriate.
      */
     protected void updateColumnControlUI() {
-        if ((columnControlButton != null) && (columnControlButton.getParent() == null)) {
+        if ((columnControlButton != null)
+                && (columnControlButton.getParent() == null)) {
             SwingUtilities.updateComponentTreeUI(columnControlButton);
         }
     }
@@ -4163,14 +4309,15 @@ public class JXTable extends JTable
             return;
         Component comp = null;
         if (maybeRenderer instanceof AbstractRenderer) {
-            comp = ((AbstractRenderer) maybeRenderer).getComponentProvider().getRendererComponent(null);
+            comp = ((AbstractRenderer) maybeRenderer).getComponentProvider()
+                    .getRendererComponent(null);
         } else {
             try {
                 // custom editors might balk about fake rows/columns
                 comp = ((TableCellRenderer) maybeRenderer)
-                .getTableCellRendererComponent(this, null, false, false,
-                        -1, -1);
-              
+                        .getTableCellRendererComponent(this, null, false,
+                                false, -1, -1);
+
             } catch (Exception e) {
                 // can't do anything - renderer can't cope with off-range cells
             }
@@ -4181,10 +4328,9 @@ public class JXTable extends JTable
     }
 
     /**
-     * Updates TableColumn after updateUI changes. This implementation
-     * delegates to the column if it is of type UIDependent, takes over
-     * to try an update of the column's cellEditor, Cell-/HeaderRenderer 
-     * otherwise. 
+     * Updates TableColumn after updateUI changes. This implementation delegates
+     * to the column if it is of type UIDependent, takes over to try an update
+     * of the column's cellEditor, Cell-/HeaderRenderer otherwise.
      * 
      * @param column the tableColumn to update.
      */
@@ -4195,7 +4341,7 @@ public class JXTable extends JTable
             updateEditorUI(column.getCellEditor());
             updateRendererUI(column.getCellRenderer());
             updateRendererUI(column.getHeaderRenderer());
-        }    
+        }
     }
 
     /**
@@ -4204,16 +4350,17 @@ public class JXTable extends JTable
      * @see org.jdesktop.swingx.decorator.UIDependent
      */
     protected void updateHighlighterUI() {
-        if (compoundHighlighter == null) return;
+        if (compoundHighlighter == null)
+            return;
         compoundHighlighter.updateUI();
     }
 
     /**
      * Auto-adjusts rowHeight to something more pleasing then the default. This
      * method is called after instantiation and after updating the UI. Does
-     * nothing if the given parameter is <code>true</code> and the rowHeight
-     * had been already set by client code. The underlying problem is that raw
-     * types can't implement UIResource.
+     * nothing if the given parameter is <code>true</code> and the rowHeight had
+     * been already set by client code. The underlying problem is that raw types
+     * can't implement UIResource.
      * <p>
      * This implementation asks the UIManager for a default value (stored with
      * key "JXTable.rowHeight"). If none is available, calculates a "reasonable"
@@ -4244,6 +4391,7 @@ public class JXTable extends JTable
      * horizontal/vertical lines. The margin defaults to 1 or 0 if the grid
      * lines are drawn or not drawn.
      * <p>
+     * 
      * @param showHorizontalLines boolean to decide whether to draw horizontal
      *        grid lines.
      * @param showVerticalLines boolean to decide whether to draw vertical grid
@@ -4251,7 +4399,8 @@ public class JXTable extends JTable
      * @see javax.swing.JTable#setShowGrid(boolean)
      * @see javax.swing.JTable#setIntercellSpacing(Dimension)
      */
-    public void setShowGrid(boolean showHorizontalLines, boolean showVerticalLines) {
+    public void setShowGrid(boolean showHorizontalLines,
+            boolean showVerticalLines) {
         int defaultRowMargin = showHorizontalLines ? 1 : 0;
         setRowMargin(defaultRowMargin);
         setShowHorizontalLines(showHorizontalLines);
@@ -4261,13 +4410,15 @@ public class JXTable extends JTable
     }
 
     /**
-     * {@inheritDoc} <p>
-     * Behaves exactly like super. <p>
-     * It's overridden to 
-     * warn against a frequent programming error: this method toggles only the
-     * <b>visibility</b> of the grid lines, it <b>does not</b> update the row/column
-     * margins - which may lead to visual artefacts, as f.i. not showing the lines at all or
-     * showing normal table background in selected state where the lines should have been.
+     * {@inheritDoc}
+     * <p>
+     * Behaves exactly like super.
+     * <p>
+     * It's overridden to warn against a frequent programming error: this method
+     * toggles only the <b>visibility</b> of the grid lines, it <b>does not</b>
+     * update the row/column margins - which may lead to visual artefacts, as
+     * f.i. not showing the lines at all or showing normal table background in
+     * selected state where the lines should have been.
      * 
      * @see #setShowGrid(boolean, boolean)
      */
@@ -4351,7 +4502,6 @@ public class JXTable extends JTable
         return rowHeightEnabled;
     }
 
-
     /**
      * Returns if it's possible to enable individual row height support.
      * 
@@ -4363,9 +4513,9 @@ public class JXTable extends JTable
     }
 
     /**
-     * Returns super's private <code>rowModel</code> which holds the
-     * individual rowHeights. This method will return <code>null</code> if the
-     * access failed, f.i. in sandbox restricted applications.
+     * Returns super's private <code>rowModel</code> which holds the individual
+     * rowHeights. This method will return <code>null</code> if the access
+     * failed, f.i. in sandbox restricted applications.
      * 
      * @return super's rowModel field or null if the access was not successful.
      */
@@ -4391,9 +4541,9 @@ public class JXTable extends JTable
     }
 
     /**
-     * Sets super's private <code>rowModel</code> which holds the
-     * individual rowHeights. This method will do nothing if the
-     * access failed, f.i. in sandbox restricted applications.
+     * Sets super's private <code>rowModel</code> which holds the individual
+     * rowHeights. This method will do nothing if the access failed, f.i. in
+     * sandbox restricted applications.
      * 
      * @param rowModel the SizeSequence to set super's rowModel to.
      */
@@ -4416,6 +4566,7 @@ public class JXTable extends JTable
                             + "Could be program logic running wild in unrestricted contexts");
         }
     }
+
     /**
      * Returns super's private field which holds the individual rowHeights. This
      * method will return <code>null</code> if the access failed, f.i. in
@@ -4440,7 +4591,7 @@ public class JXTable extends JTable
         }
         return rowModelField;
     }
-    
+
     /**
      * Returns the mapper used synch individual rowHeights in view/model
      * coordinates.
@@ -4487,13 +4638,13 @@ public class JXTable extends JTable
         return super.rowAtPoint(point);
     }
 
-    
     /**
      * 
      * {@inheritDoc}
      * <p>
      * 
      * Overridden to return a <code>JXTableHeader</code>.
+     * 
      * @see JXTableHeader
      */
     @Override
@@ -4507,6 +4658,7 @@ public class JXTable extends JTable
      * <p>
      * 
      * Overridden to return a <code>DefaultTableColumnModelExt</code>.
+     * 
      * @see org.jdesktop.swingx.table.DefaultTableColumnModelExt
      */
     @Override
@@ -4515,7 +4667,8 @@ public class JXTable extends JTable
     }
 
     /**
-     * {@inheritDoc} <p>
+     * {@inheritDoc}
+     * <p>
      * Overridden because super throws NPE on null param.
      */
     @Override
@@ -4524,11 +4677,12 @@ public class JXTable extends JTable
         this.selectionBackground = selectionBackground;
         firePropertyChange("selectionBackground", old, getSelectionBackground());
         repaint();
-//        super.setSelectionBackground(selectionBackground);
+        // super.setSelectionBackground(selectionBackground);
     }
 
     /**
-     * {@inheritDoc} <p>
+     * {@inheritDoc}
+     * <p>
      * Overridden because super throws NPE on null param.
      */
     @Override
@@ -4540,7 +4694,8 @@ public class JXTable extends JTable
     }
 
     /**
-     * {@inheritDoc} <p>
+     * {@inheritDoc}
+     * <p>
      * Overridden because super throws NPE on null param.
      */
     @Override
@@ -4551,5 +4706,4 @@ public class JXTable extends JTable
         repaint();
     }
 
-    
 }
