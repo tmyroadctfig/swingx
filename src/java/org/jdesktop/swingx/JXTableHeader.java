@@ -43,32 +43,46 @@ import org.jdesktop.swingx.table.TableColumnExt;
  * TableHeader with extended functionality if associated Table is of
  * type JXTable.<p>
  * 
- * The enhancements:
+ * <h2> Extended user interaction </h2>
+ * 
  * <ul>
- * <li> supports pluggable handler to control user interaction for sorting. 
- * The default handler toggles sort order on mouseClicked on the header
- * of the column to sort. On shift-mouseClicked, it resets any column sorting. 
+ * <li> Supports column sorting by mouse clicks into a header cell 
+ *  (outside the resize region). The concrete gestures are configurable 
+ *  by providing a custom SortGestureRecognizer.  The default recognizer
+ *  toggles sort order on mouseClicked. On shift-mouseClicked, it resets any column sorting. 
  * Both are done by invoking the corresponding methods of JXTable, 
  * <code> toggleSortOrder(int) </code> and <code> resetSortOrder() </code>
- * <li> uses ColumnHeaderRenderer which can show the sort icon
- * <li> triggers column pack (== auto-resize to exactly fit the contents)
+ * <li> Supports column pack (== auto-resize to exactly fit the contents)
  *  on double-click in resize region.
- *  <li> auto-scrolls if column is dragged outside visible rectangle. This feature
- *  is enabled if the autoscrolls property is true. The default is false 
+ *  <li> Supports horizontal auto-scroll if a column is dragged outside visible rectangle. 
+ *  This feature is enabled if the autoscrolls property is true. The default is false 
  *  (because of Issue #788-swingx which still isn't fixed for jdk1.6).
- *  <li> listens to TableColumn propertyChanges to update itself accordingly.
+ * </ul>
+ * 
+ * <h2> Extended functionality </h2>
+ * 
+ * <ul>
+ * <li> Installs a default header renderer which is able to show sort icons. 
+ *   LAF provided special effects are uneffected.
+ * <li> Listens to TableColumn propertyChanges to update itself accordingly.
+ * <li> Supports per-column header ToolTips. 
+ * <li> Guarantees reasonable minimal height > 0 for header preferred height.
  * </ul>
  * 
  * 
  * @author Jeanette Winzenburg
  * 
- * @see ColumnHeaderRenderer
  * @see JXTable#toggleSortOrder(int)
  * @see JXTable#resetSortOrder()
+ * @see SortGestureRecognizer
+ * @see ColumnHeaderRenderer
  */
 public class JXTableHeader extends JTableHeader 
     implements TableColumnModelExtListener {
 
+    /**
+     * The recognizer used for interpreting mouse events as sorting user gestures.
+     */
     private SortGestureRecognizer sortGestureRecognizer;
 
     /**
@@ -96,6 +110,7 @@ public class JXTableHeader extends JTableHeader
 
 
     /**
+     * {@inheritDoc} <p>
      * Sets the associated JTable. Enables enhanced header
      * features if table is of type JXTable.<p>
      * 
@@ -115,12 +130,16 @@ public class JXTableHeader extends JTableHeader
     }
 
     /**
-     * Implementing TableColumnModelExt: listening to column property changes.
-     * Here: triggers a resizeAndRepaint on every propertyChange which
+     * Implements TableColumnModelExt to allow internal update after
+     * column property changes.<p>
+     * 
+     * This implementation triggers a resizeAndRepaint on every propertyChange which
      * doesn't already fire a "normal" columnModelEvent.
      * 
      * @param event change notification from a contained TableColumn.
      * @see #isColumnEvent(PropertyChangeEvent)
+     * @see TableColumnModelExtListener
+     * 
      * 
      */
     public void columnPropertyChange(PropertyChangeEvent event) {
@@ -130,6 +149,13 @@ public class JXTableHeader extends JTableHeader
     
     
     /**
+     * Returns a boolean indicating if a property change event received
+     * from column changes is expected to be already broadcasted by the
+     * core TableColumnModel. <p>
+     * 
+     * This implementation returns true for notification of width, preferredWidth
+     * and visible properties, false otherwise.
+     * 
      * @param event the PropertyChangeEvent received as TableColumnModelExtListener.
      * @return a boolean to decide whether the same event triggers a
      *   base columnModelEvent.
@@ -141,7 +167,9 @@ public class JXTableHeader extends JTableHeader
     }
 
     /**
-     * overridden to respect the column tooltip, if available. 
+     * {@inheritDoc} <p>
+     * 
+     * Overridden to respect the column tooltip, if available. 
      * 
      * @return the column tooltip of the column at the mouse position 
      *   if not null or super if not available.
@@ -153,6 +181,8 @@ public class JXTableHeader extends JTableHeader
     }
 
     /**
+     * Returns the column tooltip of the column at the position
+     * of the MouseEvent, if a tooltip is available.
      * 
      * @param event the mouseEvent representing the mouse location.
      * @return the column tooltip of the column below the mouse location,
@@ -166,6 +196,11 @@ public class JXTableHeader extends JTableHeader
         return columnExt != null ? columnExt.getToolTipText() : null;
     }
     
+    /**
+     * Returns the associated table if it is of type JXTable, or null if not.
+     * 
+     * @return the associated table if of type JXTable or null if not.
+     */
     public JXTable getXTable() {
         if (!(getTable() instanceof JXTable))
             return null;
@@ -173,11 +208,12 @@ public class JXTableHeader extends JTableHeader
     }
 
     /**
-     * Returns the TableCellRenderer used for rendering the headerCell
-     * of the column at columnIndex.
+     * Returns the TableCellRenderer to use for the column with the given index. This
+     * implementation returns the column's header renderer if available or this header's
+     * default renderer if not.
      * 
-     * @param columnIndex the index of the column
-     * @return the renderer.
+     * @param columnIndex the index in view coordinates of the column
+     * @return the renderer to use for the column, guaranteed to be not null.
      */
     public TableCellRenderer getCellRenderer(int columnIndex) {
         TableCellRenderer renderer = getColumnModel().getColumn(columnIndex).getHeaderRenderer();
@@ -185,10 +221,15 @@ public class JXTableHeader extends JTableHeader
     }
     
     /**
-     * Overridden to adjust for a minimum height as returned by
-     * #getMinimumHeight.
+     * {@inheritDoc} <p>
      * 
-     * @inheritDoc
+     * Overridden to adjust for a reasonable minimum height. Done to fix Issue 334-swingx,
+     * which actually is a core issue misbehaving in returning a zero height
+     * if the first column has no text. 
+     * 
+     * @see #getPreferredSize(Dimension)
+     * @see #getMinimumHeight(int).
+     * 
      */
     @Override
     public Dimension getPreferredSize() {
@@ -199,12 +240,15 @@ public class JXTableHeader extends JTableHeader
     }
     
     /**
-     * Hack around #334-swingx: super doesnt measure all headerRenderers
-     * for prefSize. This hack does and adjusts the height of the 
-     * given Dimension to be equal to the max fo all renderers.
+     * Returns a preferred size which is adjusted to the maximum of all
+     * header renderers' height requirement.
      * 
-     * @param pref the adjusted preferred size respecting all renderers
-     *   size requirements.
+     * @param pref an initial preferred size
+     * @return the initial preferred size with its height property adjusted 
+     *      to the maximum of all renderers preferred height requirement. 
+     *  
+     *  @see #getPreferredSize()
+     *  @see #getMinimumHeight(int)
      */
     protected Dimension getPreferredSize(Dimension pref) {
         int height = pref.height;
@@ -220,14 +264,19 @@ public class JXTableHeader extends JTableHeader
     }
 
     /**
-     * Allows to enforce a minimum heigth in the 
-     * getXXSize methods.
+     * Returns a reasonable minimal preferred height for the header. This is
+     * meant as a last straw if all header values are null, renderers report 0 as
+     * their preferred height.<p>
      * 
-     * Here: jumps in if the input height is 0, then measures the
-     * cell renderer component with a dummy value.
+     * This implementation returns the default header renderer's preferred height as measured
+     * with a dummy value if the input height is 0, otherwise returns the height
+     * unchanged.
      * 
-     * @param height the prefHeigth as calcualated by super.
-     * @return a minimum height for the preferredSize.
+     * @param height the initial height.
+     * @return a reasonable minimal preferred height.
+     * 
+     * @see #getPreferredSize()
+     * @see #getPreferredSize(Dimension)
      */
     protected int getMinimumHeight(int height) {
         if ((height == 0)) {
@@ -354,13 +403,14 @@ public class JXTableHeader extends JTableHeader
     }
 
     /**
-     * Returns the (visible) view index for the given column
+     * Returns the (visible) view index for the table column
      * or -1 if not visible or not contained in this header's
      * columnModel.
      * 
      * 
-     * @param aColumn
-     * @return
+     * @param aColumn the TableColumn to find the view index for
+     * @return the view index of the given table column or -1 if not visible
+     * or not contained in the column model.
      */
     private int getViewIndexForColumn(TableColumn aColumn) {
         if (aColumn == null)
@@ -374,14 +424,16 @@ public class JXTableHeader extends JTableHeader
         return -1;
     }
 
-//    protected TableCellRenderer createDefaultRenderer() {
-//        return ColumnHeaderRenderer.createColumnHeaderRenderer();
-//    }
 
     /**
-     * Lazily creates and returns the SortGestureRecognizer.
+     * Returns the SortGestureRecognizer to use. If none available, lazily 
+     * creates a default.
      * 
-     * @return the SortGestureRecognizer used in Headerlistener.
+     * @return the SortGestureRecognizer to use for interpreting mouse events
+     *    as sort gestures.
+     *    
+     * @see #setSortGestureRecognizer(SortGestureRecognizer)
+     * @see #createSortGestureRecognizer()   
      */
     public SortGestureRecognizer getSortGestureRecognizer() {
         if (sortGestureRecognizer == null) {
@@ -392,9 +444,17 @@ public class JXTableHeader extends JTableHeader
     }
     
     /**
-     * Set the SortGestureRecognizer for use in the HeaderListener.
+     * Sets the SortGestureRecognizer to use for interpreting mouse events
+     *    as sort gestures. If null, a default as returned by createSortGestureRecognizer
+     *    is used.<p>
+     *    
+     * This is a bound property.   
      * 
-     * @param recognizer the recognizer to use in HeaderListener.
+     * @param recognizer the SortGestureRecognizer to use for interpreting mouse events
+     *    as sort gestures
+     *    
+     * @see #getSortGestureRecognizer()
+     * @see #createSortGestureRecognizer()    
      */
     public void setSortGestureRecognizer(SortGestureRecognizer recognizer) {
         SortGestureRecognizer old = getSortGestureRecognizer();
@@ -403,14 +463,96 @@ public class JXTableHeader extends JTableHeader
     }
     
     /**
-     * creates and returns the default SortGestureRecognizer.
-     * @return the SortGestureRecognizer used in Headerlistener.
+     * Creates and returns the default SortGestureRecognizer.
+     * @return the default SortGestureRecognizer to use for interpreting mouse events
+     *    as sort gestures.
      * 
+     * @see #getSortGestureRecognizer()
+     * @see #setSortGestureRecognizer(SortGestureRecognizer)
      */
     protected SortGestureRecognizer createSortGestureRecognizer() {
         return new SortGestureRecognizer();
     }
 
+    /**
+     * Controller for mapping left mouse clicks to sort/-unsort gestures for use
+     * in interested mouse listeners. This base class interprets a single click
+     * for toggling sort order, and a single SHIFT-left click for unsort.
+     * <p>
+     * 
+     * A custom implementation which doesn't allow unsort.
+     * 
+     * <pre>
+     * &lt;code&gt;
+     * public class CustomRecognizer extends SortGestureRecognizer {
+     *        // Disable reset gesture.
+     *          &#064;Override 
+     *           public boolean isResetSortOrderGesture(MouseEvent e) { 
+     *                  return false; 
+     *          }
+     * }
+     * tableHeader.setSortGestureRecognizer(new CustomRecognizer());
+     * &lt;/code&gt;
+     * </pre>
+     * 
+     * <b>Note</b>: Unsort as of SwingX means to reset the sort of all columns.
+     * Which currently doesn't make a difference because it supports single
+     * column sorts only. Might become significant after switching to JDK 1.6
+     * which supports multiple column sorting (if we can keep up the pluggable
+     * control).
+     * 
+     * 
+     */
+    public static class SortGestureRecognizer {
+
+        /**
+         * Returns a boolean indicating whether the mouse event should be interpreted
+         * as an unsort trigger or not.
+         * @param e a mouseEvent representing a left mouse click.
+         * @return true if the mouse click should be used as a unsort gesture
+         */
+        public boolean isResetSortOrderGesture(MouseEvent e) {
+            return isSortOrderGesture(e) && isResetModifier(e);
+        }
+
+        /**
+         * Returns a boolean indicating whether the mouse event should be interpreted
+         * as a toggle sort trigger or not.
+         * @param e a mouseEvent representing a left mouse click.
+         * @return true if the mouse click should be used as a toggle sort gesture
+         */
+        public boolean isToggleSortOrderGesture(MouseEvent e) {
+            return isSortOrderGesture(e) && !isResetModifier(e);
+        }
+        
+        /**
+         * Returns a boolean indicating whether the mouse event should be interpreted
+         * as any type of sort change trigger.
+         * @param e a mouseEvent representing a left mouse click.
+         * @return true if the mouse click should be used as a sort/unsort gesture
+         */
+        public boolean isSortOrderGesture(MouseEvent e) {
+            return e.getClickCount() == 1;
+        }
+        
+        /**
+         * Returns a boolean indicating whether the mouse event's modifier should be interpreted
+         * as a unsort or not.
+         * 
+         * @param e a mouseEvent representing a left mouse click.
+         * @return true if the mouse click's modifier should be interpreted as a reset.
+         * 
+         */
+        protected boolean isResetModifier(MouseEvent e) {
+            return ((e.getModifiersEx() & MouseEvent.SHIFT_DOWN_MASK) == MouseEvent.SHIFT_DOWN_MASK);
+        }
+
+    }
+
+    /**
+     * Creates and installs header listeners to service the extended functionality.
+     * This implementation creates and installs a custom mouse input listener.
+     */
     protected void installHeaderListener() {
         if (headerListener == null) {
             headerListener = new HeaderListener();
@@ -420,6 +562,10 @@ public class JXTableHeader extends JTableHeader
         }
     }
 
+    /**
+     * Uninstalls header listeners to service the extended functionality.
+     * This implementation uninstalls a custom mouse input listener.
+     */
     protected void uninstallHeaderListener() {
         if (headerListener != null) {
             removeMouseListener(headerListener);
@@ -519,31 +665,6 @@ public class JXTableHeader extends JTableHeader
         }
     }
 
-    /**
-     * Encapsulates decision about which MouseEvents should
-     * trigger sort/unsort events.
-     * 
-     * Here: a single left click for toggling sort order, a
-     * single SHIFT-left click for unsorting.
-     * 
-     */
-    public static class SortGestureRecognizer {
-        public boolean isResetSortOrderGesture(MouseEvent e) {
-            return isSortOrderGesture(e) && isResetModifier(e);
-        }
-
-        protected boolean isResetModifier(MouseEvent e) {
-            return ((e.getModifiersEx() & MouseEvent.SHIFT_DOWN_MASK) == MouseEvent.SHIFT_DOWN_MASK);
-        }
-        
-        public boolean isToggleSortOrderGesture(MouseEvent e) {
-            return isSortOrderGesture(e) && !isResetModifier(e);
-        }
-        
-        public boolean isSortOrderGesture(MouseEvent e) {
-            return e.getClickCount() == 1;
-        }
-    }
 
 
 }

@@ -51,7 +51,7 @@ import org.jdesktop.swingx.renderer.FormatStringValue;
  * per-application default register it with the UIManager, like
  * 
  * <pre><code>
- * UIManager.put(CalendarHeaderHandler.uiControlID, 
+ * UIManager.put(CalendarHeaderHandler.uiControllerID, 
  *      "org.jdesktop.swingx.plaf.basic.SpinningCalendarHeaderHandler");
  * </code>
  * </pre>
