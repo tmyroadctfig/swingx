@@ -131,37 +131,40 @@ import org.jdesktop.swingx.table.TableColumnModelExt;
  * 
  * <h2>Sorting and Filtering</h2>
  * 
- * <b>NOTE:</b> this is incompatible with core (table) sorting/filtering in JDK
- * 6+. Will be replaced by core functionality after switching the target jdk
- * version from 5 to 6.
+ * JXTable supports sorting and filtering of rows. 
+ * 
+ * Sorting support is single column only. It provides api to apply
+ * a specific sort order or to toggle the sort order of columns identified 
+ * by view index or column identifier or reset all sorts. 
+ * 
+ * <pre><code>
+ * table.setSortOrder("PERSON_ID", SortOrder.DESCENDING);
+ * table.toggleSortOder(4);
+ * table.resetSortOrder();
+ * </code></pre>
+ * 
+ * Sorting sequence can be configured per column by setting the TableColumnExt's
+ * "comparator" property. Sorting can be disabled per column or per table by
+ * {@link #setSortable(boolean)}. 
  * 
  * <p>
- * A JXTable is a JTable with built-in support for row sorting, filtering, and
- * highlighting, column visibility and a special popup control on the column
- * header for quick access to table configuration. You can instantiate a JXTable
- * just as you would a JTable, using a TableModel. However, a JXTable
- * automatically wraps TableColumns inside a TableColumnExt instance.
- * TableColumnExt supports visibility, sortability, and prototype values for
- * column sizing, none of which are available in TableColumn. You can retrieve
- * the TableColumnExt instance for a column using {@link #getColumnExt(Object)}
- * or {@link #getColumnExt(int colnumber)}.
- * 
- * <p>
- * A JXTable is, by default, sortable by clicking on column headers; each
+ * Typically, a JXTable is sortable by left clicking on column headers. By default, each
  * subsequent click on a header reverses the order of the sort, and a sort arrow
- * icon is automatically drawn on the header. Sorting can be disabled using
- * {@link #setSortable(boolean)}. Sorting on columns is handled by a Sorter
- * instance which contains a Comparator used to compare values in two rows of a
- * column. You can replace the Comparator for a given column by using
- * <code>getColumnExt("column").setComparator(customComparator)</code>
+ * icon is automatically drawn on the header. The exact mapping of a user gesture to
+ * a sort effect is configurable by installing a custom SortGestureRecognizer on the
+ * JXTableHeader.
  * 
  * <p>
  * Rows can be filtered from a JXTable using a Filter class and a
  * FilterPipeline. One assigns a FilterPipeline to the table using
- * {@link #setFilters(FilterPipeline)}. Filtering hides, but does not delete or
+ * {@link #setFilters(FilterPipeline)}. Filtering hides, but does not delete nor
  * permanently remove rows from a JXTable. Filters are used to provide sorting
  * to the table--rows are not removed, but the table is made to believe rows in
  * the model are in a sorted order.
+ * 
+ * <b>NOTE:</b> SwingX sorting/filtering is incompatible with core sorting/filtering in 
+ * JDK 6+. Will be replaced by core functionality after switching the target jdk
+ * version from 5 to 6.
  * 
  * <h2>Rendering and Highlighting</h2>
  * 
@@ -177,16 +180,16 @@ import org.jdesktop.swingx.table.TableColumnModelExt;
  * 
  * <pre><code>
  * 
- *         Highlighter simpleStriping = HighlighterFactory.createSimpleStriping();
- *         PatternPredicate patternPredicate = new PatternPredicate(&quot;&circ;M&quot;, 1);
- *         ColorHighlighter magenta = new ColorHighlighter(patternPredicate, null,
- *                 Color.MAGENTA, null, Color.MAGENTA);
- *         Highlighter shading = new ShadingColorHighlighter(
- *                 new HighlightPredicate.ColumnHighlightPredicate(1));
+ * Highlighter simpleStriping = HighlighterFactory.createSimpleStriping();
+ * PatternPredicate patternPredicate = new PatternPredicate(&quot;&circ;M&quot;, 1);
+ * ColorHighlighter magenta = new ColorHighlighter(patternPredicate, null,
+ *       Color.MAGENTA, null, Color.MAGENTA);
+ * Highlighter shading = new ShadingColorHighlighter(
+ *       new HighlightPredicate.ColumnHighlightPredicate(1));
  * 
- *         table.setHighlighters(simpleStriping,
- *                 magenta,
- *                 shading);
+ * table.setHighlighters(simpleStriping,
+ *        magenta,
+ *        shading);
  * </code></pre>
  * 
  * <p>
@@ -204,9 +207,8 @@ import org.jdesktop.swingx.table.TableColumnModelExt;
  *        return StringValues.FILE_NAME.getString(value) + &quot;, &quot; 
  *           + StringValues.DATE_TO_STRING.getString(((File) value).lastModified());
  * }};
+ * table.setCellRenderer(File.class, new DefaultTableRenderer(sv));
  * </code></pre>
- * 
- * 
  * 
  * <p>
  * <b>Note</b>: DefaultTableCellRenderer and subclasses require a hack to play
@@ -226,7 +228,7 @@ import org.jdesktop.swingx.table.TableColumnModelExt;
  * using a Highlighter.
  * 
  * <pre><code>
- * JXTable tree = new JXTable();
+ * JXTable table = new JXTable();
  * table.addHighlighter(new ColorHighlighter(HighlightPredicate.ROLLOVER_ROW, 
  *      null, Color.RED);      
  * </code></pre>
@@ -247,6 +249,12 @@ import org.jdesktop.swingx.table.TableColumnModelExt;
  * string as seen by the user.
  * 
  * <h2>Column Configuration</h2>
+ * 
+ * JXTable's default column model
+ * is of type TableColumnModelExt which allows management of hidden columns. 
+ * Furthermore, it guarantees to delegate creation and configuration of table columns
+ * to its ColumnFactory. The factory is meant as the central place to 
+ * customize column configuration.
  * 
  * <p>
  * Columns can be hidden or shown by setting the visible property on the
@@ -275,11 +283,6 @@ import org.jdesktop.swingx.table.TableColumnModelExt;
  * normally not pick this up.
  * 
  * <p>
- * JXTable guarantees to delegate creation and configuration of TableColumnExt
- * to a ColumnFactory. By default, the application-wide shared ColumnFactory is
- * used. You can install a custom ColumnFactory, either application-wide by
- * {@link ColumnFactory#setInstance(ColumnFactory)} or per table instance by
- * {@link #setColumnFactory(ColumnFactory)}.
  * 
  * 
  * <p>
@@ -317,6 +320,8 @@ import org.jdesktop.swingx.table.TableColumnModelExt;
  * @author Amy Fowler
  * @author Mark Davidson
  * @author Jeanette Winzenburg
+ * 
+ * @see JXTableHeader.SortGestureRecognizer
  */
 public class JXTable extends JTable implements TableColumnModelExtListener {
 
@@ -586,13 +591,24 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
         updateLocaleState(getLocale());
     }
 
+//--------------- Rollover support    
     /**
-     * Property to enable/disable rollover support. This can be enabled to show
-     * "live" rollover behaviour, f.i. the cursor over LinkModel cells. Default
-     * is enabled. If rollover effects are not used, this property should be
-     * disabled.
+     * Sets the property to enable/disable rollover support. If enabled, this component
+     * fires property changes on per-cell mouse rollover state, i.e. 
+     * when the mouse enters/leaves a list cell. <p>
      * 
-     * @param rolloverEnabled
+     * This can be enabled to show "live" rollover behaviour, f.i. the cursor over a cell 
+     * rendered by a JXHyperlink.<p>
+     * 
+     * The default value is true.
+     * 
+     * @param rolloverEnabled a boolean indicating whether or not the rollover
+     *   functionality should be enabled.
+     * 
+     * @see #isRolloverEnabled()
+     * @see #getLinkController()
+     * @see #createRolloverProducer()
+     * @see org.jdesktop.swingx.rollover.RolloverRenderer  
      */
     public void setRolloverEnabled(boolean rolloverEnabled) {
         boolean old = isRolloverEnabled();
@@ -613,6 +629,30 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
         firePropertyChange("rolloverEnabled", old, isRolloverEnabled());
     }
 
+    /**
+     * Returns a boolean indicating whether or not rollover support is enabled. 
+     *
+     * @return a boolean indicating whether or not rollover support is enabled. 
+     * 
+     * @see #setRolloverEnabled(boolean)
+     */
+    public boolean isRolloverEnabled() {
+        return rolloverProducer != null;
+    }
+
+    /**
+     * Returns the RolloverController for this component. Lazyly creates the 
+     * controller if necessary, that is the return value is guaranteed to be 
+     * not null. <p>
+     * 
+     * PENDING JW: rename to getRolloverController
+     * 
+     * @return the RolloverController for this tree, guaranteed to be not null.
+     * 
+     * @see #setRolloverEnabled(boolean)
+     * @see #createLinkController()
+     * @see org.jdesktop.swingx.rollover.RolloverController
+     */
     protected TableRolloverController<JXTable> getLinkController() {
         if (linkController == null) {
             linkController = createLinkController();
@@ -620,27 +660,30 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
         return linkController;
     }
 
+    /**
+     * Creates and returns a RolloverController appropriate for this component.
+     * 
+     * @return a RolloverController appropriate for this component.
+     * 
+     * @see #getLinkController()
+     * @see org.jdesktop.swingx.rollover.RolloverController
+     */
     protected TableRolloverController<JXTable> createLinkController() {
         return new TableRolloverController<JXTable>();
     }
 
     /**
-     * creates and returns the RolloverProducer to use.
+     * Creates and returns the RolloverProducer to use with this component.
+     * <p>
      * 
-     * @return <code>RolloverProducer</code>
+     * @return <code>RolloverProducer</code> to use with this component
+     * 
+     * @see #setRolloverEnabled(boolean)
      */
     protected RolloverProducer createRolloverProducer() {
         return new TableRolloverProducer();
     }
 
-    /**
-     * Returns the rolloverEnabled property.
-     * 
-     * @return <code>true</code> if rollover is enabled
-     */
-    public boolean isRolloverEnabled() {
-        return rolloverProducer != null;
-    }
 
     /**
      * Returns the column control visible property.
@@ -955,7 +998,7 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
                     LOG.log(Level.WARNING, "", ex);
                 }
             } else if ("find".equals(getName())) {
-                find();
+                doFind();
             }
         }
 
@@ -1825,7 +1868,11 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
 
     // ----------------------------- filters
 
-    /** Returns the FilterPipeline for the table. */
+    /** 
+     * Returns the FilterPipeline for the table. 
+     * 
+     * @return the FilterPipeline used for the table.
+     */
     public FilterPipeline getFilters() {
         // PENDING: this is guaranteed to be != null because
         // init calls setFilters(null) which enforces an empty
@@ -2990,14 +3037,23 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
 
     // ----------------------- Search support
 
-    /** Opens the find widget for the table. */
-    private void find() {
+    /** 
+     * Starts a search on this List's visible items. This implementation asks the
+     * SearchFactory to open a find widget on itself.
+     */
+    protected void doFind() {
         SearchFactory.getInstance().showFindInput(this, getSearchable());
     }
 
     /**
+     * Returns a Searchable for this component, guaranteed to be not null. This 
+     * implementation lazily creates a TableSearchable if necessary.
+     *  
      * 
-     * @return a not-null Searchable for this editor.
+     * @return a not-null Searchable for this component.
+     * 
+     * @see #setSearchable(Searchable)
+     * @see org.jdesktop.swingx.search.TableSearchable
      */
     public Searchable getSearchable() {
         if (searchable == null) {
@@ -3007,10 +3063,11 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
     }
 
     /**
-     * sets the Searchable for this editor. If null, a default searchable will
-     * be used.
+     * Sets the Searchable for this table. If null, a default 
+     * searchable will be used.
      * 
-     * @param searchable
+     * @param searchable the Searchable to use for this table, may be null to indicate
+     *   using the table's default searchable.
      */
     public void setSearchable(Searchable searchable) {
         this.searchable = searchable;

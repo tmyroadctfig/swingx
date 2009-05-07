@@ -437,7 +437,7 @@ public class JXTree extends JTree {
 
     /**
      * Returns a Searchable for this component, guaranteed to be not null. This 
-     * implementation lazyly creates a TreeSearchable if necessary.
+     * implementation lazily creates a TreeSearchable if necessary.
      *  
      * 
      * @return a not-null Searchable for this component.
@@ -456,7 +456,8 @@ public class JXTree extends JTree {
      * Sets the Searchable for this component. If null, a default 
      * Searchable will be created and used.
      * 
-     * @param searchable the Searchable to use for this component.
+     * @param searchable the Searchable to use for this component, may be null to 
+     *   indicate using the default.
      * 
      * @see #getSearchable()
      */
@@ -711,11 +712,12 @@ public class JXTree extends JTree {
 //------------------------ Rollover support
     
     /**
-     * Sets a boolean to enable/disable rollover support. 
-     * Installs or uninstalls the RolloverProducer/-Controller and appropriate
-     * listeners if enable or disabled, respectively. 
-     * If enabled, renderers of implementing RolloverRenderer  
-     * show "live" rollover behaviour, f.i. the cursor over LinkModel cells. <p>
+     * Sets the property to enable/disable rollover support. If enabled, the list
+     * fires property changes on per-cell mouse rollover state, i.e. 
+     * when the mouse enters/leaves a list cell. <p>
+     * 
+     * This can be enabled to show "live" rollover behaviour, f.i. the cursor over a cell 
+     * rendered by a JXHyperlink.<p>
      * 
      * The default value is false.
      * 
@@ -745,9 +747,11 @@ public class JXTree extends JTree {
     }
 
     /**
-     * Returns a boolean indicating whether or not rollover behaviour is enabled. 
+     * Returns a boolean indicating whether or not rollover support is enabled. 
      *
-     * @return a boolean indicating whether or not rollover behaviour is enabled. 
+     * @return a boolean indicating whether or not rollover support is enabled. 
+     * 
+     * @see #setRolloverEnabled(boolean)
      */
     public boolean isRolloverEnabled() {
         return rolloverProducer != null;

@@ -69,16 +69,121 @@ import org.jdesktop.swingx.search.SearchFactory;
 import org.jdesktop.swingx.search.Searchable;
 
 /**
- * JXList.
+ * Enhanced List component with support for general SwingX sorting/filtering,
+ * rendering, highlighting, rollover and search functionality. List specific
+ * enhancements include ?? PENDING JW ...
  * 
- * Enabled Rollover/LinkModel handling. Enabled Highlighter support.
+ * <h2>Sorting and Filtering</h2>
  * 
- * Added experimental support for filtering/sorting. This feature is disabled by
+ * JXList supports sorting and filtering. 
+ * 
+ * It provides api to apply a specific sort order, to toggle the sort order and to reset a sort.
+ * Sort sequence can be configured by setting a custom comparator.
+ * 
+ * <pre><code>
+ * list.setFilterEnabled(true);
+ * list.setComparator(myComparator);
+ * list.setSortOrder(SortOrder.DESCENDING);
+ * list.toggleSortOder();
+ * list.resetSortOrder();
+ * </code></pre>
+ * 
+ * <p>
+ * Rows can be filtered from a JXList using a Filter class and a
+ * FilterPipeline. One assigns a FilterPipeline to the table using
+ * {@link #setFilters(FilterPipeline)}. Filtering hides, but does not delete nor
+ * permanently remove rows from a JXList. 
+ * 
+ * <p>
+ * JXList provides api to access items of the underlying model in view coordinates
+ * and to convert from/to model coordinates.
+ * 
+ * <b>Note</b>: List sorting/filtering is disabled by
  * default because it has side-effects which might break "normal" expectations
  * when using a JList: if enabled all row coordinates (including those returned
  * by the selection) are in view coordinates. Furthermore, the model returned
- * from getModel() is a wrapper around the actual data.
+ * from getModel() is a wrapper around the actual data. 
  * 
+ * <b>Note:</b> SwingX sorting/filtering is incompatible with core sorting/filtering in 
+ * JDK 6+. Will be replaced by core functionality after switching the target jdk
+ * version from 5 to 6.
+ * 
+ * 
+ * <h2>Rendering and Highlighting</h2>
+ * 
+ * As all SwingX collection views, a JXList is a HighlighterClient (PENDING JW:
+ * formally define and implement, like in AbstractTestHighlighter), that is it
+ * provides consistent api to add and remove Highlighters which can visually
+ * decorate the rendering component.
+ * <p>
+ * 
+ * <pre><code>
+ * 
+ * JXList list = new JXList(new Contributors());
+ * // implement a custom string representation, concated from first-, lastName
+ * StringValue sv = new StringValue() {
+ *     public String getString(Object value) {
+ *        if (value instanceof Contributor) {
+ *           Contributor contributor = (Contributor) value;
+ *           return contributor.lastName() + ", " + contributor.firstName(); 
+ *        }
+ *        return StringValues.TO_STRING(value);
+ *     }
+ * };
+ * list.setCellRenderer(new DefaultListRenderer(sv); 
+ * // highlight condition: gold merits
+ * HighlightPredicate predicate = new HighlightPredicate() {
+ *    public boolean isHighlighted(Component renderer,
+ *                     ComponentAdapter adapter) {
+ *       if (!(value instanceof Contributor)) return false;              
+ *       return ((Contributor) value).hasGold();
+ *    }
+ * };
+ * // highlight with foreground color 
+ * list.addHighlighter(new PainterHighlighter(predicate, goldStarPainter);      
+ * 
+ * </code></pre>
+ * 
+ * <i>Note:</i> to support the highlighting this implementation wraps the
+ * ListCellRenderer set by client code with a DelegatingRenderer which applies
+ * the Highlighter after delegating the default configuration to the wrappee. As
+ * a side-effect, getCellRenderer does return the wrapper instead of the custom
+ * renderer. To access the latter, client code must call getWrappedCellRenderer.
+ * <p>
+ * 
+ * <h2>Rollover</h2>
+ * 
+ * As all SwingX collection views, a JXList supports per-cell rollover. If
+ * enabled, the component fires rollover events on enter/exit of a cell which by
+ * default is promoted to the renderer if it implements RolloverRenderer, that
+ * is simulates live behaviour. The rollover events can be used by client code
+ * as well, f.i. to decorate the rollover row using a Highlighter.
+ * 
+ * <pre><code>
+ * 
+ * JXList list = new JXList();
+ * list.setRolloverEnabled(true);
+ * list.setCellRenderer(new DefaultListRenderer());
+ * list.addHighlighter(new ColorHighlighter(HighlightPredicate.ROLLOVER_ROW, 
+ *      null, Color.RED);      
+ * 
+ * </code></pre>
+ * 
+ * 
+ * <h2>Search</h2>
+ * 
+ * As all SwingX collection views, a JXList is searchable. A search action is
+ * registered in its ActionMap under the key "find". The default behaviour is to
+ * ask the SearchFactory to open a search component on this component. The
+ * default keybinding is retrieved from the SearchFactory, typically ctrl-f (or
+ * cmd-f for Mac). Client code can register custom actions and/or bindings as
+ * appropriate.
+ * <p>
+ * 
+ * JXList provides api to vend a renderer-controlled String representation of
+ * cell content. This allows the Searchable and Highlighters to use WYSIWYM
+ * (What-You-See-Is-What-You-Match), that is pattern matching against the actual
+ * string as seen by the user.
  * 
  * 
  * @author Ramesh Gupta
@@ -255,13 +360,22 @@ public class JXList extends JList {
         };
     }
 
+    /** 
+     * Starts a search on this List's visible items. This implementation asks the
+     * SearchFactory to open a find widget on itself.
+     */
     protected void doFind() {
         SearchFactory.getInstance().showFindInput(this, getSearchable());
     }
 
     /**
+     * Returns a Searchable for this component, guaranteed to be not null. This 
+     * implementation lazily creates a ListSearchable if necessary.
+     *  
+     * @return a not-null Searchable for this list.
      * 
-     * @return a not-null Searchable for this editor.
+     * @see #setSearchable(Searchable)
+     * @see org.jdesktop.swingx.search.ListSearchable
      */
     public Searchable getSearchable() {
         if (searchable == null) {
@@ -271,22 +385,37 @@ public class JXList extends JList {
     }
 
     /**
-     * sets the Searchable for this editor. If null, a default 
-     * searchable will be used.
+     * Sets the Searchable for this component. If null, a default 
+     * Searchable will be created and used.
      * 
-     * @param searchable
+     * @param searchable the Searchable to use for this component, may be null to indicate
+     *   using the list's default searchable.
+     * @see #getSearchable()
      */
     public void setSearchable(Searchable searchable) {
         this.searchable = searchable;
     }
     
-
+//--------------------- Rollover support
+    
     /**
-     * Property to enable/disable rollover support. This can be enabled to show
-     * "live" rollover behaviour, f.i. the cursor over LinkModel cells. Default
-     * is disabled.
+     * Sets the property to enable/disable rollover support. If enabled, the list
+     * fires property changes on per-cell mouse rollover state, i.e. 
+     * when the mouse enters/leaves a list cell. <p>
      * 
-     * @param rolloverEnabled
+     * This can be enabled to show "live" rollover behaviour, f.i. the cursor over a cell 
+     * rendered by a JXHyperlink.<p>
+     * 
+     * Default value is disabled.
+     * 
+     * @param rolloverEnabled a boolean indicating whether or not the rollover
+     *   functionality should be enabled.
+     * 
+     * @see #isRolloverEnabled()
+     * @see #getLinkController()
+     * @see #createRolloverProducer()
+     * @see org.jdesktop.swingx.rollover.RolloverRenderer  
+     *    
      */
     public void setRolloverEnabled(boolean rolloverEnabled) {
         boolean old = isRolloverEnabled();
@@ -306,7 +435,30 @@ public class JXList extends JList {
         firePropertyChange("rolloverEnabled", old, isRolloverEnabled());
     }
 
+    /**
+     * Returns a boolean indicating whether or not rollover support is enabled. 
+     *
+     * @return a boolean indicating whether or not rollover support is enabled. 
+     * 
+     * @see #setRolloverEnabled(boolean)
+     */
+    public boolean isRolloverEnabled() {
+        return rolloverProducer != null;
+    }
     
+    /**
+     * Returns the RolloverController for this component. Lazyly creates the 
+     * controller if necessary, that is the return value is guaranteed to be 
+     * not null. <p>
+     * 
+     * PENDING JW: rename to getRolloverController
+     * 
+     * @return the RolloverController for this tree, guaranteed to be not null.
+     * 
+     * @see #setRolloverEnabled(boolean)
+     * @see #createLinkController()
+     * @see org.jdesktop.swingx.rollover.RolloverController
+     */
     protected ListRolloverController<JXList> getLinkController() {
         if (linkController == null) {
             linkController = createLinkController();
@@ -314,6 +466,14 @@ public class JXList extends JList {
         return linkController;
     }
 
+    /**
+     * Creates and returns a RolloverController appropriate for this component.
+     * 
+     * @return a RolloverController appropriate for this component.
+     * 
+     * @see #getLinkController()
+     * @see org.jdesktop.swingx.rollover.RolloverController
+     */
     protected ListRolloverController<JXList> createLinkController() {
         return new ListRolloverController<JXList>();
     }
@@ -321,19 +481,14 @@ public class JXList extends JList {
 
     /**
      * Creates and returns the RolloverProducer to use with this tree.
+     * <p>
      * 
      * @return <code>RolloverProducer</code> to use with this tree
+     * 
+     * @see #setRolloverEnabled(boolean)
      */
     protected RolloverProducer createRolloverProducer() {
         return new ListRolloverProducer();
-    }
-    /**
-     * returns the rolloverEnabled property.
-     *
-     * @return true if rollover is enabled
-     */
-    public boolean isRolloverEnabled() {
-        return rolloverProducer != null;
     }
 
     //--------------------- public sort api
@@ -572,6 +727,8 @@ public class JXList extends JList {
     }
 
     /**
+     * {@inheritDoc} <p>
+     * 
      * Overridden to update selectionMapper
      */
     @Override 
@@ -581,6 +738,7 @@ public class JXList extends JList {
     }
 
     /**
+     * {@inheritDoc} <p>
      * 
      * Sets the underlying data model. Note that if isFilterEnabled you must
      * call getWrappedModel to access the model given here. In this case
@@ -610,6 +768,8 @@ public class JXList extends JList {
     }
 
     /**
+     * Returns the FilterPipeline assigned to this list, or null if filtering not
+     * enabled.
      * 
      * @return the <code>FilterPipeline</code> assigned to this list, or
      *   null if !isFiltersEnabled().
@@ -1090,22 +1250,6 @@ public class JXList extends JList {
             return list.isSelectedIndex(row);
         }
 
-//        /**
-//         * {@inheritDoc}
-//         */
-//        @Override
-//        public String getColumnName(int columnIndex) {
-//            return "Column_" + columnIndex;
-//        }
-//
-//        /**
-//         * {@inheritDoc}
-//         */
-//        @Override
-//        public String getColumnIdentifier(int columnIndex) {
-//            return null;
-//        }
-//
     }
 
     // ------------------------------ renderers
@@ -1430,6 +1574,11 @@ public class JXList extends JList {
 
     // --------------------------- updateUI
 
+    /**
+     * {@inheritDoc} <p>
+     * 
+     * Overridden to update renderer and Highlighters.
+     */
     @Override
     public void updateUI() {
         super.updateUI();
