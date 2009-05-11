@@ -19,13 +19,11 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
 import javax.swing.border.TitledBorder;
 
 import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXDatePicker;
 import org.jdesktop.swingx.JXFrame;
-import org.jdesktop.swingx.JXMonthView;
 import org.jdesktop.swingx.JXPanel;
 import org.jdesktop.swingx.SwingXUtilities;
 import org.jdesktop.test.PropertyChangeReport;
@@ -42,8 +40,9 @@ public class CompoundFocusListenerTest extends InteractiveTestCase {
     public static void main(String[] args) {
         CompoundFocusListenerTest test = new CompoundFocusListenerTest();
         // KEEP this is global state - uncomment for debug painting completely
-        UIManager.put(JXMonthView.uiClassID, "org.jdesktop.swingx.plaf.basic.BasicSpinningMonthViewUI");
-        UIManager.put("JXDatePicker.forceZoomable", Boolean.TRUE);
+//        UIManager.put(CalendarHeaderHandler.uiControllerID, "org.jdesktop.swingx.plaf.basic.SpinningCalendarHeaderHandler");
+//        UIManager.put(SpinningCalendarHeaderHandler.FOCUSABLE_SPINNER_TEXT, Boolean.TRUE);
+//        UIManager.put("JXDatePicker.forceZoomable", Boolean.TRUE);
         try {
             test.runInteractiveTests();
         } catch (Exception e) {
