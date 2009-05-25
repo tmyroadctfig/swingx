@@ -1760,6 +1760,7 @@ public class JXLoginPane extends JXPanel {
                         break;
                     case FAILED:
                         cancelButton.setEnabled(true);
+                        panel.passwordField.requestFocusInWindow();
                         w.pack();
                         break;
                     case SUCCEEDED:
