@@ -21,17 +21,35 @@
 
 package org.jdesktop.swingx.util;
 
-import javax.swing.*;
-
-import org.jdesktop.swingx.SwingXUtilities;
-
-import java.awt.*;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Font;
+import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
+import java.awt.GridBagConstraints;
+import java.awt.Insets;
+import java.awt.MouseInfo;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.Toolkit;
+import java.awt.Window;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JInternalFrame;
+import javax.swing.JOptionPane;
+import javax.swing.RootPaneContainer;
+import javax.swing.SwingUtilities;
+
+import org.jdesktop.swingx.SwingXUtilities;
 
 /**
  * Encapsulates various utilities for windows (ie: <code>Frame</code> and
@@ -50,11 +68,11 @@ public final class WindowUtils {
     }
 
     /**
-     * <p/>
+     * <p>
      * Returns the <code>Point</code> at which a window should be placed to
      * center that window on the screen.
      * </p>
-     * <p/>
+     * <p>
      * Some thought was taken as to whether to implement a method such as this,
      * or to simply make a method that, given a window, will center it.  It was
      * decided that it is better to not alter an object within a method.
@@ -67,34 +85,37 @@ public final class WindowUtils {
      *         center that window on the screen.
      */
     public static Point getPointForCentering(Window window) {
-        //assert window != null;
-        try {
-            Point mousePoint = MouseInfo.getPointerInfo().getLocation();
-            GraphicsDevice[] devices = GraphicsEnvironment
-                    .getLocalGraphicsEnvironment().getScreenDevices();
-            for (GraphicsDevice device : devices) {
-                Rectangle bounds = device.getDefaultConfiguration().getBounds();
-                //check to see if the mouse cursor is within these bounds
-                if (mousePoint.x >= bounds.x && mousePoint.y >= bounds.y
-                    && mousePoint.x <= (bounds.x + bounds.width)
-                    && mousePoint.y <= (bounds.y + bounds.height)) {
-                    //this is it
-                    int screenWidth = bounds.width;
-                    int screenHeight = bounds.height;
-                    int width = window.getWidth();
-                    int height = window.getHeight();
-                    return new Point(((screenWidth - width) / 2) + bounds.x,
-                                        ((screenHeight - height) / 2) + bounds
-                                                .y);
-                }
-            }
-        } catch (Exception e) {
-            LOG.log(Level.FINE, e.getLocalizedMessage() +
-                                " - this can occur do to a Security exception in sandboxed apps");
-        }
-        return new Point(0, 0);
+        Rectangle usableBounds = getUsableDeviceBounds(window);
+        int screenWidth = usableBounds.width;
+        int screenHeight = usableBounds.height;
+        int width = window.getWidth();
+        int height = window.getHeight();
+        
+        return new Point(((screenWidth - width) / 2) + usableBounds.x,
+                ((screenHeight - height) / 2) + usableBounds.y);
     }
 
+    private static Rectangle getUsableDeviceBounds(Window window) {
+        Window owner = window.getOwner();
+        GraphicsConfiguration gc = null;
+        
+        if (owner == null) {
+            gc = GraphicsEnvironment.getLocalGraphicsEnvironment()
+                    .getDefaultScreenDevice().getDefaultConfiguration();
+        } else {
+            gc = owner.getGraphicsConfiguration();
+        }
+        
+        Insets insets = Toolkit.getDefaultToolkit().getScreenInsets(gc);
+        Rectangle bounds = gc.getBounds();
+        bounds.x += insets.left;
+        bounds.y += insets.top;
+        bounds.width -= (insets.left + insets.right);
+        bounds.height -= (insets.top + insets.bottom);
+        
+        return bounds;
+    }
+    
     /**
      * <p/>
      * Returns the <code>Point</code> at which a window should be placed to
