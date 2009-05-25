@@ -23,11 +23,9 @@ package org.jdesktop.swingx.util;
 
 import java.awt.Component;
 import java.awt.Container;
-import java.awt.Font;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
-import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.awt.MouseInfo;
 import java.awt.Point;
@@ -41,15 +39,9 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
 import javax.swing.JOptionPane;
-import javax.swing.RootPaneContainer;
 import javax.swing.SwingUtilities;
-
-import org.jdesktop.swingx.SwingXUtilities;
 
 /**
  * Encapsulates various utilities for windows (ie: <code>Frame</code> and
@@ -182,102 +174,6 @@ public final class WindowUtils {
         return origin;
     }
 
-    /**
-     * Utility method used to load a GridBagConstraints object (param gbc) with the
-     * data in the other parameters.  This method saves code space over doing the
-     * assignments by hand, and also allows you to reuse the same GridBagConstraints
-     * object reducing temporary object creating (at the expense of a method call.
-     * Go figure).
-     * 
-     * @deprecated (pre 0.9.6) no replacement
-     */
-    @Deprecated
-    public static void setConstraints(GridBagConstraints gbc, int gridx,
-                                      int gridy, int gridwidth, int gridheight,
-                                      double weightx, double weighty,
-                                      int anchor, int fill, int top, int left,
-                                      int bottom, int right) {
-        gbc.gridx = gridx;
-        gbc.gridy = gridy;
-        gbc.gridwidth = gridwidth;
-        gbc.gridheight = gridheight;
-        gbc.weightx = weightx;
-        gbc.weighty = weighty;
-        gbc.anchor = anchor;
-        gbc.fill = fill;
-        gbc.insets = new Insets(top, left, bottom, right);
-    }
-
-    /**
-     * Get a <code>Rectangle</code> object representing the given window's
-     * position and magnitude in space.
-     * 
-     * @param win
-     *            The window to get a Rectangle object for
-     * 
-     * @return a Rectangle object.
-     * @see com.jgui.Rectangle
-     * @deprecated (pre-0.9.6) use {@code Window#getBounds()}.
-     */
-    @Deprecated
-    public static Rectangle getRectangle(Window win) {
-        return new Rectangle(win.getY(), win.getX(), win.getWidth(), win.getHeight());
-    }
-
-    /**
-     * Get a <code>Rectangle</code> object representing the given JComponent's position and
-     * magnitude in space.
-     *
-     * @param comp The JComponent to get a Rectangle object for
-     *
-     * @return a Rectangle object.
-     * @see com.jgui.Rectangle
-     * @deprecated (pre-0.9.6) use {@code JComponent#getBounds()}.
-     */
-    @Deprecated
-    public static Rectangle getRectangle(JComponent comp) {
-        return new Rectangle(comp.getY(), comp.getX(), comp.getWidth(), comp.getHeight());
-    }
-
-    /**
-     * Locates the RootPaneContainer for the given component
-     *
-     * @param c
-     *
-     * @return the RootPaneContainer to which the component belongs to
-     * @deprecated (pre-0.9.6) use {@code SwingXUtilities#getAncestor(Class, Component)}.
-     */
-    @Deprecated
-    public static RootPaneContainer findRootPaneContainer(Component c) {
-        return SwingXUtilities.getAncestor(RootPaneContainer.class, c);
-    }
-
-    /**
-     * Locates the JFrame for the given component
-     *
-     * @param c
-     *
-     * @return the JFrame to which the component belongs to
-     * @deprecated (pre-0.9.6) use {@code SwingXUtilities#getAncestor(Class, Component)}.
-     */
-    @Deprecated
-    public static JFrame findJFrame(Component c) {
-        return SwingXUtilities.getAncestor(JFrame.class, c);
-    }
-
-    /**
-     * Locates the JDialog for the given component
-     *
-     * @param c
-     *
-     * @return the JDialog to which the component belongs to
-     * @deprecated (pre-0.9.6) use {@code SwingXUtilities#getAncestor(Class, Component)}.
-     */
-    @Deprecated
-    public static JDialog findJDialog(Component c) {
-        return SwingXUtilities.getAncestor(JDialog.class, c);
-    }
-
     public static Window findWindow(Component c) {
         if (c == null) {
             return JOptionPane.getRootFrame();
@@ -298,15 +194,6 @@ public final class WindowUtils {
             }
         }
         return compList;
-    }
-
-    /**
-     * @deprecated (pre-0.9.6) use
-     *             {@link SwingXUtilities#setComponentTreeFont(Component, Font)}
-     */
-    @Deprecated
-    public static void setFontRecursively(Container c, Font font) {
-        SwingXUtilities.setComponentTreeFont(c, font);
     }
 
     /**

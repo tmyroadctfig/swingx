@@ -22,39 +22,21 @@
 package org.jdesktop.swingx.util;
 
 import java.awt.Color;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.GraphicsConfiguration;
-import java.awt.GraphicsDevice;
-import java.awt.GraphicsEnvironment;
-import java.awt.Image;
 import java.awt.Paint;
 import java.awt.Rectangle;
-import java.awt.Shape;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.URL;
 
-import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
-import javax.swing.border.BevelBorder;
-import javax.swing.border.Border;
-
-import org.jdesktop.swingx.SwingXUtilities;
-import org.jdesktop.swingx.graphics.GraphicsUtilities;
 
 /**
  * A collection of utilties for painting visual effects.
@@ -62,12 +44,6 @@ import org.jdesktop.swingx.graphics.GraphicsUtilities;
  * @author Mark Davidson
  */
 public class PaintUtils {
-    //  Utility methods.
-    private static Border defaultBorder =
-            BorderFactory.createBevelBorder(BevelBorder.RAISED);
-    
-    
-    
     public static final GradientPaint BLUE_EXPERIENCE = new GradientPaint(
             new Point2D.Double(0, 0),
             new Color(168, 204, 241),
@@ -111,14 +87,6 @@ public class PaintUtils {
     
     
     private PaintUtils() {
-    }
-    
-    /**
-     * @deprecated (pre 0.9.6) no replacement
-     */
-    @Deprecated
-    public static Border getDefaultBorder() {
-        return defaultBorder;
     }
     
     /**
@@ -174,132 +142,6 @@ public class PaintUtils {
         g2.fillRect(0, 0, comp.getWidth(), comp.getHeight());
         g2.setPaint(oldPaint);
     }
-    
-    /**
-     * Sets the background color for a containment hierarchy.
-     * 
-     * @deprecated (pre 0.9.6) use
-     *             {@link SwingXUtilities#setComponentTreeBackground(Component, Color)}
-     */
-    @Deprecated
-    public static void setBackgroundColor(Container cont, Color color) {
-        SwingXUtilities.setComponentTreeBackground(cont, color);
-    }
-
-    /**
-     * Sets the foreground color for a containment hierarchy.
-     * 
-     * @deprecated (pre 0.9.6) use
-     *             {@link SwingXUtilities#setComponentTreeForeground(Component, Color)}
-     */
-    @Deprecated
-    public static void setForegroundColor(Container cont, Color color) {
-        SwingXUtilities.setComponentTreeForeground(cont, color);
-    }
-    
-    /**
-     * Sets the font for a containment hierarchy.
-     * 
-     * @deprecated (pre 0.9.6) use
-     *             {@link SwingXUtilities#setComponentTreeFont(Component, Font)}
-     */
-    @Deprecated
-    public static void setFont(Container cont, Font font) {
-        SwingXUtilities.setComponentTreeFont(cont, font);
-    }
-    
-    /**
-     * @param width  the width of the new BufferedImage
-     * @param height the height of the new BufferedImage
-     *
-     * @return Creates and returns a BufferedImage that is "compatible" with this machines
-     *         video card and subsystem
-     * @deprecated (pre-0.9.6) use {@link GraphicsUtilities#createCompatibleImage(int, int)}
-     */
-    @Deprecated
-    public static BufferedImage createCompatibleImage(int width, int height) {
-        GraphicsEnvironment environment =
-                GraphicsEnvironment.getLocalGraphicsEnvironment();
-        GraphicsDevice screenDevice = environment.getDefaultScreenDevice();
-        GraphicsConfiguration configuration =
-                screenDevice.getDefaultConfiguration();
-        return configuration.createCompatibleImage(width, height);
-    }
-
-    /**
-     * @param width
-     *            the width of the new BufferedImage
-     * @param height
-     *            the height of the new BufferedImage
-     * @param transparency
-     *            one of the values in the Transparency interface
-     * 
-     * @return Creates and returns a BufferedImage that is "compatible" with
-     *         this machines video card and subsystem with the given
-     *         Transparency.
-     * @deprecated (pre-0.9.6) use
-     *             {@link GraphicsUtilities#createCompatibleImage(int, int)} or
-     *             {@link GraphicsUtilities#createCompatibleTranslucentImage(int, int)}
-     */
-    @Deprecated
-    public static BufferedImage createCompatibleImage(int width, int height,
-            int transparency) {
-        GraphicsEnvironment environment =
-                GraphicsEnvironment.getLocalGraphicsEnvironment();
-        GraphicsDevice screenDevice = environment.getDefaultScreenDevice();
-        GraphicsConfiguration configuration =
-                screenDevice.getDefaultConfiguration();
-        return configuration.createCompatibleImage(width, height, transparency);
-    }
-    
-    /**
-     * @deprecated Use {@link GraphicsUtilities#convertToBufferedImage(Image)} instead
-     */
-    @Deprecated
-    public static BufferedImage convertToBufferedImage(Image img) {
-        return GraphicsUtilities.convertToBufferedImage(img);
-    }
-    
-    /**
-     * Loads the image at the URL and makes it compatible with the screen.
-     * If loading the url fails then this method will either throw an IOException
-     * or return null.
-     * 
-     * @deprecated (pre-0.9.6) use {@link GraphicsUtilities#loadCompatibleImage(URL)}
-     */
-    @Deprecated
-    public static BufferedImage loadCompatibleImage(URL resource) throws IOException {
-        return GraphicsUtilities.loadCompatibleImage(resource);
-    }
-    
-    /**
-     * @deprecated Use {@link GraphicsUtilities#loadCompatibleImage(InputStream)} instead
-     */
-    @Deprecated
-    public static BufferedImage loadCompatibleImage(InputStream in) throws IOException {
-        return GraphicsUtilities.loadCompatibleImage(in);
-    }
-    
-    /**
-     * @deprecated (pre-0.9.6) use {@link GraphicsUtilities#toCompatibleImage(BufferedImage)}
-     */
-    @Deprecated
-    public static BufferedImage toCompatibleImage(BufferedImage image) {
-        return GraphicsUtilities.toCompatibleImage(image);
-    }
-    
-    
-    /** Sets the clip on a graphics object by merging with the existing
-     * clip instead of replacing it. The new clip will be an intersection of
-     * the old clip and the passed in clip shape.   The old clip shape will
-     * be returned
-     * @deprecated (pre-0.9.6) Use {@link GraphicsUtilities#mergeClip(Graphics,Shape)} instead
-     */
-    @Deprecated
-    public static Shape setMergedClip(Graphics g, Shape newClip) {
-        return GraphicsUtilities.mergeClip(g, newClip);
-    }
-    
     
     /** Resizes a gradient to fill the width and height available. If the
      * gradient is left to right it will be resized to fill the entire width.
