@@ -25,6 +25,7 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 
 import javax.swing.JComponent;
+import javax.swing.LookAndFeel;
 import javax.swing.border.Border;
 import javax.swing.plaf.ComponentUI;
 
@@ -44,7 +45,8 @@ public class MetalTaskPaneUI extends BasicTaskPaneUI {
 
   protected void installDefaults() {
     super.installDefaults();
-    group.setOpaque(false);
+    
+    LookAndFeel.installProperty(group, "opaque", false);
   }
 
   protected Border createPaneBorder() {

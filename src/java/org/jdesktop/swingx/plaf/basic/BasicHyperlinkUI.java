@@ -43,6 +43,7 @@ import javax.swing.ButtonModel;
 import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JToolBar;
+import javax.swing.LookAndFeel;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
@@ -113,7 +114,7 @@ public class BasicHyperlinkUI extends BasicButtonUI {
     protected void installDefaults(AbstractButton b) {
         super.installDefaults(b);
 
-        b.setOpaque(false);
+        LookAndFeel.installProperty(b, "opaque", false);
         b.setBorderPainted(false);
         b.setRolloverEnabled(true);
         if (SwingXUtilities.isUIInstallable(b.getBorder())) {
