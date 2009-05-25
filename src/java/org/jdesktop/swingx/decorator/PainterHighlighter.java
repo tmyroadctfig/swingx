@@ -53,7 +53,7 @@ import org.jdesktop.swingx.renderer.PainterAware;
  * property to decorate a component depending on content.
  * 
  * <pre><code>
- * @Override
+ * &#64;Override
  * protected Component doHighlight(Component renderer, ComponentAdapter adapter) {
  *      float end = getEndOfGradient((Number) adapter.getValue());
  *      RelativePainter painter = (RelativePainter) getPainter();
@@ -62,7 +62,7 @@ import org.jdesktop.swingx.renderer.PainterAware;
  *      return renderer;
  * }
  * 
- * @Override
+ * &#64;Override
  * protected boolean canHighlight(Component renderer, ComponentAdapter adapter) {
  *     return super.canHighlight(renderer, adapter) &&
  *        (adapter.getValue() instanceof Number);

@@ -161,7 +161,55 @@ public class ColorUtil {
     public static String toHexString(Color color) {
         return "#" + Integer.toHexString(color.getRGB() | 0xFF000000).substring(2);
     }
+
+    /**
+     * Computes an appropriate foreground color (either white or black) for the
+     * given background color.
+     * 
+     * @param bg
+     *            the background color
+     * @return {@code Color.WHITE} or {@code Color.BLACK}
+     * @throws NullPointerException
+     *             if {@code bg} is {@code null}
+     */
+    public static Color computeForeground(Color bg) {
+        float[] rgb = bg.getRGBColorComponents(null);
+        float y = .3f * rgb[0] + .59f * rgb[1] + .11f * rgb[2];
         
+        return y > .5f ? Color.BLACK : Color.WHITE;
+    }
+
+    /**
+     * Blends two colors to create a new color. The {@code origin} color is the
+     * base for the new color and regardless of its alpha component, it is
+     * treated a fully opaque (alpha 255).
+     * 
+     * @param origin
+     *            the base of the new color
+     * @param over
+     *            the alpha-enabled color to add to the {@code origin} color
+     * @return a new color comprised of the {@code origin} and {@code over}
+     *         colors
+     */
+    public static Color blend(Color origin, Color over) {
+        if (over == null) {
+            return origin;
+        }
+
+        if (origin == null) {
+            return over;
+        }
+
+        int a = over.getAlpha();
+        
+        int rb = (((over.getRGB() & 0x00ff00ff) * a)
+                    + ((origin.getRGB() & 0x00ff00ff) * (0xff - a))) & 0xff00ff00;
+        int g = (((over.getRGB() & 0x0000ff00) * a)
+                    + ((origin.getRGB() & 0x0000ff00) * (0xff - a))) & 0x00ff0000;
+
+        return new Color((over.getRGB() & 0xff000000) | ((rb | g) >> 8));
+    }
+    
     /**
      * Obtain a <code>java.awt.Paint</code> instance which draws a checker
      * background of black and white. 
