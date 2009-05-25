@@ -21,17 +21,8 @@
  */
 package org.jdesktop.beans;
 
-import java.awt.HeadlessException;
-import java.io.File;
-import java.io.IOException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Enumeration;
 import java.util.List;
-import java.util.StringTokenizer;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -41,7 +32,6 @@ import junit.framework.TestCase;
 
 import org.apache.commons.collections.MultiHashMap;
 import org.apache.commons.collections.MultiMap;
-import org.jdesktop.beans.AbstractBean;
 import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXCollapsiblePane;
 import org.jdesktop.swingx.JXDatePicker;
@@ -52,7 +42,6 @@ import org.jdesktop.swingx.JXMultiThumbSlider;
 import org.jdesktop.swingx.JXSearchPanel;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.JXTreeTable;
-import org.jdesktop.swingx.JXLoginPane.SimpleNamePanel;
 import org.jdesktop.swingx.renderer.JRendererCheckBox;
 import org.jdesktop.swingx.renderer.JRendererLabel;
 import org.jdesktop.swingx.renderer.JXRendererHyperlink;
@@ -101,8 +90,6 @@ public class BeanEventsTest extends InteractiveTestCase {
         excludes.put(JXMonthView.class, "lowerBound");
         // shorthand for getSelectionModel.setSelectionInterval(newDate, newDate);
         excludes.put(JXMonthView.class, "selectionDate");
-        // shorthand for JTextField.this.setText 
-        excludes.put(SimpleNamePanel.class, "userName");
         // shorthand for getEditor.setFont 
         excludes.put(JXDatePicker.class, "font");
         // according to javadoc: api hack for testing 
