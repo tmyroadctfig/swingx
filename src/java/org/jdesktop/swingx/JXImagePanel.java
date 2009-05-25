@@ -154,7 +154,9 @@ public class JXImagePanel extends JXPanel {
      */
     public Image getImage() {
         Image image = img.get();
-        if (image == null) {
+        
+        //TODO perhaps we should have a default image loader?
+        if (image == null && imageLoader != null) {
             try {
                 image = imageLoader.call();
                 img = new SoftReference<Image>(image);
