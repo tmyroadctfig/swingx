@@ -48,26 +48,41 @@ import javax.swing.SwingUtilities;
 
 /**
  * <p>
- * A panel that draws an image. The standard (and currently only supported) mode
- * is to draw the specified image starting at position 0,0 in the panel. The
- * component&amp;s preferred size is based on the image, unless explicitly set
- * by the user.
+ * A panel that draws an image. The standard mode is to draw the specified image
+ * centered and unscaled. The component&amp;s preferred size is based on the
+ * image, unless explicitly set by the user.
  * </p>
- * 
  * <p>
- * In the future, the JXImagePanel will also support tiling of images, scaling,
- * resizing, cropping, segues etc.
- * </p>
+ * Images to be displayed can be set based on URL, Image, etc. This is
+ * accomplished by passing in an image loader.
  * 
+ * <pre>
+ * public class URLImageLoader extends Callable&lt;Image&gt; {
+ *     private URL url;
+ * 
+ *     public URLImageLoader(URL url) {
+ *         url.getClass(); //null check
+ *         this.url = url;
+ *     }
+ * 
+ *     public Image call() throws Exception {
+ *         return ImageIO.read(url);
+ *     }
+ * }
+ * 
+ * imagePanel.setImageLoader(new URLImageLoader(url));
+ * </pre>
+ * 
+ * </p>
  * <p>
  * This component also supports allowing the user to set the image. If the
  * <code>JXImagePanel</code> is editable, then when the user clicks on the
  * <code>JXImagePanel</code> a FileChooser is shown allowing the user to pick
  * some other image to use within the <code>JXImagePanel</code>.
  * </p>
- * 
  * <p>
- * Images to be displayed can be set based on URL, Image, etc.
+ * TODO In the future, the JXImagePanel will also support tiling of images,
+ * scaling, resizing, cropping, segues etc.
  * </p>
  * <p>
  * TODO other than the image loading this component can be replicated by a
@@ -121,6 +136,7 @@ public class JXImagePanel extends JXPanel {
     public JXImagePanel() {
     }
 
+    //TODO remove this constructor; no where else can a URL be used in this class
     public JXImagePanel(URL imageUrl) {
         try {
             setImage(ImageIO.read(imageUrl));
@@ -261,13 +277,18 @@ public class JXImagePanel extends JXPanel {
                 @Override
                 protected void done() {
                     super.done();
-                    try {
-                        JXImagePanel.this.setImage(get());
-                    } catch (InterruptedException e) {
-                        // ignore - canceled image load
-                    } catch (ExecutionException e) {
-                        LOG.log(Level.WARNING, "", e);
-                    }
+                    
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            try {
+                                JXImagePanel.this.setImage(get());
+                            } catch (InterruptedException e) {
+                                // ignore - canceled image load
+                            } catch (ExecutionException e) {
+                                LOG.log(Level.WARNING, "", e);
+                            }
+                        }
+                    });
                 }
 
             });
