@@ -34,28 +34,22 @@ import org.jdesktop.swingx.decorator.PatternFilter;
 import org.jdesktop.swingx.decorator.PatternMatcher;
 
 /**
- * Rudimentary search panel.
- * 
- * Updates PatternMatchers from user input.
- * 
- * Supports
- * 
- * <ol>
- * <li> text input to match
- * <li> match rules like contains/equals/...
- * <li> toggle case sensitive match
- * </ol>
- * 
- * NOTE: the method setPatternHighlighter(PatternHighlighter) has been removed
- * without having been marked deprecated (has been an oversight on my part ;-).
- * To replace, implement a custom PatternMatcher which has a Highlighter, takes
- * a pattern and configures the Highlighter with the appropriate
- * PatternPredicate.
- * 
- * <pre><code>
+ * <p>
+ * {@code JXSearchPanel} provides complex searching features. Users are able to
+ * specify searching rules, enter searching text (including regular
+ * expressions), and toggle case-sensitivity.
+ * </p>
+ * <p>
+ * One of the main features that {@code JXSearchPanel} provides is the ability
+ * to update {@link PatternMatcher}s. To highlight text with a
+ * {@link Highlighter}, you need to update the highlighter via a pattern
+ * matcher.
+ * </p>
+ * <pre>
  * public class PatternHandler implements PatternMatcher {
  * 
  *     private Highlighter highlighter;
+ * 
  *     private Pattern pattern;
  * 
  *     public void setPattern(Pattern pattern) {
@@ -64,20 +58,22 @@ import org.jdesktop.swingx.decorator.PatternMatcher;
  *     }
  * 
  * }
- * </code></pre>
- * 
+ * </pre>
+ * <p>
  * TODO: allow custom PatternModel and/or access to configuration of bound
  * PatternModel.
- * 
+ * </p>
+ * <p>
  * TODO: fully support control of multiple PatternMatchers.
+ * </p>
  * 
  * @author Ramesh Gupta
  * @author Jeanette Winzenburg
- * 
  */
 public class JXSearchPanel extends AbstractPatternPanel {
-
-
+    /**
+     * The action command key.
+     */
     public static final String MATCH_RULE_ACTION_COMMAND = "selectMatchRule";
 
     private JComboBox searchCriteria;
@@ -85,6 +81,9 @@ public class JXSearchPanel extends AbstractPatternPanel {
     private List<PatternMatcher> patternMatchers;
     
 
+    /**
+     * Creates a search panel.
+     */
     public JXSearchPanel() {
         initComponents();
         build();
@@ -95,6 +94,12 @@ public class JXSearchPanel extends AbstractPatternPanel {
 
 //----------------- accessing public properties
 
+    /**
+     * Adds a pattern matcher.
+     * 
+     * @param matcher
+     *            the matcher to add.
+     */
     public void addPatternMatcher(PatternMatcher matcher) {
         getPatternMatchers().add(matcher);
         updateFieldName(matcher);
@@ -111,11 +116,11 @@ public class JXSearchPanel extends AbstractPatternPanel {
         updateFieldName(filter);
     }
 
-
     /**
      * set the label of the search combo.
      * 
      * @param name
+     *            the label
      */
     public void setFieldName(String name) {
         String old = searchLabel.getText();
@@ -159,7 +164,7 @@ public class JXSearchPanel extends AbstractPatternPanel {
     // ---------------- action callbacks
 
     /**
-     * 
+     * Updates the pattern matchers.
      */
     @Override
     public void match() {
