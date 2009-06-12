@@ -349,8 +349,8 @@ public final class SwingXUtilities {
         Component parent = c.getParent();
 
         while (parent != null && !(clazz.isInstance(parent))) {
-            parent = c instanceof JPopupMenu
-                    ? ((JPopupMenu) c).getInvoker() : c.getParent();
+            parent = parent instanceof JPopupMenu
+                    ? ((JPopupMenu) parent).getInvoker() : parent.getParent();
         }
         
         return (T) parent;
