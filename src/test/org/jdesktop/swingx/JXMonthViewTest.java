@@ -20,6 +20,9 @@
  */
 package org.jdesktop.swingx;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+
 import java.awt.Color;
 import java.awt.ComponentOrientation;
 import java.awt.Font;
@@ -42,19 +45,18 @@ import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
+import junit.framework.TestCase;
+
 import org.jdesktop.swingx.calendar.CalendarUtils;
 import org.jdesktop.swingx.calendar.DateSelectionModel;
 import org.jdesktop.swingx.calendar.DaySelectionModel;
 import org.jdesktop.swingx.calendar.DateSelectionModel.SelectionMode;
-import org.jdesktop.swingx.event.DateSelectionListener;
 import org.jdesktop.swingx.event.DateSelectionEvent.EventType;
 import org.jdesktop.swingx.hyperlink.AbstractHyperlinkAction;
 import org.jdesktop.swingx.test.DateSelectionReport;
 import org.jdesktop.test.ActionReport;
 import org.jdesktop.test.PropertyChangeReport;
 import org.jdesktop.test.TestUtils;
-import org.jmock.Mock;
-import org.jmock.MockObjectTestCase;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -73,7 +75,7 @@ import org.junit.runners.JUnit4;
  * @author Joshua Outwater
  */
 @RunWith(JUnit4.class)
-public class JXMonthViewTest extends MockObjectTestCase {
+public class JXMonthViewTest extends TestCase {
     private static final Logger LOG = Logger.getLogger(JXMonthViewTest.class
             .getName());
     private Locale componentLocale;
@@ -2384,13 +2386,13 @@ lastRule=java.util.SimpleTimeZone[id=US/Pacific,offset=-28800000,dstSavings=3600
     @Test
     public void testDateSelectionListener() {
         JXMonthView monthView = new JXMonthView();
-        Mock listenerMock = mock(DateSelectionListener.class);
-        listenerMock.expects(once()).method("valueChanged");
-        DateSelectionListener listener = (DateSelectionListener) listenerMock.proxy();
+        DateSelectionReport listener = new DateSelectionReport();
         monthView.getSelectionModel().addDateSelectionListener(listener);
 
         Date date = new Date();
         monthView.setSelectionInterval(date, date);
+        assertThat(listener.getEventCount(), is(1));
+        assertThat(listener.getLastEvent().getEventType(), is(EventType.DATES_SET));
     }
 
 
