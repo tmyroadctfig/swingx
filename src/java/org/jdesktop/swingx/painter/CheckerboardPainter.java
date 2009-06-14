@@ -56,7 +56,7 @@ import javax.swing.JComponent;
  * 
  * @author rbair
  */
-public class CheckerboardPainter<T> extends AbstractPainter<T> {
+public class CheckerboardPainter extends AbstractPainter<Object> {
     private transient Paint checkerPaint;
     
     private Paint darkPaint = new Color(204, 204, 204);
@@ -176,7 +176,7 @@ public class CheckerboardPainter<T> extends AbstractPainter<T> {
      * sizes and light and dark Paints in one TexturePaint. I may want to cache
      * this value in the future for performance reasons
      */
-    private Paint getCheckerPaint(T c) {
+    private Paint getCheckerPaint(Object c) {
         if (checkerPaint == null) {
             double sqlength = getSquareSize();
             int length = (int)(sqlength * 2);
@@ -184,24 +184,24 @@ public class CheckerboardPainter<T> extends AbstractPainter<T> {
             Graphics2D gfx = image.createGraphics();
             
             try {
-                Paint p = getLightPaint();
+            Paint p = getLightPaint();
                 if (p == null && c instanceof JComponent) {
-                    p = ((JComponent) c).getForeground();
+                    p = ((JComponent)c).getForeground();
                 }
-                gfx.setPaint(p);
-                gfx.fillRect(0, 0, length, length);
-                p = getDarkPaint();
-                if (p == null) {
-                    if (c instanceof JComponent) {
-                        p = ((JComponent) c).getBackground();
-                    }
+            gfx.setPaint(p);
+            gfx.fillRect(0, 0, length, length);
+            p = getDarkPaint();
+            if (p == null) {
+                if(c instanceof JComponent) {
+                    p = ((JComponent)c).getBackground();
                 }
-                gfx.setPaint(p);
-                gfx.fillRect(0, 0, (int) (sqlength - 1), (int) (sqlength - 1));
+            }
+            gfx.setPaint(p);
+            gfx.fillRect(0, 0, (int)(sqlength - 1), (int)(sqlength - 1));
                 gfx.fillRect((int) sqlength, (int) sqlength,
                         (int) sqlength - 1, (int) sqlength - 1);
             } finally {
-                gfx.dispose();
+            gfx.dispose();
             }
             
             checkerPaint = new TexturePaint(image, new Rectangle(0, 0, image.getWidth(), image.getHeight()));
@@ -210,10 +210,10 @@ public class CheckerboardPainter<T> extends AbstractPainter<T> {
     }
     
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     @Override
-    public void doPaint(Graphics2D g, T t, int width, int height) {
+    protected void doPaint(Graphics2D g, Object t, int width, int height) {
         g.setPaint(getCheckerPaint(t));
         g.fillRect(0, 0, width, height);
     }

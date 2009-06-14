@@ -30,23 +30,48 @@ import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 
 /**
- * Encapsulates the display context passed into the getXXRendererComponent.
+ * Encapsulates a snapshop of cell content and default display context 
+ * for usage by a <code>ComponentProvider</code>.
  * <p>
  * 
- * Introduced to extract common state on which renderer configuration might
- * rely. Similar to the view part of ComponentAdapter - difference is that the
- * properties are not "live" dependent on the component but those passed-in are
- * used.
+ * One part is the super-set of properties that's traditionally passed into the 
+ * core renderers' (Table-, List-, Tree-) getXXCellRendererComponent. Raw 
+ * properties which define the context are 
+ * 
+ * <ul>
+ * <li> selected
+ * <li> focused
+ * <li> expanded
+ * <li> leaf
+ * </ul>
+ * 
+ * Similarl to a ComponentAdapter, the properties are a super-set of those for 
+ * a concrete component type. It's up to sub-classes (once the generics will be removed, until
+ * then the DefaultXXRenderers - PENDING JW: undecided - even after the generics removal, the
+ * param list in the subclasses are the same) fill any reasonable 
+ * defaults for those not applicable to the specific component context.
+ * 
+ * With those raw properties given, a CellContext looks up and returns dependent visual
+ * properties as appropriate for the concrete component. Typically, they are taken
+ * from the component if supported, or requested from the UIManager.
+ * Dependent properties are
+ * 
+ * <ul>
+ * <li> foreground and background color
+ * <li> border
+ * <li> icon (relevant for trees only)
+ * <li> editable
+ * </ul>
+ *
+ * For a backdoor, the cell location (in horizontal and vertical view coordinates) 
+ * and the originating component is accessible as well. Note that they are not necessarily
+ * valid for the "life" component. It's not recommened to actually use them. If needed,
+ * that's probably a sign the api is lacking :-)
  * <p>
  * 
- * Additionally, provides lookup services to accessing state-dependent
- * ui-specific default visual properties (like colors, borders, icons).
- * Typically, they are taken from the UIManager or from the component, if
- * supported in the component api.
- * <p>
- * 
- * NOTE: the generic parameterization is useful to have a type-safe
- * installContext. Reason enough?
+ * PENDING JW: the generic parameterization is useful to have a type-safe
+ * installContext but introduces a bunch of generic warnings. Not enough reason to
+ * go for, so will be removed in future versions (see Issue 1042-swingx)
  * 
  * <ul>
  * 
@@ -57,7 +82,7 @@ import javax.swing.border.EmptyBorder;
  * 
  * @author Jeanette Winzenburg
  */
-public class CellContext<T extends JComponent> implements Serializable {
+public class CellContext implements Serializable {
 
     /** the default border for unfocused cells. */
     protected static Border noFocusBorder = new EmptyBorder(1, 1, 1, 1);
@@ -81,8 +106,10 @@ public class CellContext<T extends JComponent> implements Serializable {
         }
     }
 
-    protected transient T component;
+    /** PENDING JW: maybe make this a WeakReference? Would be a more robust fix for Issue #1040-swingx. */
+    protected transient JComponent component;
 
+    /** PENDING JW: maybe make this a WeakReference? Would be a more robust fix for Issue #1040-swingx. */
     protected transient Object value;
 
     protected transient int row;
@@ -99,12 +126,10 @@ public class CellContext<T extends JComponent> implements Serializable {
 
     // --------------------------- install context
 
+
     /**
-     * Sets state of the cell's context. Note that the component might be null
-     * to indicate a cell without a concrete context. All accessors must cope
-     * with.
+     * Sets the state of the cell's context. Convenience method for subclasses. 
      * 
-     * @param component the component the cell resides on, might be null
      * @param value the content value of the cell
      * @param row the cell's row index in view coordinates
      * @param column the cell's column index in view coordinates
@@ -113,9 +138,8 @@ public class CellContext<T extends JComponent> implements Serializable {
      * @param expanded the cell's expanded state
      * @param leaf the cell's leaf state
      */
-    public void installContext(T component, Object value, int row, int column,
+    protected void installState(Object value, int row, int column,
             boolean selected, boolean focused, boolean expanded, boolean leaf) {
-        this.component = component;
         this.value = value;
         this.row = row;
         this.column = column;
@@ -125,19 +149,28 @@ public class CellContext<T extends JComponent> implements Serializable {
         this.leaf = leaf;
     }
 
+    /**
+     * Replaces the value of this cell context with the given parameter and returns 
+     * the replaced value.
+     * 
+     * @param value the new value of the cell context
+     * @return the replaced value of the cell context
+     */
     public Object replaceValue(Object value) {
         Object old = getValue();
         this.value = value;
         return old;
     }
+    
     // -------------------- accessors of installed state
 
     /**
-     * Returns the component the cell resides on, may be null.
+     * Returns the component the cell resides on, may be null. Subclasses are
+     * expected to override and return the component type they are handling.
      * 
-     * @return the component the cell resides on.
+     * @return the component the cell resides on, may be null.
      */
-    public T getComponent() {
+    public JComponent getComponent() {
         return component;
     }
 
@@ -239,7 +272,7 @@ public class CellContext<T extends JComponent> implements Serializable {
      * 
      * PENDING: fallback to UI properties if comp == null?
      * 
-     * @return the background color of the rendered component.
+     * @return the foreground color of the rendered component.
      */
     protected Color getForeground() {
         return getComponent() != null ? getComponent().getForeground() : null;

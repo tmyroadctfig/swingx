@@ -25,10 +25,14 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 
 import javax.swing.Icon;
+import javax.swing.JComponent;
 import javax.swing.JTree;
+import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultTreeCellEditor;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeCellEditor;
+
+import org.jdesktop.swingx.decorator.UIDependent;
 
 /**
  * Subclassed to hack around core bug with RtoL editing (#4980473).
@@ -44,7 +48,7 @@ import javax.swing.tree.TreeCellEditor;
  * 
  * @author Jeanette Winzenburg
  */
-public class DefaultXTreeCellEditor extends DefaultTreeCellEditor {
+public class DefaultXTreeCellEditor extends DefaultTreeCellEditor implements UIDependent {
 
     public DefaultXTreeCellEditor(JTree tree, DefaultTreeCellRenderer renderer) {
         super(tree, renderer);
@@ -57,6 +61,10 @@ public class DefaultXTreeCellEditor extends DefaultTreeCellEditor {
 
     public void setRenderer(DefaultTreeCellRenderer renderer) {
         this.renderer = renderer;
+    }
+    
+    public DefaultTreeCellRenderer getRenderer() {
+        return renderer;
     }
     
     public class XEditorContainer extends EditorContainer {
@@ -155,6 +163,21 @@ public class DefaultXTreeCellEditor extends DefaultTreeCellEditor {
      */
     private boolean isRightToLeft() {
         return (tree != null) && (!tree.getComponentOrientation().isLeftToRight());
+    }
+
+    /**
+     * Implement UIDependent. Quick hack for #1060-swingx: icons lost on laf toggle.
+     */
+    public void updateUI() {
+        if (getRenderer() != null) {
+            SwingUtilities.updateComponentTreeUI(getRenderer());
+        }
+        if (realEditor instanceof JComponent) {
+            SwingUtilities.updateComponentTreeUI((JComponent) realEditor);
+        } else if (realEditor instanceof UIDependent) {
+            ((UIDependent) realEditor).updateUI();
+        }
+        
     }
 
 }

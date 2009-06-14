@@ -39,12 +39,12 @@ import javax.swing.table.TableCellRenderer;
  * <pre><code>
  * setDefaultRenderer(Object.class, new DefaultTableRenderer());
  * setDefaultRenderer(Number.class, new DefaultTableRenderer(
- *         FormatStringValue.NUMBER_TO_STRING, JLabel.RIGHT));
+ *         FormatStringValues.NUMBER_TO_STRING, JLabel.RIGHT));
  * setDefaultRenderer(Date.class, new DefaultTableRenderer(
- *         FormatStringValue.DATE_TO_STRING));
+ *         FormatStringValues.DATE_TO_STRING));
  * // use the same center aligned default for Image/Icon
  * TableCellRenderer renderer = new DefaultTableRenderer(new MappedValue(
- *         StringValue.EMPTY, IconValue.ICON), JLabel.CENTER);
+ *         StringValues.EMPTY, IconValues.ICON), JLabel.CENTER);
  * setDefaultRenderer(Icon.class, renderer);
  * setDefaultRenderer(ImageIcon.class, renderer);
  * // use a CheckBoxProvider for booleans
@@ -67,7 +67,7 @@ import javax.swing.table.TableCellRenderer;
 public class DefaultTableRenderer extends AbstractRenderer
         implements TableCellRenderer {
 
-    private CellContext<JTable> cellContext;
+    private TableCellContext cellContext;
     
     
     /**
@@ -163,7 +163,10 @@ public class DefaultTableRenderer extends AbstractRenderer
             boolean isSelected, boolean hasFocus, int row, int column) {
         cellContext.installContext(table, value, row, column, isSelected, hasFocus,
                 true, true);
-        return componentController.getRendererComponent(cellContext);
+        Component comp = componentController.getRendererComponent(cellContext);
+        // fix issue #1040-swingx: memory leak if value not released
+        cellContext.replaceValue(null);
+        return comp;
     }
 
     /**

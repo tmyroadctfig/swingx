@@ -38,7 +38,7 @@ import javax.swing.Action;
  * 
  * @author Jeanette Winzenburg
  */
-public class LinkModelAction<T extends LinkModel> extends LinkAction<T> {
+public class LinkModelAction<T extends LinkModel> extends AbstractHyperlinkAction<T> {
     
     private ActionListener delegate;
     public static final String VISIT_ACTION = "visit";

@@ -46,7 +46,7 @@ import java.awt.geom.Ellipse2D;
  *
  * @author Romain Guy <romain.guy@mac.com>
  */
-public class GlossPainter<T> extends AbstractPainter<T> {
+public class GlossPainter extends AbstractPainter<Object> {
     /**
      * <p>Used to define the position of the gloss on the painted area.</p>
      */
@@ -101,7 +101,7 @@ public class GlossPainter<T> extends AbstractPainter<T> {
      * {@inheritDoc}
      */
     @Override
-    protected void doPaint(Graphics2D g, T component, int width, int height) {
+    protected void doPaint(Graphics2D g, Object component, int width, int height) {
         if (getPaint() != null) {
             Ellipse2D ellipse = new Ellipse2D.Double(-width / 2.0,
                 height / 2.7, width * 2.0,

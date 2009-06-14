@@ -52,6 +52,7 @@ import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXList;
 import org.jdesktop.swingx.JXSearchPanel;
 import org.jdesktop.swingx.JXTable;
+import org.jdesktop.swingx.JXTree;
 import org.jdesktop.swingx.JXTreeTable;
 import org.jdesktop.swingx.decorator.AbstractHighlighter;
 import org.jdesktop.swingx.decorator.BorderHighlighter;
@@ -85,9 +86,10 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
 //      setSystemLF(true);
       HighlighterClientVisualCheck test = new HighlighterClientVisualCheck();
       try {
-         test.runInteractiveTests();
+//         test.runInteractiveTests();
 //         test.runInteractiveTests(".*Tool.*");
 //         test.runInteractiveTests("interactive.*Search.*");
+         test.runInteractiveTests("interactive.*BorderHighlighter");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
@@ -113,6 +115,20 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
                 BorderFactory.createLineBorder(Color.RED, 3), false, true);
         table.setHighlighters(outer, inner, replace);
         showWithScrollingInFrame(table, "Border Highlighters");
+    }
+    
+    /**
+     * Show variants of border Highlighters.
+     *
+     */
+    public void interactiveTreeBorderHighlighter() {
+        JXTree tree = new JXTree();
+        tree.expandAll();
+        tree.setVisibleRowCount(tree.getRowCount());
+        // need SwingX highlighter
+        tree.setCellRenderer(new DefaultTreeRenderer());
+        tree.setHighlighters(new BorderHighlighter(BorderFactory.createLineBorder(Color.GREEN, 1)));
+        showWithScrollingInFrame(tree, "Border Highlighters");
     }
 
     /**

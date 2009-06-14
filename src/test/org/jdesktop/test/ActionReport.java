@@ -32,7 +32,7 @@ public class ActionReport implements ActionListener {
     
     public void actionPerformed(ActionEvent evt) {
         events.add(0, evt);
-        if (evt.getSource() != null) {
+        if (evt != null && evt.getSource() != null) {
             eventMap.put(evt.getSource(), evt);
         }
     }

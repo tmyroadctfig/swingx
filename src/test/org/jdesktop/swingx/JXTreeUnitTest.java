@@ -16,6 +16,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellEditor;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeCellEditor;
 import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreePath;
 
@@ -29,15 +30,16 @@ import org.jdesktop.swingx.renderer.DefaultTreeRenderer;
 import org.jdesktop.swingx.renderer.StringValue;
 import org.jdesktop.swingx.renderer.StringValues;
 import org.jdesktop.swingx.tree.DefaultXTreeCellEditor;
+import org.jdesktop.swingx.tree.DefaultXTreeCellRenderer;
 import org.jdesktop.swingx.treetable.DefaultMutableTreeTableNode;
 import org.jdesktop.swingx.treetable.FileSystemModel;
 import org.jdesktop.swingx.treetable.TreeTableModel;
 import org.jdesktop.test.AncientSwingTeam;
 import org.jdesktop.test.PropertyChangeReport;
 import org.jdesktop.test.TestUtils;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.junit.Test;
 
 
 
@@ -53,6 +55,75 @@ public class JXTreeUnitTest extends InteractiveTestCase {
         
     public JXTreeUnitTest() {
         super("JXTree Test");
+    }
+
+    /**
+     * Issue #1061-swingx: renderer/editor inconsistent on startup
+     */
+    @Test
+    public void testRendererOnInit() {
+        TestTree tree = new TestTree();
+        assertSame(tree.getSuperRenderer(), tree.getCellRenderer()); 
+    }
+
+    /**
+     * Issue #1061-swingx: renderer/editor inconsistent on startup
+     */
+    @Test
+    public void testEditorOnInit() {
+        TestTree tree = new TestTree();
+        assertSame(tree.getSuperEditor(), tree.getCellEditor()); 
+    }
+    
+    /**
+     * Issue #1061-swingx: renderer/editor inconsistent on startup
+     */
+    @Test
+    public void testDefaultRendererOnInit() {
+        TestTree tree = new TestTree();
+        assertNotNull("sanity: default renderer created", tree.getCreatedDefaultRenderer()); 
+        assertSame("sanity: default renderer used as wrappee", tree.getCreatedDefaultRenderer(), tree.getWrappedCellRenderer());
+    }
+    
+    /**
+     * Issue #1061-swingx: renderer/editor inconsistent on startup.
+     * Note: this test will fail once we use an enhanced cellEditor (which can cope with 
+     * SwingX default renderers).
+     */
+    @Test
+    public void testDefaultRendererUsedInEditorOnInit() {
+        TestTree tree = new TestTree();
+        assertTrue("sanity: editor is of type DefaultXTreeCellEditor", tree.getCellEditor() instanceof DefaultXTreeCellEditor);
+        assertSame(tree.getWrappedCellRenderer(), ((DefaultXTreeCellEditor) tree.getCellEditor()).getRenderer()); 
+    }
+    
+    
+    /**
+     * Subclass for testing: access cellRenderer/cellEditor fields 
+     */
+    public static class TestTree extends JXTree {
+        
+        private TreeCellRenderer createdDefaultRenderer;
+
+        public TreeCellRenderer getSuperRenderer() {
+            return cellRenderer;
+        }
+        
+        public TreeCellEditor getSuperEditor() {
+            return cellEditor;
+        }
+
+        public TreeCellRenderer getCreatedDefaultRenderer() {
+            return createdDefaultRenderer;
+        }
+        
+        @Override
+        protected TreeCellRenderer createDefaultCellRenderer() {
+            createdDefaultRenderer = super.createDefaultCellRenderer();
+            return createdDefaultRenderer;
+        }
+        
+        
     }
 
     /**
@@ -162,7 +233,7 @@ public class JXTreeUnitTest extends InteractiveTestCase {
     public void testDelegatingRendererUseDefault() {
         JXTree list = new JXTree();
         TreeCellRenderer defaultRenderer = list.createDefaultCellRenderer();
-        assertEquals("sanity: creates default", DefaultTreeCellRenderer.class, 
+        assertEquals("sanity: creates default", DefaultXTreeCellRenderer.class, 
                 defaultRenderer.getClass());
         DelegatingRenderer renderer = (DelegatingRenderer) list.getCellRenderer();
         assertEquals(defaultRenderer.getClass(), renderer.getDelegateRenderer().getClass());

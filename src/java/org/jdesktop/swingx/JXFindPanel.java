@@ -35,11 +35,10 @@ import org.jdesktop.swingx.search.PatternModel;
 import org.jdesktop.swingx.search.Searchable;
 
 /**
- * Find panel to incorporate search capability into the users application.
- * The most intended usage is to adding this panel to the dialogs.
+ * {@code JXFindPanel} is a basic find panel suitable for use in dialogs. It
+ * offers case-sensitivity, wrapped searching, and reverse searching.
  * 
- * 
- * @author ??
+ * @author unascribed from JDNC
  * @author Jeanette Winzenburg
  */
 public class JXFindPanel extends AbstractPatternPanel {
@@ -53,7 +52,7 @@ public class JXFindPanel extends AbstractPatternPanel {
     protected JCheckBox backCheck;
     private boolean initialized;
 
-    /*
+    /**
      * Default constructor for the find panel. Constructs panel not targeted to
      * any component.
      */
@@ -61,7 +60,7 @@ public class JXFindPanel extends AbstractPatternPanel {
         this(null);
     }
     
-    /*
+    /**
      * Construct search panel targeted to specific <code>Searchable</code> component.
      *
      * @param searchible Component where search widget will try to locate and select
@@ -204,7 +203,7 @@ public class JXFindPanel extends AbstractPatternPanel {
     }
 
     /**
-     * Proforms search and returns index of the next match.
+     * Performs search and returns index of the next match.
      *
      * @return Index of the next match in document.
      */

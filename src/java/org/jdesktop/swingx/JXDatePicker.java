@@ -52,6 +52,7 @@ import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.JFormattedTextField.AbstractFormatter;
 import javax.swing.JFormattedTextField.AbstractFormatterFactory;
@@ -107,6 +108,23 @@ import org.jdesktop.swingx.util.Contract;
  * picker.addActionListener(l);
  * </code></pre>
  * 
+ * Note that  ActionListener will <b>not</b> be notified if the user 
+ * edits the date text without hitting the Enter key afterwards. To detect both kinds of
+ * date change, interested client code can add a PropertyChangeListener.
+ * 
+ * <pre><code>
+ * JXDatePicker picker = new JXDatePicker(new Date());
+ * PropertyChangeListener listener = new PropertyChangeListener() {
+ *     public void propertyChange(PropertyChangeEvent e) {
+ *         if ("date".equals(e.getPropertyName()) {
+ *              saveDate(picker.getDate());
+ *         }
+ *     }
+ * };
+ * picker.addPropertyChangeListener(listener);
+ * </code></pre>
+
+ * 
  * <p>
  * The DateFormats used in the JXDatePicker's are initialized to the default
  * formats of the DatePickerFormatter, as defined by the picker's resourceBundle
@@ -123,6 +141,19 @@ import org.jdesktop.swingx.util.Contract;
  * The selected Date is a bound property of the JXDatePicker. This allows easy
  * binding to a property of a custom bean when using a binding framework.
  * <p>
+ * 
+ * Keybindings (as installed by the UI-Delegate)
+ * <ul>
+ * <li> ENTER commits the edited or selected value
+ * <li> ESCAPE reverts the edited or selected value
+ * <li> alt-DOWN opens the monthView popup
+ * <li> shift-F5 if monthView is visible, navigates the monthView to today 
+ *    (no effect otherwise)
+ * <li> F5 commits today 
+ * </ul>
+ * 
+ * PENDNG JW: support per-OS keybindings to be installed, currently they are 
+ * hardcoded in our (single) BasicDatePickerUI. 
  * 
  * @author Joshua Outwater
  * @author Jeanette Winzenburg
@@ -393,9 +424,8 @@ public class JXDatePicker extends JComponent {
     public void updateUI() {
         setUI((DatePickerUI) LookAndFeelAddons.getUI(this, DatePickerUI.class));
         // JW: quick hack around #706-swingx - monthView not updated
-        // not sure if this here is the correct place nor 
-        // the correct method - SwingUtilities.updateComponentTree might be better
-        getMonthView().updateUI();
+        // is this complete? how about editor (if not uiResource), linkPanel?
+        SwingUtilities.updateComponentTreeUI(getMonthView());
         invalidate();
     }
 

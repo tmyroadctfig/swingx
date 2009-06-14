@@ -136,8 +136,8 @@ public class PainterVisualCheck extends InteractiveTestCase {
     public void interactiveRolloverPainter() {
         TableModel model = new AncientSwingTeam();
         JXTable table = new JXTable(model);
-        MattePainter<JComponent> matte = new MattePainter<JComponent>(getTransparentColor(Color.RED, 80));
-        RelativePainter painter = new RelativePainter<JComponent>(matte);
+        MattePainter matte = new MattePainter(getTransparentColor(Color.RED, 80));
+        RelativePainter painter = new RelativePainter<Object>(matte);
         painter.setYFactor(0.2);
         painter.setVerticalAlignment(VerticalAlignment.BOTTOM);
         Highlighter hl = new PainterHighlighter(HighlightPredicate.ROLLOVER_ROW, painter);
@@ -173,8 +173,8 @@ public class PainterVisualCheck extends InteractiveTestCase {
     public void interactiveTableBarHighlight() {
         TableModel model = new AncientSwingTeam();
         JXTable table = new JXTable(model);
-        MattePainter<JComponent> p =  new MattePainter<JComponent>(getTransparentColor(Color.BLUE, 125));
-        RelativePainter relativePainter = new RelativePainter<JComponent>(p);
+        MattePainter p =  new MattePainter(getTransparentColor(Color.BLUE, 125));
+        RelativePainter relativePainter = new RelativePainter<Object>(p);
         relativePainter.setXFactor(.5);
         Highlighter hl = new PainterHighlighter(createComponentTextBasedPredicate("y"), 
                 relativePainter);
@@ -251,11 +251,11 @@ public class PainterVisualCheck extends InteractiveTestCase {
                    new Point2D.Double(1000, 0),
                    endColor);
 
-        MattePainter<JComponent> painter = new MattePainter<JComponent>(paint);
+        MattePainter painter = new MattePainter(paint);
         painter.setPaintStretched(true);
         // not entirely successful - the relative stretching is on
         // top of a .5 stretched gradient in matte
-        RelativePainter wrapper = new RelativePainter<JComponent>(painter);
+        RelativePainter wrapper = new RelativePainter<Object>(painter);
         wrapper.setXFactor(end);
         return wrapper;
     }
@@ -325,7 +325,7 @@ public class PainterVisualCheck extends InteractiveTestCase {
     public void interactiveAnimatedIconPainterHighlight()  {
         TableModel model = new AncientSwingTeam();
         JXTable table = new JXTable(model);
-        ImagePainter<Component> imagePainter = new ImagePainter<Component>(XTestUtils.loadDefaultImage("green-orb.png"));
+        ImagePainter imagePainter = new ImagePainter(XTestUtils.loadDefaultImage("green-orb.png"));
         imagePainter.setHorizontalAlignment(HorizontalAlignment.RIGHT);
         final RelativePainter painter = new RelativePainter<Component>(imagePainter);
         PainterHighlighter iconHighlighter = new PainterHighlighter();
@@ -399,7 +399,7 @@ public class PainterVisualCheck extends InteractiveTestCase {
         tree.setRolloverEnabled(true);
         
         tree.setCellRenderer(new DefaultTreeRenderer(StringValues.FILE_NAME));
-        ImagePainter<Component> imagePainter = new ImagePainter<Component>(XTestUtils.loadDefaultImage("green-orb.png"));
+        ImagePainter imagePainter = new ImagePainter(XTestUtils.loadDefaultImage("green-orb.png"));
         imagePainter.setHorizontalAlignment(HorizontalAlignment.RIGHT);
         final RelativePainter painter = new RelativePainter<Component>(imagePainter);
         PainterHighlighter iconHighlighter = new PainterHighlighter();
@@ -592,7 +592,7 @@ public class PainterVisualCheck extends InteractiveTestCase {
     
     public static class RelativePainter<T> extends AbstractLayoutPainter<T> {
 
-        private Painter<T> painter;
+        private Painter<? super T> painter;
         private double xFactor;
         private double yFactor;
 
@@ -600,17 +600,17 @@ public class PainterVisualCheck extends InteractiveTestCase {
             this(null);
         }
         
-        public void setPainter(Painter<T> painter) {
+        public void setPainter(Painter<? super T> painter) {
             Object old = getPainter();
             this.painter = painter;
             firePropertyChange("painter", old, getPainter());
         }
         
-        public Painter<T> getPainter() {
+        public Painter<? super T> getPainter() {
             return painter;
         }
         
-        public RelativePainter(Painter<T> delegate) {
+        public RelativePainter(Painter<? super T> delegate) {
             this.painter = delegate;
         }
         
@@ -746,7 +746,7 @@ public class PainterVisualCheck extends InteractiveTestCase {
                         isRightAligned ? endColor : startColor, 
                         new Point2D.Double(100, 0), 
                         isRightAligned ? startColor : endColor);
-                MattePainter<JComponent> painter = new MattePainter<JComponent>(paint);
+                MattePainter painter = new MattePainter(paint);
                 painter.setPaintStretched(true);
                 getPainter().setPainter(painter);
             } 

@@ -21,38 +21,27 @@
  */
 package org.jdesktop.swingx.plaf.basic;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
+import java.awt.Component;
 import java.awt.ComponentOrientation;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.text.DateFormatSymbols;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.logging.Logger;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.Box;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
+import javax.swing.CellRendererPane;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
 import org.jdesktop.swingx.InteractiveTestCase;
-import org.jdesktop.swingx.JXDatePicker;
 import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXMonthView;
-import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.calendar.CalendarUtils;
-import org.jdesktop.swingx.calendar.DateSelectionModel.SelectionMode;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -73,224 +62,170 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
     @SuppressWarnings("unused")
     private static final int CALENDAR_SPACING = 10;
     
-    public static void main(String[] args) {
-//      setSystemLF(true);
-      BasicMonthViewUITest  test = new BasicMonthViewUITest();
-      try {
-          test.runInteractiveTests();
-//        test.runInteractiveTests(".*Simple.*");
-      } catch (Exception e) {
-          System.err.println("exception when executing interactive tests:");
-          e.printStackTrace();
-      }
-  }
- 
+
     /**
-     * Issue #750-swingx: use rendering to side-step antialiase probs.
+     * Issue #1068-swingx: week numbering broken for some years and locales
      * 
-     * Debugging ...
+     * f.i. Jan, 2011 in de: first of Jan is week 52
      */
-    public void interactiveRenderingOn() {
-        // force default loading
-        new JXMonthView();
-        // this is global state - uncomment for debug painting completely
-//        UIManager.put("JXMonthView.trailingDayForeground", Color.YELLOW);
-//        UIManager.put("JXMonthView.leadingDayForeground", Color.ORANGE);
-//        UIManager.put("JXMonthView.weekOfTheYearForeground", Color.GREEN);
-//        UIManager.put("JXMonthView.unselectableDayForeground", Color.MAGENTA);
-        String frameTitle = "Debug painting: rendering on";
-        showDebugMonthView(frameTitle, null);
+    @Test
+    public void testWeekNumbersWrapBack() {
+        assertWeekNumbers(Locale.GERMAN, 2011, Calendar.JANUARY, Calendar.SATURDAY, 52, 6);
+    }
+    
+    /**
+     * Issue #1068-swingx: week numbering broken for some years and locales
+     * 
+     * f.i. Dec, 2008 in de: last of dec is first week of next year
+     */
+    @Test
+    public void testWeekNumbersWrapForward() {
+        assertWeekNumbers(Locale.GERMAN, 2008, Calendar.DECEMBER, Calendar.MONDAY, 49, 5);
     }
 
     /**
-     * Issue #750-swingx: use rendering to side-step antialiase probs.
+     * Issue #1068-swingx: week numbering broken for some years and locales
      * 
-     * Debugging ...
+     * f.i. Oct, 2008 in de: must frequent case, days spread across 5 weeks
      */
-    public void interactiveRenderingOff() {
-        String frameTitle = "Debug painting: rendering off";
-        Boolean disableRendering = Boolean.TRUE;
-        showDebugMonthView(frameTitle, disableRendering);
-    }
-    /**
-     * @param frameTitle
-     * @param disableRendering
-     */
-    private void showDebugMonthView(String frameTitle, Boolean disableRendering) {
-        final JXMonthView monthView = new JXMonthView();
-        monthView.putClientProperty("disableRendering", disableRendering);
-        monthView.setDayForeground(Calendar.SUNDAY, Color.BLUE);
-        monthView.setDaysOfTheWeekForeground(Color.RED);
-        monthView.setFlaggedDayForeground(Color.CYAN);
-        monthView.setSelectionBackground(Color.GRAY);
-        monthView.setSelectionForeground(Color.GREEN);
-        monthView.setTodayBackground(Color.PINK);
-        monthView.setTraversable(true);
-        monthView.setShowingWeekNumber(true);
-        monthView.setShowingLeadingDays(true);
-        monthView.setShowingTrailingDays(true);
-        monthView.setSelectionMode(SelectionMode.SINGLE_INTERVAL_SELECTION);
-        monthView.setPreferredColumnCount(2);
-        monthView.setPreferredRowCount(2);
-        final JXFrame frame = wrapInFrame(monthView, frameTitle);
-        addComponentOrientationToggle(frame);
-        Action toggleTraversable = new AbstractAction("toggle traversable") {
-
-            public void actionPerformed(ActionEvent e) {
-                monthView.setTraversable(!monthView.isTraversable());
-                
-            }
-            
-        };
-        addAction(frame, toggleTraversable);
-        final JXDatePicker picker = new JXDatePicker();
-        picker.getMonthView().putClientProperty("disableRendering", disableRendering);
-        picker.addActionListener(new ActionListener() {
-
-            public void actionPerformed(ActionEvent e) {
-                if (e.getActionCommand().equals(JXDatePicker.CANCEL_KEY)) return;
-                if (picker.getDate() == null) return;
-                monthView.setFlaggedDates(picker.getDate());
-            }
-            
-        });
-        final JXDatePicker unselectable = new JXDatePicker();
-        unselectable.getMonthView().putClientProperty("disableRendering", disableRendering);
-        unselectable.addActionListener(new ActionListener() {
-
-            public void actionPerformed(ActionEvent e) {
-                if (e.getActionCommand().equals(JXDatePicker.CANCEL_KEY)) return;
-                if (unselectable.getDate() == null) return;
-                monthView.setUnselectableDates(unselectable.getDate());
-            }
-            
-        });
-        final JComboBox zoneSelector = new JComboBox(Locale.getAvailableLocales());
-        // Synchronize the monthView's and selector's zones.
-        zoneSelector.setSelectedItem(monthView.getLocale());
-
-        // Set the monthView's time zone based on the selected time zone.
-        zoneSelector.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent event) {
-                Locale zone = (Locale) zoneSelector.getSelectedItem();
-                monthView.setLocale(zone);
-//                monthView.revalidate();
-            }
-        });
-
-
-        JComponent pickers = Box.createHorizontalBox();
-        pickers.add(new JLabel("Flagged: "));
-        pickers.add(picker);
-        pickers.add(new JLabel("Unselectable: "));
-        pickers.add(unselectable);
-        pickers.add(new JLabel("Locale: "));
-        pickers.add(zoneSelector);
-        frame.add(pickers, BorderLayout.SOUTH);
-        show(frame);
-    }
-
-
-    /**
-     * Issue #736-swingx: monthView cannot cope with minimalDaysInFirstWeek.
-     * 
-     * Debugging ...
-     */
-    public void interactiveDayAt() {
-        final JXMonthView monthView = new JXMonthView();
-        monthView.setTraversable(true);
-        monthView.setShowingWeekNumber(true);
-        monthView.setShowingLeadingDays(true);
-        monthView.setShowingTrailingDays(true);
-        monthView.setSelectionMode(SelectionMode.SINGLE_INTERVAL_SELECTION);
-        monthView.setPreferredColumnCount(2);
-        monthView.setPreferredRowCount(2);
-        final BasicMonthViewUI ui = ((BasicMonthViewUI) monthView.getUI());
-        monthView.addMouseListener(new MouseAdapter() {
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-//                LOG.info("calendar grid" + ui.calendarGrid);
-//                LOG.info("dayAt " + e.getPoint() + ": "
-//                        + "\n" + monthView.getDayAtLocation(e.getX(), e.getY()));
-//                Calendar monthAtLocation = ui.getMonthAtLocation(e.getX(), e.getY());
-//                LOG.info("month start " + 
-//                        (monthAtLocation != null ? monthAtLocation.getTime() : null));
-                
-//                Point p = ui.getMonthGridPositionAtLocation(e.getX(), e.getY());
-//                LOG.info("month bounds from logical " + 
-//                        p + " \n " +
-//                        ui.getMonthBounds(p.y, p.x));
-//                LOG.info("month bounds at location" + 
-//                        ui.getMonthBoundsAtLocation(e.getX(), e.getY()));
-                LOG.info("day grid position " + 
-                        ui.getDayGridPositionAtLocation(e.getX(), e.getY()) 
-                      + "\nday bounds " + 
-                        ui.getDayBoundsAtLocation(e.getX(), e.getY()));
-            }
-            
-        });
-        Action action = new AbstractActionExt("toggle minimal") {
-
-            public void actionPerformed(ActionEvent e) {
-                int minimal = monthView.getSelectionModel().getMinimalDaysInFirstWeek();
-                monthView.getSelectionModel().setMinimalDaysInFirstWeek(minimal > 1 ? 1 : 4);
-            }
-            
-        };
-        final JXFrame frame = wrapInFrame(monthView, "test mapping: printed on mouse release");
-        addAction(frame, action);
-        addComponentOrientationToggle(frame);
-        frame.pack();
-        frame.setVisible(true);
+    @Test
+    public void testWeekNumbersNormal() {
+        assertWeekNumbers(Locale.GERMAN, 2008, Calendar.OCTOBER, Calendar.WEDNESDAY, 40, 5);
     }
 
     /**
-     * Issue #736-swingx: monthView cannot cope with minimalDaysInFirstWeek.
+     * Creates a monthView with the given locale, sets the firstDisplayedDate to the 
+     * first of the given year and month (sanity asserts dayOfWeek and weekofYear) and 
+     * asserts the number of weeks in that month.
      * 
-     * Here: look at impact of forcing the minimalDays to a value different
-     * from the calendar. Days must be displayed in starting from the 
-     * first row under the days-of-week.
-     * 
-     * Not yet completely fixed: for very late firstDayOfWeek, the Jan is incompletely
-     * painted for mininalDays > 1. Rare enough to ignore for now?
+     * @param locale
+     * @param year 
+     * @param month
+     * @param expectedDay day of week (sanity)
+     * @param expectedWeek week of year of the day (sanity)
+     * @param expectedWeekNumber number of weeks in the month
      */
-    public void interactiveMinimalDaysInFirstWeek() {
-        final JXMonthView monthView = new JXMonthView();
-        monthView.setTraversable(true);
-        monthView.setShowingWeekNumber(true);
-        monthView.setShowingLeadingDays(true);
-        monthView.setShowingTrailingDays(true);
-        monthView.setSelectionMode(SelectionMode.SINGLE_INTERVAL_SELECTION);
-        Action action = new AbstractActionExt("toggle minimal") {
-
-            public void actionPerformed(ActionEvent e) {
-                int minimal = monthView.getSelectionModel().getMinimalDaysInFirstWeek();
-                monthView.getSelectionModel().setMinimalDaysInFirstWeek(minimal > 1 ? 1 : 4);
-            }
-            
-        };
-        final JXFrame frame = wrapInFrame(monthView, "click unselectable fires ActionEvent");
-        addAction(frame, action);
-        addComponentOrientationToggle(frame);
-        final JComboBox dayOfWeekComboBox = new JComboBox(new String[]{"Sunday", "Monday", "Tuesday",
-                "Wednesday", "Thursday", "Friday", "Saturday"});
-        dayOfWeekComboBox.addActionListener(new ActionListener() {
-
-            public void actionPerformed(ActionEvent e) {
-                int selected = dayOfWeekComboBox.getSelectedIndex();
-                monthView.setFirstDayOfWeek(selected + Calendar.SUNDAY);
-                
-            }
-            
-        });
-        dayOfWeekComboBox.setSelectedIndex(monthView.getFirstDayOfWeek() - Calendar.SUNDAY);
-        addStatusComponent(frame, dayOfWeekComboBox);
-        frame.pack();
-        frame.setVisible(true);
+    private void assertWeekNumbers(Locale locale, int year, int month, int expectedDay, int expectedWeek, int expectedWeekNumber) {
+        JXMonthView monthView = new JXMonthView(locale);
+        Calendar calendar = monthView.getCalendar();
+        calendar.set(year, month, 1);
+        assertEquals("sanity - day", expectedDay, calendar.get(Calendar.DAY_OF_WEEK));
+        assertEquals("sanity - weekOfYear", expectedWeek, calendar.get(Calendar.WEEK_OF_YEAR));
+        monthView.setFirstDisplayedDay(calendar.getTime());
+        assertEquals("number of weeks in month", expectedWeekNumber, 
+                ((BasicMonthViewUI) monthView.getUI()).getWeeks(monthView.getCalendar()));
+    }
+    /**
+     * Issue #1068-swingx: week numbering broken for some years and locales
+     * 
+     * month with fully six weeks: April 2010
+     */
+    @Test
+    public void testWeekNumbersFull6() {
+        assertWeekNumbers(Locale.GERMAN, 2012, Calendar.APRIL, Calendar.SUNDAY, 13, 6);
     }
 
-//------------------------------
+    /**
+     * Issue #1068-swingx: week numbering broken for some years and locales
+     * 
+     * month with minimal 4 weeks: Feb 2010
+     */
+    @Test
+    public void testWeekNumbersMinimum4() {
+        assertWeekNumbers(Locale.GERMAN, 2010, Calendar.FEBRUARY, Calendar.MONDAY, 5, 4);
+    }
+    
+
+    /**
+     * Issue #1074-swingx: Regression - monthView header background lost on updateUI.
+     */
+    @Test
+    public void testZoomableKeepsMonthStringBackground() {
+        JXMonthView monthView = new JXMonthView();
+        monthView.setZoomable(true);
+        assertEquals(monthView.getMonthStringBackground(), 
+                ((BasicMonthViewUI) monthView.getUI()).getCalendarHeaderHandler().getHeaderComponent().getBackground());
+        SwingUtilities.updateComponentTreeUI(monthView);
+        assertEquals(monthView.getMonthStringBackground(), 
+                ((BasicMonthViewUI) monthView.getUI()).getCalendarHeaderHandler().getHeaderComponent().getBackground());
+    }
+
+    /**
+     * Sanity during internal alias cleanup.
+     */
+    @Test
+    public void testFirstDisplayedInternal() {
+        JXMonthView monthView = new JXMonthView();
+        BasicMonthViewUI ui = (BasicMonthViewUI) monthView.getUI();
+        assertEquals(monthView.getFirstDisplayedDay(), ui.getFirstDisplayedDay());
+        Calendar calendar = monthView.getCalendar();
+        assertEquals(calendar.get(Calendar.MONTH), ui.getFirstDisplayedMonth());
+        assertEquals(calendar.get(Calendar.YEAR), ui.getFirstDisplayedYear());
+    }
+    
+    /**
+     * Issue #77-swingx: support year-wise navigation.
+     * Alleviate the problem by allowing custom calendar headers.
+     * 
+     * Here: test that the monthViewUI uses the custom header if available.
+     */
+    @Test
+    public void testZoomableCustomHeader() {
+        UIManager.put(CalendarHeaderHandler.uiControllerID, "org.jdesktop.swingx.plaf.basic.SpinningCalendarHeaderHandler");
+        JXMonthView monthView = new JXMonthView();
+        monthView.setZoomable(true);
+        // digging into internals
+        Container header = (Container) monthView.getComponent(0);
+        if (header instanceof CellRendererPane) {
+            header = (Container) monthView.getComponent(1);
+        }
+        try {
+            assertTrue("expected SpinningCalendarHeader but was " + header.getClass(), header instanceof SpinningCalendarHeaderHandler.SpinningCalendarHeader);
+        } finally {
+            UIManager.put(CalendarHeaderHandler.uiControllerID, null);
+        }
+        
+    }
+    
+    /**
+     * Sanity: uiClassID alike on CalendarHeaderHandler
+     */
+    @Test
+    public void testCalendarHeaderHandlerID() {
+        assertEquals("CalendarHeaderHandler", CalendarHeaderHandler.uiControllerID);
+    }
+    /**
+     * Issue #1046-swingx: month title not updated when traversing months
+     * (programatically or by navigating in monthView)
+     */
+    @Test
+    public void testZoomableAddsCalendarHeader() {
+        JXMonthView monthView = new JXMonthView();
+        monthView.setZoomable(true);
+        // digging into internals
+        Container header = (Container) monthView.getComponent(0);
+        if (header instanceof CellRendererPane) {
+            header = (Container) monthView.getComponent(1);
+        }
+        assertTrue("expected BasicCalendarHeader but was " + header.getClass(), header instanceof BasicCalendarHeaderHandler.BasicCalendarHeader);
+    }
+    
+    /**
+     * Issue #1046-swingx: month title not updated when traversing months
+     * (programatically or by navigating in monthView)
+     */
+    @Test
+    public void testZoomableUpdateUIKeepsCalendarHeader() {
+        JXMonthView monthView = new JXMonthView();
+        monthView.setZoomable(true);
+        monthView.updateUI();
+        // digging into internals
+        Component header = monthView.getComponent(0);
+        if (header instanceof CellRendererPane) {
+            header = (Container) monthView.getComponent(1);
+        }
+        assertTrue("expected BasicCalendarHeader but was " + header.getClass(), header instanceof BasicCalendarHeaderHandler.BasicCalendarHeader);
+    }
 
     /**
      * Test that day position in details day-of-week header returns null date
@@ -305,7 +240,8 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
         BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.LEFT_TO_RIGHT);
         // get a date in the first month
         Date month = ui.getMonth(1, 0);
-        assertEquals("header grid position must return null date", null, ui.getDayInMonth(month, -1, 6));
+        assertEquals("header grid position must return null date", null, ui.getDayInMonth(month, 
+                BasicMonthViewUI.DAY_HEADER_ROW, BasicMonthViewUI.LAST_DAY_COLUMN));
      }
 
     /**
@@ -321,7 +257,8 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
         BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.LEFT_TO_RIGHT, true);
         // get a date in the first month
         Date month = ui.getMonth(0, 0);
-        assertEquals("header grid position must return null date", null, ui.getDayInMonth(month, 3, -1));
+        assertEquals("header grid position must return null date", null, ui.getDayInMonth(month, 
+                BasicMonthViewUI.FIRST_WEEK_ROW + 3, BasicMonthViewUI.WEEK_HEADER_COLUMN));
      }
 
     /**
@@ -338,7 +275,8 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
         BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.LEFT_TO_RIGHT);
         // get a date in the first month
         Date month = ui.getMonth(0, 0);
-        assertEquals("leading date grid position must return null date", null, ui.getDayInMonth(month, 0, 0));
+        assertEquals("leading date grid position must return null date", null, 
+                ui.getDayInMonth(month, BasicMonthViewUI.FIRST_WEEK_ROW, BasicMonthViewUI.FIRST_DAY_COLUMN));
      }
     
     /**
@@ -356,7 +294,8 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
         // get a date in the first month
         Date month = ui.getMonth(1, 0);
         // this fails because 
-        assertEquals("leading date grid position must return null date", null, ui.getDayInMonth(month, 0, 0));
+        assertEquals("leading date grid position must return null date", null, 
+                ui.getDayInMonth(month, BasicMonthViewUI.FIRST_WEEK_ROW, BasicMonthViewUI.FIRST_DAY_COLUMN));
      }
     
     /**
@@ -377,7 +316,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
         // second month should behave the same way as first 
         // first is outside and returns null.
         int row = ui.getDayGridPositionAtLocation(monthBounds.x + 2, firstDay).y;
-        assertEquals(0, row);
+        assertEquals(BasicMonthViewUI.FIRST_WEEK_ROW, row);
         Rectangle dayBounds = ui.getDayBoundsAtLocation(monthBounds.x + 2, firstDay);
         assertNotNull(dayBounds);
     }
@@ -398,7 +337,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
         Rectangle monthBounds = ui.getMonthBoundsAtLocation(20, 20);
         int firstDayY = monthBounds.y + ui.getMonthHeaderHeight() + ui.getDaySize().height + 2;
         int row = ui.getDayGridPositionAtLocation(monthBounds.x + 2, firstDayY).y;
-        assertEquals(0, row);
+        assertEquals(BasicMonthViewUI.FIRST_WEEK_ROW, row);
         Rectangle dayBounds = ui.getDayBoundsAtLocation(monthBounds.x + 2, firstDayY);
         assertNotNull(dayBounds);
     }
@@ -451,14 +390,11 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
             return;
         }
         BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.LEFT_TO_RIGHT);
-        Rectangle bounds = ui.getMonthBoundsAtLocation(20, 20);
-        Dimension daySize = ui.getDaySize();
-        // first day column
-        int locationX = bounds.x + 2;
         // second non-header row
-        int locationY = bounds.y + ui.getMonthHeaderHeight() + 2 * daySize.height + 2;
-        Rectangle dayBounds = ui.getDayBoundsAtLocation(locationX, locationY);
-        Date date = ui.getDayAtLocation(locationX, locationY); 
+        // first day column
+        Point location = getLocationInGrid(ui, 2, 0);
+        Rectangle dayBounds = ui.getDayBoundsAtLocation(location.x, location.y);
+        Date date = ui.getDayAtLocation(location.x, location.y); 
         assertEquals(dayBounds, ui.getDayBounds(date));
      }
 
@@ -479,8 +415,8 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
         // 6th April was sunday ... it is a last day of the first week, but only at places where first day is Monday.
         // so using this obsure notation we get last day of first week depending on when the week really starts.
         cal.set(2008, Calendar.APRIL, 4 + cal.getFirstDayOfWeek()); 
-        assertEquals(6, ui.getDayGridPosition(cal.getTime()).x);
-        assertEquals(0, ui.getDayGridPosition(cal.getTime()).y);
+        assertEquals(BasicMonthViewUI.LAST_DAY_COLUMN, ui.getDayGridPosition(cal.getTime()).x);
+        assertEquals(BasicMonthViewUI.FIRST_WEEK_ROW, ui.getDayGridPosition(cal.getTime()).y);
         
      }
 
@@ -498,7 +434,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
         // get a date in the first month
         Date month = ui.getMonth(0, 0);
         // second row - cant be a leading date
-        assertDateToDayGrid(ui, month, 1, 0);
+        assertDateToDayGrid(ui, month, BasicMonthViewUI.FIRST_WEEK_ROW + 1, BasicMonthViewUI.FIRST_DAY_COLUMN);
      }
 
     /**
@@ -514,7 +450,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
         BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.LEFT_TO_RIGHT);
         // get a date in the first month
         Date month = ui.getMonth(0, 0);
-        assertDateToDayGrid(ui, month, 2, 4);
+        assertDateToDayGrid(ui, month, BasicMonthViewUI.FIRST_WEEK_ROW + 3, BasicMonthViewUI.FIRST_DAY_COLUMN);
      }
     
     /**
@@ -580,7 +516,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
             return;
         }
         BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.LEFT_TO_RIGHT);
-        assertDateToMonthGrid(ui, 0, 0);
+        assertDateToMonthGrid(ui, BasicMonthViewUI.FIRST_WEEK_ROW, BasicMonthViewUI.FIRST_DAY_COLUMN);
      }
     /**
      * Test full circle: getMonthGridPosition(Date) - had problems with first row?
@@ -607,7 +543,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
             return;
         }
         BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.LEFT_TO_RIGHT);
-        assertDateToMonthGrid(ui, 1, 1);
+        assertDateToMonthGrid(ui, 1,  1);
      }
 
     /**
@@ -799,14 +735,9 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
             return;
         }
         BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.LEFT_TO_RIGHT);
-        Rectangle monthBounds = ui.getMonthBoundsAtLocation(20, 20);
-        Rectangle dayBounds = ui.getDayBoundsAtLocation(
-                monthBounds.x + 2, 
-                monthBounds.y + ui.getMonthHeaderHeight() + 2); 
         // first column in second non-header row
-        Date date = ui.getDayAtLocation(
-                monthBounds.x + 2, 
-                monthBounds.y + ui.getMonthHeaderHeight() + 2 * dayBounds.height + 2);
+        Point location = getLocationInGrid(ui, 2, 0);
+        Date date = ui.getDayAtLocation(location.x, location.y);
         // the ui's calendar is configured to the first displayed day
         Calendar uiCalendar = ui.getCalendar();
         uiCalendar.add(Calendar.WEEK_OF_YEAR, 1);
@@ -825,14 +756,9 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
             return;
         }
         BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.RIGHT_TO_LEFT);
-        Rectangle monthBounds = ui.getMonthBoundsAtLocation(20, 20);
-        Rectangle dayBounds = ui.getDayBoundsAtLocation(
-                monthBounds.x + 2, 
-                monthBounds.y + ui.getMonthHeaderHeight() + 2); 
         // first column in second non-header row
-        Date date = ui.getDayAtLocation(
-                monthBounds.x + 2, 
-                monthBounds.y + ui.getMonthHeaderHeight() + 2 * dayBounds.height + 2); 
+        Point location = getLocationInGrid(ui, 2, 0);
+        Date date = ui.getDayAtLocation(location.x, location.y);
         Date endOfWeek = CalendarUtils.endOfWeek(ui.getCalendar(), date);
         Calendar uiCalendar = ui.getCalendar(ui.getMonthAtLocation(20, 20));
         uiCalendar.add(Calendar.WEEK_OF_YEAR, 1);
@@ -884,125 +810,334 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
         assertEquals(monthBounds.y + uiLToR.getMonthHeaderHeight(), dayBoundsLToR.y);
     }
  
+//------------------------ methods to test getDayGridPositionAtLocation (bulk)
+// PENDING JW:  should we test the corner cases separatedly? Had been historical
+    
     /**
-     * days of week is mapped to row index -1.
+     * Map pixel to logical grid, test rows. 
      */
     @Test
-    public void testDayGridPositionColumnHeader() {
-        // This test will not work in a headless configuration.
-        if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run test - headless environment");
-            return;
-        }
-        BasicMonthViewUI uiRToL = getRealizedMonthViewUI(ComponentOrientation.RIGHT_TO_LEFT);
-        Rectangle monthBounds = uiRToL.getMonthBoundsAtLocation(20, 20);
-        // first row below month header == days of week header 
-        Point dayGridRToL = uiRToL.getDayGridPositionAtLocation(
-                monthBounds.x + 2, monthBounds.y + uiRToL.getMonthHeaderHeight() + 2); 
-        assertEquals("first row below header must be day column header", -1, dayGridRToL.y);
-     }
-
-    /**
-     * day grid rows >= 0
-     */
-    @Test
-    public void testDayGridPositionRow() {
+    public void testDayGridPositionAtLocationRows() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
             LOG.info("cannot run test - headless environment");
             return;
         }
         BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.RIGHT_TO_LEFT);
-        Rectangle monthBounds = ui.getMonthBoundsAtLocation(20, 20);
-        Rectangle dayBounds = ui.getDayBoundsAtLocation(
-                monthBounds.x + 2, monthBounds.y + ui.getMonthHeaderHeight() +2); 
-
-        // first column near bottom
-        Point dayInGrid = ui.getDayGridPositionAtLocation(
-                monthBounds.x + 2, 
-                monthBounds.y + ui.getMonthHeaderHeight() + dayBounds.height + 2); 
-       
-        assertEquals("first row", 0, dayInGrid.y);
-     }
- 
-    /**
-     * Screen location mapped to logical day columns.
-     */
-    @Test
-    public void testDayGridPositionColumn() {
-        // This test will not work in a headless configuration.
-        if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run test - headless environment");
-            return;
+        int calendarRow = BasicMonthViewUI.DAY_HEADER_ROW;
+        for (int row = 0; row <= BasicMonthViewUI.WEEKS_IN_MONTH; row++) {
+            Point location = getLocationInRow(ui, row);
+            // first row below month header == days of week header 
+            Point dayGridPosition = ui.getDayGridPositionAtLocation(location.x, location.y); 
+            assertEquals("calendarRow at absolute row " + row, 
+                    calendarRow, dayGridPosition.y);
+            calendarRow++;
         }
-        BasicMonthViewUI uiRToL = getRealizedMonthViewUI(ComponentOrientation.RIGHT_TO_LEFT);
-        BasicMonthViewUI uiLToR = getRealizedMonthViewUI(ComponentOrientation.LEFT_TO_RIGHT);
-        Rectangle monthBounds = uiRToL.getMonthBoundsAtLocation(20, 20);
-        // first column in first non-header row
-        Point dayGridRToL = uiRToL.getDayGridPositionAtLocation(
-                monthBounds.x + 2, 
-                monthBounds.y + uiRToL.getMonthHeaderHeight() + 2); 
-        assertEquals("last logical column in RToL", JXMonthView.DAYS_IN_WEEK - 1, 
-                dayGridRToL.x);
-        // same for LToR
-        Point dayGridLToR = uiLToR.getDayGridPositionAtLocation(
-                monthBounds.x + 2, monthBounds.y + monthBounds.height - 20); 
-        assertEquals("first logical column in LToR", 0, dayGridLToR.x);
      }
 
-    @Test
-    public void testDayGridPositionWeekHeader() {
-        // This test will not work in a headless configuration.
-        if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run test - headless environment");
-            return;
-        }
-        BasicMonthViewUI uiRToL = getRealizedMonthViewUI(ComponentOrientation.RIGHT_TO_LEFT, true);
-        BasicMonthViewUI uiLToR = getRealizedMonthViewUI(ComponentOrientation.LEFT_TO_RIGHT, true);
-        Rectangle monthBounds = uiRToL.getMonthBoundsAtLocation(20, 20);
-        // first column near bottom
-        Point dayGridRToL = uiRToL.getDayGridPositionAtLocation(
-                monthBounds.x + monthBounds.width - 2, 
-                monthBounds.y + uiRToL.getMonthHeaderHeight() + 2); 
-        assertEquals("weeks of year column in RTL", -1, 
-                dayGridRToL.x);
-        // same for LToR
-        Point dayGridLToR = uiLToR.getDayGridPositionAtLocation(
-                monthBounds.x + 2, 
-                monthBounds.y + uiRToL.getMonthHeaderHeight() + 2); 
-        assertEquals("first logical column in LToR", -1, dayGridLToR.x);
-     }
-    
     /**
-     * day grid returns null for hitting month header.
+     * Map pixel to logical grid, test columns in LToR. 
+     * 
      */
     @Test
-    public void testDayGridPositionMonthHeaderHitLToR() {
+    public void testDayGridPositionAtLocationColumnsLToR() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
             LOG.info("cannot run test - headless environment");
             return;
         }
         BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.LEFT_TO_RIGHT);
-        Rectangle monthBounds = ui.getMonthBoundsAtLocation(20, 20);
-        assertNull("hit in header must return null grid position", 
-                ui.getDayGridPositionAtLocation(monthBounds.x + 2, monthBounds.y + 2));
-    }
+        int calendarColumn = BasicMonthViewUI.FIRST_DAY_COLUMN;
+        for (int column = 0; column < BasicMonthViewUI.DAYS_IN_WEEK; column++) {
+            Point location = getLocationInColumn(ui, column);
+            // first row below month header == days of week header 
+            Point dayGridPosition = ui.getDayGridPositionAtLocation(location.x, location.y); 
+            assertEquals("calendarColumn at absolute column " + column, 
+                    calendarColumn, dayGridPosition.x);
+            calendarColumn++;
+        }
+     }
     
     /**
-     * day grid returns null for hitting month header.
+     * Map pixel to logical grid, test columns with weekNumbers in LToR. 
      */
     @Test
-    public void testDayGridPositionMonthHeaderHitRToL() {
+    public void testDayGridPositionAtLocationColumnsLToRWithWeekNumber() {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.info("cannot run test - headless environment");
+            return;
+        }
+        BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.LEFT_TO_RIGHT, true);
+        int calendarColumn = BasicMonthViewUI.WEEK_HEADER_COLUMN;
+        for (int column = 0; column <= BasicMonthViewUI.DAYS_IN_WEEK; column++) {
+            Point location = getLocationInColumn(ui, column);
+            // first row below month header == days of week header 
+            Point dayGridPosition = ui.getDayGridPositionAtLocation(location.x, location.y); 
+            assertEquals("calendarColumn at absolute column " + column, 
+                    calendarColumn, dayGridPosition.x);
+            calendarColumn++;
+        }
+     }
+
+    /**
+     * Map pixel to logical grid, test columns in RToL. 
+     */
+    @Test
+    public void testDayGridPositionAtLocationColumnsRToL() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
             LOG.info("cannot run test - headless environment");
             return;
         }
         BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.RIGHT_TO_LEFT);
-        Rectangle monthBounds = ui.getMonthBoundsAtLocation(20, 20);
+        int calendarColumn = BasicMonthViewUI.LAST_DAY_COLUMN;
+        for (int column = 0; column < BasicMonthViewUI.DAYS_IN_WEEK; column++) {
+            Point location = getLocationInColumn(ui, column);
+            // first row below month header == days of week header 
+            Point dayGridPosition = ui.getDayGridPositionAtLocation(location.x, location.y); 
+            assertEquals("calendarColumn at absolute column " + column, 
+                    calendarColumn, dayGridPosition.x);
+            calendarColumn--;
+        }
+     }
+    
+    /**
+     * Map pixel to logical grid, test columns with weekNubmers in RToL. 
+     */
+    @Test
+    public void testDayGridPositionAtLocationColumnsRToLWithWeekNumber() {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.info("cannot run test - headless environment");
+            return;
+        }
+        BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.RIGHT_TO_LEFT, true);
+        int calendarColumn = BasicMonthViewUI.LAST_DAY_COLUMN;
+        for (int column = 0; column <= BasicMonthViewUI.DAYS_IN_WEEK; column++) {
+            Point location = getLocationInColumn(ui, column);
+            // first row below month header == days of week header 
+            Point dayGridPosition = ui.getDayGridPositionAtLocation(location.x, location.y); 
+            assertEquals("calendarColumn at absolute column " + column, 
+                    calendarColumn, dayGridPosition.x);
+            calendarColumn--;
+        }
+     }
+
+//----------------- test get DayGridPositionAtLocation (special boundary points)
+    
+    /**
+     * Map pixel to logical grid. 
+     * day grid row == DAY_HEADER_ROW.
+     */
+    @Test
+    public void testDayGridPositionAtLocationDayHeader() {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.info("cannot run test - headless environment");
+            return;
+        }
+        BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.RIGHT_TO_LEFT);
+        Point location = getLocationInRow(ui, 0);
+        // first row below month header == days of week header 
+        Point dayGridPosition = ui.getDayGridPositionAtLocation(location.x, location.y); 
+        assertEquals("first row below header must be day column header", 
+                BasicMonthViewUI.DAY_HEADER_ROW, dayGridPosition.y);
+     }
+
+    /**
+     * Map pixel to logical grid. 
+     * day grid rows == FIRST_WEEK_ROW
+     */
+    @Test
+    public void testDayGridPositionAtLocationFirstWeekRow() {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.info("cannot run test - headless environment");
+            return;
+        }
+        BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.RIGHT_TO_LEFT);
+        // location in second (geometrical, calculated from day size) grid row
+        Point location = getLocationInRow(ui, 1);
+        Point dayInGrid = ui.getDayGridPositionAtLocation(location.x, location.y); 
+       
+        assertEquals("first row", BasicMonthViewUI.FIRST_WEEK_ROW, dayInGrid.y);
+     }
+ 
+    /**
+     * Map pixel to logical grid. 
+     * day grid rows == LAST_WEEK_ROW
+     */
+    @Test
+    public void testDayGridPositionAtLocationLastWeekRow() {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.info("cannot run test - headless environment");
+            return;
+        }
+        BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.RIGHT_TO_LEFT);
+        Point location = getLocationInRow(ui, BasicMonthViewUI.WEEKS_IN_MONTH); 
+        Point dayInGrid = ui.getDayGridPositionAtLocation(location.x, location.y);
+       
+        assertEquals("first row", BasicMonthViewUI.LAST_WEEK_ROW, dayInGrid.y);
+     }
+
+    
+    /**
+     * Map pixel to logical grid. 
+     * day grid column == LAST_DAY_COLUMN in RToL and FIRST_DAY_COLUMN in LToR
+     */
+    @Test
+    public void testDayGridPositionAtLocationLastColumnRToL() {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.info("cannot run test - headless environment");
+            return;
+        }
+        BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.RIGHT_TO_LEFT);
+        Point location = getLocationInColumn(ui, 0);
+        Point dayGridPosition = ui.getDayGridPositionAtLocation(location.x, location.y); 
+        assertEquals("last logical column in RToL", BasicMonthViewUI.LAST_DAY_COLUMN, 
+                dayGridPosition.x);
+     }
+
+    /**
+     * Map pixel to logical grid. 
+     * day grid column == LAST_DAY_COLUMN in RToL and FIRST_DAY_COLUMN in LToR
+     */
+    @Test
+    public void testDayGridPositionAtLocationFirstColumnRToL() {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.info("cannot run test - headless environment");
+            return;
+        }
+        BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.RIGHT_TO_LEFT);
+        Point location = getLocationInColumn(ui, BasicMonthViewUI.DAYS_IN_WEEK - 1);
+        Point dayGridPosition = ui.getDayGridPositionAtLocation(location.x, location.y); 
+        assertEquals("last logical column in RToL", BasicMonthViewUI.FIRST_DAY_COLUMN, 
+                dayGridPosition.x);
+     }
+
+    /**
+     * Map pixel to logical grid. 
+     * day grid column == LAST_DAY_COLUMN in RToL and FIRST_DAY_COLUMN in LToR
+     */
+    @Test
+    public void testDayGridPositionAtLocationFirstColumnRToLWithWeekNumber() {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.info("cannot run test - headless environment");
+            return;
+        }
+        BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.RIGHT_TO_LEFT, true);
+        Point location = getLocationInColumn(ui, BasicMonthViewUI.DAYS_IN_WEEK - 1);
+        Point dayGridPosition = ui.getDayGridPositionAtLocation(location.x, location.y); 
+        assertEquals("last logical column in RToL", BasicMonthViewUI.FIRST_DAY_COLUMN, 
+                dayGridPosition.x);
+     }
+
+    /**
+     * Map pixel to logical grid. 
+     * day grid column == LAST_DAY_COLUMN in RToL and FIRST_DAY_COLUMN in LToR
+     */
+    @Test
+    public void testDayGridPositionAtLocationFirstColumnLToR() {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.info("cannot run test - headless environment");
+            return;
+        }
+        BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.LEFT_TO_RIGHT);
+        Point location = getLocationInColumn(ui, 0);
+        Point dayGridPosition = ui.getDayGridPositionAtLocation(location.x, location.y);
+        assertEquals("first logical column in LToR", BasicMonthViewUI.FIRST_DAY_COLUMN, dayGridPosition.x);
+     }
+    
+    /**
+     * Map pixel to logical grid. 
+     * day grid column == LAST_DAY_COLUMN in RToL and FIRST_DAY_COLUMN in LToR
+     */
+    @Test
+    public void testDayGridPositionAtLocationLastColumnLToR() {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.info("cannot run test - headless environment");
+            return;
+        }
+        BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.LEFT_TO_RIGHT);
+        Point location = getLocationInColumn(ui, BasicMonthViewUI.DAYS_IN_WEEK - 1);
+        Point dayGridPosition = ui.getDayGridPositionAtLocation(location.x, location.y);
+        assertEquals("first logical column in LToR", BasicMonthViewUI.LAST_DAY_COLUMN, dayGridPosition.x);
+     }
+    /**
+     * Map pixel to logical grid. 
+     * day grid column == LAST_DAY_COLUMN in RToL and FIRST_DAY_COLUMN in LToR
+     */
+    @Test
+    public void testDayGridPositionAtLocationWeekHeaderRToL() {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.info("cannot run test - headless environment");
+            return;
+        }
+        BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.RIGHT_TO_LEFT, true);
+        // right == week header
+        Point location = getLocationInColumn(ui, BasicMonthViewUI.DAYS_IN_WEEK); 
+        Point dayGridPosition = ui.getDayGridPositionAtLocation(location.x, location.y);
+        assertEquals("weeks of year column in RTL", BasicMonthViewUI.WEEK_HEADER_COLUMN, 
+                dayGridPosition.x);
+     }
+
+    
+    /**
+     * Map pixel to logical grid. 
+     * day grid column == LAST_DAY_COLUMN in RToL and FIRST_DAY_COLUMN in LToR
+     */
+    @Test
+    public void testDayGridPositionAtLocationWeekHeaderLToR() {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.info("cannot run test - headless environment");
+            return;
+        }
+        BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.LEFT_TO_RIGHT, true);
+        // left == week header
+        Point location = getLocationInColumn(ui, 0);
+        Point dayGridPosition = ui.getDayGridPositionAtLocation(location.x, location.y); 
+        assertEquals("first logical column in LToR", BasicMonthViewUI.WEEK_HEADER_COLUMN, dayGridPosition.x);
+     }
+
+    /**
+     * day grid returns null for hitting month header.
+     */
+    @Test
+    public void testDayGridPositionAtLocationMonthHeaderHitLToR() {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.info("cannot run test - headless environment");
+            return;
+        }
+        BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.LEFT_TO_RIGHT);
+        Point location = getLocationInMonthHeader(ui);
         assertNull("hit in header must return null grid position", 
-                ui.getDayGridPositionAtLocation(monthBounds.x + 2, monthBounds.y + 2));
+                ui.getDayGridPositionAtLocation(location.x, location.y));
+    }
+    
+    /**
+     * day grid returns null for hitting month header.
+     */
+    @Test
+    public void testDayGridPositionAtLocationMonthHeaderHitRToL() {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.info("cannot run test - headless environment");
+            return;
+        }
+        BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.RIGHT_TO_LEFT);
+        Point location = getLocationInMonthHeader(ui);
+        assertNull("hit in header must return null grid position", 
+                ui.getDayGridPositionAtLocation(location.x, location.y));
     }
     
     /**
@@ -1097,6 +1232,70 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
         assertEquals("", ui.getMonthHeaderHeight(), monthBoundsLToR.height);
     }
 
+    
+    
+    /**
+     * @param ui
+     * @return
+     */
+    private Point getLocationInMonthHeader(BasicMonthViewUI ui) {
+         Rectangle monthBounds = ui.getMonthBoundsAtLocation(20, 20);
+        return new Point(monthBounds.x + 2, monthBounds.y + 2);
+    }
+
+    /**
+     * Returns a location in the given day grid row/column (absolute coordinates)
+     * 
+     * @param ui the ui to get the location from
+     * @param columnOfDayBoxes the absolute grid column
+     * @return a location in pixel, calcualated from the month location and
+     *    day size.
+     */
+    private Point getLocationInGrid(BasicMonthViewUI ui, int rowOfDayBoxes, int columnOfDayBoxes) {
+        Rectangle monthBounds = ui.getMonthBoundsAtLocation(20, 20);
+        Dimension dayBounds = ui.getDaySize();
+        Point location = new Point(
+                monthBounds.x + columnOfDayBoxes * dayBounds.width + 2, 
+                monthBounds.y + ui.getMonthHeaderHeight() + rowOfDayBoxes * dayBounds.height + 2);
+        return location;
+    }
+
+    /**
+     * Returns a location in the given day grid column (absolute coordinates)
+     * 
+     * @param ui the ui to get the location from
+     * @param columnOfDayBoxes the absolute grid column
+     * @return a location in pixel, calcualated from the month location and
+     *    day size.
+     */
+    private Point getLocationInColumn(BasicMonthViewUI ui, int columnOfDayBoxes) {
+        Rectangle monthBounds = ui.getMonthBoundsAtLocation(20, 20);
+        Dimension dayBounds = ui.getDaySize();
+        Point location = new Point(
+                monthBounds.x + columnOfDayBoxes * dayBounds.width + 2, 
+                monthBounds.y + ui.getMonthHeaderHeight() + 2);
+        return location;
+    }
+    
+    /**
+     * Returns a location in the given day grid row (absolute coordinates)
+     * 
+     * @param ui
+     * @param rowOfDayBoxes the absolute grid row
+     * @return a location in pixel, calcualated from the month location and
+     *    day size.
+     */
+    private Point getLocationInRow(BasicMonthViewUI ui, int rowOfDayBoxes) {
+        Rectangle monthBounds = ui.getMonthBoundsAtLocation(20, 20);
+        Dimension dayBounds = ui.getDaySize();
+        Point location = new Point(
+            monthBounds.x + 2, 
+            monthBounds.y + ui.getMonthHeaderHeight() + rowOfDayBoxes * dayBounds.height + 2);
+        return location;
+    }
+
+   
+
     /**
      * Returns the ui of a realized JXMonthView with 2 columns and the 
      * given componentOrientation without showingWeekNumbers.
@@ -1118,8 +1317,6 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
      * 
      * The frame is packed and it's size extended by 40, 40 to
      * give a slight off-position (!= 0) of the months shown. 
-     * 
-     * 
      * 
      * NOTE: this must not be used in a headless environment.
      * 
@@ -1149,7 +1346,6 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
      * cleanup date representation as long: new api getDayAtLocation. will
      * replace getDayAt which is deprecated as a first step.
      */
-    @SuppressWarnings("deprecation")
     @Test
     public void testGetDayAtLocation() {
         // This test will not work in a headless configuration.
@@ -1274,18 +1470,6 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
         assertEquals(first, monthView.getUI().getLastDisplayedDay());
     };
 
-    /**
-     * Issue #708-swingx: updateUI changes state.
-     * 
-     * Here: test that firstDisplayedDate is unchanged.
-     */
-    @Test
-    public void testUpdateUIFirstDate() {
-        final JXMonthView monthView = new JXMonthView();
-        Date first = ((BasicMonthViewUI) monthView.getUI()).getFirstDisplayedDay();
-        monthView.updateUI();
-        assertEquals(first, ((BasicMonthViewUI) monthView.getUI()).getFirstDisplayedDay());
-    };
     
     /**
      * Issue #708-swingx: updateUI changes state.

@@ -217,7 +217,14 @@ public final class HighlighterFactory {
      * @return the LF specific color for background striping.
      */
      private Color getUIColor() {
-         Color color = UIManager.getColor("UIColorHighlighter.stripingBackground");
+         Color color = null;
+         // JW: can't do - Nimbus stripes even rows (somewhere deep down the ui?)
+         //, SwingX stripes odd rows
+         // --> combined == no striping 
+//         color = UIManager.getColor("Table.alternateRowColor");
+         if (color == null) {
+             color = UIManager.getColor("UIColorHighlighter.stripingBackground");
+         }
          if (color == null) {
              color = HighlighterFactory.GENERIC_GRAY;
          }

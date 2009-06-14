@@ -25,11 +25,8 @@ import java.applet.Applet;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.KeyboardFocusManager;
-import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
-import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Hashtable;
@@ -51,7 +48,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
-import javax.swing.plaf.UIResource;
 import javax.swing.plaf.basic.BasicTreeUI;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeCellRenderer;
@@ -62,15 +58,18 @@ import javax.swing.tree.TreePath;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.CompoundHighlighter;
 import org.jdesktop.swingx.decorator.Highlighter;
+import org.jdesktop.swingx.decorator.UIDependent;
 import org.jdesktop.swingx.renderer.StringValue;
 import org.jdesktop.swingx.renderer.StringValues;
 import org.jdesktop.swingx.rollover.RolloverProducer;
 import org.jdesktop.swingx.rollover.RolloverRenderer;
 import org.jdesktop.swingx.rollover.TreeRolloverController;
+import org.jdesktop.swingx.rollover.TreeRolloverProducer;
 import org.jdesktop.swingx.search.SearchFactory;
 import org.jdesktop.swingx.search.Searchable;
 import org.jdesktop.swingx.search.TreeSearchable;
 import org.jdesktop.swingx.tree.DefaultXTreeCellEditor;
+import org.jdesktop.swingx.tree.DefaultXTreeCellRenderer;
 
 
 /**
@@ -330,6 +329,9 @@ public class JXTree extends JTree {
      * This must be called from each constructor.
      */
     private void init() {
+        // Issue #1061-swingx: renderer inconsistencies
+        // force setting of renderer
+        setCellRenderer(createDefaultCellRenderer());
         // Issue #233-swingx: default editor not bidi-compliant 
         // manually install an enhanced TreeCellEditor which 
         // behaves slightly better in RtoL orientation.
@@ -342,14 +344,9 @@ public class JXTree extends JTree {
         // setup.
         // JW PENDING need to mimic ui-delegate default re-set?
         // JW PENDING alternatively, cleanup and use DefaultXXTreeCellEditor in incubator
-        TreeCellRenderer xRenderer = getCellRenderer();
-        if (xRenderer instanceof JXTree.DelegatingRenderer) {
-            TreeCellRenderer delegate = ((JXTree.DelegatingRenderer) xRenderer).getDelegateRenderer();
-            if (delegate instanceof DefaultTreeCellRenderer) { 
-                setCellEditor(new DefaultXTreeCellEditor(this, (DefaultTreeCellRenderer) delegate));
-            }   
+        if (getWrappedCellRenderer() instanceof DefaultTreeCellRenderer) {
+            setCellEditor(new DefaultXTreeCellEditor(this, (DefaultTreeCellRenderer) getWrappedCellRenderer()));
         }
-
         // Register the actions that this class can handle.
         ActionMap map = getActionMap();
         map.put("expand-all", new Actions("expand-all"));
@@ -440,7 +437,7 @@ public class JXTree extends JTree {
 
     /**
      * Returns a Searchable for this component, guaranteed to be not null. This 
-     * implementation lazyly creates a TreeSearchable if necessary.
+     * implementation lazily creates a TreeSearchable if necessary.
      *  
      * 
      * @return a not-null Searchable for this component.
@@ -459,7 +456,8 @@ public class JXTree extends JTree {
      * Sets the Searchable for this component. If null, a default 
      * Searchable will be created and used.
      * 
-     * @param searchable the Searchable to use for this component.
+     * @param searchable the Searchable to use for this component, may be null to 
+     *   indicate using the default.
      * 
      * @see #getSearchable()
      */
@@ -650,6 +648,24 @@ public class JXTree extends JTree {
         super.updateUI();
         installSelectionColors();
         updateHighlighterUI();
+        updateRendererEditorUI();
+    }
+
+    
+    /**
+     * Quick fix for #1060-swingx: icons lost on toggling LAF
+     */
+    protected void updateRendererEditorUI() {
+        if (getCellEditor() instanceof UIDependent) {
+            ((UIDependent) getCellEditor()).updateUI();
+        }
+        // PENDING JW: here we get the DelegationRenderer which is not (yet) UIDependent
+        // need to think about how to handle the per-tree icons
+        // anyway, the "real" renderer usually is updated accidentally 
+        // don't know exactly why, added to the comp hierarchy?
+//        if (getCellRenderer() instanceof UIDependent) {
+//            ((UIDependent) getCellRenderer()).updateUI();
+//        }
     }
 
     /**
@@ -658,10 +674,10 @@ public class JXTree extends JTree {
      * <b>Note:</b> this should be done in the UI delegate.
      */
     private void installSelectionColors() {
-        if (isUIResource(getSelectionBackground())) {
+        if (SwingXUtilities.isUIInstallable(getSelectionBackground())) {
             setSelectionBackground(UIManager.getColor("Tree.selectionBackground"));
         }
-        if (isUIResource(getSelectionForeground())) {
+        if (SwingXUtilities.isUIInstallable(getSelectionForeground())) {
             setSelectionForeground(UIManager.getColor("Tree.selectionForeground"));
         }
         
@@ -673,10 +689,10 @@ public class JXTree extends JTree {
      * <b>Note:</b> this should be done in the UI delegate.
      */
     private void uninstallSelectionColors() {
-        if (isUIResource(getSelectionBackground())) {
+        if (SwingXUtilities.isUIInstallable(getSelectionBackground())) {
             setSelectionBackground(null);
         }
-        if (isUIResource(getSelectionForeground())) {
+        if (SwingXUtilities.isUIInstallable(getSelectionForeground())) {
             setSelectionForeground(null);
         }
     }
@@ -691,27 +707,17 @@ public class JXTree extends JTree {
         compoundHighlighter.updateUI();
     }
 
-    /**
-     * Checks if the given value should be set by the LAF. <p>
-     * 
-     * PENDING JW: extract as utility method to ??
-     * 
-     * @param value the value to check
-     * @return true if the value is null or of type UIResource, false otherwise.
-     */
-    private boolean isUIResource(Object value) {
-        return (value == null) || (value instanceof UIResource);
-    }
 
 
 //------------------------ Rollover support
     
     /**
-     * Sets a boolean to enable/disable rollover support. 
-     * Installs or uninstalls the RolloverProducer/-Controller and appropriate
-     * listeners if enable or disabled, respectively. 
-     * If enabled, renderers of implementing RolloverRenderer  
-     * show "live" rollover behaviour, f.i. the cursor over LinkModel cells. <p>
+     * Sets the property to enable/disable rollover support. If enabled, the list
+     * fires property changes on per-cell mouse rollover state, i.e. 
+     * when the mouse enters/leaves a list cell. <p>
+     * 
+     * This can be enabled to show "live" rollover behaviour, f.i. the cursor over a cell 
+     * rendered by a JXHyperlink.<p>
      * 
      * The default value is false.
      * 
@@ -741,9 +747,11 @@ public class JXTree extends JTree {
     }
 
     /**
-     * Returns a boolean indicating whether or not rollover behaviour is enabled. 
+     * Returns a boolean indicating whether or not rollover support is enabled. 
      *
-     * @return a boolean indicating whether or not rollover behaviour is enabled. 
+     * @return a boolean indicating whether or not rollover support is enabled. 
+     * 
+     * @see #setRolloverEnabled(boolean)
      */
     public boolean isRolloverEnabled() {
         return rolloverProducer != null;
@@ -785,62 +793,12 @@ public class JXTree extends JTree {
      * Creates and returns the RolloverProducer to use with this tree.
      * <p>
      * 
-     * This implementation assumes a "hit" for rollover if the mouse is anywhere
-     * in the total width of the tree. Additionally, a pressed to the right (but
-     * outside of the label bounds) is re-dispatched as a pressed just inside
-     * the label bounds. This is a first go for #166-swingx.<p>
-     * 
-     * PENDING JW: bidi-compliance of pressed?
-     * 
      * @return <code>RolloverProducer</code> to use with this tree
      * 
      * @see #setRolloverEnabled(boolean)
      */
     protected RolloverProducer createRolloverProducer() {
-        return new RolloverProducer() {
-            @Override
-            public void mousePressed(MouseEvent e) {
-                JXTree tree = (JXTree) e.getComponent();
-                Point mousePoint = e.getPoint();
-              int labelRow = tree.getRowForLocation(mousePoint.x, mousePoint.y);
-              // default selection
-              if (labelRow >= 0) return;
-              int row = tree.getClosestRowForLocation(mousePoint.x, mousePoint.y);
-              Rectangle bounds = tree.getRowBounds(row);
-              if (bounds == null) {
-                  row = -1;
-              } else {
-                  if ((bounds.y + bounds.height < mousePoint.y) || 
-                       bounds.x > mousePoint.x)   {
-                      row = -1;
-                  }
-              }
-              // no hit
-              if (row < 0) return;
-              tree.dispatchEvent(new MouseEvent(tree, e.getID(), e.getWhen(), 
-                      e.getModifiers(), bounds.x + bounds.width - 2, mousePoint.y,
-                      e.getClickCount(), e.isPopupTrigger(), e.getButton()));
-            }
-
-            @Override
-            protected void updateRolloverPoint(JComponent component,
-                    Point mousePoint) {
-                JXTree tree = (JXTree) component;
-                int row = tree.getClosestRowForLocation(mousePoint.x, mousePoint.y);
-                Rectangle bounds = tree.getRowBounds(row);
-                if (bounds == null) {
-                    row = -1;
-                } else {
-                    if ((bounds.y + bounds.height < mousePoint.y) || 
-                            bounds.x > mousePoint.x)   {
-                           row = -1;
-                       }
-                }
-                int col = row < 0 ? -1 : 0;
-                rollover.x = col;
-                rollover.y = row;
-            }
-        };
+        return new TreeRolloverProducer();
     }
 
   
@@ -1096,7 +1054,8 @@ public class JXTree extends JTree {
      * @return the default cell renderer to use with this tree.
      */
     protected TreeCellRenderer createDefaultCellRenderer() {
-        return new DefaultTreeCellRenderer();
+//        return new DefaultTreeCellRenderer();
+        return new DefaultXTreeCellRenderer();
     }
 
     /**
@@ -1111,6 +1070,9 @@ public class JXTree extends JTree {
      */
     @Override
     public TreeCellRenderer getCellRenderer() {
+        // PENDING JW: something wrong here - why exactly can't we return super? 
+        // not even if we force the initial setting in init?
+//        return super.getCellRenderer();
         return getDelegatingRenderer();
     }
 
@@ -1144,8 +1106,14 @@ public class JXTree extends JTree {
         // == multiple delegation...
         getDelegatingRenderer().setDelegateRenderer(renderer);
         super.setCellRenderer(delegatingRenderer);
+        // quick hack for #1061: renderer/editor inconsistent
+        if ((renderer instanceof DefaultTreeCellRenderer) && 
+                (getCellEditor() instanceof DefaultXTreeCellEditor)) {
+           ((DefaultXTreeCellEditor) getCellEditor()).setRenderer((DefaultTreeCellRenderer) renderer); 
+        }
     }
 
+    
     /**
      * A decorator for the original TreeCellRenderer. Needed to hook highlighters
      * after messaging the delegate.<p>

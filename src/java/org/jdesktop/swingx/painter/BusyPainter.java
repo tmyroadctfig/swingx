@@ -38,10 +38,10 @@ import org.jdesktop.swingx.JXBusyLabel.Direction;
 import org.jdesktop.swingx.color.ColorUtil;
 
 /**
- * A specific painter that paints an "infinite progress" like animation. For more details see {@link org.jdesktop.swingx.JXBusyLabel}
- * 
+ * A specific painter that paints an "infinite progress" like animation. For
+ * more details see {@link org.jdesktop.swingx.JXBusyLabel}
  */
-public class BusyPainter<T> extends AbstractPainter<T> {
+public class BusyPainter extends AbstractPainter<Object> {
 
     private int frame = -1;
 
@@ -112,7 +112,7 @@ public class BusyPainter<T> extends AbstractPainter<T> {
      * @inheritDoc
      */
     @Override
-    protected void doPaint(Graphics2D g, T t, int width, int height) {
+    protected void doPaint(Graphics2D g, Object t, int width, int height) {
         Rectangle r = getTrajectory().getBounds();
         int tw = width - r.width - 2*r.x;
         int th = height - r.height - 2*r.y;
@@ -608,7 +608,7 @@ public class BusyPainter<T> extends AbstractPainter<T> {
         return this.direction;
     }
 
-    protected Shape provideShape(Graphics2D g, T comp, int width, int height) {
+    protected Shape provideShape(Graphics2D g, Object comp, int width, int height) {
         return new Rectangle(0,0,width,height);
     }
 

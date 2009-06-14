@@ -29,7 +29,7 @@ import javax.swing.ListCellRenderer;
 
 
 /**
- * Adapter to glue SwingX renderer support to core api. It has convenience
+ * Adapter to glue SwingX renderer support to core API. It has convenience
  * constructors to create a LabelProvider, optionally configured with a
  * StringValue and horizontal alignment. Typically, client code does not
  * interact with this class except at instantiation time.
@@ -75,7 +75,7 @@ import javax.swing.ListCellRenderer;
 public class DefaultListRenderer extends AbstractRenderer
     implements ListCellRenderer {
 
-    protected CellContext<JList> cellContext;
+    protected ListCellContext cellContext;
 
     /**
      * Instantiates a default list renderer with the default component
@@ -138,7 +138,7 @@ public class DefaultListRenderer extends AbstractRenderer
 
     
     /**
-     * Intantiates a default list renderer with default component provider
+     * Instantiates a default list renderer with default component provider
      * using both converters.
      * 
      * @param stringValue the converter to use for the string representation
@@ -149,7 +149,7 @@ public class DefaultListRenderer extends AbstractRenderer
     }
 
     /**
-     * Intantiates a default list renderer with default component provider
+     * Instantiates a default list renderer with default component provider
      * using both converters and the given alignment.
      * 
      * @param stringValue the converter to use for the string representation
@@ -178,7 +178,10 @@ public class DefaultListRenderer extends AbstractRenderer
             int index, boolean isSelected, boolean cellHasFocus) {
         cellContext.installContext(list, value, index, 0, isSelected,
                 cellHasFocus, true, true);
-        return componentController.getRendererComponent(cellContext);
+        Component comp = componentController.getRendererComponent(cellContext);
+        // fix issue #1040-swingx: memory leak if value not released
+        cellContext.replaceValue(null);
+        return comp;
     }
 
     /**

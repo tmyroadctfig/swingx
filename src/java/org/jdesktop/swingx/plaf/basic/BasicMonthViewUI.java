@@ -20,7 +20,6 @@
  */
 package org.jdesktop.swingx.plaf.basic;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -38,14 +37,12 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.text.DateFormat;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.text.DateFormatSymbols;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 import java.util.SortedSet;
 import java.util.logging.Logger;
 
@@ -55,7 +52,6 @@ import javax.swing.CellRendererPane;
 import javax.swing.Icon;
 import javax.swing.InputMap;
 import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.KeyStroke;
 import javax.swing.LookAndFeel;
 import javax.swing.UIManager;
@@ -63,6 +59,7 @@ import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.UIResource;
 
 import org.jdesktop.swingx.JXMonthView;
+import org.jdesktop.swingx.SwingXUtilities;
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.calendar.CalendarUtils;
 import org.jdesktop.swingx.calendar.DateSelectionModel;
@@ -71,19 +68,11 @@ import org.jdesktop.swingx.event.DateSelectionEvent;
 import org.jdesktop.swingx.event.DateSelectionListener;
 import org.jdesktop.swingx.plaf.MonthViewUI;
 import org.jdesktop.swingx.plaf.UIManagerExt;
-import org.jdesktop.swingx.renderer.CellContext;
-import org.jdesktop.swingx.renderer.ComponentProvider;
-import org.jdesktop.swingx.renderer.FormatStringValue;
-import org.jdesktop.swingx.renderer.LabelProvider;
-import org.jdesktop.swingx.renderer.PainterAware;
-import org.jdesktop.swingx.renderer.StringValue;
-import org.jdesktop.swingx.renderer.StringValues;
 
 /**
  * Base implementation of the <code>JXMonthView</code> UI.<p>
  *
  * <b>Note</b>: The api changed considerably between releases 0.9.4 and 0.9.5.  
- * The old methods are still available but deprecated and are no longer maintained. 
  * <p>
  * 
  * The general drift of the change was to delegate all text rendering to a dedicated
@@ -92,10 +81,6 @@ import org.jdesktop.swingx.renderer.StringValues;
  * the rendering components. Plus updating on property changes received from the 
  * monthView. <p>
  * 
- * The rendering approach is used by default. Subclass providers can turn it off
- * by overriding createRenderingHandler to return null. This is recommended until
- * the change has stabilized. In future, custom painting will be achieved by 
- * implementing custom RenderingHandlers.
  * 
  * <p>   
  * Painting: coordinate systems.
@@ -107,9 +92,10 @@ import org.jdesktop.swingx.renderer.StringValues;
  * coordinates are adjusted to ComponentOrientation. 
  * <li> The grid of days in a month with logical row/column coordinates. The logical 
  * coordinates are adjusted to ComponentOrientation. The columns 
- * are the days of the week, the rows are the weeks in a month. The column header shows
- * the localized names of the days and has the row coordinate -1. It is shown always.
- * The row header shows the week number in the year and has the column coordinate -1. It
+ * are the (optional) week header and the days of the week. The rows are the day header  
+ * and the weeks in a month. The day header shows  the localized names of the days and 
+ * has the row coordinate DAY_HEADER_ROW. It is shown always.
+ * The row header shows the week number in the year and has the column coordinate WEEK_HEADER_COLUMN. It
  * is shown only if the showingWeekNumber property is true.  
  * </ul>
  * 
@@ -122,6 +108,9 @@ import org.jdesktop.swingx.renderer.StringValues;
  * mode, that is client code should not be effected in any way as long as the mode 
  * is not explicitly enabled. <p>
  * 
+ * NOTE to LAF implementors: the active calendar header is very, very, very raw and 
+ * sure to change without much notice. Better not yet to support it right now.
+ * 
  * @author dmouse
  * @author rbair
  * @author rah003
@@ -131,31 +120,32 @@ public class BasicMonthViewUI extends MonthViewUI {
     @SuppressWarnings("all")
     private static final Logger LOG = Logger.getLogger(BasicMonthViewUI.class
             .getName());
-
     
-    private static final int WEEKS_IN_MONTH = 6;
     private static final int CALENDAR_SPACING = 10;
-
     
     /** Return value used to identify when the month down button is pressed. */
     public static final int MONTH_DOWN = 1;
     /** Return value used to identify when the month up button is pressed. */
     public static final int MONTH_UP = 2;
 
+    // constants for day columns
+    protected static final int WEEK_HEADER_COLUMN = 0;
+    protected static final int DAYS_IN_WEEK = 7;
+    protected static final int FIRST_DAY_COLUMN = WEEK_HEADER_COLUMN + 1;
+    protected static final int LAST_DAY_COLUMN = FIRST_DAY_COLUMN + DAYS_IN_WEEK -1;
 
-    private static final int WEEK_HEADER_COLUMN = -1;
+    // constants for day rows (aka: weeks)
+    protected static final int DAY_HEADER_ROW = 0;
+    protected static final int WEEKS_IN_MONTH = 6;
+    protected static final int FIRST_WEEK_ROW = DAY_HEADER_ROW + 1;
+    protected static final int LAST_WEEK_ROW = FIRST_WEEK_ROW + WEEKS_IN_MONTH - 1;
 
-
-    private static final int DAYS_IN_WEEK = 7;
-
-
-    private static final int DAY_HEADER_ROW = -1;
 
     /** localized names of all months.
      * protected for testing only!
      * PENDING: JW - should be property on JXMonthView, for symmetry with
      *   daysOfTheWeek? 
-     * @deprecated KEEP for now: re-added as quick hack in zoomable
+     * @deprecated pre-0.9.6
      *    no longer used in paint/layout with renderer. 
      */
     @Deprecated
@@ -170,12 +160,6 @@ public class BasicMonthViewUI extends MonthViewUI {
     private Handler handler;
 
     // fields related to visible date range
-    /** start of day of the first visible month. */
-    private Date firstDisplayedDate;
-    /** first visible month. */
-    private int firstDisplayedMonth;
-    /** first visible year. */
-    private int firstDisplayedYear;
     /** end of day of the last visible month. */
     private Date lastDisplayedDate;
     /** 
@@ -253,9 +237,11 @@ public class BasicMonthViewUI extends MonthViewUI {
      */
     private CellRendererPane rendererPane;
 
-
-    private BasicCalendarHeader calendarHeader;
-
+    /**
+     * The CalendarHeaderHandler which provides the header component if zoomable.
+     */
+    private CalendarHeaderHandler calendarHeaderHandler;
+    
 
     @SuppressWarnings({"UnusedDeclaration"})
     public static ComponentUI createUI(JComponent c) {
@@ -277,16 +263,16 @@ public class BasicMonthViewUI extends MonthViewUI {
         
         installDefaults();
         installDelegate();
-        installComponents();
         installKeyboardActions();
+        installComponents();
         updateLocale(false);
+        updateZoomable();
         installListeners();
     }
 
 
     @Override
     public void uninstallUI(JComponent c) {
-        
         uninstallRenderingHandler();
         uninstallListeners();
         uninstallKeyboardActions();
@@ -297,90 +283,62 @@ public class BasicMonthViewUI extends MonthViewUI {
     }
 
     /**
-     * Creates and configures the calendar header. Adds to the MonthView if
-     * zoomable.
+     * Creates and installs the calendar header handler. 
      */
     protected void installComponents() {
-        calendarHeader = createCalendarHeader();
-        calendarHeader.setFont(getAsNotUIResource(createDerivedFont()));
-        calendarHeader.setBackground(getAsNotUIResource(monthView.getMonthStringBackground()));
-        if (isZoomable()) {
-            monthView.add(calendarHeader);
-        }
+        setCalendarHeaderHandler(createCalendarHeaderHandler());
+        getCalendarHeaderHandler().install(monthView);
     }
 
     /**
-     * Returns a Font based on the param which is not of type UIResource. 
-     * 
-     * @param font the base font
-     * @return a font not of type UIResource, may be null.
+     * Uninstalls the calendar header handler.
      */
-    private Font getAsNotUIResource(Font font) {
-        if (!(font instanceof UIResource)) return font;
-        // PENDING JW: correct way to create another font instance?
-       return font.deriveFont(font.getAttributes());
-    }
-    
-    /**
-     * Returns a Color based on the param which is not of type UIResource. 
-     * 
-     * @param color the base color
-     * @return a color not of type UIResource, may be null.
-     */
-    private Color getAsNotUIResource(Color color) {
-        if (!(color instanceof UIResource)) return color;
-        // PENDING JW: correct way to create another color instance?
-        float[] rgb = color.getRGBComponents(null);
-        return new Color(rgb[0], rgb[1], rgb[2], rgb[3]);
-    }
-
     protected void uninstallComponents() {
-        monthView.remove(calendarHeader);
-        calendarHeader.setActions(null, null, null);
-        calendarHeader = null;
+        getCalendarHeaderHandler().uninstall(monthView);
+        setCalendarHeaderHandler(null);
     }
 
     /**
-     * Installs default values. 
+     * Installs default values. <p>
      * 
      * This is refactored to only install default properties on the monthView.
      * Extracted install of this delegate's properties into installDelegate. 
      *  
      */
     protected void installDefaults() {
-        // PENDING JW: move to installDefaults?
         LookAndFeel.installProperty(monthView, "opaque", Boolean.TRUE);
         
-       // JW: access all properties via the UIManagerExt ..
+       // @KEEP JW: do not use the core install methods (might have classloader probs)
+        // instead access all properties via the UIManagerExt ..
         //        BasicLookAndFeel.installColorsAndFont(monthView, 
 //                "JXMonthView.background", "JXMonthView.foreground", "JXMonthView.font");
         
-        if (isUIInstallable(monthView.getBackground())) {
+        if (SwingXUtilities.isUIInstallable(monthView.getBackground())) {
             monthView.setBackground(UIManagerExt.getColor("JXMonthView.background"));
         }
-        if (isUIInstallable(monthView.getForeground())) {
+        if (SwingXUtilities.isUIInstallable(monthView.getForeground())) {
             monthView.setForeground(UIManagerExt.getColor("JXMonthView.foreground"));
         }
-        if (isUIInstallable(monthView.getFont())) {
+        if (SwingXUtilities.isUIInstallable(monthView.getFont())) {
             // PENDING JW: missing in managerExt? Or not applicable anyway?
             monthView.setFont(UIManager.getFont("JXMonthView.font"));
         }
-        if (isUIInstallable(monthView.getMonthStringBackground())) {
+        if (SwingXUtilities.isUIInstallable(monthView.getMonthStringBackground())) {
             monthView.setMonthStringBackground(UIManagerExt.getColor("JXMonthView.monthStringBackground"));
         }
-        if (isUIInstallable(monthView.getMonthStringForeground())) {
+        if (SwingXUtilities.isUIInstallable(monthView.getMonthStringForeground())) {
             monthView.setMonthStringForeground(UIManagerExt.getColor("JXMonthView.monthStringForeground"));
         }
-        if (isUIInstallable(monthView.getDaysOfTheWeekForeground())) {
+        if (SwingXUtilities.isUIInstallable(monthView.getDaysOfTheWeekForeground())) {
             monthView.setDaysOfTheWeekForeground(UIManagerExt.getColor("JXMonthView.daysOfTheWeekForeground"));
         }
-        if (isUIInstallable(monthView.getSelectionBackground())) {
+        if (SwingXUtilities.isUIInstallable(monthView.getSelectionBackground())) {
             monthView.setSelectionBackground(UIManagerExt.getColor("JXMonthView.selectedBackground"));
         }
-        if (isUIInstallable(monthView.getSelectionForeground())) {
+        if (SwingXUtilities.isUIInstallable(monthView.getSelectionForeground())) {
             monthView.setSelectionForeground(UIManagerExt.getColor("JXMonthView.selectedForeground"));
         }
-        if (isUIInstallable(monthView.getFlaggedDayForeground())) {
+        if (SwingXUtilities.isUIInstallable(monthView.getFlaggedDayForeground())) {
             monthView.setFlaggedDayForeground(UIManagerExt.getColor("JXMonthView.flaggedDayForeground"));
         }
         
@@ -389,7 +347,7 @@ public class BasicMonthViewUI extends MonthViewUI {
     }
 
     /**
-     * Installs this ui delegates properties.
+     * Installs this ui delegate's properties.
      */
     protected void installDelegate() {
         isLeftToRight = monthView.getComponentOrientation().isLeftToRight();
@@ -408,7 +366,10 @@ public class BasicMonthViewUI extends MonthViewUI {
      * @param property the property to check.
      * @return true if the given property should be replaced by the UI#s
      *   default value, false otherwise. 
+     *   
+     * @deprecated pre-0.9.6 use {@link org.jdesktop.swingx.SwingXUtilities#isUIInstallable(Object)}
      */
+    @Deprecated
     protected boolean isUIInstallable(Object property) {
        return (property == null) || (property instanceof UIResource);
     }
@@ -417,9 +378,9 @@ public class BasicMonthViewUI extends MonthViewUI {
 
     protected void installKeyboardActions() {
         // Setup the keyboard handler.
-        // PENDING JW: change to when-ancestor? just to be on the safe side
-        // if we make the title contain active comps
-        installKeyBindings(JComponent.WHEN_FOCUSED);
+        // JW: changed (0.9.6) to when-ancestor just to be on the safe side
+        // if the title contain active comps
+        installKeyBindings(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
         // JW: removed the automatic keybindings in WHEN_IN_FOCUSED
         // which caused #555-swingx (binding active if not focused)
         ActionMap actionMap = monthView.getActionMap();
@@ -438,10 +399,32 @@ public class BasicMonthViewUI extends MonthViewUI {
         actionMap.put("adjustSelectionPreviousWeek", new KeyboardAction(KeyboardAction.ADJUST_SELECTION_PREVIOUS_WEEK));
         actionMap.put("adjustSelectionNextWeek", new KeyboardAction(KeyboardAction.ADJUST_SELECTION_NEXT_WEEK));
 
+        
         actionMap.put(JXMonthView.COMMIT_KEY, acceptAction);
         actionMap.put(JXMonthView.CANCEL_KEY, cancelAction);
+        
+        // PENDING JW: complete (year-, decade-, ?? ) and consolidate with KeyboardAction
+        // additional navigation actions
+        AbstractActionExt prev = new AbstractActionExt() {
+
+            public void actionPerformed(ActionEvent e) {
+                previousMonth();
+            }
+            
+        };
+        monthView.getActionMap().put("scrollToPreviousMonth", prev);
+        AbstractActionExt next = new AbstractActionExt() {
+
+            public void actionPerformed(ActionEvent e) {
+                nextMonth();
+            }
+            
+        };
+        monthView.getActionMap().put("scrollToNextMonth", next);
+        
     }
 
+    
     /**
      * @param inputMap
      */
@@ -499,267 +482,63 @@ public class BasicMonthViewUI extends MonthViewUI {
     }
 
     /**
-     * 
+     * Creates and installs the renderingHandler and infrastructure to use it.
      */
-    private void installRenderingHandler() {
-        renderingHandler = createRenderingHandler();
-        if (renderingHandler != null) {
+    protected void installRenderingHandler() {
+        setRenderingHandler(createRenderingHandler());
+        if (getRenderingHandler() != null) {
             rendererPane = new CellRendererPane();
             monthView.add(rendererPane);
         }
     }
     
-    private void uninstallRenderingHandler() {
-        if (renderingHandler == null) return;
+    /**
+     * Uninstalls the renderingHandler and infrastructure that used it.
+     */
+    protected void uninstallRenderingHandler() {
+        if (getRenderingHandler() == null) return;
         monthView.remove(rendererPane);
         rendererPane = null;
-        renderingHandler = null;
+        setRenderingHandler(null);
     }
 
     /**
-     * Returns the RenderingHandler to use. May return null to indicate that
-     * the "old" painting mechanism should be used.
+     * Returns the <code>CalendarRenderingHandler</code> to use. Subclasses may override to 
+     * plug-in custom implementations. <p>
      * 
      * This implementation returns an instance of RenderingHandler.
      * 
-     * @return the renderingHandler to use for painting the day boxes or
-     *   null if the old painting mechanism should be used.
+     * @return the endering handler to use for painting, must not be null
      */
     protected CalendarRenderingHandler createRenderingHandler() {
         return new RenderingHandler();
     }
     
     /**
-     * The RenderingHandler responsible for text rendering. It provides 
-     * and configures a rendering component for the given cell of
-     * a JXMonthView. <p>
-     * 
-     * 
+     * @param renderingHandler the renderingHandler to set
      */
-    protected  static class RenderingHandler implements CalendarRenderingHandler {
-        /** The CellContext for content and default visual config. */
-        private CalendarCellContext cellContext;
-        /** The providers to use per DayState. */
-        private Map<CalendarState, ComponentProvider<?>> providers;
-        // Formatters/state used by Providers. 
-        /** Localized month strings used in title. */
-        private String[] monthNames;
-        //-------- Highlight properties
-        /** The Painter used for highlighting unselectable dates. */
-        private TextCrossingPainter textCross;
-        /** The foreground color for unselectable date highlight. */
-        private Color unselectableDayForeground;
-        /** The foreground color for week of year column. */
-        private Color weekOfTheYearForeground;
-
-        /**
-         * Instantiates a RenderingHandler and installs default state.
-         */
-        public RenderingHandler() {
-            install();
-        }
-        
-        private void install() {
-            weekOfTheYearForeground = UIManagerExt.getColor("JXMonthView.weekOfTheYearForeground");
-            unselectableDayForeground = UIManagerExt.getColor("JXMonthView.unselectableDayForeground");
-            textCross = new TextCrossingPainter<JLabel>();
-            cellContext = new CalendarCellContext();
-            installProviders();
-        }
-
-        /**
-         * Creates and stores ComponentProviders for all DayStates.
-         */
-        private void installProviders() {
-            providers = new HashMap<CalendarState, ComponentProvider<?>>();
-            FormatStringValue sv = new FormatStringValue(new SimpleDateFormat("d")) {
-
-                @Override
-                public String getString(Object value) {
-                    if (value instanceof Calendar) {
-                        ((DateFormat) getFormat()).setTimeZone(((Calendar) value).getTimeZone());
-                        value = ((Calendar) value).getTime();
-                    }
-                    return super.getString(value);
-                }
-
-            };
-            ComponentProvider<?> provider = new LabelProvider(sv, JLabel.RIGHT);
-            providers.put(CalendarState.IN_MONTH, provider);
-            providers.put(CalendarState.TODAY, provider);
-            providers.put(CalendarState.TRAILING, provider);
-            providers.put(CalendarState.LEADING, provider);
-
-            StringValue wsv = new StringValue() {
-
-                public String getString(Object value) {
-                    if (value instanceof Calendar) {
-                        value = ((Calendar) value).get(Calendar.WEEK_OF_YEAR);
-                    }
-                    return StringValues.TO_STRING.getString(value);
-                }
-
-            };
-            ComponentProvider<?> weekOfYearProvider = new LabelProvider(wsv,
-                    JLabel.RIGHT);
-            providers.put(CalendarState.WEEK_OF_YEAR, weekOfYearProvider);
-
-            ComponentProvider<?> dayOfWeekProvider = new LabelProvider(JLabel.CENTER) {
-
-                @Override
-                protected String getValueAsString(CellContext context) {
-                    Object value = context.getValue();
-                    // PENDING JW: this is breaking provider's contract in its
-                    // role as StringValue! Don't in the general case.
-                    if (value instanceof Calendar) {
-                        int day = ((Calendar) value).get(Calendar.DAY_OF_WEEK);
-                        return ((JXMonthView) context.getComponent()).getDayOfTheWeek(day);
-                    }
-                    return super.getValueAsString(context);
-                }
-                
-            };
-            providers.put(CalendarState.DAY_OF_WEEK, dayOfWeekProvider);
-
-            StringValue tsv = new StringValue() {
-
-                public String getString(Object value) {
-                    if (value instanceof Calendar) {
-                        String month = monthNames[((Calendar) value)
-                                .get(Calendar.MONTH)];
-                        return month + " "
-                                + ((Calendar) value).get(Calendar.YEAR); 
-                    }
-                    return StringValues.TO_STRING.getString(value);
-                }
-
-            };
-            ComponentProvider<?> titleProvider = new LabelProvider(tsv,
-                    JLabel.CENTER);
-            providers.put(CalendarState.TITLE, titleProvider);
-        }
-        
-
-        /**
-         * Updates internal state to the given Locale.
-         * 
-         * @param locale the new Locale.
-         */
-        public void setLocale(Locale locale) {
-            monthNames = new DateFormatSymbols(locale).getMonths();
-        }
-
-        /**
-         * Configures and returns a component for rendering of the given monthView cell.
-         * 
-         * @param monthView the JXMonthView to render onto
-         * @param calendar the cell value
-         * @param dayState the DayState of the cell
-         * @return a component configured for rendering the given cell
-         */
-        public JComponent prepareRenderingComponent(JXMonthView monthView, Calendar calendar, CalendarState dayState) {
-            cellContext.installMonthContext(monthView, calendar, 
-                    isSelected(monthView, calendar, dayState), 
-                    isFocused(monthView, calendar, dayState),
-                    dayState);
-            JComponent comp = providers.get(dayState).getRendererComponent(cellContext);
-            return highlight(comp, monthView, calendar, dayState);
-        }
-
-
-        /**
-         * 
-         * PENDING JW: replace hard-coded logic by giving over to highlighters.
-         * 
-         * @param monthView the JXMonthView to render onto
-         * @param calendar the cell value
-         * @param dayState the DayState of the cell
-         * @param dayState
-         */
-        private JComponent highlight(JComponent comp, JXMonthView monthView,
-                Calendar calendar, CalendarState dayState) {
-            if ((CalendarState.LEADING == dayState) || (CalendarState.TRAILING == dayState)) return comp;
-            if (CalendarState.WEEK_OF_YEAR == dayState) {
-                if (weekOfTheYearForeground != null) {
-                    comp.setForeground(weekOfTheYearForeground);
-                } 
-                return comp;
-            }
-            if (CalendarState.TITLE == dayState) {
-                comp.setFont(getDerivedFont(comp.getFont()));
-                return comp;
-            }
-            if (CalendarState.DAY_OF_WEEK == dayState) {
-                comp.setFont(getDerivedFont(comp.getFont()));
-                if (monthView.getDaysOfTheWeekForeground() != null) {
-                    comp.setForeground(monthView.getDaysOfTheWeekForeground());
-                }
-                return comp;
-            }
-            if (monthView.isFlaggedDate(calendar.getTime())) {
-                comp.setForeground(monthView.getFlaggedDayForeground());
-            } else {
-                Color perDay = monthView.getDayForeground(calendar.get(Calendar.DAY_OF_WEEK));
-                if ((perDay != null) && (perDay != monthView.getForeground())) {
-                    // PENDING JW: this here prevents selection foreground on all
-                    // if not checked for "normal" foreground
-                    comp.setForeground(perDay);
-                }
-            }
-            if (monthView.isUnselectableDate(calendar.getTime()) 
-                    && (comp instanceof PainterAware )) {
-                textCross.setForeground(unselectableDayForeground);
-                ((PainterAware) comp).setPainter(textCross);
-            }
-            
-            return comp;
-            
-        }
-
-        /**
-         * @param font
-         * @return
-         */
-        private Font getDerivedFont(Font font) {
-            return font.deriveFont(Font.BOLD);
-        }
-
-        /**
-         * @param monthView
-         * @param calendar
-         * @param dayState
-         * @return
-         */
-        private boolean isFocused(JXMonthView monthView, Calendar calendar,
-                CalendarState dayState) {
-            return false;
-        }
-        
-        /**
-         * @param monthView the JXMonthView to render onto
-         * @param calendar the cell value
-         * @param dayState the DayState of the cell
-         * @return
-         */
-        private boolean isSelected(JXMonthView monthView, Calendar calendar,
-                CalendarState dayState) {
-            if (!isSelectable(dayState)) return false;
-            return monthView.isSelected(calendar.getTime());
-        }
-
-        
-        /**
-         * @param dayState
-         * @return
-         */
-        private boolean isSelectable(CalendarState dayState) {
-            return (CalendarState.IN_MONTH == dayState) || (CalendarState.TODAY == dayState);
-        }
-
+    protected void setRenderingHandler(CalendarRenderingHandler renderingHandler) {
+        this.renderingHandler = renderingHandler;
     }
 
-    //----------------------- controller
-    
+    /**
+     * @return the renderingHandler
+     */
+    protected CalendarRenderingHandler getRenderingHandler() {
+        return renderingHandler;
+    }
+
+    /**
+     * 
+     * Empty subclass for backward compatibility. The original implementation was 
+     * extracted as standalone class and renamed to BasicCalendarRenderingHandler. <p>
+     * 
+     * This will be available for extension by LAF providers until all collaborators 
+     * in the new rendering pipeline are ready for public exposure.
+     */
+    protected static class RenderingHandler extends BasicCalendarRenderingHandler {
+        
+    }
     /**
      * Binds/clears the keystrokes in the component input map, 
      * based on the monthView's componentInputMap enabled property.
@@ -785,8 +564,8 @@ public class BasicMonthViewUI extends MonthViewUI {
      */
     protected void updateLocale(boolean revalidate) {
         Locale locale = monthView.getLocale();
-        if (renderingHandler != null) {
-            renderingHandler.setLocale(locale);
+        if (getRenderingHandler() != null) {
+            getRenderingHandler().setLocale(locale);
         }
         monthsOfTheYear = new DateFormatSymbols(locale).getMonths();
 
@@ -804,7 +583,6 @@ public class BasicMonthViewUI extends MonthViewUI {
                 daysOfTheWeek[i - 1] = dateFormatSymbols[i];
             }
         }
-        installHeaderActions();
         if (revalidate) {
             monthView.invalidate();
             monthView.validate();
@@ -871,23 +649,63 @@ public class BasicMonthViewUI extends MonthViewUI {
      *         outside
      */
     protected Rectangle getDayBoundsAtLocation(int x, int y) {
-        Rectangle days = getMonthDetailsBoundsAtLocation(x, y);
-        if ((days == null) || (!days.contains(x, y)))
+        Rectangle monthDetails = getMonthDetailsBoundsAtLocation(x, y);
+        if ((monthDetails == null) || (!monthDetails.contains(x, y)))
             return null;
-        int calendarRow = (y - days.y) / fullBoxHeight;
-        int calendarColumn = (x - days.x) / fullBoxWidth;
-        return new Rectangle(days.x + calendarColumn * fullBoxWidth, days.y
-                + calendarRow * fullBoxHeight, fullBoxWidth, fullBoxHeight);
+        // calculate row/column in absolute grid coordinates
+        int row = (y - monthDetails.y) / fullBoxHeight;
+        int column = (x - monthDetails.x) / fullBoxWidth;
+        return new Rectangle(monthDetails.x + column * fullBoxWidth, monthDetails.y
+                + row * fullBoxHeight, fullBoxWidth, fullBoxHeight);
+    }
+
+    /**
+     * Returns the bounds of the day box at logical coordinates in the given month.
+     * The row's range is from DAY_HEADER_ROW to LAST_WEEK_ROW. Column's range is from
+     * WEEK_HEADER_COLUMN to LAST_DAY_COLUMN.
+     * 
+     * @param month the month containing the day box  
+     * @param row the logical row (== week) coordinate in the day grid 
+     * @param column the logical column (== day) coordinate in the day grid
+     * @return the bounds of the daybox or null if not showing
+     * @throws IllegalArgumentException if row or column are out off range.
+     * 
+     * @see #getDayGridPositionAtLocation(int, int)
+     */
+    protected Rectangle getDayBoundsInMonth(Date month, int row, final int column) {
+        checkValidRow(row, column);
+        if ((WEEK_HEADER_COLUMN == column) && !monthView.isShowingWeekNumber()) return null;
+        Rectangle monthBounds = getMonthBounds(month);
+        if (monthBounds == null) return null;
+        // dayOfWeek header is shown always
+        monthBounds.y += getMonthHeaderHeight() + (row - DAY_HEADER_ROW) * fullBoxHeight;
+        // PENDING JW: still looks fishy ... 
+        int absoluteColumn = column - FIRST_DAY_COLUMN;
+        if (monthView.isShowingWeekNumber()) {
+            absoluteColumn++;
+        }
+        if (isLeftToRight) {
+           monthBounds.x += absoluteColumn * fullBoxWidth; 
+        } else {
+            int leading = monthBounds.x + monthBounds.width - fullBoxWidth; 
+            monthBounds.x = leading - absoluteColumn * fullBoxWidth;
+        }
+        monthBounds.width = fullBoxWidth;
+        monthBounds.height = fullBoxHeight;
+        return monthBounds;
     }
     
+
     /**
      * Returns the logical coordinates of the day which contains the given
-     * location. The p.x of the returned value represents the day of week, the
-     * p.y represents the week of the month. The transformation takes care of
+     * location. The p.x of the returned value represents the week header or the 
+     * day of week, ranging from WEEK_HEADER_COLUMN to LAST_DAY_COLUMN. The
+     * p.y represents the day header or week of the month, ranging from DAY_HEADER_ROW
+     * to LAST_WEEK_ROW. The transformation takes care of
      * ComponentOrientation.
      * <p>
      * 
-     * Note: this is a pure geometric mapping. The returned grid position need not
+     * Note: The returned grid position need not
      * necessarily map to a date in the month which contains the location, it
      * can represent a week-number/column header or a leading/trailing date.
      * 
@@ -895,153 +713,23 @@ public class BasicMonthViewUI extends MonthViewUI {
      * @param y the y position of the location in pixel
      * @return the logical coordinates of the day in the grid of days in a month
      *         or null if outside.
+     *         
+     * @see #getDayBoundsInMonth(Date, int, int)     
      */
     protected Point getDayGridPositionAtLocation(int x, int y) {
-        Rectangle days = getMonthDetailsBoundsAtLocation(x, y);
-        if ((days == null) ||(!days.contains(x, y))) return null;
-        int calendarRow = (y - days.y) / fullBoxHeight;
-        int calendarColumn = (x - days.x) / fullBoxWidth;
+        Rectangle monthDetailsBounds = getMonthDetailsBoundsAtLocation(x, y);
+        if ((monthDetailsBounds == null) ||(!monthDetailsBounds.contains(x, y))) return null;
+        int calendarRow = (y - monthDetailsBounds.y) / fullBoxHeight + DAY_HEADER_ROW; 
+        int absoluteColumn = (x - monthDetailsBounds.x) / fullBoxWidth;
+        int calendarColumn = absoluteColumn + FIRST_DAY_COLUMN;
         if (!isLeftToRight) {
-            int start = days.x + days.width;
-            calendarColumn = (start - x) / fullBoxWidth;
+            int leading = monthDetailsBounds.x + monthDetailsBounds.width;
+            calendarColumn = (leading - x) / fullBoxWidth + FIRST_DAY_COLUMN;
         }
         if (monthView.isShowingWeekNumber()) {
             calendarColumn -= 1;
         }
-        return new Point(calendarColumn, calendarRow - 1);
-    }
-
-    /**
-     * Returns the given date's position in the grid of the month it is contained in.
-     * 
-     * @param date the Date to get the logical position for, must not be null.
-     * @return the logical coordinates of the day in the grid of days in a
-     *   month or null if the Date is not visible. 
-     */
-    protected Point getDayGridPosition(Date date) {
-        if (!isVisible(date)) return null;
-        Calendar calendar = getCalendar(date);
-        Date startOfDay = CalendarUtils.startOfDay(calendar, date);
-        // there must be a less ugly way?
-        // columns
-        CalendarUtils.startOfWeek(calendar);
-        int column = 0;
-        while (calendar.getTime().before(startOfDay)) {
-            column++;
-            calendar.add(Calendar.DAY_OF_MONTH, 1);
-        }
-        
-        Date startOfWeek = CalendarUtils.startOfWeek(calendar, date);
-        calendar.setTime(date);
-        CalendarUtils.startOfMonth(calendar);
-        int row = 0;
-        while (calendar.getTime().before(startOfWeek)) {
-            row++;
-            calendar.add(Calendar.WEEK_OF_YEAR, 1);
-        }
-        return new Point(column, row);
-    }
-    
-    /**
-     * Returns the Date at the given location. May be null if the
-     * coordinates don't map to a day in the month which contains the 
-     * coordinates. Specifically: hitting leading/trailing dates returns null.
-     * 
-     * Mapping pixel to calendar day.
-     *
-     * @param x the x position of the location in pixel
-     * @param y the y position of the location in pixel
-     * @return the day at the given location or null if the location
-     *   doesn't map to a day in the month which contains the coordinates.
-     */ 
-    @Override
-    public Date getDayAtLocation(int x, int y) {
-        Point dayInGrid = getDayGridPositionAtLocation(x, y);
-        if ((dayInGrid == null) || (dayInGrid.x < 0) || (dayInGrid.y < 0)) return null;
-        Date month = getMonthAtLocation(x, y);
-        return getDayInMonth(month, dayInGrid.y, dayInGrid.x);
-    }
-    
-    /**
-     * Returns the bounds of the given day.
-     * The bounds are in monthView coordinate system.<p>
-     * 
-     * PENDING JW: this most probably should be public as it is the logical
-     * reverse of getDayAtLocation <p>
-     * 
-     * @param date the Date to return the bounds for. Must not be null.
-     * @return the bounds of the given date or null if not visible.
-     */
-    protected Rectangle getDayBounds(Date date) {
-        if (!isVisible(date)) return null;
-        Point position = getDayGridPosition(date);
-        Rectangle monthBounds = getMonthBounds(date);
-        monthBounds.y += getMonthHeaderHeight() + (position.y + 1) * fullBoxHeight;
-        if (monthView.isShowingWeekNumber()) {
-            position.x++;
-        }
-        if (isLeftToRight) {
-           monthBounds.x += position.x * fullBoxWidth; 
-        } else {
-            int start = monthBounds.x + monthBounds.width - fullBoxWidth; 
-            monthBounds.x = start - position.x * fullBoxWidth;
-        }
-        monthBounds.width = fullBoxWidth;
-        monthBounds.height = fullBoxHeight;
-        return monthBounds;
-    }
-    
-    /**
-     * Returns the bounds of the day box at logical coordinates in the given month.
-     * The row's range is from DAY_HEADER to WEEKS_IN_MONTH - 1. Column's range is from
-     * WEEK_HEADER to DAYS_IN_WEEK - 1.
-     * 
-     * @param month the month containing the day box  
-     * @param row the logical row (== week) coordinate in the day grid 
-     * @param column the logical column (== day) coordinate in the day grid
-     * @return the bounds of the daybox or null if not showing
-     * @throws IllegalArgumentException if row or column are out off range.
-     */
-    protected Rectangle getDayBoundsInMonth(Date month, int row, int column) {
-        checkValidRow(row, column);
-        if ((WEEK_HEADER_COLUMN == column) && !monthView.isShowingWeekNumber()) return null;
-        Rectangle monthBounds = getMonthBounds(month);
-        if (monthBounds == null) return null;
-        monthBounds.y += getMonthHeaderHeight() + (row + 1) * fullBoxHeight;
-        if (monthView.isShowingWeekNumber()) {
-            column++;
-        }
-        if (isLeftToRight) {
-           monthBounds.x += column * fullBoxWidth; 
-        } else {
-            int start = monthBounds.x + monthBounds.width - fullBoxWidth; 
-            monthBounds.x = start - column * fullBoxWidth;
-        }
-        monthBounds.width = fullBoxWidth;
-        monthBounds.height = fullBoxHeight;
-        return monthBounds;
-    }
-    
-    /**
-     * @param row
-     */
-    private void checkValidRow(int row, int column) {
-        if ((column < WEEK_HEADER_COLUMN) || (column >= DAYS_IN_WEEK)) 
-            throw new IllegalArgumentException("illegal column in day grid " + column);
-        if ((row < DAY_HEADER_ROW) || (row >= WEEKS_IN_MONTH)) 
-            throw new IllegalArgumentException("illegal row in day grid" + row);
-    }
-
-    /**
-     * Returns a boolean indicating if the given Date is visible. Trailing/leading
-     * dates of the last/first displayed month are considered to be invisible.
-     * 
-     * @param date the Date to check for visibility. Must not be null.
-     * @return true if the date is visible, false otherwise.
-     */
-    private boolean isVisible(Date date) {
-        if (getFirstDisplayedDay().after(date) || getLastDisplayedDay().before(date)) return false;
-        return true;
+        return new Point(calendarColumn, calendarRow);
     }
 
     /**
@@ -1059,17 +747,21 @@ public class BasicMonthViewUI extends MonthViewUI {
      * @param row the logical row index in the day grid of the month
      * @param column the logical column index in the day grid of the month
      * @return the day at the logical grid coordinates in the given month or null
-     *    if the coordinates 
-     * @throws IllegalStateException if the month is not the start of the month.   
+     *    if the coordinates are day/week header or leading/trailing dates 
+     * @throws IllegalStateException if the month is not the start of the month. 
+     * 
+     * @see #getDayGridPosition(Date)  
      */
     protected Date getDayInMonth(Date month, int row, int column) {
-        if ((row < 0) || (column < 0)) return null;
+        if ((row == DAY_HEADER_ROW) || (column == WEEK_HEADER_COLUMN)) return null;
         Calendar calendar = getCalendar(month);
         int monthField = calendar.get(Calendar.MONTH);
         if (!CalendarUtils.isStartOfMonth(calendar))
             throw new IllegalStateException("calendar must be start of month but was: " + month.getTime());
         CalendarUtils.startOfWeek(calendar);
-        calendar.add(Calendar.DAY_OF_MONTH, row * JXMonthView.DAYS_IN_WEEK + column);
+        // PENDING JW: correctly mapped now?
+        calendar.add(Calendar.DAY_OF_MONTH, 
+                (row - FIRST_WEEK_ROW) * DAYS_IN_WEEK + (column - FIRST_DAY_COLUMN));
         if (calendar.get(Calendar.MONTH) == monthField) {
             return calendar.getTime();
         } 
@@ -1077,6 +769,117 @@ public class BasicMonthViewUI extends MonthViewUI {
         
     }
     
+    /**
+     * Returns the given date's position in the grid of the month it is contained in.
+     * 
+     * @param date the Date to get the logical position for, must not be null.
+     * @return the logical coordinates of the day in the grid of days in a
+     *   month or null if the Date is not visible. 
+     *   
+     *  @see #getDayInMonth(Date, int, int)  
+     */
+    protected Point getDayGridPosition(Date date) {
+        if (!isVisible(date)) return null;
+        Calendar calendar = getCalendar(date);
+        Date startOfDay = CalendarUtils.startOfDay(calendar, date);
+        // there must be a less ugly way?
+        // columns
+        CalendarUtils.startOfWeek(calendar);
+        int column = FIRST_DAY_COLUMN;
+        while (calendar.getTime().before(startOfDay)) {
+            column++;
+            calendar.add(Calendar.DAY_OF_MONTH, 1);
+        }
+        
+        Date startOfWeek = CalendarUtils.startOfWeek(calendar, date);
+        calendar.setTime(date);
+        CalendarUtils.startOfMonth(calendar);
+        int row = FIRST_WEEK_ROW;
+        while (calendar.getTime().before(startOfWeek)) {
+            row++;
+            calendar.add(Calendar.WEEK_OF_YEAR, 1);
+        }
+        return new Point(column, row);
+    }
+    
+
+    /**
+     * Returns the Date at the given location. May be null if the
+     * coordinates don't map to a day in the month which contains the 
+     * coordinates. Specifically: hitting leading/trailing dates returns null.
+     * 
+     * Mapping pixel to calendar day.
+     *
+     * @param x the x position of the location in pixel
+     * @param y the y position of the location in pixel
+     * @return the day at the given location or null if the location
+     *   doesn't map to a day in the month which contains the coordinates.
+     *   
+     * @see #getDayBounds(Date)  
+     */ 
+    @Override
+    public Date getDayAtLocation(int x, int y) {
+        Point dayInGrid = getDayGridPositionAtLocation(x, y);
+        if ((dayInGrid == null) 
+                || (dayInGrid.x == WEEK_HEADER_COLUMN) || (dayInGrid.y == DAY_HEADER_ROW)) return null;
+        Date month = getMonthAtLocation(x, y);
+        return getDayInMonth(month, dayInGrid.y, dayInGrid.x);
+    }
+    
+    /**
+     * Returns the bounds of the given day.
+     * The bounds are in monthView coordinate system.<p>
+     * 
+     * PENDING JW: this most probably should be public as it is the logical
+     * reverse of getDayAtLocation <p>
+     * 
+     * @param date the Date to return the bounds for. Must not be null.
+     * @return the bounds of the given date or null if not visible.
+     * 
+     * @see #getDayAtLocation(int, int)
+     */
+    protected Rectangle getDayBounds(Date date) {
+        if (!isVisible(date)) return null;
+        Point position = getDayGridPosition(date);
+        Rectangle monthBounds = getMonthBounds(date);
+        monthBounds.y += getMonthHeaderHeight() + (position.y - DAY_HEADER_ROW) * fullBoxHeight;
+        if (monthView.isShowingWeekNumber()) {
+            position.x++;
+        }
+        position.x -= FIRST_DAY_COLUMN;
+        if (isLeftToRight) {
+           monthBounds.x += position.x * fullBoxWidth; 
+        } else {
+            int start = monthBounds.x + monthBounds.width - fullBoxWidth; 
+            monthBounds.x = start - position.x * fullBoxWidth;
+        }
+        monthBounds.width = fullBoxWidth;
+        monthBounds.height = fullBoxHeight;
+        return monthBounds;
+    }
+    
+    /**
+     * @param row
+     */
+    private void checkValidRow(int row, int column) {
+        if ((column < WEEK_HEADER_COLUMN) || (column > LAST_DAY_COLUMN)) 
+            throw new IllegalArgumentException("illegal column in day grid " + column);
+        if ((row < DAY_HEADER_ROW) || (row > LAST_WEEK_ROW)) 
+            throw new IllegalArgumentException("illegal row in day grid" + row);
+    }
+
+    /**
+     * Returns a boolean indicating if the given Date is visible. Trailing/leading
+     * dates of the last/first displayed month are considered to be invisible.
+     * 
+     * @param date the Date to check for visibility. Must not be null.
+     * @return true if the date is visible, false otherwise.
+     */
+    private boolean isVisible(Date date) {
+        if (getFirstDisplayedDay().after(date) || getLastDisplayedDay().before(date)) return false;
+        return true;
+    }
+
     
     // ------------------- mapping month parts 
  
@@ -1138,7 +941,7 @@ public class BasicMonthViewUI extends MonthViewUI {
      * @return the bounds of the details grid in the month at
      *   location or null if outside.
      */
-    private Rectangle getMonthDetailsBoundsAtLocation(int x, int y) {
+    protected Rectangle getMonthDetailsBoundsAtLocation(int x, int y) {
         Rectangle month = getMonthBoundsAtLocation(x, y);
         if (month == null) return null;
         int startOfDaysY = month.y + getMonthHeaderHeight();
@@ -1484,9 +1287,6 @@ public class BasicMonthViewUI extends MonthViewUI {
     @Override
     public void paint(Graphics g, JComponent c) {
         Rectangle clip = g.getClipBounds();
-//        if (!useRenderingHandler()) {
-//            paintBackground(clip, g);
-//        }
         // Get a calender set to the first displayed date
         Calendar cal = getCalendar();
         // loop through grid of months
@@ -1496,11 +1296,7 @@ public class BasicMonthViewUI extends MonthViewUI {
                 Rectangle bounds = getMonthBounds(row, column);
                 // Check if this row falls in the clip region.
                 if (bounds.intersects(clip)) {
-//                    if (!useRenderingHandler()) {
-//                        paintMonth(g, bounds.x, bounds.y, bounds.width, bounds.height, cal);
-//                    } else {
-                        paintMonth(g, cal);
-//                    }
+                    paintMonth(g, cal);
                 }
                 cal.add(Calendar.MONTH, 1);
             }
@@ -1511,47 +1307,46 @@ public class BasicMonthViewUI extends MonthViewUI {
     /**
      * Paints the month represented by the given Calendar.
      * 
+     * Note: the given calendar must not be changed.
      * @param g the graphics to paint into
-     * @param calendar the calendar representing the month to paint.
+     * @param month the calendar specifying the first day of the month to
+     *        paint, must not be null
      */
-    protected void paintMonth(Graphics g, Calendar calendar) {
-        paintMonthHeader(g, calendar);
-        paintDayHeader(g, calendar);
-        paintWeekHeader(g, calendar);
-        paintDays(g, calendar);
+    protected void paintMonth(Graphics g, Calendar month) {
+        paintMonthHeader(g, month);
+        paintDayHeader(g, month);
+        paintWeekHeader(g, month);
+        paintDays(g, month);
     }
 
     /**
      * Paints the header of a month.
      * 
+     * Note: the given calendar must not be changed.
      * @param g the graphics to paint into
-     * @param calendar the calendar representing the the month to paint, must
-     *   not be null
+     * @param month the calendar specifying the first day of the month to
+     *        paint, must not be null
      */
-    protected void paintMonthHeader(Graphics g, Calendar calendar) {
-        Rectangle page = getMonthHeaderBounds(calendar.getTime(), false);
-        paintDayOfMonth(g, page, calendar, CalendarState.TITLE);
-//        JComponent comp = renderingHandler.prepareRenderingComponent(monthView,
-//                calendar, CalendarState.TITLE);
-//        renderComponentAt(g, comp, page);
+    protected void paintMonthHeader(Graphics g, Calendar month) {
+        Rectangle page = getMonthHeaderBounds(month.getTime(), false);
+        paintDayOfMonth(g, page, month, CalendarState.TITLE);
     }
 
     /**
      * Paints the day column header.
      * 
+     * Note: the given calendar must not be changed.
      * @param g the graphics to paint into
-     * @param calendar the calendar representing the the month to paint, must
-     *   not be null
+     * @param month the calendar specifying the first day of the month to
+     *        paint, must not be null
      */
-    protected void paintDayHeader(Graphics g, Calendar calendar) {
-        paintDaysOfWeekSeparator(g, calendar);
-        Calendar cal = (Calendar) calendar.clone();
+    protected void paintDayHeader(Graphics g, Calendar month) {
+        paintDaysOfWeekSeparator(g, month);
+        Calendar cal = (Calendar) month.clone();
         CalendarUtils.startOfWeek(cal);
-        for (int i = 0; i < JXMonthView.DAYS_IN_WEEK; i++) {
-            Rectangle dayBox = getDayBoundsInMonth(calendar.getTime(), DAY_HEADER_ROW, i);
+        for (int i = FIRST_DAY_COLUMN; i <= LAST_DAY_COLUMN; i++) {
+            Rectangle dayBox = getDayBoundsInMonth(month.getTime(), DAY_HEADER_ROW, i);
             paintDayOfMonth(g, dayBox, cal, CalendarState.DAY_OF_WEEK);
-//            JComponent comp = renderingHandler.prepareRenderingComponent(monthView, cal, CalendarState.DAY_OF_WEEK);
-//            renderComponentAt(g, comp, dayBox);
             cal.add(Calendar.DATE, 1);
         }
     }
@@ -1559,47 +1354,51 @@ public class BasicMonthViewUI extends MonthViewUI {
     /**
      * Paints the day column header.
      * 
+     * Note: the given calendar must not be changed.
      * @param g the graphics to paint into
-     * @param calendar the calendar representing the the month to paint, must
-     *   not be null
+     * @param month the calendar specifying the first day of the month to
+     *        paint, must not be null
      */
-    protected void paintWeekHeader(Graphics g, Calendar calendar) {
+    protected void paintWeekHeader(Graphics g, Calendar month) {
         if (!monthView.isShowingWeekNumber())
             return;
-        paintWeekOfYearSeparator(g, calendar);
+        paintWeekOfYearSeparator(g, month);
     
-        Calendar clonedCal = (Calendar) calendar.clone();
-        int weeks = getWeeks(clonedCal);
-        clonedCal.setTime(calendar.getTime());
-        for (int week = 0; week <= weeks; week++) {
-            Rectangle dayBox = getDayBoundsInMonth(calendar.getTime(), week, WEEK_HEADER_COLUMN);
-            paintDayOfMonth(g, dayBox, clonedCal, CalendarState.WEEK_OF_YEAR);
-//            JComponent comp = renderingHandler.prepareRenderingComponent(monthView, calendar, CalendarState.WEEK_OF_YEAR);
-//            renderComponentAt(g, comp, dayBox);
-            clonedCal.add(Calendar.WEEK_OF_YEAR, 1);
+        int weeks = getWeeks(month);
+        // the calendar passed to the renderers
+        Calendar weekCalendar = (Calendar) month.clone();
+        // we loop by logical row (== week in month) coordinates 
+        for (int week = FIRST_WEEK_ROW; week < FIRST_WEEK_ROW + weeks; week++) {
+            // get the day bounds based on logical row/column coordinates
+            Rectangle dayBox = getDayBoundsInMonth(month.getTime(), week, WEEK_HEADER_COLUMN);
+            // NOTE: this can be set to any day in the week to render the weeknumber of
+            // categorized by CalendarState
+            paintDayOfMonth(g, dayBox, weekCalendar, CalendarState.WEEK_OF_YEAR);
+            weekCalendar.add(Calendar.WEEK_OF_YEAR, 1);
         }
     }
 
     /**
      * Paints the days of the given month.
      * 
+     * Note: the given calendar must not be changed.
      * @param g the graphics to paint into
-     * @param calendar the calendar representing the the month to paint, must
-     *   not be null
+     * @param month the calendar specifying the first day of the month to
+     *        paint, must not be null
      */
-    protected void paintDays(Graphics g, Calendar calendar) {
-        Calendar clonedCal = (Calendar) calendar.clone();
+    protected void paintDays(Graphics g, Calendar month) {
+        Calendar clonedCal = (Calendar) month.clone();
         CalendarUtils.startOfMonth(clonedCal);
         Date startOfMonth = clonedCal.getTime();
         CalendarUtils.endOfMonth(clonedCal);
         Date endOfMonth = clonedCal.getTime();
         // reset the clone
-        clonedCal.setTime(calendar.getTime());
+        clonedCal.setTime(month.getTime());
         // adjust to start of week
-        clonedCal.setTime(calendar.getTime());
+        clonedCal.setTime(month.getTime());
         CalendarUtils.startOfWeek(clonedCal);
-        for (int week = 0; week < WEEKS_IN_MONTH; week++) {
-            for (int day = 0; day < 7; day++) {
+        for (int week = FIRST_WEEK_ROW; week <= LAST_WEEK_ROW; week++) {
+            for (int day = FIRST_DAY_COLUMN; day <= LAST_DAY_COLUMN; day++) {
                 CalendarState state = null;
                 if (clonedCal.getTime().before(startOfMonth)) {
                     if (monthView.isShowingLeadingDays()) {
@@ -1638,7 +1437,7 @@ public class BasicMonthViewUI extends MonthViewUI {
      * @param state the calendar state
      */
     protected void paintDayOfMonth(Graphics g, Rectangle bounds, Calendar calendar, CalendarState state) {
-        JComponent comp = renderingHandler.prepareRenderingComponent(monthView, calendar, 
+        JComponent comp = getRenderingHandler().prepareRenderingComponent(monthView, calendar, 
                 state);
         rendererPane.paintComponent(g, comp, monthView, bounds.x, bounds.y,
                 bounds.width, bounds.height, true);
@@ -1647,11 +1446,13 @@ public class BasicMonthViewUI extends MonthViewUI {
     /**
      * Paints the separator between row header (weeks of year) and days.
      * 
-     * @param g the Graphics to paint into
-     * @param cal the calendar representing the month
+     * Note: the given calendar must not be changed.
+     * @param g the graphics to paint into
+     * @param month the calendar specifying the first day of the month to
+     *        paint, must not be null
      */
-    protected void paintWeekOfYearSeparator(Graphics g, Calendar cal) {
-        Rectangle r = getSeparatorBounds(cal, 0, WEEK_HEADER_COLUMN);
+    protected void paintWeekOfYearSeparator(Graphics g, Calendar month) {
+        Rectangle r = getSeparatorBounds(month, FIRST_WEEK_ROW, WEEK_HEADER_COLUMN);
         if (r == null) return;
         g.setColor(monthView.getForeground());
         g.drawLine(r.x, r.y, r.x, r.y + r.height);
@@ -1660,31 +1461,34 @@ public class BasicMonthViewUI extends MonthViewUI {
     /**
      * Paints the separator between column header (days of week) and days.
      * 
-     * @param g the Graphics to paint into
-     * @param cal the calendar representing the month
+     * Note: the given calendar must not be changed.
+     * @param g the graphics to paint into
+     * @param month the calendar specifying the the first day of the month to
+     *        paint, must not be null
      */
-    protected void paintDaysOfWeekSeparator(Graphics g, Calendar cal) {
-        Rectangle r = getSeparatorBounds(cal, DAY_HEADER_ROW, 0);
+    protected void paintDaysOfWeekSeparator(Graphics g, Calendar month) {
+        Rectangle r = getSeparatorBounds(month, DAY_HEADER_ROW, FIRST_DAY_COLUMN);
         if (r == null) return;
         g.setColor(monthView.getForeground());
         g.drawLine(r.x, r.y, r.x + r.width, r.y);
     }
+    
     /**
-     * @param cal
+     * @param month
      * @param row
      * @param column
      * @return
      */
-    private Rectangle getSeparatorBounds(Calendar cal, int row, int column) {
-        Rectangle separator = getDayBoundsInMonth(cal.getTime(), row, column);
+    private Rectangle getSeparatorBounds(Calendar month, int row, int column) {
+        Rectangle separator = getDayBoundsInMonth(month.getTime(), row, column);
         if (separator == null) return null;
-        if (column < 0) {
+        if (column == WEEK_HEADER_COLUMN) {
             separator.height *= WEEKS_IN_MONTH;
             if (isLeftToRight) {
                 separator.x += separator.width - 1;
             }
             separator.width = 1;
-        } else if (row < 0) {
+        } else if (row == DAY_HEADER_ROW) {
             int oldWidth = separator.width;
             separator.width *= DAYS_IN_WEEK;
             if (!isLeftToRight) {
@@ -1698,7 +1502,8 @@ public class BasicMonthViewUI extends MonthViewUI {
 
     /**
      * Returns the number of weeks to paint in the current month, as represented
-     * by the given calendar.
+     * by the given calendar. The calendar is expected to be set to the first
+     * of the month. 
      * 
      * Note: the given calendar must not be changed.
      * 
@@ -1707,17 +1512,20 @@ public class BasicMonthViewUI extends MonthViewUI {
      * @return the number of weeks of this month.
      */
     protected int getWeeks(Calendar month) {
-        Date old = month.getTime();
-        CalendarUtils.startOfWeek(month);
-        int firstWeek = month.get(Calendar.WEEK_OF_YEAR);
-        month.setTime(old);
-        CalendarUtils.endOfMonth(month);
-        int lastWeek = month.get(Calendar.WEEK_OF_YEAR);
-        if (lastWeek < firstWeek) {
-            lastWeek = month.getActualMaximum(Calendar.WEEK_OF_YEAR) + 1;
+        Calendar cloned = (Calendar) month.clone();
+        // the calendar is set to the first of month, get date for last
+        CalendarUtils.endOfMonth(cloned);
+        // marker for end
+        Date last = cloned.getTime();
+        // start again
+        cloned.setTime(month.getTime());
+        CalendarUtils.startOfWeek(cloned);
+        int weeks = 0;
+        while (last.after(cloned.getTime())) {
+            weeks++;
+            cloned.add(Calendar.WEEK_OF_MONTH, 1);
         }
-        month.setTime(old);
-        return lastWeek - firstWeek;
+        return weeks;
     }
 
 
@@ -1808,37 +1616,33 @@ public class BasicMonthViewUI extends MonthViewUI {
      */
 
     /**
-     * Sets the firstDisplayedDate property to the given value. Must update
-     * dependent state as well. <p>
+     * Updates internal state that depends on the MonthView's firstDisplayedDay
+     * property. <p>
      * 
-     * Here: updated lastDisplayedDatefirstDisplayedMonth/Year accordingly.
+     * Here: updates lastDisplayedDay.
      * <p>
      * 
-     * PENDING JW: remove call to repaint() because this method is used
-     * both at install and from propertyChange
      * 
-     * @param firstDisplayedDate the firstDisplayedDate to set
+     * @param firstDisplayedDay the firstDisplayedDate to set
      */
-    protected void setFirstDisplayedDay(Date firstDisplayedDate) {
-        Calendar calendar = getCalendar(firstDisplayedDate);
-        this.firstDisplayedDate = firstDisplayedDate;
-        this.firstDisplayedMonth = calendar.get(Calendar.MONTH);
-        this.firstDisplayedYear = calendar.get(Calendar.YEAR);
-        updateLastDisplayedDay(firstDisplayedDate);
-//        monthView.repaint();
+    protected void setFirstDisplayedDay(Date firstDisplayedDay) {
+        updateLastDisplayedDay(firstDisplayedDay);
     }
+    
     /**
-     * @return the firstDisplayedDate
+     * Returns the first displayed day. Convenience delegate to 
+     * 
+     * @return the firstDisplayed
      */
     protected Date getFirstDisplayedDay() {
-        return firstDisplayedDate != null ? firstDisplayedDate : monthView.getFirstDisplayedDay();
+        return monthView.getFirstDisplayedDay();
     }
 
     /**
      * @return the firstDisplayedMonth
      */
     protected int getFirstDisplayedMonth() {
-        return firstDisplayedMonth;
+        return getCalendar().get(Calendar.MONTH);
     }
 
 
@@ -1846,7 +1650,7 @@ public class BasicMonthViewUI extends MonthViewUI {
      * @return the firstDisplayedYear
      */
     protected int getFirstDisplayedYear() {
-        return firstDisplayedYear;
+        return getCalendar().get(Calendar.YEAR);
     }
 
 
@@ -2056,7 +1860,7 @@ public class BasicMonthViewUI extends MonthViewUI {
             for (int i = calendar.getMinimum(Calendar.MONTH); i <= calendar.getMaximum(Calendar.MONTH); i++) {
                 calendar.set(Calendar.MONTH, i);
                 CalendarUtils.startOfMonth(calendar);
-                JComponent comp = renderingHandler.prepareRenderingComponent(monthView, calendar, CalendarState.TITLE);
+                JComponent comp = getRenderingHandler().prepareRenderingComponent(monthView, calendar, CalendarState.TITLE);
                 Dimension pref = comp.getPreferredSize();
                 maxMonthWidth = Math.max(maxMonthWidth, pref.width);
                 maxMonthHeight = Math.max(maxMonthHeight, pref.height);
@@ -2067,7 +1871,7 @@ public class BasicMonthViewUI extends MonthViewUI {
             calendar = getCalendar();
             CalendarUtils.startOfWeek(calendar);
             for (int i = 0; i < JXMonthView.DAYS_IN_WEEK; i++) {
-                JComponent comp = renderingHandler.prepareRenderingComponent(monthView, calendar, CalendarState.DAY_OF_WEEK);
+                JComponent comp = getRenderingHandler().prepareRenderingComponent(monthView, calendar, CalendarState.DAY_OF_WEEK);
                 Dimension pref = comp.getPreferredSize();
                 maxBoxWidth = Math.max(maxBoxWidth, pref.width);
                 maxBoxHeight = Math.max(maxBoxHeight, pref.height);
@@ -2076,16 +1880,29 @@ public class BasicMonthViewUI extends MonthViewUI {
             
             calendar = getCalendar();
             for (int i = 0; i < calendar.getMaximum(Calendar.DAY_OF_MONTH); i++) {
-                JComponent comp = renderingHandler.prepareRenderingComponent(monthView, calendar, CalendarState.IN_MONTH);
+                JComponent comp = getRenderingHandler().prepareRenderingComponent(monthView, calendar, CalendarState.IN_MONTH);
                 Dimension pref = comp.getPreferredSize();
                 maxBoxWidth = Math.max(maxBoxWidth, pref.width);
                 maxBoxHeight = Math.max(maxBoxHeight, pref.height);
                 calendar.add(Calendar.DATE, 1);
             }
             
-            // PENDING JW: currently doesn't handle monthHeader pref > sum of box widths
+            int dayColumns = JXMonthView.DAYS_IN_WEEK;
+            if (monthView.isShowingWeekNumber()) {
+                dayColumns++;
+            }
+            
+            if (maxMonthWidth > maxBoxWidth * dayColumns) {
+                //  monthHeader pref > sum of box widths
+                // handle here: increase day box width accordingly
+                double diff = maxMonthWidth - (maxBoxWidth * dayColumns);
+                maxBoxWidth += Math.ceil(diff/(double) dayColumns);
+                
+            }
+            
             fullBoxWidth = maxBoxWidth;
             fullBoxHeight = maxBoxHeight;
+            // PENDING JW: huuh? what we doing here?
             int boxHeight = maxBoxHeight - 2 * monthView.getBoxPaddingY();
             fullMonthBoxHeight = Math.max(boxHeight, maxMonthHeight) ; 
 
@@ -2115,7 +1932,7 @@ public class BasicMonthViewUI extends MonthViewUI {
             calculateMonthGridLayoutProperties();
             
             if (isZoomable()) {
-                calendarHeader.setBounds(getMonthHeaderBounds(monthView.getFirstDisplayedDay(), false));
+                getCalendarHeaderHandler().getHeaderComponent().setBounds(getMonthHeaderBounds(monthView.getFirstDisplayedDay(), false));
             }
         }
 
@@ -2163,9 +1980,9 @@ public class BasicMonthViewUI extends MonthViewUI {
                 monthView.repaint();
             } else if ("zoomable".equals(property)) {
                 updateZoomable();
-            } else if ("font".equals(property)) {
-                calendarHeader.setFont(getAsNotUIResource(createDerivedFont()));
-                monthView.revalidate();
+//            } else if ("font".equals(property)) {
+//                calendarHeaderHandler.getHeaderComponent().setFont(getAsNotUIResource(createDerivedFont()));
+//                monthView.revalidate();
             } else if ("componentInputMapEnabled".equals(property)) {
                 updateComponentInputMap();
             } else if ("locale".equals(property)) { // "locale" is bound property
@@ -2365,55 +2182,6 @@ public class BasicMonthViewUI extends MonthViewUI {
             default : throw new IllegalArgumentException("invalid adjustment action: " + action);
             }
             
-            // PENDING JW: old way to calculate the navigation #998
-            // KEEP - just a short while for quickly comparing old vs. new behaviour
-//            boolean isStartMoved = true;
-//            switch (action) {
-//                case ADJUST_SELECTION_PREVIOUS_DAY:
-//                    if (!newEndDate.after(pivotDate)) {
-//                        newStartDate = previousDay(cal, newStartDate);
-//                    } else {
-//                        newEndDate = previousDay(cal, newEndDate);
-//                    }
-//                    isStartMoved = false;
-//                    break;
-//                case ADJUST_SELECTION_NEXT_DAY:
-//                    if (!newStartDate.before(pivotDate)) {
-//                        newEndDate = nextDay(cal, newEndDate);
-//                        newStartDate = pivotDate;
-//                    } else {
-//                        newStartDate = nextDay(cal, newStartDate);
-//                    }
-//                    break;
-//                case ADJUST_SELECTION_PREVIOUS_WEEK:
-//                    if (!newEndDate.after(pivotDate)) {
-//                        newStartDate = previousWeek(cal, newStartDate);
-//                    } else {
-//                        Date newTime = previousWeek(cal, newEndDate);
-//                        if (!newTime.after(pivotDate)) {
-//                            newStartDate = newTime;
-//                            newEndDate = pivotDate;
-//                        } else {
-//                            newEndDate = cal.getTime();
-//                        }
-//
-//                    }
-//                    isStartMoved = false;
-//                    break;
-//                case ADJUST_SELECTION_NEXT_WEEK:
-//                    if (!newStartDate.before(pivotDate)) {
-//                        newEndDate = nextWeek(cal, newEndDate);
-//                    } else {
-//                        Date newTime = nextWeek(cal, newStartDate);
-//                        if (!newTime.before(pivotDate)) {
-//                            newStartDate = pivotDate;
-//                            newEndDate = newTime;
-//                        } else {
-//                            newStartDate = cal.getTime();
-//                        }
-//                    }
-//                    break;
-//            }
             if (!newStartDate.equals(selectionStart) || !newEndDate.equals(selectionEnd)) {
                 monthView.setSelectionInterval(newStartDate, newEndDate);
                 monthView.ensureDateVisible(isStartMoved ? newStartDate  : newEndDate);
@@ -2471,69 +2239,116 @@ public class BasicMonthViewUI extends MonthViewUI {
 //--------------------- zoomable    
 
     /**
-     * 
+     * Updates state after the monthView's zoomable property has been changed.
+     * This implementation adds/removes the header component if zoomable is true/false
+     * respectively.
      */
     protected void updateZoomable() {
         if (monthView.isZoomable()) {
-            monthView.add(calendarHeader);
+            monthView.add(getCalendarHeaderHandler().getHeaderComponent());
         } else {
-            monthView.remove(calendarHeader);
+            monthView.remove(getCalendarHeaderHandler().getHeaderComponent());
         }
         monthView.revalidate();
         monthView.repaint();
     }
 
-    protected BasicCalendarHeader createCalendarHeader() {
-        BasicCalendarHeader header = new BasicCalendarHeader();
-        return header;
+    /**
+     * Creates and returns a calendar header handler which provides and configures
+     * a component for use in a zoomable monthView. Subclasses may override to return
+     * a custom handler.<p>
+     * 
+     * This implementation first queries the UIManager for class to use and returns 
+     * that if available, returns a BasicCalendarHeaderHandler if not.
+     * 
+     * @return a calendar header handler providing a component for use in zoomable
+     *   monthView.
+     * 
+     * @see #getHeaderFromUIManager()  
+     * @see CalendarHeaderHandler
+     * @see BasicCalendarHeaderHandler  
+     */
+    protected CalendarHeaderHandler createCalendarHeaderHandler() {
+        CalendarHeaderHandler handler = getHeaderFromUIManager();
+        return handler != null ? handler : new BasicCalendarHeaderHandler();
+    }
+
+    
+    /**
+     * Returns a CalendarHeaderHandler looked up in the UIManager. This implementation 
+     * looks for a String registered with a key of CalendarHeaderHandler.uiControllerID. If
+     * found it assumes that the value is the class name of the handler and tries 
+     * to instantiate the handler. 
+     * 
+     * @return a CalendarHeaderHandler from the UIManager or null if none 
+     *   available or instantiation failed.
+     */
+    protected CalendarHeaderHandler getHeaderFromUIManager() {
+        Object handlerClass = UIManager.get(CalendarHeaderHandler.uiControllerID);
+        if (handlerClass instanceof String) {
+            return instantiateClass((String) handlerClass);
+        }
+        return null;
     }
 
     /**
-     * @param header
+     * @param handlerClassName
+     * @return
      */
-    private void installHeaderActions() {
-        final StringValue tsv = new StringValue() {
-
-            public String getString(Object value) {
-                if (value instanceof Calendar) {
-                    String month = monthsOfTheYear[((Calendar) value)
-                            .get(Calendar.MONTH)];
-                    return month + " "
-                            + ((Calendar) value).get(Calendar.YEAR); 
-                }
-                return StringValues.TO_STRING.getString(value);
-            }
-
-        };
-        final AbstractActionExt zoomOut = new AbstractActionExt(tsv.getString(getCalendar())) {
-
-            public void actionPerformed(ActionEvent e) {
-                // TODO Auto-generated method stub
-                
-            }
-            
-        }; 
-        AbstractActionExt prev = new AbstractActionExt(null, monthDownImage) {
-
-            public void actionPerformed(ActionEvent e) {
-                previousMonth();
-                zoomOut.setName(tsv.getString(getCalendar()));
-                
-            }
-            
-        };
-        AbstractActionExt next = new AbstractActionExt(null, monthUpImage) {
-
-            public void actionPerformed(ActionEvent e) {
-                nextMonth();
-                zoomOut.setName(tsv.getString(getCalendar()));
-                
-            }
-            
-        };
-        calendarHeader.setActions(prev, next, zoomOut);
+    private CalendarHeaderHandler instantiateClass(String handlerClassName) {
+        Class<?> handler = null;
+        try {
+            handler = Class.forName(handlerClassName);
+            return instantiateClass(handler);
+        } catch (ClassNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+         return null;
     }
 
+    /**
+     * @param handlerClass
+     * @return
+     */
+    private CalendarHeaderHandler instantiateClass(Class<?> handlerClass) {
+        Constructor constructor = null; 
+        try {
+            constructor = handlerClass.getConstructor();
+        } catch (SecurityException e) {
+            LOG.finer("cant instantiate CalendarHeaderHandler (security) " + handlerClass);
+        } catch (NoSuchMethodException e) {
+            LOG.finer("cant instantiate CalendarHeaderHandler (missing parameterless constructo?)" + handlerClass);
+        }
+        if (constructor != null) {
+            try {
+                return (CalendarHeaderHandler) constructor.newInstance();
+            } catch (IllegalArgumentException e) {
+                LOG.finer("cant instantiate CalendarHeaderHandler (missing parameterless constructo?)" + handlerClass);
+            } catch (InstantiationException e) {
+                LOG.finer("cant instantiate CalendarHeaderHandler (not instantiable) " + handlerClass);
+            } catch (IllegalAccessException e) {
+                LOG.finer("cant instantiate CalendarHeaderHandler (constructor not public) " + handlerClass);
+            } catch (InvocationTargetException e) {
+                LOG.finer("cant instantiate CalendarHeaderHandler (Invocation target)" + handlerClass);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @param calendarHeaderHandler the calendarHeaderHandler to set
+     */
+    protected void setCalendarHeaderHandler(CalendarHeaderHandler calendarHeaderHandler) {
+        this.calendarHeaderHandler = calendarHeaderHandler;
+    }
+    
+    /**
+     * @return the calendarHeaderHandler
+     */
+    protected CalendarHeaderHandler getCalendarHeaderHandler() {
+        return calendarHeaderHandler;
+    }
     
 //--------------------- deprecated painting api
 //--------------------- this is still serviced (if a ui doesn't install a renderingHandler)

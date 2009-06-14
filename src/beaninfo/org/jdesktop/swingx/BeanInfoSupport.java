@@ -50,11 +50,11 @@ public abstract class BeanInfoSupport extends SimpleBeanInfo {
      * Indicates whether I am introspecting state for the give class. This
      * helps prevent infinite loops
      */
-    private static Map<Class, Boolean> introspectingState = new HashMap<Class, Boolean>();
+    private static Map<Class<?>, Boolean> introspectingState = new HashMap<Class<?>, Boolean>();
     /**
      * The class of the bean that this BeanInfoSupport is for
      */
-    private Class beanClass;
+    private Class<?> beanClass;
     
     /**
      * @see BeanInfo
@@ -112,12 +112,12 @@ public abstract class BeanInfoSupport extends SimpleBeanInfo {
      * 
      * @param beanClass class of the bean.
      */
-    public BeanInfoSupport(Class beanClass) {
+    public BeanInfoSupport(Class<?> beanClass) {
         this.beanClass = beanClass;
         if (!isIntrospecting()) {
             introspectingState.put(beanClass, Boolean.TRUE);
             try {
-                Class superClass = beanClass.getSuperclass();
+                Class<?> superClass = beanClass.getSuperclass();
                 while (superClass != null) {
                     Introspector.flushFromCaches(superClass);
                     superClass = superClass.getSuperclass();
@@ -125,7 +125,7 @@ public abstract class BeanInfoSupport extends SimpleBeanInfo {
                 BeanInfo info = Introspector.getBeanInfo(beanClass);
                 beanDescriptor = info.getBeanDescriptor();
                 if (beanDescriptor != null) {
-                    Class customizerClass = getCustomizerClass();
+                    Class<?> customizerClass = getCustomizerClass();
                     beanDescriptor = new BeanDescriptor(beanDescriptor.getBeanClass(),
                             customizerClass == null ? beanDescriptor.getCustomizerClass()
                             : customizerClass);
@@ -214,7 +214,7 @@ public abstract class BeanInfoSupport extends SimpleBeanInfo {
      * 
      * @return <code>null</code>.
      */
-    protected Class getCustomizerClass() {
+    protected Class<?> getCustomizerClass() {
         return null;
     }
     
@@ -351,7 +351,7 @@ public abstract class BeanInfoSupport extends SimpleBeanInfo {
         }
     }
     
-    protected void setPropertyEditor(Class editorClass, String... propertyNames) {
+    protected void setPropertyEditor(Class<?> editorClass, String... propertyNames) {
         for (String propertyName : propertyNames) {
             PropertyDescriptor pd = properties.get(propertyName);
             if (pd != null) {

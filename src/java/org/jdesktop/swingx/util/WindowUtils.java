@@ -21,14 +21,27 @@
 
 package org.jdesktop.swingx.util;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
+import java.awt.Insets;
+import java.awt.MouseInfo;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.Toolkit;
+import java.awt.Window;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.swing.JInternalFrame;
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 
 /**
  * Encapsulates various utilities for windows (ie: <code>Frame</code> and
@@ -47,11 +60,11 @@ public final class WindowUtils {
     }
 
     /**
-     * <p/>
+     * <p>
      * Returns the <code>Point</code> at which a window should be placed to
      * center that window on the screen.
      * </p>
-     * <p/>
+     * <p>
      * Some thought was taken as to whether to implement a method such as this,
      * or to simply make a method that, given a window, will center it.  It was
      * decided that it is better to not alter an object within a method.
@@ -64,34 +77,37 @@ public final class WindowUtils {
      *         center that window on the screen.
      */
     public static Point getPointForCentering(Window window) {
-        //assert window != null;
-        try {
-            Point mousePoint = MouseInfo.getPointerInfo().getLocation();
-            GraphicsDevice[] devices = GraphicsEnvironment
-                    .getLocalGraphicsEnvironment().getScreenDevices();
-            for (GraphicsDevice device : devices) {
-                Rectangle bounds = device.getDefaultConfiguration().getBounds();
-                //check to see if the mouse cursor is within these bounds
-                if (mousePoint.x >= bounds.x && mousePoint.y >= bounds.y
-                    && mousePoint.x <= (bounds.x + bounds.width)
-                    && mousePoint.y <= (bounds.y + bounds.height)) {
-                    //this is it
-                    int screenWidth = bounds.width;
-                    int screenHeight = bounds.height;
-                    int width = window.getWidth();
-                    int height = window.getHeight();
-                    return new Point(((screenWidth - width) / 2) + bounds.x,
-                                        ((screenHeight - height) / 2) + bounds
-                                                .y);
-                }
-            }
-        } catch (Exception e) {
-            LOG.log(Level.FINE, e.getLocalizedMessage() +
-                                " - this can occur do to a Security exception in sandboxed apps");
-        }
-        return new Point(0, 0);
+        Rectangle usableBounds = getUsableDeviceBounds(window);
+        int screenWidth = usableBounds.width;
+        int screenHeight = usableBounds.height;
+        int width = window.getWidth();
+        int height = window.getHeight();
+        
+        return new Point(((screenWidth - width) / 2) + usableBounds.x,
+                ((screenHeight - height) / 2) + usableBounds.y);
     }
 
+    private static Rectangle getUsableDeviceBounds(Window window) {
+        Window owner = window.getOwner();
+        GraphicsConfiguration gc = null;
+        
+        if (owner == null) {
+            gc = GraphicsEnvironment.getLocalGraphicsEnvironment()
+                    .getDefaultScreenDevice().getDefaultConfiguration();
+        } else {
+            gc = owner.getGraphicsConfiguration();
+        }
+        
+        Insets insets = Toolkit.getDefaultToolkit().getScreenInsets(gc);
+        Rectangle bounds = gc.getBounds();
+        bounds.x += insets.left;
+        bounds.y += insets.top;
+        bounds.width -= (insets.left + insets.right);
+        bounds.height -= (insets.top + insets.bottom);
+        
+        return bounds;
+    }
+    
     /**
      * <p/>
      * Returns the <code>Point</code> at which a window should be placed to
@@ -158,104 +174,6 @@ public final class WindowUtils {
         return origin;
     }
 
-    /**
-     * Utility method used to load a GridBagConstraints object (param gbc) with the
-     * data in the other parameters.  This method saves code space over doing the
-     * assignments by hand, and also allows you to reuse the same GridBagConstraints
-     * object reducing temporary object creating (at the expense of a method call.
-     * Go figure).
-     */
-    public static void setConstraints(GridBagConstraints gbc, int gridx,
-                                      int gridy, int gridwidth, int gridheight,
-                                      double weightx, double weighty,
-                                      int anchor, int fill, int top, int left,
-                                      int bottom, int right) {
-        gbc.gridx = gridx;
-        gbc.gridy = gridy;
-        gbc.gridwidth = gridwidth;
-        gbc.gridheight = gridheight;
-        gbc.weightx = weightx;
-        gbc.weighty = weighty;
-        gbc.anchor = anchor;
-        gbc.fill = fill;
-        gbc.insets = new Insets(top, left, bottom, right);
-    }
-
-    /**
-     * Get a <code>Rectangle</code> object representing the given window's position and
-     * magnitude in space.
-     *
-     * @param win The window to get a Rectangle object for
-     *
-     * @return a Rectangle object.  @see com.jgui.Rectangle
-     */
-    public static Rectangle getRectangle(Window win) {
-        return new Rectangle(win.getY(), win.getX(), win.getWidth(), win.getHeight());
-    }
-
-    /**
-     * Get a <code>Rectangle</code> object representing the given JComponent's position and
-     * magnitude in space.
-     *
-     * @param comp The JComponent to get a Rectangle object for
-     *
-     * @return a Rectangle object.  @see com.jgui.Rectangle
-     */
-    public static Rectangle getRectangle(JComponent comp) {
-        return new Rectangle(comp.getY(), comp.getX(), comp.getWidth(), comp.getHeight());
-    }
-
-    /**
-     * Locates the RootPaneContainer for the given component
-     *
-     * @param c
-     *
-     * @return the RootPaneContainer to which the component belongs to
-     */
-    public static RootPaneContainer findRootPaneContainer(Component c) {
-        if (c == null) {
-            return null;
-        } else if (c instanceof RootPaneContainer) {
-            return (RootPaneContainer) c;
-        } else {
-            return findRootPaneContainer(c.getParent());
-        }
-    }
-
-    /**
-     * Locates the JFrame for the given component
-     *
-     * @param c
-     *
-     * @return the JFrame to which the component belongs to
-     */
-    public static JFrame findJFrame(Component c) {
-        if (c == null) {
-            return null;
-        } else if (c instanceof RootPaneContainer) {
-            return (JFrame) c;
-        } else {
-            return findJFrame(c.getParent());
-        }
-    }
-
-    /**
-     * Locates the JDialog for the given component
-     *
-     * @param c
-     *
-     * @return the JDialog to which the component belongs to
-     */
-    public static JDialog findJDialog(Component c) {
-        if (c == null) {
-            return null;
-        } else if (c instanceof JDialog) {
-            return (JDialog) c;
-        } else {
-            return findJDialog(c.getParent());
-        }
-    }
-
     public static Window findWindow(Component c) {
         if (c == null) {
             return JOptionPane.getRootFrame();
@@ -276,12 +194,6 @@ public final class WindowUtils {
             }
         }
         return compList;
-    }
-
-    public static void setFontRecursively(Container c, Font font) {
-        for (Component comp : getAllComponents(c)) {
-            comp.setFont(font);
-        }
     }
 
     /**

@@ -27,7 +27,33 @@ import javax.swing.JTable;
 /**
  * Table specific <code>CellContext</code>.
  */
-public class TableCellContext extends CellContext<JTable> {
+public class TableCellContext extends CellContext {
+
+    /**
+     * Sets state of the cell's context. Note that the component might be null
+     * to indicate a cell without a concrete context. All accessors must cope
+     * with.
+     * 
+     * @param component the component the cell resides on, might be null
+     * @param value the content value of the cell
+     * @param row the cell's row index in view coordinates
+     * @param column the cell's column index in view coordinates
+     * @param selected the cell's selected state
+     * @param focused the cell's focused state
+     * @param expanded the cell's expanded state
+     * @param leaf the cell's leaf state
+     */
+    public void installContext(JTable component, Object value, int row, int column,
+            boolean selected, boolean focused, boolean expanded, boolean leaf) {
+        this.component = component;
+        installState(value, row, column, selected, focused, expanded, leaf);
+    }
+    
+    
+    @Override
+    public JTable getComponent() {
+        return (JTable) super.getComponent();
+    }
 
     /**
      * Returns the cell's editable property as returned by table.isCellEditable
@@ -37,8 +63,10 @@ public class TableCellContext extends CellContext<JTable> {
      */
     @Override
     public boolean isEditable() {
-        return getComponent() != null ? getComponent().isCellEditable(
-                getRow(), getColumn()) : false;
+        if ((getComponent() == null) || !isValidRow() || !isValidColumn()) {
+            return false;
+        }
+        return getComponent().isCellEditable(getRow(), getColumn());
     }
 
     /**
@@ -66,5 +94,24 @@ public class TableCellContext extends CellContext<JTable> {
     protected String getUIPrefix() {
         return "Table.";
     }
+
+    /**
+     * PRE getComponent != null
+     * 
+     * @return whether the column coordinate is valid in this context
+     */
+    protected boolean isValidColumn() {
+        return getColumn() >= 0 && getColumn() < getComponent().getColumnCount() ;
+    }
+
+    /**
+     * PRE getComponent != null
+     * 
+     * @return whether the row coordinate is valid in this context
+     */
+    protected boolean isValidRow() {
+        return getRow() >= 0 && getRow() < getComponent().getRowCount() ;
+    }
+
 
 }

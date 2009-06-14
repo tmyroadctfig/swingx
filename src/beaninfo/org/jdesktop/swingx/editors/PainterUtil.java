@@ -13,6 +13,8 @@ package org.jdesktop.swingx.editors;
 import java.awt.GradientPaint;
 import java.awt.Graphics2D;
 import java.awt.Insets;
+import java.awt.LinearGradientPaint;
+import java.awt.RadialGradientPaint;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Arc2D;
@@ -45,19 +47,33 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.net.MalformedURLException;
 import java.net.URL;
+
 import javax.imageio.ImageIO;
 import javax.swing.JComponent;
-import org.apache.batik.ext.awt.LinearGradientPaint;
-import org.apache.batik.ext.awt.RadialGradientPaint;
+
 import org.jdesktop.swingx.JXButton;
 import org.jdesktop.swingx.JXLabel;
 import org.jdesktop.swingx.JXPanel;
+import org.jdesktop.swingx.editors.PainterPropertyEditor.AffineTransformDelegate;
+import org.jdesktop.swingx.editors.PainterPropertyEditor.Arc2DDelegate;
+import org.jdesktop.swingx.editors.PainterPropertyEditor.AreaDelegate;
+import org.jdesktop.swingx.editors.PainterPropertyEditor.CubicCurve2DDelegate;
+import org.jdesktop.swingx.editors.PainterPropertyEditor.Ellipse2DDelegate;
+import org.jdesktop.swingx.editors.PainterPropertyEditor.GeneralPathDelegate;
+import org.jdesktop.swingx.editors.PainterPropertyEditor.GradientPaintDelegate;
+import org.jdesktop.swingx.editors.PainterPropertyEditor.InsetsDelegate;
+import org.jdesktop.swingx.editors.PainterPropertyEditor.Line2DDelegate;
+import org.jdesktop.swingx.editors.PainterPropertyEditor.LinearGradientPaintDelegate;
+import org.jdesktop.swingx.editors.PainterPropertyEditor.Point2DDelegate;
+import org.jdesktop.swingx.editors.PainterPropertyEditor.QuadCurve2DDelegate;
+import org.jdesktop.swingx.editors.PainterPropertyEditor.RadialGradientPaintDelegate;
+import org.jdesktop.swingx.editors.PainterPropertyEditor.Rectangle2DDelegate;
+import org.jdesktop.swingx.editors.PainterPropertyEditor.RoundRectangle2DDelegate;
+import org.jdesktop.swingx.painter.AbstractLayoutPainter;
 import org.jdesktop.swingx.painter.AbstractPainter;
 import org.jdesktop.swingx.painter.CompoundPainter;
 import org.jdesktop.swingx.painter.ImagePainter;
 import org.jdesktop.swingx.painter.Painter;
-import org.jdesktop.swingx.editors.PainterPropertyEditor.*;
-import org.jdesktop.swingx.painter.AbstractLayoutPainter;
 import org.jdesktop.swingx.painter.RectanglePainter;
 
 /**

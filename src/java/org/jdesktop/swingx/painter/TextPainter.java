@@ -34,7 +34,7 @@ import java.awt.font.GlyphVector;
  *
  * @author rbair
  */
-public class TextPainter<T> extends AbstractAreaPainter<T> {
+public class TextPainter extends AbstractAreaPainter<Object> {
     private String text = "";
     private Font font = null;
     
@@ -123,7 +123,7 @@ public class TextPainter<T> extends AbstractAreaPainter<T> {
      * {@inheritDoc}
      */
     @Override
-    protected void doPaint(Graphics2D g, T component, int width, int height) {
+    protected void doPaint(Graphics2D g, Object component, int width, int height) {
         Font font = calculateFont(component);
         if (font != null) {
             g.setFont(font);
@@ -166,7 +166,7 @@ public class TextPainter<T> extends AbstractAreaPainter<T> {
         g.translate(-res.x,-res.y);
     }
     
-    private String calculateText(final T component) {
+    private String calculateText(final Object component) {
         // prep the text
         String text = getText();
         //make components take priority if(text == null || text.trim().equals("")) {
@@ -185,7 +185,7 @@ public class TextPainter<T> extends AbstractAreaPainter<T> {
         return text;
     }
     
-    private Font calculateFont(final T component) {
+    private Font calculateFont(final Object component) {
         // prep the various text attributes
         Font font = getFont();
         if (font == null) {
@@ -203,7 +203,7 @@ public class TextPainter<T> extends AbstractAreaPainter<T> {
      * {@inheritDoc}
      */
     @Override
-    protected Shape provideShape(Graphics2D g2, T comp, int width, int height) {
+    protected Shape provideShape(Graphics2D g2, Object comp, int width, int height) {
         Font font = calculateFont(comp);
         String text = calculateText(comp);
         FontMetrics metrics = g2.getFontMetrics(font);

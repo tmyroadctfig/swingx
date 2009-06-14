@@ -6,21 +6,30 @@
  */
 package org.jdesktop.swingx;
 
-import org.jdesktop.test.PropertyChangeReport;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
-import org.junit.Test;
-
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.ComponentOrientation;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.util.logging.Logger;
 
-/**
- * @author Jeanette Winzenburg
- */
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.BoxLayout;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.border.LineBorder;
+
+import org.jdesktop.test.PropertyChangeReport;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 @RunWith(JUnit4.class)
 public class JXTitledPanelTest extends InteractiveTestCase {
     private static final Logger LOG = Logger.getLogger(JXTitledPanelTest.class
@@ -41,6 +50,33 @@ public class JXTitledPanelTest extends InteractiveTestCase {
         super("JXTitledPane interactive test");
     }
 
+    /**
+     * Sanity: changed ui-delegate to install the opaqueness via LookAndFeel. Doing so
+     * is the equivalent of UIResource for primitive types.
+     */
+    @Test
+    public void testOpaque() {
+        JXTitledPanel titledPanel = new JXTitledPanel();
+        boolean opaque = titledPanel.isOpaque(); 
+        titledPanel.setOpaque(!opaque);
+        assertEquals("sanity: opaqueness toggled: ", !opaque, titledPanel.isOpaque());
+        titledPanel.updateUI();
+        assertEquals("ui must not overwrite custom setting: ", !opaque, titledPanel.isOpaque());
+    }
+    /**
+     * Issue #1063-swingx: JXTitledPanel must not overwrite custom border
+     */
+    @Test
+    public void testBorderOnLFChange() {
+        JXTitledPanel titledPanel = new JXTitledPanel();
+        assertTrue("sanity: titledPanels default border must be ui-installable " + titledPanel.getBorder(), 
+                SwingXUtilities.isUIInstallable(titledPanel.getBorder()));
+        LineBorder border = new LineBorder(titledPanel.getBackground());
+        titledPanel.setBorder(border);
+        assertEquals("sanity: border set", border, titledPanel.getBorder());
+        titledPanel.updateUI();
+        assertEquals("border untouched ", border, titledPanel.getBorder());
+    }
     
     @Test
     public void testLayoutOnLFChange() {
@@ -130,6 +166,14 @@ public class JXTitledPanelTest extends InteractiveTestCase {
     }
 
 //--------------------- interactive tests
+    /**
+     * Issue #1063-swingx: JXTitledPanel must respect custom border.
+     */
+    public void interactiveBorderOnUpdateUI() {
+        final JXTitledPanel titledPanel = new JXTitledPanel("Search");
+        titledPanel.setBorder(new LineBorder(titledPanel.getBackground()));
+        showInFrame(titledPanel, "border on laf change");
+    }
 
     public  void interactiveRToL() {
         String title = "starting title";

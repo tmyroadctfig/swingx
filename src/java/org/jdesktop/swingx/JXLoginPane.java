@@ -45,6 +45,8 @@ import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -53,6 +55,7 @@ import java.awt.event.WindowListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -93,6 +96,7 @@ import org.jdesktop.swingx.auth.LoginListener;
 import org.jdesktop.swingx.auth.LoginService;
 import org.jdesktop.swingx.auth.PasswordStore;
 import org.jdesktop.swingx.auth.UserNameStore;
+import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
 import org.jdesktop.swingx.painter.MattePainter;
 import org.jdesktop.swingx.plaf.LoginPaneAddon;
 import org.jdesktop.swingx.plaf.LoginPaneUI;
@@ -133,40 +137,9 @@ import org.jdesktop.swingx.util.WindowUtils;
  * @author rbair
  * @author Karl Schaefer
  * @author rah003
+ * @author Jonathan Giles
  */
 public class JXLoginPane extends JXPanel {
-
-    private static class LoginPaneLayout extends VerticalLayout implements LayoutManager {
-        public Dimension preferredLayoutSize(Container parent) {
-            Insets insets = parent.getInsets();
-            Dimension pref = new Dimension(0, 0);
-            int gap = getGap();
-            for (int i = 0, c = parent.getComponentCount(); i < c; i++) {
-              Component m = parent.getComponent(i);
-              if (m.isVisible()) {
-                Dimension componentPreferredSize = m.getPreferredSize();
-                // swingx-917 - don't let jlabel to force width due to long text
-                if (m instanceof JLabel) {
-                    View view = (View) ((JLabel)m).getClientProperty(BasicHTML.propertyKey);
-                    if (view != null) {
-                        view.setSize(pref.width, m.getHeight());
-                        // get fresh preferred size since we have forced new size on label
-                        componentPreferredSize = m.getPreferredSize();
-                    }
-                } else {
-                    pref.width = Math.max(pref.width, componentPreferredSize.width);
-                }
-                pref.height += componentPreferredSize.height + gap;
-              }
-            }
-
-            pref.width += insets.left + insets.right;
-            pref.height += insets.top + insets.bottom;
-
-            return pref;
-          }
-
-    }
 
     /**
      * The Logger
@@ -263,6 +236,7 @@ public class JXLoginPane extends JXPanel {
      * save their password
      */
     private JCheckBox saveCB;
+    
     /**
      * Label displayed whenever caps lock is on.
      */
@@ -550,6 +524,7 @@ public class JXLoginPane extends JXPanel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public LoginPaneUI getUI() {
         return (LoginPaneUI) super.getUI();
     }
@@ -579,6 +554,7 @@ public class JXLoginPane extends JXPanel {
      *
      * @see javax.swing.JComponent#updateUI
      */
+    @Override
     public void updateUI() {
         setUI((LoginPaneUI) LookAndFeelAddons.getUI(this, LoginPaneUI.class));
     }
@@ -590,6 +566,7 @@ public class JXLoginPane extends JXPanel {
      * @see javax.swing.JComponent#getUIClassID
      * @see javax.swing.UIDefaults#getUI
      */
+    @Override
     public String getUIClassID() {
         return uiClassID;
     }
@@ -614,13 +591,22 @@ public class JXLoginPane extends JXPanel {
      */
     private JXPanel createLoginPanel() {
         JXPanel loginPanel = new JXPanel();
+        
+        JPasswordField oldPwd = passwordField;
+        //create the password component
+        passwordField = new JPasswordField("", 15);
+        JLabel passwordLabel = new JLabel(UIManagerExt.getString(CLASS_NAME + ".passwordString", getLocale()));
+        passwordLabel.setLabelFor(passwordField);
+        if (oldPwd != null) {
+            passwordField.setText(new String(oldPwd.getPassword()));
+        }
 
         NameComponent oldPanel = namePanel;
         //create the NameComponent
         if (saveMode == SaveMode.NONE) {
             namePanel = new SimpleNamePanel();
         } else {
-            namePanel = new ComboNamePanel(userNameStore);
+            namePanel = new ComboNamePanel();
         }
         if (oldPanel != null) {
             // need to reset here otherwise value will get lost during LAF change as panel gets recreated.
@@ -633,15 +619,6 @@ public class JXLoginPane extends JXPanel {
         }
         JLabel nameLabel = new JLabel(UIManagerExt.getString(CLASS_NAME + ".nameString", getLocale()));
         nameLabel.setLabelFor(namePanel.getComponent());
-
-        JPasswordField oldPwd = passwordField;
-        //create the password component
-        passwordField = new JPasswordField("", 15);
-        JLabel passwordLabel = new JLabel(UIManagerExt.getString(CLASS_NAME + ".passwordString", getLocale()));
-        passwordLabel.setLabelFor(passwordField);
-        if (oldPwd != null) {
-            passwordField.setText(new String(oldPwd.getPassword()));
-        }
 
         //create the server combo box if necessary
         JLabel serverLabel = new JLabel(UIManagerExt.getString(CLASS_NAME + ".serverString", getLocale()));
@@ -697,7 +674,7 @@ public class JXLoginPane extends JXPanel {
         gridBagConstraints.anchor = GridBagConstraints.LINE_START;
         gridBagConstraints.insets = new Insets(5, lShift, 5, 11);
         loginPanel.add(passwordLabel, gridBagConstraints);
-
+        
         if (serverCombo != null) {
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
@@ -715,7 +692,7 @@ public class JXLoginPane extends JXPanel {
             gridBagConstraints.weightx = 1.0;
             gridBagConstraints.insets = new Insets(0, 0, 5, 0);
             loginPanel.add(serverCombo, gridBagConstraints);
-
+            
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = 3;
@@ -764,6 +741,7 @@ public class JXLoginPane extends JXPanel {
      * This method adds functionality to support bidi languages within this
      * component
      */
+    @Override
     public void setComponentOrientation(ComponentOrientation orient) {
         // this if is used to avoid needless creations of the image
         if(orient != super.getComponentOrientation()) {
@@ -831,6 +809,38 @@ public class JXLoginPane extends JXPanel {
 
     }
 
+    private final class LoginPaneLayout extends VerticalLayout implements LayoutManager {
+        @Override
+	public Dimension preferredLayoutSize(Container parent) {
+            Insets insets = parent.getInsets();
+            Dimension pref = new Dimension(0, 0);
+            int gap = getGap();
+            for (int i = 0, c = parent.getComponentCount(); i < c; i++) {
+              Component m = parent.getComponent(i);
+              if (m.isVisible()) {
+                Dimension componentPreferredSize = m.getPreferredSize();
+                // swingx-917 - don't let jlabel to force width due to long text
+                if (m instanceof JLabel) {
+                    View view = (View) ((JLabel)m).getClientProperty(BasicHTML.propertyKey);
+                    if (view != null) {
+                        view.setSize(pref.width, m.getHeight());
+                        // get fresh preferred size since we have forced new size on label
+                        componentPreferredSize = m.getPreferredSize();
+                    }
+                } else {
+                    pref.width = Math.max(pref.width, componentPreferredSize.width);
+                }
+                pref.height += componentPreferredSize.height + gap;
+              }
+            }
+
+            pref.width += insets.left + insets.right;
+            pref.height += insets.top + insets.bottom;
+
+            return pref;
+          }
+    }
+
     /**
      * Create and return an image to use for the Banner. This may be overridden
      * to return any image you like
@@ -875,6 +885,10 @@ public class JXLoginPane extends JXPanel {
             recreateLoginPanel();
             firePropertyChange("saveMode", oldMode, getSaveMode());
         }
+    }
+    
+    public boolean isRememberPassword() {
+	return saveCB.isVisible() && saveCB.isSelected();
     }
 
     /**
@@ -1160,6 +1174,7 @@ public class JXLoginPane extends JXPanel {
         }
     }
 
+    @Override
     public void setLocale(Locale l) {
         super.setLocale(l);
         reinitLocales(l);
@@ -1181,8 +1196,8 @@ public class JXLoginPane extends JXPanel {
             String name = getUserName();
             char[] password = getPassword();
             String server = servers.size() == 1 ? servers.get(0) : serverCombo == null ? null : (String)serverCombo.getSelectedItem();
-            loginService.startAuthentication(name, password, server);
             
+            loginService.startAuthentication(name, password, server);
         } catch(Exception ex) {
         //The status is set via the loginService listener, so no need to set
         //the status here. Just log the error.
@@ -1219,6 +1234,7 @@ public class JXLoginPane extends JXPanel {
         }
     }
 
+    @Override
     public void removeNotify() {
         try {
             // TODO: keep it here until all ui stuff is moved to uidelegate.
@@ -1245,6 +1261,7 @@ public class JXLoginPane extends JXPanel {
         return (Window) c;
     }
 
+    @Override
     public void addNotify() {
         try {
             KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(
@@ -1300,19 +1317,33 @@ public class JXLoginPane extends JXPanel {
      * Listener class to track state in the LoginService
      */
     protected class LoginListenerImpl extends LoginAdapter {
-        public void loginSucceeded(LoginEvent source) {
+        @Override
+	public void loginSucceeded(LoginEvent source) {
             //save the user names and passwords
             String userName = namePanel.getUserName();
-            savePassword();
             if ((getSaveMode() == SaveMode.USER_NAME || getSaveMode() == SaveMode.BOTH)
                     && userName != null && !userName.trim().equals("")) {
                 userNameStore.addUserName(userName);
                 userNameStore.saveUserNames();
             }
+            
+            // if the user and/or password store knows of this user, 
+            // and the checkbox is unchecked, we remove them, otherwise
+            // we save the password
+            if (saveCB.isSelected()) {
+        	savePassword();
+            } else {
+        	// remove the password from the password store
+        	if (passwordStore != null) {
+        	    passwordStore.removeUserPassword(userName);
+        	}
+            }
+            
             setStatus(Status.SUCCEEDED);
         }
 
-        public void loginStarted(LoginEvent source) {
+        @Override
+	public void loginStarted(LoginEvent source) {
             assert EventQueue.isDispatchThread();
             getActionMap().get(LOGIN_ACTION_COMMAND).setEnabled(false);
             getActionMap().get(CANCEL_LOGIN_ACTION_COMMAND).setEnabled(true);
@@ -1324,7 +1355,8 @@ public class JXLoginPane extends JXPanel {
             setStatus(Status.IN_PROGRESS);
         }
 
-        public void loginFailed(LoginEvent source) {
+        @Override
+	public void loginFailed(LoginEvent source) {
             assert EventQueue.isDispatchThread();
 //            remove(progressPanel);
 //            add(contentPanel, BorderLayout.CENTER);
@@ -1336,7 +1368,8 @@ public class JXLoginPane extends JXPanel {
             setStatus(Status.FAILED);
         }
 
-        public void loginCanceled(LoginEvent source) {
+        @Override
+	public void loginCanceled(LoginEvent source) {
             assert EventQueue.isDispatchThread();
 //            remove(progressPanel);
 //            add(contentPanel, BorderLayout.CENTER);
@@ -1363,7 +1396,8 @@ public class JXLoginPane extends JXPanel {
         public void actionPerformed(ActionEvent e) {
             panel.startLogin();
         }
-        public void itemStateChanged(ItemEvent e) {}
+        @Override
+	public void itemStateChanged(ItemEvent e) {}
     }
 
     /**
@@ -1380,6 +1414,7 @@ public class JXLoginPane extends JXPanel {
         public void actionPerformed(ActionEvent e) {
             panel.cancelLogin();
         }
+        @Override
         public void itemStateChanged(ItemEvent e) {}
     }
 
@@ -1392,10 +1427,12 @@ public class JXLoginPane extends JXPanel {
             return true;
         }
 
+	@Override
         public boolean equals(Object obj) {
             return obj instanceof NullLoginService;
         }
 
+	@Override
         public int hashCode() {
             return 7;
         }
@@ -1405,26 +1442,35 @@ public class JXLoginPane extends JXPanel {
      * Simple PasswordStore that does not remember passwords
      */
     private static final class NullPasswordStore extends PasswordStore {
-        private static final char[] EMPTY = new char[0];
+	@Override
         public boolean set(String username, String server, char[] password) {
             //null op
             return false;
         }
+	
+	@Override
         public char[] get(String username, String server) {
-            return EMPTY;
+            return new char[0];
         }
+	
+	@Override
+	public void removeUserPassword(String username) {
+	    return;
+	}
 
+	@Override
         public boolean equals(Object obj) {
             return obj instanceof NullPasswordStore;
         }
 
+	@Override
         public int hashCode() {
             return 7;
         }
     }
 
     //--------------------------------- Default NamePanel Implementations
-    public static interface NameComponent {
+    private static interface NameComponent {
         public String getUserName();
         public boolean isEnabled();
         public boolean isEditable();
@@ -1433,16 +1479,47 @@ public class JXLoginPane extends JXPanel {
         public void setUserName(String userName);
         public JComponent getComponent();
     }
+    
+    private void updatePassword(final String username) {
+        String password = "";
+        if (username != null) {
+    		char[] pw = passwordStore.get(username, null);
+    		password = pw == null ? "" : new String(pw);
+    		
+    		// if the userstore has this username, we should change the 
+    		// 'remember me' checkbox to be selected. Unselecting this will
+    		// result in the user being 'forgotten'.
+    		saveCB.setSelected(userNameStore.containsUserName(username));
+        }
+        
+        passwordField.setText(password);
+    }
 
     /**
      * If a UserNameStore is not used, then this text field is presented allowing the user
      * to simply enter their user name
      */
-    public static final class SimpleNamePanel extends JTextField implements NameComponent {
+    private final class SimpleNamePanel extends JTextField implements NameComponent {
         private static final long serialVersionUID = 6513437813612641002L;
-        public SimpleNamePanel() {
-            super("", 15);
-        }
+
+	public SimpleNamePanel() {
+	    super("", 15);
+	    
+	    // auto-complete based on the users input
+	    // AutoCompleteDecorator.decorate(this, Arrays.asList(userNameStore.getUserNames()), false);
+
+	    // listen to text input, and offer password suggestion based on current
+	    // text
+	    if (passwordStore != null && passwordField!=null) {
+		addKeyListener(new KeyAdapter() {
+		    @Override
+		    public void keyReleased(KeyEvent e) {
+			updatePassword(getText());
+		    }
+		});
+	    }
+	}
+        
         public String getUserName() {
             return getText();
         }
@@ -1452,23 +1529,42 @@ public class JXLoginPane extends JXPanel {
         public JComponent getComponent() {
             return this;
         }
-        
     }
-
+    
     /**
      * If a UserNameStore is used, then this combo box is presented allowing the user
      * to select a previous login name, or type in a new login name
      */
-    public static final class ComboNamePanel extends JComboBox implements NameComponent {
+    private final class ComboNamePanel extends JComboBox implements NameComponent {
         private static final long serialVersionUID = 2511649075486103959L;
-        private UserNameStore userNameStore;
-        public ComboNamePanel(UserNameStore userNameStore) {
+
+        public ComboNamePanel() {
             super();
-            this.userNameStore = userNameStore;
             setModel(new NameComboBoxModel());
             setEditable(true);
+            
+            // auto-complete based on the users input
+            AutoCompleteDecorator.decorate(this);
 
+            // listen to selection or text input, and offer password suggestion based on current
+            // text
+            if (passwordStore != null && passwordField!=null) {
+        	final JTextField textfield = (JTextField) getEditor().getEditorComponent();
+        	textfield.addKeyListener(new KeyAdapter() {
+        	    @Override
+        	    public void keyReleased(KeyEvent e) {
+        		updatePassword(textfield.getText());
+        	    }
+        	});
+        	
+        	super.addItemListener(new ItemListener() {
+        	    public void itemStateChanged(ItemEvent e) {
+        		updatePassword((String)getSelectedItem());
+        	    }
+        	});
+            }
         }
+        
         public String getUserName() {
             Object item = getModel().getSelectedItem();
             return item == null ? null : item.toString();
@@ -1612,7 +1708,8 @@ public class JXLoginPane extends JXPanel {
             initWindow(this, panel);
         }
 
-        public JXPanel getContentPane() {
+        @Override
+	public JXPanel getContentPane() {
             return (JXPanel) super.getContentPane();
         }
 
@@ -1663,6 +1760,7 @@ public class JXLoginPane extends JXPanel {
                         break;
                     case FAILED:
                         cancelButton.setEnabled(true);
+                        panel.passwordField.requestFocusInWindow();
                         w.pack();
                         break;
                     case SUCCEEDED:
@@ -1758,7 +1856,7 @@ public class JXLoginPane extends JXPanel {
 
     }
 
-    private class CapsOnTest {
+    private final class CapsOnTest {
 
         RemovableKeyEventDispatcher ked;
 
@@ -1811,7 +1909,7 @@ public class JXLoginPane extends JXPanel {
      * Window event listener to invoke capslock test when login panel get
      * activated.
      */
-    public static class CapsOnWinListener extends WindowAdapter implements
+    private final class CapsOnWinListener extends WindowAdapter implements
             WindowFocusListener, WindowListener {
         private CapsOnTest cot;
 
@@ -1841,7 +1939,7 @@ public class JXLoginPane extends JXPanel {
 
     }
 
-    public class RemovableKeyEventDispatcher implements KeyEventDispatcher {
+    private class RemovableKeyEventDispatcher implements KeyEventDispatcher {
 
         private CapsOnTest cot;
 

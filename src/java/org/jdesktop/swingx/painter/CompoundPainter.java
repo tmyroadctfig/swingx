@@ -288,11 +288,15 @@ public class CompoundPainter<T> extends AbstractPainter<T> {
     protected void doPaint(Graphics2D g, T component, int width, int height) {
         for (Painter p : getPainters()) {
             Graphics2D temp = (Graphics2D) g.create();
-            p.paint(temp, component, width, height);
+            
+            try {
+                p.paint(temp, component, width, height);
             if(isClipPreserved()) {
                 g.setClip(temp.getClip());
             }
-            temp.dispose();
+            } finally {
+                temp.dispose();
+            }
         }
     }
 

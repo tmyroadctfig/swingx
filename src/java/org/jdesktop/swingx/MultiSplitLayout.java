@@ -257,17 +257,6 @@ public class MultiSplitLayout implements LayoutManager
   }
 
   /**
-   * Get the MultiSplitLayout.Node associated with a component 
-   * @param name the name used to associate a component with the layout
-   * @return the node associated with the component
-   * @deprecated pre-0.9.5 please use getNodeForName instead
-   */
-  @Deprecated
-  public Node getNodeForComponent( String name )
-  {   
-    return getNodeForName( name );
-  }
-  /**
    * Get the MultiSplitLayout.Node associated with a component
    * @param name the name used to associate a component with the layout
    * @return the node associated with the component
@@ -311,18 +300,6 @@ public class MultiSplitLayout implements LayoutManager
     return getNodeForName( split, getNameForComponent( comp ));
   }
   
-  /**
-   * Get the MultiSplitLayout.Node associated with a component
-   * @param split the layout split that owns the requested node
-   * @param name the name used to associate a component with the layout
-   * @return the node associated with the component
-   * @deprecated pre-0.9.5 please use getNodeForName instead
-   */
-  @Deprecated
-  public Node getNodeForComponent( Split split, String name )
-  {
-    return getNodeForName( split, name );
-  }
   /**
    * Get the MultiSplitLayout.Node associated with a component 
    * @param split the layout split that owns the requested node

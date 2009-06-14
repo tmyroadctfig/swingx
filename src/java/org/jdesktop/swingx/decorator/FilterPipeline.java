@@ -620,7 +620,7 @@ public class FilterPipeline {
         return outList;
     }
 
-    public class IdentityFilter extends Filter {
+    public static class IdentityFilter extends Filter {
         
         
         /**

@@ -21,20 +21,15 @@
 
 package org.jdesktop.swingx;
 
-import org.apache.batik.ext.awt.MultipleGradientPaint;
-import org.apache.batik.ext.awt.RadialGradientPaint;
-import org.jdesktop.swingx.action.AbstractActionExt;
-import org.jdesktop.swingx.color.ColorUtil;
-import org.jdesktop.swingx.color.GradientPreviewPanel;
-import org.jdesktop.swingx.color.GradientThumbRenderer;
-import org.jdesktop.swingx.color.GradientTrackRenderer;
-import org.jdesktop.swingx.multislider.Thumb;
-import org.jdesktop.swingx.multislider.ThumbListener;
-
-import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.MultipleGradientPaint;
+import java.awt.RadialGradientPaint;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -43,6 +38,33 @@ import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.logging.Logger;
+
+import javax.swing.ActionMap;
+import javax.swing.ButtonGroup;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JSlider;
+import javax.swing.JSpinner;
+import javax.swing.JTextField;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.SwingUtilities;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
+import org.jdesktop.swingx.action.AbstractActionExt;
+import org.jdesktop.swingx.color.ColorUtil;
+import org.jdesktop.swingx.color.GradientPreviewPanel;
+import org.jdesktop.swingx.color.GradientThumbRenderer;
+import org.jdesktop.swingx.color.GradientTrackRenderer;
+import org.jdesktop.swingx.multislider.Thumb;
+import org.jdesktop.swingx.multislider.ThumbListener;
 
 /**
  * <p>A specialized JXPanel that allows the user to construct and choose a Gradient.
@@ -142,11 +164,11 @@ public class JXGradientChooser extends JXPanel {
             }
         }
         
-        if(mgrad.getCycleMethod() == MultipleGradientPaint.REFLECT) {
+        if(mgrad.getCycleMethod() == MultipleGradientPaint.CycleMethod.REFLECT) {
             this.reflectedRadio.setSelected(true);
             gradientPreview.setReflected(true);
         }
-        if(mgrad.getCycleMethod() == MultipleGradientPaint.REPEAT) {
+        if(mgrad.getCycleMethod() == MultipleGradientPaint.CycleMethod.REPEAT) {
             this.repeatedRadio.setSelected(true);
             gradientPreview.setRepeated(true);
         }

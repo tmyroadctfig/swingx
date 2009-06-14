@@ -37,21 +37,43 @@ import javax.swing.RepaintManager;
 import javax.swing.Scrollable;
 import javax.swing.plaf.UIResource;
 
-import org.jdesktop.swingx.painter.MattePainter;
 import org.jdesktop.swingx.painter.Painter;
-import org.jdesktop.swingx.plaf.PainterUIResource;
 
 /**
- * A simple JPanel extension that adds translucency support.
- * This component and all of its content will be displayed with the specified
- * &quot;alpha&quot; transluscency property value. It also supports the
- * Painters using the backgroundPainter property.  For example, to change the background of the
- * panel to a checkeboard do something like this:
+ * <p>
+ * An extended {@code JPanel} that provides additional features. First, the
+ * component is {@code Scrollable}, using reasonable defaults. Second, the
+ * component is alpha-channel enabled. This means that the {@code JXPanel} can
+ * be made fully or partially transparent. Finally, {@code JXPanel} has support
+ * for {@linkplain Painter painters}.
+ * </p>
+ * <p>
+ * A transparency example, this following code will show the black background of
+ * the parent:
  * 
+ * <pre>
+ * JXPanel panel = new JXPanel();
+ * panel.add(new JButton(&quot;Push Me&quot;));
+ * panel.setAlpha(.5f);
  * 
- * <PRE> <CODE>JXPanel panel = new JXPanel();
- * panel.setBackgroundPainter(new CheckerboardPainter());</CODE></PRE>
+ * container.setBackground(Color.BLACK);
+ * container.add(panel);
+ * </pre>
+ * 
+ * </p>
+ * <p>
+ * A painter example, this following code will show how to add a simple painter:
+ * 
+ * <pre>
+ * JXPanel panel = new JXPanel();
+ * panel.setBackgroundPainter(new PinstripePainter());
+ * </pre>
+ * 
+ * </p>
+ * 
  * @author rbair
+ * @see Scrollable
+ * @see Painter
  */
 public class JXPanel extends JPanel implements Scrollable {
     private boolean scrollableTracksViewportHeight = true;
@@ -82,28 +104,43 @@ public class JXPanel extends JPanel implements Scrollable {
     private Painter backgroundPainter;
     
     /**
-     * Creates a new instance of JXPanel
+     * Creates a new <code>JXPanel</code> with a double buffer
+     * and a flow layout.
      */
     public JXPanel() {
     }
     
     /**
-     * @param isDoubleBuffered
+     * Creates a new <code>JXPanel</code> with <code>FlowLayout</code>
+     * and the specified buffering strategy.
+     * If <code>isDoubleBuffered</code> is true, the <code>JXPanel</code>
+     * will use a double buffer.
+     *
+     * @param isDoubleBuffered  a boolean, true for double-buffering, which
+     *        uses additional memory space to achieve fast, flicker-free 
+     *        updates
      */
     public JXPanel(boolean isDoubleBuffered) {
         super(isDoubleBuffered);
     }
     
     /**
-     * @param layout
+     * Create a new buffered JXPanel with the specified layout manager
+     *
+     * @param layout  the LayoutManager to use
      */
     public JXPanel(LayoutManager layout) {
         super(layout);
     }
     
     /**
-     * @param layout
-     * @param isDoubleBuffered
+     * Creates a new JXPanel with the specified layout manager and buffering
+     * strategy.
+     *
+     * @param layout  the LayoutManager to use
+     * @param isDoubleBuffered  a boolean, true for double-buffering, which
+     *        uses additional memory space to achieve fast, flicker-free 
+     *        updates
      */
     public JXPanel(LayoutManager layout, boolean isDoubleBuffered) {
         super(layout, isDoubleBuffered);
@@ -128,10 +165,10 @@ public class JXPanel extends JPanel implements Scrollable {
                     oldOpaque = isOpaque();
                     setOpaque(false);
                 }
+                
                 RepaintManager manager = RepaintManager.currentManager(this);
-                if (!manager.getClass().isAnnotationPresent(TranslucentRepaintManager.class)) {
-                    RepaintManager.setCurrentManager(new RepaintManagerX());
-                }
+                RepaintManager trm = SwingXUtilities.getTranslucentRepaintManager(manager);
+                RepaintManager.setCurrentManager(trm);
             } else if (alpha == 1) {
                 //restore the oldOpaque if it was true (since opaque is false now)
                 if (oldOpaque) {
@@ -171,11 +208,28 @@ public class JXPanel extends JPanel implements Scrollable {
             return alpha;
         }
     }
-    
+
+    /**
+     * Returns the state of the panel with respect to inheriting alpha values.
+     * 
+     * @return {@code true} if this panel inherits alpha values; {@code false}
+     *         otherwise
+     * @see JXPanel#setInheritAlpha(boolean)
+     */
     public boolean isInheritAlpha() {
         return inheritAlpha;
     }
-    
+
+    /**
+     * Determines if the effective alpha of this component should include the
+     * alpha of ancestors.
+     * 
+     * @param val
+     *            {@code true} to include ancestral alpha data; {@code false}
+     *            otherwise
+     * @see #isInheritAlpha()
+     * @see #getEffectiveAlpha()
+     */
     public void setInheritAlpha(boolean val) {
         if (inheritAlpha != val) {
             inheritAlpha = val;
@@ -183,36 +237,36 @@ public class JXPanel extends JPanel implements Scrollable {
         }
     }
     
-    /* (non-Javadoc)
-     * @see javax.swing.Scrollable#getScrollableTracksViewportHeight()
+    /**
+     * {@inheritDoc}
      */
     public boolean getScrollableTracksViewportHeight() {
         return scrollableTracksViewportHeight;
     }
     
-    /* (non-Javadoc)
-     * @see javax.swing.Scrollable#getScrollableTracksViewportWidth()
+    /**
+     * {@inheritDoc}
      */
     public boolean getScrollableTracksViewportWidth() {
         return scrollableTracksViewportWidth;
     }
     
-    /* (non-Javadoc)
-     * @see javax.swing.Scrollable#getPreferredScrollableViewportSize()
+    /**
+     * {@inheritDoc}
      */
     public Dimension getPreferredScrollableViewportSize() {
         return getPreferredSize();
     }
     
-    /* (non-Javadoc)
-     * @see javax.swing.Scrollable#getScrollableBlockIncrement(java.awt.Rectangle, int, int)
+    /**
+     * {@inheritDoc}
      */
     public int getScrollableBlockIncrement(Rectangle visibleRect, int orientation, int direction) {
         return 10;
     }
     
-    /* (non-Javadoc)
-     * @see javax.swing.Scrollable#getScrollableUnitIncrement(java.awt.Rectangle, int, int)
+    /**
+     * {@inheritDoc}
      */
     public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction) {
         return 10;

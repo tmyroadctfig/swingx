@@ -59,7 +59,7 @@ import java.util.logging.Logger;
  *
  * @author Richard
  */
-public class ImagePainter<T> extends AbstractAreaPainter<T> {
+public class ImagePainter extends AbstractAreaPainter<Object> {
     /**
      * Logger to use
      */
@@ -149,7 +149,7 @@ public class ImagePainter<T> extends AbstractAreaPainter<T> {
     /**
      * {@inheritDoc}
      */
-    public void doPaint(Graphics2D g, T component, int width, int height) {
+    protected void doPaint(Graphics2D g, Object component, int width, int height) {
         if (img == null && imageURL != null) {
             loadImage();
         }
@@ -412,7 +412,7 @@ public class ImagePainter<T> extends AbstractAreaPainter<T> {
     /**
      *
      */
-    public Shape provideShape(Graphics2D g, T comp, int width, int height) {
+    protected Shape provideShape(Graphics2D g, Object comp, int width, int height) {
         if(getImage() != null) {
             BufferedImage img = getImage();
             int imgWidth = img.getWidth();

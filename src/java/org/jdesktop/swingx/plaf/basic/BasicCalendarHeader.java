@@ -20,14 +20,19 @@ import org.jdesktop.swingx.JXPanel;
  * Active header for a JXMonthView in zoomable mode.<p>
  * 
  *  PENDING JW: very much work-in-progress.
- * 
+ *  PENDING JW: CO problem ... exchange arrows on RToL
+ *  PENDING JW: when used in picker dropdown not CO not updated
+ *      
  * @author Jeanette Winzenburg
+ * 
+ * @deprecated moved into BasicCalendarHeaderHandler
  */
+@Deprecated
 class BasicCalendarHeader extends JXPanel {
 
-    private AbstractButton prevButton;
-    private AbstractButton nextButton;
-    private JXHyperlink zoomOutLink;
+    protected AbstractButton prevButton;
+    protected AbstractButton nextButton;
+    protected JXHyperlink zoomOutLink;
 
     public BasicCalendarHeader() {
         setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));

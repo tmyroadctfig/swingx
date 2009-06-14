@@ -24,7 +24,6 @@ import java.awt.Color;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.beans.PropertyChangeListener;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.EventListener;
@@ -102,7 +101,7 @@ import org.jdesktop.swingx.util.Contract;
  * </code></pre>
  * Applications may have the need to allow users to select different ranges of
  * dates.  There are three modes of selection that are supported, single, single interval
- * and multiple interval selection.  Once a selection is made an DateSelectionEvent is
+ * and multiple interval selection.  Once a selection is made a DateSelectionEvent is
  * fired to inform listeners of the change.
  * <pre>
  *    // Change the selection mode to select full weeks.
@@ -1206,7 +1205,9 @@ public class JXMonthView extends JComponent {
     /**
      * Sets the zoomable property. If true, the calendar's date range can
      * be zoomed. This state implies that the calendar is traversable and
-     * showing exactly one calendar box, effectively ignoring the properties.
+     * showing exactly one calendar box, effectively ignoring the properties.<p>
+     * 
+     * <b>Note</b>: The actual zoomable behaviour is not yet implemented.
      * 
      * @param zoomable a boolean indicating whether or not zooming date
      *    ranges is enabled.
@@ -1513,6 +1514,16 @@ public class JXMonthView extends JComponent {
     }
 
     /**
+     * Return the color that should be used for painting the numerical day of the week.
+     *
+     * @param dayOfWeek The day of week to get the color for.
+     * @return The color to be used for painting the numeric day of the week or null
+     *         If no color has yet been defined.
+     */
+    public Color getPerDayOfWeekForeground(int dayOfWeek) {
+        return dayToColorTable.get(dayOfWeek);
+    }
+    /**
      * Set the color to be used for painting the foreground of a flagged day.
      *
      * @param c The color to be used for painting.
@@ -1678,8 +1689,6 @@ public class JXMonthView extends JComponent {
      * and fires an ActionEvent
      * with the COMMIT_KEY action command.
      * 
-     * <p>PENDING: define what "commit selection" means ... currently
-     * only fires (to keep the picker happy).
      * 
      * @see #cancelSelection()
      * @see org.jdesktop.swingx.calendar.DateSelectionModel#setAdjusting(boolean)
@@ -1692,7 +1701,7 @@ public class JXMonthView extends JComponent {
     /**
      * Cancels the selection. <p>
      * 
-     * Resets the model's adjusting to 
+     * Resets the model's adjusting property to 
      * false and fires an ActionEvent with the CANCEL_KEY action command.
      * 
      * @see #commitSelection
@@ -1701,7 +1710,6 @@ public class JXMonthView extends JComponent {
     public void cancelSelection() {
         getSelectionModel().setAdjusting(false);
         fireActionPerformed(CANCEL_KEY);
-        
     }
 
     /**
@@ -1739,10 +1747,22 @@ public class JXMonthView extends JComponent {
     /**
      * Adds an ActionListener.
      * <p/>
-     * The ActionListener will receive an ActionEvent when a selection has
-     * been made.
-     *
+     * The ActionListener will receive an ActionEvent with its actionCommand
+     * set to COMMIT_KEY or CANCEL_KEY after the selection has been committed
+     * or canceled, respectively.
+     * <p>
+     * 
+     * Note that actionEvents are typically fired after a dedicated user gesture 
+     * to end an ongoing selectin (like ENTER, ESCAPE) or after explicit programmatic
+     * commits/cancels. It is usually not fired after each change to the selection state.
+     * Client code which wants to be notified about all selection changes should 
+     * register a DateSelectionListener to the DateSelectionModel.
+     * 
      * @param l The ActionListener that is to be notified
+     * 
+     * @see #commitSelection()
+     * @see #cancelSelection()
+     * @see #getSelectionModel()
      */
     public void addActionListener(ActionListener l) {
         listenerMap.add(ActionListener.class, l);
@@ -1751,7 +1771,7 @@ public class JXMonthView extends JComponent {
     /**
      * Removes an ActionListener.
      *
-     * @param l The action listener to remove.
+     * @param l The ActionListener to remove.
      */
     public void removeActionListener(ActionListener l) {
         listenerMap.remove(ActionListener.class, l);

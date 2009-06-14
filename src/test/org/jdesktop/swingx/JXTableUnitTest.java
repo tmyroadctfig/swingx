@@ -3045,7 +3045,10 @@ public class JXTableUnitTest extends InteractiveTestCase {
         assertEquals("anchor must be second last row", table.getRowCount() - 2, anchorRow);
         assertEquals("lead must be first column", 0, leadColumn);
         assertEquals("anchor must be first column", 0, anchorColumn);
-         SwingUtilities.invokeAndWait(new Runnable() {
+        // take a nap to make sure we are created before testing for focus on linux
+        // w/o this the test will intermittently fail on systems using kernel 2.6 and sun java 6
+        Thread.sleep(500);
+        SwingUtilities.invokeAndWait(new Runnable() {
             public void run() {
                 ComponentAdapter adapter = table.getComponentAdapter();
                 adapter.row = leadRow;

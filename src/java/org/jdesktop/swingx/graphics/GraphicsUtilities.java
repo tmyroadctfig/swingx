@@ -34,17 +34,21 @@
 
 package org.jdesktop.swingx.graphics;
 
+import java.awt.geom.Area;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
 import java.awt.GraphicsConfiguration;
+import java.awt.Image;
+import java.awt.Shape;
 import java.awt.Transparency;
 import java.awt.Graphics;
 import java.awt.GraphicsEnvironment;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import javax.imageio.ImageIO;
 
@@ -93,6 +97,27 @@ public class GraphicsUtilities {
 
     private static boolean isHeadless() {
         return GraphicsEnvironment.isHeadless();
+    }
+
+    /**
+     * Converts the specified image into a compatible buffered image.
+     * 
+     * @param img
+     *            the image to convert
+     * @return a compatible buffered image of the input
+     */
+    public static BufferedImage convertToBufferedImage(Image img) {
+        BufferedImage buff = createCompatibleTranslucentImage(
+                img.getWidth(null), img.getHeight(null));
+        Graphics2D g2 = buff.createGraphics();
+
+        try {
+            g2.drawImage(img, 0, 0, null);
+        } finally {
+            g2.dispose();
+        }
+
+        return buff;
     }
 
     /**
@@ -212,6 +237,31 @@ public class GraphicsUtilities {
                 new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB) :
                 getGraphicsConfiguration().createCompatibleImage(width, height,
                                                    Transparency.TRANSLUCENT);
+    }
+
+    /**
+     * <p>
+     * Returns a new compatible image from a stream. The image is loaded from
+     * the specified stream and then turned, if necessary into a compatible
+     * image.
+     * </p>
+     * 
+     * @see #createCompatibleImage(java.awt.image.BufferedImage)
+     * @see #createCompatibleImage(java.awt.image.BufferedImage, int, int)
+     * @see #createCompatibleImage(int, int)
+     * @see #createCompatibleTranslucentImage(int, int)
+     * @see #toCompatibleImage(java.awt.image.BufferedImage)
+     * @param in
+     *            the stream of the picture to load as a compatible image
+     * @return a new translucent compatible <code>BufferedImage</code> of the
+     *         specified width and height
+     * @throws java.io.IOException
+     *             if the image cannot be read or loaded
+     */
+    public static BufferedImage loadCompatibleImage(InputStream in) throws IOException {
+        BufferedImage image = ImageIO.read(in);
+        if(image == null) return null;
+        return toCompatibleImage(image);
     }
 
     /**
@@ -683,5 +733,32 @@ public class GraphicsUtilities {
             // Unmanages the image
             img.setRGB(x, y, w, h, pixels, 0, w);
         }
+    }
+
+    /**
+     * Sets the clip on a graphics object by merging a supplied clip with the
+     * existing one. The new clip will be an intersection of the old clip and
+     * the supplied clip. The old clip shape will be returned. This is useful
+     * for resetting the old clip after an operation is performed.
+     * 
+     * @param g
+     *            the graphics object to update
+     * @param clip
+     *            a new clipping region to add to the graphics clip. This may
+     *            return {@code null} if the current clip is {@code null}.
+     * @return the current clipping region of the supplied graphics object
+     * @throws NullPointerException
+     *             if any parameter is {@code null}
+     */
+    public static Shape mergeClip(Graphics g, Shape clip) {
+        Shape oldClip = g.getClip();
+        if(oldClip == null) {
+            g.setClip(clip);
+            return null;
+        }
+        Area area = new Area(oldClip);
+        area.intersect(new Area(clip));//new Rectangle(0,0,width,height)));
+        g.setClip(area);
+        return oldClip;
     }
 }

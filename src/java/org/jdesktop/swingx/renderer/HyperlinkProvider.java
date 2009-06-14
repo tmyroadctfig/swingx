@@ -24,7 +24,7 @@ import java.awt.Point;
 import java.awt.event.ActionEvent;
 
 import org.jdesktop.swingx.JXHyperlink;
-import org.jdesktop.swingx.hyperlink.LinkAction;
+import org.jdesktop.swingx.hyperlink.AbstractHyperlinkAction;
 import org.jdesktop.swingx.rollover.RolloverProducer;
 import org.jdesktop.swingx.rollover.RolloverRenderer;
 
@@ -61,7 +61,7 @@ public class HyperlinkProvider
          RolloverRenderer {
 
 
-    private LinkAction<Object> linkAction;
+    private AbstractHyperlinkAction<Object> linkAction;
     protected Class<?> targetClass;
 
     /**
@@ -79,7 +79,7 @@ public class HyperlinkProvider
      * 
      * @param linkAction the action that acts on values.
      */
-    public HyperlinkProvider(LinkAction linkAction) {
+    public HyperlinkProvider(AbstractHyperlinkAction linkAction) {
         this(linkAction, null);
     }
     
@@ -92,7 +92,7 @@ public class HyperlinkProvider
      * @param linkAction the action that acts on values.
      * @param targetClass the type of values the action can handle.
      */
-    public HyperlinkProvider(LinkAction linkAction, Class targetClass) {
+    public HyperlinkProvider(AbstractHyperlinkAction linkAction, Class targetClass) {
         super();
 //        rendererComponent.addActionListener(createEditorActionListener());
         setLinkAction(linkAction, targetClass);
@@ -117,7 +117,7 @@ public class HyperlinkProvider
      * 
      * @param linkAction
      */
-    public void setLinkAction(LinkAction linkAction) {
+    public void setLinkAction(AbstractHyperlinkAction linkAction) {
         setLinkAction(linkAction, null);
     }
     
@@ -130,7 +130,7 @@ public class HyperlinkProvider
      * 
      * @param linkAction
      */
-    public void setLinkAction(LinkAction linkAction, Class targetClass) {
+    public void setLinkAction(AbstractHyperlinkAction linkAction, Class targetClass) {
         if (linkAction == null) {
             linkAction = createDefaultLinkAction();
         }
@@ -165,8 +165,8 @@ public class HyperlinkProvider
      * 
      * @return a default LinkAction for showing the target.
      */
-    protected LinkAction createDefaultLinkAction() {
-        return new LinkAction<Object>(null) {
+    protected AbstractHyperlinkAction createDefaultLinkAction() {
+        return new AbstractHyperlinkAction<Object>(null) {
 
             public void actionPerformed(ActionEvent e) {
                 // TODO Auto-generated method stub

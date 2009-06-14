@@ -35,18 +35,19 @@ import javax.swing.tree.TreePath;
 import org.jdesktop.swingx.JXTree;
 
 /**
- * Tree specific cellContext.
+ * Tree specific <code>CellContext</code>. 
+ * 
  * <ul>
- * <li>PENDING: setters for icons?
  * <li>PENDING: use focus border as returned from list or table instead of
  * rolling its own? The missing ui-border probably is a consequence of the
  * border hacking as implemented in core default renderer. SwingX has a
  * composite default which should use the "normal" border.
  * <li> PENDING: selection colors couple explicitly to SwingX - should we go JXTree as
  *   generic type?
+ * <li> PENDING: for a JXTree use the icons as returned by the xtree api?
  * </ul>
  */
-public class TreeCellContext extends CellContext<JTree> {
+public class TreeCellContext extends CellContext {
     /** the icon to use for a leaf node. */
     protected Icon leafIcon;
 
@@ -59,6 +60,32 @@ public class TreeCellContext extends CellContext<JTree> {
     /** the border around a focused node. */
     private Border treeFocusBorder;
 
+    /**
+     * Sets state of the cell's context. Note that the component might be null
+     * to indicate a cell without a concrete context. All accessors must cope
+     * with.
+     * 
+     * @param component the component the cell resides on, might be null
+     * @param value the content value of the cell
+     * @param row the cell's row index in view coordinates
+     * @param column the cell's column index in view coordinates
+     * @param selected the cell's selected state
+     * @param focused the cell's focused state
+     * @param expanded the cell's expanded state
+     * @param leaf the cell's leaf state
+     */
+    public void installContext(JTree component, Object value, int row, int column,
+            boolean selected, boolean focused, boolean expanded, boolean leaf) {
+        this.component = component;
+        installState(value, row, column, selected, focused, expanded, leaf);
+    }
+
+    
+    @Override
+    public JTree getComponent() {
+        return (JTree) super.getComponent();
+    }
+    
 //------------------- accessors for derived state
     
     /**

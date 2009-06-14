@@ -57,6 +57,7 @@ import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
@@ -412,7 +413,7 @@ public class BasicErrorPaneUI extends ErrorPaneUI {
             dlg = new JXErrorDialog((Frame)w, pane);
         } else {
             // default fallback to null
-            dlg = new JXErrorDialog((Dialog)null, pane);
+            dlg = new JXErrorDialog(JOptionPane.getRootFrame(), pane);
         }
         centerWindow(dlg, owner);
         return dlg;

@@ -26,6 +26,7 @@ package org.jdesktop.swingx.auth;
  *  to store the passwords is left up to the implementation.
  *
  * @author Bino George
+ * @author Jonathan Giles
  */
 public abstract class PasswordStore {
     /**
@@ -45,4 +46,10 @@ public abstract class PasswordStore {
      *  otherwise. Returned array can be empty if the password is empty.
      */
     public abstract char[] get(String username, String server);
+
+    /**
+     * This should attempt to remove the given username from the password store, as well as any associated password.
+     * @param username The username to remove
+     */
+    public abstract void removeUserPassword(String username);
 }

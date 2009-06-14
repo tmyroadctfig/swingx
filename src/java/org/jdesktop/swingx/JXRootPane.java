@@ -51,12 +51,32 @@ import javax.swing.KeyStroke;
  * @author Mark Davidson
  */
 public class JXRootPane extends JRootPane {
+    /**
+     * An extended {@code RootLayout} offering support for managing the status
+     * bar.
+     * 
+     * @author Karl George Schaefer
+     * @author Jeanette Winzenberg
+     */
     protected class XRootLayout extends RootLayout {
 
         LayoutManager2 delegate;
 
+        /**
+         * The layout manager backing this manager. The delegate is used to
+         * calculate the size when the UI handles the window decorations.
+         * 
+         * @param delegate
+         *            the backing manager
+         */
         public void setLayoutManager(LayoutManager2 delegate) {
             this.delegate = delegate;
+        }
+
+        private Dimension delegatePreferredLayoutSize(Container parent) {
+            if (delegate == null)
+                return super.preferredLayoutSize(parent);
+            return delegate.preferredLayoutSize(parent);
         }
 
         /**
@@ -71,6 +91,12 @@ public class JXRootPane extends JRootPane {
                 pref.height += statusPref.height;
             }
             return pref;
+        }
+
+        private Dimension delegateMinimumLayoutSize(Container parent) {
+            if (delegate == null)
+                return super.minimumLayoutSize(parent);
+            return delegate.minimumLayoutSize(parent);
         }
 
         /**
@@ -88,6 +114,13 @@ public class JXRootPane extends JRootPane {
 
         }
 
+        private Dimension delegateMaximumLayoutSize(Container parent) {
+            if (delegate == null)
+
+                return super.maximumLayoutSize(parent);
+            return delegate.maximumLayoutSize(parent);
+        }
+
         /**
          * {@inheritDoc}
          */
@@ -101,6 +134,14 @@ public class JXRootPane extends JRootPane {
                 pref.height += statusPref.height;
             }
             return pref;
+        }
+
+        private void delegateLayoutContainer(Container parent) {
+            if (delegate == null) {
+                super.layoutContainer(parent);
+            } else {
+                delegate.layoutContainer(parent);
+            }
         }
 
         /**
@@ -125,50 +166,11 @@ public class JXRootPane extends JRootPane {
             }
 
         }
-
-        /**
-         * @param parent
-         * @return
-         */
-        private Dimension delegatePreferredLayoutSize(Container parent) {
-            if (delegate == null)
-                return super.preferredLayoutSize(parent);
-            return delegate.preferredLayoutSize(parent);
-        }
-
-        /**
-         * @param parent
-         * @return
-         */
-        private Dimension delegateMinimumLayoutSize(Container parent) {
-            if (delegate == null)
-                return super.minimumLayoutSize(parent);
-            return delegate.minimumLayoutSize(parent);
-        }
-
-        /**
-         * @param target
-         * @return
-         */
-        private Dimension delegateMaximumLayoutSize(Container parent) {
-            if (delegate == null)
-
-                return super.maximumLayoutSize(parent);
-            return delegate.maximumLayoutSize(parent);
-        }
-
-        /**
-         * @param parent
-         */
-        private void delegateLayoutContainer(Container parent) {
-            if (delegate == null) {
-                super.layoutContainer(parent);
-            } else {
-                delegate.layoutContainer(parent);
-            }
-        }
     }
     
+    /**
+     * The current status bar for this root pane.
+     */
     protected JXStatusBar statusBar;
 
     private JToolBar toolBar;
@@ -179,6 +181,9 @@ public class JXRootPane extends JRootPane {
      */
     private JButton cancelButton;
 
+    /**
+     * Creates an extended root pane.
+     */
     public JXRootPane() {
         installKeyboardActions();
     }
@@ -243,6 +248,9 @@ public class JXRootPane extends JRootPane {
     }
 
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setLayout(LayoutManager layout) {
         if (layout instanceof XRootLayout) {
@@ -391,6 +399,11 @@ public class JXRootPane extends JRootPane {
         firePropertyChange("statusBar", oldStatusBar, getStatusBar());
     }
 
+    /**
+     * Gets the currently installed status bar.
+     * 
+     * @return the current status bar
+     */
     public JXStatusBar getStatusBar() {
         return statusBar;
     }
@@ -431,15 +444,17 @@ public class JXRootPane extends JRootPane {
         firePropertyChange("toolBar", oldToolBar, getToolBar());
     }
 
+    /**
+     * The currently installed tool bar.
+     * 
+     * @return the current tool bar
+     */
     public JToolBar getToolBar() {
         return toolBar;
     }
 
     /**
-     * Set the menu bar for this root pane.
-     * 
-     * @param menuBar
-     *            the menu bar to register
+     * {@inheritDoc}
      */
     @Override
     public void setJMenuBar(JMenuBar menuBar) {

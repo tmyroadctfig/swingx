@@ -30,7 +30,7 @@ import java.awt.geom.RoundRectangle2D;
  * portion of a capsule using the portion property.
  * @author joshy
  */
-public class CapsulePainter extends AbstractAreaPainter {
+public class CapsulePainter extends AbstractAreaPainter<Object> {
     public enum Portion { Top, Full, Bottom, Left, Right }
     private Portion portion;
     

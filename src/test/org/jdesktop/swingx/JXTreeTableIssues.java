@@ -47,7 +47,7 @@ import javax.swing.tree.TreePath;
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
-import org.jdesktop.swingx.hyperlink.LinkAction;
+import org.jdesktop.swingx.hyperlink.AbstractHyperlinkAction;
 import org.jdesktop.swingx.renderer.CellContext;
 import org.jdesktop.swingx.renderer.CheckBoxProvider;
 import org.jdesktop.swingx.renderer.ComponentProvider;
@@ -678,7 +678,7 @@ public class JXTreeTableIssues extends InteractiveTestCase {
      * 
      */
     public void interactiveTreeTableLinkRendererSimpleText() {
-        LinkAction simpleAction = new LinkAction<Object>(null) {
+        AbstractHyperlinkAction simpleAction = new AbstractHyperlinkAction<Object>(null) {
 
             public void actionPerformed(ActionEvent e) {
                 LOG.info("hit: " + getTarget());

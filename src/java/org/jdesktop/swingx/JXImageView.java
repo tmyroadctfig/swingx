@@ -24,7 +24,7 @@ package org.jdesktop.swingx;
 import org.jdesktop.swingx.color.ColorUtil;
 import org.jdesktop.swingx.error.ErrorListener;
 import org.jdesktop.swingx.error.ErrorSupport;
-import org.jdesktop.swingx.util.PaintUtils;
+import org.jdesktop.swingx.graphics.GraphicsUtilities;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -294,7 +294,9 @@ public class JXImageView extends JXPanel {
      * to all registered ErrorListeners
      * @return the action
      * @see ErrorListener
+     * @deprecated see SwingX issue 990
      */
+    @Deprecated
     public Action getOpenAction() {
         Action action = new AbstractAction() {
             public void actionPerformed(ActionEvent actionEvent) {
@@ -335,7 +337,9 @@ public class JXImageView extends JXPanel {
      * then save the image from the view. If the save fails an error will be fired
      * to all registered ErrorListeners
      * @return an Action
+     * @deprecated see SwingX issue 990
      */
+    @Deprecated
     public Action getSaveAction() {
         Action action = new AbstractAction() {
             public void actionPerformed(ActionEvent evt) {
@@ -388,7 +392,9 @@ public class JXImageView extends JXPanel {
     /**
      * Get an action which will rotate the currently selected image clockwise.
      * @return an action
+     * @deprecated see SwingX issue 990
      */
+    @Deprecated
     public Action getRotateClockwiseAction() {
         Action action = new AbstractAction() {
             public void actionPerformed(ActionEvent evt) {
@@ -424,7 +430,9 @@ public class JXImageView extends JXPanel {
     /**
      * Gets an action which will rotate the current image counter clockwise.
      * @return an Action
+     * @deprecated see SwingX issue 990
      */
+    @Deprecated
     public Action getRotateCounterClockwiseAction() {
         Action action = new AbstractAction() {
             public void actionPerformed(ActionEvent evt) {
@@ -459,7 +467,9 @@ public class JXImageView extends JXPanel {
     /**
      * Gets an action which will zoom the current image out by a factor of 2.
      * @return an action
+     * @deprecated see SwingX issue 990
      */
+    @Deprecated
     public Action getZoomOutAction() {
         Action action = new AbstractAction() {
             public void actionPerformed(ActionEvent actionEvent) {
@@ -473,7 +483,9 @@ public class JXImageView extends JXPanel {
     /**
      * Gets an action which will zoom the current image in by a factor of 2
      * @return an action
+     * @deprecated see SwingX issue 990
      */
+    @Deprecated
     public Action getZoomInAction() {
         Action action = new AbstractAction() {
             public void actionPerformed(ActionEvent actionEvent) {
@@ -600,14 +612,16 @@ public class JXImageView extends JXPanel {
             return new ImageTransferable(view.getImage(),
                     view.getExportName(), view.getExportFormat());
         }
+        
+        @SuppressWarnings("unchecked")
         public boolean importData(JComponent comp, Transferable t) {
             if (canImport(comp, t.getTransferDataFlavors())) {
                 try {
                     if(t.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
-                        List files = (List) t.getTransferData(DataFlavor.javaFileListFlavor);
+                        List<File> files = (List<File>) t.getTransferData(DataFlavor.javaFileListFlavor);
                         //log.fine("doing file list flavor");
                         if (files.size() > 0) {
-                            File file = (File) files.get(0);
+                            File file = files.get(0);
                             //log.fine("readingt hte image: " + file.getCanonicalPath());
                             /*Iterator it = ImageIO.getImageReaders(new FileInputStream(file));
                             while(it.hasNext()) {
@@ -671,7 +685,7 @@ public class JXImageView extends JXPanel {
                     files = new ArrayList<File>();
                     File file = File.createTempFile(exportName,"."+exportFormat);
                     //log.fine("writing to: " + file);
-                    ImageIO.write(PaintUtils.convertToBufferedImage(img),exportFormat,file);
+                    ImageIO.write(GraphicsUtilities.convertToBufferedImage(img),exportFormat,file);
                     files.add(file);
                 }
                 //log.fine("returning: " + files);

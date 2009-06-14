@@ -58,7 +58,7 @@ public final class StringValues {
     /**
      * A {@code StringValue} that presents the current L&F display name for a
      * given file. If the value passed to {@code FILE_NAME} is not a
-     * {@link File}, this has the same effect as {@link StringValues#EMPTY}.
+     * {@link File}, this has the same effect as {@link StringValues#TO_STRING}.
      */
     @SuppressWarnings("serial")
     public static final StringValue FILE_NAME = new StringValue() {
@@ -69,14 +69,14 @@ public final class StringValues {
                 return fsv.getSystemDisplayName((File) value);
             }
 
-            return StringValues.EMPTY.getString(value);
+            return StringValues.TO_STRING.getString(value);
         }
     };
 
     /**
      * A {@code StringValue} that presents the current L&F type name for a
      * given file. If the value passed to {@code FILE_TYPE} is not a
-     * {@link File}, this has the same effect as {@link StringValues#EMPTY}.
+     * {@link File}, this has the same effect as {@link StringValues#TO_STRING}.
      */
     @SuppressWarnings("serial")
     public static final StringValue FILE_TYPE = new StringValue() {
@@ -87,7 +87,7 @@ public final class StringValues {
                 return fsv.getSystemTypeDescription((File) value);
             }
             
-            return StringValues.EMPTY.getString(value);
+            return StringValues.TO_STRING.getString(value);
         }
     };
 

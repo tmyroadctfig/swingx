@@ -21,10 +21,12 @@
 package org.jdesktop.swingx;
 
 import java.awt.Color;
+import java.awt.ComponentOrientation;
 import java.awt.Font;
 import java.awt.GraphicsEnvironment;
 import java.awt.Insets;
 import java.lang.reflect.InvocationTargetException;
+import java.text.DateFormatSymbols;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
@@ -35,6 +37,7 @@ import java.util.TreeSet;
 import java.util.logging.Logger;
 
 import javax.swing.Action;
+import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
@@ -45,6 +48,7 @@ import org.jdesktop.swingx.calendar.DaySelectionModel;
 import org.jdesktop.swingx.calendar.DateSelectionModel.SelectionMode;
 import org.jdesktop.swingx.event.DateSelectionListener;
 import org.jdesktop.swingx.event.DateSelectionEvent.EventType;
+import org.jdesktop.swingx.hyperlink.AbstractHyperlinkAction;
 import org.jdesktop.swingx.test.DateSelectionReport;
 import org.jdesktop.test.ActionReport;
 import org.jdesktop.test.PropertyChangeReport;
@@ -114,6 +118,122 @@ public class JXMonthViewTest extends MockObjectTestCase {
        public void tearDown() {
         JComponent.setDefaultLocale(componentLocale);
     }
+
+    /**
+     * Issue #1072-swingx: nav icons incorrect for RToL if zoomable
+     */
+    @Test
+    public void testNavigationIconsUpdatedWithCO() {
+       Action action = monthView.getActionMap().get("nextMonth"); 
+       if (monthView.getComponentOrientation().isLeftToRight()) {
+           Icon icon = (Icon) action.getValue(Action.SMALL_ICON);
+           assertNotNull("sanity: the decorated month nav action has an icon", icon);
+           assertEquals(UIManager.getIcon("JXMonthView.monthUpFileName"), icon);
+           monthView.applyComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+//           assertNotSame(icon, action.getValue(Action.SMALL_ICON));
+           assertEquals(action.getValue(Action.SMALL_ICON), UIManager.getIcon("JXMonthView.monthDownFileName"));
+       } else {
+           
+       }
+    }
+    
+    /**
+     * Issue #1046-swingx: month title not updated when traversing months
+     * (programatically or by navigating in monthView)
+     */
+    @Test
+    public void testZoomableNameOnMonthChange() {
+        JXMonthView monthView = new JXMonthView();
+        AbstractHyperlinkAction<?> action = (AbstractHyperlinkAction<?>) monthView.getActionMap().get("zoomOut");
+        assertSame(monthView, action.getTarget());
+        String[] monthNames = new DateFormatSymbols(monthView.getLocale()).getMonths();
+        Calendar calendar = monthView.getCalendar();
+        int month = calendar.get(Calendar.MONTH);
+        assertTrue(action.getName().startsWith(monthNames[month]));
+        calendar.add(Calendar.MONTH, 1);
+        monthView.setFirstDisplayedDay(calendar.getTime());
+        int nextMonth = calendar.get(Calendar.MONTH);
+        assertTrue("month changed: old/new " + month + "/" + nextMonth, nextMonth != month);
+        assertTrue("name must be updated, expected: " + monthNames[nextMonth] + " was: " + action.getName()
+                , action.getName().startsWith(monthNames[nextMonth]));
+    }
+
+    /**
+     * Issue #1046-swingx: month title not updated when traversing months
+     * (programatically or by navigating in monthView)
+     */
+    @Test
+    public void testZoomableNameOnLocaleChange() {
+        JXMonthView monthView = new JXMonthView();
+        AbstractHyperlinkAction<?> action = (AbstractHyperlinkAction<?>) monthView.getActionMap().get("zoomOut");
+        assertSame(monthView, action.getTarget());
+        Locale locale = Locale.FRENCH;
+        if (locale.equals(monthView.getLocale())) {
+            locale = Locale.GERMAN;
+        }
+        monthView.setLocale(locale);
+        String[] monthNames = new DateFormatSymbols(monthView.getLocale()).getMonths();
+        Calendar calendar = monthView.getCalendar();
+        int month = calendar.get(Calendar.MONTH);
+        assertTrue("name must be updated with locale, expected: " + monthNames[month] + " was: " + action.getName(), 
+                action.getName().startsWith(monthNames[month]));
+    }
+
+    /**
+     * Issue #1046-swingx: month title not updated when traversing months
+     * (programatically or by navigating in monthView)
+     * 
+     * Test that zoomOutActin is installed for zoomable.
+     */
+    @Test
+    public void testZoomableZoomOutAction() {
+        JXMonthView monthView = new JXMonthView();
+        assertNotNull("monthView must have zoomOutAction", monthView.getActionMap().get("zoomOut"));
+        monthView.setZoomable(true);
+        assertNotNull("monthView must have zoomOutAction", monthView.getActionMap().get("zoomOut"));
+    }
+    
+    
+    /**
+     * Test that navigational actions are installed
+     */
+    @Test
+    public void testNavigationActionsInstalled() {
+        JXMonthView monthView = new JXMonthView();
+        assertActionInstalled(monthView, "scrollToNextMonth");
+        assertActionInstalled(monthView, "scrollToPreviousMonth");
+        // actions mapped by CalendarHeaderHandler
+        assertActionInstalled(monthView, "nextMonth");
+        assertActionInstalled(monthView, "previousMonth");
+    }
+    
+    /**
+     * @param monthView
+     * @param actionKey
+     */
+    private void assertActionInstalled(JXMonthView monthView, String actionKey) {
+        assertNotNull("ui must have installed action for " + actionKey, monthView.getActionMap().get(actionKey));
+    }
+
+    /**
+     * Test that navigational actions are working as expected.
+     */
+    @Test
+    public void testNavigationActionsWorking() {
+        assertActionPerformed(new JXMonthView(), "scrollToNextMonth", Calendar.MONTH, 1);
+        assertActionPerformed(new JXMonthView(), "nextMonth", Calendar.MONTH, 1);
+        assertActionPerformed(new JXMonthView(), "scrollToPreviousMonth", Calendar.MONTH, -1);
+        assertActionPerformed(new JXMonthView(), "previousMonth", Calendar.MONTH, -1);
+    }
+    
+    private void assertActionPerformed(JXMonthView monthView, String actionKey, int calendarField, int amount) {
+        Calendar calendar = monthView.getCalendar();
+        calendar.add(calendarField, amount);
+        Action action = monthView.getActionMap().get(actionKey);
+        action.actionPerformed(null);
+        assertEquals(calendar.getTime(), monthView.getFirstDisplayedDay());
+    }
+
 
     @Test
     public void testZoomableProperty() {

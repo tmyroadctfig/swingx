@@ -8,18 +8,19 @@ package org.jdesktop.swingx.editors;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.LinearGradientPaint;
+import java.awt.MultipleGradientPaint;
 import java.awt.Paint;
 import java.awt.Rectangle;
 import java.awt.geom.Point2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.List;
+
 import javax.swing.JComponent;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import org.apache.batik.ext.awt.MultipleGradientPaint;
+
 import org.jdesktop.swingx.JXGradientChooser;
-import org.jdesktop.swingx.multislider.Thumb;
 import org.jdesktop.swingx.color.ColorUtil;
 import org.jdesktop.swingx.color.EyeDropperColorChooserPanel;
 
@@ -171,7 +172,7 @@ public class PaintPicker extends javax.swing.JPanel {
         // fill in the gradient
         Point2D start = new Point2D.Float(0, 0);
         Point2D end = new Point2D.Float((float) length, 0);
-        MultipleGradientPaint paint = new org.apache.batik.ext.awt.LinearGradientPaint(
+        MultipleGradientPaint paint = new LinearGradientPaint(
                 (float) start.getX(),
                 (float) start.getY(),
                 (float) end.getX(),

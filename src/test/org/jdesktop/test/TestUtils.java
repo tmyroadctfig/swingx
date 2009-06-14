@@ -445,22 +445,21 @@ public final class TestUtils extends Assert {
                     newVal = new File("dummy");
                 } else if (c.equals(Date.class)) {
                     Calendar cal = GregorianCalendar.getInstance();
-                    // set ms to 0
-                    cal.add(Calendar.MILLISECOND, - cal.get(Calendar.MILLISECOND));
                     // set specific date range
                     cal.set(2009, 1, 1, 0, 0, 0);
-                    cal.roll(Calendar.MONTH, 1);
+                    // set ms to 0
+                    cal.set(Calendar.MILLISECOND, 0);
                     newVal = cal.getTime();
                     if (newVal.equals(val)) {
-                        cal.set(2009, 1, 14, 0, 0, 0);
+                        cal.set(2009, 3, 1, 0, 0, 0);
                         newVal = cal.getTime();
                     }
                 } else if (c.equals(Date[].class)) {
                     Calendar cal = GregorianCalendar.getInstance();
-                    // set ms to 0
-                    cal.add(Calendar.MILLISECOND, - cal.get(Calendar.MILLISECOND));
                     // set specific date range
                     cal.set(2009, 1, 11, 0, 0, 0);
+                    // set ms to 0
+                    cal.set(Calendar.MILLISECOND, 0);
                     Date d1 = cal.getTime();
                     cal.set(2009, 1, 15, 0, 0, 0);
                     newVal = new Date[] {d1, cal.getTime()};

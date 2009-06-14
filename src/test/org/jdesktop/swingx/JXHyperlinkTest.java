@@ -11,16 +11,20 @@ import java.awt.event.ActionEvent;
 import java.awt.event.MouseListener;
 import java.util.logging.Logger;
 
+import javax.swing.border.Border;
+import javax.swing.border.EmptyBorder;
+import javax.swing.plaf.UIResource;
+
 import junit.framework.TestCase;
 
-import org.jdesktop.swingx.hyperlink.LinkAction;
+import org.jdesktop.swingx.hyperlink.AbstractHyperlinkAction;
 import org.jdesktop.swingx.plaf.basic.BasicHyperlinkUI.BasicHyperlinkListener;
 import org.jdesktop.test.PropertyChangeReport;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.junit.Test;
-import org.junit.Before;
-import org.junit.After;
 
 
 /**
@@ -48,6 +52,19 @@ public class JXHyperlinkTest extends TestCase {
     }
     
     @Test
+    public void testBorderUIResource() {
+        JXHyperlink hyperlink = new JXHyperlink();
+        if (!(hyperlink.getBorder() instanceof UIResource)) {
+            LOG.info("not running test, LAF doesn't install hyperlink border");
+            return;
+        }
+        Border border = new EmptyBorder(1, 2, 3, 4);
+        hyperlink.setBorder(border);
+        hyperlink.updateUI();
+        assertSame("border untouched in updateUI ", border, hyperlink.getBorder());
+    }
+    
+    @Test
     public void testHyperlinkButtonListener() {
         JXHyperlink hyperlink = new JXHyperlink();
         MouseListener[] listeners = hyperlink.getMouseListeners();
@@ -71,13 +88,13 @@ public class JXHyperlinkTest extends TestCase {
        hyperlink.doClick();
        assertTrue("hyperlink autoClicks if it has no action", hyperlink.isClicked());
        
-       LinkAction<Object> emptyAction = createEmptyLinkAction();
+       AbstractHyperlinkAction<Object> emptyAction = createEmptyLinkAction();
        JXHyperlink hyperlink2 = new JXHyperlink(emptyAction);
        hyperlink2.doClick();
        assertFalse(emptyAction.isVisited());
        assertFalse("hyperlink does nothing if has action", hyperlink2.isClicked());
        
-       LinkAction emptyAction3 = createEmptyLinkAction();
+       AbstractHyperlinkAction emptyAction3 = createEmptyLinkAction();
        JXHyperlink hyperlink3 = new JXHyperlink(emptyAction3);
        hyperlink3.setOverrulesActionOnClick(true);
        hyperlink3.doClick();
@@ -102,7 +119,7 @@ public class JXHyperlinkTest extends TestCase {
      */
     @Test
     public void testLinkActionSetTarget() {
-        LinkAction<Object> linkAction = createEmptyLinkAction();
+        AbstractHyperlinkAction<Object> linkAction = createEmptyLinkAction();
         linkAction.setVisited(true);
         JXHyperlink hyperlink = new JXHyperlink(linkAction);
         Object target = new Object();
@@ -116,7 +133,7 @@ public class JXHyperlinkTest extends TestCase {
      */
     @Test
     public void testSetClickedActionUnchanged() {
-        LinkAction<Object> linkAction = createEmptyLinkAction();
+        AbstractHyperlinkAction<Object> linkAction = createEmptyLinkAction();
         linkAction.setVisited(true);
         JXHyperlink hyperlink = new JXHyperlink(linkAction);
         // sanity assert..
@@ -161,7 +178,7 @@ public class JXHyperlinkTest extends TestCase {
      */
     @Test
     public void testSetNullAction() {
-        LinkAction action = createEmptyLinkAction();
+        AbstractHyperlinkAction action = createEmptyLinkAction();
         JXHyperlink hyperlink = new JXHyperlink(action);
         assertEquals("hyperlink action must be equal to linkAction", action, hyperlink.getAction());
         hyperlink.setAction(null);
@@ -176,7 +193,7 @@ public class JXHyperlinkTest extends TestCase {
     @Test
     public void testSetAction() {
         JXHyperlink hyperlink = new JXHyperlink();
-        LinkAction action = createEmptyLinkAction();
+        AbstractHyperlinkAction action = createEmptyLinkAction();
         hyperlink.setAction(action);
         assertEquals("hyperlink action must be equal to linkAction", 
                 action, hyperlink.getAction());
@@ -189,7 +206,7 @@ public class JXHyperlinkTest extends TestCase {
      */
     @Test
     public void testListeningVisited() {
-       LinkAction<Object> linkAction = createEmptyLinkAction();
+       AbstractHyperlinkAction<Object> linkAction = createEmptyLinkAction();
        JXHyperlink hyperlink = new JXHyperlink(linkAction);
        // sanity: both are expected to be false
        assertEquals(linkAction.isVisited(), hyperlink.isClicked());
@@ -208,7 +225,7 @@ public class JXHyperlinkTest extends TestCase {
      */
     @Test
     public void testInitialVisitedSynched() {
-        LinkAction<Object> linkAction = createEmptyLinkAction();
+        AbstractHyperlinkAction<Object> linkAction = createEmptyLinkAction();
        linkAction.setVisited(true);
        // sanity: linkAction is changed to true
        assertTrue(linkAction.isVisited());
@@ -230,8 +247,8 @@ public class JXHyperlinkTest extends TestCase {
         }
     }
 
-    protected LinkAction<Object> createEmptyLinkAction() {
-        LinkAction<Object> linkAction = new LinkAction<Object>(null) {
+    protected AbstractHyperlinkAction<Object> createEmptyLinkAction() {
+        AbstractHyperlinkAction<Object> linkAction = new AbstractHyperlinkAction<Object>(null) {
 
             public void actionPerformed(ActionEvent e) {
                 // TODO Auto-generated method stub
@@ -242,8 +259,8 @@ public class JXHyperlinkTest extends TestCase {
         return linkAction;
     }
 
-    protected LinkAction createEmptyLinkAction(String name) {
-        LinkAction linkAction = createEmptyLinkAction();
+    protected AbstractHyperlinkAction createEmptyLinkAction(String name) {
+        AbstractHyperlinkAction linkAction = createEmptyLinkAction();
         linkAction.setName(name);
         return linkAction;
     }

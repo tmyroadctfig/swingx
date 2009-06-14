@@ -32,7 +32,7 @@ import org.jdesktop.swingx.action.AbstractActionExt;
  * 
  * @author Jeanette Winzenburg
  */
-public abstract class LinkAction<T> extends AbstractActionExt {
+public abstract class AbstractHyperlinkAction<T> extends AbstractActionExt {
 
     /**
      * Key for the visited property value.
@@ -48,17 +48,17 @@ public abstract class LinkAction<T> extends AbstractActionExt {
      * Instantiates a LinkAction with null target. 
      * 
      */
-    public LinkAction () {
+    public AbstractHyperlinkAction () {
         this(null);    }
     
     /**
      * Instantiates a LinkAction with a target of type targetClass. 
      * The visited property is initialized as defined by 
-     * {@link LinkAction#installTarget()}
+     * {@link AbstractHyperlinkAction#installTarget()}
      * 
      * @param target the target this action should act on.
      */
-    public LinkAction(T target) {
+    public AbstractHyperlinkAction(T target) {
        setTarget(target);
     }
 

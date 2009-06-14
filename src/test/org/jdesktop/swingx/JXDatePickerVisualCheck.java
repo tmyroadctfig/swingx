@@ -39,6 +39,7 @@ import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Box;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
@@ -97,7 +98,7 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
 //            test.runInteractiveTests("interactive.*PrefSize.*");
 //            test.runInteractiveTests("interactive.*Keep.*");
 //          test.runInteractiveTests("interactive.*Multiple.*");
-            test.runInteractiveTests("interactive.*Popup.*");
+            test.runInteractiveTests("interactive.*Event.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
@@ -273,10 +274,13 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
        picker.getEditor().setName("first DateField");
         JComponent comp = new JPanel();
         comp.add(picker);
-        comp.add(new JXDatePicker(new Date()));
+        JXDatePicker other = new JXDatePicker(new Date());
+        comp.add(other);
+//        other.setFocusable(false);
+//        picker.setFocusable(false);
         JXFrame frame = wrapInFrame(comp, "popup: picker <-> picker", true);
         addMessage(frame, "click on second opens popup of first (mac only?)");
-        show(frame);
+        show(frame, 400, 400);
     }
 
     
@@ -706,6 +710,7 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
         
     }
     
+
     /**
      * Issue #235-swingx: action events
      * 
@@ -732,15 +737,16 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
      * 
      * 
      */
-    public void interactiveActionEvent() {
+    public void interactiveActionEventSetAction() {
         JXDatePicker picker = new JXDatePicker();
         JTextField simpleField = new JTextField("simple field");
         JFormattedTextField textField = new JFormattedTextField(DateFormat.getDateInstance());
         textField.setValue(new Date());
         JComboBox box = new JComboBox(new Object[] {"one", "two", "three"});
         box.setEditable(true);
-        
-        ActionListener l = new ActionListener() {
+        JComboBox nonEditableBox = new JComboBox(new Object[] {"one", "two", "three"});
+        JSpinner spinner = new JSpinner();
+        final Action l = new AbstractActionExt("recived") {
 
             public void actionPerformed(ActionEvent e) {
                 LOG.info("got action from: " + e.getSource().getClass().getName() + 
@@ -748,19 +754,31 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
             }
             
         };
-        simpleField.addActionListener(l);
-        textField.addActionListener(l);
+        simpleField.setAction(l);
+        textField.setAction(l);
+        // picker doesn't have action-related api
         picker.addActionListener(l);
 //        picker.getMonthView().addActionListener(l);
-        box.addActionListener(l);
+        box.setAction(l);
+        nonEditableBox.setAction(l);
+        
         JPanel panel = new JPanel();
         panel.add(simpleField);
         panel.add(textField);
         panel.add(picker);
         panel.add(box);
-        
-        JXFrame frame = showInFrame(panel, "Compare action events: keyboard/mouse");
-        frame.pack();
+        panel.add(new JCheckBox(l));
+        panel.add(nonEditableBox);
+        JXFrame frame = wrapInFrame(panel, "SetAction - Compare action events: keyboard/mouse");
+        Action toggleEnabled = new AbstractActionExt("toggleEnabledAction") {
+
+            public void actionPerformed(ActionEvent e) {
+                l.setEnabled(!l.isEnabled());
+            }
+            
+        };
+        addAction(frame, toggleEnabled);
+        show(frame);
     }
 
     /**

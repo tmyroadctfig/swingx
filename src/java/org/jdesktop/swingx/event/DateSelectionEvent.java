@@ -90,4 +90,11 @@ public class DateSelectionEvent extends EventObject {
     public boolean isAdjusting() {
         return adjusting;
     }
+
+    @Override
+    public String toString() {
+        return "[" + String.valueOf(getSource()) + " type: " + getEventType() + " isAdjusting: " + isAdjusting();
+    }
+    
+    
 }

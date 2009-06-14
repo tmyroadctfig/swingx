@@ -48,7 +48,6 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
-import javax.swing.JTree;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListModel;
 import javax.swing.LookAndFeel;
@@ -613,7 +612,7 @@ public class RendererIssues extends InteractiveTestCase {
      * 
      */
     public void testNodeTypeIcons() {
-       CellContext<JTree> context = new TreeCellContext();
+       TreeCellContext context = new TreeCellContext();
        context.installContext(null, "dummy", -1, -1, false, false, false, true);
        final Icon custom = XTestUtils.loadDefaultIcon();
        IconValue iv = new IconValue() {

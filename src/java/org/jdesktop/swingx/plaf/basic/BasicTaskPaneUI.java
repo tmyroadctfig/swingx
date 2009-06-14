@@ -117,7 +117,7 @@ public class BasicTaskPaneUI extends TaskPaneUI {
      * </ul>
      */
     protected void installDefaults() {
-        group.setOpaque(true);
+        LookAndFeel.installProperty(group, "opaque", true);
         group.setBorder(createPaneBorder());
         ((JComponent) group.getContentPane())
                 .setBorder(createContentPaneBorder());

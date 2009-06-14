@@ -21,20 +21,26 @@
 
 package org.jdesktop.swingx.color;
 
-import org.apache.batik.ext.awt.LinearGradientPaint;
-import org.apache.batik.ext.awt.MultipleGradientPaint;
-import org.apache.batik.ext.awt.RadialGradientPaint;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.LinearGradientPaint;
+import java.awt.MultipleGradientPaint;
+import java.awt.Paint;
+import java.awt.RadialGradientPaint;
+import java.awt.RenderingHints;
+import java.awt.event.MouseEvent;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
+import java.util.List;
+import java.util.logging.Logger;
+
+import javax.swing.event.MouseInputAdapter;
+
 import org.jdesktop.swingx.JXGradientChooser;
 import org.jdesktop.swingx.JXPanel;
 import org.jdesktop.swingx.multislider.MultiThumbModel;
 import org.jdesktop.swingx.multislider.Thumb;
-
-import javax.swing.event.MouseInputAdapter;
-import java.awt.*;
-import java.awt.event.MouseEvent;
-import java.awt.geom.Point2D;
-import java.util.List;
-import java.util.logging.Logger;
 
 /**
  * <p><b>Dependency</b>: Because this class relies on LinearGradientPaint and
@@ -160,25 +166,25 @@ public class GradientPreviewPanel extends JXPanel {
         }
 
         // set up the cycle type
-        MultipleGradientPaint.CycleMethodEnum cycle = MultipleGradientPaint.NO_CYCLE;
+        MultipleGradientPaint.CycleMethod cycle = MultipleGradientPaint.CycleMethod.NO_CYCLE;
         if(isRepeated()) {
         //if(picker.repeatedRadio.isSelected()) {
-            cycle = MultipleGradientPaint.REPEAT;
+            cycle = MultipleGradientPaint.CycleMethod.REPEAT;
         }
         if(isReflected()) {
         //if(picker.reflectedRadio.isSelected()) {
-            cycle = MultipleGradientPaint.REFLECT;
+            cycle = MultipleGradientPaint.CycleMethod.REFLECT;
         }
         
         // create the underlying gradient paint
         MultipleGradientPaint paint = null;
         if(isRadial()) { //picker.styleCombo.getSelectedItem().toString().equals("Radial")) {
-            paint = new org.apache.batik.ext.awt.RadialGradientPaint(
+            paint = new RadialGradientPaint(
             start, (float)start.distance(end),start,
-            fractions, colors, cycle, MultipleGradientPaint.SRGB
+            fractions, colors, cycle, MultipleGradientPaint.ColorSpaceType.SRGB, null
             );
         } else {
-            paint = new org.apache.batik.ext.awt.LinearGradientPaint(
+            paint = new LinearGradientPaint(
             (float)start.getX(),
             (float)start.getY(),
             (float)end.getX(),

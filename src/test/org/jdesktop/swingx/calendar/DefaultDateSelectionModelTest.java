@@ -28,11 +28,10 @@ import java.util.logging.Logger;
 
 import org.jdesktop.swingx.event.DateSelectionEvent;
 import org.jdesktop.swingx.test.DateSelectionReport;
+import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.junit.Test;
-import org.junit.Before;
-import org.junit.After;
 
 
 /**
@@ -393,22 +392,25 @@ public class DefaultDateSelectionModelTest extends AbstractTestDateSelectionMode
     public void testSingleIntervalSelection() {
         model.setSelectionMode(DateSelectionModel.SelectionMode.SINGLE_INTERVAL_SELECTION);
         Date startDate = new Date();
-        Calendar cal = Calendar.getInstance();
+        // PENDING JW: hit US DST switching again ... how to handle that? 
+        Calendar cal = Calendar.getInstance(); //TimeZone.getTimeZone("US/Eastern"));
         cal.setTime(startDate);
+//        cal.set(2009, Calendar.MARCH, 5, 2, 0);
+//        startDate = cal.getTime();
         cal.add(Calendar.DAY_OF_MONTH, 5);
         Date endDate = cal.getTime();
         model.setSelectionInterval(startDate, endDate);
         SortedSet<Date> selection = model.getSelection();
-        assertTrue(startDate.equals(selection.first()));
-        assertTrue(endDate.equals(selection.last()));
+        assertEquals(startDate, selection.first());
+        assertEquals(endDate, selection.last());
 
         cal.setTime(startDate);
         cal.roll(Calendar.MONTH, 1);
         Date startDateNextMonth = cal.getTime();
         model.addSelectionInterval(startDateNextMonth, startDateNextMonth);
         selection = model.getSelection();
-        assertTrue(startDateNextMonth.equals(selection.first()));
-        assertTrue(startDateNextMonth.equals(selection.last()));
+        assertEquals(startDateNextMonth, selection.first());
+        assertEquals(startDateNextMonth, selection.last());
     }
 
     /**

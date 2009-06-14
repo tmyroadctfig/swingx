@@ -83,7 +83,7 @@ public class JXTitledPanel extends JXPanel {
     private Font titleFont;
 
     /**
-     * The forground color to use for the Title (particularly for the text)
+     * The foreground color to use for the Title (particularly for the text)
      */
     private Color titleForeground;
 
@@ -131,7 +131,6 @@ public class JXTitledPanel extends JXPanel {
      * Returns the look and feel (L&F) object that renders this component.
      * 
      * @return the TitledPanelUI object that renders this component
-     * @since 1.4
      */
     @Override
     public TitledPanelUI getUI() {
@@ -144,10 +143,9 @@ public class JXTitledPanel extends JXPanel {
      * @param ui
      *            the TitledPanelUI L&F object
      * @see javax.swing.UIDefaults#getUI
-     * @since 1.4
-     * @beaninfo bound: true hidden: true attribute: visualUpdate true
-     *           description: The UI object that implements the Component's
-     *           LookAndFeel.
+     * @beaninfo bound: true
+     *          hidden: true attribute: visualUpdate true
+     *     description: The UI object that implements the Component's LookAndFeel.
      */
     public void setUI(TitledPanelUI ui) {
         super.setUI(ui);
@@ -160,8 +158,8 @@ public class JXTitledPanel extends JXPanel {
      * @return "TitledPanelUI"
      * @see JComponent#getUIClassID
      * @see javax.swing.UIDefaults#getUI
-     * @beaninfo expert: true description: A string that specifies the name of
-     *           the L&F class.
+     * @beaninfo expert: true 
+     *      description: A string that specifies the name of the L&F class.
      */
     @Override
     public String getUIClassID() {
@@ -181,10 +179,21 @@ public class JXTitledPanel extends JXPanel {
                 .getUI(this, TitledPanelUI.class));
     }
 
+    /**
+     * Gets the title for this titled panel.
+     * 
+     * @return the currently displayed title
+     */
     public String getTitle() {
         return title;
     }
 
+    /**
+     * Sets the title for this title panel.
+     * 
+     * @param title
+     *            the title to display
+     */
     public void setTitle(String title) {
         String oldTitle = this.title;
         this.title = (title == null ? "" : title);

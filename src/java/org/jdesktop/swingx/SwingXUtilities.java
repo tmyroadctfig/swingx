@@ -37,8 +37,10 @@ import javax.swing.JComponent;
 import javax.swing.JPopupMenu;
 import javax.swing.KeyStroke;
 import javax.swing.MenuElement;
+import javax.swing.RepaintManager;
 import javax.swing.SwingUtilities;
 import javax.swing.plaf.ComponentInputMapUIResource;
+import javax.swing.plaf.UIResource;
 import javax.swing.text.html.HTMLDocument;
 
 /**
@@ -322,7 +324,37 @@ public final class SwingXUtilities {
         }
     }
 
+    /**
+     * An improved version of
+     * {@link SwingUtilities#getAncestorOfClass(Class, Component)}. This method
+     * traverses {@code JPopupMenu} invoker and uses generics to return an
+     * appropriately typed object.
+     * 
+     * @param <T>
+     *            the type of ancestor to find
+     * @param clazz
+     *            the class instance of the ancestor to find
+     * @param c
+     *            the component to start the search from
+     * @return an ancestor of the correct type or {@code null} if no such
+     *         ancestor exists. This method also returns {@code null} if any
+     *         parameter is {@code null}.
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> T getAncestor(Class<T> clazz, Component c) {
+        if (clazz == null || c == null) {
+            return null;
+        }
+        
+        Component parent = c.getParent();
 
+        while (parent != null && !(clazz.isInstance(parent))) {
+            parent = parent instanceof JPopupMenu
+                    ? ((JPopupMenu) parent).getInvoker() : parent.getParent();
+        }
+        
+        return (T) parent;
+    }
 
     /**
      * Returns whether the component is part of the parent's
@@ -349,4 +381,43 @@ public final class SwingXUtilities {
         }
         return false;
     }
+
+    /**
+     * Obtains a {@code TranslucentRepaintManager} from the specified manager.
+     * If the current manager is a {@code TranslucentRepaintManager} or a
+     * {@code ForwardingRepaintManager} that contains a {@code
+     * TranslucentRepaintManager}, then the passed in manager is returned.
+     * Otherwise a new repaint manager is created and returned.
+     * 
+     * @param delegate
+     *            the current repaint manager
+     * @return a non-{@code null} {@code TranslucentRepaintManager}
+     * @throws NullPointerException if {@code delegate} is {@code null}
+     */
+    static RepaintManager getTranslucentRepaintManager(RepaintManager delegate) {
+        RepaintManager manager = delegate;
+        
+        while (manager != null && !manager.getClass().isAnnotationPresent(TranslucentRepaintManager.class)) {
+            if (manager instanceof ForwardingRepaintManager) {
+                manager = ((ForwardingRepaintManager) manager).getDelegateManager();
+            } else {
+                manager = null;
+            }
+        }
+        
+        return manager == null ? new RepaintManagerX(delegate) : delegate;
+    }
+    
+    /**
+     * Checks and returns whether the given property should be replaced
+     * by the UI's default value. 
+     * 
+     * @param property the property to check.
+     * @return true if the given property should be replaced by the UI's
+     *   default value, false otherwise. 
+     */
+    public static boolean isUIInstallable(Object property) {
+       return (property == null) || (property instanceof UIResource);
+    }
+
 }

@@ -23,6 +23,7 @@ package org.jdesktop.swingx;
 
 import org.jdesktop.swingx.action.ActionManager;
 import org.jdesktop.swingx.action.Targetable;
+import org.jdesktop.swingx.action.TargetableSupport;
 import org.jdesktop.swingx.search.SearchFactory;
 import org.jdesktop.swingx.search.Searchable;
 
@@ -70,15 +71,58 @@ import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
 /**
- * An extended editor pane which has the following features built in:
- * <ul>
- *   <li>Text search
- *   <li>undo/redo
- *   <li>simple html/plain text editing
- * </ul>
- *
+ * <p>
+ * {@code JXEditorPane} offers enhanced functionality over the standard {@code
+ * JEditorPane}.
+ * </p>
+ * <h3>Additional Features</h3>
+ * <dl>
+ * <dt>
+ * Improved text editing</dt>
+ * <dd>
+ * The standard text component commands for <i>cut</i>, <i>copy</i>, and
+ * <i>paste</i> used enhanced selection methods. The commands will only be
+ * active if there is text to cut or copy selected or valid text in the
+ * clipboard to paste.</dd>
+ * <dt>
+ * Improved HTML editing</dt>
+ * <dd>
+ * Using the context-sensitive approach for the standard text commands, {@code
+ * JXEditorPane} provides HTML editing commands that alter functionality
+ * depending on the document state. Currently, the user can quick-format the
+ * document with headers (H# tags), paragraphs, and breaks.</dd>
+ * <dt>
+ * Built-in UndoManager</dt>
+ * <dd>
+ * Text components provide {@link UndoableEditEvent}s. {@code JXEditorPane}
+ * places those events in an {@link UndoManager} and provides
+ * <i>undo</i>/<i>redo</i> commands. Undo and redo are context-sensitive (like
+ * the text commands) and will only be active if it is possible to perform the
+ * command.</dd>
+ * <dt>
+ * Built-in search</dt>
+ * <dd>
+ * Using SwingX {@linkplain SearchFactory search mechanisms}, {@code
+ * JXEditorPane} provides search capabilities, allowing the user to find text
+ * within the document.</dd>
+ * </dl>
+ * <h3>Example</h3>
+ * <p>
+ * Creating a {@code JXEditorPane} is no different than creating a {@code
+ * JEditorPane}. However, the following example demonstrates the best way to
+ * access the improved command functionality.
+ * 
+ * <pre>
+ * JXEditorPane editorPane = new JXEditorPane("some URL");
+ * add(editorPane);
+ * JToolBar toolBar = ActionContainerFactory.createToolBar(editorPane.getCommands[]);
+ * toolBar.addSeparator();
+ * toolBar.add(editorPane.getParagraphSelector());
+ * setToolBar(toolBar);
+ * </pre>
+ * </p>
+ * 
  * @author Mark Davidson
  */
 public class JXEditorPane extends JEditorPane implements /*Searchable, */Targetable {
@@ -117,20 +161,49 @@ public class JXEditorPane extends JEditorPane implements /*Searchable, */Targeta
     private TargetableSupport targetSupport = new TargetableSupport(this);
     private Searchable searchable;
     
+    /**
+     * Creates a new <code>JXEditorPane</code>.
+     * The document model is set to <code>null</code>.
+     */
     public JXEditorPane() {
         init();
     }
 
+    /**
+     * Creates a <code>JXEditorPane</code> based on a string containing
+     * a URL specification.
+     *
+     * @param url the URL
+     * @exception IOException if the URL is <code>null</code> or
+     *      cannot be accessed
+     */
     public JXEditorPane(String url) throws IOException {
         super(url);
         init();
     }
 
+    /**
+     * Creates a <code>JXEditorPane</code> that has been initialized
+     * to the given text.  This is a convenience constructor that calls the
+     * <code>setContentType</code> and <code>setText</code> methods.
+     *
+     * @param type mime type of the given text
+     * @param text the text to initialize with; may be <code>null</code>
+     * @exception NullPointerException if the <code>type</code> parameter
+     *      is <code>null</code>
+     */
     public JXEditorPane(String type, String text) {
         super(type, text);
         init();
     }
 
+    /**
+     * Creates a <code>JXEditorPane</code> based on a specified URL for input.
+     *
+     * @param initialPage the URL
+     * @exception IOException if the URL is <code>null</code>
+     *      or cannot be accessed
+     */
     public JXEditorPane(URL initialPage) throws IOException {
         super(initialPage);
         init();
@@ -486,6 +559,9 @@ public class JXEditorPane extends JEditorPane implements /*Searchable, */Targeta
         this.searchable = searchable;
     }
     
+    /**
+     * A {@code Searchable} implementation for {@code Document}s.
+     */
     public class DocumentSearchable implements Searchable {
         public int search(String searchString) {
             return search(searchString, -1);

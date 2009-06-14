@@ -22,6 +22,8 @@ import javax.swing.JTree;
 import javax.swing.ListModel;
 import javax.swing.plaf.UIResource;
 import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.TreeCellEditor;
+import javax.swing.tree.TreeCellRenderer;
 
 import org.jdesktop.swingx.decorator.AbstractHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
@@ -33,12 +35,14 @@ import org.jdesktop.swingx.renderer.ComponentProvider;
 import org.jdesktop.swingx.renderer.DefaultListRenderer;
 import org.jdesktop.swingx.renderer.DefaultTreeRenderer;
 import org.jdesktop.swingx.renderer.IconValue;
-import org.jdesktop.swingx.renderer.IconValues;
 import org.jdesktop.swingx.renderer.StringValue;
 import org.jdesktop.swingx.renderer.StringValues;
 import org.jdesktop.swingx.renderer.WrappingIconPanel;
 import org.jdesktop.swingx.renderer.WrappingProvider;
 import org.jdesktop.swingx.test.XTestUtils;
+import org.jdesktop.swingx.tree.DefaultXTreeCellEditor;
+import org.jdesktop.swingx.tree.DefaultXTreeCellRenderer;
+import org.junit.Test;
 
 
 /**
@@ -65,15 +69,29 @@ public class JXTreeIssues extends JXTreeUnitTest {
       JXTreeIssues test = new JXTreeIssues();
       try {
 //          test.runInteractiveTests();
-//          test.runInteractiveTests("interactive.*RToL.*");
-//          test.runInteractiveTests("interactive.*Edit.*");
-        test.runInteractiveTests("interactive.*Icons.*");
+          test.runInteractiveTests("interactive.*UpdateUI.*");
+//        test.runInteractiveTests("interactive.*Icons.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
       }
   }
-
+    
+    /**
+     * Issue #1061-swingx: renderer/editor inconsistent on startup.
+     * Note: this test will fail once we use an enhanced cellEditor (which can cope with 
+     * SwingX default renderers).
+     */
+    @Test
+    public void testRendererUsedInEditorAfterSet() {
+        TestTree tree = new TestTree();
+        assertTrue("sanity: editor is of type DefaultXTreeCellEditor", tree.getCellEditor() instanceof DefaultXTreeCellEditor);
+        TreeCellRenderer renderer = new DefaultTreeCellRenderer();
+        tree.setCellRenderer(renderer);
+        assertSame("sanity: new renderer is wrapped", renderer, tree.getWrappedCellRenderer());
+        assertSame("editor must be updated with new renderer", renderer, ((DefaultXTreeCellEditor) tree.getCellEditor()).getRenderer()); 
+    }
+    
     /**
      * Issue #601-swingx: allow LAF to hook in LAF provided renderers.
      * 
@@ -116,11 +134,12 @@ public class JXTreeIssues extends JXTreeUnitTest {
      * Issue ??-swingx: JXTree must update renderer. 
      * It does ... the renderer comp is never removed from the tree's 
      * rendererPane? Not true - removed at end of paint.
+     * Why is this renderer replaced on LAF-toggle?
      */
-    public void interactiveUpdateUIRenderer() {
+    public void interactiveUpdateUIRendererProvider() {
         JXTree tree = new JXTree();
         tree.setCellRenderer(sharedRenderer);
-        showWithScrollingInFrame(tree, "updateUI must update renderer");
+        showWithScrollingInFrame(tree, "updateUI must update renderer??");
     }
 
     /**
@@ -141,21 +160,61 @@ public class JXTreeIssues extends JXTreeUnitTest {
         showWithScrollingInFrame(tree, "updateUI must update renderer");
     }
 
+    
     /**
-     * Issue ??-swingx: JXTree must update renderer
+     * Issue #1060-swingx: JXTree must update renderer
      * 
      * tree renderer not updated if set on the tree (as opposed to using the 
      * default set by the ui-delegate)
      */
-    public void interactiveUpdateUICoreDefaultRenderer() {
+    public void interactiveUpdateUICoreTreeDefaultRenderer() {
         JTree tree = new JTree();
-        DefaultTreeCellRenderer renderer = new DefaultTreeCellRenderer();
-//        renderer.setClosedIcon(XTestUtils.loadDefaultIcon());
-        tree.setCellRenderer(renderer);
-        showWithScrollingInFrame(tree, "JTree/core renderer: updateUI must update renderer");
+        tree.getModel().valueForPathChanged(tree.getPathForRow(0), "core with ui provided renderer");
+        tree.setEditable(true);
+        JTree treeSetRenderer = new JTree();
+        treeSetRenderer.getModel().valueForPathChanged(treeSetRenderer.getPathForRow(0), "core with renderer set");
+        treeSetRenderer.setCellRenderer(new DefaultTreeCellRenderer());
+        treeSetRenderer.setEditable(true);
+        
+        JXFrame frame = wrapWithScrollingInFrame(tree, treeSetRenderer, "JTree/core renderer: updateUI must update renderer");
+        addComponentOrientationToggle(frame);
+        show(frame);
     }
 
+    /**
+     * Issue #1060-swingx: JXTree must update renderer
+     * 
+     * tree renderer not updated if set on the tree (as opposed to using the 
+     * default set by the ui-delegate)
+     */
+    public void interactiveUpdateUIXTreeDefaultRenderer() {
+        JXTree tree = new JXTree();
+        tree.getModel().valueForPathChanged(tree.getPathForRow(0), "x with ui provided renderer");
+        tree.setEditable(true);
+        JXTree treeSetRenderer = new JXTree();
+        treeSetRenderer.getModel().valueForPathChanged(treeSetRenderer.getPathForRow(0), "x with renderer set");
+        treeSetRenderer.setCellRenderer(new DefaultXTreeCellRenderer());
+        treeSetRenderer.setEditable(true);
+        JXFrame frame = wrapWithScrollingInFrame(tree, treeSetRenderer, "JXTree/core renderer: updateUI must update renderer");
+        addComponentOrientationToggle(frame);
+        show(frame);
+    }
     
+    /**
+     * Issue #1060-swingx: JXTree must update renderer
+     * 
+     * tree renderer not updated if set on the tree (as opposed to using the 
+     * default set by the ui-delegate)
+     */
+    public void interactiveUpdateUIXTreeXRenderer() {
+        JXTree treeSetRenderer = new JXTree();
+        treeSetRenderer.getModel().valueForPathChanged(treeSetRenderer.getPathForRow(0), "x with renderer set");
+        treeSetRenderer.setCellRenderer(new DefaultTreeRenderer());
+        treeSetRenderer.setEditable(true);
+        JXFrame frame = wrapWithScrollingInFrame(treeSetRenderer, "JXTree/x renderer: updateUI must update renderer/editor");
+        addComponentOrientationToggle(frame);
+        show(frame);
+    }
 
     /**
      * Size effecting decoration vs. initial config (in provider).

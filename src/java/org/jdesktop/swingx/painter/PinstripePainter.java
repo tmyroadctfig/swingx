@@ -28,8 +28,7 @@ import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.geom.Area;
 import java.awt.geom.Line2D;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
+
 import javax.swing.JComponent;
 
 /**
@@ -51,7 +50,7 @@ import javax.swing.JComponent;
  *
  * @author rbair
  */
-public class PinstripePainter<T> extends AbstractPainter<T> {
+public class PinstripePainter extends AbstractPainter<Object> {
     /**
      * The angle in degrees to paint the pinstripes at. The default
      * value is 45. The value will be between 0 and 360 inclusive. The
@@ -197,9 +196,9 @@ public class PinstripePainter<T> extends AbstractPainter<T> {
     }
     
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
-    public void doPaint(Graphics2D g, T component, int width, int height) {
+    protected void doPaint(Graphics2D g, Object component, int width, int height) {
         //draws pinstripes at the angle specified in this class
         //and at the given distance apart
         Shape oldClip = g.getClip();

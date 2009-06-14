@@ -53,7 +53,7 @@ public class BasicMonthViewUIIssues extends InteractiveTestCase {
           e.printStackTrace();
       }
   }
-
+ 
     /**
      * Issue #786-swingx: IllegalStateException when paintDays of April 2008.
      * 

@@ -67,22 +67,6 @@ import java.io.Serializable;
 public interface StringValue extends Serializable {
 
     /**
-     * Default converter using the toString.
-     * 
-     * @deprecated pre-0.9.5 Use {@link StringValues#TO_STRING} instead
-     */
-    @Deprecated
-    public final static StringValue TO_STRING = StringValues.TO_STRING;
-
-    /**
-     * Converter returning an empty String always.
-     * 
-     * @deprecated pre-0.9.5 Use {@link StringValues#EMPTY} instead
-     */
-    @Deprecated
-    public final static StringValue EMPTY = StringValues.EMPTY;
-    
-    /**
      * Returns a string representation of the given value. <p>
      * 
      * PENDING JW: forgot - why not null return guaranteed?

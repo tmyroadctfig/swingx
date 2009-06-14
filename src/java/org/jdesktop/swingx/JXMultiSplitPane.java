@@ -173,7 +173,7 @@ public class JXMultiSplitPane extends JPanel {
     }
 
     private class DefaultDividerPainter extends DividerPainter {
-        public void doPaint(Graphics2D g, Divider divider, int width, int height) {
+        protected void doPaint(Graphics2D g, Divider divider, int width, int height) {
             if ((divider == activeDivider()) && !isContinuousLayout()) {
             g.setColor(Color.black);
             g.fillRect(0, 0, width, height);
@@ -246,12 +246,12 @@ public class JXMultiSplitPane extends JPanel {
           Graphics2D g2 = (Graphics2D)g.create();
           
             try {
-                Insets ins = this.getInsets();
-                g2.translate(ins.left, ins.top);
+          Insets ins = this.getInsets();
+          g2.translate(ins.left, ins.top);
                 backgroundPainter.paint(g2, this, this.getWidth() - ins.left
                         - ins.right, this.getHeight() - ins.top - ins.bottom);
             } finally {
-                g2.dispose();
+          g2.dispose();
             }
       } else {
           super.paintComponent(g);

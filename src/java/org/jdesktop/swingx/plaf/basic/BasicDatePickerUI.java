@@ -154,7 +154,7 @@ public class BasicDatePickerUI extends DatePickerUI {
     protected void installComponents() {
         
         JFormattedTextField editor = datePicker.getEditor();
-        if (editor == null || editor instanceof UIResource) {
+        if (SwingXUtilities.isUIInstallable(editor)) {
             DateFormat[] formats = getCustomFormats(editor);
             // we are not yet listening ...
             datePicker.setEditor(createEditor());
@@ -242,7 +242,7 @@ public class BasicDatePickerUI extends DatePickerUI {
         // PENDING: get from LF
         pickerInputMap.put(KeyStroke.getKeyStroke("F5"), JXDatePicker.HOME_COMMIT_KEY);
         pickerInputMap.put(KeyStroke.getKeyStroke("shift F5"), JXDatePicker.HOME_NAVIGATE_KEY);
-        pickerInputMap.put(KeyStroke.getKeyStroke("SPACE"), "TOGGLE_POPUP");
+        pickerInputMap.put(KeyStroke.getKeyStroke("alt DOWN"), "TOGGLE_POPUP");
         
         installLinkPanelKeyboardActions();
     }
@@ -684,7 +684,6 @@ public class BasicDatePickerUI extends DatePickerUI {
      * PENDING: currently this resets at once - but it's a no-no,
      * because it happens during notification
      * 
-     * 
      * @param oldDate the old date to revert to
      */
     private void revertValue(Date oldDate) {
@@ -696,6 +695,8 @@ public class BasicDatePickerUI extends DatePickerUI {
      * selection.
      * 
      * Here: does nothing if the change is intermediate.
+     * 
+     * PENDNG JW: shouldn't we listen to actionEvents then?
      * 
      * @param eventType the type of the selection change
      * @param adjusting flag to indicate whether the the selection change

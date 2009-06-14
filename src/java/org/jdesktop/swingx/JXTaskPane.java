@@ -196,7 +196,6 @@ public class JXTaskPane extends JPanel implements
     
     updateUI();
     setFocusable(true);
-    setOpaque(false);
 
     // disable animation if specified in UIManager
     setAnimated(!Boolean.FALSE.equals(UIManager.get("TaskPane.animate")));

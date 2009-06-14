@@ -39,7 +39,7 @@ import javax.swing.tree.TreeCellRenderer;
 public class DefaultTreeRenderer extends AbstractRenderer
         implements TreeCellRenderer {
 
-    private CellContext<JTree> cellContext;
+    private TreeCellContext cellContext;
     
     /**
      * Instantiates a default tree renderer with the default component
@@ -144,7 +144,10 @@ public class DefaultTreeRenderer extends AbstractRenderer
             boolean hasFocus) {
         cellContext.installContext(tree, value, row, 0, selected, hasFocus,
                 expanded, leaf);
-        return componentController.getRendererComponent(cellContext);
+        Component comp = componentController.getRendererComponent(cellContext);
+        // fix issue #1040-swingx: memory leak if value not released
+        cellContext.replaceValue(null);
+        return comp;
     }
 
 

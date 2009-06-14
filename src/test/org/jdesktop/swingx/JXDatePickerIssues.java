@@ -28,6 +28,10 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.text.DateFormatSymbols;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -72,7 +76,7 @@ public class JXDatePickerIssues extends InteractiveTestCase {
         try {
 //            test.runInteractiveTests();
 //          test.runInteractiveTests("interactive.*UpdateUI.*");
-          test.runInteractiveTests("interactive.*Null.*");
+          test.runInteractiveTests("interactive.*Symbols.*");
 //          test.runInteractiveTests("interactive.*Visible.*");
           
         } catch (Exception e) {
@@ -81,8 +85,30 @@ public class JXDatePickerIssues extends InteractiveTestCase {
         }
     }
 
-
-    private Calendar calendar;
+    public void interactiveDateSymbols() {
+        for (Locale locale : Locale.getAvailableLocales()) {
+            LOG.info("locale " + locale + locale.getDisplayCountry());
+        }
+        DecimalFormat df = (DecimalFormat) NumberFormat.getInstance(new Locale("ar", "KW"));
+        DecimalFormatSymbols dfs = new DecimalFormatSymbols(new Locale("ar", "KW"));//df.getDecimalFormatSymbols();
+        LOG.info("" + df + " zero " + dfs.getZeroDigit());
+        LOG.info("" + dfs);
+        df.setDecimalFormatSymbols(dfs);
+        DateFormatSymbols dateSymbols = null;
+        // set the beginning of the range to Arabic digits
+//        dfs.setZeroDigit('\u0660');
+//        df.setDecimalFormatSymbols(dfs);
+        JXDatePicker picker = new JXDatePicker(new Locale("ar", "KW"));
+        JLabel label1 = new JLabel(df.format(1));
+        JLabel label2 = new JLabel(df.format(2));
+        JComponent component = new JPanel();
+        component.add(label1);
+        component.add(label2);
+        component.add(picker);
+        showInFrame(component, "Symbos");
+        System.out.println(df.format(1));
+        System.out.println(df.format(2));
+    }
 
     /**
      * Issue #??-swingx: first week of year in year-week format invalid?
@@ -602,6 +628,8 @@ public class JXDatePickerIssues extends InteractiveTestCase {
 
 
 
+
+    private Calendar calendar;
     
 
     @Override

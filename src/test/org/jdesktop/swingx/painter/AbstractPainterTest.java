@@ -24,7 +24,12 @@ import junit.framework.TestCase;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.List;
 
+import org.jdesktop.beans.ClassSearchUtils;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import org.junit.Test;
@@ -299,6 +304,41 @@ public class AbstractPainterTest extends TestCase {
         f2.filtered = false;
     }
 
+    @Test
+    public void testVisibilityOfOriginallyProtectedMethodsInExtendingClasses() {
+        List<Class<?>> allClasses = ClassSearchUtils.searchClassPath("org.jdesktop.swingx.");
+        List<Class<?>> painters = new ArrayList<Class<?>>();
+        for (Class<?> clazz : allClasses) {
+            try {
+                if (clazz.isAnonymousClass()) {
+                    // skip inner classes as those expose methods for specific purpose (either tests of to overcome some implementation issue)
+                    continue;
+                }
+                painters.add(clazz.asSubclass(AbstractPainter.class));
+            } catch (ClassCastException e) {
+                // ignore
+            }
+        }
+        // collect all protected methods
+        Method[] methods = AbstractPainter.class.getDeclaredMethods();
+        List<Method> mets = new ArrayList<Method>();
+        for (Method m : methods) {
+            if (Modifier.isProtected(m.getModifiers())) {
+                mets.add(m);
+            }
+        }
+        // check that the methods are not made public
+        for (Class<?> clazz : painters) {
+            for (Method m : mets) {
+                try {
+                    assertTrue("Class " + clazz.getName() + " must keep overriden AbstractPainter method " + m.getName() + " visibility intact.", Modifier.isProtected(clazz.getDeclaredMethod(m.getName(), m.getParameterTypes()).getModifiers()));
+                } catch (NoSuchMethodException e) {
+                    // not declared - ignore
+                }
+            }
+        }
+    }
+    
     //tests that compound behaviors, such as caching in compound situations, works
     //I don't extend CompoundPainter because I don't want to test the CompoundPainter
     //itself, just test the general concepts that go into *any* aggregate Painter
