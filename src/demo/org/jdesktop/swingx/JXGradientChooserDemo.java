@@ -20,13 +20,17 @@
  */
 package org.jdesktop.swingx;
 
-import org.apache.batik.ext.awt.LinearGradientPaint;
-import org.apache.batik.ext.awt.MultipleGradientPaint;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.LinearGradientPaint;
+import java.awt.MultipleGradientPaint;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.UIManager;
 
 /**
  * @author joshy

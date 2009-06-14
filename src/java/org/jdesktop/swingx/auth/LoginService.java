@@ -24,10 +24,10 @@ import java.awt.EventQueue;
 import java.util.logging.Logger;
 
 import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
 import javax.swing.event.EventListenerList;
 
 import org.jdesktop.beans.AbstractBean;
-import org.jdesktop.swingworker.SwingWorker;
 
 /**
  * <b>LoginService</b> is the abstract base class for all classes implementing
@@ -38,10 +38,6 @@ import org.jdesktop.swingworker.SwingWorker;
  * determine the user roles. It is not defined as abstract to simplify the task
  * of implementing a login service for those who do not require this
  * functionality.
- * <p>
- * Asynchronous login behavior requires the {@code SwingWorker}. For Java 5.0,
- * users will need the
- * <a href="http://swingworker.dev.java.net/">SwingWorker BackPort</a>.
  * 
  * @author Bino George
  * @author Shai Almog

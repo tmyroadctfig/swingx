@@ -20,16 +20,22 @@
  */
 package org.jdesktop.swingx.color;
 
-import org.apache.batik.ext.awt.MultipleGradientPaint;
-import org.jdesktop.swingx.JXMultiThumbSlider;
-import org.jdesktop.swingx.multislider.Thumb;
-import org.jdesktop.swingx.multislider.TrackRenderer;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.LinearGradientPaint;
+import java.awt.MultipleGradientPaint;
+import java.awt.Paint;
+import java.awt.Rectangle;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.List;
+
+import javax.swing.JComponent;
+
+import org.jdesktop.swingx.JXMultiThumbSlider;
+import org.jdesktop.swingx.multislider.Thumb;
+import org.jdesktop.swingx.multislider.TrackRenderer;
 
 /**
  * <p><b>Dependency</b>: Because this class relies on LinearGradientPaint and
@@ -79,7 +85,7 @@ public class GradientTrackRenderer extends JComponent implements TrackRenderer {
         // fill in the gradient
         Point2D start = new Point2D.Float(0,0);
         Point2D end = new Point2D.Float(track_width,0);
-        MultipleGradientPaint paint = new org.apache.batik.ext.awt.LinearGradientPaint(
+        MultipleGradientPaint paint = new LinearGradientPaint(
                 (float)start.getX(),
                 (float)start.getY(),
                 (float)end.getX(),

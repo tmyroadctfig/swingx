@@ -12,6 +12,9 @@ package org.jdesktop.swingx.editors;
 import java.awt.Color;
 import java.awt.GradientPaint;
 import java.awt.Insets;
+import java.awt.LinearGradientPaint;
+import java.awt.RadialGradientPaint;
+import java.awt.MultipleGradientPaint.ColorSpaceType;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Arc2D;
 import java.awt.geom.Area;
@@ -32,22 +35,8 @@ import java.beans.PropertyEditorSupport;
 import java.beans.Statement;
 import java.beans.XMLEncoder;
 import java.io.ByteArrayOutputStream;
-import org.apache.batik.ext.awt.LinearGradientPaint;
-import org.apache.batik.ext.awt.MultipleGradientPaint.ColorSpaceEnum;
-import org.apache.batik.ext.awt.RadialGradientPaint;
-import org.jdesktop.swingx.JXPanel;
-//import org.jdesktop.swingx.painter.BackgroundPainter;
-import org.jdesktop.swingx.painter.CheckerboardPainter;
-import org.jdesktop.swingx.painter.CompoundPainter;
-import org.jdesktop.swingx.painter.GlossPainter;
-import org.jdesktop.swingx.painter.MattePainter;
+
 import org.jdesktop.swingx.painter.Painter;
-import org.jdesktop.swingx.painter.PinstripePainter;
-import org.jdesktop.swingx.painter.ShapePainter;
-import org.jdesktop.swingx.painter.TextPainter;
-//import org.jdesktop.swingx.painter.gradient.BasicGradientPainter;
-//import org.jdesktop.swingx.painter.gradient.LinearGradientPainter;
-//import org.jdesktop.swingx.painter.gradient.RadialGradientPainter;
 
 /**
  * Two parts to this property editor. The first part is a simple dropdown.
@@ -214,7 +203,7 @@ public class PainterPropertyEditor extends PropertyEditorSupport {
         
         protected Expression instantiate(Object oldInstance, Encoder out) {
             
-            ColorSpaceEnum e = ((LinearGradientPaint)oldInstance).getColorSpace();
+            ColorSpaceType e = ((LinearGradientPaint)oldInstance).getColorSpace();
             Expression retValue;
             
             retValue = super.instantiate(oldInstance, out);
