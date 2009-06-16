@@ -25,13 +25,12 @@ import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.CompoundHighlighter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.Highlighter;
+import org.jdesktop.swingx.decorator.HighlightPredicate.AndHighlightPredicate;
 import org.jdesktop.swingx.treetable.FileSystemModel;
 import org.jdesktop.test.AncientSwingTeam;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.junit.Test;
-import org.junit.Before;
-import org.junit.After;
 
 
 @RunWith(JUnit4.class)
@@ -156,10 +155,9 @@ public class RolloverTest extends InteractiveTestCase {
     
     public void interactiveTreeTableRollover() {
         final JXTreeTable table = new JXTreeTable(treeTableModel);
-        table.setRolloverEnabled(true);
         final CompoundHighlighter compoundHighlighter = new CompoundHighlighter(foregroundHighlighter);
         table.setHighlighters(compoundHighlighter);
-        JXFrame frame = wrapWithScrollingInFrame(table, "Table with rollover");
+        JXFrame frame = wrapWithScrollingInFrame(table, "TreeTable with rollover");
         Action toggleAction = new AbstractAction("toggle foreground/background") {
             boolean isBackground;
             public void actionPerformed(ActionEvent e) {
@@ -180,6 +178,39 @@ public class RolloverTest extends InteractiveTestCase {
         frame.setVisible(true);
     }
 
+    /**
+     * Example for per-cell rollover decoration in JXTreeTable.
+     */
+    public void interactiveTreeTableRolloverHierarchical() {
+        final JXTreeTable table = new JXTreeTable(treeTableModel);
+        HighlightPredicate andPredicate = new AndHighlightPredicate(
+                new HighlightPredicate.ColumnHighlightPredicate(0),
+                HighlightPredicate.ROLLOVER_ROW
+                );
+        final Highlighter foregroundHighlighter = new ColorHighlighter(andPredicate, null,
+                Color.MAGENTA);
+        final Highlighter backgroundHighlighter = new ColorHighlighter(andPredicate, Color.YELLOW,
+                null);
+        table.setHighlighters(foregroundHighlighter);
+        JXFrame frame = wrapWithScrollingInFrame(table, "TreeTable with rollover - effect hierarchical column");
+        Action toggleAction = new AbstractAction("toggle foreground/background") {
+            boolean isBackground;
+            public void actionPerformed(ActionEvent e) {
+                if (isBackground) {
+                    table.setHighlighters(foregroundHighlighter);
+                } else {
+                    table.setHighlighters(backgroundHighlighter);
+                    
+                }
+                isBackground = !isBackground;
+                
+            }
+            
+        };
+        addAction(frame, toggleAction);
+        frame.setVisible(true);
+    }
+    
     @Override
     protected void setUp() throws Exception {
         super.setUp();
