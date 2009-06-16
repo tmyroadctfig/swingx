@@ -31,6 +31,8 @@ import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
+import javax.swing.DefaultCellEditor;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
@@ -96,7 +98,7 @@ public class JXTreeTableIssues extends InteractiveTestCase {
 //            test.runInteractiveTests(".*ColumnSelection.*");
 //            test.runInteractiveTests(".*Text.*");
 //            test.runInteractiveTests(".*TreeExpand.*");
-            test.runInteractiveTests("interactive.*Cancel.*");
+            test.runInteractiveTests("interactive.*EditWith.*");
 //          test.runInteractiveTests("interactive.*CustomColor.*");
               
         } catch (Exception e) {
@@ -104,6 +106,29 @@ public class JXTreeTableIssues extends InteractiveTestCase {
             e.printStackTrace();
         }
     }
+
+    
+    /**
+     * Issue #??: combo editor is closed immediately after starting
+     * 
+     * Happens if row is not selected at the moment of starting, okay if selected.
+     */
+    public void interactiveEditWithComboBox() {
+        // quick for having an editable treeTableModel (non hierarchical column)
+        TreeTableModel model = new ComponentTreeTableModel(new JXFrame()) {
+
+            @Override
+            public boolean isCellEditable(Object node, int column) {
+                return super.isCellEditable(node, column) || column == 1;
+            }
+        };
+        JXTreeTable table = new JXTreeTable(model);
+        JComboBox box = new JComboBox(new Object[] {"something", "else", "whatever"});
+        box.setEditable(true);
+        table.getColumn(1).setCellEditor(new DefaultCellEditor(box));
+        showWithScrollingInFrame(table, "combo editor in column 1");
+    }
+    
 
     /**
      * Issue #875-swingx: cell selection incorrect in hierarchical column.
