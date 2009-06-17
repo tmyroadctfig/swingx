@@ -247,24 +247,32 @@ public class AutoCompleteDocument implements Document {
         // insert the string into the document
         delegate.insertString(offs, str, a);
         // lookup and select a matching item
-        LookupResult lookupResult = lookupItem(getText(0, getLength()));
-        if (lookupResult.matchingItem != null) {
+        LookupResult lookupResult;
+        String pattern = getText(0, getLength());
+        
+        if(pattern == null || pattern.length() == 0) {
+            lookupResult = new LookupResult(null, "");
             setSelectedItem(lookupResult.matchingItem, lookupResult.matchingString);
         } else {
-            if (strictMatching) {
-                // keep old item selected if there is no match
-                lookupResult.matchingItem = adaptor.getSelectedItem();
-                lookupResult.matchingString = adaptor.getSelectedItemAsString();
-                // imitate no insert (later on offs will be incremented by
-                // str.length(): selection won't move forward)
-                offs = offs-str.length();
-                // provide feedback to the user that his input has been received but can not be accepted
-                UIManager.getLookAndFeel().provideErrorFeedback(adaptor.getTextComponent());
-            } else {
-                // no item matches => use the current input as selected item
-                lookupResult.matchingItem=getText(0, getLength());
-                lookupResult.matchingString=getText(0, getLength());
+            lookupResult = lookupItem(pattern);
+            if (lookupResult.matchingItem != null) {
                 setSelectedItem(lookupResult.matchingItem, lookupResult.matchingString);
+            } else {
+                if (strictMatching) {
+                    // keep old item selected if there is no match
+                    lookupResult.matchingItem = adaptor.getSelectedItem();
+                    lookupResult.matchingString = adaptor.getSelectedItemAsString();
+                    // imitate no insert (later on offs will be incremented by
+                    // str.length(): selection won't move forward)
+                    offs = offs-str.length();
+                    // provide feedback to the user that his input has been received but can not be accepted
+                    UIManager.getLookAndFeel().provideErrorFeedback(adaptor.getTextComponent());
+                } else {
+                    // no item matches => use the current input as selected item
+                    lookupResult.matchingItem=getText(0, getLength());
+                    lookupResult.matchingString=getText(0, getLength());
+                    setSelectedItem(lookupResult.matchingItem, lookupResult.matchingString);
+                }
             }
         }
         setText(lookupResult.matchingString);
