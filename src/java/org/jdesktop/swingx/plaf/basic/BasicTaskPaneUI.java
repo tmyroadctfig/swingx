@@ -401,7 +401,7 @@ public class BasicTaskPaneUI extends TaskPaneUI {
         }
 
         public void mouseReleased(MouseEvent e) {
-            if (isInBorder(e)) {
+            if (SwingUtilities.isLeftMouseButton(e) && isInBorder(e)) {
                 group.setCollapsed(!group.isCollapsed());
             }
         }
