@@ -12,6 +12,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.swing.ListModel;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 
@@ -30,7 +31,23 @@ public class ListDataReport implements ListDataListener {
     protected List<ListDataEvent> removedEvents = Collections.synchronizedList(new LinkedList<ListDataEvent>());
     protected List<ListDataEvent> allEvents = Collections.synchronizedList(new LinkedList<ListDataEvent>());
 
-//  ------------------ implement ListDataListener    
+    /**
+     * Instantiates a ListDataReport.
+     */
+    public ListDataReport() {
+       this(null); 
+    }
+    
+    /**
+     * Instantiates a ListDataReport and registers as listener to the given ListModel.
+     */
+    public ListDataReport(ListModel model) {
+       if (model != null) {
+           model.addListDataListener(this);
+       }
+    }
+    
+    //  ------------------ implement ListDataListener    
 
     public void contentsChanged(ListDataEvent e) {
         changedEvents.add(0, e);
