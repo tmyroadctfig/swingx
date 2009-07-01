@@ -115,7 +115,7 @@ public class ListComboBoxModel<E> extends AbstractListModel implements ComboBoxM
      */
     public void actionPerformed(ActionEvent evt) {
         if(evt.getActionCommand().equals(UPDATE)) {
-            this.fireContentsChanged(this, 0, getSize());
+            this.fireContentsChanged(this, 0, getSize() - 1);
         }
     }
 }

@@ -107,7 +107,7 @@ public class MapComboBoxModel<K, V> extends ListComboBoxModel<K> {
             copy.removeAll(keys);
             data.removeAll(copy);
             
-            fireContentsChanged(this, 0, getSize());
+            fireContentsChanged(this, 0, getSize() - 1);
         }
     }
 
