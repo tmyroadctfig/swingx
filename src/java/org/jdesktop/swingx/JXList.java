@@ -44,6 +44,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
+import javax.swing.plaf.ListUI;
 
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.CompoundHighlighter;
@@ -56,6 +57,8 @@ import org.jdesktop.swingx.decorator.SelectionMapper;
 import org.jdesktop.swingx.decorator.SortController;
 import org.jdesktop.swingx.decorator.SortKey;
 import org.jdesktop.swingx.decorator.SortOrder;
+import org.jdesktop.swingx.plaf.LookAndFeelAddons;
+import org.jdesktop.swingx.plaf.XListAddon;
 import org.jdesktop.swingx.renderer.AbstractRenderer;
 import org.jdesktop.swingx.renderer.DefaultListRenderer;
 import org.jdesktop.swingx.renderer.StringValue;
@@ -192,6 +195,22 @@ import org.jdesktop.swingx.search.Searchable;
 public class JXList extends JList {
     @SuppressWarnings("all")
     private static final Logger LOG = Logger.getLogger(JXList.class.getName());
+    
+    /**
+     * UI Class ID
+     */
+    public final static String uiClassID = "XListUI";
+    
+    /**
+     * Registers a Addon for JXList.
+     */
+    // @KEEP JW- will be used if sortable/filterable again
+    static {
+        LookAndFeelAddons.contribute(new XListAddon());
+    }
+
+    
+
     public static final String EXECUTE_BUTTON_ACTIONCOMMAND = "executeButtonAction";
 
     /** The pipeline holding the filters. */
@@ -1574,6 +1593,7 @@ public class JXList extends JList {
 
     // --------------------------- updateUI
 
+    
     /**
      * {@inheritDoc} <p>
      * 
@@ -1581,9 +1601,21 @@ public class JXList extends JList {
      */
     @Override
     public void updateUI() {
-        super.updateUI();
+        // PENDING JW: temporary during dev to quickly switch between default and custom ui
+        if (getUIClassID() == super.getUIClassID()) {
+            super.updateUI();
+        } else {    
+            setUI((ListUI) LookAndFeelAddons.getUI(this, ListUI.class));
+        }
         updateRendererUI();
         updateHighlighterUI();
+    }
+
+    @Override
+    public String getUIClassID() {
+        // PENDING JW: temporary during dev to quickly switch between default and custom ui
+        return super.getUIClassID();
+//        return uiClassID;
     }
 
     private void updateRendererUI() {
