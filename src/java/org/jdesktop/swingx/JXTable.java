@@ -123,9 +123,9 @@ import org.jdesktop.swingx.table.TableColumnModelExt;
  * 
  * <h2>Sorting and Filtering</h2>
  * 
- * JXTable supports sorting and filtering of rows. 
+ * JXTable supports sorting and filtering of rows (switched to core sorting). 
  * 
- * Sorting support is single column only. It provides api to apply
+ * Additionally, it provides api (<b>Note</b>: currently not functional) to apply
  * a specific sort order or to toggle the sort order of columns identified 
  * by view index or column identifier or reset all sorts. 
  * 
@@ -142,21 +142,9 @@ import org.jdesktop.swingx.table.TableColumnModelExt;
  * <p>
  * Typically, a JXTable is sortable by left clicking on column headers. By default, each
  * subsequent click on a header reverses the order of the sort, and a sort arrow
- * icon is automatically drawn on the header. The exact mapping of a user gesture to
- * a sort effect is configurable by installing a custom SortGestureRecognizer on the
- * JXTableHeader.
+ * icon is automatically drawn on the header. 
  * 
  * <p>
- * Rows can be filtered from a JXTable using a Filter class and a
- * FilterPipeline. One assigns a FilterPipeline to the table using
- * {@link #setFilters(FilterPipeline)}. Filtering hides, but does not delete nor
- * permanently remove rows from a JXTable. Filters are used to provide sorting
- * to the table--rows are not removed, but the table is made to believe rows in
- * the model are in a sorted order.
- * 
- * <b>NOTE:</b> SwingX sorting/filtering is incompatible with core sorting/filtering in 
- * JDK 6+. Will be replaced by core functionality after switching the target jdk
- * version from 5 to 6.
  * 
  * <h2>Rendering and Highlighting</h2>
  * 
@@ -313,7 +301,6 @@ import org.jdesktop.swingx.table.TableColumnModelExt;
  * @author Mark Davidson
  * @author Jeanette Winzenburg
  * 
- * @see JXTableHeader.SortGestureRecognizer
  */
 public class JXTable extends JTable implements TableColumnModelExtListener {
 
@@ -549,6 +536,8 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
     private void init() {
         putClientProperty(USE_DTCR_COLORMEMORY_HACK, Boolean.TRUE);
         setEditable(true);
+        setAutoCreateRowSorter(true);
+        // PENDING JW: how to relate to auto-createRowSorter?
         setSortable(true);
         setRolloverEnabled(true);
         setTerminateEditOnFocusLost(true);

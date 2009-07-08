@@ -46,13 +46,15 @@ import org.jdesktop.swingx.table.TableColumnExt;
  * <h2> Extended user interaction </h2>
  * 
  * <ul>
- * <li> Supports column sorting by mouse clicks into a header cell 
+ * <li> Note: this is currently (?) disabled due to missing core functionality. 
+ * Supports column sorting by mouse clicks into a header cell 
  *  (outside the resize region). The concrete gestures are configurable 
  *  by providing a custom SortGestureRecognizer.  The default recognizer
  *  toggles sort order on mouseClicked. On shift-mouseClicked, it resets any column sorting. 
  * Both are done by invoking the corresponding methods of JXTable, 
  * <code> toggleSortOrder(int) </code> and <code> resetSortOrder() </code>
- * <li> Supports column pack (== auto-resize to exactly fit the contents)
+ * <li> Note: this is currently (?) disabled due to missing core functionality. 
+ * Supports column pack (== auto-resize to exactly fit the contents)
  *  on double-click in resize region.
  *  <li> Supports horizontal auto-scroll if a column is dragged outside visible rectangle. 
  *  This feature is enabled if the autoscrolls property is true. The default is false 
@@ -122,11 +124,11 @@ public class JXTableHeader extends JTableHeader
 //        setColumnModel(table.getColumnModel());
         // the additional listening option makes sense only if the table
         // actually is a JXTable
-        if (getXTable() != null) {
-            installHeaderListener();
-        } else {
-            uninstallHeaderListener();
-        }
+//        if (getXTable() != null) {
+//            installHeaderListener();
+//        } else {
+//            uninstallHeaderListener();
+//        }
     }
 
     /**
@@ -290,67 +292,6 @@ public class JXTableHeader extends JTableHeader
         return height;
     }
     
-    /**
-     * {@inheritDoc} <p>
-     * 
-     * Overridden to update the default renderer. 
-     * 
-     * @see #preUpdateRendererUI()
-     * @see #postUpdateRendererUI(TableCellRenderer)
-     * @see ColumnHeaderRenderer
-     */
-    @Override
-    public void updateUI() {
-        TableCellRenderer oldRenderer = preUpdateRendererUI();
-        super.updateUI();
-        postUpdateRendererUI(oldRenderer);
-    }
-
-    /**
-     * Prepares the default renderer and internal state for updateUI. 
-     * Returns the default renderer set when entering this method.
-     * Called from updateUI before calling super.updateUI to 
-     * allow UIDelegate to cleanup, if necessary. This implementation
-     * does so by restoring the header's default renderer to the 
-     * <code>ColumnHeaderRenderer</code>'s delegate.
-     *  
-     * @return the current default renderer 
-     * @see #updateUI()
-     */
-    protected TableCellRenderer preUpdateRendererUI() {
-        TableCellRenderer oldRenderer = getDefaultRenderer();
-        // reset the default to the original to give S
-        if (oldRenderer instanceof ColumnHeaderRenderer) {
-            setDefaultRenderer(((ColumnHeaderRenderer)oldRenderer).getDelegateRenderer());
-        }
-        return oldRenderer;
-    }
-
-    /**
-     * Cleans up after the UIDelegate has updated the default renderer.
-     * Called from <code>updateUI</code> after calling <code>super.updateUI</code>.
-     * This implementation wraps a <code>UIResource</code> default renderer into a 
-     * <code>ColumnHeaderRenderer</code>.
-     * 
-     * @param oldRenderer the default renderer before updateUI
-     * 
-     * @see #updateUI()
-     * 
-     * 
-     */
-    protected void postUpdateRendererUI(TableCellRenderer oldRenderer) {
-        TableCellRenderer current = getDefaultRenderer();
-        if (!(current instanceof ColumnHeaderRenderer) && (current instanceof UIResource)) {
-            ColumnHeaderRenderer renderer;
-            if (oldRenderer instanceof ColumnHeaderRenderer) {
-                renderer = (ColumnHeaderRenderer) oldRenderer;
-                renderer.updateUI(this);
-            } else {
-                renderer = new ColumnHeaderRenderer(this);
-            }
-            setDefaultRenderer(renderer);
-        }
-    }
     
     /**
      * {@inheritDoc} <p>
@@ -424,7 +365,56 @@ public class JXTableHeader extends JTableHeader
         return -1;
     }
 
+/*------------------- deprecated stuff
+ * no longer used internally - keep until we know better how to
+ *    meet our requirments in Mustang 
+ */   
+    /**
+     * Prepares the default renderer and internal state for updateUI. 
+     * Returns the default renderer set when entering this method.
+     * Called from updateUI before calling super.updateUI to 
+     * allow UIDelegate to cleanup, if necessary. This implementation
+     * does so by restoring the header's default renderer to the 
+     * <code>ColumnHeaderRenderer</code>'s delegate.
+     *  
+     * @return the current default renderer 
+     * 
+     * @deprecated no longer used internally
+     */
+    @Deprecated
+    protected TableCellRenderer preUpdateRendererUI() {
+        TableCellRenderer oldRenderer = getDefaultRenderer();
+        // reset the default to the original to give S
+        if (oldRenderer instanceof ColumnHeaderRenderer) {
+            setDefaultRenderer(((ColumnHeaderRenderer)oldRenderer).getDelegateRenderer());
+        }
+        return oldRenderer;
+    }
 
+    /**
+     * Cleans up after the UIDelegate has updated the default renderer.
+     * Called from <code>updateUI</code> after calling <code>super.updateUI</code>.
+     * This implementation wraps a <code>UIResource</code> default renderer into a 
+     * <code>ColumnHeaderRenderer</code>.
+     * 
+     * @param oldRenderer the default renderer before updateUI
+     * @deprecated no longer used internally
+     */
+    @Deprecated
+    protected void postUpdateRendererUI(TableCellRenderer oldRenderer) {
+        TableCellRenderer current = getDefaultRenderer();
+        if (!(current instanceof ColumnHeaderRenderer) && (current instanceof UIResource)) {
+            ColumnHeaderRenderer renderer;
+            if (oldRenderer instanceof ColumnHeaderRenderer) {
+                renderer = (ColumnHeaderRenderer) oldRenderer;
+                renderer.updateUI(this);
+            } else {
+                renderer = new ColumnHeaderRenderer(this);
+            }
+            setDefaultRenderer(renderer);
+        }
+    }
+    
     /**
      * Returns the SortGestureRecognizer to use. If none available, lazily 
      * creates a default.
@@ -433,8 +423,12 @@ public class JXTableHeader extends JTableHeader
      *    as sort gestures.
      *    
      * @see #setSortGestureRecognizer(SortGestureRecognizer)
-     * @see #createSortGestureRecognizer()   
+     * @see #createSortGestureRecognizer()  
+     * 
+     * @deprecated no longer used internally - keep until we know better how to
+     *    meet our requirments in Mustang
      */
+    @Deprecated
     public SortGestureRecognizer getSortGestureRecognizer() {
         if (sortGestureRecognizer == null) {
             sortGestureRecognizer = createSortGestureRecognizer();
@@ -455,7 +449,10 @@ public class JXTableHeader extends JTableHeader
      *    
      * @see #getSortGestureRecognizer()
      * @see #createSortGestureRecognizer()    
+     * @deprecated no longer used internally - keep until we know better how to
+     *    meet our requirments in Mustang
      */
+    @Deprecated
     public void setSortGestureRecognizer(SortGestureRecognizer recognizer) {
         SortGestureRecognizer old = getSortGestureRecognizer();
         this.sortGestureRecognizer = recognizer;
@@ -469,7 +466,10 @@ public class JXTableHeader extends JTableHeader
      * 
      * @see #getSortGestureRecognizer()
      * @see #setSortGestureRecognizer(SortGestureRecognizer)
+     * @deprecated no longer used internally - keep until we know better how to
+     *    meet our requirments in Mustang
      */
+    @Deprecated
     protected SortGestureRecognizer createSortGestureRecognizer() {
         return new SortGestureRecognizer();
     }
@@ -501,8 +501,11 @@ public class JXTableHeader extends JTableHeader
      * which supports multiple column sorting (if we can keep up the pluggable
      * control).
      * 
+     * @deprecated no longer used internally - keep until we know better how to
+     *    meet our requirments in Mustang
      * 
      */
+    @Deprecated
     public static class SortGestureRecognizer {
 
         /**
@@ -552,7 +555,10 @@ public class JXTableHeader extends JTableHeader
     /**
      * Creates and installs header listeners to service the extended functionality.
      * This implementation creates and installs a custom mouse input listener.
+     * @deprecated no longer used internally - keep until we know better how to
+     *    meet our requirments in Mustang
      */
+    @Deprecated
     protected void installHeaderListener() {
         if (headerListener == null) {
             headerListener = new HeaderListener();
@@ -565,7 +571,10 @@ public class JXTableHeader extends JTableHeader
     /**
      * Uninstalls header listeners to service the extended functionality.
      * This implementation uninstalls a custom mouse input listener.
+     * @deprecated no longer used internally - keep until we know better how to
+     *    meet our requirments in Mustang
      */
+    @Deprecated
     protected void uninstallHeaderListener() {
         if (headerListener != null) {
             removeMouseListener(headerListener);
@@ -576,6 +585,11 @@ public class JXTableHeader extends JTableHeader
 
     private MouseInputListener headerListener;
 
+    /**
+     * @deprecated no longer used internally - keep until we know better how to
+     *    meet our requirments in Mustang
+     */
+    @Deprecated
     private class HeaderListener implements MouseInputListener, Serializable {
         private TableColumn cachedResizingColumn;
 
