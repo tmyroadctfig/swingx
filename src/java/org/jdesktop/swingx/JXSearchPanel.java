@@ -30,7 +30,7 @@ import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 
-import org.jdesktop.swingx.decorator.PatternFilter;
+import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.PatternMatcher;
 
 /**
@@ -111,10 +111,10 @@ public class JXSearchPanel extends AbstractPatternPanel {
      * PENDING: change to do a addPatternMatcher to enable multiple control.
      * 
      */
-    public void setPatternFilter(PatternFilter filter) {
-        getPatternMatchers().add(filter);
-        updateFieldName(filter);
-    }
+//    public void setPatternFilter(PatternFilter filter) {
+//        getPatternMatchers().add(filter);
+//        updateFieldName(filter);
+//    }
 
     /**
      * set the label of the search combo.
@@ -150,14 +150,14 @@ public class JXSearchPanel extends AbstractPatternPanel {
      */
     protected void updateFieldName(PatternMatcher matcher) {
         
-        if (matcher instanceof PatternFilter) {
-            PatternFilter filter = (PatternFilter) matcher;
-            searchLabel.setText(filter.getColumnName());
-        } else {
+//        if (matcher instanceof PatternFilter) {
+//            PatternFilter filter = (PatternFilter) matcher;
+//            searchLabel.setText(filter.getColumnName());
+//        } else {
             if (searchLabel.getText().length() == 0) { // ugly hack
                 searchLabel.setText("Field");
                 /** TODO: Remove this hack!!! */
-            }
+//            }
         }
     }
 

@@ -39,7 +39,9 @@ import javax.swing.KeyStroke;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
+import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
+import javax.swing.RowSorter.SortKey;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListDataEvent;
@@ -48,15 +50,7 @@ import javax.swing.plaf.ListUI;
 
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.CompoundHighlighter;
-import org.jdesktop.swingx.decorator.DefaultSelectionMapper;
-import org.jdesktop.swingx.decorator.FilterPipeline;
 import org.jdesktop.swingx.decorator.Highlighter;
-import org.jdesktop.swingx.decorator.PipelineEvent;
-import org.jdesktop.swingx.decorator.PipelineListener;
-import org.jdesktop.swingx.decorator.SelectionMapper;
-import org.jdesktop.swingx.decorator.SortController;
-import org.jdesktop.swingx.decorator.SortKey;
-import org.jdesktop.swingx.decorator.SortOrder;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 import org.jdesktop.swingx.plaf.XListAddon;
 import org.jdesktop.swingx.renderer.AbstractRenderer;
@@ -70,6 +64,8 @@ import org.jdesktop.swingx.rollover.RolloverRenderer;
 import org.jdesktop.swingx.search.ListSearchable;
 import org.jdesktop.swingx.search.SearchFactory;
 import org.jdesktop.swingx.search.Searchable;
+import org.jdesktop.swingx.sort.SortController;
+import org.jdesktop.swingx.sort.SortUtils;
 
 /**
  * Enhanced List component with support for general SwingX sorting/filtering,
@@ -78,6 +74,9 @@ import org.jdesktop.swingx.search.Searchable;
  * 
  * <h2>Sorting and Filtering</h2>
  * 
+ * <b>NOTE: sorting/filtering is currently disabled. All related methods are
+ * dis-functional, the overriden methods behave just the same as JList. </b>
+ * <p>
  * JXList supports sorting and filtering. 
  * 
  * It provides api to apply a specific sort order, to toggle the sort order and to reset a sort.
@@ -92,12 +91,6 @@ import org.jdesktop.swingx.search.Searchable;
  * </code></pre>
  * 
  * <p>
- * Rows can be filtered from a JXList using a Filter class and a
- * FilterPipeline. One assigns a FilterPipeline to the table using
- * {@link #setFilters(FilterPipeline)}. Filtering hides, but does not delete nor
- * permanently remove rows from a JXList. 
- * 
- * <p>
  * JXList provides api to access items of the underlying model in view coordinates
  * and to convert from/to model coordinates.
  * 
@@ -109,7 +102,7 @@ import org.jdesktop.swingx.search.Searchable;
  * 
  * <b>Note:</b> SwingX sorting/filtering is incompatible with core sorting/filtering in 
  * JDK 6+. Will be replaced by core functionality after switching the target jdk
- * version from 5 to 6.
+ * version from 5 to 6, we are on the move right now.
  * 
  * 
  * <h2>Rendering and Highlighting</h2>
@@ -213,9 +206,6 @@ public class JXList extends JList {
 
     public static final String EXECUTE_BUTTON_ACTIONCOMMAND = "executeButtonAction";
 
-    /** The pipeline holding the filters. */
-    protected FilterPipeline filters;
-
     /**
      * The pipeline holding the highlighters.
      */
@@ -241,13 +231,7 @@ public class JXList extends JList {
     /** A wrapper around the default renderer enabling decoration. */
     private DelegatingRenderer delegatingRenderer;
 
-    private WrappingListModel wrappingModel;
-
-    private PipelineListener pipelineListener;
-
     private boolean filterEnabled;
-
-    private SelectionMapper selectionMapper;
 
     private Searchable searchable;
 
@@ -526,7 +510,7 @@ public class JXList extends JList {
     public void resetSortOrder() {
         SortController controller = getSortController();
         if (controller != null) {
-            controller.setSortKeys(null);
+            controller.removeAll();
         }
     }
 
@@ -547,7 +531,7 @@ public class JXList extends JList {
     public void toggleSortOrder() {
         SortController controller = getSortController();
         if (controller != null) {
-            controller.toggleSortOrder(0, getComparator());
+            controller.toggleSortOrder(0);
         }
     }
 
@@ -565,15 +549,13 @@ public class JXList extends JList {
      *    
      */
     public void setSortOrder(SortOrder sortOrder) {
-        if ((sortOrder == null) || !sortOrder.isSorted()) {
+        if (!SortUtils.isSorted(sortOrder)) {
             resetSortOrder();
             return;
         }
         SortController sortController = getSortController();
         if (sortController != null) {
-            SortKey sortKey = new SortKey(sortOrder, 
-                    0, getComparator());    
-            sortController.setSortKeys(Collections.singletonList(sortKey));
+//            sortController.setSortOrder(0, sortOrder);
         }
     }
 
@@ -587,9 +569,7 @@ public class JXList extends JList {
     public SortOrder getSortOrder() {
         SortController sortController = getSortController();
         if (sortController == null) return SortOrder.UNSORTED;
-        SortKey sortKey = SortKey.getFirstSortKeyForColumn(sortController.getSortKeys(), 
-                0);
-        return sortKey != null ? sortKey.getSortOrder() : SortOrder.UNSORTED;
+        return sortController.getSortOrder(0);
     }
 
     /**
@@ -631,11 +611,7 @@ public class JXList extends JList {
      * @return the currently active <code>SortController</code> may be null
      */
     protected SortController getSortController() {
-//      // this check is for the sake of the very first call after instantiation
-        // doesn't apply for JXList? need to test for filterEnabled?
-        //if (filters == null) return null;
-        if (!isFilterEnabled()) return null;
-        return getFilters().getSortController();
+        return null;
     }
     
     
@@ -675,8 +651,7 @@ public class JXList extends JList {
      * @throws IndexOutOfBoundsException if viewIndex < 0 or viewIndex >= getElementCount() 
      */
     public int convertIndexToModel(int viewIndex) {
-        return isFilterEnabled() ? getFilters().convertRowIndexToModel(
-                viewIndex) : viewIndex;
+        return viewIndex;
     }
 
     /**
@@ -691,8 +666,7 @@ public class JXList extends JList {
      * 
      */
     public int convertIndexToView(int modelIndex) {
-        return isFilterEnabled() ? getFilters().convertRowIndexToView(
-                modelIndex) : modelIndex;
+        return modelIndex;
     }
 
     /**
@@ -702,16 +676,20 @@ public class JXList extends JList {
      * @return the underlying model
      */
     public ListModel getWrappedModel() {
-        return isFilterEnabled() ? wrappingModel.getModel() : getModel();
+        return /* isFilterEnabled() ? wrappingModel.getModel() : */ getModel();
     }
 
     /**
      * Enables/disables filtering support. If enabled all row indices -
      * including the selection - are in view coordinates and getModel returns a
-     * wrapper around the underlying model.
+     * wrapper around the underlying model.<p>
+     * 
+     * <b>NOTE</b>: Currently, this method has no effect - filtering/sorting of
+     * a JXList is disabled until SwingX is fully moved to the core style 
+     * filtering/sorting. <p>
      * 
      * Note: as an implementation side-effect calling this method clears the
-     * selection (done in super.setModel).
+     * selection (done in super.setModel).<p>
      * 
      * PENDING: cleanup state transitions!! - currently this can be safely
      * applied once only to enable. Internal state is inconsistent if trying to
@@ -720,20 +698,22 @@ public class JXList extends JList {
      * 
      * see Issue #2-swinglabs.
      * 
+     * 
      * @param enabled
      * @throws IllegalStateException if trying to disable again.
      */
     public void setFilterEnabled(boolean enabled) {
-        boolean old = isFilterEnabled();
-        if (old == enabled)
-            return;
-        if (old) 
-            throw new IllegalStateException("must not reset filterEnabled");
-        // JW: filterEnabled must be set before calling super.setModel!
-        filterEnabled = enabled;
-        wrappingModel = new WrappingListModel(getModel());
-        super.setModel(wrappingModel);
-        firePropertyChange("filterEnabled", old, isFilterEnabled());
+        return;
+//        boolean old = isFilterEnabled();
+//        if (old == enabled)
+//            return;
+//        if (old) 
+//            throw new IllegalStateException("must not reset filterEnabled");
+//        // JW: filterEnabled must be set before calling super.setModel!
+//        filterEnabled = enabled;
+//        wrappingModel = new WrappingListModel(getModel());
+//        super.setModel(wrappingModel);
+//        firePropertyChange("filterEnabled", old, isFilterEnabled());
     }
 
     /**
@@ -753,7 +733,7 @@ public class JXList extends JList {
     @Override 
     public void setSelectionModel(ListSelectionModel newModel) {
         super.setSelectionModel(newModel);
-        getSelectionMapper().setViewSelectionModel(getSelectionModel());
+//        getSelectionMapper().setViewSelectionModel(getSelectionModel());
     }
 
     /**
@@ -768,346 +748,14 @@ public class JXList extends JList {
      */
     @Override
     public void setModel(ListModel model) {
-        if (isFilterEnabled()) {
-            wrappingModel.setModel(model);
-        } else {
-            super.setModel(model);
-        }
+        super.setModel(model);
+//        if (isFilterEnabled()) {
+//            wrappingModel.setModel(model);
+//        } else {
+//            super.setModel(model);
+//        }
     }
 
-    /**
-     * widened access for testing...
-     * @return the selection mapper
-     */
-    protected SelectionMapper getSelectionMapper() {
-        if (selectionMapper == null) {
-            selectionMapper = new DefaultSelectionMapper(filters, getSelectionModel());
-        }
-        return selectionMapper;
-    }
-
-    /**
-     * Returns the FilterPipeline assigned to this list, or null if filtering not
-     * enabled.
-     * 
-     * @return the <code>FilterPipeline</code> assigned to this list, or
-     *   null if !isFiltersEnabled().
-     */
-    public FilterPipeline getFilters() {
-        if ((filters == null) && isFilterEnabled()) {
-            setFilters(null);
-        }
-        return filters;
-    }
-
-    /** Sets the FilterPipeline for filtering the items of this list, maybe null
-     *  to remove all previously applied filters. 
-     *  
-     *  Note: the current "interactive" sortState is preserved (by 
-     *  internally copying the old sortKeys to the new pipeline, if any). 
-     *  
-     *  PRE: isFilterEnabled()
-     * 
-     * @param pipeline the <code>FilterPipeline</code> to use, null removes
-     *   all filters.
-     * @throws IllegalStateException if !isFilterEnabled()
-     */
-    public void setFilters(FilterPipeline pipeline) {
-        if (!isFilterEnabled()) throw
-            new IllegalStateException("filters not enabled - not allowed to set filters");
-
-        FilterPipeline old = filters;
-        List<? extends SortKey> sortKeys = null;
-        if (old != null) {
-            old.removePipelineListener(pipelineListener);
-            sortKeys = old.getSortController().getSortKeys();
-        }
-        if (pipeline == null) {
-            pipeline = new FilterPipeline();
-        }
-        filters = pipeline;
-        filters.getSortController().setSortKeys(sortKeys);
-        // JW: first assign to prevent (short?) illegal internal state
-        // #173-swingx
-        use(filters);
-        getSelectionMapper().setFilters(filters);
-
-    }
-
-    /**
-     * setModel() and setFilters() may be called in either order.
-     * 
-     * @param pipeline
-     */
-    private void use(FilterPipeline pipeline) {
-        if (pipeline != null) {
-            // check JW: adding listener multiple times (after setModel)?
-            if (initialUse(pipeline)) {
-                pipeline.addPipelineListener(getFilterPipelineListener());
-                pipeline.assign(getComponentAdapter());
-            } else {
-                pipeline.flush();
-            }
-        }
-    }
-
-    /**
-     * @return true is not yet used in this JXTable, false otherwise
-     */
-    private boolean initialUse(FilterPipeline pipeline) {
-        if (pipelineListener == null)
-            return true;
-        PipelineListener[] l = pipeline.getPipelineListeners();
-        for (int i = 0; i < l.length; i++) {
-            if (pipelineListener.equals(l[i]))
-                return false;
-        }
-        return true;
-    }
-
-    /** returns the listener for changes in filters. */
-    protected PipelineListener getFilterPipelineListener() {
-        if (pipelineListener == null) {
-            pipelineListener = createPipelineListener();
-        }
-        return pipelineListener;
-    }
-
-    /** creates the listener for changes in filters. */
-    protected PipelineListener createPipelineListener() {
-        return new PipelineListener() {
-            public void contentsChanged(PipelineEvent e) {
-                updateOnFilterContentChanged();
-            }
-        };
-    }
-
-    /**
-     * method called on change notification from filterpipeline.
-     */
-    protected void updateOnFilterContentChanged() {
-        // make the wrapper listen to the pipeline?
-        if (wrappingModel != null) {
-            wrappingModel.updateOnFilterContentChanged();
-        }
-        revalidate();
-        repaint();
-    }
-
-    private class WrappingListModel extends AbstractListModel {
-
-        private ListModel delegate;
-
-        private ListDataListener listDataListener;
-        private Point OUTSIDE = new Point(-1, -1);
-        protected boolean ignoreFilterContentChanged;
-
-        public WrappingListModel(ListModel model) {
-            setModel(model);
-        }
-
-        public void updateOnFilterContentChanged() {
-            if (ignoreFilterContentChanged) return;
-            fireContentsChanged(this, -1, -1);
-
-        }
-
-        public void setModel(ListModel model) {
-            ListModel old = this.getModel();
-            if (old != null) {
-                old.removeListDataListener(listDataListener);
-            }
-            this.delegate = model;
-            delegate.addListDataListener(getListDataListener());
-            // sequence of method calls? 
-            // fire contentsChanged after internal cleanup?
-            fireContentsChanged(this, -1, -1);
-            // fix #477-swingx
-            getSelectionMapper().clearModelSelection();
-            getFilters().flush();
-        }
-
-        private ListDataListener getListDataListener() {
-            if (listDataListener == null) {
-                listDataListener = createListDataListener();
-            }
-            return listDataListener;
-        }
-
-        private ListDataListener createListDataListener() {
-            return new ListDataListener() {
-                public void intervalAdded(ListDataEvent e) {
-                    boolean wasEnabled = getSelectionMapper().isEnabled();
-                    getSelectionMapper().setEnabled(false);
-                    try {
-                        updateModelSelection(e);
-                        ignoreFilterContentChanged = true;
-                        getFilters().flush();
-                        ignoreFilterContentChanged = false;
-                        // do the mapping after the flush and refire
-                        refireMappedEvent(getMappedEvent(e));
-                    } finally {
-                        // for mutations, super and UI must be done with updating their internals
-                        // before it's safe to synch the view selection
-                        getSelectionMapper().setEnabled(wasEnabled);
-                    }
-                }
-
-                public void intervalRemoved(ListDataEvent e) {
-                    boolean wasEnabled = getSelectionMapper().isEnabled();
-                    getSelectionMapper().setEnabled(false);
-                    try {
-                        updateModelSelection(e);
-                        // do the mapping before flushing
-                        // otherwise we may get indexOOBs
-                        ListDataEvent mappedEvent = getMappedEvent(e);
-                        ignoreFilterContentChanged = true;
-                        getFilters().flush();
-                        ignoreFilterContentChanged = false;
-                        refireMappedEvent(mappedEvent);
-                    } finally {
-                        // for mutations, super and UI must be done with updating their internals
-                        // before it's safe to synch the view selection
-                        getSelectionMapper().setEnabled(wasEnabled);
-                    }
-                }
-
-                public void contentsChanged(ListDataEvent e) {
-                    updateInternals(e);
-                    refireContentsChanged(e);
-                }
-            };
-        }
-
-        /**
-         * Refires the received event. Tries its best to map to the new
-         * coordinates. At this point, the internals (selection, filter) are
-         * updated, so it's safe to use the conversion methods.
-         * 
-         * @param e the ListDataEvent received from the wrapped model.
-         */
-        private void refireContentsChanged(ListDataEvent e) {
-            // quick check for single item removal
-            if ((e.getIndex0() >= 0) 
-                && (e.getIndex0() == e.getIndex1())) {
-                // single outside - no notification
-                int viewIndex = convertIndexToView(e.getIndex0());
-                if (viewIndex == -1) return;
-                fireContentsChanged(this, viewIndex, viewIndex);
-            } else if (e.getIndex0() >= 0) {
-                // PENDING JW: narrow the interval bounds
-                fireContentsChanged(this, 0, getSize());
-            } else {
-                fireContentsChanged(this, -1, -1);
-            }
-        }
-
-        /**
-         * @param mappedEvent
-         */
-        protected void refireMappedEvent(ListDataEvent mappedEvent) {
-            if (mappedEvent == null) return;
-            if (mappedEvent.getType() == ListDataEvent.INTERVAL_REMOVED) {
-                fireIntervalRemoved(this, mappedEvent.getIndex0(), mappedEvent.getIndex1());
-            } else if (mappedEvent.getType() == ListDataEvent.INTERVAL_ADDED) {
-                fireIntervalAdded(this, mappedEvent.getIndex0(), mappedEvent.getIndex1());
-            } else {
-                fireContentsChanged(this, mappedEvent.getIndex0(), mappedEvent.getIndex1());
-            }
-        }
-
-
-        private ListDataEvent getMappedEvent(ListDataEvent e) {
-            // quick check for single item removal
-            if ((e.getIndex0() != - 1) 
-                && (e.getIndex0() == e.getIndex1())) {
-                int viewIndex = convertIndexToView(e.getIndex0());
-                // single outside - no notification
-                if (viewIndex == -1) return null;
-                return new ListDataEvent(this, e.getType(), viewIndex, viewIndex);
-            }
-            Point mappedRange = getContinousMappedRange(e);
-            if (mappedRange == null) {
-             // cant help - no support for discontiouns interval remove notification
-                return new ListDataEvent(this, ListDataEvent.CONTENTS_CHANGED, -1, -1);
-            } else if (OUTSIDE == mappedRange) {
-                return null;
-                // do nothing, everything is outside
-            }
-            // could map to a continous interval
-            return new ListDataEvent(this, e.getType(), mappedRange.x, mappedRange.y);
-        }
-
-
-        
-        
-        protected Point getContinousMappedRange(ListDataEvent e) {
-            List<Integer> mapped = new ArrayList<Integer>();
-            for (int i = e.getIndex0(); i <= e.getIndex1(); i++) {
-                int viewIndex = convertIndexToView(i);
-                if (viewIndex >= 0) {
-                    mapped.add(viewIndex);
-                }
-            }
-            if (mapped.size() == 0) return OUTSIDE;
-            if (mapped.size() == 1) return new Point(mapped.get(0), mapped.get(0));
-            Collections.sort(mapped);
-            for (int i = 0; i < mapped.size() - 2; i++) {
-                if (mapped.get(i+1) - mapped.get(i) != 1) return null;
-            }
-            return new Point(mapped.get(0), mapped.get(mapped.size() - 1));
-        }
-
-        private void updateInternals(ListDataEvent e) {
-            boolean wasEnabled = getSelectionMapper().isEnabled();
-            getSelectionMapper().setEnabled(false);
-            try {
-                updateModelSelection(e);
-            } finally {
-                getSelectionMapper().setEnabled(wasEnabled);
-            }
-            ignoreFilterContentChanged = true;
-            getFilters().flush();
-            ignoreFilterContentChanged = false;
-        }
-
-        /**
-         * Adjusts the model coordinates of the selection as appropriate
-         * for the given event.
-         * 
-         * @param e the ListDataEvent to adjust from.
-         */
-        protected void updateModelSelection(ListDataEvent e) {
-            if (e.getType() == ListDataEvent.INTERVAL_REMOVED) {
-                getSelectionMapper()
-                        .removeIndexInterval(e.getIndex0(), e.getIndex1());
-            } else if (e.getType() == ListDataEvent.INTERVAL_ADDED) {
-
-                int minIndex = Math.min(e.getIndex0(), e.getIndex1());
-                int maxIndex = Math.max(e.getIndex0(), e.getIndex1());
-                int length = maxIndex - minIndex + 1;
-                getSelectionMapper().insertIndexInterval(minIndex, length, true);
-            } else if (e.getIndex0() == -1) {
-                getSelectionMapper().clearModelSelection();
-            }
-
-        }
-
-        public ListModel getModel() {
-            return delegate;
-        }
-
-        public int getSize() {
-            return getFilters().getOutputSize();
-        }
-
-        public Object getElementAt(int index) {
-            return getFilters().getValueAt(index, 0);
-        }
-
-
-
-    }
 
     // ---------------------------- uniform data model
 
