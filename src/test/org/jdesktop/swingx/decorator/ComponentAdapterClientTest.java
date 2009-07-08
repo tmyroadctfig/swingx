@@ -277,21 +277,6 @@ public class ComponentAdapterClientTest extends InteractiveTestCase {
     /**
      * Issue #767-swingx: consistent string representation.
      * 
-     * Here: test PatternFilter uses getStringXX
-     */
-    @Test
-    public void testTableGetStringUsedInPatternFilter() {
-        JXTableT table = new JXTableT(new AncientSwingTeam());
-        table.setDefaultRenderer(Color.class, new DefaultTableRenderer(sv));
-        PatternFilter filter = new PatternFilter("R/G/B: -2", 0, 2);
-        table.setFilters(new FilterPipeline(filter));
-        assertTrue(table.getRowCount() > 0);
-        assertEquals(sv.getString(table.getValueAt(0, 2)), table.getStringAt(0, 2));
-    }
-
-    /**
-     * Issue #767-swingx: consistent string representation.
-     * 
      * Here: test SearchPredicate uses getStringXX.
      */
     @Test
