@@ -35,7 +35,6 @@ import java.awt.event.ActionEvent;
 import java.awt.print.PrinterException;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
@@ -67,7 +66,7 @@ import javax.swing.JViewport;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
-import javax.swing.SizeSequence;
+import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
 import javax.swing.UIManager;
@@ -88,17 +87,8 @@ import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.action.BoundAction;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.CompoundHighlighter;
-import org.jdesktop.swingx.decorator.DefaultSelectionMapper;
-import org.jdesktop.swingx.decorator.FilterPipeline;
 import org.jdesktop.swingx.decorator.Highlighter;
-import org.jdesktop.swingx.decorator.PipelineEvent;
-import org.jdesktop.swingx.decorator.PipelineListener;
 import org.jdesktop.swingx.decorator.ResetDTCRColorHighlighter;
-import org.jdesktop.swingx.decorator.SelectionMapper;
-import org.jdesktop.swingx.decorator.SizeSequenceMapper;
-import org.jdesktop.swingx.decorator.SortController;
-import org.jdesktop.swingx.decorator.SortKey;
-import org.jdesktop.swingx.decorator.SortOrder;
 import org.jdesktop.swingx.decorator.UIDependent;
 import org.jdesktop.swingx.event.TableColumnModelExtListener;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
@@ -117,6 +107,8 @@ import org.jdesktop.swingx.search.AbstractSearchable;
 import org.jdesktop.swingx.search.SearchFactory;
 import org.jdesktop.swingx.search.Searchable;
 import org.jdesktop.swingx.search.TableSearchable;
+import org.jdesktop.swingx.sort.SortController;
+import org.jdesktop.swingx.sort.SortUtils;
 import org.jdesktop.swingx.table.ColumnControlButton;
 import org.jdesktop.swingx.table.ColumnFactory;
 import org.jdesktop.swingx.table.DefaultTableColumnModelExt;
@@ -373,9 +365,6 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
         LookAndFeelAddons.getAddon();
     }
 
-    /** The FilterPipeline for the table. */
-    protected FilterPipeline filters;
-
     /** The CompoundHighlighter for the table. */
     protected CompoundHighlighter compoundHighlighter;
 
@@ -396,17 +385,9 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
     /** The ComponentAdapter for model data access. */
     protected ComponentAdapter dataAdapter;
 
-    /**
-     * The handler for mapping view/model coordinates of row selection. Widened
-     * access to allow lazy instantiation in subclasses (#746-swingx).
-     */
-    protected SelectionMapper selectionMapper;
 
     /** flag to indicate if table is interactively sortable. */
     private boolean sortable;
-
-    /** Listens for changes from the filters. */
-    private PipelineListener pipelineListener;
 
     /** Listens for changes from the highlighters. */
     private ChangeListener highlighterChangeListener;
@@ -420,11 +401,6 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
     /** The default number of visible columns (in a ScrollPane). */
     private int visibleColumnCount = -1;
 
-    private SizeSequenceMapper rowModelMapper;
-
-    private Field rowModelField;
-
-    private boolean rowHeightEnabled;
 
     /**
      * Flag to indicate if the column control is visible.
@@ -576,8 +552,6 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
         setSortable(true);
         setRolloverEnabled(true);
         setTerminateEditOnFocusLost(true);
-        // guarantee getFilters() to return != null
-        setFilters(null);
         initActionsAndBindings();
         initFocusBindings();
         // instantiate row height depending ui setting or font size.
@@ -1473,49 +1447,6 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
 
     // ------------------------ override super because of filter-awareness
 
-    /**
-     * Returns the row count in the table; if filters are applied, this is the
-     * filtered row count.
-     */
-    @Override
-    public int getRowCount() {
-        // RG: If there are no filters, call superclass version rather than
-        // accessing model directly
-        return filters == null ? super.getRowCount() : filters.getOutputSize();
-    }
-
-    /**
-     * Convert row index from view coordinates to model coordinates accounting
-     * for the presence of sorters and filters.
-     * 
-     * @param row row index in view coordinates
-     * @return row index in model coordinates
-     */
-    public int convertRowIndexToModel(int row) {
-        return getFilters() != null ? getFilters().convertRowIndexToModel(row)
-                : row;
-    }
-
-    /**
-     * Convert row index from model coordinates to view coordinates accounting
-     * for the presence of sorters and filters.
-     * 
-     * @param row row index in model coordinates
-     * @return row index in view coordinates
-     */
-    public int convertRowIndexToView(int row) {
-        return getFilters() != null ? getFilters().convertRowIndexToView(row)
-                : row;
-    }
-
-    /**
-     * Overridden to account for row index mapping. {@inheritDoc}
-     */
-    @Override
-    public Object getValueAt(int row, int column) {
-        return getModel().getValueAt(convertRowIndexToModel(row),
-                convertColumnIndexToModel(column));
-    }
 
     /**
      * Overridden to account for row index mapping. This implementation respects
@@ -1530,8 +1461,7 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
     public void setValueAt(Object aValue, int row, int column) {
         if (!isCellEditable(row, column))
             return;
-        getModel().setValueAt(aValue, convertRowIndexToModel(row),
-                convertColumnIndexToModel(column));
+        super.setValueAt(aValue, row, column);
     }
 
     /**
@@ -1574,29 +1504,7 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
         return editable;
     }
 
-    /**
-     * Overridden to update selectionMapper
-     */
-    @Override
-    public void setSelectionModel(ListSelectionModel newModel) {
-        super.setSelectionModel(newModel);
-        getSelectionMapper().setViewSelectionModel(getSelectionModel());
-    }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setModel(TableModel newModel) {
-        // JW: need to look here? is done in tableChanged as well.
-        boolean wasEnabled = getSelectionMapper().isEnabled();
-        getSelectionMapper().setEnabled(false);
-        try {
-            super.setModel(newModel);
-        } finally {
-            getSelectionMapper().setEnabled(wasEnabled);
-        }
-    }
 
     /**
      * {@inheritDoc}
@@ -1624,87 +1532,20 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
     }
 
     /**
-     * additionally updates filtered state. {@inheritDoc}
+     * {@inheritDoc} <p>
+     * 
+     * Overridden to re-calculate intialize column width and preferred scrollable
+     * size after a structureChanged if autocreateColumnsFromModel is true.
      */
     @Override
     public void tableChanged(TableModelEvent e) {
-        if (getSelectionModel().getValueIsAdjusting()) {
-            // this may happen if the uidelegate/editor changed selection
-            // and adjusting state
-            // before firing a editingStopped
-            // need to enforce update of model selection
-            getSelectionModel().setValueIsAdjusting(false);
-        }
-        // JW: make SelectionMapper deaf ... super doesn't know about row
-        // mapping and sets rowSelection in model coordinates
-        // causing complete confusion.
-        boolean wasEnabled = getSelectionMapper().isEnabled();
-        getSelectionMapper().setEnabled(false);
-        try {
-            SizeSequence rowModel = nullSuperRowModel(e);
             super.tableChanged(e);
-            if (rowModel != null) {
-                retoreSuperRowModel(rowModel);
-            }
-            updateSelectionAndRowModel(e);
-        } finally {
-            getSelectionMapper().setEnabled(wasEnabled);
-        }
-        if (shouldSortOnChange(e)) {
-            use(filters);
-        }
         if (isStructureChanged(e) && getAutoCreateColumnsFromModel()) {
             initializeColumnWidths();
             resetCalculatedScrollableSize(true);
         }
     }
 
-    /**
-     * Sets super's rowModel to the given SizeSequence if not null, does nothing
-     * if null.
-     * 
-     * Hack around #924-swingx.
-     * 
-     * @param rowModel the SizeSequence to set super's rowModel to.
-     */
-    private void retoreSuperRowModel(SizeSequence rowModel) {
-        if (rowModel == null)
-            return;
-        setSuperRowModel(rowModel);
-    }
-
-    /**
-     * Nulls super's rowModel and returns the old one if rowHeightEnabled and
-     * the event is either a remove or a insert. Does nothing and returns null
-     * otherwise.
-     * 
-     * Hack around #924-swingx.
-     * 
-     * @param e the TableModelEvent used to decide whether a nulling is needed.
-     * @return super's old SizeSequence or null
-     */
-    private SizeSequence nullSuperRowModel(TableModelEvent e) {
-        if (!isRowHeightEnabled())
-            return null;
-        if (!isInsertRemove(e))
-            return null;
-        SizeSequence result = getSuperRowModel();
-        setSuperRowModel(null);
-        return result;
-    }
-
-    /**
-     * @param e
-     * @return
-     */
-    private boolean isInsertRemove(TableModelEvent e) {
-        if (isStructureChanged(e))
-            return false;
-        if ((e.getType() == TableModelEvent.INSERT)
-                || (e.getType() == TableModelEvent.DELETE))
-            return true;
-        return false;
-    }
 
     /**
      * Returns a boolean to indicate whether the table should be resorted after
@@ -1724,60 +1565,6 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
         return true;
     }
 
-    /**
-     * reset model selection coordinates in SelectionMapper after model events.
-     * 
-     * @param e
-     */
-    private void updateSelectionAndRowModel(TableModelEvent e) {
-        if (isStructureChanged(e) || isDataChanged(e)) {
-
-            // JW fixing part of #172 - trying to adjust lead/anchor to valid
-            // indices (at least in model coordinates) after super's default
-            // clearSelection
-            // in dataChanged/structureChanged.
-            hackLeadAnchor(e);
-
-            getSelectionMapper().clearModelSelection();
-            getRowModelMapper().clearModelSizes();
-            updateViewSizeSequence();
-
-            // JW: c&p from JTable
-        } else if (e.getType() == TableModelEvent.INSERT) {
-            int start = e.getFirstRow();
-            int end = e.getLastRow();
-            if (start < 0) {
-                start = 0;
-            }
-            if (end < 0) {
-                end = getModel().getRowCount() - 1;
-            }
-
-            // Adjust the selectionMapper to account for the new rows.
-            int length = end - start + 1;
-            getSelectionMapper().insertIndexInterval(start, length, true);
-            getRowModelMapper().insertIndexInterval(start, length,
-                    getRowHeight());
-
-        } else if (e.getType() == TableModelEvent.DELETE) {
-            int start = e.getFirstRow();
-            int end = e.getLastRow();
-            if (start < 0) {
-                start = 0;
-            }
-            if (end < 0) {
-                end = getModel().getRowCount() - 1;
-            }
-
-            int deletedCount = end - start + 1;
-            // Adjust the selectionMapper to account for the new rows
-            getSelectionMapper().removeIndexInterval(start, end);
-            getRowModelMapper().removeIndexInterval(start, deletedCount);
-
-        }
-        // nothing to do on TableEvent.updated
-
-    }
 
     /**
      * Convenience method to detect dataChanged table event type.
@@ -1838,139 +1625,6 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
         }
     }
 
-    /**
-     * Called if individual row height mapping need to be updated. This
-     * implementation guards against unnessary access of super's private
-     * rowModel field.
-     */
-    protected void updateViewSizeSequence() {
-        SizeSequence sizeSequence = null;
-        if (isRowHeightEnabled()) {
-            sizeSequence = getSuperRowModel();
-        }
-        getRowModelMapper().setViewSizeSequence(sizeSequence, getRowHeight());
-    }
-
-    /**
-     * @return <code>SelectionMapper</code>
-     */
-    public SelectionMapper getSelectionMapper() {
-        // JW: why is this public? Probably made so accidentally?
-        // maybe not: was introduced in version 1.148 when applying
-        // Jesse's patch to #386-swingx (added functionality to
-        // turn off the mapping
-        if (selectionMapper == null) {
-            selectionMapper = new DefaultSelectionMapper(filters,
-                    getSelectionModel());
-        }
-        return selectionMapper;
-    }
-
-    // ----------------------------- filters
-
-    /** 
-     * Returns the FilterPipeline for the table. 
-     * 
-     * @return the FilterPipeline used for the table.
-     */
-    public FilterPipeline getFilters() {
-        // PENDING: this is guaranteed to be != null because
-        // init calls setFilters(null) which enforces an empty
-        // pipeline
-        return filters;
-    }
-
-    /**
-     * setModel() and setFilters() may be called in either order.
-     * 
-     * @param pipeline
-     */
-    private void use(FilterPipeline pipeline) {
-        if (pipeline != null) {
-            // check JW: adding listener multiple times (after setModel)?
-            if (initialUse(pipeline)) {
-                pipeline.addPipelineListener(getFilterPipelineListener());
-                pipeline.assign(getComponentAdapter());
-            } else {
-                pipeline.flush();
-            }
-        }
-    }
-
-    /**
-     * @return true is not yet used in this JXTable, false otherwise
-     */
-    private boolean initialUse(FilterPipeline pipeline) {
-        if (pipelineListener == null)
-            return true;
-        PipelineListener[] l = pipeline.getPipelineListeners();
-        for (int i = 0; i < l.length; i++) {
-            if (pipelineListener.equals(l[i]))
-                return false;
-        }
-        return true;
-    }
-
-    /**
-     * Sets the FilterPipeline for filtering table rows, maybe null to remove
-     * all previously applied filters.
-     * 
-     * Note: the current "interactive" sortState is preserved (by internally
-     * copying the old sortKeys to the new pipeline, if any).
-     * 
-     * @param pipeline the <code>FilterPipeline</code> to use, null removes all
-     *        filters.
-     */
-    public void setFilters(FilterPipeline pipeline) {
-        FilterPipeline old = getFilters();
-        List<? extends SortKey> sortKeys = null;
-        if (old != null) {
-            old.removePipelineListener(pipelineListener);
-            sortKeys = old.getSortController().getSortKeys();
-        }
-        if (pipeline == null) {
-            pipeline = new FilterPipeline();
-        }
-        filters = pipeline;
-        filters.getSortController().setSortKeys(sortKeys);
-        // JW: first assign to prevent (short?) illegal internal state
-        // #173-swingx
-        use(filters);
-        getRowModelMapper().setFilters(filters);
-        getSelectionMapper().setFilters(filters);
-        repaint();
-    }
-
-    /** returns the listener for changes in filters. */
-    protected PipelineListener getFilterPipelineListener() {
-        if (pipelineListener == null) {
-            pipelineListener = createPipelineListener();
-        }
-        return pipelineListener;
-    }
-
-    /** creates the listener for changes in filters. */
-    protected PipelineListener createPipelineListener() {
-        return new PipelineListener() {
-            public void contentsChanged(PipelineEvent e) {
-                updateOnFilterContentChanged();
-            }
-        };
-    }
-
-    /**
-     * method called on change notification from filterpipeline.
-     */
-    protected void updateOnFilterContentChanged() {
-        revalidate();
-        repaint();
-        // this is a quick fix for #445-swingx: sort icon not updated on
-        // programatic sorts
-        if (getTableHeader() != null) {
-            getTableHeader().repaint();
-        }
-    }
-
     // -------------------------------- sorting
 
     /**
@@ -2012,7 +1666,7 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
         // JW PENDING: think about notification instead of manual repaint.
         SortController controller = getSortController();
         if (controller != null) {
-            controller.setSortKeys(null);
+            controller.removeAll();
         }
         if (getTableHeader() != null) {
             getTableHeader().repaint();
@@ -2043,8 +1697,7 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
         SortController controller = getSortController();
         if (controller != null) {
             TableColumnExt columnExt = getColumnExt(columnIndex);
-            controller.toggleSortOrder(convertColumnIndexToModel(columnIndex),
-                    columnExt != null ? columnExt.getComparator() : null);
+            controller.toggleSortOrder(convertColumnIndexToModel(columnIndex));
         }
     }
 
@@ -2086,7 +1739,7 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
      * 
      */
     public void setSortOrder(int columnIndex, SortOrder sortOrder) {
-        if ((sortOrder == null) || !sortOrder.isSorted()) {
+        if (!SortUtils.isSorted(sortOrder)) {
             resetSortOrder();
             return;
         }
@@ -2095,10 +1748,7 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
         SortController sortController = getSortController();
         if (sortController != null) {
             TableColumnExt columnExt = getColumnExt(columnIndex);
-            SortKey sortKey = new SortKey(sortOrder,
-                    convertColumnIndexToModel(columnIndex),
-                    columnExt != null ? columnExt.getComparator() : null);
-            sortController.setSortKeys(Collections.singletonList(sortKey));
+            sortController.setSortOrder(columnExt.getModelIndex(), sortOrder);
         }
     }
 
@@ -2113,9 +1763,7 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
         SortController sortController = getSortController();
         if (sortController == null)
             return SortOrder.UNSORTED;
-        SortKey sortKey = SortKey.getFirstSortKeyForColumn(sortController
-                .getSortKeys(), convertColumnIndexToModel(columnIndex));
-        return sortKey != null ? sortKey.getSortOrder() : SortOrder.UNSORTED;
+        return sortController.getSortOrder(convertColumnIndexToModel(columnIndex));
     }
 
     /**
@@ -2147,8 +1795,7 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
             TableColumnExt columnExt = getColumnExt(identifier);
             if (columnExt == null)
                 return;
-            controller.toggleSortOrder(columnExt.getModelIndex(), columnExt
-                    .getComparator());
+            controller.toggleSortOrder(columnExt.getModelIndex());
         }
     }
 
@@ -2172,7 +1819,7 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
      * 
      */
     public void setSortOrder(Object identifier, SortOrder sortOrder) {
-        if ((sortOrder == null) || !sortOrder.isSorted()) {
+        if (!SortUtils.isSorted(sortOrder)) {
             resetSortOrder();
             return;
         }
@@ -2180,12 +1827,11 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
             return;
         SortController sortController = getSortController();
         if (sortController != null) {
+            // PENDING JW: no longer limited to columnExt because comparator synch is done elsewhere
             TableColumnExt columnExt = getColumnExt(identifier);
             if (columnExt == null)
                 return;
-            SortKey sortKey = new SortKey(sortOrder, columnExt.getModelIndex(),
-                    columnExt.getComparator());
-            sortController.setSortKeys(Collections.singletonList(sortKey));
+            sortController.setSortOrder(columnExt.getModelIndex(), sortOrder);
         }
     }
 
@@ -2205,13 +1851,12 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
         SortController sortController = getSortController();
         if (sortController == null)
             return SortOrder.UNSORTED;
+        // PENDING JW: no longer limited to columnExt because comparator synch is done elsewhere
         TableColumnExt columnExt = getColumnExt(identifier);
         if (columnExt == null)
             return SortOrder.UNSORTED;
         int modelIndex = columnExt.getModelIndex();
-        SortKey sortKey = SortKey.getFirstSortKeyForColumn(sortController
-                .getSortKeys(), modelIndex);
-        return sortKey != null ? sortKey.getSortOrder() : SortOrder.UNSORTED;
+        return sortController.getSortOrder(modelIndex);
     }
 
     /**
@@ -2240,11 +1885,7 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
      * @return the currently active <code>SortController</code> may be null
      */
     protected SortController getSortController() {
-        // // this check is for the sake of the very first call after
-        // instantiation
-        if (filters == null)
-            return null;
-        return getFilters().getSortController();
+        return null;
     }
 
     /**
@@ -2258,20 +1899,21 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
         // check if there's a column with it available
         SortController controller = getSortController();
         if (controller != null) {
-            SortKey sortKey = SortKey.getFirstSortingKey(controller
-                    .getSortKeys());
-            if (sortKey != null) {
-                int sorterColumn = sortKey.getColumn();
-                List<TableColumn> columns = getColumns(true);
-                for (Iterator<TableColumn> iter = columns.iterator(); iter
-                        .hasNext();) {
-                    TableColumn column = iter.next();
-                    if (column.getModelIndex() == sorterColumn) {
-                        return column;
-                    }
-                }
-
-            }
+            // PENDING JW: use RowSorter?
+//            SortKey sortKey = SortKey.getFirstSortingKey(controller
+//                    .getSortKeys());
+//            if (sortKey != null) {
+//                int sorterColumn = sortKey.getColumn();
+//                List<TableColumn> columns = getColumns(true);
+//                for (Iterator<TableColumn> iter = columns.iterator(); iter
+//                        .hasNext();) {
+//                    TableColumn column = iter.next();
+//                    if (column.getModelIndex() == sorterColumn) {
+//                        return column;
+//                    }
+//                }
+//
+//            }
         }
         return null;
     }
@@ -4487,8 +4129,7 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
     /**
      * {@inheritDoc}
      * <p>
-     * Overriden to keep view/model coordinates of SizeSequence in synch. Marks
-     * the request as client-code induced.
+     * Overriden to mark the request as client-code induced.
      * 
      * @see #isXTableRowHeightSet
      */
@@ -4498,25 +4139,6 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
         if (rowHeight > 0) {
             isXTableRowHeightSet = true;
         }
-        updateViewSizeSequence();
-
-    }
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * Does nothing if support of individual rowHeights is not enabled.
-     * Overriden to keep view/model coordinates of SizeSequence in synch.
-     * 
-     * @see #isRowHeightEnabled()
-     */
-    @Override
-    public void setRowHeight(int row, int rowHeight) {
-        if (!isRowHeightEnabled())
-            return;
-        super.setRowHeight(row, rowHeight);
-        updateViewSizeSequence();
-        resizeAndRepaint();
     }
 
     /**
@@ -4530,138 +4152,25 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
      *        enabled.
      * @see #isRowHeightEnabled()
      * @see #setRowHeight(int, int)
+     * 
+     * @deprecated no longer necessary (switched to 1.6)
      */
+    @Deprecated
     public void setRowHeightEnabled(boolean enabled) {
-        // PENDING: should we throw an Exception if the enabled fails?
-        // Or silently fail - depends on runtime context,
-        // can't do anything about it.
-        boolean old = isRowHeightEnabled();
-        if (old == enabled)
-            return;
-        if (enabled && !canEnableRowHeight())
-            return;
-        rowHeightEnabled = enabled;
-        if (!enabled) {
-            adminSetRowHeight(getRowHeight());
-        }
-        firePropertyChange("rowHeightEnabled", old, rowHeightEnabled);
     }
 
     /**
      * Returns a boolean to indicate whether individual row height is enabled.
      * 
      * @return a boolean to indicate whether individual row height support is
-     *         enabled.
+     *         enabled, always true
      * @see #setRowHeightEnabled(boolean)
-     * @see #setRowHeight(int, int)
+     * 
+     * @deprecated no longer necessary (switched to 1.6)
      */
+    @Deprecated
     public boolean isRowHeightEnabled() {
-        return rowHeightEnabled;
-    }
-
-    /**
-     * Returns if it's possible to enable individual row height support.
-     * 
-     * @return a boolean to indicate whether access of super's private
-     *         <code>rowModel</code> is allowed.
-     */
-    private boolean canEnableRowHeight() {
-        return getRowModelField() != null;
-    }
-
-    /**
-     * Returns super's private <code>rowModel</code> which holds the individual
-     * rowHeights. This method will return <code>null</code> if the access
-     * failed, f.i. in sandbox restricted applications.
-     * 
-     * @return super's rowModel field or null if the access was not successful.
-     */
-    private SizeSequence getSuperRowModel() {
-        try {
-            Field field = getRowModelField();
-            if (field != null) {
-                return (SizeSequence) field.get(this);
-            }
-        } catch (SecurityException e) {
-            LOG.fine("cannot use reflection "
-                    + " - expected behaviour in sandbox");
-        } catch (IllegalArgumentException e) {
-            LOG
-                    .fine("problem while accessing super's private field - private api changed?");
-        } catch (IllegalAccessException e) {
-            LOG
-                    .fine("cannot access private field "
-                            + " - expected behaviour in sandbox. "
-                            + "Could be program logic running wild in unrestricted contexts");
-        }
-        return null;
-    }
-
-    /**
-     * Sets super's private <code>rowModel</code> which holds the individual
-     * rowHeights. This method will do nothing if the access failed, f.i. in
-     * sandbox restricted applications.
-     * 
-     * @param rowModel the SizeSequence to set super's rowModel to.
-     */
-    private void setSuperRowModel(SizeSequence rowModel) {
-        try {
-            Field field = getRowModelField();
-            if (field != null) {
-                field.set(this, rowModel);
-            }
-        } catch (SecurityException e) {
-            LOG.fine("cannot use reflection "
-                    + " - expected behaviour in sandbox");
-        } catch (IllegalArgumentException e) {
-            LOG
-                    .fine("problem while accessing super's private field - private api changed?");
-        } catch (IllegalAccessException e) {
-            LOG
-                    .fine("cannot access private field "
-                            + " - expected behaviour in sandbox. "
-                            + "Could be program logic running wild in unrestricted contexts");
-        }
-    }
-
-    /**
-     * Returns super's private field which holds the individual rowHeights. This
-     * method will return <code>null</code> if the access failed, f.i. in
-     * sandbox restricted applications.
-     * 
-     * @return the super's field with access allowed or null if an Exception
-     *         caught while trying to access.
-     */
-    private Field getRowModelField() {
-        if (rowModelField == null) {
-            try {
-                rowModelField = JTable.class.getDeclaredField("rowModel");
-                rowModelField.setAccessible(true);
-            } catch (SecurityException e) {
-                rowModelField = null;
-                LOG.fine("cannot access JTable private field rowModel "
-                        + "- expected behaviour in sandbox");
-            } catch (NoSuchFieldException e) {
-                LOG.fine("problem while accessing super's private field"
-                        + " - private api changed?");
-            }
-        }
-        return rowModelField;
-    }
-
-    /**
-     * Returns the mapper used synch individual rowHeights in view/model
-     * coordinates.
-     * 
-     * @return the <code>SizeSequenceMapper</code> used to synch view/model
-     *         coordinates for individual row heights
-     * @see org.jdesktop.swingx.decorator.SizeSequenceMapper
-     */
-    protected SizeSequenceMapper getRowModelMapper() {
-        if (rowModelMapper == null) {
-            rowModelMapper = new SizeSequenceMapper(filters);
-        }
-        return rowModelMapper;
+        return true;
     }
 
     /**
