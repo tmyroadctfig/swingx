@@ -1677,6 +1677,64 @@ public class JXTableSortRevamp extends InteractiveTestCase {
 
  
     //----------------------- interactive 
+    
+    /**
+     * Issue #271-swingx: make sort triggering mouseEvents
+     * customizable.
+     * 
+     * added SortGestureRecognizer.
+     * 
+     * No longer supported - need to re-think (maybe could push core addition?)
+     *
+     */
+    public void interactiveSortGestureRecognizer() {
+//        final JXTable table = new JXTable(10, 2);
+//        JXFrame frame = wrapWithScrollingInFrame(table, "Sort Gesture customization");
+//        Action action = new AbstractAction("toggle default/custom recognizer") {
+//            boolean hasCustom;
+//            public void actionPerformed(ActionEvent e) {
+//                SortGestureRecognizer recognizer = null;
+//                if (!hasCustom) {
+//                    hasCustom = !hasCustom;
+//                    recognizer = new SortGestureRecognizer() {
+//                        /**
+//                         * allow double clicks to trigger a sort.
+//                         */
+//                        @Override
+//                        public boolean isSortOrderGesture(MouseEvent e) {
+//                            return e.getClickCount() <= 2;
+//                        }
+//
+//                        /**
+//                         * Disable reset gesture.
+//                         */
+//                        @Override
+//                        public boolean isResetSortOrderGesture(MouseEvent e) {
+//                            return false;
+//                        }
+//
+//                        /**
+//                         * ignore modifiers.
+//                         */
+//                        @Override
+//                        public boolean isToggleSortOrderGesture(MouseEvent e) {
+//                            return isSortOrderGesture(e);
+//                        }
+//                        
+//                        
+//                        
+//                    };
+//                }
+//                ((JXTableHeader) table.getTableHeader()).setSortGestureRecognizer(recognizer);
+//                
+//            }
+//            
+//        };
+//        addAction(frame, action);
+//        frame.setVisible(true);
+        
+    }
+
     public void interactiveIndividualRowHeightAndFilter() {
         final JXTable table = new JXTable(createAscendingModel(0, 50));
         table.setRowHeightEnabled(true);

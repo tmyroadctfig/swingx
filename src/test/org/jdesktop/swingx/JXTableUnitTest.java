@@ -7,6 +7,8 @@
 
 package org.jdesktop.swingx;
 
+import static org.junit.Assert.*;
+
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -133,6 +135,14 @@ public class JXTableUnitTest extends InteractiveTestCase {
     }
 
 
+    /**
+     * JXTable auto-create rowsorter is true by default.
+     */
+    @Test
+    public void testAutoCreateRowSorter() {
+        JXTable table = new JXTable();
+        assertEquals("table must have default auto-create rowsorter true", true, table.getAutoCreateRowSorter());
+    }
     /**
      * Issue #847-swingx: JXTable respect custom corner if columnControl not visible
      * 

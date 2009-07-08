@@ -19,7 +19,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
-import java.awt.event.MouseEvent;
 import java.text.Format;
 import java.text.NumberFormat;
 import java.util.Comparator;
@@ -56,7 +55,6 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 
 import org.jdesktop.swingx.JXTable.NumberEditor;
-import org.jdesktop.swingx.JXTableHeader.SortGestureRecognizer;
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.decorator.AbstractHighlighter;
 import org.jdesktop.swingx.decorator.ColorHighlighter;
@@ -92,8 +90,8 @@ public class JXTableVisualCheck extends JXTableUnitTest {
       JXTableVisualCheck test = new JXTableVisualCheck();
       try {
 //        test.runInteractiveTests();
-          test.runInteractiveTests("interactive.*Grid.*");
-//          test.runInteractiveTests("interactive.*Header.*");
+//          test.runInteractiveTests("interactive.*Grid.*");
+          test.runInteractiveTests("interactive.*Header.*");
 //          test.runInteractiveTests("interactive.*ColumnProp.*");
 //          test.runInteractiveTests("interactive.*Multiple.*");
 //          test.runInteractiveTests("interactive.*RToL.*");
@@ -548,60 +546,6 @@ public class JXTableVisualCheck extends JXTableUnitTest {
    
 
     /**
-     * Issue #271-swingx: make sort triggering mouseEvents
-     * customizable.
-     * 
-     * added SortGestureRecognizer.
-     *
-     */
-    public void interactiveSortGestureRecognizer() {
-        final JXTable table = new JXTable(10, 2);
-        JXFrame frame = wrapWithScrollingInFrame(table, "Sort Gesture customization");
-        Action action = new AbstractAction("toggle default/custom recognizer") {
-            boolean hasCustom;
-            public void actionPerformed(ActionEvent e) {
-                SortGestureRecognizer recognizer = null;
-                if (!hasCustom) {
-                    hasCustom = !hasCustom;
-                    recognizer = new SortGestureRecognizer() {
-                        /**
-                         * allow double clicks to trigger a sort.
-                         */
-                        @Override
-                        public boolean isSortOrderGesture(MouseEvent e) {
-                            return e.getClickCount() <= 2;
-                        }
-
-                        /**
-                         * Disable reset gesture.
-                         */
-                        @Override
-                        public boolean isResetSortOrderGesture(MouseEvent e) {
-                            return false;
-                        }
-
-                        /**
-                         * ignore modifiers.
-                         */
-                        @Override
-                        public boolean isToggleSortOrderGesture(MouseEvent e) {
-                            return isSortOrderGesture(e);
-                        }
-                        
-                        
-                        
-                    };
-                }
-                ((JXTableHeader) table.getTableHeader()).setSortGestureRecognizer(recognizer);
-                
-            }
-            
-        };
-        addAction(frame, action);
-        frame.setVisible(true);
-        
-    }
-    /**
      * Issue #281-swingx: header should be auto-repainted on changes to
      * header title, value.
      * 
@@ -832,7 +776,6 @@ public class JXTableVisualCheck extends JXTableUnitTest {
     
     public void interactiveTestRowHeightAndSelection() {
         final JXTable table = new JXTable(sortableTableModel);
-        table.setRowHeightEnabled(true);
         table.setRowHeight(0, table.getRowHeight() * 2);
         final int column = 0;
         table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
@@ -864,7 +807,6 @@ public class JXTableVisualCheck extends JXTableUnitTest {
 
     public void interactiveTestRowHeight() {
         final JXTable table = new JXTable(sortableTableModel);
-        table.setRowHeightEnabled(true);
         table.setRowHeight(0, table.getRowHeight() * 2);
         JXFrame frame = wrapWithScrollingInFrame(table, "Individual rowheight");
         Action temp = new AbstractAction("empty selection") {

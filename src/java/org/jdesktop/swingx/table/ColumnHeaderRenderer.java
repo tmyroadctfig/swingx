@@ -30,27 +30,18 @@ import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JTable;
-import javax.swing.SortOrder;
-import javax.swing.UIManager;
-import javax.swing.border.Border;
-import javax.swing.border.CompoundBorder;
 import javax.swing.plaf.UIResource;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 
-import org.jdesktop.swingx.JXTable;
-import org.jdesktop.swingx.border.IconBorder;
-import org.jdesktop.swingx.icon.SortArrowIcon;
 import org.jdesktop.swingx.plaf.ColumnHeaderRendererAddon;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
-import org.jdesktop.swingx.sort.SortUtils;
 
 /**
- * Header renderer class which renders column sort feedback (arrows).
  * <p>
- * Additionally, it allows to customize renderer properties like <code>Font</code>, 
- * <code>Alignment</code> and similar. This part needs to go somewhere else
- * when we switch to Mustang.
+ * Header renderer which allows to customize renderer properties like <code>Font</code>, 
+ * <code>Alignment</code> and similar. This renderer is no longer used internally by swingx, 
+ * keep it a while?
  * <p>
  * 
  * Note: #169-jdnc, #193-swingx - Header doesn't look right in winXP/mac seem - to be
@@ -79,15 +70,6 @@ public class ColumnHeaderRenderer extends JComponent
     }
     private static TableCellRenderer sharedInstance = null;
 
-    private static Icon defaultDownIcon = new SortArrowIcon(false);
-
-    private static Icon defaultUpIcon = new SortArrowIcon(true);
-
-    private Icon downIcon = defaultDownIcon;
-
-    private Icon upIcon = defaultUpIcon;
-
-    private IconBorder iconBorder = new IconBorder();
     private boolean antiAliasedText = false;
 
     private TableCellRenderer delegateRenderer;
@@ -165,7 +147,6 @@ public class ColumnHeaderRenderer extends JComponent
     public ColumnHeaderRenderer() {
         label = new LabelProperties();
         initDelegate();
-        updateIconUI();
     }
 
     public ColumnHeaderRenderer(JTableHeader header) {
@@ -189,43 +170,11 @@ public class ColumnHeaderRenderer extends JComponent
             boolean isSelected, boolean hasFocus, int rowIndex, int columnIndex) {
         Component comp = configureDelegate(table, value, isSelected, hasFocus, rowIndex,
                 columnIndex);
-        if ((table instanceof JXTable) && (comp instanceof JComponent)) {
-            // work-around core issues
-            hackBorder((JComponent) comp);
-            SortOrder sortOrder = ((JXTable) table).getSortOrder(columnIndex);
-//            Border border = UIManager.getBorder("TableHeader.cellBorder");
-//            LOG.info("in renderer: " + UIManager.getBorder("TableHeader.cellBorder"));
-            if (SortUtils.isSorted(sortOrder)) {
-                iconBorder.setIcon(sortOrder == SortOrder.ASCENDING ? upIcon : downIcon);
-                Border origBorder = ((JComponent) comp).getBorder();
-                Border border = new CompoundBorder(origBorder, iconBorder);
-                ((JComponent) comp).setBorder(border);
-            }
-        }
         adjustComponentOrientation(comp);
         return comp;
     }
 
 
-    /**
-     * 
-     * @param component
-     */
-    private void hackBorder(JComponent component) {
-        if (hackBorder(component, VISTA_BORDER_HACK)) return;
-        hackBorder(component, METAL_BORDER_HACK);
-    }
-
-    /**
-     * 
-     * @param component
-     */
-    private boolean hackBorder(JComponent component, Object key) {
-        Border hackBorder = UIManager.getBorder(key);
-        if (hackBorder == null) return false;
-            component.setBorder(hackBorder);
-            return true;
-    }
 
     /**
      * Adjusts the Component's orientation to JXTable's CO if appropriate.
@@ -306,25 +255,6 @@ public class ColumnHeaderRenderer extends JComponent
         return label.getFont();
     }
 
-    public void setDownIcon(Icon icon) {
-        Icon old = getDownIcon();
-        this.downIcon = icon;
-        firePropertyChange("downIcon", old, getDownIcon());
-    }
-
-    public Icon getDownIcon() {
-        return downIcon;
-    }
-
-    public void setUpIcon(Icon icon) {
-        Icon old = getUpIcon();
-        this.upIcon = icon;
-        firePropertyChange("upIcon", old, getUpIcon());
-    }
-
-    public Icon getUpIcon() {
-        return upIcon;
-    }
 
     public void setHorizontalAlignment(int alignment) {
         int old = getHorizontalAlignment();
@@ -397,26 +327,11 @@ public class ColumnHeaderRenderer extends JComponent
     public void updateUI() {
         super.updateUI();
         initDelegate();
-        updateIconUI();
-    }
+     }
     
     public void updateUI(JTableHeader header) {
-        updateIconUI();
         if (header.getDefaultRenderer() != this) {
             delegateRenderer = header.getDefaultRenderer();
-        }
-    }
-    
-    private void updateIconUI() {
-        if (getUpIcon() instanceof UIResource) {
-            Icon icon = UIManager.getIcon(UP_ICON_KEY);
-            setUpIcon(icon != null ? icon : defaultUpIcon);
-            
-        }
-        if (getDownIcon() instanceof UIResource) {
-            Icon icon = UIManager.getIcon(DOWN_ICON_KEY);
-            setDownIcon(icon != null ? icon : defaultDownIcon);
-            
         }
     }
 
