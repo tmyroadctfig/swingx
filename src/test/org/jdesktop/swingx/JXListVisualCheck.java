@@ -6,19 +6,13 @@ package org.jdesktop.swingx;
 
 import java.awt.Color;
 import java.awt.Cursor;
-import java.awt.event.ActionEvent;
 import java.util.logging.Logger;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.DefaultListModel;
 import javax.swing.JList;
 
 import org.jdesktop.swingx.decorator.ColorHighlighter;
-import org.jdesktop.swingx.decorator.FilterPipeline;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
-import org.jdesktop.swingx.decorator.PatternFilter;
 import org.jdesktop.swingx.decorator.PatternPredicate;
 import org.jdesktop.swingx.hyperlink.EditorPaneLinkVisitor;
 import org.jdesktop.swingx.hyperlink.LinkModel;
@@ -42,101 +36,6 @@ public class JXListVisualCheck extends JXListTest {
         }
     }
 
-
-    /**
-     * Issue #377-swingx: JXList (it's wrapping model) fires incorrect events.
-     * 
-     * 
-     */
-    public void interactiveFilterMutateModel() {
-        final DefaultListModel model = createAscendingListModel(0, 5);
-        final JXList list = new JXList(model, true);
-        list.setFilters(new FilterPipeline(new PatternFilter()));
-        JXFrame frame = wrapWithScrollingInFrame(list, "Mutate model with filter");
-        Action addItem = new AbstractAction("add item") {
-
-            public void actionPerformed(ActionEvent e) {
-                int selected = list.getSelectedIndex();
-                if (selected >= 0) {
-                    selected = list.convertIndexToModel(selected);
-                }
-                if (selected > 0) {
-                    model.add(selected - 1, model.getSize());
-                } else {
-                    model.addElement(model.getSize());
-                }
-                
-            }
-            
-        };
-        addAction(frame, addItem);
-        Action removeItem = new AbstractAction("remove item") {
-
-            public void actionPerformed(ActionEvent e) {
-                int selected = list.getSelectedIndex();
-                if (selected >= 0) {
-                    selected = list.convertIndexToModel(selected);
-                }
-                if (selected > 0) {
-                    model.remove(selected - 1);
-                } 
-                
-            }
-            
-        };
-        addAction(frame, removeItem);
-        Action changeItem = new AbstractAction("change item") {
-
-            public void actionPerformed(ActionEvent e) {
-                int selected = list.getSelectedIndex();
-                if (selected >= 0) {
-                    selected = list.convertIndexToModel(selected);
-                }
-                if (selected > 0) {
-                    int newValue = ((Integer) model.getElementAt(selected - 1)).intValue() + 10;
-                    model.set(selected - 1, newValue);
-                } 
-                
-            }
-            
-        };
-        addAction(frame, changeItem);
-        Action flush = new AbstractAction("toggle sort") {
-
-            public void actionPerformed(ActionEvent e) {
-                list.toggleSortOrder();
-            }
-            
-        };
-        addAction(frame, flush);
-        show(frame);
-    }
-    
-
-    public void interactiveTestSort() {
-        final JXList list = new JXList(listModel, true);
-        JXFrame frame = wrapWithScrollingInFrame(list, "Toggle sorter");
-        Action toggleSortOrder = new AbstractAction("Toggle Sort Order") {
-
-            public void actionPerformed(ActionEvent e) {
-                list.toggleSortOrder();
-                
-            }
-            
-        };
-        addAction(frame, toggleSortOrder);
-        Action resetSortOrder = new AbstractAction("Reset Sort Order") {
-
-            public void actionPerformed(ActionEvent e) {
-                list.resetSortOrder();
-                
-            }
-            
-        };
-        addAction(frame, resetSortOrder);
-        frame.setVisible(true);
-        
-    }
     
     public void interactiveTestCompareFocusedCellBackground() {
         JXList xlist = new JXList(listModel);

@@ -61,15 +61,9 @@ import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.decorator.AbstractHighlighter;
 import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
-import org.jdesktop.swingx.decorator.Filter;
-import org.jdesktop.swingx.decorator.FilterPipeline;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
-import org.jdesktop.swingx.decorator.PatternFilter;
-import org.jdesktop.swingx.decorator.ShuttleSorter;
-import org.jdesktop.swingx.decorator.SortController;
-import org.jdesktop.swingx.decorator.Sorter;
 import org.jdesktop.swingx.hyperlink.LinkModel;
 import org.jdesktop.swingx.hyperlink.LinkModelAction;
 import org.jdesktop.swingx.renderer.CheckBoxProvider;
@@ -505,56 +499,6 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         
     }
     
-    /**
-     * Example: how to implement a custom toggle sort cycle.
-     * unsorted - ascending - descending - unsorted.
-     */
-    public void interactiveCustomToggleSortOrder() {
-        FilterPipeline myFilterPipeline = new CustomToggleSortOrderFP();
-        JXTable table = new JXTable(sortableTableModel);
-        table.setFilters(myFilterPipeline);
-        JXFrame frame = wrapWithScrollingInFrame(table, "Custom sort toggle");
-        frame.setVisible(true);
-        
-    }
-    /**
-     * Example: how to implement a custom toggle sort cycle.
-     * 
-     */
-    public class CustomToggleSortOrderFP extends FilterPipeline {
-
-        public CustomToggleSortOrderFP() {
-            super();
-        }
-
-        public CustomToggleSortOrderFP(Filter[] inList) {
-            super(inList);
-        }
-
-        @Override
-        protected SortController createDefaultSortController() {
-            return new CustomSortController();
-        }
-        
-        protected class CustomSortController extends SorterBasedSortController {
-
-            @Override
-            public void toggleSortOrder(int column, Comparator comparator) {
-                Sorter currentSorter = getSorter();
-                if ((currentSorter != null) && 
-                     (currentSorter.getColumnIndex() == column) &&
-                     !currentSorter.isAscending()) {
-                    setSorter(null);
-                } else {
-                    super.toggleSortOrder(column, comparator);
-                } 
-            }
-            
-        }
-    };
-    
-
-
     /**
      * Respect not-sortable column.
      */
@@ -1053,104 +997,6 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         frame.setVisible(true);
     }   
     
-    /** 
-     * Issue #??: Problems with filters and ColumnControl
-     * 
-     * - sporadic ArrayIndexOOB after sequence:
-     * filter(column), sort(column), hide(column), setFilter(null)
-     * 
-     * - filtering invisible columns? Unclear state transitions.
-     *
-     */
-    public void interactiveTestColumnControlAndFilters() {
-        final JXTable table = new JXTable(sortableTableModel);
-        // hmm bug regression with combos as editors - same in JTable
-//        JComboBox box = new JComboBox(new Object[] {"one", "two", "three" });
-//        box.setEditable(true);
-//        table.getColumnExt(0).setCellEditor(new DefaultCellEditor(box));
-        Action toggleFilter = new AbstractAction("Toggle Filter col. 0") {
-            boolean hasFilters;
-            public void actionPerformed(ActionEvent e) {
-                if (hasFilters) {
-                    table.setFilters(null);
-                } else {
-                    Filter filter = new PatternFilter("e", 0, 0);
-                    table.setFilters(new FilterPipeline(new Filter[] {filter}));
-
-                }
-                hasFilters = !hasFilters;
-            }
-            
-        };
-        toggleFilter.putValue(Action.SHORT_DESCRIPTION, "filtering first column - problem if invisible ");
-        table.setColumnControlVisible(true);
-        JXFrame frame = wrapWithScrollingInFrame(table, "JXTable ColumnControl and Filters");
-        addAction(frame, toggleFilter);
-        frame.setVisible(true);
-    }
- 
-    /**
-     * Issue #55-swingx: NPE on setModel if sorter in pipeline and new
-     * model getColumnCount() < sorter.getColumnIndex().
-     *
-     */
-    public void interactiveSetModelFilter() {
-        final DefaultTableModel model = createAscendingModel(0, 20, 3, true);
-        final AncientSwingTeam ancientSwingTeam = new AncientSwingTeam();
-        final JXTable table = new JXTable(ancientSwingTeam);
-        Sorter sorter = new ShuttleSorter(3, false);
-        FilterPipeline pipeline = new FilterPipeline(new Filter[] {sorter});
-        table.setFilters(pipeline);
-        table.setRowHeight(0, 25);
-        Action action = new AbstractAction("toggleModel") {
-
-            public void actionPerformed(ActionEvent e) {
-                if (table.getModel() == ancientSwingTeam) {
-                    table.setModel(model);
-                } else {
-                    table.setModel(ancientSwingTeam);
-                }
-                
-            }
-            
-        };
-        JXFrame frame = wrapWithScrollingInFrame(table, "model update?");
-        addAction(frame, action);
-        frame.setVisible(true);
-    }
-    
-
-    /** 
-     * @KEEP this is about testing Mustang sorting.
-     */
-    public void interactiveTestColumnControlAndFiltersRowSorter() {
-//        final JXTable table = new JXTable(sortableTableModel);
-//        // hmm bug regression with combos as editors - same in JTable
-////        JComboBox box = new JComboBox(new Object[] {"one", "two", "three" });
-////        box.setEditable(true);
-////        table.getColumnExt(0).setCellEditor(new DefaultCellEditor(box));
-//        Action toggleFilter = new AbstractAction("Toggle RowFilter -contains e- ") {
-//            boolean hasFilters;
-//            public void actionPerformed(ActionEvent e) {
-//                if (hasFilters) {
-//                    table.setFilters(null);
-//                } else {
-//                    RowSorterFilter filter = new RowSorterFilter();
-//                    filter.setRowFilter(RowFilter.regexFilter(".*e.*", 0));
-//                    table.setFilters(new FilterPipeline(new Filter[] {filter}));
-//
-//                }
-//                hasFilters = !hasFilters;
-//            }
-//            
-//        };
-//        toggleFilter.putValue(Action.SHORT_DESCRIPTION, "filtering first column - problem if invisible ");
-//        table.setColumnControlVisible(true);
-//        JFrame frame = wrapWithScrollingInFrame(table, "JXTable ColumnControl and Filters");
-//        addAction(frame, toggleFilter);
-//        frame.setVisible(true);
-    }
- 
 
     /** 
      * Issue #155-swingx: vertical scrollbar policy lost.
@@ -1534,39 +1380,6 @@ public class JXTableVisualCheck extends JXTableUnitTest {
     }
 
 
-
-    public void interactiveTestTableSorter1() {
-        JXTable table = new JXTable(sortableTableModel);
-        table.setBackground(new Color(0xFF, 0xFF, 0xCC)); // notepad
-        table.setGridColor(Color.cyan.darker());
-        table.setRowHeight(22);
-        table.setRowMargin(1);
-        table.setShowHorizontalLines(true);
-        table.setFilters(new FilterPipeline(new Filter[] {
-                                            new ShuttleSorter(0, true), // column 0, ascending
-                                            new ShuttleSorter(1, true), // column 1, ascending
-        }));
-
-        JFrame frame = wrapWithScrollingInFrame(table, "TableSorter1 col 0= asc, col 1 = asc");
-        frame.setVisible(true);
-
-    }
-    
-    public void interactiveTestTableSorter2() {
-        JXTable table = new JXTable(sortableTableModel);
-        table.setBackground(new Color(0xF5, 0xFF, 0xF5)); // ledger
-        table.setGridColor(Color.cyan.darker());
-        table.setRowHeight(22);
-        table.setRowMargin(1);
-        table.setShowHorizontalLines(true);
-        table.setFilters(new FilterPipeline(new Filter[] {
-                                            new ShuttleSorter(0, true), // column 0, ascending
-                                            new ShuttleSorter(1, false), // column 1, descending
-        }));
-        JFrame frame = wrapWithScrollingInFrame(table, "TableSorter2 col 0 = asc, col 1 = desc");
-        frame.setVisible(true);
-    }
-    
     @SuppressWarnings("deprecation")
     public void interactiveTestFocusedCellBackground() {
         TableModel model = new AncientSwingTeam() {
@@ -1583,78 +1396,6 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         frame.setVisible(true);
     }
 
-
-    public void interactiveTestTableSorter3() {
-        JXTable table = new JXTable(sortableTableModel);
-        table.setFilters(new FilterPipeline(new Filter[] {
-                                            new ShuttleSorter(1, true), // column 1, ascending
-                                            new ShuttleSorter(0, false), // column 0, descending
-        }));
-        JFrame frame = wrapWithScrollingInFrame(table, "TableSorter3 col 1 = asc, col 0 = desc");
-        frame.setVisible(true);
-    }
-
-    public void interactiveTestTableSorter4() {
-        JXTable table = new JXTable(sortableTableModel);
-        table.setFilters(new FilterPipeline(new Filter[] {
-                new ShuttleSorter(0, false), // column 0, descending
-                                            
-                new ShuttleSorter(1, true), // column 1, ascending
-        }));
-        JFrame frame = wrapWithScrollingInFrame(table, "TableSorter4 col 0 = des, col 1 = asc");
-        frame.setVisible(true);
-    }
-    
-    public void interactiveTestTablePatternFilter1() {
-        JXTable table = new JXTable(tableModel);
-        installLinkRenderer(table);
-        table.setIntercellSpacing(new Dimension(1, 1));
-        table.setShowGrid(true);
-        table.setFilters(new FilterPipeline(new Filter[] {
-                                            new PatternFilter("^A", 0, 1)
-        }));
-        JFrame frame = wrapWithScrollingInFrame(table, "TablePatternFilter1 Test");
-        frame.setVisible(true);
-    }
-
-    public void interactiveTestTablePatternFilter2() {
-        JXTable table = new JXTable(tableModel);
-        installLinkRenderer(table);
-        table.setIntercellSpacing(new Dimension(2, 2));
-        table.setShowGrid(true);
-        table.setFilters(new FilterPipeline(new Filter[] {
-                                            new PatternFilter("^S", 0, 1),
-                                            new ShuttleSorter(0, false), // column 0, descending
-        }));
-        JFrame frame = wrapWithScrollingInFrame(table, "TablePatternFilter2 Test");
-        frame.setVisible(true);
-    }
-
-    public void interactiveTestTablePatternFilter3() {
-        JXTable table = new JXTable(tableModel);
-        installLinkRenderer(table);
-        table.setShowGrid(true);
-        table.setFilters(new FilterPipeline(new Filter[] {
-                                            new PatternFilter("^S", 0, 1),
-                                            new ShuttleSorter(1, false), // column 1, descending
-                                            new ShuttleSorter(0, false), // column 0, descending
-        }));
-        JFrame frame = wrapWithScrollingInFrame(table, "TablePatternFilter3 Test");
-        frame.setVisible(true);
-    }
-
-    public void interactiveTestTablePatternFilter4() {
-        JXTable table = new JXTable(tableModel);
-        installLinkRenderer(table);
-        table.setIntercellSpacing(new Dimension(3, 3));
-        table.setShowGrid(true);
-        table.setFilters(new FilterPipeline(new Filter[] {
-                                            new PatternFilter("^A", 0, 1),
-                                            new ShuttleSorter(0, false), // column 0, descending
-        }));
-        JFrame frame = wrapWithScrollingInFrame(table, "TablePatternFilter4 Test");
-        frame.setVisible(true);
-    }
 
     public void interactiveTestTableViewProperties() {
         JXTable table = new JXTable(tableModel);
