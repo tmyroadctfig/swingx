@@ -249,35 +249,6 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
     
 
     /**
-     * Issue 746-swingx: treetable selectionMapper must not be static.
-     * 
-     * Here: test that different treetables have different instances of mapper.
-     */
-    @Test
-    public void testSelectionMapperViewSelectionModel() {
-        JXTreeTable one = new JXTreeTable();
-        assertSame("mapper's viewselectionModel must be same as the treetable's", 
-                one.getSelectionModel(), one.getSelectionMapper().getViewSelectionModel());
-        DefaultListSelectionModel selectionModel = new DefaultListSelectionModel();
-        one.setSelectionModel(selectionModel);
-        assertSame("mapper's viewselectionModel must be reset to new", 
-                selectionModel, one.getSelectionMapper().getViewSelectionModel());
-    }
-    
-    
-    /**
-     * Issue 746-swingx: treetable selectionMapper must not be static.
-     * 
-     * Here: test that different treetables have different instances of mapper.
-     */
-    @Test
-    public void testSelectionMapper() {
-        JXTreeTable one = new JXTreeTable();
-        JXTreeTable two = new JXTreeTable();
-        assertNotSame("treetables must not share the selectionMapper", 
-                one.getSelectionMapper(), two.getSelectionMapper());
-    }
-    /**
      * #561-swingx: KeyEvent on hierarchical column doesn't start editing.
      * 
      * Here: test method without event (delegates to event == null)

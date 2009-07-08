@@ -63,15 +63,11 @@ import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.decorator.AbstractHighlighter;
 import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
-import org.jdesktop.swingx.decorator.Filter;
-import org.jdesktop.swingx.decorator.FilterPipeline;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
-import org.jdesktop.swingx.decorator.PatternFilter;
 import org.jdesktop.swingx.decorator.PatternPredicate;
 import org.jdesktop.swingx.decorator.ShadingColorHighlighter;
-import org.jdesktop.swingx.decorator.ShuttleSorter;
 import org.jdesktop.swingx.decorator.HighlightPredicate.AndHighlightPredicate;
 import org.jdesktop.swingx.decorator.HighlightPredicate.ColumnHighlightPredicate;
 import org.jdesktop.swingx.decorator.HighlightPredicate.DepthHighlightPredicate;
@@ -1104,35 +1100,6 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
     }
 
     
-    /**
-     * Issue #204: weird filtering.
-     *
-     */
-    public void interactiveTestFilters() {
-        JXTreeTable treeTable = new JXTreeTable(treeTableModel);
-        treeTable.putClientProperty("JTree.lineStyle", "Angled");
-        treeTable.setRowHeight(22);
-        treeTable.setFilters(new FilterPipeline(new Filter[] {
-                new PatternFilter( "^d",
-                        Pattern.CASE_INSENSITIVE, 0), }));
-        JFrame frame = wrapWithScrollingInFrame(treeTable,
-                "PatternFilter");
-        frame.setVisible(true);
-    }
-    
-    /**
-     * Issue #??: weird sorting.
-     *
-     */
-    public void interactiveTestSortingFilters() {
-        JXTreeTable treeTable = new JXTreeTable(treeTableModel);
-        treeTable.setRowHeight(22);
-        treeTable.setFilters(new FilterPipeline(new Filter[] {
-                new ShuttleSorter(1, false), }));
-        JFrame frame = wrapWithScrollingInFrame(treeTable,
-                "SortingFilter");
-        frame.setVisible(true);
-    }
     
     
     public void interactiveTestHighlightAndRowHeight() {

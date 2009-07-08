@@ -397,7 +397,7 @@ public class TableColumnExt extends TableColumn implements UIDependent {
      * @param comparator a custom comparator to use in interactive
      *    sorting.
      * @see #getComparator
-     * @see org.jdesktop.swingx.decorator.SortController
+     * @see org.jdesktop.swingx.sort.SortController
      * @see org.jdesktop.swingx.decorator.SortKey
      */
     public void setComparator(Comparator comparator) {

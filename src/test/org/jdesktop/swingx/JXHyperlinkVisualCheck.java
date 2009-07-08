@@ -24,13 +24,13 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListModel;
+import javax.swing.SortOrder;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
 import org.jdesktop.swingx.decorator.HighlighterFactory;
-import org.jdesktop.swingx.decorator.SortOrder;
-import org.jdesktop.swingx.hyperlink.EditorPaneLinkVisitor;
 import org.jdesktop.swingx.hyperlink.AbstractHyperlinkAction;
+import org.jdesktop.swingx.hyperlink.EditorPaneLinkVisitor;
 import org.jdesktop.swingx.hyperlink.LinkModel;
 import org.jdesktop.swingx.hyperlink.LinkModelAction;
 import org.jdesktop.swingx.renderer.DefaultListRenderer;

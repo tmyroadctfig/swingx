@@ -67,7 +67,7 @@ public class JTableIssues extends InteractiveTestCase {
       try {
 //        test.runInteractiveTests();
 //          test.runInteractiveTests("interactive.*ColumnControl.*");
-          test.runInteractiveTests("interactive.*Sort.*");
+          test.runInteractiveTests("interactive.*NPE.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();

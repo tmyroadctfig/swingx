@@ -30,6 +30,7 @@ import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JTable;
+import javax.swing.SortOrder;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
@@ -39,10 +40,10 @@ import javax.swing.table.TableCellRenderer;
 
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.border.IconBorder;
-import org.jdesktop.swingx.decorator.SortOrder;
 import org.jdesktop.swingx.icon.SortArrowIcon;
 import org.jdesktop.swingx.plaf.ColumnHeaderRendererAddon;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
+import org.jdesktop.swingx.sort.SortUtils;
 
 /**
  * Header renderer class which renders column sort feedback (arrows).
@@ -194,8 +195,8 @@ public class ColumnHeaderRenderer extends JComponent
             SortOrder sortOrder = ((JXTable) table).getSortOrder(columnIndex);
 //            Border border = UIManager.getBorder("TableHeader.cellBorder");
 //            LOG.info("in renderer: " + UIManager.getBorder("TableHeader.cellBorder"));
-            if (sortOrder.isSorted()) {
-                iconBorder.setIcon(sortOrder.isAscending() ? upIcon : downIcon);
+            if (SortUtils.isSorted(sortOrder)) {
+                iconBorder.setIcon(sortOrder == SortOrder.ASCENDING ? upIcon : downIcon);
                 Border origBorder = ((JComponent) comp).getBorder();
                 Border border = new CompoundBorder(origBorder, iconBorder);
                 ((JComponent) comp).setBorder(border);

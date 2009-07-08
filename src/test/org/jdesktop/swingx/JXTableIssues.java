@@ -65,11 +65,7 @@ import org.jdesktop.swingx.action.BoundAction;
 import org.jdesktop.swingx.decorator.AbstractHighlighter;
 import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
-import org.jdesktop.swingx.decorator.Filter;
-import org.jdesktop.swingx.decorator.FilterPipeline;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
-import org.jdesktop.swingx.decorator.PatternFilter;
-import org.jdesktop.swingx.decorator.SortKey;
 import org.jdesktop.swingx.table.TableColumnExt;
 import org.jdesktop.swingx.treetable.FileSystemModel;
 import org.jdesktop.test.AncientSwingTeam;
@@ -141,40 +137,6 @@ public class JXTableIssues extends InteractiveTestCase {
         });
 
     }
-
-    /**
-     * Issue #856-swingx: no notification on filters changed
-     */
-    public void testFiltersProperty() {
-        JXTable table = new JXTable(10, 2);
-        FilterPipeline pipeline = table.getFilters();
-        assertNotNull("sanity: pipeline never null", pipeline);
-        FilterPipeline other = new FilterPipeline();
-        PropertyChangeReport report = new PropertyChangeReport();
-        table.addPropertyChangeListener(report);
-        table.setFilters(other);
-        assertEquals("sanity: new pipeline set", other, table.getFilters());
-        TestUtils.assertPropertyChangeEvent(report, "filters", pipeline, other, false);
-    }
-
-    /**
-     * Issue #856-swingx: no notification on filters changed
-     * 
-     * Here: test JXList
-     */
-    public void testFiltersPropertyList() {
-        JXList table = new JXList(true);
-        FilterPipeline pipeline = table.getFilters();
-        assertNotNull("sanity: pipeline never null", pipeline);
-        FilterPipeline other = new FilterPipeline();
-        PropertyChangeReport report = new PropertyChangeReport();
-        table.addPropertyChangeListener(report);
-        table.setFilters(other);
-        assertEquals("sanity: new pipeline set", other, table.getFilters());
-        TestUtils.assertPropertyChangeEvent(report, "filters", pipeline, other, false);
-    }
-
-
 
      /**
      * test if created a new instance of the renderer. While the old
@@ -365,25 +327,6 @@ public class JXTableIssues extends InteractiveTestCase {
         assertEquals(1, report.getEventCount("terminateEditOnFocusLost"));
         assertEquals(false, report.getLastNewValue("terminateEditOnFocusLost"));
     }
-    /**
-     * JXTable has responsibility to guarantee usage of 
-     * TableColumnExt comparator and update the sort if
-     * the columns comparator changes.
-     * 
-     */
-    public void testComparatorToPipelineDynamic() {
-        JXTable table = new JXTable(new AncientSwingTeam());
-        TableColumnExt columnX = table.getColumnExt(0);
-        table.toggleSortOrder(0);
-        columnX.setComparator(Collator.getInstance());
-        // invalid assumption .. only the comparator must be used.
-//        assertEquals("interactive sorter must be same as sorter in column", 
-//                columnX.getSorter(), table.getFilters().getSorter());
-        SortKey sortKey = SortKey.getFirstSortKeyForColumn(table.getFilters().getSortController().getSortKeys(), 0);
-        assertNotNull(sortKey);
-        assertEquals(columnX.getComparator(), sortKey.getComparator());
-       
-    }
 
 
     /**
@@ -483,59 +426,13 @@ public class JXTableIssues extends InteractiveTestCase {
         ColorHighlighter highlighter = new ColorHighlighter(predicate, Color.MAGENTA, null, Color.MAGENTA, null);
         table.addHighlighter(highlighter);
         JXTable other = new JXTable(table.getModel());
-        other.setFilters(new FilterPipeline(new IdentityFilter()));
+//        other.setFilters(new FilterPipeline(new IdentityFilter()));
         other.addHighlighter(highlighter);
         JXFrame frame = wrapWithScrollingInFrame(table, other, "repaint on update in first");
         addMessage(frame, "edit first cell in left table (start with/out a)");
         show(frame);
     }
     
-    public class IdentityFilter extends Filter {
-        
-        
-        /**
-         * PENDING JW: fires always, even without sorter ..
-         * Could do better - but will break behaviour of apps which relied on
-         * the (buggy) side-effect of repainting on each change.
-         * 
-         */
-        @Override
-        public void refresh() {
-            if ((pipeline == null) ||
-              (pipeline.getSortController().getSortKeys().size() == 0)) return;
-            super.refresh();
-        }
-
-        @Override
-        protected void init() {
-
-        }
-
-        @Override
-        protected void reset() {
-
-        }
-
-        @Override
-        protected void filter() {
-
-        }
-
-        @Override
-        public int getSize() {
-            return this.getInputSize();
-        }
-
-        @Override
-        protected int mapTowardModel(int row) {
-            return row;
-        }
-
-        @Override
-        protected int mapTowardView(int row) {
-            return row;
-        }
-    }
 
     /**
      * Issue #610-swingx: Cancel editing via Escape doesn't fire editingCanceled.
@@ -619,26 +516,6 @@ public class JXTableIssues extends InteractiveTestCase {
     }
     
 
-    public void interactiveIndividualRowHeightAndFilter() {
-        final JXTable table = new JXTable(createAscendingModel(0, 50));
-        table.setRowHeightEnabled(true);
-        table.setRowHeight(1, 100);
-        final FilterPipeline filterPipeline = new FilterPipeline(new PatternFilter(".*1.*",0,0));
-        Action action = new AbstractAction("filter") {
-
-            public void actionPerformed(ActionEvent e) {
-                if (table.getFilters() == filterPipeline) {
-                    table.setFilters(null);
-                } else {
-                    table.setFilters(filterPipeline);
-                }
-            }
-            
-        };
-        JXFrame frame = wrapWithScrollingInFrame(table, "toggle filter and indi rowheight");
-        addAction(frame, action);
-        frame.setVisible(true);
-    }
     public void interactiveDeleteRowAboveSelection() {
         CompareTableBehaviour compare = new CompareTableBehaviour(new Object[] { "A", "B", "C", "D", "E", "F", "G", "H", "I" });
         compare.table.getSelectionModel().setSelectionInterval(2, 5);
