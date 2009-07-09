@@ -69,7 +69,6 @@ import org.jdesktop.swingx.renderer.DefaultTableRenderer;
 import org.jdesktop.swingx.renderer.HyperlinkProvider;
 import org.jdesktop.swingx.search.SearchFactory;
 import org.jdesktop.swingx.table.ColumnFactory;
-import org.jdesktop.swingx.table.ColumnHeaderRenderer;
 import org.jdesktop.swingx.table.DatePickerCellEditor;
 import org.jdesktop.swingx.table.NumberEditorExt;
 import org.jdesktop.swingx.table.TableColumnExt;
@@ -1349,62 +1348,6 @@ public class JXTableVisualCheck extends JXTableUnitTest {
     }
 
 
-    public void interactiveTestTableColumnProperties() {
-        JXTable table = new JXTable();
-        table.setModel(tableModel);
-        installLinkRenderer(table);
-
-        table.getTableHeader().setBackground(Color.green);
-        table.getTableHeader().setForeground(Color.magenta);
-        table.getTableHeader().setFont(new Font("Serif", Font.PLAIN, 10));
-
-        ColumnHeaderRenderer headerRenderer = ColumnHeaderRenderer.createColumnHeaderRenderer();
-        headerRenderer.setHorizontalAlignment(JLabel.LEFT);
-        headerRenderer.setBackground(Color.blue);
-        headerRenderer.setForeground(Color.yellow);
-        headerRenderer.setIcon(new Icon() {
-            public int getIconWidth() {
-                return 12;
-            }
-
-            public int getIconHeight() {
-                return 12;
-            }
-
-            public void paintIcon(Component c, Graphics g, int x, int y) {
-                g.setColor(Color.red);
-                g.fillOval(0, 0, 10, 10);
-            }
-        });
-        headerRenderer.setIconTextGap(20);
-        headerRenderer.setFont(new Font("Serif", Font.BOLD, 18));
-
-        for (int i = 0; i < table.getColumnCount(); i++) {
-            TableColumnExt column = table.getColumnExt(i);
-            if (i % 3 > 0) {
-                column.setHeaderRenderer(headerRenderer);
-            }
-            if (i % 2 > 0) {
-                TableCellRenderer cellRenderer =
-                    table.getNewDefaultRenderer(table.getColumnClass(i));
-                if (cellRenderer instanceof JLabel || cellRenderer instanceof AbstractButton) {
-                    JComponent labelCellRenderer = (JComponent)cellRenderer;
-                    labelCellRenderer.setBackground(Color.gray);
-                    labelCellRenderer.setForeground(Color.red);
-                    if (cellRenderer instanceof JLabel) {
-                        ((JLabel) labelCellRenderer).setHorizontalAlignment(JLabel.CENTER);
-                    } else {
-                        ((AbstractButton) labelCellRenderer).setHorizontalAlignment(JLabel.CENTER);
-                    }
-                    column.setCellRenderer(cellRenderer);
-                }
-            }
-        }
-
-        JXFrame frame = wrapWithScrollingInFrame(table, "TableColumnProperties Test");
-        addStatusMessage(frame, "column properties currently not working");
-        frame.setVisible(true);
-    }
 
     public void interactiveTestEditableHighlight() {
         JXTable table = new JXTable(tableModel);

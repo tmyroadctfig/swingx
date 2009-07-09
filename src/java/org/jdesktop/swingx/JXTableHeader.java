@@ -36,7 +36,6 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
 import org.jdesktop.swingx.event.TableColumnModelExtListener;
-import org.jdesktop.swingx.table.ColumnHeaderRenderer;
 import org.jdesktop.swingx.table.TableColumnExt;
 
 /**
@@ -368,51 +367,6 @@ public class JXTableHeader extends JTableHeader
  * no longer used internally - keep until we know better how to
  *    meet our requirments in Mustang 
  */   
-    /**
-     * Prepares the default renderer and internal state for updateUI. 
-     * Returns the default renderer set when entering this method.
-     * Called from updateUI before calling super.updateUI to 
-     * allow UIDelegate to cleanup, if necessary. This implementation
-     * does so by restoring the header's default renderer to the 
-     * <code>ColumnHeaderRenderer</code>'s delegate.
-     *  
-     * @return the current default renderer 
-     * 
-     * @deprecated no longer used internally
-     */
-    @Deprecated
-    protected TableCellRenderer preUpdateRendererUI() {
-        TableCellRenderer oldRenderer = getDefaultRenderer();
-        // reset the default to the original to give S
-        if (oldRenderer instanceof ColumnHeaderRenderer) {
-            setDefaultRenderer(((ColumnHeaderRenderer)oldRenderer).getDelegateRenderer());
-        }
-        return oldRenderer;
-    }
-
-    /**
-     * Cleans up after the UIDelegate has updated the default renderer.
-     * Called from <code>updateUI</code> after calling <code>super.updateUI</code>.
-     * This implementation wraps a <code>UIResource</code> default renderer into a 
-     * <code>ColumnHeaderRenderer</code>.
-     * 
-     * @param oldRenderer the default renderer before updateUI
-     * @deprecated no longer used internally
-     */
-    @Deprecated
-    protected void postUpdateRendererUI(TableCellRenderer oldRenderer) {
-        TableCellRenderer current = getDefaultRenderer();
-        if (!(current instanceof ColumnHeaderRenderer) && (current instanceof UIResource)) {
-            ColumnHeaderRenderer renderer;
-            if (oldRenderer instanceof ColumnHeaderRenderer) {
-                renderer = (ColumnHeaderRenderer) oldRenderer;
-                renderer.updateUI(this);
-            } else {
-                renderer = new ColumnHeaderRenderer(this);
-            }
-            setDefaultRenderer(renderer);
-        }
-    }
 
 /*----------------- SortGesture/MouseListener support
  * @KEEP JW: Maybe re-inserted due to core bugs, so keep it a while longer ;-)    
