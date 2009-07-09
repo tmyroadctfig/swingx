@@ -104,6 +104,37 @@ public class JTableIssues extends InteractiveTestCase {
           assertSame(sorter, table.getRowSorter());
       }
 
+    /**
+     * If autoCreate if off, the control of updating a sorter's model is left
+     * completely to the client. Corner case: if had been autoCreated, then
+     * turned off, then set a new model, the autoCreated still points to the old
+     * model.
+     */
+    @Test
+    public void testRowSorterModelUpdated() {
+        JTable table = new JTable();
+        table.setAutoCreateRowSorter(true);
+        table.setAutoCreateRowSorter(false);
+        TableModel old = table.getModel();
+        table.setModel(new DefaultTableModel());
+        assertSame("tend to not extpect: rowsorter still old? ", old, table.getRowSorter().getModel());
+        assertSame("expect rowSorter's model updated?", table.getModel(), table.getRowSorter().getModel());
+    }
+
+    /**
+     * If autoCreate if off, the control of updating a sorter's model is left
+     * completely to the client. Corner case: if had been autoCreated, then
+     * turned off, then set a new model, the autoCreated still points to the old
+     * model.
+     */
+    @Test
+    public void testRowSorterNulled() {
+        JTable table = new JTable();
+        table.setAutoCreateRowSorter(true);
+        table.setAutoCreateRowSorter(false);
+        assertNull("expect auto-created rowsorter nulled?", table.getRowSorter());
+    }
+    
   //----------------------- interactive
    
       /**

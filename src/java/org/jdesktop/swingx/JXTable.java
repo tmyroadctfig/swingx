@@ -65,6 +65,7 @@ import javax.swing.JTextField;
 import javax.swing.JViewport;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
+import javax.swing.RowSorter;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
@@ -82,6 +83,7 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.action.BoundAction;
@@ -456,6 +458,8 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
     private boolean editable;
 
     private Dimension calculatedPrefScrollableViewportSize;
+
+    private boolean autoCreateRowSorter;
 
     /** Instantiates a JXTable with a default table model, no data. */
     public JXTable() {
@@ -1535,6 +1539,66 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
         }
     }
 
+    /**
+     * {@inheritDoc} <p>
+     * 
+     * Overridden to prevent super from creating RowSorter.
+     */
+    @Override
+    public void setModel(TableModel dataModel) {
+        boolean old = getAutoCreateRowSorter();
+        try {
+            this.autoCreateRowSorter = false;
+            super.setModel(dataModel);
+        } finally {
+            this.autoCreateRowSorter = old;
+        }
+        if (getAutoCreateRowSorter()) {
+            setRowSorter(createDefaultRowSorter());
+        }
+        
+    }
+
+    /**
+     * {@inheritDoc} <p>
+     * 
+     * Overridden to 
+     * <ul>
+     * <li> fix core bug: replaces sorter even if flag doesn't change.
+     * <li> use xflag (need because super's RowSorter creation is hard-coded.
+     */
+    @Override
+    public void setAutoCreateRowSorter(boolean autoCreateRowSorter) {
+        if (getAutoCreateRowSorter() == autoCreateRowSorter) return;
+        boolean oldValue = getAutoCreateRowSorter();
+        this.autoCreateRowSorter = autoCreateRowSorter;
+        if (autoCreateRowSorter) {
+            setRowSorter(createDefaultRowSorter());
+        }
+        firePropertyChange("autoCreateRowSorter", oldValue,
+                           getAutoCreateRowSorter());
+    }
+
+    /**
+     * {@inheritDoc} <p>
+     * 
+     * Overridden to return xflag
+     */
+    @Override
+    public boolean getAutoCreateRowSorter() {
+        return autoCreateRowSorter;
+    }
+
+    /**
+     * Creates and returns the default RowSorter. Note that this is already
+     * configured to the current TableModel - no api in the base class to set
+     * the model?
+     * 
+     * @return the default RowSorter.
+     */
+    protected RowSorter<? extends TableModel> createDefaultRowSorter() {
+        return new TableRowSorter<TableModel>(getModel());
+    }
 
     /**
      * Returns a boolean to indicate whether the table should be resorted after
@@ -1616,6 +1680,7 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
 
     // -------------------------------- sorting
 
+    
     /**
      * Sets &quot;sortable&quot; property indicating whether or not this table
      * supports sortable columns. If <code>sortable</code> is <code>true</code>
