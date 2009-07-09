@@ -77,7 +77,6 @@ import org.jdesktop.swingx.table.TableColumnExt;
  * @see JXTable#toggleSortOrder(int)
  * @see JXTable#resetSortOrder()
  * @see SortGestureRecognizer
- * @see ColumnHeaderRenderer
  */
 public class JXTableHeader extends JTableHeader 
     implements TableColumnModelExtListener {
@@ -414,7 +413,10 @@ public class JXTableHeader extends JTableHeader
             setDefaultRenderer(renderer);
         }
     }
-    
+
+/*----------------- SortGesture/MouseListener support
+ * @KEEP JW: Maybe re-inserted due to core bugs, so keep it a while longer ;-)    
+ */
     /**
      * Returns the SortGestureRecognizer to use. If none available, lazily 
      * creates a default.

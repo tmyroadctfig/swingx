@@ -7,8 +7,6 @@
 
 package org.jdesktop.swingx;
 
-import static org.junit.Assert.*;
-
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -39,6 +37,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
+import javax.swing.RowSorter;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.event.TableModelEvent;
@@ -51,6 +50,7 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 
 import org.jdesktop.swingx.JXTable.GenericEditor;
 import org.jdesktop.swingx.action.BoundAction;
@@ -105,11 +105,11 @@ public class JXTableUnitTest extends InteractiveTestCase {
     }
 
     @Before
-       public void setUpJu4() throws Exception {
+    public void setUpJu4() throws Exception {
         // just a little conflict between ant and maven builds
         // junit4 @before methods needs to be public, while
         // junit3 setUp() inherited from super is protected
-      this.setUp();
+        this.setUp();
     }
     
     @Override
@@ -129,12 +129,117 @@ public class JXTableUnitTest extends InteractiveTestCase {
     
     @Override
     @After
-       public void tearDown() throws Exception {
+    public void tearDown() throws Exception {
         UIManager.put("JXTable.rowHeight", uiTableRowHeight);
         super.tearDown();
     }
 
+    /**
+     * core issue: rowSorter replaced on setAutoCreateRowSorter even without change to flag.
+     */
+    @Test
+    public void testSetAutoCreateRowSorter() {
+        JXTable table = new JXTable(new AncientSwingTeam());
+        RowSorter<?> sorter = table.getRowSorter();
+        assertNotNull("sanity: core rowSorter is created", sorter);
+        table.setAutoCreateRowSorter(true);
+        assertSame(sorter, table.getRowSorter());
+    }
 
+    /**
+     * Sanity test: we are tricksing super to think that auto-create is off, but
+     * only super. At all other times the property must be as set. 
+     * 
+     */
+    @Test
+    public void testAutoCreateRowSorterGetterSetterSynched() {
+        JTable table = new JXTable();
+        table.setAutoCreateRowSorter(false);
+        assertEquals(false, table.getAutoCreateRowSorter());
+        table.setAutoCreateRowSorter(true);
+        assertEquals(true, table.getAutoCreateRowSorter());
+    }
+    /**
+     * Sanity test: we are tricksing super to think that auto-create is off, but
+     * only super. Here we test if setModel does reset the property to its old state.
+     * 
+     */
+    @Test
+    public void testSetModelKeepsCreateRowSorterFlagTrue() {
+        JTable table = new JXTable();
+        assertSetModelKeepsCreateSorterFlag(table, true);
+    }
+    /**
+     * Sanity test: we are tricksing super to think that auto-create is off, but
+     * only super. Here we test if setModel does reset the property to its old state.
+     * 
+     */
+    @Test
+    public void testSetModelKeepsCreateRowSorterFlagFalse() {
+        JTable table = new JXTable();
+        assertSetModelKeepsCreateSorterFlag(table, false);
+    }
+
+    /**
+     * @param table
+     * @param flag
+     */
+    private void assertSetModelKeepsCreateSorterFlag(JTable table, boolean flag) {
+        table.setAutoCreateRowSorter(flag);
+        table.setModel(new DefaultTableModel());
+        assertEquals(flag, table.getAutoCreateRowSorter());
+    }
+
+    
+    /**
+     * Test that setModel uses factory method to create rowSorter.
+     */
+    @Test
+    public void testSetModelCreateDefaultRowSorter() {
+        JXTable table = new JXRTable();
+        table.setModel(new AncientSwingTeam());
+        assertTrue("table must install default rowSorter, but was: " + table.getRowSorter().getClass(), 
+                table.getRowSorter() instanceof XTableRowSorter);
+        assertSame("default RowSorter must be configured with table model", 
+                table.getModel(), table.getRowSorter().getModel() );
+    }
+    
+    /**
+     * Test that JXTable uses factroy method when auto-creating a rowSorter.
+     */
+    @Test
+    public void testCreateDefaultRowSorterOverridden() {
+        JXTable table = new JXRTable();
+        assertTrue("table must install default rowSorter, but was: " + table.getRowSorter().getClass(), 
+                table.getRowSorter() instanceof XTableRowSorter);
+        assertSame("default RowSorter must be configured with table model", 
+                table.getModel(), table.getRowSorter().getModel() );
+    }
+    
+    public static class JXRTable extends JXTable {
+        @Override
+        protected RowSorter<? extends TableModel> createDefaultRowSorter() {
+            XTableRowSorter sorter = new XTableRowSorter();
+            sorter.setModel(getModel());
+            return sorter;
+        }
+    }
+    
+    /** 
+     * quick class to check that JXTable uses its factory method to auto-create
+     */
+    public static class XTableRowSorter<M extends TableModel> extends TableRowSorter<M> {
+        
+    }
+    
+    /**
+     * Sanity: default rowSorter has same model as table.
+     */
+    @Test
+    public void testAutoCreateRowSorterModelInstalled() {
+        JXTable table = new JXTable();
+        assertSame("model must be same", table.getModel(), table.getRowSorter().getModel());
+    }
     /**
      * JXTable auto-create rowsorter is true by default.
      */
