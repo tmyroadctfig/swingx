@@ -32,11 +32,9 @@ import org.jdesktop.swingx.plaf.motif.MotifLookAndFeelAddons;
 import org.jdesktop.swingx.plaf.nimbus.NimbusLookAndFeelAddons;
 import org.jdesktop.swingx.plaf.windows.WindowsClassicLookAndFeelAddons;
 import org.jdesktop.swingx.plaf.windows.WindowsLookAndFeelAddons;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.junit.Test;
-import org.junit.Before;
-import org.junit.After;
 
 
 /**
@@ -57,7 +55,6 @@ public class UIResourcesTest extends TestCase {
         System.setProperty("swingx.enableStrictResourceChecking", "true");
         LookAndFeelAddons.contribute(new BusyLabelAddon());
         LookAndFeelAddons.contribute(new ColumnControlButtonAddon());
-        LookAndFeelAddons.contribute(new ColumnHeaderRendererAddon());
         LookAndFeelAddons.contribute(new DatePickerAddon());
         LookAndFeelAddons.contribute(new ErrorPaneAddon());
         LookAndFeelAddons.contribute(new HeaderAddon());
