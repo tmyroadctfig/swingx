@@ -20,6 +20,8 @@
  */
 package org.jdesktop.swingx;
 
+import static org.junit.Assert.*;
+
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Point;
@@ -30,7 +32,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Vector;
 import java.util.logging.Logger;
 
-import javax.swing.DefaultListSelectionModel;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -38,6 +39,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
@@ -78,8 +80,52 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
         super("JXTreeTable Unit Test");
     }
 
-    
     /**
+     * Issue #1121: most not be sortable
+     * 
+     * Here: test that the autoCreateRowSorter property is false.
+     */
+    @Test
+    public void testAutoCreateRowSorterDisabled() {
+        JXTreeTable table = new JXTreeTable();
+        assertEquals("treeTable autoCreateRowSorter must be false", false, table.getAutoCreateRowSorter());
+    }
+    /**
+     * Issue #1121: most not be sortable
+     * 
+     * Here: test that the autoCreateRowSorter property is not settable.
+     */
+    @Test
+    public void testAutoCreateRowSorterNotSettable() {
+        JXTreeTable table = new JXTreeTable();
+        table.setAutoCreateRowSorter(true);
+        assertEquals("treeTable autoCreateRowSorter must be false", false, table.getAutoCreateRowSorter());
+    }
+
+    /**
+     * Issue #1121: most not be sortable
+     * 
+     * Here: test that the no rowSorter installed.
+     */
+    @Test
+    public void testRowSorterNull() {
+        JXTreeTable table = new JXTreeTable();
+        assertNull("null rowsorter initially, was: " + table.getRowSorter(),
+                table.getRowSorter());
+    }
+    /**
+     * Issue #1121: most not be sortable
+     * 
+     * Here: test that the no rowSorter installed.
+     */
+    @Test
+    public void testRowSorterNotSettable() {
+        JXTreeTable table = new JXTreeTable();
+        table.setRowSorter(new TableRowSorter<TableModel>());
+        assertNull("rowsorter not settable, was: " + table.getRowSorter(), 
+                table.getRowSorter());
+    }
+/**
      * Issue #766-swingx: drop image is blinking over hierarchical column.
      * 
      * Test the hack - enabled by default, can be disabled by setting the

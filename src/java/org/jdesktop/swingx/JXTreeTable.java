@@ -44,6 +44,7 @@ import javax.swing.JComponent;
 import javax.swing.JTable;
 import javax.swing.JTree;
 import javax.swing.ListSelectionModel;
+import javax.swing.RowSorter;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
@@ -181,7 +182,8 @@ public class JXTreeTable extends JXTable {
         initActions();
         // disable sorting
         super.setSortable(false);
-        
+        super.setAutoCreateRowSorter(false);
+        super.setRowSorter(null);
         // no grid
         setShowGrid(false, false);
 
@@ -262,10 +264,12 @@ public class JXTreeTable extends JXTable {
     }
 
     /** 
-     * overridden to do nothing. 
+     * {@inheritDoc} <p>
+     * Overridden to do nothing. 
      * 
-     * TreeTable is not sortable by default, because 
-     * Sorters/Filters currently don't work properly.
+     * TreeTable is not sortable because there is no equivalent to 
+     * RowSorter (which is targeted to linear structures) for 
+     * hierarchical data.
      * 
      */
     @Override
@@ -275,6 +279,32 @@ public class JXTreeTable extends JXTable {
 
     
     
+    /** 
+     * {@inheritDoc} <p>
+     * Overridden to do nothing. 
+     * 
+     * TreeTable is not sortable because there is no equivalent to 
+     * RowSorter (which is targeted to linear structures) for 
+     * hierarchical data.
+     * 
+     */
+    @Override
+    public void setAutoCreateRowSorter(boolean autoCreateRowSorter) {
+    }
+
+    /** 
+     * {@inheritDoc} <p>
+     * Overridden to do nothing. 
+     * 
+     * TreeTable is not sortable because there is no equivalent to 
+     * RowSorter (which is targeted to linear structures) for 
+     * hierarchical data.
+     * 
+     */
+    @Override
+    public void setRowSorter(RowSorter<? extends TableModel> sorter) {
+    }
+
     /**
      * {@inheritDoc} <p>
      * 
