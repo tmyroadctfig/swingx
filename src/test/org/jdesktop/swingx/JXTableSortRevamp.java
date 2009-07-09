@@ -50,6 +50,8 @@ import org.jdesktop.swingx.renderer.DefaultTableRenderer;
 import org.jdesktop.swingx.renderer.StringValue;
 import org.jdesktop.swingx.renderer.StringValues;
 import org.jdesktop.swingx.table.TableColumnExt;
+import org.jdesktop.swingx.test.ComponentTreeTableModel;
+import org.jdesktop.swingx.treetable.FileSystemModel;
 import org.jdesktop.test.AncientSwingTeam;
 import org.junit.After;
 import org.junit.Before;
@@ -108,6 +110,17 @@ public class JXTableSortRevamp extends InteractiveTestCase {
         super.tearDown();
     }
 
+    
+    public static void main(String[] args) {
+        JXTableSortRevamp test = new JXTableSortRevamp();
+        try {
+//            test.runInteractiveTests();
+            test.runInteractiveTests("interactive.*NPE.*");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
     /**
      * Issue #??- ComponentAdapter's default implementation does not
      *    return the value at the adapter's view state.
@@ -277,7 +290,6 @@ public class JXTableSortRevamp extends InteractiveTestCase {
     public void testIndividualRowHeightAndFilterInsert() {
         fail("JXTable - swingx filtering/sorting disabled");
         JXTable table = new JXTable(createAscendingModel(0, 50));
-        table.setRowHeightEnabled(true);
         table.setRowHeight(1, 100);
 //        final FilterPipeline filterPipeline = new FilterPipeline(new PatternFilter("[123]",0,0));
 //        table.setFilters(filterPipeline);
@@ -296,7 +308,6 @@ public class JXTableSortRevamp extends InteractiveTestCase {
     public void testIndividualRowHeightAndFilterRemove() {
         fail("JXTable - swingx filtering/sorting disabled");
         JXTable table = new JXTable(createAscendingModel(0, 50));
-        table.setRowHeightEnabled(true);
 //        table.setRowHeight(1, 100);
 //        final FilterPipeline filterPipeline = new FilterPipeline(new PatternFilter("[123]",0,0));
 //        table.setFilters(filterPipeline);
@@ -313,7 +324,6 @@ public class JXTableSortRevamp extends InteractiveTestCase {
     public void testIndividualRowHeightAndFilter() {
         fail("JXTable - swingx filtering/sorting disabled");
         JXTable table = new JXTable(createAscendingModel(0, 50));
-        table.setRowHeightEnabled(true);
         table.setRowHeight(1, 100);
 //        final FilterPipeline filterPipeline = new FilterPipeline(new PatternFilter("[123]",0,0));
 //        table.setFilters(filterPipeline);
@@ -787,9 +797,6 @@ public class JXTableSortRevamp extends InteractiveTestCase {
     public void testKeepRowHeightOnUpdateAndEmptySelection() {
         fail("JXTable - swingx filtering/sorting disabled");
         JXTable table = new JXTable(10, 3);
-        table.setRowHeightEnabled(true);
-        // sanity assert
-        assertTrue("row height enabled", table.isRowHeightEnabled());
         table.setRowHeight(0, 25);
         // sanity assert
         assertEquals(25, table.getRowHeight(0));
@@ -813,7 +820,6 @@ public class JXTableSortRevamp extends InteractiveTestCase {
     public void testIndividualRowHeight() {
         fail("JXTable - swingx filtering/sorting disabled");
         JXTable table = new JXTable(createAscendingModel(0, 10));
-        table.setRowHeightEnabled(true);
         table.setRowHeight(0, 25);
         assertEquals(25, table.getRowHeight(0));
         assertEquals(table.getRowHeight(), table.getRowHeight(1));
@@ -831,7 +837,6 @@ public class JXTableSortRevamp extends InteractiveTestCase {
     public void testResetIndividualRowHeight() {
         fail("JXTable - swingx filtering/sorting disabled");
         JXTable table = new JXTable(createAscendingModel(0, 10));
-        table.setRowHeightEnabled(true);
         table.setRowHeight(0, 25);
 //        table.getFilters().getSortController().setSortKeys
 //            (Collections.singletonList(
@@ -1140,7 +1145,6 @@ public class JXTableSortRevamp extends InteractiveTestCase {
         fail("JXTable - swingx filtering/sorting disabled");
         DefaultTableModel model = createAscendingModel(0, 10);
         JXTable table = new JXTable(model);
-        table.setRowHeightEnabled(true);
         int selectedRow = table.getRowCount() - 1;
         table.setRowHeight(selectedRow, 25);
         table.toggleSortOrder(0);
@@ -1236,7 +1240,6 @@ public class JXTableSortRevamp extends InteractiveTestCase {
         fail("JXTable - swingx filtering/sorting disabled");
         DefaultTableModel ascendingModel = createAscendingModel(0, 20);
         JXTable table = new JXTable(ascendingModel);
-        table.setRowHeightEnabled(true);
         int selectedRow = table.getRowCount() - 1;
         table.setRowHeight(selectedRow, 25);
         assertEquals("last row must have indy rowheight", 25, table.getRowHeight(selectedRow));
@@ -1277,7 +1280,6 @@ public class JXTableSortRevamp extends InteractiveTestCase {
         fail("JXTable - swingx filtering/sorting disabled");
         DefaultTableModel ascendingModel = createAscendingModel(0, 20);
         JXTable table = new JXTable(ascendingModel);
-        table.setRowHeightEnabled(true);
         // select the last row in view coordinates
         int selectedRow = table.getRowCount() - 1;
         table.setRowHeight(selectedRow, 25);
@@ -1678,6 +1680,12 @@ public class JXTableSortRevamp extends InteractiveTestCase {
  
     //----------------------- interactive 
     
+    public void interactiveTreeTableNPE() {
+        JXTreeTable treeTable = new JXTreeTable(new FileSystemModel());
+//        treeTable.expandAll();
+        showWithScrollingInFrame(treeTable, "NPE");
+    }
+    
     /**
      * Issue #271-swingx: make sort triggering mouseEvents
      * customizable.
@@ -1685,6 +1693,7 @@ public class JXTableSortRevamp extends InteractiveTestCase {
      * added SortGestureRecognizer.
      * 
      * No longer supported - need to re-think (maybe could push core addition?)
+     * Anyway, re-opened the old issue.
      *
      */
     public void interactiveSortGestureRecognizer() {
@@ -1737,7 +1746,6 @@ public class JXTableSortRevamp extends InteractiveTestCase {
 
     public void interactiveIndividualRowHeightAndFilter() {
         final JXTable table = new JXTable(createAscendingModel(0, 50));
-        table.setRowHeightEnabled(true);
         table.setRowHeight(1, 100);
 //        final FilterPipeline filterPipeline = new FilterPipeline(new PatternFilter(".*1.*",0,0));
 //        Action action = new AbstractAction("filter") {

@@ -269,6 +269,10 @@ public class RenderingTest extends TestCase {
     @Test
     public void testToolTipManagerTreeTableTreeRenderer() {
         JXTreeTable treeTable = new JXTreeTable(new ComponentTreeTableModel(new JXPanel()));
+        // core row conversion is lenient than ol' swingx
+        // PENDING JW: raise an issue about JXTreeTable not being sortable 
+        // (remove the default auto-createRowSorter)
+        treeTable.setRootVisible(true);
         JComponent label = (JComponent) treeTable.prepareRenderer(treeTable.getCellRenderer(0, 0), 0, 0);
         String tip = "some tip";
         PropertyChangeReport report = new PropertyChangeReport();

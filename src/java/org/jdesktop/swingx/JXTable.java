@@ -1592,7 +1592,10 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
     /**
      * Creates and returns the default RowSorter. Note that this is already
      * configured to the current TableModel - no api in the base class to set
-     * the model?
+     * the model? <p>
+     * 
+     * PENDING JW: review method signature - better expose the need for the
+     * model by adding a parameter? 
      * 
      * @return the default RowSorter.
      */
