@@ -71,6 +71,7 @@ import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
 import javax.swing.UIManager;
+import javax.swing.RowSorter.SortKey;
 import javax.swing.border.LineBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -83,7 +84,6 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
-import javax.swing.table.TableRowSorter;
 
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.action.BoundAction;
@@ -111,6 +111,7 @@ import org.jdesktop.swingx.search.Searchable;
 import org.jdesktop.swingx.search.TableSearchable;
 import org.jdesktop.swingx.sort.SortController;
 import org.jdesktop.swingx.sort.SortUtils;
+import org.jdesktop.swingx.sort.TableSortController;
 import org.jdesktop.swingx.table.ColumnControlButton;
 import org.jdesktop.swingx.table.ColumnFactory;
 import org.jdesktop.swingx.table.DefaultTableColumnModelExt;
@@ -1600,7 +1601,8 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
      * @return the default RowSorter.
      */
     protected RowSorter<? extends TableModel> createDefaultRowSorter() {
-        return new TableRowSorter<TableModel>(getModel());
+//        return new TableRowSorter<TableModel>(getModel());
+        return new TableSortController<TableModel>(getModel());
     }
 
     /**
@@ -1723,7 +1725,7 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
         // JW PENDING: think about notification instead of manual repaint.
         SortController controller = getSortController();
         if (controller != null) {
-            controller.removeAll();
+            controller.resetSortOrders();
         }
         if (getTableHeader() != null) {
             getTableHeader().repaint();
@@ -1942,6 +1944,10 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
      * @return the currently active <code>SortController</code> may be null
      */
     protected SortController getSortController() {
+        // PENDING JW: not yet fully wired, so disable 
+//        if (getRowSorter() instanceof SortController) {
+//            return (SortController) getRowSorter();
+//        }
         return null;
     }
 
@@ -1954,23 +1960,24 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
     public TableColumn getSortedColumn() {
         // bloody hack: get primary SortKey and
         // check if there's a column with it available
-        SortController controller = getSortController();
+//        SortController controller = getSortController();
+        RowSorter<?> controller = getRowSorter();
         if (controller != null) {
-            // PENDING JW: use RowSorter?
-//            SortKey sortKey = SortKey.getFirstSortingKey(controller
-//                    .getSortKeys());
-//            if (sortKey != null) {
-//                int sorterColumn = sortKey.getColumn();
-//                List<TableColumn> columns = getColumns(true);
-//                for (Iterator<TableColumn> iter = columns.iterator(); iter
-//                        .hasNext();) {
-//                    TableColumn column = iter.next();
-//                    if (column.getModelIndex() == sorterColumn) {
-//                        return column;
-//                    }
-//                }
-//
-//            }
+            // PENDING JW: must use RowSorter?
+            SortKey sortKey = SortUtils.getFirstSortingKey(controller
+                    .getSortKeys());
+            if (sortKey != null) {
+                int sorterColumn = sortKey.getColumn();
+                List<TableColumn> columns = getColumns(true);
+                for (Iterator<TableColumn> iter = columns.iterator(); iter
+                        .hasNext();) {
+                    TableColumn column = iter.next();
+                    if (column.getModelIndex() == sorterColumn) {
+                        return column;
+                    }
+                }
+
+            }
         }
         return null;
     }

@@ -13,7 +13,6 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.Graphics;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -21,9 +20,11 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.text.Format;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
@@ -31,19 +32,19 @@ import javax.swing.AbstractButton;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListSelectionModel;
-import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JToolBar;
 import javax.swing.JViewport;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
+import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
+import javax.swing.RowSorter.SortKey;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableColumnModelEvent;
@@ -53,6 +54,7 @@ import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 
 import org.jdesktop.swingx.JXTable.NumberEditor;
 import org.jdesktop.swingx.action.AbstractActionExt;
@@ -89,8 +91,8 @@ public class JXTableVisualCheck extends JXTableUnitTest {
       JXTableVisualCheck test = new JXTableVisualCheck();
       try {
 //        test.runInteractiveTests();
-//          test.runInteractiveTests("interactive.*Grid.*");
-          test.runInteractiveTests("interactive.*Header.*");
+          test.runInteractiveTests("interactive.*Multi.*");
+//          test.runInteractiveTests("interactive.*Header.*");
 //          test.runInteractiveTests("interactive.*ColumnProp.*");
 //          test.runInteractiveTests("interactive.*Multiple.*");
 //          test.runInteractiveTests("interactive.*RToL.*");
@@ -114,6 +116,75 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         // super has LF specific tests...
         setSystemLF(true);
     }
+
+    public void interactiveMultiColumnSort() {
+        DefaultTableModel model = createMultiSortModel();
+        JXTable table = new JXTable(model);
+        table.setVisibleRowCount(model.getRowCount());
+        JXFrame frame = wrapWithScrollingInFrame(table, "multi-column-sort");
+        final TableRowSorter<?> rowSorter = (TableRowSorter<?>) table.getRowSorter();
+        final List<SortKey> sortKeys = new ArrayList<SortKey>();
+        for (int i = 0; i < rowSorter.getMaxSortKeys(); i++) {
+            sortKeys.add(new SortKey(i, SortOrder.ASCENDING));
+        }
+        Action setSortKeys = new AbstractAction("sortKeys") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                rowSorter.setSortKeys(sortKeys);
+            }
+        };
+        addAction(frame, setSortKeys);
+        Action reset = new AbstractAction("resetSort") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                rowSorter.setSortKeys(null);
+                
+            }
+        };
+        rowSorter.setSortable(0, false);
+        addAction(frame, reset);
+        show(frame);
+    }
+
+
+    /**
+     * @return
+     */
+    private DefaultTableModel createMultiSortModel() {
+        String[] first = { "animal", "plant" };
+        String[] second = {"insect", "mammal", "spider" };
+        String[] third = {"red", "green", "yellow", "blue" };
+        Integer[] age = { 1, 5, 12, 20, 100 };
+        Object[][] rows = new Object[][] { first, second, third, age };
+        DefaultTableModel model = new DefaultTableModel(20, 4) {
+
+            @Override
+            public Class<?> getColumnClass(int columnIndex) {
+                return columnIndex == getColumnCount() - 1 ? 
+                        Integer.class : super.getColumnClass(columnIndex);
+            }
+            
+        };
+        for (int i = 0; i < rows.length; i++) {
+            setValues(model, rows[i], i);
+        }
+        return model;
+    }
+    /**
+     * @param model
+     * @param first
+     * @param i
+     */
+    private void setValues(DefaultTableModel model, Object[] first, int column) {
+        Random seed = new Random();
+        for (int row = 0; row < model.getRowCount(); row++) {
+            int random = seed.nextInt(first.length);
+            model.setValueAt(first[random], row, column);
+        }
+    }
+
 
     /**
      * Possible problem: table without gridlines has header mis-aligned.

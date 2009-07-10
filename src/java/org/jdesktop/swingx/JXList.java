@@ -510,7 +510,7 @@ public class JXList extends JList {
     public void resetSortOrder() {
         SortController controller = getSortController();
         if (controller != null) {
-            controller.removeAll();
+            controller.resetSortOrders();
         }
     }
 

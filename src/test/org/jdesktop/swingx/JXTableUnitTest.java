@@ -66,6 +66,7 @@ import org.jdesktop.swingx.renderer.StringValues;
 import org.jdesktop.swingx.rollover.RolloverController;
 import org.jdesktop.swingx.rollover.RolloverProducer;
 import org.jdesktop.swingx.rollover.TableRolloverController;
+import org.jdesktop.swingx.sort.TableSortController;
 import org.jdesktop.swingx.table.ColumnControlButton;
 import org.jdesktop.swingx.table.ColumnFactory;
 import org.jdesktop.swingx.table.NumberEditorExt;
@@ -134,6 +135,17 @@ public class JXTableUnitTest extends InteractiveTestCase {
         super.tearDown();
     }
 
+    
+    /**
+     * Test that JXTable uses TableSortController by default.
+     */
+    @Test
+    public void testSortController() {
+        JXTable table = new JXTable();
+        assertTrue("default sorter expected TableRowSorter, but was:" + table.getRowSorter(),
+                table.getRowSorter() instanceof TableSortController);
+//        assertEquals(table.getRowSorter(), table.getSortController());
+    }
     /**
      * core issue: rowSorter replaced on setAutoCreateRowSorter even without change to flag.
      */
