@@ -36,6 +36,7 @@ import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXCollapsiblePane;
 import org.jdesktop.swingx.JXDatePicker;
 import org.jdesktop.swingx.JXImagePanel;
+import org.jdesktop.swingx.JXList;
 import org.jdesktop.swingx.JXMonthView;
 import org.jdesktop.swingx.JXMultiSplitPane;
 import org.jdesktop.swingx.JXMultiThumbSlider;
@@ -66,8 +67,14 @@ public class BeanEventsTest extends InteractiveTestCase {
         // overwritten method setPreferredScrollableViewportSize from JTable
         // the super implementation fails to fire event. Attempt to do so in JXTable causes other test failures. Needs to be investigated.
         excludes.put(JXTable.class, "preferredScrollableViewportSize");
+        // no op due to method being deprecated
+        excludes.put(JXTable.class, "rowHeightEnabled");
         // no op due to sorting conflict 
         excludes.put(JXTreeTable.class, "sortable");
+        // shorthand for getSortController().setSortOrder
+        excludes.put(JXList.class, "sortOrder");
+        // no op temporarily disabled due to changes in filtering implementation 
+        excludes.put(JXList.class, "filterEnabled");
         // no op due to sorting conflict 
         excludes.put(JXTreeTable.class, "filters");
         // shorthand for getRenderer.setLargeModel
@@ -132,7 +139,7 @@ public class BeanEventsTest extends InteractiveTestCase {
             }
             try {
                 Object inst = beanClass.newInstance();
-                log.info("Testing " + beanClass);
+                log.fine("Testing " + beanClass);
                 TestUtils.assertPCEFiring( inst, (Collection<String>) excludes.get(beanClass));
             } catch (Exception e) {
                 log.info("ignoring " + beanClass + " because of " + e.getMessage());
