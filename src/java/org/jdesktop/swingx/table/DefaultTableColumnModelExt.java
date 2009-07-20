@@ -138,8 +138,24 @@ public class DefaultTableColumnModelExt extends DefaultTableColumnModel
      */
     public boolean isRemovedToInvisibleEvent(int oldIndex) {
         if (oldIndex >= currentColumns.size()) return false;
-        if (!(currentColumns.get(oldIndex) instanceof TableColumnExt)) return false;
-        return Boolean.TRUE.equals(((TableColumnExt) currentColumns.get(oldIndex)).getClientProperty(IGNORE_EVENT));
+        // PENDING JW: quick fix (of the hack ;-) for #1123 
+        // actually the implementation should concede that the oldIndex of a columnRemoved
+        // event is always useless, so instead of looping the columns, consider to
+        // have a field with the hidden column ...
+        for (TableColumn column : currentColumns) {
+            if (column instanceof TableColumnExt) {
+                TableColumnExt columnExt = (TableColumnExt) column;
+                if (!columnExt.isVisible()) {
+                    if (((TableColumnExt) column).getClientProperty(IGNORE_EVENT) != null) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+        
+//        if (!(currentColumns.get(oldIndex) instanceof TableColumnExt)) return false;
+//        return Boolean.TRUE.equals(((TableColumnExt) currentColumns.get(oldIndex)).getClientProperty(IGNORE_EVENT));
     }
 
     /**
@@ -241,7 +257,12 @@ public class DefaultTableColumnModelExt extends DefaultTableColumnModel
      * @param col the column which was hidden.
      */    
     protected void moveToInvisible(TableColumnExt col) {
-        col.putClientProperty(IGNORE_EVENT, Boolean.TRUE);
+        // PENDING JW: quick fix (of the hack ;-) for #1123 
+        // actually the implementation should concede that the oldIndex of a columnRemoved
+        // event is always useless, so instead of looping the columns, consider to
+        // have a field with the hidden column ...
+        int currentIndex = tableColumns.indexOf(col);
+        col.putClientProperty(IGNORE_EVENT, currentIndex);
         super.removeColumn(col);
         col.putClientProperty(IGNORE_EVENT, null);
     }
