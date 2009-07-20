@@ -234,7 +234,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
     public void testDayInMonthForDayOfWeekHeader() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run test - headless environment");
+            LOG.fine("cannot run test - headless environment");
             return;
         }
         BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.LEFT_TO_RIGHT);
@@ -251,7 +251,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
     public void testDayInMonthForWeekNumberHeader() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run test - headless environment");
+            LOG.fine("cannot run test - headless environment");
             return;
         }
         BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.LEFT_TO_RIGHT, true);
@@ -269,7 +269,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
     public void testDayInMonthLeadingFirstMonth() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run test - headless environment");
+            LOG.fine("cannot run test - headless environment");
             return;
         }
         BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.LEFT_TO_RIGHT);
@@ -287,7 +287,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
     public void testDayInMonthLeadingSecondMonth() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run test - headless environment");
+            LOG.fine("cannot run test - headless environment");
             return;
         }
         BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.LEFT_TO_RIGHT);
@@ -306,7 +306,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
     public void testDayBoundsAtLocationLeadingSecondMonth() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run test - headless environment");
+            LOG.fine("cannot run test - headless environment");
             return;
         }
         BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.LEFT_TO_RIGHT);
@@ -329,7 +329,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
     public void testDayBoundsAtLocationLeadingFirstMonth() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run test - headless environment");
+            LOG.fine("cannot run test - headless environment");
             return;
         }
         BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.LEFT_TO_RIGHT);
@@ -349,7 +349,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
     public void testDayAtLocationLeadingSecondMonth() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run test - headless environment");
+            LOG.fine("cannot run test - headless environment");
             return;
         }
         BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.LEFT_TO_RIGHT);
@@ -368,7 +368,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
     public void testDayAtLocationLeadingFirstMonth() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run test - headless environment");
+            LOG.fine("cannot run test - headless environment");
             return;
         }
         BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.LEFT_TO_RIGHT);
@@ -386,7 +386,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
     public void testDayBoundsFromDate() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run test - headless environment");
+            LOG.fine("cannot run test - headless environment");
             return;
         }
         BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.LEFT_TO_RIGHT);
@@ -407,7 +407,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
     public void testDateToGridPosition6Apr2008() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run test - headless environment");
+            LOG.fine("cannot run test - headless environment");
             return;
         }
         BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.LEFT_TO_RIGHT);
@@ -427,7 +427,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
     public void testDateToGridPositionNonLeading() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run test - headless environment");
+            LOG.fine("cannot run test - headless environment");
             return;
         }
         BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.LEFT_TO_RIGHT);
@@ -444,7 +444,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
     public void testDateToGridPositionMiddle() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run test - headless environment");
+            LOG.fine("cannot run test - headless environment");
             return;
         }
         BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.LEFT_TO_RIGHT);
@@ -482,7 +482,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
     public void testMonthGridPositionFirstRowFromDate() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run test - headless environment");
+            LOG.fine("cannot run test - headless environment");
             return;
         }
         BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.LEFT_TO_RIGHT);
@@ -512,7 +512,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
     public void testDateToMonthGridPositionFirst() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run test - headless environment");
+            LOG.fine("cannot run test - headless environment");
             return;
         }
         BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.LEFT_TO_RIGHT);
@@ -525,7 +525,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
     public void testDateToMonthGridPositionSecond() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run test - headless environment");
+            LOG.fine("cannot run test - headless environment");
             return;
         }
         BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.LEFT_TO_RIGHT);
@@ -539,7 +539,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
     public void testDateToMonthGridPositionLast() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run test - headless environment");
+            LOG.fine("cannot run test - headless environment");
             return;
         }
         BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.LEFT_TO_RIGHT);
@@ -553,7 +553,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
     public void testDateToMonthBounds() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run test - headless environment");
+            LOG.fine("cannot run test - headless environment");
             return;
         }
         BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.LEFT_TO_RIGHT);
@@ -571,7 +571,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
     public void testDateToMonthBoundsNotVisible() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run test - headless environment");
+            LOG.fine("cannot run test - headless environment");
             return;
         }
         BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.LEFT_TO_RIGHT);
@@ -591,7 +591,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
     public void testMonthBoundsNullDate() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run test - headless environment");
+            LOG.fine("cannot run test - headless environment");
             return;
         }
         BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.LEFT_TO_RIGHT);
@@ -610,7 +610,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
     public void testDateToDayBoundsLeadingDate() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run test - headless environment");
+            LOG.fine("cannot run test - headless environment");
             return;
         }
         BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.LEFT_TO_RIGHT);
@@ -630,7 +630,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
     public void testDayBoundsNullDate() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run test - headless environment");
+            LOG.fine("cannot run test - headless environment");
             return;
         }
         BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.LEFT_TO_RIGHT);
@@ -648,7 +648,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
     @Test
     public void testMonthSize() {
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run test - headless environment");
+            LOG.fine("cannot run test - headless environment");
             return;
         }
         BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.RIGHT_TO_LEFT);
@@ -664,7 +664,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
     @Test
     public void testDaySize() {
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run test - headless environment");
+            LOG.fine("cannot run test - headless environment");
             return;
         }
         BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.RIGHT_TO_LEFT);
@@ -679,7 +679,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
     @Test
     public void testMonthBoundsFromLogicalRToL() {
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run test - headless environment");
+            LOG.fine("cannot run test - headless environment");
             return;
         }
         BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.RIGHT_TO_LEFT);
@@ -695,7 +695,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
     @Test
     public void testMonthBoundsFromLogicalLToR() {
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run test - headless environment");
+            LOG.fine("cannot run test - headless environment");
             return;
         }
         BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.LEFT_TO_RIGHT);
@@ -714,7 +714,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
     @Test
     public void testFirstMonthLocation() {
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run test - headless environment");
+            LOG.fine("cannot run test - headless environment");
             return;
         }
         BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.LEFT_TO_RIGHT);
@@ -731,7 +731,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
     public void testDayAtLocationLToR() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run test - headless environment");
+            LOG.fine("cannot run test - headless environment");
             return;
         }
         BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.LEFT_TO_RIGHT);
@@ -752,7 +752,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
     public void testDayAtLocationRToL() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run test - headless environment");
+            LOG.fine("cannot run test - headless environment");
             return;
         }
         BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.RIGHT_TO_LEFT);
@@ -774,7 +774,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
     public void testDayAtLocationDayHeaderNull() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run test - headless environment");
+            LOG.fine("cannot run test - headless environment");
             return;
         }
         BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.LEFT_TO_RIGHT);
@@ -790,7 +790,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
     public void testDayBounds() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run test - headless environment");
+            LOG.fine("cannot run test - headless environment");
             return;
         }
         BasicMonthViewUI uiRToL = getRealizedMonthViewUI(ComponentOrientation.RIGHT_TO_LEFT);
@@ -820,7 +820,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
     public void testDayGridPositionAtLocationRows() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run test - headless environment");
+            LOG.fine("cannot run test - headless environment");
             return;
         }
         BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.RIGHT_TO_LEFT);
@@ -843,7 +843,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
     public void testDayGridPositionAtLocationColumnsLToR() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run test - headless environment");
+            LOG.fine("cannot run test - headless environment");
             return;
         }
         BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.LEFT_TO_RIGHT);
@@ -865,7 +865,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
     public void testDayGridPositionAtLocationColumnsLToRWithWeekNumber() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run test - headless environment");
+            LOG.fine("cannot run test - headless environment");
             return;
         }
         BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.LEFT_TO_RIGHT, true);
@@ -887,7 +887,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
     public void testDayGridPositionAtLocationColumnsRToL() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run test - headless environment");
+            LOG.fine("cannot run test - headless environment");
             return;
         }
         BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.RIGHT_TO_LEFT);
@@ -909,7 +909,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
     public void testDayGridPositionAtLocationColumnsRToLWithWeekNumber() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run test - headless environment");
+            LOG.fine("cannot run test - headless environment");
             return;
         }
         BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.RIGHT_TO_LEFT, true);
@@ -934,7 +934,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
     public void testDayGridPositionAtLocationDayHeader() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run test - headless environment");
+            LOG.fine("cannot run test - headless environment");
             return;
         }
         BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.RIGHT_TO_LEFT);
@@ -953,7 +953,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
     public void testDayGridPositionAtLocationFirstWeekRow() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run test - headless environment");
+            LOG.fine("cannot run test - headless environment");
             return;
         }
         BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.RIGHT_TO_LEFT);
@@ -972,7 +972,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
     public void testDayGridPositionAtLocationLastWeekRow() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run test - headless environment");
+            LOG.fine("cannot run test - headless environment");
             return;
         }
         BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.RIGHT_TO_LEFT);
@@ -991,7 +991,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
     public void testDayGridPositionAtLocationLastColumnRToL() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run test - headless environment");
+            LOG.fine("cannot run test - headless environment");
             return;
         }
         BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.RIGHT_TO_LEFT);
@@ -1009,7 +1009,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
     public void testDayGridPositionAtLocationFirstColumnRToL() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run test - headless environment");
+            LOG.fine("cannot run test - headless environment");
             return;
         }
         BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.RIGHT_TO_LEFT);
@@ -1027,7 +1027,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
     public void testDayGridPositionAtLocationFirstColumnRToLWithWeekNumber() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run test - headless environment");
+            LOG.fine("cannot run test - headless environment");
             return;
         }
         BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.RIGHT_TO_LEFT, true);
@@ -1045,7 +1045,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
     public void testDayGridPositionAtLocationFirstColumnLToR() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run test - headless environment");
+            LOG.fine("cannot run test - headless environment");
             return;
         }
         BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.LEFT_TO_RIGHT);
@@ -1062,7 +1062,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
     public void testDayGridPositionAtLocationLastColumnLToR() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run test - headless environment");
+            LOG.fine("cannot run test - headless environment");
             return;
         }
         BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.LEFT_TO_RIGHT);
@@ -1078,7 +1078,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
     public void testDayGridPositionAtLocationWeekHeaderRToL() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run test - headless environment");
+            LOG.fine("cannot run test - headless environment");
             return;
         }
         BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.RIGHT_TO_LEFT, true);
@@ -1098,7 +1098,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
     public void testDayGridPositionAtLocationWeekHeaderLToR() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run test - headless environment");
+            LOG.fine("cannot run test - headless environment");
             return;
         }
         BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.LEFT_TO_RIGHT, true);
@@ -1115,7 +1115,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
     public void testDayGridPositionAtLocationMonthHeaderHitLToR() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run test - headless environment");
+            LOG.fine("cannot run test - headless environment");
             return;
         }
         BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.LEFT_TO_RIGHT);
@@ -1131,7 +1131,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
     public void testDayGridPositionAtLocationMonthHeaderHitRToL() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run test - headless environment");
+            LOG.fine("cannot run test - headless environment");
             return;
         }
         BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.RIGHT_TO_LEFT);
@@ -1148,7 +1148,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
     public void testMonthFromGrid() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run test - headless environment");
+            LOG.fine("cannot run test - headless environment");
             return;
         }
         BasicMonthViewUI uiRToL = getRealizedMonthViewUI(ComponentOrientation.RIGHT_TO_LEFT);
@@ -1171,7 +1171,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
     public void testMonthGridPositionAtLocation() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run test - headless environment");
+            LOG.fine("cannot run test - headless environment");
             return;
         }
         BasicMonthViewUI uiRToL = getRealizedMonthViewUI(ComponentOrientation.RIGHT_TO_LEFT);
@@ -1192,7 +1192,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
     public void testMonthBoundsAtLocation() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run test - headless environment");
+            LOG.fine("cannot run test - headless environment");
             return;
         }
         BasicMonthViewUI uiRToL = getRealizedMonthViewUI(ComponentOrientation.RIGHT_TO_LEFT);
@@ -1219,7 +1219,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
     public void testMonthHeaderBoundsAtLocation() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run test - headless environment");
+            LOG.fine("cannot run test - headless environment");
             return;
         }
         JXMonthView monthView = new JXMonthView();
@@ -1350,7 +1350,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
     public void testGetDayAtLocation() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run test - headless environment");
+            LOG.fine("cannot run test - headless environment");
             return;
         }
         JXMonthView monthView = new JXMonthView();

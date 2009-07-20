@@ -38,7 +38,7 @@ public class CompoundFocusListenerIssues extends CompoundFocusListenerTest {
     public void testKeyboardFocusManager() throws InterruptedException, InvocationTargetException {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run test - headless environment");
+            LOG.fine("cannot run test - headless environment");
             return;
         }
         JXDatePicker picker = getRealizedDatePicker();

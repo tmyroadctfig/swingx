@@ -110,7 +110,7 @@ public class XLocalizeTest extends InteractiveTestCase {
     public void testLocaleDialogPropertyNotificationInListener() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run localeDialogPropertyNotificationInListener - headless environment");
+            LOG.fine("cannot run localeDialogPropertyNotificationInListener - headless environment");
             return;
         }
         final String prefix = PatternModel.SEARCH_PREFIX;

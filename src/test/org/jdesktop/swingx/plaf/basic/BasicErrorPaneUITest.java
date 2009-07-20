@@ -29,7 +29,7 @@ public class BasicErrorPaneUITest {
     @Test
     public void testGetErrorFrameNull() {
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run - headless environment");
+            LOG.fine("cannot run - headless environment");
             return;
         }
         assertNotNull(ui.getErrorFrame(null));
@@ -37,7 +37,7 @@ public class BasicErrorPaneUITest {
     @Test
     public void testGetErrorFrameFrame() {
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run - headless environment");
+            LOG.fine("cannot run - headless environment");
             return;
         }
         assertNotNull(ui.getErrorFrame(new JFrame()));
@@ -45,7 +45,7 @@ public class BasicErrorPaneUITest {
     @Test
     public void testGetErrorFrameDialog() {
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run - headless environment");
+            LOG.fine("cannot run - headless environment");
             return;
         }
         assertNotNull(ui.getErrorFrame(new JDialog()));
@@ -53,7 +53,7 @@ public class BasicErrorPaneUITest {
     @Test
     public void testGetErrorFrameContentPane() {
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run - headless environment");
+            LOG.fine("cannot run - headless environment");
             return;
         }
         JFrame frame = new JFrame();
@@ -62,7 +62,7 @@ public class BasicErrorPaneUITest {
     @Test
     public void testGetErrorFrameJPanel() {
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run - headless environment");
+            LOG.fine("cannot run - headless environment");
             return;
         }
         assertNotNull(ui.getErrorFrame(new JPanel()));
@@ -71,7 +71,7 @@ public class BasicErrorPaneUITest {
     @Test
     public void testGetErrorFrameApplet() {
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run - headless environment");
+            LOG.fine("cannot run - headless environment");
             return;
         }
         assertNotNull(ui.getErrorFrame(new Applet()));
@@ -80,7 +80,7 @@ public class BasicErrorPaneUITest {
     @Test
     public void testGetErrorFrameJWindow() {
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run - headless environment");
+            LOG.fine("cannot run - headless environment");
             return;
         }
         assertNotNull(ui.getErrorFrame(new JWindow()));
@@ -89,7 +89,7 @@ public class BasicErrorPaneUITest {
     @Test
     public void testGetErrorDialogNull() {
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run - headless environment");
+            LOG.fine("cannot run - headless environment");
             return;
         }
         assertNotNull(ui.getErrorDialog(null));
@@ -98,7 +98,7 @@ public class BasicErrorPaneUITest {
     @Test
     public void testGetErrorDialogFrame() {
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run - headless environment");
+            LOG.fine("cannot run - headless environment");
             return;
         }
         assertNotNull(ui.getErrorDialog(new JFrame()));
@@ -106,7 +106,7 @@ public class BasicErrorPaneUITest {
     @Test
     public void testGetErrorDialogDialog() {
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run - headless environment");
+            LOG.fine("cannot run - headless environment");
             return;
         }
         assertNotNull(ui.getErrorDialog(new JDialog()));
@@ -115,7 +115,7 @@ public class BasicErrorPaneUITest {
     @Test
     public void testGetErrorDialogContentPane() {
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run - headless environment");
+            LOG.fine("cannot run - headless environment");
             return;
         }
         JFrame frame = new JFrame();
@@ -125,7 +125,7 @@ public class BasicErrorPaneUITest {
     @Test
     public void testGetErrorDialogJPanel() {
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run - headless environment");
+            LOG.fine("cannot run - headless environment");
             return;
         }
         assertNotNull(ui.getErrorDialog(new JPanel()));
@@ -134,7 +134,7 @@ public class BasicErrorPaneUITest {
     @Test
     public void testGetErrorDialogApplet() {
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run - headless environment");
+            LOG.fine("cannot run - headless environment");
             return;
         }
         assertNotNull(ui.getErrorDialog(new Applet()));
@@ -146,7 +146,7 @@ public class BasicErrorPaneUITest {
     @Test
     public void testGetErrorDialogJWindow() {
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run - headless environment");
+            LOG.fine("cannot run - headless environment");
             return;
         }
         assertNotNull(ui.getErrorDialog(new JWindow()));
@@ -155,7 +155,7 @@ public class BasicErrorPaneUITest {
     @Test
     public void testGetErrorInternalFrameNull() {
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run - headless environment");
+            LOG.fine("cannot run - headless environment");
             return;
         }
         assertNotNull(ui.getErrorInternalFrame(null));
@@ -163,7 +163,7 @@ public class BasicErrorPaneUITest {
     @Test
     public void testGetErrorInternalFrameFrame() {
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run - headless environment");
+            LOG.fine("cannot run - headless environment");
             return;
         }
         assertNotNull(ui.getErrorInternalFrame(new JFrame()));
@@ -171,7 +171,7 @@ public class BasicErrorPaneUITest {
     @Test
     public void testGetErrorInternalFrameDialog() {
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run - headless environment");
+            LOG.fine("cannot run - headless environment");
             return;
         }
         assertNotNull(ui.getErrorInternalFrame(new JDialog()));
@@ -179,7 +179,7 @@ public class BasicErrorPaneUITest {
     @Test
     public void testGetErrorInternalFrameContentPane() {
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run - headless environment");
+            LOG.fine("cannot run - headless environment");
             return;
         }
         JFrame frame = new JFrame();
@@ -188,7 +188,7 @@ public class BasicErrorPaneUITest {
     @Test
     public void testGetErrorInternalFrameJPanel() {
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run - headless environment");
+            LOG.fine("cannot run - headless environment");
             return;
         }
         assertNotNull(ui.getErrorInternalFrame(new JPanel()));
@@ -197,7 +197,7 @@ public class BasicErrorPaneUITest {
     @Test
     public void testGetErrorInternalFrameApplet() {
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run - headless environment");
+            LOG.fine("cannot run - headless environment");
             return;
         }
         assertNotNull(ui.getErrorInternalFrame(new Applet()));
@@ -206,7 +206,7 @@ public class BasicErrorPaneUITest {
     @Test
     public void testGetErrorInternalFrameJWindow() {
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run - headless environment");
+            LOG.fine("cannot run - headless environment");
             return;
         }
         assertNotNull(ui.getErrorInternalFrame(new JWindow()));

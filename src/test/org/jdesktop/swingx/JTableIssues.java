@@ -1032,7 +1032,7 @@ public class JTableIssues extends InteractiveTestCase {
     public void testInitialLeadAnchor() throws InterruptedException, InvocationTargetException {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run testLeadAnchorOnFocusGained - headless environment");
+            LOG.fine("cannot run testLeadAnchorOnFocusGained - headless environment");
             return;
         }
         DefaultTableModel model = new DefaultTableModel(10, 2) {
