@@ -426,9 +426,6 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
      */
     private int oldAutoResizeMode;
 
-    /** property to control the tracksViewportHeight behaviour. */
-    private boolean fillsViewportHeight;
-
     /**
      * flag to indicate enhanced auto-resize-off behaviour is on. This is
      * set/reset in setHorizontalScrollEnabled.
@@ -1382,61 +1379,19 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
     }
 
     /**
-     * Sets the flag which controls the scrollableTracksViewportHeight property.
-     * If true the table's height will be always at least as large as the
-     * containing parent, if false the table's height will be independent of
-     * parent's height.
+     * {@inheritDoc} <p>
+     * 
+     * Overridden for documentation reasons only: same behaviour but different default value.
      * <p>
      * 
      * The default value is <code>true</code>.
      * <p>
-     * 
-     * Note: this a backport from Mustang's <code>JTable</code>.
-     * 
-     * @param fillsViewportHeight boolean to indicate whether the table should
-     *        always fill parent's height.
-     * @see #getFillsViewportHeight()
-     * @see #getScrollableTracksViewportHeight()
      */
+    @Override
     public void setFillsViewportHeight(boolean fillsViewportHeight) {
         if (fillsViewportHeight == getFillsViewportHeight())
             return;
-        boolean old = getFillsViewportHeight();
-        this.fillsViewportHeight = fillsViewportHeight;
-        firePropertyChange("fillsViewportHeight", old, getFillsViewportHeight());
-        revalidate();
-    }
-
-    /**
-     * Returns the flag which controls the scrollableTracksViewportHeight
-     * property.
-     * 
-     * @return true if the table's height will always be at least as large as
-     *         the containing parent, false if it is independent
-     * @see #setFillsViewportHeight(boolean)
-     * @see #getScrollableTracksViewportHeight()
-     */
-    public boolean getFillsViewportHeight() {
-        return fillsViewportHeight;
-    }
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * 
-     * Overridden to control the tracksHeight property depending on
-     * fillsViewportHeight and relative size to containing parent.
-     * 
-     * @return true if the control flag is true and the containing parent height
-     *         > prefHeight, else returns false.
-     * @see #setFillsViewportHeight(boolean)
-     * 
-     */
-    @Override
-    public boolean getScrollableTracksViewportHeight() {
-        return getFillsViewportHeight()
-                && getParent() instanceof JViewport
-                && (((JViewport) getParent()).getHeight() > getPreferredSize().height);
+        super.setFillsViewportHeight(fillsViewportHeight);
     }
 
     // ------------------------ override super because of filter-awareness
