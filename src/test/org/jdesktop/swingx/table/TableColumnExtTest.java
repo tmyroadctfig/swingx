@@ -23,11 +23,9 @@ import org.jdesktop.swingx.decorator.UIDependent;
 import org.jdesktop.swingx.renderer.DefaultTableRenderer;
 import org.jdesktop.test.PropertyChangeReport;
 import org.jdesktop.test.SerializableSupport;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.junit.Test;
-import org.junit.Before;
-import org.junit.After;
 
 
 /**
@@ -170,7 +168,7 @@ public class TableColumnExtTest extends TestCase {
         TableColumnExt tableColumn = new TableColumnExt();
         PropertyChangeReport report = new PropertyChangeReport();
         tableColumn.addPropertyChangeListener(report);
-        Comparator comparator = Collator.getInstance();
+        Comparator<?> comparator = Collator.getInstance();
         tableColumn.setComparator(comparator);
         assertTrue(report.hasEvents());
         assertEquals(1, report.getEventCount("comparator"));
@@ -186,7 +184,7 @@ public class TableColumnExtTest extends TestCase {
     @Test
     public void testCopyComparator() {
         TableColumnExt tableColumn = new TableColumnExt();
-        Comparator comparator = Collator.getInstance();
+        Comparator<?> comparator = Collator.getInstance();
         tableColumn.setComparator(comparator);
         TableColumnExt clone = new TableColumnExt(tableColumn);
         assertEquals(comparator, clone.getComparator());
