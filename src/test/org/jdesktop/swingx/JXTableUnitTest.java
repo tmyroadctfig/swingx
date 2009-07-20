@@ -269,7 +269,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
     public void testCornerRespectLAF() {
         Object corner = UIManager.get("Table.scrollPaneCornerComponent");
         if (!(corner instanceof Class)) {
-            LOG.info("cannont run - LAF doesn't provide corner component");
+            LOG.fine("cannont run - LAF doesn't provide corner component");
             return;
         }
         final JXTable table = new JXTable(10, 2);
@@ -345,7 +345,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
     public void testCornerRespectCustom() throws Exception {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run testCornerNPE - headless environment");
+            LOG.fine("cannot run testCornerNPE - headless environment");
             return;
         }
         
@@ -381,7 +381,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
     public void testCornerNPE() throws Exception {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run testCornerNPE - headless environment");
+            LOG.fine("cannot run testCornerNPE - headless environment");
             return;
         }
         
@@ -408,7 +408,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
     public void testCornerNPEVerticalSPPolicy() throws Exception {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run testCornerNPE - headless environment");
+            LOG.fine("cannot run testCornerNPE - headless environment");
             return;
         }
         
@@ -1774,7 +1774,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
     public void testTrackViewportHeight() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run trackViewportHeight - headless environment");
+            LOG.fine("cannot run trackViewportHeight - headless environment");
             return;
         }
         JXTable table = new JXTable(10, 2);
@@ -1797,7 +1797,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
     public void testNotTrackViewportHeight() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run notTrackViewportHeight - headless environment");
+            LOG.fine("cannot run notTrackViewportHeight - headless environment");
             return;
         }
         JXTable table = new JXTable(10, 2);
@@ -1881,7 +1881,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
     public void testTrackViewportWidth() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run trackViewportWidth - headless environment");
+            LOG.fine("cannot run trackViewportWidth - headless environment");
             return;
         }
         JXTable table = new JXTable(10, 2);
@@ -1926,7 +1926,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
     public void testNotTrackViewportWidth() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run trackViewportWidth - headless environment");
+            LOG.fine("cannot run trackViewportWidth - headless environment");
             return;
         }
         JXTable table = new JXTable(10, 2);
@@ -2199,7 +2199,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
     public void testConserveVerticalScrollBarPolicy() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run conserveVerticalScrollBarPolicy - headless environment");
+            LOG.fine("cannot run conserveVerticalScrollBarPolicy - headless environment");
             return;
         }
         JXTable table = new JXTable(0, 3);
@@ -2370,7 +2370,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
     public void testLeadFocusCell() throws InterruptedException, InvocationTargetException {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run leadFocusCell - headless environment");
+            LOG.fine("cannot run leadFocusCell - headless environment");
             return;
         }
         final JXTable table = new JXTable();

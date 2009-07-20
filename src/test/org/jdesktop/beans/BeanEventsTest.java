@@ -142,7 +142,7 @@ public class BeanEventsTest extends InteractiveTestCase {
                 log.fine("Testing " + beanClass);
                 TestUtils.assertPCEFiring( inst, (Collection<String>) excludes.get(beanClass));
             } catch (Exception e) {
-                log.info("ignoring " + beanClass + " because of " + e.getMessage());
+                log.fine("ignoring " + beanClass + " because of " + e.getMessage());
             }
         }
     }

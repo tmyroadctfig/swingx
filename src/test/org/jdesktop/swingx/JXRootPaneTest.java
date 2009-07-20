@@ -63,7 +63,7 @@ public class JXRootPaneTest extends InteractiveTestCase {
     public void testLayoutDelegateLAF() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run test - headless environment");
+            LOG.fine("cannot run test - headless environment");
             return;
         }
         if (!UIManager.getLookAndFeel().getSupportsWindowDecorations()) {
@@ -91,7 +91,7 @@ public class JXRootPaneTest extends InteractiveTestCase {
     public void testLayoutWithLAFDecoration() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run testLAFDecorationLayout - headless environment");
+            LOG.fine("cannot run testLAFDecorationLayout - headless environment");
             return;
         }
         if (!UIManager.getLookAndFeel().getSupportsWindowDecorations()) {
@@ -124,7 +124,7 @@ public class JXRootPaneTest extends InteractiveTestCase {
     public void testLayoutWithOut() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run testLAFDecorationLayout - headless environment");
+            LOG.fine("cannot run testLAFDecorationLayout - headless environment");
             return;
         }
         JXFrame frame = new JXFrame();

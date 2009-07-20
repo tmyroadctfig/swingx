@@ -71,7 +71,7 @@ public class JXMonthViewVisualTest extends InteractiveTestCase {
     @Test
     public void testLastDisplayedDateInitial() throws InterruptedException, InvocationTargetException {
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run lastDisplayedDate - headless");
+            LOG.fine("cannot run lastDisplayedDate - headless");
             return;
         }
         final JXMonthView monthView = new JXMonthView();
@@ -101,7 +101,7 @@ public class JXMonthViewVisualTest extends InteractiveTestCase {
     @Test
     public void testLastDisplayedDateSizeChanged() throws InterruptedException, InvocationTargetException {
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run lastDisplayedDate - headless");
+            LOG.fine("cannot run lastDisplayedDate - headless");
             return;
         }
         final JXMonthView monthView = new JXMonthView();
@@ -136,7 +136,7 @@ public class JXMonthViewVisualTest extends InteractiveTestCase {
     @Test
     public void testLastDisplayedDateSizeChangedEnsureVisible() throws InterruptedException, InvocationTargetException {
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run lastDisplayedDate - headless");
+            LOG.fine("cannot run lastDisplayedDate - headless");
             return;
         }
         final JXMonthView monthView = new JXMonthView();

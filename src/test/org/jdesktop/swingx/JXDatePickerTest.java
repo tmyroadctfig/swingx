@@ -295,7 +295,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
     @Test
     public void testVisibleMonthContainsSelectionOpenSet() {
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run testLinkPanelNull - headless");
+            LOG.fine("cannot run testLinkPanelNull - headless");
             return;
         }
         calendar.set(2008, Calendar.JULY, 15);
@@ -323,7 +323,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
     @Test
     public void testVisibleMonthContainsSelectionOpenInitial() {
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run testLinkPanelNull - headless");
+            LOG.fine("cannot run testLinkPanelNull - headless");
             return;
         }
         calendar.set(2008, Calendar.JULY, 15);
@@ -601,7 +601,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
     @Test
     public void testLinkPanelSetNull() {
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run testLinkPanelNull - headless");
+            LOG.fine("cannot run testLinkPanelNull - headless");
             return;
         }
         JXDatePicker picker = new JXDatePicker();
@@ -621,7 +621,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
     @Test
     public void testLinkPanelInitalNull() {
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run testLinkPanelNull - headless");
+            LOG.fine("cannot run testLinkPanelNull - headless");
             return;
         }
         JXDatePicker picker = new JXDatePicker();
@@ -642,7 +642,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
     @Test
     public void testLinkPanelRemovedAdded() {
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run testLinkPanelNull - headless");
+            LOG.fine("cannot run testLinkPanelNull - headless");
             return;
         }
         JXDatePicker picker = new JXDatePicker();

@@ -113,7 +113,7 @@ public class JXTableIssues extends InteractiveTestCase {
     public void testGetValueOnInit() throws Exception {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run test - headless environment");
+            LOG.fine("cannot run test - headless environment");
             return;
         }
         final List<Integer> set = new ArrayList<Integer>();
@@ -340,7 +340,7 @@ public class JXTableIssues extends InteractiveTestCase {
     public void testToggleTrackViewportHeight() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run trackViewportHeight - headless environment");
+            LOG.fine("cannot run trackViewportHeight - headless environment");
             return;
         }
         final JXTable table = new JXTable(10, 2);

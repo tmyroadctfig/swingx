@@ -89,7 +89,7 @@ public class BasicMonthViewUIIssues extends InteractiveTestCase {
     public void testDayBoundsLeadingDatesNull() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run test - headless environment");
+            LOG.fine("cannot run test - headless environment");
             return;
         }
         BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.LEFT_TO_RIGHT);

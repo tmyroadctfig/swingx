@@ -180,7 +180,7 @@ public class JXTableHeaderTest extends InteractiveTestCase {
     public void testHeaderVisibleWithoutColumns() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run headerVisible - headless environment");
+            LOG.fine("cannot run headerVisible - headless environment");
             return;
         }
         JXTable table = new JXTable();
@@ -206,7 +206,7 @@ public class JXTableHeaderTest extends InteractiveTestCase {
     public void testHeaderVisibleWithColumns() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run headerVisible - headless environment");
+            LOG.fine("cannot run headerVisible - headless environment");
             return;
         }
         JXTable table = new JXTable(10, 2);

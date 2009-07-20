@@ -1155,7 +1155,7 @@ public class JXMonthViewTest extends TestCase {
     public void testAutoScrollOnSelectionRevalidate() throws InterruptedException, InvocationTargetException {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run test - headless environment");
+            LOG.fine("cannot run test - headless environment");
             return;
         }
         final JXMonthView us = new JXMonthView();
@@ -1312,7 +1312,7 @@ public class JXMonthViewTest extends TestCase {
     public void testLastDisplayedOnResize() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run test - headless environment");
+            LOG.fine("cannot run test - headless environment");
             return;
         }
         // get a reference width so we can simulate a one-month resize

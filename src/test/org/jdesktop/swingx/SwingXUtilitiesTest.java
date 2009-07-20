@@ -100,7 +100,7 @@ public class SwingXUtilitiesTest extends InteractiveTestCase {
     public void testUpdateAllComponentTreeUIs() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run test - headless environment");
+            LOG.fine("cannot run test - headless environment");
             return;
         }
         if (isCrossPlatformLFSameAsSystem()) {

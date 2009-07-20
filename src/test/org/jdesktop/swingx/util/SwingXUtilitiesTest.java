@@ -81,7 +81,7 @@ public class SwingXUtilitiesTest extends InteractiveTestCase {
     @Test
     public void testDescendingPopup() throws InterruptedException, InvocationTargetException {
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run - headless");
+            LOG.fine("cannot run - headless");
             return;
         }
         final JXDatePicker picker = new JXDatePicker();

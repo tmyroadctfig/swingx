@@ -75,7 +75,7 @@ public class FindTest extends InteractiveTestCase {
     public void testSearchFactoryNullTarget() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run testSearchFactoryNullTarget - headless environment");
+            LOG.fine("cannot run testSearchFactoryNullTarget - headless environment");
             return;
         }
         
@@ -93,7 +93,7 @@ public class FindTest extends InteractiveTestCase {
     public void testFindDialogDisposeDeprecated() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run test - headless environment");
+            LOG.fine("cannot run test - headless environment");
             return;
         }
         JXFrame frame = new JXFrame();
@@ -117,7 +117,7 @@ public class FindTest extends InteractiveTestCase {
     public void testFindDialogDispose() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run test - headless environment");
+            LOG.fine("cannot run test - headless environment");
             return;
         }
         JXFrame frame = new JXFrame();
@@ -141,7 +141,7 @@ public class FindTest extends InteractiveTestCase {
     public void testFindDialogHide() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run test - headless environment");
+            LOG.fine("cannot run test - headless environment");
             return;
         }
         JXFrame frame = new JXFrame();
@@ -301,7 +301,7 @@ public class FindTest extends InteractiveTestCase {
     public void testFindDialogNew() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run test - headless environment");
+            LOG.fine("cannot run test - headless environment");
             return;
         }
         JXFrame frame = new JXFrame();
@@ -423,7 +423,7 @@ public class FindTest extends InteractiveTestCase {
         }
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run testSearchKeyStroke - headless environment");
+            LOG.fine("cannot run testSearchKeyStroke - headless environment");
             return;
         }
         assertNotNull("searchfactory must return search accelerator", 

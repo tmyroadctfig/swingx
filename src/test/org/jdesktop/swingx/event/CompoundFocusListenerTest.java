@@ -97,7 +97,7 @@ public class CompoundFocusListenerTest extends InteractiveTestCase {
     public void testFocusedInitialTrue() throws InterruptedException, InvocationTargetException {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run test - headless environment");
+            LOG.fine("cannot run test - headless environment");
             return;
         }
         final JXDatePicker picker = getRealizedDatePicker();
@@ -138,7 +138,7 @@ public class CompoundFocusListenerTest extends InteractiveTestCase {
     public void testRelease() throws InterruptedException, InvocationTargetException {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run test - headless environment");
+            LOG.fine("cannot run test - headless environment");
             return;
         }
         JXDatePicker picker = getRealizedDatePicker();
@@ -167,7 +167,7 @@ public class CompoundFocusListenerTest extends InteractiveTestCase {
     public void testFireFocusedProperty() throws InterruptedException, InvocationTargetException {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run test - headless environment");
+            LOG.fine("cannot run test - headless environment");
             return;
         }
         JXDatePicker picker = getRealizedDatePicker();
