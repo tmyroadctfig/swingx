@@ -8,7 +8,6 @@
 package org.jdesktop.swingx;
 
 import java.awt.Component;
-import java.awt.Graphics;
 import java.awt.GraphicsEnvironment;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -23,22 +22,24 @@ import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.Box;
 import javax.swing.DefaultCellEditor;
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.DefaultRowSorter;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
+import javax.swing.JInternalFrame;
 import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.RepaintManager;
 import javax.swing.RowSorter;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.event.RowSorterEvent;
 import javax.swing.event.TableModelEvent;
-import javax.swing.plaf.basic.BasicTableUI;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
@@ -67,7 +68,7 @@ public class JTableIssues extends InteractiveTestCase {
       try {
 //        test.runInteractiveTests();
 //          test.runInteractiveTests("interactive.*ColumnControl.*");
-          test.runInteractiveTests("interactive.*NPE.*");
+          test.runInteractiveTests("interactive.*Edit.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
@@ -136,6 +137,36 @@ public class JTableIssues extends InteractiveTestCase {
     }
     
   //----------------------- interactive
+    
+    /**
+     * Core issue: terminateEditOnFocusLost weird behaviour if in InternalFrame
+     * see: 
+     * http://forums.java.net/jive/thread.jspa?threadID=64281
+     * 
+     * To reproduce: edit first column (combo dropdown), click in textfield, click again
+     * in first column: editing not started again.
+     * 
+     * Same in JXTable, but there always: the terminateEditOnFocusLost is true by default.
+     */
+    public void interactiveTerminateEditInInternalFrame() {
+        JTable table = new JTable(new AncientSwingTeam());
+        table.putClientProperty("terminateEditOnFocusLost", true);
+        JComboBox box = new JComboBox(new Object[]{"one", "two"});
+        table.getColumnModel().getColumn(0).setCellEditor(new DefaultCellEditor(box));
+        JComponent panel = Box.createVerticalBox();
+        panel.add(new JScrollPane(table));
+        panel.add(new JTextField("something to focus outside table"));
+        
+        JInternalFrame internal = new JInternalFrame();
+        internal.setContentPane(panel);
+        JDesktopPane desktop = new JDesktopPane();
+        desktop.add(internal);
+        JXFrame frame = wrapInFrame(desktop, "terminate editing when in internal frame (combo)");
+        internal.pack();
+        internal.setLocation(50, 30);
+        internal.setVisible(true);
+        show(frame, 600, 600);
+    }
    
       /**
        * Core Issue: the calculation of the repaint region after update is completely broken.
