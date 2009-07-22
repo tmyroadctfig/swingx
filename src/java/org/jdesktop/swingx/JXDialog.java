@@ -23,19 +23,17 @@ package org.jdesktop.swingx;
 import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.Frame;
-import java.awt.event.KeyEvent;
 import java.util.Locale;
 
 import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
-import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
-import javax.swing.KeyStroke;
+import javax.swing.JToolBar;
 import javax.swing.plaf.basic.BasicOptionPaneUI;
 
 import org.jdesktop.swingx.action.BoundAction;
@@ -63,6 +61,7 @@ import org.jdesktop.swingx.plaf.UIManagerExt;
  * </ul>
  * 
  * @author Jeanette Winzenburg
+ * @author Karl Schaefer
  */
 public class JXDialog extends JDialog {
 
@@ -114,6 +113,69 @@ public class JXDialog extends JDialog {
         setContent(content);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected JXRootPane createRootPane() {
+        return new JXRootPane();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public JXRootPane getRootPane() {
+        return (JXRootPane) super.getRootPane();
+    }
+    
+    /**
+     * Sets the status bar property on the underlying {@code JXRootPane}.
+     * 
+     * @param statusBar
+     *            the {@code JXStatusBar} which is to be the status bar
+     * @see #getStatusBar()
+     * @see JXRootPane#setStatusBar(JXStatusBar)
+     */
+    public void setStatusBar(JXStatusBar statusBar) {
+        getRootPane().setStatusBar(statusBar);
+    }
+    
+    /**
+     * Returns the value of the status bar property from the underlying
+     * {@code JXRootPane}.
+     * 
+     * @return the {@code JXStatusBar} which is the current status bar
+     * @see #setStatusBar(JXStatusBar)
+     * @see JXRootPane#getStatusBar()
+     */
+    public JXStatusBar getStatusBar() {
+        return getRootPane().getStatusBar();
+    }
+
+    /**
+     * Sets the tool bar property on the underlying {@code JXRootPane}.
+     * 
+     * @param toolBar
+     *            the {@code JToolBar} which is to be the tool bar
+     * @see #getToolBar()
+     * @see JXRootPane#setToolBar(JToolBar)
+     */
+    public void setToolBar(JToolBar toolBar) {
+        getRootPane().setToolBar(toolBar);
+    }
+    
+    /**
+     * Returns the value of the tool bar property from the underlying
+     * {@code JXRootPane}.
+     * 
+     * @return the {@code JToolBar} which is the current tool bar
+     * @see #setToolBar(JToolBar)
+     * @see JXRootPane#getToolBar()
+     */
+    public JToolBar getToolBar() {
+        return getRootPane().getToolBar();
+    }
+    
     /**
      * PENDING: widen access - this could be public to make the content really 
      * pluggable?
@@ -274,21 +336,16 @@ public class JXDialog extends JDialog {
         Action executeAction = getAction(EXECUTE_ACTION_COMMAND);
         Action closeAction = getAction(CLOSE_ACTION_COMMAND);
 
-        JButton findButton = new JButton(executeAction);
-        panel.add(findButton);
+        JButton defaultButton = new JButton(executeAction);
+        panel.add(defaultButton);
+        getRootPane().setDefaultButton(defaultButton);
+        
         if (executeAction != closeAction) {
-            panel.add(new JButton(closeAction));
+            JButton b = new JButton(closeAction);
+            panel.add(b);
+            getRootPane().setCancelButton(b);
         }
-
-
-        KeyStroke enterKey = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0, false);
-        KeyStroke escapeKey = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0, false);
-
-        InputMap inputMap = getRootPane().getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
-        inputMap.put(enterKey, EXECUTE_ACTION_COMMAND);
-        inputMap.put(escapeKey, CLOSE_ACTION_COMMAND);
-
-        getRootPane().setDefaultButton(findButton);
+        
         return panel;
     }
 
@@ -339,7 +396,4 @@ public class JXDialog extends JDialog {
         String text = UIManagerExt.getString(UIPREFIX + key, locale);
         return text != null ? text : key;
     }
-
-
-
 }
