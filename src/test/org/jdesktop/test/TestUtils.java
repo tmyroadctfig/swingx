@@ -41,7 +41,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.TimeZone;
-import java.util.TreeSet;
 import java.util.logging.Logger;
 import java.util.prefs.AbstractPreferences;
 import java.util.prefs.BackingStoreException;
@@ -54,13 +53,12 @@ import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.border.Border;
 
+import junit.framework.Assert;
+
 import org.apache.commons.lang.StringUtils;
-import org.jdesktop.beans.AbstractBean;
 import org.jdesktop.swingx.graphics.GraphicsUtilities;
 import org.jdesktop.swingx.painter.MattePainter;
 import org.jdesktop.swingx.painter.Painter;
-
-import junit.framework.Assert;
 
 /**
  * Extends assert to get all the ease-of-use assert methods
@@ -479,7 +477,8 @@ public final class TestUtils extends Assert {
                     Object[] enums = c.getEnumConstants();
                     newVal = val.equals(enums[0]) ? enums[1] : enums[0];
                 } else {
-                    System.err.println("Handling for type " + met.getParameterTypes()[0] + " not handled yet ... if you got this message, please implement the support for objects used by bean you are testing.");
+//                    System.err.println("Handling for type " + met.getParameterTypes()[0] + " not handled yet ... if you got this message, please implement the support for objects used by bean you are testing.");
+                    LOG.fine("Handling for type " + met.getParameterTypes()[0] + " not handled yet ... if you got this message, please implement the support for objects used by bean you are testing.");
                     newVal = null;
                     continue;
                 }
@@ -492,7 +491,8 @@ public final class TestUtils extends Assert {
             } catch (NoSuchMethodException e) {
                 // getter doesn't exist ... not really a bean method ... skip
             } catch (Exception e) {
-                e.printStackTrace();
+                LOG.fine("by swingx convention: no printstackTrace allowed - " + e);
+//                e.printStackTrace();
             }
         }
     }
