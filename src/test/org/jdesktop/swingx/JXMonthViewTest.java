@@ -28,6 +28,7 @@ import java.awt.ComponentOrientation;
 import java.awt.Font;
 import java.awt.GraphicsEnvironment;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
 import java.lang.reflect.InvocationTargetException;
 import java.text.DateFormatSymbols;
 import java.util.Arrays;
@@ -39,13 +40,12 @@ import java.util.TimeZone;
 import java.util.TreeSet;
 import java.util.logging.Logger;
 
+import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
-
-import junit.framework.TestCase;
 
 import org.jdesktop.swingx.calendar.CalendarUtils;
 import org.jdesktop.swingx.calendar.DateSelectionModel;
@@ -69,13 +69,13 @@ import org.junit.runners.JUnit4;
  *
  * There's another class with passing unit tests for JXMonthView (JXMonthViewVisualTest)
  * because this 
- * extends mock while the other extends InteractiveTestCase. Both are expected
- * to pass.
+ * extended mock while the other extends InteractiveTestCase. Both are expected
+ * to pass. As mock had been removed, they should be merged.
  * 
  * @author Joshua Outwater
  */
 @RunWith(JUnit4.class)
-public class JXMonthViewTest extends TestCase {
+public class JXMonthViewTest extends InteractiveTestCase {
     private static final Logger LOG = Logger.getLogger(JXMonthViewTest.class
             .getName());
     private Locale componentLocale;
@@ -121,6 +121,96 @@ public class JXMonthViewTest extends TestCase {
         JComponent.setDefaultLocale(componentLocale);
     }
 
+    public static void main(String[] args) {
+        JXMonthViewTest test = new JXMonthViewTest();
+        try {
+            test.runInteractiveTests();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
+    /**
+     * Issue #1125-swingx: JXMonthView today incorrect.
+     * 
+     */
+    @Test
+    public void testUpdateTodayInAddNotify() {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.fine("cannot run ui test - headless environment");
+            return;
+        }
+        Clock clock = new Clock();
+        clock.nextDay();
+        JXMonthView monthView = createMonthViewWithClock(clock);
+        assertEquals("sanity: monthView takes clock current initially", 
+                CalendarUtils.startOfDay(monthView.getCalendar(), clock.getCurrentDate()), monthView.getToday());
+        // increment clock
+        clock.nextDay();
+        // realize monthView
+        showInFrame(monthView, "");
+        assertEquals(" monthView must update today in addNotify", 
+                CalendarUtils.startOfDay(monthView.getCalendar(), clock.getCurrentDate()), monthView.getToday());
+    }
+
+    /**
+     * Creates and returns a JXMonthView which uses the given time source for current.
+     * 
+     * @param clock the time source used by monthView.
+     */
+    public static JXMonthView createMonthViewWithClock(final Clock clock) {
+        JXMonthView monthView = new JXMonthView() {
+
+            @Override
+            Date getCurrentDate() {
+                return clock.getCurrentDate();
+            }
+            
+        };
+        return monthView;
+    }
+    
+    /**
+     * Quick class to inject a current time source.
+     */
+    public static class Clock {
+        private static int millisPerDay = 24 * 60 * 60 * 1000;
+        private Date current;
+
+        /**
+         * Instantiates a time source with default current.
+         */
+        public Clock() {
+            this(null);
+        }
+        
+        /**
+         * Instantiates a time source with the given date as current. If null, uses
+         * System.currentTimeMillis().
+         * 
+         * @param date the current date.
+         */
+        public Clock(Date date) {
+            this.current = date != null ? date : new Date(System.currentTimeMillis()); 
+        }
+        /**
+         * Returns the current time.
+         * 
+         * @return current time.
+         */
+        public Date getCurrentDate() {
+            return current;
+        }
+        
+        /**
+         * Increments current by one day.
+         */
+        public void nextDay() {
+            current = new Date(current.getTime() + millisPerDay);
+        }
+        
+    }
     /**
      * Issue #1072-swingx: nav icons incorrect for RToL if zoomable
      */

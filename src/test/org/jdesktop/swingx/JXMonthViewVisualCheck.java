@@ -42,9 +42,9 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 import javax.swing.UIManager;
 
+import org.jdesktop.swingx.JXMonthViewTest.Clock;
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.calendar.CalendarUtils;
 import org.jdesktop.swingx.calendar.DateSelectionModel.SelectionMode;
@@ -71,15 +71,37 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
       try {
 //          test.runInteractiveTests();
 //        test.runInteractiveTests(".*Event.*");
-          test.runInteractiveTests("interactive.*Zoomable.*");
-          test.runInteractiveTests("interactive.*Title.*");
-        test.runInteractiveTests("interactive.*Time.*");
+//          test.runInteractiveTests("interactive.*Zoomable.*");
+//          test.runInteractiveTests("interactive.*Title.*");
+        test.runInteractiveTests("interactive.*Today.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
       }
   }
-    
+
+    /**
+     * Issue #1125-swingx: JXMonthView today incorrect.
+     * Visual partly fix: updated in addNotify.
+     */
+    public void interactiveTodayUpdateInPicker() {
+        final Clock clock = new Clock();
+        JXMonthView monthView = JXMonthViewTest.createMonthViewWithClock(clock);
+        JXDatePicker picker = new JXDatePicker();
+        picker.setMonthView(monthView);
+        JXFrame frame = wrapInFrame(picker, "today ");
+        Action nextDay = new AbstractAction("next today - update via addNotify") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                clock.nextDay();
+                
+            }
+        };
+        addAction(frame, nextDay);
+        show(frame);
+    }
+
     /**
      * Issue #1028-swingx: monthView title looks wrong if box paddings = 0
      */
@@ -435,7 +457,7 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
         final JXMonthView monthView = new JXMonthView(); 
         monthView.setTraversable(true);
         final JXFrame frame = showInFrame(monthView, "MonthView today");
-        Action action = new AbstractActionExt("increment today") {
+        Action action = new AbstractActionExt("increment today - programmatically") {
             public void actionPerformed(ActionEvent e) {
                 monthView.incrementToday();
             }

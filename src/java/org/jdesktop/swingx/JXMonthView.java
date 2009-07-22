@@ -252,7 +252,7 @@ public class JXMonthView extends JComponent {
      * display.
      */
     public JXMonthView() {
-        this(new Date(System.currentTimeMillis()), null, null);
+        this(null, null, null);
     }
 
     /**
@@ -263,7 +263,7 @@ public class JXMonthView extends JComponent {
      * @param locale desired locale, if null the system default locale is used
      */
     public JXMonthView(final Locale locale) {
-        this(new Date(System.currentTimeMillis()), null, locale);
+        this(null, null, locale);
     }
 
     /**
@@ -271,10 +271,11 @@ public class JXMonthView extends JComponent {
      * default Locale and the given time as the first date to 
      * display.
      *
-     * @param firstDisplayedDate The first month to display.
+     * @param firstDisplayedDay a day of the first month to display; if null, the current
+     *   System time is used.
      */
-    public JXMonthView(Date firstDisplayedDate) {
-        this(firstDisplayedDate, null, null);
+    public JXMonthView(Date firstDisplayedDay) {
+        this(firstDisplayedDay, null, null);
     }
 
     /**
@@ -282,12 +283,13 @@ public class JXMonthView extends JComponent {
      * default Locale, the given time as the first date to 
      * display and the given selection model. 
      * 
-     * @param firstDisplayedDate The first month to display.
+     * @param firstDisplayedDay a day of the first month to display; if null, the current
+     *   System time is used.
      * @param model the selection model to use, if null a <code>DefaultSelectionModel</code> is
      *   created.
      */
-    public JXMonthView(Date firstDisplayedDate, final DateSelectionModel model) {
-        this(firstDisplayedDate, model, null);
+    public JXMonthView(Date firstDisplayedDay, final DateSelectionModel model) {
+        this(firstDisplayedDay, model, null);
     }
 
 
@@ -296,7 +298,8 @@ public class JXMonthView extends JComponent {
      * given Locale, the given time as the first date to 
      * display and the given selection model. 
      * 
-     * @param firstDisplayedDay 
+     * @param firstDisplayedDay a day of the first month to display; if null, the current
+     *   System time is used.
      * @param model the selection model to use, if null a <code>DefaultSelectionModel</code> is
      *   created.
      * @param locale desired locale, if null the system default locale is used
@@ -307,7 +310,7 @@ public class JXMonthView extends JComponent {
 
         initModel(model, locale);
         superSetLocale(locale);
-        setFirstDisplayedDay(firstDisplayedDay);
+        setFirstDisplayedDay(firstDisplayedDay != null ? firstDisplayedDay : getCurrentDate());
         // Keep track of today
         updateTodayFromCurrentTime();
 
@@ -669,14 +672,27 @@ public class JXMonthView extends JComponent {
     }
    
 //------------------ today
-    
+
+    /**
+     * Returns the current Date (whateverthatmeans). Internally always invoked when
+     * the current default is needed. Introduced mainly for testing, don't override!
+     * 
+     * This implementation returns a Date instantiated with <code>System.currentTimeInMillis</code>.
+     * 
+     * @return the date deemed as current. 
+     */
+    Date getCurrentDate() {
+        return new Date(System.currentTimeMillis());
+    }
+
+
     /**
      * Sets today from the current system time. 
      * 
      * temporary widened access for testing.
      */
     protected void updateTodayFromCurrentTime() {
-        setToday(new Date(System.currentTimeMillis()));
+        setToday(getCurrentDate());
     }
 
     /**
@@ -1656,7 +1672,9 @@ public class JXMonthView extends JComponent {
     @Override
     public void addNotify() {
         super.addNotify();
-
+        // partial fix for #1125: today updated in addNotify
+        // partial, because still not in synch if not shown
+        updateTodayFromCurrentTime();
         // Setup timer to update the value of today.
         int secondsTillTomorrow = 86400;
 
@@ -1670,7 +1688,8 @@ public class JXMonthView extends JComponent {
         }
 
         // Modify the initial delay by the current time.
-        cal.setTimeInMillis(System.currentTimeMillis());
+//        cal.setTimeInMillis(System.currentTimeMillis());
+        cal.setTime(getCurrentDate());
         secondsTillTomorrow = secondsTillTomorrow -
                 (cal.get(Calendar.HOUR_OF_DAY) * 3600) -
                 (cal.get(Calendar.MINUTE) * 60) -
