@@ -881,16 +881,6 @@ public class JXList extends JList {
             }
             return StringValues.TO_STRING.getString(getValueAt(row, column));
         }
-        
-        
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void setValueAt(Object aValue, int row, int column) {
-            throw new UnsupportedOperationException(
-                    "The model is immutable.");
-        }
 
         /**
          * {@inheritDoc}

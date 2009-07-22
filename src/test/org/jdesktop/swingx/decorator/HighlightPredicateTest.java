@@ -992,12 +992,6 @@ public class HighlightPredicateTest extends InteractiveTestCase {
             }
 
             @Override
-            public void setValueAt(Object aValue, int row, int column) {
-                // not implemented
-                
-            }
-
-            @Override
             public boolean isCellEditable(int row, int column) {
                 return isEditable();
             }
@@ -1056,12 +1050,6 @@ public class HighlightPredicateTest extends InteractiveTestCase {
             @Override
             public Object getValue() {
                 return getValueAt(row, column);
-            }
-
-            @Override
-            public void setValueAt(Object aValue, int row, int column) {
-                // TODO Auto-generated method stub
-                
             }
 
             @Override

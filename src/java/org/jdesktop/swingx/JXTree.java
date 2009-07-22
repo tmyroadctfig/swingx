@@ -1657,15 +1657,6 @@ public class JXTree extends JTree {
         public boolean isCellEditable(int row, int column) {
             return false;        /** TODO:  */
         }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void setValueAt(Object aValue, int row, int column) {
-            /** TODO:  */
-        }
-        
     }
 
 

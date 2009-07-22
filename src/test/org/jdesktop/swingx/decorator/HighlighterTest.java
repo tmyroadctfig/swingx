@@ -768,12 +768,6 @@ public class HighlighterTest extends InteractiveTestCase {
             }
 
             @Override
-            public void setValueAt(Object aValue, int row, int column) {
-                // TODO Auto-generated method stub
-                
-            }
-
-            @Override
             public boolean isCellEditable(int row, int column) {
                 // TODO Auto-generated method stub
                 return false;
@@ -843,13 +837,6 @@ public class HighlighterTest extends InteractiveTestCase {
                 // TODO Auto-generated method stub
                 return false;
             }
-
-            @Override
-            public void setValueAt(Object value, int row, int column) {
-                // TODO Auto-generated method stub
-                
-            }
-            
         };
         return adapter;
     }

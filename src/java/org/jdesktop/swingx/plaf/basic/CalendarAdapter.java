@@ -124,11 +124,4 @@ class CalendarAdapter extends ComponentAdapter {
     public boolean isEditable() {
         return false;
     }
-
-
-    @Override
-    public void setValueAt(Object value, int row, int column) {
-    }
-
-    
 }

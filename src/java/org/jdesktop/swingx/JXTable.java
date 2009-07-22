@@ -2869,14 +2869,6 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
          * {@inheritDoc}
          */
         @Override
-        public void setValueAt(Object aValue, int row, int column) {
-            table.getModel().setValueAt(aValue, row, column);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
         public boolean isCellEditable(int row, int column) {
             return table.getModel().isCellEditable(row, column);
         }

@@ -360,12 +360,6 @@ public class JXTableSortRevamp extends InteractiveTestCase {
             public boolean isSelected() {
                 return false;
             }
-
-            @Override
-            public void setValueAt(Object aValue, int row, int column) {
-              
-            }
-            
         };
         assertEquals("adapter filteredValue expects row view coordinates", 
                 table.getValueAt(0, 0), adapter.getFilteredValueAt(0, 0));

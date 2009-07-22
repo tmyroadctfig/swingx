@@ -242,16 +242,6 @@ public abstract class ComponentAdapter {
      *          specified row and column
      */
     public abstract Object getValueAt(int row, int column);
-    
-    /**
-     * Sets the value of the target component's cell identified by the
-     * specified row and column in model coordinates.
-     * 
-     * @param aValue the value to set
-     * @param row in model coordinates
-     * @param column in model coordinates
-     */
-    public abstract void setValueAt(Object aValue, int row, int column);
 
     /**
      * Determines whether this cell is editable.
