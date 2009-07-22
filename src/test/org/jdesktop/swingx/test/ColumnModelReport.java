@@ -15,6 +15,7 @@ import java.util.List;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.TableColumnModelEvent;
+import javax.swing.table.TableColumnModel;
 
 import org.jdesktop.swingx.event.TableColumnModelExtListener;
 import org.jdesktop.test.PropertyChangeReport;
@@ -39,6 +40,16 @@ public class ColumnModelReport implements TableColumnModelExtListener {
 //    private List<PropertyChangeEvent> columnPropertyEvents = new LinkedList<PropertyChangeEvent>();
 
     private PropertyChangeReport propertyReport = new PropertyChangeReport();
+    
+    public ColumnModelReport() {
+        this(null);
+    }
+    
+    public ColumnModelReport(TableColumnModel model) {
+        if (model != null) {
+            model.addColumnModelListener(this);
+        }
+    }
     
 //------------------------ implement TableColumnModelListener    
     public void columnAdded(TableColumnModelEvent e) {
