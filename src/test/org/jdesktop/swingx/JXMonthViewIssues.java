@@ -23,6 +23,7 @@ package org.jdesktop.swingx;
 
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GraphicsEnvironment;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -38,11 +39,13 @@ import java.util.Map;
 import java.util.TimeZone;
 import java.util.logging.Logger;
 
+import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 
+import org.jdesktop.swingx.JXMonthViewTest.Clock;
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.calendar.CalendarUtils;
 import org.jdesktop.swingx.calendar.DaySelectionModel;
@@ -51,6 +54,7 @@ import org.jdesktop.swingx.event.DateSelectionEvent.EventType;
 import org.jdesktop.swingx.test.DateSelectionReport;
 import org.jdesktop.test.PropertyChangeReport;
 import org.jdesktop.test.TestUtils;
+import org.junit.Test;
 
 /**
  * Test to expose known issues with JXMonthView.
@@ -67,10 +71,10 @@ public class JXMonthViewIssues extends InteractiveTestCase {
       setSystemLF(true);
       InteractiveTestCase  test = new JXMonthViewIssues();
       try {
-          test.runInteractiveTests();
+//          test.runInteractiveTests();
 //        test.runInteractiveTests("interactive.*Locale.*");
 //          test.runInteractiveTests("interactive.*AutoScroll.*");
-//        test.runInteractiveTests("interactive.*Repaint.*");
+        test.runInteractiveTests("interactive.*Today.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
@@ -85,6 +89,46 @@ public class JXMonthViewIssues extends InteractiveTestCase {
     // the calendar to use, its date is initialized with the today-field in setUpCalendar
     protected Calendar calendar;
   
+
+    /**
+     * Issue #1125-swingx: JXMonthView today incorrect.
+     * Visualize remaining problem: not kept in synch automatically (note: here
+     * we do simulate the case that the monthView is not showing - if it is, the
+     * internal timer should take over. Ehem ...).
+     */
+    public void interactiveTodayUpdate() {
+        final Clock clock = new Clock();
+        JXMonthView monthView = JXMonthViewTest.createMonthViewWithClock(clock);
+        JXFrame frame = wrapInFrame(monthView, "today ");
+        Action nextDay = new AbstractAction("next today - update via addNotify") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                clock.nextDay();
+                
+            }
+        };
+        addAction(frame, nextDay);
+        show(frame);
+    }
+
+    /**
+     * Issue #1125-swingx: JXMonthView today incorrect.
+     * Here we test the update if not added, still failing ...
+     */
+    @Test
+    public void testUpdateTodayInAddNotify() {
+        Clock clock = new Clock();
+        clock.nextDay();
+        JXMonthView monthView = JXMonthViewTest.createMonthViewWithClock(clock);
+        assertEquals("sanity: monthView takes clock current initially", 
+                CalendarUtils.startOfDay(monthView.getCalendar(), clock.getCurrentDate()), monthView.getToday());
+        // increment clock
+        clock.nextDay();
+        assertEquals(" monthView must update today in addNotify", 
+                CalendarUtils.startOfDay(monthView.getCalendar(), clock.getCurrentDate()), monthView.getToday());
+    }
+
     public void interactiveMonthViewAntialisedPaint() {
         JXMonthView custom =  new JXMonthView() {
             
