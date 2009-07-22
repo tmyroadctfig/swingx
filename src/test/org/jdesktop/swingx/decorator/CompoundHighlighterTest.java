@@ -501,12 +501,6 @@ public class CompoundHighlighterTest extends InteractiveTestCase {
             }
 
             @Override
-            public void setValueAt(Object aValue, int row, int column) {
-                // TODO Auto-generated method stub
-                
-            }
-
-            @Override
             public boolean isCellEditable(int row, int column) {
                 // TODO Auto-generated method stub
                 return false;
