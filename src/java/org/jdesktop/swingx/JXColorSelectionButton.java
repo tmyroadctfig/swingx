@@ -177,26 +177,31 @@ public class JXColorSelectionButton extends JButton {
      * Conditionally create and show the color chooser dialog.
      */
     private void showDialog() {
+        final Color oldColor = getBackground();
+        
         if (dialog == null) {
             dialog = JColorChooser.createDialog(JXColorSelectionButton.this,
                     "Choose a color", true, getChooser(),
                     new ActionListener() {
-                        public void actionPerformed(ActionEvent actionEvent) {
-                        }
-                    },
-                    new ActionListener() {
-                        public void actionPerformed(ActionEvent actionEvent) {
+                public void actionPerformed(ActionEvent actionEvent) {
+                    Color color = getChooser().getColor();
+                    if (color != null) {
+                        setBackground(color);
                     }
-                });
+                }
+            },
+            new ActionListener() {
+                public void actionPerformed(ActionEvent actionEvent) {
+                    setBackground(oldColor);
+                }
+            });
             dialog.getContentPane().add(getChooser());
             getChooser().getSelectionModel().addChangeListener(
                     new ColorChangeListener(JXColorSelectionButton.this));
         }
+        
         dialog.setVisible(true);
-        Color color = getChooser().getColor();
-        if (color != null) {
-            setBackground(color);
-        }
+
     }
     
     /**
