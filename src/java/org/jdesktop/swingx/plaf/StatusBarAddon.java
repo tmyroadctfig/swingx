@@ -65,7 +65,8 @@ public class StatusBarAddon extends AbstractComponentAddon {
             
             String xpStyle = OS.getWindowsVisualStyle();
             
-            if (WindowsLookAndFeelAddons.SILVER_VISUAL_STYLE.equalsIgnoreCase(xpStyle)) {
+            if (WindowsLookAndFeelAddons.SILVER_VISUAL_STYLE.equalsIgnoreCase(xpStyle)
+                    || WindowsLookAndFeelAddons.VISTA_VISUAL_STYLE.equalsIgnoreCase(xpStyle)) {
                 defaults.add("StatusBar.leftImage", "resources/silver-statusbar-left.png");
                 defaults.add("StatusBar.middleImage", "resources/silver-statusbar-middle.png");
                 defaults.add("StatusBar.rightImage", "resources/silver-statusbar-right.png");
