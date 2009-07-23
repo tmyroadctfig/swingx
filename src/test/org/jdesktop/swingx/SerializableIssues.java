@@ -235,22 +235,6 @@ public class SerializableIssues extends InteractiveTestCase {
      * Issue #423-swingx: all descendants of JComponent must be 
      * serializable.<p>
      * 
-     * First blow: BufferedImage
-     * 
-     */
-    public void testLoginDialog() {
-        JXLoginDialog component = new JXLoginDialog();
-        try {
-            SerializableSupport.serialize(component);
-        } catch (Exception e) {
-            fail("not serializable " + e);
-        } 
-    }
-
-    /**
-     * Issue #423-swingx: all descendants of JComponent must be 
-     * serializable.<p>
-     * 
      * First blow: DelegatingRenderer.
      * 
      */
