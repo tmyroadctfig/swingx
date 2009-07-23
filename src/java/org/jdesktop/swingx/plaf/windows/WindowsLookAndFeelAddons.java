@@ -31,4 +31,5 @@ public class WindowsLookAndFeelAddons extends BasicLookAndFeelAddons {
   
   public static final String SILVER_VISUAL_STYLE = "Metallic";
 
+  public static final String VISTA_VISUAL_STYLE = "NormalColor";
 }
