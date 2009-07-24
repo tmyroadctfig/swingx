@@ -29,12 +29,9 @@ import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.DefaultListSelectionModel;
 import javax.swing.JTable;
-import javax.swing.ListSelectionModel;
 import javax.swing.SortOrder;
 import javax.swing.UIManager;
-import javax.swing.RowSorter.SortKey;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
@@ -49,7 +46,8 @@ import org.jdesktop.swingx.decorator.ComponentAdapterTest.JXTableT;
 import org.jdesktop.swingx.renderer.DefaultTableRenderer;
 import org.jdesktop.swingx.renderer.StringValue;
 import org.jdesktop.swingx.renderer.StringValues;
-import org.jdesktop.swingx.sort.SortUtils;
+import org.jdesktop.swingx.sort.SortController;
+import org.jdesktop.swingx.table.ColumnFactory;
 import org.jdesktop.swingx.table.TableColumnExt;
 import org.jdesktop.swingx.treetable.FileSystemModel;
 import org.jdesktop.test.AncientSwingTeam;
@@ -121,8 +119,28 @@ public class JXTableSortRevamp extends InteractiveTestCase {
         }
     }
     
+//-------------- sortable continued
 
-//--------------- open for decision
+//--------------- current re-introduce
+
+    
+    
+    /**
+     * JXTable has responsibility to guarantee usage of 
+     * TableColumnExt comparator.
+     * 
+     */
+    @Test
+    public void testComparatorToPipeline() {
+        fail("comparator not yet propagated from column to sorter");
+        JXTable table = new JXTable(new AncientSwingTeam());
+        TableColumnExt columnX = table.getColumnExt(0);
+        columnX.setComparator(Collator.getInstance());
+        table.toggleSortOrder(0);
+//        SortKey sortKey = SortKey.getFirstSortKeyForColumn(table.getFilters().getSortController().getSortKeys(), 0);
+//        assertNotNull(sortKey);
+//        assertEquals(columnX.getComparator(), sortKey.getComparator());
+    }
 
 
     
@@ -196,37 +214,6 @@ public class JXTableSortRevamp extends InteractiveTestCase {
         // sanity
         assertEquals(1, table.getValueAt(0, 0));
         assertEquals(100, table.getRowHeight(0));
-    }
-
-    /**
-     * JXTable has responsibility to guarantee usage of 
-     * TableColumnExt comparator.
-     * 
-     */
-    @Test
-    public void testComparatorToPipeline() {
-        fail("JXTable - swingx filtering/sorting disabled");
-        JXTable table = new JXTable(new AncientSwingTeam());
-        TableColumnExt columnX = table.getColumnExt(0);
-        columnX.setComparator(Collator.getInstance());
-        table.toggleSortOrder(0);
-//        SortKey sortKey = SortKey.getFirstSortKeyForColumn(table.getFilters().getSortController().getSortKeys(), 0);
-//        assertNotNull(sortKey);
-//        assertEquals(columnX.getComparator(), sortKey.getComparator());
-    }
-
-    /**
-     * resetSortOrders didn't check for tableHeader != null.
-     * Didn't show up before new sorter api because method was protected and 
-     * only called from JXTableHeader.
-     *
-     */
-    @Test
-    public void testResetSortOrderNPE() {
-        fail("JXTable - swingx filtering/sorting disabled");
-        JXTable table = new JXTable(sortableTableModel);
-        table.setTableHeader(null);
-        table.resetSortOrder();
     }
 
 

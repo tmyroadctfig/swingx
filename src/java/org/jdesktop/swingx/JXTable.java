@@ -464,6 +464,8 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
 
     private boolean autoCreateRowSorter;
 
+    private boolean ignoreAddColumn;
+
     /** Instantiates a JXTable with a default table model, no data. */
     public JXTable() {
         init();
@@ -1486,17 +1488,22 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
     }
 
     /**
-     * {@inheritDoc} <p>
+     * {@inheritDoc}
+     * <p>
      * 
-     * Overridden to re-calculate intialize column width and preferred scrollable
-     * size after a structureChanged if autocreateColumnsFromModel is true.
+     * Overridden to re-calculate intialize column width and preferred
+     * scrollable size after a structureChanged if autocreateColumnsFromModel is
+     * true.
      */
     @Override
     public void tableChanged(TableModelEvent e) {
-            super.tableChanged(e);
+        super.tableChanged(e);
         if (isStructureChanged(e) && getAutoCreateColumnsFromModel()) {
             initializeColumnWidths();
             resetCalculatedScrollableSize(true);
+        }
+        if ((isStructureChanged(e))) {
+            configureSorterProperties();
         }
     }
 
@@ -1510,9 +1517,11 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
         boolean old = getAutoCreateRowSorter();
         try {
             this.autoCreateRowSorter = false;
+            this.ignoreAddColumn = true;
             super.setModel(dataModel);
         } finally {
             this.autoCreateRowSorter = old;
+            this.ignoreAddColumn = false;
         }
         if (getAutoCreateRowSorter()) {
             setRowSorter(createDefaultRowSorter());
@@ -1548,6 +1557,37 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
     @Override
     public boolean getAutoCreateRowSorter() {
         return autoCreateRowSorter;
+    }
+
+    /**
+     * {@inheritDoc} <p>
+     * 
+     * Overridden propagate sort-related properties to the sorter after calling super,
+     * if the given RowSorter is of type SortController. Does nothing additional otherwise.
+     */
+    @Override
+    public void setRowSorter(RowSorter<? extends TableModel> sorter) {
+        super.setRowSorter(sorter);
+        configureSorterProperties();
+    }
+
+    /**
+     * Propagates sort-related properties from table/columns to the sorter if it
+     * is of type SortController, does nothing otherwise.
+     * 
+     */
+    protected void configureSorterProperties() {
+        // need to hack: if a structureChange is the result of a setModel
+        // the rowsorter is not yet updated
+        if (ignoreAddColumn || (getSortController() == null))  return;
+        getSortController().setSortable(sortable);
+        List<TableColumn> columns = getColumns(true);
+        for (TableColumn tableColumn : columns) {
+            int modelIndex = tableColumn.getModelIndex();
+            getSortController().setSortable(modelIndex, 
+                    tableColumn instanceof TableColumnExt ? 
+                            ((TableColumnExt) tableColumn).isSortable() : true);
+        }
     }
 
     /**
@@ -1971,6 +2011,23 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
         }
         return null;
     }
+
+    /**
+     * {@inheritDoc} <p>
+     * 
+     * Overridden to propagate sort-related column properties to the SortController.<p>
+     *  
+     *  PENDING JW: check correct update on visibility change!
+     * 
+     */
+    @Override
+    public void columnAdded(TableColumnModelEvent e) {
+        super.columnAdded(e);
+        if (ignoreAddColumn) return;
+        TableColumn column = getColumn(e.getToIndex());
+        updateSortableAfterColumnChanged(column, column instanceof TableColumnExt ? ((TableColumnExt) column).isSortable() : true);
+    }
+
 
     // ----------------- enhanced column support: delegation to TableColumnModel
     /**
