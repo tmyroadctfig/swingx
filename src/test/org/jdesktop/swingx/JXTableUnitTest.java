@@ -7,8 +7,6 @@
 
 package org.jdesktop.swingx;
 
-import static org.junit.Assert.*;
-
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -69,6 +67,7 @@ import org.jdesktop.swingx.renderer.StringValues;
 import org.jdesktop.swingx.rollover.RolloverController;
 import org.jdesktop.swingx.rollover.RolloverProducer;
 import org.jdesktop.swingx.rollover.TableRolloverController;
+import org.jdesktop.swingx.sort.SortUtils;
 import org.jdesktop.swingx.sort.TableSortController;
 import org.jdesktop.swingx.table.ColumnControlButton;
 import org.jdesktop.swingx.table.ColumnFactory;
@@ -142,6 +141,27 @@ public class JXTableUnitTest extends InteractiveTestCase {
 //--------------------- sortable property
     
  // --------------- sortable property 
+
+    /**
+     * Issue 1131-swingx: table must unsort column on sortable change.
+     * 
+     * Invalid as of switch to core sorting. On the contrary, the table must
+     * not go clever under the feat of the controller.
+     * 
+     */
+    @Test
+    public void testTableUnsortedColumnOnColumnSortableChange() {
+        JXTable table = new JXTable(10, 2);
+        TableColumnExt columnExt = table.getColumnExt(0);
+        table.toggleSortOrder(0);
+        assertTrue("sanity: sorted", SortUtils.isSorted(table.getSortOrder(0)));
+        columnExt.setSortable(false);
+        assertTrue("changing sortability must not change sort state (with default controller)", 
+                SortUtils.isSorted(table.getSortOrder(0)));
+    }
+
+
+
     /**
      * JXTable has responsibility to respect TableColumnExt
      * sortable property.
