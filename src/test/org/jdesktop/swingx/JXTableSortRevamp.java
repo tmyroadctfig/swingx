@@ -48,6 +48,7 @@ import org.jdesktop.swingx.decorator.ComponentAdapterTest.JXTableT;
 import org.jdesktop.swingx.renderer.DefaultTableRenderer;
 import org.jdesktop.swingx.renderer.StringValue;
 import org.jdesktop.swingx.renderer.StringValues;
+import org.jdesktop.swingx.sort.SortUtils;
 import org.jdesktop.swingx.table.TableColumnExt;
 import org.jdesktop.swingx.treetable.FileSystemModel;
 import org.jdesktop.test.AncientSwingTeam;
@@ -194,71 +195,6 @@ public class JXTableSortRevamp extends InteractiveTestCase {
         assertEquals(1, table.getValueAt(0, 0));
         assertEquals(100, table.getRowHeight(0));
     }
-
-    /**
-     * Issue 373-swingx: table must unsort column on sortable change.
-     * 
-     * Here we test if switching sortable to false on the sorted column resets
-     * the sorting, special case hidden column. This fails because columnModel
-     * doesn't fire property change events for hidden columns (see Issue
-     * #369-swingx).
-     * 
-     */
-    @Test
-    public void testTableUnsortedColumnOnHiddenColumnSortableChange() {
-        fail("JXTable - swingx filtering/sorting disabled");
-        JXTable table = new JXTable(10, 2);
-        TableColumnExt columnExt = table.getColumnExt(0);
-        Object identifier = columnExt.getIdentifier();
-        table.toggleSortOrder(identifier);
-//        assertTrue(table.getSortOrder(identifier).isSorted());
-//        columnExt.setVisible(false);
-//        assertTrue(table.getSortOrder(identifier).isSorted());
-//        columnExt.setSortable(false);
-//        assertFalse("table must have unsorted column on sortable change", table
-//                .getSortOrder(identifier).isSorted());
-    }
-
-
-    /**
-     * Issue 373-swingx: table must unsort column on sortable change.
-     *
-     * Here we test if switching sortable to false on the sorted column
-     * resets the sorting.
-     * 
-     */
-    @Test
-    public void testTableUnsortedColumnOnColumnSortableChange() {
-        fail("JXTable - swingx filtering/sorting disabled");
-        JXTable table = new JXTable(10, 2);
-        TableColumnExt columnExt = table.getColumnExt(0);
-//        table.toggleSortOrder(0);
-//        assertTrue(table.getSortOrder(0).isSorted());
-//        columnExt.setSortable(false);
-//        assertFalse("table must have unsorted column on sortable change", 
-//                table.getSortOrder(0).isSorted());
-    }
-
-    /**
-     * Issue 373-swingx: table must unsort column on sortable change.
-     *
-     * Here we test if switching sortable to false on unsorted column has
-     * no effect.
-     */
-    @Test
-    public void testTableSortedColumnOnNotSortedColumnSortableChange() {
-        fail("JXTable - swingx filtering/sorting disabled");
-        JXTable table = new JXTable(10, 2);
-        int unsortedColumn = 1;
-        TableColumnExt columnExt = table.getColumnExt(unsortedColumn);
-        table.toggleSortOrder(0);
-//        assertTrue(table.getSortOrder(0).isSorted());
-//        columnExt.setSortable(false);
-//        assertTrue("table must keep sortorder on unsorted column sortable change", 
-//                table.getSortOrder(0).isSorted());
-    }
-
-
 
     /**
      * JXTable has responsibility to guarantee usage of 
