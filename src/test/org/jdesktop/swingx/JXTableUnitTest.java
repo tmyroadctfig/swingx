@@ -38,6 +38,7 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.RowSorter;
+import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.event.TableModelEvent;
@@ -69,6 +70,7 @@ import org.jdesktop.swingx.rollover.TableRolloverController;
 import org.jdesktop.swingx.sort.TableSortController;
 import org.jdesktop.swingx.table.ColumnControlButton;
 import org.jdesktop.swingx.table.ColumnFactory;
+import org.jdesktop.swingx.table.DefaultTableColumnModelExt;
 import org.jdesktop.swingx.table.NumberEditorExt;
 import org.jdesktop.swingx.table.TableColumnExt;
 import org.jdesktop.test.AncientSwingTeam;
@@ -135,6 +137,246 @@ public class JXTableUnitTest extends InteractiveTestCase {
         super.tearDown();
     }
 
+//--------------------- sortable property
+    
+ // --------------- sortable property 
+    /**
+     * JXTable has responsibility to respect TableColumnExt
+     * sortable property.
+     * 
+     */
+    @Test
+    public void testSetSortOrderByIdentifierColumnNotSortable() {
+        JXTable table = new JXTable(sortableTableModel);
+        Object identifier = "Last Name";
+        TableColumnExt columnX = table.getColumnExt(identifier);
+        //  make column not sortable.
+        columnX.setSortable(false);
+        table.setSortOrder(identifier, SortOrder.ASCENDING);
+        assertEquals("unsortable column must be unsorted", SortOrder.UNSORTED, table.getSortOrder(identifier));
+    }
+
+    /**
+     * JXTable has responsibility to respect TableColumnExt
+     * sortable property.
+     * 
+     */
+    @Test
+    public void testToggleSortOrderByIdentifierColumnNotSortable() {
+        JXTable table = new JXTable(sortableTableModel);
+        Object identifier = "Last Name";
+        TableColumnExt columnX = table.getColumnExt(identifier);
+        // old way: make column not sortable.
+        columnX.setSortable(false);
+        table.toggleSortOrder(identifier);
+        assertEquals("unsortable column must be unsorted", SortOrder.UNSORTED, table.getSortOrder(identifier));
+    }
+
+
+    /**
+     * JXTable has responsibility to respect TableColumnExt
+     * sortable property.
+     * 
+     */
+    @Test
+    public void testSetSortOrderColumnNotSortable() {
+        JXTable table = new JXTable(sortableTableModel);
+        TableColumnExt columnX = table.getColumnExt(0);
+        // old way: make column not sortable.
+        columnX.setSortable(false);
+        table.setSortOrder(0, SortOrder.ASCENDING);
+        assertEquals("unsortable column must be unsorted", SortOrder.UNSORTED, table.getSortOrder(0));
+       
+    }
+
+    /**
+     * JXTable has responsibility to respect TableColumnExt
+     * sortable property.
+     * 
+     */
+    @Test
+    public void testToggleSortOrderColumnNotSortable() {
+        JXTable table = new JXTable(sortableTableModel);
+        TableColumnExt columnX = table.getColumnExt(0);
+        // old way: make column not sortable.
+        columnX.setSortable(false);
+        table.toggleSortOrder(0);
+        assertEquals("unsortable column must be unsorted", SortOrder.UNSORTED, table.getSortOrder(0));
+       
+    }
+   
+    /**
+     * not yet wired. 
+     */
+    @Test
+    public void testTableSortableSynchedToController() {
+        JXTable table = new JXTable();
+        table.setSortable(false);
+        assertEquals(table.isSortable(), table.getSortController().isSortable());
+    }
+    
+//----------------- table sort api
+/* NOTE: if applicable we test the api on columns which are not of type TableColumnExt
+ * Doing so because the pre-Mustang implementation worked on columns of extended type only.
+ *    
+ */
+
+    /**
+     * add api to access the sorted column.
+     *
+     */
+    @Test
+    public void testSortedColumn() {
+        JXTable table = createTableWithCoreColumns();
+        table.toggleSortOrder(1);
+        assertEquals(table.getColumn(1), table.getSortedColumn());
+        table.toggleSortOrder(2);
+        assertEquals(table.getColumn(2), table.getSortedColumn());
+    }
+
+    /**
+     * Create and return a table with core column type.
+     * 
+     * @return
+     */
+    private JXTable createTableWithCoreColumns() {
+        JXTable table = new JXTable();
+        table.setAutoCreateColumnsFromModel(false);
+        table.setModel(sortableTableModel);
+        TableColumnModel columnModel = new DefaultTableColumnModelExt();
+        for (int i = 0; i < sortableTableModel.getColumnCount(); i++) {
+            TableColumn column = new TableColumn(i);
+            column.setHeaderValue(sortableTableModel.getColumnName(i));
+            column.setIdentifier(sortableTableModel.getColumnName(i));
+            columnModel.addColumn(column);
+        }
+        table.setColumnModel(columnModel);
+        return table;
+    }
+    /**
+     * Unsetting sortOrder of one column must not remove sorts in other columns.
+     * 
+     * Previously we had single column sort only, so remove that single was same
+     * as reset all.
+     */
+    @Test
+    public void testSetUnsortedSortOrder() {
+        JXTable table = createTableWithCoreColumns();
+        // prepare: two columns sorted
+        table.setSortOrder(0, SortOrder.ASCENDING);
+        table.setSortOrder(1, SortOrder.ASCENDING);
+        assertEquals("sanity: really multiple columns sorted", 2, table.getRowSorter().getSortKeys().size());
+        // unsort primary sort column
+        table.setSortOrder(1, SortOrder.UNSORTED);
+        assertEquals("secondary sort column must still be sorted", SortOrder.ASCENDING, table.getSortOrder(0));
+    }
+    /**
+     * Unsetting sortOrder of one column must not remove sorts in other columns.
+     * 
+     * Previously we had single column sort only, so remove that single was same
+     * as reset all.
+     */
+    @Test
+    public void testSetUnsortedSortOrderByIdentifier() {
+        JXTable table = createTableWithCoreColumns();
+        // prepare: two columns sorted
+        table.setSortOrder("First Name", SortOrder.ASCENDING);
+        table.setSortOrder("Last Name", SortOrder.ASCENDING);
+        assertEquals("sanity: really multiple columns sorted", 2, table.getRowSorter().getSortKeys().size());
+        // unsort primary sort column
+        table.setSortOrder("Last Name",  SortOrder.UNSORTED);
+        assertEquals("secondary sort column must still be sorted", SortOrder.ASCENDING, table.getSortOrder("First Name"));
+    }
+    
+    /**
+     * Programmatic sorting of hidden column (through table api).
+     * 
+     */
+    @Test
+    public void testSetSortOrderHiddenColumn() {
+        // hidden only defined for TableColumnExt
+        JXTable table = new JXTable(sortableTableModel);
+        Object identifier = "Last Name";
+        TableColumnExt columnExt = table.getColumnExt(identifier);
+        columnExt.setVisible(false);
+        table.setSortOrder(identifier, SortOrder.ASCENDING);
+        assertEquals("sorted column must be at " + identifier, columnExt, table.getSortedColumn());
+        assertEquals("column must be sorted after setting sortOrder on " + identifier, SortOrder.ASCENDING, table.getSortOrder(identifier));
+    }
+    
+    
+
+    /**
+     * added xtable.setSortOrder(Object, SortOrder)
+     * 
+     */
+    @Test
+    public void testSetSortOrderByIdentifier() {
+        JXTable table = createTableWithCoreColumns();
+        Object identifier = "Last Name";
+        TableColumn columnExt = table.getColumn(identifier);
+        table.setSortOrder(identifier, SortOrder.ASCENDING);
+        assertEquals("sorted column must be at " + identifier, columnExt, table.getSortedColumn());
+        assertEquals("column must be sorted after setting sortOrder on " + identifier, SortOrder.ASCENDING, table.getSortOrder(identifier));
+    }
+
+    /**
+     * testing new sorter api: 
+     * getSortOrder(int), toggleSortOrder(int).
+     *
+     */
+    @Test
+    public void testToggleSortOrder() {
+        JXTable table = createTableWithCoreColumns();
+        assertSame(SortOrder.UNSORTED, table.getSortOrder(0));
+        table.toggleSortOrder(0);
+        assertSame(SortOrder.ASCENDING, table.getSortOrder(0));
+        // sanity: other columns uneffected
+        assertSame(SortOrder.UNSORTED, table.getSortOrder(1));
+        table.toggleSortOrder(0);
+        assertSame(SortOrder.DESCENDING, table.getSortOrder(0));
+        table.resetSortOrder();
+        assertSame(SortOrder.UNSORTED, table.getSortOrder(0));
+    }
+    
+
+    /**
+     * testing new sorter api: 
+     * toggleSortOrder(Object), resetSortOrder.
+     *
+     */
+    @Test
+    public void testToggleSortOrderByIdentifier() {
+        JXTable table = createTableWithCoreColumns();
+        Object firstColumn = "First Name";
+        Object secondColumn = "Last Name";
+        assertSame(SortOrder.UNSORTED, table.getSortOrder(secondColumn));
+        table.toggleSortOrder(firstColumn);
+        assertSame(SortOrder.ASCENDING, table.getSortOrder(firstColumn));
+        // sanity: other columns uneffected
+        assertSame(SortOrder.UNSORTED, table.getSortOrder(secondColumn));
+        table.toggleSortOrder(firstColumn);
+        assertSame(SortOrder.DESCENDING, table.getSortOrder(firstColumn));
+        table.resetSortOrder();
+        assertSame(SortOrder.UNSORTED, table.getSortOrder(firstColumn));
+    }
+
+    
+    /**
+     * added xtable.setSortOrder(int, SortOrder)
+     * 
+     */
+    @Test
+    public void testSetSortOrder() {
+        JXTable table = createTableWithCoreColumns();
+        int col = 0;
+        TableColumn columnExt = table.getColumn(col);
+        table.setSortOrder(col, SortOrder.ASCENDING);
+        assertEquals("sorted column must be at " + col, columnExt, table.getSortedColumn());
+        assertEquals("column must be sorted after setting sortOrder on " + col, SortOrder.ASCENDING, table.getSortOrder(col));
+    }
+
+// --------------------- SortController/RowSorter
     
     /**
      * Test that JXTable uses TableSortController by default.
@@ -143,8 +385,8 @@ public class JXTableUnitTest extends InteractiveTestCase {
     public void testSortController() {
         JXTable table = new JXTable();
         assertTrue("default sorter expected TableRowSorter, but was:" + table.getRowSorter(),
-                table.getRowSorter() instanceof TableSortController);
-//        assertEquals(table.getRowSorter(), table.getSortController());
+                table.getRowSorter() instanceof TableSortController<?>);
+        assertSame(table.getRowSorter(), table.getSortController());
     }
     /**
      * core issue: rowSorter replaced on setAutoCreateRowSorter even without change to flag.
@@ -211,7 +453,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
         JXTable table = new JXRTable();
         table.setModel(new AncientSwingTeam());
         assertTrue("table must install default rowSorter, but was: " + table.getRowSorter().getClass(), 
-                table.getRowSorter() instanceof XTableRowSorter);
+                table.getRowSorter() instanceof XTableRowSorter<?>);
         assertSame("default RowSorter must be configured with table model", 
                 table.getModel(), table.getRowSorter().getModel() );
     }
@@ -223,7 +465,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
     public void testCreateDefaultRowSorterOverridden() {
         JXTable table = new JXRTable();
         assertTrue("table must install default rowSorter, but was: " + table.getRowSorter().getClass(), 
-                table.getRowSorter() instanceof XTableRowSorter);
+                table.getRowSorter() instanceof XTableRowSorter<?>);
         assertSame("default RowSorter must be configured with table model", 
                 table.getModel(), table.getRowSorter().getModel() );
     }
@@ -231,7 +473,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
     public static class JXRTable extends JXTable {
         @Override
         protected RowSorter<? extends TableModel> createDefaultRowSorter() {
-            XTableRowSorter sorter = new XTableRowSorter();
+            XTableRowSorter<TableModel> sorter = new XTableRowSorter<TableModel>();
             sorter.setModel(getModel());
             return sorter;
         }
@@ -260,6 +502,143 @@ public class JXTableUnitTest extends InteractiveTestCase {
         JXTable table = new JXTable();
         assertEquals("table must have default auto-create rowsorter true", true, table.getAutoCreateRowSorter());
     }
+//------------------- ComponentAdapter
+    
+    /**
+     * Issue #??- ComponentAdapter's default implementation does not
+     *    return the value at the adapter's view state.
+     * 
+     * Clarified the documentation: the assumption for the base implementation
+     * is that model coordinates == view coordinates, that is it's up to 
+     * subclasses to implement the model correctly if they support different
+     * coordinate systems.
+     *
+     */
+    @Test
+    public void testComponentAdapterCoordinatesDocumentation() {
+        final JXTable table = new JXTable(createAscendingModel(0, 10));
+        Object originalFirstRowValue = table.getValueAt(0,0);
+        Object originalLastRowValue = table.getValueAt(table.getRowCount() - 1, 0);
+        assertEquals("view row coordinate equals model row coordinate", 
+                table.getModel().getValueAt(0, 0), originalFirstRowValue);
+        // sort first column - actually does not change anything order 
+        table.toggleSortOrder(0);
+        // sanity asssert
+        assertEquals("view order must be unchanged ", 
+                table.getValueAt(0, 0), originalFirstRowValue);
+        // invert sort
+        table.toggleSortOrder(0);
+        // sanity assert
+        assertEquals("view order must be reversed changed ", 
+                table.getValueAt(0, 0), originalLastRowValue);
+        ComponentAdapter adapter = new ComponentAdapter(table) {
+
+            @Override
+            public Object getColumnIdentifierAt(int columnIndex) {
+                // TODO Auto-generated method stub
+                return null;
+            }
+
+            @Override
+            public int getColumnIndex(Object identifier) {
+                // TODO Auto-generated method stub
+                return 0;
+            }
+
+            @Override
+            public String getColumnName(int columnIndex) {
+                return null;
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public Object getFilteredValueAt(int row, int column) {
+                return getValueAt(table.convertRowIndexToModel(row), column);
+            }
+
+            @Override
+            public Object getValueAt(int row, int column) {
+                return table.getModel().getValueAt(row, column);
+            }
+            
+            @Override
+            public Object getValue() {
+                return getValueAt(table.convertRowIndexToModel(row), viewToModel(column));
+            }
+
+            @Override
+            public boolean hasFocus() {
+                return false;
+            }
+
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+
+            @Override
+            public boolean isEditable() {
+                return false;
+            }
+            
+            @Override
+            public boolean isSelected() {
+                return false;
+            }
+        };
+        assertEquals("adapter filteredValue expects row view coordinates", 
+                table.getValueAt(0, 0), adapter.getFilteredValueAt(0, 0));
+        // adapter coordinates are view coordinates
+        adapter.row = 0;
+        adapter.column = 0;
+        assertEquals("adapter.getValue must return value at adapter coordinates", 
+                table.getValueAt(0, 0), adapter.getValue());
+        
+        assertEquals(adapter.getFilteredValueAt(0, adapter.getColumnCount() -1), 
+                adapter.getValue(adapter.getColumnCount()-1));
+        
+        
+    }
+    /**
+     * Test assumptions of accessing table model/view values through
+     * the table's componentAdapter.
+     * 
+     * PENDING JW: revisit - diff from above method?
+     */
+    @Test
+    public void testComponentAdapterCoordinates() {
+        JXTable table = new JXTable(createAscendingModel(0, 10));
+        Object originalFirstRowValue = table.getValueAt(0,0);
+        Object originalLastRowValue = table.getValueAt(table.getRowCount() - 1, 0);
+        assertEquals("view row coordinate equals model row coordinate", 
+                table.getModel().getValueAt(0, 0), originalFirstRowValue);
+        // sort first column - actually does not change anything order 
+        table.toggleSortOrder(0);
+        // sanity asssert
+        assertEquals("view order must be unchanged ", 
+                table.getValueAt(0, 0), originalFirstRowValue);
+        // invert sort
+        table.toggleSortOrder(0);
+        // sanity assert
+        assertEquals("view order must be reversed changed ", 
+                table.getValueAt(0, 0), originalLastRowValue);
+        ComponentAdapter adapter = table.getComponentAdapter();
+        assertEquals("adapter filteredValue expects row view coordinates", 
+                table.getValueAt(0, 0), adapter.getFilteredValueAt(0, 0));
+        // adapter coordinates are view coordinates
+        adapter.row = 0;
+        adapter.column = 0;
+        assertEquals("adapter.getValue must return value at adapter coordinates", 
+                table.getValueAt(0, 0), adapter.getValue());
+        assertEquals("adapter.getValue must return value at adapter coordinates", 
+                table.getValueAt(0, 0), adapter.getValue(0));
+    }
+
+
+//------------------ end of sort-related tests
+    
     /**
      * Issue #847-swingx: JXTable respect custom corner if columnControl not visible
      * 
