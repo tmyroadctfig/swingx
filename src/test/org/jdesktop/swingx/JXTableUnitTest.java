@@ -7,6 +7,8 @@
 
 package org.jdesktop.swingx;
 
+import static org.junit.Assert.*;
+
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -205,8 +207,9 @@ public class JXTableUnitTest extends InteractiveTestCase {
        
     }
    
+    
     /**
-     * not yet wired. 
+     * Setting table's sortable property updates controller.
      */
     @Test
     public void testTableSortableSynchedToController() {
@@ -220,7 +223,22 @@ public class JXTableUnitTest extends InteractiveTestCase {
  * Doing so because the pre-Mustang implementation worked on columns of extended type only.
  *    
  */
-
+    /**
+     * beware: test internals! While isSortable(Object) is no longer used internally, 
+     * subclasses still might, so need to work without throwing up. Which might have happened
+     * if the column is not of extended type.  
+     */
+    @Test
+    public void testSortableByIdentifier() {
+        JXTable table = createTableWithCoreColumns();
+        TableColumn column = table.getColumn(table.getColumnCount() -1);
+        Object id = column.getIdentifier();
+        // here we provoke a crash  (crazy core behaviour if id not found)
+        column.setIdentifier("changed: " + id);
+        // PENDING JW: what to return if no column found? current fallback is to 
+        // overall-sortable
+        assertEquals(table.getSortController().isSortable(), table.isSortable(id));
+    }
     /**
      * add api to access the sorted column.
      *
