@@ -1940,7 +1940,8 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
     }
 
     /**
-     * Returns the primary sort column, or null if nothing sorted.
+     * Returns the primary sort column, or null if nothing sorted or no sortKey
+     *   corresponds to a TableColumn currently contained in the TableColumnModel.
      * 
      * @return the currently interactively sorted TableColumn or null if there
      *         is not sorter active or if the sorted column index does not
@@ -1969,33 +1970,6 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
             }
         }
         return null;
-    }
-
-    /**
-     * overridden to remove the interactive sorter if the sorted column is no
-     * longer contained in the ColumnModel.
-     */
-    @Override
-    public void columnRemoved(TableColumnModelEvent e) {
-        // JW - old problem: need access to removed column
-        // to get hold of removed modelIndex
-        // to remove interactive sorter if any
-        // no way
-        // int modelIndex = convertColumnIndexToModel(e.getFromIndex());
-        updateSorterAfterColumnRemoved();
-        super.columnRemoved(e);
-    }
-
-    /**
-     * guarantee that the interactive sorter is removed if its column is
-     * removed.
-     * 
-     */
-    private void updateSorterAfterColumnRemoved() {
-        TableColumn sortedColumn = getSortedColumn();
-        if (sortedColumn == null) {
-            resetSortOrder();
-        }
     }
 
     // ----------------- enhanced column support: delegation to TableColumnModel
