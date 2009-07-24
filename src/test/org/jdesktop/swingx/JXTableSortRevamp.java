@@ -34,6 +34,7 @@ import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.SortOrder;
 import javax.swing.UIManager;
+import javax.swing.RowSorter.SortKey;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
@@ -121,7 +122,8 @@ public class JXTableSortRevamp extends InteractiveTestCase {
     }
     
 
-//--------------- expected to pass if getSortController wired to RowSorter.
+//--------------- open for decision
+
 
     
 ///------------------------ still failing    
@@ -228,18 +230,6 @@ public class JXTableSortRevamp extends InteractiveTestCase {
     }
 
 
-    /**
-     * Issue #232-swingx: selection not kept if selectionModel had been changed.
-     *
-     */
-    @Test
-    public void testSelectionMapperUpdatedOnSelectionModelChange() {
-        fail("JXTable - swingx filtering/sorting disabled");
-        JXTable table = new JXTable();
-        ListSelectionModel model = new DefaultListSelectionModel();
-        table.setSelectionModel(model);
-//        assertEquals(model, table.getSelectionMapper().getViewSelectionModel());
-    }
 
     /**
      * 
@@ -330,88 +320,6 @@ public class JXTableSortRevamp extends InteractiveTestCase {
         assertTrue("view index visible", viewRow >= 0);
         table.setRowSelectionInterval(viewRow, viewRow);
     }
-    /**
-     * 
-     * Issue #172-swingx. 
-     * 
-     * 
-     * reported exception if row removed (Ray, at the end of)
-     * http://www.javadesktop.org/forums/thread.jspa?messageID=117814
-     *
-     */
-    @Test
-    public void testSelectionAndRemoveRowOfMisbehavingModel() {
-        fail("JXTable - swingx filtering/sorting disabled");
-        DefaultTableModel model = new DefaultTableModel(10, 2) {
-
-            @Override
-            public void fireTableRowsDeleted(int firstRow, int lastRow) {
-                fireTableStructureChanged();
-            }
-            
-            
-        };
-        for (int i = 0; i < model.getRowCount(); i++) {
-            model.setValueAt(i, i, 0);
-        }
-        JXTable table = new JXTable(model);
-        int modelRow = table.getRowCount() - 1;
-        table.toggleSortOrder(0);
-        // set a selection near the end - will be invalid after filtering
-        table.setRowSelectionInterval(modelRow, modelRow);
-        model.removeRow(modelRow);
-        int lastRow = table.getModel().getRowCount() - 1;
-        int viewRow = table.convertRowIndexToView(lastRow);
-        assertTrue("view index visible", viewRow >= 0);
-        table.setRowSelectionInterval(viewRow, viewRow);
-    }
-
-
-    
-    /**
-     * 
-     * Issue #172-swingx. 
-     * 
-     * 
-     * reported exception if row removed (Ray, at the end of)
-     * http://www.javadesktop.org/forums/thread.jspa?messageID=117814
-     *
-     */
-    @Test
-    public void testSelectionAndRemoveRowOfMisbehavingModelRay() {
-        fail("JXTable - swingx filtering/sorting disabled");
-        DefaultTableModel model = new DefaultTableModel(10, 2) {
-
-            @Override
-            public void fireTableRowsDeleted(int firstRow, int lastRow) {
-                fireTableStructureChanged();
-            }
-            
-            
-        };
-        for (int i = 0; i < model.getRowCount(); i++) {
-            model.setValueAt(i, i, 0);
-        }
-        JXTable table = new JXTable(model);
-        int modelRow = table.getRowCount() - 1;
-//        Filter[] filters = new Filter[] {new ShuttleSorter(0, true)};
-//        FilterPipeline filterPipe = new FilterPipeline(filters);
-//        table.setFilters(filterPipe);        
-        // set a selection near the end - will be invalid after filtering
-        table.setRowSelectionInterval(modelRow, modelRow);
-        model.removeRow(modelRow);
-        int lastRow = table.getModel().getRowCount() - 1;
-        int viewRow = table.convertRowIndexToView(lastRow);
-        // JW: here's the problem - the anchor of the selectionModel is not updated correctly
-        // after removing the last model row
-        // not longer valid (as of 50u6)
-//        assertEquals("anchor must be last", lastRow, table.getSelectionModel().getAnchorSelectionIndex());
-        assertTrue("view index visible", viewRow >= 0);
-        assertEquals("view index is last", viewRow, lastRow);
-        table.setRowSelectionInterval(viewRow, viewRow);
-    }
-
-
 
     /**
      * Issue #167-swingx: table looses individual row height 
@@ -444,166 +352,6 @@ public class JXTableSortRevamp extends InteractiveTestCase {
     }
     
 
-    @Test
-    public void testIndividualRowHeight() {
-        fail("JXTable - swingx filtering/sorting disabled");
-        JXTable table = new JXTable(createAscendingModel(0, 10));
-        table.setRowHeight(0, 25);
-        assertEquals(25, table.getRowHeight(0));
-        assertEquals(table.getRowHeight(), table.getRowHeight(1));
-//        table.getFilters().getSortController().setSortKeys
-//            (Collections.singletonList(
-//                new SortKey(SortOrder.DESCENDING, 0)));
-        assertEquals(table.getRowHeight(), table.getRowHeight(1));
-        assertEquals(25, table.getRowHeight(table.getRowCount() - 1));
-        table.setRowHeight(table.getRowHeight());
-        assertEquals(table.getRowHeight(), table.getRowHeight(table.getRowCount() - 1));
-    }
-    
-
-    @Test
-    public void testResetIndividualRowHeight() {
-        fail("JXTable - swingx filtering/sorting disabled");
-        JXTable table = new JXTable(createAscendingModel(0, 10));
-        table.setRowHeight(0, 25);
-//        table.getFilters().getSortController().setSortKeys
-//            (Collections.singletonList(
-//                new SortKey(SortOrder.DESCENDING, 0)));
-//        assertEquals("individual row height must be moved to last row", 
-//                25, table.getRowHeight(table.getRowCount() - 1));
-        // reset
-        table.setRowHeight(table.getRowHeight());
-        assertEquals("individual row height must be reset", 
-                table.getRowHeight(), table.getRowHeight(table.getRowCount() - 1));
-    }
-    /**
-     * Issue #64-swingx: setFilters(null) throws NPE if has selection.
-     *
-     */
-    @Test
-    public void testSetNullFilters() {
-        fail("JXTable - swingx filtering/sorting disabled");
-        JXTable table = new JXTable(sortableTableModel);
-        table.setRowSelectionInterval(0, 0);
-//        table.setFilters(null);
-        assertEquals("selected row must be unchanged", 0, table.getSelectedRow());
-    }
-
-    /**
-     * Issue #119: Exception if sorter on last column and setting
-     * model with fewer columns.
-     * 
-     * JW: related to #53-swingx - sorter not removed on column removed. 
-     * 
-     * PatternFilter does not throw - checks with modelToView if the 
-     * column is visible and returns false match if not. Hmm...
-     * 
-     * 
-     */
-    @Test
-    public void testFilterInChainOnModelChange() {
-        fail("JXTable - swingx filtering/sorting disabled");
-        JXTable table = new JXTable(createAscendingModel(0, 10, 5, true));
-        int columnCount = table.getColumnCount();
-        assertEquals(5, columnCount);
-//        Filter filter = new PatternFilter(".*", 0, columnCount - 1);
-//        FilterPipeline pipeline = new FilterPipeline(new Filter[] {filter});
-//        table.setFilters(pipeline);
-//        assertEquals(10, pipeline.getOutputSize());
-//        table.setModel(new DefaultTableModel(10, columnCount - 1));
-    }
-    
-    /**
-     * Issue #119: Exception if sorter on last column and setting
-     * model with fewer columns.
-     * 
-     * 
-     * JW: related to #53-swingx - sorter not removed on column removed. 
-     * 
-     * Similar if sorter in filter pipeline -- absolutely need mutable
-     * pipeline!!
-     * Filed the latter part as Issue #55-swingx 
-     *
-     */
-    @Test
-    public void testSorterInChainOnModelChange() {
-        fail("JXTable - swingx filtering/sorting disabled");
-        JXTable table = new JXTable(new DefaultTableModel(10, 5));
-        int columnCount = table.getColumnCount();
-//        Sorter sorter = new ShuttleSorter(columnCount - 1, false);
-//        FilterPipeline pipeline = new FilterPipeline(new Filter[] {sorter});
-//        table.setFilters(pipeline);
-        table.setModel(new DefaultTableModel(10, columnCount - 1));
-    }
-    
-
-    /**
-     * Issue #119: Exception if sorter on last column and setting
-     * model with fewer columns.
-     * 
-     * JW: related to #53-swingx - sorter not removed on column removed. 
-     *
-     */
-    @Test
-    public void testInteractiveSorterOnModelChange() {
-        fail("JXTable - swingx filtering/sorting disabled");
-        JXTable table = new JXTable(sortableTableModel);
-        int columnCount = table.getColumnCount();
-        table.toggleSortOrder(columnCount - 1);
-        table.setModel(new DefaultTableModel(10, columnCount - 1));
-//        assertTrue(table.getFilters().getSortController().getSortKeys().isEmpty());
-    }
-    
-
-    /**
-     * Issue #53-swingx: interactive sorter not removed if column removed.
-     *
-     */
-    @Test
-    public void testSorterAfterColumnRemoved() {
-        fail("JXTable - swingx filtering/sorting disabled");
-        JXTable table = new JXTable(sortableTableModel);
-        TableColumnExt columnX = table.getColumnExt(0);
-        table.toggleSortOrder(0);
-        table.removeColumn(columnX);
-//        assertTrue("sorter must be removed when column removed", 
-//                table.getFilters().getSortController().getSortKeys().isEmpty());
-        
-    }
-    
-    /**
-     * interactive sorter must be active if column is hidden.
-     * THINK: no longer valid... check sortkeys instead?
-     */
-    @Test
-    public void testSorterAfterColumnHidden() {
-        fail("JXTable - swingx filtering/sorting disabled");
-        JXTable table = new JXTable(sortableTableModel);
-        TableColumnExt columnX = table.getColumnExt(0);
-        table.toggleSortOrder(0);
-//        List<? extends SortKey> sortKeys = table.getFilters().getSortController().getSortKeys();
-//        columnX.setVisible(false);
-//        assertEquals("interactive sorter must be same as sorter in column", 
-//                sortKeys, table.getFilters().getSortController().getSortKeys());
-    }
-    
-    /**
-     * Issue #54: hidden columns not removed on setModel.
-     *
-     */
-    @Test
-    public void testRemoveAllColumsAfterModelChanged() {
-        fail("JXTable - swingx filtering/sorting disabled");
-        JXTable table = new JXTable(sortableTableModel);
-        TableColumnExt columnX = table.getColumnExt(0);
-        columnX.setVisible(false);
-        table.setModel(new DefaultTableModel());
-        assertEquals("all columns must have been removed", 0, table.getColumnCount(true));
-        assertEquals("all columns must have been removed", 
-                table.getColumnCount(), table.getColumnCount(true));
-//        assertTrue("sorter must be removed when column removed",
-//                table.getFilters().getSortController().getSortKeys().isEmpty());
-    }
     /**
      * Issue #187: filter update removes interactive sorter.
      *

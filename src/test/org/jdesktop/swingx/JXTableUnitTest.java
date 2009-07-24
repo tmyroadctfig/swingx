@@ -41,6 +41,7 @@ import javax.swing.RowSorter;
 import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import javax.swing.RowSorter.SortKey;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -138,7 +139,58 @@ public class JXTableUnitTest extends InteractiveTestCase {
         super.tearDown();
     }
 
-//--------------------- sortable property
+//--------------------- sort state on modifications
+    
+    /**
+     * For comparison ...
+     * 
+     * Issue #1132-swingx: JXTable - define and implement behaviour on remove column
+     */
+    @Test
+    public void testSortStateAfterRemoveColumn() {
+        JTable table = new JTable();
+        table.setAutoCreateRowSorter(true);
+        table.setModel(new AncientSwingTeam());
+        table.getRowSorter().toggleSortOrder(0);
+        List<? extends SortKey> sortKeys = table.getRowSorter().getSortKeys();
+        table.removeColumn(table.getColumnModel().getColumn(0));
+        assertEquals(sortKeys, table.getRowSorter().getSortKeys());
+    }
+
+    /**
+     * 
+     * Issue #1132-swingx: JXTable - define and implement behaviour on remove column
+     * 
+     * was: Issue #53-swingx: interactive sorter not removed if column removed.
+     *
+     */
+    @Test
+    public void testSorterAfterColumnRemoved() {
+        JXTable table = new JXTable(sortableTableModel);
+        TableColumnExt columnX = table.getColumnExt(0);
+        table.toggleSortOrder(0);
+        table.removeColumn(columnX);
+        // this is trivially true, as only contained columns are found ....
+        assertNull("sorter must be removed when column removed", 
+                table.getSortedColumn());
+        // check the sort keys instead
+        assertEquals("consistency with core: sortKeys untouched after remove column", 
+                1, table.getRowSorter().getSortKeys().size());
+    }
+    
+    /**
+     * Interactive sorter must be active if column is hidden.
+     */
+    @Test
+    public void testSorterAfterColumnHidden() {
+        JXTable table = new JXTable(sortableTableModel);
+        TableColumnExt columnX = table.getColumnExt(0);
+        table.toggleSortOrder(0);
+        columnX.setVisible(false);
+        assertEquals("interactive sorter must be same as sorter in column", 
+                columnX, table.getSortedColumn());
+    }
+    
     
  // --------------- sortable property 
 
@@ -676,6 +728,8 @@ public class JXTableUnitTest extends InteractiveTestCase {
 
 
 //------------------ end of sort-related tests
+
+    
     
     /**
      * Issue #847-swingx: JXTable respect custom corner if columnControl not visible
@@ -2590,6 +2644,21 @@ public class JXTableUnitTest extends InteractiveTestCase {
         adapter.row = 0;
         adapter.column = 0;
         highlighter.highlight(new JLabel(), adapter);
+    }
+    
+    /**
+     * Issue #54: hidden columns not removed on setModel.
+     *
+     */
+    @Test
+    public void testRemoveAllColumsAfterModelChanged() {
+        JXTable table = new JXTable(sortableTableModel);
+        TableColumnExt columnX = table.getColumnExt(0);
+        columnX.setVisible(false);
+        table.setModel(new DefaultTableModel());
+        assertEquals("all columns must have been removed", 0, table.getColumnCount(true));
+        assertEquals("all columns must have been removed", 
+                table.getColumnCount(), table.getColumnCount(true));
     }
     
 
