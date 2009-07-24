@@ -1655,7 +1655,10 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
      * regardless of each column's individual <code>sorting</code> property. The
      * default is <code>true</code>. <p>
      * 
-     * Note: as of post-1.0 this property is propagated to the SortController. 
+     * <b>Note</b>: as of post-1.0 this property is propagated to the SortController. 
+     * Whether or not a change triggers a re-sort is up to either the concrete controller 
+     * implementation (the default doesn't) or client code. This behaviour is
+     * different from old SwingX style sorting.
      * 
      * @see TableColumnExt#isSortable()
      * @param sortable boolean indicating whether or not this table supports
@@ -2267,7 +2270,13 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
 
     /**
      * Synch's the SortController column sortable property to the new value, if 
-     * available. Does nothing if there is no SortController.
+     * available. Does nothing if there is no SortController. This method is
+     * called on sortable property change notification from the ext column model. <p>
+     * 
+     * <b>Note</b>: as of post-1.0 a column's property is propagated to the SortController. 
+     * Whether or not a change triggers a re-sort is up to either the concrete controller 
+     * implementation (the default doesn't) or client code. This behaviour is
+     * different from old SwingX style sorting.
      * 
      * @param column the <code>TableColumn</code> which sent the change
      *        notifcation
