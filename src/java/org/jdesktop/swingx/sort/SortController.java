@@ -21,6 +21,8 @@
 
 package org.jdesktop.swingx.sort;
 
+import java.util.Comparator;
+
 import javax.swing.SortOrder;
 
 /**
@@ -113,6 +115,31 @@ public interface SortController {
      */
     boolean isSortable(int column);
 
+    /**
+     * Sets the <code>Comparator</code> to use when sorting the specified
+     * column.  This does not trigger a sort.  If you want to sort after
+     * setting the comparator you need to explicitly invoke <code>sort</code>.
+     *
+     * @param column the index of the column the <code>Comparator</code> is
+     *        to be used for, in terms of the underlying model
+     * @param comparator the <code>Comparator</code> to use
+     * @throws IndexOutOfBoundsException if <code>column</code> is outside
+     *         the range of the underlying model
+     */
+    public void setComparator(int column, Comparator<?> comparator);
+
+    /**
+     * Returns the <code>Comparator</code> for the specified 
+     * column.  This will return <code>null</code> if a <code>Comparator</code>
+     * has not been specified for the column.
+     *
+     * @param column the column to fetch the <code>Comparator</code> for, in
+     *        terms of the underlying model
+     * @return the <code>Comparator</code> for the specified column
+     * @throws IndexOutOfBoundsException if column is outside
+     *         the range of the underlying model
+     */
+    public Comparator<?> getComparator(int column);
     
     /**
      * Reverses the sort order of the specified column. The exact behaviour is

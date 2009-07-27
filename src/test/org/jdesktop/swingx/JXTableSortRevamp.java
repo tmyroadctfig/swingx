@@ -21,8 +21,6 @@
  */
 package org.jdesktop.swingx;
 
-import static org.junit.Assert.*;
-
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.text.Collator;
@@ -31,12 +29,10 @@ import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.JTable;
 import javax.swing.SortOrder;
 import javax.swing.UIManager;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.event.TableModelEvent;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
@@ -48,15 +44,10 @@ import org.jdesktop.swingx.decorator.ComponentAdapterTest.JXTableT;
 import org.jdesktop.swingx.renderer.DefaultTableRenderer;
 import org.jdesktop.swingx.renderer.StringValue;
 import org.jdesktop.swingx.renderer.StringValues;
-import org.jdesktop.swingx.sort.SortController;
 import org.jdesktop.swingx.sort.TableSortController;
-import org.jdesktop.swingx.sort.TableSortControllerTest;
-import org.jdesktop.swingx.table.ColumnFactory;
 import org.jdesktop.swingx.table.TableColumnExt;
 import org.jdesktop.swingx.treetable.FileSystemModel;
 import org.jdesktop.test.AncientSwingTeam;
-import org.jdesktop.test.PropertyChangeReport;
-import org.jdesktop.test.TestUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -129,43 +120,6 @@ public class JXTableSortRevamp extends InteractiveTestCase {
 //--------------- current re-introduce
 
     
-    
-    /**
-     * JXTable has responsibility to guarantee usage of 
-     * TableColumnExt comparator.
-     * 
-     */
-    @Test
-    public void testComparatorToPipeline() {
-        fail("comparator not yet propagated from column to sorter");
-        JXTable table = new JXTable(new AncientSwingTeam());
-        TableColumnExt columnX = table.getColumnExt(0);
-        columnX.setComparator(Collator.getInstance());
-        table.toggleSortOrder(0);
-//        SortKey sortKey = SortKey.getFirstSortKeyForColumn(table.getFilters().getSortController().getSortKeys(), 0);
-//        assertNotNull(sortKey);
-//        assertEquals(columnX.getComparator(), sortKey.getComparator());
-    }
-
-    /**
-     * JXTable has responsibility to guarantee usage of 
-     * TableColumnExt comparator and update the sort if
-     * the columns comparator changes.
-     * 
-     */
-    public void testComparatorToPipelineDynamic() {
-        JXTable table = new JXTable(new AncientSwingTeam());
-        TableColumnExt columnX = table.getColumnExt(0);
-        columnX.setComparator(Collator.getInstance());
-        // invalid assumption .. only the comparator must be used.
-//        assertEquals("interactive sorter must be same as sorter in column", 
-//                columnX.getSorter(), table.getFilters().getSorter());
-//        SortKey sortKey = SortKey.getFirstSortKeyForColumn(table.getFilters().getSortController().getSortKeys(), 0);
-//        assertNotNull(sortKey);
-//        assertEquals(columnX.getComparator(), sortKey.getComparator());
-       
-    }
-
     
 ///------------------------ still failing    
     /**

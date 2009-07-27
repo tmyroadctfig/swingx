@@ -36,6 +36,7 @@ import java.awt.print.PrinterException;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.EventObject;
@@ -1606,6 +1607,9 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
             getSortController().setSortable(modelIndex, 
                     tableColumn instanceof TableColumnExt ? 
                             ((TableColumnExt) tableColumn).isSortable() : true);
+            getSortController().setComparator(modelIndex, 
+                    tableColumn instanceof TableColumnExt ? 
+                            ((TableColumnExt) tableColumn).getComparator() : null);
         }
     }
 
@@ -2055,6 +2059,7 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
         if (ignoreAddColumn) return;
         TableColumn column = getColumn(e.getToIndex());
         updateSortableAfterColumnChanged(column, column instanceof TableColumnExt ? ((TableColumnExt) column).isSortable() : true);
+        updateComparatorAfterColumnChanged(column, column instanceof TableColumnExt ? ((TableColumnExt) column).getComparator() : null);
     }
 
 
@@ -2293,6 +2298,9 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
         } else if (event.getPropertyName().equals("sortable")) {
             updateSortableAfterColumnChanged((TableColumn) event.getSource(),
                     (Boolean) event.getNewValue());
+        } else if (event.getPropertyName().equals("comparator")) {
+            updateComparatorAfterColumnChanged((TableColumn) event.getSource(),
+                    (Comparator<?>) event.getNewValue());
         } else if (event.getPropertyName().startsWith("highlighter")) {
             if (event.getSource() instanceof TableColumnExt
                     && getRowCount() > 0) {
@@ -2346,6 +2354,26 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
             boolean sortable) {
         if (getSortController() == null) return;
         getSortController().setSortable(column.getModelIndex(), sortable);
+    }
+    
+    /**
+     * Synch's the SortController column comparator property to the new value, if 
+     * available. Does nothing if there is no SortController. This method is
+     * called on comparator property change notification from the ext column model. <p>
+     * 
+     * <b>Note</b>: as of post-1.0 a column's property is propagated to the SortController. 
+     * Whether or not a change triggers a re-sort is up to either the concrete controller 
+     * implementation (the default doesn't) or client code. This behaviour is
+     * different from old SwingX style sorting.
+     * 
+     * @param column the <code>TableColumn</code> which sent the change
+     *        notifcation
+     * @param sortable the new value of the column's sortable property
+     */
+    private void updateComparatorAfterColumnChanged(TableColumn column,
+            Comparator<?> comparator) {
+        if (getSortController() == null) return;
+        getSortController().setComparator(column.getModelIndex(), comparator);
     }
 
     // -------------------------- ColumnFactory
