@@ -23,7 +23,6 @@ package org.jdesktop.swingx;
 
 import java.awt.Color;
 import java.awt.event.ActionEvent;
-import java.text.Collator;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,8 +43,6 @@ import org.jdesktop.swingx.decorator.ComponentAdapterTest.JXTableT;
 import org.jdesktop.swingx.renderer.DefaultTableRenderer;
 import org.jdesktop.swingx.renderer.StringValue;
 import org.jdesktop.swingx.renderer.StringValues;
-import org.jdesktop.swingx.sort.TableSortController;
-import org.jdesktop.swingx.table.TableColumnExt;
 import org.jdesktop.swingx.treetable.FileSystemModel;
 import org.jdesktop.test.AncientSwingTeam;
 import org.junit.After;
@@ -117,6 +114,28 @@ public class JXTableSortRevamp extends InteractiveTestCase {
     }
     
     
+    public void interactiveSortKeys() {
+        final JXTable table = new JXTable(new AncientSwingTeam());
+        JXFrame frame = wrapWithScrollingInFrame(table, "sort cycles");
+        Action three = new AbstractAction("three-cylce") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                table.getSortController().setSortOrderCycle(SortOrder.ASCENDING, SortOrder.DESCENDING, SortOrder.UNSORTED);
+            }
+        };
+        addAction(frame, three);
+        Action two = new AbstractAction("two-cylce") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                table.getSortController().setSortOrderCycle(SortOrder.ASCENDING, SortOrder.DESCENDING);
+            }
+        };
+        addAction(frame, two);
+        show(frame);
+    }
+
 //--------------- current re-introduce
 
     
