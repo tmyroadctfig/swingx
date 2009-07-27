@@ -139,6 +139,75 @@ public class JXTableUnitTest extends InteractiveTestCase {
         super.tearDown();
     }
 
+    
+  //-------------- sortsOnUpdates 
+
+
+    /**
+     * Issue #1122-swingx: re-introduce JXTable sort api.
+     * 
+     * Test sortsOnUpdate property.
+     * Here: initial is true, bare property.
+     */
+    @Test
+    public void testSortsOnUpdateToSorterInSettingProperty() {
+        JXTable table = new JXTable();
+        table.setSortsOnUpdates(false);
+        assertEquals("property propagated to controller", false, table.getSortController().getSortsOnUpdates());
+    }
+    
+    /**
+     * Issue #1122-swingx: re-introduce JXTable sort api.
+     * Test sortsOnUpdate property.
+     * Here: initial is true, bare property.
+     */
+    @Test
+    public void testSortsOnUpdateToSorterInSettingSorter() {
+        JXTable table = new JXTable();
+        table.setSortsOnUpdates(false);
+        table.setRowSorter(new TableSortController<TableModel>(table.getModel()));
+        assertEquals("property propagated to controller", false, table.getSortController().getSortsOnUpdates());
+    }
+    
+    /**
+     * Issue #1122-swingx: re-introduce JXTable sort api.
+     * Test sortsOnUpdate property.
+     * Here: test change notification.
+     */
+    @Test
+    public void testSortsOnUpdateChangeNotification() {
+        JXTable table = new JXTable();
+        // remove sorter to get bare property
+        table.setRowSorter(null);
+        PropertyChangeReport report = new PropertyChangeReport(table);
+        table.setSortsOnUpdates(false);
+        TestUtils.assertPropertyChangeEvent(report, "sortsOnUpdates", true, false);
+    }
+    /**
+     * Issue #1122-swingx: re-introduce JXTable sort api.
+     * Test sortsOnUpdate property.
+     * Here: initial is true, bare property.
+     */
+    @Test
+    public void testSortsOnUpdateInitialTrueBare() {
+        JXTable table = new JXTable();
+        // remove sorter to get bare property
+        table.setRowSorter(null);
+        assertEquals("initial sortsOnUpdate", true, table.getSortsOnUpdates());
+    }
+    /**
+     * Issue #1122-swingx: re-introduce JXTable sort api.
+     * Test sortsOnUpdate property.
+     * 
+     * Here: initial is true, bare taken from sortController.
+     */
+    @Test
+    public void testSortsOnUpdateInitialTrue() {
+        JXTable table = new JXTable();
+        assertEquals("initial sortsOnUpdate", true, table.getSortsOnUpdates());
+    }
+    
+    
 //--------------------- sort state on modifications
     
     /**

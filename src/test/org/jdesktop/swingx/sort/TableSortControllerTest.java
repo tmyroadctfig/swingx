@@ -21,6 +21,8 @@
  */
 package org.jdesktop.swingx.sort;
 
+import static org.junit.Assert.*;
+
 import java.util.List;
 
 import javax.swing.SortOrder;
@@ -45,6 +47,14 @@ public class TableSortControllerTest extends InteractiveTestCase {
     private TableModel teamModel;
     private TableSortController<TableModel> controller;
 
+    /**
+     * Test that sortsOnUpdate property is true by default. 
+     * That's different from core (which is false)
+     */
+    @Test
+    public void testSortsOnUpdateDefault() {
+       assertEquals("sortsOnUpdates must be true by default", true, controller.getSortsOnUpdates()); 
+    }
     /**
      * Test that toggle sort order has no effect if column not sortable.
      */

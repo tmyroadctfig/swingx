@@ -461,11 +461,13 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
     private boolean editable;
 
     private Dimension calculatedPrefScrollableViewportSize;
-
+    /** flag to indicate whether the rowSorter is auto-created. */
     private boolean autoCreateRowSorter;
-
+    /** flag to indicate whether model update events should trigger resorts. */
+    private boolean sortsOnUpdates;
     /** flag to indicate that it's unsafe to update sortable-related sorter properties. */
     private boolean ignoreAddColumn;
+    
 
     /** Instantiates a JXTable with a default table model, no data. */
     public JXTable() {
@@ -547,6 +549,7 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
         putClientProperty(USE_DTCR_COLORMEMORY_HACK, Boolean.TRUE);
         setEditable(true);
         setAutoCreateRowSorter(true);
+        setSortsOnUpdates(true);
         // PENDING JW: how to relate to auto-createRowSorter?
         setSortable(true);
         setRolloverEnabled(true);
@@ -1450,8 +1453,8 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
     public boolean isCellEditable(int row, int column) {
         if (!isEditable())
             return false;
-        boolean editable = getModel().isCellEditable(
-                convertRowIndexToModel(row), convertColumnIndexToModel(column));
+        boolean editable = super.isCellEditable(row, column);
+//                convertRowIndexToModel(row), convertColumnIndexToModel(column));
         if (editable) {
             TableColumnExt tableColumn = getColumnExt(column);
             if (tableColumn != null) {
@@ -1593,7 +1596,10 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
         // need to hack: if a structureChange is the result of a setModel
         // the rowsorter is not yet updated
         if (ignoreAddColumn || (getSortController() == null))  return;
+        // configure from table properties
         getSortController().setSortable(sortable);
+        getSortController().setSortsOnUpdates(sortsOnUpdates);
+        // configure from column properties
         List<TableColumn> columns = getColumns(true);
         for (TableColumn tableColumn : columns) {
             int modelIndex = tableColumn.getModelIndex();
@@ -1618,23 +1624,6 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
         return new TableSortController<TableModel>(getModel());
     }
 
-    /**
-     * Returns a boolean to indicate whether the table should be resorted after
-     * receiving the given event. This implementation returns true always.
-     * <p>
-     * 
-     * NOTE: this is a quick hack to give subclasses a hook to experiment with
-     * conditional keeping the view unsorted, f.i. after edits. It's untested
-     * ... and will not receive much work because in Mustang the
-     * DefaultRowSorter has the functionality.
-     * 
-     * @param e the event which might trigger a resort.
-     * @return a boolean indicating whether the event should trigger a re-sort,
-     *         here true always.
-     */
-    protected boolean shouldSortOnChange(TableModelEvent e) {
-        return true;
-    }
 
 
     /**
@@ -1737,6 +1726,33 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
         return getSortController() != null ? getSortController().isSortable() : sortable;
     }
 
+    /**
+     * If true, specifies that a sort should happen when the underlying
+     * model is updated (<code>rowsUpdated</code> is invoked).  For
+     * example, if this is true and the user edits an entry the
+     * location of that item in the view may change.  The default is
+     * true.
+     *
+     * @param sortsOnUpdates whether or not to sort on update events
+     */
+    public void setSortsOnUpdates(boolean sortsOnUpdates) {
+        boolean old = getSortsOnUpdates();
+        this.sortsOnUpdates = sortsOnUpdates;
+        if (getSortController() != null) {
+            getSortController().setSortsOnUpdates(sortsOnUpdates);
+        }
+        firePropertyChange("sortsOnUpdates", old, getSortsOnUpdates());
+    }
+    
+    /**
+     * Returns true if  a sort should happen when the underlying
+     * model is updated; otherwise, returns false.
+     *
+     * @return whether or not to sort when the model is updated
+     */
+    public boolean getSortsOnUpdates() {
+        return getSortController() != null ? getSortController().getSortsOnUpdates() : sortsOnUpdates;
+    }
     /**
      * Resets sorting of all columns.
      * Delegates to the SortController if available, or does nothing if not.<p>

@@ -21,6 +21,8 @@
  */
 package org.jdesktop.swingx;
 
+import static org.junit.Assert.*;
+
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.text.Collator;
@@ -47,10 +49,14 @@ import org.jdesktop.swingx.renderer.DefaultTableRenderer;
 import org.jdesktop.swingx.renderer.StringValue;
 import org.jdesktop.swingx.renderer.StringValues;
 import org.jdesktop.swingx.sort.SortController;
+import org.jdesktop.swingx.sort.TableSortController;
+import org.jdesktop.swingx.sort.TableSortControllerTest;
 import org.jdesktop.swingx.table.ColumnFactory;
 import org.jdesktop.swingx.table.TableColumnExt;
 import org.jdesktop.swingx.treetable.FileSystemModel;
 import org.jdesktop.test.AncientSwingTeam;
+import org.jdesktop.test.PropertyChangeReport;
+import org.jdesktop.test.TestUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -119,8 +125,7 @@ public class JXTableSortRevamp extends InteractiveTestCase {
         }
     }
     
-//-------------- sortable continued
-
+    
 //--------------- current re-introduce
 
     
@@ -142,6 +147,24 @@ public class JXTableSortRevamp extends InteractiveTestCase {
 //        assertEquals(columnX.getComparator(), sortKey.getComparator());
     }
 
+    /**
+     * JXTable has responsibility to guarantee usage of 
+     * TableColumnExt comparator and update the sort if
+     * the columns comparator changes.
+     * 
+     */
+    public void testComparatorToPipelineDynamic() {
+        JXTable table = new JXTable(new AncientSwingTeam());
+        TableColumnExt columnX = table.getColumnExt(0);
+        columnX.setComparator(Collator.getInstance());
+        // invalid assumption .. only the comparator must be used.
+//        assertEquals("interactive sorter must be same as sorter in column", 
+//                columnX.getSorter(), table.getFilters().getSorter());
+//        SortKey sortKey = SortKey.getFirstSortKeyForColumn(table.getFilters().getSortController().getSortKeys(), 0);
+//        assertNotNull(sortKey);
+//        assertEquals(columnX.getComparator(), sortKey.getComparator());
+       
+    }
 
     
 ///------------------------ still failing    
@@ -402,455 +425,6 @@ public class JXTableSortRevamp extends InteractiveTestCase {
         assertEquals("last row must be selected", table.getRowCount() - 1, table.getSelectedRow());
     }
 
-    /**
-     * Issue #173: 
-     * ArrayIndexOOB if replacing model with one containing
-     * fewer rows and the "excess" is selected.
-     *
-     */
-    @Test
-    public void testSelectionAndToggleModel() {
-        fail("JXTable - swingx filtering/sorting disabled");
-        JXTable table = new JXTable();
-        table.setModel(createAscendingModel(0, 10));
-        // sort first column
-        table.toggleSortOrder(0);
-        // select last rows
-        table.addRowSelectionInterval(table.getRowCount() - 2, table.getRowCount() - 1);
-        // invert sort
-        table.toggleSortOrder(0);
-        // set model with less rows
-        table.setModel(createAscendingModel(0, 8));
-        
-    }
-    
-    /**
-     * testing selection and adding rows.
-     * 
-     *
-     */
-    @Test
-    public void testSelectionAndAddRows() {
-        fail("JXTable - swingx filtering/sorting disabled");
-        JXTable table = new JXTable();
-        DefaultTableModel model = createAscendingModel(0, 10);
-        table.setModel(model);
-        // sort first column
-        table.toggleSortOrder(0);
-        // select last rows
-        table.addRowSelectionInterval(table.getRowCount() - 2, table.getRowCount() - 1);
-        // invert sort
-        table.toggleSortOrder(0);
-        
-        Integer highestValue = new Integer(100);
-        model.addRow(new Object[] { highestValue });
-        assertEquals(highestValue, table.getValueAt(0, 0));
-    }
-
-    /**
-     * Issue #??: removing row throws ArrayIndexOOB on selection
-     *
-     */
-    @Test
-    public void testSelectionRemoveRowsReselect() {
-        fail("JXTable - swingx filtering/sorting disabled");
-        JXTable table = new JXTable();
-        DefaultTableModel model = createAscendingModel(0, 10);
-        table.setModel(model);
-        // sort first column
-        table.toggleSortOrder(0);
-        // invert sort
-        table.toggleSortOrder(0);
-        // select last row
-        int modelLast = table.getRowCount() - 1;
-        table.setRowSelectionInterval(modelLast, modelLast);
-        model.removeRow(table.convertRowIndexToModel(modelLast));
-        table.setRowSelectionInterval(table.getRowCount() - 1, table.getRowCount() - 1);
-    }
-
-    
-    /**
-     * Issue #16: removing row throws ArrayIndexOOB if
-     * last row was selected
-     *
-     */
-    @Test
-    public void testSelectionAndRemoveRows() {
-        fail("JXTable - swingx filtering/sorting disabled");
-        JXTable table = new JXTable();
-        DefaultTableModel model = createAscendingModel(0, 10);
-        table.setModel(model);
-        // sort first column
-        table.toggleSortOrder(0);
-        // select last rows
-        table.addRowSelectionInterval(table.getRowCount() - 2, table.getRowCount() - 1);
-        // invert sort
-        table.toggleSortOrder(0);
-        model.removeRow(0);
-    }
-
-    @Test
-    public void testDeleteRowAboveIndividualRowHeight() {
-        fail("JXTable - swingx filtering/sorting disabled");
-        DefaultTableModel model = createAscendingModel(0, 10);
-        JXTable table = new JXTable(model);
-        int selectedRow = table.getRowCount() - 1;
-        table.setRowHeight(selectedRow, 25);
-        table.toggleSortOrder(0);
-        assertEquals("last row is individual", 25, table.getRowHeight(selectedRow));
-        model.removeRow(0);
-        assertEquals("last row is individual", 25, table.getRowHeight(selectedRow - 1));
-        
-    }
-
-    /**
-     * Issue #223 - part d)
-     * 
-     * test if selection is cleared after receiving a dataChanged.
-     * Need to specify behaviour: lead/anchor of selectionModel are 
-     * not changed in clearSelection(). So modelSelection has old 
-     * lead which is mapped as a selection in the view (may be out-of 
-     * range). Hmmm...
-     * 
-     */
-    @Test
-    public void testSelectionAfterDataChanged() {
-        fail("JXTable - swingx filtering/sorting disabled");
-        DefaultTableModel ascendingModel = createAscendingModel(0, 20, 5, false);
-        JXTable table = new JXTable(ascendingModel);
-        int selectedRow = table.getRowCount() - 1;
-        table.setRowSelectionInterval(selectedRow, selectedRow);
-        // sanity
-        assertEquals("last row must be selected", selectedRow, table.getSelectedRow());
-        ascendingModel.fireTableDataChanged();
-        assertEquals("selection must be cleared", -1, table.getSelectedRow());
-    }
-
-    /**
-     * Issue #223 - part d)
-     * 
-     * test if selection is cleared after receiving a dataChanged.
-     * 
-     */
-    @Test
-    public void testCoreTableSelectionAfterDataChanged() {
-        fail("JXTable - swingx filtering/sorting disabled");
-        DefaultTableModel ascendingModel = createAscendingModel(0, 20, 5, false);
-        JTable table = new JTable(ascendingModel);
-        int selectedRow = table.getRowCount() - 1;
-        table.setRowSelectionInterval(selectedRow, selectedRow);
-        // sanity
-        assertEquals("last row must be selected", selectedRow, table.getSelectedRow());
-        ascendingModel.fireTableDataChanged();
-        assertEquals("selection must be cleared", -1, table.getSelectedRow());
-        
-    }
-    
-    /**
-     * Issue #223
-     * 
-     * test if selection is updated on remove row above selection.
-     */
-    @Test
-    public void testDeleteRowAboveSelection() {
-        fail("JXTable - swingx filtering/sorting disabled");
-        DefaultTableModel ascendingModel = createAscendingModel(0, 20);
-        JXTable table = new JXTable(ascendingModel);
-        int selectedRow = table.getRowCount() - 1;
-        table.setRowSelectionInterval(selectedRow, selectedRow);
-        // set a pipeline
-        table.toggleSortOrder(0);
-        assertEquals("last row must be selected", selectedRow, table.getSelectedRow());
-        ascendingModel.removeRow(0);
-        assertEquals("last row must still be selected after remove be selected", table.getRowCount() - 1, table.getSelectedRow());
-        
-    }
-
-    /**
-     * Issue #223
-     * 
-     * test if selection is updated on add row above selection.
-     */
-    @Test
-    public void testAddRowAboveSelection() {
-        fail("JXTable - swingx filtering/sorting disabled");
-        DefaultTableModel ascendingModel = createAscendingModel(0, 20);
-        JXTable table = new JXTable(ascendingModel);
-        int selectedRow = table.getRowCount() - 1;
-        table.setRowSelectionInterval(selectedRow, selectedRow);
-        assertEquals("last row must be selected", selectedRow, table.getSelectedRow());
-        ascendingModel.insertRow(0, new Object[table.getColumnCount()]);
-        assertEquals("last row must still be selected after add above", table.getRowCount() - 1, table.getSelectedRow());
-    }
-
-
-    @Test
-    public void testAddRowAboveIndividualRowHeigh() {
-        fail("JXTable - swingx filtering/sorting disabled");
-        DefaultTableModel ascendingModel = createAscendingModel(0, 20);
-        JXTable table = new JXTable(ascendingModel);
-        int selectedRow = table.getRowCount() - 1;
-        table.setRowHeight(selectedRow, 25);
-        assertEquals("last row must have indy rowheight", 25, table.getRowHeight(selectedRow));
-        ascendingModel.insertRow(0, new Object[table.getColumnCount()]);
-        assertEquals("last row must still have indy rowheight after add above", 25, table.getRowHeight(selectedRow + 1));
-    }
-
-    /**
-     * Issue #223
-     * test if selection is updated on add row above selection.
-     *
-     */
-    @Test
-    public void testAddRowAboveSelectionInvertedOrder() {
-        fail("JXTable - swingx filtering/sorting disabled");
-        DefaultTableModel ascendingModel = createAscendingModel(0, 20);
-        JXTable table = new JXTable(ascendingModel);
-        // select the last row in view coordinates
-        int selectedRow = table.getRowCount() - 1;
-        table.setRowSelectionInterval(selectedRow, selectedRow);
-        // set a pipeline - ascending, no change
-        table.toggleSortOrder(0);
-        // revert order 
-        table.toggleSortOrder(0);
-        assertEquals("first row must be selected", 0, table.getSelectedRow());
-        // remove row in model coordinates
-        Object[] row = new Integer[table.getColumnCount()];
-        // insert high value
-        row[0] = new Integer(100);
-        ascendingModel.addRow(row);
-        // selection must be moved one below
-        assertEquals("selection must be incremented by one ", 1, table.getSelectedRow());
-        
-    }
-
-    @Test
-    public void testAddRowAboveIndividualRowHeightInvertedOrder() {
-        fail("JXTable - swingx filtering/sorting disabled");
-        DefaultTableModel ascendingModel = createAscendingModel(0, 20);
-        JXTable table = new JXTable(ascendingModel);
-        // select the last row in view coordinates
-        int selectedRow = table.getRowCount() - 1;
-        table.setRowHeight(selectedRow, 25);
-        // set a pipeline - ascending, no change
-        table.toggleSortOrder(0);
-        // revert order 
-        table.toggleSortOrder(0);
-        assertEquals("first row must have indy rowheight", 25, table.getRowHeight(0));
-        // remove row in model coordinates
-        Object[] row = new Integer[table.getColumnCount()];
-        // insert high value
-        row[0] = new Integer(100);
-        ascendingModel.addRow(row);
-        // selection must be moved one below
-        assertEquals("row with indy height must be incremented by one ", 25, table.getRowHeight(1));
-        
-    }
-
-    
-    /**
-     * Issue #223
-     * test if selection is updated on remove row above selection.
-     *
-     */
-    @Test
-    public void testDeleteRowAboveSelectionInvertedOrder() {
-        fail("JXTable - swingx filtering/sorting disabled");
-        DefaultTableModel ascendingModel = createAscendingModel(0, 20);
-        JXTable table = new JXTable(ascendingModel);
-        // select the last row in view coordinates
-        int selectedRow = table.getRowCount() - 1;
-        table.setRowSelectionInterval(selectedRow, selectedRow);
-        // set a pipeline - ascending, no change
-        table.toggleSortOrder(0);
-        // revert order 
-        table.toggleSortOrder(0);
-        assertEquals("first row must be selected", 0, table.getSelectedRow());
-        // remove row in model coordinates
-        ascendingModel.removeRow(0);
-        assertEquals("first row must still be selected after remove ", 0, table.getSelectedRow());
-    }
-
-    /**
-     * Issue #223
-     * test if selection is kept if row below selection is removed.
-     *
-     */
-    @Test
-    public void testDeleteRowBelowSelection() {
-        fail("JXTable - swingx filtering/sorting disabled");
-        DefaultTableModel ascendingModel = createAscendingModel(0, 20);
-        JXTable table = new JXTable(ascendingModel);
-        int selectedRow = 0;
-        table.setRowSelectionInterval(selectedRow, selectedRow);
-        // sort ascending 
-        table.toggleSortOrder(0);
-        assertEquals("first row must be selected", selectedRow, table.getSelectedRow());
-        ascendingModel.removeRow(selectedRow + 1);
-        assertEquals("first row must still be selected after remove", selectedRow, table.getSelectedRow());
-    }
-
-    /**
-     * Issue #223
-     * test if selection is kept if row below selection is removed.
-     *
-     */
-    @Test
-    public void testDeleteRowBelowSelectionInvertedOrder() {
-        fail("JXTable - swingx filtering/sorting disabled");
-        DefaultTableModel ascendingModel = createAscendingModel(0, 20);
-        JXTable table = new JXTable(ascendingModel);
-        int selectedRow = 0;
-        table.setRowSelectionInterval(selectedRow, selectedRow);
-        // sort ascending
-        table.toggleSortOrder(0);
-        // revert order 
-        table.toggleSortOrder(0);
-        assertEquals("last row must be selected", table.getRowCount() - 1, table.getSelectedRow());
-        ascendingModel.removeRow(selectedRow + 1);
-        assertEquals("last row must still be selected after remove", table.getRowCount() - 1, table.getSelectedRow());
-        
-    }
-
-    /**
-     * Issue #223
-     * test if selection is kept if row in selection is removed.
-     *
-     */
-    @Test
-    public void testDeleteLastRowInSelection() {
-        fail("JXTable - swingx filtering/sorting disabled");
-        DefaultTableModel ascendingModel = createAscendingModel(0, 20);
-        JXTable table = new JXTable(ascendingModel);
-        int selectedRow = 0;
-        int lastSelectedRow = 1;
-        table.setRowSelectionInterval(selectedRow, lastSelectedRow);
-        // set a pipeline
-        table.toggleSortOrder(0);
-        int[] selectedRows = table.getSelectedRows();
-        for (int i = selectedRow; i <= lastSelectedRow; i++) {
-            assertEquals("row must be selected " + i, i, selectedRows[i]);
-            
-        }
-        ascendingModel.removeRow(lastSelectedRow);
-        int[] selectedRowsAfter = table.getSelectedRows();
-        for (int i = selectedRow; i < lastSelectedRow; i++) {
-            assertEquals("row must be selected " + i, i, selectedRowsAfter[i]);
-            
-        }
-        assertFalse("removed row must not be selected " + lastSelectedRow, table.isRowSelected(lastSelectedRow));
-        
-    }
-    /**
-     * quick check if overriding sortOnChange prevents auto-resort.
-     *
-     */
-    @Test
-    public void testSortOnChange() {
-        fail("JXTable - swingx filtering/sorting disabled");
-        JXTable table = new JXTable(createAscendingModel(0, 10)) {
-
-            @Override
-            protected boolean shouldSortOnChange(TableModelEvent e) {
-                if (isUpdate(e)) {
-                    return false;
-                }
-                return super.shouldSortOnChange(e);
-            }
-            
-        };
-        // sort ascending
-        table.toggleSortOrder(0);
-        Integer first = (Integer) table.getValueAt(0, 0);
-        Integer second = (Integer) table.getValueAt(1, 0);
-        // sanity
-        assertTrue(first.intValue() < second.intValue());
-        int high = first.intValue() + 100;
-        // set a high value
-        table.setValueAt(high, 0, 0);
-        assertEquals("sort should not update after", high, table.getValueAt(0, 0));
-    }
-    
-
-    /**
-     * check if setting to false really disables sortability.
-     *
-     */
-    @Test
-    public void testSortable() {
-        fail("JXTable - swingx filtering/sorting disabled");
-        JXTable table = new JXTable(createAscendingModel(0, 10));
-        boolean sortable = table.isSortable();
-        // sanity assert: sortable defaults to true
-        assertTrue("JXTable sortable defaults to true", sortable);
-        table.toggleSortOrder(0);
-        Object first = table.getValueAt(0, 0);
-        table.setSortable(false);
-        assertFalse(table.isSortable());
-        // reverse the sorting order on first column
-        table.toggleSortOrder(0);
-        assertEquals("sorting on a non-sortable table must do nothing", first, table.getValueAt(0, 0));
-    }
-    
-    /**
-     * Issue #171: row-coordinate not transformed in isCellEditable (sorting)
-     *
-     */
-    @Test
-    public void testSortedEditability() {
-        fail("JXTable - swingx filtering/sorting disabled");
-        int rows = 2;
-        RowObjectTableModel model = createRowObjectTableModel(rows);
-        JXTable table = new JXTable(model);
-        RowObject firstInModel = model.getRowObject(0);
-        assertEquals("rowObject data must be equal", firstInModel.getData1(), table.getValueAt(0, 0));
-        assertEquals("rowObject editability must be equal", firstInModel.isEditable(), table.isCellEditable(0, 0));
-        // nothing changed
-        table.toggleSortOrder(0);
-        Object firstDataValueInTable = table.getValueAt(0,0);
-        boolean firstEditableValueInTable = table.isCellEditable(0, 0);
-        assertEquals("rowObject data must be equal", firstInModel.getData1(), table.getValueAt(0, 0));
-        assertEquals("rowObject editability must be equal", firstInModel.isEditable(), table.isCellEditable(0, 0));
-        // sanity assert: first and last have different values/editability
-        assertTrue("lastValue different from first", firstDataValueInTable !=
-                table.getValueAt(rows - 1, 0));
-        assertTrue("lastEditability different from first", firstEditableValueInTable !=
-            table.isCellEditable(rows - 1, 0));
-        // reverse order
-        table.toggleSortOrder(0);
-        assertEquals("last row data must be equal to former first", firstDataValueInTable, 
-                table.getValueAt(rows - 1, 0));
-        assertEquals("last row editability must be equal to former first", firstEditableValueInTable, 
-                table.isCellEditable(rows - 1, 0));
-    }
-
-    /**
-     * Issue #171: row-coordinate not transformed in isCellEditable (filtering)
-     *
-     */
-    @Test
-    public void testFilteredEditability() {
-        fail("JXTable - swingx filtering/sorting disabled");
-        int rows = 2;
-        RowObjectTableModel model = createRowObjectTableModel(rows);
-        JXTable table = new JXTable(model);
-        // sanity assert
-        for (int i = 0; i < table.getRowCount(); i++) {
-            assertEquals("even/uneven rows must be editable/notEditable " + i,
-                    i % 2 == 0, table.isCellEditable(i, 0));
-        }
-        // need to chain two filters (to reach the "else" block in
-        // filter.isCellEditable()
-//        PatternFilter filter = new PatternFilter("^NOT", 0, 1);
-//        PatternFilter noFilter = new PatternFilter(".*", 0, 1);
-//
-//        table.setFilters(new FilterPipeline(new Filter[] {noFilter, filter}));
-        assertEquals("row count is half", rows / 2, table.getRowCount());
-        for (int i = 0; i < table.getRowCount(); i++) {
-            assertFalse("all rows must be not-editable " + i, table.isCellEditable(i, 0));
-            
-        }
-    }
 
     /**
      * Issue #167: IllegalStateException if re-setting filter while
@@ -982,26 +556,6 @@ public class JXTableSortRevamp extends InteractiveTestCase {
         
     }
 
-    /**
-     * JXTable has responsibility to guarantee usage of 
-     * TableColumnExt comparator and update the sort if
-     * the columns comparator changes.
-     * 
-     */
-    public void testComparatorToPipelineDynamic() {
-        fail("JXTable - swingx filtering/sorting disabled");
-        JXTable table = new JXTable(new AncientSwingTeam());
-        TableColumnExt columnX = table.getColumnExt(0);
-        table.toggleSortOrder(0);
-        columnX.setComparator(Collator.getInstance());
-        // invalid assumption .. only the comparator must be used.
-//        assertEquals("interactive sorter must be same as sorter in column", 
-//                columnX.getSorter(), table.getFilters().getSorter());
-//        SortKey sortKey = SortKey.getFirstSortKeyForColumn(table.getFilters().getSortController().getSortKeys(), 0);
-//        assertNotNull(sortKey);
-//        assertEquals(columnX.getComparator(), sortKey.getComparator());
-       
-    }
 
 //-------------------------- tests for moving column control into swingx
 
