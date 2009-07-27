@@ -103,6 +103,8 @@ public class TableSortController<M extends TableModel> extends TableRowSorter<M>
      * {@inheritDoc}
      * <p>
      * 
+     * Overridden - that is completely new implementation - to get first/next SortOrder
+     * from sort order cycle. Does nothing if the cycle is empty. 
      */
     @Override
     public void toggleSortOrder(int column) {
@@ -116,8 +118,8 @@ public class TableSortController<M extends TableModel> extends TableRowSorter<M>
         List<SortKey> keys = new ArrayList<SortKey>(getSortKeys());
         SortKey sortKey = SortUtils.getFirstSortKeyForColumn(keys, column);
         if (keys.indexOf(sortKey) == 0)  {
-            //  primary key: in this case we'll toggle
-            keys.set(column, new SortKey(column, getNextInCycle(sortKey.getSortOrder())));
+            //  primary key: in this case we'll use next sortorder in cylce
+            keys.set(0, new SortKey(column, getNextInCycle(sortKey.getSortOrder())));
         } else {
             // all others: make primary with first sortOrder in cycle
             keys.remove(sortKey);
@@ -131,8 +133,11 @@ public class TableSortController<M extends TableModel> extends TableRowSorter<M>
     
 
     /**
-     * @param current
-     * @return
+     * Returns the next SortOrder relative to the current, or null
+     * if the sort order cycle is empty. 
+     * 
+     * @param current the current SortOrder
+     * @return the next SortOrder to use, may be null if the cycle is empty.
      */
     private SortOrder getNextInCycle(SortOrder current) {
         int pos = sortCycle.indexOf(current);
@@ -148,7 +153,9 @@ public class TableSortController<M extends TableModel> extends TableRowSorter<M>
     }
 
     /**
-     * @return
+     * Returns the first SortOrder in the sort order cycle, or null if empty.
+     * 
+     * @return the first SortOrder in the sort order cycle or null if empty.
      */
     private SortOrder getFirstInCycle() {
         return sortCycle.size() > 0 ? sortCycle.get(0) : null;
@@ -210,7 +217,7 @@ public class TableSortController<M extends TableModel> extends TableRowSorter<M>
     
 
     /**
-     * Not yet functional (unused internally).
+     * {@inheritDoc} <p>
      */
     @Override
     public SortOrder[] getSortOrderCycle() {
@@ -218,7 +225,7 @@ public class TableSortController<M extends TableModel> extends TableRowSorter<M>
     }
 
     /**
-     * Not yet functional (does nothing).
+     * {@inheritDoc} <p>
      */
     @Override
     public void setSortOrderCycle(SortOrder... cycle) {
