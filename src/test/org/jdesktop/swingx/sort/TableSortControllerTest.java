@@ -24,6 +24,7 @@ package org.jdesktop.swingx.sort;
 import static org.junit.Assert.*;
 
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.swing.SortOrder;
 import javax.swing.RowSorter.SortKey;
@@ -43,9 +44,61 @@ import org.junit.runners.JUnit4;
  */
 @RunWith(JUnit4.class)
 public class TableSortControllerTest extends InteractiveTestCase {
-
+    @SuppressWarnings("unused")
+    private static final Logger LOG = Logger
+            .getLogger(TableSortControllerTest.class.getName());
+    
     private TableModel teamModel;
     private TableSortController<TableModel> controller;
+
+    public static void main(String[] args) {
+        TableSortControllerTest test = new TableSortControllerTest();
+        try {
+            test.runInteractiveTests();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
+    @Test(expected=NullPointerException.class)
+    public void testNPEOnNullSortOrderCycleElements() {
+        controller.setSortOrderCycle(null);
+    }
+    @Test
+    public void testUseSortOrderCycle() {
+        // empty cylce - does nothing
+        controller.setSortOrderCycle(new SortOrder[0]);
+        controller.toggleSortOrder(0);
+        assertEquals(SortOrder.UNSORTED, controller.getSortOrder(0));
+    }
+    
+    @Test
+    public void testSortOrderCycleSet() {
+        SortOrder[] cycle = new SortOrder[] {};
+        controller.setSortOrderCycle(cycle);
+        assertEqualsArrayByElements(cycle, controller.getSortOrderCycle());
+    }
+    
+    /**
+     * Need to completely take over the toggleSortOrder to support custom cycle.
+     * So need to check if the exception is thrown as expected
+     */
+    @Test(expected=IndexOutOfBoundsException.class)
+    public void testColumnIndexCheckedOnToggle() {
+        controller.toggleSortOrder(teamModel.getColumnCount());
+    }
+    /**
+     * @param string
+     * @param first
+     * @param second
+     */
+    private void assertEqualsArrayByElements(Object[] first,
+            Object[] second) {
+        assertEquals("must have same size", first.length, second.length);
+        for (int i = 0; i < second.length; i++) {
+            assertEquals("item must be same at index:  " + i, first[i], second[i]);
+        }
+    }
 
     /**
      * Test that sortsOnUpdate property is true by default. 
@@ -125,6 +178,7 @@ public class TableSortControllerTest extends InteractiveTestCase {
         SortOrder[] cycle = controller.getSortOrderCycle();
         for (int i = 0; i < cycle.length; i++) {
             controller.toggleSortOrder(0);
+            LOG.info("sortorder in cycle" + i + cycle[i]);
             assertEquals(cycle[i], controller.getSortOrder(0));
         }
     }
@@ -179,14 +233,11 @@ public class TableSortControllerTest extends InteractiveTestCase {
             assertTrue("columns must be sortable by default", controller.isSortable(i));
         }
     }
-    
-    
     @Before
     @Override
     public void setUp() throws Exception {
         teamModel = new AncientSwingTeam();
-        controller = new TableSortController<TableModel>();
-        controller.setModel(teamModel);
+        controller = new TableSortController<TableModel>(teamModel);
     }
 
     

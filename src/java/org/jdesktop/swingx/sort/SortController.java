@@ -188,11 +188,13 @@ public interface SortController {
     void resetSortOrders();
     
     /**
-     * Sets the cycle of sort ordes to toggle through.
+     * Sets the cycle of sort ordes to toggle through. Zero or more SortOrders which
+     * must not be null.
      * 
-     * @param cyle
+     * @param cycle the SortOrders to cycle through, may be empty
+     * @throws NullPointerException if the array or any of its elements is null
      */
-    void setSortOrderCycle(SortOrder... cyle);
+    void setSortOrderCycle(SortOrder... cycle);
     
     /**
      * Returns the cycle of sort orders to cycle through.

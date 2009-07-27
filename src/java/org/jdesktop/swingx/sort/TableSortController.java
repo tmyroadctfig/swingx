@@ -22,11 +22,15 @@
 package org.jdesktop.swingx.sort;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.SortOrder;
+import javax.swing.RowSorter.SortKey;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
+
+import org.jdesktop.swingx.util.Contract;
 
 /**
  * A SortController to use for a JXTable.<p>
@@ -40,9 +44,9 @@ public class TableSortController<M extends TableModel> extends TableRowSorter<M>
         SortController {
 
     private final static SortOrder[] DEFAULT_CYCLE = new SortOrder[] {SortOrder.ASCENDING, SortOrder.DESCENDING};
-    
-    private SortOrder[] sortCycle = DEFAULT_CYCLE;
 
+    private List<SortOrder> sortCycle;
+    
     private boolean sortable = true;
     
     public TableSortController() {
@@ -54,28 +58,17 @@ public class TableSortController<M extends TableModel> extends TableRowSorter<M>
      */
     public TableSortController(M model) {
         super(model);
+        setSortOrderCycle(DEFAULT_CYCLE);
         setSortsOnUpdates(true);
     }
 
+    /**
+     * {@inheritDoc} <p>
+     * 
+     */
     @Override
     public void setSortable(boolean sortable) {
         this.sortable = sortable;
-    }
-    
-    @Override
-    public boolean isSortable() {
-        return sortable;
-    }
-    
-    @Override
-    public void setSortable(int column, boolean sortable) {
-        super.setSortable(column, sortable);
-    }
-    
-    @Override
-    public boolean isSortable(int column) {
-        if (!isSortable()) return false;
-        return super.isSortable(column);
     }
     
     /**
@@ -83,8 +76,89 @@ public class TableSortController<M extends TableModel> extends TableRowSorter<M>
      * 
      */
     @Override
+    public boolean isSortable() {
+        return sortable;
+    }
+    
+    /**
+     * {@inheritDoc} <p>
+     * 
+     */
+    @Override
+    public void setSortable(int column, boolean sortable) {
+        super.setSortable(column, sortable);
+    }
+    
+    /**
+     * {@inheritDoc} <p>
+     * 
+     */
+    @Override
+    public boolean isSortable(int column) {
+        if (!isSortable()) return false;
+        return super.isSortable(column);
+    }
+    
+    /**
+     * {@inheritDoc}
+     * <p>
+     * 
+     */
+    @Override
     public void toggleSortOrder(int column) {
-        super.toggleSortOrder(column);
+        checkColumn(column);
+        if (!isSortable(column))
+            return;
+        SortOrder firstInCycle = getFirstInCycle();
+        // nothing to toggle through
+        if (firstInCycle == null)
+            return;
+        List<SortKey> keys = new ArrayList<SortKey>(getSortKeys());
+        SortKey sortKey = SortUtils.getFirstSortKeyForColumn(keys, column);
+        if (keys.indexOf(sortKey) == 0)  {
+            //  primary key: in this case we'll toggle
+            keys.set(column, new SortKey(column, getNextInCycle(sortKey.getSortOrder())));
+        } else {
+            // all others: make primary with first sortOrder in cycle
+            keys.remove(sortKey);
+            keys.add(0, new SortKey(column, getFirstInCycle()));
+        }
+        if (keys.size() > getMaxSortKeys()) {
+            keys = keys.subList(0, getMaxSortKeys());
+        }
+        setSortKeys(keys);
+    }
+    
+
+    /**
+     * @param current
+     * @return
+     */
+    private SortOrder getNextInCycle(SortOrder current) {
+        int pos = sortCycle.indexOf(current);
+        if (pos < 0) {
+            // not in cycle ... what to do?
+            return getFirstInCycle();
+        }
+        pos++;
+        if (pos >= sortCycle.size()) {
+            pos = 0;
+        }
+        return sortCycle.get(pos);
+    }
+
+    /**
+     * @return
+     */
+    private SortOrder getFirstInCycle() {
+        return sortCycle.size() > 0 ? sortCycle.get(0) : null;
+    }
+
+    private void checkColumn(int column) {
+        if (column < 0 || column >= getModelWrapper().getColumnCount()) {
+            throw new IndexOutOfBoundsException(
+                    "column beyond range of TableModel");
+        }
     }
 
     /**
@@ -105,12 +179,20 @@ public class TableSortController<M extends TableModel> extends TableRowSorter<M>
         setSortKeys(keys);
     }
     
+    /**
+     * {@inheritDoc} <p>
+     * 
+     */
     @Override
     public SortOrder getSortOrder(int column) {
         SortKey key = SortUtils.getFirstSortKeyForColumn(getSortKeys(), column);
         return key != null ? key.getSortOrder() : SortOrder.UNSORTED;
     }
 
+    /**
+     * {@inheritDoc} <p>
+     * 
+     */
     @Override
     public void resetSortOrders() {
         if (!isSortable()) return;
@@ -132,18 +214,17 @@ public class TableSortController<M extends TableModel> extends TableRowSorter<M>
      */
     @Override
     public SortOrder[] getSortOrderCycle() {
-        // PENDING JW: ensure immutable or go enumeration?
-        // 
-        return sortCycle;
+        return sortCycle.toArray(new SortOrder[0]);
     }
 
     /**
      * Not yet functional (does nothing).
      */
     @Override
-    public void setSortOrderCycle(SortOrder... cyle) {
-        // TODO Auto-generated method stub
-        
+    public void setSortOrderCycle(SortOrder... cycle) {
+        Contract.asNotNull(cycle, "Elements of SortOrderCycle must not be null");
+        // JW: not safe enough?
+        sortCycle = Arrays.asList(cycle);
     }
 
 }
