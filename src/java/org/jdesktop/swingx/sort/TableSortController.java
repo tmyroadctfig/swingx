@@ -54,6 +54,7 @@ public class TableSortController<M extends TableModel> extends TableRowSorter<M>
      */
     public TableSortController(M model) {
         super(model);
+        setSortsOnUpdates(true);
     }
 
     @Override

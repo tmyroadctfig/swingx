@@ -8,6 +8,7 @@
 
 package org.jdesktop.test;
 
+import java.awt.Component;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Collections;
@@ -31,8 +32,21 @@ public class PropertyChangeReport implements PropertyChangeListener {
     protected List<PropertyChangeEvent> events = Collections.synchronizedList(new LinkedList<PropertyChangeEvent>());
     protected Map<String, PropertyChangeEvent> eventMap = Collections.synchronizedMap(new HashMap<String, PropertyChangeEvent>());
     
+    public PropertyChangeReport() {
+        this(null);
+    }
+    
+    /**
+     * @param component
+     */
+    public PropertyChangeReport(Component component) {
+        if(component != null) {
+            component.addPropertyChangeListener(this);
+        }
+    }
 //------------------------ implement PropertyChangeListener
     
+
     public void propertyChange(PropertyChangeEvent evt) {
         events.add(0, evt);
         if (evt.getPropertyName() != null) {

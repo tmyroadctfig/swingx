@@ -29,7 +29,6 @@ import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
-import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -72,7 +71,6 @@ import org.jdesktop.test.AncientSwingTeam;
 import org.jdesktop.test.CellEditorReport;
 import org.jdesktop.test.PropertyChangeReport;
 import org.jdesktop.test.SerializableSupport;
-import org.jdesktop.test.TestUtils;
 
 /**
  * Test to exposed known issues of <code>JXTable</code>.
@@ -94,7 +92,8 @@ public class JXTableIssues extends InteractiveTestCase {
           test.runInteractiveTests();
 //            test.runInteractiveTests("interactive.*Scroll.*");
          //   test.runInteractiveTests("interactive.*Render.*");
-            test.runInteractiveTests("interactive.*ExtendOnRemoveAdd.*");
+//          test.runInteractiveTests("interactive.*ExtendOnRemoveAdd.*");
+            test.runInteractiveTests("interactive.*SortOn.*");
 //            test.runInteractiveTests("interactive.*Repaint.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
@@ -471,50 +470,6 @@ public class JXTableIssues extends InteractiveTestCase {
         frame.add(field, BorderLayout.SOUTH);
         frame.setVisible(true);
     }
-    /**
-     * row index conversion goes nuts if not re-sorted on update.
-     * Looks like a repaint problem.
-     */
-    public void interactiveSortOnUpdate() {
-        JXTable xtable = new JXTable(new AncientSwingTeam()) {
-
-            @Override
-            protected boolean shouldSortOnChange(TableModelEvent e) {
-                if (isUpdate(e)) {
-                    return false;
-                }
-                return super.shouldSortOnChange(e);
-            }
-            
-        };
-        JXTable table = new JXTable(xtable.getModel()) {
-
-            @Override
-            protected boolean shouldSortOnChange(TableModelEvent e) {
-                if (isUpdate(e)) {
-                    repaint(e);
-                    return false;
-                }
-                return super.shouldSortOnChange(e);
-            }
-
-            /**
-             * Hack to repaint at the correct row in terms of 
-             * view coordinates.
-             * @param e
-             */
-            private void repaint(TableModelEvent e) {
-                int firstRow = convertRowIndexToView(e.getFirstRow());
-                Rectangle rowRect = getCellRect(firstRow, 0, true);
-                rowRect.width = getWidth();
-                repaint(rowRect);
-            }
-            
-        };
-        JXFrame frame = wrapWithScrollingInFrame(xtable, table, "edit and shouldSortOnChange false");
-        frame.setVisible(true);
-    }
-    
 
     public void interactiveDeleteRowAboveSelection() {
         CompareTableBehaviour compare = new CompareTableBehaviour(new Object[] { "A", "B", "C", "D", "E", "F", "G", "H", "I" });

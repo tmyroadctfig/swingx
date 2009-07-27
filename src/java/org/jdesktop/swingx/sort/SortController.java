@@ -173,4 +173,24 @@ public interface SortController {
      * @return
      */
     SortOrder[] getSortOrderCycle();
+    
+    /**
+     * If true, specifies that a sort should happen when the underlying
+     * model is updated (<code>rowsUpdated</code> is invoked).  For
+     * example, if this is true and the user edits an entry the
+     * location of that item in the view may change.  The default is
+     * true.
+     *
+     * @param sortsOnUpdates whether or not to sort on update events
+     */
+    public void setSortsOnUpdates(boolean sortsOnUpdates);
+
+    /**
+     * Returns true if  a sort should happen when the underlying
+     * model is updated; otherwise, returns false.
+     *
+     * @return whether or not to sort when the model is updated
+     */
+    public boolean getSortsOnUpdates();
+
 }
