@@ -464,6 +464,7 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
 
     private boolean autoCreateRowSorter;
 
+    /** flag to indicate that it's unsafe to update sortable-related sorter properties. */
     private boolean ignoreAddColumn;
 
     /** Instantiates a JXTable with a default table model, no data. */
@@ -1502,9 +1503,10 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
             initializeColumnWidths();
             resetCalculatedScrollableSize(true);
         }
-        if ((isStructureChanged(e))) {
-            configureSorterProperties();
-        }
+        // JW: handled by addColumn
+//        if ((isStructureChanged(e))) {
+//            configureSorterProperties();
+//        }
     }
 
     /**
@@ -1527,6 +1529,17 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
             setRowSorter(createDefaultRowSorter());
         }
         
+    }
+
+    /**
+     * {@inheritDoc} <p>
+     * 
+     * Overridden to synch sorter state from columns.
+     */
+    @Override
+    public void setColumnModel(TableColumnModel columnModel) {
+        super.setColumnModel(columnModel);
+        configureSorterProperties();
     }
 
     /**
@@ -1912,7 +1925,7 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
      */
     protected boolean isSortable(int columnIndex) {
         if (getSortController() != null) {
-            return getSortController().isSortable(columnIndex);
+            return getSortController().isSortable(convertColumnIndexToModel(columnIndex));
         }
         //PENDING JW: the fall-back implementation (== no sortController) is rather meaningless. 
         // Remove?

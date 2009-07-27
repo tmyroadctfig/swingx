@@ -198,40 +198,65 @@ public class JXTableUnitTest extends InteractiveTestCase {
      * Issue 1131-swingx: JXTable must guarantee to pass column sortable property
      * always.
      * 
-     * Here: test that all columns in sortController are updated after setModel.
+     * Here: test that all columns in sortController are updated after structureChanged event.
+     * with a real structureChanged (more columns)
      */
     @Test
-    public void testSortableColumnPropertyOnStructureChanged() {
-        ColumnFactory factory = new ColumnFactory() {
-
-            @Override
-            public void configureTableColumn(TableModel model,
-                    TableColumnExt columnExt) {
-                super.configureTableColumn(model, columnExt);
-                // make odd columns not-sortable
-                columnExt.setSortable(columnExt.getModelIndex() % 2 == 0);
-            }
-            
-        };
+    public void testSortableColumnPropertyOnStructureChangedRemoveColumn() {
+        SortableTestFactory factory = new SortableTestFactory();
         JXTable table = new JXTable();
         table.setColumnFactory(factory);
         // quick access to fire a structure change
-        DefaultTableModel model = new DefaultTableModel(10, 5) {
-
-            @Override
-            public void setValueAt(Object aValue, int row, int column) {
-                fireTableStructureChanged();
-            }
-            
-        };
+        DefaultTableModel model = new DefaultTableModel(10, 5);
         table.setModel(model);
         // trigger structureChanged 
-        model.setValueAt(null, 0, 0);
-        for (int i = 0; i < table.getColumnCount(); i++) {
-            assertEquals("odd/even columns must be not/-sortable: " + i, i % 2 == 0, table.isSortable(i));
-        }
+        model.setColumnCount(model.getColumnCount() - 2);
+        factory.assertSortableColumnState(table);
+    }
+    
+    /**
+     * Issue 1131-swingx: JXTable must guarantee to pass column sortable property
+     * always.
+     * 
+     * Here: test that all columns in sortController are updated after structureChanged event.
+     * with a real structureChanged (more columns)
+     */
+    @Test
+    public void testSortableColumnPropertyOnStructureChangedAddColumn() {
+        SortableTestFactory factory = new SortableTestFactory();
+        JXTable table = new JXTable();
+        table.setColumnFactory(factory);
+        // quick access to fire a structure change
+        DefaultTableModel model = new DefaultTableModel(10, 5);
+        table.setModel(model);
+        // trigger structureChanged 
+        model.setColumnCount(model.getColumnCount() + 2);
+        factory.assertSortableColumnState(table);
     }
 
+    /**
+     * Issue 1131-swingx: JXTable must guarantee to pass column sortable property
+     * always.
+     * 
+     * Here: test that all columns in sortController are updated after setColumnModel.
+     */
+    @Test
+    public void testSortableSetColumnModel() {
+        SortableTestFactory factory = new SortableTestFactory();
+        JXTable table = new JXTable();
+        table.setAutoCreateColumnsFromModel(false);
+        table.setModel(sortableTableModel);
+        DefaultTableColumnModelExt columnModel = new DefaultTableColumnModelExt();
+        // add two columns, one sortable, one not sortable
+        columnModel.addColumn(factory.createAndConfigureTableColumn(sortableTableModel, 0));
+        columnModel.addColumn(factory.createAndConfigureTableColumn(sortableTableModel, 1));
+        // hide unsortable column
+        columnModel.getColumnExt(1).setVisible(false);
+        table.setColumnModel(columnModel);
+        factory.assertSortableColumnState(table);
+    }
+    
+    
     /**
      * Issue 1131-swingx: JXTable must guarantee to pass column sortable property
      * always.
@@ -240,26 +265,14 @@ public class JXTableUnitTest extends InteractiveTestCase {
      */
     @Test
     public void testSortableAddColumn() {
-        ColumnFactory factory = new ColumnFactory() {
-            
-            @Override
-            public void configureTableColumn(TableModel model,
-                    TableColumnExt columnExt) {
-                super.configureTableColumn(model, columnExt);
-                // make odd columns not-sortable
-                columnExt.setSortable(columnExt.getModelIndex() % 2 == 0);
-            }
-            
-        };
+        SortableTestFactory factory = new SortableTestFactory();
         JXTable table = new JXTable();
         table.setAutoCreateColumnsFromModel(false);
         table.setModel(sortableTableModel);
         // add two columns, one sortable, one not sortable
         table.addColumn(factory.createAndConfigureTableColumn(sortableTableModel, 0));
         table.addColumn(factory.createAndConfigureTableColumn(sortableTableModel, 1));
-        for (int i = 0; i < table.getColumnCount(); i++) {
-            assertEquals("odd/even columns must be not/-sortable: " + i, i % 2 == 0, table.isSortable(i));
-        }
+        factory.assertSortableColumnState(table);
     }
     
 
@@ -271,25 +284,57 @@ public class JXTableUnitTest extends InteractiveTestCase {
      */
     @Test
     public void testSortableColumnPropertyOnSetModel() {
-        ColumnFactory factory = new ColumnFactory() {
-
-            @Override
-            public void configureTableColumn(TableModel model,
-                    TableColumnExt columnExt) {
-                super.configureTableColumn(model, columnExt);
-                // make odd columns not-sortable
-                columnExt.setSortable(columnExt.getModelIndex() % 2 == 0);
-            }
-            
-        };
+        SortableTestFactory factory = new SortableTestFactory();
         JXTable table = new JXTable();
         table.setColumnFactory(factory);
         table.setModel(sortableTableModel);
-        for (int i = 0; i < table.getColumnCount(); i++) {
-            assertEquals("odd/even columns must be not/-sortable: " + i, i % 2 == 0, table.isSortable(i));
-        }
+        factory.assertSortableColumnState(table);
+    }
+    
+    /**
+     * Issue ??-swingx: JXTable isSortable by index must convert index
+     * 
+     */
+    @Test
+    public void testIsSortableColumn() {
+        SortableTestFactory factory = new SortableTestFactory();
+        JXTable table = new JXTable();
+        table.setColumnFactory(factory);
+        table.setModel(sortableTableModel);
+        TableColumnExt columnExt = table.getColumnExt(1);
+        assertFalse("sanity: second column not sortable", columnExt.isSortable());
+        table.moveColumn(0, 1);
+        assertSame("sanity: moved", columnExt, table.getColumnExt(0));
+        assertEquals("isSortable by index must convert column index", 
+                false, table.isSortable(0));
     }
 
+    /**
+     * Convenience factory for testing. Configures every odd column as not sortable
+     * and has a method to assert that the sortable state is as configured.
+     */
+    public static class SortableTestFactory extends ColumnFactory {
+        
+        @Override
+        public void configureTableColumn(TableModel model,
+                TableColumnExt columnExt) {
+            super.configureTableColumn(model, columnExt);
+            // make odd columns not-sortable
+            columnExt.setSortable(columnExt.getModelIndex() % 2 == 0);
+        }
+        
+        public void assertSortableColumnState(JXTable table) {
+            List<TableColumn> columns = table.getColumns(true);
+            for (TableColumn tableColumn : columns) {
+                int i = tableColumn.getModelIndex();
+                assertEquals("odd/even columns must be not/-sortable: " + i, i % 2 == 0, 
+                        table.getSortController().isSortable(i));
+                
+            }
+        }
+    }
+    
+    
     /**
      * Issue 1131-swingx: JXTable must guarantee to pass column sortable property
      * always.
