@@ -18,7 +18,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.text.Collator;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -261,7 +263,36 @@ public class JXTableUnitTest extends InteractiveTestCase {
     }
     
     
- // --------------- sortable property 
+ // --------------- sortable/comparator property 
+
+    
+    /**
+     * JXTable has responsibility to guarantee usage of 
+     * TableColumnExt comparator.
+     * 
+     */
+    @Test
+    public void testComparatorToController() {
+        JXTable table = new JXTable(new AncientSwingTeam());
+        TableColumnExt columnX = table.getColumnExt(0);
+        columnX.setComparator(Collator.getInstance());
+        assertSame(columnX.getComparator(), table.getSortController().getComparator(columnX.getModelIndex()));
+    }
+    
+    /**
+     * JXTable has responsibility to guarantee usage of 
+     * TableColumnExt comparator.
+     * 
+     */
+    @Test
+    public void testComparatorToControllerInSetSorter() {
+        JXTable table = new JXTable(new AncientSwingTeam());
+        TableColumnExt columnX = table.getColumnExt(0);
+        columnX.setComparator(Collator.getInstance());
+        table.setRowSorter(new TableSortController<TableModel>(table.getModel()));
+        assertSame(columnX.getComparator(), table.getSortController().getComparator(columnX.getModelIndex()));
+    }
+
 
     /**
      * Issue 1131-swingx: JXTable must guarantee to pass column sortable property
@@ -388,8 +419,13 @@ public class JXTableUnitTest extends InteractiveTestCase {
         public void configureTableColumn(TableModel model,
                 TableColumnExt columnExt) {
             super.configureTableColumn(model, columnExt);
-            // make odd columns not-sortable
-            columnExt.setSortable(columnExt.getModelIndex() % 2 == 0);
+            if (columnExt.getModelIndex() % 2 != 0) {
+                // make odd columns not-sortable
+                columnExt.setSortable(false);
+            } else {
+                // set per-column comparator for even columns
+                columnExt.setComparator(Collator.getInstance());
+            }
         }
         
         public void assertSortableColumnState(JXTable table) {
@@ -398,6 +434,15 @@ public class JXTableUnitTest extends InteractiveTestCase {
                 int i = tableColumn.getModelIndex();
                 assertEquals("odd/even columns must be not/-sortable: " + i, i % 2 == 0, 
                         table.getSortController().isSortable(i));
+                if (tableColumn instanceof TableColumnExt) {
+                    Comparator<?> comparator = ((TableColumnExt) tableColumn).getComparator();
+                    // JW: need to check against null because sorter might have its own
+                    // ideas about default comparators
+                    if (comparator != null) {
+                        assertSame("comparator must be same: " + i, comparator, 
+                            table.getSortController().getComparator(i));
+                    }
+                }
                 
             }
         }
