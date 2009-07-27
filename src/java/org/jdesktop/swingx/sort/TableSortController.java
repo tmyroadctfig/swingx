@@ -26,7 +26,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.SortOrder;
-import javax.swing.RowSorter.SortKey;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
@@ -47,7 +46,7 @@ public class TableSortController<M extends TableModel> extends TableRowSorter<M>
 
     private List<SortOrder> sortCycle;
     
-    private boolean sortable = true;
+    private boolean sortable;
     
     public TableSortController() {
         this(null);
@@ -58,6 +57,7 @@ public class TableSortController<M extends TableModel> extends TableRowSorter<M>
      */
     public TableSortController(M model) {
         super(model);
+        setSortable(true);
         setSortOrderCycle(DEFAULT_CYCLE);
         setSortsOnUpdates(true);
     }

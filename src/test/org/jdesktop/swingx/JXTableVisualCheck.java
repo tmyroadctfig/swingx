@@ -91,7 +91,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
       JXTableVisualCheck test = new JXTableVisualCheck();
       try {
 //        test.runInteractiveTests();
-          test.runInteractiveTests("interactive.*Multi.*");
+          test.runInteractiveTests("interactive.*SortOrder.*");
 //          test.runInteractiveTests("interactive.*Header.*");
 //          test.runInteractiveTests("interactive.*ColumnProp.*");
 //          test.runInteractiveTests("interactive.*Multiple.*");
@@ -115,6 +115,47 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         super.setUp();
         // super has LF specific tests...
         setSystemLF(true);
+    }
+
+    /**
+     * Quick check of sort order cycle (including pathologicals)
+     */
+    public void interactiveSortOrderCycle() {
+        final JXTable table = new JXTable(new AncientSwingTeam());
+        JXFrame frame = wrapWithScrollingInFrame(table, "sort cycles");
+        Action three = new AbstractAction("three-cylce") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                table.getSortController().setSortOrderCycle(SortOrder.ASCENDING, SortOrder.DESCENDING, SortOrder.UNSORTED);
+            }
+        };
+        addAction(frame, three);
+        Action two = new AbstractAction("two-cylce") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                table.getSortController().setSortOrderCycle(SortOrder.ASCENDING, SortOrder.DESCENDING);
+            }
+        };
+        addAction(frame, two);
+        Action one = new AbstractAction("one-cylce") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                table.getSortController().setSortOrderCycle(SortOrder.DESCENDING);
+            }
+        };
+        addAction(frame, one);
+        Action none = new AbstractAction("empty-cylce") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                table.getSortController().setSortOrderCycle();
+            }
+        };
+        addAction(frame, none);
+        show(frame);
     }
 
     public void interactiveMultiColumnSort() {
