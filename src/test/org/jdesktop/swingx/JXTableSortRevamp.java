@@ -113,28 +113,6 @@ public class JXTableSortRevamp extends InteractiveTestCase {
         }
     }
     
-    
-    public void interactiveSortKeys() {
-        final JXTable table = new JXTable(new AncientSwingTeam());
-        JXFrame frame = wrapWithScrollingInFrame(table, "sort cycles");
-        Action three = new AbstractAction("three-cylce") {
-            
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                table.getSortController().setSortOrderCycle(SortOrder.ASCENDING, SortOrder.DESCENDING, SortOrder.UNSORTED);
-            }
-        };
-        addAction(frame, three);
-        Action two = new AbstractAction("two-cylce") {
-            
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                table.getSortController().setSortOrderCycle(SortOrder.ASCENDING, SortOrder.DESCENDING);
-            }
-        };
-        addAction(frame, two);
-        show(frame);
-    }
 
 //--------------- current re-introduce
 
