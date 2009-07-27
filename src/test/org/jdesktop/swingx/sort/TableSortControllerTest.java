@@ -60,10 +60,18 @@ public class TableSortControllerTest extends InteractiveTestCase {
         }
     }
     
+    @Test
+    public void testLastColumn() {
+        controller.toggleSortOrder(teamModel.getColumnCount() - 1);
+        // was silly mistake ...
+        controller.toggleSortOrder(teamModel.getColumnCount() - 1);
+    }
+    
     @Test(expected=NullPointerException.class)
     public void testNPEOnNullSortOrderCycleElements() {
         controller.setSortOrderCycle(null);
     }
+    
     @Test
     public void testUseSortOrderCycle() {
         // empty cylce - does nothing
