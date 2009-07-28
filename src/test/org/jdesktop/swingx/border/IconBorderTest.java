@@ -36,10 +36,10 @@ import javax.swing.border.Border;
 import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.action.AbstractActionExt;
-import org.jdesktop.swingx.icon.SortArrowIcon;
+import org.jdesktop.swingx.icon.ColumnControlIcon;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.junit.Test;
 
 
 /**
@@ -63,7 +63,7 @@ public class IconBorderTest extends InteractiveTestCase {
     
     @Test
     public void testIconBorderSetNullIcon() {
-        IconBorder border = new IconBorder(new SortArrowIcon(true));
+        IconBorder border = new IconBorder(new ColumnControlIcon());
         border.setIcon(null);
         JLabel label = new JLabel("dummy");
         border.getBorderInsets(label);
@@ -74,7 +74,7 @@ public class IconBorderTest extends InteractiveTestCase {
      */
     @Test
     public void testPadding() {
-        IconBorder border = new IconBorder(new SortArrowIcon(true));
+        IconBorder border = new IconBorder(new ColumnControlIcon());
         int oldPadding = border.getPadding();
         int padding = oldPadding + 10;
         border.setPadding(padding);
@@ -83,7 +83,7 @@ public class IconBorderTest extends InteractiveTestCase {
     
     @Test
     public void testNotNegativePadding() {
-        IconBorder border = new IconBorder(new SortArrowIcon(true),
+        IconBorder border = new IconBorder(new ColumnControlIcon(),
                 SwingConstants.EAST, - 10);
         assertTrue(border.getPadding() >= 0);
         border.setPadding(-10);
@@ -97,7 +97,7 @@ public class IconBorderTest extends InteractiveTestCase {
      */
     @Test
     public void testDefaultPadding() {
-        Icon icon = new SortArrowIcon(true);
+        Icon icon = new ColumnControlIcon();
         IconBorder border = new IconBorder(icon, SwingConstants.WEST);
         JLabel label = new JLabel("dummy");
         label.setBorder(border);
@@ -114,7 +114,7 @@ public class IconBorderTest extends InteractiveTestCase {
      * 
      */
     public void interactiveIconBorderNullIcon() {
-        final Icon icon = new SortArrowIcon(true);
+        final Icon icon = new ColumnControlIcon();
         final IconBorder border = new IconBorder(icon);
         final JLabel label = new JLabel("...dummy............ with icon border");
         Border lineBorder = BorderFactory.createLineBorder(Color.RED, 2);
