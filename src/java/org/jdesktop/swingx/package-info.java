@@ -38,9 +38,9 @@
  * 
  * <h3>Filtering/Sorting for Tables and Lists</h3>
  * 
- * <b>NOTE:</b> this is incompatible with core (table) sorting/filtering in
- * JDK 6+. Will be replaced by core functionality after switching the target
- * jdk version from 5 to 6.
+ * <b>NOTE:</b> Currently on the move to core (JDK 6+) sorting/filtering. Trunk
+ * has all SwingX specials removed, JXTable sort api back again. JXList still
+ * disabled.
  * 
  * <h3>Login/Authentication Framework</h3>
  * 
@@ -139,6 +139,12 @@
  * 
  * </ul>
  * 
+ * <h2>External Information Sources</h2>
+ * 
+ * <a href="http://wiki.java.net/bin/view/Javadesktop/SwingX">SwingX Twiki</a>
+ * <a href="http://wiki.java.net/bin/view/Javadesktop/SwingXChanges">Change History</a>
+ * <a href="http://forums.java.net/jive/forum.jspa?forumID=73">SwingLabs User and 
+ * Developer Discussion Forum</a>
  */
 package org.jdesktop.swingx;
 

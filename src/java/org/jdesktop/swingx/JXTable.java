@@ -140,13 +140,15 @@ import org.jdesktop.swingx.table.TableColumnModelExt;
  * </code></pre>
  * 
  * Sorting sequence can be configured per column by setting the TableColumnExt's
- * "comparator" property (TBD). Sorting can be disabled per column or per table by
- * {@link #setSortable(boolean)}. The table takes responsibility to propagate these
+ * <code>comparator</code> property. Sorting can be disabled per column - setting the TableColumnExt's
+ * <code>sortable</code> or per table by {@link #setSortable(boolean)}. 
+ * The table takes responsibility to propagate these
  * properties to the current sorter, if available <p>
  * 
  * Note that the enhanced sorting controls are effective only if the RowSorter is 
  * of type SortController, which it is by default. Different from core JTable, the 
- * autoCreateRowSorter property is enabled by default.
+ * autoCreateRowSorter property is enabled by default. If on, the JXTable creates and
+ * uses a default row sorter as returned by the createDefaultRowSorter method.
  * 
  * <p>
  * Typically, a JXTable is sortable by left clicking on column headers. By default, each
