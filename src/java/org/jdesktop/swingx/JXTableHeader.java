@@ -23,19 +23,22 @@ package org.jdesktop.swingx;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.beans.PropertyChangeEvent;
 import java.io.Serializable;
+import java.util.logging.Logger;
 
 import javax.swing.JTable;
+import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
 import javax.swing.event.MouseInputListener;
-import javax.swing.plaf.UIResource;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
 import org.jdesktop.swingx.event.TableColumnModelExtListener;
+import org.jdesktop.swingx.sort.SortController;
 import org.jdesktop.swingx.table.TableColumnExt;
 
 /**
@@ -52,9 +55,10 @@ import org.jdesktop.swingx.table.TableColumnExt;
  *  toggles sort order on mouseClicked. On shift-mouseClicked, it resets any column sorting. 
  * Both are done by invoking the corresponding methods of JXTable, 
  * <code> toggleSortOrder(int) </code> and <code> resetSortOrder() </code>
- * <li> Note: this is currently (?) disabled due to missing core functionality. 
- * Supports column pack (== auto-resize to exactly fit the contents)
+ * <li> Supports column pack (== auto-resize to exactly fit the contents)
  *  on double-click in resize region.
+ *  Note: this is only fully effective if the JXTable has control over the row sorter,
+ *  that is if the row sorter is of type SortController.
  *  <li> Supports horizontal auto-scroll if a column is dragged outside visible rectangle. 
  *  This feature is enabled if the autoscrolls property is true. The default is false 
  *  (because of Issue #788-swingx which still isn't fixed for jdk1.6).
@@ -68,6 +72,9 @@ import org.jdesktop.swingx.table.TableColumnExt;
  * <li> Listens to TableColumn propertyChanges to update itself accordingly.
  * <li> Supports per-column header ToolTips. 
  * <li> Guarantees reasonable minimal height > 0 for header preferred height.
+ * <li> Does its best to not sort if the mouse click happens in the resize region.
+ *  Note: this is only fully effective if the JXTable has control over the row sorter,
+ *  that is if the row sorter is of type SortController.
  * </ul>
  * 
  * 
@@ -80,6 +87,9 @@ import org.jdesktop.swingx.table.TableColumnExt;
 public class JXTableHeader extends JTableHeader 
     implements TableColumnModelExtListener {
 
+    @SuppressWarnings("unused")
+    private static final Logger LOG = Logger.getLogger(JXTableHeader.class
+            .getName());
     /**
      * The recognizer used for interpreting mouse events as sorting user gestures.
      */
@@ -122,11 +132,11 @@ public class JXTableHeader extends JTableHeader
 //        setColumnModel(table.getColumnModel());
         // the additional listening option makes sense only if the table
         // actually is a JXTable
-//        if (getXTable() != null) {
-//            installHeaderListener();
-//        } else {
-//            uninstallHeaderListener();
-//        }
+        if (getXTable() != null) {
+            installHeaderListener();
+        } else {
+            uninstallHeaderListener();
+        }
     }
 
     /**
@@ -362,15 +372,180 @@ public class JXTableHeader extends JTableHeader
         }
         return -1;
     }
+    /**
+     * Creates and installs header listeners to service the extended functionality.
+     * This implementation creates and installs a custom mouse input listener.
+     */
+    protected void installHeaderListener() {
+        if (headerListener == null) {
+            headerListener = new HeaderListener();
+            addMouseListener(headerListener);
+            addMouseMotionListener(headerListener);
+            MouseListener[] ls = getMouseListeners();
+            LOG.info("" + ls);
+        }
+    }
 
-/*------------------- deprecated stuff
- * no longer used internally - keep until we know better how to
- *    meet our requirments in Mustang 
- */   
+    /**
+     * Uninstalls header listeners to service the extended functionality.
+     * This implementation uninstalls a custom mouse input listener.
+     */
+    protected void uninstallHeaderListener() {
+        if (headerListener != null) {
+            removeMouseListener(headerListener);
+            removeMouseMotionListener(headerListener);
+            headerListener = null;
+        }
+    }
 
-/*----------------- SortGesture/MouseListener support
- * @KEEP JW: Maybe re-inserted due to core bugs, so keep it a while longer ;-)    
- */
+    private MouseInputListener headerListener;
+
+    /**
+     * A MouseListener implementation to support enhanced tableHeader functionality.
+     * 
+     * Supports column "packing" by double click in resize region. Works around
+     * core issue #6862170 (must not sort column by click into resize region).
+     * <p>
+     * 
+     * Note that the logic is critical, mostly because it must be independent of
+     * sequence of listener notification. So we check whether or not a pressed
+     * happens in the resizing region in both pressed and released, taking the
+     * header's resizingColumn property as a marker. The inResize flag can only
+     * be turned on in those. At the end of the released, we check if we are
+     * in resize and disable core sorting - which happens in clicked - if appropriate.
+     * In our clicked we hook the pack action (happens only on double click)
+     * and reset the resizing region flag always. Pressed (and all other methods)
+     * restore sorting enablement. 
+     * <p>
+     * 
+     * Is fully effective only if JXTable has control over the row sorter, that is
+     * if the row sorter is of type SortController.
+     * 
+     */
+    private class HeaderListener implements MouseInputListener, Serializable {
+        private TableColumn cachedResizingColumn;
+        private SortOrder[] cachedSortOrderCycle;
+        
+        public void mouseClicked(MouseEvent e) {
+            if (shouldIgnore(e)) {
+                return;
+            }
+            doResize(e);
+            uncacheResizingColumn();
+        }
+
+
+        public void mousePressed(MouseEvent e) {
+            resetToggleSortOrder(e);
+            if (shouldIgnore(e)) {
+                return;
+            }
+            cacheResizingColumn(e);
+        }
+
+
+        public void mouseReleased(MouseEvent e) {
+            if (shouldIgnore(e)) {
+                return;
+            }
+            cacheResizingColumn(e);
+            if (isInResizeRegion(e) && e.getClickCount() % 2 == 1) {
+                disableToggleSortOrder(e);
+            }
+        }
+
+        private boolean shouldIgnore(MouseEvent e) {
+            return !SwingUtilities.isLeftMouseButton(e)
+              || !table.isEnabled();
+        }
+
+
+        private void doResize(MouseEvent e) {
+            if (e.getClickCount() != 2)
+                return;
+            int column = getViewIndexForColumn(cachedResizingColumn);
+            if (column >= 0) {
+                (getXTable()).packColumn(column, 5);
+            }
+        }
+
+
+        /**
+         * @param e
+         */
+        private void disableToggleSortOrder(MouseEvent e) {
+            SortController controller = getXTable().getSortController();
+            if (controller == null) return;
+            cachedSortOrderCycle = controller.getSortOrderCycle();
+            controller.setSortOrderCycle();
+        }
+        /**
+         * 
+         */
+        private void resetToggleSortOrder(MouseEvent e) {
+            if (cachedSortOrderCycle == null) return;
+            getXTable().getSortController().setSortOrderCycle(cachedSortOrderCycle);
+            cachedSortOrderCycle = null;
+        }
+
+
+        /**
+         * Caches the resizing column if set. Does nothing if null.
+         *     
+         * @param e
+         */
+        private void cacheResizingColumn(MouseEvent e) {
+            TableColumn column = getResizingColumn();
+            if (column != null) {
+                cachedResizingColumn = column;
+            }
+        }
+
+        /**
+         * Sets the cached resizing column to null.
+         */
+        private void uncacheResizingColumn() {
+            cachedResizingColumn = null;
+        }
+
+        /**
+         * Returns true if the mouseEvent happened in the resizing region.
+         * 
+         * @param e
+         * @return
+         */
+        private boolean isInResizeRegion(MouseEvent e) {
+            return cachedResizingColumn != null; // inResize;
+        }
+
+        public void mouseEntered(MouseEvent e) {
+        }
+
+        public void mouseExited(MouseEvent e) {
+            uncacheResizingColumn();
+            resetToggleSortOrder(e);
+        }
+
+        public void mouseDragged(MouseEvent e) {
+            uncacheResizingColumn();
+            resetToggleSortOrder(e);
+        }
+
+        public void mouseMoved(MouseEvent e) {
+            resetToggleSortOrder(e);
+        }
+    }
+
+    
+    /*------------------- deprecated stuff
+     * no longer used internally - keep until we know better how to
+     *    meet our requirments in Mustang 
+     */   
+    /*----------------- SortGesture support
+     * @KEEP JW: Maybe re-inserted due to core bugs, so keep it a while longer ;-)
+     * But beware: no longer used internally    
+     */
+
     /**
      * Returns the SortGestureRecognizer to use. If none available, lazily 
      * creates a default.
@@ -508,132 +683,6 @@ public class JXTableHeader extends JTableHeader
 
     }
 
-    /**
-     * Creates and installs header listeners to service the extended functionality.
-     * This implementation creates and installs a custom mouse input listener.
-     * @deprecated no longer used internally - keep until we know better how to
-     *    meet our requirments in Mustang
-     */
-    @Deprecated
-    protected void installHeaderListener() {
-        if (headerListener == null) {
-            headerListener = new HeaderListener();
-            addMouseListener(headerListener);
-            addMouseMotionListener(headerListener);
-
-        }
-    }
-
-    /**
-     * Uninstalls header listeners to service the extended functionality.
-     * This implementation uninstalls a custom mouse input listener.
-     * @deprecated no longer used internally - keep until we know better how to
-     *    meet our requirments in Mustang
-     */
-    @Deprecated
-    protected void uninstallHeaderListener() {
-        if (headerListener != null) {
-            removeMouseListener(headerListener);
-            removeMouseMotionListener(headerListener);
-            headerListener = null;
-        }
-    }
-
-    private MouseInputListener headerListener;
-
-    /**
-     * @deprecated no longer used internally - keep until we know better how to
-     *    meet our requirments in Mustang
-     */
-    @Deprecated
-    private class HeaderListener implements MouseInputListener, Serializable {
-        private TableColumn cachedResizingColumn;
-
-        public void mouseClicked(MouseEvent e) {
-            if (shouldIgnore(e)) {
-                return;
-            }
-            if (isInResizeRegion(e)) {
-                doResize(e);
-            } else {
-                doSort(e);
-            }
-        }
-
-        private boolean shouldIgnore(MouseEvent e) {
-            return !SwingUtilities.isLeftMouseButton(e)
-              || !table.isEnabled();
-        }
-
-        private void doSort(MouseEvent e) {
-            JXTable table = getXTable();
-            if (!table.isSortable())
-                return;
-            if (getSortGestureRecognizer().isResetSortOrderGesture(e)) {
-                table.resetSortOrder();
-                repaint();
-            } else if (getSortGestureRecognizer().isToggleSortOrderGesture(e)){
-                int column = columnAtPoint(e.getPoint());
-                if (column >= 0) {
-                    table.toggleSortOrder(column);
-                }
-                uncacheResizingColumn();
-                repaint();
-            }
-
-        }
-
-        private void doResize(MouseEvent e) {
-            if (e.getClickCount() != 2)
-                return;
-            int column = getViewIndexForColumn(cachedResizingColumn);
-            if (column >= 0) {
-                (getXTable()).packColumn(column, 5);
-            }
-            uncacheResizingColumn();
-
-        }
-
-
-        public void mouseReleased(MouseEvent e) {
-            cacheResizingColumn(e);
-        }
-
-        public void mousePressed(MouseEvent e) {
-            cacheResizingColumn(e);
-        }
-
-        private void cacheResizingColumn(MouseEvent e) {
-            if (!getSortGestureRecognizer().isSortOrderGesture(e))
-                return;
-            TableColumn column = getResizingColumn();
-            if (column != null) {
-                cachedResizingColumn = column;
-            }
-        }
-
-        private void uncacheResizingColumn() {
-            cachedResizingColumn = null;
-        }
-
-        private boolean isInResizeRegion(MouseEvent e) {
-            return cachedResizingColumn != null; // inResize;
-        }
-
-        public void mouseEntered(MouseEvent e) {
-        }
-
-        public void mouseExited(MouseEvent e) {
-            uncacheResizingColumn();
-        }
-
-        public void mouseDragged(MouseEvent e) {
-            uncacheResizingColumn();
-        }
-
-        public void mouseMoved(MouseEvent e) {
-        }
-    }
 
 
 
