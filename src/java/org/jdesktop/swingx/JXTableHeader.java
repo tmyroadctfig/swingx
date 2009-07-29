@@ -23,7 +23,6 @@ package org.jdesktop.swingx;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.beans.PropertyChangeEvent;
 import java.io.Serializable;
 import java.util.logging.Logger;
@@ -92,7 +91,9 @@ public class JXTableHeader extends JTableHeader
             .getName());
     /**
      * The recognizer used for interpreting mouse events as sorting user gestures.
+     * @deprecated no longer used internally.
      */
+    @Deprecated
     private SortGestureRecognizer sortGestureRecognizer;
 
     /**
@@ -381,8 +382,6 @@ public class JXTableHeader extends JTableHeader
             headerListener = new HeaderListener();
             addMouseListener(headerListener);
             addMouseMotionListener(headerListener);
-            MouseListener[] ls = getMouseListeners();
-            LOG.info("" + ls);
         }
     }
 
@@ -426,6 +425,9 @@ public class JXTableHeader extends JTableHeader
         private TableColumn cachedResizingColumn;
         private SortOrder[] cachedSortOrderCycle;
         
+        /**
+         * Packs column on double click in resize region.
+         */
         public void mouseClicked(MouseEvent e) {
             if (shouldIgnore(e)) {
                 return;
@@ -434,7 +436,9 @@ public class JXTableHeader extends JTableHeader
             uncacheResizingColumn();
         }
 
-
+        /**
+         * Resets sort enablement always, set resizing marker if available.
+         */
         public void mousePressed(MouseEvent e) {
             resetToggleSortOrder(e);
             if (shouldIgnore(e)) {
@@ -443,7 +447,10 @@ public class JXTableHeader extends JTableHeader
             cacheResizingColumn(e);
         }
 
-
+        /** 
+         * Sets resizing marker if available, disables table sorting if in 
+         * resize region and sort gesture (aka: single click).
+         */
         public void mouseReleased(MouseEvent e) {
             if (shouldIgnore(e)) {
                 return;
@@ -454,12 +461,25 @@ public class JXTableHeader extends JTableHeader
             }
         }
 
+        /**
+         * Returns a boolean indication if the mouse event should be ignored.
+         * Here: returns true if table not enabled or not an event from the left mouse
+         * button.
+         * 
+         * @param e
+         * @return
+         */
         private boolean shouldIgnore(MouseEvent e) {
             return !SwingUtilities.isLeftMouseButton(e)
               || !table.isEnabled();
         }
 
-
+        /**
+         * Packs caches resizing column on double click, if available. Does nothing
+         * otherwise.
+         * 
+         * @param e
+         */
         private void doResize(MouseEvent e) {
             if (e.getClickCount() != 2)
                 return;
@@ -471,6 +491,7 @@ public class JXTableHeader extends JTableHeader
 
 
         /**
+         * 
          * @param e
          */
         private void disableToggleSortOrder(MouseEvent e) {
@@ -521,16 +542,25 @@ public class JXTableHeader extends JTableHeader
         public void mouseEntered(MouseEvent e) {
         }
 
+        /**
+         * Resets all cached state.
+         */
         public void mouseExited(MouseEvent e) {
             uncacheResizingColumn();
             resetToggleSortOrder(e);
         }
 
+        /**
+         * Resets all cached state.
+         */
         public void mouseDragged(MouseEvent e) {
             uncacheResizingColumn();
             resetToggleSortOrder(e);
         }
 
+        /**
+         * Resets all cached state.
+         */
         public void mouseMoved(MouseEvent e) {
             resetToggleSortOrder(e);
         }
