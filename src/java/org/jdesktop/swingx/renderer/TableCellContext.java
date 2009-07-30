@@ -47,9 +47,29 @@ public class TableCellContext extends CellContext {
             boolean selected, boolean focused, boolean expanded, boolean leaf) {
         this.component = component;
         installState(value, row, column, selected, focused, expanded, leaf);
+        this.dropOn = checkDropOnState();
     }
     
     
+    /**
+     * 
+     */
+    private boolean checkDropOnState() {
+        if ((getComponent() == null) || !isValidRow() || !isValidColumn()) {
+            return false;
+        }
+        JTable.DropLocation dropLocation = getComponent().getDropLocation();
+        if (dropLocation != null
+                && !dropLocation.isInsertRow()
+                && !dropLocation.isInsertColumn()
+                && dropLocation.getRow() == row
+                && dropLocation.getColumn() == column) {
+            return true;
+        }
+        return false;
+    }
+
+
     @Override
     public JTable getComponent() {
         return (JTable) super.getComponent();
@@ -69,11 +89,18 @@ public class TableCellContext extends CellContext {
         return getComponent().isCellEditable(getRow(), getColumn());
     }
 
+    
+
     /**
      * {@inheritDoc}
      */
     @Override
     protected Color getSelectionBackground() {
+        Color selection = null;
+        if (isDropOn()) {
+            selection = getDropCellBackground();
+            if (selection != null) return selection;
+        }
         return getComponent() != null ? getComponent()
                 .getSelectionBackground() : null;
     }
@@ -83,6 +110,11 @@ public class TableCellContext extends CellContext {
      */
     @Override
     protected Color getSelectionForeground() {
+        Color selection = null;
+        if (isDropOn()) {
+            selection = getDropCellForeground();
+            if (selection != null) return selection;
+        }
         return getComponent() != null ? getComponent()
                 .getSelectionForeground() : null;
     }

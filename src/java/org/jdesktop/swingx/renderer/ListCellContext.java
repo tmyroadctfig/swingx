@@ -47,8 +47,25 @@ public class ListCellContext extends CellContext {
             boolean selected, boolean focused, boolean expanded, boolean leaf) {
         this.component = component;
         installState(value, row, column, selected, focused, expanded, leaf);
+        this.dropOn = checkDropOnState();
     }
-    
+
+    /**
+     * 
+     */
+    private boolean checkDropOnState() {
+        if ((getComponent() == null)) {
+            return false;
+        }
+        JList.DropLocation dropLocation = getComponent().getDropLocation();
+        if (dropLocation != null
+                && !dropLocation.isInsert()
+                && dropLocation.getIndex() == row) {
+            return true;
+        }
+        return false;
+    }
+
     
     @Override
     public JList getComponent() {
@@ -60,6 +77,11 @@ public class ListCellContext extends CellContext {
      */
     @Override
     protected Color getSelectionBackground() {
+        Color selection = null;
+        if (isDropOn()) {
+            selection = getDropCellBackground();
+            if (selection != null) return selection;
+        }
         return getComponent() != null ? getComponent().getSelectionBackground() : null;
     }
 
@@ -68,6 +90,11 @@ public class ListCellContext extends CellContext {
      */
     @Override
     protected Color getSelectionForeground() {
+        Color selection = null;
+        if (isDropOn()) {
+            selection = getDropCellForeground();
+            if (selection != null) return selection;
+        }
         return getComponent() != null ? getComponent().getSelectionForeground() : null;
     }
 
