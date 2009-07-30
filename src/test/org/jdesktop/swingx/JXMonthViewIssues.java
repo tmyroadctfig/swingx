@@ -21,6 +21,8 @@
  */
 package org.jdesktop.swingx;
 
+import static org.junit.Assert.*;
+
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GraphicsEnvironment;
@@ -29,6 +31,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.lang.reflect.InvocationTargetException;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -44,11 +47,13 @@ import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.SwingUtilities;
 
 import org.jdesktop.swingx.JXMonthViewTest.Clock;
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.calendar.CalendarUtils;
 import org.jdesktop.swingx.calendar.DaySelectionModel;
+import org.jdesktop.swingx.calendar.SingleDaySelectionModel;
 import org.jdesktop.swingx.calendar.DateSelectionModel.SelectionMode;
 import org.jdesktop.swingx.event.DateSelectionEvent.EventType;
 import org.jdesktop.swingx.test.DateSelectionReport;
@@ -89,7 +94,27 @@ public class JXMonthViewIssues extends InteractiveTestCase {
     // the calendar to use, its date is initialized with the today-field in setUpCalendar
     protected Calendar calendar;
   
+    @Test
+    public void testMonthViewPaintNPE() throws InterruptedException, InvocationTargetException {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.fine("cannot run ui test - headless environment");
+            return;
+        }
+        
+        final JXMonthView monthView = new JXMonthView();
+        monthView.setTimeZone(TimeZone.getTimeZone("GMT"));
+        monthView.setSelectionModel(new SingleDaySelectionModel());
+        SwingUtilities.invokeAndWait(new Runnable() {
+            public void run() {
+                showInFrame(monthView, "Colored editor");
+                // hmmm ... this prints a stacktrace to the output - why doesn't the test fail?
+            }
+        });
 
+    }
+    
+    
     /**
      * Issue #1125-swingx: JXMonthView today incorrect.
      * Visualize remaining problem: not kept in synch automatically (note: here
