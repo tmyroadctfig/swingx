@@ -2399,7 +2399,7 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
      * 
      */
     @Override
-    public void createDefaultColumnsFromModel() {
+    public final void createDefaultColumnsFromModel() {
         // JW: when could this happen?
         if (getModel() == null)
             return;
