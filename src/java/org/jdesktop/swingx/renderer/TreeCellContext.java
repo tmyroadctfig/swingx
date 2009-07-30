@@ -78,9 +78,22 @@ public class TreeCellContext extends CellContext {
             boolean selected, boolean focused, boolean expanded, boolean leaf) {
         this.component = component;
         installState(value, row, column, selected, focused, expanded, leaf);
+        this.dropOn = checkDropOnState();
     }
 
-    
+    private boolean checkDropOnState() {
+        if ((getComponent() == null)) {
+            return false;
+        }
+        JTree.DropLocation dropLocation = getComponent().getDropLocation();
+        if (dropLocation != null
+                && dropLocation.getChildIndex() == -1
+                && getComponent().getRowForPath(dropLocation.getPath()) == row) {
+            return true;
+        }
+        return false;
+    }
+   
     @Override
     public JTree getComponent() {
         return (JTree) super.getComponent();
@@ -114,6 +127,11 @@ public class TreeCellContext extends CellContext {
      */
     @Override
     protected Color getSelectionBackground() {
+        Color selection = null;
+        if (isDropOn()) {
+            selection = getDropCellBackground();
+            if (selection != null) return selection;
+        }
         if (getComponent() instanceof JXTree) {
             return ((JXTree) getComponent()).getSelectionBackground();
         }
@@ -125,6 +143,11 @@ public class TreeCellContext extends CellContext {
      */
     @Override
     protected Color getSelectionForeground() {
+        Color selection = null;
+        if (isDropOn()) {
+            selection = getDropCellForeground();
+            if (selection != null) return selection;
+        }
         if (getComponent() instanceof JXTree) {
             return ((JXTree) getComponent()).getSelectionForeground();
         }

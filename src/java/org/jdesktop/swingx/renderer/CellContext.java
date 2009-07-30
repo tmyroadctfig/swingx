@@ -124,6 +124,8 @@ public class CellContext implements Serializable {
 
     protected transient boolean leaf;
 
+    protected transient boolean dropOn;
+    
     // --------------------------- install context
 
 
@@ -266,6 +268,20 @@ public class CellContext implements Serializable {
     }
 
     /**
+     * Returns a boolean indicating if the cell is a drop location with any of the dropOn
+     * modes. It's up to subclasses to implement.
+     * <p>
+     * 
+     * Here: false.
+     * 
+     * @return true if the current cell is a drop location with any of the dropOn modes,
+     *    false otherwise
+     */
+    protected boolean isDropOn() {
+        return dropOn;
+    }
+    
+    /**
      * Returns the foreground color of the renderered component or null if the
      * component is null
      * <p>
@@ -275,6 +291,9 @@ public class CellContext implements Serializable {
      * @return the foreground color of the rendered component.
      */
     protected Color getForeground() {
+        if (isDropOn()) {
+            return getSelectionForeground();
+        }
         return getComponent() != null ? getComponent().getForeground() : null;
     }
 
@@ -288,6 +307,9 @@ public class CellContext implements Serializable {
      * @return the background color of the rendered component.
      */
     protected Color getBackground() {
+        if (isDropOn()) {
+            return getSelectionBackground();
+        }
         return getComponent() != null ? getComponent().getBackground() : null;
     }
 
@@ -374,6 +396,13 @@ public class CellContext implements Serializable {
         return UIManager.getColor(getUIKey("focusCellBackground"));
     }
 
+    protected Color getDropCellForeground() {
+        return UIManager.getColor(getUIKey("dropCellForeground"));
+    }
+    
+    protected Color getDropCellBackground() {
+        return UIManager.getColor(getUIKey("dropCellBackground"));
+    }
     // ----------------------- convenience
 
     /**

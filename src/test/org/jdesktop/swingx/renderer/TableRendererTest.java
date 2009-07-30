@@ -21,6 +21,8 @@
  */
 package org.jdesktop.swingx.renderer;
 
+import static org.junit.Assert.*;
+
 import java.awt.Color;
 import java.awt.Component;
 import java.io.Serializable;
@@ -92,6 +94,37 @@ public class TableRendererTest extends InteractiveTestCase {
         table.getColumnModel().getColumn(xColumn).setCellRenderer(xTableRenderer);
     }
     
+    /**
+     * Issue #484-swingx: dnd on color not showing.
+     * Can't really test - can't mock a drop-on only bare context methods.
+     */
+    @Test
+    public void testCellContextDropOn() {
+        TableCellContext cellContext = new TableCellContext();
+        cellContext.installContext(null, "whatever", 0, 0, false, true, false, false);
+        assertFalse("context must cope with null component", cellContext.isDropOn());
+        // fake ... and test internals
+        cellContext.dropOn = true;
+        assertTrue("context must use dropOn flag ... dooh", cellContext.isDropOn());
+    }
+    /**
+     * Issue #484-swingx: dnd on color not showing.
+     * Can't really test - can't mock a drop-on only bare context methods.
+     */
+    @Test
+    public void testCellContextDropOnColors() {
+        TableCellContext cellContext = new TableCellContext();
+        Color dropBackground = UIManager.getColor("Table.dropCellBackground");
+        LOG.info("background " + dropBackground);
+        if (dropBackground != null) {
+            assertEquals(dropBackground, cellContext.getDropCellBackground());
+        }
+        Color dropForeground = UIManager.getColor("Table.dropCellForeground");
+        LOG.info("foreground " + dropForeground);
+        if (dropForeground != null) {
+            assertEquals(dropForeground, cellContext.getDropCellForeground());
+        }
+    }
     /**
      * Issue ??-swingx: getEditable throws if cell coordinates invalid
      */
