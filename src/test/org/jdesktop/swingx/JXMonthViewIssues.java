@@ -21,8 +21,6 @@
  */
 package org.jdesktop.swingx;
 
-import static org.junit.Assert.*;
-
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GraphicsEnvironment;
@@ -47,7 +45,6 @@ import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.SwingUtilities;
 
 import org.jdesktop.swingx.JXMonthViewTest.Clock;
 import org.jdesktop.swingx.action.AbstractActionExt;
@@ -79,7 +76,7 @@ public class JXMonthViewIssues extends InteractiveTestCase {
 //          test.runInteractiveTests();
 //        test.runInteractiveTests("interactive.*Locale.*");
 //          test.runInteractiveTests("interactive.*AutoScroll.*");
-        test.runInteractiveTests("interactive.*Today.*");
+        test.runInteractiveTests("interactive.*PaintNPE.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
@@ -93,27 +90,6 @@ public class JXMonthViewIssues extends InteractiveTestCase {
     protected Date yesterday;
     // the calendar to use, its date is initialized with the today-field in setUpCalendar
     protected Calendar calendar;
-  
-    @Test
-    public void testMonthViewPaintNPE() throws InterruptedException, InvocationTargetException {
-        // This test will not work in a headless configuration.
-        if (GraphicsEnvironment.isHeadless()) {
-            LOG.fine("cannot run ui test - headless environment");
-            return;
-        }
-        
-        final JXMonthView monthView = new JXMonthView();
-        monthView.setTimeZone(TimeZone.getTimeZone("GMT"));
-        monthView.setSelectionModel(new SingleDaySelectionModel());
-        SwingUtilities.invokeAndWait(new Runnable() {
-            public void run() {
-                showInFrame(monthView, "Colored editor");
-                // hmmm ... this prints a stacktrace to the output - why doesn't the test fail?
-            }
-        });
-
-    }
-    
     
     /**
      * Issue #1125-swingx: JXMonthView today incorrect.

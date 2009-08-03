@@ -481,13 +481,21 @@ public class JXMonthView extends JComponent {
     }
 
     /**
-     * Installs the internal calendars from the selection model.
+     * Installs the internal calendars from the selection model.<p>
+     * 
+     * PENDING JW: in fixing #11433, added update of firstDisplayedDay and
+     * today here - check if correct place to do so. 
      * 
      */
     private void installCalendar() {
         cal = model.getCalendar();
         firstDayOfWeek = cal.getFirstDayOfWeek();
+        Date anchorDate = getAnchorDate();
         anchor = (Calendar) cal.clone();
+        if (anchorDate != null) {
+            setFirstDisplayedDay(anchorDate);
+        }
+        updateTodayFromCurrentTime();
     }
 
     /**
@@ -496,10 +504,11 @@ public class JXMonthView extends JComponent {
      * have some invariant for testing. Do not use in client code, may change
      * without notice!
      * 
-     * @return the "uncleaned" first display date.
+     * @return the "uncleaned" first display date or null if the firstDisplayedDay
+     *   is not yet set.
      */
     protected Date getAnchorDate() {
-        return anchor.getTime();
+        return anchor != null ? anchor.getTime() : null;
     }
 
     /**
