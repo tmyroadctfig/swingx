@@ -28,7 +28,6 @@ import java.awt.ComponentOrientation;
 import java.awt.Font;
 import java.awt.GraphicsEnvironment;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
 import java.lang.reflect.InvocationTargetException;
 import java.text.DateFormatSymbols;
 import java.util.Arrays;
@@ -40,7 +39,6 @@ import java.util.TimeZone;
 import java.util.TreeSet;
 import java.util.logging.Logger;
 
-import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.JComponent;
@@ -50,6 +48,7 @@ import javax.swing.UIManager;
 import org.jdesktop.swingx.calendar.CalendarUtils;
 import org.jdesktop.swingx.calendar.DateSelectionModel;
 import org.jdesktop.swingx.calendar.DaySelectionModel;
+import org.jdesktop.swingx.calendar.SingleDaySelectionModel;
 import org.jdesktop.swingx.calendar.DateSelectionModel.SelectionMode;
 import org.jdesktop.swingx.event.DateSelectionEvent.EventType;
 import org.jdesktop.swingx.hyperlink.AbstractHyperlinkAction;
@@ -128,6 +127,22 @@ public class JXMonthViewTest extends InteractiveTestCase {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+    
+    /**
+     * Issue #1143-swingx: NPE after setTimeZone/setModel.
+     */
+    @Test
+    public void testFirstDisplayedDayAfterTimeZone() {
+        JXMonthView monthView = new JXMonthView();
+        TimeZone tz = TimeZone.getTimeZone("GMT+4");
+        if (monthView.getTimeZone().equals(tz)) {
+            tz = TimeZone.getTimeZone("GMT+5");
+        }
+        monthView.setTimeZone(tz);
+        assertTrue(CalendarUtils.isStartOfDay(monthView.getCalendar()));
+        monthView.setSelectionModel(new SingleDaySelectionModel());
+        assertTrue(CalendarUtils.isStartOfDay(monthView.getCalendar()));
     }
     
     /**
@@ -832,6 +847,8 @@ public class JXMonthViewTest extends InteractiveTestCase {
         int modelMinimal = model.getMinimalDaysInFirstWeek();
         monthView.setSelectionModel(model);
         assertEquals("timeZone must be updated from model", tz, monthView.getTimeZone());
+        // Issue 1143
+        assertTrue("firstDisplayedDay must be updated to start of day", CalendarUtils.isStartOfDay(monthView.getCalendar()));
         assertEquals("Locale must be updated from model", locale, monthView.getLocale());
         // be aware if it makes no sense to assert
         if (firstDayOfWeek != model.getFirstDayOfWeek()) {

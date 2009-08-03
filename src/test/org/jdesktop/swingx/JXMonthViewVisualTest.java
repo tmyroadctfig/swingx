@@ -30,11 +30,9 @@ import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 
 import org.jdesktop.swingx.calendar.CalendarUtils;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.junit.Test;
-import org.junit.Before;
-import org.junit.After;
 
 
 /**
@@ -42,7 +40,9 @@ import org.junit.After;
  *  
  * This one does not use mocks but some methods 
  * of InteractiveTestCase. That's why the passing methods could not be moved
- * into JXMonthViewTest.
+ * into JXMonthViewTest.<p>
+ * 
+ * PENDING JW: merge into JXMonthViewTest (which doesn't use mock any longer).
  * 
  * @author Jeanette Winzenburg
  */
