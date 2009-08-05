@@ -23,6 +23,7 @@ package org.jdesktop.swingx.sort;
 
 import java.util.Comparator;
 
+import javax.swing.RowFilter;
 import javax.swing.SortOrder;
 
 /**
@@ -47,13 +48,14 @@ import javax.swing.SortOrder;
  * </ol>
  *
  * PENDING JW: add RowFilter support<p>
- * 
+ * PENDING JW: generics are introduced in the process of adding filter support and
+ *   are experimental ... right now we get tons of warnings ...<p>
  * 
  *  @author <a href="mailto:jesse@swank.ca">Jesse Wilson</a>
  *  @author Jeanette Winzenburg
  * 
  */
-public interface SortController {
+public interface SortController<M, I> {
 
     /**
      * Sets whether or not this controller is sortable.<p>
@@ -212,7 +214,7 @@ public interface SortController {
      *
      * @param sortsOnUpdates whether or not to sort on update events
      */
-    public void setSortsOnUpdates(boolean sortsOnUpdates);
+    void setSortsOnUpdates(boolean sortsOnUpdates);
 
     /**
      * Returns true if  a sort should happen when the underlying
@@ -220,6 +222,55 @@ public interface SortController {
      *
      * @return whether or not to sort when the model is updated
      */
-    public boolean getSortsOnUpdates();
+    boolean getSortsOnUpdates();
+    
+//-------------------- filter
+    
+    /**
+     * Sets the filter that determines which rows, if any, should be
+     * hidden from the view.  The filter is applied before sorting.  A value
+     * of <code>null</code> indicates all values from the model should be
+     * included.
+     * <p>
+     * <code>RowFilter</code>'s <code>include</code> method is passed an
+     * <code>Entry</code> that wraps the underlying model.  The number
+     * of columns in the <code>Entry</code> corresponds to the
+     * number of columns in the underlying model.  The identifier
+     * comes from the underlying model as well.
+     * <p>
+     * This method triggers a sort.
+     *
+     * PENDING JW: the "underlying model" is the ModelWrapper ... want to 
+     * expose here as well? Otherwise, the second paramter doesn't make much sense.
+     * 
+     * @param filter the filter used to determine what entries should be
+     *        included
+     */
+     void setRowFilter(RowFilter<? super M, ? super I> filter);
+
+    /**
+     * Returns the filter that determines which rows, if any, should
+     * be hidden from view.
+     *
+     * @return the filter
+     */
+     RowFilter<? super M,? super I> getRowFilter();
+
+    /**
+     * Sets the StringValueProvider to look up the StringValues. If the value
+     * is not-null, it guarantees to use it exclusively for string conversion. <p>
+     * 
+     * PENDING JW: this is more or less parallel to TableStringConverter. Need to think
+     * about merging somehow.
+     * 
+     * @param provider the look up for StringValues, may be null.
+     */
+    void setStringValueProvider(StringValueProvider provider);
+
+    /**
+     * @return
+     */
+    StringValueProvider getStringValueProvider();
+
 
 }
