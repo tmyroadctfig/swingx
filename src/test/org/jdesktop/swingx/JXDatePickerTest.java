@@ -47,6 +47,7 @@ import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.plaf.UIResource;
+import javax.swing.text.DateFormatter;
 import javax.swing.text.DefaultFormatterFactory;
 
 import org.jdesktop.swingx.calendar.CalendarUtils;
@@ -88,6 +89,30 @@ public class JXDatePickerTest extends InteractiveTestCase {
        public void tearDown() {
     }
 
+    /**
+     * Issue #1144-swingx: JXDatePicker must accept custom formatter.
+     * Pathological .. but anyway: formatter may be null.
+     * Issue manifests in throwing NPE.
+     */
+    @Test
+    public void testCustomFormatterNull() {
+        JXDatePicker picker = new JXDatePicker();
+        DefaultFormatterFactory factory = new DefaultFormatterFactory();
+        assertEquals("sanity (null formatter): ", null, factory.getFormatter(picker.getEditor()));
+        picker.getEditor().setFormatterFactory(factory);
+        picker.updateUI();
+    }
+    /**
+     * Issue #1144-swingx: JXDatePicker must accept custom formatter.
+     * Use core DateFormatter - issue manifests in throwing classcastEx
+     */
+    @Test
+    public void testCustomFormatterCore() {
+        JXDatePicker picker = new JXDatePicker();
+        DefaultFormatterFactory factory = new DefaultFormatterFactory(new DateFormatter());
+        picker.getEditor().setFormatterFactory(factory);
+        picker.updateUI();
+    }
     
     /**
      * Issue #910-swingx: home commit must be disabled if picker not editable.

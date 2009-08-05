@@ -190,7 +190,10 @@ public class BasicDatePickerUI extends DatePickerUI {
             AbstractFormatterFactory factory = editor.getFormatterFactory();
             if (factory != null) {
                 AbstractFormatter formatter = factory.getFormatter(editor);
-                if (!(formatter instanceof DatePickerFormatterUIResource))  {
+                // fix for #1144: classCastException for custom formatters
+                // PENDING JW: revisit for #1138
+                if ((formatter instanceof DatePickerFormatter) && !(formatter instanceof UIResource)) {
+//                if (!(formatter instanceof DatePickerFormatterUIResource))  {
                     formats = ((DatePickerFormatter) formatter).getFormats();
                 }
             }
