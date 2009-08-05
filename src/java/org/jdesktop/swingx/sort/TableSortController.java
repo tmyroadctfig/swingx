@@ -28,6 +28,7 @@ import java.util.List;
 import javax.swing.SortOrder;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
+import javax.swing.table.TableStringConverter;
 
 import org.jdesktop.swingx.util.Contract;
 
@@ -40,13 +41,15 @@ import org.jdesktop.swingx.util.Contract;
  * @author Jeanette Winzenburg
  */
 public class TableSortController<M extends TableModel> extends TableRowSorter<M> implements
-        SortController {
+        SortController<M, Integer> {
 
     private final static SortOrder[] DEFAULT_CYCLE = new SortOrder[] {SortOrder.ASCENDING, SortOrder.DESCENDING};
 
     private List<SortOrder> sortCycle;
     
     private boolean sortable;
+
+    private StringValueProvider stringValueProvider;
     
     public TableSortController() {
         this(null);
@@ -234,4 +237,41 @@ public class TableSortController<M extends TableModel> extends TableRowSorter<M>
         sortCycle = Arrays.asList(cycle);
     }
 
+    /**
+     * @param registry
+     */
+    @Override
+    public void setStringValueProvider(StringValueProvider registry) {
+        this.stringValueProvider = registry;
+        updateStringConverter();
+    }
+    
+    /**
+     * @return
+     */
+    @Override
+    public StringValueProvider getStringValueProvider() {
+        return stringValueProvider;
+    }
+
+    
+    /**
+     * Glue to TableStringConverter.
+     */
+    private void updateStringConverter() {
+        TableStringConverter converter = null;
+        if (stringValueProvider != null) {
+            converter = new StringValueBasedConverter();
+        }
+        setStringConverter(converter);
+    }
+    
+    private class StringValueBasedConverter extends TableStringConverter {
+
+        @Override
+        public String toString(TableModel model, int row, int column) {
+            return stringValueProvider.getStringValue(row, column).getString(model.getValueAt(row, column));
+        }
+        
+    }
 }

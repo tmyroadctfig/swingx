@@ -21,16 +21,20 @@
  */
 package org.jdesktop.swingx.sort;
 
-import static org.junit.Assert.*;
-
+import java.awt.Color;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
+import javax.swing.RowFilter;
 import javax.swing.SortOrder;
 import javax.swing.RowSorter.SortKey;
 import javax.swing.table.TableModel;
 
 import org.jdesktop.swingx.InteractiveTestCase;
+import org.jdesktop.swingx.renderer.StringValue;
+import org.jdesktop.swingx.renderer.StringValues;
 import org.jdesktop.test.AncientSwingTeam;
 import org.junit.Before;
 import org.junit.Test;
@@ -50,6 +54,16 @@ public class TableSortControllerTest extends InteractiveTestCase {
     
     private TableModel teamModel;
     private TableSortController<TableModel> controller;
+    
+    /**
+     * A custom StringValue for Color. Maps to a string composed of the
+     * prefix "R/G/B: " and the Color's rgb value.
+     */
+    private StringValue sv;
+
+    /** writable version */
+    private StringValueRegistry registry;
+
 
     public static void main(String[] args) {
         TableSortControllerTest test = new TableSortControllerTest();
@@ -61,6 +75,23 @@ public class TableSortControllerTest extends InteractiveTestCase {
     }
     
     @Test
+    public void testUseStringValueProvider() {
+        registry.setStringValue(sv, Color.class);
+        controller.setStringValueProvider(registry);
+        RowFilter<TableModel, Integer> filter = RowFilter.regexFilter("R/G/B: -2", 2);
+        controller.setRowFilter(filter);
+        assertTrue("view row count: " + controller.getViewRowCount(), controller.getViewRowCount() > 0);
+//        assertEquals(sv.getString(table.getValueAt(0, 2)), table.getStringAt(0, 2));
+    }
+    
+    @Test
+    public void testSetStringValueProvider() {
+        registry.setStringValue(sv, Color.class);
+        controller.setStringValueProvider(registry);
+        assertEquals(registry, controller.getStringValueProvider());
+    }
+    
+    @Test
     public void testLastColumn() {
         controller.toggleSortOrder(teamModel.getColumnCount() - 1);
         // was silly mistake ...
@@ -68,8 +99,13 @@ public class TableSortControllerTest extends InteractiveTestCase {
     }
     
     @Test(expected=NullPointerException.class)
+    public void testNPEOnNullSortOrderCycle() {
+        controller.setSortOrderCycle((SortOrder[])null);
+    }
+    
+    @Test(expected=NullPointerException.class)
     public void testNPEOnNullSortOrderCycleElements() {
-        controller.setSortOrderCycle(null);
+        controller.setSortOrderCycle((SortOrder) null);
     }
     
     @Test
@@ -186,7 +222,6 @@ public class TableSortControllerTest extends InteractiveTestCase {
         SortOrder[] cycle = controller.getSortOrderCycle();
         for (int i = 0; i < cycle.length; i++) {
             controller.toggleSortOrder(0);
-            LOG.info("sortorder in cycle" + i + cycle[i]);
             assertEquals(cycle[i], controller.getSortOrder(0));
         }
     }
@@ -241,11 +276,66 @@ public class TableSortControllerTest extends InteractiveTestCase {
             assertTrue("columns must be sortable by default", controller.isSortable(i));
         }
     }
+
+//-------------------- utility methods and setup
+    
+    /**
+     * Creates and returns a StringValue which maps a Color to it's R/G/B rep, 
+     * prepending "R/G/B: "
+     * 
+     * @return the StringValue for color.
+     */
+    private StringValue createColorStringValue() {
+        StringValue sv = new StringValue() {
+
+            public String getString(Object value) {
+                if (value instanceof Color) {
+                    Color color = (Color) value;
+                    return "R/G/B: " + color.getRGB();
+                }
+                return StringValues.TO_STRING.getString(value);
+            }
+            
+        };
+        return sv;
+    }
+    /**
+     * @param registry2
+     * @param teamModel2
+     */
+    private void initColumnClasses(StringValueRegistry registry,
+            TableModel model) {
+        Map<Integer, Class<?>> classPerColumn = new HashMap<Integer, Class<?>>();
+        for (int i = 0; i < model.getColumnCount(); i++) {
+            if (!Object.class.equals(model.getColumnClass(i))) {
+                classPerColumn.put(i, model.getColumnClass(i));
+            }
+        }
+        registry.setColumnClasses(classPerColumn);
+    }
+
+    /**
+     * @param registry2
+     * @param class1
+     */
+    private void installPerClass(StringValueRegistry registry,
+            Class<?>... clazz ) {
+        Map<Integer, Class<?>> classPerColumn = new HashMap<Integer, Class<?>>();
+        for (int i = 0; i < clazz.length; i++) {
+            classPerColumn.put(i, clazz[i]);
+        }
+        registry.setColumnClasses(classPerColumn);
+    }
+
+
     @Before
     @Override
     public void setUp() throws Exception {
         teamModel = new AncientSwingTeam();
         controller = new TableSortController<TableModel>(teamModel);
+        sv = createColorStringValue();
+        registry = new StringValueRegistry();
+        initColumnClasses(registry, teamModel);
     }
 
     

@@ -406,6 +406,21 @@ public class JXTableIssues extends InteractiveTestCase {
     }
 
 //----------------- interactive
+    /**
+     * Use-case: null always at bottom, independent of sort order.
+     * Unsupported by core default. Can SwingX? No ...
+     */
+    public void interactiveSortIgnoreNull() {
+        TableModel model = new DefaultTableModel(10, 3);
+        for (int i = 0; i < 3; i++) {
+            model.setValueAt(i+1, i, 0);
+        }
+        JTable table = new JTable();
+        table.setAutoCreateRowSorter(true);
+        table.setModel(model);
+        JXTable xtable = new JXTable(model);
+        showWithScrollingInFrame(xtable, table, "JXTable <-> JTable: ignore null in sort");
+    }
 
     /**
      * Unconditional repaint on cell update (through the default
