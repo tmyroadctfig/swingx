@@ -22,10 +22,15 @@
 package org.jdesktop.swingx;
 
 import java.awt.Color;
+import java.awt.Component;
+import java.util.Date;
 import java.util.logging.Logger;
 
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.RowFilter;
 import javax.swing.UIManager;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableStringConverter;
@@ -35,7 +40,10 @@ import org.jdesktop.swingx.decorator.ComponentAdapterTest.JXTableT;
 import org.jdesktop.swingx.renderer.DefaultTableRenderer;
 import org.jdesktop.swingx.renderer.StringValue;
 import org.jdesktop.swingx.renderer.StringValues;
+import org.jdesktop.swingx.sort.StringValueRegistry;
 import org.jdesktop.swingx.sort.TableSortController;
+import org.jdesktop.swingx.table.ColumnFactory;
+import org.jdesktop.swingx.table.TableColumnExt;
 import org.jdesktop.test.AncientSwingTeam;
 import org.junit.After;
 import org.junit.Before;
@@ -108,10 +116,8 @@ public class JXTableSortRevamp extends InteractiveTestCase {
             e.printStackTrace();
         }
     }
-    
 
 //--------------- current re-introduce
-
     /**
      * Issue #1145-swingx: re-enable filtering with single-string-representation.
      * was: Issue #767-swingx: consistent string representation.
@@ -149,7 +155,6 @@ public class JXTableSortRevamp extends InteractiveTestCase {
             }
         };
         ((TableSortController) table.getRowSorter()).setStringConverter(coreConverter);
-        LOG.info("setting filter ...");
         RowFilter<?, ?> filter = RowFilter.regexFilter("R/G/B: -2", 2);
         table.getSortController().setRowFilter(filter);
         assertTrue(table.getRowCount() > 0);
@@ -177,7 +182,6 @@ public class JXTableSortRevamp extends InteractiveTestCase {
             }
         };
         ((TableSortController) table.getRowSorter()).setStringConverter(coreConverter);
-        LOG.info("setting filter ...");
         RowFilter<?, ?> filter = RowFilter.regexFilter("R/G/B: -2", 2);
         table.getSortController().setRowFilter(filter);
         assertTrue(table.getRowCount() > 0);

@@ -112,6 +112,7 @@ import org.jdesktop.swingx.search.Searchable;
 import org.jdesktop.swingx.search.TableSearchable;
 import org.jdesktop.swingx.sort.SortController;
 import org.jdesktop.swingx.sort.SortUtils;
+import org.jdesktop.swingx.sort.StringValueRegistry;
 import org.jdesktop.swingx.sort.TableSortController;
 import org.jdesktop.swingx.table.ColumnControlButton;
 import org.jdesktop.swingx.table.ColumnFactory;
@@ -470,6 +471,8 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
     private boolean sortsOnUpdates;
     /** flag to indicate that it's unsafe to update sortable-related sorter properties. */
     private boolean ignoreAddColumn;
+
+    private StringValueRegistry stringValueRegistry;
     
 
     /** Instantiates a JXTable with a default table model, no data. */
@@ -550,6 +553,7 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
      */
     private void init() {
         putClientProperty(USE_DTCR_COLORMEMORY_HACK, Boolean.TRUE);
+        initDefaultStringValues();
         setEditable(true);
         setAutoCreateRowSorter(true);
         setSortsOnUpdates(true);
@@ -1501,6 +1505,8 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
      * Overridden to re-calculate intialize column width and preferred
      * scrollable size after a structureChanged if autocreateColumnsFromModel is
      * true.
+     * <p>
+     * 
      */
     @Override
     public void tableChanged(TableModelEvent e) {
@@ -1509,10 +1515,9 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
             initializeColumnWidths();
             resetCalculatedScrollableSize(true);
         }
-        // JW: handled by addColumn
-//        if ((isStructureChanged(e))) {
-//            configureSorterProperties();
-//        }
+        if ((isStructureChanged(e))) {
+            updateStringValueRegistryClass();
+        }
     }
 
     /**
@@ -2058,11 +2063,14 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
     @Override
     public void columnAdded(TableColumnModelEvent e) {
         super.columnAdded(e);
-        if (ignoreAddColumn) return;
+        // PENDING JW: check for visibility event?
         TableColumn column = getColumn(e.getToIndex());
+        updateStringValueAfterColumnChanged(column, column.getCellRenderer());
+        if (ignoreAddColumn) return;
         updateSortableAfterColumnChanged(column, column instanceof TableColumnExt ? ((TableColumnExt) column).isSortable() : true);
         updateComparatorAfterColumnChanged(column, column instanceof TableColumnExt ? ((TableColumnExt) column).getComparator() : null);
     }
+
 
 
     // ----------------- enhanced column support: delegation to TableColumnModel
@@ -2303,6 +2311,9 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
         } else if (event.getPropertyName().equals("comparator")) {
             updateComparatorAfterColumnChanged((TableColumn) event.getSource(),
                     (Comparator<?>) event.getNewValue());
+        } else if (event.getPropertyName().equals("cellRenderer")) {
+            updateStringValueAfterColumnChanged((TableColumn) event.getSource(), 
+                    (TableCellRenderer) event.getNewValue());
         } else if (event.getPropertyName().startsWith("highlighter")) {
             if (event.getSource() instanceof TableColumnExt
                     && getRowCount() > 0) {
@@ -2318,6 +2329,7 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
         }
 
     }
+
 
     /**
      * Adjusts editing state after column's property change. Cancels ongoing
@@ -3280,6 +3292,71 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
                 repaint();
             }
         };
+    }
+
+    /**
+     * Returns the StringValueRegistry which defines the string representation for
+     * each cells. This is strictly for internal use by the table, which has the 
+     * responsibility to keep in synch with registered renderers.<p>
+     * 
+     * Currently exposed for testing reasons, client code is recommended to not use nor override.
+     * 
+     * @return
+     */
+    protected StringValueRegistry getStringValueRegistry() {
+        if (stringValueRegistry == null) {
+            stringValueRegistry = new StringValueRegistry();
+        }
+        return stringValueRegistry;
+    }
+    
+    /**
+     * Updates per-column class in StringValueRegistry. This is called after
+     * structureChanged.  
+     */
+    private void updateStringValueRegistryClass() {
+        getStringValueRegistry().setColumnClasses(null);
+        for (int i = 0; i < getModel().getColumnCount(); i++) {
+            getStringValueRegistry().setColumnClass(getModel().getColumnClass(i), i);
+        }
+    }
+    
+    /**
+     * @param tableColumn
+     * @param renderer
+     */
+    private void updateStringValueAfterColumnChanged(TableColumn tableColumn,
+            TableCellRenderer renderer) {
+        getStringValueRegistry().setStringValue(
+                renderer instanceof StringValue ? (StringValue) renderer : null, 
+                        tableColumn.getModelIndex());
+    }
+    /**
+     * Called in init to synch the StringValueProvider with default renderers per class
+     */
+    private void initDefaultStringValues() {
+        for (Object clazz : defaultRenderersByColumnClass.keySet()) {
+            Object renderer = defaultRenderersByColumnClass.get(clazz);
+            if (renderer instanceof StringValue) {
+                getStringValueRegistry().setStringValue((StringValue) renderer, (Class<?>) clazz);
+            }
+        }
+    }
+    
+    /**
+     * {@inheritDoc} <p>
+     * 
+     * Overridden to synchronize the string representation. If the renderer is of type
+     * StringValue a mapping it will be used as converter for the class type. If not, 
+     * the mapping is reset to default.
+     */
+    @Override
+    public void setDefaultRenderer(Class<?> columnClass,
+            TableCellRenderer renderer) {
+        super.setDefaultRenderer(columnClass, renderer);
+        getStringValueRegistry().setStringValue(
+                (renderer instanceof StringValue) ? (StringValue) renderer : null, 
+                        columnClass);
     }
 
     /**
