@@ -251,6 +251,67 @@ public class JXTableHeaderIssues extends JXTableHeaderTest {
         frame.setVisible(true);
     }
 
+
+    /**
+     * Issue #271-swingx: make sort triggering mouseEvents
+     * customizable.
+     * 
+     * added SortGestureRecognizer.
+     * 
+     * No longer supported - need to re-think (maybe could push core addition?)
+     * Anyway, re-opened the old issue.
+     *
+     */
+//    public void interactiveSortGestureRecognizer() {
+//        final JXTable table = new JXTable(10, 2);
+//        JXFrame frame = wrapWithScrollingInFrame(table, "Sort Gesture customization");
+//        Action action = new AbstractAction("toggle default/custom recognizer") {
+//            boolean hasCustom;
+//            public void actionPerformed(ActionEvent e) {
+//                SortGestureRecognizer recognizer = null;
+//                if (!hasCustom) {
+//                    hasCustom = !hasCustom;
+//                    recognizer = new SortGestureRecognizer() {
+//                        /**
+//                         * allow double clicks to trigger a sort.
+//                         */
+//                        @Override
+//                        public boolean isSortOrderGesture(MouseEvent e) {
+//                            return e.getClickCount() <= 2;
+//                        }
+//
+//                        /**
+//                         * Disable reset gesture.
+//                         */
+//                        @Override
+//                        public boolean isResetSortOrderGesture(MouseEvent e) {
+//                            return false;
+//                        }
+//
+//                        /**
+//                         * ignore modifiers.
+//                         */
+//                        @Override
+//                        public boolean isToggleSortOrderGesture(MouseEvent e) {
+//                            return isSortOrderGesture(e);
+//                        }
+//                        
+//                        
+//                        
+//                    };
+//                }
+//                ((JXTableHeader) table.getTableHeader()).setSortGestureRecognizer(recognizer);
+//                
+//            }
+//            
+//        };
+//        addAction(frame, action);
+//        frame.setVisible(true);
+//        
+//    }
+
+    
+
     /**
      * Issue 337-swingx: header heigth depends on sort icon (for ocean only?) 
      * Looks like a problem in MetalBorders.TableHeaderBorder: extends AbstractBorder but
