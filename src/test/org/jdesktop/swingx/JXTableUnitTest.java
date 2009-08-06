@@ -147,6 +147,37 @@ public class JXTableUnitTest extends InteractiveTestCase {
     
     /**
      * Issue 1145-swingx: re-enable filter to use string representation.
+     * Here: test that cell-location StringValue look up setColumnModel.
+     * 
+     */
+    @Test
+    public void testStringValueRegistryFromSetColumnModel() {
+        JXTable table = new JXTable();
+        table.setAutoCreateColumnsFromModel(false);
+        table.setModel(createModelDefaultColumnClasses(4));
+        final int column = 2;
+        // custom column factory which sets per-column renderer
+        ColumnFactory factory = new ColumnFactory() {
+            
+            @Override
+            public void configureTableColumn(TableModel model,
+                    TableColumnExt columnExt) {
+                super.configureTableColumn(model, columnExt);
+                if (columnExt.getModelIndex() == column)
+                    columnExt.setCellRenderer(new DefaultTableRenderer());
+            }
+            
+        };
+        DefaultTableColumnModelExt model = new DefaultTableColumnModelExt();
+        for (int i = 0; i < table.getModel().getColumnCount(); i++) {
+            model.addColumn(factory.createAndConfigureTableColumn(table.getModel(), i));
+        }
+        table.setColumnModel(model);
+        StringValueRegistry provider = table.getStringValueRegistry();
+        assertEquals(table.getCellRenderer(0, column), provider.getStringValue(0, column));
+    }
+    /**
+     * Issue 1145-swingx: re-enable filter to use string representation.
      * Here: test that cell-location StringValue look up initial per-column renderer
      * 
      */

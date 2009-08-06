@@ -77,7 +77,14 @@ public final class StringValueRegistry implements StringValueProvider {
         getPerColumnMap().put(column, sv);
     }
 
-
+    /**
+     * Removes all per-column mappings of StringValues.
+     * 
+     */
+    public void clearColumnStringValues() {
+        getPerColumnMap().clear();
+    }
+    
     /**
      * Sets the StringValue to use for the given class. If the converter is null,
      * the mapping is removed.
