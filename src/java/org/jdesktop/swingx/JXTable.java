@@ -3055,18 +3055,19 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
          */
         @Override
         public String getFilteredStringAt(int row, int column) {
-            int viewColumn = modelToView(column);
-            if (viewColumn >= 0) {
-                return table.getStringAt(row, viewColumn);
-            }
-            // PENDING JW: how to get a String rep for invisible cells?
-            // rows may be filtered, columns hidden.
-            TableCellRenderer renderer = getRendererByModelColumn(column);
-            if (renderer instanceof StringValue) {
-                return ((StringValue) renderer).getString(getFilteredValueAt(
-                        row, column));
-            }
-            return super.getFilteredStringAt(row, column);
+            return getStringAt(table.convertRowIndexToModel(row), column);
+//            int viewColumn = modelToView(column);
+//            if (viewColumn >= 0) {
+//                return table.getStringAt(row, viewColumn);
+//            }
+//            // PENDING JW: how to get a String rep for invisible cells?
+//            // rows may be filtered, columns hidden.
+//            TableCellRenderer renderer = getRendererByModelColumn(column);
+//            if (renderer instanceof StringValue) {
+//                return ((StringValue) renderer).getString(getFilteredValueAt(
+//                        row, column));
+//            }
+//            return super.getFilteredStringAt(row, column);
         }
 
         /**

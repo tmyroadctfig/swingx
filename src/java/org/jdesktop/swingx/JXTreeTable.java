@@ -2720,8 +2720,7 @@ public class JXTreeTable extends JXTable {
          * {@inheritDoc} <p>
          * 
          * Overridden to fix #821-swingx: string rep of hierarchical column incorrect.
-         * In this case we must delegate to the tree directly if hidden, the visible
-         * is handled by the TreeTable itself.<p>
+         * In this case we must delegate to the tree directly (via treetable.getHierarchicalString).
          * 
          * PENDING JW: revisit once we switch to really using a table renderer. 
          */
@@ -2730,8 +2729,11 @@ public class JXTreeTable extends JXTable {
             if (table.getTreeTableModel().getHierarchicalColumn() == column) {
                 if (modelToView(column) < 0) {
                     // hidden hierarchical column, access directly
-                    return table.getHierarchicalStringAt(row);
+                    // PENDING JW: after introducing and wiring StringValueRegistry, 
+                    // had to change to query the hierarchicalString always
+                    // could probably be done more elegantly, but ...
                 }
+                return table.getHierarchicalStringAt(row);
             }
             return super.getFilteredStringAt(row, column);
         }
@@ -2740,8 +2742,7 @@ public class JXTreeTable extends JXTable {
          * {@inheritDoc} <p>
          * 
          * Overridden to fix #821-swingx: string rep of hierarchical column incorrect.
-         * In this case we must delegate to the tree directly if hidden, the visible
-         * is handled by the TreeTable itself.<p>
+         * In this case we must delegate to the tree directly (via treetable.getHierarchicalString).
          * 
          * PENDING JW: revisit once we switch to really using a table renderer. 
          */
@@ -2750,8 +2751,11 @@ public class JXTreeTable extends JXTable {
             if (table.getTreeTableModel().getHierarchicalColumn() == column) {
                 if (modelToView(column) < 0) {
                     // hidden hierarchical column, access directly
-                    return table.getHierarchicalStringAt(row);
+                    // PENDING JW: after introducing and wiring StringValueRegistry, 
+                    // had to change to query the hierarchicalString always
+                    // could probably be done more elegantly, but ...
                 }
+                return table.getHierarchicalStringAt(row);
             }
             return super.getStringAt(row, column);
         }
