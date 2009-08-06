@@ -29,6 +29,8 @@ import java.util.regex.Pattern;
 
 import javax.swing.Action;
 import javax.swing.DefaultCellEditor;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -71,6 +73,7 @@ import org.jdesktop.swingx.rollover.RolloverController;
 import org.jdesktop.swingx.rollover.RolloverProducer;
 import org.jdesktop.swingx.rollover.TableRolloverController;
 import org.jdesktop.swingx.sort.SortUtils;
+import org.jdesktop.swingx.sort.StringValueRegistry;
 import org.jdesktop.swingx.sort.TableSortController;
 import org.jdesktop.swingx.table.ColumnControlButton;
 import org.jdesktop.swingx.table.ColumnFactory;
@@ -140,6 +143,141 @@ public class JXTableUnitTest extends InteractiveTestCase {
         UIManager.put("JXTable.rowHeight", uiTableRowHeight);
         super.tearDown();
     }
+ // --------- add usage of StringValueRegistry into JXTable
+    
+    /**
+     * Issue 1145-swingx: re-enable filter to use string representation.
+     * Here: test that cell-location StringValue look up initial per-column renderer
+     * 
+     */
+    @Test
+    public void testStringValueRegistryFromColumnFactory() {
+        JXTable table = new JXTable();
+        final int column = 2;
+        // custom column factory which sets per-column renderer
+        ColumnFactory factory = new ColumnFactory() {
+
+            @Override
+            public void configureTableColumn(TableModel model,
+                    TableColumnExt columnExt) {
+                super.configureTableColumn(model, columnExt);
+                if (columnExt.getModelIndex() == column)
+                    columnExt.setCellRenderer(new DefaultTableRenderer());
+            }
+            
+        };
+        table.setColumnFactory(factory);
+        table.setModel(createModelDefaultColumnClasses(4));
+        StringValueRegistry provider = table.getStringValueRegistry();
+        assertEquals(table.getCellRenderer(0, column), provider.getStringValue(0, column));
+    }
+    
+    /**
+     * Issue 1145-swingx: re-enable filter to use string representation.
+     * Here: test that cell-location StringValue look up updates per-column renderer
+     * on setting on TableColumn.
+     */
+    @Test
+    public void testStringValueRegistryFromColumnRendererChange() {
+        JXTable table = new JXTable(createModelDefaultColumnClasses(4));
+        int column = 2;
+        table.getColumn(column).setCellRenderer(new DefaultTableRenderer());
+        StringValueRegistry provider = table.getStringValueRegistry();
+        assertEquals(table.getCellRenderer(0, column), provider.getStringValue(0, column));
+    }
+    
+    /**
+     * Issue 1145-swingx: re-enable filter to use string representation.
+     * Here: test that cell-location StringValue look up is updated with model in setModel.
+     */
+    @Test
+    public void testStringValueRegistryWithModelSet() {
+        JXTable table = new JXTable();
+        table.setModel(createModelDefaultColumnClasses(4));
+        StringValueRegistry provider = table.getStringValueRegistry();
+        for (int i = 0; i < table.getColumnCount(); i++) {
+            assertEquals("stringValue must be same as renderer for class: " + table.getColumnClass(i),
+                    table.getDefaultRenderer(table.getColumnClass(i)),
+                    provider.getStringValue(0, i));
+        }
+    }
+    /**
+     * Issue 1145-swingx: re-enable filter to use string representation.
+     * Here: test that cell-location StringValue look up is updated with model initially.
+     */
+    @Test
+    public void testStringValueRegistryWithModelInitial() {
+        JXTable table = new JXTable(createModelDefaultColumnClasses(4));
+        StringValueRegistry provider = table.getStringValueRegistry();
+        for (int i = 0; i < table.getColumnCount(); i++) {
+            assertEquals("stringValue must be same as renderer for class: " + table.getColumnClass(i),
+                    table.getDefaultRenderer(table.getColumnClass(i)),
+                    provider.getStringValue(0, i));
+        }
+    }
+    
+    /**
+     * Issue 1145-swingx: re-enable filter to use string representation.
+     * Here: test that default per-class string values are removed if not 
+     *   of type StringValue.
+     */
+    @Test
+    public void testStringValueRegistryUpdatedRemoved() {
+        JXTable table = new JXTable();
+        table.setDefaultRenderer(Number.class, new DefaultTableCellRenderer());
+        assertEquals(null, 
+                table.getStringValueRegistry().getStringValue(Number.class));
+    }
+    /**
+     * Issue 1145-swingx: re-enable filter to use string representation.
+     * Here: test that default per-class string values are updated.
+     */
+    @Test
+    public void testStringValueRegistryUpdated() {
+        JXTable table = new JXTable();
+        table.setDefaultRenderer(Component.class, new DefaultTableRenderer());
+        assertEquals(table.getDefaultRenderer(Component.class), 
+                table.getStringValueRegistry().getStringValue(Component.class));
+    }
+    
+    /**
+     * Issue 1145-swingx: re-enable filter to use string representation.
+     * Here: test that default per-class string values are registered initially.
+     */
+    @Test
+    public void testStringValueRegistryInitial() {
+        JXTable table = new JXTable();
+        StringValueRegistry provider = table.getStringValueRegistry();
+        for (int i = 0; i < DEFAULT_COLUMN_TYPES.length; i++) {
+            assertEquals("stringValue must be same as renderer for class: " + DEFAULT_COLUMN_NAMES[i],
+                    table.getDefaultRenderer(DEFAULT_COLUMN_TYPES[i]),
+                    provider.getStringValue(DEFAULT_COLUMN_TYPES[i]));
+        }
+    }
+
+
+    /**
+     * Creates and returns a TableModel with default column classes, as
+     * defined by DEFAULT_COLUMN_TYPES.
+     * @return
+     */
+    private TableModel createModelDefaultColumnClasses(int rows) {
+        DefaultTableModel model = new DefaultTableModel(DEFAULT_COLUMN_NAMES, rows) {
+
+            @Override
+            public Class<?> getColumnClass(int columnIndex) {
+                return DEFAULT_COLUMN_TYPES[columnIndex];
+            }
+            
+        };
+        return model;
+    }
+    
+    private static String[] DEFAULT_COLUMN_NAMES = { 
+        "Object", "Number", "Date", "Icon", "ImageIcon", "Boolean"};
+    private static Class<?>[] DEFAULT_COLUMN_TYPES = new Class[] {
+        Object.class, Number.class, Date.class, Icon.class, ImageIcon.class, Boolean.class
+    };
 
     
   //-------------- sortsOnUpdates 

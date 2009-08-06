@@ -23,6 +23,7 @@ package org.jdesktop.swingx.sort;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import org.jdesktop.swingx.renderer.StringValue;
 import org.jdesktop.swingx.renderer.StringValues;
@@ -39,6 +40,10 @@ import org.jdesktop.swingx.renderer.StringValues;
  */
 public final class StringValueRegistry implements StringValueProvider {
 
+    @SuppressWarnings("unused")
+    private static final Logger LOG = Logger
+            .getLogger(StringValueRegistry.class.getName());
+    
     private Map<Class<?>, StringValue> perClass;
     private HashMap<Integer, StringValue> perColumn;
     private HashMap<Integer, Class<?>> classPerColumn;
@@ -58,28 +63,46 @@ public final class StringValueRegistry implements StringValueProvider {
         return sv != null ? sv : StringValues.TO_STRING;
     }
 
+//-------------------- manage     
     /**
-     * Sets a StringValue to use for the given column.
+     * Sets a StringValue to use for the given column. If the converter is null,
+     * the mapping is removed.
      * 
      * @param sv the StringValue to use for the given column.
      * @param column the column index in model coordinates.
      * 
      */
     public void setStringValue(StringValue sv, int column) {
+        // PENDING really remove mapping if sv null
         getPerColumnMap().put(column, sv);
     }
 
 
     /**
-     * Sets the StringValue to use for the given class.
+     * Sets the StringValue to use for the given class. If the converter is null,
+     * the mapping is removed.
      * 
      * @param sv the StringValue to use for the given column.
      * @param clazz the class 
      */
     public void setStringValue(StringValue sv, Class<?> clazz) {
+        // PENDING really remove mapping if sv null
         getPerClassMap().put(clazz, sv);
     }
     
+    /**
+     * Returns the StringValue registered for the given class. <p>
+     * 
+     * <b>This is temporarily exposed for testing only - do not use, it will
+     * be removed very soon!</b>
+     * 
+     * @param clazz the class to find the registered StringValue for
+     * @return the StringValue registered for the class, or null if not directly
+     *   registered.
+     */
+    public StringValue getStringValue(Class<?> clazz) {
+        return getPerClassMap().get(clazz);
+    }
     /**
      * Sets the column class.
      * 

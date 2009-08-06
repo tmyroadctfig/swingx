@@ -21,6 +21,8 @@
  */
 package org.jdesktop.swingx.sort;
 
+import static org.junit.Assert.*;
+
 import java.awt.Color;
 import java.util.HashMap;
 import java.util.Map;
@@ -60,6 +62,16 @@ public class StringValueProviderTest extends InteractiveTestCase {
     private TableModel teamModel;
     private int column;
     
+    /**
+     * Test registry: by class - null removes.
+     */
+    @Test
+    public void testPerClassNullRemoves() {
+        registry.setStringValue(sv, NamedColor.class);
+        registry.setStringValue(null, NamedColor.class);
+        registry.setStringValue(null, Number.class);
+        assertNull(registry.getStringValue(NamedColor.class));
+    }
     /**
      * Test registry: by class (direct class registered)
      */
