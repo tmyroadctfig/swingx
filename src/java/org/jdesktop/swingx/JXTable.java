@@ -3089,19 +3089,21 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
          */
         @Override
         public String getStringAt(int row, int column) {
-            int viewRow = table.convertRowIndexToView(row);
-            int viewColumn = table.convertColumnIndexToView(column);
-            if ((viewRow >= 0) && (viewColumn >= 0)) {
-                return table.getStringAt(viewRow, viewColumn);
-            }
-
-            TableCellRenderer renderer = getRendererByModelColumn(column);
-            if (renderer instanceof StringValue) {
-                return ((StringValue) renderer).getString(getValueAt(row,
-                        column));
-            }
-            // no luck - return default
-            return super.getStringAt(row, column);
+            StringValue sv = table.getStringValueRegistry().getStringValue(row, column);
+            return sv.getString(getValueAt(row, column));
+//            int viewRow = table.convertRowIndexToView(row);
+//            int viewColumn = table.convertColumnIndexToView(column);
+//            if ((viewRow >= 0) && (viewColumn >= 0)) {
+//                return table.getStringAt(viewRow, viewColumn);
+//            }
+//
+//            TableCellRenderer renderer = getRendererByModelColumn(column);
+//            if (renderer instanceof StringValue) {
+//                return ((StringValue) renderer).getString(getValueAt(row,
+//                        column));
+//            }
+//            // no luck - return default
+//            return super.getStringAt(row, column);
         }
 
         /**

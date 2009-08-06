@@ -22,28 +22,15 @@
 package org.jdesktop.swingx;
 
 import java.awt.Color;
-import java.awt.Component;
-import java.util.Date;
 import java.util.logging.Logger;
 
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-import javax.swing.RowFilter;
 import javax.swing.UIManager;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
-import javax.swing.table.TableStringConverter;
 
 import org.jdesktop.swingx.JXTableUnitTest.DynamicTableModel;
-import org.jdesktop.swingx.decorator.ComponentAdapterTest.JXTableT;
-import org.jdesktop.swingx.renderer.DefaultTableRenderer;
 import org.jdesktop.swingx.renderer.StringValue;
 import org.jdesktop.swingx.renderer.StringValues;
-import org.jdesktop.swingx.sort.StringValueRegistry;
-import org.jdesktop.swingx.sort.TableSortController;
-import org.jdesktop.swingx.table.ColumnFactory;
-import org.jdesktop.swingx.table.TableColumnExt;
 import org.jdesktop.test.AncientSwingTeam;
 import org.junit.After;
 import org.junit.Before;
@@ -118,60 +105,6 @@ public class JXTableSortRevamp extends InteractiveTestCase {
     }
 
 //--------------- current re-introduce
-    /**
-     * Issue #1145-swingx: re-enable filtering with single-string-representation.
-     * was: Issue #767-swingx: consistent string representation.
-     * 
-     * Here: test PatternFilter uses getStringXX. 
-     * Hard-coded to access the adapter - this fails because the old implementation calls
-     * row conversion method during the filtering. Don't quite understand how that 
-     * could have worked before (which it did ...)
-     */
-    @Test
-    public void testTableGetStringUsedInPatternFilterCA() {
-        final JXTableT table = new JXTableT(new AncientSwingTeam());
-        table.setDefaultRenderer(Color.class, new DefaultTableRenderer(sv));
-        TableStringConverter coreConverter = new TableStringConverter() {
-            
-            @Override
-            public String toString(TableModel model, int row, int column) {
-                String fromAdapter = table.getComponentAdapter().getStringAt(row, column);
-                return fromAdapter;
-            }
-        };
-        ((TableSortController) table.getRowSorter()).setStringConverter(coreConverter);
-        RowFilter<?, ?> filter = RowFilter.regexFilter("R/G/B: -2", 2);
-        table.getSortController().setRowFilter(filter);
-        assertTrue(table.getRowCount() > 0);
-        assertEquals(sv.getString(table.getValueAt(0, 2)), table.getStringAt(0, 2));
-    }
-    
-    /**
-     * Issue #1145-swingx: re-enable filtering with single-string-representation.
-     * was: Issue #767-swingx: consistent string representation.
-     * 
-     * Here: test PatternFilter uses getStringXX
-     * Sanity: to check the filter as such works as expected we hard-code the 
-     * core converter to use the string value directly.
-     */
-    @Test
-    public void testTableGetStringUsedInPatternFilterSanity() {
-        final JXTableT table = new JXTableT(new AncientSwingTeam());
-        table.setDefaultRenderer(Color.class, new DefaultTableRenderer(sv));
-        TableStringConverter coreConverter = new TableStringConverter() {
-            
-            @Override
-            public String toString(TableModel model, int row, int column) {
-                String fromModel = sv.getString(model.getValueAt(row, column));
-                return fromModel;
-            }
-        };
-        ((TableSortController) table.getRowSorter()).setStringConverter(coreConverter);
-        RowFilter<?, ?> filter = RowFilter.regexFilter("R/G/B: -2", 2);
-        table.getSortController().setRowFilter(filter);
-        assertTrue(table.getRowCount() > 0);
-        assertEquals(sv.getString(table.getValueAt(0, 2)), table.getStringAt(0, 2));
-    }
     
     
     
@@ -250,4 +183,11 @@ public class JXTableSortRevamp extends InteractiveTestCase {
         return sv;
     }
 
+    /**
+     * Keep runner happy ...
+     */
+    @Test
+    public void testDummy() {
+        
+    }
 }
