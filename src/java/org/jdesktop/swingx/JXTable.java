@@ -1551,6 +1551,7 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
     public void setColumnModel(TableColumnModel columnModel) {
         super.setColumnModel(columnModel);
         configureSorterProperties();
+        initPerColumnStringValues();
     }
 
     /**
@@ -3343,6 +3344,15 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
         }
     }
     
+    /**
+     * Inits per column string values from TableColumns
+     */
+    private void initPerColumnStringValues() {
+        getStringValueRegistry().clearColumnStringValues();
+        for (TableColumn tableColumn : getColumns(true)) {
+            updateStringValueAfterColumnChanged(tableColumn, tableColumn.getCellRenderer());
+        }
+    }
     /**
      * {@inheritDoc} <p>
      * 
