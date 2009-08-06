@@ -122,21 +122,6 @@ public class JXTableSortRevamp extends InteractiveTestCase {
      * Issue #1145-swingx: re-enable filtering with single-string-representation.
      * was: Issue #767-swingx: consistent string representation.
      * 
-     * Here: test PatternFilter uses getStringXX
-     */
-    @Test
-    public void testTableGetStringUsedInPatternFilter() {
-        JXTableT table = new JXTableT(new AncientSwingTeam());
-        table.setDefaultRenderer(Color.class, new DefaultTableRenderer(sv));
-        RowFilter<?, ?> filter = RowFilter.regexFilter("R/G/B: -2.*", 2);
-        table.getSortController().setRowFilter(filter);
-        assertTrue(table.getRowCount() > 0);
-        assertEquals(sv.getString(table.getValueAt(0, 2)), table.getStringAt(0, 2));
-    }
-    /**
-     * Issue #1145-swingx: re-enable filtering with single-string-representation.
-     * was: Issue #767-swingx: consistent string representation.
-     * 
      * Here: test PatternFilter uses getStringXX. 
      * Hard-coded to access the adapter - this fails because the old implementation calls
      * row conversion method during the filtering. Don't quite understand how that 

@@ -41,6 +41,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
+import javax.swing.RowFilter;
 import javax.swing.RowSorter;
 import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
@@ -65,6 +66,7 @@ import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.PatternPredicate;
+import org.jdesktop.swingx.decorator.ComponentAdapterTest.JXTableT;
 import org.jdesktop.swingx.hyperlink.LinkModel;
 import org.jdesktop.swingx.renderer.DefaultTableRenderer;
 import org.jdesktop.swingx.renderer.StringValue;
@@ -110,6 +112,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
     // stored ui properties to reset in teardown
     private Object uiTableRowHeight;
 
+    private StringValue sv;
     public JXTableUnitTest() {
         super("JXTable unit test");
     }
@@ -134,6 +137,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
         defaultToSystemLF = true;
         setSystemLF(defaultToSystemLF);
         uiTableRowHeight = UIManager.get("JXTable.rowHeight");
+        sv = createColorStringValue();
     }
 
     
@@ -144,6 +148,21 @@ public class JXTableUnitTest extends InteractiveTestCase {
         super.tearDown();
     }
  // --------- add usage of StringValueRegistry into JXTable
+    /**
+     * Issue #1145-swingx: re-enable filtering with single-string-representation.
+     * was: Issue #767-swingx: consistent string representation.
+     * 
+     * Here: test PatternFilter uses getStringXX
+     */
+    @Test
+    public void testTableGetStringUsedInPatternFilter() {
+        JXTableT table = new JXTableT(new AncientSwingTeam());
+        table.setDefaultRenderer(Color.class, new DefaultTableRenderer(sv));
+        RowFilter<?, ?> filter = RowFilter.regexFilter("R/G/B: -2.*", 2);
+        table.getSortController().setRowFilter(filter);
+        assertTrue(table.getRowCount() > 0);
+        assertEquals(sv.getString(table.getValueAt(0, 2)), table.getStringAt(0, 2));
+    }
     
     /**
      * Issue 1145-swingx: re-enable filter to use string representation.
@@ -3480,6 +3499,26 @@ public class JXTableUnitTest extends InteractiveTestCase {
         assertEquals("default Double editor", NumberEditorExt.class, table.getDefaultEditor(Double.class).getClass());
     }
 
+    /**
+     * Creates and returns a StringValue which maps a Color to it's R/G/B rep, 
+     * prepending "R/G/B: "
+     * 
+     * @return the StringValue for color.
+     */
+    private StringValue createColorStringValue() {
+        StringValue sv = new StringValue() {
+
+            public String getString(Object value) {
+                if (value instanceof Color) {
+                    Color color = (Color) value;
+                    return "R/G/B: " + color.getRGB();
+                }
+                return StringValues.TO_STRING.getString(value);
+            }
+            
+        };
+        return sv;
+    }
     
 
     public static class DynamicTableModel extends AbstractTableModel {
