@@ -58,6 +58,7 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
+import javax.swing.table.TableStringConverter;
 
 import org.jdesktop.swingx.JXTable.GenericEditor;
 import org.jdesktop.swingx.action.BoundAction;
@@ -148,6 +149,65 @@ public class JXTableUnitTest extends InteractiveTestCase {
         super.tearDown();
     }
  // --------- add usage of StringValueRegistry into JXTable
+
+    /**
+     * Issue #1145-swingx: re-enable filtering with single-string-representation.
+     * was: Issue #767-swingx: consistent string representation.
+     * 
+     * Here: test PatternFilter uses getStringXX. 
+     * Hard-coded to access the adapter - this failed because the old implementation calls
+     * row conversion method during the filtering. Don't quite understand how that 
+     * could have worked before (which it did ...)
+     * Passes after changing componentAdapter to use the table's StringValueProvider instead.
+     */
+    @Test
+    public void testTableGetStringUsedInPatternFilterCA() {
+        final JXTableT table = new JXTableT(new AncientSwingTeam());
+        table.setDefaultRenderer(Color.class, new DefaultTableRenderer(sv));
+        TableStringConverter coreConverter = new TableStringConverter() {
+            
+            @Override
+            public String toString(TableModel model, int row, int column) {
+                String fromAdapter = table.getComponentAdapter().getStringAt(row, column);
+                return fromAdapter;
+            }
+        };
+        ((TableSortController) table.getRowSorter()).setStringConverter(coreConverter);
+        RowFilter<?, ?> filter = RowFilter.regexFilter("R/G/B: -2", 2);
+        table.getSortController().setRowFilter(filter);
+        assertTrue(table.getRowCount() > 0);
+        assertEquals(sv.getString(table.getValueAt(0, 2)), table.getStringAt(0, 2));
+    }
+    
+    /**
+     * Issue #1145-swingx: re-enable filtering with single-string-representation.
+     * was: Issue #767-swingx: consistent string representation.
+     * 
+     * Here: test PatternFilter uses getStringXX
+     * Sanity: to check the filter as such works as expected we hard-code the 
+     * core converter to use the string value directly.
+     */
+    @Test
+    public void testTableGetStringUsedInPatternFilterSanity() {
+        final JXTableT table = new JXTableT(new AncientSwingTeam());
+        table.setDefaultRenderer(Color.class, new DefaultTableRenderer(sv));
+        TableStringConverter coreConverter = new TableStringConverter() {
+            
+            @Override
+            public String toString(TableModel model, int row, int column) {
+                String fromModel = sv.getString(model.getValueAt(row, column));
+                return fromModel;
+            }
+        };
+        ((TableSortController) table.getRowSorter()).setStringConverter(coreConverter);
+        RowFilter<?, ?> filter = RowFilter.regexFilter("R/G/B: -2", 2);
+        table.getSortController().setRowFilter(filter);
+        assertTrue(table.getRowCount() > 0);
+        assertEquals(sv.getString(table.getValueAt(0, 2)), table.getStringAt(0, 2));
+    }
+    
+    
+
     /**
      * Issue #1145-swingx: re-enable filtering with single-string-representation.
      * was: Issue #767-swingx: consistent string representation.
