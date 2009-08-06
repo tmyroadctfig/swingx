@@ -1605,6 +1605,7 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
         // need to hack: if a structureChange is the result of a setModel
         // the rowsorter is not yet updated
         if (ignoreAddColumn || (getSortController() == null))  return;
+        getSortController().setStringValueProvider(getStringValueRegistry());
         // configure from table properties
         getSortController().setSortable(sortable);
         getSortController().setSortsOnUpdates(sortsOnUpdates);
@@ -2056,10 +2057,11 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
     /**
      * {@inheritDoc} <p>
      * 
-     * Overridden to propagate sort-related column properties to the SortController.<p>
+     * Overridden to propagate sort-related column properties to the SortController and 
+     * to update string representation of column.<p>
      *  
-     *  PENDING JW: check correct update on visibility change!
-     * 
+     *  PENDING JW: check correct update on visibility change!<p>
+     *  PENDING JW: need cleanup of string rep after column removed (if it's a real remove)
      */
     @Override
     public void columnAdded(TableColumnModelEvent e) {
@@ -3379,11 +3381,15 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
      *         the table.
      */
     public String getStringAt(int row, int column) {
-        TableCellRenderer renderer = getCellRenderer(row, column);
-        if (renderer instanceof StringValue) {
-            return ((StringValue) renderer).getString(getValueAt(row, column));
-        }
-        return StringValues.TO_STRING.getString(getValueAt(row, column));
+        // changed implementation to use StringValueRegistry
+        StringValue stringValue = getStringValueRegistry().getStringValue(
+                convertRowIndexToModel(row), convertColumnIndexToModel(column));
+        return stringValue.getString(getValueAt(row, column));
+//        TableCellRenderer renderer = getCellRenderer(row, column);
+//        if (renderer instanceof StringValue) {
+//            return ((StringValue) renderer).getString(getValueAt(row, column));
+//        }
+//        return StringValues.TO_STRING.getString(getValueAt(row, column));
     }
 
     /**
