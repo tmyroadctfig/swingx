@@ -21,7 +21,6 @@
  */
 package org.jdesktop.swingx.sort;
 
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -31,16 +30,16 @@ import javax.swing.RowFilter;
 import org.jdesktop.swingx.util.Contract;
 
 /**
- * Factory of additional <code>RowFilter</code>s. 
+ * Factory of additional <code>RowFilter</code>s. <p>
+ * 
+ * Trigger is the missing of Pattern/Regex+matchflags factory method in core.
+ * Can't do much other than c&p core as both abstract base class GeneralFilter and
+ * concrete RowFilter are private. Expose the base as public for custom subclasses
  * 
  * @author Jeanette Winzenburg
  */
 @SuppressWarnings("unchecked")
 public class RowFilters {
-    @SuppressWarnings("unused")
-    private static final Logger LOG = Logger.getLogger(RowFilters.class
-            .getName());
-
     
     /**
      * Returns a <code>RowFilter</code> that uses a regular
@@ -214,21 +213,5 @@ public class RowFilters {
     }
     
     private RowFilters() {};
-
-// varargs blues ;-)    
-    private void a(String text, int... i) {
-        a(text, 0, i);
-    }
-    
-    private void a(String text, int flags, int... i) {
-       LOG.info(text + flags + (i)); 
-    }
-    
-    public static void main(String[] args) {
-        RowFilters filters = new RowFilters();
-        filters.a("without any");
-        // verify that this gives a compiler error (ambigous method)
-//        filters.a("with flags only", 0);
-    }
     
 }
