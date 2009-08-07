@@ -1,0 +1,234 @@
+/*
+ * $Id$
+ *
+ * Copyright 2009 Sun Microsystems, Inc., 4150 Network Circle,
+ * Santa Clara, California 95054, U.S.A. All rights reserved.
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ */
+package org.jdesktop.swingx.sort;
+
+import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
+
+import javax.swing.RowFilter;
+
+import org.jdesktop.swingx.util.Contract;
+
+/**
+ * Factory of additional <code>RowFilter</code>s. 
+ * 
+ * @author Jeanette Winzenburg
+ */
+@SuppressWarnings("unchecked")
+public class RowFilters {
+    @SuppressWarnings("unused")
+    private static final Logger LOG = Logger.getLogger(RowFilters.class
+            .getName());
+
+    
+    /**
+     * Returns a <code>RowFilter</code> that uses a regular
+     * expression to determine which entries to include.  Only entries
+     * with at least one matching value are included.  For
+     * example, the following creates a <code>RowFilter</code> that
+     * includes entries with at least one value starting with
+     * "a":
+     * <pre>
+     *   RowFilter.regexFilter("^a");
+     * </pre>
+     * <p>
+     * The returned filter uses {@link java.util.regex.Matcher#find}
+     * to test for inclusion.  To test for exact matches use the
+     * characters '^' and '$' to match the beginning and end of the
+     * string respectively.  For example, "^foo$" includes only rows whose
+     * string is exactly "foo" and not, for example, "food".  See
+     * {@link java.util.regex.Pattern} for a complete description of
+     * the supported regular-expression constructs.
+     *
+     * @param regex the regular expression to filter on
+     * @param indices the indices of the values to check.  If not supplied all
+     *               values are evaluated
+     * @return a <code>RowFilter</code> implementing the specified criteria
+     * @throws NullPointerException if <code>regex</code> is
+     *         <code>null</code>
+     * @throws IllegalArgumentException if any of the <code>indices</code>
+     *         are &lt; 0
+     * @throws PatternSyntaxException if <code>regex</code> is
+     *         not a valid regular expression.
+     * @see java.util.regex.Pattern
+     */
+    public static <M,I> RowFilter<M,I> regexFilter(String regex,
+            int... indices) {
+        return regexFilter(0, regex, indices);
+    }
+    
+    /**
+     * Returns a <code>RowFilter</code> that uses a regular
+     * expression to determine which entries to include.  Only entries
+     * with at least one matching value are included.  For
+     * example, the following creates a <code>RowFilter</code> that
+     * includes entries with at least one value starting with
+     * "a" ignoring case:
+     * <pre>
+     *   RowFilter.regexFilter(Pattern.CASE_INSENSITIVE, "^a");
+     * </pre>
+     * <p>
+     * The returned filter uses {@link java.util.regex.Matcher#find}
+     * to test for inclusion.  To test for exact matches use the
+     * characters '^' and '$' to match the beginning and end of the
+     * string respectively.  For example, "^foo$" includes only rows whose
+     * string is exactly "foo" and not, for example, "food".  See
+     * {@link java.util.regex.Pattern} for a complete description of
+     * the supported regular-expression constructs.
+     *
+     * @param matchFlags      
+     *         Match flags, a bit mask that may include
+     *         {@link #CASE_INSENSITIVE}, {@link #MULTILINE}, {@link #DOTALL},
+     *         {@link #UNICODE_CASE}, {@link #CANON_EQ}, {@link #UNIX_LINES},
+     *         {@link #LITERAL} and {@link #COMMENTS}
+     *
+     * @param regex the regular expression to filter on
+     * @param indices the indices of the values to check.  If not supplied all
+     *               values are evaluated
+     * @return a <code>RowFilter</code> implementing the specified criteria
+     * @throws NullPointerException if <code>regex</code> is
+     *         <code>null</code>
+     * @throws IllegalArgumentException if any of the <code>indices</code>
+     *         are &lt; 0
+     * @throws  IllegalArgumentException
+     *          If bit values other than those corresponding to the defined
+     *          match flags are set in <tt>flags</tt>
+     * @throws PatternSyntaxException if <code>regex</code> is
+     *         not a valid regular expression.
+     * @see java.util.regex.Pattern
+     */
+    public static <M,I> RowFilter<M,I> regexFilter(int matchFlags, String regex,
+            int... indices) {
+        return regexFilter(Pattern.compile(regex, matchFlags), indices);
+    }
+    
+    /**
+     * Returns a <code>RowFilter</code> that uses a regular
+     * expression to determine which entries to include.  
+     * 
+     * @param pattern the Pattern to use for matching
+     * @param indices the indices of the values to check.  If not supplied all
+     *               values are evaluated
+     * @return a <code>RowFilter</code> implementing the specified criteria
+     * @throws NullPointerException if <code>pattern</code> is
+     *         <code>null</code>
+     * @see java.util.regex.Pattern
+     */
+    public static <M,I> RowFilter<M,I> regexFilter(Pattern pattern,
+                                                       int... indices) {
+        return (RowFilter<M,I>)new RegexFilter(pattern, indices);
+    }
+
+    /**
+     * C&P from core Swing to allow subclassing.
+     */
+    public static abstract class GeneralFilter extends RowFilter<Object,Object> {
+        private int[] columns;
+
+        protected GeneralFilter(int[] columns) {
+            checkIndices(columns);
+            this.columns = columns;
+        }
+
+        @Override
+        public boolean include(Entry<? extends Object,? extends Object> value){
+            int count = value.getValueCount();
+            if (columns.length > 0) {
+                for (int i = columns.length - 1; i >= 0; i--) {
+                    int index = columns[i];
+                    if (index < count) {
+                        if (include(value, index)) {
+                            return true;
+                        }
+                    }
+                }
+            }
+            else {
+                while (--count >= 0) {
+                    if (include(value, count)) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        protected abstract boolean include(
+              Entry<? extends Object,? extends Object> value, int index);
+        /**
+         * Throws an IllegalArgumentException if any of the values in
+         * columns are < 0.
+         */
+        protected void checkIndices(int[] columns) {
+            for (int i = columns.length - 1; i >= 0; i--) {
+                if (columns[i] < 0) {
+                    throw new IllegalArgumentException("Index must be >= 0");
+                }
+            }
+        }
+    }
+
+    /**
+     * C&P from core to allow richer factory methods.
+     */
+    private static class RegexFilter extends GeneralFilter {
+        private Matcher matcher;
+
+        RegexFilter(Pattern regex, int[] columns) {
+            super(columns);
+            if (regex == null) {
+                // JW: Exception type changed to comply with swingx convention
+                Contract.asNotNull(regex, "Pattern must be non-null");
+//                throw new IllegalArgumentException("Pattern must be non-null");
+            }
+            matcher = regex.matcher("");
+        }
+
+        @Override
+        protected boolean include(
+                Entry<? extends Object,? extends Object> value, int index) {
+            matcher.reset(value.getStringValue(index));
+            return matcher.find();
+        }
+    }
+    
+    private RowFilters() {};
+
+// varargs blues ;-)    
+    private void a(String text, int... i) {
+        a(text, 0, i);
+    }
+    
+    private void a(String text, int flags, int... i) {
+       LOG.info(text + flags + (i)); 
+    }
+    
+    public static void main(String[] args) {
+        RowFilters filters = new RowFilters();
+        filters.a("without any");
+        // verify that this gives a compiler error (ambigous method)
+//        filters.a("with flags only", 0);
+    }
+    
+}
