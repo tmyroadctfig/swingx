@@ -385,8 +385,6 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
     protected ComponentAdapter dataAdapter;
 
 
-    /** flag to indicate if table is interactively sortable. */
-    private boolean sortable;
 
     /** Listens for changes from the highlighters. */
     private ChangeListener highlighterChangeListener;
@@ -465,13 +463,16 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
     private boolean editable;
 
     private Dimension calculatedPrefScrollableViewportSize;
+    
     /** flag to indicate whether the rowSorter is auto-created. */
     private boolean autoCreateRowSorter;
+    /** flag to indicate if table is interactively sortable. */
+    private boolean sortable;
     /** flag to indicate whether model update events should trigger resorts. */
     private boolean sortsOnUpdates;
     /** flag to indicate that it's unsafe to update sortable-related sorter properties. */
     private boolean ignoreAddColumn;
-
+    /** Registry of per-cell string representation. */
     private StringValueRegistry stringValueRegistry;
     
 
@@ -899,24 +900,6 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
                     scrollPane
                             .setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
                 }
-                // else {
-                // if (verticalScrollPolicy != 0) {
-                // // Fix #155-swingx: reset only if we had force always before
-                // // PENDING: JW - doesn't cope with dynamically changing the
-                // policy
-                // // shouldn't be much of a problem because doesn't happen too
-                // often??
-                // scrollPane.setVerticalScrollBarPolicy(verticalScrollPolicy);
-                // }
-                // try {
-                // scrollPane.setCorner(JScrollPane.UPPER_TRAILING_CORNER,
-                // null);
-                // } catch (Exception ex) {
-                // // Ignore spurious exception thrown by JScrollPane. This
-                // // is a Swing bug!
-                // }
-                //
-                // }
             }
         }
     }
@@ -1461,7 +1444,6 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
         if (!isEditable())
             return false;
         boolean editable = super.isCellEditable(row, column);
-//                convertRowIndexToModel(row), convertColumnIndexToModel(column));
         if (editable) {
             TableColumnExt tableColumn = getColumnExt(column);
             if (tableColumn != null) {
@@ -1502,9 +1484,13 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
      * {@inheritDoc}
      * <p>
      * 
-     * Overridden to re-calculate intialize column width and preferred
+     * Overridden to update internal state related to enhanced functionality.
+     * <ul>
+     * <li> re-calculate intialize column width and preferred
      * scrollable size after a structureChanged if autocreateColumnsFromModel is
      * true.
+     * <li> update string representation control after structureChanged
+     * </ul>
      * <p>
      * 
      */
@@ -1516,7 +1502,7 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
             resetCalculatedScrollableSize(true);
         }
         if ((isStructureChanged(e))) {
-            updateStringValueRegistryClass();
+            updateStringValueRegistryColumnClasses();
         }
     }
 
@@ -1561,6 +1547,7 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
      * <ul>
      * <li> fix core bug: replaces sorter even if flag doesn't change.
      * <li> use xflag (need because super's RowSorter creation is hard-coded.
+     * </ul>
      */
     @Override
     public void setAutoCreateRowSorter(boolean autoCreateRowSorter) {
@@ -1861,14 +1848,7 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
     public void toggleSortOrder(Object identifier) {
         if (getSortController() == null)
             return;
-        TableColumn columnExt = null;
-        try {
-            columnExt = getColumn(identifier);
-        } catch (IllegalArgumentException e) {
-            // hacking around weird getColumn(Object) behaviour -
-            // PENDING JW: revisit and override
-            columnExt = getColumnExt(identifier);
-        }
+         TableColumn columnExt = getColumnByIdentifier(identifier);
         if (columnExt == null)
             return;
         getSortController().toggleSortOrder(columnExt.getModelIndex());
@@ -1892,14 +1872,7 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
     public void setSortOrder(Object identifier, SortOrder sortOrder) {
         if (getSortController() == null)
             return;
-        TableColumn columnExt = null;
-        try {
-            columnExt = getColumn(identifier);
-        } catch (IllegalArgumentException e) {
-            // hacking around weird getColumn(Object) behaviour -
-            // PENDING JW: revisit and override
-            columnExt = getColumnExt(identifier);
-        }
+        TableColumn columnExt = getColumnByIdentifier(identifier);
         if (columnExt == null)
             return;
         getSortController().setSortOrder(columnExt.getModelIndex(), sortOrder);
@@ -1921,7 +1894,24 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
     public SortOrder getSortOrder(Object identifier) {
         if (getSortController() == null)
             return SortOrder.UNSORTED;
-        TableColumn columnExt = null; 
+        TableColumn columnExt = getColumnByIdentifier(identifier);
+        if (columnExt == null)
+            return SortOrder.UNSORTED;
+        int modelIndex = columnExt.getModelIndex();
+        return getSortController().getSortOrder(modelIndex);
+    }
+
+    /**
+     * Returns a contained TableColumn with the given identifier. 
+     * 
+     *  Note that this is a hack around weird columnModel.getColumn(Object) contract in
+     *  core TableColumnModel (throws exception if not found).
+     *  
+     * @param identifier the column identifier
+     * @return a TableColumn with the identifier if found, or null if not found.
+     */
+    private TableColumn getColumnByIdentifier(Object identifier) {
+        TableColumn columnExt;
         try {
             columnExt = getColumn(identifier);
         } catch (IllegalArgumentException e) {
@@ -1929,10 +1919,7 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
             // PENDING JW: revisit and override
             columnExt = getColumnExt(identifier);
         }
-        if (columnExt == null)
-            return SortOrder.UNSORTED;
-        int modelIndex = columnExt.getModelIndex();
-        return getSortController().getSortOrder(modelIndex);
+        return columnExt;
     }
 
     /**
@@ -1986,13 +1973,7 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
     protected boolean isSortable(Object identifier) {
         if (getSortController() != null) {
             TableColumn columnExt = null; 
-            try {
-                columnExt = getColumn(identifier);
-            } catch (IllegalArgumentException e) {
-                // hacking around weird getColumn(Object) behaviour - 
-                // PENDING JW: revisit and override
-                columnExt = getColumnExt(identifier);
-            }
+            columnExt = getColumnByIdentifier(identifier);
             if (columnExt != null) {
                 return getSortController().isSortable(columnExt.getModelIndex());
             }
@@ -2032,7 +2013,6 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
     public TableColumn getSortedColumn() {
         // bloody hack: get primary SortKey and
         // check if there's a column with it available
-//        SortController controller = getSortController();
         RowSorter<?> controller = getRowSorter();
         if (controller != null) {
             // PENDING JW: must use RowSorter?
@@ -2068,7 +2048,7 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
         super.columnAdded(e);
         // PENDING JW: check for visibility event?
         TableColumn column = getColumn(e.getToIndex());
-        updateStringValueAfterColumnChanged(column, column.getCellRenderer());
+        updateStringValueForColumn(column, column.getCellRenderer());
         if (ignoreAddColumn) return;
         updateSortableAfterColumnChanged(column, column instanceof TableColumnExt ? ((TableColumnExt) column).isSortable() : true);
         updateComparatorAfterColumnChanged(column, column instanceof TableColumnExt ? ((TableColumnExt) column).getComparator() : null);
@@ -2315,7 +2295,7 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
             updateComparatorAfterColumnChanged((TableColumn) event.getSource(),
                     (Comparator<?>) event.getNewValue());
         } else if (event.getPropertyName().equals("cellRenderer")) {
-            updateStringValueAfterColumnChanged((TableColumn) event.getSource(), 
+            updateStringValueForColumn((TableColumn) event.getSource(), 
                     (TableCellRenderer) event.getNewValue());
         } else if (event.getPropertyName().startsWith("highlighter")) {
             if (event.getSource() instanceof TableColumnExt
@@ -2934,13 +2914,20 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
             return column == null ? "" : column.getHeaderValue().toString();
         }
 
+        /**
+         * Returns the first contained TableColumn with the given model index, or
+         * null if none is found.
+         * 
+         * @param modelColumn the column index in model coordinates, must be valid
+         * @return the first contained TableColumn with the given model index, or
+         *   null if none is found
+         * @throws IllegalArgumentExcetpion if model index invalid  
+         */
         protected TableColumn getColumnByModelIndex(int modelColumn) {
-            // throwing here makes a filter test fail .. it's probably an issue
-            // but don't want to touch (swingx filters will be gone soon)
-            // if ((modelColumn < 0) || (modelColumn >= getColumnCount())) {
-            // throw new IllegalArgumentException("invalid column index: " +
-            // modelColumn);
-            // }
+            if ((modelColumn < 0) || (modelColumn >= getColumnCount())) {
+                throw new IllegalArgumentException("invalid column index, must be positive and less than " 
+                        + getColumnCount() + " was: " + modelColumn);
+            }
             List<TableColumn> columns = table.getColumns(true);
             for (Iterator<TableColumn> iter = columns.iterator(); iter
                     .hasNext();) {
@@ -2951,15 +2938,6 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
             }
             return null;
         }
-
-        // @Override
-        // public String getColumnIdentifier(int columnIndex) {
-        // // TableColumn column = getColumnByModelIndex(columnIndex);
-        // // Object identifier = column != null ? column.getIdentifier() :
-        // null;
-        // Object identifier = getColumnIdentifierAt(columnIndex);
-        // return identifier != null ? identifier.toString() : null;
-        // }
 
         /**
          * {@inheritDoc}
@@ -3046,28 +3024,10 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
          * {@inheritDoc}
          * <p>
          * 
-         * PENDING JW: this is implemented to duplicate this table's lookup code
-         * if the column is not visible. That's not good enough if subclasses
-         * implemented a different strategy! We do it anyway for now, mostly we
-         * will be lucky and improve the situation against using toString
-         * always.
-         * 
          */
         @Override
         public String getFilteredStringAt(int row, int column) {
             return getStringAt(table.convertRowIndexToModel(row), column);
-//            int viewColumn = modelToView(column);
-//            if (viewColumn >= 0) {
-//                return table.getStringAt(row, viewColumn);
-//            }
-//            // PENDING JW: how to get a String rep for invisible cells?
-//            // rows may be filtered, columns hidden.
-//            TableCellRenderer renderer = getRendererByModelColumn(column);
-//            if (renderer instanceof StringValue) {
-//                return ((StringValue) renderer).getString(getFilteredValueAt(
-//                        row, column));
-//            }
-//            return super.getFilteredStringAt(row, column);
         }
 
         /**
@@ -3081,59 +3041,13 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
         /**
          * {@inheritDoc}
          * 
-         * PENDING JW: this is implemented to duplicate this table's lookup code
-         * if either the row or the column is not visible. That's not good
-         * enough if subclasses implemented a different strategy! We do it
-         * anyway for now, mostly we will be lucky and improve the situation
-         * against using toString always.
-         * 
+         * This is implemented to query the table's StringValueRegistry for an appropriate
+         * StringValue and use that for getting the string representation.
          */
         @Override
         public String getStringAt(int row, int column) {
             StringValue sv = table.getStringValueRegistry().getStringValue(row, column);
             return sv.getString(getValueAt(row, column));
-//            int viewRow = table.convertRowIndexToView(row);
-//            int viewColumn = table.convertColumnIndexToView(column);
-//            if ((viewRow >= 0) && (viewColumn >= 0)) {
-//                return table.getStringAt(viewRow, viewColumn);
-//            }
-//
-//            TableCellRenderer renderer = getRendererByModelColumn(column);
-//            if (renderer instanceof StringValue) {
-//                return ((StringValue) renderer).getString(getValueAt(row,
-//                        column));
-//            }
-//            // no luck - return default
-//            return super.getStringAt(row, column);
-        }
-
-        /**
-         * Returns a suitable renderer for the column index in model
-         * coordinates.
-         * 
-         * PENDING JW: this duplicates this table's lookup code if column is not
-         * visible. That's not good enough if subclasses implemented a different
-         * strategy! We do it anyway for now, mostly we will be lucky and
-         * improve the situation against using toString always.
-         * 
-         * @param column the columnIndex in model coordinates
-         * @return a renderer suitable for rendering cells in the given column
-         */
-        private TableCellRenderer getRendererByModelColumn(int column) {
-            // PENDING JW: here we are tricksing - duplicating JXTable renderer
-            // lookup strategy
-            // that's inherently unsafe, as subclasses may decide to do it
-            // differently
-            TableColumn tableColumn = getColumnByModelIndex(column);
-            TableCellRenderer renderer = tableColumn.getCellRenderer();
-            if (renderer == null) {
-                renderer = table.getDefaultRenderer(table.getModel()
-                        .getColumnClass(column));
-            }
-            if (renderer == null) {
-                renderer = table.getDefaultRenderer(Object.class);
-            }
-            return renderer;
         }
 
         /**
@@ -3311,16 +3225,26 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
      */
     protected StringValueRegistry getStringValueRegistry() {
         if (stringValueRegistry == null) {
-            stringValueRegistry = new StringValueRegistry();
+            stringValueRegistry = createDefaultStringValueRegistry();
         }
         return stringValueRegistry;
     }
+
+    /**
+     * Creates and returns the default registry for StringValues.<p>
+     * 
+     * @return the default registry for StringValues.
+     */
+    protected StringValueRegistry createDefaultStringValueRegistry() {
+        return new StringValueRegistry();
+    }
+    
     
     /**
      * Updates per-column class in StringValueRegistry. This is called after
      * structureChanged.  
      */
-    private void updateStringValueRegistryClass() {
+    private void updateStringValueRegistryColumnClasses() {
         getStringValueRegistry().setColumnClasses(null);
         for (int i = 0; i < getModel().getColumnCount(); i++) {
             getStringValueRegistry().setColumnClass(getModel().getColumnClass(i), i);
@@ -3328,10 +3252,14 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
     }
     
     /**
-     * @param tableColumn
-     * @param renderer
+     * Updates per-column StringValue in StringValueRegistry based on given tableColumn.
+     * This is called after the column's renderer property changed or after the column
+     * is added.
+     * 
+     * @param tableColumn the column to update from
+     * @param renderer the renderer potentially useful as StringValue.
      */
-    private void updateStringValueAfterColumnChanged(TableColumn tableColumn,
+    private void updateStringValueForColumn(TableColumn tableColumn,
             TableCellRenderer renderer) {
         getStringValueRegistry().setStringValue(
                 renderer instanceof StringValue ? (StringValue) renderer : null, 
@@ -3355,7 +3283,7 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
     private void initPerColumnStringValues() {
         getStringValueRegistry().clearColumnStringValues();
         for (TableColumn tableColumn : getColumns(true)) {
-            updateStringValueAfterColumnChanged(tableColumn, tableColumn.getCellRenderer());
+            updateStringValueForColumn(tableColumn, tableColumn.getCellRenderer());
         }
     }
     /**
@@ -3388,11 +3316,6 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
         StringValue stringValue = getStringValueRegistry().getStringValue(
                 convertRowIndexToModel(row), convertColumnIndexToModel(column));
         return stringValue.getString(getValueAt(row, column));
-//        TableCellRenderer renderer = getCellRenderer(row, column);
-//        if (renderer instanceof StringValue) {
-//            return ((StringValue) renderer).getString(getValueAt(row, column));
-//        }
-//        return StringValues.TO_STRING.getString(getValueAt(row, column));
     }
 
     /**
@@ -3403,8 +3326,12 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
      * <code>Class</code> for the column is an interface). This method
      * guarantees to always return a <code>not null</code> value. Returns the
      * default renderer for <code>Object</code> if super returns
-     * <code>null</code>.
+     * <code>null</code>.<p>
      * 
+     * <b>Note</b>: The lookup strategy for is unchanged compared to super. Subclasses
+     * which override this with a different lookup strategy are strongly advised to 
+     * implement a custom StringValueRegistry with that lookup strategy to keep
+     * the WYSIWYM in SwingX. 
      * 
      */
     @Override
@@ -3602,7 +3529,7 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
      */
     @Override
     protected void createDefaultRenderers() {
-        // super.createDefaultRenderers();
+         super.createDefaultRenderers();
         // This duplicates JTable's functionality in order to make the renderers
         // available in getNewDefaultRenderer(); If JTable's renderers either
         // were public, or it provided a factory for *new* renderers, this would
@@ -3630,35 +3557,6 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
         // use a ButtonProvider for booleans
         setDefaultRenderer(Boolean.class, new DefaultTableRenderer(
                 new CheckBoxProvider()));
-
-        // // standard renderers
-        // // Objects
-        // setLazyRenderer(Object.class,
-        // "javax.swing.table.DefaultTableCellRenderer");
-        //
-        // // Numbers
-        // setLazyRenderer(Number.class,
-        // "org.jdesktop.swingx.JXTable$NumberRenderer");
-        //
-        // // Doubles and Floats
-        // setLazyRenderer(Float.class,
-        // "org.jdesktop.swingx.JXTable$DoubleRenderer");
-        // setLazyRenderer(Double.class,
-        // "org.jdesktop.swingx.JXTable$DoubleRenderer");
-        //
-        // // Dates
-        // setLazyRenderer(Date.class,
-        // "org.jdesktop.swingx.JXTable$DateRenderer");
-        //
-        // // Icons and ImageIcons
-        // setLazyRenderer(Icon.class,
-        // "org.jdesktop.swingx.JXTable$IconRenderer");
-        // setLazyRenderer(ImageIcon.class,
-        // "org.jdesktop.swingx.JXTable$IconRenderer");
-        //
-        // // Booleans
-        // setLazyRenderer(Boolean.class,
-        // "org.jdesktop.swingx.JXTable$BooleanRenderer");
 
     }
 
@@ -3938,10 +3836,6 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
      */
     @Override
     public void removeEditor() {
-        // if (editorRemover != null) {
-        // editorRemover.uninstall();
-        // editorRemover = null;
-        // }
         boolean isFocusOwnerInTheTable = isFocusOwnerDescending();
         // let super do its stuff
         super.removeEditor();
@@ -3972,26 +3866,6 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
                 .getCurrentKeyboardFocusManager().getPermanentFocusOwner();
         return SwingXUtilities.isDescendingFrom(permanent, this);
     }
-
-    // /**
-    // * @param focusOwner
-    // * @return
-    // */
-    // private boolean isDescending(Component focusOwner) {
-    // while (focusOwner != null) {
-    // if (focusOwner instanceof JPopupMenu) {
-    // focusOwner = ((JPopupMenu) focusOwner).getInvoker();
-    // if (focusOwner == null) {
-    // return false;
-    // }
-    // }
-    // if (focusOwner == this) {
-    // return true;
-    // }
-    // focusOwner = focusOwner.getParent();
-    // }
-    // return false;
-    // }
 
     protected transient CellEditorRemover editorRemover;
 
@@ -4478,7 +4352,6 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
         this.selectionBackground = selectionBackground;
         firePropertyChange("selectionBackground", old, getSelectionBackground());
         repaint();
-        // super.setSelectionBackground(selectionBackground);
     }
 
     /**
