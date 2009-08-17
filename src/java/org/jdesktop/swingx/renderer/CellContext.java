@@ -373,7 +373,8 @@ public class CellContext implements Serializable {
         if (isFocused()) {
             return getFocusBorder();
         }
-        return getNoFocusBorder();
+        Border border = UIManager.getBorder(getUIKey("cellNoFocusBorder"));
+        return border != null ? border : getNoFocusBorder();
     }
 
     /**
