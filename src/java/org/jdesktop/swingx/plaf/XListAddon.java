@@ -23,19 +23,30 @@ package org.jdesktop.swingx.plaf;
 import org.jdesktop.swingx.JXList;
 
 /**
- * Addon for <code>JXList</code>.<p>
- *
+ * Addon for <code>JXList</code>.
+ * <p>
+ * 
  * Will install a custom ui if JXList will be sortable/filterable again.
  * Currently unused, does nothing.
  */
 public class XListAddon extends AbstractComponentAddon {
 
-  public XListAddon() {
-    super("JXList");
-  }
+    public XListAddon() {
+        super("JXList");
+    }
 
-  @Override
-  protected void addBasicDefaults(LookAndFeelAddons addon, DefaultsList defaults) {
-//    defaults.add(JXList.uiClassID, "org.jdesktop.swingx.plaf.basic.core.BasicXListUI");
-  }
+    @Override
+    protected void addBasicDefaults(LookAndFeelAddons addon,
+            DefaultsList defaults) {
+        defaults.add(JXList.uiClassID,
+                "org.jdesktop.swingx.plaf.basic.core.BasicXListUI");
+    }
+
+    @Override
+    protected void addNimbusDefaults(LookAndFeelAddons addon,
+            DefaultsList defaults) {
+        defaults.add(JXList.uiClassID,
+                "org.jdesktop.swingx.plaf.synth.SynthXListUI");
+
+    }
 }

@@ -22,16 +22,11 @@
 package org.jdesktop.swingx;
 
 import java.awt.Component;
-import java.awt.Point;
 import java.awt.event.ActionEvent;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
-import java.util.List;
 import java.util.Vector;
 import java.util.logging.Logger;
 
-import javax.swing.AbstractListModel;
 import javax.swing.Action;
 import javax.swing.JComponent;
 import javax.swing.JList;
@@ -41,11 +36,8 @@ import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
 import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
-import javax.swing.RowSorter.SortKey;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.event.ListDataEvent;
-import javax.swing.event.ListDataListener;
 import javax.swing.plaf.ListUI;
 
 import org.jdesktop.swingx.decorator.ComponentAdapter;
@@ -1252,8 +1244,8 @@ public class JXList extends JList {
     @Override
     public String getUIClassID() {
         // PENDING JW: temporary during dev to quickly switch between default and custom ui
-        return super.getUIClassID();
-//        return uiClassID;
+//        return super.getUIClassID();
+        return uiClassID;
     }
 
     private void updateRendererUI() {
