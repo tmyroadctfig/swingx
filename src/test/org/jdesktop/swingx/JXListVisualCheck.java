@@ -6,9 +6,22 @@ package org.jdesktop.swingx;
 
 import java.awt.Color;
 import java.awt.Cursor;
+import java.awt.event.ActionEvent;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.logging.Logger;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.Box;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.DefaultListModel;
+import javax.swing.JComponent;
 import javax.swing.JList;
+import javax.swing.JScrollPane;
+import javax.swing.ListModel;
+import javax.swing.UIManager;
+import javax.swing.plaf.UIResource;
 
 import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
@@ -19,17 +32,25 @@ import org.jdesktop.swingx.hyperlink.LinkModel;
 import org.jdesktop.swingx.hyperlink.LinkModelAction;
 import org.jdesktop.swingx.renderer.DefaultListRenderer;
 import org.jdesktop.swingx.renderer.HyperlinkProvider;
+import org.junit.After;
+import org.junit.Before;
 
-public class JXListVisualCheck extends JXListTest {
+public class JXListVisualCheck extends InteractiveTestCase { //JXListTest {
     @SuppressWarnings("all")
     private static final Logger LOG = Logger.getLogger(JXListVisualCheck.class
             .getName());
     public static void main(String[] args) {
         setSystemLF(true);
+//        LookAndFeel l;
+//        SynthConstants s;
         JXListVisualCheck test = new JXListVisualCheck();
         try {
+//            NimbusLookAndFeel n;
+//            Region my = XRegion.XLIST;
+            setLookAndFeel("Nimbus");
+//            new XRegion("XList", "XListUI", false);
           test.runInteractiveTests();
-//            test.runInteractiveTests("interactive.*Rollover.*");
+//            test.runInteractiveTests("interactive.*Multi.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
@@ -38,11 +59,32 @@ public class JXListVisualCheck extends JXListTest {
 
     
     public void interactiveTestCompareFocusedCellBackground() {
-        JXList xlist = new JXList(listModel);
-        xlist.setBackground(new Color(0xF5, 0xFF, 0xF5));
-        JList list = new JList(listModel);
-        list.setBackground(new Color(0xF5, 0xFF, 0xF5));
-        showWithScrollingInFrame(xlist, list, "unselectedd focused background: JXList/JList");
+        final JXList xlist = new JXList(listModel);
+        LOG.info("xlist ui" + xlist.getUI());
+        final Color bg = new Color(0xF5, 0xFF, 0xF5);
+        final JList list = new JList(listModel);
+//        xlist.setBackground(bg);
+//        list.setBackground(bg);
+        JXFrame frame = wrapWithScrollingInFrame(xlist, list, 
+                "unselectedd focused background: JXList/JList");
+        Action toggle = new AbstractAction("toggle background") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Color old = xlist.getBackground();
+                Color back = ((old == null) || (old instanceof UIResource)) ? bg : null;
+                xlist.setBackground(back);
+                list.setBackground(back);
+                if (back == null) {
+                    // force ui default background
+                    list.updateUI();
+                    xlist.updateUI();
+                }
+                
+            }
+        };
+        addAction(frame, toggle);
+        show(frame);
     }
 
     public void interactiveTestTablePatternFilter5() {
@@ -81,12 +123,23 @@ public class JXListVisualCheck extends JXListTest {
      *
      */
     public void interactiveTestRolloverHighlightMultiColumn() {
+        LOG.info("rtol-map? " + UIManager.get("List.focusInputMap.RightToLeft"));
+        LOG.info("ancestor maps? " + UIManager.get("Table.ancestorInputMap"));
+        LOG.info("ancestor rtol maps? " + UIManager.get("Table.ancestorInputMap.RightToLeft"));
+        
         JXList list = new JXList(listModel);
         list.setRolloverEnabled(true);
         list.setLayoutOrientation(JList.HORIZONTAL_WRAP);
         list.addHighlighter(new ColorHighlighter(HighlightPredicate.ROLLOVER_ROW, new Color(0xF0, 0xF0, 0xE0), 
                 null));
-        showWithScrollingInFrame(list, "rollover highlight - horz. Wrap");
+        JList core = new JList(listModel);
+        core.setLayoutOrientation(JList.HORIZONTAL_WRAP);
+        JComponent box = Box.createVerticalBox();
+        box.add(new JScrollPane(list));
+        box.add(new JScrollPane(core));
+        JXFrame frame = wrapInFrame(box, "rollover highlight - horz. Wrap");
+        addComponentOrientationToggle(frame);
+        show(frame);
     }
     /**
      * Issue #503-swingx: rolloverEnabled disables custom cursor
@@ -107,13 +160,68 @@ public class JXListVisualCheck extends JXListTest {
     public void interactiveTestRolloverHighlightAndLink() {
         JXList list = new JXList(createListModelWithLinks());
         EditorPaneLinkVisitor editorPaneLinkVisitor = new EditorPaneLinkVisitor();
-        LinkModelAction action = new LinkModelAction(editorPaneLinkVisitor);
+        LinkModelAction<?> action = new LinkModelAction<LinkModel>(editorPaneLinkVisitor);
         HyperlinkProvider h = new HyperlinkProvider(action, LinkModel.class);
         list.setCellRenderer(new DefaultListRenderer(h));
         list.setRolloverEnabled(true);
         list.addHighlighter(new ColorHighlighter(HighlightPredicate.ROLLOVER_ROW, new Color(0xF0, 0xF0, 0xE0), 
                 null));
         showWithScrollingInFrame(list, editorPaneLinkVisitor.getOutputComponent(), "rollover highlight with links");
+    }
+
+    
+
+    protected ListModel createListModel() {
+        JList list = new JList();
+        return new DefaultComboBoxModel(list.getActionMap().allKeys());
+    }
+
+    protected DefaultListModel createAscendingListModel(int startRow, int count) {
+        DefaultListModel l = new DefaultListModel();
+        for (int row = startRow; row < startRow  + count; row++) {
+            l.addElement(new Integer(row));
+        }
+        return l;
+    }
+    protected DefaultListModel createListModelWithLinks() {
+        DefaultListModel model = new DefaultListModel();
+        for (int i = 0; i < 20; i++) {
+            try {
+                LinkModel link = new LinkModel("a link text " + i, null, new URL("http://some.dummy.url" + i));
+                if (i == 1) {
+                    URL url = JXEditorPaneTest.class.getResource("resources/test.html");
+
+                    link = new LinkModel("a resource", null, url);
+                }
+                model.addElement(link);
+            } catch (MalformedURLException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+ 
+        return model;
+    }
+
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        listModel = createListModel();
+        ascendingListModel = createAscendingListModel(0, 20);
+    }
+
+    protected ListModel listModel;
+    protected DefaultListModel ascendingListModel;
+
+    
+    @Before
+    public void setUpJ4() throws Exception {
+        setUp();
+    }
+    
+    @After
+    public void tearDownJ4() throws Exception {
+        tearDown();
     }
 
 }
