@@ -531,7 +531,7 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
      * @param rowData Row data, as a Vector of Objects.
      * @param columnNames Column names, as a Vector of Strings.
      */
-    public JXTable(Vector rowData, Vector columnNames) {
+    public JXTable(Vector<?> rowData, Vector<?> columnNames) {
         super(rowData, columnNames);
         init();
     }
@@ -1664,26 +1664,6 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
         return e == null || e.getFirstRow() == TableModelEvent.HEADER_ROW;
     }
 
-    /**
-     * Trying to hack around #172-swingx: lead/anchor of row selection model is
-     * not adjusted to valid (not even model indices!) in the usual
-     * clearSelection after dataChanged/structureChanged.
-     * 
-     * Note: as of jdk1.5U6 the anchor/lead of the view selectionModel is
-     * unconditionally set to -1 after data/structureChanged.
-     * 
-     * @param e
-     */
-    private void hackLeadAnchor(TableModelEvent e) {
-        int lead = getSelectionModel().getLeadSelectionIndex();
-        int anchor = getSelectionModel().getAnchorSelectionIndex();
-        int lastRow = getModel().getRowCount() - 1;
-        if ((lead > lastRow) || (anchor > lastRow)) {
-            lead = lastRow;
-            getSelectionModel().setAnchorSelectionIndex(lead);
-            getSelectionModel().setLeadSelectionIndex(lead);
-        }
-    }
 
     // -------------------------------- sorting
 
@@ -3500,7 +3480,10 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
      * @return TableCellRenderer instance which renders values of the specified
      *         type
      * @see #getDefaultRenderer(Class)
+     * 
+     * @deprecated not working anyway - no replacement. 
      */
+    @Deprecated
     public TableCellRenderer getNewDefaultRenderer(Class<?> columnClass) {
         TableCellRenderer renderer = getDefaultRenderer(columnClass);
         if (renderer != null) {
