@@ -21,7 +21,6 @@ import java.awt.event.FocusEvent;
 import java.text.Format;
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
@@ -31,7 +30,7 @@ import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
-import javax.swing.DefaultListSelectionModel;
+import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
@@ -41,14 +40,10 @@ import javax.swing.JTable;
 import javax.swing.JToolBar;
 import javax.swing.JViewport;
 import javax.swing.KeyStroke;
-import javax.swing.ListSelectionModel;
 import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
 import javax.swing.RowSorter.SortKey;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableColumnModelEvent;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
@@ -59,7 +54,6 @@ import javax.swing.table.TableRowSorter;
 import org.jdesktop.swingx.JXTable.NumberEditor;
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.decorator.AbstractHighlighter;
-import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.Highlighter;
@@ -74,7 +68,9 @@ import org.jdesktop.swingx.table.ColumnFactory;
 import org.jdesktop.swingx.table.DatePickerCellEditor;
 import org.jdesktop.swingx.table.NumberEditorExt;
 import org.jdesktop.swingx.table.TableColumnExt;
+import org.jdesktop.swingx.treetable.FileSystemModel;
 import org.jdesktop.test.AncientSwingTeam;
+import org.junit.Test;
 
 /**
  * Split from old JXTableUnitTest - contains "interactive"
@@ -91,7 +87,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
       JXTableVisualCheck test = new JXTableVisualCheck();
       try {
 //        test.runInteractiveTests();
-          test.runInteractiveTests("interactive.*SortOrder.*");
+          test.runInteractiveTests("interactive.*Sort.*");
 //          test.runInteractiveTests("interactive.*Header.*");
 //          test.runInteractiveTests("interactive.*ColumnProp.*");
 //          test.runInteractiveTests("interactive.*Multiple.*");
@@ -115,6 +111,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         super.setUp();
         // super has LF specific tests...
         setSystemLF(true);
+//        setLookAndFeel("Nimbus");
     }
 
     /**
@@ -122,7 +119,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
      */
     public void interactiveSortOrderCycle() {
         final JXTable table = new JXTable(new AncientSwingTeam());
-        JXFrame frame = wrapWithScrollingInFrame(table, "sort cycles");
+        JXFrame frame = wrapWithScrollingInFrame(table, new JTable(table.getModel()), "sort cycles");
         Action three = new AbstractAction("three-cylce") {
             
             @Override
@@ -226,31 +223,6 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         }
     }
 
-
-    /**
-     * Possible problem: table without gridlines has header mis-aligned.
-     * Looks okay for me.
-     */
-    public void interactiveNoGridlines() {
-        JXTable table = new JXTable(20, 100);
-        for (int i = 0; i < table.getColumnCount(); i++) {
-            table.setValueAt("col: " + i, 0, i);
-        }
-        table.setHorizontalScrollEnabled(true);
-        table.setShowGrid(true, false);
-        showWithScrollingInFrame(table, "align header without gridlines?");
-    }
-    
-    /**
-     * Issue #908-swingx: move updateUI responsibility into column.
-     * 
-     */
-    public void interactiveUpdateUIRenderers() {
-        JXTable table = new JXTable(new AncientSwingTeam());
-        table.getColumn(4).setCellRenderer(new DefaultTableRenderer(new CheckBoxProvider()));
-        showWithScrollingInFrame(table, "toggle ui - must update renderers");
-    }
-    
     /**
      * Issue #908-swingx: move updateUI responsibility into column.
      * 
@@ -268,11 +240,13 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         };
         for (int i = 0; i < model.getRowCount(); i++) {
             model.setValueAt(new Date(), i, 0);
+            model.setValueAt(true, i, 1);
         }
         JXTable table = new JXTable(model);
         TableCellEditor editor = new DatePickerCellEditor();
         table.getColumn(0).setCellEditor(editor);
-        showWithScrollingInFrame(table, "toggle ui - must update editors");
+        table.getColumn(4).setCellRenderer(new DefaultTableRenderer(new CheckBoxProvider()));
+        showWithScrollingInFrame(table, "toggle ui - must update editors/renderers");
     }
     /**
      * Issue #550-swingx: xtable must not reset columns' pref/size on 
@@ -399,26 +373,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
      }
 
 
-    /**
-     * Issue #445-swingx: sort icon not updated on programatic sorting.
-     * The issue is the update (== repaint), so a non-visual test method
-     * will always pass (the icon-border is set in getRendererComp).
-     */
-    public void interactiveHeaderUpdateOnSorting() {
-        final JXTable table = new JXTable(createAscendingModel(0, 10));
-        Action action = new AbstractActionExt("toggle sorter order") {
-
-            public void actionPerformed(ActionEvent e) {
-                table.toggleSortOrder(0);
-                
-            }
-        };
-        JXFrame frame = wrapWithScrollingInFrame(table, "sort icon");
-        addAction(frame, action);
-        frame.setVisible(true);
-    }
-    
-
+ 
     /**
      * Issue #393-swingx: localized NumberEditor.
      * 
@@ -607,19 +562,6 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         frame.setVisible(true);
         
     }
-    
-    /**
-     * Respect not-sortable column.
-     */
-    public void interactiveColumnNotSortable() {
-        final JXTable table = new JXTable(sortableTableModel) ;
-        table.setColumnControlVisible(true);
-        table.getColumnExt(0).setSortable(false);
-        JXFrame frame = wrapWithScrollingInFrame(table, "Always sorted");
-        frame.setVisible(true);
-        
-    }
-   
 
     /**
      * Expose sorted column. 
@@ -655,6 +597,36 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         
     }
    
+    /**
+     * Issue #282-swingx: compare disabled appearance of
+     * collection views.
+     *
+     */
+    public void interactiveDisabledCollectionViews() {
+        final JXTable table = new JXTable(new AncientSwingTeam());
+        table.setEnabled(false);
+        final JXList list = new JXList(new String[] {"one", "two", "and something longer"});
+        list.setEnabled(false);
+        final JXTree tree = new JXTree(new FileSystemModel());
+        tree.setEnabled(false);
+        JComponent box = Box.createHorizontalBox();
+        box.add(new JScrollPane(table));
+        box.add(new JScrollPane(list));
+        box.add(new JScrollPane(tree));
+        JXFrame frame = wrapInFrame(box, "disabled collection views");
+        AbstractAction action = new AbstractAction("toggle disabled") {
+
+            public void actionPerformed(ActionEvent e) {
+                table.setEnabled(!table.isEnabled());
+                list.setEnabled(!list.isEnabled());
+                tree.setEnabled(!tree.isEnabled());
+            }
+            
+        };
+        addAction(frame, action);
+        frame.setVisible(true);
+        
+    }
 
     /**
      * Issue #281-swingx: header should be auto-repainted on changes to
@@ -763,28 +735,6 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         LOG.info("Viewport: " + table.getParent().getWidth());
     }
     
-    /**
-     * Issue #256-swingx: viewport config.
-     *
-     */
-    public void interactiveTestFillsViewportHeight() {
-        final JXTable table = new JXTable(10, 2);
-        table.setFillsViewportHeight(true);
-        JXFrame frame = wrapWithScrollingInFrame(table, "toggle viewport height");
-        frame.setSize(500, table.getPreferredSize().height * 2);
-        Action action = new AbstractAction("toggle fill") {
-
-            public void actionPerformed(ActionEvent e) {
-                table.setFillsViewportHeight(!table.getFillsViewportHeight());
-                
-            }
-            
-        };
-        addAction(frame, action);
-        frame.setVisible(true);
-
-    }
-
     /** 
      * Issue ??: Anchor lost after receiving a structure changed.
      * Lead/anchor no longer automatically initialized - no visual clue
@@ -869,8 +819,6 @@ public class JXTableVisualCheck extends JXTableUnitTest {
     public void interactiveRToLTableWithColumnControl() {
         final JXTable table = new JXTable(createAscendingModel(0, 20));
          JScrollPane pane = new JScrollPane(table);
-//        table.setColumnControlVisible(true);
-//        pane.applyComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
         final JXFrame frame = wrapInFrame(pane, "RToLScrollPane");
         addComponentOrientationToggle(frame);
         Action toggleColumnControl = new AbstractAction("toggle column control") {
@@ -885,170 +833,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         frame.setVisible(true);
     }
     
-    public void interactiveTestRowHeightAndSelection() {
-        final JXTable table = new JXTable(sortableTableModel);
-        table.setRowHeight(0, table.getRowHeight() * 2);
-        final int column = 0;
-        table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 
-            public void valueChanged(ListSelectionEvent e) {
-                if (e.getValueIsAdjusting()) return;
-                ListSelectionModel model = (ListSelectionModel) e.getSource();
-                int selected = model.getMinSelectionIndex();
-                if (selected < 0) return;
-                System.out.println("from selection: " + table.getValueAt(selected, column));
-            }
-            
-        });
-        JXFrame frame = wrapWithScrollingInFrame(table, "Accessing values (indy rowheights)");
-        Action updateCellAction = new AbstractAction("update cell value") {
-
-            public void actionPerformed(ActionEvent e) {
-                int anchorRow = table.getSelectionModel().getLeadSelectionIndex();
-                int anchorCol = table.getColumnModel().getSelectionModel().getLeadSelectionIndex();
-                if ((anchorRow < 0) || (anchorCol < 0)) return;
-                table.setValueAt("x" + table.getValueAt(anchorRow, anchorCol), anchorRow, anchorCol);
-                
-            }
-            
-        };
-        addAction(frame, updateCellAction);
-        frame.setVisible(true);
-    }
-
-    public void interactiveTestRowHeight() {
-        final JXTable table = new JXTable(sortableTableModel);
-        table.setRowHeight(0, table.getRowHeight() * 2);
-        JXFrame frame = wrapWithScrollingInFrame(table, "Individual rowheight");
-        Action temp = new AbstractAction("empty selection") {
-
-            public void actionPerformed(ActionEvent e) {
-                table.changeSelection(-1, -1, false, false);
-                
-            }
-            
-        };
-        addAction(frame, temp);
-        frame.setVisible(true);
-    }
-    
-
-    /**
-     * Issue #232-swingx: SelectionMapper not updated on changing selectionModel.
-     * visually verify that the mapper keeps the selection after re-setting
-     * table's selectionModel.
-     * 
-     * 
-     *
-     */
-    public void interactiveSelectionMapperOnSelectionModelChange() {
-        final JXTable table = new JXTable(sortableTableModel);
-        table.setSelectionModel(new DefaultListSelectionModel());
-        JXFrame frame = wrapWithScrollingInFrame(table, "SelectionMapper: keep selection on change view model");
-//        Action temp = new AbstractAction("toggle selectionModel") {
-//
-//            public void actionPerformed(ActionEvent e) {
-//                table.setSelectionModel(new DefaultListSelectionModel());
-//                
-//            }
-//            
-//        };
-//        addAction(frame, temp);
-        frame.setVisible(true);
-    }
-/**
-     * example mixed sorting (Jens Elkner).
-     *
-     */
-    public void interactiveTestSorterPatch() {
-        Object[][] fourWheels = new Object[][]{
-             new Object[] {"Car", new Car(180f)},
-             new Object[] {"Porsche", new Porsche(170)}, 
-             new Object[] {"Porsche", new Porsche(170)}, 
-             new Object[] {"Porsche", new Porsche(170, false)}, 
-             new Object[] {"Tractor", new Tractor(20)},
-             new Object[] {"Tractor", new Tractor(10)},
-
-        };
-        DefaultTableModel model = new DefaultTableModel(fourWheels, new String[] {"Text", "Car"}) ;
-        JXTable table = new JXTable(model);
-        JFrame frame = wrapWithScrollingInFrame(table, "Sorter patch");
-        frame.setVisible(true);
-        
-    
-    }
-    
-    public class Car implements Comparable<Car> {
-        float speed = 100;
-        public Car(float speed) { this.speed = speed; }
-        public int compareTo(Car o) {
-            return speed < o.speed ? -1 : speed > o.speed ? 1 : 0;
-        }
-        @Override
-        public String toString() {
-            return "Car - " + speed;
-        }
-    }
-    public class Porsche extends Car {
-        boolean hasBridgeStone = true;
-        public Porsche(float speed) { super(speed); }
-        public Porsche(float speed, boolean bridgeStone) { 
-            this(speed); 
-            hasBridgeStone = bridgeStone;
-        }
-        @Override
-        public int compareTo(Car o) {
-            if (o instanceof Porsche) {
-                return ((Porsche) o).hasBridgeStone ? 0 : 1; 
-            }
-            return super.compareTo(o);
-        }
-        @Override
-        public String toString() {
-            return "Porsche - " + speed + (hasBridgeStone ? "+" : "");
-        }
-    }
-    
-    public class Tractor implements Comparable<Tractor> {
-        float speed = 20;
-        public Tractor(float speed) { this.speed = speed; }
-        public int compareTo(Tractor o) {
-            return speed < o.speed ? -1 : speed > o.speed ? 1 : 0;
-        }
-        @Override
-        public String toString() {
-            return "Tractor - " + speed;
-        }
-    }
-
-    
-    
-    /**
-     * Issue #179: Sorter does not use collator if cell content is
-     *  a String.
-     *
-     */
-    public void interactiveTestLocaleSorter() {
-        
-        Object[][] rowData = new Object[][] {
-                new Object[] { Boolean.TRUE, "aa" },
-                new Object[] { Boolean.FALSE, "AB" },
-                new Object[] { Boolean.FALSE, "AC" },
-                new Object[] { Boolean.TRUE, "BA" },
-                new Object[] { Boolean.FALSE, "BB" },
-                new Object[] { Boolean.TRUE, "BC" } };
-        String[] columnNames = new String[] { "Critical", "Task" };
-        DefaultTableModel model =  new DefaultTableModel(rowData, columnNames);
-//        {
-//            public Class getColumnClass(int column) {
-//                return column == 1 ? String.class : super.getColumnClass(column);
-//            }
-//        };
-        final JXTable table = new JXTable(model);
-        table.toggleSortOrder(1);
-        JFrame frame = wrapWithScrollingInFrame(table, "locale sorting");
-        frame.setVisible(true);
-    }   
     
 
     /** 
@@ -1220,113 +1005,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         addAction(frame, action);
         frame.setVisible(true);
     }
-//---------------------------------
-
-    /**
-     * quick check if multiple comparators per column work.
-     * Basically yes, with a slight tweak: need to comment guarding
-     * code in filterpipeline throwing exceptions.
-     * 
-     * So commented the body for now, need to enquire why the guard
-     * was added in the first place.
-     * 
-     * @KEEP
-     */
-    public void interactiveMultipleComparatorsPerColumn() {
-//        JXTable table = new JXTable(createSplittableValues());
-//        Sorter sorter1 = new ShuttleSorter(0, false);
-//        sorter1.setComparator(new ClassComparator(0));
-//        Sorter sorter2 = new ShuttleSorter(0, true );
-//        sorter2.setComparator(new ClassComparator(1));
-//        
-//        FilterPipeline pipeline = new FilterPipeline(new Filter[] { sorter1, sorter2 });
-//        table.setFilters(pipeline);
-//        JXFrame frame = wrapWithScrollingInFrame(table, "MultipleSorter per Column");
-//        frame.setVisible(true);
-        
-    }
     
-    /**
-     * @KEEP - this is used in the commented method above.
-     */
-//    private TableModel createSplittableValues() {
-//        String[] values = {"avalue:zvalue", "avalue:yvalue", "avalue:xvalue", 
-//                "bvalue:zvalue", "bvalue:yvalue", "bvalue:xvalue", 
-//                "cvalue:zvalue", "cvalue:yvalue", "cvalue:xvalue", 
-//                };
-//        DefaultTableModel model = new DefaultTableModel(values.length, 1);
-//        for (int i = 0; i < values.length; i++) {
-//            model.setValueAt(values[i], i, 0);
-//        }
-//    return model;
-//}
-
-    public class ClassComparator implements Comparator {
-        
-        List packageOrder;
-        int sortIndex;
-        
-        public ClassComparator(int index) {
-            this.sortIndex = index;
-        }
-
-        public int compare(Object o1, Object o2) {
-            String[] value1 = String.valueOf(o1).split(":");
-            String[] value2 = String.valueOf(o2).split(":");
-            
-            String part1 = value1.length > sortIndex ? value1[sortIndex] : "";
-            String part2 = value2.length > sortIndex ? value2[sortIndex] : "";
-            return part1.compareTo(part2);
-        }
-        
-    }
-    
-    /**
-     * Issue #31 (swingx): clicking header must not sort if table !enabled.
-     *
-     */
-    public void interactiveTestDisabledTableSorting() {
-        final JXTable table = new JXTable(sortableTableModel);
-        table.setEnabled(false);
-        table.setColumnControlVisible(true);
-        Action toggleAction = new AbstractAction("Toggle Enabled") {
-
-            public void actionPerformed(ActionEvent e) {
-                table.setEnabled(!table.isEnabled());
-                
-            }
-            
-        };
-        JXFrame frame = wrapWithScrollingInFrame(table, "Disabled tabled: no sorting");
-        addAction(frame, toggleAction);
-        frame.setVisible(true);  
-    }
-
-
-    
-    /**
-     * Issue #191: sorting and custom renderer
-     * not reproducible ...
-     *
-     */
-    public void interactiveTestCustomRendererSorting() {
-        JXTable table = new JXTable(sortableTableModel);
-        TableColumn column = table.getColumn("No.");
-        TableCellRenderer renderer = new DefaultTableCellRenderer() {
-            @Override
-            public Component getTableCellRendererComponent(JTable table, Object value,
-                    boolean isSelected, boolean hasFocus, int row, int col) {
-                value = "# " + value ;
-                Component comp = super.getTableCellRendererComponent(table, value,
-                        isSelected, hasFocus, row,  col );
-                return comp;
-            }
-        };
-        column.setCellRenderer(renderer);
-        JFrame frame = wrapWithScrollingInFrame(table, "RendererSortingTest");
-        frame.setVisible(true);  
-    }
-
     /**
      */
     public void interactiveTestToggleSortable() {
@@ -1379,7 +1058,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
 
 
     private void installLinkRenderer(JXTable table) {
-        LinkModelAction action = new LinkModelAction() {
+        LinkModelAction<?> action = new LinkModelAction<LinkModel>() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -1433,7 +1112,6 @@ public class JXTableVisualCheck extends JXTableUnitTest {
     }
 
 
-    @SuppressWarnings("deprecation")
     public void interactiveTestFocusedCellBackground() {
         TableModel model = new AncientSwingTeam() {
             @Override
@@ -1459,15 +1137,6 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         frame.setVisible(true);
     }
 
-
-
-    public void interactiveTestEditableHighlight() {
-        JXTable table = new JXTable(tableModel);
-        table.addHighlighter(new ColorHighlighter(HighlightPredicate.EDITABLE, Color.RED,
-                Color.WHITE));
-        JFrame frame = wrapWithScrollingInFrame(table, "Editability Highlighter Test");
-        frame.setVisible(true);
-    }
     
     public void interactiveColumnHighlighting() {
         final JXTable table = new JXTable(new AncientSwingTeam());
@@ -1521,6 +1190,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
     /**
      * dummy
      */
+    @Test
     public void testDummy() {
     }   
 

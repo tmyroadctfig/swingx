@@ -118,36 +118,6 @@ public class JXTableUnitTest extends InteractiveTestCase {
         super("JXTable unit test");
     }
 
-    @Before
-    public void setUpJu4() throws Exception {
-        // just a little conflict between ant and maven builds
-        // junit4 @before methods needs to be public, while
-        // junit3 setUp() inherited from super is protected
-        this.setUp();
-    }
-    
-    @Override
-    protected void setUp() throws Exception {
-       super.setUp();
-        // set loader priority to normal
-        if (tableModel == null) {
-            tableModel = new DynamicTableModel();
-        }
-        sortableTableModel = new AncientSwingTeam();
-        // make sure we have the same default for each test
-        defaultToSystemLF = true;
-        setSystemLF(defaultToSystemLF);
-        uiTableRowHeight = UIManager.get("JXTable.rowHeight");
-        sv = createColorStringValue();
-    }
-
-    
-    @Override
-    @After
-    public void tearDown() throws Exception {
-        UIManager.put("JXTable.rowHeight", uiTableRowHeight);
-        super.tearDown();
-    }
  // --------- add usage of StringValueRegistry into JXTable
 
     /**
@@ -178,34 +148,6 @@ public class JXTableUnitTest extends InteractiveTestCase {
         assertTrue(table.getRowCount() > 0);
         assertEquals(sv.getString(table.getValueAt(0, 2)), table.getStringAt(0, 2));
     }
-    
-    /**
-     * Issue #1145-swingx: re-enable filtering with single-string-representation.
-     * was: Issue #767-swingx: consistent string representation.
-     * 
-     * Here: test PatternFilter uses getStringXX
-     * Sanity: to check the filter as such works as expected we hard-code the 
-     * core converter to use the string value directly.
-     */
-    @Test
-    public void testTableGetStringUsedInPatternFilterSanity() {
-        final JXTableT table = new JXTableT(new AncientSwingTeam());
-        table.setDefaultRenderer(Color.class, new DefaultTableRenderer(sv));
-        TableStringConverter coreConverter = new TableStringConverter() {
-            
-            @Override
-            public String toString(TableModel model, int row, int column) {
-                String fromModel = sv.getString(model.getValueAt(row, column));
-                return fromModel;
-            }
-        };
-        ((TableSortController) table.getRowSorter()).setStringConverter(coreConverter);
-        RowFilter<?, ?> filter = RowFilter.regexFilter("R/G/B: -2", 2);
-        table.getSortController().setRowFilter(filter);
-        assertTrue(table.getRowCount() > 0);
-        assertEquals(sv.getString(table.getValueAt(0, 2)), table.getStringAt(0, 2));
-    }
-    
     
 
     /**
@@ -1270,7 +1212,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
     @Test
     public void testCornerRespectLAF() {
         Object corner = UIManager.get("Table.scrollPaneCornerComponent");
-        if (!(corner instanceof Class)) {
+        if (!(corner instanceof Class<?>)) {
             LOG.fine("cannont run - LAF doesn't provide corner component");
             return;
         }
@@ -1712,8 +1654,8 @@ public class JXTableUnitTest extends InteractiveTestCase {
     @Test
     public void testFocusTransferKeyBinding() {
         JTable core = new JTable();
-        Set forwardKeys = core.getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS);
-        Set backwardKeys = core.getFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS);
+        Set<?> forwardKeys = core.getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS);
+        Set<?> backwardKeys = core.getFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS);
         JXTable table = new JXTable();
         for (Object key : forwardKeys) {
             InputMap map = table.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
@@ -2630,15 +2572,14 @@ public class JXTableUnitTest extends InteractiveTestCase {
         } catch (Exception e) {
             fail("unexpected exception type (expected NPE)" + e);
         }
-//            // PENDING JW: this fails after removing filterpipeline
-//        try {
-//            new JXTable((Object[][]) null, new Object[] {  });
-//            fail("null arrays must throw NPE");
-//        } catch (NullPointerException e) {
-//            // nothing to do - expected
-//        } catch (Exception e) {
-//            fail("unexpected exception type (expected NPE)" + e);
-//        }
+        try {
+            new JXTable((Object[][]) null, new Object[] {  });
+            fail("null arrays must throw NPE");
+        } catch (NullPointerException e) {
+            // nothing to do - expected
+        } catch (Exception e) {
+            fail("unexpected exception type (expected NPE)" + e);
+        }
         try {
             new JXTable(new Object[][] {{ }, { }}, (Object[]) null);
             fail("null arrays throw NPE");
@@ -2777,53 +2718,6 @@ public class JXTableUnitTest extends InteractiveTestCase {
         assertEquals(table.getColumns(), table.getColumns(false));
     }
 
-    /**
-     * Issue #256-swingX: viewport - do track height.
-     * 
-     * 
-     */
-    @Test
-    public void testTrackViewportHeight() {
-        // This test will not work in a headless configuration.
-        if (GraphicsEnvironment.isHeadless()) {
-            LOG.fine("cannot run trackViewportHeight - headless environment");
-            return;
-        }
-        JXTable table = new JXTable(10, 2);
-        table.setFillsViewportHeight(true);
-        Dimension tablePrefSize = table.getPreferredSize();
-        JScrollPane scrollPane = new JScrollPane(table);
-        JXFrame frame = wrapInFrame(scrollPane, "");
-        frame.setSize(500, tablePrefSize.height * 2);
-        frame.setVisible(true);
-        assertEquals("table height be equal to viewport", 
-                table.getHeight(), scrollPane.getViewport().getHeight());
-     }
- 
-    /**
-     * Issue #256-swingX: viewport - don't track height.
-     * 
-     * 
-     */
-    @Test
-    public void testNotTrackViewportHeight() {
-        // This test will not work in a headless configuration.
-        if (GraphicsEnvironment.isHeadless()) {
-            LOG.fine("cannot run notTrackViewportHeight - headless environment");
-            return;
-        }
-        JXTable table = new JXTable(10, 2);
-        table.setFillsViewportHeight(false);
-        Dimension tablePrefSize = table.getPreferredSize();
-        JScrollPane scrollPane = new JScrollPane(table);
-        JXFrame frame = wrapInFrame(scrollPane, "");
-        // make sure the height is > table pref height
-        frame.setSize(500, tablePrefSize.height * 2);
-        frame.setVisible(true);
-        assertEquals("table height must be unchanged", 
-                tablePrefSize.height, table.getHeight());
-    }
-
     
     /**
      * Issue #256-swingx: added fillsViewportHeight property.
@@ -2839,22 +2733,6 @@ public class JXTableUnitTest extends InteractiveTestCase {
     }
     
     
-    /**
-     * Issue #256-swingx: added fillsViewportHeight property.
-     * 
-     * check "fillsViewportHeight" property change fires event.
-     *
-     */
-    @Test
-    public void testFillsViewportProperty() {
-        JXTable table = new JXTable(10, 1);
-        boolean fill = table.getFillsViewportHeight();
-        PropertyChangeReport report = new PropertyChangeReport();
-        table.addPropertyChangeListener(report);
-        table.setFillsViewportHeight(!fill);
-        assertEquals("must have fired propertyChange for fillsViewportHeight", 1, report.getEventCount("fillsViewportHeight"));
-        assertEquals("property must equal newValue", table.getFillsViewportHeight(), report.getLastNewValue("fillsViewportHeight"));
-    }
     
     /**
      * Issue #256-swingX: viewport - don't change background
@@ -3162,8 +3040,8 @@ public class JXTableUnitTest extends InteractiveTestCase {
     private PropertyChangeListener getLinkControllerAsPropertyChangeListener(JXTable table, String propertyName) {
         PropertyChangeListener[] listeners = table.getPropertyChangeListeners(propertyName);
         for (int i = 0; i < listeners.length; i++) {
-            if (listeners[i] instanceof TableRolloverController) {
-                return (TableRolloverController) listeners[i];
+            if (listeners[i] instanceof TableRolloverController<?>) {
+                return (TableRolloverController<?>) listeners[i];
             }
         }
         return null;
@@ -3242,21 +3120,6 @@ public class JXTableUnitTest extends InteractiveTestCase {
     }
 
 
-    @Test
-    public void testIndividualRowHeightAfterSetModel() {
-        JXTable table = new JXTable(createAscendingModel(0, 10));
-        table.setRowHeightEnabled(true);
-        table.setRowHeight(0, 25);
-        // sanity assert
-        assertEquals(25, table.getRowHeight(0));
-        table.setModel(sortableTableModel);
-        assertEquals("individual rowheight must be reset", 
-                table.getRowHeight(), table.getRowHeight(0));
-        
-    }
-
-    
-
     /**
      * Issue #197: JXTable pattern search differs from 
      * PatternHighlighter/Filter.
@@ -3328,38 +3191,6 @@ public class JXTableUnitTest extends InteractiveTestCase {
         assertTrue("viewIndex must be positive for visible", viewIndexOne >= 0);
         assertEquals(columnOne.isVisible(), viewIndexOne >= 0);
     }
-    /**
-     * Issue #189, #214: Sorter fails if content is comparable with mixed types
-     * 
-     */
-    @Test
-    public void testMixedComparableTypes() {
-        
-        Object[][] rowData = new Object[][] {
-                new Object[] { Boolean.TRUE, new Integer(2) },
-                new Object[] { Boolean.TRUE, "BC" } };
-        String[] columnNames = new String[] { "Critical", "Task" };
-        DefaultTableModel model =  new DefaultTableModel(rowData, columnNames);
-        final JXTable table = new JXTable(model);
-        table.toggleSortOrder(1);
-    }   
-    
-    /**
-     * Issue #189, #214: Sorter fails if content is 
-     * mixed comparable/not comparable
-     *
-     */
-    @Test
-    public void testMixedComparableTypesWithNonComparable() {
-        
-        Object[][] rowData = new Object[][] {
-                new Object[] { Boolean.TRUE, new Integer(2) },
-                new Object[] { Boolean.TRUE, new Object() } };
-        String[] columnNames = new String[] { "Critical", "Task" };
-        DefaultTableModel model =  new DefaultTableModel(rowData, columnNames);
-        final JXTable table = new JXTable(model);
-        table.toggleSortOrder(1);
-    }   
 
     @Test
     public void testIncrementalSearch() {
@@ -3438,6 +3269,20 @@ public class JXTableUnitTest extends InteractiveTestCase {
     }
     
 
+    /**
+     * Test default editors types as expected.
+     *
+     */
+    @Test
+    public void testLazyEditorsByClass() {
+        JXTable table = new JXTable();
+        assertEquals("default Boolean editor", JXTable.BooleanEditor.class, table.getDefaultEditor(Boolean.class).getClass());
+        assertEquals("default Number editor", NumberEditorExt.class, table.getDefaultEditor(Number.class).getClass());
+        assertEquals("default Double editor", NumberEditorExt.class, table.getDefaultEditor(Double.class).getClass());
+    }
+
+//---------------------------- factory, convenience models, set-up ...
+    
     /**
      * returns a tableModel with count rows filled with
      * ascending integers in first column
@@ -3520,9 +3365,9 @@ public class JXTableUnitTest extends InteractiveTestCase {
      */
     static class RowObjectTableModel extends AbstractTableModel {
 
-        List data;
+        List<?> data;
 
-        public RowObjectTableModel(List data) {
+        public RowObjectTableModel(List<?> data) {
             this.data = data;
         }
 
@@ -3556,18 +3401,6 @@ public class JXTableUnitTest extends InteractiveTestCase {
     }
 
     
-
-    /**
-     * Symmetrical test for editors.
-     *
-     */
-    @Test
-    public void testLazyEditorsByClass() {
-        JXTable table = new JXTable();
-        assertEquals("default Boolean editor", JXTable.BooleanEditor.class, table.getDefaultEditor(Boolean.class).getClass());
-        assertEquals("default Number editor", NumberEditorExt.class, table.getDefaultEditor(Number.class).getClass());
-        assertEquals("default Double editor", NumberEditorExt.class, table.getDefaultEditor(Double.class).getClass());
-    }
 
     /**
      * Creates and returns a StringValue which maps a Color to it's R/G/B rep, 
@@ -3728,4 +3561,36 @@ public class JXTableUnitTest extends InteractiveTestCase {
         assertEquals(1, events.size());
         assertSame(events.get(0), tableHighlighter);
     }
+    
+    @Before
+    public void setUpJu4() throws Exception {
+        // just a little conflict between ant and maven builds
+        // junit4 @before methods needs to be public, while
+        // junit3 setUp() inherited from super is protected
+        this.setUp();
+    }
+    
+    @Override
+    protected void setUp() throws Exception {
+       super.setUp();
+        // set loader priority to normal
+        if (tableModel == null) {
+            tableModel = new DynamicTableModel();
+        }
+        sortableTableModel = new AncientSwingTeam();
+        // make sure we have the same default for each test
+        defaultToSystemLF = true;
+        setSystemLF(defaultToSystemLF);
+        uiTableRowHeight = UIManager.get("JXTable.rowHeight");
+        sv = createColorStringValue();
+    }
+
+    
+    @Override
+    @After
+    public void tearDown() throws Exception {
+        UIManager.put("JXTable.rowHeight", uiTableRowHeight);
+        super.tearDown();
+    }
+
 }

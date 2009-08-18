@@ -12,9 +12,7 @@ import java.awt.GraphicsEnvironment;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
-import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Date;
 import java.util.Vector;
@@ -66,9 +64,9 @@ public class JTableIssues extends InteractiveTestCase {
 //      setSystemLF(true);
       JTableIssues test = new JTableIssues();
       try {
-//        test.runInteractiveTests();
+        test.runInteractiveTests();
 //          test.runInteractiveTests("interactive.*ColumnControl.*");
-          test.runInteractiveTests("interactive.*Edit.*");
+//          test.runInteractiveTests("interactive.*Edit.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
@@ -138,6 +136,7 @@ public class JTableIssues extends InteractiveTestCase {
     
   //----------------------- interactive
     
+    
     /**
      * Core issue: terminateEditOnFocusLost weird behaviour if in InternalFrame
      * see: 
@@ -183,9 +182,10 @@ public class JTableIssues extends InteractiveTestCase {
               /**
                * Overridden to reach fire rowUpdated (instead of cellUpdated)
                */
+              @SuppressWarnings("unchecked")
               @Override
               public void setValueAt(Object aValue, int row, int column) {
-                  Vector rowVector = (Vector)dataVector.elementAt(row);
+                  Vector<Object> rowVector = (Vector<Object>)dataVector.elementAt(row);
                   rowVector.setElementAt(aValue, column);
                   fireTableRowsUpdated(row, row);
               }
@@ -209,17 +209,7 @@ public class JTableIssues extends InteractiveTestCase {
           addAction(frame, action);
       }
       
-      
-      /**
-       * NPE on null values (if comparable)? No, not any longer.
-       */
-      public void interactiveSortWithNull() {
-          final JTable table = new JTable(new AncientSwingTeam());
-          table.setValueAt(null, 4, 3);
-          table.setAutoCreateRowSorter(true);
-          JXFrame frame = showWithScrollingInFrame(table, "NPE with null number?");
-      }
-
+     
       /**
        * Core issue #6539455: table not properly repainted on update (from model).
        * 
@@ -232,7 +222,7 @@ public class JTableIssues extends InteractiveTestCase {
       public void interactiveSortOnUpdateNotEditing() {
           final JTable table = new JTable(new AncientSwingTeam());
           table.setAutoCreateRowSorter(true);
-          ((TableRowSorter) table.getRowSorter()).setSortsOnUpdates(true);
+          ((TableRowSorter<?>) table.getRowSorter()).setSortsOnUpdates(true);
           table.getRowSorter().toggleSortOrder(0);
           JXFrame frame = showWithScrollingInFrame(table,
                   "updates and repaint");
@@ -260,7 +250,7 @@ public class JTableIssues extends InteractiveTestCase {
           final JTable table = new JTableRepaintOnUpdate();
           table.setModel(new AncientSwingTeam());
           table.setAutoCreateRowSorter(true);
-          ((TableRowSorter) table.getRowSorter()).setSortsOnUpdates(true);
+          ((TableRowSorter<?>) table.getRowSorter()).setSortsOnUpdates(true);
           table.getRowSorter().toggleSortOrder(0);
           JXFrame frame = showWithScrollingInFrame(table,
                   "updates and repaint (hacked)");
@@ -448,7 +438,6 @@ public class JTableIssues extends InteractiveTestCase {
       public void interactiveSortOnResize() {
           JTable table = new JTable(new AncientSwingTeam());
           table.setAutoCreateRowSorter(true);
-          MouseListener l = new MouseAdapter() {};
           showWithScrollingInFrame(table, "must not sort in resize");
       }
 

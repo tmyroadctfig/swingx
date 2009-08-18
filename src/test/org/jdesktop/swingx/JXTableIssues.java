@@ -23,11 +23,8 @@ package org.jdesktop.swingx;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
-import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,29 +32,21 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
-import javax.swing.AbstractButton;
 import javax.swing.Action;
 import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
-import javax.swing.Box;
 import javax.swing.CellEditor;
-import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
-import javax.swing.Timer;
 import javax.swing.event.CellEditorListener;
 import javax.swing.event.ChangeEvent;
-import javax.swing.event.TableModelEvent;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellEditor;
-import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 
 import org.jdesktop.swingx.action.BoundAction;
@@ -66,7 +55,6 @@ import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.table.TableColumnExt;
-import org.jdesktop.swingx.treetable.FileSystemModel;
 import org.jdesktop.test.AncientSwingTeam;
 import org.jdesktop.test.CellEditorReport;
 import org.jdesktop.test.PropertyChangeReport;
@@ -93,7 +81,7 @@ public class JXTableIssues extends InteractiveTestCase {
 //            test.runInteractiveTests("interactive.*Scroll.*");
          //   test.runInteractiveTests("interactive.*Render.*");
 //          test.runInteractiveTests("interactive.*ExtendOnRemoveAdd.*");
-            test.runInteractiveTests("interactive.*SortOn.*");
+//            test.runInteractiveTests("interactive.*Extend.*");
 //            test.runInteractiveTests("interactive.*Repaint.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
@@ -136,31 +124,6 @@ public class JXTableIssues extends InteractiveTestCase {
         });
 
     }
-
-     /**
-     * test if created a new instance of the renderer. While the old
-     * assertions are true, it's useless with swingx renderers: the renderer is
-     * a new instance but not specialized to boolean. So added an assert
-     * for the actual component type. Which fails for now - need to 
-     * think if we really need the functionality!
-     *
-     */
-    public void testNewRendererInstance() {
-        JXTable table = new JXTable();
-        TableCellRenderer newRenderer = table.getNewDefaultRenderer(Boolean.class);
-        TableCellRenderer sharedRenderer = table.getDefaultRenderer(Boolean.class);
-        // following assertions are useful only with core renderers 
-        // (they differ by type on the renderer level)
-        assertNotNull(newRenderer);
-        assertNotSame("new renderer must be different from shared", sharedRenderer, newRenderer);
-        assertNotSame("new renderer must be different from object renderer", 
-                table.getDefaultRenderer(Object.class), newRenderer);
-        Component comp = newRenderer.getTableCellRendererComponent(table, Boolean.TRUE, false, false, -1, -1);
-        assertTrue("Boolean rendering component is expected to be a Checkbox by default" +
-                        "\n but is " + comp.getClass(), 
-                comp instanceof AbstractButton);
-    }
-
 
 
     /**
@@ -307,6 +270,7 @@ public class JXTableIssues extends InteractiveTestCase {
         table.setHorizontalScrollEnabled(false);
         assertEquals("horizontalScroll must be off", false, table.isHorizontalScrollEnabled());
     }
+    
     /**
      * we have a slight inconsistency in event values: setting the
      * client property to null means "false" but the event fired
@@ -328,84 +292,34 @@ public class JXTableIssues extends InteractiveTestCase {
     }
 
 
-    /**
-     * Issue #256-swingX: viewport - toggle track height must
-     * revalidate.
-     * 
-     * PENDING JW: the visual test looks okay - probably something wrong with the
-     * test setup ... invoke doesn't help
-     * 
-     */
-    public void testToggleTrackViewportHeight() {
-        // This test will not work in a headless configuration.
-        if (GraphicsEnvironment.isHeadless()) {
-            LOG.fine("cannot run trackViewportHeight - headless environment");
-            return;
-        }
-        final JXTable table = new JXTable(10, 2);
-        table.setFillsViewportHeight(true);
-        final Dimension tablePrefSize = table.getPreferredSize();
-        JScrollPane scrollPane = new JScrollPane(table);
-        JXFrame frame = wrapInFrame(scrollPane, "");
-        frame.setSize(500, tablePrefSize.height * 2);
-        frame.setVisible(true);
-        assertEquals("table height be equal to viewport", 
-                table.getHeight(), scrollPane.getViewport().getHeight());
-        table.setFillsViewportHeight(false);
-        assertEquals("table height be equal to table pref height", 
-                tablePrefSize.height, table.getHeight());
- 
-        
-    }
 
     
-//-------------------- adapted jesse wilson: #223
-
-
-    /**
-     * Enhancement: modifying (= filtering by resetting the content) should keep 
-     * selection
-     * 
-     */
-    public void testModifyTableContentAndSelection() {
-        CompareTableBehaviour compare = new CompareTableBehaviour(new Object[] { "A", "B", "C", "D", "E", "F", "G", "H", "I" });
-        compare.table.getSelectionModel().setSelectionInterval(2, 5);
-        Object[] selectedObjects = new Object[] { "C", "D", "E", "F" };
-        assertSelection(compare.tableModel, compare.table.getSelectionModel(), selectedObjects);
-        compare.tableModel.setContents(new Object[] { "B", "C", "D", "F", "G", "H" });
-        Object[] selectedObjectsAfterModify = (new Object[] { "C", "D", "F" });
-        assertSelection(compare.tableModel, compare.table.getSelectionModel(), selectedObjectsAfterModify);
-    }
-    
-    /**
-     * Enhancement: modifying (= filtering by resetting the content) should keep 
-     * selection
-     */
-    public void testModifyXTableContentAndSelection() {
-        CompareTableBehaviour compare = new CompareTableBehaviour(new Object[] { "A", "B", "C", "D", "E", "F", "G", "H", "I" });
-        compare.xTable.getSelectionModel().setSelectionInterval(2, 5);
-        Object[] selectedObjects = new Object[] { "C", "D", "E", "F" };
-        assertSelection(compare.tableModel, compare.xTable.getSelectionModel(), selectedObjects);
-        compare.tableModel.setContents(new Object[] { "B", "C", "D", "F", "G", "H" });
-        Object[] selectedObjectsAfterModify = (new Object[] { "C", "D", "F" });
-        assertSelection(compare.tableModel, compare.xTable.getSelectionModel(), selectedObjectsAfterModify);
-    }
-   
-    
-    
-     
-    private void assertSelection(TableModel tableModel, ListSelectionModel selectionModel, Object[] expected) {
-        List<Object> selected = new ArrayList<Object>();
-        for(int r = 0; r < tableModel.getRowCount(); r++) {
-            if(selectionModel.isSelectedIndex(r)) selected.add(tableModel.getValueAt(r, 0));
-        }
-        
-        List expectedList = Arrays.asList(expected);
-        assertEquals("selected Objects must be as expected", expectedList, selected);
-    
-    }
 
 //----------------- interactive
+
+    /**
+     * Issue #1154-swingx: Regression after switching to Mustang.
+     * was: Issue #31 (swingx): clicking header must not sort if table !enabled.
+     *
+     */
+    public void interactiveTestDisabledTableSorting() {
+        final JXTable table = new JXTable(new AncientSwingTeam());
+        table.setEnabled(false);
+        table.setColumnControlVisible(true);
+        Action toggleAction = new AbstractAction("Toggle Enabled") {
+
+            public void actionPerformed(ActionEvent e) {
+                table.setEnabled(!table.isEnabled());
+                
+            }
+            
+        };
+        JXFrame frame = wrapWithScrollingInFrame(table, "Disabled tabled: no sorting");
+        addAction(frame, toggleAction);
+        frame.setVisible(true);  
+    }
+
+
     /**
      * Use-case: null always at bottom, independent of sort order.
      * Unsupported by core default. Can SwingX? No ...
@@ -423,8 +337,11 @@ public class JXTableIssues extends InteractiveTestCase {
     }
 
     /**
-     * Unconditional repaint on cell update (through the default
+     * After moving to Mustang, this might be vieweda as a bug ;-)
+     * Was: Unconditional repaint on cell update (through the default
      * identify filter). 
+     * Is: only the updated cell is repainted, unrelated (from model perspective)
+     * cells (like others in row) are not repainted. 
      */
     public void interactiveRepaintOnUpdateSingleCell() {
         JXTable table =  new JXTable(10, 5);
@@ -440,7 +357,6 @@ public class JXTableIssues extends InteractiveTestCase {
         ColorHighlighter highlighter = new ColorHighlighter(predicate, Color.MAGENTA, null, Color.MAGENTA, null);
         table.addHighlighter(highlighter);
         JXTable other = new JXTable(table.getModel());
-//        other.setFilters(new FilterPipeline(new IdentityFilter()));
         other.addHighlighter(highlighter);
         JXFrame frame = wrapWithScrollingInFrame(table, other, "repaint on update in first");
         addMessage(frame, "edit first cell in left table (start with/out a)");
@@ -486,195 +402,86 @@ public class JXTableIssues extends InteractiveTestCase {
         frame.setVisible(true);
     }
 
-    public void interactiveDeleteRowAboveSelection() {
-        CompareTableBehaviour compare = new CompareTableBehaviour(new Object[] { "A", "B", "C", "D", "E", "F", "G", "H", "I" });
-        compare.table.getSelectionModel().setSelectionInterval(2, 5);
-        compare.xTable.getSelectionModel().setSelectionInterval(2, 5);
-        JComponent box = createContent(compare, createRowDeleteAction(0, compare.tableModel));
-        
-        JFrame frame = wrapInFrame(box, "delete above selection");
-        frame.setVisible(true);
-    }
 
-    public void interactiveDeleteRowBelowSelection() {
-        CompareTableBehaviour compare = new CompareTableBehaviour(new Object[] { "A", "B", "C", "D", "E", "F", "G", "H", "I" });
-        compare.table.getSelectionModel().setSelectionInterval(6, 7);
-        compare.xTable.getSelectionModel().setSelectionInterval(6, 7);
-        JComponent box = createContent(compare, createRowDeleteAction(-1, compare.tableModel));
-        JFrame frame = wrapInFrame(box, "delete below selection");
-        frame.setVisible(true);
-        
-        
-    }
     /**
-     * Issue #370-swingx: "jumping" selection while dragging.
-     * 
+     * Match highlighter fails to display correctly if column-based highlighter alters background
+     * color.
      */
-    public void interactiveExtendSelection() {
-        final UpdatingTableModel model = new UpdatingTableModel();
-        JXTable table = new JXTable(model);
-        // Swing Timer - EDT in Timer
-        ActionListener l = new ActionListener() {
-            int i = 0;
-
-            public void actionPerformed(ActionEvent e) {
-                model.updateCell(i++ % 10);
+    public void interactiveColumnHighlightingWithSearch() {
+        JXTable table = new JXTable(new AncientSwingTeam());
+        
+        table.getColumnExt("Favorite Color").setHighlighters(new AbstractHighlighter() {
+            @Override
+            protected Component doHighlight(Component renderer, ComponentAdapter adapter) {
+                Color color = (Color) adapter.getValue();
                 
+                if (renderer instanceof JComponent) {
+                    ((JComponent) renderer).setBorder(BorderFactory.createLineBorder(color));
+                }
+                
+                return renderer;
             }
-            
-        };
-        Timer timer = new Timer(1000, l);
-        timer.start();
-        JXFrame frame = wrapWithScrollingInFrame(table, "#370 - extend selection by dragging");
+        });
+        
+        table.getColumnExt(0).addHighlighter(
+                new ColorHighlighter(new HighlightPredicate() {
+                    public boolean isHighlighted(Component renderer, ComponentAdapter adapter) {
+                        return adapter.getValue().toString().contains("e");
+                    }
+                }, Color.GREEN, null));
+        
+        JFrame frame = wrapWithScrollingInFrame(table, "Column Highlighter with Search Test");
+        table.putClientProperty(JXTable.MATCH_HIGHLIGHTER, true);
+        //should highlight Jeff with Yellow
+        table.getSearchable().search("e", 3);
         frame.setVisible(true);
     }
     
-    /** 
-     * Simple model for use in continous update tests. 
-     * Issue #370-swingx: jumping selection on dragging.
-     */
-    private class UpdatingTableModel extends AbstractTableModel {
+  //-------------------- adapted jesse wilson: #223
 
-        private int[][] data = new int[10][5];
-
-        public UpdatingTableModel() {
-            for (int row = 0; row < data.length; row++) {
-                fillRow(row);
-            }
-        }
-
-        public int getRowCount() {
-            return 10;
-        }
-
-        public int getColumnCount() {
-            return 5;
-        }
-
-        public Object getValueAt(int rowIndex, int columnIndex) {
-            return data[rowIndex][columnIndex];
-        }
-
-        /**
-         * update first column of row on EDT.
-         * @param row
-         */
-        public void invokeUpdateCell(final int row) {
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    updateCell(row);
-                }
-            });
-        }
-
-        /**
-         * update first column of row. Sorting on any column except the first
-         * doesn't change row sequence - shouldn't interfere with selection
-         * extension.
-         * 
-         * @param row
-         */
-        public void updateCell(final int row) {
-            updateCell(row, 0);
-            fireTableCellUpdated(row, 0);
-        }
-
-        public void fillRow(int row) {
-            for (int col = 0; col < data[row].length; col++) {
-                updateCell(row, col);
-            }
-        }
-
-        /**
-         * Fills the given cell with random value.
-         * @param row
-         * @param col
-         */
-        private void updateCell(int row, int col) {
-            data[row][col] = (int) Math.round(Math.random() * 200);
-        }
-    }
-  
 
     /**
-     * Issue #282-swingx: compare disabled appearance of
-     * collection views.
-     *
+     * Enhancement: modifying (= filtering by resetting the content) should keep 
+     * selection
+     * 
      */
-    public void interactiveDisabledCollectionViews() {
-        final JXTable table = new JXTable(new AncientSwingTeam());
-        table.setEnabled(false);
-        final JXList list = new JXList(new String[] {"one", "two", "and something longer"});
-        list.setEnabled(false);
-        final JXTree tree = new JXTree(new FileSystemModel());
-        tree.setEnabled(false);
-        JComponent box = Box.createHorizontalBox();
-        box.add(new JScrollPane(table));
-        box.add(new JScrollPane(list));
-        box.add(new JScrollPane(tree));
-        JXFrame frame = wrapInFrame(box, "disabled collection views");
-        AbstractAction action = new AbstractAction("toggle disabled") {
-
-            public void actionPerformed(ActionEvent e) {
-                table.setEnabled(!table.isEnabled());
-                list.setEnabled(!list.isEnabled());
-                tree.setEnabled(!tree.isEnabled());
-            }
-            
-        };
-        addAction(frame, action);
-        frame.setVisible(true);
+    public void testModifyTableContentAndSelection() {
+        CompareTableBehaviour compare = new CompareTableBehaviour(new Object[] { "A", "B", "C", "D", "E", "F", "G", "H", "I" });
+        compare.table.getSelectionModel().setSelectionInterval(2, 5);
+        Object[] selectedObjects = new Object[] { "C", "D", "E", "F" };
+        assertSelection(compare.tableModel, compare.table.getSelectionModel(), selectedObjects);
+        compare.tableModel.setContents(new Object[] { "B", "C", "D", "F", "G", "H" });
+        Object[] selectedObjectsAfterModify = (new Object[] { "C", "D", "F" });
+        assertSelection(compare.tableModel, compare.table.getSelectionModel(), selectedObjectsAfterModify);
+    }
+    
+    /**
+     * Enhancement: modifying (= filtering by resetting the content) should keep 
+     * selection
+     */
+    public void testModifyXTableContentAndSelection() {
+        CompareTableBehaviour compare = new CompareTableBehaviour(new Object[] { "A", "B", "C", "D", "E", "F", "G", "H", "I" });
+        compare.xTable.getSelectionModel().setSelectionInterval(2, 5);
+        Object[] selectedObjects = new Object[] { "C", "D", "E", "F" };
+        assertSelection(compare.tableModel, compare.xTable.getSelectionModel(), selectedObjects);
+        compare.tableModel.setContents(new Object[] { "B", "C", "D", "F", "G", "H" });
+        Object[] selectedObjectsAfterModify = (new Object[] { "C", "D", "F" });
+        assertSelection(compare.tableModel, compare.xTable.getSelectionModel(), selectedObjectsAfterModify);
+    }
+   
+    
+    
+     
+    private void assertSelection(TableModel tableModel, ListSelectionModel selectionModel, Object[] expected) {
+        List<Object> selected = new ArrayList<Object>();
+        for(int r = 0; r < tableModel.getRowCount(); r++) {
+            if(selectionModel.isSelectedIndex(r)) selected.add(tableModel.getValueAt(r, 0));
+        }
         
+        List<?> expectedList = Arrays.asList(expected);
+        assertEquals("selected Objects must be as expected", expectedList, selected);
+    
     }
-    public void interactiveDataChanged() {
-        final DefaultTableModel model = createAscendingModel(0, 10, 5, false);
-        JXTable xtable = new JXTable(model);
-        xtable.setRowSelectionInterval(0, 0);
-//        JTable table = new JTable(model);
-//        table.setRowSelectionInterval(0, 0);
-        AbstractAction action = new AbstractAction("fire dataChanged") {
-
-            public void actionPerformed(ActionEvent e) {
-                model.fireTableDataChanged();
-                
-            }
-            
-        };
-//        JXFrame frame = wrapWithScrollingInFrame(xtable, table, "selection after data changed");
-        JXFrame frame = wrapWithScrollingInFrame(xtable, "selection after data changed");
-        addAction(frame, action);
-        frame.setVisible(true);
-        
-    }
-    private JComponent createContent(CompareTableBehaviour compare, Action action) {
-        JComponent box = new JPanel(new BorderLayout());
-        box.add(new JScrollPane(compare.table), BorderLayout.WEST);
-        box.add(new JScrollPane(compare.xTable), BorderLayout.EAST);
-        box.add(new JButton(action), BorderLayout.SOUTH);
-        return box;
-    }
-
-    private Action createRowDeleteAction(final int row, final ReallySimpleTableModel simpleTableModel) {
-        Action delete = new AbstractAction("DeleteRow " + ((row < 0) ? "last" : "" + row)) {
-
-            public void actionPerformed(ActionEvent e) {
-                int rowToDelete = row;
-                if (row < 0) {
-                    rowToDelete = simpleTableModel.getRowCount() - 1;
-                }
-                if ((rowToDelete < 0) || (rowToDelete >= simpleTableModel.getRowCount())) {
-                    return;
-                }
-                 simpleTableModel.removeRow(rowToDelete);
-                 if (simpleTableModel.getRowCount() == 0) {
-                     setEnabled(false);
-                 }
-            }
-            
-        };
-        return delete;
-    }
-
     public static class CompareTableBehaviour {
       
         public ReallySimpleTableModel tableModel;
@@ -733,6 +540,7 @@ public class JXTableIssues extends InteractiveTestCase {
      * @param rowCount the number of rows
      * @return
      */
+    @SuppressWarnings("unused")
     private DefaultTableModel createAscendingModel(int startRow, final int rowCount, 
             final int columnCount, boolean fillLast) {
         DefaultTableModel model = new DefaultTableModel(rowCount, columnCount) {
@@ -750,6 +558,7 @@ public class JXTableIssues extends InteractiveTestCase {
     }
     
     
+    @SuppressWarnings("unused")
     private DefaultTableModel createAscendingModel(int startRow, int count) {
         DefaultTableModel model = new DefaultTableModel(count, 5);
         for (int i = 0; i < model.getRowCount(); i++) {
@@ -759,62 +568,4 @@ public class JXTableIssues extends InteractiveTestCase {
     }
     
 
-    /**
-     * Issue #??: JXTable pattern search differs from 
-     * PatternHighlighter/Filter. 
-     * 
-     * Fixing the issue (respect the pattern as is by calling 
-     * pattern.matcher().matches instead of the find()) must 
-     * make sure that the search methods taking the string 
-     * include wildcards.
-     *
-     *  Note: this method passes as long as the issue is not
-     *  fixed!
-     *  
-     *  TODO: check status!
-     */
-    public void testWildCardInSearchByString() {
-        JXTable table = new JXTable(createAscendingModel(0, 11));
-        int row = 1;
-        String lastName = table.getValueAt(row, 0).toString();
-        int found = table.getSearchable().search(lastName, -1);
-        assertEquals("found must be equal to row", row, found);
-        found = table.getSearchable().search(lastName, found);
-        assertEquals("search must succeed", 10, found);
-        fail("check status ...");
-    }
-
-    /**
-     * Match highlighter fails to display correctly if column-based highlighter alters background
-     * color.
-     */
-    public void interactiveColumnHighlightingWithSearch() {
-        JXTable table = new JXTable(new AncientSwingTeam());
-        
-        table.getColumnExt("Favorite Color").setHighlighters(new AbstractHighlighter() {
-            @Override
-            protected Component doHighlight(Component renderer, ComponentAdapter adapter) {
-                Color color = (Color) adapter.getValue();
-                
-                if (renderer instanceof JComponent) {
-                    ((JComponent) renderer).setBorder(BorderFactory.createLineBorder(color));
-                }
-                
-                return renderer;
-            }
-        });
-        
-        table.getColumnExt(0).addHighlighter(
-                new ColorHighlighter(new HighlightPredicate() {
-                    public boolean isHighlighted(Component renderer, ComponentAdapter adapter) {
-                        return adapter.getValue().toString().contains("e");
-                    }
-                }, Color.GREEN, null));
-        
-        JFrame frame = wrapWithScrollingInFrame(table, "Column Highlighter with Search Test");
-        table.putClientProperty(JXTable.MATCH_HIGHLIGHTER, true);
-        //should highlight Jeff with Yellow
-        table.getSearchable().search("e", 3);
-        frame.setVisible(true);
-    }
 }
