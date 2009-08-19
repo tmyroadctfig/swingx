@@ -101,99 +101,107 @@ public class JXTaskPaneContainer extends JXPanel {
 
   public final static String uiClassID = "swingx/TaskPaneContainerUI";
   
-  // ensure at least the default ui is registered
-  static {
-    LookAndFeelAddons.contribute(new TaskPaneContainerAddon());
-  }
-
-  /**
-   * Creates a new empty taskpane.
-   */
-  public JXTaskPaneContainer() {
-      super(null);
-    updateUI();
-    
-    addContainerListener(new ContainerAdapter() {
-        public void componentRemoved(ContainerEvent e) {
-            repaint();
-        }
-    });
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  public TaskPaneContainerUI getUI() {
-      return (TaskPaneContainerUI) super.getUI();
-  }
-  
-  /**
-   * Notification from the <code>UIManager</code> that the L&F has changed.
-   * Replaces the current UI object with the latest version from the <code>UIManager</code>.
-   * 
-   * @see javax.swing.JComponent#updateUI
-   */
-  public void updateUI() {
-    setUI((TaskPaneContainerUI)LookAndFeelAddons.getUI(this, TaskPaneContainerUI.class));
-  }
-
-  /**
-   * Sets the L&F object that renders this component.
-   * 
-   * @param ui the <code>TaskPaneContainerUI</code> L&F object
-   * @see javax.swing.UIDefaults#getUI
-   * 
-   * @beaninfo bound: true hidden: true description: The UI object that
-   * implements the taskpane's LookAndFeel.
-   */
-  public void setUI(TaskPaneContainerUI ui) {
-    super.setUI(ui);
-  }
-
-  /**
-   * Returns the name of the L&F class that renders this component.
-   * 
-   * @return the string {@link #uiClassID}
-   * @see javax.swing.JComponent#getUIClassID
-   * @see javax.swing.UIDefaults#getUI
-   */
-  public String getUIClassID() {
-    return uiClassID;
-  }
-
-  /**
-   * Adds a <code>JXTaskPane</code> to this JXTaskPaneContainer.
-   * 
-   * @param group
-   */
-  public void add(JXTaskPane group) {
-    super.add(group);
-  }
-
-  /**
-   * Removes a <code>JXTaskPane</code> from this JXTaskPaneContainer.
-   * 
-   * @param group
-   */
-  public void remove(JXTaskPane group) {
-    super.remove(group);
-  }
-
-  /**
-   * @see Scrollable#getScrollableTracksViewportHeight()
-   */
-  public boolean getScrollableTracksViewportHeight() {
-    if (getParent() instanceof JViewport) {
-      return (((JViewport)getParent()).getHeight() > getPreferredSize().height);
-    } else {
-      return false;
+    // ensure at least the default ui is registered
+    static {
+        LookAndFeelAddons.contribute(new TaskPaneContainerAddon());
     }
-  }
+
+    /**
+     * Creates a new empty taskpane.
+     */
+    public JXTaskPaneContainer() {
+        super(null);
+        updateUI();
+
+        addContainerListener(new ContainerAdapter() {
+            @Override
+            public void componentRemoved(ContainerEvent e) {
+                repaint();
+            }
+        });
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public TaskPaneContainerUI getUI() {
+        return (TaskPaneContainerUI) super.getUI();
+    }
   
-  /**
-   * @see Scrollable#getScrollableTracksViewportWidth()
-   */
-  public boolean getScrollableTracksViewportWidth() {
-    return true;
-  }
+    /**
+     * Notification from the <code>UIManager</code> that the L&F has changed.
+     * Replaces the current UI object with the latest version from the
+     * <code>UIManager</code>.
+     * 
+     * @see javax.swing.JComponent#updateUI
+     */
+    @Override
+    public void updateUI() {
+        setUI((TaskPaneContainerUI) LookAndFeelAddons.getUI(this,
+                TaskPaneContainerUI.class));
+    }
+
+    /**
+     * Sets the L&F object that renders this component.
+     * 
+     * @param ui the <code>TaskPaneContainerUI</code> L&F object
+     * @see javax.swing.UIDefaults#getUI
+     * 
+     * @beaninfo bound: true hidden: true description: The UI object that
+     *           implements the taskpane's LookAndFeel.
+     */
+    public void setUI(TaskPaneContainerUI ui) {
+        super.setUI(ui);
+    }
+
+    /**
+     * Returns the name of the L&F class that renders this component.
+     * 
+     * @return the string {@link #uiClassID}
+     * @see javax.swing.JComponent#getUIClassID
+     * @see javax.swing.UIDefaults#getUI
+     */
+    @Override
+    public String getUIClassID() {
+        return uiClassID;
+    }
+
+    /**
+     * Adds a <code>JXTaskPane</code> to this JXTaskPaneContainer.
+     * 
+     * @param group
+     */
+    public void add(JXTaskPane group) {
+        super.add(group);
+    }
+
+    /**
+     * Removes a <code>JXTaskPane</code> from this JXTaskPaneContainer.
+     * 
+     * @param group
+     */
+    public void remove(JXTaskPane group) {
+        super.remove(group);
+    }
+
+    /**
+     * @see Scrollable#getScrollableTracksViewportHeight()
+     */
+    @Override
+    public boolean getScrollableTracksViewportHeight() {
+        if (getParent() instanceof JViewport) {
+            return (((JViewport) getParent()).getHeight() > getPreferredSize().height);
+        } else {
+            return false;
+        }
+    }
+  
+    /**
+     * @see Scrollable#getScrollableTracksViewportWidth()
+     */
+    @Override
+    public boolean getScrollableTracksViewportWidth() {
+        return true;
+    }
 }
