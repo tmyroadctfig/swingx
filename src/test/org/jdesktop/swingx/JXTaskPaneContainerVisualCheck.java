@@ -19,7 +19,9 @@
 package org.jdesktop.swingx;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.util.Locale;
 
@@ -33,6 +35,7 @@ import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 
 import org.jdesktop.swingx.action.AbstractActionExt;
+import org.jdesktop.swingx.painter.Painter;
 
 /**
  * Simple tests to ensure that the {@code JXTaskPane} can be instantiated and
@@ -46,17 +49,47 @@ public class JXTaskPaneContainerVisualCheck extends InteractiveTestCase {
     }
 
     public static void main(String[] args) throws Exception {
+        setLookAndFeel("Windows");
 //        setSystemLF(true);
         JXTaskPaneContainerVisualCheck test = new JXTaskPaneContainerVisualCheck();
         
         try {
-            test.runInteractiveTests();
+//            test.runInteractiveTests();
+            test.runInteractiveTests("interactive.*Color.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
         }
     }
     
+    /**
+     * Requirement: color of parent, that is transparent. 
+     * Issue ??-swingx: Not respected in Windows - that's because 
+     * the windows addon installs a background painter (container is-a JXPanel).
+     * <p>
+     * Actually, it was slightly different: use same color as laf-background of
+     * other components, what ever that means. Nevertheless, the issue here
+     * is that there are two different mechanisms to define background 
+     * (plain color or painter) by the laf, should be made consistent. 
+     */
+    public void interactiveContainerColor() {
+        JXTaskPaneContainer container = new JXTaskPaneContainer();
+        container.setOpaque(false);
+        Painter<?> nullPainter = new Painter<Object>() {
+            @Override
+            public void paint(Graphics2D g, Object object, int width, int height) {
+            }
+        };
+        container.setBackgroundPainter(nullPainter);
+        JXTaskPane first = new JXTaskPane();
+        fillTaskPane(first);
+        container.add(first);
+        JXTaskPane second = new JXTaskPane();
+        fillTaskPane(second);
+        showWithScrollingInFrame(container, "transparent");
+        container.getParent().setBackground(Color.CYAN);
+        assertTrue(container.getParent().isOpaque());
+    }
     
     public void interactiveGap() {
         JXTaskPaneContainer container = new JXTaskPaneContainer();
