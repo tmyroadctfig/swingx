@@ -58,7 +58,6 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
-import javax.swing.table.TableStringConverter;
 
 import org.jdesktop.swingx.JXTable.GenericEditor;
 import org.jdesktop.swingx.action.BoundAction;
@@ -120,34 +119,6 @@ public class JXTableUnitTest extends InteractiveTestCase {
 
  // --------- add usage of StringValueRegistry into JXTable
 
-    /**
-     * Issue #1145-swingx: re-enable filtering with single-string-representation.
-     * was: Issue #767-swingx: consistent string representation.
-     * 
-     * Here: test PatternFilter uses getStringXX. 
-     * Hard-coded to access the adapter - this failed because the old implementation calls
-     * row conversion method during the filtering. Don't quite understand how that 
-     * could have worked before (which it did ...)
-     * Passes after changing componentAdapter to use the table's StringValueProvider instead.
-     */
-    @Test
-    public void testTableGetStringUsedInPatternFilterCA() {
-        final JXTableT table = new JXTableT(new AncientSwingTeam());
-        table.setDefaultRenderer(Color.class, new DefaultTableRenderer(sv));
-        TableStringConverter coreConverter = new TableStringConverter() {
-            
-            @Override
-            public String toString(TableModel model, int row, int column) {
-                String fromAdapter = table.getComponentAdapter().getStringAt(row, column);
-                return fromAdapter;
-            }
-        };
-        ((TableSortController) table.getRowSorter()).setStringConverter(coreConverter);
-        RowFilter<?, ?> filter = RowFilter.regexFilter("R/G/B: -2", 2);
-        table.getSortController().setRowFilter(filter);
-        assertTrue(table.getRowCount() > 0);
-        assertEquals(sv.getString(table.getValueAt(0, 2)), table.getStringAt(0, 2));
-    }
     
 
     /**
@@ -3191,6 +3162,38 @@ public class JXTableUnitTest extends InteractiveTestCase {
         assertTrue("viewIndex must be positive for visible", viewIndexOne >= 0);
         assertEquals(columnOne.isVisible(), viewIndexOne >= 0);
     }
+    /**
+     * Issue #189, #214: Sorter fails if content is comparable with mixed types
+     * 
+     */
+    @Test
+    public void testMixedComparableTypes() {
+        
+        Object[][] rowData = new Object[][] {
+                new Object[] { Boolean.TRUE, new Integer(2) },
+                new Object[] { Boolean.TRUE, "BC" } };
+        String[] columnNames = new String[] { "Critical", "Task" };
+        DefaultTableModel model =  new DefaultTableModel(rowData, columnNames);
+        final JXTable table = new JXTable(model);
+        table.toggleSortOrder(1);
+    }   
+    
+    /**
+     * Issue #189, #214: Sorter fails if content is 
+     * mixed comparable/not comparable
+     *
+     */
+    @Test
+    public void testMixedComparableTypesWithNonComparable() {
+        
+        Object[][] rowData = new Object[][] {
+                new Object[] { Boolean.TRUE, new Integer(2) },
+                new Object[] { Boolean.TRUE, new Object() } };
+        String[] columnNames = new String[] { "Critical", "Task" };
+        DefaultTableModel model =  new DefaultTableModel(rowData, columnNames);
+        final JXTable table = new JXTable(model);
+        table.toggleSortOrder(1);
+    }   
 
     @Test
     public void testIncrementalSearch() {
