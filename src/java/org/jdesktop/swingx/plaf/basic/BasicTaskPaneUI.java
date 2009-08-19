@@ -371,6 +371,7 @@ public class BasicTaskPaneUI extends TaskPaneUI {
      * Mouse listener responsible for handling of toggle events.
      */
     class ToggleListener extends MouseInputAdapter {
+        @Override
         public void mouseEntered(MouseEvent e) {
             if (isInBorder(e)) {
                 e.getComponent().setCursor(
@@ -381,12 +382,14 @@ public class BasicTaskPaneUI extends TaskPaneUI {
             }
         }
 
+        @Override
         public void mouseExited(MouseEvent e) {
             e.getComponent().setCursor(null);
             mouseOver = false;
                         group.repaint(0, 0, group.getWidth(), getTitleHeight(group));
         }
 
+        @Override
         public void mouseMoved(MouseEvent e) {
             if (isInBorder(e)) {
                 e.getComponent().setCursor(
@@ -400,6 +403,7 @@ public class BasicTaskPaneUI extends TaskPaneUI {
                         group.repaint(0, 0, group.getWidth(), getTitleHeight(group));
         }
 
+        @Override
         public void mouseReleased(MouseEvent e) {
             if (SwingUtilities.isLeftMouseButton(e) && isInBorder(e)) {
                 group.setCollapsed(!group.isCollapsed());
@@ -424,6 +428,7 @@ public class BasicTaskPaneUI extends TaskPaneUI {
             group.setCollapsed(!group.isCollapsed());
         }
         
+        @Override
         public boolean isEnabled() {
             return group.isVisible();
         }

@@ -44,6 +44,7 @@ public class GlossyTaskPaneUI extends BasicTaskPaneUI {
     return new GlossyTaskPaneUI();
   }
 
+  @Override
   protected Border createPaneBorder() {
     return new GlossyPaneBorder();
   }
@@ -52,6 +53,7 @@ public class GlossyTaskPaneUI extends BasicTaskPaneUI {
    * Overriden to paint the background of the component but keeping the rounded
    * corners.
    */
+  @Override
   public void update(Graphics g, JComponent c) {
     if (c.isOpaque()) {
       g.setColor(c.getParent().getBackground());
@@ -69,6 +71,7 @@ public class GlossyTaskPaneUI extends BasicTaskPaneUI {
    */
   class GlossyPaneBorder extends PaneBorder {
     
+    @Override
     protected void paintTitleBackground(JXTaskPane group, Graphics g) {
       if (group.isSpecial()) {
         g.setColor(specialTitleBackground);
@@ -132,6 +135,7 @@ public class GlossyTaskPaneUI extends BasicTaskPaneUI {
       g.drawLine(0, getTitleHeight(group) - 1, group.getWidth(), getTitleHeight(group) - 1);
     }
 
+    @Override
     protected void paintExpandedControls(JXTaskPane group, Graphics g, int x,
       int y, int width, int height) {
       ((Graphics2D)g).setRenderingHint(
