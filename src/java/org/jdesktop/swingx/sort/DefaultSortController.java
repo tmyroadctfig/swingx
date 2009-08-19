@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.DefaultRowSorter;
+import javax.swing.RowFilter;
 import javax.swing.SortOrder;
 
 import org.jdesktop.swingx.renderer.StringValue;
@@ -252,6 +253,15 @@ public abstract class DefaultSortController<M, I> extends DefaultRowSorter<M, I>
         }
         return stringValueProvider;
     }
+
+    /**
+     * Overridden for a quick experiment ... 
+     */
+    @Override
+    public void setRowFilter(RowFilter<? super M, ? super I> filter) {
+        super.setRowFilter(filter);
+    }
+
 
     private static final StringValueProvider DEFAULT_PROVIDER = new StringValueProvider() {
 
