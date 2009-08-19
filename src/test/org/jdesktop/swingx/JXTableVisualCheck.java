@@ -64,6 +64,7 @@ import org.jdesktop.swingx.renderer.CheckBoxProvider;
 import org.jdesktop.swingx.renderer.DefaultTableRenderer;
 import org.jdesktop.swingx.renderer.HyperlinkProvider;
 import org.jdesktop.swingx.search.SearchFactory;
+import org.jdesktop.swingx.sort.DefaultSortController;
 import org.jdesktop.swingx.table.ColumnFactory;
 import org.jdesktop.swingx.table.DatePickerCellEditor;
 import org.jdesktop.swingx.table.NumberEditorExt;
@@ -160,7 +161,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         JXTable table = new JXTable(model);
         table.setVisibleRowCount(model.getRowCount());
         JXFrame frame = wrapWithScrollingInFrame(table, "multi-column-sort");
-        final TableRowSorter<?> rowSorter = (TableRowSorter<?>) table.getRowSorter();
+        final DefaultSortController<?, ?> rowSorter = (DefaultSortController<?, ?>) table.getRowSorter();
         final List<SortKey> sortKeys = new ArrayList<SortKey>();
         for (int i = 0; i < rowSorter.getMaxSortKeys(); i++) {
             sortKeys.add(new SortKey(i, SortOrder.ASCENDING));
@@ -834,6 +835,34 @@ public class JXTableVisualCheck extends JXTableUnitTest {
     }
     
 
+    
+    
+    /**
+     * Issue #179: Sorter does not use collator if cell content is
+     *  a String.
+     *
+     */
+    public void interactiveTestLocaleSorter() {
+        
+        Object[][] rowData = new Object[][] {
+                new Object[] { Boolean.TRUE, "aa" },
+                new Object[] { Boolean.FALSE, "AB" },
+                new Object[] { Boolean.FALSE, "AC" },
+                new Object[] { Boolean.TRUE, "BA" },
+                new Object[] { Boolean.FALSE, "BB" },
+                new Object[] { Boolean.TRUE, "BC" } };
+        String[] columnNames = new String[] { "Critical", "Task" };
+        DefaultTableModel model =  new DefaultTableModel(rowData, columnNames);
+//        {
+//            public Class getColumnClass(int column) {
+//                return column == 1 ? String.class : super.getColumnClass(column);
+//            }
+//        };
+        final JXTable table = new JXTable(model);
+        table.toggleSortOrder(1);
+        JFrame frame = wrapWithScrollingInFrame(table, "locale sorting");
+        frame.setVisible(true);
+    }   
     
 
     /** 
