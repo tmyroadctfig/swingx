@@ -37,7 +37,7 @@ import org.junit.runners.JUnit4;
  * @author Jeanette Winzenburg
  */
 @RunWith(JUnit4.class)
-public class ListSortControllerTest extends AbstractTestSortController {
+public class ListSortControllerTest extends AbstractTestSortController<ListSortController<ListModel>, ListModel> {
 
     @SuppressWarnings("unused")
     private static final Logger LOG = Logger
@@ -48,8 +48,8 @@ public class ListSortControllerTest extends AbstractTestSortController {
      */
     @Test
     public void testUseStringValueProvider() {
-        ListModel model = (ListModel) controller.getModel();
-        ListSortController<ListModel> controller = new ListSortController<ListModel>(model);
+//        ListModel model = (ListModel) controller.getModel();
+//        ListSortController<ListModel> controller = new ListSortController<ListModel>(model);
         registry.setStringValue(sv, 0);
         controller.setStringValueProvider(registry);
         RowFilter<Object, Object> filter = RowFilter.regexFilter("R/G/B: -2", 0);
@@ -63,9 +63,9 @@ public class ListSortControllerTest extends AbstractTestSortController {
     }
     
     @Override
-    protected DefaultSortController<?> createDefaultSortController(
-            Object model) {
-        return new ListSortController<ListModel>((ListModel) model);
+    protected ListSortController<ListModel> createDefaultSortController(
+            ListModel model) {
+        return new ListSortController<ListModel>(model);
     }
 
     @Override
@@ -75,7 +75,7 @@ public class ListSortControllerTest extends AbstractTestSortController {
 
 
     @Override
-    protected void setupModelDependentState(Object model) {
+    protected void setupModelDependentState(ListModel model) {
     }
 
 }
