@@ -47,7 +47,7 @@ public abstract class AbstractTestSortController extends InteractiveTestCase {
     private static final Logger LOG = Logger
             .getLogger(AbstractTestSortController.class.getName());
     
-    protected DefaultSortController<?, ?> controller;
+    protected DefaultSortController<?> controller;
     /**
      * A custom StringValue for Color. Maps to a string composed of the
      * prefix "R/G/B: " and the Color's rgb value.
@@ -280,7 +280,7 @@ public abstract class AbstractTestSortController extends InteractiveTestCase {
      * @param model the model to use in the SortController
      * @return
      */
-    protected abstract DefaultSortController<?, ?> createDefaultSortController(Object model);
+    protected abstract DefaultSortController<?> createDefaultSortController(Object model);
     /**
      * initialize model dependent state. Note that the model is the same as returned
      * from createModel. Called in setup only

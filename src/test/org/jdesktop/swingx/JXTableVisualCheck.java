@@ -49,7 +49,6 @@ import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
-import javax.swing.table.TableRowSorter;
 
 import org.jdesktop.swingx.JXTable.NumberEditor;
 import org.jdesktop.swingx.action.AbstractActionExt;
@@ -161,7 +160,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         JXTable table = new JXTable(model);
         table.setVisibleRowCount(model.getRowCount());
         JXFrame frame = wrapWithScrollingInFrame(table, "multi-column-sort");
-        final DefaultSortController<?, ?> rowSorter = (DefaultSortController<?, ?>) table.getRowSorter();
+        final DefaultSortController<?> rowSorter = (DefaultSortController<?>) table.getRowSorter();
         final List<SortKey> sortKeys = new ArrayList<SortKey>();
         for (int i = 0; i < rowSorter.getMaxSortKeys(); i++) {
             sortKeys.add(new SortKey(i, SortOrder.ASCENDING));

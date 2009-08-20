@@ -55,7 +55,7 @@ import javax.swing.SortOrder;
  *  @author Jeanette Winzenburg
  * 
  */
-public interface SortController<M, I> {
+public interface SortController<M> {
 
     /**
      * Sets whether or not this controller is sortable.<p>
@@ -246,7 +246,7 @@ public interface SortController<M, I> {
      * @param filter the filter used to determine what entries should be
      *        included
      */
-     void setRowFilter(RowFilter<? super M, ? super I> filter);
+     void setRowFilter(RowFilter<? super M, ? super Integer> filter);
 
     /**
      * Returns the filter that determines which rows, if any, should
@@ -254,7 +254,7 @@ public interface SortController<M, I> {
      *
      * @return the filter
      */
-     RowFilter<? super M,? super I> getRowFilter();
+     RowFilter<? super M,? super Integer> getRowFilter();
 
     /**
      * Sets the StringValueProvider to look up the StringValues. If the value

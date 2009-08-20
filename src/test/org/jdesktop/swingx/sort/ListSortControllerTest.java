@@ -46,14 +46,14 @@ public class ListSortControllerTest extends AbstractTestSortController {
      * Commented temporarily because this fails to compile on the server
      * (compiles okay locally)
      */
-//    @Test
-//    public void testUseStringValueProvider() {
-//        registry.setStringValue(sv, 0);
-//        controller.setStringValueProvider(registry);
-//        RowFilter<Object, Object> filter = RowFilter.regexFilter("R/G/B: -2", 0);
-//        controller.setRowFilter(filter);
-//        assertTrue("view row count: " + controller.getViewRowCount(), controller.getViewRowCount() > 0);
-//    }
+    @Test
+    public void testUseStringValueProvider() {
+        registry.setStringValue(sv, 0);
+        controller.setStringValueProvider(registry);
+        RowFilter<Object, Object> filter = RowFilter.regexFilter("R/G/B: -2", 0);
+        controller.setRowFilter(filter);
+        assertTrue("view row count: " + controller.getViewRowCount(), controller.getViewRowCount() > 0);
+    }
 
     @Override
     protected int getColumnCount() {
@@ -61,7 +61,7 @@ public class ListSortControllerTest extends AbstractTestSortController {
     }
     
     @Override
-    protected DefaultSortController<?, ?> createDefaultSortController(
+    protected DefaultSortController<?> createDefaultSortController(
             Object model) {
         return new ListSortController<ListModel>((ListModel) model);
     }
