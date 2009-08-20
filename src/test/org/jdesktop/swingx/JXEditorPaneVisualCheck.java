@@ -96,8 +96,7 @@ public class JXEditorPaneVisualCheck extends JXEditorPaneTest {
       toolbar.setOrientation(JToolBar.VERTICAL);
       editor.setEditable(false);
       editor.setPreferredSize(new Dimension(600, 400));
-      JXList list = new JXList();
-      list.setFilterEnabled(true);
+      JXList list = new JXList(true);
       list.setModel(createListModel(actionNames));
       
       JXFrame frame = wrapWithScrollingInFrame(editor, list, "Looking at swingx editor default and styled actions");

@@ -290,7 +290,7 @@ public class JXListSortRevamp extends InteractiveTestCase {
     public void testSetModelFlushFilter() {
         fail("list sorting/filtering disabled");
         final JXList list = new JXList();
-        list.setFilterEnabled(true);
+//        list.setFilterEnabled(true);
 //        PatternFilter filter = new PatternFilter(".*1.*", 0, 0);
 //        final FilterPipeline pipeline = new FilterPipeline(filter);
 //        final DefaultListModel model = new DefaultListModel();
@@ -311,8 +311,7 @@ public class JXListSortRevamp extends InteractiveTestCase {
     @Test
     public void testSetModelEmptySelection() {
         fail("list sorting/filtering disabled");
-        final JXList list = new JXList();
-        list.setFilterEnabled(true);
+        final JXList list = new JXList(true);
         final DefaultListModel model = new DefaultListModel();
         for (int i = 0; i < 10; i++)
             model.addElement("Element " + i);
@@ -392,7 +391,7 @@ public class JXListSortRevamp extends InteractiveTestCase {
     }
     
     private void assertFilterEnabled(JXList list, boolean b) {
-        assertEquals(b, list.isFilterEnabled());
+        assertEquals(b, list.getAutoCreateRowSorter());
     }
 
     /**
@@ -587,22 +586,6 @@ public class JXListSortRevamp extends InteractiveTestCase {
     }
 
 
-    /**
-     * setFilterEnabled throws NPE if formerly had selection.
-     * 
-     *
-     */
-    @Test
-    public void testSetFilterEnabledWithSelection() {
-        fail("list sorting/filtering disabled");
-        final JXList list = new JXList(ascendingListModel);
-        assertEquals(20, list.getElementCount());
-        final int modelRow = 0;
-        // set a selection 
-        list.setSelectedIndex(modelRow);
-        list.setFilterEnabled(true);
-        
-    }
 
     @Test
     public void testEmptyFilter() {
@@ -622,28 +605,6 @@ public class JXListSortRevamp extends InteractiveTestCase {
         
     }
 
-    /**
-     * Emergency break for #2-swinglabs: 
-     * it's not allowed to reset filterEnabled property to false again.
-     *
-     */
-    @Test
-    public void testFilterEnabledAndDisabled() {
-        fail("list sorting/filtering disabled");
-        JXList list = new JXList(ascendingListModel, true);
-        try {
-            list.setFilterEnabled(false);
-            fail("must not reset the filterEnabled property");
-        } catch (IllegalStateException e) {
-            // do nothing this is the exception we expect. 
-        } catch (Exception e) { 
-            fail("unexpected exception type" + e);
-        }
-//        assertSame(ascendingListModel, list.getModel());
-//        assertEquals(ascendingListModel.getSize(), list.getElementCount());
-//        assertEquals(ascendingListModel.getElementAt(0), list.getElementAt(0));
-        
-    }
     
     @Test
     public void testSortingFilterEnabled() {
@@ -849,7 +810,7 @@ public class JXListSortRevamp extends InteractiveTestCase {
         // a side-effect of setFilterEnabled is to clear the selection!
         // this is done in JList.setModel(..) which is called when 
         // changing filterEnabled!
-        list.setFilterEnabled(true);
+//        list.setFilterEnabled(true);
         assertEquals(20, list.getElementCount());
 //        list.setFilters(new FilterPipeline(new Filter[] {new PatternFilter("0", 0, 0) }));
         assertEquals(2, list.getElementCount());

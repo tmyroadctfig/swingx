@@ -313,11 +313,10 @@ public class JXHyperlinkVisualCheck extends InteractiveTestCase {
             
         };
         
-        JXList list = new JXList(createPlayerModel());
+        JXList list = new JXList(createPlayerModel(), true);
         list.setRolloverEnabled(true);
         // descending order - check if the action is performed for the 
         // correct value
-        list.setFilterEnabled(true);
         list.setSortOrder(SortOrder.DESCENDING);
         list.setCellRenderer(new DefaultListRenderer(
                 new HyperlinkProvider(linkAction, Player.class)));

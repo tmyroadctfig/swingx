@@ -6,6 +6,8 @@
  */
 package org.jdesktop.swingx;
 
+import static org.junit.Assert.*;
+
 import java.awt.Color;
 import java.beans.PropertyChangeListener;
 import java.net.MalformedURLException;
@@ -30,8 +32,10 @@ import org.jdesktop.swingx.renderer.StringValue;
 import org.jdesktop.swingx.renderer.StringValues;
 import org.jdesktop.swingx.rollover.ListRolloverController;
 import org.jdesktop.swingx.rollover.RolloverProducer;
+import org.jdesktop.swingx.sort.ListSortController;
 import org.jdesktop.test.AncientSwingTeam;
 import org.jdesktop.test.PropertyChangeReport;
+import org.jdesktop.test.TestUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -52,20 +56,71 @@ public class JXListTest extends InteractiveTestCase {
 
     protected ListModel listModel;
     protected DefaultListModel ascendingListModel;
+    /** empty default list */
+    private JXList list;
 
+
+    //------------- sort properties
     
-    @Before
-    public void setUpJ4() throws Exception {
-        setUp();
+    @Test
+    public void testSortsOnUpdateSet() {
+        PropertyChangeReport report = new PropertyChangeReport(list);
+        list.setSortsOnUpdates(false);
+        TestUtils.assertPropertyChangeEvent(report, "sortsOnUpdates", true, false);
+        assertFalse(list.getSortsOnUpdates());
+    }
+
+    @Test
+    public void testSortsOnUpdateDefault() {
+        assertTrue(list.getSortsOnUpdates());
     }
     
-    @After
-    public void tearDownJ4() throws Exception {
-        tearDown();
+    @Test
+    public void testSortableSet() {
+        PropertyChangeReport report = new PropertyChangeReport(list);
+        list.setSortable(false);
+        TestUtils.assertPropertyChangeEvent(report, "sortable", true, false);
+        assertFalse(list.isSortable());
     }
     
+    @Test
+    public void testSortableDefault() {
+        assertTrue(list.isSortable());
+    }
+    //------------ rowSorter api
     
-
+    
+    @Test
+    public void testAutoCreateRowSorterConstructor() {
+        JXList list = new JXList(true);
+        assertTrue(list.getAutoCreateRowSorter());
+        assertNotNull(list.getRowSorter());
+    }
+    
+    @Test
+    public void testRowSorterSet() {
+        assertNull(list.getRowSorter());
+        ListSortController<ListModel> controller = new ListSortController<ListModel>(list.getModel());
+        PropertyChangeReport report = new PropertyChangeReport(list);
+        list.setRowSorter(controller);
+        TestUtils.assertPropertyChangeEvent(report, list, "rowSorter", null, controller);
+        assertSame(controller, list.getRowSorter());
+    }
+    
+    @Test
+    public void testAutoCreateRowSorterSet() {
+        PropertyChangeReport report = new PropertyChangeReport(list);
+        list.setAutoCreateRowSorter(true);
+        assertTrue(list.getAutoCreateRowSorter());
+        TestUtils.assertPropertyChangeEvent(report, "autoCreateRowSorter", false, true, false);
+        assertNotNull(list.getRowSorter());
+    }
+    
+    @Test
+    public void testAutoCreateRowSorterDefault() {
+        assertFalse(list.getAutoCreateRowSorter());
+    }
+//------------------------end of re-enable sort/filter
     /**
      * Issue #816-swingx: Delegating renderer must create list's default.
      * Consistent api: expose wrappedRenderer the same way as wrappedModel
@@ -407,12 +462,25 @@ public class JXListTest extends InteractiveTestCase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
+        list = new JXList();
         listModel = createListModel();
         ascendingListModel = createAscendingListModel(0, 20);
     }
     public JXListTest() {
         super("JXList Tests");
     }
+
+    
+    @Before
+    public void setUpJ4() throws Exception {
+        setUp();
+    }
+    
+    @After
+    public void tearDownJ4() throws Exception {
+        tearDown();
+    }
+
 
     
 }
