@@ -435,8 +435,7 @@ public class ComponentAdapterTest extends TestCase {
      */
     @Test
     public void testListGetStringAtSorted() {
-        JXListT list = new JXListT(AncientSwingTeam.createNamedColorListModel());
-        list.setFilterEnabled(true);
+        JXListT list = new JXListT(AncientSwingTeam.createNamedColorListModel(), true);
         list.setCellRenderer(new DefaultListRenderer(sv));
         list.toggleSortOrder();
         String text = sv.getString(list.getWrappedModel().getElementAt(2));
@@ -507,6 +506,9 @@ public class ComponentAdapterTest extends TestCase {
 
         public JXListT(ListModel model) {
             super(model);
+        }
+        public JXListT(ListModel model, boolean autoCreateRowSorter) {
+            super(model, autoCreateRowSorter);
         }
 
         public JXListT(Object[] data) {

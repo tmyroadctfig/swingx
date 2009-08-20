@@ -34,6 +34,7 @@ import javax.swing.KeyStroke;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
+import javax.swing.RowSorter;
 import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
@@ -56,8 +57,9 @@ import org.jdesktop.swingx.rollover.RolloverRenderer;
 import org.jdesktop.swingx.search.ListSearchable;
 import org.jdesktop.swingx.search.SearchFactory;
 import org.jdesktop.swingx.search.Searchable;
+import org.jdesktop.swingx.sort.ListSortController;
 import org.jdesktop.swingx.sort.SortController;
-import org.jdesktop.swingx.sort.SortUtils;
+import org.jdesktop.swingx.table.TableColumnExt;
 
 /**
  * Enhanced List component with support for general SwingX sorting/filtering,
@@ -223,11 +225,17 @@ public class JXList extends JList {
     /** A wrapper around the default renderer enabling decoration. */
     private DelegatingRenderer delegatingRenderer;
 
-    private boolean filterEnabled;
-
     private Searchable searchable;
 
     private Comparator<?> comparator;
+
+    private boolean autoCreateRowSorter;
+
+    private RowSorter<? extends ListModel> rowSorter;
+
+    private boolean sortable;
+
+    private boolean sortsOnUpdates;
 
     /**
     * Constructs a <code>JXList</code> with an empty model and filters disabled.
@@ -337,8 +345,9 @@ public class JXList extends JList {
 
 
     private void init(boolean filterEnabled) {
-        setFilterEnabled(filterEnabled);
-        
+        setAutoCreateRowSorter(filterEnabled);
+        setSortable(true);
+        setSortsOnUpdates(true);
         Action findAction = createFindAction();
         getActionMap().put("find", findAction);
         
@@ -487,81 +496,220 @@ public class JXList extends JList {
     }
 
     //--------------------- public sort api
-//    /** 
-//     * Returns the sortable property.
-//     * Here: same as filterEnabled.
-//     * @return true if the table is sortable. 
-//     */
-//    public boolean isSortable() {
-//        return isFilterEnabled();
-//    }
+    
     /**
-     * Removes the interactive sorter.
+     * Returns {@code true} if whenever the model changes, a new
+     * {@code RowSorter} should be created and installed
+     * as the table's sorter; otherwise, returns {@code false}. 
+     *
+     * @return true if a {@code RowSorter} should be created when
+     *         the model changes
+     * @since 1.6
+     */
+    public boolean getAutoCreateRowSorter() {
+        return autoCreateRowSorter;
+    }
+
+    /**
+     * Specifies whether a {@code RowSorter} should be created for the
+     * list whenever its model changes.
+     * <p>
+     * When {@code setAutoCreateRowSorter(true)} is invoked, a {@code
+     * RowSorter} is immediately created and installed on the
+     * list.  While the {@code autoCreateRowSorter} property remains
+     * {@code true}, every time the model is changed, a new {@code
+     * RowSorter} is created and set as the list's row sorter.<p>
+     * 
+     * The default value is false.
+     *
+     * @param autoCreateRowSorter whether or not a {@code RowSorter}
+     *        should be automatically created
+     * @beaninfo
+     *        bound: true
+     *    preferred: true
+     *  description: Whether or not to turn on sorting by default.
+     */
+    public void setAutoCreateRowSorter(boolean autoCreateRowSorter) {
+        if (getAutoCreateRowSorter() == autoCreateRowSorter) return;
+        boolean oldValue = getAutoCreateRowSorter();
+        this.autoCreateRowSorter = autoCreateRowSorter;
+        if (autoCreateRowSorter) {
+            setRowSorter(createDefaultRowSorter());
+        }
+        firePropertyChange("autoCreateRowSorter", oldValue,
+                           getAutoCreateRowSorter());
+    }
+
+    /**
+     * Creates and returns the default RowSorter. Note that this is already
+     * configured to the current ListModel.
+     * 
+     * PENDING JW: review method signature - better expose the need for the
+     * model by adding a parameter? 
+     * 
+     * @return the default RowSorter.
+     */
+    protected RowSorter<? extends ListModel> createDefaultRowSorter() {
+        return new ListSortController<ListModel>(getModel());
+    }
+    /**
+     * Returns the object responsible for sorting.
+     *
+     * @return the object responsible for sorting
+     * @since 1.6
+     */
+    public RowSorter<? extends ListModel> getRowSorter() {
+        return rowSorter;
+    }
+
+    /**
+     * Sets the <code>RowSorter</code>.  <code>RowSorter</code> is used
+     * to provide sorting and filtering to a <code>JXList</code>.
+     * <p>
+     * This method clears the selection and resets any variable row heights.
+     * <p>
+     * If the underlying model of the <code>RowSorter</code> differs from
+     * that of this <code>JXList</code> undefined behavior will result.
+     *
+     * @param sorter the <code>RowSorter</code>; <code>null</code> turns
+     *        sorting off
+     */
+    public void setRowSorter(RowSorter<? extends ListModel> sorter) {
+        RowSorter<? extends ListModel> oldRowSorter = getRowSorter();
+        this.rowSorter = sorter;
+        
+//        if (sortManager != null) {
+//            oldRowSorter = sortManager.sorter;
+//            sortManager.dispose();
+//            sortManager = null;
+//        }
+//        rowModel = null;
+//        clearSelectionAndLeadAnchor();
+//        if (sorter != null) {
+//            sortManager = new SortManager(sorter);
+//        }
+//        resizeAndRepaint();
+        firePropertyChange("rowSorter", oldRowSorter, sorter);
+//        firePropertyChange("sorter", oldRowSorter, sorter);
+    }
+
+    /**
+     * Sets &quot;sortable&quot; property indicating whether or not this list
+     * isSortable. 
+     * 
+     * <b>Note</b>: as of post-1.0 this property is propagated to the SortController. 
+     * Whether or not a change triggers a re-sort is up to either the concrete controller 
+     * implementation (the default doesn't) or client code. This behaviour is
+     * different from old SwingX style sorting.
+     * 
+     * @see TableColumnExt#isSortable()
+     * @param sortable boolean indicating whether or not this table supports
+     *        sortable columns
+     */
+    public void setSortable(boolean sortable) {
+        boolean old = isSortable();
+        this.sortable = sortable;
+        if (getSortController() != null) {
+            getSortController().setSortable(sortable);
+        }
+        firePropertyChange("sortable", old, isSortable());
+    }
+
+    /**
+     * Returns the table's sortable property.<p>
+     * 
+     * Note: as of post-1.0 this property is propagated to the SortController. 
+     * 
+     * @return true if the table is sortable.
+     */
+    public boolean isSortable() {
+        return getSortController() != null ? getSortController().isSortable() : sortable;
+    }
+
+    /**
+     * If true, specifies that a sort should happen when the underlying
+     * model is updated (<code>rowsUpdated</code> is invoked).  For
+     * example, if this is true and the user edits an entry the
+     * location of that item in the view may change.  The default is
+     * true.
+     *
+     * @param sortsOnUpdates whether or not to sort on update events
+     */
+    public void setSortsOnUpdates(boolean sortsOnUpdates) {
+        boolean old = getSortsOnUpdates();
+        this.sortsOnUpdates = sortsOnUpdates;
+        if (getSortController() != null) {
+            getSortController().setSortsOnUpdates(sortsOnUpdates);
+        }
+        firePropertyChange("sortsOnUpdates", old, getSortsOnUpdates());
+    }
+    
+    /**
+     * Returns true if  a sort should happen when the underlying
+     * model is updated; otherwise, returns false.
+     *
+     * @return whether or not to sort when the model is updated
+     */
+    public boolean getSortsOnUpdates() {
+        return getSortController() != null ? getSortController().getSortsOnUpdates() : sortsOnUpdates;
+    }
+
+    /**
+     * Resets sorting of all columns.
+     * Delegates to the SortController if available, or does nothing if not.<p>
+     * 
+     * PENDING JW: method name - consistent in SortController and here.
      * 
      */
     public void resetSortOrder() {
-        SortController controller = getSortController();
-        if (controller != null) {
-            controller.resetSortOrders();
-        }
+        if (getSortController() == null)
+            return;
+        getSortController().resetSortOrders();
     }
 
     /**
      * 
-     * Toggles the sort order of the items.
+     * Toggles the sort order of the list.
+     * Delegates to the SortController if available, or does nothing if not.<p>
+     * 
      * <p>
-     * The exact behaviour is defined by the SortController's
-     * toggleSortOrder implementation. Typically a unsorted 
-     * column is sorted in ascending order, a sorted column's
-     * order is reversed. 
-     * <p>
-     * PENDING: where to get the comparator from?
+     * The exact behaviour is defined by the SortController's toggleSortOrder
+     * implementation. Typically a unsorted list is sorted in ascending order,
+     * a sorted list's order is reversed.
      * <p>
      * 
      * 
      */
     public void toggleSortOrder() {
-        SortController controller = getSortController();
-        if (controller != null) {
-            controller.toggleSortOrder(0);
-        }
+        if (getSortController() == null)
+            return;
+        getSortController().toggleSortOrder(0);
     }
 
     /**
-     * Sorts the list using SortOrder. 
+     * Sorts the list using SortOrder.
+     * Delegates to the SortController if available, or does nothing if not.<p>
      * 
+     * @param sortOrder the sort order to use.
      * 
-     * Respects the JXList's sortable and comparator 
-     * properties: routes the comparator to the SortController
-     * and does nothing if !isFilterEnabled(). 
-     * <p>
-     * 
-     * @param sortOrder the sort order to use. If null or SortOrder.UNSORTED, 
-     *   this method has the same effect as resetSortOrder();
-     *    
      */
     public void setSortOrder(SortOrder sortOrder) {
-        if (!SortUtils.isSorted(sortOrder)) {
-            resetSortOrder();
+        if (getSortController() == null)
             return;
-        }
-        SortController sortController = getSortController();
-        if (sortController != null) {
-//            sortController.setSortOrder(0, sortOrder);
-        }
+        getSortController().setSortOrder(0, sortOrder);
     }
 
 
     /**
      * Returns the SortOrder. 
+     * Delegates to the SortController if available, or returns SortOrder.UNSORTED if not.<p>
      * 
-     * @return the interactive sorter's SortOrder  
-     *  or SortOrder.UNSORTED 
+     * @return the current SortOrder
      */
     public SortOrder getSortOrder() {
-        SortController sortController = getSortController();
-        if (sortController == null) return SortOrder.UNSORTED;
-        return sortController.getSortOrder(0);
+        if (getSortController() == null)
+            return SortOrder.UNSORTED;
+        return getSortController().getSortOrder(0);
     }
 
     /**
@@ -574,9 +722,13 @@ public class JXList extends JList {
     }
     
     /**
-     * Sets the comparator used. As a side-effect, the 
-     * current sort might be updated. The exact behaviour
-     * is defined in #updateSortAfterComparatorChange. 
+     * Sets the comparator to use for sorting.<p>
+     *  
+     * <b>Note</b>: as of post-1.0 the property is propagated to the SortController,
+     * if available.
+     * Whether or not a change triggers a re-sort is up to either the concrete controller 
+     * implementation (the default doesn't) or client code. This behaviour is
+     * different from old SwingX style sorting.
      * 
      * @param comparator the comparator to use.
      */
@@ -588,18 +740,18 @@ public class JXList extends JList {
     }
     
     /**
-     * Updates sort after comparator has changed. 
-     * Here: sets the current sortOrder with the new comparator.
+     * Updates the SortController's comparator, if available. Does nothing otherwise. 
      *
      */
     protected void updateSortAfterComparatorChange() {
-        setSortOrder(getSortOrder());
-        
+        if (getSortController() == null) return;
+        getSortController().setComparator(0, getComparator());
     }
 
     /**
-     * returns the currently active SortController. Will be null if
-     * !isFilterEnabled().
+     * Returns the currently active SortController. May be null if RowSorter
+     * is null or not of type SortController.
+     * 
      * @return the currently active <code>SortController</code> may be null
      */
     protected SortController getSortController() {
@@ -610,7 +762,7 @@ public class JXList extends JList {
     // ---------------------------- filters
 
     /**
-     * returns the element at the given index. The index is in view coordinates
+     * Returns the element at the given index. The index is in view coordinates
      * which might differ from model coordinates if filtering is enabled and
      * filters/sorters are active.
      * 
@@ -620,7 +772,7 @@ public class JXList extends JList {
      *         getElementCount()
      */
     public Object getElementAt(int viewIndex) {
-        return getModel().getElementAt(viewIndex);
+        return getModel().getElementAt(convertIndexToModel(viewIndex));
     }
 
     /**
@@ -631,7 +783,8 @@ public class JXList extends JList {
      * @return number of elements in this list in view coordinates
      */
     public int getElementCount() {
-        return getModel().getSize();
+        return getRowSorter() != null ? 
+                getRowSorter().getViewRowCount(): getModel().getSize();
     }
 
     /**
@@ -643,14 +796,13 @@ public class JXList extends JList {
      * @throws IndexOutOfBoundsException if viewIndex < 0 or viewIndex >= getElementCount() 
      */
     public int convertIndexToModel(int viewIndex) {
-        return viewIndex;
+        return getRowSorter() != null ? 
+                getRowSorter().convertRowIndexToModel(viewIndex):viewIndex;
     }
 
     /**
      * Convert index from model coordinates to view coordinates accounting
      * for the presence of sorters and filters.
-     * 
-     * PENDING Filter guards against out of range - should not? 
      * 
      * @param modelIndex index in model coordinates
      * @return index in view coordinates if the model index maps to a view coordinate
@@ -658,64 +810,21 @@ public class JXList extends JList {
      * 
      */
     public int convertIndexToView(int modelIndex) {
-        return modelIndex;
+        return getRowSorter() != null 
+            ? getRowSorter().convertRowIndexToView(modelIndex) : modelIndex;
     }
 
     /**
-     * returns the underlying model. If !isFilterEnabled this will be the same
-     * as getModel().
      * 
-     * @return the underlying model
+     * @return the underlying model, same as getModel().
+     * @deprecated no longer used - custom ui-delegate does-the-right-thing when
+     *   accessing elements.
      */
+    @Deprecated
     public ListModel getWrappedModel() {
-        return /* isFilterEnabled() ? wrappingModel.getModel() : */ getModel();
+        return getModel();
     }
 
-    /**
-     * Enables/disables filtering support. If enabled all row indices -
-     * including the selection - are in view coordinates and getModel returns a
-     * wrapper around the underlying model.<p>
-     * 
-     * <b>NOTE</b>: Currently, this method has no effect - filtering/sorting of
-     * a JXList is disabled until SwingX is fully moved to the core style 
-     * filtering/sorting. <p>
-     * 
-     * Note: as an implementation side-effect calling this method clears the
-     * selection (done in super.setModel).<p>
-     * 
-     * PENDING: cleanup state transitions!! - currently this can be safely
-     * applied once only to enable. Internal state is inconsistent if trying to
-     * disable again. As a temporary emergency measure, this will throw a 
-     * IllegalStateException. 
-     * 
-     * see Issue #2-swinglabs.
-     * 
-     * 
-     * @param enabled
-     * @throws IllegalStateException if trying to disable again.
-     */
-    public void setFilterEnabled(boolean enabled) {
-        return;
-//        boolean old = isFilterEnabled();
-//        if (old == enabled)
-//            return;
-//        if (old) 
-//            throw new IllegalStateException("must not reset filterEnabled");
-//        // JW: filterEnabled must be set before calling super.setModel!
-//        filterEnabled = enabled;
-//        wrappingModel = new WrappingListModel(getModel());
-//        super.setModel(wrappingModel);
-//        firePropertyChange("filterEnabled", old, isFilterEnabled());
-    }
-
-    /**
-     * 
-     * @return a <boolean> indicating if filtering is enabled.
-     * @see #setFilterEnabled(boolean)
-     */
-    public boolean isFilterEnabled() {
-        return filterEnabled;
-    }
 
     /**
      * {@inheritDoc} <p>
