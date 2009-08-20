@@ -48,6 +48,8 @@ public class ListSortControllerTest extends AbstractTestSortController {
      */
     @Test
     public void testUseStringValueProvider() {
+        ListModel model = (ListModel) controller.getModel();
+        ListSortController<ListModel> controller = new ListSortController<ListModel>(model);
         registry.setStringValue(sv, 0);
         controller.setStringValueProvider(registry);
         RowFilter<Object, Object> filter = RowFilter.regexFilter("R/G/B: -2", 0);
