@@ -42,12 +42,12 @@ import org.junit.runners.JUnit4;
  * @author Jeanette Winzenburg
  */
 @RunWith(JUnit4.class)
-public abstract class AbstractTestSortController extends InteractiveTestCase {
+public abstract class AbstractTestSortController<SC extends DefaultSortController<M>, M> extends InteractiveTestCase {
     @SuppressWarnings("unused")
     private static final Logger LOG = Logger
             .getLogger(AbstractTestSortController.class.getName());
     
-    protected DefaultSortController<?> controller;
+    protected SC controller;
     /**
      * A custom StringValue for Color. Maps to a string composed of the
      * prefix "R/G/B: " and the Color's rgb value.
@@ -272,7 +272,7 @@ public abstract class AbstractTestSortController extends InteractiveTestCase {
      * Called in setup only.
      * @return
      */
-    protected abstract Object createModel();
+    protected abstract M createModel();
     /**
      * Create and return a SortController as appropriate. Note that the
      * parameter is the model as returned by createModel. Called in setup only.
@@ -280,13 +280,13 @@ public abstract class AbstractTestSortController extends InteractiveTestCase {
      * @param model the model to use in the SortController
      * @return
      */
-    protected abstract DefaultSortController<?> createDefaultSortController(Object model);
+    protected abstract SC createDefaultSortController(M model);
     /**
      * initialize model dependent state. Note that the model is the same as returned
      * from createModel. Called in setup only
      * @param model
      */
-    protected abstract void setupModelDependentState(Object model);
+    protected abstract void setupModelDependentState(M model);
     
     
     /**
@@ -314,7 +314,7 @@ public abstract class AbstractTestSortController extends InteractiveTestCase {
     public void setUp() throws Exception {
         sv = createColorStringValue();
         registry = new StringValueRegistry();
-        Object teamModel = createModel();
+        M teamModel = createModel();
         controller = createDefaultSortController(teamModel);
         setupModelDependentState(teamModel);
     }

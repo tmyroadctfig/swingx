@@ -40,7 +40,7 @@ import org.junit.runners.JUnit4;
  * @author Jeanette Winzenburg
  */
 @RunWith(JUnit4.class)
-public class TableSortControllerTest extends AbstractTestSortController {
+public class TableSortControllerTest extends AbstractTestSortController<TableSortController<TableModel>, TableModel> {
     @SuppressWarnings("unused")
     private static final Logger LOG = Logger
             .getLogger(TableSortControllerTest.class.getName());
@@ -109,9 +109,9 @@ public class TableSortControllerTest extends AbstractTestSortController {
     }
 
     @Override
-    protected DefaultSortController<?> createDefaultSortController(
-            Object model) {
-        return new TableSortController<TableModel>((TableModel) model);
+    protected TableSortController<TableModel> createDefaultSortController(
+            TableModel model) {
+        return new TableSortController<TableModel>(model);
     }
 
 
@@ -122,8 +122,8 @@ public class TableSortControllerTest extends AbstractTestSortController {
 
 
     @Override
-    protected void setupModelDependentState(Object model) {
-      initColumnClasses(registry, (TableModel) model);
+    protected void setupModelDependentState(TableModel model) {
+      initColumnClasses(registry,  model);
 
     }
 
