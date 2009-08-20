@@ -28,7 +28,7 @@ import javax.swing.ListModel;
  * 
  * @author Jeanette Winzenburg
  */
-public class ListSortController<M extends ListModel> extends DefaultSortController<M, Integer> {
+public class ListSortController<M extends ListModel> extends DefaultSortController<M> {
 
     /** underlying model */
     private M listModel;

@@ -36,13 +36,11 @@ import org.jdesktop.swingx.util.Contract;
 /**
  * A SortController to use for a JXTable.<p>
  * 
- * PENDING JW: should move up to DefaultRowSorter for re-use in ListRowSorter, but as long
- * as we don't have the latter ... 
  * 
  * @author Jeanette Winzenburg
  */
-public abstract class DefaultSortController<M, I> extends DefaultRowSorter<M, I> implements
-        SortController<M, I> {
+public abstract class DefaultSortController<M> extends DefaultRowSorter<M, Integer> implements
+        SortController<M> {
 
     private final static SortOrder[] DEFAULT_CYCLE = new SortOrder[] {SortOrder.ASCENDING, SortOrder.DESCENDING};
 

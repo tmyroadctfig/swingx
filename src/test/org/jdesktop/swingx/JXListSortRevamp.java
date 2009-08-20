@@ -6,9 +6,7 @@
  */
 package org.jdesktop.swingx;
 
-import java.awt.Color;
 import java.awt.event.ActionEvent;
-import java.beans.PropertyChangeListener;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.Collator;
@@ -17,37 +15,23 @@ import java.util.Vector;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
-import javax.swing.DefaultListSelectionModel;
-import javax.swing.ListCellRenderer;
 import javax.swing.ListModel;
-import javax.swing.ListSelectionModel;
 import javax.swing.SortOrder;
-import javax.swing.RowSorter.SortKey;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 
-import org.jdesktop.swingx.JXList.DelegatingRenderer;
-import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
-import org.jdesktop.swingx.decorator.Highlighter;
-import org.jdesktop.swingx.decorator.SearchPredicate;
 import org.jdesktop.swingx.hyperlink.LinkModel;
-import org.jdesktop.swingx.renderer.DefaultListRenderer;
-import org.jdesktop.swingx.renderer.StringValue;
-import org.jdesktop.swingx.renderer.StringValues;
-import org.jdesktop.swingx.rollover.ListRolloverController;
-import org.jdesktop.swingx.rollover.RolloverProducer;
-import org.jdesktop.test.AncientSwingTeam;
+import org.jdesktop.swingx.sort.ListSortController;
+import org.jdesktop.swingx.sort.SortManager;
 import org.jdesktop.test.ListDataReport;
-import org.jdesktop.test.PropertyChangeReport;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.junit.Test;
-import org.junit.Before;
-import org.junit.After;
 
 
 /**
@@ -62,18 +46,37 @@ public class JXListSortRevamp extends InteractiveTestCase {
     protected ListModel listModel;
     protected DefaultListModel ascendingListModel;
 
-    
-    @Before
-    public void setUpJ4() throws Exception {
-        setUp();
+    public static void main(String[] args) {
+        JXListSortRevamp test = new JXListSortRevamp();
+        try {
+            test.runInteractiveTests();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
     
-    @After
-    public void tearDownJ4() throws Exception {
-        tearDown();
-    }
 
+//------------------ re-enable
     
+    @Test
+    public void interactiveRowSorter() {
+        JXList list = new JXList(ascendingListModel);
+        final ListSortController<ListModel> controller = new ListSortController<ListModel>(list.getModel());
+        list.setRowSorter(controller);
+        new SortManager(controller, list);
+        Action sort = new AbstractAction("toggle sort") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                controller.toggleSortOrder(0);
+                
+            }
+        };
+        JXFrame frame = showWithScrollingInFrame(list, "sort in rowSorter");
+        addAction(frame, sort);
+        show(frame);
+    }
+//-------------------- failing tests    
     /**
      * Issue #855-swingx: throws AIOOB on repeated remove/add.
      * Reason is that the lead/anchor is not removed in removeIndexInterval
@@ -996,4 +999,14 @@ public class JXListSortRevamp extends InteractiveTestCase {
     }
 
     
+    @Before
+    public void setUpJ4() throws Exception {
+        setUp();
+    }
+    
+    @After
+    public void tearDownJ4() throws Exception {
+        tearDown();
+    }
+
 }

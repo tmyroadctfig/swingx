@@ -31,7 +31,7 @@ import javax.swing.table.TableModel;
  * 
  * @author Jeanette Winzenburg
  */
-public class TableSortController<M extends TableModel> extends DefaultSortController<M, Integer>  {
+public class TableSortController<M extends TableModel> extends DefaultSortController<M>  {
 
     /**
      * Underlying model.
