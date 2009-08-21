@@ -26,6 +26,7 @@ import java.util.logging.Logger;
 
 import javax.swing.JButton;
 import javax.swing.JPanel;
+import javax.swing.JTable;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.jdesktop.swingx.InteractiveTestCase;
@@ -88,7 +89,25 @@ public class ComponentAdapterClientTest extends InteractiveTestCase {
     public void tearDownJ4() throws Exception {
         tearDown();
     }
-    
+
+    /**
+     * Issue #1156-swingx: sort must use comparable
+     * 
+     * visually check that the custom string value for the color column is
+     * used for sorting.
+     */
+    public void interactiveTableSortComparableAndStringValue() {
+        JXTable table = new JXTable(new AncientSwingTeam());
+        table.setDefaultRenderer(Color.class, new DefaultTableRenderer(sv));
+        
+        JTable core = new JTable(table.getModel());
+        core.setAutoCreateRowSorter(true);
+        JXFrame frame = wrapWithScrollingInFrame(table, core, "JXTable <--> JTable: Compare sorting of color column");
+        
+        show(frame);
+    }
+
+
     /**
      * Issue #767-swingx: consistent string representation.
      * 

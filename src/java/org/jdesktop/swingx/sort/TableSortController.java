@@ -21,6 +21,9 @@
  */
 package org.jdesktop.swingx.sort;
 
+import java.text.Collator;
+import java.util.Comparator;
+
 import javax.swing.table.TableModel;
 
 /**
@@ -32,6 +35,12 @@ import javax.swing.table.TableModel;
  * @author Jeanette Winzenburg
  */
 public class TableSortController<M extends TableModel> extends DefaultSortController<M>  {
+    /**
+     * Comparator that uses compareTo on the contents.
+     */
+    @SuppressWarnings("unchecked")
+    private static final Comparator COMPARABLE_COMPARATOR =
+            new ComparableComparator();
 
     /**
      * Underlying model.
@@ -61,6 +70,67 @@ public class TableSortController<M extends TableModel> extends DefaultSortContro
         tableModel = model;
         setModelWrapper(new TableRowSorterModelWrapper());
     }
+
+    
+    /**
+     * Returns the <code>Comparator</code> for the specified 
+     * column.  If a <code>Comparator</code> has not been specified using
+     * the <code>setComparator</code> method a <code>Comparator</code>
+     * will be returned based on the column class
+     * (<code>TableModel.getColumnClass</code>) of the specified column.
+     * If the column class is <code>String</code>,
+     * <code>Collator.getInstance</code> is returned.  If the
+     * column class implements <code>Comparable</code> a private
+     * <code>Comparator</code> is returned that invokes the
+     * <code>compareTo</code> method.  Otherwise
+     * <code>Collator.getInstance</code> is returned.<p>
+     * 
+     * PENDING JW: think about implications to string value lookup!
+     *
+     * @throws IndexOutOfBoundsException {@inheritDoc}
+     */
+    @Override
+    public Comparator<?> getComparator(int column) {
+        Comparator<?> comparator = super.getComparator(column);
+        if (comparator != null) {
+            return comparator;
+        }
+        Class<?> columnClass = getModel().getColumnClass(column);
+        if (columnClass == String.class) {
+            return Collator.getInstance();
+        }
+        if (Comparable.class.isAssignableFrom(columnClass)) {
+            return COMPARABLE_COMPARATOR;
+        }
+        return Collator.getInstance();
+    }
+
+    /**
+     * {@inheritDoc}<p>
+     * Note: must implement same logic as the overridden comparator
+     * lookup, otherwise will throw ClassCastException because 
+     * here the comparator is never null. <p>
+     * 
+     * PENDING JW: think about implications to string value lookup!
+     * 
+     * @throws IndexOutOfBoundsException {@inheritDoc}
+     */
+    @Override
+    protected boolean useToString(int column) {
+        Comparator<?> comparator = super.getComparator(column);
+        if (comparator != null) {
+            return false;
+        }
+        Class<?> columnClass = getModel().getColumnClass(column);
+        if (columnClass == String.class) {
+            return false;
+        }
+        if (Comparable.class.isAssignableFrom(columnClass)) {
+            return false;
+        }
+        return true;
+    }
+
 
     /**
      * Implementation of DefaultRowSorter.ModelWrapper that delegates to a
@@ -96,6 +166,14 @@ public class TableSortController<M extends TableModel> extends DefaultSortContro
         @Override
         public Integer getIdentifier(int index) {
             return index;
+        }
+    }
+
+
+    @SuppressWarnings("unchecked")
+    private static class ComparableComparator implements Comparator {
+        public int compare(Object o1, Object o2) {
+            return ((Comparable)o1).compareTo(o2);
         }
     }
 

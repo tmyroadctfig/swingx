@@ -26,7 +26,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.DefaultRowSorter;
-import javax.swing.RowFilter;
 import javax.swing.SortOrder;
 
 import org.jdesktop.swingx.renderer.StringValue;
