@@ -22,12 +22,18 @@
 package org.jdesktop.swingx.sort;
 
 import java.awt.Color;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.swing.RowFilter;
+import javax.swing.SortOrder;
+import javax.swing.RowSorter.SortKey;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 
 import org.jdesktop.test.AncientSwingTeam;
 import org.junit.Test;
@@ -56,11 +62,8 @@ public class TableSortControllerTest extends AbstractTestSortController<TableSor
         }
     }
 
-
     
     /**
-     * Commented temporarily because this fails to compile on the server
-     * (compiles okay locally).
      * 
       */
     @Test
