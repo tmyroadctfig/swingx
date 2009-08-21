@@ -23,6 +23,7 @@ package org.jdesktop.swingx.sort;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.swing.DefaultRowSorter;
@@ -40,6 +41,13 @@ import org.jdesktop.swingx.util.Contract;
  */
 public abstract class DefaultSortController<M> extends DefaultRowSorter<M, Integer> implements
         SortController<M> {
+
+    /**
+     * Comparator that uses compareTo on the contents.
+     */
+    @SuppressWarnings("unchecked")
+    public static final Comparator COMPARABLE_COMPARATOR =
+            new ComparableComparator();
 
     private final static SortOrder[] DEFAULT_CYCLE = new SortOrder[] {SortOrder.ASCENDING, SortOrder.DESCENDING};
 
@@ -259,4 +267,13 @@ public abstract class DefaultSortController<M> extends DefaultRowSorter<M, Integ
         }
         
     };
+    
+
+    @SuppressWarnings("unchecked")
+    private static class ComparableComparator implements Comparator {
+        public int compare(Object o1, Object o2) {
+            return ((Comparable)o1).compareTo(o2);
+        }
+    }
+
 }

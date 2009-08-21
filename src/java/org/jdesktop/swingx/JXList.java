@@ -68,8 +68,12 @@ import org.jdesktop.swingx.table.TableColumnExt;
  * 
  * <h2>Sorting and Filtering</h2>
  * 
- * <b>NOTE: sorting/filtering is currently disabled. All related methods are
- * dis-functional, the overriden methods behave just the same as JList. </b>
+ * <b>NOTE: sorting/filtering is currently a moving target. Basics - setting a 
+ * RowSorter, sorter api - are working again. Still missing: synch selection and
+ * nofication to RowSorter after model changes. Do not use if you have mutable
+ * models! The former filterEnabled
+ * property is mapped to autoCreateRowSorter and false by default.
+ * </b>
  * <p>
  * JXList supports sorting and filtering. 
  * 
@@ -77,7 +81,7 @@ import org.jdesktop.swingx.table.TableColumnExt;
  * Sort sequence can be configured by setting a custom comparator.
  * 
  * <pre><code>
- * list.setFilterEnabled(true);
+ * list.setAutoCreateRowSorter(true);
  * list.setComparator(myComparator);
  * list.setSortOrder(SortOrder.DESCENDING);
  * list.toggleSortOder();
@@ -87,16 +91,6 @@ import org.jdesktop.swingx.table.TableColumnExt;
  * <p>
  * JXList provides api to access items of the underlying model in view coordinates
  * and to convert from/to model coordinates.
- * 
- * <b>Note</b>: List sorting/filtering is disabled by
- * default because it has side-effects which might break "normal" expectations
- * when using a JList: if enabled all row coordinates (including those returned
- * by the selection) are in view coordinates. Furthermore, the model returned
- * from getModel() is a wrapper around the actual data. 
- * 
- * <b>Note:</b> SwingX sorting/filtering is incompatible with core sorting/filtering in 
- * JDK 6+. Will be replaced by core functionality after switching the target jdk
- * version from 5 to 6, we are on the move right now.
  * 
  * 
  * <h2>Rendering and Highlighting</h2>
@@ -755,6 +749,9 @@ public class JXList extends JList {
      * @return the currently active <code>SortController</code> may be null
      */
     protected SortController getSortController() {
+        if (getRowSorter() instanceof SortController) {
+            return (SortController) getRowSorter();
+        }
         return null;
     }
     

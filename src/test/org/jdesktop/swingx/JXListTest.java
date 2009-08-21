@@ -6,8 +6,6 @@
  */
 package org.jdesktop.swingx;
 
-import static org.junit.Assert.*;
-
 import java.awt.Color;
 import java.beans.PropertyChangeListener;
 import java.net.MalformedURLException;
@@ -18,8 +16,11 @@ import java.util.Vector;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
+import javax.swing.DefaultRowSorter;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListModel;
+import javax.swing.RowFilter;
+import javax.swing.SortOrder;
 
 import org.jdesktop.swingx.JXList.DelegatingRenderer;
 import org.jdesktop.swingx.decorator.ColorHighlighter;
@@ -33,6 +34,8 @@ import org.jdesktop.swingx.renderer.StringValues;
 import org.jdesktop.swingx.rollover.ListRolloverController;
 import org.jdesktop.swingx.rollover.RolloverProducer;
 import org.jdesktop.swingx.sort.ListSortController;
+import org.jdesktop.swingx.sort.RowFilters;
+import org.jdesktop.swingx.sort.TableSortController;
 import org.jdesktop.test.AncientSwingTeam;
 import org.jdesktop.test.PropertyChangeReport;
 import org.jdesktop.test.TestUtils;
@@ -58,6 +61,105 @@ public class JXListTest extends InteractiveTestCase {
     protected DefaultListModel ascendingListModel;
     /** empty default list */
     private JXList list;
+
+//----------------- sorter api on JXList
+
+    /**
+     * JXList has responsibility to guarantee usage of 
+     * its comparator.
+     */
+    @Test
+    public void testSetComparatorToSortController() {
+        JXList list = new JXList(listModel, true);
+        list.setComparator(Collator.getInstance());
+        assertSame(list.getComparator(), list.getSortController().getComparator(0));
+    }
+    
+    /**
+     * added xtable.setSortOrder(int, SortOrder)
+     * 
+     */
+    @Test
+    public void testSetSortOrder() {
+        JXList list = new JXList(ascendingListModel, true);
+        list.setSortOrder(SortOrder.ASCENDING);
+        assertEquals("column must be sorted after setting sortOrder on ", SortOrder.ASCENDING, list.getSortOrder());
+    }
+    
+
+
+    /**
+     * testing new sorter api: 
+     * getSortOrder(), toggleSortOrder(), resetSortOrder().
+     *
+     */
+    @Test
+    public void testToggleSortOrder() {
+        JXList list = new JXList(ascendingListModel, true);
+        assertSame(SortOrder.UNSORTED, list.getSortOrder());
+        list.toggleSortOrder();
+        assertSame(SortOrder.ASCENDING, list.getSortOrder());
+        list.toggleSortOrder();
+        assertSame(SortOrder.DESCENDING, list.getSortOrder());
+        list.resetSortOrder();
+        assertSame(SortOrder.UNSORTED, list.getSortOrder());
+    }
+
+    /**
+     * prepare sort testing: internal probs with SortController?
+     */
+    @Test
+    public void testSortController() {
+        JXList list = new JXList(ascendingListModel, true);
+        assertNotNull("sortController must be initialized", list.getSortController());
+    }
+    
+
+//----------------- data api on JXList
+
+
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void testConvertToModelPreconditions() {
+        final JXList list = new JXList(ascendingListModel, true);
+        assertEquals(20, list.getElementCount());
+        RowFilter<ListModel, Integer> filter = RowFilters.regexFilter("0", 0);
+        ((DefaultRowSorter<ListModel, Integer>) list.getRowSorter()).setRowFilter(filter);
+        assertEquals(2, list.getElementCount());
+        list.convertIndexToModel(list.getElementCount());
+    }
+ 
+
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void testElementAtPreconditions() {
+        final JXList list = new JXList(ascendingListModel, true);
+        assertEquals(20, list.getElementCount());
+        RowFilter<ListModel, Integer> filter = RowFilters.regexFilter("0", 0);
+        ((DefaultRowSorter<ListModel, Integer>) list.getRowSorter()).setRowFilter(filter);
+        assertEquals(2, list.getElementCount());
+        list.getElementAt(list.getElementCount());
+    }
+
+    @Test
+    public void testNoSorter() {
+        JXList list = new JXList(ascendingListModel);
+        assertEquals(ascendingListModel.getSize(), list.getElementCount());
+        assertEquals(ascendingListModel.getElementAt(0), list.getElementAt(0));
+    }
+    
+    @Test
+    public void testSorterNotSorted() {
+        JXList list = new JXList(ascendingListModel, true);
+        assertEquals(ascendingListModel.getSize(), list.getElementCount());
+        assertEquals(ascendingListModel.getElementAt(0), list.getElementAt(0));
+    }
+    
+    @Test
+    public void testSorterSorted() {
+        JXList list = new JXList(ascendingListModel, true);
+        list.setSortOrder(SortOrder.DESCENDING);
+        assertEquals(ascendingListModel.getSize(), list.getElementCount());
+        assertEquals(ascendingListModel.getElementAt(0), list.getElementAt(list.getElementCount() - 1));
+    }
 
 
     //------------- sort properties
@@ -89,14 +191,33 @@ public class JXListTest extends InteractiveTestCase {
     }
     //------------ rowSorter api
     
-    
+    /**
+     * test filterEnabled property on initialization.
+     *
+     */
     @Test
-    public void testAutoCreateRowSorterConstructor() {
-        JXList list = new JXList(true);
-        assertTrue(list.getAutoCreateRowSorter());
-        assertNotNull(list.getRowSorter());
+    public void testConstructorAutoCreateSorter() {
+        assertAutoCreateRowSorter(new JXList(), false);
+        assertAutoCreateRowSorter(new JXList(new DefaultListModel()), false);
+        assertAutoCreateRowSorter(new JXList(new Vector<Object>()), false);
+        assertAutoCreateRowSorter(new JXList(new Object[] { }), false);
+        
+        assertAutoCreateRowSorter(new JXList(false), false);
+        assertAutoCreateRowSorter(new JXList(new DefaultListModel(), false), false);
+        assertAutoCreateRowSorter(new JXList(new Vector<Object>(), false), false);
+        assertAutoCreateRowSorter(new JXList(new Object[] { }, false), false);
+
+        assertAutoCreateRowSorter(new JXList(true), true);
+        assertAutoCreateRowSorter(new JXList(new DefaultListModel(), true), true);
+        assertAutoCreateRowSorter(new JXList(new Vector<Object>(), true), true);
+        assertAutoCreateRowSorter(new JXList(new Object[] { }, true), true);
     }
     
+    private void assertAutoCreateRowSorter(JXList list, boolean b) {
+        assertEquals(b, list.getAutoCreateRowSorter());
+    }
+    
+   
     @Test
     public void testRowSorterSet() {
         assertNull(list.getRowSorter());
@@ -115,11 +236,43 @@ public class JXListTest extends InteractiveTestCase {
         TestUtils.assertPropertyChangeEvent(report, "autoCreateRowSorter", false, true, false);
         assertNotNull(list.getRowSorter());
     }
+ 
     
+    /**
+     * Test assumptions of accessing list model/view values through
+     * the list's componentAdapter.
+     */
     @Test
-    public void testAutoCreateRowSorterDefault() {
-        assertFalse(list.getAutoCreateRowSorter());
+    public void testComponentAdapterCoordinates() {
+        JXList list = new JXList(ascendingListModel, true);
+        list.setComparator(TableSortController.COMPARABLE_COMPARATOR);
+        Object originalFirstRowValue = list.getElementAt(0);
+        Object originalLastRowValue = list.getElementAt(list.getElementCount() - 1);
+        assertEquals("view row coordinate equals model row coordinate", 
+                list.getModel().getElementAt(0), originalFirstRowValue);
+        // sort first column - actually does not change anything order 
+        list.toggleSortOrder();
+        // sanity asssert
+        assertEquals("view order must be unchanged ", 
+                list.getElementAt(0), originalFirstRowValue);
+        // invert sort
+        list.toggleSortOrder();
+        // sanity assert
+        assertEquals("view order must be reversed changed ", 
+                list.getElementAt(0), originalLastRowValue);
+        ComponentAdapter adapter = list.getComponentAdapter();
+        assertEquals("adapter filteredValue expects row view coordinates", 
+                list.getElementAt(0), adapter.getFilteredValueAt(0, 0));
+        // adapter coordinates are view coordinates
+        adapter.row = 0;
+        adapter.column = 0;
+        assertEquals("adapter.getValue must return value at adapter coordinates", 
+                list.getElementAt(0), adapter.getValue());
+        assertEquals("adapter.getValue must return value at adapter coordinates", 
+                list.getElementAt(0), adapter.getValue(0));
     }
+    
+
 //------------------------end of re-enable sort/filter
     /**
      * Issue #816-swingx: Delegating renderer must create list's default.
