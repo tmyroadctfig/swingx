@@ -41,28 +41,6 @@ import org.junit.Test;
  */
 public class SortControllerIssues extends InteractiveTestCase {
 
-    /**
-     * Issue #1156-swingx: sorter must use comparable if available
-     * TableSortController
-     */
-    @Test
-    public void testComparableComparatorTable() {
-        TableModel model = new DefaultTableModel(2, 1) {
-            
-            @Override
-            public Class<?> getColumnClass(int columnIndex) {
-                return Integer.class;
-            }
-            
-        };
-        model.setValueAt(10, 0, 0);
-        model.setValueAt(2, 1, 0);
-        TableSortController<TableModel> sorter = new TableSortController<TableModel>(model);
-        List<SortKey> keys = new ArrayList<SortKey>();
-        keys.add(new SortKey(0, SortOrder.ASCENDING));
-        sorter.setSortKeys(keys);
-        assertEquals(0, sorter.convertRowIndexToModel(1));
-    }
 
     /**
      * Issue #1156-swingx: sorter must use comparable if available

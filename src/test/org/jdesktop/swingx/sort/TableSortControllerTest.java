@@ -21,6 +21,8 @@
  */
 package org.jdesktop.swingx.sort;
 
+import static org.junit.Assert.*;
+
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import javax.swing.JTable;
 import javax.swing.RowFilter;
 import javax.swing.SortOrder;
 import javax.swing.RowSorter.SortKey;
@@ -35,6 +38,12 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
+import org.jdesktop.swingx.JXFrame;
+import org.jdesktop.swingx.JXTable;
+import org.jdesktop.swingx.decorator.ColorHighlighter;
+import org.jdesktop.swingx.decorator.HighlightPredicate;
+import org.jdesktop.swingx.decorator.PatternPredicate;
+import org.jdesktop.swingx.renderer.DefaultTableRenderer;
 import org.jdesktop.test.AncientSwingTeam;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -62,7 +71,36 @@ public class TableSortControllerTest extends AbstractTestSortController<TableSor
         }
     }
 
+    /**
+     * Issue #1156-swingx: sorter must use comparable if available
+     * TableSortController
+     */
+    @Test
+    public void testComparableComparatorTable() {
+        TableModel model = new DefaultTableModel(2, 1) {
+            
+            @Override
+            public Class<?> getColumnClass(int columnIndex) {
+                return Integer.class;
+            }
+            
+        };
+        model.setValueAt(10, 0, 0);
+        model.setValueAt(2, 1, 0);
+        TableSortController<TableModel> sorter = new TableSortController<TableModel>(model);
+        sorter.setSortOrder(0, SortOrder.ASCENDING);
+        assertEquals(0, sorter.convertRowIndexToModel(1));
+    }
     
+    /**
+     * Issue #1156-swingx: sorter must use comparable if available
+     * fix for that (comparator update falls back to collator) introduced a 
+     * ClassCastException - useString must be implemented the same way
+     */
+    @Test
+    public void testUseString() {
+        controller.setSortOrder(2, SortOrder.ASCENDING);
+    }
     /**
      * 
       */
