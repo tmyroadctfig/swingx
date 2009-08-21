@@ -15,11 +15,13 @@ import javax.swing.Action;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.ListModel;
+import javax.swing.RowFilter;
 import javax.swing.SortOrder;
 import javax.swing.table.DefaultTableModel;
 
 import org.jdesktop.swingx.hyperlink.LinkModel;
 import org.jdesktop.swingx.sort.ListSortController;
+import org.jdesktop.swingx.sort.RowFilters;
 import org.jdesktop.swingx.sort.SortManager;
 import org.jdesktop.swingx.sort.TableSortController;
 import org.junit.After;
@@ -40,11 +42,15 @@ public class JXListSortRevamp extends InteractiveTestCase {
 
     protected ListModel listModel;
     protected DefaultListModel ascendingListModel;
+    private ListSortController<ListModel> controller;
+    private JXList list;
+    private SortManager sortManager;
 
     public static void main(String[] args) {
         JXListSortRevamp test = new JXListSortRevamp();
         try {
-            test.runInteractiveTests();
+//            test.runInteractiveTests();
+            test.runInteractiveTests("interactive.*RowSorter.*");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -53,9 +59,20 @@ public class JXListSortRevamp extends InteractiveTestCase {
 
 //------------------ re-enable
     
-    @Test
     public void interactiveRowSorter() {
-        JXList list = new JXList(ascendingListModel);
+        final JXList list = new JXList(ascendingListModel);
+        final DefaultTableModel tableModel = new DefaultTableModel(list.getElementCount(), 1) {
+
+            @Override
+            public Class<?> getColumnClass(int columnIndex) {
+                return Integer.class;
+            }
+            
+        };
+        for (int i = 0; i < tableModel.getRowCount(); i++) {
+            tableModel.setValueAt(i, i, 0);
+        }
+        final JXTable table = new JXTable(tableModel);
         final ListSortController<ListModel> controller = new ListSortController<ListModel>(list.getModel());
         list.setRowSorter(controller);
         controller.setComparator(0, TableSortController.COMPARABLE_COMPARATOR);
@@ -76,54 +93,91 @@ public class JXListSortRevamp extends InteractiveTestCase {
                 
             }
         };
-        JXFrame frame = showWithScrollingInFrame(list, "sort in rowSorter");
+        Action toggleFilter = new AbstractAction("toggle filter") {
+            boolean hasFilter;
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (hasFilter) {
+                RowFilter<Object, Integer> filter = RowFilters.regexFilter("0", 0);
+                    list.getSortController().setRowFilter(filter);
+                    table.getSortController().setRowFilter(filter);
+                } else {
+                    list.getSortController().setRowFilter(null);
+                    table.getSortController().setRowFilter(null);
+                }
+                hasFilter = !hasFilter;
+            }
+        };
+        Action removeFirst = new AbstractAction("remove firstM") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                ascendingListModel.remove(0);
+                tableModel.removeRow(0);
+                
+            }
+        };
+        JXFrame frame = showWithScrollingInFrame(list, table, "sort in rowSorter");
         addAction(frame, sort);
         addAction(frame, reset);
+        addAction(frame, toggleFilter);
+        addAction(frame, removeFirst);
         show(frame);
     }
-//-------------------- failing tests    
+
+    /**
+     * test if selection is kept after deleting a row above the
+     * selected.
+     * 
+     * This fails because the ui-delegate has its hands in removing
+     * selection after removed, that is they are doubly removed.
+     *
+     */
+    @Test
+    public void testSelectionAfterAddAbove() {
+        // selecte second row
+        list.setSelectedIndex(1);
+        // remove first 
+        ascendingListModel.insertElementAt(5, 0);
+        assertEquals("selected must have moved after adding at start", 
+                2, list.getSelectedIndex());
+    }
+    
+    /**
+     * test if selection is kept after deleting a row above the
+     * selected.
+     * 
+     * This fails because the ui-delegate has its hands in removing
+     * selection after removed, that is they are doubly removed.
+     *
+     */
+    @Test
+    public void testSelectionAfterDeleteAbove() {
+        // selecte second row
+        list.setSelectedIndex(1);
+        // remove first 
+        ascendingListModel.remove(0);
+        assertEquals("first row must be selected removing old first", 
+                0, list.getSelectedIndex());
+    }
+    
     /**
      * Issue #855-swingx: throws AIOOB on repeated remove/add.
      * Reason is that the lead/anchor is not removed in removeIndexInterval
      */
     @Test
     public void testAddRemoveSelect() {
-        fail("list sorting/filtering disabled");
-        DefaultListModel model = new DefaultListModel();
-        model.addElement("something");
-        JXList list = new JXList(model, true);
         list.setSortOrder(SortOrder.ASCENDING);
         list.setSelectedIndex(0);
-        model.remove(0);
+        ascendingListModel.remove(0);
         assertTrue("sanity - empty selection after remove", list.isSelectionEmpty());
-        model.addElement("element");
+        ascendingListModel.addElement(-1);
         assertTrue("sanity - empty selection re-adding", list.isSelectionEmpty());
         list.setSelectedIndex(0);
     }
     
-    /**
-     * Issue #855-swingx: throws AIOOB on repeated remove/add.
-     * Reason is that the lead/anchor is not removed in removeIndexInterval.
-     * 
-     * Compare JXTable behaviour: doesn't blow. JXList probably does because of 
-     * the necessary event mapping. Sequence of selection/pipeline induced 
-     * cleanup is different.
-     * 
-     */
-    @Test
-    public void testAddRemoveSelectTable() {
-        DefaultTableModel model = new DefaultTableModel(0, 1);
-        model.addRow(new Object[] {"something"});
-        JXTable list = new JXTable(model);
-        list.setSortOrder(0, SortOrder.ASCENDING);
-        list.setRowSelectionInterval(0, 0);
-        model.removeRow(0);
-        assertTrue("sanity - empty selection after remove", list.getSelectionModel().isSelectionEmpty());
-        model.addRow(new Object[] {"something"});
-        assertTrue("sanity - empty selection re-adding", list.getSelectionModel().isSelectionEmpty());
-        list.setRowSelectionInterval(0, 0);
-    }
-
+    //-------------------- failing tests    
+    
     
 
     
@@ -198,134 +252,6 @@ public class JXListSortRevamp extends InteractiveTestCase {
 
 
     
-    /**
-     * test if selection is kept after deleting a row above the
-     * selected.
-     * 
-     * This fails after quick fix for #370-swingx. 
-     *
-     */
-    @Test
-    public void testSelectionAfterAddAtFirst() {
-        fail("list sorting/filtering disabled");
-        JXList list = new JXList(ascendingListModel, true);
-        // selecte second row
-        list.setSelectedIndex(0);
-        Object oldFirst = list.getElementAt(0);
-        Object newFirst = new Integer(-1);
-        // add first 
-        ascendingListModel.insertElementAt(newFirst, 0);
-        // sanity
-        assertEquals(newFirst, list.getElementAt(0));
-        assertEquals(oldFirst, list.getElementAt(1));
-        assertEquals("first row must be selected inserting new first", 
-                0, list.getSelectedIndex());
-    }
-
-    /**
-     * sanity test: compare table with list behaviour (#377-swingx)
-     * 
-     */
-    @Test
-    public void testSelectionAfterAddAtFirstCompareTable() {
-        fail("list sorting/filtering disabled");
-        DefaultTableModel ascendingModel = new DefaultTableModel(20, 2);
-        JXTable table = new JXTable(ascendingModel);
-        // select second row
-        table.setRowSelectionInterval(0, 0);
-        // remove first
-        ascendingModel.addRow(new Object[]{"", ""});
-        assertEquals("second row must be selected after adding new first", 
-                0, table.getSelectedRow());
-        
-    }
-
-    /**
-     * test if selection is kept after deleting a row above the
-     * selected.
-     * 
-     * This fails after quick fix for #370-swingx. 
-     *
-     */
-    @Test
-    public void testSelectionAfterAddAbove() {
-        fail("list sorting/filtering disabled");
-        JXList list = new JXList(ascendingListModel, true);
-        // selecte second row
-        list.setSelectedIndex(1);
-        Object oldFirst = list.getElementAt(1);
-        Object newFirst = new Integer(-1);
-        // add first 
-        ascendingListModel.insertElementAt(newFirst, 0);
-        // sanity
-        assertEquals(newFirst, list.getElementAt(0));
-        assertEquals(oldFirst, list.getElementAt(2));
-        assertEquals("second row must be selected inserting new first", 
-                2, list.getSelectedIndex());
-    }
-
-    /**
-     * Issue #223
-     * test if selection is updated on add row above selection.
-     *
-     */
-    @Test
-    public void testAddRowAboveSelectionInvertedOrder() {
-        fail("list sorting/filtering disabled");
-        JXList list = new JXList(ascendingListModel, true);
-        // select the last row in view coordinates
-        int selectedRow = list.getElementCount() - 2;
-        list.setSelectedIndex(selectedRow);
-        // set a pipeline - ascending, no change
-        list.toggleSortOrder();
-        // revert order 
-        list.toggleSortOrder();
-        assertEquals("second row must be selected", 1, list.getSelectedIndex());
-        // add row in model coordinates
-        // insert high value
-        Object row = new Integer(100);
-        ascendingListModel.addElement(row);
-        // selection must be moved one below
-        assertEquals("selection must be incremented by one ", 2, list.getSelectedIndex());
-        
-    }
-
-    /**
-     * test if selection is kept after deleting a row above the
-     * selected.
-     * 
-     * This fails after quick fix for #370-swingx. 
-     *
-     */
-    @Test
-    public void testSelectionAfterDeleteAbove() {
-        fail("list sorting/filtering disabled");
-        JXList list = new JXList(ascendingListModel, true);
-        // selecte second row
-        list.setSelectedIndex(1);
-        // remove first 
-        ascendingListModel.remove(0);
-        assertEquals("first row must be selected removing old first", 
-                0, list.getSelectedIndex());
-        
-    }
-    /**
-     * sanity test: compare table with list behaviour (#370-swingx)
-     * 
-     */
-    @Test
-    public void testSelectionAfterDeleteAboveCompareTable() {
-        fail("list sorting/filtering disabled");
-        DefaultTableModel ascendingModel = new DefaultTableModel(20, 2);
-        JXTable table = new JXTable(ascendingModel);
-        // select second row
-        table.setRowSelectionInterval(1, 1);
-        // remove first
-        ascendingModel.removeRow(0);
-        assertEquals("first row must be selected after removing old first", 
-                0, table.getSelectedRow());
-        
-    }
 
 // ------------ from XIssues, had been failing anyway
     
@@ -534,6 +460,12 @@ public class JXListSortRevamp extends InteractiveTestCase {
         super.setUp();
         listModel = createListModel();
         ascendingListModel = createAscendingListModel(0, 20);
+        list = new JXList(ascendingListModel);
+        controller = new ListSortController<ListModel>(list.getModel());
+        controller.setComparator(0, TableSortController.COMPARABLE_COMPARATOR);
+        list.setRowSorter(controller);
+        sortManager = new SortManager(controller, list);
+
     }
     public JXListSortRevamp() {
         super("JXList Tests");
