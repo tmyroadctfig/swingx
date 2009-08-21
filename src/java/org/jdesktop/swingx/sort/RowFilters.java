@@ -145,7 +145,7 @@ public class RowFilters {
     public static abstract class GeneralFilter extends RowFilter<Object,Object> {
         private int[] columns;
 
-        protected GeneralFilter(int[] columns) {
+        protected GeneralFilter(int... columns) {
             checkIndices(columns);
             this.columns = columns;
         }
