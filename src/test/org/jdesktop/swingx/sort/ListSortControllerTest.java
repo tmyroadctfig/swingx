@@ -43,13 +43,9 @@ public class ListSortControllerTest extends AbstractTestSortController<ListSortC
     private static final Logger LOG = Logger
             .getLogger(ListSortControllerTest.class.getName());
     /**
-     * Commented temporarily because this fails to compile on the server
-     * (compiles okay locally)
      */
     @Test
     public void testUseStringValueProvider() {
-//        ListModel model = (ListModel) controller.getModel();
-//        ListSortController<ListModel> controller = new ListSortController<ListModel>(model);
         registry.setStringValue(sv, 0);
         controller.setStringValueProvider(registry);
         RowFilter<Object, Object> filter = RowFilter.regexFilter("R/G/B: -2", 0);
