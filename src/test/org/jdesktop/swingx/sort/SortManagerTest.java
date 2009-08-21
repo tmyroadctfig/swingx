@@ -59,6 +59,29 @@ public class SortManagerTest extends InteractiveTestCase {
     private SortManager sortManager;
     private int testRow;
 
+
+
+    /**
+     * Issue #223
+     * test if selection is updated on add row above selection.
+     *
+     */
+    @Test
+    public void testAddRowAboveSelectionInvertedOrder() {
+        // select the last row in view coordinates
+        int selectedRow = list.getElementCount() - 2;
+        list.setSelectedIndex(selectedRow);
+        // revert order 
+        list.setSortOrder(SortOrder.DESCENDING);
+        assertEquals("second row must be selected", 1, list.getSelectedIndex());
+        // add row in model coordinates
+        // insert high value
+        Object row = new Integer(100);
+        ascendingListModel.addElement(row);
+        assertEquals(row, list.getElementAt(0));
+        // selection must be moved one below
+        assertEquals("selection must be incremented by one ", 2, list.getSelectedIndex());
+    }
     
     /**
      * 

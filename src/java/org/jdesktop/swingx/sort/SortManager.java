@@ -28,6 +28,7 @@ import javax.swing.RowSorter;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.event.RowSorterEvent;
 import javax.swing.event.RowSorterListener;
 
@@ -40,7 +41,7 @@ import sun.swing.SwingUtilities2;
  * row heights when sorting is enabled. This information is encapsulated
  * into a class to avoid bulking up JTable.
  */
-public final class SortManager implements RowSorterListener {
+public final class SortManager implements RowSorterListener, ListSelectionListener, ListDataListener {
     RowSorter<? extends ListModel> sorter;
     JXList table;
 
@@ -63,6 +64,8 @@ public final class SortManager implements RowSorterListener {
         this.sorter = sorter;
         this.table = list;
         sorter.addRowSorterListener(this);
+        list.getSelectionModel().addListSelectionListener(this);
+        list.getModel().addListDataListener(this);
     }
 
     /**
@@ -213,8 +216,7 @@ public final class SortManager implements RowSorterListener {
      * and after the sorter has been notified. If necessary this will
      * reapply the selection and variable row heights.
      */
-    public void processChange(RowSorterEvent sortEvent,
-                              ModelChange change,
+    public void processChange(ModelChange change,
                               boolean sorterChanged) {
         if (change != null) {
 //            if (change.allRowsChanged) {
@@ -404,17 +406,25 @@ public final class SortManager implements RowSorterListener {
      */
     private void sortedTableChanged(RowSorterEvent e) {
         prepareForChange(e, null);
-        processChange(e, null, sorterChanged);
+        processChange(null, sorterChanged);
         table.repaint();
     }
 
+    private void sortedTableChanged(ListDataEvent e) {
+        ModelChange change = new ModelChange(e);
+        prepareForChange(null, change);
+        notifySorter(change);
+        if (change.type != ListDataEvent.CONTENTS_CHANGED) {
+            sorterChanged = true;
+        }
+        processChange(change, sorterChanged);
+    }
     /**
      * Invoked when <code>sorterChanged</code> is invoked, or
      * when <code>tableChanged</code> is invoked and sorting is enabled.
      */
     private void sortedTableChanged(RowSorterEvent sortedEvent,
                                     ListDataEvent e) {
-        int editingModelIndex = -1;
         ModelChange change = (e != null) ? new ModelChange(e) : null;
 
 
@@ -435,7 +445,7 @@ public final class SortManager implements RowSorterListener {
             sorterChanged = true;
         }
 
-        processChange(sortedEvent, change, sorterChanged);
+        processChange(change, sorterChanged);
 
         if (sorterChanged) {
 
@@ -463,24 +473,44 @@ public final class SortManager implements RowSorterListener {
             if (change.allRowsChanged) {
                 sorter.allRowsChanged();
             } else {
-            switch(change.type) {
-            case ListDataEvent.CONTENTS_CHANGED:
+                switch (change.type) {
+                case ListDataEvent.CONTENTS_CHANGED:
                     sorter.rowsUpdated(change.startModelIndex,
-                                       change.endModelIndex);
-                break;
-            case ListDataEvent.INTERVAL_ADDED:
-                sorter.rowsInserted(change.startModelIndex,
-                                    change.endModelIndex);
-                break;
-            case ListDataEvent.INTERVAL_REMOVED:
-                sorter.rowsDeleted(change.startModelIndex,
-                                   change.endModelIndex);
-                break;
-            }
+                            change.endModelIndex);
+                    break;
+                case ListDataEvent.INTERVAL_ADDED:
+                    sorter.rowsInserted(change.startModelIndex,
+                            change.endModelIndex);
+                    break;
+                case ListDataEvent.INTERVAL_REMOVED:
+                    sorter.rowsDeleted(change.startModelIndex,
+                            change.endModelIndex);
+                    break;
+                }
             }
         } finally {
             ignoreSortChange = false;
         }
+    }
+
+    @Override
+    public void valueChanged(ListSelectionEvent e) {
+        viewSelectionChanged(e);
+    }
+
+    @Override
+    public void contentsChanged(ListDataEvent e) {
+        sortedTableChanged(e);
+    }
+
+    @Override
+    public void intervalAdded(ListDataEvent e) {
+        sortedTableChanged(e);
+    }
+
+    @Override
+    public void intervalRemoved(ListDataEvent e) {
+        sortedTableChanged(e);
     }
 
 }
