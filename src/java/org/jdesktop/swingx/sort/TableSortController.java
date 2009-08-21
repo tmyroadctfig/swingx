@@ -36,13 +36,6 @@ import javax.swing.table.TableModel;
  */
 public class TableSortController<M extends TableModel> extends DefaultSortController<M>  {
     /**
-     * Comparator that uses compareTo on the contents.
-     */
-    @SuppressWarnings("unchecked")
-    private static final Comparator COMPARABLE_COMPARATOR =
-            new ComparableComparator();
-
-    /**
      * Underlying model.
      */
     private M tableModel;
@@ -169,12 +162,5 @@ public class TableSortController<M extends TableModel> extends DefaultSortContro
         }
     }
 
-
-    @SuppressWarnings("unchecked")
-    private static class ComparableComparator implements Comparator {
-        public int compare(Object o1, Object o2) {
-            return ((Comparable)o1).compareTo(o2);
-        }
-    }
 
 }
