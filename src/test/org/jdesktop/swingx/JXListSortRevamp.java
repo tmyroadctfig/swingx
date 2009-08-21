@@ -22,7 +22,7 @@ import javax.swing.table.DefaultTableModel;
 import org.jdesktop.swingx.hyperlink.LinkModel;
 import org.jdesktop.swingx.sort.ListSortController;
 import org.jdesktop.swingx.sort.RowFilters;
-import org.jdesktop.swingx.sort.SortManager;
+import org.jdesktop.swingx.sort.ListSortUI;
 import org.jdesktop.swingx.sort.TableSortController;
 import org.junit.After;
 import org.junit.Before;
@@ -44,7 +44,7 @@ public class JXListSortRevamp extends InteractiveTestCase {
     protected DefaultListModel ascendingListModel;
     private ListSortController<ListModel> controller;
     private JXList list;
-    private SortManager sortManager;
+    private ListSortUI sortManager;
 
     public static void main(String[] args) {
         JXListSortRevamp test = new JXListSortRevamp();
@@ -76,7 +76,7 @@ public class JXListSortRevamp extends InteractiveTestCase {
         final ListSortController<ListModel> controller = new ListSortController<ListModel>(list.getModel());
         list.setRowSorter(controller);
         controller.setComparator(0, TableSortController.COMPARABLE_COMPARATOR);
-        new SortManager(controller, list);
+        new ListSortUI(controller, list);
         Action sort = new AbstractAction("toggle sort") {
             
             @Override
@@ -464,7 +464,7 @@ public class JXListSortRevamp extends InteractiveTestCase {
         controller = new ListSortController<ListModel>(list.getModel());
         controller.setComparator(0, TableSortController.COMPARABLE_COMPARATOR);
         list.setRowSorter(controller);
-        sortManager = new SortManager(controller, list);
+        sortManager = new ListSortUI(controller, list);
 
     }
     public JXListSortRevamp() {

@@ -33,17 +33,26 @@ import javax.swing.event.RowSorterEvent;
 import javax.swing.event.RowSorterListener;
 
 import org.jdesktop.swingx.JXList;
+import org.jdesktop.swingx.util.Contract;
 
 import sun.swing.SwingUtilities2;
 
 /**
- * SortManager provides support for managing the selection and variable
- * row heights when sorting is enabled. This information is encapsulated
- * into a class to avoid bulking up JTable.
+ * SortManager provides support for managing the synchronization between
+ * RowSorter, SelectionModel and ListModel if a JXList is sortable.<p>
+ * 
+ * Note: this is here and public only until fully understood (it's an 
+ * adapted version of JTable.SortManager). After that it should be moved
+ * into/near the BasicXListUI to keep in the tradition of control of a 
+ * ListUI (which takes all while a table does most itself).<p>
+ * 
+ * PENDING JW: remove exposure of listener implemenations - will happen 
+ * automatically when moving over to ui-delegate.
+ * 
  */
-public final class SortManager implements RowSorterListener, ListSelectionListener, ListDataListener {
+public final class ListSortUI implements RowSorterListener, ListSelectionListener, ListDataListener {
     RowSorter<? extends ListModel> sorter;
-    JXList table;
+    JXList list;
 
     // Selection, in terms of the model. This is lazily created
     // as needed.
@@ -58,11 +67,9 @@ public final class SortManager implements RowSorterListener, ListSelectionListen
     private boolean sorterChanged;
     private boolean ignoreSortChange;
 
-
-
-    public SortManager(RowSorter<? extends ListModel> sorter, JXList list) {
+    public ListSortUI(RowSorter<? extends ListModel> sorter, JXList list) {
         this.sorter = sorter;
-        this.table = list;
+        this.list = list;
         sorter.addRowSorterListener(this);
         list.getSelectionModel().addListSelectionListener(this);
         list.getModel().addListDataListener(this);
@@ -86,7 +93,7 @@ public final class SortManager implements RowSorterListener, ListSelectionListen
     }
 
     private ListSelectionModel getViewSelectionModel() {
-        return table.getSelectionModel();
+        return list.getSelectionModel();
     }
     /**
      * Invoked when the underlying model has completely changed.
@@ -96,77 +103,70 @@ public final class SortManager implements RowSorterListener, ListSelectionListen
         modelSelection = null;
     }
 
+//--------------------- prepare change, that is cache selection if needed
     /**
-     * Invoked when the selection, on the view, has changed.
-     */
-    public void viewSelectionChanged(ListSelectionEvent e) {
-        if (!syncingSelection && modelSelection != null) {
-            modelSelection = null;
-        }
-    }
-
-    /**
-     * Invoked when either the table model has changed, or the RowSorter
-     * has changed. This is invoked prior to notifying the sorter of the
-     * change.
-     */
-    public void prepareForChange(RowSorterEvent sortEvent,
-                                 ModelChange change) {
-//        if (table.getUpdateSelectionOnSort()) {
-//        }
-        cacheSelection(sortEvent, change);
-    }
-
-    /**
+     * Invoked when the RowSorter has changed. 
      * Updates the internal cache of the selection based on the change.
+     * 
+     * @param sortEvent the notification
+     * @throws NullPointerException if the given event is null.
      */
-    private void cacheSelection(RowSorterEvent sortEvent,
-                                ModelChange change) {
-        if (sortEvent != null) {
-            // sort order changed. If modelSelection is null and filtering
-            // is enabled we need to cache the selection in terms of the
-            // underlying model, this will allow us to correctly restore
-            // the selection even if rows are filtered out.
-            if (modelSelection == null &&
-                    sorter.getViewRowCount() != getModelRowCount()) {
-                modelSelection = new DefaultListSelectionModel();
-                ListSelectionModel viewSelection = getViewSelectionModel();
-                int min = viewSelection.getMinSelectionIndex();
-                int max = viewSelection.getMaxSelectionIndex();
-                int modelIndex;
-                for (int viewIndex = min; viewIndex <= max; viewIndex++) {
-                    if (viewSelection.isSelectedIndex(viewIndex)) {
-                        modelIndex = convertRowIndexToModel(
-                                sortEvent, viewIndex);
-                        if (modelIndex != -1) {
-                            modelSelection.addSelectionInterval(
-                                modelIndex, modelIndex);
-                        }
+    private void prepareForChange(RowSorterEvent sortEvent) {
+        Contract.asNotNull(sortEvent, "sorter event not null");
+        // sort order changed. If modelSelection is null and filtering
+        // is enabled we need to cache the selection in terms of the
+        // underlying model, this will allow us to correctly restore
+        // the selection even if rows are filtered out.
+        if (modelSelection == null &&
+                sorter.getViewRowCount() != getModelRowCount()) {
+            modelSelection = new DefaultListSelectionModel();
+            ListSelectionModel viewSelection = getViewSelectionModel();
+            int min = viewSelection.getMinSelectionIndex();
+            int max = viewSelection.getMaxSelectionIndex();
+            int modelIndex;
+            for (int viewIndex = min; viewIndex <= max; viewIndex++) {
+                if (viewSelection.isSelectedIndex(viewIndex)) {
+                    modelIndex = convertRowIndexToModel(
+                            sortEvent, viewIndex);
+                    if (modelIndex != -1) {
+                        modelSelection.addSelectionInterval(
+                            modelIndex, modelIndex);
                     }
                 }
-                modelIndex = convertRowIndexToModel(sortEvent,
-                        viewSelection.getLeadSelectionIndex());
-                SwingUtilities2.setLeadAnchorWithoutSelection(
-                        modelSelection, modelIndex, modelIndex);
-            } else if (modelSelection == null) {
-                // Sorting changed, haven't cached selection in terms
-                // of model and no filtering. Temporarily cache selection.
-                cacheModelSelection(sortEvent);
             }
-        } else if (change.allRowsChanged) {
+            modelIndex = convertRowIndexToModel(sortEvent,
+                    viewSelection.getLeadSelectionIndex());
+            SwingUtilities2.setLeadAnchorWithoutSelection(
+                    modelSelection, modelIndex, modelIndex);
+        } else if (modelSelection == null) {
+            // Sorting changed, haven't cached selection in terms
+            // of model and no filtering. Temporarily cache selection.
+            cacheModelSelection(sortEvent);
+        }
+    }
+    /**
+     * Invoked when the list model has changed. This is invoked prior to 
+     * notifying the sorter of the change.
+     * Updates the internal cache of the selection based on the change.
+     * 
+     * @param change the notification
+     * @throws NullPointerException if the given event is null.
+     */
+    private void prepareForChange(ModelChange change) {
+        Contract.asNotNull(change, "table event not null");
+        if (change.allRowsChanged) {
             // All the rows have changed, chuck any cached selection.
             modelSelection = null;
         } else if (modelSelection != null) {
             // Table changed, reflect changes in cached selection model.
-            switch(change.type) {
+            switch (change.type) {
             case ListDataEvent.INTERVAL_REMOVED:
                 modelSelection.removeIndexInterval(change.startModelIndex,
-                                                   change.endModelIndex);
+                        change.endModelIndex);
                 break;
             case ListDataEvent.INTERVAL_ADDED:
                 modelSelection.insertIndexInterval(change.startModelIndex,
-                                                   change.endModelIndex,
-                                                   true);
+                        change.endModelIndex, true);
                 break;
             default:
                 break;
@@ -178,32 +178,7 @@ public final class SortManager implements RowSorterListener, ListSelectionListen
         }
     }
 
-    private int convertRowIndexToModel(RowSorterEvent e, int viewIndex) {
-        if (e != null) {
-            if (e.getPreviousRowCount() == 0) {
-                return viewIndex;
-            }
-            // range checking handled by RowSorterEvent
-            return e.convertPreviousRowIndexToModel(viewIndex);
-        }
-        // Make sure the viewIndex is valid
-        if (viewIndex < 0 || viewIndex >= sorter.getViewRowCount()) {
-            return -1;
-        }
-        return sorter.convertRowIndexToModel(viewIndex);
-    }
-
-    /**
-     * Converts the selection to model coordinates.  This is used when
-     * the model changes or the sorter changes.
-     */
-    private int[] convertSelectionToModel(RowSorterEvent e) {
-        int[] selection = table.getSelectedIndices();
-        for (int i = selection.length - 1; i >= 0; i--) {
-            selection[i] = convertRowIndexToModel(e, selection[i]);
-        }
-        return selection;
-    }
+    
 
     private void cacheModelSelection(RowSorterEvent sortEvent) {
         lastModelSelection = convertSelectionToModel(sortEvent);
@@ -211,30 +186,13 @@ public final class SortManager implements RowSorterListener, ListSelectionListen
                     getViewSelectionModel().getLeadSelectionIndex());
     }
 
+//----------------------- process change, that is restore selection if needed    
     /**
      * Inovked when either the table has changed or the sorter has changed
      * and after the sorter has been notified. If necessary this will
      * reapply the selection and variable row heights.
      */
-    public void processChange(ModelChange change,
-                              boolean sorterChanged) {
-        if (change != null) {
-//            if (change.allRowsChanged) {
-//                modelRowSizes = null;
-//                rowModel = null;
-//            } else if (modelRowSizes != null) {
-//                if (change.type == TableModelEvent.INSERT) {
-//                    modelRowSizes.insertEntries(change.startModelIndex,
-//                                                change.endModelIndex -
-//                                                change.startModelIndex + 1,
-//                                                getRowHeight());
-//                } else if (change.type == TableModelEvent.DELETE) {
-//                    modelRowSizes.removeEntries(change.startModelIndex,
-//                                                change.endModelIndex -
-//                                                change.startModelIndex +1 );
-//                }
-//            }
-        }
+    private void processChange(ModelChange change) {
         if (sorterChanged) {
             restoreSelection(change);
         }
@@ -285,13 +243,13 @@ public final class SortManager implements RowSorterListener, ListSelectionListen
             ModelChange change) {
         // Convert the selection from model to view
         for (int i = selection.length - 1; i >= 0; i--) {
-            selection[i] = convertRowIndexToView(selection[i], change);
+            selection[i] = convertRowIndexToView(change, selection[i]);
         }
-        lead = convertRowIndexToView(lead, change);
+        lead = convertRowIndexToView(change, lead);
 
         // Check for the common case of no change in selection for 1 row
         if (selection.length == 0 ||
-            (selection.length == 1 && selection[0] == table.getSelectedIndex())) {
+            (selection.length == 1 && selection[0] == list.getSelectedIndex())) {
             return;
         }
         ListSelectionModel selectionModel = getViewSelectionModel();
@@ -309,6 +267,7 @@ public final class SortManager implements RowSorterListener, ListSelectionListen
         selectionModel.setValueIsAdjusting(false);
     }
 
+//------------------- row index conversion methods    
     /**
      * Converts a model index to view index.  This is called when the
      * sorter or model changes and sorting is enabled.
@@ -316,10 +275,11 @@ public final class SortManager implements RowSorterListener, ListSelectionListen
      * @param change describes the TableModelEvent that initiated the change;
      *        will be null if called as the result of a sort
      */
-    private int convertRowIndexToView(int modelIndex, ModelChange change) {
+    private int convertRowIndexToView(ModelChange change, int modelIndex) {
         if (modelIndex < 0) {
             return -1;
         }
+//        Contract.asNotNull(change, "change must not be null?");
         if (change != null && modelIndex >= change.startModelIndex) {
             if (change.type == ListDataEvent.INTERVAL_ADDED) {
                 if (modelIndex + change.length >= change.modelRowCount) {
@@ -349,120 +309,39 @@ public final class SortManager implements RowSorterListener, ListSelectionListen
         return sorter.convertRowIndexToView(modelIndex);
     }
 
-    /**
-     * ModelChange is used when sorting to restore state, it corresponds
-     * to data from a TableModelEvent.  The values are precalculated as
-     * they are used extensively.
-     */
-     final static class ModelChange {
-        // Starting index of the change, in terms of the model
-        int startModelIndex;
 
-        // Ending index of the change, in terms of the model
-        int endModelIndex;
-
-        // Type of change
-        int type;
-
-        // Number of rows in the model
-        int modelRowCount;
-
-//        // The event that triggered this.
-//        ListDataEvent event;
-
-        // Length of the change (end - start + 1)
-        int length;
-
-        // True if the event indicates all the contents have changed
-        boolean allRowsChanged;
-
-        public ModelChange(ListDataEvent e) {
-            type = e.getType();
-            startModelIndex = e.getIndex0();
-            endModelIndex = e.getIndex1();
-            allRowsChanged = startModelIndex < 0;
-            modelRowCount = ((ListModel) e.getSource()).getSize();
-            if (allRowsChanged) {
-                startModelIndex = Math.max(0, startModelIndex);
-                endModelIndex = Math.max(0, modelRowCount - 1);
+    private int convertRowIndexToModel(RowSorterEvent e, int viewIndex) {
+        // JW: the event is null if the selection is cached in prepareChange
+        // after model notification. Then the conversion from the 
+        // sorter is still valid as the prepare is called before 
+        // notifying the sorter.
+        if (e != null) {
+            if (e.getPreviousRowCount() == 0) {
+                return viewIndex;
             }
-            length = endModelIndex - startModelIndex + 1;
+            // range checking handled by RowSorterEvent
+            return e.convertPreviousRowIndexToModel(viewIndex);
         }
-    }
-
-    @Override
-    public void sorterChanged(RowSorterEvent e) {
-        ListDataListener l;
-        if (e.getType() == RowSorterEvent.Type.SORTED) {
-            sorterChanged = true;
-            if (!ignoreSortChange) {
-                sortedTableChanged(e);
-            }
+        // Make sure the viewIndex is valid
+        if (viewIndex < 0 || viewIndex >= sorter.getViewRowCount()) {
+            return -1;
         }
+        return sorter.convertRowIndexToModel(viewIndex);
     }
 
     /**
-     * @param e
+     * Converts the selection to model coordinates.  This is used when
+     * the model changes or the sorter changes.
      */
-    private void sortedTableChanged(RowSorterEvent e) {
-        prepareForChange(e, null);
-        processChange(null, sorterChanged);
-        table.repaint();
+    private int[] convertSelectionToModel(RowSorterEvent e) {
+        int[] selection = list.getSelectedIndices();
+        for (int i = selection.length - 1; i >= 0; i--) {
+            selection[i] = convertRowIndexToModel(e, selection[i]);
+        }
+        return selection;
     }
-
-    private void sortedTableChanged(ListDataEvent e) {
-        ModelChange change = new ModelChange(e);
-        prepareForChange(null, change);
-        notifySorter(change);
-        if (change.type != ListDataEvent.CONTENTS_CHANGED) {
-            sorterChanged = true;
-        }
-        processChange(change, sorterChanged);
-    }
-    /**
-     * Invoked when <code>sorterChanged</code> is invoked, or
-     * when <code>tableChanged</code> is invoked and sorting is enabled.
-     */
-    private void sortedTableChanged(RowSorterEvent sortedEvent,
-                                    ListDataEvent e) {
-        ModelChange change = (e != null) ? new ModelChange(e) : null;
-
-
-        prepareForChange(sortedEvent, change);
-
-        if (change != null) {
-            if (change.type == ListDataEvent.CONTENTS_CHANGED) {
-//                repaintSortedRows(change);
-            }
-            notifySorter(change);
-            if (change.type != ListDataEvent.CONTENTS_CHANGED) {
-                // If the Sorter is unsorted we will not have received
-                // notification, force treating insert/delete as a change.
-                sorterChanged = true;
-            }
-        }
-        else {
-            sorterChanged = true;
-        }
-
-        processChange(change, sorterChanged);
-
-        if (sorterChanged) {
-
-            // And handle the appropriate repainting.
-//            if (e == null || change.type != TableModelEvent.UPDATE) {
-////                resizeAndRepaint();
-//            }
-            table.repaint();
-        }
-
-        // Check if lead/anchor need to be reset.
-        if (change != null && change.allRowsChanged) {
-//            table.clearSelectionAndLeadAnchor();
-//            resizeAndRepaint();
-        }
-    }
-
+    
+//------------------ 
     /**
      * Notifies the sorter of a change in the underlying model.
      */
@@ -493,6 +372,56 @@ public final class SortManager implements RowSorterListener, ListSelectionListen
         }
     }
 
+//----------------------methods called by listeners
+    
+    /**
+     * Called after notification from ListModel.
+     * @param e
+     */
+    private void modelChanged(ListDataEvent e) {
+        ModelChange change = new ModelChange(e);
+        prepareForChange(change);
+        notifySorter(change);
+        if (change.type != ListDataEvent.CONTENTS_CHANGED) {
+            sorterChanged = true;
+        }
+        processChange(change);
+    }
+
+    /**
+     * Called after notification from selectionModel.
+     * 
+     * Invoked when the selection, on the view, has changed.
+     */
+    private void viewSelectionChanged(ListSelectionEvent e) {
+        if (!syncingSelection && modelSelection != null) {
+            modelSelection = null;
+        }
+    }
+
+    /**
+     * Called after notification from RowSorter.
+     * 
+     * @param e RowSorter event of type SORTED.
+     */
+    private void sortedChanged(RowSorterEvent e) {
+        sorterChanged = true;
+        if (!ignoreSortChange) {
+            prepareForChange(e);
+            processChange(null);
+            list.repaint();
+        }
+    }
+
+//------------------- implementing listeners    
+
+    @Override
+    public void sorterChanged(RowSorterEvent e) {
+        if (e.getType() == RowSorterEvent.Type.SORTED) {
+            sortedChanged(e);
+        }
+    }
+
     @Override
     public void valueChanged(ListSelectionEvent e) {
         viewSelectionChanged(e);
@@ -500,18 +429,59 @@ public final class SortManager implements RowSorterListener, ListSelectionListen
 
     @Override
     public void contentsChanged(ListDataEvent e) {
-        sortedTableChanged(e);
+        modelChanged(e);
     }
 
     @Override
     public void intervalAdded(ListDataEvent e) {
-        sortedTableChanged(e);
+        modelChanged(e);
     }
 
     @Override
     public void intervalRemoved(ListDataEvent e) {
-        sortedTableChanged(e);
+        modelChanged(e);
     }
+
+    /**
+     * ModelChange is used when sorting to restore state, it corresponds
+     * to data from a TableModelEvent.  The values are precalculated as
+     * they are used extensively.<p>
+     * 
+     * PENDING JW: this is not yet fully adapted to ListDataEvent.
+     */
+     final static class ModelChange {
+        // Starting index of the change, in terms of the model
+        int startModelIndex;
+
+        // Ending index of the change, in terms of the model
+        int endModelIndex;
+
+        // Type of change
+        int type;
+
+        // Number of rows in the model
+        int modelRowCount;
+
+        // Length of the change (end - start + 1)
+        int length;
+
+        // True if the event indicates all the contents have changed
+        boolean allRowsChanged;
+
+        public ModelChange(ListDataEvent e) {
+            type = e.getType();
+            startModelIndex = e.getIndex0();
+            endModelIndex = e.getIndex1();
+            allRowsChanged = startModelIndex < 0;
+            modelRowCount = ((ListModel) e.getSource()).getSize();
+            if (allRowsChanged) {
+                startModelIndex = Math.max(0, startModelIndex);
+                endModelIndex = Math.max(0, modelRowCount - 1);
+            }
+            length = endModelIndex - startModelIndex + 1;
+        }
+    }
+     
 
 }
 
