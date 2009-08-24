@@ -74,6 +74,7 @@ import org.jdesktop.swingx.decorator.HighlightPredicate.DepthHighlightPredicate;
 import org.jdesktop.swingx.renderer.DefaultTreeRenderer;
 import org.jdesktop.swingx.test.ComponentTreeTableModel;
 import org.jdesktop.swingx.test.XTestUtils;
+import org.jdesktop.swingx.treetable.AbstractTreeTableModel;
 import org.jdesktop.swingx.treetable.DefaultMutableTreeTableNode;
 import org.jdesktop.swingx.treetable.DefaultTreeTableModel;
 import org.jdesktop.swingx.treetable.FileSystemModel;
@@ -102,11 +103,47 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
 //             test.runInteractiveTests("interactive.*RowHeightCompare.*");
 //             test.runInteractiveTests("interactive.*RToL.*");
 //             test.runInteractiveTests("interactive.*Insert.*");
-             test.runInteractiveTests("interactive.*Edit.*");
+             test.runInteractiveTests("interactive.*WinP.*");
         } catch (Exception ex) {
 
         }
     }
+
+    /**
+     * Performance problems with Windows LAF.
+     */
+    public void interactiveTreeTableWinPerformance() {
+        JXTreeTable table = new JXTreeTable(new SimpleTestModel());
+        showWithScrollingInFrame(table, "JXTreeTable (performance in win");
+    }
+    public static class SimpleTestModel extends AbstractTreeTableModel {
+        private static final String root = "Root";
+ 
+        public SimpleTestModel() {
+            super(root);
+        }
+ 
+        public int getColumnCount() {
+            return 4;
+        }
+ 
+        public Object getValueAt(Object o, int i) {
+            return o + ":" + i;
+        }
+ 
+        public Object getChild(Object parent, int index) {
+            return parent == root ? String.valueOf(index) : null;
+        }
+ 
+        public int getChildCount(Object parent) {
+            return parent == root ? 10000 : 0;
+        }
+ 
+        public int getIndexOfChild(Object parent, Object child) {
+            return parent == root ? Integer.valueOf((String) child) : -1;
+        }
+    }
+
 
 
     

@@ -16,13 +16,12 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.ListModel;
 import javax.swing.RowFilter;
-import javax.swing.SortOrder;
 import javax.swing.table.DefaultTableModel;
 
 import org.jdesktop.swingx.hyperlink.LinkModel;
 import org.jdesktop.swingx.sort.ListSortController;
-import org.jdesktop.swingx.sort.RowFilters;
 import org.jdesktop.swingx.sort.ListSortUI;
+import org.jdesktop.swingx.sort.RowFilters;
 import org.jdesktop.swingx.sort.TableSortController;
 import org.junit.After;
 import org.junit.Before;
@@ -125,6 +124,28 @@ public class JXListSortRevamp extends InteractiveTestCase {
         show(frame);
     }
 
+ 
+    //----------------- re-enabled functionality
+    /**
+     * Issue #477-swingx:
+     * 
+     * Selection must be cleared after setModel. This is from
+     * super's contract.
+     * 
+     * Not yet ready: must update ListSortUI after model update. 
+     *
+     */
+    @Test
+    public void testSetModelEmptySelection() {
+        fail("list sorting/filtering not yet completely enabled");
+        final JXList list = new JXList(listModel, true);
+        int selection = 0;
+        list.setSelectedIndex(selection);
+        list.setModel(ascendingListModel);
+        assertTrue("setting model must clear selectioon", list.isSelectionEmpty());
+        assertEquals(ascendingListModel.getSize(), list.getElementCount());
+    }
+    
     /**
      * test if selection is kept after deleting a row above the
      * selected.
@@ -161,139 +182,6 @@ public class JXListSortRevamp extends InteractiveTestCase {
                 0, list.getSelectedIndex());
     }
     
-    /**
-     * Issue #855-swingx: throws AIOOB on repeated remove/add.
-     * Reason is that the lead/anchor is not removed in removeIndexInterval
-     */
-    @Test
-    public void testAddRemoveSelect() {
-        list.setSortOrder(SortOrder.ASCENDING);
-        list.setSelectedIndex(0);
-        ascendingListModel.remove(0);
-        assertTrue("sanity - empty selection after remove", list.isSelectionEmpty());
-        ascendingListModel.addElement(-1);
-        assertTrue("sanity - empty selection re-adding", list.isSelectionEmpty());
-        list.setSelectedIndex(0);
-    }
-    
-    //-------------------- failing tests    
-    
-    
-
-    
-    /**
-     * Issue #477-swingx: list with filter not updated after setModel.
-     * 
-     * Reason is that there's no call to filter.flush in that path
-     * of action. Probably due to mostly c&p from JXTable - which
-     * always goes through tableChanged (which JList doesn't).
-     * How to test?
-     *
-     */
-    @Test
-    public void testSetModelFlushFilter() {
-        fail("list sorting/filtering disabled");
-        final JXList list = new JXList();
-//        list.setFilterEnabled(true);
-//        PatternFilter filter = new PatternFilter(".*1.*", 0, 0);
-//        final FilterPipeline pipeline = new FilterPipeline(filter);
-//        final DefaultListModel model = new DefaultListModel();
-//        for (int i = 0; i < 10; i++)
-//            model.addElement("Element " + i);
-//        list.setFilters(pipeline);
-//        list.setModel(model);
-//        assertEquals(1, list.getElementCount());
-    }
-
-    /**
-     * Issue #477-swingx:
-     * 
-     * Selection must be cleared after setModel. This is from
-     * super's contract.
-     *
-     */
-    @Test
-    public void testSetModelEmptySelection() {
-        fail("list sorting/filtering disabled");
-        final JXList list = new JXList(true);
-        final DefaultListModel model = new DefaultListModel();
-        for (int i = 0; i < 10; i++)
-            model.addElement("Element " + i);
-        list.setModel(model);
-        int selection = 0;
-        list.setSelectedIndex(selection);
-//        PatternFilter filter = new PatternFilter(".*", 0, 0);
-//        final FilterPipeline pipeline = new FilterPipeline(filter);
-//        list.setFilters(pipeline);
-        assertEquals("setting filters must keep selection", selection, list.getSelectedIndex());
-        list.setModel(model);
-        assertEquals(model.getSize(), list.getElementCount());
-        assertTrue("setting model must clear selectioon", list.isSelectionEmpty());
-    }
-    
-   
-
-
-    /**
-     * Issue #232-swingx: selection not kept if selectionModel had been changed.
-     *
-     *  PENDING: selectionMapper shouldn't be available if list not filterable? 
-     */
-    @Test
-    public void testSelectionMapperFilterDisabled() {
-        fail("list sorting/filtering disabled");
-//        JXList table = new JXList();
-//        // created lazily, need to get hold before replacing list's selection
-//        SelectionMapper mapper = table.getSelectionMapper();
-//        ListSelectionModel model = new DefaultListSelectionModel();
-//        table.setSelectionModel(model);
-//        assertEquals(model, mapper.getViewSelectionModel());
-    }
-
-
-    
-
-// ------------ from XIssues, had been failing anyway
-    
-    /**
-     * Issue #855-swingx: throws AIOOB on repeated remove/add.
-     * Open question: should selectionMapper guard against invalid
-     * selection indices from view selection? Currently it blows. 
-     * Probably good because it's most certainly a programming error.
-     */
-    public void testInvalidViewSelect() {
-        fail("list sorting/filtering disabled - but had been failing before");
-        DefaultListModel model = new DefaultListModel();
-        model.addElement("something");
-        JXList list = new JXList(model, true);
-        list.setSortOrder(SortOrder.ASCENDING);
-        // list guards against invalid index
-        list.setSelectedIndex(1);
-        // selectionModel can't do anything (has no notion about size)
-        // selectionMapper doesn't guard and blows on conversion - should it?
-        list.getSelectionModel().setSelectionInterval(1, 1);
-    }
-
-    public void testConvertToViewPreconditions() {
-        fail("list sorting/filtering disabled - but had been failing before");
-        final JXList list = new JXList(ascendingListModel);
-        // a side-effect of setFilterEnabled is to clear the selection!
-        // this is done in JList.setModel(..) which is called when 
-        // changing filterEnabled!
-//        list.setFilterEnabled(true);
-        assertEquals(20, list.getElementCount());
-//        list.setFilters(new FilterPipeline(new Filter[] {new PatternFilter("0", 0, 0) }));
-        assertEquals(2, list.getElementCount());
-        try {
-            list.convertIndexToView(ascendingListModel.getSize());
-            fail("accessing list out of range index must throw execption");
-        } catch (IndexOutOfBoundsException ex) {
-            // this is correct behaviour
-        } catch (Exception ex) {
-            fail("got " + ex);
-        }
-        
-    }
 
 //--------------------- interactive
     

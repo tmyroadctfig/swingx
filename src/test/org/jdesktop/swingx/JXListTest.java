@@ -16,7 +16,6 @@ import java.util.Vector;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
-import javax.swing.DefaultRowSorter;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListModel;
 import javax.swing.RowFilter;
@@ -27,6 +26,7 @@ import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.SearchPredicate;
+import org.jdesktop.swingx.decorator.ComponentAdapterTest.JXListT;
 import org.jdesktop.swingx.hyperlink.LinkModel;
 import org.jdesktop.swingx.renderer.DefaultListRenderer;
 import org.jdesktop.swingx.renderer.StringValue;
@@ -35,6 +35,7 @@ import org.jdesktop.swingx.rollover.ListRolloverController;
 import org.jdesktop.swingx.rollover.RolloverProducer;
 import org.jdesktop.swingx.sort.ListSortController;
 import org.jdesktop.swingx.sort.RowFilters;
+import org.jdesktop.swingx.sort.StringValueRegistry;
 import org.jdesktop.swingx.sort.TableSortController;
 import org.jdesktop.test.AncientSwingTeam;
 import org.jdesktop.test.PropertyChangeReport;
@@ -61,7 +62,85 @@ public class JXListTest extends InteractiveTestCase {
     protected DefaultListModel ascendingListModel;
     /** empty default list */
     private JXList list;
+    private StringValue sv;
 
+//--------------- string rep
+    /**
+     * Issue #1152-swingx: re-enable filtering with single-string-representation.
+     * was: Issue #767-swingx: consistent string representation.
+     * 
+     * Here: test Pattern filtering uses string rep
+     */
+    @Test
+    public void testListGetStringUsedInPatternFilter() {
+        JXList list = new JXList(AncientSwingTeam.createNamedColorListModel(), true);
+        list.setCellRenderer(new DefaultListRenderer(sv));
+        RowFilter<Object, Integer> filter = RowFilter.regexFilter("R/G/B: -2.*", 0);
+        list.getSortController().setRowFilter(filter);
+        assertTrue(list.getElementCount() > 0);
+        assertEquals(sv.getString(list.getElementAt(0)), list.getStringAt(0));
+    }
+
+    /**
+     * Issue #1152-swingx: re-enable filtering with single-string-representation.
+     * was: Issue #767-swingx: consistent string representation.
+     * 
+     * Here: test list has stringValueProvider and configures the sortController with it
+     */
+    @Test
+    public void testStringValueRegistry() {
+        JXList list = new JXList(AncientSwingTeam.createNamedColorListModel(), true);
+        assertSame(list.getStringValueRegistry(), list.getSortController().getStringValueProvider());
+    }
+    
+    /**
+     * Issue #1152-swingx: re-enable filtering with single-string-representation.
+     * was: Issue #767-swingx: consistent string representation.
+     * 
+     * Here: test updates the sortController on renderer change.
+     */
+    @Test
+    public void testStringValueRegistryFromRendererChange() {
+        JXList list = new JXList(AncientSwingTeam.createNamedColorListModel(), true);
+        StringValueRegistry provider = list.getStringValueRegistry();
+        list.setCellRenderer(new DefaultListRenderer(sv));
+        assertEquals(list.getWrappedCellRenderer(), provider.getStringValue(0, 0));
+    }
+
+    /**
+     * Issue #1152-swingx: re-enable filtering with single-string-representation.
+     * was: Issue #767-swingx: consistent string representation.
+     * 
+     * Here: test getStringAt use provider (sanity, trying to pull the rag failed
+     * during re-enable)
+     */
+    @Test
+    public void testStringAtUseProvider() {
+        JXList list = new JXList(AncientSwingTeam.createNamedColorListModel(), true);
+        list.setCellRenderer(new DefaultListRenderer(sv));
+        list.getStringValueRegistry().setStringValue(StringValues.TO_STRING, 0);
+        assertEquals(StringValues.TO_STRING.getString(list.getElementAt(0)),
+                list.getStringAt(0));
+        
+    }
+    /**
+     * Issue #1152-swingx: re-enable filtering with single-string-representation.
+     * was: Issue #767-swingx: consistent string representation.
+     * 
+     * Here: test getStringAt of ComponentAdapter use provider 
+     * (sanity, trying to pull the rag failed during re-enable)
+     */
+    @Test
+    public void testStringAtComponentAdapterUseProvider() {
+        JXListT list = new JXListT(AncientSwingTeam.createNamedColorListModel(), true);
+        list.setCellRenderer(new DefaultListRenderer(sv));
+        list.getStringValueRegistry().setStringValue(StringValues.TO_STRING, 0);
+        ComponentAdapter adapter = list.getComponentAdapter();
+        assertEquals(StringValues.TO_STRING.getString(list.getElementAt(0)),
+                adapter.getStringAt(0, 0));
+        
+    }
+    
 //----------------- sorter api on JXList
 
     /**
@@ -83,7 +162,8 @@ public class JXListTest extends InteractiveTestCase {
     public void testSetSortOrder() {
         JXList list = new JXList(ascendingListModel, true);
         list.setSortOrder(SortOrder.ASCENDING);
-        assertEquals("column must be sorted after setting sortOrder on ", SortOrder.ASCENDING, list.getSortOrder());
+        assertSame("column must be sorted after setting sortOrder on ", SortOrder.ASCENDING, list.getSortOrder());
+        assertSame(SortOrder.ASCENDING, list.getSortController().getSortOrder(0));
     }
     
 
@@ -116,6 +196,17 @@ public class JXListTest extends InteractiveTestCase {
     
 
 //----------------- data api on JXList
+    /**
+     * testing that rowSorter's model is updated
+     */
+    @Test
+    public void testSetModel() {
+        JXList list = new JXList(true);
+        list.setModel(listModel);
+        assertEquals(listModel.getSize(), list.getElementCount());
+        assertSame(listModel, list.getRowSorter().getModel());
+    }
+
 
 
     @Test(expected = IndexOutOfBoundsException.class)
@@ -123,7 +214,7 @@ public class JXListTest extends InteractiveTestCase {
         final JXList list = new JXList(ascendingListModel, true);
         assertEquals(20, list.getElementCount());
         RowFilter<ListModel, Integer> filter = RowFilters.regexFilter("0", 0);
-        ((DefaultRowSorter<ListModel, Integer>) list.getRowSorter()).setRowFilter(filter);
+        list.getSortController().setRowFilter(filter);
         assertEquals(2, list.getElementCount());
         list.convertIndexToModel(list.getElementCount());
     }
@@ -134,9 +225,23 @@ public class JXListTest extends InteractiveTestCase {
         final JXList list = new JXList(ascendingListModel, true);
         assertEquals(20, list.getElementCount());
         RowFilter<ListModel, Integer> filter = RowFilters.regexFilter("0", 0);
-        ((DefaultRowSorter<ListModel, Integer>) list.getRowSorter()).setRowFilter(filter);
+        list.getSortController().setRowFilter(filter);
         assertEquals(2, list.getElementCount());
         list.getElementAt(list.getElementCount());
+    }
+
+    /**
+     * 
+     */
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void testConvertToViewPreconditions() {
+        final JXList list = new JXList(ascendingListModel);
+        list.setAutoCreateRowSorter(true);
+        assertEquals(20, list.getElementCount());
+        RowFilter<ListModel, Integer> filter = RowFilters.regexFilter("0", 0);
+        list.getSortController().setRowFilter(filter);
+        assertEquals(2, list.getElementCount());
+        list.convertIndexToView(ascendingListModel.getSize());
     }
 
     @Test
@@ -163,7 +268,20 @@ public class JXListTest extends InteractiveTestCase {
 
 
     //------------- sort properties
-    
+
+    @Test
+    public void testPropertiesToSorterOnSetRowsorter() {
+//        list.setModel(listModel);
+        list.setSortsOnUpdates(false);
+        list.setSortable(false);
+        Collator comparator = Collator.getInstance();
+        list.setComparator(comparator);
+        ListSortController<?> controller = new ListSortController<ListModel>(list.getModel());
+        list.setRowSorter(controller);
+        assertEquals("sortable propagated", false, controller.isSortable(0));
+        assertSame("comparator propagated", comparator, controller.getComparator(0));
+        assertEquals("sortsOnUpdates propagated", false, controller.getSortsOnUpdates());
+    }
     @Test
     public void testSortsOnUpdateSet() {
         PropertyChangeReport report = new PropertyChangeReport(list);
@@ -587,6 +705,28 @@ public class JXListTest extends InteractiveTestCase {
     }
 
     /**
+     * Creates and returns a StringValue which maps a Color to it's R/G/B rep, 
+     * prepending "R/G/B: "
+     * 
+     * @return the StringValue for color.
+     */
+    private StringValue createColorStringValue() {
+        StringValue sv = new StringValue() {
+
+            public String getString(Object value) {
+                if (value instanceof Color) {
+                    Color color = (Color) value;
+                    return "R/G/B: " + color.getRGB();
+                }
+                return StringValues.TO_STRING.getString(value);
+            }
+            
+        };
+        return sv;
+    }
+    
+
+    /**
      * Creates and returns a number filter, passing values which are numbers and
      * have int values inside or outside of the bounds (included), depending on the given 
      * flag.
@@ -618,6 +758,7 @@ public class JXListTest extends InteractiveTestCase {
         list = new JXList();
         listModel = createListModel();
         ascendingListModel = createAscendingListModel(0, 20);
+        sv = createColorStringValue();
     }
     public JXListTest() {
         super("JXList Tests");

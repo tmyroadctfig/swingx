@@ -49,7 +49,6 @@ import org.jdesktop.swingx.plaf.XListAddon;
 import org.jdesktop.swingx.renderer.AbstractRenderer;
 import org.jdesktop.swingx.renderer.DefaultListRenderer;
 import org.jdesktop.swingx.renderer.StringValue;
-import org.jdesktop.swingx.renderer.StringValues;
 import org.jdesktop.swingx.rollover.ListRolloverController;
 import org.jdesktop.swingx.rollover.ListRolloverProducer;
 import org.jdesktop.swingx.rollover.RolloverProducer;
@@ -59,6 +58,7 @@ import org.jdesktop.swingx.search.SearchFactory;
 import org.jdesktop.swingx.search.Searchable;
 import org.jdesktop.swingx.sort.ListSortController;
 import org.jdesktop.swingx.sort.SortController;
+import org.jdesktop.swingx.sort.StringValueRegistry;
 import org.jdesktop.swingx.table.TableColumnExt;
 
 /**
@@ -230,6 +230,8 @@ public class JXList extends JList {
     private boolean sortable;
 
     private boolean sortsOnUpdates;
+
+    private StringValueRegistry stringValueRegistry;
 
     /**
     * Constructs a <code>JXList</code> with an empty model and filters disabled.
@@ -583,8 +585,22 @@ public class JXList extends JList {
 //            sortManager = new SortManager(sorter);
 //        }
 //        resizeAndRepaint();
+        configureSorterProperties();
         firePropertyChange("rowSorter", oldRowSorter, sorter);
-//        firePropertyChange("sorter", oldRowSorter, sorter);
+    }
+
+    /**
+     * Propagates sort-related properties from table/columns to the sorter if it
+     * is of type SortController, does nothing otherwise.
+     * 
+     */
+    protected void configureSorterProperties() {
+        if (getSortController() == null) return;
+        // configure from table properties
+        getSortController().setSortable(sortable);
+        getSortController().setSortsOnUpdates(sortsOnUpdates);
+        getSortController().setComparator(0, comparator);
+        getSortController().setStringValueProvider(getStringValueRegistry());
     }
 
     /**
@@ -748,9 +764,12 @@ public class JXList extends JList {
      * 
      * @return the currently active <code>SortController</code> may be null
      */
-    protected SortController getSortController() {
-        if (getRowSorter() instanceof SortController) {
-            return (SortController) getRowSorter();
+    @SuppressWarnings("unchecked")
+    protected SortController<? extends ListModel> getSortController() {
+        if (getRowSorter() instanceof SortController<?>) {
+            // JW: the RowSorter is always of type <? extends ListModel>
+            // so the unchecked cast is safe
+            return (SortController<? extends ListModel>) getRowSorter();
         }
         return null;
     }
@@ -847,11 +866,9 @@ public class JXList extends JList {
     @Override
     public void setModel(ListModel model) {
         super.setModel(model);
-//        if (isFilterEnabled()) {
-//            wrappingModel.setModel(model);
-//        } else {
-//            super.setModel(model);
-//        }
+        if (getAutoCreateRowSorter()) {
+            setRowSorter(createDefaultRowSorter());
+        }
     }
 
 
@@ -921,7 +938,7 @@ public class JXList extends JList {
          */
         @Override
         public int getRowCount() {
-            return list.getWrappedModel().getSize();
+            return list.getModel().getSize();
         }
 
         /**
@@ -930,7 +947,7 @@ public class JXList extends JList {
          */
         @Override
         public Object getValue() {
-            return list.getElementAt(row);
+            return getFilteredValueAt(row, 0);
         }
 
         /**
@@ -938,7 +955,7 @@ public class JXList extends JList {
          */
         @Override
         public Object getValueAt(int row, int column) {
-            return list.getWrappedModel().getElementAt(row);
+            return list.getModel().getElementAt(row);
         }
 
         /**
@@ -963,21 +980,18 @@ public class JXList extends JList {
          */
         @Override
         public String getString() {
-            return list.getStringAt(row);
+            return getFilteredStringAt(row, 0);
         }
 
         /**
          * {@inheritDoc}
+         * This is implemented to query the table's StringValueRegistry for an appropriate
+         * StringValue and use that for getting the string representation.
          */
         @Override
         public String getStringAt(int row, int column) {
-            // PENDING JW: here we are duplicating code from the list
-            // that's because list api is in view-coordinates
-            ListCellRenderer renderer = list.getDelegatingRenderer().getDelegateRenderer();
-            if (renderer instanceof StringValue) {
-                return ((StringValue) renderer).getString(getValueAt(row, column));
-            }
-            return StringValues.TO_STRING.getString(getValueAt(row, column));
+            StringValue sv = list.getStringValueRegistry().getStringValue(row, column);
+            return sv.getString(getValueAt(row, column));
         }
 
         /**
@@ -1120,6 +1134,32 @@ public class JXList extends JList {
         };
     }
 
+    /**
+     * Returns the StringValueRegistry which defines the string representation for
+     * each cells. This is strictly for internal use by the table, which has the 
+     * responsibility to keep in synch with registered renderers.<p>
+     * 
+     * Currently exposed for testing reasons, client code is recommended to not use nor override.
+     * 
+     * @return
+     */
+    protected StringValueRegistry getStringValueRegistry() {
+        if (stringValueRegistry == null) {
+            stringValueRegistry = createDefaultStringValueRegistry();
+        }
+        return stringValueRegistry;
+    }
+
+    /**
+     * Creates and returns the default registry for StringValues.<p>
+     * 
+     * @return the default registry for StringValues.
+     */
+    protected StringValueRegistry createDefaultStringValueRegistry() {
+        return new StringValueRegistry();
+    }
+    
+    
     
     /**
      * Returns the string representation of the cell value at the given position. 
@@ -1129,11 +1169,10 @@ public class JXList extends JList {
      *   table. 
      */
     public String getStringAt(int row) {
-        ListCellRenderer renderer = getDelegatingRenderer().getDelegateRenderer();
-        if (renderer instanceof StringValue) {
-            return ((StringValue) renderer).getString(getElementAt(row));
-        }
-        return StringValues.TO_STRING.getString(getElementAt(row));
+        // changed implementation to use StringValueRegistry
+        StringValue stringValue = getStringValueRegistry().getStringValue(
+                convertIndexToModel(row), 0);
+        return stringValue.getString(getElementAt(row));
     }
 
     private DelegatingRenderer getDelegatingRenderer() {
@@ -1200,6 +1239,9 @@ public class JXList extends JList {
         // how about fixedCellWidths?
         // need to test!!
         getDelegatingRenderer().setDelegateRenderer(renderer);
+        getStringValueRegistry().setStringValue(
+                renderer instanceof StringValue ? (StringValue) renderer: null, 
+                        0);
         super.setCellRenderer(delegatingRenderer);
     }
 

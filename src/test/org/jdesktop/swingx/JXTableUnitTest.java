@@ -131,7 +131,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
     public void testTableGetStringUsedInPatternFilter() {
         JXTableT table = new JXTableT(new AncientSwingTeam());
         table.setDefaultRenderer(Color.class, new DefaultTableRenderer(sv));
-        RowFilter<?, ?> filter = RowFilter.regexFilter("R/G/B: -2.*", 2);
+        RowFilter<Object, Integer> filter = RowFilter.regexFilter("R/G/B: -2.*", 2);
         table.getSortController().setRowFilter(filter);
         assertTrue(table.getRowCount() > 0);
         assertEquals(sv.getString(table.getValueAt(0, 2)), table.getStringAt(0, 2));
