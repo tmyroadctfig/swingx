@@ -253,7 +253,7 @@ public class JXTree extends JTree {
      *
      * @param value an Vector of objects that are children of the root.
      */
-    public JXTree(Vector value) {
+    public JXTree(Vector<?> value) {
         super(value);
         init();
     }
@@ -269,7 +269,7 @@ public class JXTree extends JTree {
      *
      * @param value a Hashtable containing objects that are children of the root.
      */
-    public JXTree(Hashtable value) {
+    public JXTree(Hashtable<?, ?> value) {
         super(value);
         init();
     }
