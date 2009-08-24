@@ -19,13 +19,12 @@ import javax.swing.RowFilter;
 import javax.swing.table.DefaultTableModel;
 
 import org.jdesktop.swingx.hyperlink.LinkModel;
+import org.jdesktop.swingx.plaf.basic.core.ListSortUI;
 import org.jdesktop.swingx.sort.ListSortController;
-import org.jdesktop.swingx.sort.ListSortUI;
 import org.jdesktop.swingx.sort.RowFilters;
 import org.jdesktop.swingx.sort.TableSortController;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
@@ -43,7 +42,6 @@ public class JXListSortRevamp extends InteractiveTestCase {
     protected DefaultListModel ascendingListModel;
     private ListSortController<ListModel> controller;
     private JXList list;
-    private ListSortUI sortManager;
 
     public static void main(String[] args) {
         JXListSortRevamp test = new JXListSortRevamp();
@@ -75,7 +73,6 @@ public class JXListSortRevamp extends InteractiveTestCase {
         final ListSortController<ListModel> controller = new ListSortController<ListModel>(list.getModel());
         list.setRowSorter(controller);
         controller.setComparator(0, TableSortController.COMPARABLE_COMPARATOR);
-        new ListSortUI(list, controller);
         Action sort = new AbstractAction("toggle sort") {
             
             @Override
@@ -126,63 +123,6 @@ public class JXListSortRevamp extends InteractiveTestCase {
 
  
     //----------------- re-enabled functionality
-    /**
-     * Issue #477-swingx:
-     * 
-     * Selection must be cleared after setModel. This is from
-     * super's contract.
-     * 
-     * Not yet ready: must update ListSortUI after model update. 
-     *
-     */
-    @Test
-    public void testSetModelEmptySelection() {
-        fail("list sorting/filtering not yet completely enabled");
-        final JXList list = new JXList(listModel, true);
-        int selection = 0;
-        list.setSelectedIndex(selection);
-        list.setModel(ascendingListModel);
-        assertTrue("setting model must clear selectioon", list.isSelectionEmpty());
-        assertEquals(ascendingListModel.getSize(), list.getElementCount());
-    }
-    
-    /**
-     * test if selection is kept after deleting a row above the
-     * selected.
-     * 
-     * This fails because the ui-delegate has its hands in removing
-     * selection after removed, that is they are doubly removed.
-     *
-     */
-    @Test
-    public void testSelectionAfterAddAbove() {
-        // selecte second row
-        list.setSelectedIndex(1);
-        // remove first 
-        ascendingListModel.insertElementAt(5, 0);
-        assertEquals("selected must have moved after adding at start", 
-                2, list.getSelectedIndex());
-    }
-    
-    /**
-     * test if selection is kept after deleting a row above the
-     * selected.
-     * 
-     * This fails because the ui-delegate has its hands in removing
-     * selection after removed, that is they are doubly removed.
-     *
-     */
-    @Test
-    public void testSelectionAfterDeleteAbove() {
-        // selecte second row
-        list.setSelectedIndex(1);
-        // remove first 
-        ascendingListModel.remove(0);
-        assertEquals("first row must be selected removing old first", 
-                0, list.getSelectedIndex());
-    }
-    
-
 //--------------------- interactive
     
 
@@ -352,7 +292,6 @@ public class JXListSortRevamp extends InteractiveTestCase {
         controller = new ListSortController<ListModel>(list.getModel());
         controller.setComparator(0, TableSortController.COMPARABLE_COMPARATOR);
         list.setRowSorter(controller);
-        sortManager = new ListSortUI(list, controller);
 
     }
     public JXListSortRevamp() {

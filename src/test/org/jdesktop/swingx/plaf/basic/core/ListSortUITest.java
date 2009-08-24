@@ -19,10 +19,11 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
-package org.jdesktop.swingx.sort;
+package org.jdesktop.swingx.plaf.basic.core;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.logging.Logger;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
@@ -37,7 +38,10 @@ import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXEditorPaneTest;
 import org.jdesktop.swingx.JXList;
 import org.jdesktop.swingx.hyperlink.LinkModel;
-import org.jdesktop.swingx.sort.ListSortUI.ModelChange;
+import org.jdesktop.swingx.plaf.basic.core.ListSortUI.ModelChange;
+import org.jdesktop.swingx.sort.ListSortController;
+import org.jdesktop.swingx.sort.RowFilters;
+import org.jdesktop.swingx.sort.TableSortController;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -52,10 +56,14 @@ import org.junit.runners.JUnit4;
  */
 @RunWith(JUnit4.class)
 public class ListSortUITest extends InteractiveTestCase {
+    @SuppressWarnings("unused")
+    private static final Logger LOG = Logger.getLogger(ListSortUITest.class
+            .getName());
+    
     protected DefaultListModel ascendingListModel;
     private JXList list;
     private ListSortController<ListModel> controller;
-    private ListSortUI sortUI;
+//    private ListSortUI sortUI;
     private int testRow;
 
     @Test(expected = IllegalStateException.class)
@@ -162,14 +170,70 @@ public class ListSortUITest extends InteractiveTestCase {
         // use the 2 to be sure the comparable is used
         list.setSelectedIndex(testRow);
         list.setSortOrder(SortOrder.DESCENDING);
+        int index = list.getSelectedIndex();
         assertEquals("last row must be selected after sorting", 
-                ascendingListModel.getSize() - (testRow + 1) , list.getSelectedIndex());
-    }
-    
-    @Test
-    public void testPrepareNull() {
+                ascendingListModel.getSize() - (testRow + 1) , index);
         
     }
+
+    /**
+     * Issue #477-swingx:
+     * 
+     * Selection must be cleared after setModel. This is from
+     * super's contract.
+     * 
+     * Not yet ready: must update ListSortUI after model update. 
+     *
+     */
+    @Test
+    public void testSetModelEmptySelection() {
+//        fail("list sorting/filtering not yet completely enabled");
+        final JXList list = new JXList(new DefaultListModel(), true);
+        int selection = 0;
+        list.setSelectedIndex(selection);
+        list.setModel(ascendingListModel);
+        assertTrue("setting model must clear selectioon", list.isSelectionEmpty());
+        assertEquals(ascendingListModel.getSize(), list.getElementCount());
+    }
+    
+    /**
+     * test if selection is kept after deleting a row above the
+     * selected.
+     * 
+     * This fails because the ui-delegate has its hands in removing
+     * selection after removed, that is they are doubly removed.
+     *
+     */
+    @Test
+    public void testSelectionAfterAddAbove() {
+        // selecte second row
+        list.setSelectedIndex(1);
+        // remove first 
+        ascendingListModel.insertElementAt(5, 0);
+        assertEquals("selected must have moved after adding at start", 
+                2, list.getSelectedIndex());
+    }
+    
+    /**
+     * test if selection is kept after deleting a row above the
+     * selected.
+     * 
+     * This fails because the ui-delegate has its hands in removing
+     * selection after removed, that is they are doubly removed.
+     *
+     */
+    @Test
+    public void testSelectionAfterDeleteAbove() {
+        // selecte second row
+        list.setSelectedIndex(1);
+        // remove first 
+        ascendingListModel.remove(0);
+        assertEquals("first row must be selected removing old first", 
+                0, list.getSelectedIndex());
+    }
+    
+
+
 //------------------- ModelChange - temporary ...    
     @Test
     public void testModelAdded() {
@@ -262,7 +326,7 @@ public class ListSortUITest extends InteractiveTestCase {
         controller = new ListSortController<ListModel>(list.getModel());
         list.setComparator(TableSortController.COMPARABLE_COMPARATOR);
         list.setRowSorter(controller);
-        sortUI = new ListSortUI(list, controller);
+//        sortUI = new ListSortUI(list, controller);
         testRow = 2;
     }
     
@@ -270,7 +334,7 @@ public class ListSortUITest extends InteractiveTestCase {
     @Override
     protected void tearDown() throws Exception {
         super.tearDown();
-        sortUI.dispose();
+//        sortUI.dispose();
     }
 
     @Before
