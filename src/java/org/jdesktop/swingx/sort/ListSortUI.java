@@ -38,7 +38,7 @@ import org.jdesktop.swingx.util.Contract;
 import sun.swing.SwingUtilities2;
 
 /**
- * SortManager provides support for managing the synchronization between
+ * ListSortUI provides support for managing the synchronization between
  * RowSorter, SelectionModel and ListModel if a JXList is sortable.<p>
  * 
  * Note: this is here and public only until fully understood (it's an 
@@ -47,12 +47,14 @@ import sun.swing.SwingUtilities2;
  * ListUI (which takes all while a table does most itself).<p>
  * 
  * PENDING JW: remove exposure of listener implemenations - will happen 
- * automatically when moving over to ui-delegate.
+ * automatically when moving over to ui-delegate. Plus don't listen directly, make
+ * the ui manage the notification. The ui has to listen to model, selection anyway 
+ * (because needs to do its stuff if no sortUI installed).  
  * 
  */
 public final class ListSortUI implements RowSorterListener, ListSelectionListener, ListDataListener {
-    RowSorter<? extends ListModel> sorter;
-    JXList list;
+    private RowSorter<? extends ListModel> sorter;
+    private JXList list;
 
     // Selection, in terms of the model. This is lazily created
     // as needed.
@@ -67,21 +69,35 @@ public final class ListSortUI implements RowSorterListener, ListSelectionListene
     private boolean sorterChanged;
     private boolean ignoreSortChange;
 
-    public ListSortUI(RowSorter<? extends ListModel> sorter, JXList list) {
-        this.sorter = sorter;
-        this.list = list;
+    /**
+     * Intanstiates a SortUI on the list which has the given RowSorter.
+     * 
+     * @param list the list to control, must not be null
+     * @param sorter the rowSorter of the list, must not be null
+     * @throws NullPointerException if either the list or the sorter is null
+     * @throws IllegalStateException if the sorter is not the sorter installed
+     *   on the list
+     */
+    public ListSortUI(JXList list, RowSorter<? extends ListModel> sorter) {
+        this.sorter = Contract.asNotNull(sorter, "RowSorter must not be null");
+        this.list = Contract.asNotNull(list, "list must not be null");
+        if (sorter != list.getRowSorter()) throw
+            new IllegalStateException("sorter must be same as the one on list");
         sorter.addRowSorterListener(this);
         list.getSelectionModel().addListSelectionListener(this);
         list.getModel().addListDataListener(this);
     }
 
     /**
-     * Disposes any resources used by this SortManager.
+     * Disposes any resources used by this SortManager. 
+     * Note: this instance must not be used after dispose!
      */
     public void dispose() {
         if (sorter != null) {
             sorter.removeRowSorterListener(this);
         }
+        sorter = null;
+        list = null;
     }
 
 
@@ -376,9 +392,9 @@ public final class ListSortUI implements RowSorterListener, ListSelectionListene
     
     /**
      * Called after notification from ListModel.
-     * @param e
+     * @param e the change event from the listModel.
      */
-    private void modelChanged(ListDataEvent e) {
+    public void modelChanged(ListDataEvent e) {
         ModelChange change = new ModelChange(e);
         prepareForChange(change);
         notifySorter(change);
@@ -393,7 +409,7 @@ public final class ListSortUI implements RowSorterListener, ListSelectionListene
      * 
      * Invoked when the selection, on the view, has changed.
      */
-    private void viewSelectionChanged(ListSelectionEvent e) {
+    public void viewSelectionChanged(ListSelectionEvent e) {
         if (!syncingSelection && modelSelection != null) {
             modelSelection = null;
         }
@@ -422,6 +438,7 @@ public final class ListSortUI implements RowSorterListener, ListSelectionListene
         }
     }
 
+//----------------- obsolete listener methods, will be removed after move to ui    
     @Override
     public void valueChanged(ListSelectionEvent e) {
         viewSelectionChanged(e);
