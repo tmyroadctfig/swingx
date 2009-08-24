@@ -20,8 +20,6 @@
  */
 package org.jdesktop.swingx;
 
-import static org.junit.Assert.*;
-
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Point;

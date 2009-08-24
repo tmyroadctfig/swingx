@@ -22,7 +22,6 @@ import javax.swing.JTree;
 import javax.swing.ListModel;
 import javax.swing.plaf.UIResource;
 import javax.swing.tree.DefaultTreeCellRenderer;
-import javax.swing.tree.TreeCellEditor;
 import javax.swing.tree.TreeCellRenderer;
 
 import org.jdesktop.swingx.decorator.AbstractHighlighter;
@@ -118,7 +117,7 @@ public class JXTreeIssues extends JXTreeUnitTest {
     
     
     private DefaultTreeRenderer sharedRenderer;
-    ComponentProvider provider;
+    ComponentProvider<?> provider;
     
     
 

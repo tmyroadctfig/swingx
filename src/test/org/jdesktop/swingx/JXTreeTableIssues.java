@@ -703,7 +703,7 @@ public class JXTreeTableIssues extends InteractiveTestCase {
      * 
      */
     public void interactiveTreeTableLinkRendererSimpleText() {
-        AbstractHyperlinkAction simpleAction = new AbstractHyperlinkAction<Object>(null) {
+        AbstractHyperlinkAction<Object> simpleAction = new AbstractHyperlinkAction<Object>(null) {
 
             public void actionPerformed(ActionEvent e) {
                 LOG.info("hit: " + getTarget());
@@ -756,7 +756,7 @@ public class JXTreeTableIssues extends InteractiveTestCase {
             }
             
         };
-        ComponentProvider provider = new CheckBoxProvider(sv);
+        ComponentProvider<?> provider = new CheckBoxProvider(sv);
 //            /**
 //             * custom tooltip: show row. Note: the context is that 
 //             * of the rendering tree. No way to get at table state?
@@ -869,7 +869,7 @@ public class JXTreeTableIssues extends InteractiveTestCase {
             }
 
         };
-        ComponentProvider tableProvider = new LabelProvider(format);
+        ComponentProvider<?> tableProvider = new LabelProvider(format);
         WrappingProvider wrappingProvider = new WrappingProvider(tableProvider) {
             Border redBorder = BorderFactory.createLineBorder(Color.RED);
 
@@ -995,7 +995,7 @@ public class JXTreeTableIssues extends InteractiveTestCase {
      */
     public void interactiveTreeTableGetValueRenderer() {
         JXTreeTable tree = new JXTreeTable(new ComponentTreeTableModel(new JXFrame()));
-        ComponentProvider provider = new CheckBoxProvider(StringValues.TO_STRING) {
+        ComponentProvider<?> provider = new CheckBoxProvider(StringValues.TO_STRING) {
             
             @Override
             protected String getValueAsString(CellContext context) {

@@ -58,6 +58,15 @@ public class ListSortUITest extends InteractiveTestCase {
     private ListSortUI sortUI;
     private int testRow;
 
+    
+    @Test
+    public void testSetFilterKeepsSelection() {
+        int selection = 0;
+        list.setSelectedIndex(selection);
+        RowFilter<Object, Integer> filter = RowFilters.regexFilter(".*", 0);
+        controller.setRowFilter(filter);
+        assertEquals("setting filters must keep selection", selection, list.getSelectedIndex());
+    }
 
 
     /**
@@ -81,6 +90,22 @@ public class ListSortUITest extends InteractiveTestCase {
         // selection must be moved one below
         assertEquals("selection must be incremented by one ", 2, list.getSelectedIndex());
     }
+    
+    /**
+     * Issue #855-swingx: throws AIOOB on repeated remove/add.
+     * Reason is that the lead/anchor is not removed in removeIndexInterval
+     */
+    @Test
+    public void testAddRemoveSelect() {
+        list.setSortOrder(SortOrder.ASCENDING);
+        list.setSelectedIndex(0);
+        ascendingListModel.remove(0);
+        assertTrue("sanity - empty selection after remove", list.isSelectionEmpty());
+        ascendingListModel.addElement(-1);
+        assertTrue("sanity - empty selection re-adding", list.isSelectionEmpty());
+        list.setSelectedIndex(0);
+    }
+    
     
     /**
      * 
@@ -221,7 +246,7 @@ public class ListSortUITest extends InteractiveTestCase {
         ascendingListModel = createAscendingListModel(0, 20);
         list = new JXList(ascendingListModel);
         controller = new ListSortController<ListModel>(list.getModel());
-        controller.setComparator(0, TableSortController.COMPARABLE_COMPARATOR);
+        list.setComparator(TableSortController.COMPARABLE_COMPARATOR);
         list.setRowSorter(controller);
         sortUI = new ListSortUI(controller, list);
         testRow = 2;
