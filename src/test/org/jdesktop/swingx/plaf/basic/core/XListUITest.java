@@ -23,6 +23,7 @@ package org.jdesktop.swingx.plaf.basic.core;
 
 import java.util.Arrays;
 
+import javax.swing.DefaultListModel;
 import javax.swing.JList;
 import javax.swing.LookAndFeel;
 import javax.swing.UIManager;
@@ -42,6 +43,32 @@ import sun.swing.plaf.synth.SynthUI;
  */
 @RunWith(JUnit4.class)
 public class XListUITest extends InteractiveTestCase {
+    
+    /**
+     * Issue 1152-swingx: JXList re-enable sorting.
+     * 
+     * here: add managing ListSortUI to responsibility of XListUI. 
+     */
+    @Test
+    public void testSortUIUpdateOnSetModel() {
+        JXList list = new JXList(true);
+        BasicXListUI ui = (BasicXListUI) list.getUI();
+        ListSortUI sortUI = ui.getSortUI();
+        list.setModel(new DefaultListModel());
+        assertNotSame(sortUI, ui.getSortUI());
+    }
+    /**
+     * Issue 1152-swingx: JXList re-enable sorting.
+     * 
+     * here: add managing ListSortUI to responsibility of XListUI. 
+     */
+    @Test
+    public void testSortUIInstalled() {
+        JXList list = new JXList(true);
+        BasicXListUI ui = (BasicXListUI) list.getUI();
+        assertNotNull(ui.getSortUI());
+    }
+    
     /**
      * getContext(component) should throw if given component is not ours (for
      * 1:1 delegate implemenations). 

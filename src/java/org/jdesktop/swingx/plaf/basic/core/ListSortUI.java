@@ -19,16 +19,14 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
-package org.jdesktop.swingx.sort;
+package org.jdesktop.swingx.plaf.basic.core;
 
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
 import javax.swing.RowSorter;
 import javax.swing.event.ListDataEvent;
-import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.event.RowSorterEvent;
 import javax.swing.event.RowSorterListener;
 
@@ -52,7 +50,7 @@ import sun.swing.SwingUtilities2;
  * (because needs to do its stuff if no sortUI installed).  
  * 
  */
-public final class ListSortUI implements RowSorterListener, ListSelectionListener, ListDataListener {
+public final class ListSortUI implements RowSorterListener{ //, ListSelectionListener { //, ListDataListener {
     private RowSorter<? extends ListModel> sorter;
     private JXList list;
 
@@ -84,8 +82,8 @@ public final class ListSortUI implements RowSorterListener, ListSelectionListene
         if (sorter != list.getRowSorter()) throw
             new IllegalStateException("sorter must be same as the one on list");
         sorter.addRowSorterListener(this);
-        list.getSelectionModel().addListSelectionListener(this);
-        list.getModel().addListDataListener(this);
+//        list.getSelectionModel().addListSelectionListener(this);
+//        list.getModel().addListDataListener(this);
     }
 
     /**
@@ -439,25 +437,25 @@ public final class ListSortUI implements RowSorterListener, ListSelectionListene
     }
 
 //----------------- obsolete listener methods, will be removed after move to ui    
-    @Override
-    public void valueChanged(ListSelectionEvent e) {
-        viewSelectionChanged(e);
-    }
+//    @Override
+//    public void valueChanged(ListSelectionEvent e) {
+//        viewSelectionChanged(e);
+//    }
 
-    @Override
-    public void contentsChanged(ListDataEvent e) {
-        modelChanged(e);
-    }
-
-    @Override
-    public void intervalAdded(ListDataEvent e) {
-        modelChanged(e);
-    }
-
-    @Override
-    public void intervalRemoved(ListDataEvent e) {
-        modelChanged(e);
-    }
+//    @Override
+//    public void contentsChanged(ListDataEvent e) {
+//        modelChanged(e);
+//    }
+//
+//    @Override
+//    public void intervalAdded(ListDataEvent e) {
+//        modelChanged(e);
+//    }
+//
+//    @Override
+//    public void intervalRemoved(ListDataEvent e) {
+//        modelChanged(e);
+//    }
 
     /**
      * ModelChange is used when sorting to restore state, it corresponds

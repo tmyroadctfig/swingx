@@ -77,9 +77,13 @@ import sun.swing.UIAction;
 
 /**
  * An extensible implementation of {@code ListUI} for JXList.
- * <p>
  * {@code BasicXListUI} instances cannot be shared between multiple
  * lists.<p>
+ * 
+ * Added functionality is to support sorting/filtering, that is keep model-selection and
+ * RowSorter state synchronized. The details are delegated to a ListSortUI, but this
+ * class is responsible to manage the sortUI on changes of list properties, model and 
+ * view selection (same strategy as in JXTable).<p>
  * 
  * Note: this delegate is mostly a 1:1 copy of BasicListUI. The difference is that
  * it accesses the list elements and list elementCount exclusively through the 
@@ -87,7 +91,7 @@ import sun.swing.UIAction;
  * 
  * The differences (goal was to touch as little code as possible as this needs
  * to be updated on every change to core until that is changed to not access
- * the list's model directly, sigh):
+ * the list's model directly, sigh) for core functionality:
  * <ul>
  * <li> extracted method for list.getModel().getSize (for the delegate class and 
  *      all contained static classes) and use that method exclusively
@@ -95,6 +99,17 @@ import sun.swing.UIAction;
  *    which messages the list
  * <li> rename key for shared actionMap to keep core list actions separate 
  *    (just in case somebody wants both) - they point to the wrong delegate
+ * </ul>
+ * 
+ * Differences to achieve extended functionality:
+ * <ul>
+ * <li> added methods to un/-installSortUI and call in un/installUI(component)
+ * <li> changed PropertyChangeHandler to call updateSortUI after calling handler
+ * <li> changed createPropertyChangeListener to return a PropertyChangeHandler
+ * <li> changed ListDataHandler to check if event handled by SortUI and delegate
+ *    to handler only if not
+ * <li> changed createListDataListener to return a ListDataHandler
+ * 
  * </ul>
  * 
  * Note: extension of core (instead of implement from scratch) is to keep 
@@ -115,7 +130,7 @@ public class BasicXListUI  extends BasicListUI
     private static final StringBuilder BASELINE_COMPONENT_KEY =
         new StringBuilder("List.baselineComponent");
 
-    protected JList list = null;
+    protected JXList list = null;
     protected CellRendererPane rendererPane;
 
     // Listeners that this UI attaches to the JList
@@ -244,7 +259,9 @@ public class BasicXListUI  extends BasicListUI
 
 //-------------------- X-Wrapper
     
-    ListModel modelX;
+    private ListModel modelX;
+
+    private ListSortUI sortUI;
     /**
      * Compatibility Wrapper: a synthetic model which delegates to list api and throws
      * @return
@@ -288,9 +305,76 @@ public class BasicXListUI  extends BasicListUI
     protected Object getElementAt(int viewIndex) {
         return ((JXList) list).getElementAt(viewIndex);
     }
+
+//--------------- api to support/control sorting/filtering
     
+    protected ListSortUI getSortUI() {
+        return sortUI;
+    }
+    
+    /**
+     * Installs SortUI if the list has a rowSorter. Does nothing if not.
+     */
+    protected void installSortUI() {
+        if (list.getRowSorter() == null) return;
+        sortUI = new ListSortUI(list, list.getRowSorter());
+    }
+    
+    /**
+     * Dispose and null's the sortUI if installed. Does nothing if not.
+     */
+    protected void uninstallSortUI() {
+        if (sortUI == null) return;
+        sortUI.dispose();
+        sortUI = null;
+    }
+    
+    /**
+     * Called from the PropertyChangeHandler.
+     * 
+     * @param property the name of the changed property.
+     */
+    protected void updateSortUI(String property) {
+        if ("rowSorter".equals(property)) {
+            updateSortUIToRowSorterProperty();
+        }
+    }
+    /**
+     * 
+     */
+    private void updateSortUIToRowSorterProperty() {
+        uninstallSortUI();
+        installSortUI();
+    }
+    
+    /**
+     * Returns a boolean indicating whether or not the event has been processed
+     * by the sortUI. 
+     * @param e
+     * @return
+     */
+    protected boolean processedBySortUI(ListDataEvent e) {
+        if (sortUI == null)
+            return false;
+        sortUI.modelChanged(e);
+        return true;
+    }
+    
+    /**
+     * Returns a boolean indicating whether or not the event has been processed
+     * by the sortUI. 
+     * @param e
+     * @return
+     */
+    protected boolean processedBySortUI(ListSelectionEvent e) {
+        if (sortUI == null) return false;
+        sortUI.viewSelectionChanged(e);
+        list.repaint();
+        return true;
+    }
 //---------------------    
     
+
     /**
      * Paint one List cell: compute the relevant state, get the "rubber stamp"
      * cell renderer component, and then use the CellRendererPane to paint it.
@@ -975,7 +1059,7 @@ public class BasicXListUI  extends BasicListUI
      */
     public void installUI(JComponent c)
     {
-        list = (JList)c;
+        list = (JXList)c;
 
         layoutOrientation = list.getLayoutOrientation();
 
@@ -990,6 +1074,7 @@ public class BasicXListUI  extends BasicListUI
         installDefaults();
         installListeners();
         installKeyboardActions();
+        installSortUI();
     }
 
 
@@ -1004,6 +1089,7 @@ public class BasicXListUI  extends BasicListUI
      */
     public void uninstallUI(JComponent c)
     {
+        uninstallSortUI();
         uninstallListeners();
         uninstallDefaults();
         uninstallKeyboardActions();
@@ -1714,6 +1800,7 @@ public class BasicXListUI  extends BasicListUI
     {
         public void valueChanged(ListSelectionEvent e)
         {
+            if (processedBySortUI(e)) return;
             getHandler().valueChanged(e);
         }
     }
@@ -1741,7 +1828,7 @@ public class BasicXListUI  extends BasicListUI
      * @see #installUI
      */
     protected ListSelectionListener createListSelectionListener() {
-        return getHandler();
+        return new ListSelectionHandler();
     }
 
 
@@ -1772,17 +1859,22 @@ public class BasicXListUI  extends BasicListUI
     public class ListDataHandler implements ListDataListener
     {
         public void intervalAdded(ListDataEvent e) {
+            if (processedBySortUI(e))
+                return;
             getHandler().intervalAdded(e);
         }
 
 
-        public void intervalRemoved(ListDataEvent e)
-        {
+        public void intervalRemoved(ListDataEvent e) {
+            if (processedBySortUI(e))
+                return;
             getHandler().intervalRemoved(e);
         }
 
 
         public void contentsChanged(ListDataEvent e) {
+            if (processedBySortUI(e))
+                return;
             getHandler().contentsChanged(e);
         }
     }
@@ -1811,7 +1903,7 @@ public class BasicXListUI  extends BasicListUI
      * @see #installUI
      */
     protected ListDataListener createListDataListener() {
-        return getHandler();
+        return new ListDataHandler();
     }
 
 
@@ -1840,6 +1932,7 @@ public class BasicXListUI  extends BasicListUI
         public void propertyChange(PropertyChangeEvent e)
         {
             getHandler().propertyChange(e);
+            updateSortUI(e.getPropertyName());
         }
     }
 
@@ -1868,7 +1961,7 @@ public class BasicXListUI  extends BasicListUI
      * @see #installUI
      */
     protected PropertyChangeListener createPropertyChangeListener() {
-        return getHandler();
+        return new PropertyChangeHandler();
     }
 
     /** Used by IncrementLeadSelectionAction. Indicates the action should
