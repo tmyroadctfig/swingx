@@ -74,6 +74,7 @@ import org.jdesktop.swingx.renderer.StringValues;
 import org.jdesktop.swingx.rollover.RolloverController;
 import org.jdesktop.swingx.rollover.RolloverProducer;
 import org.jdesktop.swingx.rollover.TableRolloverController;
+import org.jdesktop.swingx.sort.RowFilters;
 import org.jdesktop.swingx.sort.SortUtils;
 import org.jdesktop.swingx.sort.StringValueRegistry;
 import org.jdesktop.swingx.sort.TableSortController;
@@ -132,7 +133,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
         JXTableT table = new JXTableT(new AncientSwingTeam());
         table.setDefaultRenderer(Color.class, new DefaultTableRenderer(sv));
         RowFilter<Object, Integer> filter = RowFilter.regexFilter("R/G/B: -2.*", 2);
-        table.getSortController().setRowFilter(filter);
+        table.setRowFilter(filter);
         assertTrue(table.getRowCount() > 0);
         assertEquals(sv.getString(table.getValueAt(0, 2)), table.getStringAt(0, 2));
     }
@@ -316,7 +317,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
     public void testSortsOnUpdateToSorterInSettingProperty() {
         JXTable table = new JXTable();
         table.setSortsOnUpdates(false);
-        assertEquals("property propagated to controller", false, table.getSortController().getSortsOnUpdates());
+        assertEquals("property propagated to controller", false, getSortController(table).getSortsOnUpdates());
     }
     
     /**
@@ -329,7 +330,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
         JXTable table = new JXTable();
         table.setSortsOnUpdates(false);
         table.setRowSorter(new TableSortController<TableModel>(table.getModel()));
-        assertEquals("property propagated to controller", false, table.getSortController().getSortsOnUpdates());
+        assertEquals("property propagated to controller", false, getSortController(table).getSortsOnUpdates());
     }
     
     /**
@@ -437,7 +438,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
         JXTable table = new JXTable(new AncientSwingTeam());
         TableColumnExt columnX = table.getColumnExt(0);
         columnX.setComparator(Collator.getInstance());
-        assertSame(columnX.getComparator(), table.getSortController().getComparator(columnX.getModelIndex()));
+        assertSame(columnX.getComparator(), getSortController(table).getComparator(columnX.getModelIndex()));
     }
     
     /**
@@ -451,7 +452,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
         TableColumnExt columnX = table.getColumnExt(0);
         columnX.setComparator(Collator.getInstance());
         table.setRowSorter(new TableSortController<TableModel>(table.getModel()));
-        assertSame(columnX.getComparator(), table.getSortController().getComparator(columnX.getModelIndex()));
+        assertSame(columnX.getComparator(), getSortController(table).getComparator(columnX.getModelIndex()));
     }
 
 
@@ -594,14 +595,14 @@ public class JXTableUnitTest extends InteractiveTestCase {
             for (TableColumn tableColumn : columns) {
                 int i = tableColumn.getModelIndex();
                 assertEquals("odd/even columns must be not/-sortable: " + i, i % 2 == 0, 
-                        table.getSortController().isSortable(i));
+                        getSortController(table).isSortable(i));
                 if (tableColumn instanceof TableColumnExt) {
                     Comparator<?> comparator = ((TableColumnExt) tableColumn).getComparator();
                     // JW: need to check against null because sorter might have its own
                     // ideas about default comparators
                     if (comparator != null) {
                         assertSame("comparator must be same: " + i, comparator, 
-                            table.getSortController().getComparator(i));
+                                getSortController(table).getComparator(i));
                     }
                 }
                 
@@ -621,7 +622,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
         JXTable table = new JXTable();
         table.setSortable(false);
         table.setModel(sortableTableModel);
-        assertEquals(false, table.getSortController().isSortable());
+        assertEquals(false, getSortController(table).isSortable());
     }
 
     /**
@@ -717,9 +718,46 @@ public class JXTableUnitTest extends InteractiveTestCase {
     public void testTableSortableSynchedToController() {
         JXTable table = new JXTable();
         table.setSortable(false);
-        assertEquals(table.isSortable(), table.getSortController().isSortable());
+        assertEquals(table.isSortable(), getSortController(table).isSortable());
     }
     
+    /**
+     * Setting table's sortable property updates controller.
+     */
+    @Test
+    public void testTableRowFilterSynchedToController() {
+        JXTable table = new JXTable();
+        RowFilter<Object, Object> filter = RowFilters.regexFilter(".*");
+        table.setRowFilter(filter);
+        assertEquals(filter, getSortController(table).getRowFilter());
+        assertEquals(filter, table.getRowFilter());
+    }
+    
+    /**
+     * Setting table's sortable property updates controller.
+     */
+    @Test
+    public void testTableSortOrderCycleSynchedToController() {
+        JXTable table = new JXTable();
+        SortOrder[] cycle = new SortOrder[] {SortOrder.DESCENDING, SortOrder.UNSORTED};
+        table.setSortOrderCycle(cycle);
+        assertEqualsArrayByElements(cycle, getSortController(table).getSortOrderCycle());
+        assertEqualsArrayByElements(cycle, table.getSortOrderCycle());
+    }
+
+    /**
+     * @param string
+     * @param first
+     * @param second
+     */
+    private void assertEqualsArrayByElements(Object[] first,
+            Object[] second) {
+        assertEquals("must have same size", first.length, second.length);
+        for (int i = 0; i < second.length; i++) {
+            assertEquals("item must be same at index:  " + i, first[i], second[i]);
+        }
+    }
+
 //----------------- table sort api
 /* NOTE: if applicable we test the api on columns which are not of type TableColumnExt
  * Doing so because the pre-Mustang implementation worked on columns of extended type only.
@@ -739,7 +777,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
         column.setIdentifier("changed: " + id);
         // PENDING JW: what to return if no column found? current fallback is to 
         // overall-sortable
-        assertEquals(table.getSortController().isSortable(), table.isSortable(id));
+        assertEquals(getSortController(table).isSortable(), table.isSortable(id));
     }
     /**
      * add api to access the sorted column.
@@ -920,7 +958,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
         JXTable table = new JXTable();
         assertTrue("default sorter expected TableRowSorter, but was:" + table.getRowSorter(),
                 table.getRowSorter() instanceof TableSortController<?>);
-        assertSame(table.getRowSorter(), table.getSortController());
+        assertSame(table.getRowSorter(), getSortController(table));
     }
     /**
      * core issue: rowSorter replaced on setAutoCreateRowSorter even without change to flag.
@@ -3282,6 +3320,16 @@ public class JXTableUnitTest extends InteractiveTestCase {
         assertEquals("default Boolean editor", JXTable.BooleanEditor.class, table.getDefaultEditor(Boolean.class).getClass());
         assertEquals("default Number editor", NumberEditorExt.class, table.getDefaultEditor(Number.class).getClass());
         assertEquals("default Double editor", NumberEditorExt.class, table.getDefaultEditor(Double.class).getClass());
+    }
+
+    
+    /**
+     * Convenience: type cast of default rowSorter.
+     * @param table
+     * @return
+     */
+    private static TableSortController<? extends TableModel> getSortController(JXTable table) {
+        return (TableSortController<? extends TableModel>) table.getRowSorter();
     }
 
 //---------------------------- factory, convenience models, set-up ...

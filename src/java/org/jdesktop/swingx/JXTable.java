@@ -66,6 +66,7 @@ import javax.swing.JTextField;
 import javax.swing.JViewport;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
+import javax.swing.RowFilter;
 import javax.swing.RowSorter;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SortOrder;
@@ -1733,6 +1734,59 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
     public boolean getSortsOnUpdates() {
         return getSortController() != null ? getSortController().getSortsOnUpdates() : sortsOnUpdates;
     }
+    
+    /**
+     * Sets the filter to the sorter, if available and of type SortController.
+     * Does nothing otherwise.
+     * <p>
+     *
+     * @param filter the filter used to determine what entries should be
+     *        included
+     */
+    public void setRowFilter(RowFilter<? super TableModel, ? super Integer> filter) {
+        if (getSortController() == null) return;
+        getSortController().setRowFilter(filter);
+    }
+    
+    /**
+     * Returns the filter of the sorter, if available and of type SortController.
+     * Returns null otherwise.<p>
+     * 
+     * PENDING JW: generics? had to remove return type from getSortController to 
+     * make this compilable, so probably wrong. 
+     * 
+     * @return the filter used in the sorter.
+     */
+    @SuppressWarnings("unchecked")
+    public RowFilter<?, ?> getRowFilter() {
+        return getSortController() != null ? getSortController().getRowFilter() : null;
+    }
+    
+    /**
+     * Sets the sortorder cycle of the sorter, if available and of type SortController. Does
+     * nothing otherwise.<p>
+     * 
+     * PENDING JW: make property of the table as well, to propagate to sorter if
+     *   reset?
+     * 
+     * @param cycle the sequence of zero or more not-null SortOrders to cycle through.
+     * @throws NullPointerException if the array or any of its elements are null
+     * 
+     */
+    public void setSortOrderCycle(SortOrder... cycle) {
+        if (getSortController() == null) return;
+        getSortController().setSortOrderCycle(cycle);
+    }
+    
+    /**
+     * Returns the sequence of sortOrders of the sorter, if available and of type SortController.
+     * Null otherwise.
+     *   
+     * @return the sort order cycle of the sorter, if available, null otherwise.
+     */
+    public SortOrder[] getSortOrderCycle() {
+        return getSortController() != null ? getSortController().getSortOrderCycle() : null;
+    }
     /**
      * Resets sorting of all columns.
      * Delegates to the SortController if available, or does nothing if not.<p>
@@ -1971,7 +2025,15 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
 
     /**
      * Returns the currently active SortController. May be null, if the current RowSorter
-     * is not an instance of SortController.
+     * is not an instance of SortController. <p>
+     * 
+     * <b>Note</b>: treat this as private api, don't use in client code as it might 
+     * be changed to private without notice! Most probably an intermediate exposure
+     * (JXTableHeader mis-uses it to silently disable sorting if in resizing area)
+     * <p>
+     * 
+     * PENDING JW: generics - can't get the
+     * RowFilter getter signature correct with having controller typed here. 
      * 
      * @return the currently active <code>SortController</code> may be null
      */
@@ -1980,7 +2042,7 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
         if (getRowSorter() instanceof SortController<?>) {
             // JW: the RowSorter is always of type <? extends ListModel>
             // so the unchecked cast is safe
-            return (SortController<? extends TableModel>) getRowSorter();
+            return  (SortController<? extends TableModel>) getRowSorter();
         }
         return null;
     }
