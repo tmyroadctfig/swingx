@@ -19,7 +19,6 @@ import javax.swing.RowFilter;
 import javax.swing.table.DefaultTableModel;
 
 import org.jdesktop.swingx.hyperlink.LinkModel;
-import org.jdesktop.swingx.plaf.basic.core.ListSortUI;
 import org.jdesktop.swingx.sort.ListSortController;
 import org.jdesktop.swingx.sort.RowFilters;
 import org.jdesktop.swingx.sort.TableSortController;
@@ -96,10 +95,10 @@ public class JXListSortRevamp extends InteractiveTestCase {
                 if (hasFilter) {
                 RowFilter<Object, Integer> filter = RowFilters.regexFilter("0", 0);
                     list.getSortController().setRowFilter(filter);
-                    table.getSortController().setRowFilter(filter);
+                    table.setRowFilter(filter);
                 } else {
                     list.getSortController().setRowFilter(null);
-                    table.getSortController().setRowFilter(null);
+                    table.setRowFilter(null);
                 }
                 hasFilter = !hasFilter;
             }
