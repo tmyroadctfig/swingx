@@ -94,10 +94,10 @@ public class JXListSortRevamp extends InteractiveTestCase {
             public void actionPerformed(ActionEvent e) {
                 if (hasFilter) {
                 RowFilter<Object, Integer> filter = RowFilters.regexFilter("0", 0);
-                    list.getSortController().setRowFilter(filter);
+                    list.setRowFilter(filter);
                     table.setRowFilter(filter);
                 } else {
-                    list.getSortController().setRowFilter(null);
+                    list.setRowFilter(null);
                     table.setRowFilter(null);
                 }
                 hasFilter = !hasFilter;

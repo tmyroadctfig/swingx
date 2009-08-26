@@ -76,7 +76,7 @@ public class JXListTest extends InteractiveTestCase {
         JXList list = new JXList(AncientSwingTeam.createNamedColorListModel(), true);
         list.setCellRenderer(new DefaultListRenderer(sv));
         RowFilter<Object, Integer> filter = RowFilter.regexFilter("R/G/B: -2.*", 0);
-        list.getSortController().setRowFilter(filter);
+        list.setRowFilter(filter);
         assertTrue(list.getElementCount() > 0);
         assertEquals(sv.getString(list.getElementAt(0)), list.getStringAt(0));
     }
@@ -90,7 +90,7 @@ public class JXListTest extends InteractiveTestCase {
     @Test
     public void testStringValueRegistry() {
         JXList list = new JXList(AncientSwingTeam.createNamedColorListModel(), true);
-        assertSame(list.getStringValueRegistry(), list.getSortController().getStringValueProvider());
+        assertSame(list.getStringValueRegistry(), getSortController(list).getStringValueProvider());
     }
     
     /**
@@ -151,7 +151,7 @@ public class JXListTest extends InteractiveTestCase {
     public void testSetComparatorToSortController() {
         JXList list = new JXList(listModel, true);
         list.setComparator(Collator.getInstance());
-        assertSame(list.getComparator(), list.getSortController().getComparator(0));
+        assertSame(list.getComparator(), getSortController(list).getComparator(0));
     }
     
     /**
@@ -163,7 +163,7 @@ public class JXListTest extends InteractiveTestCase {
         JXList list = new JXList(ascendingListModel, true);
         list.setSortOrder(SortOrder.ASCENDING);
         assertSame("column must be sorted after setting sortOrder on ", SortOrder.ASCENDING, list.getSortOrder());
-        assertSame(SortOrder.ASCENDING, list.getSortController().getSortOrder(0));
+        assertSame(SortOrder.ASCENDING, getSortController(list).getSortOrder(0));
     }
     
 
@@ -191,7 +191,7 @@ public class JXListTest extends InteractiveTestCase {
     @Test
     public void testSortController() {
         JXList list = new JXList(ascendingListModel, true);
-        assertNotNull("sortController must be initialized", list.getSortController());
+        assertNotNull("sortController must be initialized", list.getRowSorter());
     }
     
 
@@ -214,7 +214,7 @@ public class JXListTest extends InteractiveTestCase {
         final JXList list = new JXList(ascendingListModel, true);
         assertEquals(20, list.getElementCount());
         RowFilter<ListModel, Integer> filter = RowFilters.regexFilter("0", 0);
-        list.getSortController().setRowFilter(filter);
+        list.setRowFilter(filter);
         assertEquals(2, list.getElementCount());
         list.convertIndexToModel(list.getElementCount());
     }
@@ -225,7 +225,7 @@ public class JXListTest extends InteractiveTestCase {
         final JXList list = new JXList(ascendingListModel, true);
         assertEquals(20, list.getElementCount());
         RowFilter<ListModel, Integer> filter = RowFilters.regexFilter("0", 0);
-        list.getSortController().setRowFilter(filter);
+        list.setRowFilter(filter);
         assertEquals(2, list.getElementCount());
         list.getElementAt(list.getElementCount());
     }
@@ -239,7 +239,7 @@ public class JXListTest extends InteractiveTestCase {
         list.setAutoCreateRowSorter(true);
         assertEquals(20, list.getElementCount());
         RowFilter<ListModel, Integer> filter = RowFilters.regexFilter("0", 0);
-        list.getSortController().setRowFilter(filter);
+        list.setRowFilter(filter);
         assertEquals(2, list.getElementCount());
         list.convertIndexToView(ascendingListModel.getSize());
     }
@@ -307,6 +307,54 @@ public class JXListTest extends InteractiveTestCase {
     public void testSortableDefault() {
         assertTrue(list.isSortable());
     }
+    
+    
+    /**
+     * Setting table's sortable property updates controller.
+     */
+    @Test
+    public void testTableRowFilterSynchedToController() {
+        JXList list = new JXList(true);
+        RowFilter<Object, Object> filter = RowFilters.regexFilter(".*");
+        list.setRowFilter(filter);
+        assertEquals(filter, getSortController(list).getRowFilter());
+        assertEquals(filter, list.getRowFilter());
+    }
+    
+    /**
+     * Setting table's sortable property updates controller.
+     */
+    @Test
+    public void testTableSortOrderCycleSynchedToController() {
+        JXList list = new JXList(true);
+        SortOrder[] cycle = new SortOrder[] {SortOrder.DESCENDING, SortOrder.UNSORTED};
+        list.setSortOrderCycle(cycle);
+        assertEqualsArrayByElements(cycle, getSortController(list).getSortOrderCycle());
+        assertEqualsArrayByElements(cycle, list.getSortOrderCycle());
+    }
+
+    /**
+     * @param string
+     * @param first
+     * @param second
+     */
+    private void assertEqualsArrayByElements(Object[] first,
+            Object[] second) {
+        assertEquals("must have same size", first.length, second.length);
+        for (int i = 0; i < second.length; i++) {
+            assertEquals("item must be same at index:  " + i, first[i], second[i]);
+        }
+    }
+
+    /**
+     * Convenience: type cast of default rowSorter.
+     * @param list
+     * @return
+     */
+    private ListSortController<? extends ListModel> getSortController(JXList list) {
+        return (ListSortController<? extends ListModel>) list.getRowSorter();
+    }
+
     //------------ rowSorter api
     
     /**

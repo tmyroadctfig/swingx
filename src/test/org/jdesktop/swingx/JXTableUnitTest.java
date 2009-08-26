@@ -958,7 +958,6 @@ public class JXTableUnitTest extends InteractiveTestCase {
         JXTable table = new JXTable();
         assertTrue("default sorter expected TableRowSorter, but was:" + table.getRowSorter(),
                 table.getRowSorter() instanceof TableSortController<?>);
-        assertSame(table.getRowSorter(), getSortController(table));
     }
     /**
      * core issue: rowSorter replaced on setAutoCreateRowSorter even without change to flag.

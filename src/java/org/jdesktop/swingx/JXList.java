@@ -34,6 +34,7 @@ import javax.swing.KeyStroke;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
+import javax.swing.RowFilter;
 import javax.swing.RowSorter;
 import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
@@ -665,6 +666,59 @@ public class JXList extends JList {
     }
 
     /**
+     * Sets the filter to the sorter, if available and of type SortController.
+     * Does nothing otherwise.
+     * <p>
+     *
+     * @param filter the filter used to determine what entries should be
+     *        included
+     */
+    public void setRowFilter(RowFilter<? super ListModel, ? super Integer> filter) {
+        if (getSortController() == null) return;
+        getSortController().setRowFilter(filter);
+    }
+    
+    /**
+     * Returns the filter of the sorter, if available and of type SortController.
+     * Returns null otherwise.<p>
+     * 
+     * PENDING JW: generics? had to remove return type from getSortController to 
+     * make this compilable, so probably wrong. 
+     * 
+     * @return the filter used in the sorter.
+     */
+    @SuppressWarnings("unchecked")
+    public RowFilter<?, ?> getRowFilter() {
+        return getSortController() != null ? getSortController().getRowFilter() : null;
+    }
+    
+    /**
+     * Sets the sortorder cycle of the sorter, if available and of type SortController. Does
+     * nothing otherwise.<p>
+     * 
+     * PENDING JW: make property of the table as well, to propagate to sorter if
+     *   reset?
+     * 
+     * @param cycle the sequence of zero or more not-null SortOrders to cycle through.
+     * @throws NullPointerException if the array or any of its elements are null
+     * 
+     */
+    public void setSortOrderCycle(SortOrder... cycle) {
+        if (getSortController() == null) return;
+        getSortController().setSortOrderCycle(cycle);
+    }
+    
+    /**
+     * Returns the sequence of sortOrders of the sorter, if available and of type SortController.
+     * Null otherwise.
+     *   
+     * @return the sort order cycle of the sorter, if available, null otherwise.
+     */
+    public SortOrder[] getSortOrderCycle() {
+        return getSortController() != null ? getSortController().getSortOrderCycle() : null;
+    }
+
+    /**
      * Resets sorting of all columns.
      * Delegates to the SortController if available, or does nothing if not.<p>
      * 
@@ -765,7 +819,7 @@ public class JXList extends JList {
      * @return the currently active <code>SortController</code> may be null
      */
     @SuppressWarnings("unchecked")
-    protected SortController<? extends ListModel> getSortController() {
+    private SortController<? extends ListModel> getSortController() {
         if (getRowSorter() instanceof SortController<?>) {
             // JW: the RowSorter is always of type <? extends ListModel>
             // so the unchecked cast is safe
