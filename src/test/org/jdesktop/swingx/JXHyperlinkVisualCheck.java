@@ -125,11 +125,11 @@ public class JXHyperlinkVisualCheck extends InteractiveTestCase {
         JXHyperlink noActionHyperlink = new JXHyperlink();
         noActionHyperlink.setText("have no action - auto-click");
         box.add(noActionHyperlink);
-        AbstractHyperlinkAction doNothingAction = createEmptyLinkAction("have do nothing action - follow action");
+        AbstractHyperlinkAction<?> doNothingAction = createEmptyLinkAction("have do nothing action - follow action");
         JXHyperlink doNothingActionHyperlink = new JXHyperlink(doNothingAction);
         box.add(doNothingActionHyperlink);
         
-        AbstractHyperlinkAction doNothingAction2 = createEmptyLinkAction("have do nothing action - overrule");
+        AbstractHyperlinkAction<?> doNothingAction2 = createEmptyLinkAction("have do nothing action - overrule");
         JXHyperlink overruleActionHyperlink = new JXHyperlink(doNothingAction2);
         overruleActionHyperlink.setOverrulesActionOnClick(true);
         box.add(overruleActionHyperlink);
@@ -165,7 +165,7 @@ public class JXHyperlinkVisualCheck extends InteractiveTestCase {
         EditorPaneLinkVisitor visitor = new EditorPaneLinkVisitor();
         LinkModel link = new LinkModel("Click me!", null, JXEditorPaneTest.class.getResource("resources/test.html"));
 
-        LinkModelAction linkAction = new LinkModelAction<LinkModel>(link, visitor);
+        LinkModelAction<?> linkAction = new LinkModelAction<LinkModel>(link, visitor);
 //        linkAction.setVisitingDelegate(visitor);
         JXHyperlink hyperlink = new JXHyperlink(linkAction);
         JPanel panel = new JPanel(new BorderLayout());
@@ -179,7 +179,7 @@ public class JXHyperlinkVisualCheck extends InteractiveTestCase {
 
 //---------------------- interactive test: JXTree
     public void interactiveTreeLinkRendererSimpleText() {
-        AbstractHyperlinkAction simpleAction = new AbstractHyperlinkAction<Object>(null) {
+        AbstractHyperlinkAction<Object> simpleAction = new AbstractHyperlinkAction<Object>(null) {
 
             public void actionPerformed(ActionEvent e) {
                 LOG.info("hit: " + getTarget());
@@ -208,7 +208,7 @@ public class JXHyperlinkVisualCheck extends InteractiveTestCase {
     public void interactiveTableHyperlinkNoTooltip() {
         JXTable table = new JXTable(createModelWithLinks());
         EditorPaneLinkVisitor visitor = new EditorPaneLinkVisitor();
-        LinkModelAction action = new LinkModelAction<LinkModel>(visitor) {
+        LinkModelAction<?> action = new LinkModelAction<LinkModel>(visitor) {
 
             @Override
             protected void updateFromTarget() {
@@ -232,7 +232,7 @@ public class JXHyperlinkVisualCheck extends InteractiveTestCase {
     public void interactiveTableHyperlinkSimpleText() {
         JXTable table = new JXTable(createModelWithLinks());
         EditorPaneLinkVisitor visitor = new EditorPaneLinkVisitor();
-        LinkModelAction action = new LinkModelAction<LinkModel>(visitor);
+        LinkModelAction<?> action = new LinkModelAction<LinkModel>(visitor);
         // set the default renderer for LinkModel - which is basically
         // a bean wrapped around an URL
         table.setDefaultRenderer(LinkModel.class, new DefaultTableRenderer
@@ -245,7 +245,7 @@ public class JXHyperlinkVisualCheck extends InteractiveTestCase {
         // table.setDefaultEditor(LinkModel.class, new LinkRenderer(action2, LinkModel.class));
 
         // simple activatable action on the target in the first column
-        AbstractHyperlinkAction simpleAction = new AbstractHyperlinkAction<Object>(null) {
+        AbstractHyperlinkAction<Object> simpleAction = new AbstractHyperlinkAction<Object>(null) {
             
             public void actionPerformed(ActionEvent e) {
                 LOG.info("hit: " + getTarget());
@@ -274,7 +274,7 @@ public class JXHyperlinkVisualCheck extends InteractiveTestCase {
     public void interactiveTableHyperlinkLFStripingHighlighter() {
         EditorPaneLinkVisitor visitor = new EditorPaneLinkVisitor();
         final JXTable table = new JXTable(createModelWithLinks());
-        LinkModelAction action = new LinkModelAction(visitor);
+        LinkModelAction<?> action = new LinkModelAction<LinkModel>(visitor);
         table.setDefaultRenderer(LinkModel.class, new DefaultTableRenderer
                 (new HyperlinkProvider(action, LinkModel.class)));
         table.setHighlighters(HighlighterFactory.createSimpleStriping());
@@ -351,7 +351,7 @@ public class JXHyperlinkVisualCheck extends InteractiveTestCase {
      *
      */
     public void interactiveListHyperlinkSimpleText() {
-        AbstractHyperlinkAction linkAction = new AbstractHyperlinkAction<Object>(null) {
+        AbstractHyperlinkAction<Object> linkAction = new AbstractHyperlinkAction<Object>(null) {
 
             public void actionPerformed(ActionEvent e) {
                 LOG.info("hit: " + getTarget());
@@ -375,7 +375,7 @@ public class JXHyperlinkVisualCheck extends InteractiveTestCase {
         EditorPaneLinkVisitor visitor = new EditorPaneLinkVisitor();
         JXList list = new JXList(createListModelWithLinks(20));
         list.setRolloverEnabled(true);
-        LinkModelAction action = new LinkModelAction(visitor);
+        LinkModelAction<?> action = new LinkModelAction<LinkModel>(visitor);
         list.setCellRenderer(new DefaultListRenderer(
                 new HyperlinkProvider(action, LinkModel.class)));
         JFrame frame = wrapWithScrollingInFrame(list, visitor.getOutputComponent(), "show link renderer in list");
@@ -390,7 +390,7 @@ public class JXHyperlinkVisualCheck extends InteractiveTestCase {
     public void interactiveListHyperlinkLFStripingHighlighter() {
         EditorPaneLinkVisitor visitor = new EditorPaneLinkVisitor();
         JXList list = new JXList(createListModelWithLinks(20));
-        LinkModelAction action = new LinkModelAction<LinkModel>(visitor);
+        LinkModelAction<?> action = new LinkModelAction<LinkModel>(visitor);
         list.setCellRenderer(new DefaultListRenderer(
                 new HyperlinkProvider(action, LinkModel.class)));
         list.setRolloverEnabled(true);
@@ -475,8 +475,8 @@ public class JXHyperlinkVisualCheck extends InteractiveTestCase {
         return linkAction;
     }
 
-    protected AbstractHyperlinkAction createEmptyLinkAction(String name) {
-        AbstractHyperlinkAction linkAction = createEmptyLinkAction();
+    protected AbstractHyperlinkAction<?> createEmptyLinkAction(String name) {
+        AbstractHyperlinkAction<?> linkAction = createEmptyLinkAction();
         linkAction.setName(name);
         return linkAction;
     }

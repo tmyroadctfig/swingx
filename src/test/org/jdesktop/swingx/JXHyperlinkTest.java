@@ -94,7 +94,7 @@ public class JXHyperlinkTest extends TestCase {
        assertFalse(emptyAction.isVisited());
        assertFalse("hyperlink does nothing if has action", hyperlink2.isClicked());
        
-       AbstractHyperlinkAction emptyAction3 = createEmptyLinkAction();
+       AbstractHyperlinkAction<?> emptyAction3 = createEmptyLinkAction();
        JXHyperlink hyperlink3 = new JXHyperlink(emptyAction3);
        hyperlink3.setOverrulesActionOnClick(true);
        hyperlink3.doClick();
@@ -178,7 +178,7 @@ public class JXHyperlinkTest extends TestCase {
      */
     @Test
     public void testSetNullAction() {
-        AbstractHyperlinkAction action = createEmptyLinkAction();
+        AbstractHyperlinkAction<?> action = createEmptyLinkAction();
         JXHyperlink hyperlink = new JXHyperlink(action);
         assertEquals("hyperlink action must be equal to linkAction", action, hyperlink.getAction());
         hyperlink.setAction(null);
@@ -193,7 +193,7 @@ public class JXHyperlinkTest extends TestCase {
     @Test
     public void testSetAction() {
         JXHyperlink hyperlink = new JXHyperlink();
-        AbstractHyperlinkAction action = createEmptyLinkAction();
+        AbstractHyperlinkAction<?> action = createEmptyLinkAction();
         hyperlink.setAction(action);
         assertEquals("hyperlink action must be equal to linkAction", 
                 action, hyperlink.getAction());
@@ -259,8 +259,8 @@ public class JXHyperlinkTest extends TestCase {
         return linkAction;
     }
 
-    protected AbstractHyperlinkAction createEmptyLinkAction(String name) {
-        AbstractHyperlinkAction linkAction = createEmptyLinkAction();
+    protected AbstractHyperlinkAction<?> createEmptyLinkAction(String name) {
+        AbstractHyperlinkAction<?> linkAction = createEmptyLinkAction();
         linkAction.setName(name);
         return linkAction;
     }

@@ -20,22 +20,25 @@
  */
 package org.jdesktop.swingx.painter;
 
-import org.jdesktop.swingx.JXHeader;
-import org.jdesktop.swingx.JXFrame;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
-import org.junit.Test;
-
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionListener;
+import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.lang.reflect.InvocationTargetException;
 
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
+
 import junit.framework.TestCase;
+
+import org.jdesktop.swingx.JXFrame;
+import org.jdesktop.swingx.JXHeader;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
 /**
  * @author rbair

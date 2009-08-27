@@ -1,6 +1,6 @@
 package org.jdesktop.swingx.plaf.basic;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
 
 import java.applet.Applet;
 import java.awt.GraphicsEnvironment;

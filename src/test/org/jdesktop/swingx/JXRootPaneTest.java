@@ -22,9 +22,9 @@ import javax.swing.table.DefaultTableModel;
 import org.jdesktop.swingx.JXRootPane.XRootLayout;
 import org.jdesktop.test.AncientSwingTeam;
 import org.jdesktop.test.PropertyChangeReport;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.junit.Test;
 
 
     

@@ -36,11 +36,9 @@ import org.jdesktop.swingx.JXDatePicker;
 import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.SwingXUtilities;
 import org.jdesktop.swingx.plaf.basic.BasicDatePickerUI;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.junit.Test;
-import org.junit.Before;
-import org.junit.After;
 
 
 /**

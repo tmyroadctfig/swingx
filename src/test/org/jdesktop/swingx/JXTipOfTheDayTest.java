@@ -29,9 +29,9 @@ import org.jdesktop.swingx.tips.DefaultTipOfTheDayModel;
 import org.jdesktop.swingx.tips.TipLoader;
 import org.jdesktop.swingx.tips.TipOfTheDayModel;
 import org.jdesktop.test.PropertyChangeReport;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.junit.Test;
 
 
 @RunWith(JUnit4.class)

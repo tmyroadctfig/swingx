@@ -38,9 +38,9 @@ import javax.swing.plaf.IconUIResource;
 import junit.framework.TestCase;
 
 import org.jdesktop.swingx.test.XTestUtils;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.junit.Test;
 
 
 /**

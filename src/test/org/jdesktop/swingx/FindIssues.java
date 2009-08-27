@@ -6,8 +6,6 @@
  */
 package org.jdesktop.swingx;
 
-import java.util.TreeMap;
-
 import javax.swing.AbstractListModel;
 
 import org.jdesktop.swingx.search.FindTest;
@@ -42,7 +40,6 @@ public class FindIssues extends FindTest {
      * showing. Hack around ...
      */
     public void testFindBarNPEComponents() {
-        TreeMap map;
         Searchable searchable = new JXTable().getSearchable();
         JXFindBar findBar = new JXFindBar();
         // old hack

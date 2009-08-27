@@ -137,7 +137,7 @@ public class PainterVisualCheck extends InteractiveTestCase {
         TableModel model = new AncientSwingTeam();
         JXTable table = new JXTable(model);
         MattePainter matte = new MattePainter(getTransparentColor(Color.RED, 80));
-        RelativePainter painter = new RelativePainter<Object>(matte);
+        RelativePainter<?> painter = new RelativePainter<Object>(matte);
         painter.setYFactor(0.2);
         painter.setVerticalAlignment(VerticalAlignment.BOTTOM);
         Highlighter hl = new PainterHighlighter(HighlightPredicate.ROLLOVER_ROW, painter);
@@ -174,7 +174,7 @@ public class PainterVisualCheck extends InteractiveTestCase {
         TableModel model = new AncientSwingTeam();
         JXTable table = new JXTable(model);
         MattePainter p =  new MattePainter(getTransparentColor(Color.BLUE, 125));
-        RelativePainter relativePainter = new RelativePainter<Object>(p);
+        RelativePainter<?> relativePainter = new RelativePainter<Object>(p);
         relativePainter.setXFactor(.5);
         Highlighter hl = new PainterHighlighter(createComponentTextBasedPredicate("y"), 
                 relativePainter);
@@ -198,7 +198,7 @@ public class PainterVisualCheck extends InteractiveTestCase {
         JXList list = new JXList();
         Highlighter highlighter = HighlighterFactory.createSimpleStriping(HighlighterFactory.LINE_PRINTER);
         table.addHighlighter(highlighter);
-        Painter gradient = createGradientPainter(Color.YELLOW, .7f, true);
+        Painter<?> gradient = createGradientPainter(Color.YELLOW, .7f, true);
         list.setHighlighters(highlighter, new PainterHighlighter(gradient));
         // quick-fill and hook to table columns' visibility state
         configureList(list, table, false);
@@ -241,7 +241,7 @@ public class PainterVisualCheck extends InteractiveTestCase {
      * @param transparent
      * @return
      */
-    protected Painter createGradientPainter(Color startColor, float end,
+    protected Painter<?> createGradientPainter(Color startColor, float end,
             boolean transparent) {
         startColor = getTransparentColor(startColor, transparent ? 125 : 254);
         Color endColor = getTransparentColor(Color.WHITE, 0);
@@ -255,7 +255,7 @@ public class PainterVisualCheck extends InteractiveTestCase {
         painter.setPaintStretched(true);
         // not entirely successful - the relative stretching is on
         // top of a .5 stretched gradient in matte
-        RelativePainter wrapper = new RelativePainter<Object>(painter);
+        RelativePainter<?> wrapper = new RelativePainter<Object>(painter);
         wrapper.setXFactor(end);
         return wrapper;
     }
@@ -327,7 +327,7 @@ public class PainterVisualCheck extends InteractiveTestCase {
         JXTable table = new JXTable(model);
         ImagePainter imagePainter = new ImagePainter(XTestUtils.loadDefaultImage("green-orb.png"));
         imagePainter.setHorizontalAlignment(HorizontalAlignment.RIGHT);
-        final RelativePainter painter = new RelativePainter<Component>(imagePainter);
+        final RelativePainter<?> painter = new RelativePainter<Component>(imagePainter);
         PainterHighlighter iconHighlighter = new PainterHighlighter();
         iconHighlighter.setHighlightPredicate(HighlightPredicate.ROLLOVER_ROW);
         iconHighlighter.setPainter(painter);
@@ -401,7 +401,7 @@ public class PainterVisualCheck extends InteractiveTestCase {
         tree.setCellRenderer(new DefaultTreeRenderer(StringValues.FILE_NAME));
         ImagePainter imagePainter = new ImagePainter(XTestUtils.loadDefaultImage("green-orb.png"));
         imagePainter.setHorizontalAlignment(HorizontalAlignment.RIGHT);
-        final RelativePainter painter = new RelativePainter<Component>(imagePainter);
+        final RelativePainter<?> painter = new RelativePainter<Component>(imagePainter);
         PainterHighlighter iconHighlighter = new PainterHighlighter();
         iconHighlighter.setHighlightPredicate(HighlightPredicate.ROLLOVER_ROW);
         iconHighlighter.setPainter(painter);
@@ -495,7 +495,7 @@ public class PainterVisualCheck extends InteractiveTestCase {
     /**
      * Simple Painter for subimage.
      */
-    public static class SubImagePainter extends AbstractPainter {
+    public static class SubImagePainter extends AbstractPainter<Object> {
         BufferedImage image;
         Rectangle imageClip;
 

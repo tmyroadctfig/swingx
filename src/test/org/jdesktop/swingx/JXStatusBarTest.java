@@ -13,9 +13,9 @@ import javax.swing.JLabel;
 import javax.swing.LookAndFeel;
 import javax.swing.UIManager;
 
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.junit.Test;
 
 
 /**

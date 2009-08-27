@@ -28,7 +28,6 @@ import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.JComponent;
 
-import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.painter.AlphaPainter;
 import org.jdesktop.swingx.painter.CompoundPainter;
@@ -42,6 +41,16 @@ import org.jdesktop.swingx.painter.ShapePainter;
 public class JXLabelVisualCheck extends InteractiveTestCase {
     
     static Logger log = Logger.getAnonymousLogger();
+    
+    public static void main(String[] args) {
+        JXLabelVisualCheck test = new JXLabelVisualCheck();
+        try {
+            test.runInteractiveTests();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
 
     /**
      * Issue #??-swingx: default foreground painter not guaranteed after change.
@@ -57,10 +66,10 @@ public class JXLabelVisualCheck extends InteractiveTestCase {
         final JXLabel foreground = new JXLabel(
                 "setup: compound - default and overlay ");
         ShapePainter shapePainter = new ShapePainter();
-        final AlphaPainter alpha = new AlphaPainter();
+        final AlphaPainter<?> alpha = new AlphaPainter<Object>();
         alpha.setAlpha(0.2f);
         alpha.setPainters(shapePainter);
-        CompoundPainter compound = new CompoundPainter(foreground
+        CompoundPainter<?> compound = new CompoundPainter<Object>(foreground
                 .getForegroundPainter(), alpha);
         foreground.setForegroundPainter(compound);
         box.add(foreground);
@@ -68,7 +77,7 @@ public class JXLabelVisualCheck extends InteractiveTestCase {
             boolean reset;
             public void actionPerformed(ActionEvent e) {
                 if (reset) {
-                    CompoundPainter painter = new CompoundPainter(alpha, foreground.getForegroundPainter());
+                    CompoundPainter<?> painter = new CompoundPainter<Object>(alpha, foreground.getForegroundPainter());
                     foreground.setForegroundPainter(painter);
                 } else {
                   // try to reset to default

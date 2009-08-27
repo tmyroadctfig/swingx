@@ -13,7 +13,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import javax.swing.event.TreeExpansionEvent;
-import javax.swing.event.TreeExpansionListener;
 import javax.swing.event.TreeWillExpandListener;
 import javax.swing.tree.ExpandVetoException;
 

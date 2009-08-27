@@ -20,9 +20,9 @@
  */
 package org.jdesktop.swingx.painter;
 
-import org.jdesktop.swingx.image.AbstractFilter;
-
 import java.awt.image.BufferedImage;
+
+import org.jdesktop.swingx.image.AbstractFilter;
 
 /**
  * A useful Filter implementation for testing Painters

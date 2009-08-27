@@ -28,11 +28,11 @@ import org.jdesktop.swingx.decorator.HighlightPredicate.OrHighlightPredicate;
 import org.jdesktop.swingx.decorator.HighlightPredicate.RowGroupHighlightPredicate;
 import org.jdesktop.swingx.decorator.HighlightPredicate.TypeHighlightPredicate;
 import org.jdesktop.swingx.rollover.RolloverProducer;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.junit.Test;
-import org.junit.Before;
-import org.junit.After;
 
 
 /**

@@ -25,15 +25,6 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
-import java.io.File;
-import java.io.IOException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.StringTokenizer;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
 import java.util.logging.Logger;
 
 import javax.swing.Action;
@@ -44,12 +35,10 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.border.Border;
 
-import org.jdesktop.beans.AbstractBean;
 import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXLabel;
 import org.jdesktop.swingx.action.AbstractActionExt;
-import org.jdesktop.test.TestUtils;
 
 /**
  * Test to exposed known issues of <code>Painter</code>s.
@@ -90,10 +79,10 @@ public class PainterIssues extends InteractiveTestCase {
         final JXLabel foreground = new JXLabel(
                 "setup: compound - default and overlay ");
         ShapePainter shapePainter = new ShapePainter();
-        AlphaPainter alpha = new AlphaPainter();
+        AlphaPainter<?> alpha = new AlphaPainter<Object>();
         alpha.setAlpha(0.2f);
         alpha.setPainters(shapePainter);
-        CompoundPainter compound = new CompoundPainter(alpha, foreground
+        CompoundPainter<?> compound = new CompoundPainter<Object>(alpha, foreground
                 .getForegroundPainter());
         foreground.setForegroundPainter(compound);
         box.add(foreground);
@@ -134,7 +123,7 @@ public class PainterIssues extends InteractiveTestCase {
         JXXButton label = new JXXButton();
         label.setText("Painter in textfield: source for shared painter");
         ShapePainter shapePainter = new ShapePainter();
-        AlphaPainter alpha = new AlphaPainter();
+        AlphaPainter<?> alpha = new AlphaPainter<Object>();
         alpha.setAlpha(0.2f);
         alpha.setPainters(shapePainter);
         painter.setPainters(label.getPainter(), alpha);

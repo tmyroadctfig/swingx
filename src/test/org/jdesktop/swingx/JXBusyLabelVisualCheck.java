@@ -32,9 +32,6 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-
-import org.jdesktop.swingx.JXHeader;
-
 /**
  * Visual tests of JXBusyLabel issues.
  * @author had

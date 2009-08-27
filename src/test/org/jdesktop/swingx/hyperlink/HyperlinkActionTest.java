@@ -10,13 +10,12 @@ import javax.swing.Action;
 
 import junit.framework.TestCase;
 
-import org.jdesktop.swingx.hyperlink.AbstractHyperlinkAction;
 import org.jdesktop.test.PropertyChangeReport;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.junit.Test;
-import org.junit.Before;
-import org.junit.After;
 
 
 /**
@@ -48,7 +47,7 @@ public class HyperlinkActionTest extends TestCase {
     public void testConstructorsAndCustomTargetInstall() {
         Object target = new Object();
         final boolean visitedIsTrue = true;
-        AbstractHyperlinkAction linkAction = new AbstractHyperlinkAction<Object>(target) {
+        AbstractHyperlinkAction<Object> linkAction = new AbstractHyperlinkAction<Object>(target) {
 
             public void actionPerformed(ActionEvent e) {
                 // TODO Auto-generated method stub

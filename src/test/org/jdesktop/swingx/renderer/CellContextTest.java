@@ -23,7 +23,6 @@ package org.jdesktop.swingx.renderer;
 
 import javax.swing.LookAndFeel;
 import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
 
 import org.jdesktop.swingx.InteractiveTestCase;
 import org.junit.Test;

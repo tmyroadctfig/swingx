@@ -745,7 +745,6 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
         JComboBox box = new JComboBox(new Object[] {"one", "two", "three"});
         box.setEditable(true);
         JComboBox nonEditableBox = new JComboBox(new Object[] {"one", "two", "three"});
-        JSpinner spinner = new JSpinner();
         final Action l = new AbstractActionExt("recived") {
 
             public void actionPerformed(ActionEvent e) {

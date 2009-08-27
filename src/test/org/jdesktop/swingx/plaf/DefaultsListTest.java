@@ -20,14 +20,11 @@
  */
 package org.jdesktop.swingx.plaf;
 
+import junit.framework.TestCase;
+
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.junit.Test;
-import org.junit.Before;
-import org.junit.After;
-
-
-import junit.framework.TestCase;
 
 /**
  * This test ensures that all values that should be {@code UIResouce}s are.

@@ -28,8 +28,6 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.ListModel;
 import javax.swing.SortOrder;
 import javax.swing.RowSorter.SortKey;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableModel;
 
 import org.jdesktop.swingx.InteractiveTestCase;
 import org.junit.Test;

@@ -15,14 +15,13 @@ import java.util.Iterator;
 import javax.swing.Action;
 import javax.swing.JButton;
 
+import junit.framework.TestCase;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.junit.Test;
-import org.junit.Before;
-import org.junit.After;
-
-
-import junit.framework.TestCase;
 
 /**
  * Unit test driver for the ActionManager
@@ -45,6 +44,7 @@ public class ActionManagerTest extends TestCase {
     }
     
     // TODO: Add more attributes which represent actions and types.
+    @Override
     protected void setUp() {
         // JW: changed on reorg to remove reference to Application 
         //        manager = Application.getInstance().getActionManager();
@@ -148,7 +148,7 @@ public class ActionManagerTest extends TestCase {
         Controller controller = new Controller();
 
         // Register the action on the controller.
-        Iterator iter = manager.getActionIDs().iterator();
+        Iterator<?> iter = manager.getActionIDs().iterator();
         while (iter.hasNext()) {
             manager.registerCallback(iter.next(), controller, "action");
         }
@@ -239,7 +239,7 @@ public class ActionManagerTest extends TestCase {
     public void testEnabled() {
         boolean[] values = new boolean[] { true, false, true, true, false, false };
 
-        Iterator iter;
+        Iterator<?> iter;
         for (int i = 0; i < values.length; i++) {
 
             // Test for actions enabled by disabling actions.
@@ -260,7 +260,7 @@ public class ActionManagerTest extends TestCase {
     public void testSelected() {
         boolean[] values = new boolean[] { true, false, true, true, false, false };
 
-        Iterator iter;
+        Iterator<?> iter;
         for (int i = 0; i < values.length; i++) {
 
             // Test for actions enabled by disabling actions.

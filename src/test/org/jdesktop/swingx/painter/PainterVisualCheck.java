@@ -50,7 +50,7 @@ public class PainterVisualCheck extends RichInteractiveTestCase {
         //the painter will be invalid (cache cleared), and updated on the
         //next paint.
         final JXButton button = new JXButton();
-        AbstractPainter p = (AbstractPainter)button.getForegroundPainter();
+        AbstractPainter<?> p = (AbstractPainter<?>)button.getForegroundPainter();
         p.setFilters(new FastBlurFilter());
         button.addActionListener(new ActionListener(){
             private String[] values = new String[] {"Hello", "Goodbye", "SwingLabs", "Turkey Bowl"};
@@ -90,8 +90,8 @@ public class PainterVisualCheck extends RichInteractiveTestCase {
         };
         final TextPainter text = new TextPainter();
         text.setText(messages[0]);
-        CompoundPainter cp = new CompoundPainter(
-                new RectanglePainter(),
+        CompoundPainter<?> cp = new CompoundPainter<Object>(
+                new RectanglePainter<Object>(),
                 text
         );
         cp.setFilters(new FastBlurFilter());
@@ -158,12 +158,14 @@ public class PainterVisualCheck extends RichInteractiveTestCase {
         }
     }
 
-    private static final class SlowPainter extends AbstractPainter {
+    private static final class SlowPainter extends AbstractPainter<Object> {
+        @Override
         protected void doPaint(Graphics2D g, Object component, int width, int height) {
             try {
                 Thread.sleep(1000);
             } catch (Exception e) {}
         }
+        @Override
         protected boolean shouldUseCache() {
             return isCacheable();
         }
@@ -171,7 +173,7 @@ public class PainterVisualCheck extends RichInteractiveTestCase {
 
     private static final class SlowTestThread extends Thread {
         private Graphics2D g = new BufferedImage(10, 10, BufferedImage.TYPE_INT_ARGB).createGraphics();
-        private Painter p = null;
+        private Painter<?> p = null;
         private JLabel label = null;
         private String prefix = null;
 
@@ -181,6 +183,7 @@ public class PainterVisualCheck extends RichInteractiveTestCase {
             this.prefix = s;
         }
 
+        @Override
         public void run() {
             while(true) {
                 double start = System.currentTimeMillis();

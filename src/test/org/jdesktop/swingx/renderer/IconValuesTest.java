@@ -23,14 +23,11 @@ package org.jdesktop.swingx.renderer;
 
 import java.io.File;
 
+import junit.framework.TestCase;
+
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.junit.Test;
-import org.junit.Before;
-import org.junit.After;
-
-
-import junit.framework.TestCase;
 
 /**
  *

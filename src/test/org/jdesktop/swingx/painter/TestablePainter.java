@@ -20,7 +20,7 @@
  */
 package org.jdesktop.swingx.painter;
 
-import java.awt.*;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImageOp;
 
 /**

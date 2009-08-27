@@ -27,11 +27,9 @@ import java.beans.PropertyChangeListener;
 import org.jdesktop.swingx.table.TableColumnExt;
 import org.jdesktop.test.PropertyChangeReport;
 import org.jdesktop.test.TestUtils;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.junit.Test;
-import org.junit.Before;
-import org.junit.After;
 
 
 /**

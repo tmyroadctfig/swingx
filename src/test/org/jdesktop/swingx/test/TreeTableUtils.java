@@ -30,6 +30,7 @@ public class TreeTableUtils {
         return ttModel;
     }
     
+    @SuppressWarnings("unchecked")
     private static DefaultMutableTreeTableNode convertDefaultMutableTreeNode(DefaultMutableTreeNode node) {
         DefaultMutableTreeTableNode ttNode = new DefaultMutableTreeTableNode(node.getUserObject());
         
