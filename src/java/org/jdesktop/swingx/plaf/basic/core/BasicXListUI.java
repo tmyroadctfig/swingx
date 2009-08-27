@@ -357,6 +357,8 @@ public class BasicXListUI  extends BasicListUI
         if (sortUI == null)
             return false;
         sortUI.modelChanged(e);
+        updateLayoutStateNeeded = modelChanged;
+        redrawList();
         return true;
     }
     

@@ -14,6 +14,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
+import javax.swing.JTable;
 import javax.swing.ListModel;
 import javax.swing.RowFilter;
 import javax.swing.table.DefaultTableModel;
@@ -38,7 +39,7 @@ import org.junit.runners.JUnit4;
 public class JXListSortRevamp extends InteractiveTestCase {
 
     protected ListModel listModel;
-    protected DefaultListModel ascendingListModel;
+    protected DefaultListModelF ascendingListModel;
     private ListSortController<ListModel> controller;
     private JXList list;
 
@@ -58,7 +59,7 @@ public class JXListSortRevamp extends InteractiveTestCase {
     public void interactiveRowSorter() {
         final JXList list = new JXList(ascendingListModel);
         final DefaultTableModel tableModel = new DefaultTableModel(list.getElementCount(), 1) {
-
+            
             @Override
             public Class<?> getColumnClass(int columnIndex) {
                 return Integer.class;
@@ -76,7 +77,8 @@ public class JXListSortRevamp extends InteractiveTestCase {
             
             @Override
             public void actionPerformed(ActionEvent e) {
-                controller.toggleSortOrder(0);
+                list.toggleSortOrder();
+                table.toggleSortOrder(0);
                 
             }
         };
@@ -85,6 +87,7 @@ public class JXListSortRevamp extends InteractiveTestCase {
             @Override
             public void actionPerformed(ActionEvent e) {
                 controller.resetSortOrders();
+                table.resetSortOrder();
                 
             }
         };
@@ -93,7 +96,7 @@ public class JXListSortRevamp extends InteractiveTestCase {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (hasFilter) {
-                RowFilter<Object, Integer> filter = RowFilters.regexFilter("0", 0);
+                    RowFilter<Object, Integer> filter = RowFilters.regexFilter("0", 0);
                     list.setRowFilter(filter);
                     table.setRowFilter(filter);
                 } else {
@@ -112,15 +115,63 @@ public class JXListSortRevamp extends InteractiveTestCase {
                 
             }
         };
+        Action addFirst = new AbstractAction("add firstM") {
+            int counter;
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                ascendingListModel.add(0, 10 * ++counter);
+                tableModel.insertRow(0, new Object[] {ascendingListModel.getElementAt(0)});
+                
+            }
+        };
+        Action fireAllChanged = new AbstractAction("fireDataChanged") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                ascendingListModel.fireContentsChanged();
+                tableModel.fireTableDataChanged();
+            }
+            
+        };
         JXFrame frame = showWithScrollingInFrame(list, table, "sort in rowSorter");
         addAction(frame, sort);
         addAction(frame, reset);
         addAction(frame, toggleFilter);
         addAction(frame, removeFirst);
+        addAction(frame, addFirst);
+        addAction(frame, fireAllChanged);
+        show(frame);
+    }
+    
+    public void interactiveRowCoreSorterCore() {
+        final DefaultTableModel tableModel = new DefaultTableModel(list.getElementCount(), 1) {
+
+            @Override
+            public Class<?> getColumnClass(int columnIndex) {
+                return Integer.class;
+            }
+            
+        };
+        for (int i = 0; i < tableModel.getRowCount(); i++) {
+            tableModel.setValueAt(i, i, 0);
+        }
+        final JXTable table = new JXTable(tableModel);
+        final JTable core = new JTable(table.getModel());
+        core.setAutoCreateRowSorter(true);
+        Action fireAllChanged = new AbstractAction("fireDataChanged") {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                tableModel.fireTableDataChanged();
+            }
+            
+        };
+        JXFrame frame = showWithScrollingInFrame(table, core, "dataChanged");
+        addAction(frame, fireAllChanged);
         show(frame);
     }
 
- 
+    
     //----------------- re-enabled functionality
 //--------------------- interactive
     
@@ -229,8 +280,16 @@ public class JXListSortRevamp extends InteractiveTestCase {
         return new DefaultComboBoxModel(list.getActionMap().allKeys());
     }
 
-    protected DefaultListModel createAscendingListModel(int startRow, int count) {
-        DefaultListModel l = new DefaultListModel();
+    public static class DefaultListModelF extends DefaultListModel {
+        /**
+         * Fires a contentsChanged with -1, -1. 
+         */
+        public void fireContentsChanged() {
+            fireContentsChanged(this, -1, -1);
+        }
+    };
+    protected DefaultListModelF createAscendingListModel(int startRow, int count) {
+        DefaultListModelF l = new DefaultListModelF();
         for (int row = startRow; row < startRow  + count; row++) {
             l.addElement(new Integer(row));
         }
