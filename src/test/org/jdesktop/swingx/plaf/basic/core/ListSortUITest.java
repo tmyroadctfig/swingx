@@ -37,6 +37,7 @@ import javax.swing.event.ListSelectionListener;
 import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXEditorPaneTest;
 import org.jdesktop.swingx.JXList;
+import org.jdesktop.swingx.JXListSortRevamp.DefaultListModelF;
 import org.jdesktop.swingx.hyperlink.LinkModel;
 import org.jdesktop.swingx.plaf.basic.core.ListSortUI.ModelChange;
 import org.jdesktop.swingx.sort.ListSortController;
@@ -60,7 +61,7 @@ public class ListSortUITest extends InteractiveTestCase {
     private static final Logger LOG = Logger.getLogger(ListSortUITest.class
             .getName());
     
-    protected DefaultListModel ascendingListModel;
+    protected DefaultListModelF ascendingListModel;
     private JXList list;
     private ListSortController<ListModel> controller;
 //    private ListSortUI sortUI;
@@ -181,19 +182,41 @@ public class ListSortUITest extends InteractiveTestCase {
      * 
      * Selection must be cleared after setModel. This is from
      * super's contract.
-     * 
-     * Not yet ready: must update ListSortUI after model update. 
      *
      */
     @Test
     public void testSetModelEmptySelection() {
-//        fail("list sorting/filtering not yet completely enabled");
         final JXList list = new JXList(new DefaultListModel(), true);
         int selection = 0;
         list.setSelectedIndex(selection);
         list.setModel(ascendingListModel);
         assertTrue("setting model must clear selectioon", list.isSelectionEmpty());
         assertEquals(ascendingListModel.getSize(), list.getElementCount());
+    }
+    /**
+     * Selection must be cleared after dataChanged. 
+     *
+     */
+    @Test
+    public void testDataChangedEmptySelection() {
+        final JXList list = new JXList(ascendingListModel, true);
+        int selection = 0;
+        list.setSelectedIndex(selection);
+        ascendingListModel.fireContentsChanged();
+        assertTrue("dataChanged must clear selection", list.isSelectionEmpty());
+    }
+    /**
+     * Selection must be cleared after dataChanged. 
+     *
+     */
+    @Test
+    public void testDataChangedSortedEmptySelection() {
+        final JXList list = new JXList(ascendingListModel, true);
+        int selection = 0;
+        list.setSelectedIndex(selection);
+        list.setSortOrder(SortOrder.DESCENDING);
+        ascendingListModel.fireContentsChanged();
+        assertTrue("dataChanged must clear selection", list.isSelectionEmpty());
     }
     
     /**
@@ -279,9 +302,9 @@ public class ListSortUITest extends InteractiveTestCase {
         ModelChange change = new ModelChange(e);
         assertEquals(ListDataEvent.CONTENTS_CHANGED, change.type);
         assertTrue(change.allRowsChanged);
-        assertEquals(last-first +1, change.length);
-        assertEquals(0, change.startModelIndex);
-        assertEquals(0, change.endModelIndex);
+        assertEquals(-1, change.startModelIndex);
+        assertEquals(-1, change.endModelIndex);
+        assertEquals(-1, change.length);
     }
     
   //-------------------- factory methods, setup    
@@ -290,8 +313,8 @@ public class ListSortUITest extends InteractiveTestCase {
         return new DefaultComboBoxModel(list.getActionMap().allKeys());
     }
 
-    protected DefaultListModel createAscendingListModel(int startRow, int count) {
-        DefaultListModel l = new DefaultListModel();
+    protected DefaultListModelF createAscendingListModel(int startRow, int count) {
+        DefaultListModelF l = new DefaultListModelF();
         for (int row = startRow; row < startRow  + count; row++) {
             l.addElement(new Integer(row));
         }

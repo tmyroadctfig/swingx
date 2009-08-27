@@ -39,18 +39,18 @@ import sun.swing.SwingUtilities2;
  * ListSortUI provides support for managing the synchronization between
  * RowSorter, SelectionModel and ListModel if a JXList is sortable.<p>
  * 
- * Note: this is here and public only until fully understood (it's an 
- * adapted version of JTable.SortManager). After that it should be moved
- * into/near the BasicXListUI to keep in the tradition of control of a 
- * ListUI (which takes all while a table does most itself).<p>
- * 
- * PENDING JW: remove exposure of listener implemenations - will happen 
- * automatically when moving over to ui-delegate. Plus don't listen directly, make
- * the ui manage the notification. The ui has to listen to model, selection anyway 
- * (because needs to do its stuff if no sortUI installed).  
+ * This implementation is an adaption of JTable.SortManager fit to the
+ * needs of a ListUI. In contrast to JTable tradition, the ui delegate has 
+ * full control about listening to model/selection changes and updating
+ * the list accordingly. So it's role is that of a helper to the ui-delgate
+ * (vs. as a helper of the JTable). It's still up to the ListUI itself to
+ * listen to model/selection and propagate the notification to this class, if
+ * a sorter is installed, but still do the usual updates (layout, repaint) itself.
+ * On the other hand, listening to the sorter and updating list state accordingly 
+ * is completely done by this.
  * 
  */
-public final class ListSortUI implements RowSorterListener{ //, ListSelectionListener { //, ListDataListener {
+public final class ListSortUI { 
     private RowSorter<? extends ListModel> sorter;
     private JXList list;
 
@@ -66,6 +66,7 @@ public final class ListSortUI implements RowSorterListener{ //, ListSelectionLis
     private int[] lastModelSelection;
     private boolean sorterChanged;
     private boolean ignoreSortChange;
+    private RowSorterListener sorterListener;
 
     /**
      * Intanstiates a SortUI on the list which has the given RowSorter.
@@ -81,9 +82,8 @@ public final class ListSortUI implements RowSorterListener{ //, ListSelectionLis
         this.list = Contract.asNotNull(list, "list must not be null");
         if (sorter != list.getRowSorter()) throw
             new IllegalStateException("sorter must be same as the one on list");
-        sorter.addRowSorterListener(this);
-//        list.getSelectionModel().addListSelectionListener(this);
-//        list.getModel().addListDataListener(this);
+        sorterListener = createRowSorterListener();
+        sorter.addRowSorterListener(sorterListener);
     }
 
     /**
@@ -92,30 +92,55 @@ public final class ListSortUI implements RowSorterListener{ //, ListSelectionLis
      */
     public void dispose() {
         if (sorter != null) {
-            sorter.removeRowSorterListener(this);
+            sorter.removeRowSorterListener(sorterListener);
         }
         sorter = null;
         list = null;
     }
 
+//----------------------methods called by listeners
+    
+    /**
+     * Called after notification from ListModel.
+     * @param e the change event from the listModel.
+     */
+    public void modelChanged(ListDataEvent e) {
+        ModelChange change = new ModelChange(e);
+        prepareForChange(change);
+        notifySorter(change);
+        if (change.type != ListDataEvent.CONTENTS_CHANGED) {
+            // If the Sorter is unsorted we will not have received
+            // notification, force treating insert/delete as a change.
+            sorterChanged = true;
+        }
+        processChange(change);
+    }
 
     /**
-     * @return
+     * Called after notification from selectionModel.
+     * 
+     * Invoked when the selection, on the view, has changed.
      */
-    private int getModelRowCount() {
-        return sorter.getModelRowCount();
+    public void viewSelectionChanged(ListSelectionEvent e) {
+        if (!syncingSelection && modelSelection != null) {
+            modelSelection = null;
+        }
     }
 
-    private ListSelectionModel getViewSelectionModel() {
-        return list.getSelectionModel();
-    }
     /**
-     * Invoked when the underlying model has completely changed.
+     * Called after notification from RowSorter.
+     * 
+     * @param e RowSorter event of type SORTED.
      */
-    public void allChanged() {
-        modelLeadIndex = -1;
-        modelSelection = null;
+    protected void sortedChanged(RowSorterEvent e) {
+        sorterChanged = true;
+        if (!ignoreSortChange) {
+            prepareForChange(e);
+            processChange(null);
+            list.repaint();
+        }
     }
+
 
 //--------------------- prepare change, that is cache selection if needed
     /**
@@ -132,7 +157,7 @@ public final class ListSortUI implements RowSorterListener{ //, ListSelectionLis
         // underlying model, this will allow us to correctly restore
         // the selection even if rows are filtered out.
         if (modelSelection == null &&
-                sorter.getViewRowCount() != getModelRowCount()) {
+                sorter.getViewRowCount() != sorter.getModelRowCount()) {
             modelSelection = new DefaultListSelectionModel();
             ListSelectionModel viewSelection = getViewSelectionModel();
             int min = viewSelection.getMinSelectionIndex();
@@ -207,7 +232,10 @@ public final class ListSortUI implements RowSorterListener{ //, ListSelectionLis
      * reapply the selection and variable row heights.
      */
     private void processChange(ModelChange change) {
-        if (sorterChanged) {
+        if (change != null && change.allRowsChanged) {
+            allChanged();
+            getViewSelectionModel().clearSelection();
+        } else if (sorterChanged) {
             restoreSelection(change);
         }
     }
@@ -317,7 +345,7 @@ public final class ListSortUI implements RowSorterListener{ //, ListSelectionLis
             }
             // else, updated
         }
-        if (modelIndex >= getModelRowCount()) {
+        if (modelIndex >= sorter.getModelRowCount()) {
             return -1;
         }
         return sorter.convertRowIndexToView(modelIndex);
@@ -386,77 +414,40 @@ public final class ListSortUI implements RowSorterListener{ //, ListSelectionLis
         }
     }
 
-//----------------------methods called by listeners
-    
-    /**
-     * Called after notification from ListModel.
-     * @param e the change event from the listModel.
-     */
-    public void modelChanged(ListDataEvent e) {
-        ModelChange change = new ModelChange(e);
-        prepareForChange(change);
-        notifySorter(change);
-        if (change.type != ListDataEvent.CONTENTS_CHANGED) {
-            sorterChanged = true;
-        }
-        processChange(change);
-    }
 
-    /**
-     * Called after notification from selectionModel.
-     * 
-     * Invoked when the selection, on the view, has changed.
-     */
-    public void viewSelectionChanged(ListSelectionEvent e) {
-        if (!syncingSelection && modelSelection != null) {
-            modelSelection = null;
-        }
+    private ListSelectionModel getViewSelectionModel() {
+        return list.getSelectionModel();
     }
-
     /**
-     * Called after notification from RowSorter.
-     * 
-     * @param e RowSorter event of type SORTED.
+     * Invoked when the underlying model has completely changed.
      */
-    private void sortedChanged(RowSorterEvent e) {
-        sorterChanged = true;
-        if (!ignoreSortChange) {
-            prepareForChange(e);
-            processChange(null);
-            list.repaint();
-        }
+    private void allChanged() {
+        modelLeadIndex = -1;
+        modelSelection = null;
     }
 
 //------------------- implementing listeners    
 
-    @Override
-    public void sorterChanged(RowSorterEvent e) {
-        if (e.getType() == RowSorterEvent.Type.SORTED) {
-            sortedChanged(e);
-        }
+    /**
+     * Creates and returns a RowSorterListener. This implementation
+     * calls sortedChanged if the event is of type SORTED.
+     * 
+     * @return rowSorterListener to install on sorter.
+     */
+    protected RowSorterListener createRowSorterListener() {
+        RowSorterListener l = new RowSorterListener() {
+
+            @Override
+            public void sorterChanged(RowSorterEvent e) {
+                if (e.getType() == RowSorterEvent.Type.SORTED) {
+                    sortedChanged(e);
+                }
+                
+            }
+            
+        };
+        return l;
     }
-
-//----------------- obsolete listener methods, will be removed after move to ui    
-//    @Override
-//    public void valueChanged(ListSelectionEvent e) {
-//        viewSelectionChanged(e);
-//    }
-
-//    @Override
-//    public void contentsChanged(ListDataEvent e) {
-//        modelChanged(e);
-//    }
-//
-//    @Override
-//    public void intervalAdded(ListDataEvent e) {
-//        modelChanged(e);
-//    }
-//
-//    @Override
-//    public void intervalRemoved(ListDataEvent e) {
-//        modelChanged(e);
-//    }
-
     /**
      * ModelChange is used when sorting to restore state, it corresponds
      * to data from a TableModelEvent.  The values are precalculated as
@@ -465,35 +456,34 @@ public final class ListSortUI implements RowSorterListener{ //, ListSelectionLis
      * PENDING JW: this is not yet fully adapted to ListDataEvent.
      */
      final static class ModelChange {
-        // Starting index of the change, in terms of the model
+         // JW: if we received a dataChanged, there _is no_ notion 
+         // of end/start/length of change 
+        // Starting index of the change, in terms of the model, -1 if dataChanged
         int startModelIndex;
 
-        // Ending index of the change, in terms of the model
+        // Ending index of the change, in terms of the model, -1 if dataChanged
         int endModelIndex;
 
+        // Length of the change (end - start + 1), - 1 if dataChanged
+        int length;
+        
         // Type of change
         int type;
 
         // Number of rows in the model
         int modelRowCount;
 
-        // Length of the change (end - start + 1)
-        int length;
 
         // True if the event indicates all the contents have changed
         boolean allRowsChanged;
 
         public ModelChange(ListDataEvent e) {
             type = e.getType();
+            modelRowCount = ((ListModel) e.getSource()).getSize();
             startModelIndex = e.getIndex0();
             endModelIndex = e.getIndex1();
             allRowsChanged = startModelIndex < 0;
-            modelRowCount = ((ListModel) e.getSource()).getSize();
-            if (allRowsChanged) {
-                startModelIndex = Math.max(0, startModelIndex);
-                endModelIndex = Math.max(0, modelRowCount - 1);
-            }
-            length = endModelIndex - startModelIndex + 1;
+            length = allRowsChanged ? -1 : endModelIndex - startModelIndex + 1;
         }
     }
      
