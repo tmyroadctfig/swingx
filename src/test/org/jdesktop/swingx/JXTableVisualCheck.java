@@ -124,7 +124,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
             
             @Override
             public void actionPerformed(ActionEvent e) {
-                table.getSortController().setSortOrderCycle(SortOrder.ASCENDING, SortOrder.DESCENDING, SortOrder.UNSORTED);
+                table.setSortOrderCycle(SortOrder.ASCENDING, SortOrder.DESCENDING, SortOrder.UNSORTED);
             }
         };
         addAction(frame, three);
@@ -132,7 +132,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
             
             @Override
             public void actionPerformed(ActionEvent e) {
-                table.getSortController().setSortOrderCycle(SortOrder.ASCENDING, SortOrder.DESCENDING);
+                table.setSortOrderCycle(SortOrder.ASCENDING, SortOrder.DESCENDING);
             }
         };
         addAction(frame, two);
@@ -140,7 +140,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
             
             @Override
             public void actionPerformed(ActionEvent e) {
-                table.getSortController().setSortOrderCycle(SortOrder.DESCENDING);
+                table.setSortOrderCycle(SortOrder.DESCENDING);
             }
         };
         addAction(frame, one);
@@ -148,7 +148,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
             
             @Override
             public void actionPerformed(ActionEvent e) {
-                table.getSortController().setSortOrderCycle();
+                table.setSortOrderCycle();
             }
         };
         addAction(frame, none);

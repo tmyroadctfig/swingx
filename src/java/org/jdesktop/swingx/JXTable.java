@@ -2038,7 +2038,7 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
      * @return the currently active <code>SortController</code> may be null
      */
     @SuppressWarnings("unchecked")
-    protected SortController<? extends TableModel> getSortController() {
+    private SortController<? extends TableModel> getSortController() {
         if (getRowSorter() instanceof SortController<?>) {
             // JW: the RowSorter is always of type <? extends ListModel>
             // so the unchecked cast is safe
