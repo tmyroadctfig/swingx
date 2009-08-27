@@ -22,15 +22,22 @@
 package org.jdesktop.swingx.painter;
 
 //import org.jdesktop.swingx.editors.PainterUtil;
-import org.jdesktop.swingx.painter.effects.AreaEffect;
-
-import javax.imageio.ImageIO;
-import java.awt.*;
+import java.awt.BasicStroke;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.Paint;
+import java.awt.Rectangle;
+import java.awt.Shape;
+import java.awt.TexturePaint;
 import java.awt.geom.Area;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
 import java.util.logging.Logger;
+
+import javax.imageio.ImageIO;
+
+import org.jdesktop.swingx.painter.effects.AreaEffect;
 
 /**
  * <p>A Painter instance that paints an image. Any Image is acceptable. This

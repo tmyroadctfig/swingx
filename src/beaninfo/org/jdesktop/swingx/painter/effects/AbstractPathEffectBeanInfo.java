@@ -11,7 +11,6 @@ package org.jdesktop.swingx.painter.effects;
 
 import org.jdesktop.swingx.BeanInfoSupport;
 import org.jdesktop.swingx.editors.Paint2PropertyEditor;
-import org.jdesktop.swingx.painter.effects.*;
 
 /**
  *

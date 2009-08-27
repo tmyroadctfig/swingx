@@ -21,8 +21,9 @@
 
 package org.jdesktop.swingx;
 
-import javax.swing.*;
 import java.beans.PropertyChangeListener;
+
+import javax.swing.Action;
 
 /**
  * UIAction is the basis of all of basic's action classes that are used in

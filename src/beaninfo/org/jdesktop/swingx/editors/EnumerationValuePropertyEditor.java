@@ -12,6 +12,7 @@ package org.jdesktop.swingx.editors;
 import java.beans.PropertyEditorSupport;
 import java.util.HashMap;
 import java.util.Map;
+
 import org.jdesktop.swingx.EnumerationValue;
 
 /**

@@ -213,7 +213,7 @@ public class JXSearchPanel extends AbstractPatternPanel {
     @Override
     protected void bind() {
         super.bind();
-        List matchRules = getPatternModel().getMatchRules();
+        List<?> matchRules = getPatternModel().getMatchRules();
         // PENDING: map rules to localized strings
         ComboBoxModel model = new DefaultComboBoxModel(matchRules.toArray());
         model.setSelectedItem(getPatternModel().getMatchRule());

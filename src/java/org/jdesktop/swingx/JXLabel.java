@@ -39,8 +39,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.Reader;
 import java.io.StringReader;
-//import java.util.logging.Level;
-//import java.util.logging.Logger;
 
 import javax.swing.Icon;
 import javax.swing.JLabel;
@@ -68,8 +66,8 @@ import javax.swing.text.StyledEditorKit;
 import javax.swing.text.View;
 import javax.swing.text.ViewFactory;
 import javax.swing.text.WrappedPlainView;
+
 import org.jdesktop.swingx.painter.AbstractPainter;
-import org.jdesktop.swingx.painter.MattePainter;
 import org.jdesktop.swingx.painter.Painter;
 
 /**

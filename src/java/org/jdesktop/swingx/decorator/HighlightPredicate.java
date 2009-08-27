@@ -625,7 +625,7 @@ public interface HighlightPredicate {
          * @param compareValue the fixed class to compare the 
          *   adapter value against.
          */
-        public TypeHighlightPredicate(Class compareValue) {
+        public TypeHighlightPredicate(Class<?> compareValue) {
             this.clazz = compareValue;
         }
         

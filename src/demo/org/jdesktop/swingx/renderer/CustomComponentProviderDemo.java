@@ -117,7 +117,7 @@ public class CustomComponentProviderDemo {
      * Note: this method is extracted for emphasis only :-)
      */
     private void configureRendering(JXTable table, JXTree tree) {
-        ComponentProvider provider = new MonthViewProvider();
+        ComponentProvider<?> provider = new MonthViewProvider();
         table.setDefaultRenderer(Date.class, new DefaultTableRenderer(provider));
         tree.setCellRenderer(new DefaultTreeRenderer(new WrappingProvider(provider)));
     }

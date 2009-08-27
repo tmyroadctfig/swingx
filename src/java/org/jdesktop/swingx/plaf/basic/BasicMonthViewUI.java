@@ -2312,7 +2312,7 @@ public class BasicMonthViewUI extends MonthViewUI {
      * @return
      */
     private CalendarHeaderHandler instantiateClass(Class<?> handlerClass) {
-        Constructor constructor = null; 
+        Constructor<?> constructor = null; 
         try {
             constructor = handlerClass.getConstructor();
         } catch (SecurityException e) {

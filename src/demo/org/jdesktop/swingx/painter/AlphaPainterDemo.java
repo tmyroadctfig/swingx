@@ -20,10 +20,12 @@
  */
 package org.jdesktop.swingx.painter;
 
-import org.jdesktop.swingx.JXPanel;
+import java.awt.Color;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
+
+import org.jdesktop.swingx.JXPanel;
 
 /**
  * Demo of the AlphaPainter.

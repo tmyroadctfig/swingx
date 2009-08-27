@@ -10,6 +10,7 @@
 package org.jdesktop.swingx.painter.demo;
 
 import java.io.File;
+
 import org.jdesktop.swingx.editors.PainterUtil;
 import org.jdesktop.swingx.painter.ImagePainter;
 

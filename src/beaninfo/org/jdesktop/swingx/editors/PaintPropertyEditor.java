@@ -17,8 +17,6 @@ import java.awt.Rectangle;
 import java.beans.PropertyEditorSupport;
 import java.util.HashMap;
 import java.util.Map;
-//import org.jdesktop.swingx.painter.gradient.BasicGradientPainter;
-//import org.jdesktop.swingx.painter.gradient.LinearGradientPainter;
 
 /**
  * Two parts to this property editor. The first part is a simple dropdown.

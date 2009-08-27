@@ -24,9 +24,11 @@ package org.jdesktop.swingx;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+
 import javax.swing.Icon;
-import org.jdesktop.swingx.plaf.HeaderUI;
+
 import org.jdesktop.swingx.plaf.HeaderAddon;
+import org.jdesktop.swingx.plaf.HeaderUI;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 
 /**

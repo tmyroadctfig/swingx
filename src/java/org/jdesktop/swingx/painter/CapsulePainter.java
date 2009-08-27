@@ -22,7 +22,8 @@
 
 package org.jdesktop.swingx.painter;
 
-import java.awt.*;
+import java.awt.Graphics2D;
+import java.awt.Shape;
 import java.awt.geom.RoundRectangle2D;
 
 /**

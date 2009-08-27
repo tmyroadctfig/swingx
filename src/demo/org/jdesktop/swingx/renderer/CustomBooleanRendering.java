@@ -115,8 +115,8 @@ public class CustomBooleanRendering {
         table.packColumn(2, -1);
     }
 
-    private Painter getPainter(String resource) {
-        Painter yesPainter = null;
+    private Painter<?> getPainter(String resource) {
+        Painter<?> yesPainter = null;
         try {
             yesPainter = new ImagePainter(ImageIO
                     .read(CustomBooleanRendering.class
@@ -137,7 +137,7 @@ public class CustomBooleanRendering {
      * Adhoc model.
      */
     public static class DemoTableModel extends AbstractTableModel {
-        Class[] columnClasses = { String.class, String.class, String.class,
+        Class<?>[] columnClasses = { String.class, String.class, String.class,
                 Integer.class, Boolean.class
         };
         

@@ -20,17 +20,30 @@
  */
 package org.jdesktop.swingx.color;
 
-import org.jdesktop.swingx.JXColorSelectionButton;
-
-import javax.swing.*;
-import javax.swing.colorchooser.AbstractColorChooserPanel;
-import javax.swing.event.MouseInputAdapter;
-import java.awt.*;
+import java.awt.AWTException;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.Robot;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JColorChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
+import javax.swing.colorchooser.AbstractColorChooserPanel;
+import javax.swing.event.MouseInputAdapter;
+
+import org.jdesktop.swingx.JXColorSelectionButton;
 
 /**
  * <p>EyeDropperColorChooserPanel is a pluggable panel for the 

@@ -21,9 +21,12 @@
 
 package org.jdesktop.swingx.painter;
 
-import org.jdesktop.swingx.painter.effects.AreaEffect;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Paint;
+import java.awt.Shape;
 
-import java.awt.*;
+import org.jdesktop.swingx.painter.effects.AreaEffect;
 import org.jdesktop.swingx.util.PaintUtils;
 
 

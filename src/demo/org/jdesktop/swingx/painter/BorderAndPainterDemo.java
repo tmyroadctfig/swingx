@@ -16,9 +16,8 @@ import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
-import java.awt.Shape;
-import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
+
 import javax.imageio.ImageIO;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -26,6 +25,7 @@ import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
+
 import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXPanel;
 import org.jdesktop.swingx.util.PaintUtils;
@@ -44,7 +44,7 @@ public class BorderAndPainterDemo {
         l.setHorizontalAlignment(SwingConstants.CENTER);
         p.add(l);
         
-        RectanglePainter bkg = new RectanglePainter();
+        RectanglePainter<JComponent> bkg = new RectanglePainter<JComponent>();
         bkg.setRounded(true);
         bkg.setFillPaint(PaintUtils.BLUE_EXPERIENCE);
         bkg.setStyle(RectanglePainter.Style.FILLED);
@@ -65,13 +65,14 @@ public class BorderAndPainterDemo {
     
     private static final class ComponentPainterAdapter extends AbstractPainter<JComponent>{
         private static final Insets INSETS = new Insets(0, 0, 0, 0);
-        private Painter p;
+        private Painter<JComponent> p;
         private Insets insets = null;
-        public ComponentPainterAdapter(Painter p, Insets i) {
+        public ComponentPainterAdapter(Painter<JComponent> p, Insets i) {
             this.p = p;
             this.insets = i;
         }
         
+        @Override
         protected void doPaint(Graphics2D g, JComponent object, int width, int height) {
             if (insets == null) {
                 object.getInsets(INSETS);

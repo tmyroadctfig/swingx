@@ -23,8 +23,8 @@ package org.jdesktop.swingx.error;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.swing.SwingUtilities;
-import org.jdesktop.swingx.*;
 
 /**
  * ErrorSupport provides support for managing error listeners.

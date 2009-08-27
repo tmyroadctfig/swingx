@@ -44,11 +44,12 @@ import javax.swing.JSlider;
 import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import org.jdesktop.swingx.painter.Painter;
+
 import org.jdesktop.swingx.JXLabel.TextAlignment;
 import org.jdesktop.swingx.image.FastBlurFilter;
 import org.jdesktop.swingx.painter.AbstractPainter;
 import org.jdesktop.swingx.painter.MattePainter;
+import org.jdesktop.swingx.painter.Painter;
 import org.jdesktop.swingx.util.PaintUtils;
 
 /**
@@ -79,8 +80,8 @@ public class JXLabelDemo {
         label.setVerticalAlignment(SwingConstants.CENTER);
         label.setPreferredSize(new Dimension(474,474));
         
-        Painter standardPainter = label.getForegroundPainter();
-        final AbstractPainter ap = (AbstractPainter)standardPainter;
+        Painter<?> standardPainter = label.getForegroundPainter();
+        final AbstractPainter<?> ap = (AbstractPainter<?>)standardPainter;
         
         MattePainter bkground = new MattePainter(PaintUtils.BLUE_EXPERIENCE, true);
         label.setBackgroundPainter(bkground);
@@ -115,7 +116,7 @@ public class JXLabelDemo {
             }});
 
         Object[] items = new Object[] {"Left", "Center", "Right","Justified"};
-        final List itemList = new ArrayList();
+        final List<Object> itemList = new ArrayList<Object>();
         itemList.addAll(Arrays.asList(items));
         JComboBox combo = new JComboBox(items);
         combo.addItemListener(new ItemListener() {

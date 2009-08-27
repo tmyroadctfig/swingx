@@ -20,13 +20,14 @@
  */
 package org.jdesktop.swingx;
 
-import org.jdesktop.swingx.painter.AbstractPainter;
-import org.jdesktop.swingx.image.StackBlurFilter;
-
-import javax.swing.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImageOp;
+
+import javax.swing.JPanel;
+
+import org.jdesktop.swingx.image.StackBlurFilter;
+import org.jdesktop.swingx.painter.AbstractPainter;
 
 /**
  * Simple demo
@@ -36,12 +37,13 @@ public class JXButtonDemo extends JPanel {
     public JXButtonDemo() {
         //simple demo that blurs the button's text
         final JXButton b = new JXButton("Execute");
-        final AbstractPainter fgPainter = (AbstractPainter)b.getForegroundPainter();
+        final AbstractPainter<?> fgPainter = (AbstractPainter<?>)b.getForegroundPainter();
         final StackBlurFilter filter = new StackBlurFilter();
         fgPainter.setFilters(filter);
 
         b.addMouseListener(new MouseAdapter() {
             boolean entered = false;
+            @Override
             public void mouseEntered(MouseEvent mouseEvent) {
                 if (!entered) {
                     fgPainter.setFilters(new BufferedImageOp[0]);
@@ -49,6 +51,7 @@ public class JXButtonDemo extends JPanel {
                     entered = true;
                 }
             }
+            @Override
             public void mouseExited(MouseEvent mouseEvent) {
                 if (entered) {
                     fgPainter.setFilters(filter);
