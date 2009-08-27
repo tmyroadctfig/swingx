@@ -745,6 +745,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
         assertEqualsArrayByElements(cycle, table.getSortOrderCycle());
     }
 
+    
     /**
      * @param string
      * @param first
