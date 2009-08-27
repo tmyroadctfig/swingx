@@ -24,7 +24,6 @@ package org.jdesktop.swingx.decorator;
 import javax.swing.JComponent;
 
 import org.jdesktop.swingx.renderer.StringValues;
-import org.junit.runner.manipulation.Sorter;
 
 /**
  * Abstract base class for all component data adapter classes. A
