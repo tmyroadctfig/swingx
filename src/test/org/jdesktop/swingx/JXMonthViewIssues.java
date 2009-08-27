@@ -23,13 +23,11 @@ package org.jdesktop.swingx;
 
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.GraphicsEnvironment;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.lang.reflect.InvocationTargetException;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -50,7 +48,6 @@ import org.jdesktop.swingx.JXMonthViewTest.Clock;
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.calendar.CalendarUtils;
 import org.jdesktop.swingx.calendar.DaySelectionModel;
-import org.jdesktop.swingx.calendar.SingleDaySelectionModel;
 import org.jdesktop.swingx.calendar.DateSelectionModel.SelectionMode;
 import org.jdesktop.swingx.event.DateSelectionEvent.EventType;
 import org.jdesktop.swingx.test.DateSelectionReport;
@@ -136,7 +133,7 @@ public class JXMonthViewIssues extends InteractiveTestCase {
             @Override
             public void paint(Graphics g) {
                 Toolkit tk = Toolkit.getDefaultToolkit ();
-                Map map = (Map) (tk.getDesktopProperty ("awt.font.desktophints"));
+                Map<?, ?> map = (Map<?, ?>) (tk.getDesktopProperty ("awt.font.desktophints"));
                 LOG.info("hints " + map);
                 if (map != null) {
                     ((Graphics2D) g).addRenderingHints(map);

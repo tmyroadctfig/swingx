@@ -1,15 +1,18 @@
 package org.jdesktop.swingx.geom;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.FlatteningPathIterator;
 import java.awt.geom.Point2D;
 
-import static org.junit.Assert.*;
-
-import org.junit.Test;
 import org.junit.Before;
+import org.junit.Test;
 
 /**
  * Basic tests for Morphing2D

@@ -480,6 +480,7 @@ public class RendererIssues extends InteractiveTestCase {
                 return null;
             }
 
+            @SuppressWarnings("unused")
             private int getVisibleWidth() {
                 int width = getVisibleRect().width;
                 int indent =  (((BasicTreeUI)getUI()).getLeftChildIndent() + ((BasicTreeUI)getUI()).getRightChildIndent());
@@ -515,7 +516,7 @@ public class RendererIssues extends InteractiveTestCase {
         MattePainter painter = new MattePainter(Color.YELLOW);
         Highlighter hl = new PainterHighlighter(HighlightPredicate.ROLLOVER_ROW, painter);
         tree.addHighlighter(hl);
-        ComponentProvider provider = new NormalButtonProvider(StringValues.TO_STRING, JLabel.LEADING);
+        ComponentProvider<?> provider = new NormalButtonProvider(StringValues.TO_STRING, JLabel.LEADING);
         tree.setCellRenderer(new DefaultTreeRenderer(provider));
         tree.setRolloverEnabled(true);
         showWithScrollingInFrame(tree, "Fancy..");

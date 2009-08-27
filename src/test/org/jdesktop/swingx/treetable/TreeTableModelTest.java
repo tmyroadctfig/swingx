@@ -105,7 +105,7 @@ public class TreeTableModelTest extends InteractiveTestCase {
      */
     private void assertColumnClassAssignableFromValue(TreeTableModel model) {
         for (int i = 0; i < model.getColumnCount(); i++) {
-            Class clazz = model.getColumnClass(i);
+            Class<?> clazz = model.getColumnClass(i);
             Object value = model.getValueAt(model.getRoot(), i);
             if (value != null) {
                 assertTrue("column class must be assignable to value class at column " + i + "\n" +

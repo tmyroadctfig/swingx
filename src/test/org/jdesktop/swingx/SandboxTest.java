@@ -6,12 +6,11 @@ package org.jdesktop.swingx;
 
 import java.util.logging.Logger;
 
+import junit.framework.TestCase;
+
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.junit.Test;
-
-
-import junit.framework.TestCase;
 
 /**
  * "hand test" sandbox restrictions 

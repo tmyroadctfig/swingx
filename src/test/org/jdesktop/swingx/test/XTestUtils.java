@@ -46,7 +46,7 @@ public class XTestUtils {
             .getName());
     
     private static String IMAGE_DIR = "resources/images/";
-    private static Class BASE = JXTable.class; 
+    private static Class<?> BASE = JXTable.class; 
     private static String IMAGE_NAME = "kleopatra.jpg";
     /**
      * 

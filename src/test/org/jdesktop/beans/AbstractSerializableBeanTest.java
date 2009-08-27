@@ -30,11 +30,9 @@ import java.io.Serializable;
 import junit.framework.TestCase;
 
 import org.jdesktop.test.SerializableSupport;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.junit.Test;
-import org.junit.Before;
-import org.junit.After;
 
 
 /**

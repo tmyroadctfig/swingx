@@ -42,11 +42,11 @@ import org.jdesktop.swingx.renderer.StringValue;
 import org.jdesktop.swingx.renderer.StringValues;
 import org.jdesktop.swingx.treetable.TreeTableModel;
 import org.jdesktop.test.AncientSwingTeam;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.junit.Test;
-import org.junit.Before;
-import org.junit.After;
 
 
 /**
@@ -438,7 +438,7 @@ public class ComponentAdapterTest extends TestCase {
         JXListT list = new JXListT(AncientSwingTeam.createNamedColorListModel(), true);
         list.setCellRenderer(new DefaultListRenderer(sv));
         list.toggleSortOrder();
-        String text = sv.getString(list.getWrappedModel().getElementAt(2));
+        String text = sv.getString(list.getModel().getElementAt(2));
         ComponentAdapter adapter = list.getComponentAdapter(2);
         assertEquals(text, adapter.getStringAt(2, 0));
     }
@@ -661,6 +661,7 @@ public class ComponentAdapterTest extends TestCase {
     }
 
 
+    @SuppressWarnings("unused")
     private DefaultTableModel createAscendingModel(int startRow, int count) {
         DefaultTableModel model = new DefaultTableModel(count, 5);
         for (int i = 0; i < model.getRowCount(); i++) {

@@ -20,6 +20,7 @@ public class SerializableSupport {
     /**
      * Serialize the specified object to bytes, then deserialize it back.
      */
+    @SuppressWarnings("unchecked")
     public static <T> T serialize(T object) throws IOException, ClassNotFoundException {
         return (T)fromBytes(toBytes(object));
     }

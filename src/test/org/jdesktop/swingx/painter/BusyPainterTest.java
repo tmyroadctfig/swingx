@@ -24,9 +24,9 @@ import junit.framework.TestCase;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.jdesktop.test.TestUtils;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.junit.Test;
 
 /**
  * Test for AbstractPainter

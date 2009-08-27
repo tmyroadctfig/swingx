@@ -21,29 +21,16 @@
  */
 package org.jdesktop.swingx.sort;
 
-import static org.junit.Assert.*;
-
 import java.awt.Color;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import javax.swing.JTable;
 import javax.swing.RowFilter;
 import javax.swing.SortOrder;
-import javax.swing.RowSorter.SortKey;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
-import javax.swing.table.TableRowSorter;
 
-import org.jdesktop.swingx.JXFrame;
-import org.jdesktop.swingx.JXTable;
-import org.jdesktop.swingx.decorator.ColorHighlighter;
-import org.jdesktop.swingx.decorator.HighlightPredicate;
-import org.jdesktop.swingx.decorator.PatternPredicate;
-import org.jdesktop.swingx.renderer.DefaultTableRenderer;
 import org.jdesktop.test.AncientSwingTeam;
 import org.junit.Test;
 import org.junit.runner.RunWith;

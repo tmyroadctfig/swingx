@@ -119,6 +119,7 @@ public class ActionMapTreeTableModel extends DefaultTreeTableModel {
         }
 
 
+        @Override
         public String toString() {
             return key.toString();
         }

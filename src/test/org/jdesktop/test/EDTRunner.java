@@ -6,7 +6,7 @@ package org.jdesktop.test;
 import java.lang.reflect.InvocationTargetException;
 
 import javax.swing.SwingUtilities;
- 
+
 import org.junit.runner.notification.Failure;
 import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.BlockJUnit4ClassRunner;

@@ -18,9 +18,9 @@ import javax.swing.ActionMap;
 import javax.swing.JEditorPane;
 import javax.swing.text.html.HTMLDocument;
 
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.junit.Test;
 
 
 /**

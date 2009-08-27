@@ -24,6 +24,7 @@ package org.jdesktop.swingx;
 import java.io.NotSerializableException;
 import java.util.logging.Logger;
 
+import javax.swing.AbstractButton;
 import javax.swing.UIManager;
 import javax.swing.tree.TreeCellRenderer;
 
@@ -164,7 +165,7 @@ public class SerializableTest extends InteractiveTestCase {
      */
     @Test
     public void testRadioGroup() {
-        JXRadioGroup component = new JXRadioGroup();
+        JXRadioGroup<?> component = new JXRadioGroup<AbstractButton>();
         try {
             SerializableSupport.serialize(component);
         } catch (Exception e) {

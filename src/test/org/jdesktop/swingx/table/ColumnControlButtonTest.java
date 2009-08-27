@@ -39,11 +39,11 @@ import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 import org.jdesktop.swingx.table.ColumnControlButton.ColumnVisibilityAction;
 import org.jdesktop.swingx.table.ColumnControlButton.DefaultColumnControlPopup;
 import org.jdesktop.test.AncientSwingTeam;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.junit.Test;
-import org.junit.Before;
-import org.junit.After;
 
 
 /**

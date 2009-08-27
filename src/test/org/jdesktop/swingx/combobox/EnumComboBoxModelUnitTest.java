@@ -5,11 +5,9 @@
 package org.jdesktop.swingx.combobox;
 
 import org.jdesktop.swingx.InteractiveTestCase;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.junit.Test;
-import org.junit.Before;
-import org.junit.After;
 
 
 @RunWith(JUnit4.class)

@@ -51,7 +51,7 @@ public class CompoundPainterIssues extends InteractiveTestCase {
         BufferedImage img = new BufferedImage(10, 10, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = img.createGraphics();
 
-        AbstractPainter painter = new ShapePainter() {
+        AbstractPainter<Object> painter = new ShapePainter() {
             @Override
             protected boolean shouldUseCache() {
                 return isCacheable();
@@ -85,7 +85,7 @@ public class CompoundPainterIssues extends InteractiveTestCase {
         assertTrue("initial state of dirty must be true? was: " + imagePainter.isDirty(), imagePainter.isDirty());
         imagePainter.paint(g, null, 10, 10);
         assertFalse(imagePainter.isDirty());
-        CompoundPainter compound = new CompoundPainter(imagePainter);
+        CompoundPainter<?> compound = new CompoundPainter<Object>(imagePainter);
         assertFalse(compound.isDirty());
         PropertyChangeReport report = new PropertyChangeReport();
         compound.addPropertyChangeListener(report);

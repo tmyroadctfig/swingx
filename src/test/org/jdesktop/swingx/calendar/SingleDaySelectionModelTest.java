@@ -29,11 +29,10 @@ import java.util.logging.Logger;
 import org.jdesktop.swingx.calendar.DateSelectionModel.SelectionMode;
 import org.jdesktop.swingx.event.DateSelectionEvent;
 import org.jdesktop.swingx.test.DateSelectionReport;
+import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.junit.Test;
-import org.junit.Before;
-import org.junit.After;
 
 
 /**

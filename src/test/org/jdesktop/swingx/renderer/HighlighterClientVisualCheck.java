@@ -348,9 +348,9 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
      */
     public static class ValueMappedHighlightPredicate implements HighlightPredicate {
 
-        private List values;
+        private List<?> values;
         private int testColumn;
-        public ValueMappedHighlightPredicate(List values, int testColumn) {
+        public ValueMappedHighlightPredicate(List<?> values, int testColumn) {
             this.values = values;
             this.testColumn = testColumn;
         }

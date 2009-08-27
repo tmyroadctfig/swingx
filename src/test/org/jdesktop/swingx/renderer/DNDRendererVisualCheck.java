@@ -8,7 +8,6 @@ import java.awt.Component;
 import java.awt.datatransfer.DataFlavor;
 import java.util.logging.Logger;
 
-import javax.swing.DefaultListCellRenderer;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -18,7 +17,6 @@ import javax.swing.JTree;
 import javax.swing.TransferHandler;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
-import javax.swing.tree.DefaultTreeCellRenderer;
 
 import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXFrame;
@@ -178,8 +176,6 @@ public class DNDRendererVisualCheck extends InteractiveTestCase {
         textField.setDragEnabled(true);
         addStatusComponent(frame, textField);
         show(frame);
-        DefaultListCellRenderer r;
-        DefaultTreeCellRenderer x;
     }
     
     /**
@@ -202,8 +198,6 @@ public class DNDRendererVisualCheck extends InteractiveTestCase {
         textField.setDragEnabled(true);
         addStatusComponent(frame, textField);
         show(frame);
-        DefaultListCellRenderer r;
-        DefaultTreeCellRenderer x;
     }
     
     /**
@@ -227,8 +221,6 @@ public class DNDRendererVisualCheck extends InteractiveTestCase {
         textField.setDragEnabled(true);
         addStatusComponent(frame, textField);
         show(frame);
-        DefaultListCellRenderer r;
-        DefaultTreeCellRenderer x;
     }
     
 

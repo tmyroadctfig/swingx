@@ -10,13 +10,12 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.jdesktop.swingx.search.PatternModel;
 import org.jdesktop.test.PropertyChangeReport;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.junit.Test;
-import org.junit.Before;
-import org.junit.After;
 
 
 /**
@@ -130,7 +129,7 @@ public class PatternModelTest extends TestCase {
     @Test
     public void testAvailableMatchRules() {
         PatternModel model = new PatternModel();
-        List rules = model.getMatchRules();
+        List<?> rules = model.getMatchRules();
         assertNotNull("rules must not be null", rules);
     }
     

@@ -21,8 +21,6 @@ import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.plaf.ColorUIResource;
 
-import junit.framework.TestCase;
-
 import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.decorator.HighlighterFactory.UIColorHighlighter;
 import org.jdesktop.swingx.painter.AbstractAreaPainter;
@@ -36,9 +34,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.junit.Test;
-import org.junit.Before;
-import org.junit.After;
 
 
 /**
@@ -105,7 +100,7 @@ public class HighlighterTest extends InteractiveTestCase {
         PainterHighlighter hl = new PainterHighlighter();
         assertEquals(HighlightPredicate.ALWAYS, hl.getHighlightPredicate());
         assertNull(hl.getPainter());
-        Painter mattePainter = new MattePainter();
+        Painter<?> mattePainter = new MattePainter();
         PainterHighlighter withPainter = new PainterHighlighter(mattePainter);
         assertEquals(HighlightPredicate.ALWAYS, withPainter.getHighlightPredicate());
         assertEquals(mattePainter, withPainter.getPainter());

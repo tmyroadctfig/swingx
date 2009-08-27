@@ -21,8 +21,6 @@
  */
 package org.jdesktop.swingx.renderer;
 
-import static org.junit.Assert.*;
-
 import java.awt.Color;
 import java.awt.Component;
 import java.io.Serializable;
@@ -187,7 +185,7 @@ public class TableRendererTest extends InteractiveTestCase {
      */
     private TableModel createTableModelWithDefaultTypes() {
         String[] names = {"Object", "Number", "Double", "Date", "ImageIcon", "Boolean"};
-        final Class[] types = {Object.class, Number.class, Double.class, Date.class, ImageIcon.class, Boolean.class};
+        final Class<?>[] types = {Object.class, Number.class, Double.class, Date.class, ImageIcon.class, Boolean.class};
         DefaultTableModel model = new DefaultTableModel(names, 0) {
 
             @Override

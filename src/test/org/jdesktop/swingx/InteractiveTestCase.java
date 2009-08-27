@@ -81,7 +81,7 @@ public abstract class InteractiveTestCase extends junit.framework.TestCase {
      */
     public void runInteractiveTests(String regexPattern)  throws java.lang.Exception {
         setUp();
-        Class testClass = getClass();
+        Class<?> testClass = getClass();
         Method methods[] = testClass.getMethods();
 
         for (int i = 0; i < methods.length; i++) {

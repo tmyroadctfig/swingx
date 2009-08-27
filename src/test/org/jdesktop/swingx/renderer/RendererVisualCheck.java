@@ -452,7 +452,6 @@ public class RendererVisualCheck extends InteractiveTestCase {
      * @param table
      */
     private void installDynamicRowHeights(final JXTable table) {
-        table.setRowHeightEnabled(true);
         updateRowHeight(table);
         TableColumnModelListener columnListener = new TableColumnModelListener() {
 
@@ -672,7 +671,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
      */
     private TableModel createTableModelWithDefaultTypes() {
         String[] names = {"Object", "Number", "Double", "Date", "ImageIcon", "Boolean"};
-        final Class[] types = {Object.class, Number.class, Double.class, Date.class, ImageIcon.class, Boolean.class};
+        final Class<?>[] types = {Object.class, Number.class, Double.class, Date.class, ImageIcon.class, Boolean.class};
         DefaultTableModel model = new DefaultTableModel(names, 0) {
 
             @Override
@@ -911,7 +910,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
     public void interactiveTestTableLinkRenderer() {
         EditorPaneLinkVisitor visitor = new EditorPaneLinkVisitor();
         JXTable table = new JXTable(createModelWithLinks());
-        LinkModelAction action = new LinkModelAction<LinkModel>(visitor);
+        LinkModelAction<LinkModel> action = new LinkModelAction<LinkModel>(visitor);
         ComponentProvider<JXHyperlink> controller = new HyperlinkProvider(action, LinkModel.class);
         table.setDefaultRenderer(LinkModel.class, new DefaultTableRenderer(controller));
         JFrame frame = wrapWithScrollingInFrame(table, visitor.getOutputComponent(), "show link renderer in table");
@@ -927,7 +926,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
         EditorPaneLinkVisitor visitor = new EditorPaneLinkVisitor();
         JXList list = new JXList(createListModelWithLinks(20));
         list.setRolloverEnabled(true);
-        LinkModelAction action = new LinkModelAction(visitor);
+        LinkModelAction<LinkModel> action = new LinkModelAction<LinkModel>(visitor);
         ComponentProvider<JXHyperlink> context = new HyperlinkProvider(action, LinkModel.class);
         list.setCellRenderer(new DefaultListRenderer(context));
         JFrame frame = wrapWithScrollingInFrame(list, visitor.getOutputComponent(), "show link renderer in list");
@@ -943,7 +942,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
         EditorPaneLinkVisitor visitor = new EditorPaneLinkVisitor();
         JXTree tree = new JXTree(createTreeModelWithLinks(20));
         tree.setRolloverEnabled(true);
-        LinkModelAction action = new LinkModelAction(visitor);
+        LinkModelAction<LinkModel> action = new LinkModelAction<LinkModel>(visitor);
         ComponentProvider<JXHyperlink> context = new HyperlinkProvider(action, LinkModel.class);
         tree.setCellRenderer(new DefaultTreeRenderer(new WrappingProvider(context)));
         JFrame frame = wrapWithScrollingInFrame(tree, visitor.getOutputComponent(), "show link renderer in list");
@@ -1206,7 +1205,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
         xtable.setDefaultRenderer(Color.class, new DefaultTableRenderer(controller));
         TreeModel model = createTreeColorModel();
         JTree tree = new JTree(model);
-        ComponentProvider wrapper = new WrappingProvider(controller); //;createColorRenderingLabelController());
+        ComponentProvider<?> wrapper = new WrappingProvider(controller); //;createColorRenderingLabelController());
         TreeCellRenderer renderer = new DefaultTreeRenderer(wrapper);
         tree.setCellRenderer(renderer);
         JXFrame frame = wrapWithScrollingInFrame(xtable, tree, "JXTable/JXTree: Custom color renderer - sharing the component controller");
@@ -1488,7 +1487,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
      * @since 1.1.1
      */
     public static PropertyDescriptor getPropertyDescriptor(
-        Class beanClass,
+        Class<?> beanClass,
         String propertyName)
         throws IntrospectionException {
 

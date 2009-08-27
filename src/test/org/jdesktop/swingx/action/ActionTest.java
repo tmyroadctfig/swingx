@@ -15,14 +15,13 @@ import javax.swing.JRadioButton;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JToggleButton;
 
+import junit.framework.TestCase;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.junit.Test;
-import org.junit.Before;
-import org.junit.After;
-
-
-import junit.framework.TestCase;
 
 @RunWith(JUnit4.class)
 public class ActionTest extends TestCase {

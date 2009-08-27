@@ -18,15 +18,12 @@ import javax.swing.JComponent;
 import javax.swing.UIManager;
 import javax.swing.plaf.UIResource;
 
+import junit.framework.TestCase;
+
 import org.jdesktop.swingx.icon.EmptyIcon;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.junit.Test;
-import org.junit.Before;
-import org.junit.After;
-
-
-import junit.framework.TestCase;
 
 /**
  * Tests the functionality of {@code UIManagerExt}.

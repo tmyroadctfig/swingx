@@ -94,6 +94,7 @@ public class JXDatePickerIssues extends InteractiveTestCase {
         LOG.info("" + df + " zero " + dfs.getZeroDigit());
         LOG.info("" + dfs);
         df.setDecimalFormatSymbols(dfs);
+        @SuppressWarnings("unused")
         DateFormatSymbols dateSymbols = null;
         // set the beginning of the range to Arabic digits
 //        dfs.setZeroDigit('\u0660');

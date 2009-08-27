@@ -150,7 +150,7 @@ public class RenderingTest extends TestCase {
      */
     @Test
     public void testHyperlinkStringValue() {
-        AbstractHyperlinkAction linkAction = new AbstractHyperlinkAction() {
+        AbstractHyperlinkAction<?> linkAction = new AbstractHyperlinkAction<Object>() {
 
             public void actionPerformed(ActionEvent e) {
                 // nothing
@@ -290,7 +290,7 @@ public class RenderingTest extends TestCase {
      */
     @Test
     public void testToolTipManagerHyperlinkProvider() {
-        AbstractHyperlinkAction linkAction = new AbstractHyperlinkAction() {
+        AbstractHyperlinkAction<?> linkAction = new AbstractHyperlinkAction<Object>() {
 
             public void actionPerformed(ActionEvent e) {
                 // do nothing
@@ -665,9 +665,9 @@ public class RenderingTest extends TestCase {
                 null, null, delegate, false);
         assertWrappingProviderState(new WrappingProvider(iv, delegate, false), 
                 iv, null, delegate, false);
-        assertWrappingProviderState(new WrappingProvider(iv, (ComponentProvider) null, false), 
+        assertWrappingProviderState(new WrappingProvider(iv, (ComponentProvider<?>) null, false), 
                 iv, null, null, false);
-        assertWrappingProviderState(new WrappingProvider(null, (ComponentProvider) null, false), 
+        assertWrappingProviderState(new WrappingProvider(null, (ComponentProvider<?>) null, false), 
                 null, null, null, false);
     }
    
@@ -708,7 +708,7 @@ public class RenderingTest extends TestCase {
     }
     
     private void assertWrappingProviderState(WrappingProvider provider, 
-            IconValue iv, StringValue sv, ComponentProvider delegate, boolean unwrap) {
+            IconValue iv, StringValue sv, ComponentProvider<?> delegate, boolean unwrap) {
         if (iv == null) {
             assertEquals("default StringValue must be empty", StringValues.EMPTY, 
                     provider.getStringValue());
@@ -852,7 +852,7 @@ public class RenderingTest extends TestCase {
      */
     @Test
     public void testButtonProviderConstructor() {
-        ComponentProvider provider = new CheckBoxProvider();
+        ComponentProvider<?> provider = new CheckBoxProvider();
         assertEquals(JLabel.CENTER, provider.getHorizontalAlignment());
         assertEquals(StringValues.EMPTY, provider.getStringValue());
        
@@ -979,7 +979,7 @@ public class RenderingTest extends TestCase {
         assertEmptyContext(new HyperlinkProvider());
     }
     
-    private void assertEmptyContext(ComponentProvider provider) {
+    private void assertEmptyContext(ComponentProvider<?> provider) {
         DefaultListRenderer renderer = new DefaultListRenderer(provider);
         renderer.getListCellRendererComponent(null, null, -1, false, false);
         // treeRenderer - use the same provider, can't do in real life, 
@@ -1004,7 +1004,7 @@ public class RenderingTest extends TestCase {
         // wrong assumption - we are wrapping...
 //        assertSame(FormatStringValue.DATE_TO_STRING, renderer.componentController.formatter);
         assertSame(StringValues.DATE_TO_STRING, ((WrappingProvider) renderer.componentController).wrappee.formatter);
-        ComponentProvider controller = new CheckBoxProvider();
+        ComponentProvider<?> controller = new CheckBoxProvider();
         renderer = new DefaultTreeRenderer(controller);
         assertSame(controller, renderer.componentController);
     }
@@ -1020,7 +1020,7 @@ public class RenderingTest extends TestCase {
         renderer = new DefaultListRenderer(StringValues.DATE_TO_STRING);
         assertTrue(renderer.componentController instanceof LabelProvider);
         assertSame(StringValues.DATE_TO_STRING, renderer.componentController.formatter);
-        ComponentProvider controller = new CheckBoxProvider();
+        ComponentProvider<?> controller = new CheckBoxProvider();
         renderer = new DefaultListRenderer(controller);
         assertSame(controller, renderer.componentController);
     }
@@ -1074,7 +1074,7 @@ public class RenderingTest extends TestCase {
         renderer = new DefaultTableRenderer(StringValues.DATE_TO_STRING);
         assertTrue(renderer.componentController instanceof LabelProvider);
         assertSame(StringValues.DATE_TO_STRING, renderer.componentController.formatter);
-        ComponentProvider controller = new CheckBoxProvider();
+        ComponentProvider<?> controller = new CheckBoxProvider();
         renderer = new DefaultTableRenderer(controller);
         assertSame(controller, renderer.componentController);
     }
@@ -1135,7 +1135,7 @@ public class RenderingTest extends TestCase {
      */
     @Test
     public void testGetComponentNullContext() {
-        ComponentProvider controller = new LabelProvider();
+        ComponentProvider<?> controller = new LabelProvider();
         assertEquals(controller.rendererComponent, controller.getRendererComponent(null));
     }
     

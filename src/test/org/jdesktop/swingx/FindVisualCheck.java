@@ -34,7 +34,6 @@ import org.jdesktop.swingx.renderer.IconValues;
 import org.jdesktop.swingx.renderer.StringValues;
 import org.jdesktop.swingx.search.SearchFactory;
 import org.jdesktop.swingx.search.TableSearchable;
-import org.jdesktop.swingx.search.AbstractSearchable.SearchResult;
 import org.jdesktop.swingx.search.FindTest.TestListModel;
 import org.jdesktop.swingx.search.FindTest.TestTableModel;
 import org.jdesktop.swingx.treetable.FileSystemModel;

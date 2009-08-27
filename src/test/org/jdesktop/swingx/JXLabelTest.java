@@ -23,7 +23,6 @@ package org.jdesktop.swingx;
 
 import java.util.logging.Logger;
 
-import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.painter.Painter;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -46,7 +45,7 @@ public class JXLabelTest extends InteractiveTestCase {
     @Test
     public void testDefaultForegroundPainter() {
         JXLabel label =  new JXLabel();
-        Painter defaultForeground = label.getForegroundPainter();
+        Painter<?> defaultForeground = label.getForegroundPainter();
         // sanity
         assertNotNull(defaultForeground);
         label.setForegroundPainter(null);
