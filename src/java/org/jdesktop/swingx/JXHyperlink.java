@@ -20,16 +20,18 @@
  */
 package org.jdesktop.swingx;
 
-import org.jdesktop.swingx.hyperlink.AbstractHyperlinkAction;
-import org.jdesktop.swingx.plaf.HyperlinkAddon;
-import org.jdesktop.swingx.plaf.LookAndFeelAddons;
-
-import javax.swing.*;
-import javax.swing.plaf.ButtonUI;
-import java.awt.*;
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+
+import javax.swing.Action;
+import javax.swing.JButton;
+import javax.swing.plaf.ButtonUI;
+
+import org.jdesktop.swingx.hyperlink.AbstractHyperlinkAction;
+import org.jdesktop.swingx.plaf.HyperlinkAddon;
+import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 
 /**
  * A hyperlink component that derives from JButton to provide compatibility

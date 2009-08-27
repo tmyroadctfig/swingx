@@ -10,10 +10,7 @@
 package org.jdesktop.swingx.editors;
 
 import java.awt.Rectangle;
-import java.awt.geom.Rectangle2D;
 import java.beans.PropertyEditorSupport;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 
 
 /**

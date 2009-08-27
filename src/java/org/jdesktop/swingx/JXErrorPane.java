@@ -22,16 +22,18 @@ package org.jdesktop.swingx;
 
 import java.awt.Component;
 import java.lang.reflect.InvocationTargetException;
+
 import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
 import javax.swing.SwingUtilities;
-import org.jdesktop.swingx.error.ErrorReporter;
+
 import org.jdesktop.swingx.error.ErrorInfo;
-import org.jdesktop.swingx.plaf.ErrorPaneUI;
+import org.jdesktop.swingx.error.ErrorReporter;
 import org.jdesktop.swingx.plaf.ErrorPaneAddon;
+import org.jdesktop.swingx.plaf.ErrorPaneUI;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 
 /**

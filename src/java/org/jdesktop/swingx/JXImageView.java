@@ -21,15 +21,19 @@
 
 package org.jdesktop.swingx;
 
-import org.jdesktop.swingx.color.ColorUtil;
-import org.jdesktop.swingx.error.ErrorListener;
-import org.jdesktop.swingx.error.ErrorSupport;
-import org.jdesktop.swingx.graphics.GraphicsUtilities;
-
-import javax.imageio.ImageIO;
-import javax.swing.*;
-import javax.swing.event.MouseInputAdapter;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Cursor;
+import java.awt.Dialog;
+import java.awt.FileDialog;
+import java.awt.Frame;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.Paint;
+import java.awt.Point;
+import java.awt.RenderingHints;
+import java.awt.Window;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -47,6 +51,19 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
+
+import javax.imageio.ImageIO;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.JComponent;
+import javax.swing.SwingUtilities;
+import javax.swing.TransferHandler;
+import javax.swing.event.MouseInputAdapter;
+
+import org.jdesktop.swingx.color.ColorUtil;
+import org.jdesktop.swingx.error.ErrorListener;
+import org.jdesktop.swingx.error.ErrorSupport;
+import org.jdesktop.swingx.graphics.GraphicsUtilities;
 
 /**
  * <p>A panel which shows an image centered. The user can drag an image into the 

@@ -21,6 +21,7 @@
 package org.jdesktop.swingx;
 
 import java.beans.BeanDescriptor;
+
 import javax.swing.SwingConstants;
 
 /**

@@ -7,6 +7,7 @@
 package org.jdesktop.swingx;
 
 import java.util.logging.Level;
+
 import org.jdesktop.swingx.error.ErrorInfo;
 
 /**

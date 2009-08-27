@@ -27,6 +27,7 @@ import java.awt.Paint;
 import java.awt.Rectangle;
 import java.awt.TexturePaint;
 import java.awt.image.BufferedImage;
+
 import javax.swing.JComponent;
 
 /**

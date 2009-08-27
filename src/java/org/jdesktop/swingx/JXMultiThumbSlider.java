@@ -21,6 +21,18 @@
 
 package org.jdesktop.swingx;
 
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.JComponent;
+import javax.swing.event.MouseInputAdapter;
+
 import org.jdesktop.swingx.multislider.DefaultMultiThumbModel;
 import org.jdesktop.swingx.multislider.MultiThumbModel;
 import org.jdesktop.swingx.multislider.ThumbDataEvent;
@@ -28,16 +40,9 @@ import org.jdesktop.swingx.multislider.ThumbDataListener;
 import org.jdesktop.swingx.multislider.ThumbListener;
 import org.jdesktop.swingx.multislider.ThumbRenderer;
 import org.jdesktop.swingx.multislider.TrackRenderer;
-import org.jdesktop.swingx.plaf.MultiThumbSliderAddon;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
+import org.jdesktop.swingx.plaf.MultiThumbSliderAddon;
 import org.jdesktop.swingx.plaf.MultiThumbSliderUI;
-
-import javax.swing.*;
-import javax.swing.event.MouseInputAdapter;
-import java.awt.*;
-import java.awt.event.MouseEvent;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * <p>A slider which can have multiple control points or <i>Thumbs</i></p>

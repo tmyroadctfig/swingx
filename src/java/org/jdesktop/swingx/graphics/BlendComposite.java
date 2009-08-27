@@ -41,8 +41,8 @@ import java.awt.image.ColorModel;
 import java.awt.image.DataBuffer;
 import java.awt.image.DirectColorModel;
 import java.awt.image.Raster;
-import java.awt.image.WritableRaster;
 import java.awt.image.RasterFormatException;
+import java.awt.image.WritableRaster;
 
 /**
  * <p>A blend composite defines the rule according to which a drawing primitive

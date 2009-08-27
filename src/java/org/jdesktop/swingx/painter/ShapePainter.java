@@ -21,11 +21,18 @@
 
 package org.jdesktop.swingx.painter;
 
-import org.jdesktop.swingx.painter.effects.AreaEffect;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Paint;
+import java.awt.Rectangle;
+import java.awt.Shape;
+import java.awt.Stroke;
 import java.awt.geom.Ellipse2D;
+
+import javax.swing.JComponent;
+
+import org.jdesktop.swingx.painter.effects.AreaEffect;
 
 
 /**

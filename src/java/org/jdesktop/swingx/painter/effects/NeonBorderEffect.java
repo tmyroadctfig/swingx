@@ -22,7 +22,12 @@
 
 package org.jdesktop.swingx.painter.effects;
 
-import java.awt.*;
+import java.awt.AlphaComposite;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.Shape;
 
 /**
  * An effect which draws a multicolored border around a painter's shape.

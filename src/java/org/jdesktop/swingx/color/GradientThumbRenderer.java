@@ -20,12 +20,15 @@
  */
 package org.jdesktop.swingx.color;
 
-import org.jdesktop.swingx.JXMultiThumbSlider;
-import org.jdesktop.swingx.multislider.ThumbRenderer;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Image;
 
 import javax.imageio.ImageIO;
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JComponent;
+
+import org.jdesktop.swingx.JXMultiThumbSlider;
+import org.jdesktop.swingx.multislider.ThumbRenderer;
 
 public class GradientThumbRenderer extends JComponent implements ThumbRenderer {
     private Image thumb_black;

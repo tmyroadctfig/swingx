@@ -47,7 +47,7 @@ class BasicCalendarRenderingHandler implements CalendarRenderingHandler {
     private Map<CalendarState, ComponentProvider<?>> providers;
     //-------- Highlight properties
     /** The Painter used for highlighting unselectable dates. */
-    private TextCrossingPainter textCross;
+    private TextCrossingPainter<?> textCross;
     /** The foreground color for unselectable date highlight. */
     private Color unselectableDayForeground;
 

@@ -370,7 +370,7 @@ public final class SimpleRendererDemo {
         }
     }
     
-    public static class Contributor implements Comparable {
+    public static class Contributor implements Comparable<Object> {
         private String firstName;
         private String lastName;
         @SuppressWarnings("unused")
@@ -426,6 +426,7 @@ public final class SimpleRendererDemo {
     /**
      * 
      */
+    @SuppressWarnings("unused")
     private static void initLF() {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());

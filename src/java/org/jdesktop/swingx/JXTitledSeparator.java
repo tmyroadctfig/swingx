@@ -27,6 +27,7 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+
 import javax.swing.Box;
 import javax.swing.Icon;
 import javax.swing.JLabel;

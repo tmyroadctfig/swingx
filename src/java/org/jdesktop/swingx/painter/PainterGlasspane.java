@@ -22,10 +22,14 @@
 
 package org.jdesktop.swingx.painter;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.swing.JComponent;
+import javax.swing.SwingUtilities;
 
 /**
  * This is a glasspane which will draw the specified painter on

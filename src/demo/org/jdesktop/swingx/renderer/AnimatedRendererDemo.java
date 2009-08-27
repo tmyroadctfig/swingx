@@ -125,9 +125,9 @@ public final class AnimatedRendererDemo {
         table.addHighlighter(stars);
         list.addHighlighter(stars);
         list.setRolloverEnabled(true);
-        final RelativePainter silver = (RelativePainter) silverHL.getPainter();
+        final RelativePainter<?> silver = (RelativePainter<?>) silverHL.getPainter();
         silver.setXFactor(1.);
-        final RelativePainter gold = (RelativePainter) goldHL.getPainter();
+        final RelativePainter<?> gold = (RelativePainter<?>) goldHL.getPainter();
         gold.setXFactor(1.0);
         ActionListener l = new ActionListener() {
             public void actionPerformed(ActionEvent e) {

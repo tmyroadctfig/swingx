@@ -23,7 +23,12 @@ package org.jdesktop.swingx;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
-import javax.swing.*;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
 
 import org.jdesktop.swingx.action.AbstractActionExt;
 

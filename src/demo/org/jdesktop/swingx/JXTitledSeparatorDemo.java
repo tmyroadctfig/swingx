@@ -24,7 +24,12 @@ package org.jdesktop.swingx;
 import java.awt.Color;
 import java.awt.ComponentOrientation;
 import java.awt.Font;
-import javax.swing.*;
+
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 
 /**
  *

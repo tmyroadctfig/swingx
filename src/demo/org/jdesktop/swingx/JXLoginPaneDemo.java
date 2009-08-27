@@ -19,7 +19,6 @@
 package org.jdesktop.swingx;
 
 import java.util.Arrays;
-import java.util.Collections;
 
 import javax.swing.JFrame;
 
