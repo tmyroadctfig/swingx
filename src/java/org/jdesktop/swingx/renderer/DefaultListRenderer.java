@@ -83,7 +83,7 @@ public class DefaultListRenderer extends AbstractRenderer
      *
      */
     public DefaultListRenderer() {
-        this((ComponentProvider) null);
+        this((ComponentProvider<?>) null);
     }
 
     /**
@@ -99,7 +99,7 @@ public class DefaultListRenderer extends AbstractRenderer
      * @param componentProvider the provider of the configured component to
      *   use for cell rendering
      */
-    public DefaultListRenderer(ComponentProvider componentProvider) {
+    public DefaultListRenderer(ComponentProvider<?> componentProvider) {
         super(componentProvider);
         this.cellContext = new ListCellContext();
     }
@@ -188,7 +188,7 @@ public class DefaultListRenderer extends AbstractRenderer
      * {@inheritDoc}
      */ 
     @Override
-    protected ComponentProvider createDefaultComponentProvider() {
+    protected ComponentProvider<?> createDefaultComponentProvider() {
         return new LabelProvider(createDefaultStringValue());
     }
 

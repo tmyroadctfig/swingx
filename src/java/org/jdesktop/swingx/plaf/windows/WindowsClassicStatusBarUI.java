@@ -25,12 +25,14 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics2D;
 import java.awt.Insets;
+
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.Border;
-import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.BorderUIResource;
+import javax.swing.plaf.ComponentUI;
+
 import org.jdesktop.swingx.JXStatusBar;
 import org.jdesktop.swingx.plaf.basic.BasicStatusBarUI;
 

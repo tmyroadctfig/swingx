@@ -71,7 +71,7 @@ import org.jdesktop.swingx.treetable.TreeTableNode;
 public class WrappingProvider extends 
     ComponentProvider<WrappingIconPanel>  implements RolloverRenderer {
 
-    protected ComponentProvider wrappee;
+    protected ComponentProvider<?> wrappee;
     private boolean unwrapUserObject;
 
     /**
@@ -79,7 +79,7 @@ public class WrappingProvider extends
      * 
      */
     public WrappingProvider() {
-        this((ComponentProvider) null);
+        this((ComponentProvider<?>) null);
     }
 
     /**
@@ -125,7 +125,7 @@ public class WrappingProvider extends
      * 
      * @param delegate the provider to use as delegate
      */
-    public WrappingProvider(ComponentProvider delegate) {
+    public WrappingProvider(ComponentProvider<?> delegate) {
         this(delegate, true);
     }
     
@@ -138,7 +138,7 @@ public class WrappingProvider extends
      * @param unwrapUserObject a flag indicating whether this provider
      * should auto-unwrap the userObject from the context value. 
      */
-    public WrappingProvider(ComponentProvider delegate, boolean unwrapUserObject) {
+    public WrappingProvider(ComponentProvider<?> delegate, boolean unwrapUserObject) {
         this(null, delegate, unwrapUserObject);
     }
 
@@ -152,7 +152,7 @@ public class WrappingProvider extends
      * @param unwrapUserObject a flag indicating whether this provider
      *          should auto-unwrap the userObject from the context value. 
      */
-    public WrappingProvider(IconValue iv, ComponentProvider delegate, boolean unwrapUserObject) {
+    public WrappingProvider(IconValue iv, ComponentProvider<?> delegate, boolean unwrapUserObject) {
         super(iv != null ? (new MappedValue(null, iv)) : StringValues.EMPTY);
         setWrappee(delegate);
         setUnwrapUserObject(unwrapUserObject);
@@ -169,7 +169,7 @@ public class WrappingProvider extends
      *          should auto-unwrap the userObject from the context value. 
      */
     public WrappingProvider(IconValue iv, StringValue delegateStringValue, boolean unwrapUserObject) {
-        this(iv, (ComponentProvider) null, unwrapUserObject);
+        this(iv, (ComponentProvider<?>) null, unwrapUserObject);
         getWrappee().setStringValue(delegateStringValue);
     }
     
@@ -181,7 +181,7 @@ public class WrappingProvider extends
      *  
      * @param delegate the provider to use as delegate. 
      */
-    public void setWrappee(ComponentProvider delegate) {
+    public void setWrappee(ComponentProvider<?> delegate) {
         if (delegate == null) {
             delegate = new LabelProvider();
         }
@@ -193,7 +193,7 @@ public class WrappingProvider extends
      * 
      * @return the provider used for rendering the node content.
      */
-    public ComponentProvider getWrappee() {
+    public ComponentProvider<?> getWrappee() {
         return wrappee;
     }
     

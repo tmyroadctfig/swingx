@@ -77,7 +77,7 @@ public class DefaultTableRenderer extends AbstractRenderer
      * @see #DefaultTableRenderer(ComponentProvider)
      */
     public DefaultTableRenderer() {
-        this((ComponentProvider) null);
+        this((ComponentProvider<?>) null);
     }
 
     /**
@@ -88,7 +88,7 @@ public class DefaultTableRenderer extends AbstractRenderer
      * @param componentProvider the provider of the configured component to
      *        use for cell rendering
      */
-    public DefaultTableRenderer(ComponentProvider componentProvider) {
+    public DefaultTableRenderer(ComponentProvider<?> componentProvider) {
         super(componentProvider);
         this.cellContext = new TableCellContext();
     }
@@ -173,7 +173,7 @@ public class DefaultTableRenderer extends AbstractRenderer
      * {@inheritDoc}
      */ 
     @Override
-    protected ComponentProvider createDefaultComponentProvider() {
+    protected ComponentProvider<?> createDefaultComponentProvider() {
         return new LabelProvider();
     }
 

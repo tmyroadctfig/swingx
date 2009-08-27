@@ -31,6 +31,6 @@ import org.jdesktop.swingx.painter.Painter;
  * @author Jeanette Winzenburg
  */
 public interface PainterAware {
-    void setPainter(Painter painter);
-    Painter getPainter();
+    void setPainter(Painter<?> painter);
+    Painter<?> getPainter();
 }

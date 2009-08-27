@@ -21,6 +21,7 @@
 
 package org.jdesktop.swingx.plaf;
 import java.awt.Image;
+
 import javax.swing.plaf.PanelUI;
 
 /**

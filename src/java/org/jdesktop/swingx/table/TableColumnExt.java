@@ -115,7 +115,7 @@ public class TableColumnExt extends TableColumn implements UIDependent {
 
 
     /** per-column comparator  */
-    protected Comparator comparator;
+    protected Comparator<?> comparator;
     /** per-column sortable property. Initialized to <code>true</code>. */
     protected boolean sortable = true;
     /** per-column editable property. Initialized to <code>true</code>.*/
@@ -400,8 +400,8 @@ public class TableColumnExt extends TableColumn implements UIDependent {
      * @see org.jdesktop.swingx.sort.SortController
      * @see org.jdesktop.swingx.decorator.SortKey
      */
-    public void setComparator(Comparator comparator) {
-        Comparator old = getComparator();
+    public void setComparator(Comparator<?> comparator) {
+        Comparator<?> old = getComparator();
         this.comparator = comparator;
         firePropertyChange("comparator", old, getComparator());
     }
@@ -413,7 +413,7 @@ public class TableColumnExt extends TableColumn implements UIDependent {
      * @return <code>Comparator</code> to use for this column
      * @see #setComparator
      */
-    public Comparator getComparator() {
+    public Comparator<?> getComparator() {
         return comparator;
     }
 

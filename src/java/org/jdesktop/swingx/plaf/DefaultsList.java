@@ -124,7 +124,7 @@ public final class DefaultsList {
             shouldThrow |= value instanceof Icon;
             shouldThrow |= value instanceof InputMap;
             shouldThrow |= value instanceof Insets;
-            shouldThrow |= value instanceof Painter;
+            shouldThrow |= value instanceof Painter<?>;
             
             if (shouldThrow) {
                 throw new IllegalArgumentException(message);

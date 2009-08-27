@@ -323,7 +323,7 @@ public class PatternModel {
      */
     public static class RegexCreator {
         protected String matchRule;
-        private List rules;
+        private List<String> rules;
 
         public String getMatchRule() {
             if (matchRule == null) {
@@ -376,15 +376,15 @@ public class PatternModel {
             return MATCH_RULE_CONTAINS;
         }
 
-        public List getMatchRules() {
+        public List<String> getMatchRules() {
             if (rules == null) {
                 rules = createAndInitRules();
             }
             return rules;
         }
 
-        private List createAndInitRules() {
-            if (!supportsRules()) return Collections.EMPTY_LIST;
+        private List<String> createAndInitRules() {
+            if (!supportsRules()) return Collections.emptyList();
             List<String> list = new ArrayList<String>();
             list.add(MATCH_RULE_CONTAINS);
             list.add(MATCH_RULE_EQUALS);
@@ -610,7 +610,7 @@ public class PatternModel {
         return getRegexCreator().getMatchRule();
     }
 
-    public List getMatchRules() {
+    public List<String> getMatchRules() {
         return getRegexCreator().getMatchRules();
     }
 

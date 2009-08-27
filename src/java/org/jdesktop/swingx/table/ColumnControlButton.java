@@ -720,7 +720,7 @@ public class ColumnControlButton extends JButton {
      * @return a list containing all additional actions to include into the popup.
      */
     protected List<Action> getAdditionalActions() {
-        List actionKeys = getColumnControlActionKeys();
+        List<?> actionKeys = getColumnControlActionKeys();
         List<Action> actions = new ArrayList<Action>();
         for (Object key : actionKeys) {
           actions.add(table.getActionMap().get(key));

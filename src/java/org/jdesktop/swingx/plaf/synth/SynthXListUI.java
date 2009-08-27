@@ -38,7 +38,6 @@ import javax.swing.plaf.synth.SynthStyle;
 
 import org.jdesktop.swingx.SwingXUtilities;
 import org.jdesktop.swingx.plaf.basic.core.BasicXListUI;
-import org.jdesktop.swingx.plaf.basic.core.BasicXListUI.PropertyChangeHandler;
 
 import sun.swing.plaf.synth.SynthUI;
 
