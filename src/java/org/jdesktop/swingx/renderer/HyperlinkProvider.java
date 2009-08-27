@@ -92,7 +92,7 @@ public class HyperlinkProvider
      * @param linkAction the action that acts on values.
      * @param targetClass the type of values the action can handle.
      */
-    public HyperlinkProvider(AbstractHyperlinkAction linkAction, Class targetClass) {
+    public HyperlinkProvider(AbstractHyperlinkAction linkAction, Class<?> targetClass) {
         super();
 //        rendererComponent.addActionListener(createEditorActionListener());
         setLinkAction(linkAction, targetClass);
@@ -105,7 +105,7 @@ public class HyperlinkProvider
      * 
      * @param targetClass the type of values the action can handle.
      */
-    public void setTargetClass(Class targetClass) {
+    public void setTargetClass(Class<?> targetClass) {
         this.targetClass = targetClass;
     }
 
@@ -130,7 +130,7 @@ public class HyperlinkProvider
      * 
      * @param linkAction
      */
-    public void setLinkAction(AbstractHyperlinkAction linkAction, Class targetClass) {
+    public void setLinkAction(AbstractHyperlinkAction linkAction, Class<?> targetClass) {
         if (linkAction == null) {
             linkAction = createDefaultLinkAction();
         }

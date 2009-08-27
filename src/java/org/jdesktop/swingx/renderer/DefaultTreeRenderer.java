@@ -47,7 +47,7 @@ public class DefaultTreeRenderer extends AbstractRenderer
      * 
      */
     public DefaultTreeRenderer() {
-        this((ComponentProvider)null);
+        this((ComponentProvider<?>)null);
     }
 
 
@@ -59,7 +59,7 @@ public class DefaultTreeRenderer extends AbstractRenderer
      * @param componentProvider the provider of the configured component to
      *        use for cell rendering
      */
-    public DefaultTreeRenderer(ComponentProvider componentProvider) {
+    public DefaultTreeRenderer(ComponentProvider<?> componentProvider) {
         super(componentProvider);
         this.cellContext = new TreeCellContext();
     }
@@ -155,7 +155,7 @@ public class DefaultTreeRenderer extends AbstractRenderer
      * {@inheritDoc}
      */ 
     @Override
-    protected ComponentProvider createDefaultComponentProvider() {
+    protected ComponentProvider<?> createDefaultComponentProvider() {
         return new WrappingProvider();
     }
 

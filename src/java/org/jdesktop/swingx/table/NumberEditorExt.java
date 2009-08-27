@@ -47,8 +47,8 @@ import javax.swing.border.LineBorder;
  */
 public class NumberEditorExt extends DefaultCellEditor {
     
-    private static Class[] argTypes = new Class[]{String.class};
-    java.lang.reflect.Constructor constructor;
+    private static Class<?>[] argTypes = new Class[]{String.class};
+    java.lang.reflect.Constructor<?> constructor;
     
     public NumberEditorExt() {
         this(null);
@@ -98,7 +98,7 @@ public class NumberEditorExt extends DefaultCellEditor {
                                              int row, int column) {
         ((JComponent)getComponent()).setBorder(new LineBorder(Color.black));
         try {
-            final Class type = table.getColumnClass(column);
+            final Class<?> type = table.getColumnClass(column);
             // Assume that the Number object we are dealing with has a constructor which takes
             // a single string parameter.
             if (!Number.class.isAssignableFrom(type)) {

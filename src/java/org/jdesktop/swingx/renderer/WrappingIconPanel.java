@@ -234,7 +234,7 @@ public class WrappingIconPanel extends JXPanel implements PainterAware {
      * 
      * @return the delegate's Painter or null.
      */
-    public Painter getPainter() {
+    public Painter<?> getPainter() {
         if (delegate instanceof PainterAware) {
             return ((PainterAware) delegate).getPainter();
         }
@@ -247,7 +247,7 @@ public class WrappingIconPanel extends JXPanel implements PainterAware {
      * 
      * @param painter the Painter to apply to the delegate.
      */
-    public void setPainter(Painter painter) {
+    public void setPainter(Painter<?> painter) {
         if (delegate instanceof PainterAware) {
             ((PainterAware) delegate).setPainter(painter);
         }

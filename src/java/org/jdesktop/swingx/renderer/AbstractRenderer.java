@@ -33,9 +33,9 @@ import org.jdesktop.swingx.rollover.RolloverRenderer;
 public abstract class AbstractRenderer 
     implements  RolloverRenderer, StringValue, Serializable {
 
-    protected ComponentProvider componentController;
+    protected ComponentProvider<?> componentController;
 
-    public AbstractRenderer(ComponentProvider provider) {
+    public AbstractRenderer(ComponentProvider<?> provider) {
         if (provider ==  null) {
             provider = createDefaultComponentProvider();
         }
@@ -47,7 +47,7 @@ public abstract class AbstractRenderer
      * 
      * @return the ComponentProvider used by this renderer
      */
-    public ComponentProvider getComponentProvider() {
+    public ComponentProvider<?> getComponentProvider() {
         return componentController;
     }
 
@@ -56,7 +56,7 @@ public abstract class AbstractRenderer
      * 
      * @return the default <code>ComponentProvider</code>
      */
-    protected abstract ComponentProvider createDefaultComponentProvider();
+    protected abstract ComponentProvider<?> createDefaultComponentProvider();
     
 // --------------- implement StringValue    
     

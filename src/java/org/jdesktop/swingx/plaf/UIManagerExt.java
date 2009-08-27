@@ -539,7 +539,7 @@ public class UIManagerExt {
      */
     public static Painter<?> getPainter(Object key) {
         Object value = UIManager.getDefaults().get(key);
-        return (value instanceof Painter) ? (Painter<?>) value : null;
+        return (value instanceof Painter<?>) ? (Painter<?>) value : null;
     }
     
     /**
@@ -559,7 +559,7 @@ public class UIManagerExt {
      */
     public static Painter<?> getPainter(Object key, Locale l) {
         Object value = UIManager.getDefaults().get(key, l);
-        return (value instanceof Painter) ? (Painter<?>) value : null;
+        return (value instanceof Painter<?>) ? (Painter<?>) value : null;
     }
     
     /**
