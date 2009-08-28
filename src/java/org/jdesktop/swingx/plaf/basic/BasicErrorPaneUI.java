@@ -455,6 +455,7 @@ public class BasicErrorPaneUI extends ErrorPaneUI {
         return layout;
     }
 
+    @Override
     public Dimension calculatePreferredSize() {
         //TODO returns a Dimension that is either X wide, or as wide as necessary
         //to show the title. It is Y high.
@@ -789,6 +790,7 @@ public class BasicErrorPaneUI extends ErrorPaneUI {
          * @see #setPreferredSize
          * @see ComponentUI
          */
+        @Override
         public Dimension getPreferredSize() {
             int width = 0;
             int height = 0;
@@ -816,6 +818,7 @@ public class BasicErrorPaneUI extends ErrorPaneUI {
             this.details = detailComponent;
         }
 
+        @Override
         protected Transferable createTransferable(JComponent c) {
             String text = details.getSelectedText();
             if (text == null || text.equals("")) {
@@ -826,6 +829,7 @@ public class BasicErrorPaneUI extends ErrorPaneUI {
             return new StringSelection(text);
         }
 
+        @Override
         public int getSourceActions(JComponent c) {
             return TransferHandler.COPY;
         }
@@ -871,6 +875,7 @@ public class BasicErrorPaneUI extends ErrorPaneUI {
             };
             closeButton.addActionListener(closeAction);
             addComponentListener(new ComponentAdapter() {
+                @Override
                 public void componentHidden(ComponentEvent e) {
                     //remove the action listener
                     closeButton.removeActionListener(closeAction);
@@ -926,6 +931,7 @@ public class BasicErrorPaneUI extends ErrorPaneUI {
         }
 
         w.addWindowListener(new WindowAdapter() {
+            @Override
             public void windowClosed(WindowEvent e) {
                 //remove the action listener
                 closeButton.removeActionListener(closeAction);

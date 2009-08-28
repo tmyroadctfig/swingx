@@ -21,6 +21,7 @@ public final class EnumerationValue {
         return name;
     }
     
+    @Override
     public String toString() {
         return name;
     }

@@ -11,6 +11,7 @@ public class VerticalLayoutBeanInfo extends BeanInfoSupport {
         super(VerticalLayout.class);        
     }
     
+    @Override
     protected void initialize() {
         setHidden(true, "class");
     }

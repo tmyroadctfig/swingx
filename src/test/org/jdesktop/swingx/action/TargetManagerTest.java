@@ -33,6 +33,7 @@ public class TargetManagerTest extends TestCase {
         tearDown();
     }
     
+    @Override
     protected void tearDown() {
         TargetManager manager = TargetManager.getInstance();
         manager.reset();

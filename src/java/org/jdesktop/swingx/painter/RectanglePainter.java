@@ -207,6 +207,7 @@ public class RectanglePainter<T> extends AbstractAreaPainter<T> {
 
 
 
+    @Override
     protected void doPaint(Graphics2D g, T component, int width, int height) {
         RectangularShape shape = calculateShape(width, height);
         switch (getStyle()) {
@@ -277,6 +278,7 @@ public class RectanglePainter<T> extends AbstractAreaPainter<T> {
         }
     }
 
+    @Override
     public Shape provideShape(Graphics2D g, T comp, int width, int height) {
         return calculateShape(width,height);
     }

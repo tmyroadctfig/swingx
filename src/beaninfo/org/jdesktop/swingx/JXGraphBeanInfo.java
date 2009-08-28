@@ -33,6 +33,7 @@ public class JXGraphBeanInfo extends BeanInfoSupport {
         super(JXGraph.class);
     }
 
+    @Override
     protected void initialize() {
         setCategory("Graph View", "majorX", "majorY", "minorCountX", "minorCountY",
                     "origin", "view");

@@ -67,6 +67,7 @@ public class BasicLoginPaneUI extends LoginPaneUI {
     return new BasicLoginPaneUI((JXLoginPane)c);
   }
 
+    @Override
     public void installUI(JComponent c) {
         installDefaults();
     }
@@ -87,6 +88,7 @@ public class BasicLoginPaneUI extends LoginPaneUI {
      * Creates default 400x60 banner for the login panel.
      * @see org.jdesktop.swingx.plaf.LoginPaneUI#getBanner()
      */
+    @Override
     public Image getBanner() {
         int w = 400;
         int h = 60;

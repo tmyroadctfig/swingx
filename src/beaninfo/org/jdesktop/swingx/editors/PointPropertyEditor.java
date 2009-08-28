@@ -34,15 +34,18 @@ public class PointPropertyEditor extends PropertyEditorSupport {
     public PointPropertyEditor() {
     }
 
+    @Override
     public Point getValue() {
         return (Point)super.getValue();
     }
 
+    @Override
     public String getJavaInitializationString() {
         Point point = getValue();
         return point == null ? "null" : "new java.awt.Point(" + point.getX() + ", " + point.getY() + ")";
     }
 
+    @Override
     public void setAsText(String text) throws IllegalArgumentException {
         String originalParam = text;
         try {
@@ -55,6 +58,7 @@ public class PointPropertyEditor extends PropertyEditorSupport {
         }
     }
 
+    @Override
     public String getAsText() {
         Point point = getValue();
         return point == null ? "[]" : "[" + point.x + ", " + point.y + "]";

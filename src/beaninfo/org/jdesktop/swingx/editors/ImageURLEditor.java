@@ -29,38 +29,46 @@ public class ImageURLEditor extends PropertyEditorSupport {
         });
     }
     
+    @Override
     public String getValue() {
         return imageURL;
     }
     
+    @Override
     public void setValue(Object object) {
         imageURL = (String)object;
         super.setValue(imageURL);
         picker.imageView.setImage(image);
     }
     
+    @Override
     public void setAsText(String text) throws IllegalArgumentException {
         // do nothing right now
     }
     
+    @Override
     public String getAsText() {
         return imageURL;
     }
     
+    @Override
     public void paintValue(Graphics graphics, Rectangle r) {
         //graphics.drawImage(image, (int)r.getX(), (int)r.getY(),
         //        (int)r.getWidth(), (int)r.getHeight(), null);
     }
     
     
+    @Override
     public boolean isPaintable() {
         return false;
     }
     
+    @Override
     public boolean supportsCustomEditor() {
         return true;
     }
     
+    @Override
     public Component getCustomEditor() {
         return picker;
     }

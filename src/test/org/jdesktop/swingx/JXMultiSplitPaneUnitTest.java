@@ -38,6 +38,7 @@ public class JXMultiSplitPaneUnitTest extends TestCase {
         tearDown();
     }
     
+    @Override
     protected void setUp() throws Exception {
         DefaultSplitPaneModel model = new DefaultSplitPaneModel();
         MultiSplitLayout layout = new MultiSplitLayout(model);

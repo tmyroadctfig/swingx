@@ -11,6 +11,7 @@ public class JXLabelBeanInfo extends BeanInfoSupport {
         super(JXLabel.class);        
     }
     
+    @Override
     protected void initialize() {
         String iconName = "resources/" + JXLabel.class.getSimpleName();
         setSmallMonoIconName(iconName + "16.png");

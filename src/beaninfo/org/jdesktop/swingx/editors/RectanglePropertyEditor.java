@@ -23,15 +23,18 @@ public class RectanglePropertyEditor extends PropertyEditorSupport {
     public RectanglePropertyEditor() {
     }
     
+    @Override
     public Rectangle getValue() {
         return (Rectangle)super.getValue();
     }
     
+    @Override
     public String getJavaInitializationString() {
         Rectangle rect = getValue();
         return rect == null ? "null" : "new java.awt.Rectangle(" + rect.getX() + ", " + rect.getY() + ", " + rect.getWidth() + ", " + rect.getHeight() + ")";
     }
     
+    @Override
     public void setAsText(String text) throws IllegalArgumentException {
         String originalParam = text;
         try {
@@ -46,6 +49,7 @@ public class RectanglePropertyEditor extends PropertyEditorSupport {
     }
     
     
+    @Override
     public String getAsText() {
         Rectangle rect = getValue();
         return rect == null ? "[]" : "[" + rect.x + ", " + rect.y + ", " + rect.width + ", " + rect.height + "]";

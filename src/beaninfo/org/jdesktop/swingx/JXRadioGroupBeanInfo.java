@@ -30,6 +30,7 @@ public class JXRadioGroupBeanInfo extends BeanInfoSupport {
         super(JXRadioGroup.class);
     }
 
+    @Override
     protected void initialize() {
     }
 }

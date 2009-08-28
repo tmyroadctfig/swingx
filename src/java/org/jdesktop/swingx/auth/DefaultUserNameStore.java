@@ -59,6 +59,7 @@ public class DefaultUserNameStore extends UserNameStore {
     /**
      * Loads the user names from Preferences
      */
+    @Override
     public void loadUserNames() {
         initPrefs();
         if (prefs != null) {
@@ -74,6 +75,7 @@ public class DefaultUserNameStore extends UserNameStore {
     /**
      * Saves the user names to Preferences
      */
+    @Override
     public void saveUserNames() {
         initPrefs();
         if (prefs != null) {
@@ -87,6 +89,7 @@ public class DefaultUserNameStore extends UserNameStore {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String[] getUserNames() {
         String[] copy = new String[userNames.length];
         System.arraycopy(userNames, 0, copy, 0, userNames.length);
@@ -97,6 +100,7 @@ public class DefaultUserNameStore extends UserNameStore {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setUserNames(String[] userNames) {
         userNames = userNames == null ? new String[0] : userNames;
         String[] old = getUserNames();
@@ -108,6 +112,7 @@ public class DefaultUserNameStore extends UserNameStore {
      * Add a username to the store.
      * @param name
      */
+    @Override
     public void addUserName(String name) {
         if (!containsUserName(name)) {
             String[] newNames = new String[userNames.length + 1];
@@ -124,6 +129,7 @@ public class DefaultUserNameStore extends UserNameStore {
      *
      * @param name
      */
+    @Override
     public void removeUserName(String name) {
         if (containsUserName(name)) {
             String[] newNames = new String[userNames.length - 1];
@@ -140,6 +146,7 @@ public class DefaultUserNameStore extends UserNameStore {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean containsUserName(String name) {
         for (String s : userNames) {
             if (s.equals(name)) {

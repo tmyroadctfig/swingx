@@ -18,6 +18,7 @@ public class EnumComboBoxModelUnitTest extends InteractiveTestCase {
 
     enum MyEnum2 {
         EasyStuff, HardStuff;
+        @Override
         public String toString() {
             switch (this) {
             case EasyStuff:
@@ -32,6 +33,7 @@ public class EnumComboBoxModelUnitTest extends InteractiveTestCase {
 
     enum MyEnum3 {
         RightStuff, WrongStuff;
+        @Override
         public String toString() {
             switch (this) {
             case RightStuff:

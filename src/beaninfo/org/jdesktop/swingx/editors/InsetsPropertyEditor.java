@@ -22,10 +22,12 @@ public class InsetsPropertyEditor extends PropertyEditorSupport {
     public InsetsPropertyEditor() {
     }
     
+    @Override
     public Insets getValue() {
         return (Insets)super.getValue();
     }
     
+    @Override
     public void setAsText(String text) {
         String originalParam = text;
         
@@ -39,6 +41,7 @@ public class InsetsPropertyEditor extends PropertyEditorSupport {
         }
     }
     
+    @Override
     public String getAsText() {
         Insets val = getValue();
         return val == null ? "[]" : "[" + val.top + ", " + val.left + ", " + 

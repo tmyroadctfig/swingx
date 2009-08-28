@@ -19,6 +19,7 @@ public class AbstractPainterBeanInfo extends BeanInfoSupport {
         super(clazz);
     }
 
+    @Override
     protected void initialize() {
         setHidden(true, "class", "propertyChangeListeners", "vetoableChangeListeners", "filters");
         setPropertyEditor(InterpolationPropertyEditor.class, "interpolation");

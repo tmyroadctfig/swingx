@@ -41,11 +41,13 @@ class TestablePainter extends AbstractPainter {
         super(cacheable);
     }
 
+    @Override
     protected void doPaint(Graphics2D g, Object obj, int width, int height) {
         painted = true;
         last = obj;
     }
 
+    @Override
     protected void validate(Object object) {
         if (last != object) {
             clearCache();
@@ -53,6 +55,7 @@ class TestablePainter extends AbstractPainter {
         }
     }
 
+    @Override
     protected void configureGraphics(Graphics2D g) {
         configured = true;
         configureCalledFirst = configured && !painted;

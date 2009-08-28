@@ -64,6 +64,7 @@ import com.jhlabs.image.ShadowFilter;
  *
  * @author  joshy
  */
+@SuppressWarnings("unchecked")
 public class PainterDemoSet extends javax.swing.JFrame {
     private static final MultipleGradientPaint gradient = new LinearGradientPaint(
             new Point2D.Double(0,0), new Point2D.Double(100,0),
@@ -1396,6 +1397,7 @@ public class PainterDemoSet extends javax.swing.JFrame {
             { "Crash", "Dave Mathews Band", "Crash" }
         };
         return new JTable(new DefaultTableModel(data,columns) {
+            @Override
             public boolean isCellEditable(int row, int column) {
                 return editable;
             }
@@ -1423,6 +1425,7 @@ public class PainterDemoSet extends javax.swing.JFrame {
             this.title = title;
             this.citeid = citeid;
         }
+        @Override
         public String toString() {
             return this.title;
         }

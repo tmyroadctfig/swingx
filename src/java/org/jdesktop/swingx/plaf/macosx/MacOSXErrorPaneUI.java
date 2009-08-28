@@ -80,6 +80,7 @@ public class MacOSXErrorPaneUI extends BasicErrorPaneUI {
         super();
     }
 
+    @Override
     protected void configureDetailsButton(boolean expanded) {
         if (expanded) {
             detailButton.setText(UIManagerExt.getString(CLASS_NAME + ".details_contract_text", detailButton.getLocale()));
@@ -90,6 +91,7 @@ public class MacOSXErrorPaneUI extends BasicErrorPaneUI {
         }
     }
     
+    @Override
     protected void configureReportAction(AbstractActionExt reportAction) {
         reportAction.setName(UIManagerExt.getString(CLASS_NAME + ".report_button_text", pane.getLocale()));
 //        reportButton.setText("Send Report To Apple");
@@ -156,6 +158,7 @@ public class MacOSXErrorPaneUI extends BasicErrorPaneUI {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected LayoutManager createDetailPanelLayout() {
         GridBagLayout layout = new GridBagLayout();
         layout.addLayoutComponent(detailsScrollPane, new GridBagConstraints(0,0,1,1,1.0,1.0,GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0,0,0,0),0,0));
@@ -166,6 +169,7 @@ public class MacOSXErrorPaneUI extends BasicErrorPaneUI {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void reinit() {
         super.reinit();
         ErrorInfo info = pane == null ? null : pane.getErrorInfo();
@@ -186,6 +190,7 @@ public class MacOSXErrorPaneUI extends BasicErrorPaneUI {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected int getDetailsHeight() {
         return 150;
     }

@@ -35,6 +35,7 @@ public class JXCollapsiblePaneBeanInfo extends BeanInfoSupport {
         super(JXCollapsiblePane.class);        
     }
 
+    @Override
     protected void initialize() {
         BeanDescriptor bd = getBeanDescriptor();
         bd.setName("JXCollapsiblePane");

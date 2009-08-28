@@ -15,6 +15,7 @@ public class ShapePainterBeanInfo extends BeanInfoSupport {
         super(ShapePainter.class);
     }
     
+    @Override
     protected void initialize() {
         setPropertyEditor(ShapePropertyEditor.class, "shape");
         setPreferred(true, "shape");

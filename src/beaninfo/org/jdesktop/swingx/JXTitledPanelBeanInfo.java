@@ -13,6 +13,7 @@ public class JXTitledPanelBeanInfo extends BeanInfoSupport {
         super(JXTitledPanel.class);
     }
     
+    @Override
     protected void initialize() {
         BeanDescriptor bd = getBeanDescriptor();
         bd.setValue("containerDelegate", "getContentContainer");

@@ -24,6 +24,7 @@ public class NeonBorderEffectBeanInfo extends AbstractPainterBeanInfo {
         super(NeonBorderEffect.class);
     }
     
+    @Override
     protected void initialize() {
         super.initialize();
         setPropertyEditor(Paint2PropertyEditor.class, "edgeColor", "centerColor", "brushColor");

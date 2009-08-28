@@ -35,6 +35,7 @@ public class JXHeaderBeanInfo extends BeanInfoSupport {
         super(JXHeader.class);
     }
 
+    @Override
     protected void initialize() {
         BeanDescriptor bd = getBeanDescriptor();
         bd.setValue("isContainer", Boolean.FALSE);

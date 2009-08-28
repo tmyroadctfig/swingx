@@ -16,6 +16,7 @@ public class IconBorderBeanInfo extends BeanInfoSupport {
         super(IconBorder.class);        
     }
 
+    @Override
     protected void initialize() {
         setHidden(true, "class", "borderOpaque");
         setEnumerationValues(new EnumerationValue[] {

@@ -14,6 +14,7 @@ public class RectanglePainterBeanInfo extends BeanInfoSupport {
         super(RectanglePainter.class);
     }
     
+    @Override
     protected void initialize() {
         setPreferred(true, "roundHeight", "roundWidth", "rounded");
     }

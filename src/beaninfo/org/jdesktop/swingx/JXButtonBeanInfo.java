@@ -11,6 +11,7 @@ public class JXButtonBeanInfo extends BeanInfoSupport {
         super(JXButton.class);        
     }
     
+    @Override
     protected void initialize() {
         setPreferred(true, "backgroundPainter", "foregroundPainter");
     }

@@ -31,6 +31,7 @@ public class JXHyperlinkBeanInfo extends BeanInfoSupport {
         super(JXHyperlink.class);
     }
 
+    @Override
     protected void initialize() {
         setPreferred(true, "clickedColor", "unclickedColor");
         setPreferred(false, "background", "foreground", "border");

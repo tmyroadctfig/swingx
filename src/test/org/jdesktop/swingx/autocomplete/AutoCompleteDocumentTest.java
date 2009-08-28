@@ -38,10 +38,12 @@ import org.junit.runners.JUnit4;
 @RunWith(JUnit4.class)
 public class AutoCompleteDocumentTest extends TestCase {
 
+    @Override
     @Before
        public void setUp() {
     }
 
+    @Override
     @After
        public void tearDown() {
     }

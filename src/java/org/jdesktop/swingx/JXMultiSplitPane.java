@@ -175,6 +175,7 @@ public class JXMultiSplitPane extends JPanel {
     }
 
     private class DefaultDividerPainter extends DividerPainter {
+        @Override
         protected void doPaint(Graphics2D g, Divider divider, int width, int height) {
             if ((divider == activeDivider()) && !isContinuousLayout()) {
             g.setColor(Color.black);
@@ -242,6 +243,7 @@ public class JXMultiSplitPane extends JPanel {
      * @see #paint(Graphics)
      * @see javax.swing.plaf.ComponentUI
      */
+    @Override
     protected void paintComponent(Graphics g)
     {
       if (backgroundPainter != null) {
@@ -291,6 +293,7 @@ public class JXMultiSplitPane extends JPanel {
      * <p>
      * {@inheritDoc}
      */
+    @Override
     protected void paintChildren(Graphics g) {
       super.paintChildren(g);
       DividerPainter dp = getDividerPainter();
@@ -509,24 +512,30 @@ public class JXMultiSplitPane extends JPanel {
 
     private class InputHandler extends MouseInputAdapter implements KeyListener {
 
+        @Override
         public void mouseEntered(MouseEvent e) {
             updateCursor(e.getX(), e.getY(), true);
         }
     
+        @Override
         public void mouseMoved(MouseEvent e) {
             updateCursor(e.getX(), e.getY(), true);
         }
     
+        @Override
         public void mouseExited(MouseEvent e) {
             updateCursor(e.getX(), e.getY(), false);
         }
     
+        @Override
         public void mousePressed(MouseEvent e) {
             startDrag(e.getX(), e.getY());
         }
+        @Override
         public void mouseReleased(MouseEvent e) {
             finishDrag(e.getX(), e.getY());
         }
+        @Override
         public void mouseDragged(MouseEvent e) {
             updateDrag(e.getX(), e.getY());        
         }
@@ -540,6 +549,7 @@ public class JXMultiSplitPane extends JPanel {
         public void keyTyped(KeyEvent e) { }
     }
 
+    @Override
     public AccessibleContext getAccessibleContext() {
         if( accessibleContext == null ) {
             accessibleContext = new AccessibleMultiSplitPane();
@@ -548,6 +558,7 @@ public class JXMultiSplitPane extends JPanel {
     }
     
     protected class AccessibleMultiSplitPane extends AccessibleJPanel {
+        @Override
         public AccessibleRole getAccessibleRole() {
             return AccessibleRole.SPLIT_PANE;
         }

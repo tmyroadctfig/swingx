@@ -50,11 +50,13 @@ public class GradientTrackRenderer extends JComponent implements TrackRenderer {
     
     private JXMultiThumbSlider slider;
     
+    @Override
     public void paint(Graphics g) {
         super.paint(g);
         paintComponent(g);
     }
 
+    @Override
     protected void paintComponent(Graphics gfx) {
         Graphics2D g = (Graphics2D)gfx;
         

@@ -38,22 +38,27 @@ public class ShapePropertyEditor extends PropertyEditorSupport {
         });
     }
     
+    @Override
     public Shape getValue() {
         return (Shape)super.getValue();
     }
     
+    @Override
     public void setValue(Object value) {
         super.setValue(value);
     }
     
+    @Override
     public boolean isPaintable() {
         return true;
     }
     
+    @Override
     public boolean supportsCustomEditor() {
         return true;
     }
     
+    @Override
     public Component getCustomEditor() {
         return chooser;
     }

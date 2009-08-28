@@ -156,6 +156,7 @@ public class ImagePainter extends AbstractAreaPainter<Object> {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void doPaint(Graphics2D g, Object component, int width, int height) {
         if (img == null && imageURL != null) {
             loadImage();
@@ -419,6 +420,7 @@ public class ImagePainter extends AbstractAreaPainter<Object> {
     /**
      *
      */
+    @Override
     protected Shape provideShape(Graphics2D g, Object comp, int width, int height) {
         if(getImage() != null) {
             BufferedImage img = getImage();

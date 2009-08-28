@@ -33,6 +33,7 @@ public class JXFrameBeanInfo extends BeanInfoSupport {
         super(JXFrame.class);
     }
 
+    @Override
     protected void initialize() {
         setPreferred(true, "cancelButton", "defaultButton");
         setPreferred(true, "startPosition");

@@ -124,6 +124,7 @@ public class JXDialog extends JDialog {
     /**
      * {@inheritDoc}
      */
+    @Override
     public JXRootPane getRootPane() {
         return (JXRootPane) super.getRootPane();
     }

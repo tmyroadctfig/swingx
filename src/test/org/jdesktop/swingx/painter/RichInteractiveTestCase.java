@@ -80,6 +80,7 @@ public class RichInteractiveTestCase extends TestCase {
                     buttonPanel.add(failButton);
                     frame.add(buttonPanel, BorderLayout.SOUTH);
                     frame.addWindowListener(new WindowAdapter() {
+                        @Override
                         public void windowClosed(WindowEvent windowEvent) {
                             block = false;
                         }

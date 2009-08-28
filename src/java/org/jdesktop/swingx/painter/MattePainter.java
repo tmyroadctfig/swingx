@@ -84,6 +84,7 @@ public class MattePainter extends AbstractAreaPainter<Object> {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void doPaint(Graphics2D g, Object component, int width, int height) {
         Paint p = getFillPaint();
         if (p != null) {
@@ -95,6 +96,7 @@ public class MattePainter extends AbstractAreaPainter<Object> {
         }
     }
 
+    @Override
     public Shape provideShape(Graphics2D g, Object comp, int width, int height) {
         return new Rectangle(0,0,width,height);
     }

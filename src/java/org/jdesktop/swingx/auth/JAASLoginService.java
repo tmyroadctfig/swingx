@@ -67,6 +67,7 @@ public class JAASLoginService extends LoginService {
      * @inheritDoc
      *      
      */
+    @Override
     public boolean authenticate(String name, char[] password, String server) throws Exception {
 		// If user has selected a different server, update the login service
 		if (server != null) {

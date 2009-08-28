@@ -32,6 +32,7 @@ public class JXListBeanInfo extends BeanInfoSupport {
         super(JXList.class);
     }
 
+    @Override
     protected void initialize() {
         setPreferred(true, "highlighters");
 //        setPropertyEditor(HighlighterPropertyEditor.class, "highlighters");

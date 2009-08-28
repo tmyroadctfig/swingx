@@ -1422,6 +1422,7 @@ public class JXLoginPane extends JXPanel {
      * us to avoid having to check for LoginService being null
      */
     private static final class NullLoginService extends LoginService {
+        @Override
         public boolean authenticate(String name, char[] password, String server) throws Exception {
             return true;
         }
@@ -1785,6 +1786,7 @@ public class JXLoginPane extends JXPanel {
         controls.add(buttonPanel);
         w.add(controls, BorderLayout.SOUTH);
         w.addWindowListener(new WindowAdapter() {
+            @Override
             public void windowClosing(java.awt.event.WindowEvent e) {
                 panel.cancelLogin();
             }
@@ -1918,11 +1920,13 @@ public class JXLoginPane extends JXPanel {
             this.cot = cot;
         }
 
+        @Override
         public void windowActivated(WindowEvent e) {
             cot.runTest();
             stamp = System.currentTimeMillis();
         }
 
+        @Override
         public void windowGainedFocus(WindowEvent e) {
             // repeat test only if more then 20ms passed between activation test
             // and now.

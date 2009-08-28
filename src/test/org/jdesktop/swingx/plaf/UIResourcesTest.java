@@ -51,6 +51,7 @@ public class UIResourcesTest extends TestCase {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void setUp() {
         System.setProperty("swingx.enableStrictResourceChecking", "true");
         LookAndFeelAddons.contribute(new BusyLabelAddon());

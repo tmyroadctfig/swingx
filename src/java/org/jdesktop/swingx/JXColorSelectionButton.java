@@ -113,6 +113,7 @@ public class JXColorSelectionButton extends JButton {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void paintComponent(Graphics g) {
         // want disabledForeground when disabled, current colour otherwise
         final Color FILL_COLOR = isEnabled() ? ColorUtil.removeAlpha(getBackground())

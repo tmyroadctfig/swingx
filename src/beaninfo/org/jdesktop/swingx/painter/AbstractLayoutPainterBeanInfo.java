@@ -18,6 +18,7 @@ public class AbstractLayoutPainterBeanInfo extends BeanInfoSupport {
         super(clazz);
     }
 
+    @Override
     protected void initialize() {
         setPropertyEditor(HorizontalAlignmentPropertyEditor.class, "horizontalAlignment");
         setPropertyEditor(VerticalAlignmentPropertyEditor.class, "verticalAlignment");

@@ -13,6 +13,7 @@ public class DropShadowBorderBeanInfo extends BeanInfoSupport {
         super(DropShadowBorder.class);        
     }
     
+    @Override
     protected void initialize() {
         setHidden(true, "class");
         String iconName = "/org/jdesktop/swingx/resources/DropShadowBorder";

@@ -93,13 +93,16 @@ public class EyeDropperColorChooserPanel extends AbstractColorChooserPanel {
     public EyeDropperColorChooserPanel() {
         initComponents();
         MouseInputAdapter mia = new MouseInputAdapter() {
+            @Override
             public void mousePressed(MouseEvent evt) {
             }
+            @Override
             public void mouseDragged(MouseEvent evt) {
                 Point pt = evt.getPoint();
                 SwingUtilities.convertPointToScreen(pt,evt.getComponent());
                 ((MagnifyingPanel)magPanel).setMagPoint(pt);
             }
+            @Override
             public void mouseReleased(MouseEvent evt) {
                 Color newColor = new Color(((MagnifyingPanel)magPanel).activeColor);
                 getColorSelectionModel().setSelectedColor(newColor);
@@ -132,6 +135,7 @@ public class EyeDropperColorChooserPanel extends AbstractColorChooserPanel {
             this.point = point;
             repaint();
         }
+        @Override
         public void paintComponent(Graphics g) {
             if(point != null) {
                 Rectangle rect = new Rectangle((int)point.getX()-10,(int)point.getY()-10,20,20);
@@ -260,18 +264,21 @@ public class EyeDropperColorChooserPanel extends AbstractColorChooserPanel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void updateChooser() {
     }
     
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void buildChooser() {
     }
     
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getDisplayName() {
         return "Grab from Screen";
     }
@@ -279,6 +286,7 @@ public class EyeDropperColorChooserPanel extends AbstractColorChooserPanel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Icon getSmallDisplayIcon() {
         return new ImageIcon();
     }
@@ -286,6 +294,7 @@ public class EyeDropperColorChooserPanel extends AbstractColorChooserPanel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Icon getLargeDisplayIcon() {
         return new ImageIcon();
     }

@@ -32,6 +32,7 @@ public class JXTaskPaneContainerBeanInfo extends BeanInfoSupport {
         super(JXTaskPaneContainer.class);
     }
     
+    @Override
     protected void initialize() {
         BeanDescriptor bd = getBeanDescriptor();
         // setup bean descriptor in constructor.

@@ -21,15 +21,18 @@ public class DimensionPropertyEditor extends PropertyEditorSupport {
     public DimensionPropertyEditor() {
     }
     
+    @Override
     public Dimension getValue() {
         return (Dimension)super.getValue();
     }
     
+    @Override
     public String getJavaInitializationString() {
         Dimension point = getValue();
         return point == null ? "null" : "new java.awt.Dimension(" + point.width + ", " + point.height + ")";
     }
     
+    @Override
     public void setAsText(String text) throws IllegalArgumentException {
         String originalParam = text;
         try {
@@ -44,6 +47,7 @@ public class DimensionPropertyEditor extends PropertyEditorSupport {
         }
     }
     
+    @Override
     public String getAsText() {
         Dimension dim = getValue();
         return dim == null ? "[]" : "[" + dim.width + ", " + dim.height + "]";

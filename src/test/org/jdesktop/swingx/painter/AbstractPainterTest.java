@@ -47,6 +47,7 @@ public class AbstractPainterTest extends TestCase {
     private TestablePainter p;
     private TestableFilter filter;
 
+    @Override
     @Before
        public void setUp() {
         p = new TestablePainter();
@@ -55,6 +56,7 @@ public class AbstractPainterTest extends TestCase {
         filter = new TestableFilter();
     }
 
+    @Override
     @After
        public void tearDown() {
         g.dispose();
@@ -352,6 +354,7 @@ public class AbstractPainterTest extends TestCase {
             this.painters = painters;
         }
 
+        @Override
         protected void validate(Object object) {
             super.validate(object);
             //iterate over all of the painters and query them to see if they
@@ -366,6 +369,7 @@ public class AbstractPainterTest extends TestCase {
             }
         }
 
+        @Override
         protected void doPaint(Graphics2D g, Object obj, int width, int height) {
             super.doPaint(g, obj, width, height);
             for (TestablePainter p : painters) {

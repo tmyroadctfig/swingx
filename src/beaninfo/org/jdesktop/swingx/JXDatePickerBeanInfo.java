@@ -34,6 +34,7 @@ public class JXDatePickerBeanInfo extends BeanInfoSupport {
         super(JXDatePicker.class);
     }
 
+    @Override
     protected void initialize() {
         BeanDescriptor bd = getBeanDescriptor();
         bd.setValue("isContainer", Boolean.FALSE);

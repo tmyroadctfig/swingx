@@ -50,6 +50,7 @@ public class ErrorPaneAddon extends AbstractComponentAddon {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void addMacDefaults(LookAndFeelAddons addon, DefaultsList defaults) {
         super.addMacDefaults(addon, defaults);
         

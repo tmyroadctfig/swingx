@@ -14,6 +14,7 @@ public class CompoundPainterBeanInfo extends BeanInfoSupport {
         super(CompoundPainter.class);
     }
 
+    @Override
     protected void initialize() {
         setPreferred(true, "painters");
     }
