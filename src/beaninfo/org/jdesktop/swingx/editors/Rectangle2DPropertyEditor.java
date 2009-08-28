@@ -34,15 +34,18 @@ public class Rectangle2DPropertyEditor extends PropertyEditorSupport {
     public Rectangle2DPropertyEditor() {
     }
 
+    @Override
     public Rectangle2D getValue() {
         return (Rectangle2D.Double)super.getValue();
     }
 
+    @Override
     public String getJavaInitializationString() {
         Rectangle2D rect = getValue();
         return rect == null ? "null" : "new java.awt.geom.Rectangle2D.Double(" + rect.getX() + ", " + rect.getY() + ", " + rect.getWidth() + ", " + rect.getHeight() + ")";
     }
 
+    @Override
     public void setAsText(String text) throws IllegalArgumentException {
         String originalParam = text;
         try {
@@ -55,6 +58,7 @@ public class Rectangle2DPropertyEditor extends PropertyEditorSupport {
         }
     }
 
+    @Override
     public String getAsText() {
         Rectangle2D rect = getValue();
         return rect == null ? "[]" : "[" + rect.getX() + ", " + rect.getY() + ", " + rect.getWidth() + ", " + rect.getHeight() + "]";

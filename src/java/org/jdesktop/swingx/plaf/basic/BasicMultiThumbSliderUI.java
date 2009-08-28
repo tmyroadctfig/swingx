@@ -45,11 +45,13 @@ public class BasicMultiThumbSliderUI extends MultiThumbSliderUI {
         return new BasicMultiThumbSliderUI();
     }
     
+    @Override
     public void installUI(JComponent c) {
         slider = (JXMultiThumbSlider<?>)c;
         slider.setThumbRenderer(new BasicThumbRenderer());
         slider.setTrackRenderer(new BasicTrackRenderer());        
     }
+    @Override
     public void uninstallUI(JComponent c) {
         slider = null;
     }
@@ -59,6 +61,7 @@ public class BasicMultiThumbSliderUI extends MultiThumbSliderUI {
             setPreferredSize(new Dimension(14,14));
         }
 
+        @Override
         protected void paintComponent(Graphics g) {
             g.setColor(Color.green);
             Polygon poly = new Polygon();
@@ -77,6 +80,7 @@ public class BasicMultiThumbSliderUI extends MultiThumbSliderUI {
 
     private class BasicTrackRenderer extends JComponent implements TrackRenderer {
         private JXMultiThumbSlider<?> slider;
+        @Override
         public void paintComponent(Graphics g) {
             g.setColor(slider.getBackground());
             g.fillRect(0, 0, slider.getWidth(), slider.getHeight());

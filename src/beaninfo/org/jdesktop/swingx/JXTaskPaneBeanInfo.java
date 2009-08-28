@@ -34,6 +34,7 @@ public class JXTaskPaneBeanInfo extends BeanInfoSupport {
         super(JXTaskPane.class);
     }
     
+    @Override
     protected void initialize() {
         BeanDescriptor bd = getBeanDescriptor();
         

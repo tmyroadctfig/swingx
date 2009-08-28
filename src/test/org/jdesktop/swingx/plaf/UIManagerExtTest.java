@@ -38,6 +38,7 @@ public class UIManagerExtTest extends TestCase {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void setUp() {
         UIManagerExt.addResourceBundle("org.jdesktop.swingx.plaf.UIManagerExtTest");
     }

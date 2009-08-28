@@ -237,6 +237,7 @@ public class JXImagePanel extends JXPanel {
      *  {@inheritDoc}
      *  The old property value in PCE fired by this method might not be always correct!
      */
+    @Override
     public Dimension getPreferredSize() {
         if (!isPreferredSizeSet() && img != null) {
             Image img = this.img.get();
@@ -263,6 +264,7 @@ public class JXImagePanel extends JXPanel {
      * 
      * @param g
      */
+    @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g;
@@ -383,6 +385,7 @@ public class JXImagePanel extends JXPanel {
 
         private JFileChooser chooser;
 
+        @Override
         public void mouseClicked(MouseEvent evt) {
             if (chooser == null) {
                 chooser = new JFileChooser();
@@ -397,6 +400,7 @@ public class JXImagePanel extends JXPanel {
             }
         }
 
+        @Override
         public void mouseEntered(MouseEvent evt) {
             if (oldCursor == null) {
                 oldCursor = getCursor();
@@ -404,6 +408,7 @@ public class JXImagePanel extends JXPanel {
             }
         }
 
+        @Override
         public void mouseExited(MouseEvent evt) {
             if (oldCursor != null) {
                 setCursor(oldCursor);

@@ -13,6 +13,7 @@ public class JXErrorPaneBeanInfo extends BeanInfoSupport {
         super(JXErrorPane.class);        
     }
 
+    @Override
     protected void initialize() {
         BeanDescriptor bd = getBeanDescriptor();
         bd.setValue("isContainer", Boolean.FALSE);

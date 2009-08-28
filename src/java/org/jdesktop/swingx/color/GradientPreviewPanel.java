@@ -129,6 +129,7 @@ public class GradientPreviewPanel extends JXPanel {
         return this.model;
     }
 
+    @Override
     protected void paintComponent(Graphics g) {
         try {
             Graphics2D g2 = (Graphics2D)g;
@@ -217,6 +218,7 @@ public class GradientPreviewPanel extends JXPanel {
     
     private class GradientMouseHandler extends MouseInputAdapter {
 
+        @Override
         public void mousePressed(MouseEvent evt) {
             moving_start = false;
             moving_end = false;
@@ -235,6 +237,7 @@ public class GradientPreviewPanel extends JXPanel {
             start = evt.getPoint();
         }
 
+        @Override
         public void mouseDragged(MouseEvent evt) {
             if (moving_start) {
                 start = evt.getPoint();

@@ -26,7 +26,6 @@ import org.jdesktop.swingx.renderer.CellContext;
 import org.jdesktop.swingx.renderer.ComponentProvider;
 import org.jdesktop.swingx.renderer.FormatStringValue;
 import org.jdesktop.swingx.renderer.LabelProvider;
-import org.jdesktop.swingx.renderer.PainterAware;
 import org.jdesktop.swingx.renderer.StringValue;
 import org.jdesktop.swingx.renderer.StringValues;
 
@@ -226,7 +225,7 @@ class BasicCalendarRenderingHandler implements CalendarRenderingHandler {
      * NOTE: it's the responsibility of the CalendarCellContext to detangle
      * all "default" (that is: which could be queried from the comp and/or UIManager)
      * foreground/background colors based on the given state! Moved out off here.
-     * 
+     * <p>
      * PENDING JW: replace hard-coded logic by giving over to highlighters.
      * 
      * @param monthView the JXMonthView to render onto
@@ -237,33 +236,7 @@ class BasicCalendarRenderingHandler implements CalendarRenderingHandler {
     private JComponent highlight(JComponent comp, JXMonthView monthView,
             Calendar calendar, CalendarState dayState) {
         CalendarAdapter adapter = getCalendarAdapter(monthView, calendar, dayState);
-        
-        if (true) {
-            return (JComponent) getHighlighter().highlight(comp, adapter);
-        }
-        // PENDING JW: never reach this - taken over by formally adding Highlighters
-        // keep the code here for debugging until we are sure that the switch went okay
-        if ((CalendarState.LEADING == dayState) 
-                || (CalendarState.TRAILING == dayState)
-                || (CalendarState.WEEK_OF_YEAR == dayState)
-                ) return comp;
-        if (CalendarState.TITLE == dayState) {
-            comp.setFont(getDerivedFont(comp.getFont()));
-            return comp;
-        }
-        if (CalendarState.DAY_OF_WEEK == dayState) {
-            comp.setFont(getDerivedFont(comp.getFont()));
-            return comp;
-        }
-        // state left is TO_DAY or IN_MONTH 
-        if (monthView.isUnselectableDate(calendar.getTime()) 
-                && (comp instanceof PainterAware )) {
-            textCross.setForeground(unselectableDayForeground);
-            ((PainterAware) comp).setPainter(textCross);
-        }
-        
-        return comp;
-        
+        return (JComponent) getHighlighter().highlight(comp, adapter);
     }
 
     /**

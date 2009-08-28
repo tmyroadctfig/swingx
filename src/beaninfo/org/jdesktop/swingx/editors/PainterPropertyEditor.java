@@ -50,10 +50,12 @@ public class PainterPropertyEditor extends PropertyEditorSupport {
     public PainterPropertyEditor() {
     }
     
+    @Override
     public Painter getValue() {
         return (Painter)super.getValue();
     }
     
+    @Override
     public String getJavaInitializationString() {
         Painter painter = getValue();
         //TODO!!!
@@ -201,6 +203,7 @@ public class PainterPropertyEditor extends PropertyEditorSupport {
             //, "cycleMethod", "colorSpace", "transform"});
         }
         
+        @Override
         protected Expression instantiate(Object oldInstance, Encoder out) {
             
             ColorSpaceType e = ((LinearGradientPaint)oldInstance).getColorSpace();
@@ -271,6 +274,7 @@ public class PainterPropertyEditor extends PropertyEditorSupport {
         public InsetsDelegate() {
             super(new String[] {"top", "left", "bottom", "right"});
         }
+        @Override
         protected Expression instantiate(Object oldInstance,
                 Encoder out) {
             Insets ins = (Insets)oldInstance;
@@ -286,6 +290,7 @@ public class PainterPropertyEditor extends PropertyEditorSupport {
         }
     }
     public static final class AreaDelegate extends PersistenceDelegate {
+        @Override
         protected Expression instantiate(Object oldInstance, Encoder out) {
             Area a = (Area)oldInstance;
             
@@ -329,9 +334,11 @@ public class PainterPropertyEditor extends PropertyEditorSupport {
         }
     }
     public static final class GeneralPathDelegate extends PersistenceDelegate {
+        @Override
         protected Expression instantiate(Object oldInstance, Encoder out) {
             return new Expression(oldInstance, GeneralPath.class, "new", new Object[0]);
         }
+        @Override
         protected void initialize(Class<?> type, Object oldInstance, Object newInstance, Encoder out) {
             GeneralPath a = (GeneralPath)oldInstance;
             

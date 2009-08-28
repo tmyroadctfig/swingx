@@ -14,6 +14,7 @@ public class TextPainterBeanInfo extends BeanInfoSupport {
         super(TextPainter.class);
     }
     
+    @Override
     protected void initialize() {
         setPreferred(true, "font", "text");
     }

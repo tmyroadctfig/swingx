@@ -61,6 +61,7 @@ public class PainterGlasspane extends JComponent {
         repaint();
     }
     
+    @Override
     protected void paintComponent(Graphics gfx) {
         Graphics2D g = (Graphics2D)gfx;
         if(getPainter() != null) {

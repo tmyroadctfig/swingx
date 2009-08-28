@@ -62,21 +62,25 @@ public class Painter2PropertyEditor extends PropertyEditorSupport {
         });
     }
     
+    @Override
     public Painter getValue() {
         return painter;
     }
     
+    @Override
     public void setValue(Object object) {
         log("setting: " + object);
         painter = (Painter)object;
         super.setValue(object);
     }
     
+    @Override
     public void setAsText(String text) throws IllegalArgumentException {
 //        u.p("setting as text: " + text);
         log("setting as text: " + text);
     }
     
+    @Override
     public String getAsText() {
         if(painter instanceof URLPainter) {
             return ((URLPainter)painter).getURL().toString();
@@ -88,6 +92,7 @@ public class Painter2PropertyEditor extends PropertyEditorSupport {
         }
     }
     
+    @Override
     public String getJavaInitializationString() {
         URLPainter painter = (URLPainter)getValue();
         return painter == null ? "null" : 
@@ -95,10 +100,12 @@ public class Painter2PropertyEditor extends PropertyEditorSupport {
                 painter.getURL().toString()+"\")";
     }
 
+    @Override
     public boolean supportsCustomEditor() {
         return true;
     }
     
+    @Override
     public Component getCustomEditor() {
         return picker;
     }

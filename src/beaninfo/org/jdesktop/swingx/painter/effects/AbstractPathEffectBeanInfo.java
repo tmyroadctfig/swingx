@@ -23,6 +23,7 @@ public class AbstractPathEffectBeanInfo extends BeanInfoSupport {
         super(AbstractAreaEffect.class);
     }
     
+    @Override
     protected void initialize() {
         setHidden(true, "class");
         setPropertyEditor(Paint2PropertyEditor.class, "brushColor");

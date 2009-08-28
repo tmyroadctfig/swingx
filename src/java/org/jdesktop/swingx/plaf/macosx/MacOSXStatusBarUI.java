@@ -50,6 +50,7 @@ public class MacOSXStatusBarUI extends BasicStatusBarUI {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void installDefaults(JXStatusBar sb) {
         super.installDefaults(sb);
         

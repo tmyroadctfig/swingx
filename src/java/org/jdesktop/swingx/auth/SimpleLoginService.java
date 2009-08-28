@@ -52,6 +52,7 @@ public final class SimpleLoginService extends LoginService {
     /**
      * Attempts to authenticate the given username and password against the password map
      */
+    @Override
     public boolean authenticate(String name, char[] password, String server) throws Exception {
         char[] p = passwordMap.get(name);
         return Arrays.equals(password, p);

@@ -182,6 +182,7 @@ public class TargetableActionTest extends TestCase {
                 public int getColumnCount() { return 4; }
                 public int getRowCount() { return 4;}
                 public Object getValueAt(int row, int col) { return new Integer(row*col); }
+                @Override
                 public boolean isCellEditable(int row, int col) { return true; }
             };
         JXTable table = new JXTable(dataModel);

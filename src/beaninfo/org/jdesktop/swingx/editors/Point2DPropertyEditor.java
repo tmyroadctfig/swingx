@@ -34,15 +34,18 @@ public class Point2DPropertyEditor extends PropertyEditorSupport {
     public Point2DPropertyEditor() {
     }
     
+    @Override
     public Point2D getValue() {
         return (Point2D)super.getValue();
     }
     
+    @Override
     public String getJavaInitializationString() {
         Point2D point = getValue();
         return point == null ? "null" : "new java.awt.geom.Point2D.Double(" + point.getX() + ", " + point.getY() + ")";
     }
     
+    @Override
     public void setAsText(String text) throws IllegalArgumentException {
         
         String originalParam = text;
@@ -58,6 +61,7 @@ public class Point2DPropertyEditor extends PropertyEditorSupport {
         }
     }
     
+    @Override
     public String getAsText() {
         Point2D point = getValue();
         return point == null ? "[]" : "[" + point.getX() + ", " + point.getY() + "]";

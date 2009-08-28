@@ -34,38 +34,46 @@ public class ImageEditor extends PropertyEditorSupport {
         });
     }
     
+    @Override
     public Image getValue() {
         return image;
     }
     
+    @Override
     public void setValue(Object object) {
         image = (Image)object;
         super.setValue(image);
         picker.imageView.setImage(image);
     }
 
+    @Override
     public void setAsText(String text) throws IllegalArgumentException {
         // do nothing right now
     }
     
+    @Override
     public String getAsText() {
         return "an Image";
     }
 
+    @Override
     public void paintValue(Graphics graphics, Rectangle r) {
         graphics.drawImage(image, (int)r.getX(), (int)r.getY(),
                 (int)r.getWidth(), (int)r.getHeight(), null);   
     }
     
 
+    @Override
     public boolean isPaintable() {
         return true;
     }
 
+    @Override
     public boolean supportsCustomEditor() {
         return true;
     }
 
+    @Override
     public Component getCustomEditor() {
         return picker;
     }

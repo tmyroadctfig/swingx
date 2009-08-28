@@ -18,6 +18,7 @@ public class JXImageViewBeanInfo extends BeanInfoSupport{
     public JXImageViewBeanInfo() {
         super(JXImageView.class);
     }
+    @Override
     protected void initialize() {
         setPreferred(true, "icon");
         setPreferred(true, "dragEnabled");

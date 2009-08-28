@@ -46,6 +46,7 @@ public class GradientThumbRenderer extends JComponent implements ThumbRenderer {
     }
     
     private boolean selected;
+    @Override
     protected void paintComponent(Graphics g) {
         JComponent thumb = this;
         int w = thumb.getWidth();

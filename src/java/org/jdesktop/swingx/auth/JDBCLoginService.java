@@ -204,6 +204,7 @@ public class JDBCLoginService extends LoginService {
      * @param server Must be either a valid JDBC URL for the type of JDBC driver you are using,
      * or must be a valid JNDIContext from which to get the database connection
      */
+    @Override
     public boolean authenticate(String name, char[] password, String server) throws Exception {
         //try to form a connection. If it works, conn will not be null
         //if the jndiContext is not null, then try to get the DataSource to use

@@ -30,6 +30,7 @@ public class JXTreeBeanInfo extends BeanInfoSupport {
         super(JXTree.class);
     }
 
+    @Override
     protected void initialize() {
     }
 }

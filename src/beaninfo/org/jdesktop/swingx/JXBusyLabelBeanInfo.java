@@ -11,6 +11,7 @@ public class JXBusyLabelBeanInfo extends BeanInfoSupport {
         super(JXBusyLabel.class);        
     }
     
+    @Override
     protected void initialize() {
         setPreferred(true, "busy");
         String iconName = "resources/" + JXBusyLabel.class.getSimpleName();

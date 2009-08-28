@@ -127,6 +127,7 @@ public class TableSortControllerTest extends AbstractTestSortController<TableSor
      * @param registry2
      * @param class1
      */
+    @SuppressWarnings("unused")
     private void installPerClass(StringValueRegistry registry,
             Class<?>... clazz ) {
         Map<Integer, Class<?>> classPerColumn = new HashMap<Integer, Class<?>>();

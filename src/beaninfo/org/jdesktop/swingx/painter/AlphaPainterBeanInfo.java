@@ -13,6 +13,7 @@ public class AlphaPainterBeanInfo extends BeanInfoSupport {
         super(AlphaPainter.class);
     }
     
+    @Override
     protected void initialize() {
         setPreferred(true, "alpha");
     }

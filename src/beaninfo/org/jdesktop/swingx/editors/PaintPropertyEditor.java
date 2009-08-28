@@ -74,6 +74,7 @@ public class PaintPropertyEditor extends PropertyEditorSupport {
     public PaintPropertyEditor() {
     }
     
+    @Override
     public String[] getTags() {
         String[] names = DEFAULT_PAINTS.values().toArray(new String[0]);
         String[] results = new String[names.length+1];
@@ -82,10 +83,12 @@ public class PaintPropertyEditor extends PropertyEditorSupport {
         return results;
     }
     
+    @Override
     public Paint getValue() {
         return (Paint)super.getValue();
     }
 
+    @Override
     public String getJavaInitializationString() {
         Paint paint = getValue();
         //TODO!!!
@@ -93,6 +96,7 @@ public class PaintPropertyEditor extends PropertyEditorSupport {
             "org.jdesktop.swingx.painter.gradient.LinearGradientPainter.BLACK_STAR";
     }
 
+    @Override
     public void setAsText(String text) throws IllegalArgumentException {
         if (text == null || text.trim().equals("") || text.trim().equalsIgnoreCase("none")
                 || text.trim().equalsIgnoreCase("<none>")
@@ -116,6 +120,7 @@ public class PaintPropertyEditor extends PropertyEditorSupport {
                 " not match one of the names of the standard paints");
     }
 
+    @Override
     public String getAsText() {
         Paint p = getValue();
         if (p == null) {
@@ -127,6 +132,7 @@ public class PaintPropertyEditor extends PropertyEditorSupport {
         }
     }
 
+    @Override
     public void paintValue(Graphics gfx, Rectangle box) {
         Paint p = getValue();
         if (p == null) {
@@ -137,6 +143,7 @@ public class PaintPropertyEditor extends PropertyEditorSupport {
         }
     }
 
+    @Override
     public boolean isPaintable() {
         return true;
     }

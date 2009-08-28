@@ -28,6 +28,7 @@ public class EnumPropertyEditor<E extends Enum<E>> extends PropertyEditorSupport
         set = EnumSet.allOf(en);
     }
     
+    @Override
     public String[] getTags() {
         List<String> strs = new ArrayList<String>();
         for(E e : set) {
@@ -36,10 +37,12 @@ public class EnumPropertyEditor<E extends Enum<E>> extends PropertyEditorSupport
         return strs.toArray(new String[0]);
     }
     
+    @Override
     public String getAsText() {
         return getValue().toString();
     }
     
+    @Override
     public void setAsText(String text) throws IllegalArgumentException {
 //        u.p("setting as text: " + text);
         Enum<E> e = Enum.valueOf(en, text);

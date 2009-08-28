@@ -13,6 +13,7 @@ public class JXFindPanelBeanInfo extends BeanInfoSupport {
         super(JXFindPanel.class);
     }
 
+    @Override
     protected void initialize() {
         BeanDescriptor bd = getBeanDescriptor();
         bd.setValue("isContainer", Boolean.FALSE);        

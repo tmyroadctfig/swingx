@@ -114,6 +114,7 @@ public class MatteBorderExt extends MatteBorder {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void paintBorder(Component c, Graphics g, int x, int y,
                             int width, int height) {
         if ( (tileIcons == null) || (tileIcons.length < 2)) {

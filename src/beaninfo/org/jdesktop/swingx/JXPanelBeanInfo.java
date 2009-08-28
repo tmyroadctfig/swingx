@@ -33,6 +33,7 @@ public class JXPanelBeanInfo extends BeanInfoSupport {
         super(JXPanel.class);
     }
 
+    @Override
     protected void initialize() {
         setPreferred(true, "opaque", "alpha", "inheritAlpha", "backgroundPainter");
         setPreferred(false, "foreground");

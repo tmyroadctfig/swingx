@@ -15,6 +15,7 @@ public class CheckerboardPainterBeanInfo extends BeanInfoSupport {
         super(CheckerboardPainter.class);
     }
 
+    @Override
     protected void initialize() {
         setPreferred(true, "darkPaint", "lightPaint", "squareSize");
         setPropertyEditor(PaintPropertyEditor.class, "darkPaint", "lightPaint");

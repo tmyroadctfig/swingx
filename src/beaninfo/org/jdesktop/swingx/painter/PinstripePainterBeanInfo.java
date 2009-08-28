@@ -15,6 +15,7 @@ public class PinstripePainterBeanInfo extends BeanInfoSupport {
         super(PinstripePainter.class);
     }
 
+    @Override
     protected void initialize() {
         setPreferred(true, "angle", "spacing", "paint");
         setPropertyEditor(Paint2PropertyEditor.class, "paint");

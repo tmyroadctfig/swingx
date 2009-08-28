@@ -64,6 +64,7 @@ public class NeonBorderEffect extends AbstractAreaEffect {
         this.setOffset(new Point(0,0));
     }
     
+    @Override
     protected void paintBorderGlow(Graphics2D gfx, Shape clipShape, int width, int height) {
         
         /*

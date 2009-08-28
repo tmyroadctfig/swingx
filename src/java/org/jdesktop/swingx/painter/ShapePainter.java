@@ -136,6 +136,7 @@ public class ShapePainter extends AbstractAreaPainter<Object> {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void doPaint(Graphics2D g, Object component, int w, int h) {
         //set the stroke if it is not null
         Stroke s = new BasicStroke(this.getBorderWidth());
@@ -181,6 +182,7 @@ public class ShapePainter extends AbstractAreaPainter<Object> {
     }
     
     // shape effect stuff
+    @Override
     protected Shape provideShape(Graphics2D g, Object comp, int width, int height) {
         return getShape();
     }

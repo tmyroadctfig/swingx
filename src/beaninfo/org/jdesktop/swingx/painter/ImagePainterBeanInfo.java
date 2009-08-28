@@ -17,6 +17,7 @@ public class ImagePainterBeanInfo extends BeanInfoSupport {
         super(ImagePainter.class);
     }
     
+    @Override
     protected void initialize() {
         setPropertyEditor(ImageEditor.class,"image");
         setPropertyEditor(ImageURLEditor.class,"imageString");

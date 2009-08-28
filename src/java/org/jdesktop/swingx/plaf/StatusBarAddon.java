@@ -50,6 +50,7 @@ public class StatusBarAddon extends AbstractComponentAddon {
                 "org.jdesktop.swingx.plaf.macosx.MacOSXStatusBarUI");
     }
     
+    @Override
     protected void addMetalDefaults(LookAndFeelAddons addon, DefaultsList defaults) {
         super.addMetalDefaults(addon, defaults);
         
@@ -57,6 +58,7 @@ public class StatusBarAddon extends AbstractComponentAddon {
                 "org.jdesktop.swingx.plaf.metal.MetalStatusBarUI");
     }
     
+    @Override
     protected void addWindowsDefaults(LookAndFeelAddons addon, DefaultsList defaults) {
         super.addWindowsDefaults(addon, defaults);
         if (OS.isUsingWindowsVisualStyles()) {

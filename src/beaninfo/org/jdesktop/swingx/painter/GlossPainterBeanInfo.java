@@ -16,6 +16,7 @@ public class GlossPainterBeanInfo extends BeanInfoSupport {
         super(GlossPainter.class);
     }
     
+    @Override
     protected void initialize() {
         setPropertyEditor(Paint2PropertyEditor.class,"paint");
         setPropertyEditor(GlossPositionPropertyEditor.class, "position");

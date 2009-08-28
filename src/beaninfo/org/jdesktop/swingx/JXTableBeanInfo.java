@@ -30,6 +30,7 @@ public class JXTableBeanInfo extends BeanInfoSupport {
         super(JXTable.class);
     }
 
+    @Override
     protected void initialize() {
     }
 }

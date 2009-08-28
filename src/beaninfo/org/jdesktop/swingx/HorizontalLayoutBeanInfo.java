@@ -11,6 +11,7 @@ public class HorizontalLayoutBeanInfo extends BeanInfoSupport {
         super(HorizontalLayout.class);        
     }
     
+    @Override
     protected void initialize() {
         setHidden(true, "class");
     }

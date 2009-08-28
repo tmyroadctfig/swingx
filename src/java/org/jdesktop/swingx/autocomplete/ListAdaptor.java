@@ -78,22 +78,27 @@ public class ListAdaptor extends AbstractAutoCompleteAdaptor implements ListSele
         markEntireText();
     }
     
+    @Override
     public Object getSelectedItem() {
         return list.getSelectedValue();
     }
     
+    @Override
     public int getItemCount() {
         return list.getModel().getSize();
     }
     
+    @Override
     public Object getItem(int index) {
         return list.getModel().getElementAt(index);
     }
     
+    @Override
     public void setSelectedItem(Object item) {
         list.setSelectedValue(item, true);
     }
     
+    @Override
     public JTextComponent getTextComponent() {
         return textComponent;
     }

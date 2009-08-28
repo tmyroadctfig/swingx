@@ -35,6 +35,7 @@ public class JXTitledSeparatorBeanInfo extends BeanInfoSupport {
         super(JXTitledSeparator.class);
     }
 
+    @Override
     protected void initialize() {
         String iconName = "resources/" + JXTitledSeparator.class.getSimpleName();
         setSmallMonoIconName(iconName + "16.png");

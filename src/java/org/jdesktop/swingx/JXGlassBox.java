@@ -87,6 +87,7 @@ public class JXGlassBox extends JXPanel {
         setAlpha(alpha);
     }
 
+    @Override
     public void setAlpha(float alpha) {
         super.setAlpha(alpha);
         this.alphaIncrement = (alphaEnd - alphaStart)/(SHOW_DELAY/TIMER_INCREMENT);
@@ -138,6 +139,7 @@ public class JXGlassBox extends JXPanel {
         if (dismissOnClick && !oldDismissOnClick) {
             if (dismissListener == null) {
                 dismissListener = new MouseAdapter() {
+                    @Override
                     public void mouseClicked(MouseEvent e) {
                         dismiss();
                     }
@@ -150,6 +152,7 @@ public class JXGlassBox extends JXPanel {
         }
     }
 
+    @Override
     public void paint(Graphics g) {
         super.paint(g);
         if (!animateTimer.isRunning() && getAlpha() < alphaEnd ) {
@@ -160,6 +163,7 @@ public class JXGlassBox extends JXPanel {
         }
     }
 
+    @Override
     public void setVisible(boolean visible) {
         boolean old = isVisible();
         setAlpha(alphaStart);

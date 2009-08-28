@@ -194,6 +194,7 @@ public class JXButton extends JButton {
         return painting ? opaque : super.isOpaque();
     }
 
+    @Override
     protected void paintComponent(Graphics g) {
         Painter<JXButton> bgPainter = getBackgroundPainter();
         Painter<JXButton> fgPainter = getForegroundPainter();
@@ -226,6 +227,7 @@ public class JXButton extends JButton {
     }
     // paint anything but text and icon
     private static final class DefaultBackgroundPainter extends AbstractPainter<JXButton> {
+        @Override
         protected void doPaint(Graphics2D g, JXButton b, int width, int height) {
             boolean op = b.opaque;
             // have to read this before setting painting == true !!!
@@ -250,12 +252,14 @@ public class JXButton extends JButton {
         //if any of the state of the JButton that affects the background has changed,
         //then I must clear the cache. This is really hard to get right, there are
         //bound to be bugs. An alternative is to NEVER cache.
+        @Override
         protected boolean shouldUseCache() {
             return false;
         }
     }
     // paint only a text and icon (if any)
     private static final class DefaultForegroundPainter extends AbstractPainter<JXButton> {
+        @Override
         protected void doPaint(Graphics2D g, JXButton b, int width, int height) {
             b.setPainting(true);
             boolean t1 = b.isBorderPainted();
@@ -278,6 +282,7 @@ public class JXButton extends JButton {
         //if any of the state of the JButton that affects the foreground has changed,
         //then I must clear the cache. This is really hard to get right, there are
         //bound to be bugs. An alternative is to NEVER cache.
+        @Override
         protected boolean shouldUseCache() {
             return false;
         }

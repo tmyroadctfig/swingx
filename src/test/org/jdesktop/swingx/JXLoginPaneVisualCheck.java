@@ -150,12 +150,10 @@ public class JXLoginPaneVisualCheck extends InteractiveTestCase {
         JComponent.setDefaultLocale(Locale.FRANCE);
         final JXLoginPane panel = new JXLoginPane(new LoginService() {
 
+                        @Override
                         public boolean authenticate(String name, char[] password,
                                         String server) throws Exception {
-                                if (true) {
                                         throw new Exception("Ex.");
-                                }
-                                return false;
                         }});
         final JXLoginFrame frame = JXLoginPane.showLoginFrame(panel);
         // if uncommented dialog will disappear immediately due to invocation of login action
@@ -182,12 +180,10 @@ public class JXLoginPaneVisualCheck extends InteractiveTestCase {
         JComponent.setDefaultLocale(Locale.FRANCE);
         final JXLoginPane panel = new JXLoginPane(new LoginService() {
 
+                        @Override
                         public boolean authenticate(String name, char[] password,
                                         String server) throws Exception {
-                                if (true) {
                                         throw new Exception("Ex.");
-                                }
-                                return false;
                         }});
         final JXLoginFrame frame = JXLoginPane.showLoginFrame(panel);
         // if uncomented dialog will disappear immediatelly dou to invocation of login action
@@ -216,7 +212,8 @@ public class JXLoginPaneVisualCheck extends InteractiveTestCase {
         final JFrame frame = JXLoginPane.showLoginFrame(panel);
         panel.setLoginService(new LoginService() {
 
-			public boolean authenticate(String name, char[] password,
+			@Override
+            public boolean authenticate(String name, char[] password,
 					String server) throws Exception {
 				panel.startLogin();
 				Thread.sleep(5000);

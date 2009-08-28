@@ -14,6 +14,7 @@ public class MattePainterBeanInfo extends BeanInfoSupport {
         super(MattePainter.class);
     }
 
+    @Override
     protected void initialize() {
         setPreferred(true, "fillPaint");
     }

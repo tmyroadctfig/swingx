@@ -73,6 +73,7 @@ public class ForwardingRepaintManager extends RepaintManager {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void addDirtyRegion(JComponent c, int x, int y, int w, int h) {
         delegate.addDirtyRegion(c, x, y, w, h);
     }
@@ -88,6 +89,7 @@ public class ForwardingRepaintManager extends RepaintManager {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void addInvalidComponent(JComponent invalidComponent) {
         delegate.addInvalidComponent(invalidComponent);
     }
@@ -95,6 +97,7 @@ public class ForwardingRepaintManager extends RepaintManager {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Rectangle getDirtyRegion(JComponent component) {
         return delegate.getDirtyRegion(component);
     }
@@ -102,6 +105,7 @@ public class ForwardingRepaintManager extends RepaintManager {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Dimension getDoubleBufferMaximumSize() {
         return delegate.getDoubleBufferMaximumSize();
     }
@@ -109,6 +113,7 @@ public class ForwardingRepaintManager extends RepaintManager {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Image getOffscreenBuffer(Component c, int proposedWidth, int proposedHeight) {
         return delegate.getOffscreenBuffer(c, proposedWidth, proposedHeight);
     }
@@ -116,6 +121,7 @@ public class ForwardingRepaintManager extends RepaintManager {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Image getVolatileOffscreenBuffer(Component c, int proposedWidth, int proposedHeight) {
         return delegate.getVolatileOffscreenBuffer(c, proposedWidth, proposedHeight);
     }
@@ -123,6 +129,7 @@ public class ForwardingRepaintManager extends RepaintManager {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isCompletelyDirty(JComponent component) {
         return delegate.isCompletelyDirty(component);
     }
@@ -130,6 +137,7 @@ public class ForwardingRepaintManager extends RepaintManager {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isDoubleBufferingEnabled() {
         return delegate.isDoubleBufferingEnabled();
     }
@@ -137,6 +145,7 @@ public class ForwardingRepaintManager extends RepaintManager {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void markCompletelyClean(JComponent component) {
         delegate.markCompletelyClean(component);
     }
@@ -144,6 +153,7 @@ public class ForwardingRepaintManager extends RepaintManager {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void markCompletelyDirty(JComponent component) {
         delegate.markCompletelyDirty(component);
     }
@@ -151,6 +161,7 @@ public class ForwardingRepaintManager extends RepaintManager {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void paintDirtyRegions() {
         delegate.paintDirtyRegions();
     }
@@ -158,6 +169,7 @@ public class ForwardingRepaintManager extends RepaintManager {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void removeInvalidComponent(JComponent component) {
         delegate.removeInvalidComponent(component);
     }
@@ -165,6 +177,7 @@ public class ForwardingRepaintManager extends RepaintManager {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setDoubleBufferingEnabled(boolean flag) {
         delegate.setDoubleBufferingEnabled(flag);
     }
@@ -172,6 +185,7 @@ public class ForwardingRepaintManager extends RepaintManager {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setDoubleBufferMaximumSize(Dimension d) {
         delegate.setDoubleBufferMaximumSize(d);
     }
@@ -179,6 +193,7 @@ public class ForwardingRepaintManager extends RepaintManager {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String toString() {
         return delegate.toString();
     }
@@ -186,6 +201,7 @@ public class ForwardingRepaintManager extends RepaintManager {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void validateInvalidComponents() {
         delegate.validateInvalidComponents();
     }

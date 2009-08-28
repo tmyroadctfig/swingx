@@ -30,6 +30,7 @@ public class JXImagePanelBeanInfo extends BeanInfoSupport {
         super(JXImagePanel.class);
     }
 
+    @Override
     protected void initialize() {
         setPreferred(true, "editable");
     }

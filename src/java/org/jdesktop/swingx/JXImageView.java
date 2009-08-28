@@ -518,6 +518,7 @@ public class JXImageView extends JXPanel {
      * Implementation detail.
      * @param g 
      */
+    @Override
     protected void paintComponent(Graphics g) {
         ((Graphics2D)g).setPaint(checkerPaint);
         //g.setColor(getBackground());
@@ -548,11 +549,13 @@ public class JXImageView extends JXPanel {
             this.panel = panel;
         }
 
+        @Override
         public void mousePressed(MouseEvent evt) {
             prev = evt.getPoint();
             start = prev;
         }
 
+        @Override
         public void mouseDragged(MouseEvent evt) {
             Point curr = evt.getPoint();
             
@@ -582,6 +585,7 @@ public class JXImageView extends JXPanel {
             repaint();
         }
 
+        @Override
         public void mouseReleased(MouseEvent evt) {
             prev = null;
         }
@@ -594,18 +598,22 @@ public class JXImageView extends JXPanel {
              urlFlavor = new DataFlavor("application/x-java-url;class=java.net.URL");
         }
         
+        @Override
         public void exportAsDrag(JComponent c, InputEvent evt, int action) {
             //log.fine("exportting as drag");
             super.exportAsDrag(c,evt,action);
         }
+        @Override
         public int getSourceActions(JComponent c) {
             //log.fine("get source actions: " + c);
             return COPY;
         }
+        @Override
         protected void exportDone(JComponent source, Transferable data, int action) {
             //log.fine("exportDone: " + source + " " + data + " " +action);
         }
 
+        @Override
         public boolean canImport(JComponent c, DataFlavor[] flavors) {
             //log.fine("canImport:" + c);
             for (int i = 0; i < flavors.length; i++) {
@@ -624,12 +632,14 @@ public class JXImageView extends JXPanel {
             return false;
         }
 
+        @Override
         protected Transferable createTransferable(JComponent c) {
             JXImageView view = (JXImageView)c;
             return new ImageTransferable(view.getImage(),
                     view.getExportName(), view.getExportFormat());
         }
         
+        @Override
         @SuppressWarnings("unchecked")
         public boolean importData(JComponent comp, Transferable t) {
             if (canImport(comp, t.getTransferDataFlavors())) {

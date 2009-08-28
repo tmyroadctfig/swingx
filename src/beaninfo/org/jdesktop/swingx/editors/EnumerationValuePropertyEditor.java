@@ -38,6 +38,7 @@ public abstract class EnumerationValuePropertyEditor extends PropertyEditorSuppo
         }
     }
 
+    @Override
     public String getJavaInitializationString() {
         EnumerationValue value = values.get(getValue());
         if (value == null) {
@@ -47,10 +48,12 @@ public abstract class EnumerationValuePropertyEditor extends PropertyEditorSuppo
         }
     }
 
+    @Override
     public String[] getTags() {
         return tags;
     }
 
+    @Override
     public String getAsText() {
         EnumerationValue value = values.get(getValue());
         if (value == null) {
@@ -60,6 +63,7 @@ public abstract class EnumerationValuePropertyEditor extends PropertyEditorSuppo
         }
     }
     
+    @Override
     public void setAsText(String text) throws IllegalArgumentException {
         EnumerationValue v = getValueByName(text);
         if (v == null) {

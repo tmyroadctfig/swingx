@@ -30,6 +30,7 @@ public class JXDialogBeanInfo extends BeanInfoSupport {
         super(JXDialog.class);
     }
 
+    @Override
     protected void initialize() {
     }
 }

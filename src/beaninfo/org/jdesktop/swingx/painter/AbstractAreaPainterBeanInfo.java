@@ -19,6 +19,7 @@ public class AbstractAreaPainterBeanInfo extends BeanInfoSupport {
         super(clazz);
     }
 
+    @Override
     protected void initialize() {
         setPropertyEditor(StylePropertyEditor.class, "style");
         setPropertyEditor(Paint2PropertyEditor.class, "fillPaint", "borderPaint");

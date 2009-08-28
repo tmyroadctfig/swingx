@@ -53,6 +53,7 @@ public class AutoCompleteDecoratorTest extends TestCase {
         tearDown();
     }
     
+    @Override
     protected void setUp() {
         combo = new JComboBox(new String[]{"Alpha", "Bravo", "Charlie", "Delta"});
     }

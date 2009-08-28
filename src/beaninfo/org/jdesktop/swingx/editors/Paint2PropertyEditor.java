@@ -29,10 +29,12 @@ public class Paint2PropertyEditor extends PropertyEditorSupport {
         
     }
     
+    @Override
     public Paint getValue() {
         return paint;
     }
 
+    @Override
     public void setValue(Object object) {
         paint = (Paint)object;
         picker.setPaint(paint);
@@ -40,6 +42,7 @@ public class Paint2PropertyEditor extends PropertyEditorSupport {
     }
 
        
+    @Override
     public String getJavaInitializationString() {
         Paint paint = getValue();
         //TODO!!!
@@ -47,29 +50,35 @@ public class Paint2PropertyEditor extends PropertyEditorSupport {
             "org.jdesktop.swingx.painter.gradient.LinearGradientPainter.BLACK_STAR";
     }
     
+    @Override
     public void setAsText(String text) throws IllegalArgumentException {
         // do nothing right now
     }
     
+    @Override
     public String getAsText() {
         return "PainterText";
     }
     
+    @Override
     public void paintValue(Graphics g, Rectangle box) {
         Graphics2D g2 = (Graphics2D)g;
         //picker.setPaint(getValue());
         g2.setPaint(picker.getDisplayPaint(box));
         g2.fill(box);
     }
+    @Override
     public boolean isPaintable() {
         return true;
     }
     
 
+    @Override
     public boolean supportsCustomEditor() {
         return true;
     }
 
+    @Override
     public Component getCustomEditor() {
         return picker;
     }

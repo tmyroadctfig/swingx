@@ -133,6 +133,7 @@ public abstract class LoginService extends AbstractBean {
             }
         } else {
             loginWorker = new SwingWorker<Boolean, Void>() {
+                @Override
                 protected Boolean doInBackground() throws Exception {
                     try {
                         final boolean result = authenticate(user, password,

@@ -30,6 +30,7 @@ public class JXEditorPaneBeanInfo extends BeanInfoSupport {
         super(JXEditorPane.class);
     }
 
+    @Override
     protected void initialize() {
     }
 }

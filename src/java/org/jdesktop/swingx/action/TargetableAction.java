@@ -118,6 +118,7 @@ public class TargetableAction extends AbstractActionExt {
      * @param evt event which will be forwarded to the TargetManager
      * @see TargetManager
      */
+    @Override
     public void itemStateChanged(ItemEvent evt) {
         // Update all objects that share this item
         boolean newValue;
@@ -132,6 +133,7 @@ public class TargetableAction extends AbstractActionExt {
         }
     }
 
+    @Override
     public String toString() {
         return super.toString();
     }

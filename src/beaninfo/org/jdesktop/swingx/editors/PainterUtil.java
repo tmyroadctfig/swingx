@@ -205,10 +205,12 @@ public class PainterUtil {
     }
     
     static class TypeSafeEnumPersistenceDelegate extends PersistenceDelegate {
+        @Override
         protected boolean mutatesTo( Object oldInstance, Object newInstance ) {
             return oldInstance == newInstance;
         }
         
+        @Override
         protected Expression instantiate( Object oldInstance, Encoder out ) {
             Class type = oldInstance.getClass();
             if ( !Modifier.isPublic( type.getModifiers() ) )
@@ -230,12 +232,14 @@ public class PainterUtil {
     }
     
     public static final class RenderingHintsDelegate extends PersistenceDelegate {
+        @Override
         protected Expression instantiate(Object oldInstance, Encoder out) {
             //u.p("rh inst");
             // give it a constructor w/ null as the argument
             return new Expression(oldInstance, oldInstance.getClass(),
                     "new", new Object[] { null });
         }
+        @Override
         protected void initialize(Class<?> type, Object oldInstance, Object newInstance, Encoder out) {
             //u.p("rh init ");
             RenderingHints rh = (RenderingHints)oldInstance;
@@ -246,6 +250,7 @@ public class PainterUtil {
     }
     
     public static final class AbstractPainterDelegate extends DefaultPersistenceDelegate {
+        @Override
         protected void initialize(Class type, Object oldInstance,
                 Object newInstance, Encoder out) {
 //            p("ap delegate called");
@@ -254,6 +259,7 @@ public class PainterUtil {
     }
     
     public static final class ImagePainterDelegate extends DefaultPersistenceDelegate {
+        @Override
         protected void initialize(Class type, Object oldInstance,
                 Object newInstance, Encoder out) {
 //            p("image painter delegate called");

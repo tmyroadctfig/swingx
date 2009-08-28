@@ -25,6 +25,7 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -62,7 +63,7 @@ public class JXButtonVisualCheck extends InteractiveTestCase {
                 //do nothing
             }
         };
-        action.putValue(action.NAME, "My Action");
+        action.putValue(Action.NAME, "My Action");
         action.setEnabled(true);
         final JFrame f = new JFrame();
         f.setSize(300, 200);
