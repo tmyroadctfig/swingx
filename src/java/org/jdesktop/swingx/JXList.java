@@ -33,7 +33,6 @@ import javax.swing.JList;
 import javax.swing.KeyStroke;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListModel;
-import javax.swing.ListSelectionModel;
 import javax.swing.RowFilter;
 import javax.swing.RowSorter;
 import javax.swing.SortOrder;
@@ -569,18 +568,6 @@ public class JXList extends JList {
     public void setRowSorter(RowSorter<? extends ListModel> sorter) {
         RowSorter<? extends ListModel> oldRowSorter = getRowSorter();
         this.rowSorter = sorter;
-        
-//        if (sortManager != null) {
-//            oldRowSorter = sortManager.sorter;
-//            sortManager.dispose();
-//            sortManager = null;
-//        }
-//        rowModel = null;
-//        clearSelectionAndLeadAnchor();
-//        if (sorter != null) {
-//            sortManager = new SortManager(sorter);
-//        }
-//        resizeAndRepaint();
         configureSorterProperties();
         firePropertyChange("rowSorter", oldRowSorter, sorter);
     }
@@ -888,18 +875,6 @@ public class JXList extends JList {
     @Deprecated
     public ListModel getWrappedModel() {
         return getModel();
-    }
-
-
-    /**
-     * {@inheritDoc} <p>
-     * 
-     * Overridden to update selectionMapper
-     */
-    @Override 
-    public void setSelectionModel(ListSelectionModel newModel) {
-        super.setSelectionModel(newModel);
-//        getSelectionMapper().setViewSelectionModel(getSelectionModel());
     }
 
     /**
