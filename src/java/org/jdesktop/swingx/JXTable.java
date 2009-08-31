@@ -2027,18 +2027,17 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
      * Returns the currently active SortController. May be null, if the current RowSorter
      * is not an instance of SortController. <p>
      * 
-     * <b>Note</b>: treat this as private api, don't use in client code as it might 
-     * be changed to private without notice! Most probably an intermediate exposure
-     * (JXTableHeader mis-uses it to silently disable sorting if in resizing area)
-     * <p>
-     * 
      * PENDING JW: generics - can't get the
-     * RowFilter getter signature correct with having controller typed here. 
+     * RowFilter getter signature correct with having controller typed here. <p>
+     * 
+     * PENDING JW: swaying about hiding or not - currently the only way to
+     * make the view not configure a RowSorter of type SortController is to 
+     * let this return null. 
      * 
      * @return the currently active <code>SortController</code> may be null
      */
     @SuppressWarnings("unchecked")
-    private SortController<? extends TableModel> getSortController() {
+    protected SortController<? extends TableModel> getSortController() {
         if (getRowSorter() instanceof SortController<?>) {
             // JW: the RowSorter is always of type <? extends ListModel>
             // so the unchecked cast is safe
