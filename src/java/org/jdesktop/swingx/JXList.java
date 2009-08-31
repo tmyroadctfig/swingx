@@ -796,12 +796,16 @@ public class JXList extends JList {
 
     /**
      * Returns the currently active SortController. May be null if RowSorter
-     * is null or not of type SortController.
+     * is null or not of type SortController.<p>
+     * 
+     * PENDING JW: swaying about hiding or not - currently the only way to
+     * make the view not configure a RowSorter of type SortController is to 
+     * let this return null. 
      * 
      * @return the currently active <code>SortController</code> may be null
      */
     @SuppressWarnings("unchecked")
-    private SortController<? extends ListModel> getSortController() {
+    protected SortController<? extends ListModel> getSortController() {
         if (getRowSorter() instanceof SortController<?>) {
             // JW: the RowSorter is always of type <? extends ListModel>
             // so the unchecked cast is safe
