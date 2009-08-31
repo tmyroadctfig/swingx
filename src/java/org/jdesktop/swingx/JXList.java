@@ -68,16 +68,9 @@ import org.jdesktop.swingx.table.TableColumnExt;
  * enhancements include ?? PENDING JW ...
  * 
  * <h2>Sorting and Filtering</h2>
- * 
- * <b>NOTE: sorting/filtering is currently a moving target. Basics - setting a 
- * RowSorter, sorter api - are working again. Still missing: synch selection and
- * nofication to RowSorter after model changes. Do not use if you have mutable
- * models! The former filterEnabled
- * property is mapped to autoCreateRowSorter and false by default.
- * </b>
- * <p>
  * JXList supports sorting and filtering. 
  * 
+ * Changed to use core support. Usage is very similar to J/X/Table.
  * It provides api to apply a specific sort order, to toggle the sort order and to reset a sort.
  * Sort sequence can be configured by setting a custom comparator.
  * 
@@ -91,9 +84,12 @@ import org.jdesktop.swingx.table.TableColumnExt;
  * 
  * <p>
  * JXList provides api to access items of the underlying model in view coordinates
- * and to convert from/to model coordinates.
+ * and to convert from/to model coordinates. 
  * 
- * 
+ * <b>Note</b>: JXList needs a specific ui-delegate - BasicXListUI and subclasses - which
+ * is aware of model vs. view coordiate systems and which controls the synchronization of 
+ * selection/dataModel and sorter state. SwingX comes with a subclass for Synth. 
+ *  
  * <h2>Rendering and Highlighting</h2>
  * 
  * As all SwingX collection views, a JXList is a HighlighterClient (PENDING JW:
@@ -244,7 +240,7 @@ public class JXList extends JList {
 
     /**
      * Constructs a <code>JXList</code> that displays the elements in the
-     * specified, non-<code>null</code> model and filters disabled.
+     * specified, non-<code>null</code> model and automatic creation of a RowSorter disabled.
      *
      * @param dataModel   the data model for this list
      * @exception IllegalArgumentException   if <code>dataModel</code>
@@ -256,7 +252,7 @@ public class JXList extends JList {
 
     /**
      * Constructs a <code>JXList</code> that displays the elements in
-     * the specified array and filters disabled.
+     * the specified array and automatic creation of a RowSorter disabled.
      *
      * @param  listData  the array of Objects to be loaded into the data model
      * @throws IllegalArgumentException   if <code>listData</code>
@@ -268,7 +264,7 @@ public class JXList extends JList {
 
     /**
      * Constructs a <code>JXList</code> that displays the elements in
-     * the specified <code>Vector</code> and filtes disabled.
+     * the specified <code>Vector</code> and automatic creation of a RowSorter disabled.
      *
      * @param  listData  the <code>Vector</code> to be loaded into the
      *          data model
@@ -282,45 +278,45 @@ public class JXList extends JList {
 
     /**
      * Constructs a <code>JXList</code> with an empty model and
-     * filterEnabled property.
+     * automatic creation of a RowSorter as given.
      * 
-     * @param filterEnabled <code>boolean</code> to determine if 
-     *  filtering/sorting is enabled
+     * @param autoCreateRowSorter <code>boolean</code> to determine if 
+     *  a RowSorter should be created automatically.
      */
-    public JXList(boolean filterEnabled) {
-        init(filterEnabled);
+    public JXList(boolean autoCreateRowSorter) {
+        init(autoCreateRowSorter);
     }
 
     /**
      * Constructs a <code>JXList</code> with the specified model and
-     * filterEnabled property.
+     * automatic creation of a RowSorter as given.
      * 
      * @param dataModel   the data model for this list
-     * @param filterEnabled <code>boolean</code> to determine if 
-     *          filtering/sorting is enabled
+     * @param autoCreateRowSorter <code>boolean</code> to determine if 
+     *  a RowSorter should be created automatically.
      * @throws IllegalArgumentException   if <code>dataModel</code>
      *                                          is <code>null</code>
      */
-    public JXList(ListModel dataModel, boolean filterEnabled) {
+    public JXList(ListModel dataModel, boolean autoCreateRowSorter) {
         super(dataModel);
-        init(filterEnabled);
+        init(autoCreateRowSorter);
     }
 
     /**
      * Constructs a <code>JXList</code> that displays the elements in
-     * the specified array and filterEnabled property.
+     * the specified array and automatic creation of a RowSorter as given.
      *
      * @param  listData  the array of Objects to be loaded into the data model
-     * @param filterEnabled <code>boolean</code> to determine if filtering/sorting
-     *   is enabled
+     * @param autoCreateRowSorter <code>boolean</code> to determine if 
+     *  a RowSorter should be created automatically.
      * @throws IllegalArgumentException   if <code>listData</code>
      *                                          is <code>null</code>
      */
-    public JXList(Object[] listData, boolean filterEnabled) {
+    public JXList(Object[] listData, boolean autoCreateRowSorter) {
         super(listData);
         if (listData == null) 
            throw new IllegalArgumentException("listData must not be null");
-        init(filterEnabled);
+        init(autoCreateRowSorter);
     }
 
     /**
@@ -329,20 +325,20 @@ public class JXList extends JList {
      *
      * @param  listData  the <code>Vector</code> to be loaded into the
      *          data model
-     * @param filterEnabled <code>boolean</code> to determine if filtering/sorting
-     *   is enabled
+     * @param autoCreateRowSorter <code>boolean</code> to determine if 
+     *  a RowSorter should be created automatically.
      * @throws IllegalArgumentException if <code>listData</code> is <code>null</code>
      */
-    public JXList(Vector<?> listData, boolean filterEnabled) {
+    public JXList(Vector<?> listData, boolean autoCreateRowSorter) {
         super(listData);
         if (listData == null) 
            throw new IllegalArgumentException("listData must not be null");
-        init(filterEnabled);
+        init(autoCreateRowSorter);
     }
 
 
-    private void init(boolean filterEnabled) {
-        setAutoCreateRowSorter(filterEnabled);
+    private void init(boolean autoCreateRowSorter) {
+        setAutoCreateRowSorter(autoCreateRowSorter);
         setSortable(true);
         setSortsOnUpdates(true);
         Action findAction = createFindAction();
@@ -350,7 +346,6 @@ public class JXList extends JList {
         
         KeyStroke findStroke = SearchFactory.getInstance().getSearchAccelerator();
         getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(findStroke, "find");
-        
     }
 
     private Action createFindAction() {
