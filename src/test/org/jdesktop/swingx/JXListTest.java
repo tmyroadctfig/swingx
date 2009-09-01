@@ -7,11 +7,16 @@
 package org.jdesktop.swingx;
 
 import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.GraphicsEnvironment;
 import java.beans.PropertyChangeListener;
+import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.Collator;
 import java.util.Vector;
+import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
@@ -20,6 +25,7 @@ import javax.swing.ListCellRenderer;
 import javax.swing.ListModel;
 import javax.swing.RowFilter;
 import javax.swing.SortOrder;
+import javax.swing.SwingUtilities;
 
 import org.jdesktop.swingx.JXList.DelegatingRenderer;
 import org.jdesktop.swingx.decorator.ColorHighlighter;
@@ -58,12 +64,46 @@ import org.junit.runners.JUnit4;
 @RunWith(JUnit4.class)
 public class JXListTest extends InteractiveTestCase {
 
+    @SuppressWarnings("unused")
+    private static final Logger LOG = Logger.getLogger(JXListTest.class
+            .getName());
+    
     protected ListModel listModel;
     protected DefaultListModel ascendingListModel;
     /** empty default list */
     private JXList list;
     private StringValue sv;
 
+    /**
+     * Issue 1161-swingx: JXList not completely updated on setRowFilter
+     */
+    @Test
+    public void testRevalidateOnSetRowFilter() throws InterruptedException, InvocationTargetException {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.fine("cannot run ui test - headless environment");
+            return;
+        }
+        
+        final JXList list = new JXList(AncientSwingTeam.createNamedColorListModel(), true);
+        showWithScrollingInFrame(list, "");
+        final Dimension size = list.getSize();
+        SwingUtilities.invokeAndWait(new Runnable() {
+            public void run() {
+                RowFilter<? super ListModel, ? super Integer> filter = RowFilters.regexFilter(Pattern.CASE_INSENSITIVE, "^b");
+                list.setRowFilter(filter);
+            }
+        });
+        SwingUtilities.invokeAndWait(new Runnable() {
+            public void run() {
+                // subtraction arbitrary number, don't want to depend on single pixels
+                assertTrue("height must be adjusted to reduced number of rows, " +
+                		"but was (old/current): " + size.height + "/" + list.getSize().height, 
+                		size.height - 50 > list.getSize().height);
+
+            }
+        });
+    }
 //--------------- string rep
     /**
      * Issue #1152-swingx: re-enable filtering with single-string-representation.

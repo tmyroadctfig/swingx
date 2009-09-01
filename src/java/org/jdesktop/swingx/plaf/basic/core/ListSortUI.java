@@ -137,7 +137,12 @@ public final class ListSortUI {
         if (!ignoreSortChange) {
             prepareForChange(e);
             processChange(null);
-            list.repaint();
+            // PENDING Jw: this is fix of 1161-swingx - not updated after setting 
+            // rowFilter
+            // potentially costly? but how to distinguish a mere sort from a 
+            // filterchanged? (only the latter requires a revalidate)
+            list.revalidate();
+//            list.repaint();
         }
     }
 

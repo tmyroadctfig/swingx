@@ -71,13 +71,21 @@ public class JXListVisualCheck extends InteractiveTestCase { //JXListTest {
         list.toggleSortOrder();
         JXFrame frame = showWithScrollingInFrame(list, core, "x <-> core: nextMatch");
         Action toggleFilter = new AbstractAction("toggleFilter") {
-            RowFilter filter = RowFilters.regexFilter(Pattern.CASE_INSENSITIVE, "^b");
             @Override
             public void actionPerformed(ActionEvent e) {
+                RowFilter<Object, Object> filter = RowFilters.regexFilter(Pattern.CASE_INSENSITIVE, "^b");
                 list.setRowFilter(list.getRowFilter() == null ? filter : null);
             }
         };
         addAction(frame, toggleFilter);
+        Action toggleSort = new AbstractAction("toggleSortOrder") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                list.toggleSortOrder();
+            }
+        };
+        addAction(frame, toggleSort);
     }
     
     public void interactiveTestCompareFocusedCellBackground() {
