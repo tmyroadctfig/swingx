@@ -10,6 +10,7 @@ import java.awt.event.ActionEvent;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -20,6 +21,7 @@ import javax.swing.JComponent;
 import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.ListModel;
+import javax.swing.RowFilter;
 import javax.swing.UIManager;
 import javax.swing.plaf.UIResource;
 
@@ -32,6 +34,8 @@ import org.jdesktop.swingx.hyperlink.LinkModel;
 import org.jdesktop.swingx.hyperlink.LinkModelAction;
 import org.jdesktop.swingx.renderer.DefaultListRenderer;
 import org.jdesktop.swingx.renderer.HyperlinkProvider;
+import org.jdesktop.swingx.sort.RowFilters;
+import org.jdesktop.test.AncientSwingTeam;
 import org.junit.After;
 import org.junit.Before;
 
@@ -47,16 +51,34 @@ public class JXListVisualCheck extends InteractiveTestCase { //JXListTest {
         try {
 //            NimbusLookAndFeel n;
 //            Region my = XRegion.XLIST;
-            setLookAndFeel("Nimbus");
+//            setLookAndFeel("Nimbus");
 //            new XRegion("XList", "XListUI", false);
-          test.runInteractiveTests();
-//            test.runInteractiveTests("interactive.*Multi.*");
+//          test.runInteractiveTests();
+            test.runInteractiveTests("interactive.*Match.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
         }
     }
 
+    /**
+     * Issue 1161-swingx: JXList not completely updated on setRowFilter
+     * Issue 1162-swingx: JXList getNextMatch access model directly
+     */
+    public void interactiveNextMatch() {
+        JList core = new JList(AncientSwingTeam.createNamedColorListModel());
+        final JXList list = new JXList(core.getModel(), true);
+        list.toggleSortOrder();
+        JXFrame frame = showWithScrollingInFrame(list, core, "x <-> core: nextMatch");
+        Action toggleFilter = new AbstractAction("toggleFilter") {
+            RowFilter filter = RowFilters.regexFilter(Pattern.CASE_INSENSITIVE, "^b");
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                list.setRowFilter(list.getRowFilter() == null ? filter : null);
+            }
+        };
+        addAction(frame, toggleFilter);
+    }
     
     public void interactiveTestCompareFocusedCellBackground() {
         final JXList xlist = new JXList(listModel);
