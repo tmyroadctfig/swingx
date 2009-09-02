@@ -26,6 +26,7 @@ import javax.swing.ListModel;
 import javax.swing.RowFilter;
 import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
+import javax.swing.text.Position.Bias;
 
 import org.jdesktop.swingx.JXList.DelegatingRenderer;
 import org.jdesktop.swingx.decorator.ColorHighlighter;
@@ -74,6 +75,28 @@ public class JXListTest extends InteractiveTestCase {
     private JXList list;
     private StringValue sv;
 
+    /**
+     * Issue #1162-swingx: getNextMatch incorrect if sorted.
+     */
+    @Test
+    public void testNextMatch() {
+        JXList list = new JXList(AncientSwingTeam.createNamedColorListModel(), true);
+        int index = list.getNextMatch("b", 0, Bias.Forward);
+        assertEquals(1, index);
+        list.toggleSortOrder();
+        assertEquals(0, list.getNextMatch("b", 0, Bias.Forward));
+    }
+    
+    /**
+     * Issue #1162-swingx: getNextMatch incorrect for non-standard stringValue
+     */
+    @Test
+    public void testNextMatchUseString() {
+        JXList list = new JXList(AncientSwingTeam.createNamedColorListModel(), true);
+        list.setCellRenderer(new DefaultListRenderer(sv));
+        assertEquals("must not find a match for 'b', all start with 'r'", 
+                -1, list.getNextMatch("b", 0, Bias.Forward));
+    }
     /**
      * Issue 1161-swingx: JXList not completely updated on setRowFilter
      */

@@ -68,7 +68,7 @@ public class JXListVisualCheck extends InteractiveTestCase { //JXListTest {
     public void interactiveNextMatch() {
         JList core = new JList(AncientSwingTeam.createNamedColorListModel());
         final JXList list = new JXList(core.getModel(), true);
-        list.toggleSortOrder();
+//        list.toggleSortOrder();
         JXFrame frame = showWithScrollingInFrame(list, core, "x <-> core: nextMatch");
         Action toggleFilter = new AbstractAction("toggleFilter") {
             @Override

@@ -26,6 +26,7 @@ import java.awt.event.ActionEvent;
 import java.util.Comparator;
 import java.util.Vector;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 import javax.swing.Action;
 import javax.swing.JComponent;
@@ -40,6 +41,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.plaf.ListUI;
+import javax.swing.text.Position.Bias;
 
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.CompoundHighlighter;
@@ -391,8 +393,19 @@ public class JXList extends JList {
         this.searchable = searchable;
     }
     
-//--------------------- Rollover support
     
+    /**
+     * {@inheritDoc} <p>
+     * 
+     * Overridden to cope with sorting/filtering, taking over completely.
+     */
+    @Override
+    public int getNextMatch(String prefix, int startIndex, Bias bias) {
+        Pattern pattern = Pattern.compile("^" + prefix, Pattern.CASE_INSENSITIVE);
+        return getSearchable().search(pattern, startIndex, bias ==Bias.Backward);
+    }
+//--------------------- Rollover support
+
     /**
      * Sets the property to enable/disable rollover support. If enabled, the list
      * fires property changes on per-cell mouse rollover state, i.e. 
