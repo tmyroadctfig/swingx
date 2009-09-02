@@ -142,7 +142,7 @@ public final class ListSortUI {
             // potentially costly? but how to distinguish a mere sort from a 
             // filterchanged? (only the latter requires a revalidate)
             list.revalidate();
-//            list.repaint();
+            list.repaint();
         }
     }
 
