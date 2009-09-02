@@ -262,7 +262,9 @@ public class JXLabel extends JLabel {
             public boolean equals(Object obj) {
                 return obj != null && this.getClass().equals(obj.getClass());
             }
+            
         };
+        ((AbstractPainter<?>) foregroundPainter).setAntialiasing(false);
     }
 
     /**

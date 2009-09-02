@@ -26,11 +26,9 @@ import java.awt.Container;
 import java.awt.Font;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.RenderingHints;
 import java.awt.event.HierarchyBoundsAdapter;
 import java.awt.event.HierarchyBoundsListener;
 import java.awt.event.HierarchyEvent;
@@ -82,14 +80,15 @@ public class BasicHeaderUI extends HeaderUI {
     protected class DescriptionPane extends JXLabel {
             @Override
             public void paint(Graphics g) {
-//                LOG.info(getText() + ": all hints " + ((Graphics2D)g).getRenderingHints()
-//                        + "\n     " + ": aliased " + ((Graphics2D)g).getRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING));
                 // switch off jxlabel default antialiasing
                 // JW: that cost me dearly to track down - it's the default foreground painter
                 // which is an AbstractPainter which has _global_ antialiased on by default
                 // and here the _text_ antialiased is turned off
-                ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
-                        RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
+                // changed JXLabel default foregroundPainter to have antialiasing false by 
+                // default, so remove interference here
+                // part of fix for #920 - the other part is in JXLabel, fix 1164
+//                ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+//                        RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
                 super.paint(g);
             }
 
