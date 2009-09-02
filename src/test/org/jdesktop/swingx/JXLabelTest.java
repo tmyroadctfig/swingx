@@ -23,6 +23,7 @@ package org.jdesktop.swingx;
 
 import java.util.logging.Logger;
 
+import org.jdesktop.swingx.painter.AbstractPainter;
 import org.jdesktop.swingx.painter.Painter;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -38,6 +39,16 @@ public class JXLabelTest extends InteractiveTestCase {
     
     static Logger log = Logger.getAnonymousLogger();
 
+    /**
+     * Issue #1164-swingx: do not interfere with core antialiased handling.
+     */
+    @Test
+    public void testDefaultForegroundNotAntialiasing() {
+        JXLabel label = new JXLabel();
+        AbstractPainter<?> painter = (AbstractPainter<?>) label.getForegroundPainter();
+        assertFalse("foreground painter must not be antialiasing", painter.isAntialiasing());
+    }
+    
     /**
      * Issue #??-swingx: default foreground painter not guaranteed after change.
      *
