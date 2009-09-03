@@ -7,6 +7,7 @@
 
 package org.jdesktop.swingx;
 
+import java.awt.GraphicsEnvironment;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseListener;
 import java.util.logging.Logger;
@@ -18,6 +19,7 @@ import javax.swing.plaf.UIResource;
 import junit.framework.TestCase;
 
 import org.jdesktop.swingx.hyperlink.AbstractHyperlinkAction;
+import org.jdesktop.swingx.hyperlink.HyperlinkAction;
 import org.jdesktop.swingx.plaf.basic.BasicHyperlinkUI.BasicHyperlinkListener;
 import org.jdesktop.test.PropertyChangeReport;
 import org.junit.After;
@@ -49,6 +51,19 @@ public class JXHyperlinkTest extends TestCase {
     @After
     public void tearDownJ4() throws Exception {
         tearDown();
+    }
+    
+    @Test
+    public void testSetURI() {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.fine("cannot run ui test - headless environment");
+            return;
+        }
+        JXHyperlink hyperlink = new JXHyperlink();
+        hyperlink.setURI(null);
+        assertNotNull(hyperlink.getAction());
+        assertTrue(hyperlink.getAction() instanceof HyperlinkAction);
     }
     
     @Test

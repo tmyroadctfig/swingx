@@ -4,7 +4,12 @@
  */
 package org.jdesktop.swingx.hyperlink;
 
+import java.awt.Desktop;
+import java.awt.GraphicsEnvironment;
 import java.awt.event.ActionEvent;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.logging.Logger;
 
 import javax.swing.Action;
 
@@ -25,6 +30,9 @@ import org.junit.runners.JUnit4;
 @RunWith(JUnit4.class)
 public class HyperlinkActionTest extends TestCase {
 
+    @SuppressWarnings("unused")
+    private static final Logger LOG = Logger
+            .getLogger(HyperlinkActionTest.class.getName());
     
     private PropertyChangeReport report;
 
@@ -38,6 +46,88 @@ public class HyperlinkActionTest extends TestCase {
         tearDown();
     }
     
+    @Test
+    public void testURIActionFactoryMail() throws URISyntaxException {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.fine("cannot run ui test - headless environment");
+            return;
+        }
+        URI uri = new URI("mailto:java-net@java.sun.com");
+        HyperlinkAction action = HyperlinkAction.createHyperlinkAction(uri);
+        assertEquals(true, action.isEnabled());
+        assertEquals(Desktop.Action.MAIL, action.getDesktopAction());
+    }
+    
+    @Test
+    public void testURIActionFactoryBrowseNull() {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.fine("cannot run ui test - headless environment");
+            return;
+        }
+        
+        HyperlinkAction action = HyperlinkAction.createHyperlinkAction(null);
+        assertEquals(false, action.isEnabled());
+        assertEquals(Desktop.Action.BROWSE, action.getDesktopAction());
+    }
+    
+    @Test
+    public void testURIActionPerformed() {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.fine("cannot run ui test - headless environment");
+            return;
+        }
+        
+        HyperlinkAction action = new HyperlinkAction();
+        action.actionPerformed(null);
+    }
+    
+    @Test
+    public void testURIActionNullMailEnabled() {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.fine("cannot run ui test - headless environment");
+            return;
+        }
+        
+        HyperlinkAction action = new HyperlinkAction(Desktop.Action.MAIL);
+        assertEquals(true, action.isEnabled());
+    }
+    
+    @Test
+    public void testURIActionNullTargetBrowseDisabled() {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.fine("cannot run ui test - headless environment");
+            return;
+        }
+        
+        HyperlinkAction action = new HyperlinkAction();
+        assertEquals(false, action.isEnabled());
+    }
+    
+    @Test
+    public void testUriActionEmptyConstructor() {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.fine("cannot run ui test - headless environment");
+            return;
+        }
+        HyperlinkAction action = new HyperlinkAction();
+        assertEquals(Desktop.Action.BROWSE, action.getDesktopAction());
+    }
+    
+    @Test (expected=IllegalArgumentException.class)
+    public void testUriActionIllegalType() {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.fine("cannot run ui test - headless environment");
+            return;
+        }
+        new HyperlinkAction(Desktop.Action.EDIT);
+    }
 
     /**
      * test if auto-installed visited property is respected.

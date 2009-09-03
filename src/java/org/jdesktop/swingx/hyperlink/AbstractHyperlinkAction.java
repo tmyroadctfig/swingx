@@ -28,8 +28,6 @@ import org.jdesktop.swingx.action.AbstractActionExt;
  * Convenience implementation to simplify {@link org.jdesktop.swingx.JXHyperlink} configuration and
  * provide minimal api. <p>
  * 
- * PENDING: rename to AbstractLinkAction
- * 
  * @author Jeanette Winzenburg
  */
 public abstract class AbstractHyperlinkAction<T> extends AbstractActionExt {

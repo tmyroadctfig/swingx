@@ -21,15 +21,19 @@
 package org.jdesktop.swingx;
 
 import java.awt.Color;
+import java.awt.GraphicsEnvironment;
+import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.net.URI;
 
 import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.plaf.ButtonUI;
 
 import org.jdesktop.swingx.hyperlink.AbstractHyperlinkAction;
+import org.jdesktop.swingx.hyperlink.HyperlinkAction;
 import org.jdesktop.swingx.plaf.HyperlinkAddon;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 
@@ -127,6 +131,22 @@ public class JXHyperlink extends JButton {
         init();
     }
 
+    /**
+     * Convenience method to create and install a HyperlinkAction for the given uri.
+     * 
+     * @param uri to uri to create a HyperlinkAction for, maybe null.
+     * @return a HyperlinkAction for the given URI.
+     * @throws HeadlessException if {@link
+     * GraphicsEnvironment#isHeadless()} returns {@code true}
+     * @throws UnsupportedOperationException if the current platform doesn't support
+     *   Desktop
+     *   
+     * @see org.jdesktop.swingx.HyperlinkAction.createHyperlinkAction(URI)  
+     */
+    public void setURI(URI uri) {
+        setAction(HyperlinkAction.createHyperlinkAction(uri));
+    }
+    
     /**
      * Returns the foreground color for unvisited links.
      * 
