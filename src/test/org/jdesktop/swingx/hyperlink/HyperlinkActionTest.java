@@ -124,7 +124,7 @@ public class HyperlinkActionTest extends TestCase {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
             LOG.fine("cannot run ui test - headless environment");
-            return;
+            throw new IllegalArgumentException("dummy");
         }
         new HyperlinkAction(Desktop.Action.EDIT);
     }
