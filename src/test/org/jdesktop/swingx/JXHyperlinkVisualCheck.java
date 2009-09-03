@@ -10,6 +10,8 @@ package org.jdesktop.swingx;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.logging.Logger;
 
@@ -58,16 +60,23 @@ public class JXHyperlinkVisualCheck extends InteractiveTestCase {
       setSystemLF(true);
       JXHyperlinkVisualCheck test = new JXHyperlinkVisualCheck();
       try {
-//          test.runInteractiveTests();
-          test.runInteractiveTests("interactive.*Table.*");
-          test.runInteractiveTests("interactive.*List.*");
-          test.runInteractiveTests("interactive.*Tree.*");
+          test.runInteractiveTests();
+//          test.runInteractiveTests("interactive.*Table.*");
+//          test.runInteractiveTests("interactive.*List.*");
+//          test.runInteractiveTests("interactive.*Tree.*");
 //          test.runInteractiveTests("interactive.*Underline.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
         } 
   }
+    
+    public void interactiveHyperlinkURI() throws URISyntaxException {
+        JXHyperlink link = new JXHyperlink();
+        URI uri = new URI("mailto:java-net@java.sun.com");
+        link.setURI(uri);
+        showInFrame(link, "uri");
+    }
     
     /**
      * Issue #441-swingx: underline not showing for html text.
