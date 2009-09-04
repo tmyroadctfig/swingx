@@ -24,7 +24,6 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Font;
-import java.awt.Frame;
 import java.awt.Window;
 import java.awt.event.InputEvent;
 import java.io.IOException;
@@ -302,10 +301,13 @@ public final class SwingXUtilities {
      * 
      */
     public static void updateAllComponentTreeUIs() {
-        for (Frame frame : Frame.getFrames()) {
-            updateAllComponentTreeUIs(frame);
+//        for (Frame frame : Frame.getFrames()) {
+//            updateAllComponentTreeUIs(frame);
+//        }
+        // JW: updated to new 1.6 api - returns all windows, owned and ownerless
+        for (Window window: Window.getWindows()) {
+            SwingUtilities.updateComponentTreeUI(window);
         }
-        
     }
 
 
