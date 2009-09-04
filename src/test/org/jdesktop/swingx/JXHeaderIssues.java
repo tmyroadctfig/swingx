@@ -21,6 +21,12 @@
  */
 package org.jdesktop.swingx;
 
+import java.awt.Color;
+import java.awt.GradientPaint;
+import java.util.logging.Logger;
+
+import org.jdesktop.swingx.painter.MattePainter;
+
 
 /**
  * Test to expose known issues of <code>JXHeader</code>.
@@ -37,13 +43,9 @@ package org.jdesktop.swingx;
  * @author Jeanette Winzenburg
  */
 public class JXHeaderIssues extends InteractiveTestCase {
-    
-
-    public void interactiveHeaderEmpty() {
-        JXHeader header = new JXHeader();
-        showInFrame(header, "empty constructor");
-    }
-    
+    @SuppressWarnings("unused")
+    private static final Logger LOG = Logger.getLogger(JXHeaderIssues.class
+            .getName());
     public static void main(String args[]) {
         JXHeaderIssues test = new JXHeaderIssues();
         try {
@@ -55,42 +57,44 @@ public class JXHeaderIssues extends InteractiveTestCase {
     }
 
     /**
-     * Sanity: trying to track default rendering hints.
-     * @KEEP until Issue ?? with header antialiased is solved.
+     * Issue 1167-swingx: all components with horizontal gradients must be
+     * ComponentOrientation aware.
+     * 
      */
-//    public void interactiveLabel() {
-//        JLabel label = new JLabel("JLabel tweaked * tracking, tracking ...") {
-//
-//            @Override
-//            protected void paintComponent(Graphics g) {
-//                if (ui != null) {
-//                    Graphics scratchGraphics = (g == null) ? null : g.create();
-//                    try {
-//                        RenderingHints old = ((Graphics2D)scratchGraphics).getRenderingHints();
-//                      LOG.info(getText() + ": all hints " + old
-//                      + "\n     " + ": aliased " + ((Graphics2D)scratchGraphics).getRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING));
-//                      ((Graphics2D) scratchGraphics).setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-//                              RenderingHints.VALUE_ANTIALIAS_ON);
-//                        ui.update(scratchGraphics, this);
-////                        SwingUtilities2.drawStringUnderlineCharAt(this, scratchGraphics, getText(), -1, 0, 10);
-//                        RenderingHints after =((Graphics2D)scratchGraphics).getRenderingHints();
-//                        LOG.warning(getText() + ": all hints " + after
-//                                + "\n     " + ": aliased " + ((Graphics2D)scratchGraphics).getRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING)
-//                                + "\n     " + "equals? " + old.equals(after));
-//                    }
-//                    finally {
-//                        scratchGraphics.dispose();
-//                    }
-//                }
-//            }
-//            
-//        };
-//        JComponent box = Box.createVerticalBox();
-//        box.add(label);
-//        box.add(new JXLabel("JXLabel * tracking ... tracking .."));
-//        box.add(new JLabel("JLabel raw * tracking tracking ..."));
-//        showInFrame(box, "label");
-//    }
+    public void interactiveHeaderGradient() {
+        JXHeader header = new JXHeader();
+        JXFrame frame = wrapInFrame(header, "gradient not CO-aware");
+        addComponentOrientationToggle(frame);
+        show(frame, 500, 500);
+    }
+    
+    /**
+     * Issue 1167-swingx: all components with horizontal gradients must be
+     * ComponentOrientation aware.
+     * 
+     */
+    public void interactiveLoginGradient() {
+        JXLoginPane header = new JXLoginPane();
+        JXFrame frame = wrapInFrame(header, "gradient not CO-aware");
+        addComponentOrientationToggle(frame);
+        show(frame, 500, 500);
+    }
+    
+    /**
+     * Issue 1167-swingx: all components with horizontal gradients must be
+     * ComponentOrientation aware.
+     * 
+     */
+    public void interactiveGradient() {
+        GradientPaint paint = new GradientPaint(0f, 0f, Color.WHITE, 500f, 
+                500f, Color.BLUE);
+        JXTitledPanel panel = new JXTitledPanel("want a gradient");
+        panel.setTitlePainter(new MattePainter(paint, true));
+        JXFrame frame = wrapInFrame(panel, "gradient");
+        addComponentOrientationToggle(frame);
+        show(frame, 500, 500);
+    }
+    
 
     @Override
     protected void setUp() throws Exception {

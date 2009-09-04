@@ -71,6 +71,10 @@ public class JXHyperlinkVisualCheck extends InteractiveTestCase {
         } 
   }
     
+    /**
+     * Issue #6-swingx: convenience api for setting uri's
+     * @throws URISyntaxException
+     */
     public void interactiveHyperlinkURI() throws URISyntaxException {
         JXHyperlink link = new JXHyperlink();
         URI uri = new URI("mailto:java-net@java.sun.com");
