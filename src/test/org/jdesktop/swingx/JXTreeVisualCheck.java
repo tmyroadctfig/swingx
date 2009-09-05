@@ -72,10 +72,10 @@ public class JXTreeVisualCheck extends JXTreeUnitTest {
       JXTreeVisualCheck test = new JXTreeVisualCheck();
       try {
 //          test.runInteractiveTests();
-//          test.runInteractiveTests("interactive.*RToL.*");
+          test.runInteractiveTests("interactive.*RToL.*");
 //          test.runInteractiveTests("interactive.*Revalidate.*");
 //          test.runInteractiveTests("interactiveRootExpansionTest");
-        test.runInteractiveTests("interactive.*UpdateUI.*");
+//        test.runInteractiveTests("interactive.*UpdateUI.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();

@@ -60,6 +60,7 @@ import javax.swing.event.TreeWillExpandListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeSelectionModel;
@@ -402,8 +403,8 @@ public class JXTreeTable extends JXTable {
     
     protected TreeTableHacker createTreeTableHacker() {
 //        return new TreeTableHacker();
-        return new TreeTableHackerExt();
-//        return new TreeTableHackerExt2();
+//        return new TreeTableHackerExt();
+        return new TreeTableHackerExt2();
     }
 
     /**
@@ -614,7 +615,12 @@ public class JXTreeTable extends JXTable {
      * 
      * Note: this solves the selection issue but is not bidi-compliant - in RToL
      * contexts the expansion/collapse handles aren't detected and consequently
-     * are disfunctional.
+     * are disfunctional.<p>
+     * 
+     * Note: with 1.6 the expansion control was broken even with the "normal extended"
+     * TreeTableHackerExt. When fixing that (renderer must have correct width for
+     * BasicTreeUI since 1.6) took a look into why this didn't work and made it work.
+     * So, now this is the default hack ... 
      * 
      * @author tiberiu@dev.java.net
      */
@@ -661,9 +667,19 @@ public class JXTreeTable extends JXTable {
                     if (bounds == null) {
                         row = -1;
                     } else {
-                        if ((bounds.y + bounds.height < treeMousePoint.y)
-                                || bounds.x > treeMousePoint.x) {
-                            row = -1;
+                        // JW: fix issue 1168-swingx: expansion control broken in 
+                        if (getComponentOrientation().isLeftToRight()) {
+                            // this is LToR only
+                            if ((bounds.y + bounds.height < treeMousePoint.y)
+                                    || bounds.x > treeMousePoint.x) {
+                                row = -1;
+                            }
+                        } else {
+                            if ((bounds.y + bounds.height < treeMousePoint.y)
+                                    || bounds.x + bounds.width < treeMousePoint.x) {
+                                row = -1;
+                            }
+                            
                         }
                     }
                     // make sure the expansionChangedFlag is set to false for
@@ -698,7 +714,13 @@ public class JXTreeTable extends JXTable {
         /**
          * This is a patch provided for Issue #980-swingx which should
          * improve the bidi-compliance. Still doesn't work in our 
-         * visual tests...
+         * visual tests...<p>
+         * 
+         * Problem was not in the translation to renderer coordinate system,
+         * it was in the method itself: the check whether we are "beyond" the
+         * cell content box is bidi-dependent. Plus (since 1.6), width of
+         * renderer must be > 0.
+         * 
          * 
          * @param column the column index under the event, if any.
          * @param e the event which might trigger a expand/collapse.
@@ -709,12 +731,13 @@ public class JXTreeTable extends JXTable {
 //                    - getCellRect(0, column, false).x, me.getY());
             Rectangle tableCellRect = getCellRect(0, column, false);
            
-            if( getComponentOrientation().isLeftToRight() ) {
-                return new Point(me.getX() - tableCellRect.x, me.getY());
-            }
- 
-            int x = (me.getX() - tableCellRect.x) - tableCellRect.width - 10;
-            return new Point(x, me.getY());
+            return new  Point(me.getX() - tableCellRect.x, me.getY());
+//            if( getComponentOrientation().isLeftToRight() ) {
+//            }
+// 
+//            int x = (me.getX() - tableCellRect.x); // - tableCellRect.width;
+//            LOG.info("in treePoint x/me " +  tableCellRect + "/ " + me );
+//            return new Point(x, me.getY());
         }
     }
     
@@ -2460,15 +2483,16 @@ public class JXTreeTable extends JXTable {
          */
         @Override
         public void setBounds(int x, int y, int w, int h) {
+            y = 0;
+            x = 0;
             if (treeTable != null) {
-                y = 0;
                 // It is not enough to set the height to treeTable.getHeight()
                 h = treeTable.getRowCount() * this.getRowHeight();
-//                int hierarchicalC = treeTable.getHierarchicalColumn();
-//                if (hierarchicalC >= 0) {
-//                    TableColumn column = treeTable.getColumn(hierarchicalC);
-//                    w = Math.min(w, column.getWidth());
-//                }
+                int hierarchicalC = treeTable.getHierarchicalColumn();
+                if (hierarchicalC >= 0) {
+                    TableColumn column = treeTable.getColumn(hierarchicalC);
+                    w = column.getWidth();//Math.max(w, column.getWidth());
+                }
             }
             super.setBounds(x, y, w, h);
         }

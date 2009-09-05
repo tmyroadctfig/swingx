@@ -91,19 +91,19 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
     public static void main(String[] args) {
         // NOTE JW: this property has be set "very early" in the application life-cycle
         // it's immutable once read from the UIManager (into a final static field!!)
-//        System.setProperty("sun.swing.enableImprovedDragGesture", "true" );
+        System.setProperty("sun.swing.enableImprovedDragGesture", "true" );
         setSystemLF(true);
         JXTreeTableVisualCheck test = new JXTreeTableVisualCheck();
         try {
 //            test.runInteractiveTests();
 //            test.runInteractiveTests("interactive.*Hierarchical.*");
 //               test.runInteractiveTests("interactive.*ToolTip.*");
-//           test.runInteractiveTests("interactive.*DnD.*");
+           test.runInteractiveTests("interactive.*DnD.*");
 //             test.runInteractiveTests("interactive.*Compare.*");
 //             test.runInteractiveTests("interactive.*RowHeightCompare.*");
 //             test.runInteractiveTests("interactive.*RToL.*");
 //             test.runInteractiveTests("interactive.*Insert.*");
-             test.runInteractiveTests("interactive.*WinP.*");
+//             test.runInteractiveTests("interactive.*WinP.*");
         } catch (Exception ex) {
 
         }

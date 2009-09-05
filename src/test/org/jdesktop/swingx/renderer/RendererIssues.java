@@ -479,8 +479,6 @@ public class RendererIssues extends InteractiveTestCase {
                 }
                 return null;
             }
-
-            @SuppressWarnings("unused")
             private int getVisibleWidth() {
                 int width = getVisibleRect().width;
                 int indent =  (((BasicTreeUI)getUI()).getLeftChildIndent() + ((BasicTreeUI)getUI()).getRightChildIndent());
