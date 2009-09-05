@@ -655,18 +655,24 @@ public class JXTreeTable extends JXTable {
             if (me.getModifiers() == 0
                     || me.getModifiers() == InputEvent.BUTTON1_MASK) {
                 // compute where the mouse point is relative to the tree
-                // renderer
+                // as renderer, that the x coordinate translated to be relative
+                // to the column x-position
                 Point treeMousePoint = getTreeMousePoint(column, me);
                 int treeRow = renderer.getRowForLocation(treeMousePoint.x,
                         treeMousePoint.y);
                 int row = 0;
+                // mouse location not inside the node content
                 if (treeRow < 0) {
+                    // get the row for mouse location
                     row = renderer.getClosestRowForLocation(treeMousePoint.x,
                             treeMousePoint.y);
+                    // check against actual bounds of the row
                     Rectangle bounds = renderer.getRowBounds(row);
                     if (bounds == null) {
                         row = -1;
                     } else {
+                        // check if the mouse location is "leading"
+                        // relative to the content box 
                         // JW: fix issue 1168-swingx: expansion control broken in 
                         if (getComponentOrientation().isLeftToRight()) {
                             // this is LToR only
@@ -686,9 +692,13 @@ public class JXTreeTable extends JXTable {
                     // the case that up in the tree nothing happens
                     expansionChangedFlag = false;
                 }
-
-                if ((treeRow >= 0) || ((treeRow < 0) && (row < 0))) {
-                    // default selection
+                // if in content box
+                if ((treeRow >= 0) 
+                        // or outside but leading
+                        || ((treeRow < 0) && (row < 0))) {
+                    // dispatch the translated event to the tree
+                    // which either triggers a tree selection
+                    // or expands/collapses a node
                     MouseEvent pressed = new MouseEvent(renderer, me.getID(),
                             me.getWhen(), me.getModifiers(), treeMousePoint.x,
                             treeMousePoint.y, me.getClickCount(), me
@@ -727,11 +737,12 @@ public class JXTreeTable extends JXTable {
          * @return the Point adjusted for bidi
          */
         protected Point getTreeMousePoint(int column, MouseEvent me) {
-//            return new Point(me.getX()
-//                    - getCellRect(0, column, false).x, me.getY());
-            Rectangle tableCellRect = getCellRect(0, column, false);
-           
-            return new  Point(me.getX() - tableCellRect.x, me.getY());
+            // could inline as it wasn't the place to fix for broken RToL
+            return new Point(me.getX()
+                    - getCellRect(0, column, false).x, me.getY());
+//            Rectangle tableCellRect = getCellRect(0, column, false);
+//           
+//            return new  Point(me.getX() - tableCellRect.x, me.getY());
 //            if( getComponentOrientation().isLeftToRight() ) {
 //            }
 // 
@@ -2479,19 +2490,26 @@ public class JXTreeTable extends JXTable {
 
 
         /**
-         * This is overridden to set the height to match that of the JTable.
+         * This is overridden to set the location to (0, 0) and set
+         * the dimension to exactly fill the bounds of the hierarchical
+         * column.<p>
          */
         @Override
         public void setBounds(int x, int y, int w, int h) {
+            // location is relative to the hierarchical column
             y = 0;
             x = 0;
             if (treeTable != null) {
+                // adjust height to table height
                 // It is not enough to set the height to treeTable.getHeight()
+                // JW: why not?
                 h = treeTable.getRowCount() * this.getRowHeight();
                 int hierarchicalC = treeTable.getHierarchicalColumn();
+                // JW: re-introduced to fix Issue 1168-swingx
                 if (hierarchicalC >= 0) {
                     TableColumn column = treeTable.getColumn(hierarchicalC);
-                    w = column.getWidth();//Math.max(w, column.getWidth());
+                    // adjust width to width of hierarchical column
+                    w = column.getWidth();
                 }
             }
             super.setBounds(x, y, w, h);
