@@ -692,10 +692,12 @@ public class JXTreeTable extends JXTable {
                     // the case that up in the tree nothing happens
                     expansionChangedFlag = false;
                 }
-                // if in content box
-                if ((treeRow >= 0) 
-                        // or outside but leading
-                        || ((treeRow < 0) && (row < 0))) {
+                
+                if ((treeRow >= 0) // if in content box
+                        || ((treeRow < 0) && (row < 0))) {// or outside but leading
+                    if (treeRow >= 0)  { //Issue 561-swingx: in content box, update column lead to focus
+                        getColumnModel().getSelectionModel().setLeadSelectionIndex(column);
+                    }
                     // dispatch the translated event to the tree
                     // which either triggers a tree selection
                     // or expands/collapses a node
@@ -715,6 +717,7 @@ public class JXTreeTable extends JXTable {
                 }
                 if (expansionChangedFlag) {
                     changedExpansion = true;
+                } else {
                 }
             }
             expansionChangedFlag = false;
