@@ -101,7 +101,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
            test.runInteractiveTests("interactive.*DnD.*");
 //             test.runInteractiveTests("interactive.*Compare.*");
 //             test.runInteractiveTests("interactive.*RowHeightCompare.*");
-//             test.runInteractiveTests("interactive.*RToL.*");
+             test.runInteractiveTests("interactive.*RToL.*");
 //             test.runInteractiveTests("interactive.*Insert.*");
 //             test.runInteractiveTests("interactive.*WinP.*");
         } catch (Exception ex) {
@@ -827,9 +827,20 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
     public void interactiveRToLTreeTableEditor() {
         final TreeTableModel model = createMutableVisualizeModel();
         final JXTreeTable table = new JXTreeTable(model);
-        final JXFrame frame = wrapWithScrollingInFrame(table, "Editor: position follows Component orientation");
+        table.expandAll();
+        
+        final JXFrame frame = wrapWithScrollingInFrame(table, new JTable(table.getModel()),
+                "Editor: position follows Component orientation");
         addComponentOrientationToggle(frame);
-        frame.setVisible(true);
+        Action edit = new AbstractAction("edit 1/1") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                table.editCellAt(1, 1);
+            }
+        };
+        addAction(frame, edit);
+        show(frame);
     }
 
     /**

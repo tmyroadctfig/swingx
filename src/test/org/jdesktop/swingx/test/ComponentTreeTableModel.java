@@ -105,13 +105,15 @@ public class ComponentTreeTableModel extends AbstractTreeTableModel {
             return Class.class;
         case 2:
             return Dimension.class;
+        case 3:
+            return Integer.class;
         default:
             return Object.class;
         }
     }
     
     public int getColumnCount() {
-        return 3;
+        return 4;
     }
     
     @Override
@@ -123,6 +125,8 @@ public class ComponentTreeTableModel extends AbstractTreeTableModel {
             return "Type";
         case 2:
             return "Size";
+        case 3:
+            return "Width";
         default:
             return "Column " + column;
         }
@@ -137,6 +141,8 @@ public class ComponentTreeTableModel extends AbstractTreeTableModel {
             return comp.getClass();
         case 2:
             return comp.getSize();
+        case 3: 
+            return comp.getWidth();
         default:
             return null;
         }
@@ -151,14 +157,19 @@ public class ComponentTreeTableModel extends AbstractTreeTableModel {
         // introduced for testing #270-swingx: 
         // NPE for invisible rows (if parent is collapsed.
         ((Component) node).getName();
-        return column == 0;
+        return column == 0 || column == 3;
     }
 
     @Override
     public void setValueAt(Object value, Object node, int column) {
         if (!isCellEditable(node, column)) return;
+        
         Component comp = (Component) node;
-        comp.setName(String.valueOf(value));
+        if (column == 0) {
+            comp.setName(String.valueOf(value));
+        } else if (column == 3) {
+            comp.setSize(new Integer((Integer) value), comp.getHeight());
+        }
         nodeChanged(comp);
     }
 
