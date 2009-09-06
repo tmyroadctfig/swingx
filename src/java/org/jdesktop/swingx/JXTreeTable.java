@@ -714,6 +714,12 @@ public class JXTreeTable extends JXTable {
                                     .getX(), pressed.getY(), pressed
                                     .getClickCount(), pressed.isPopupTrigger());
                     renderer.dispatchEvent(released);
+                    // part of 561-swingx: if focus elsewhere and dispatching the
+                    // mouseEvent the focus doesn't move from elsewhere
+                    // still doesn't help in very first click after startup
+                    // probably lead of row selection event not correctly updated
+                    // on synch from treeSelectionModel
+                    requestFocusInWindow();
                 }
                 if (expansionChangedFlag) {
                     changedExpansion = true;
