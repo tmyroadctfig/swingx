@@ -12,8 +12,11 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.swing.JTree;
 import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeExpansionListener;
+
+import org.jdesktop.swingx.JXTreeTable;
 
 /**
  * A CellEditorListener that stores the received ChangeEvents.
@@ -28,7 +31,21 @@ public class TreeExpansionReport implements TreeExpansionListener {
     protected List<TreeExpansionEvent> collapsedEvents = Collections.synchronizedList(new LinkedList<TreeExpansionEvent>());
     protected List<TreeExpansionEvent> allEvents = Collections.synchronizedList(new LinkedList<TreeExpansionEvent>());
     
+    public TreeExpansionReport() {
+        this((JTree) null);
+    }
     
+    public TreeExpansionReport(JTree tree) {
+        if (tree != null) {
+            tree.addTreeExpansionListener(this);
+        }
+    }
+    
+    public TreeExpansionReport(JXTreeTable tree) {
+        if (tree != null) {
+            tree.addTreeExpansionListener(this);
+        }
+    }
 //------------------------ implement CellEditorListener
 
     
