@@ -404,7 +404,8 @@ public class JXTreeTable extends JXTable {
     protected TreeTableHacker createTreeTableHacker() {
 //        return new TreeTableHacker();
 //        return new TreeTableHackerExt();
-        return new TreeTableHackerExt2();
+//        return new TreeTableHackerExt2();
+        return new TreeTableHackerExt3();
     }
 
     /**
@@ -610,17 +611,13 @@ public class JXTreeTable extends JXTable {
     
     /**
      * Patch for #471-swingx: no selection on click in hierarchical column
-     * outside of node-text. Mar 2007.
+     * if outside of node-text. Mar 2007.
      * <p>
-     * 
-     * Note: this solves the selection issue but is not bidi-compliant - in RToL
-     * contexts the expansion/collapse handles aren't detected and consequently
-     * are disfunctional.<p>
      * 
      * Note: with 1.6 the expansion control was broken even with the "normal extended"
      * TreeTableHackerExt. When fixing that (renderer must have correct width for
      * BasicTreeUI since 1.6) took a look into why this didn't work and made it work.
-     * So, now this is the default hack ... 
+     * So, now this is bidi-compliant.
      * 
      * @author tiberiu@dev.java.net
      */
@@ -643,8 +640,8 @@ public class JXTreeTable extends JXTable {
                  */
                 me = new MouseEvent((Component) me.getSource(),
                         MouseEvent.MOUSE_PRESSED, me.getWhen(), me
-                                .getModifiers(), me.getX(), me.getY(), me
-                                .getClickCount(), me.isPopupTrigger());
+                        .getModifiers(), me.getX(), me.getY(), me
+                        .getClickCount(), me.isPopupTrigger());
             }
             // If the modifiers are not 0 (or the left mouse button),
             // tree may try and toggle the selection, and table
@@ -704,6 +701,134 @@ public class JXTreeTable extends JXTable {
                     MouseEvent pressed = new MouseEvent(renderer, me.getID(),
                             me.getWhen(), me.getModifiers(), treeMousePoint.x,
                             treeMousePoint.y, me.getClickCount(), me
+                            .isPopupTrigger());
+                    renderer.dispatchEvent(pressed);
+                    // For Mac OS X, we need to dispatch a MOUSE_RELEASED as
+                    // well
+                    MouseEvent released = new MouseEvent(renderer,
+                            java.awt.event.MouseEvent.MOUSE_RELEASED, pressed
+                            .getWhen(), pressed.getModifiers(), pressed
+                            .getX(), pressed.getY(), pressed
+                            .getClickCount(), pressed.isPopupTrigger());
+                    renderer.dispatchEvent(released);
+                    // part of 561-swingx: if focus elsewhere and dispatching the
+                    // mouseEvent the focus doesn't move from elsewhere
+                    // still doesn't help in very first click after startup
+                    // probably lead of row selection event not correctly updated
+                    // on synch from treeSelectionModel
+                    requestFocusInWindow();
+                }
+                if (expansionChangedFlag) {
+                    changedExpansion = true;
+                } else {
+                }
+            }
+            expansionChangedFlag = false;
+            return changedExpansion;
+        }
+        
+        /**
+         * This is a patch provided for Issue #980-swingx which should
+         * improve the bidi-compliance. Still doesn't work in our 
+         * visual tests...<p>
+         * 
+         * Problem was not in the translation to renderer coordinate system,
+         * it was in the method itself: the check whether we are "beyond" the
+         * cell content box is bidi-dependent. Plus (since 1.6), width of
+         * renderer must be > 0.
+         * 
+         * 
+         * @param column the column index under the event, if any.
+         * @param e the event which might trigger a expand/collapse.
+         * @return the Point adjusted for bidi
+         */
+        protected Point getTreeMousePoint(int column, MouseEvent me) {
+            // could inline as it wasn't the place to fix for broken RToL
+            return new Point(me.getX()
+                    - getCellRect(0, column, false).x, me.getY());
+        }
+    }
+    /**
+     * A more (or less, depending in pov :-) aggressiv hacker. Compared
+     * to super, it dispatches less events to address open issues.<p>
+     * 
+     * Issue #474-swingx: double click should start edit (not expand/collapse)
+     *    changed mightBeExpansionTrigger to filter out clickCounts > 1
+     * <p>   
+     * Issue #875-swingx: cell selection mode
+     *    changed the dispatch to do so only if mouse event outside content
+     *    box and leading
+     * <p>
+     * Issue #1169-swingx: remove 1.5 dnd hack
+     *    removed the additional dispatch here and    
+     *    changed in the implementation of hackAroundDragEnabled
+     *    to no longer look for the system property (it's useless even if set)
+     * 
+     * @author tiberiu@dev.java.net
+     */
+    public class TreeTableHackerExt3 extends TreeTableHackerExt2 {
+        @Override
+        protected boolean expandOrCollapseNode(int column, EventObject e) {
+            if (!isHierarchical(column))
+                return false;
+            if (!mightBeExpansionTrigger(e))
+                return false;
+            boolean changedExpansion = false;
+            MouseEvent me = (MouseEvent) e;
+            // If the modifiers are not 0 (or the left mouse button),
+            // tree may try and toggle the selection, and table
+            // will then try and toggle, resulting in the
+            // selection remaining the same. To avoid this, we
+            // only dispatch when the modifiers are 0 (or the left mouse
+            // button).
+            if (me.getModifiers() == 0
+                    || me.getModifiers() == InputEvent.BUTTON1_MASK) {
+                // compute where the mouse point is relative to the tree
+                // as renderer, that the x coordinate translated to be relative
+                // to the column x-position
+                Point treeMousePoint = getTreeMousePoint(column, me);
+                int treeRow = renderer.getRowForLocation(treeMousePoint.x,
+                        treeMousePoint.y);
+                int row = 0;
+                // mouse location not inside the node content
+                if (treeRow < 0) {
+                    // get the row for mouse location
+                    row = renderer.getClosestRowForLocation(treeMousePoint.x,
+                            treeMousePoint.y);
+                    // check against actual bounds of the row
+                    Rectangle bounds = renderer.getRowBounds(row);
+                    if (bounds == null) {
+                        row = -1;
+                    } else {
+                        // check if the mouse location is "leading"
+                        // relative to the content box 
+                        // JW: fix issue 1168-swingx: expansion control broken in 
+                        if (getComponentOrientation().isLeftToRight()) {
+                            // this is LToR only
+                            if ((bounds.y + bounds.height < treeMousePoint.y)
+                                    || bounds.x > treeMousePoint.x) {
+                                row = -1;
+                            }
+                        } else {
+                            if ((bounds.y + bounds.height < treeMousePoint.y)
+                                    || bounds.x + bounds.width < treeMousePoint.x) {
+                                row = -1;
+                            }
+                            
+                        }
+                    }
+                }
+                // make sure the expansionChangedFlag is set to false for
+                // the case that up in the tree nothing happens
+                expansionChangedFlag = false;
+                
+                if  ((treeRow < 0) && (row < 0)) {// outside and leading
+                    // dispatch the translated event to the tree
+                    // which either triggers a tree selection
+                    // or expands/collapses a node
+                    MouseEvent pressed = new MouseEvent(renderer, me.getID(),
+                            me.getWhen(), me.getModifiers(), treeMousePoint.x,
+                            treeMousePoint.y, me.getClickCount(), me
                                     .isPopupTrigger());
                     renderer.dispatchEvent(pressed);
                     // For Mac OS X, we need to dispatch a MOUSE_RELEASED as
@@ -729,64 +854,34 @@ public class JXTreeTable extends JXTable {
             expansionChangedFlag = false;
             return changedExpansion;
         }
-
         /**
-         * This is a patch provided for Issue #980-swingx which should
-         * improve the bidi-compliance. Still doesn't work in our 
-         * visual tests...<p>
-         * 
-         * Problem was not in the translation to renderer coordinate system,
-         * it was in the method itself: the check whether we are "beyond" the
-         * cell content box is bidi-dependent. Plus (since 1.6), width of
-         * renderer must be > 0.
-         * 
-         * 
-         * @param column the column index under the event, if any.
-         * @param e the event which might trigger a expand/collapse.
-         * @return the Point adjusted for bidi
+         * Overridden to exclude clickcounts > 1.
          */
-        protected Point getTreeMousePoint(int column, MouseEvent me) {
-            // could inline as it wasn't the place to fix for broken RToL
-            return new Point(me.getX()
-                    - getCellRect(0, column, false).x, me.getY());
-//            Rectangle tableCellRect = getCellRect(0, column, false);
-//           
-//            return new  Point(me.getX() - tableCellRect.x, me.getY());
-//            if( getComponentOrientation().isLeftToRight() ) {
-//            }
-// 
-//            int x = (me.getX() - tableCellRect.x); // - tableCellRect.width;
-//            LOG.info("in treePoint x/me " +  tableCellRect + "/ " + me );
-//            return new Point(x, me.getY());
+        @Override
+        protected boolean mightBeExpansionTrigger(EventObject e) {
+            if (!(e instanceof MouseEvent)) return false;
+            MouseEvent me = (MouseEvent) e;
+            if (!SwingUtilities.isLeftMouseButton(me)) return false;
+            if (me.getClickCount() > 1) return false;
+            return me.getID() == MouseEvent.MOUSE_PRESSED;
         }
+
     }
     
     /**
-     * decides whether we want to apply the hack for #168-jdnc. here: returns
-     * true if dragEnabled() and the improved drag handling is not activated (or
-     * the system property is not accessible). The given mouseEvent is not
-     * analysed.
+     * Decides whether we want to apply the hack for #168-jdnc. here: returns
+     * true if dragEnabled() and a client property with key DRAG_HACK_FLAG_KEY
+     * has a value of boolean true.<p>
      * 
-     * PENDING: Mustang?
+     * Note: this is updated for 1.6, as the intermediate system property
+     * for enabled drag support is useless now (it's the default)
      * 
      * @param me the mouseEvent that triggered a editCellAt
      * @return true if the hack should be applied.
      */
     protected boolean hackAroundDragEnabled(MouseEvent me) {
         Boolean dragHackFlag = (Boolean) getClientProperty(DRAG_HACK_FLAG_KEY);
-        if (dragHackFlag == null) {
-            // access and store the system property as a client property once
-            String priority = null;
-            try {
-                priority = System.getProperty("sun.swing.enableImprovedDragGesture");
-
-            } catch (Exception ex) {
-                // found some foul expression or failed to read the property
-            }
-            dragHackFlag = (priority == null);
-            putClientProperty(DRAG_HACK_FLAG_KEY, dragHackFlag);
-        }
-        return getDragEnabled() && dragHackFlag;
+        return getDragEnabled() && Boolean.TRUE.equals(dragHackFlag);
     }
 
     /**
@@ -2555,6 +2650,14 @@ public class JXTreeTable extends JXTable {
             }
             
         }
+
+        
+        @Override
+        public boolean isRowSelected(int row) {
+            if ((treeTable == null) || (treeTable.getHierarchicalColumn() <0)) return false;
+            return treeTable.isCellSelected(row, treeTable.getHierarchicalColumn());
+        }
+
 
         public Component getTableCellRendererComponent(JTable table,
             Object value,

@@ -995,6 +995,7 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
      * Issue #168-jdnc: dnd enabled breaks node collapse/expand.
      * testing auto-detection of dragHackEnabled.
      * 
+     * Removed auto-detection (cleanup 1.6)
      */
     @Test
     public void testDragHackFlagOn() {
@@ -1003,13 +1004,14 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
         treeTable.getTreeTableHacker().expandOrCollapseNode(0, 
                 new MouseEvent(treeTable, MouseEvent.MOUSE_PRESSED, 0, InputEvent.BUTTON1_MASK, 0, 0, 1, false));
         Boolean dragHackFlag = (Boolean) treeTable.getClientProperty(JXTreeTable.DRAG_HACK_FLAG_KEY);
-        assertNotNull(dragHackFlag);
-        assertTrue(dragHackFlag);
+        assertNull(dragHackFlag);
     }
 
     /**
      * Issue #168-jdnc: dnd enabled breaks node collapse/expand.
      * testing auto-detection of dragHackEnabled.
+     * 
+     * Removed auto-detection (cleanup 1.6)
      * 
      */
     @Test
@@ -1020,8 +1022,7 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
         treeTable.getTreeTableHacker().expandOrCollapseNode(0, 
                 new MouseEvent(treeTable, MouseEvent.MOUSE_PRESSED, 0, InputEvent.BUTTON1_MASK, 0, 0, 1, false));
         Boolean dragHackFlag = (Boolean) treeTable.getClientProperty(JXTreeTable.DRAG_HACK_FLAG_KEY);
-        assertNotNull(dragHackFlag);
-        assertFalse(dragHackFlag);
+        assertNull(dragHackFlag);
         System.getProperties().remove("sun.swing.enableImprovedDragGesture");
     }
 
