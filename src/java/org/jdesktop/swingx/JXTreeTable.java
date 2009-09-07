@@ -48,6 +48,7 @@ import javax.swing.RowSorter;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
+import javax.swing.event.ChangeEvent;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
@@ -220,7 +221,7 @@ public class JXTreeTable extends JXTable {
         }
         // adjust the tree's rowHeight to this.rowHeight
         adjustTreeRowHeight(getRowHeight());
-
+        adjustTreeBounds();
         setSelectionModel(selectionWrapper.getListSelectionModel());
         
         // propagate the lineStyle property to the renderer
@@ -237,7 +238,6 @@ public class JXTreeTable extends JXTable {
     }
 
 
-    
     private void initActions() {
         // Register the actions that this class can handle.
         ActionMap map = getActionMap();
@@ -1039,6 +1039,25 @@ public class JXTreeTable extends JXTable {
         }
     }
 
+    /**
+     * {@inheritDoc} <p>
+     * 
+     * Overridden to adjust the renderer's size.
+     */
+    @Override
+    public void columnMarginChanged(ChangeEvent e) {
+        super.columnMarginChanged(e);
+        adjustTreeBounds();
+    }
+
+    /**
+     * Forces the renderer to resize for fitting into hierarchical column.
+     */
+    private void adjustTreeBounds() {
+        if (renderer != null) {
+            renderer.setBounds(0, 0, 0, 0);
+        }
+    }
 
     /**
      * <p>Overridden to ensure that private renderer state is kept in sync with the
