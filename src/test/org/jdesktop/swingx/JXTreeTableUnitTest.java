@@ -32,6 +32,7 @@ import java.util.logging.Logger;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.event.TableModelEvent;
@@ -78,6 +79,22 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
         super("JXTreeTable Unit Test");
     }
 
+    /**
+     * Part of issue ??-swingx: tree width must be same as hierarchical column width
+     */
+    @Test
+    public void testTreeWidth() {
+        JXTreeTable table = new JXTreeTable(new FileSystemModel());
+        table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        JXTree tree = (JXTree) table.getCellRenderer(0, 0);
+        int old = table.getColumn(0).getWidth();
+        assertEquals(old, tree.getWidth());
+        int width = old *2;
+        table.getColumn(0).setWidth(width);
+        assertEquals(width, table.getColumn(0).getWidth());
+        assertEquals(width, tree.getWidth());
+    }
+    
     /**
      * Issue #1121: most not be sortable
      * 
