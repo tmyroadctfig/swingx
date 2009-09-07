@@ -20,6 +20,8 @@
  */
 package org.jdesktop.swingx;
 
+import static org.junit.Assert.*;
+
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Point;
@@ -59,6 +61,7 @@ import org.jdesktop.swingx.treetable.TreeTableNode;
 import org.jdesktop.test.AncientSwingTeam;
 import org.jdesktop.test.PropertyChangeReport;
 import org.jdesktop.test.TableModelReport;
+import org.jdesktop.test.TreeExpansionReport;
 import org.jdesktop.test.TreeSelectionReport;
 import org.junit.Before;
 import org.junit.Test;
@@ -79,6 +82,30 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
         super("JXTreeTable Unit Test");
     }
 
+    /**
+     * Issue #876-swingx: add support for adding/removing expansion listeners.
+     */
+    @Test
+    public void testExpansionListenerSourceExpanded() {
+        JXTreeTable table = new JXTreeTable(new FileSystemModel());
+        TreeExpansionReport report = new TreeExpansionReport(table);
+        table.expandRow(0);
+        assertEquals(1, report.getEventCount());
+        assertEquals(table, report.getLastExpandedEvent().getSource());
+    }
+    /**
+     * Issue #876-swingx: add support for adding/removing expansion listeners.
+     */
+    @Test
+    public void testExpansionListenerSourceCollapsed() {
+        JXTreeTable table = new JXTreeTable(new FileSystemModel());
+        table.expandRow(0);
+        TreeExpansionReport report = new TreeExpansionReport(table);
+        table.collapseRow(0);
+        assertEquals(1, report.getEventCount());
+        assertEquals(table, report.getLastCollapsedEvent().getSource());
+    }
+    
     /**
      * Part of issue ??-swingx: tree width must be same as hierarchical column width
      */

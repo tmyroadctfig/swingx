@@ -70,6 +70,7 @@ import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
 import org.jdesktop.swingx.decorator.ComponentAdapter;
+import org.jdesktop.swingx.event.TreeExpansionBroadcaster;
 import org.jdesktop.swingx.renderer.StringValue;
 import org.jdesktop.swingx.renderer.StringValues;
 import org.jdesktop.swingx.rollover.RolloverProducer;
@@ -143,6 +144,7 @@ public class JXTreeTable extends JXTable {
     
     private TreeTableHacker treeTableHacker;
     private boolean consumedOnPress;
+    private TreeExpansionBroadcaster treeExpansionBroadcaster;
 
     /**
      * Constructs a JXTreeTable using a
@@ -1646,13 +1648,22 @@ public class JXTreeTable extends JXTable {
     /**
      * Adds a listener for <code>TreeExpansion</code> events.
      * 
-     * TODO (JW): redirect event source to this. 
-     * 
      * @param tel a TreeExpansionListener that will be notified 
      * when a tree node is expanded or collapsed
      */
     public void addTreeExpansionListener(TreeExpansionListener tel) {
-        renderer.addTreeExpansionListener(tel);
+        getTreeExpansionBroadcaster().addTreeExpansionListener(tel);
+    }
+
+    /**
+     * @return
+     */
+    private TreeExpansionBroadcaster getTreeExpansionBroadcaster() {
+        if (treeExpansionBroadcaster == null) {
+            treeExpansionBroadcaster = new TreeExpansionBroadcaster(this);
+            renderer.addTreeExpansionListener(treeExpansionBroadcaster);
+        }
+        return treeExpansionBroadcaster;
     }
 
     /**
@@ -1660,7 +1671,8 @@ public class JXTreeTable extends JXTable {
      * @param tel the <code>TreeExpansionListener</code> to remove
      */
     public void removeTreeExpansionListener(TreeExpansionListener tel) {
-        renderer.removeTreeExpansionListener(tel);
+        if (treeExpansionBroadcaster == null) return;
+        treeExpansionBroadcaster.removeTreeExpansionListener(tel);
     }
 
     /**
