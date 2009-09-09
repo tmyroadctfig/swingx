@@ -75,12 +75,30 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
 //        test.runInteractiveTests(".*Event.*");
 //          test.runInteractiveTests("interactive.*Zoomable.*");
 //          test.runInteractiveTests("interactive.*Title.*");
-        test.runInteractiveTests("interactive.*TimeZone.*");
+        test.runInteractiveTests("interactive.*LastDisplayed.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
       }
   }
+    
+    /**
+     * LastDisplayed incorrect?
+     */
+    public void interactiveLastDisplayedMultiple() {
+        final JXMonthView monthView = new JXMonthView();
+        monthView.setPreferredColumnCount(2);
+        JXFrame frame = wrapInFrame(monthView, "lastDisplayed");
+        Action action = new AbstractAction("print last") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                LOG.info("last displayed " + monthView.getLastDisplayedDay());
+            }
+        };
+        addAction(frame, action);
+        show(frame);
+    }
 
     /**
      * Issue #1125-swingx: JXMonthView today incorrect.

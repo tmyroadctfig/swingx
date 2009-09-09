@@ -56,6 +56,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.JFormattedTextField.AbstractFormatter;
 import javax.swing.JFormattedTextField.AbstractFormatterFactory;
+import javax.swing.event.PopupMenuListener;
 import javax.swing.text.DefaultFormatterFactory;
 
 import org.jdesktop.swingx.calendar.DatePickerFormatter;
@@ -207,6 +208,7 @@ public class JXDatePicker extends JComponent {
     
     private JXMonthView _monthView;
     private boolean editable = true;
+    // PENDING JW: remove - duplication, we have access to super's listenerlist
     private EventListenerMap listenerMap;
     protected boolean lightWeightPopupEnabled = JPopupMenu.getDefaultLightWeightPopupEnabled();
 
@@ -906,6 +908,38 @@ public class JXDatePicker extends JComponent {
         }
     }
  
+    /**
+     * Adds a PopupMenuListener.<p>
+     * 
+     * PENDING JW: the canceled method is never called due to internal 
+     * interference in BasicDatePickerUI. Probably need to re-visit that. 
+     * 
+     * @param l the PopupMenuListener to add.
+     */
+    public void addPopupMenuListener(PopupMenuListener l) {
+        listenerMap.add(PopupMenuListener.class, l);
+    }
+    
+    /**
+     * Removes a PopupMenuListener.
+     * 
+     * @param l the PopupMenuListener to remove.
+     */
+    public void removePopupMenuListener(PopupMenuListener l) {
+        listenerMap.remove(PopupMenuListener.class, l);
+    }
+    
+    /**
+     * Returns an array containing all PopupMenuListeners which are 
+     * registered to this picker.
+     * 
+     * @return an array containing all PopupMenuListeners which are
+     * registered to this picker, guaranteed to be never null.
+     */
+    public PopupMenuListener[] getPopupMenuListeners() {
+        return getListeners(PopupMenuListener.class);
+    }
+    
     /**
      * Pes: added setLocale method to refresh link text on locale changes
      */
