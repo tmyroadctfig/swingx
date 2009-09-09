@@ -25,11 +25,13 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
 import java.awt.event.ActionListener;
+import java.lang.reflect.InvocationTargetException;
 import java.text.DateFormat;
 import java.text.Format;
 import java.text.MessageFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -44,6 +46,7 @@ import javax.swing.JFormattedTextField;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.plaf.UIResource;
@@ -59,6 +62,7 @@ import org.jdesktop.swingx.plaf.UIManagerExt;
 import org.jdesktop.swingx.plaf.basic.BasicDatePickerUI.EditorCancelAction;
 import org.jdesktop.swingx.test.XTestUtils;
 import org.jdesktop.test.ActionReport;
+import org.jdesktop.test.PopupMenuReport;
 import org.jdesktop.test.PropertyChangeReport;
 import org.jdesktop.test.TestUtils;
 import org.junit.After;
@@ -89,6 +93,57 @@ public class JXDatePickerTest extends InteractiveTestCase {
        public void tearDown() {
     }
 
+    /**
+     * Issue #1171-swingx: support popupMenuListeners.
+     * 
+     * Tests notification on showing.
+     * @throws InvocationTargetException 
+     * @throws InterruptedException 
+     */
+    @Test
+    public void testPopupMenuListenerNotificationVisible() throws InterruptedException, InvocationTargetException {
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.fine("cannot run testLinkPanelNull - headless");
+            return;
+        }
+        final JXDatePicker picker = new JXDatePicker();
+        final JXFrame frame = new JXFrame("showing", false);
+        frame.add(picker);
+        frame.pack();
+        frame.setVisible(true);
+        final PopupMenuReport report = new PopupMenuReport();
+        picker.addPopupMenuListener(report);
+        Action togglePopup = picker.getActionMap().get("TOGGLE_POPUP");
+        togglePopup.actionPerformed(null);
+        SwingUtilities.invokeAndWait(new Runnable() {
+            public void run() {
+                assertEquals(1, report.getEventCount());
+                assertEquals(1, report.getVisibleEventCount());
+                frame.dispose();
+                
+            }
+        });
+    }
+    
+    
+    /**
+     * Issue #1171-swingx: support popupMenuListeners.
+     * 
+     * Tests add/remove.
+     */
+    @Test
+    public void testPopupMenuListenerManagement() {
+        JXDatePicker picker = new JXDatePicker();
+        assertNotNull(picker.getPopupMenuListeners());
+        int count = picker.getPopupMenuListeners().length;
+        PopupMenuReport report = new PopupMenuReport();
+        picker.addPopupMenuListener(report);
+        assertEquals(count + 1, picker.getPopupMenuListeners().length);
+        assertTrue(Arrays.asList(picker.getPopupMenuListeners()).contains(report));
+        picker.removePopupMenuListener(report);
+        assertEquals(count, picker.getPopupMenuListeners().length);
+        assertFalse(Arrays.asList(picker.getPopupMenuListeners()).contains(report));
+    }
     /**
      * Issue #1144-swingx: JXDatePicker must accept custom formatter.
      * Pathological .. but anyway: formatter may be null.

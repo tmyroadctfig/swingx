@@ -57,6 +57,8 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.JSpinner.DefaultEditor;
 import javax.swing.UIManager.LookAndFeelInfo;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 import javax.swing.text.DateFormatter;
 import javax.swing.text.DefaultFormatterFactory;
 
@@ -96,15 +98,37 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
         try {
 //            test.runInteractiveTests();
 //            test.runInteractiveTests("interactive.*PrefSize.*");
-//            test.runInteractiveTests("interactive.*Keep.*");
+            test.runInteractiveTests("interactive.*MenuListener.*");
 //          test.runInteractiveTests("interactive.*Multiple.*");
-            test.runInteractiveTests("interactive.*Event.*");
+//            test.runInteractiveTests("interactive.*Event.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
         }
     }
 
+    public void interactivePopupMenuListener() {
+        JXDatePicker picker = new JXDatePicker();
+        PopupMenuListener l = new PopupMenuListener() {
+            
+            @Override
+            public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+                LOG.info("visible");
+            }
+            
+            @Override
+            public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
+                LOG.info("invisible");
+            }
+            
+            @Override
+            public void popupMenuCanceled(PopupMenuEvent e) {
+                LOG.info("canceled");
+            }
+        };
+        picker.addPopupMenuListener(l);
+        showInFrame(picker, "notification?");
+    }
     /**
      * Issue #940-swingx: support multiple selection in picker.
      * Nothing out-off-the-box, trying to implement custom 
@@ -347,7 +371,12 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
      * Behaviour defined by selection model of monthView. While the default 
      * (DaySelectionModel) normalizes the dates to the start of the day in the
      * model's calendar coordinates, a SingleDaySelectionModel keeps the date as-is.
-     * For now, need to explicitly set. 
+     * For now, need to explicitly set. <p>
+     * 
+     * Note: picking a date in the monthView still resets. And may lead to 
+     * inconsistent fields (picker.date different from editor/model selected) the
+     * latter being normalized? Not reproducible here - in the reported example 
+     * the time-part was hard-set when getting an actionEvent from the monthView.
      */
     public void interactiveKeepTimeFields() {
         final JXDatePicker picker = new JXDatePicker();
@@ -363,6 +392,9 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
             public void propertyChange(PropertyChangeEvent evt) {
                 if ("date".equals(evt.getPropertyName())) {
                     field.setValue(evt.getNewValue());
+                    LOG.info("picker/editor/monthView: " + picker.getDate() + "/" 
+                           + picker.getEditor().getValue() + "/"
+                           + picker.getMonthView().getSelectionDate());
                 }
                 
             }
@@ -387,6 +419,66 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
         
     }
 
+    /**
+     * Issue #568-swingx: DatePicker must not reset time fields.
+     * 
+     * Behaviour defined by selection model of monthView. While the default 
+     * (DaySelectionModel) normalizes the dates to the start of the day in the
+     * model's calendar coordinates, a SingleDaySelectionModel keeps the date as-is.
+     * For now, need to explicitly set. <p>
+     * 
+     * Note: picking a date in the monthView still resets. And may lead to 
+     * inconsistent fields (picker.date different from editor/model selected) the
+     * latter being normalized? Not reproducible here - in the reported example 
+     * the time-part was hard-set when getting an actionEvent from the monthView.
+     */
+    public void interactiveKeepEndOfDay() {
+        final JXDatePicker picker = new JXDatePicker();
+        SingleDaySelectionModel selectionModel = new SingleDaySelectionModel() {
+
+            @Override
+            public Date getNormalizedDate(Date date) {
+                return endOfDay(date);
+            }
+            
+        };
+        picker.getMonthView().setSelectionModel(selectionModel);
+        picker.setDate(new Date());
+        DateFormat format = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.FULL);
+        picker.setFormats(format);
+        final JFormattedTextField field = new JFormattedTextField(format);
+        field.setValue(picker.getDate());
+        PropertyChangeListener l = new PropertyChangeListener() {
+
+            public void propertyChange(PropertyChangeEvent evt) {
+                if ("date".equals(evt.getPropertyName())) {
+                    field.setValue(evt.getNewValue());
+                    LOG.info("picker/editor/monthView: " + picker.getDate() + "/" 
+                           + picker.getEditor().getValue() + "/"
+                           + picker.getMonthView().getSelectionDate());
+                }
+                
+            }
+            
+        };
+        picker.addPropertyChangeListener(l);
+        Action setDate = new AbstractActionExt("set date") {
+
+            public void actionPerformed(ActionEvent e) {
+                picker.setDate(new Date());
+                
+            }
+            
+        };
+        JComponent box = Box.createHorizontalBox();
+        box.add(picker);
+        box.add(field);
+        JXFrame frame = wrapInFrame(box, "end of day");
+        addAction(frame, setDate);
+        frame.pack();
+        frame.setVisible(true);
+        
+    }
     /**
      * Issue #706-swingx: picker doesn't update monthView.
      * 
