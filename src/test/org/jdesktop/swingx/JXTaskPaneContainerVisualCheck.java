@@ -49,13 +49,13 @@ public class JXTaskPaneContainerVisualCheck extends InteractiveTestCase {
     }
 
     public static void main(String[] args) throws Exception {
-        setLookAndFeel("Windows");
+//        setLookAndFeel("Nimbus");
 //        setSystemLF(true);
         JXTaskPaneContainerVisualCheck test = new JXTaskPaneContainerVisualCheck();
         
         try {
-//            test.runInteractiveTests();
-            test.runInteractiveTests("interactive.*Color.*");
+            test.runInteractiveTests();
+//            test.runInteractiveTests("interactive.*Color.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
@@ -202,6 +202,7 @@ public class JXTaskPaneContainerVisualCheck extends InteractiveTestCase {
         splitter.setContinuousLayout(true);
         
         JXFrame frame = wrapInFrame(splitter, "split pane test");
+        addComponentOrientationToggle(frame);
         frame.pack();
         frame.setVisible(true);
     }

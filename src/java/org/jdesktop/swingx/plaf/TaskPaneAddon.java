@@ -188,4 +188,51 @@ public class TaskPaneAddon extends AbstractComponentAddon {
     defaults.add("TaskPane.specialTitleOver", new ColorUIResource(125, 125, 97));
   }
   
+    @Override
+    protected void addNimbusDefaults(LookAndFeelAddons addon,
+            DefaultsList defaults) {
+        super.addNimbusDefaults(addon, defaults);
+
+        defaults.add(JXTaskPane.uiClassID,
+                "org.jdesktop.swingx.plaf.nimbus.NimbusTaskPaneUI");
+        // dynamically changing the LaF to Nimbus does not refresh correctly the
+        // control colors if they are not hard-coded due to Nimbus DerivedColors
+        // lazy initialization
+        // defaults.add("TaskPane.foreground", new
+        // ColorUIResource(UIManager.getColor("activeCaption")));
+        defaults.add("TaskPane.foreground", new ColorUIResource(186, 190, 198));
+        // defaults.add("TaskPane.background", new
+        // ColorUIResource(UIManager.getColor("control")));
+        defaults.add("TaskPane.background", new ColorUIResource(214, 217, 223));
+        // defaults.add("TaskPane.specialTitleBackground", new
+        // ColorUIResource(UIManager.getColor("nimbusBlueGrey")));
+        defaults.add("TaskPane.specialTitleBackground", new ColorUIResource(
+                169, 176, 190));
+        // defaults.add("TaskPane.titleBackgroundGradientStart", new
+        // ColorUIResource(UIManager.getColor("background")));
+        defaults.add("TaskPane.titleBackgroundGradientStart",
+                new ColorUIResource(214, 217, 223));
+        // defaults.add("TaskPane.titleBackgroundGradientEnd", new
+        // ColorUIResource(UIManager.getColor("controlLHighlight")));
+        defaults.add("TaskPane.titleBackgroundGradientEnd",
+                new ColorUIResource(247, 248, 250));
+        defaults.add("TaskPane.titleForeground", new ColorUIResource(
+                Color.BLACK));
+        defaults.add("TaskPane.specialTitleForeground", new ColorUIResource(
+                Color.BLACK));
+        // defaults.add("TaskPane.borderColor", new
+        // ColorUIResource(UIManager.getColor("nimbusBorder")));
+        defaults
+                .add("TaskPane.borderColor", new ColorUIResource(146, 151, 161));
+        // defaults.add("TaskPane.titleOver", new
+        // ColorUIResource(UIManager.getColor("nimbusSelection")));
+        defaults.add("TaskPane.titleOver", new ColorUIResource(57, 105, 138));
+        // defaults.add("TaskPane.specialTitleOver", new
+        // ColorUIResource(UIManager.getColor("nimbusSelection")));
+        defaults.add("TaskPane.specialTitleOver", new ColorUIResource(57, 105,
+                138));
+
+    }
+
+
 }
