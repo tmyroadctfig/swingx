@@ -20,6 +20,7 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.text.Collator;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
@@ -74,6 +75,7 @@ import org.jdesktop.swingx.renderer.StringValues;
 import org.jdesktop.swingx.rollover.RolloverController;
 import org.jdesktop.swingx.rollover.RolloverProducer;
 import org.jdesktop.swingx.rollover.TableRolloverController;
+import org.jdesktop.swingx.sort.DefaultSortController;
 import org.jdesktop.swingx.sort.RowFilters;
 import org.jdesktop.swingx.sort.SortUtils;
 import org.jdesktop.swingx.sort.StringValueRegistry;
@@ -114,9 +116,127 @@ public class JXTableUnitTest extends InteractiveTestCase {
     private Object uiTableRowHeight;
 
     private StringValue sv;
+
+    private JXTable table;
     public JXTableUnitTest() {
         super("JXTable unit test");
     }
+
+    /**
+     * Issue #1173-swingx: clarify table's responsibities in sorter configuration.
+     */
+    @Test
+    public void testHasSortController() {
+        assertTrue(table.hasSortController());
+        table.setRowSorter(new TableRowSorter<TableModel>());
+        assertFalse(table.hasSortController());
+    }
+
+    /**
+     * Issue #1173-swingx: clarify table's responsibities in sorter configuration.
+     */
+    @Test
+    public void testControlsSorterPropertiesOnSettingSorterTrue() {
+        assertControlsSorterPropertiesTrue(true);
+    }
+    
+    /**
+     * Issue #1173-swingx: clarify table's responsibities in sorter configuration.
+     */
+    @Test
+    public void testControlsSorterPropertiesOnSettingPropertyTrue() {
+        assertControlsSorterPropertiesTrue(false);
+    }
+    /**
+     * Issue #1173-swingx: clarify table's responsibities in sorter configuration.
+     */
+    @Test
+    public void testControlsSorterPropertiesOnSettingSorterFalse() {
+        assertControlsSorterPropertiesFalse(true);
+    }
+    
+    /**
+     * Issue #1173-swingx: clarify table's responsibities in sorter configuration.
+     */
+    @Test
+    public void testControlsSorterPropertiesOnSettingPropertyFalse() {
+        assertControlsSorterPropertiesFalse(false);
+    }
+    
+    /**
+     * RowSorter properties not touched if getControlsSorterProperties false.
+     */
+    private void assertControlsSorterPropertiesFalse(boolean setSorter) {
+        table.setAutoCreateRowSorter(false);
+        SortOrder[] cycle = new SortOrder[] {SortOrder.DESCENDING, SortOrder.UNSORTED};
+        table.setSortOrderCycle(cycle);
+        table.setSortsOnUpdates(!table.getSortsOnUpdates());
+        table.setSortable(!table.isSortable());
+        if (setSorter) {
+            table.setRowSorter(new TableSortController<TableModel>(table.getModel()));
+            assertFalse("StringValueProvider propagated to controller", 
+                    table.getStringValueRegistry().equals(getSortController(table).getStringValueProvider()));
+        }
+        assertEquals("sortsOnUpdates propagated to controller", 
+                !table.getSortsOnUpdates(), getSortController(table).getSortsOnUpdates());
+        assertEquals("sortable propagated to controller",
+                !table.isSortable(), getSortController(table).isSortable());
+        assertFalse("sortOrderCycle propagated to controller",
+                Arrays.equals(table.getSortOrderCycle(), 
+                        getSortController(table).getSortOrderCycle()));
+    }
+    /**
+     * RowSorter properties updated on getControlsSorterProperties true.
+     */
+    private void assertControlsSorterPropertiesTrue(boolean setSorter) {
+        SortOrder[] cycle = new SortOrder[] {SortOrder.DESCENDING, SortOrder.UNSORTED};
+        table.setSortOrderCycle(cycle);
+        table.setSortsOnUpdates(!table.getSortsOnUpdates());
+        table.setSortable(!table.isSortable());
+        if (setSorter) {
+            table.setRowSorter(new TableSortController<TableModel>(table.getModel()));
+        }
+        assertEquals("sortsOnUpdates propagated to controller", 
+                table.getSortsOnUpdates(), getSortController(table).getSortsOnUpdates());
+        assertEquals("sortable propagated to controller",
+                table.isSortable(), getSortController(table).isSortable());
+        assertTrue("sortOrderCycle propagated to controller",
+                Arrays.equals(table.getSortOrderCycle(), 
+                        getSortController(table).getSortOrderCycle()));
+        assertEquals("StringValueProvider propagated to controller", 
+                table.getStringValueRegistry(), getSortController(table).getStringValueProvider());
+    }
+
+  //-------------- sort-related properties on table
+
+
+    
+    /**
+     * Issue #1122-swingx: re-introduce JXTable sort api.
+     * Test sortsOnUpdate property.
+     * Here: test default value and change notification.
+     */
+    @Test
+    public void testSortsOnUpdateChangeNotification() {
+        assertEquals("initial sortsOnUpdate", true, table.getSortsOnUpdates());
+        PropertyChangeReport report = new PropertyChangeReport(table);
+        table.setSortsOnUpdates(false);
+        TestUtils.assertPropertyChangeEvent(report, "sortsOnUpdates", true, false);
+    }
+    
+    /**
+     * Setting table's sortable property updates controller.
+     */
+    @Test
+    public void testSortOrderCycleNotification() {
+        SortOrder[] cycle = new SortOrder[] {SortOrder.DESCENDING, SortOrder.UNSORTED};
+        PropertyChangeReport report = new PropertyChangeReport(table);
+        table.setSortOrderCycle(cycle);
+        TestUtils.assertPropertyChangeEvent(report, "sortOrderCycle", 
+                    DefaultSortController.getDefaultSortOrderCycle(), table.getSortOrderCycle());
+    }
+
+    
 
  // --------- add usage of StringValueRegistry into JXTable
 
@@ -216,7 +336,6 @@ public class JXTableUnitTest extends InteractiveTestCase {
      */
     @Test
     public void testStringValueRegistryWithModelSet() {
-        JXTable table = new JXTable();
         table.setModel(createModelDefaultColumnClasses(4));
         StringValueRegistry provider = table.getStringValueRegistry();
         for (int i = 0; i < table.getColumnCount(); i++) {
@@ -247,7 +366,6 @@ public class JXTableUnitTest extends InteractiveTestCase {
      */
     @Test
     public void testStringValueRegistryUpdatedRemoved() {
-        JXTable table = new JXTable();
         table.setDefaultRenderer(Number.class, new DefaultTableCellRenderer());
         assertEquals(null, 
                 table.getStringValueRegistry().getStringValue(Number.class));
@@ -258,7 +376,6 @@ public class JXTableUnitTest extends InteractiveTestCase {
      */
     @Test
     public void testStringValueRegistryUpdated() {
-        JXTable table = new JXTable();
         table.setDefaultRenderer(Component.class, new DefaultTableRenderer());
         assertEquals(table.getDefaultRenderer(Component.class), 
                 table.getStringValueRegistry().getStringValue(Component.class));
@@ -270,7 +387,6 @@ public class JXTableUnitTest extends InteractiveTestCase {
      */
     @Test
     public void testStringValueRegistryInitial() {
-        JXTable table = new JXTable();
         StringValueRegistry provider = table.getStringValueRegistry();
         for (int i = 0; i < DEFAULT_COLUMN_TYPES.length; i++) {
             assertEquals("stringValue must be same as renderer for class: " + DEFAULT_COLUMN_NAMES[i],
@@ -303,73 +419,6 @@ public class JXTableUnitTest extends InteractiveTestCase {
         Object.class, Number.class, Date.class, Icon.class, ImageIcon.class, Boolean.class
     };
 
-    
-  //-------------- sortsOnUpdates 
-
-
-    /**
-     * Issue #1122-swingx: re-introduce JXTable sort api.
-     * 
-     * Test sortsOnUpdate property.
-     * Here: initial is true, bare property.
-     */
-    @Test
-    public void testSortsOnUpdateToSorterInSettingProperty() {
-        JXTable table = new JXTable();
-        table.setSortsOnUpdates(false);
-        assertEquals("property propagated to controller", false, getSortController(table).getSortsOnUpdates());
-    }
-    
-    /**
-     * Issue #1122-swingx: re-introduce JXTable sort api.
-     * Test sortsOnUpdate property.
-     * Here: initial is true, bare property.
-     */
-    @Test
-    public void testSortsOnUpdateToSorterInSettingSorter() {
-        JXTable table = new JXTable();
-        table.setSortsOnUpdates(false);
-        table.setRowSorter(new TableSortController<TableModel>(table.getModel()));
-        assertEquals("property propagated to controller", false, getSortController(table).getSortsOnUpdates());
-    }
-    
-    /**
-     * Issue #1122-swingx: re-introduce JXTable sort api.
-     * Test sortsOnUpdate property.
-     * Here: test change notification.
-     */
-    @Test
-    public void testSortsOnUpdateChangeNotification() {
-        JXTable table = new JXTable();
-        // remove sorter to get bare property
-        table.setRowSorter(null);
-        PropertyChangeReport report = new PropertyChangeReport(table);
-        table.setSortsOnUpdates(false);
-        TestUtils.assertPropertyChangeEvent(report, "sortsOnUpdates", true, false);
-    }
-    /**
-     * Issue #1122-swingx: re-introduce JXTable sort api.
-     * Test sortsOnUpdate property.
-     * Here: initial is true, bare property.
-     */
-    @Test
-    public void testSortsOnUpdateInitialTrueBare() {
-        JXTable table = new JXTable();
-        // remove sorter to get bare property
-        table.setRowSorter(null);
-        assertEquals("initial sortsOnUpdate", true, table.getSortsOnUpdates());
-    }
-    /**
-     * Issue #1122-swingx: re-introduce JXTable sort api.
-     * Test sortsOnUpdate property.
-     * 
-     * Here: initial is true, bare taken from sortController.
-     */
-    @Test
-    public void testSortsOnUpdateInitialTrue() {
-        JXTable table = new JXTable();
-        assertEquals("initial sortsOnUpdate", true, table.getSortsOnUpdates());
-    }
     
     
 //--------------------- sort state on modifications
@@ -466,7 +515,6 @@ public class JXTableUnitTest extends InteractiveTestCase {
     @Test
     public void testSortableColumnPropertyOnStructureChangedRemoveColumn() {
         SortableTestFactory factory = new SortableTestFactory();
-        JXTable table = new JXTable();
         table.setColumnFactory(factory);
         // quick access to fire a structure change
         DefaultTableModel model = new DefaultTableModel(10, 5);
@@ -486,7 +534,6 @@ public class JXTableUnitTest extends InteractiveTestCase {
     @Test
     public void testSortableColumnPropertyOnStructureChangedAddColumn() {
         SortableTestFactory factory = new SortableTestFactory();
-        JXTable table = new JXTable();
         table.setColumnFactory(factory);
         // quick access to fire a structure change
         DefaultTableModel model = new DefaultTableModel(10, 5);
@@ -505,7 +552,6 @@ public class JXTableUnitTest extends InteractiveTestCase {
     @Test
     public void testSortableSetColumnModel() {
         SortableTestFactory factory = new SortableTestFactory();
-        JXTable table = new JXTable();
         table.setAutoCreateColumnsFromModel(false);
         table.setModel(sortableTableModel);
         DefaultTableColumnModelExt columnModel = new DefaultTableColumnModelExt();
@@ -528,7 +574,6 @@ public class JXTableUnitTest extends InteractiveTestCase {
     @Test
     public void testSortableAddColumn() {
         SortableTestFactory factory = new SortableTestFactory();
-        JXTable table = new JXTable();
         table.setAutoCreateColumnsFromModel(false);
         table.setModel(sortableTableModel);
         // add two columns, one sortable, one not sortable
@@ -547,7 +592,6 @@ public class JXTableUnitTest extends InteractiveTestCase {
     @Test
     public void testSortableColumnPropertyOnSetModel() {
         SortableTestFactory factory = new SortableTestFactory();
-        JXTable table = new JXTable();
         table.setColumnFactory(factory);
         table.setModel(sortableTableModel);
         factory.assertSortableColumnState(table);
@@ -560,7 +604,6 @@ public class JXTableUnitTest extends InteractiveTestCase {
     @Test
     public void testIsSortableColumn() {
         SortableTestFactory factory = new SortableTestFactory();
-        JXTable table = new JXTable();
         table.setColumnFactory(factory);
         table.setModel(sortableTableModel);
         TableColumnExt columnExt = table.getColumnExt(1);
@@ -619,7 +662,6 @@ public class JXTableUnitTest extends InteractiveTestCase {
      */
     @Test
     public void testSortableTablePropertyOnSetModel() {
-        JXTable table = new JXTable();
         table.setSortable(false);
         table.setModel(sortableTableModel);
         assertEquals(false, getSortController(table).isSortable());
@@ -707,7 +749,6 @@ public class JXTableUnitTest extends InteractiveTestCase {
         columnX.setSortable(false);
         table.toggleSortOrder(0);
         assertEquals("unsortable column must be unsorted", SortOrder.UNSORTED, table.getSortOrder(0));
-       
     }
    
     
@@ -715,49 +756,13 @@ public class JXTableUnitTest extends InteractiveTestCase {
      * Setting table's sortable property updates controller.
      */
     @Test
-    public void testTableSortableSynchedToController() {
-        JXTable table = new JXTable();
-        table.setSortable(false);
-        assertEquals(table.isSortable(), getSortController(table).isSortable());
-    }
-    
-    /**
-     * Setting table's sortable property updates controller.
-     */
-    @Test
     public void testTableRowFilterSynchedToController() {
-        JXTable table = new JXTable();
         RowFilter<Object, Object> filter = RowFilters.regexFilter(".*");
         table.setRowFilter(filter);
         assertEquals(filter, getSortController(table).getRowFilter());
         assertEquals(filter, table.getRowFilter());
     }
     
-    /**
-     * Setting table's sortable property updates controller.
-     */
-    @Test
-    public void testTableSortOrderCycleSynchedToController() {
-        JXTable table = new JXTable();
-        SortOrder[] cycle = new SortOrder[] {SortOrder.DESCENDING, SortOrder.UNSORTED};
-        table.setSortOrderCycle(cycle);
-        assertEqualsArrayByElements(cycle, getSortController(table).getSortOrderCycle());
-        assertEqualsArrayByElements(cycle, table.getSortOrderCycle());
-    }
-
-    
-    /**
-     * @param string
-     * @param first
-     * @param second
-     */
-    private void assertEqualsArrayByElements(Object[] first,
-            Object[] second) {
-        assertEquals("must have same size", first.length, second.length);
-        for (int i = 0; i < second.length; i++) {
-            assertEquals("item must be same at index:  " + i, first[i], second[i]);
-        }
-    }
 
 //----------------- table sort api
 /* NOTE: if applicable we test the api on columns which are not of type TableColumnExt
@@ -956,7 +961,6 @@ public class JXTableUnitTest extends InteractiveTestCase {
      */
     @Test
     public void testSortController() {
-        JXTable table = new JXTable();
         assertTrue("default sorter expected TableRowSorter, but was:" + table.getRowSorter(),
                 table.getRowSorter() instanceof TableSortController<?>);
     }
@@ -979,7 +983,6 @@ public class JXTableUnitTest extends InteractiveTestCase {
      */
     @Test
     public void testAutoCreateRowSorterGetterSetterSynched() {
-        JTable table = new JXTable();
         table.setAutoCreateRowSorter(false);
         assertEquals(false, table.getAutoCreateRowSorter());
         table.setAutoCreateRowSorter(true);
@@ -992,7 +995,6 @@ public class JXTableUnitTest extends InteractiveTestCase {
      */
     @Test
     public void testSetModelKeepsCreateRowSorterFlagTrue() {
-        JTable table = new JXTable();
         assertSetModelKeepsCreateSorterFlag(table, true);
     }
     /**
@@ -1002,7 +1004,6 @@ public class JXTableUnitTest extends InteractiveTestCase {
      */
     @Test
     public void testSetModelKeepsCreateRowSorterFlagFalse() {
-        JTable table = new JXTable();
         assertSetModelKeepsCreateSorterFlag(table, false);
     }
 
@@ -1063,7 +1064,6 @@ public class JXTableUnitTest extends InteractiveTestCase {
      */
     @Test
     public void testAutoCreateRowSorterModelInstalled() {
-        JXTable table = new JXTable();
         assertSame("model must be same", table.getModel(), table.getRowSorter().getModel());
     }
     /**
@@ -1071,7 +1071,6 @@ public class JXTableUnitTest extends InteractiveTestCase {
      */
     @Test
     public void testAutoCreateRowSorter() {
-        JXTable table = new JXTable();
         assertEquals("table must have default auto-create rowsorter true", true, table.getAutoCreateRowSorter());
     }
 //------------------- ComponentAdapter
@@ -1648,7 +1647,6 @@ public class JXTableUnitTest extends InteractiveTestCase {
      */
     @Test
     public void testFocusTransferActions() {
-        JXTable table = new JXTable();
         assertNotNull("must have forward action",
                 table.getActionMap().get(JXTable.FOCUS_NEXT_COMPONENT));
         assertNotNull("must have backward action",
@@ -1665,7 +1663,6 @@ public class JXTableUnitTest extends InteractiveTestCase {
         JTable core = new JTable();
         Set<?> forwardKeys = core.getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS);
         Set<?> backwardKeys = core.getFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS);
-        JXTable table = new JXTable();
         for (Object key : forwardKeys) {
             InputMap map = table.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
             assertNotNull("must have binding for forward focus transfer " + key, 
@@ -1684,7 +1681,6 @@ public class JXTableUnitTest extends InteractiveTestCase {
      */
     @Test
     public void testFocusTransferNoDefaultKeys() {
-        JXTable table = new JXTable();
         assertTrue(table.getFocusTraversalKeys(
                 KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS).isEmpty());
         assertTrue(table.getFocusTraversalKeys(
@@ -2088,7 +2084,6 @@ public class JXTableUnitTest extends InteractiveTestCase {
      */
     @Test
     public void testSetSelectionBackground() {
-        JXTable table = new JXTable();
         PropertyChangeReport report = new PropertyChangeReport();
         table.addPropertyChangeListener(report);
         Color oldBackground = table.getSelectionBackground();
@@ -2105,7 +2100,6 @@ public class JXTableUnitTest extends InteractiveTestCase {
      */
     @Test
     public void testNullSelectionBackground() {
-        JXTable table = new JXTable();
         table.setSelectionBackground(null);
     }
 
@@ -2115,7 +2109,6 @@ public class JXTableUnitTest extends InteractiveTestCase {
      */
     @Test
     public void testSetSelectionForeground() {
-        JXTable table = new JXTable();
         PropertyChangeReport report = new PropertyChangeReport();
         table.addPropertyChangeListener(report);
         Color oldForeground = table.getSelectionForeground();
@@ -2131,7 +2124,6 @@ public class JXTableUnitTest extends InteractiveTestCase {
      */
     @Test
     public void testNullSelectionForeground() {
-        JXTable table = new JXTable();
         table.setSelectionForeground(null);
     }
 
@@ -2291,7 +2283,6 @@ public class JXTableUnitTest extends InteractiveTestCase {
             }
             
         };
-        JXTable table = new JXTable();
         table.setColumnFactory(factory);
         table.setModel(new DefaultTableModel(10, 2));
         assertEquals(null, table.getColumn(0).getHeaderValue());
@@ -2320,7 +2311,6 @@ public class JXTableUnitTest extends InteractiveTestCase {
      */
     @Test
     public void testSetColumnFactory() {
-        JXTable table = new JXTable();
         PropertyChangeReport report = new PropertyChangeReport();
         table.addPropertyChangeListener(report);
         ColumnFactory factory = createCustomColumnFactory();
@@ -2343,7 +2333,6 @@ public class JXTableUnitTest extends InteractiveTestCase {
      */
     @Test
     public void testUseCustomColumnFactory() {
-        JXTable table = new JXTable();
         PropertyChangeReport report = new PropertyChangeReport();
         table.addPropertyChangeListener(report);
         ColumnFactory factory = createCustomColumnFactory();
@@ -2519,7 +2508,6 @@ public class JXTableUnitTest extends InteractiveTestCase {
      */
     @Test
     public void testNullTableEventNPE() {
-        JXTable table = new JXTable();
         // don't throw null events
         table.tableChanged(null);
         assertFalse(table.isUpdate(null));
@@ -2554,7 +2542,6 @@ public class JXTableUnitTest extends InteractiveTestCase {
      */
     @Test
     public void testSetColumnControl() {
-        JXTable table = new JXTable();
         JComponent columnControl = table.getColumnControl();
         assertTrue(columnControl instanceof ColumnControlButton);
         JComponent newControl = new JButton();
@@ -2672,7 +2659,6 @@ public class JXTableUnitTest extends InteractiveTestCase {
      */
     @Test
     public void testGetTerminateEditOnFocusLost() {
-       JXTable table = new JXTable();
        // sanity assert: setting client property set's property
        PropertyChangeReport report = new PropertyChangeReport();
        table.addPropertyChangeListener(report);
@@ -2691,7 +2677,6 @@ public class JXTableUnitTest extends InteractiveTestCase {
      */
     @Test
     public void testInitialTerminateEditOnFocusLost() {
-       JXTable table = new JXTable();
        assertTrue("terminate edit must be on by default", table.isTerminateEditOnFocusLost());
     }
 
@@ -2702,7 +2687,6 @@ public class JXTableUnitTest extends InteractiveTestCase {
      */
     @Test
     public void testSetTerminateEditOnFocusLost() {
-       JXTable table = new JXTable();
        // sanity assert: setting client property set's property
        PropertyChangeReport report = new PropertyChangeReport();
        table.addPropertyChangeListener(report);
@@ -2919,7 +2903,6 @@ public class JXTableUnitTest extends InteractiveTestCase {
      */
     @Test
     public void testTableColumnType() {
-        JXTable table = new JXTable();
         table.setAutoCreateColumnsFromModel(false);
         table.setModel(new DefaultTableModel(2, 1));
         TableColumnModel columnModel = new DefaultTableColumnModel();
@@ -3634,6 +3617,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
         setSystemLF(defaultToSystemLF);
         uiTableRowHeight = UIManager.get("JXTable.rowHeight");
         sv = createColorStringValue();
+        table = new JXTable();
     }
 
     

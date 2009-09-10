@@ -259,6 +259,15 @@ public abstract class DefaultSortController<M> extends DefaultRowSorter<M, Integ
         return stringValueProvider;
     }
 
+    /**
+     * Returns the default cycle.
+     * 
+     * @return default sort order cycle.
+     */
+    public static SortOrder[] getDefaultSortOrderCycle() {
+        return Arrays.copyOf(DEFAULT_CYCLE, DEFAULT_CYCLE.length);
+    }
+    
     private static final StringValueProvider DEFAULT_PROVIDER = new StringValueProvider() {
 
         @Override
