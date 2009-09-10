@@ -48,15 +48,14 @@ public class JXTaskPaneVisualCheck extends InteractiveTestCase {
         JXTaskPaneVisualCheck test = new JXTaskPaneVisualCheck();
         
         try {
-//            test.runInteractiveTests();
+            test.runInteractiveTests();
 //            test.runInteractiveTests("interactiveDisplay");
-            test.runInteractiveTests("interactiveMnemonic");
+//            test.runInteractiveTests("interactiveMnemonic");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
         }
     }
-    
     public void interactiveMnemonic() {
         JXTaskPane pane = new JXTaskPane();
         pane.setTitle("Use Me");

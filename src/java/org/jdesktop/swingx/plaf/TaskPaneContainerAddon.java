@@ -131,4 +131,16 @@ public class TaskPaneContainerAddon extends AbstractComponentAddon {
     defaults.add("TaskPaneContainer.background", new ColorUIResource(238, 238, 238));
   }
 
+    @Override
+    protected void addNimbusDefaults(LookAndFeelAddons addon,
+            DefaultsList defaults) {
+        super.addNimbusDefaults(addon, defaults);
+        // dynamically changing the LaF to Nimbus does not refresh correctly the
+        // control colors if they are not hard-coded due to Nimbus DerivedColors
+        // lazy initialization
+//        defaults.add("TaskPaneContainer.background", new ColorUIResource(
+//                UIManager.getColor("control")));
+        defaults.add("TaskPaneContainer.background", new ColorUIResource(214,217,223));
+    }
+
 }
