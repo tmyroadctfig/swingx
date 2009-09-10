@@ -62,6 +62,8 @@ import javax.swing.UIManager;
 import javax.swing.JFormattedTextField.AbstractFormatter;
 import javax.swing.JFormattedTextField.AbstractFormatterFactory;
 import javax.swing.border.Border;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.UIResource;
 import javax.swing.text.DefaultFormatterFactory;
@@ -124,6 +126,8 @@ public class BasicDatePickerUI extends DatePickerUI {
     private PropertyChangeListener monthViewPropertyListener;
 
     private PopupRemover popupRemover;
+
+    private PopupMenuListener popupMenuListener;
 
 
     @SuppressWarnings({"UnusedDeclaration"})
@@ -720,7 +724,7 @@ public class BasicDatePickerUI extends DatePickerUI {
      *   may be null.
      */
     protected void updateFromMonthViewChanged(JXMonthView oldMonthView) {
-        popup = null;
+        uninstallPopup();
         updateMonthViewListeners(oldMonthView);
         TimeZone oldTimeZone = null;
         if (oldMonthView != null) {
@@ -1057,7 +1061,7 @@ public class BasicDatePickerUI extends DatePickerUI {
      */
     public void toggleShowPopup() {
         if (popup == null) {
-            popup = createMonthViewPopup();
+            installPopup();
         }
         if (popup.isVisible()) {
             popup.setVisible(false);
@@ -1075,6 +1079,93 @@ public class BasicDatePickerUI extends DatePickerUI {
         }
 
     }
+
+    /**
+     * Creates the popup and registers the popup listener. All internal 
+     * methods must use this method instead of calling createPopup directly.
+     */
+    protected void installPopup() {
+        popup = createMonthViewPopup();
+        popup.addPopupMenuListener(getPopupMenuListener());
+    }
+
+    /**
+     * Removes the popup listener from the popup and null it, if
+     * it was not null. All internal popup removal/replacement must 
+     * use this method instead of nulling directly.
+     * 
+     */
+    protected void uninstallPopup() {
+        if (popup != null) {
+            popup.removePopupMenuListener(getPopupMenuListener());
+        }
+       popup = null;
+    }
+
+    /**
+     * Returns the PopupMenuListener for the MonthView popup. Lazily created.
+     * 
+     * @return the popupuMenuListener to install on the popup
+     */
+    protected PopupMenuListener getPopupMenuListener() {
+        if (popupMenuListener == null) {
+            popupMenuListener = createPopupMenuListener();
+        }
+        return popupMenuListener;
+    }
+
+    /**
+     * Creates and returns a PopupMenuListener.
+     * 
+     * PENDING JW: the listener management assumes a stateless implementation
+     * relative to the popup/picker. Custom implementations should take care
+     * to not keep any references. 
+     * 
+     * @return
+     */
+    protected PopupMenuListener createPopupMenuListener() {
+        PopupMenuListener l= new PopupMenuListener() {
+            
+            @Override
+            public void popupMenuCanceled(PopupMenuEvent e) {
+                PopupMenuListener[] ls = datePicker.getPopupMenuListeners();
+                PopupMenuEvent retargeted = null;
+                for (PopupMenuListener listener : ls) {
+                    if (retargeted == null) {
+                        retargeted = new PopupMenuEvent(this);
+                    }
+                    listener.popupMenuCanceled(retargeted);
+                }
+            }
+
+            @Override
+            public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
+                PopupMenuListener[] ls = datePicker.getPopupMenuListeners();
+                PopupMenuEvent retargeted = null;
+                for (PopupMenuListener listener : ls) {
+                    if (retargeted == null) {
+                        retargeted = new PopupMenuEvent(this);
+                    }
+                    listener.popupMenuWillBecomeInvisible(retargeted);
+                }
+            }
+
+            @Override
+            public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+                PopupMenuListener[] ls = datePicker.getPopupMenuListeners();
+                PopupMenuEvent retargeted = null;
+                for (PopupMenuListener listener : ls) {
+                    if (retargeted == null) {
+                        retargeted = new PopupMenuEvent(this);
+                    }
+                    listener.popupMenuWillBecomeVisible(retargeted);
+                }
+            }
+            
+        };
+        return l;
+    }
+
 
     /**
      * 
@@ -1272,7 +1363,7 @@ public class BasicDatePickerUI extends DatePickerUI {
                 if (popup != null) {
                     popup.setVisible(false);
                 }
-                popup = null;
+                uninstallPopup();
             } else if ("formats".equals(property)) {
                 updateFormatsFromTimeZone(datePicker.getTimeZone());
             }
