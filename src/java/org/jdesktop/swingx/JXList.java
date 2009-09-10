@@ -23,6 +23,7 @@ package org.jdesktop.swingx;
 
 import java.awt.Component;
 import java.awt.event.ActionEvent;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Vector;
 import java.util.logging.Logger;
@@ -58,6 +59,7 @@ import org.jdesktop.swingx.rollover.RolloverRenderer;
 import org.jdesktop.swingx.search.ListSearchable;
 import org.jdesktop.swingx.search.SearchFactory;
 import org.jdesktop.swingx.search.Searchable;
+import org.jdesktop.swingx.sort.DefaultSortController;
 import org.jdesktop.swingx.sort.ListSortController;
 import org.jdesktop.swingx.sort.SortController;
 import org.jdesktop.swingx.sort.StringValueRegistry;
@@ -231,6 +233,8 @@ public class JXList extends JList {
 
     private StringValueRegistry stringValueRegistry;
 
+    private SortOrder[] sortOrderCycle;
+
     /**
     * Constructs a <code>JXList</code> with an empty model and filters disabled.
     *
@@ -339,9 +343,10 @@ public class JXList extends JList {
 
 
     private void init(boolean autoCreateRowSorter) {
-        setAutoCreateRowSorter(autoCreateRowSorter);
+        sortOrderCycle = DefaultSortController.getDefaultSortOrderCycle();
         setSortable(true);
         setSortsOnUpdates(true);
+        setAutoCreateRowSorter(autoCreateRowSorter);
         Action findAction = createFindAction();
         getActionMap().put("find", findAction);
         
@@ -591,11 +596,12 @@ public class JXList extends JList {
      * 
      */
     protected void configureSorterProperties() {
-        if (getSortController() == null) return;
+        if (!getControlsSorterProperties()) return;
         // configure from table properties
         getSortController().setSortable(sortable);
         getSortController().setSortsOnUpdates(sortsOnUpdates);
         getSortController().setComparator(0, comparator);
+        getSortController().setSortOrderCycle(getSortOrderCycle());
         getSortController().setStringValueProvider(getStringValueRegistry());
     }
 
@@ -615,7 +621,7 @@ public class JXList extends JList {
     public void setSortable(boolean sortable) {
         boolean old = isSortable();
         this.sortable = sortable;
-        if (getSortController() != null) {
+        if (getControlsSorterProperties()) {
             getSortController().setSortable(sortable);
         }
         firePropertyChange("sortable", old, isSortable());
@@ -624,12 +630,10 @@ public class JXList extends JList {
     /**
      * Returns the table's sortable property.<p>
      * 
-     * Note: as of post-1.0 this property is propagated to the SortController. 
-     * 
      * @return true if the table is sortable.
      */
     public boolean isSortable() {
-        return getSortController() != null ? getSortController().isSortable() : sortable;
+        return sortable;
     }
 
     /**
@@ -644,7 +648,7 @@ public class JXList extends JList {
     public void setSortsOnUpdates(boolean sortsOnUpdates) {
         boolean old = getSortsOnUpdates();
         this.sortsOnUpdates = sortsOnUpdates;
-        if (getSortController() != null) {
+        if (getControlsSorterProperties()) {
             getSortController().setSortsOnUpdates(sortsOnUpdates);
         }
         firePropertyChange("sortsOnUpdates", old, getSortsOnUpdates());
@@ -657,118 +661,35 @@ public class JXList extends JList {
      * @return whether or not to sort when the model is updated
      */
     public boolean getSortsOnUpdates() {
-        return getSortController() != null ? getSortController().getSortsOnUpdates() : sortsOnUpdates;
+        return sortsOnUpdates;
     }
 
     /**
-     * Sets the filter to the sorter, if available and of type SortController.
-     * Does nothing otherwise.
-     * <p>
-     *
-     * @param filter the filter used to determine what entries should be
-     *        included
-     */
-    public void setRowFilter(RowFilter<? super ListModel, ? super Integer> filter) {
-        if (getSortController() == null) return;
-        getSortController().setRowFilter(filter);
-    }
-    
-    /**
-     * Returns the filter of the sorter, if available and of type SortController.
-     * Returns null otherwise.<p>
-     * 
-     * PENDING JW: generics? had to remove return type from getSortController to 
-     * make this compilable, so probably wrong. 
-     * 
-     * @return the filter used in the sorter.
-     */
-    @SuppressWarnings("unchecked")
-    public RowFilter<?, ?> getRowFilter() {
-        return getSortController() != null ? getSortController().getRowFilter() : null;
-    }
-    
-    /**
-     * Sets the sortorder cycle of the sorter, if available and of type SortController. Does
-     * nothing otherwise.<p>
-     * 
-     * PENDING JW: make property of the table as well, to propagate to sorter if
-     *   reset?
+     * Sets the sortorder cycle used when toggle sorting this table's columns. 
+     * This property is propagated to the SortController
+     * if controlsSorterProperties is true. 
      * 
      * @param cycle the sequence of zero or more not-null SortOrders to cycle through.
      * @throws NullPointerException if the array or any of its elements are null
      * 
      */
     public void setSortOrderCycle(SortOrder... cycle) {
-        if (getSortController() == null) return;
-        getSortController().setSortOrderCycle(cycle);
+        SortOrder[] old = getSortOrderCycle();
+        if (getControlsSorterProperties()) {
+            getSortController().setSortOrderCycle(cycle);
+        }
+        this.sortOrderCycle = Arrays.copyOf(cycle, cycle.length);
+        firePropertyChange("sortOrderCycle", old, getSortOrderCycle());
     }
     
     /**
-     * Returns the sequence of sortOrders of the sorter, if available and of type SortController.
-     * Null otherwise.
+     * Returns the sortOrder cycle used when toggle sorting this table's columns, guaranteed
+     * to be not null.
      *   
-     * @return the sort order cycle of the sorter, if available, null otherwise.
+     * @return the sort order cycle used in toggle sort, not null 
      */
     public SortOrder[] getSortOrderCycle() {
-        return getSortController() != null ? getSortController().getSortOrderCycle() : null;
-    }
-
-    /**
-     * Resets sorting of all columns.
-     * Delegates to the SortController if available, or does nothing if not.<p>
-     * 
-     * PENDING JW: method name - consistent in SortController and here.
-     * 
-     */
-    public void resetSortOrder() {
-        if (getSortController() == null)
-            return;
-        getSortController().resetSortOrders();
-    }
-
-    /**
-     * 
-     * Toggles the sort order of the list.
-     * Delegates to the SortController if available, or does nothing if not.<p>
-     * 
-     * <p>
-     * The exact behaviour is defined by the SortController's toggleSortOrder
-     * implementation. Typically a unsorted list is sorted in ascending order,
-     * a sorted list's order is reversed.
-     * <p>
-     * 
-     * 
-     */
-    public void toggleSortOrder() {
-        if (getSortController() == null)
-            return;
-        getSortController().toggleSortOrder(0);
-    }
-
-    /**
-     * Sorts the list using SortOrder.
-     * Delegates to the SortController if available, or does nothing if not.<p>
-     * 
-     * @param sortOrder the sort order to use.
-     * 
-     */
-    public void setSortOrder(SortOrder sortOrder) {
-        if (getSortController() == null)
-            return;
-        getSortController().setSortOrder(0, sortOrder);
-    }
-
-
-    /**
-     * Returns the SortOrder. 
-     * Delegates to the SortController if available, or returns SortOrder.UNSORTED if not.<p>
-     * 
-     * @return the current SortOrder
-     */
-    public SortOrder getSortOrder() {
-        if (getSortController() == null)
-            return SortOrder.UNSORTED;
-        return getSortController().getSortOrder(0);
+        return Arrays.copyOf(sortOrderCycle, sortOrderCycle.length);
     }
 
     /**
@@ -803,9 +724,95 @@ public class JXList extends JList {
      *
      */
     protected void updateSortAfterComparatorChange() {
-        if (getSortController() == null) return;
-        getSortController().setComparator(0, getComparator());
+        if (getControlsSorterProperties()) {
+            getSortController().setComparator(0, getComparator());
+        }
     }
+
+//------------------------- sort: do sort/filter
+    
+    /**
+     * Sets the filter to the sorter, if available and of type SortController.
+     * Does nothing otherwise.
+     * <p>
+     *
+     * @param filter the filter used to determine what entries should be
+     *        included
+     */
+    public void setRowFilter(RowFilter<? super ListModel, ? super Integer> filter) {
+        if (hasSortController())
+            getSortController().setRowFilter(filter);
+    }
+    
+    /**
+     * Returns the filter of the sorter, if available and of type SortController.
+     * Returns null otherwise.<p>
+     * 
+     * PENDING JW: generics? had to remove return type from getSortController to 
+     * make this compilable, so probably wrong. 
+     * 
+     * @return the filter used in the sorter.
+     */
+    @SuppressWarnings("unchecked")
+    public RowFilter<?, ?> getRowFilter() {
+        return hasSortController() ? getSortController().getRowFilter() : null;
+    }
+    
+    /**
+     * Resets sorting of all columns.
+     * Delegates to the SortController if available, or does nothing if not.<p>
+     * 
+     * PENDING JW: method name - consistent in SortController and here.
+     * 
+     */
+    public void resetSortOrder() {
+        if (hasSortController()) 
+            getSortController().resetSortOrders();
+    }
+
+    /**
+     * 
+     * Toggles the sort order of the list.
+     * Delegates to the SortController if available, or does nothing if not.<p>
+     * 
+     * <p>
+     * The exact behaviour is defined by the SortController's toggleSortOrder
+     * implementation. Typically a unsorted list is sorted in ascending order,
+     * a sorted list's order is reversed.
+     * <p>
+     * 
+     * 
+     */
+    public void toggleSortOrder() {
+        if (hasSortController())
+            getSortController().toggleSortOrder(0);
+    }
+
+    /**
+     * Sorts the list using SortOrder.
+     * Delegates to the SortController if available, or does nothing if not.<p>
+     * 
+     * @param sortOrder the sort order to use.
+     * 
+     */
+    public void setSortOrder(SortOrder sortOrder) {
+        if (hasSortController())
+            getSortController().setSortOrder(0, sortOrder);
+    }
+
+
+    /**
+     * Returns the SortOrder. 
+     * Delegates to the SortController if available, or returns SortOrder.UNSORTED if not.<p>
+     * 
+     * @return the current SortOrder
+     */
+    public SortOrder getSortOrder() {
+        if (hasSortController())
+            return getSortController().getSortOrder(0);
+        return SortOrder.UNSORTED;
+    }
+
 
     /**
      * Returns the currently active SortController. May be null if RowSorter
@@ -819,14 +826,45 @@ public class JXList extends JList {
      */
     @SuppressWarnings("unchecked")
     protected SortController<? extends ListModel> getSortController() {
-        if (getRowSorter() instanceof SortController<?>) {
+        if (hasSortController()) {
             // JW: the RowSorter is always of type <? extends ListModel>
             // so the unchecked cast is safe
             return (SortController<? extends ListModel>) getRowSorter();
         }
         return null;
     }
+
+    /**
+     * Returns a boolean indicating whether the table has a SortController.
+     * If true, the call to getSortController is guaranteed to return a not-null
+     * value.
+     * 
+     * @return a boolean indicating whether the table has a SortController.
+     * 
+     * @see #getSortController()
+     */
+    protected boolean hasSortController() {
+        return getRowSorter() instanceof SortController<?>;
+    }
     
+    /**
+     * Returns a boolean indicating whether the table configures the sorter's
+     * properties. If true, guaranteed that table's and the columns' sort related 
+     * properties are propagated to the sorter. If false, guaranteed to not
+     * touch the sorter's configuration.<p>
+     * 
+     * This implementation returns true if the sorter is of type SortController.
+     * 
+     * Note: the synchronization is unidirection from the table to the sorter. 
+     * Changing the sorter under the table's feet might lead to undefined
+     * behaviour.
+     * 
+     * @return a boolean indicating whether the table configurers the sorter's
+     *  properties.
+     */
+    protected boolean getControlsSorterProperties() {
+        return hasSortController() && getAutoCreateRowSorter();
+    }
     
     // ---------------------------- filters
 
