@@ -345,11 +345,10 @@ public class ListSortUITest extends InteractiveTestCase {
     protected void setUp() throws Exception {
         super.setUp();
         ascendingListModel = createAscendingListModel(0, 20);
-        list = new JXList(ascendingListModel);
+        list = new JXList(ascendingListModel, true);
         controller = new ListSortController<ListModel>(list.getModel());
         list.setComparator(TableSortController.COMPARABLE_COMPARATOR);
         list.setRowSorter(controller);
-//        sortUI = new ListSortUI(list, controller);
         testRow = 2;
     }
     
@@ -357,7 +356,6 @@ public class ListSortUITest extends InteractiveTestCase {
     @Override
     protected void tearDown() throws Exception {
         super.tearDown();
-//        sortUI.dispose();
     }
 
     @Before

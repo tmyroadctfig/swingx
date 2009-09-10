@@ -40,6 +40,7 @@ import org.jdesktop.swingx.renderer.StringValue;
 import org.jdesktop.swingx.renderer.StringValues;
 import org.jdesktop.swingx.rollover.ListRolloverController;
 import org.jdesktop.swingx.rollover.RolloverProducer;
+import org.jdesktop.swingx.sort.DefaultSortController;
 import org.jdesktop.swingx.sort.ListSortController;
 import org.jdesktop.swingx.sort.RowFilters;
 import org.jdesktop.swingx.sort.StringValueRegistry;
@@ -334,7 +335,7 @@ public class JXListTest extends InteractiveTestCase {
 
     @Test
     public void testPropertiesToSorterOnSetRowsorter() {
-//        list.setModel(listModel);
+        list.setAutoCreateRowSorter(true);
         list.setSortsOnUpdates(false);
         list.setSortable(false);
         Collator comparator = Collator.getInstance();
@@ -345,32 +346,23 @@ public class JXListTest extends InteractiveTestCase {
         assertSame("comparator propagated", comparator, controller.getComparator(0));
         assertEquals("sortsOnUpdates propagated", false, controller.getSortsOnUpdates());
     }
+    
     @Test
-    public void testSortsOnUpdateSet() {
+    public void testSortsOnUpdate() {
         PropertyChangeReport report = new PropertyChangeReport(list);
         list.setSortsOnUpdates(false);
         TestUtils.assertPropertyChangeEvent(report, "sortsOnUpdates", true, false);
         assertFalse(list.getSortsOnUpdates());
     }
 
-    @Test
-    public void testSortsOnUpdateDefault() {
-        assertTrue(list.getSortsOnUpdates());
-    }
     
     @Test
-    public void testSortableSet() {
+    public void testSortable() {
         PropertyChangeReport report = new PropertyChangeReport(list);
         list.setSortable(false);
         TestUtils.assertPropertyChangeEvent(report, "sortable", true, false);
         assertFalse(list.isSortable());
     }
-    
-    @Test
-    public void testSortableDefault() {
-        assertTrue(list.isSortable());
-    }
-    
     
     /**
      * Setting table's sortable property updates controller.
@@ -388,26 +380,15 @@ public class JXListTest extends InteractiveTestCase {
      * Setting table's sortable property updates controller.
      */
     @Test
-    public void testTableSortOrderCycleSynchedToController() {
+    public void testSortOrderCycle() {
         JXList list = new JXList(true);
         SortOrder[] cycle = new SortOrder[] {SortOrder.DESCENDING, SortOrder.UNSORTED};
+        PropertyChangeReport report = new PropertyChangeReport(list);
         list.setSortOrderCycle(cycle);
-        assertEqualsArrayByElements(cycle, getSortController(list).getSortOrderCycle());
-        assertEqualsArrayByElements(cycle, list.getSortOrderCycle());
+        TestUtils.assertPropertyChangeEvent(report, "sortOrderCycle", 
+                    DefaultSortController.getDefaultSortOrderCycle(), list.getSortOrderCycle());
     }
 
-    /**
-     * @param string
-     * @param first
-     * @param second
-     */
-    private void assertEqualsArrayByElements(Object[] first,
-            Object[] second) {
-        assertEquals("must have same size", first.length, second.length);
-        for (int i = 0; i < second.length; i++) {
-            assertEquals("item must be same at index:  " + i, first[i], second[i]);
-        }
-    }
 
     /**
      * Convenience: type cast of default rowSorter.
