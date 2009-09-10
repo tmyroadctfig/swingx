@@ -35,6 +35,7 @@ import java.awt.event.ActionEvent;
 import java.awt.print.PrinterException;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -111,6 +112,7 @@ import org.jdesktop.swingx.search.AbstractSearchable;
 import org.jdesktop.swingx.search.SearchFactory;
 import org.jdesktop.swingx.search.Searchable;
 import org.jdesktop.swingx.search.TableSearchable;
+import org.jdesktop.swingx.sort.DefaultSortController;
 import org.jdesktop.swingx.sort.SortController;
 import org.jdesktop.swingx.sort.SortUtils;
 import org.jdesktop.swingx.sort.StringValueRegistry;
@@ -475,6 +477,8 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
     private boolean ignoreAddColumn;
     /** Registry of per-cell string representation. */
     private StringValueRegistry stringValueRegistry;
+
+    private SortOrder[] sortOrderCycle;
     
 
     /** Instantiates a JXTable with a default table model, no data. */
@@ -556,12 +560,12 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
     private void init() {
         putClientProperty(USE_DTCR_COLORMEMORY_HACK, Boolean.TRUE);
         initDefaultStringValues();
-        setEditable(true);
-        setAutoCreateRowSorter(true);
+        sortOrderCycle = DefaultSortController.getDefaultSortOrderCycle();
         setSortsOnUpdates(true);
-        // PENDING JW: how to relate to auto-createRowSorter?
         setSortable(true);
+        setAutoCreateRowSorter(true);
         setRolloverEnabled(true);
+        setEditable(true);
         setTerminateEditOnFocusLost(true);
         initActionsAndBindings();
         initFocusBindings();
@@ -1592,11 +1596,12 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
     protected void configureSorterProperties() {
         // need to hack: if a structureChange is the result of a setModel
         // the rowsorter is not yet updated
-        if (ignoreAddColumn || (getSortController() == null))  return;
+        if (ignoreAddColumn || (!getControlsSorterProperties()))  return;
         getSortController().setStringValueProvider(getStringValueRegistry());
         // configure from table properties
         getSortController().setSortable(sortable);
         getSortController().setSortsOnUpdates(sortsOnUpdates);
+        getSortController().setSortOrderCycle(getSortOrderCycle());
         // configure from column properties
         List<TableColumn> columns = getColumns(true);
         for (TableColumn tableColumn : columns) {
@@ -1666,7 +1671,7 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
     }
 
 
-    // -------------------------------- sorting
+    // -------------------------------- sorting: configure sorter
 
     
     /**
@@ -1678,19 +1683,20 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
      * regardless of each column's individual <code>sorting</code> property. The
      * default is <code>true</code>. <p>
      * 
-     * <b>Note</b>: as of post-1.0 this property is propagated to the SortController. 
+     * <b>Note</b>: as of post-1.0 this property is propagated to the SortController
+     * if controlsSorterProperties is true. 
      * Whether or not a change triggers a re-sort is up to either the concrete controller 
      * implementation (the default doesn't) or client code. This behaviour is
      * different from old SwingX style sorting.
      * 
-     * @see TableColumnExt#isSortable()
      * @param sortable boolean indicating whether or not this table supports
      *        sortable columns
+     * @see #getControlsSorterProperties()
      */
     public void setSortable(boolean sortable) {
         boolean old = isSortable();
         this.sortable = sortable;
-        if (getSortController() != null) {
+        if (getControlsSorterProperties()) {
             getSortController().setSortable(sortable);
         }
         firePropertyChange("sortable", old, isSortable());
@@ -1699,27 +1705,33 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
     /**
      * Returns the table's sortable property.<p>
      * 
-     * Note: as of post-1.0 this property is propagated to the SortController. 
-     * 
      * @return true if the table is sortable.
+     * @see #setSortable(boolean)
      */
     public boolean isSortable() {
-        return getSortController() != null ? getSortController().isSortable() : sortable;
+        return sortable;
     }
 
     /**
      * If true, specifies that a sort should happen when the underlying
      * model is updated (<code>rowsUpdated</code> is invoked).  For
      * example, if this is true and the user edits an entry the
-     * location of that item in the view may change.  The default is
-     * true.
+     * location of that item in the view may change. 
+     * This property is propagated to the SortController
+     * if controlsSorterProperties is true. 
+     * <p> 
+     * 
+     * The default value is true.<p>
      *
      * @param sortsOnUpdates whether or not to sort on update events
+     * @see #getSortsOnUpdates()
+     * @see #getControlsSorterProperties()
+     * 
      */
     public void setSortsOnUpdates(boolean sortsOnUpdates) {
         boolean old = getSortsOnUpdates();
         this.sortsOnUpdates = sortsOnUpdates;
-        if (getSortController() != null) {
+        if (getControlsSorterProperties()) {
             getSortController().setSortsOnUpdates(sortsOnUpdates);
         }
         firePropertyChange("sortsOnUpdates", old, getSortsOnUpdates());
@@ -1732,8 +1744,39 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
      * @return whether or not to sort when the model is updated
      */
     public boolean getSortsOnUpdates() {
-        return getSortController() != null ? getSortController().getSortsOnUpdates() : sortsOnUpdates;
+        return sortsOnUpdates;
     }
+
+    /**
+     * Sets the sortorder cycle used when toggle sorting this table's columns. 
+     * This property is propagated to the SortController
+     * if controlsSorterProperties is true. 
+     * 
+     * @param cycle the sequence of zero or more not-null SortOrders to cycle through.
+     * @throws NullPointerException if the array or any of its elements are null
+     * 
+     */
+    public void setSortOrderCycle(SortOrder... cycle) {
+        SortOrder[] old = getSortOrderCycle();
+        if (getControlsSorterProperties()) {
+            getSortController().setSortOrderCycle(cycle);
+        }
+        this.sortOrderCycle = Arrays.copyOf(cycle, cycle.length);
+        firePropertyChange("sortOrderCycle", old, getSortOrderCycle());
+    }
+    
+    /**
+     * Returns the sortOrder cycle used when toggle sorting this table's columns, guaranteed
+     * to be not null.
+     *   
+     * @return the sort order cycle used in toggle sort, not null 
+     */
+    public SortOrder[] getSortOrderCycle() {
+        return Arrays.copyOf(sortOrderCycle, sortOrderCycle.length);
+    }
+
+    
+//------------------------- sorting: sort/filter
     
     /**
      * Sets the filter to the sorter, if available and of type SortController.
@@ -1744,8 +1787,9 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
      *        included
      */
     public void setRowFilter(RowFilter<? super TableModel, ? super Integer> filter) {
-        if (getSortController() == null) return;
-        getSortController().setRowFilter(filter);
+        if (hasSortController()) {
+            getSortController().setRowFilter(filter);
+        }
     }
     
     /**
@@ -1759,34 +1803,9 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
      */
     @SuppressWarnings("unchecked")
     public RowFilter<?, ?> getRowFilter() {
-        return getSortController() != null ? getSortController().getRowFilter() : null;
+        return hasSortController() ? getSortController().getRowFilter() : null;
     }
     
-    /**
-     * Sets the sortorder cycle of the sorter, if available and of type SortController. Does
-     * nothing otherwise.<p>
-     * 
-     * PENDING JW: make property of the table as well, to propagate to sorter if
-     *   reset?
-     * 
-     * @param cycle the sequence of zero or more not-null SortOrders to cycle through.
-     * @throws NullPointerException if the array or any of its elements are null
-     * 
-     */
-    public void setSortOrderCycle(SortOrder... cycle) {
-        if (getSortController() == null) return;
-        getSortController().setSortOrderCycle(cycle);
-    }
-    
-    /**
-     * Returns the sequence of sortOrders of the sorter, if available and of type SortController.
-     * Null otherwise.
-     *   
-     * @return the sort order cycle of the sorter, if available, null otherwise.
-     */
-    public SortOrder[] getSortOrderCycle() {
-        return getSortController() != null ? getSortController().getSortOrderCycle() : null;
-    }
     /**
      * Resets sorting of all columns.
      * Delegates to the SortController if available, or does nothing if not.<p>
@@ -1795,8 +1814,7 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
      * 
      */
     public void resetSortOrder() {
-        if (getSortController() == null)
-            return;
+        if (!hasSortController()) return;
         getSortController().resetSortOrders();
         // JW PENDING: think about notification instead of manual repaint.
         if (getTableHeader() != null) {
@@ -1821,10 +1839,9 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
      * 
      */
     public void toggleSortOrder(int columnIndex) {
-        if (getSortController() == null)
-            return;
-        getSortController().toggleSortOrder(
-                convertColumnIndexToModel(columnIndex));
+        if (hasSortController()){
+            getSortController().toggleSortOrder(convertColumnIndexToModel(columnIndex));
+        }
     }
 
     /**
@@ -1840,11 +1857,10 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
      * 
      */
     public void setSortOrder(int columnIndex, SortOrder sortOrder) {
-        if (getSortController() == null)
-            return;
-        getSortController().setSortOrder(
-                convertColumnIndexToModel(columnIndex), sortOrder);
-
+        if (hasSortController()) {
+            getSortController().setSortOrder(
+                    convertColumnIndexToModel(columnIndex), sortOrder);
+        }
     }
 
     /**
@@ -1856,9 +1872,10 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
      *         SortOrder.UNSORTED
      */
     public SortOrder getSortOrder(int columnIndex) {
-        if (getSortController() == null)
-            return SortOrder.UNSORTED;
-        return getSortController().getSortOrder(convertColumnIndexToModel(columnIndex));
+        if (hasSortController()) {
+            return getSortController().getSortOrder(convertColumnIndexToModel(columnIndex));
+        }
+        return SortOrder.UNSORTED;
     }
 
     /**
@@ -1880,7 +1897,7 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
      * 
      */
     public void toggleSortOrder(Object identifier) {
-        if (getSortController() == null)
+        if (!hasSortController())
             return;
          TableColumn columnExt = getColumnByIdentifier(identifier);
         if (columnExt == null)
@@ -1904,7 +1921,7 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
      * 
      */
     public void setSortOrder(Object identifier, SortOrder sortOrder) {
-        if (getSortController() == null)
+        if (!hasSortController())
             return;
         TableColumn columnExt = getColumnByIdentifier(identifier);
         if (columnExt == null)
@@ -1926,7 +1943,7 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
      *         SortOrder.UNSORTED
      */
     public SortOrder getSortOrder(Object identifier) {
-        if (getSortController() == null)
+        if (!hasSortController())
             return SortOrder.UNSORTED;
         TableColumn columnExt = getColumnByIdentifier(identifier);
         if (columnExt == null)
@@ -1972,9 +1989,11 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
      * @param columnIndex column in view coordinates
      * @return boolean indicating whether or not the column is sortable in this
      *         table.
+     * @deprecated        
      */
+    @Deprecated
     protected boolean isSortable(int columnIndex) {
-        if (getSortController() != null) {
+        if (hasSortController()) {
             return getSortController().isSortable(convertColumnIndexToModel(columnIndex));
         }
         //PENDING JW: the fall-back implementation (== no sortController) is rather meaningless. 
@@ -2003,9 +2022,11 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
      * @param identifier the column's identifier
      * @return boolean indicating whether or not the column is sortable in this
      *         table.
+     * @deprecated        
      */
+    @Deprecated
     protected boolean isSortable(Object identifier) {
-        if (getSortController() != null) {
+        if (hasSortController()) {
             TableColumn columnExt = null; 
             columnExt = getColumnByIdentifier(identifier);
             if (columnExt != null) {
@@ -2038,7 +2059,7 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
      */
     @SuppressWarnings("unchecked")
     protected SortController<? extends TableModel> getSortController() {
-        if (getRowSorter() instanceof SortController<?>) {
+        if (hasSortController()) {
             // JW: the RowSorter is always of type <? extends ListModel>
             // so the unchecked cast is safe
             return  (SortController<? extends TableModel>) getRowSorter();
@@ -2046,6 +2067,38 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
         return null;
     }
 
+    /**
+     * Returns a boolean indicating whether the table has a SortController.
+     * If true, the call to getSortController is guaranteed to return a not-null
+     * value.
+     * 
+     * @return a boolean indicating whether the table has a SortController.
+     * 
+     * @see #getSortController()
+     */
+    protected boolean hasSortController() {
+        return getRowSorter() instanceof SortController<?>;
+    }
+    
+    /**
+     * Returns a boolean indicating whether the table configures the sorter's
+     * properties. If true, guaranteed that table's and the columns' sort related 
+     * properties are propagated to the sorter. If false, guaranteed to not
+     * touch the sorter's configuration.<p>
+     * 
+     * This implementation returns true if the sorter is of type SortController.
+     * 
+     * Note: the synchronization is unidirection from the table to the sorter. 
+     * Changing the sorter under the table's feet might lead to undefined
+     * behaviour.
+     * 
+     * @return a boolean indicating whether the table configurers the sorter's
+     *  properties.
+     */
+    protected boolean getControlsSorterProperties() {
+        return hasSortController() && getAutoCreateRowSorter();
+    }
+    
     /**
      * Returns the primary sort column, or null if nothing sorted or no sortKey
      *   corresponds to a TableColumn currently contained in the TableColumnModel.
@@ -2379,13 +2432,8 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
 
     /**
      * Synch's the SortController column sortable property to the new value, if 
-     * available. Does nothing if there is no SortController. This method is
+     * controlsSorterProperties. Does nothing otherwise. This method is
      * called on sortable property change notification from the ext column model. <p>
-     * 
-     * <b>Note</b>: as of post-1.0 a column's property is propagated to the SortController. 
-     * Whether or not a change triggers a re-sort is up to either the concrete controller 
-     * implementation (the default doesn't) or client code. This behaviour is
-     * different from old SwingX style sorting.
      * 
      * @param column the <code>TableColumn</code> which sent the change
      *        notifcation
@@ -2393,19 +2441,14 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
      */
     private void updateSortableAfterColumnChanged(TableColumn column,
             boolean sortable) {
-        if (getSortController() == null) return;
-        getSortController().setSortable(column.getModelIndex(), sortable);
+        if (getControlsSorterProperties()) {  
+            getSortController().setSortable(column.getModelIndex(), sortable);
+        }
     }
-    
     /**
      * Synch's the SortController column comparator property to the new value, if 
-     * available. Does nothing if there is no SortController. This method is
+     * controlsSorterProperties. Does nothing otherwise. This method is
      * called on comparator property change notification from the ext column model. <p>
-     * 
-     * <b>Note</b>: as of post-1.0 a column's property is propagated to the SortController. 
-     * Whether or not a change triggers a re-sort is up to either the concrete controller 
-     * implementation (the default doesn't) or client code. This behaviour is
-     * different from old SwingX style sorting.
      * 
      * @param column the <code>TableColumn</code> which sent the change
      *        notifcation
@@ -2413,8 +2456,9 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
      */
     private void updateComparatorAfterColumnChanged(TableColumn column,
             Comparator<?> comparator) {
-        if (getSortController() == null) return;
-        getSortController().setComparator(column.getModelIndex(), comparator);
+        if (getControlsSorterProperties()) {
+            getSortController().setComparator(column.getModelIndex(), comparator);
+        }
     }
 
     // -------------------------- ColumnFactory

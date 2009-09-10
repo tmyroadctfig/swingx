@@ -47,9 +47,6 @@ import javax.swing.SortOrder;
  * <li> if both are true toggle the SortOrder of the given column
  * </ol>
  *
- * PENDING JW: add RowFilter support<p>
- * PENDING JW: generics are introduced in the process of adding filter support and
- *   are experimental ... right now we get tons of warnings ...<p>
  * 
  *  @author <a href="mailto:jesse@swank.ca">Jesse Wilson</a>
  *  @author Jeanette Winzenburg
@@ -57,6 +54,8 @@ import javax.swing.SortOrder;
  */
 public interface SortController<M> {
 
+//----------------- configuration
+    
     /**
      * Sets whether or not this controller is sortable.<p>
      * 
@@ -144,6 +143,62 @@ public interface SortController<M> {
     public Comparator<?> getComparator(int column);
     
     /**
+     * Sets the cycle of sort ordes to toggle through. Zero or more SortOrders which
+     * must not be null.
+     * 
+     * @param cycle the SortOrders to cycle through, may be empty
+     * @throws NullPointerException if the array or any of its elements is null
+     */
+    void setSortOrderCycle(SortOrder... cycle);
+    
+    /**
+     * Returns the cycle of sort orders to cycle through.
+     * 
+     * @return
+     */
+    SortOrder[] getSortOrderCycle();
+    
+    /**
+     * If true, specifies that a sort should happen when the underlying
+     * model is updated (<code>rowsUpdated</code> is invoked).  For
+     * example, if this is true and the user edits an entry the
+     * location of that item in the view may change.  The default is
+     * true.
+     *
+     * @param sortsOnUpdates whether or not to sort on update events
+     */
+    void setSortsOnUpdates(boolean sortsOnUpdates);
+
+    /**
+     * Returns true if  a sort should happen when the underlying
+     * model is updated; otherwise, returns false.
+     *
+     * @return whether or not to sort when the model is updated
+     */
+    boolean getSortsOnUpdates();
+    
+    /**
+     * Sets the StringValueProvider to look up the StringValues. If the value
+     * is not-null, it guarantees to use it exclusively for string conversion. <p>
+     * 
+     * PENDING JW: this is more or less parallel to TableStringConverter. Need to think
+     * about merging somehow.
+     * 
+     * @param provider the look up for StringValues, may be null.
+     */
+    void setStringValueProvider(StringValueProvider provider);
+
+    /**
+     * Returns the StringValueProvider used to look up StringValues.
+     * 
+     * @return StringValueProvider used to look up StringValues, guaranteed to
+     *  be not null.
+     */
+    StringValueProvider getStringValueProvider();
+    
+//------------------------ sort
+    
+    /**
      * Reverses the sort order of the specified column. The exact behaviour is
      * up to implementations.<p>
      * 
@@ -189,41 +244,6 @@ public interface SortController<M> {
      */
     void resetSortOrders();
     
-    /**
-     * Sets the cycle of sort ordes to toggle through. Zero or more SortOrders which
-     * must not be null.
-     * 
-     * @param cycle the SortOrders to cycle through, may be empty
-     * @throws NullPointerException if the array or any of its elements is null
-     */
-    void setSortOrderCycle(SortOrder... cycle);
-    
-    /**
-     * Returns the cycle of sort orders to cycle through.
-     * 
-     * @return
-     */
-    SortOrder[] getSortOrderCycle();
-    
-    /**
-     * If true, specifies that a sort should happen when the underlying
-     * model is updated (<code>rowsUpdated</code> is invoked).  For
-     * example, if this is true and the user edits an entry the
-     * location of that item in the view may change.  The default is
-     * true.
-     *
-     * @param sortsOnUpdates whether or not to sort on update events
-     */
-    void setSortsOnUpdates(boolean sortsOnUpdates);
-
-    /**
-     * Returns true if  a sort should happen when the underlying
-     * model is updated; otherwise, returns false.
-     *
-     * @return whether or not to sort when the model is updated
-     */
-    boolean getSortsOnUpdates();
-    
 //-------------------- filter
     
     /**
@@ -256,21 +276,6 @@ public interface SortController<M> {
      */
      RowFilter<? super M,? super Integer> getRowFilter();
 
-    /**
-     * Sets the StringValueProvider to look up the StringValues. If the value
-     * is not-null, it guarantees to use it exclusively for string conversion. <p>
-     * 
-     * PENDING JW: this is more or less parallel to TableStringConverter. Need to think
-     * about merging somehow.
-     * 
-     * @param provider the look up for StringValues, may be null.
-     */
-    void setStringValueProvider(StringValueProvider provider);
-
-    /**
-     * @return
-     */
-    StringValueProvider getStringValueProvider();
 
 
 }
