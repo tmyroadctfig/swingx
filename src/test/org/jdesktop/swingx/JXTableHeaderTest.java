@@ -45,6 +45,31 @@ public class JXTableHeaderTest extends InteractiveTestCase {
     }
     
 
+    /**
+     * Issue #1154-swingx: Regression after switching to Mustang.
+     * was: Issue #31 (swingx): clicking header must not sort if table !enabled.
+     * 
+     * Actually, an older debate - to disable or not to disable the header
+     * if table disabled. Decided to synch header disabled (via listener in
+     * JXTableHeader. This is consistent with ColumnControlButton.
+     *
+     */
+    @Test
+    public void testEnabledSynched() {
+        // test synch on propertyChange
+        JXTable table = new JXTable();
+        table.setEnabled(false);
+        assertEquals(table.isEnabled(), table.getTableHeader().isEnabled());
+        // test synch on setTable
+        JXTableHeader header = new JXTableHeader();
+        header.setTable(table);
+        assertEquals(table.isEnabled(), header.isEnabled());
+        // test true if table null
+        header.setTable(null);
+        assertEquals(true, header.isEnabled());
+    }
+    
+    
 
     /**
      * Issue #485-swingx: table header disappears if all header values are
