@@ -24,6 +24,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.Serializable;
 import java.util.logging.Logger;
 
@@ -95,6 +96,7 @@ public class JXTableHeader extends JTableHeader
      */
     @Deprecated
     private SortGestureRecognizer sortGestureRecognizer;
+    private PropertyChangeListener tablePropertyChangeListener;
 
     /**
      *  Constructs a <code>JTableHeader</code> with a default 
@@ -129,7 +131,9 @@ public class JXTableHeader extends JTableHeader
      */
     @Override
     public void setTable(JTable table) {
+        uninstallTable();
         super.setTable(table);
+        installTable();
 //        setColumnModel(table.getColumnModel());
         // the additional listening option makes sense only if the table
         // actually is a JXTable
@@ -139,6 +143,33 @@ public class JXTableHeader extends JTableHeader
             uninstallHeaderListener();
         }
     }
+
+    /**
+     * Installs the table. <p>
+     * This implemenation synchs enabled state and installs the PropertyChangeListener. 
+     */
+    protected void installTable() {
+        updateEnabledFromTable();
+        if (getTable() == null) return;
+        getTable().addPropertyChangeListener(getTablePropertyChangeListener());
+    }
+    
+    /**
+     * Synchs the header's enabled with the table's enabled property.
+     */
+    protected void updateEnabledFromTable() {
+        setEnabled(getTable() != null ? getTable().isEnabled() : true);
+    }
+
+    /**
+     * Uninstalls the table. <p>
+     * This implementation uninstalls the PropertyChangeListener.
+     */
+    protected void uninstallTable() {
+        if (getTable() == null) return;
+        getTable().removePropertyChangeListener(getTablePropertyChangeListener());
+    }
+
 
     /**
      * Implements TableColumnModelExt to allow internal update after
@@ -373,6 +404,43 @@ public class JXTableHeader extends JTableHeader
         }
         return -1;
     }
+    
+    /**
+     * Returns the PropertyChangeListener to register on the owning table,
+     * lazily created.
+     * 
+     * @return the PropertyChangeListener to use on the owning table.
+     */
+    protected PropertyChangeListener getTablePropertyChangeListener() {
+        if (tablePropertyChangeListener == null) {
+            tablePropertyChangeListener = createTablePropertyChangeListener();
+        }
+        return tablePropertyChangeListener;
+    }
+
+    /**
+     * Creates and returns the PropertyChangeListener to register on the 
+     * owning table.<p>
+     * 
+     * This implementation synchs the header's enabled properties with the 
+     * table's enabled.
+     * 
+     * @return the PropertyChangeListener to register on the owning table.
+     */
+    protected PropertyChangeListener createTablePropertyChangeListener() {
+        PropertyChangeListener l = new PropertyChangeListener() {
+            
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                if ("enabled".equals(evt.getPropertyName())) {
+                    updateEnabledFromTable();
+                }
+            }
+        };
+        return l;
+    }
+
+
     /**
      * Creates and installs header listeners to service the extended functionality.
      * This implementation creates and installs a custom mouse input listener.

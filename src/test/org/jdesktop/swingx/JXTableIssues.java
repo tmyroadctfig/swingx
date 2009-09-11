@@ -20,6 +20,8 @@
  */
 package org.jdesktop.swingx;
 
+import static org.junit.Assert.*;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -59,6 +61,7 @@ import org.jdesktop.test.AncientSwingTeam;
 import org.jdesktop.test.CellEditorReport;
 import org.jdesktop.test.PropertyChangeReport;
 import org.jdesktop.test.SerializableSupport;
+import org.junit.Test;
 
 /**
  * Test to exposed known issues of <code>JXTable</code>.
@@ -293,31 +296,8 @@ public class JXTableIssues extends InteractiveTestCase {
 
 
 
-    
-
 //----------------- interactive
 
-    /**
-     * Issue #1154-swingx: Regression after switching to Mustang.
-     * was: Issue #31 (swingx): clicking header must not sort if table !enabled.
-     *
-     */
-    public void interactiveTestDisabledTableSorting() {
-        final JXTable table = new JXTable(new AncientSwingTeam());
-        table.setEnabled(false);
-        table.setColumnControlVisible(true);
-        Action toggleAction = new AbstractAction("Toggle Enabled") {
-
-            public void actionPerformed(ActionEvent e) {
-                table.setEnabled(!table.isEnabled());
-                
-            }
-            
-        };
-        JXFrame frame = wrapWithScrollingInFrame(table, "Disabled tabled: no sorting");
-        addAction(frame, toggleAction);
-        frame.setVisible(true);  
-    }
 
 
     /**

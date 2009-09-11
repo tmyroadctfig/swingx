@@ -32,19 +32,21 @@ import javax.swing.table.TableColumnModel;
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.table.DefaultTableColumnModelExt;
 import org.jdesktop.swingx.table.TableColumnExt;
+import org.jdesktop.test.AncientSwingTeam;
 
 public class JXTableHeaderIssues extends JXTableHeaderTest {
     @SuppressWarnings("all")
     private static final Logger LOG = Logger
             .getLogger(JXTableHeaderIssues.class.getName());
     public static void main(String args[]) {
+        
         JXTableHeaderIssues test = new JXTableHeaderIssues();
 //        setSystemLF(true);
         try {
-//          test.runInteractiveTests();
+          test.runInteractiveTests();
          //   test.runInteractiveTests("interactive.*Siz.*");
          //   test.runInteractiveTests("interactive.*Render.*");
-            test.runInteractiveTests("interactive.*Auto.*");
+//            test.runInteractiveTests("interactive.*Auto.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
@@ -63,6 +65,31 @@ public class JXTableHeaderIssues extends JXTableHeaderTest {
         assertTrue(header.getAutoscrolls());
     }
     
+    /**
+     * Issue #1154-swingx: Regression after switching to Mustang.
+     * was: Issue #31 (swingx): clicking header must not sort if table !enabled.
+     *
+     * OOOKayyyy ... this is a core issue: mouse listener in BasicTableHeaderUI
+     * don't respect the header's enabled property (reported with review id 1605216).
+     * It's possible to drag, resize, sort even if disabled. The only "normal"
+     * behaviour is that the resizing cursor isn't showing.
+     */
+    public void interactiveTestDisabledTableSorting() {
+        final JXTable table = new JXTable(new AncientSwingTeam());
+        table.setEnabled(false);
+        table.setColumnControlVisible(true);
+        Action toggleAction = new AbstractAction("Toggle Enabled") {
+
+            public void actionPerformed(ActionEvent e) {
+                table.setEnabled(!table.isEnabled());
+                
+            }
+            
+        };
+        JXFrame frame = wrapWithScrollingInFrame(table, "Disabled tabled: no sorting");
+        addAction(frame, toggleAction);
+        frame.setVisible(true);  
+    }
     
     /**
      * Quick proof-of-concept: JXTableHeader can go dirty and
