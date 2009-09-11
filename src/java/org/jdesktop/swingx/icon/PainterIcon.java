@@ -19,7 +19,7 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-package org.jdesktop.swingx.painter;
+package org.jdesktop.swingx.icon;
 
 import java.awt.Component;
 import java.awt.Dimension;
@@ -27,6 +27,8 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 
 import javax.swing.Icon;
+
+import org.jdesktop.swingx.painter.Painter;
 
 public class PainterIcon implements Icon {
     Dimension size;

@@ -30,8 +30,8 @@ import javax.swing.JLabel;
 import javax.swing.Timer;
 import javax.swing.plaf.LabelUI;
 
+import org.jdesktop.swingx.icon.PainterIcon;
 import org.jdesktop.swingx.painter.BusyPainter;
-import org.jdesktop.swingx.painter.PainterIcon;
 import org.jdesktop.swingx.plaf.BusyLabelAddon;
 import org.jdesktop.swingx.plaf.BusyLabelUI;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
