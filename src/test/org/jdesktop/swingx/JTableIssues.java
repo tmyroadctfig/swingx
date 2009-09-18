@@ -7,7 +7,11 @@
 
 package org.jdesktop.swingx;
 
+import static org.junit.Assert.*;
+
+import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -22,57 +26,236 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.DefaultCellEditor;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.DefaultRowSorter;
+import javax.swing.Icon;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
+import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.JTree;
 import javax.swing.RowSorter;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.event.RowSorterEvent;
 import javax.swing.event.TableModelEvent;
+import javax.swing.plaf.ColorUIResource;
+import javax.swing.plaf.TableUI;
+import javax.swing.plaf.UIResource;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
+import javax.swing.tree.TreeCellRenderer;
 
 import org.jdesktop.swingx.action.AbstractActionExt;
+import org.jdesktop.swingx.decorator.HighlighterFactory;
+import org.jdesktop.swingx.plaf.LookAndFeelUtils;
+import org.jdesktop.swingx.test.XTestUtils;
 import org.jdesktop.test.AncientSwingTeam;
 import org.jdesktop.test.CellEditorReport;
 import org.jdesktop.test.ListSelectionReport;
 import org.jdesktop.test.PropertyChangeReport;
 import org.jdesktop.test.TestUtils;
+import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
+
+import com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel;
 
 /**
  * @author Jeanette Winzenburg
  */
 public class JTableIssues extends InteractiveTestCase {
+    /**
+     * 
+     */
+    private static final String ALTERNATE_ROW_COLOR = "Table.alternateRowColor";
     private static final Logger LOG = Logger.getLogger(JTableIssues.class
             .getName());
     
-    public static void main(String args[]) {
-//      setSystemLF(true);
+    public static void main(String args[]) throws Exception {
+//        setLookAndFeel("Nimbus");
       JTableIssues test = new JTableIssues();
       try {
-        test.runInteractiveTests();
+//        test.runInteractiveTests();
 //          test.runInteractiveTests("interactive.*ColumnControl.*");
 //          test.runInteractiveTests("interactive.*Edit.*");
+          test.runInteractiveTests("interactive.*NimbusL.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
       }
   }
+    
 
+    @Override
+    @BeforeClass
+    protected void setUp() throws Exception {
+        super.setUp();
+        
+    }
+
+
+    //------------ Nimbus
+    
+    public void interactiveNimbusLabelBackground() throws Exception {
+        setLookAndFeel("Metal");
+        final JLabel uiLabel = new JLabel("use ColorUIResource");
+        uiLabel.setOpaque(true);
+        uiLabel.setBackground(new ColorUIResource(Color.WHITE));
+        final JLabel label = new JLabel("use plain Color");
+        label.setOpaque(true);
+        label.setBackground(Color.WHITE);
+        JComponent panel = new JPanel();
+        panel.setOpaque(true);
+        panel.setBackground(Color.RED);
+        panel.add(uiLabel);
+        panel.add(label);
+        JXFrame frame = wrapInFrame(panel, "ColorUIResource - Color");
+        Action action = new AbstractAction("setWhite") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                uiLabel.setBackground(new ColorUIResource(Color.WHITE));
+                label.setBackground(Color.WHITE);
+            }
+        };
+        addAction(frame, action);
+        show(frame);
+    }
+    
+    
+    public void interactiveNimbusTableColor() {
+        final JLabel label = new JLabel("background");
+        label.setName("Table.Background");
+        printComponentProperties(label);
+        label.setOpaque(true);
+        label.setBackground(UIManager.getColor("Table.background"));
+        label.setBackground(new ColorUIResource(Color.WHITE));
+//        label.setBackground(Color.WHITE);
+        final JLabel alternate = new JLabel("alternate");
+        alternate.setName(ALTERNATE_ROW_COLOR);
+        alternate.setOpaque(true);
+        alternate.setBackground(UIManager.getColor(ALTERNATE_ROW_COLOR));
+        JComponent panel = new JPanel();
+        panel.add(label);
+        panel.add(alternate);
+        JXFrame frame = wrapInFrame(panel, "normal - alternate");
+        Action print = new AbstractAction("print") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                printComponentProperties(label);
+                printComponentProperties(alternate);
+            }
+        };
+        addAction(frame, print);
+        show(frame);
+    }
+    
+    private void printComponentProperties(JLabel label) {
+        LOG.info("LAF/back/alternate " + UIManager.getLookAndFeel() + 
+                "\n class " + label.getClass() +
+                "\n  name " + label.getName() +
+                "\n back " + label.getBackground() + 
+                "\n opaque " + label.isOpaque());
+    }
+    
+    /**
+     * Issue #6594663: gridlines not settable
+     */
+    public void interactiveNimbusProperties() {
+        final JTable core = new JTable(new AncientSwingTeam());
+        final JXTable table = new JXTable(core.getModel());
+        JXFrame frame = wrapWithScrollingInFrame(core, table, "core <--> xtable: Gridlines?");
+        Action action = new AbstractAction("toggle grid") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (core.getRowMargin() == 0) {
+                    core.setIntercellSpacing(new Dimension(1, 1));
+                    core.setShowGrid(true);
+                    table.setShowGrid(true, true);
+                } else {
+                    
+                }
+            }
+        };
+        addAction(frame, action);
+        final Action updateUI = new AbstractAction("updateUI") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                core.updateUI();
+                table.updateUI();
+            }
+        };
+        addAction(frame, updateUI);
+        Action alternate = new AbstractAction("alternate back") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+               UIManager.put(ALTERNATE_ROW_COLOR, Color.RED);
+               updateUI.actionPerformed(null);
+            }
+        };
+        addAction(frame, alternate);
+        show(frame);
+    }
+    /**
+     * Core issues: throws NPE for interface column classes
+     * Problem with Nimbus: installs LAF renderers, but doesn't for duplicate 
+     * for Icon?
+     * http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6830678
+     */
+    public void interactiveNimbusIconCore() {
+        NimbusLookAndFeel l;
+        TableUI t;
+        TableModel model = new DefaultTableModel(10, 2) {
+            
+            @Override
+            public Class<?> getColumnClass(int columnIndex) {
+                if (columnIndex == 0) {
+                    return Icon.class;
+                }
+                return super.getColumnClass(columnIndex);
+            }
+            
+        };
+        model.setValueAt(XTestUtils.loadDefaultIcon(), 0, 0);
+        JTable core = new JTable(model);
+        showWithScrollingInFrame(core, "core: NPE with Icon?");
+    }
+   
+
+    public void interactiveNimbusIconX() {
+        TableModel model = new DefaultTableModel(10, 2) {
+
+            @Override
+            public Class<?> getColumnClass(int columnIndex) {
+                if (columnIndex == 0) {
+                    return Icon.class;
+                }
+                return super.getColumnClass(columnIndex);
+            }
+             
+        };
+        model.setValueAt(XTestUtils.loadDefaultIcon(), 0, 0);
+        JXTable table = new JXTable(model);
+        showWithScrollingInFrame(table, "xtable: NPE with Icon?");
+    }
+    
   //---------------- core sorting 
     
   //------------------ testing core    
@@ -136,6 +319,25 @@ public class JTableIssues extends InteractiveTestCase {
     
   //----------------------- interactive
     
+    public void interactiveAutoRowSorter() {
+        // mimic a table coming out of a component factory,
+        // which makes it autoCreate always
+        final JTable table = new JTable();
+        table.setAutoCreateRowSorter(true);
+        JXFrame frame = wrapWithScrollingInFrame(table, "autoCreateFalse keeps rowSorter");
+        Action toggle = new AbstractAction("new model") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // mimic client code - special case
+                table.setAutoCreateRowSorter(false);
+                // silently allows error which fails at runtime when clicking header
+                table.setModel(new DefaultTableModel(20, table.getColumnCount() +1 ));
+            }
+        };
+        addAction(frame, toggle);
+        show(frame);
+    }
     
     /**
      * Core issue: terminateEditOnFocusLost weird behaviour if in InternalFrame
