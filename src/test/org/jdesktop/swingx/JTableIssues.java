@@ -7,8 +7,6 @@
 
 package org.jdesktop.swingx;
 
-import static org.junit.Assert.*;
-
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -26,7 +24,6 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.DefaultCellEditor;
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.DefaultRowSorter;
 import javax.swing.Icon;
@@ -41,37 +38,28 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.JTree;
 import javax.swing.RowSorter;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.event.RowSorterEvent;
 import javax.swing.event.TableModelEvent;
 import javax.swing.plaf.ColorUIResource;
-import javax.swing.plaf.TableUI;
-import javax.swing.plaf.UIResource;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
-import javax.swing.tree.TreeCellRenderer;
 
 import org.jdesktop.swingx.action.AbstractActionExt;
-import org.jdesktop.swingx.decorator.HighlighterFactory;
-import org.jdesktop.swingx.plaf.LookAndFeelUtils;
 import org.jdesktop.swingx.test.XTestUtils;
 import org.jdesktop.test.AncientSwingTeam;
 import org.jdesktop.test.CellEditorReport;
 import org.jdesktop.test.ListSelectionReport;
 import org.jdesktop.test.PropertyChangeReport;
 import org.jdesktop.test.TestUtils;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel;
 
 /**
  * @author Jeanette Winzenburg
@@ -220,8 +208,6 @@ public class JTableIssues extends InteractiveTestCase {
      * http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6830678
      */
     public void interactiveNimbusIconCore() {
-        NimbusLookAndFeel l;
-        TableUI t;
         TableModel model = new DefaultTableModel(10, 2) {
             
             @Override
