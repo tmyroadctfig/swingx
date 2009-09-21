@@ -21,6 +21,8 @@
  */
 package org.jdesktop.swingx.renderer;
 
+import java.util.logging.Logger;
+
 import javax.swing.LookAndFeel;
 import javax.swing.UIManager;
 
@@ -37,6 +39,10 @@ import org.junit.Test;
  */
 public class CellContextTest extends InteractiveTestCase {
 
+    @SuppressWarnings("unused")
+    private static final Logger LOG = Logger.getLogger(CellContextTest.class
+            .getName());
+    
     /**
      * Issue #1151-swingx: Nimbus border not used in renderer. 
      * @throws Exception 
@@ -60,6 +66,10 @@ public class CellContextTest extends InteractiveTestCase {
      */
     @Test
     public void assertNimbusNoFocusBorder(CellContext context) throws Exception {
+        if (!hasLookAndFeel("Nimbus")) {
+            LOG.fine("can't run - no Nimbus");
+            return;
+        }
         LookAndFeel lf = UIManager.getLookAndFeel();
         try {
             setLookAndFeel("Nimbus");

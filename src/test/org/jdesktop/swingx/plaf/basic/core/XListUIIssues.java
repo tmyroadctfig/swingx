@@ -48,6 +48,30 @@ public class XListUIIssues extends InteractiveTestCase {
     @SuppressWarnings("unused")
     private static final Logger LOG = Logger.getLogger(XListUIIssues.class
             .getName());
+    /**
+     * getContext(component) should throw if given component is not ours (for
+     * 1:1 delegate implemenations). 
+     * 
+     * PENDING JW: moved out of XListUITest because server doesn't know Nimbus
+     * back again if jdk version updated to u10+. Or: can we have conditions
+     * in the expected clause?
+     * 
+     * @throws Exception 
+     */
+    @Test (expected=IllegalArgumentException.class)
+    public void testSynthUIX() throws Exception {
+        LookAndFeel lf = UIManager.getLookAndFeel();
+        try {
+            setLookAndFeel("Nimbus");
+            JXList list = new JXList();
+            SynthUI ui = (SynthUI) list.getUI();
+            ui.getContext(new JXList());
+        } finally {
+            UIManager.setLookAndFeel(lf);
+        }
+        
+    }
+
 
     /**
      * getContext(component) should throw if given component is not ours (for

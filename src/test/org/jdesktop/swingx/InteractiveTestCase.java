@@ -407,14 +407,41 @@ public abstract class InteractiveTestCase extends junit.framework.TestCase {
      * 
      */
     public static void setLookAndFeel(String nameSnippet) throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException {
+        String laf = getLookAndFeelClassName(nameSnippet);
+        if (laf != null) {
+            UIManager.setLookAndFeel(laf);
+            return;
+        }
+        throw new UnsupportedLookAndFeelException("no LAF installed with name snippet " + nameSnippet);
+    }
+    
+    /**
+     * Returns a boolean indicating whether or not the UI has a LAF with a name
+     * containing the name snippet installed.
+     * 
+     * @param nameSnippet part of the name as published by the LAF.
+     * @return a boolean indicating whether there's installed LAF with
+     *   a name containing the name snippet.
+     */
+    public static boolean hasLookAndFeel(String nameSnippet) {
+        return getLookAndFeelClassName(nameSnippet) != null;
+    }
+    
+    /**
+     * Returns the class name of the installed LookAndFeel with a name
+     * containing the name snippet or null if none found.
+     * 
+     * @param nameSnippet
+     * @return
+     */
+    public static String getLookAndFeelClassName(String nameSnippet) {
         LookAndFeelInfo[] plafs = UIManager.getInstalledLookAndFeels();
         for (LookAndFeelInfo info : plafs) {
             if (info.getName().contains(nameSnippet)) {
-                UIManager.setLookAndFeel(info.getClassName());
-                return;
+                return info.getClassName();
             }
         }
-        throw new UnsupportedLookAndFeelException("no LAF installed with name snippet " + nameSnippet);
+        return null;
     }
     /**
      * Action to toggle plaf and update all toplevel windows of the

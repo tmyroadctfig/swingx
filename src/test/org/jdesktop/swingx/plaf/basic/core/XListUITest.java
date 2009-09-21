@@ -22,6 +22,7 @@
 package org.jdesktop.swingx.plaf.basic.core;
 
 import java.util.Arrays;
+import java.util.logging.Logger;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
@@ -34,8 +35,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-import sun.swing.plaf.synth.SynthUI;
-
 /**
  * Contains base tests for extended ui-delegates of JXList.
  * 
@@ -43,6 +42,10 @@ import sun.swing.plaf.synth.SynthUI;
  */
 @RunWith(JUnit4.class)
 public class XListUITest extends InteractiveTestCase {
+    
+    @SuppressWarnings("unused")
+    private static final Logger LOG = Logger.getLogger(XListUITest.class
+            .getName());
     
     /**
      * Issue 1152-swingx: JXList re-enable sorting.
@@ -70,25 +73,6 @@ public class XListUITest extends InteractiveTestCase {
     }
     
     /**
-     * getContext(component) should throw if given component is not ours (for
-     * 1:1 delegate implemenations). 
-     * @throws Exception 
-     */
-    @Test (expected=IllegalArgumentException.class)
-    public void testSynthUIX() throws Exception {
-        LookAndFeel lf = UIManager.getLookAndFeel();
-        try {
-            setLookAndFeel("Nimbus");
-            JXList list = new JXList();
-            SynthUI ui = (SynthUI) list.getUI();
-            ui.getContext(new JXList());
-        } finally {
-            UIManager.setLookAndFeel(lf);
-        }
-        
-    }
-
-    /**
      * For SynthLF, mapping of ui-delegate happens statically in Region: for all
      * known regions it registers the SynthLookAndFeel as delegate factory. First
      * time around, Region.XLIST is not yet known - xdelegate used. Second time
@@ -102,6 +86,10 @@ public class XListUITest extends InteractiveTestCase {
      */
     @Test
     public void testSynthXUIFound() throws Exception {
+        if (!hasLookAndFeel("Nimbus")) {
+            LOG.info("can't run - no Nimbus");
+            return;
+        }
         LookAndFeel lf = UIManager.getLookAndFeel();
         try {
             setLookAndFeel("Nimbus");
