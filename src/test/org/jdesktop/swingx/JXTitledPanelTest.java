@@ -10,6 +10,8 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.ComponentOrientation;
 import java.awt.Font;
+import java.awt.GradientPaint;
+import java.awt.LinearGradientPaint;
 import java.awt.event.ActionEvent;
 import java.util.logging.Logger;
 
@@ -26,6 +28,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.border.LineBorder;
 
+import org.jdesktop.swingx.painter.MattePainter;
 import org.jdesktop.test.PropertyChangeReport;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -166,6 +169,29 @@ public class JXTitledPanelTest extends InteractiveTestCase {
     }
 
 //--------------------- interactive tests
+ 
+    
+    /**
+     * Issue #157-swingx: JXTitledPanel not fully bidi-compliant.
+     * 
+     * Last issue: gradient not adjusted - should be handled by 
+     * the painter. See Issue #1163-swingx
+     */
+    public void interactiveGradient() {
+        LinearGradientPaint l;
+        GradientPaint paint = new GradientPaint(0f, 0f, Color.WHITE, 500f, 
+                500f, Color.BLUE);
+        JXTitledPanel panel = new JXTitledPanel("want a gradient");
+        panel.setTitlePainter(new MattePainter(paint, true));
+//        ImagePainter p = new ImagePainter(XTestUtils.loadDefaultImage());
+//        p.setScaleType(ScaleType.OutsideFit);
+//        p.setHorizontalAlignment(HorizontalAlignment.LEFT);
+//        panel.setTitlePainter(p);
+        JXFrame frame = wrapInFrame(panel, "gradient");
+        addComponentOrientationToggle(frame);
+        show(frame, 500, 500);
+    }
+
     /**
      * Issue #1063-swingx: JXTitledPanel must respect custom border.
      */
