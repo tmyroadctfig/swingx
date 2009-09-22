@@ -325,6 +325,7 @@ public class PainterVisualCheck extends InteractiveTestCase {
     public void interactiveAnimatedIconPainterHighlight()  {
         TableModel model = new AncientSwingTeam();
         JXTable table = new JXTable(model);
+        table.getColumn(1).setCellRenderer(new DefaultTableRenderer(new HyperlinkProvider()));
         ImagePainter imagePainter = new ImagePainter(XTestUtils.loadDefaultImage("green-orb.png"));
         imagePainter.setHorizontalAlignment(HorizontalAlignment.RIGHT);
         final RelativePainter<?> painter = new RelativePainter<Component>(imagePainter);

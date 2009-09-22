@@ -22,14 +22,20 @@
 package org.jdesktop.swingx.plaf.nimbus;
 
 import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.util.logging.Logger;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
@@ -38,7 +44,11 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.UIManager.LookAndFeelInfo;
+import javax.swing.plaf.ColorUIResource;
+import javax.swing.plaf.UIResource;
 import javax.swing.table.AbstractTableModel;
+
+import org.jdesktop.swingx.SwingXUtilities;
 
 
 /**
@@ -46,9 +56,18 @@ import javax.swing.table.AbstractTableModel;
  */
 public class RawNimbus {
 
+    @SuppressWarnings("unused")
+    private static final Logger LOG = Logger.getLogger(RawNimbus.class
+            .getName());
+    
     private JComponent createContent() {
         JTabbedPane pane = new JTabbedPane();
         JTable table = new JTable(new SomeData());
+        Color selectionBackground = table.getSelectionBackground();
+        LOG.info("ui resource? " + (selectionBackground instanceof UIResource) + selectionBackground);
+        table.setSelectionBackground(new ColorUIResource(selectionBackground));
+//        table.setSelectionBackground(new ColorUIResource(Color.RED));
+//        table.setSelectionBackground(Color.RED);
         JLabel tableLabel = new JLabel("background from table");
         tableLabel.setOpaque(true);
         tableLabel.setBackground(table.getBackground());
@@ -67,6 +86,7 @@ public class RawNimbus {
         panel.add(label);
         panel.add(alternate);
         panel.add(table); //new JScrollPane(table));
+        panel.add(createButtonBar());
         pane.addTab("JTable" , panel);
         JList list = new JList(new DefaultComboBoxModel(new Object[] {"just", "some", "elements"}));
         pane.addTab("JList", new JScrollPane(list));
@@ -76,11 +96,52 @@ public class RawNimbus {
         return pane;
     }
     
+    /**
+     * @return
+     */
+    private JComponent createButtonBar() {
+        JComponent bar = new JPanel();
+        Action laf = new AbstractAction("toggle LAF (metal/nimbus") {
+            boolean isMetal = false;
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    if (isMetal) {
+                        setLookAndFeel("Nimbus");
+                    } else {
+                        setLookAndFeel("Metal");
+                    }
+                    isMetal = !isMetal;
+                    SwingXUtilities.updateAllComponentTreeUIs();
+                } catch (Exception e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                }
+
+            }
+        };
+        bar.add(new JButton(laf));
+        Action remove = new AbstractAction("remove alternate color") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Object alternate = UIManager.getLookAndFeelDefaults().remove("Table.alternateRowColor");
+                LOG.info("removed? got color " + UIManager.getColor("Table.alternateRowColor") + alternate);
+                SwingXUtilities.updateAllComponentTreeUIs();
+            }
+        };
+        bar.add(new JButton(remove));
+        return bar;
+    }
+
     public static void main(String[] args) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 try {
                     setLookAndFeel("Nimbus");
+                    Object alternate = UIManager.getLookAndFeelDefaults().remove("Table.alternateRowColor");
+                    LOG.info("removed? got color " + UIManager.getColor("Table.alternateRowColor") + alternate);
                 } catch (Exception e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();

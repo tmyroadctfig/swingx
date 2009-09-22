@@ -97,6 +97,7 @@ import org.jdesktop.swingx.decorator.ResetDTCRColorHighlighter;
 import org.jdesktop.swingx.decorator.UIDependent;
 import org.jdesktop.swingx.event.TableColumnModelExtListener;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
+import org.jdesktop.swingx.plaf.TableAddon;
 import org.jdesktop.swingx.plaf.UIManagerExt;
 import org.jdesktop.swingx.renderer.AbstractRenderer;
 import org.jdesktop.swingx.renderer.CheckBoxProvider;
@@ -211,7 +212,27 @@ import org.jdesktop.swingx.table.TableColumnModelExt;
  * setForeground/setBackground. The hack is applied by default which might lead
  * to unexpected side-effects in custom renderers subclassing DTCR. See
  * {@link #resetDefaultTableCellRendererHighlighter} for details.
+ * <p>
  * 
+ * <b>Note</b>: by default JXTable disables the alternate row striping provided
+ * by Nimbus, instead it does use the color provided by Nimbus to configure the
+ * UIColorHighlighter. Like in any other LAF without striping support, 
+ * client code has to explicitly turn on striping by 
+ * setting a Highlighter like:
+ * 
+ * <pre><code>
+ * table.addHighlighter(HighlighterFactory.createSimpleStriping());
+ * </code></pre>
+ * 
+ * Alternatively, if client code wants to rely on the LAF provided striping
+ * support, it can set a property in the UIManager ("early" in the application
+ * lifetime to prevent JXTable to disable Nimbus handling it. In this case it is 
+ * recommended to not any of the ui-dependent Highlighters provided by the
+ * HighlighterFactory.
+ * 
+ * <pre><code>
+ * UIManager.put("Nimbus.keepAlternateRowColor", Boolean.TRUE);
+ * </code></pre>
  * 
  * <h2>Rollover</h2>
  * 
@@ -365,6 +386,7 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
     static {
         // Hack: make sure the resource bundle is loaded
         LookAndFeelAddons.getAddon();
+        LookAndFeelAddons.contribute(new TableAddon());
     }
 
     /** The CompoundHighlighter for the table. */
