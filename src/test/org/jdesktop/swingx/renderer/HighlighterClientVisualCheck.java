@@ -45,6 +45,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.ListModel;
+import javax.swing.UIManager;
 import javax.swing.table.TableModel;
 
 import org.jdesktop.swingx.InteractiveTestCase;
@@ -83,12 +84,13 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
     
     
     public static void main(String args[]) {
+        UIManager.put("Nimbus.keepAlternateRowColor", Boolean.TRUE);
 //      setSystemLF(true);
       HighlighterClientVisualCheck test = new HighlighterClientVisualCheck();
       try {
-          setLookAndFeel("Nimbus");
-         test.runInteractiveTests();
-//         test.runInteractiveTests(".*Tool.*");
+//          setLookAndFeel("Nimbus");
+//         test.runInteractiveTests();
+         test.runInteractiveTests(".*Simple.*");
 //         test.runInteractiveTests("interactive.*Search.*");
 //         test.runInteractiveTests("interactive.*BorderHighlighter");
       } catch (Exception e) {
@@ -97,6 +99,7 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
       }
   }
 
+    
     /**
      * Show variants of border Highlighters.
      *
@@ -686,6 +689,17 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
     
 
 //--------------------- factory    
+    /**
+     * Simple ui-striping.
+     *
+     */
+    public void interactiveSimpleStripingUI() {
+        JXTable table = new JXTable(tableModel);
+        table.setVisibleRowCount(table.getRowCount() + 3);
+        table.addHighlighter(HighlighterFactory.createSimpleStriping());
+        showWithScrollingInFrame(table, "Simple ui striping");
+    }
+
     /**
      * shows the effect of a simple striping highlighter on a 
      * colored table.
