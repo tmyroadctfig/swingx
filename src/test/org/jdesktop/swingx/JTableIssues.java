@@ -7,6 +7,7 @@
 
 package org.jdesktop.swingx;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -44,6 +45,7 @@ import javax.swing.UIManager;
 import javax.swing.event.RowSorterEvent;
 import javax.swing.event.TableModelEvent;
 import javax.swing.plaf.ColorUIResource;
+import javax.swing.plaf.UIResource;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
@@ -79,7 +81,7 @@ public class JTableIssues extends InteractiveTestCase {
 //        test.runInteractiveTests();
 //          test.runInteractiveTests("interactive.*ColumnControl.*");
 //          test.runInteractiveTests("interactive.*Edit.*");
-          test.runInteractiveTests("interactive.*NimbusL.*");
+          test.runInteractiveTests("interactive.*NimbusP.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
@@ -91,6 +93,7 @@ public class JTableIssues extends InteractiveTestCase {
     @BeforeClass
     protected void setUp() throws Exception {
         super.setUp();
+        setLookAndFeel("Nimbus");
         
     }
 
@@ -98,7 +101,6 @@ public class JTableIssues extends InteractiveTestCase {
     //------------ Nimbus
     
     public void interactiveNimbusLabelBackground() throws Exception {
-        setLookAndFeel("Metal");
         final JLabel uiLabel = new JLabel("use ColorUIResource");
         uiLabel.setOpaque(true);
         uiLabel.setBackground(new ColorUIResource(Color.WHITE));
@@ -136,6 +138,7 @@ public class JTableIssues extends InteractiveTestCase {
         alternate.setName(ALTERNATE_ROW_COLOR);
         alternate.setOpaque(true);
         alternate.setBackground(UIManager.getColor(ALTERNATE_ROW_COLOR));
+//        assertTrue(UIManager.getColor(ALTERNATE_ROW_COLOR) instanceof UIResource);
         JComponent panel = new JPanel();
         panel.add(label);
         panel.add(alternate);
@@ -167,6 +170,9 @@ public class JTableIssues extends InteractiveTestCase {
         final JTable core = new JTable(new AncientSwingTeam());
         final JXTable table = new JXTable(core.getModel());
         JXFrame frame = wrapWithScrollingInFrame(core, table, "core <--> xtable: Gridlines?");
+        JLabel label = new JLabel("got something, just a label opaque ...");
+        label.setOpaque(true);
+        frame.add(label, BorderLayout.SOUTH);
         Action action = new AbstractAction("toggle grid") {
             
             @Override
@@ -185,16 +191,25 @@ public class JTableIssues extends InteractiveTestCase {
             
             @Override
             public void actionPerformed(ActionEvent e) {
+                Color color = UIManager.getColor(ALTERNATE_ROW_COLOR);
+                LOG.info("alternate uiresource? " + (color instanceof UIResource) + color);
                 core.updateUI();
                 table.updateUI();
+                core.repaint();
+                table.repaint();
             }
         };
         addAction(frame, updateUI);
+//        NimbusDefaults d;
         Action alternate = new AbstractAction("alternate back") {
             
             @Override
             public void actionPerformed(ActionEvent e) {
-               UIManager.put(ALTERNATE_ROW_COLOR, Color.RED);
+                Color color = UIManager.getColor(ALTERNATE_ROW_COLOR);
+                LOG.info("alternate uiresource? " + (color instanceof UIResource) + color);
+                UIManager.put(ALTERNATE_ROW_COLOR, 
+                        new ColorUIResource(color != null ? color : Color.RED));
+//               UIManager.put(ALTERNATE_ROW_COLOR, Color.RED);
                updateUI.actionPerformed(null);
             }
         };
