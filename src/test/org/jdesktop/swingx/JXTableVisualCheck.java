@@ -21,6 +21,7 @@ import java.awt.event.FocusEvent;
 import java.text.Format;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
@@ -114,6 +115,34 @@ public class JXTableVisualCheck extends JXTableUnitTest {
 //        setLookAndFeel("Nimbus");
     }
 
+    /**
+     * Trying to make null biggest value.
+     * 
+     * Can't do - nulls don't reach the comparator.
+     */
+    public void interactiveSortWithNull() {
+        JXTable table = new JXTable(createAscendingModel(1, 20));
+        for (int i = 0; i < table.getRowCount(); i+=2) {
+            table.setValueAt(null, i, 0);
+        }
+        Comparator<?> comparator = new Comparator<Object>() {
+
+            @Override
+            public int compare(Object o1, Object o2) {
+                if (o1 == null) {
+                    if (o2 == null) return 0;
+                    return 1;
+                }
+                if (o2 == null) {
+                    return -1;
+                }
+                return ((Integer) o1).compareTo((Integer) o2);
+            }
+            
+        };
+        table.getColumnExt(0).setComparator(comparator);
+        showWithScrollingInFrame(table, "nulls");
+    }
     /**
      * Quick check of sort order cycle (including pathologicals)
      */
