@@ -33,6 +33,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import javax.swing.AbstractAction;
+import javax.swing.CellRendererPane;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JViewport;
@@ -919,6 +920,43 @@ public class JXCollapsiblePane extends JXPanel {
                 ((JComponent) c).setOpaque(true);
             }
         }
+
+        /**
+         * {@inheritDoc} <p>
+         * 
+         * Overridden to not have JViewPort behaviour (that is scroll the view)
+         * but delegate to parent scrollRectToVisible just a JComponent does.<p>
+         * 
+         * 
+         */
+//        @Override
+//        public void scrollRectToVisible(Rectangle aRect) {
+//            // PENDING JW: this is a quick fix for Issue 1181-swingx
+//            // need to revisit if it has side-effects
+//            Container parent;
+//            int dx = getX(), dy = getY();
+//
+//            for (parent = getParent();
+//                     !(parent == null) &&
+//                     !(parent instanceof JComponent) &&
+//                     !(parent instanceof CellRendererPane);
+//                 parent = parent.getParent()) {
+//                 Rectangle bounds = parent.getBounds();
+//
+//                 dx += bounds.x;
+//                 dy += bounds.y;
+//            }
+//
+//            if (!(parent == null) && !(parent instanceof CellRendererPane)) {
+//                aRect.x += dx;
+//                aRect.y += dy;
+//
+//                ((JComponent)parent).scrollRectToVisible(aRect);
+//                aRect.x -= dx;
+//                aRect.y -= dy;
+//            }
+//        }
+        
     }
 
 // TEST CASE
