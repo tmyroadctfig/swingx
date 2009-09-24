@@ -31,6 +31,7 @@ import java.util.logging.Logger;
 import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 
 import org.jdesktop.swingx.action.AbstractActionExt;
@@ -53,6 +54,31 @@ public class JXTaskPaneIssues extends InteractiveTestCase {
         }
     }
     
+    /**
+     * Issue #1181-swingx: scrollRectToVisible not effective if component in JXTaskPane.
+     * 
+     * example adapted from tjwolf,
+     * http://forums.java.net/jive/thread.jspa?threadID=66759&tstart=0
+     */
+    public void interactiveScrollRectToVisible() {
+        final JXTree tree = new JXTree();
+        tree.expandAll();
+        JXTaskPane pane = new JXTaskPane();
+        pane.add(tree);
+        JComponent component = new JPanel(new BorderLayout());
+        component.add(pane);
+        JXFrame frame = wrapWithScrollingInFrame(component, "scroll to last row must work");
+        Action action = new AbstractActionExt("scrollToLastRow") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                tree.scrollRowToVisible(tree.getRowCount()- 1);
+            }
+        };
+        addAction(frame, action);
+        // small dimension, make sure there is something to scroll
+        show(frame, 300, 200);
+    }
     
     /**
      * Trying to resize a top-level window on collapsed state changes of a taskpane.
