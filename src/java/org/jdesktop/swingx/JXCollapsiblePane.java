@@ -458,6 +458,21 @@ public class JXCollapsiblePane extends JXPanel {
     public void setAnimated(boolean animated) {
         if (animated != useAnimation) {
             useAnimation = animated;
+            
+            if (!animated) {
+            	if (animateTimer.isRunning()) {
+            		//TODO should we listen for animation state change?
+            		//yes, but we're best off creating a UI delegate for these changes
+            		SwingUtilities.invokeLater(new Runnable() {
+						@Override
+						public void run() {
+							currentDimension = -1;
+						}
+					});
+            	} else {
+            		currentDimension = -1;
+            	}
+            }
             firePropertyChange("animated", !useAnimation, useAnimation);
         }
     }
