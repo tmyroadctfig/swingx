@@ -89,6 +89,29 @@ public class JXCollapsiblePaneVisualCheck extends InteractiveTestCase {
     	frame.setVisible(true);
     }
     
+    
+    /**
+     * Test case for bug 1076.
+     */
+    public void interactiveAnimationSizingTest() {
+    	JPanel panel = new JPanel(new BorderLayout());
+    	
+    	final JXCollapsiblePane collPane = new JXCollapsiblePane();
+    	collPane.setCollapsed(true);
+    	collPane.add(new JLabel("hello!"));
+    	collPane.setAnimated(false); // critical statement
+
+    	panel.add(collPane, BorderLayout.NORTH);
+
+		JButton button = new JButton("coll/exp");
+		button.addActionListener(collPane.getActionMap().get(
+				JXCollapsiblePane.TOGGLE_ACTION));
+
+		panel.add(button, BorderLayout.CENTER);
+		
+		showInFrame(panel, "Animation Sizing Test");
+    }
+    
     /**
      * do nothing test - keep the testrunner happy.
      */
