@@ -944,36 +944,14 @@ public class JXCollapsiblePane extends JXPanel {
          * 
          * Overridden to not have JViewPort behaviour (that is scroll the view)
          * but delegate to parent scrollRectToVisible just a JComponent does.<p>
-         * 
-         * 
          */
-//        @Override
-//        public void scrollRectToVisible(Rectangle aRect) {
-//            // PENDING JW: this is a quick fix for Issue 1181-swingx
-//            // need to revisit if it has side-effects
-//            Container parent;
-//            int dx = getX(), dy = getY();
-//
-//            for (parent = getParent();
-//                     !(parent == null) &&
-//                     !(parent instanceof JComponent) &&
-//                     !(parent instanceof CellRendererPane);
-//                 parent = parent.getParent()) {
-//                 Rectangle bounds = parent.getBounds();
-//
-//                 dx += bounds.x;
-//                 dy += bounds.y;
-//            }
-//
-//            if (!(parent == null) && !(parent instanceof CellRendererPane)) {
-//                aRect.x += dx;
-//                aRect.y += dy;
-//
-//                ((JComponent)parent).scrollRectToVisible(aRect);
-//                aRect.x -= dx;
-//                aRect.y -= dy;
-//            }
-//        }
+        @Override
+        public void scrollRectToVisible(Rectangle aRect) {
+        	//avoids JViewport's implementation
+        	//by using JXCollapsiblePane's it will delegate upward
+        	//getting any core fixes, by avoiding c&p
+        	JXCollapsiblePane.this.scrollRectToVisible(aRect);
+        }
         
     }
 

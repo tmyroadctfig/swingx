@@ -31,7 +31,10 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 
 import org.jdesktop.swingx.JXCollapsiblePane.Direction;
 
@@ -141,6 +144,31 @@ public class JXCollapsiblePaneVisualCheck extends InteractiveTestCase {
 		panel.add(button, BorderLayout.CENTER);
 		
 		showInFrame(panel, "Focus Test");
+    }
+    
+    /**
+     * Test case for bug 1181. scrollXXXToVisible does not work.
+     */
+    public void interactiveScrollToVisibleTest() {
+    	JPanel panel = new JPanel(new BorderLayout());
+    	
+    	JXCollapsiblePane pane = new JXCollapsiblePane();
+    	pane.setScrollableTracksViewportHeight(false);
+		panel.add(new JScrollPane(pane), BorderLayout.SOUTH);
+    	
+    	final JXTree tree = new JXTree();
+    	pane.add(tree);
+    	
+    	JXFindBar find = new JXFindBar(tree.getSearchable());
+    	panel.add(find, BorderLayout.CENTER);
+    	
+    	showInFrame(panel, "Scroll Rect To Visible Test");
+    	
+    	SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				tree.expandAll();
+			}
+		});
     }
 
     /**
