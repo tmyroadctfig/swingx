@@ -21,7 +21,11 @@
 package org.jdesktop.swingx;
 
 import java.awt.BorderLayout;
+import java.awt.EventQueue;
 import java.awt.GridLayout;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -103,7 +107,7 @@ public class JXCollapsiblePaneVisualCheck extends InteractiveTestCase {
 
     	panel.add(collPane, BorderLayout.NORTH);
 
-		JButton button = new JButton("coll/exp");
+		JButton button = new JButton("Toggle");
 		button.addActionListener(collPane.getActionMap().get(
 				JXCollapsiblePane.TOGGLE_ACTION));
 
@@ -112,6 +116,33 @@ public class JXCollapsiblePaneVisualCheck extends InteractiveTestCase {
 		showInFrame(panel, "Animation Sizing Test");
     }
     
+    /**
+     * Test case for bug 1087.  Hidden components should not have focus.
+     */
+    public void interactiveFocusTest() {
+    	JPanel panel = new JPanel(new BorderLayout());
+    	
+    	final JXCollapsiblePane instance = new JXCollapsiblePane();
+    	panel.add(instance, BorderLayout.SOUTH);
+    	
+        JButton paneButton = new JButton("I do nothing");
+        paneButton.addFocusListener(new FocusAdapter() {
+            public void focusGained(FocusEvent e) {
+            	if (instance.isCollapsed()) {
+            		fail("Why am i getting focus?!");
+            	}
+            }
+        });
+        instance.add(paneButton);
+        
+		JButton button = new JButton("Toggle");
+		button.addActionListener(instance.getActionMap().get(
+				JXCollapsiblePane.TOGGLE_ACTION));
+		panel.add(button, BorderLayout.CENTER);
+		
+		showInFrame(panel, "Focus Test");
+    }
+
     /**
      * do nothing test - keep the testrunner happy.
      */
