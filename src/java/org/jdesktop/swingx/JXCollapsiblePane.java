@@ -573,10 +573,12 @@ public class JXCollapsiblePane extends JXPanel {
 
                     setAnimationParams(new AnimationParams(30, delta, 0.01f, 1.0f));
                     animator.reinit(dimension, preferredDimension);
+                    wrapper.getView().setVisible(true);
                     animateTimer.start();
                 }
             } else {
                 wrapper.collapsedState = collapsed;
+                wrapper.getView().setVisible(!collapsed);
                 revalidate();
             }
             repaint();
@@ -787,6 +789,7 @@ public class JXCollapsiblePane extends JXPanel {
                         return;
                     } else {
                         wrapper.collapsedState = true;
+                        wrapper.getView().setVisible(false);
                         JXCollapsiblePane.this.firePropertyChange(ANIMATION_STATE_KEY, null,
                                                                   "collapsed");
                     }
