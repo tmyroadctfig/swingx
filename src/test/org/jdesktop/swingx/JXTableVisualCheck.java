@@ -15,11 +15,6 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
-import java.text.Format;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
@@ -34,7 +29,6 @@ import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -51,7 +45,6 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 
-import org.jdesktop.swingx.JXTable.NumberEditor;
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.decorator.AbstractHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
@@ -67,7 +60,6 @@ import org.jdesktop.swingx.search.SearchFactory;
 import org.jdesktop.swingx.sort.DefaultSortController;
 import org.jdesktop.swingx.table.ColumnFactory;
 import org.jdesktop.swingx.table.DatePickerCellEditor;
-import org.jdesktop.swingx.table.NumberEditorExt;
 import org.jdesktop.swingx.table.TableColumnExt;
 import org.jdesktop.swingx.treetable.FileSystemModel;
 import org.jdesktop.test.AncientSwingTeam;
@@ -88,7 +80,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
       JXTableVisualCheck test = new JXTableVisualCheck();
       try {
 //        test.runInteractiveTests();
-          test.runInteractiveTests("interactive.*Sort.*");
+          test.runInteractiveTests("interactive.*FloatingPoint.*");
 //          test.runInteractiveTests("interactive.*Header.*");
 //          test.runInteractiveTests("interactive.*ColumnProp.*");
 //          test.runInteractiveTests("interactive.*Multiple.*");
@@ -403,101 +395,6 @@ public class JXTableVisualCheck extends JXTableUnitTest {
 
 
  
-    /**
-     * Issue #393-swingx: localized NumberEditor.
-     * 
-     * Playing ... looks working :-)
-     *
-     *  
-     */
-    public void interactiveFloatingPointEditor(){
-        DefaultTableModel model = new DefaultTableModel(
-                new String[] {"Double-core", "Double-ext", "Integer-core", "Integer-ext", "Object"}, 10) {
-
-            @Override
-            public Class<?> getColumnClass(int columnIndex) {
-                if ((columnIndex == 0) || (columnIndex == 1)) {
-                    return Double.class;
-                }
-                if ((columnIndex == 2) || (columnIndex == 3)){
-                    return Integer.class;
-                }
-                return Object.class;
-            }
-            
-        };
-        final JXTable table = new JXTable(model);
-        table.setSurrendersFocusOnKeystroke(true);
-        table.setValueAt(10.2, 0, 0);
-        table.setValueAt(10.2, 0, 1);
-        table.setValueAt(10, 0, 2);
-        table.setValueAt(10, 0, 3);
-        
-        NumberEditor numberEditor = new NumberEditor();
-        table.getColumn(0).setCellEditor(numberEditor);
-        table.getColumn(2).setCellEditor(numberEditor);
-        showWithScrollingInFrame(table, "Extended NumberEditors (col 1/3)");
-    }
-
-    /**
-     *  Issue #??-swingx: default number editor shows 3 digits only.
-     *  
-     *  Compare with plain JFromattedTextField and default NumberFormat - same. 
-     *  To see, type a number with fractional digits > 3 in the first text field
-     *  and press commit or transfer focus away. 
-     */
-    public void interactiveFloatingPointEditorDigits(){
-        DefaultTableModel model = new DefaultTableModel(
-                new String[] {"Double-default", "Double-customMaxDigits"}, 10) {
-
-            @Override
-            public Class<?> getColumnClass(int columnIndex) {
-                if ((columnIndex == 0) || (columnIndex == 1)) {
-                    return Double.class;
-                }
-                if ((columnIndex == 2) || (columnIndex == 3)){
-                    return Integer.class;
-                }
-                return Object.class;
-            }
-            
-        };
-        final JXTable table = new JXTable(model);
-        table.setSurrendersFocusOnKeystroke(true);
-        table.setValueAt(10.2, 0, 0);
-        table.setValueAt(10.2, 0, 1);
-        NumberFormat moreFractionalDigits = NumberFormat.getInstance();
-        moreFractionalDigits.setMaximumFractionDigits(20);
-        NumberEditorExt numberEditor = new NumberEditorExt(moreFractionalDigits);
-        table.getColumn(1).setCellEditor(numberEditor);
-        JXFrame frame = showWithScrollingInFrame(table, "Extended NumberEditors (col 1/3)");
-        Format format = NumberFormat.getInstance();
-        final JFormattedTextField field = new JFormattedTextField(format);
-        field.setColumns(10);
-        final JFormattedTextField target = new JFormattedTextField(format);
-        target.setColumns(10);
-        field.addActionListener(new ActionListener() {
-
-            public void actionPerformed(ActionEvent e) {
-                target.setValue(field.getValue());
-                LOG.info("value: " + field.getValue());
-            }
-            
-        });
-        FocusAdapter focusAdapter = new FocusAdapter() {
-
-            @Override
-            public void focusLost(FocusEvent e) {
-                LOG.info("field value: " + field.getValue());
-                LOG.info("table value: " + table.getValueAt(0, 1));
-            }
-            
-        };
-        field.addFocusListener(focusAdapter);
-        table.addFocusListener(focusAdapter);
-        addStatusComponent(frame, field);
-        addStatusComponent(frame, target);
-    }
     /**
      * Issue #417-swingx: disable default find.
      *
