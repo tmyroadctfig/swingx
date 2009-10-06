@@ -24,7 +24,6 @@ import java.awt.Color;
 import java.awt.Component;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.lang.reflect.InvocationTargetException;
 import java.text.NumberFormat;
 import java.text.ParseException;
 
@@ -85,10 +84,39 @@ public class NumberEditorExt extends DefaultCellEditor {
     
     @Override
     public boolean stopCellEditing() {
-        // If the user tries to tab out of the field, the textField will call stopCellEditing().
-        // Check for a valid edit, and don't let the focus leave until the edit is valid.
-        if (!((JFormattedTextField) editorComponent).isEditValid()) return false;
+        if (!isValid()) return false;
         return super.stopCellEditing();
+    }
+    
+    /**
+     * Returns a boolean indicating whether the current text is valid for
+     * instantiating the expected Number type.
+     * 
+     * @return true if text is valid, false otherwise.
+     */
+    protected boolean isValid() {
+        if (!getComponent().isEditValid()) return false;
+        try {
+            getNumber();
+            return true;
+        } catch (Exception ex) {
+            
+        }
+        return false;
+    }
+    
+    /**
+     * Returns the editor value as number. May fail for a variety of reasons,
+     * as it forces parsing of the current text as well as reflective construction
+     * of the target type.
+     * 
+     * @return the editor value or null
+     * @throws Exception if creation of the expected type fails in some way.
+     */
+    protected Number getNumber() throws Exception {
+        Number number = (Number) super.getCellEditorValue();
+        if (number==null) return null;
+        return (Number) constructor.newInstance(new Object[]{number.toString()});
     }
     
     /** Override and set the border back to normal in case there was an error previously */
@@ -112,26 +140,37 @@ public class NumberEditorExt extends DefaultCellEditor {
         return super.getTableCellEditorComponent(table, value, isSelected, row, column);
     }
     
+    /**
+     * {@inheritDoc} <p>
+     * 
+     * Overridden to instantiate a Number of the expected type. Note that this
+     * may throw a IllegalStateException if invoked without querying 
+     * for a valid value with stopCellEditing. This should not happen during
+     * normal usage.
+     * 
+     * @throws IllegalStateException if current value invalid
+     * 
+     */
     @Override
-    public Object getCellEditorValue() {
-        Number number = (Number) super.getCellEditorValue();
-        if (number==null) return null;
-        // we use a String value as an intermediary between the Number object returned by the 
-        // the NumberFormat and the kind of Object the column wants.
+    public Number getCellEditorValue() throws IllegalStateException {
         try {
-            return constructor.newInstance(new Object[]{number.toString()});
-        } catch (IllegalArgumentException ex) {
-            throw new RuntimeException("NumberEditor not propertly configured", ex);
-        } catch (InstantiationException ex) {
-            throw new RuntimeException("NumberEditor not propertly configured", ex);
-        } catch (IllegalAccessException ex) {
-            throw new RuntimeException("NumberEditor not propertly configured", ex);
-        } catch (InvocationTargetException ex) {
-            throw new RuntimeException("NumberEditor not propertly configured", ex);
-        }
+            return getNumber();
+        } catch (Exception ex) {
+            throw new IllegalStateException("Number conversion not possible from " +
+            		"current string " + getComponent().getText());
+        } 
     }
 
 
+    /**
+     * {@inheritDoc} <p>
+     * 
+     * Convenience override with type cast.
+     */
+    @Override
+    public JFormattedTextField getComponent() {
+        return (JFormattedTextField) super.getComponent();
+    }
     /**
      * Use a static method so that we can do some stuff before calling the
      * superclass.
