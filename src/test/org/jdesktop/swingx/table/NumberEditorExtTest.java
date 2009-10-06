@@ -57,7 +57,7 @@ import org.junit.runners.JUnit4;
 @RunWith(JUnit4.class)
 public class NumberEditorExtTest extends InteractiveTestCase {
 
-    private static final String TOO_BIG_INTEGER = "1111111111111111111111";
+    private static final String TOO_BIG_INTEGER = "11111111111111111111111111";
 
     
     @SuppressWarnings("unused")
@@ -87,42 +87,48 @@ public class NumberEditorExtTest extends InteractiveTestCase {
         field.setText(TOO_BIG_INTEGER);
         try {
             field.commitEdit();
+            LOG.info("field: " + field.getValue());
         } catch (ParseException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
-    @Test
-    public void testNumberFormatter() {
+    @Test (expected = ParseException.class)
+    public void testNumberFormatter() throws ParseException {
         NumberFormat format = NumberFormat.getIntegerInstance();
         NumberFormatter formatter = new NumberFormatter(format);
         formatter.setMaximum(Integer.MAX_VALUE - 1);
         formatter.setMinimum(Integer.MIN_VALUE + 1);
-//        formatter.setValueClass(Integer.class);
-        formatter.setAllowsInvalid(false);
-        try {
-            Number number = (Number) formatter.stringToValue(TOO_BIG_INTEGER);
-            assertTrue(number instanceof Integer);
-            LOG.info("too big: " + number );
-        } catch (ParseException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        formatter.stringToValue(TOO_BIG_INTEGER);
     }
-
-    @Test
-    public void testNumberFormatInteger() {
+    
+    
+    @Test (expected = ParseException.class)
+    public void testStrictNumberFormatterMinMax() throws ParseException {
         NumberFormat format = NumberFormat.getIntegerInstance();
-        try {
-            // this passes - everything fitting into double range is acceptable
-            Number number = format.parse(TOO_BIG_INTEGER);
-            // this blows - must fit into Integer.MIN/MAX
-            new Integer(TOO_BIG_INTEGER);
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        NumberFormatter formatter = new StrictNumberFormatter(format);
+        formatter.setMaximum(Integer.MAX_VALUE);
+        formatter.setMinimum(Integer.MIN_VALUE);
+        formatter.stringToValue(TOO_BIG_INTEGER);
     }
+    
+    @Test (expected = ParseException.class)
+    public void testStrictNumberFormatterAutoValueClass() throws ParseException {
+        NumberFormat format = NumberFormat.getIntegerInstance();
+        NumberFormatter formatter = new StrictNumberFormatter(format);
+        formatter.setValueClass(Integer.class);
+        formatter.stringToValue(TOO_BIG_INTEGER);
+    }
+    
+    @Test (expected = ParseException.class)
+    public void testStrictNumberFormatterSmallExceed() throws ParseException {
+        NumberFormat format = NumberFormat.getIntegerInstance();
+        NumberFormatter formatter = new StrictNumberFormatter(format);
+        formatter.setValueClass(Integer.class);
+        String text = new Integer(Integer.MAX_VALUE).toString() + "1";
+        formatter.stringToValue(text);
+    }
+    
     /**
      * Issue #1183-swingx: NumberEditorExt throws in getCellEditorValue if
      *   Integer (short, byte..) below/above min/max.
@@ -182,7 +188,18 @@ public class NumberEditorExtTest extends InteractiveTestCase {
      *  invokation later the value is valid is incorrect. 
      */
     public void interactiveNumberOutOfBounds() {
-        final JFormattedTextField field = new JFormattedTextField(NumberFormat.getIntegerInstance());
+        StrictNumberFormatter formatter = new StrictNumberFormatter(NumberFormat.getIntegerInstance());
+        formatter.setMaximum(Integer.MAX_VALUE);
+        formatter.setMinimum(Integer.MIN_VALUE);
+        final JFormattedTextField field = new JFormattedTextField(
+                formatter) {
+
+                    @Override
+                    protected void invalidEdit() {
+                        LOG.info("invalid .... " + getText());
+                    }
+            
+        };
         final JCheckBox validBox = new JCheckBox("valid");
         final JCheckBox editValid = new JCheckBox("edit valid");
         DocumentListener listener = new DocumentListener() {
@@ -208,7 +225,7 @@ public class NumberEditorExtTest extends InteractiveTestCase {
                     field.commitEdit();
                 } catch (ParseException e1) {
                     // TODO Auto-generated catch block
-                    e1.printStackTrace();
+//                    e1.printStackTrace();
                 }
                 LOG.info("current value " + field.getValue());
             }
@@ -256,7 +273,7 @@ public class NumberEditorExtTest extends InteractiveTestCase {
         JComponent content = Box.createVerticalBox();
         content.add(field);
         content.add(other);
-        JXFrame frame = showInFrame(content, "");
+        showInFrame(content, "");
     }
     
     /**
