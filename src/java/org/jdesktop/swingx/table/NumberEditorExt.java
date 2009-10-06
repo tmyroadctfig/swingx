@@ -40,21 +40,48 @@ import javax.swing.border.LineBorder;
 
 /**
  * 
- * Issue #393-swingx: localized NumberEditor.
+ * Issue #393-swingx: localized NumberEditor. Added feature to use StrictNumberFormatter.
  * 
  * @author Noel Grandin
+ * @author Jeanette Winzenburg
  */
 public class NumberEditorExt extends DefaultCellEditor {
     
     private static Class<?>[] argTypes = new Class[]{String.class};
     java.lang.reflect.Constructor<?> constructor;
+    private boolean useStrictFormatter;
     
+    /**
+     * Instantiates an editor with default NumberFormat and default NumberFormatter.
+     */
     public NumberEditorExt() {
         this(null);
     }
-    public NumberEditorExt(NumberFormat formatter) {
-        super(createFormattedTextField(formatter));
-        final JFormattedTextField textField = ((JFormattedTextField)getComponent());
+    
+    /**
+     * Instantiates an editor with the given NumberFormat and default NumberFormatter.
+     * 
+     * @param format the NumberFormat to use for conversion, may be null to indicate 
+     *    usage of default NumberFormat.
+     */
+    public NumberEditorExt(NumberFormat format) {
+        this(format, false);
+    }
+    
+    /**
+     * Instantiates an editor with the given NumberFormat and NumberFormatter depending on
+     * useStrictFormatter.
+     * 
+     * @param format the NumberFormat to use for conversion, may be null to indicate
+     *    usage of default NumberFormat
+     * @param useStrictFormatter if true, uses a StrictNumberFormatter, else uses
+     *    default NumberFormatter
+     */
+    public NumberEditorExt(NumberFormat format, boolean useStrictFormatter) {
+        
+        super(useStrictFormatter ? createFormattedTextFieldX(format) : createFormattedTextField(format));
+        this.useStrictFormatter = useStrictFormatter;
+        final JFormattedTextField textField = getComponent();
         
         textField.setName("Table.editor");
         textField.setHorizontalAlignment(JTextField.RIGHT);
@@ -65,15 +92,14 @@ public class NumberEditorExt extends DefaultCellEditor {
         delegate = new EditorDelegate() {
                 @Override
                 public void setValue(Object value) {
-                    ((JFormattedTextField)getComponent()).setValue(value);
+                    getComponent().setValue(value);
                 }
 
                 @Override
                 public Object getCellEditorValue() {
-                    JFormattedTextField textField = ((JFormattedTextField)getComponent());
                     try {
-                        textField.commitEdit();
-                        return textField.getValue();
+                        getComponent().commitEdit();
+                        return getComponent().getValue();
                     } catch (ParseException ex) {
                         return null;
                     }
@@ -97,7 +123,8 @@ public class NumberEditorExt extends DefaultCellEditor {
     protected boolean isValid() {
         if (!getComponent().isEditValid()) return false;
         try {
-            getNumber();
+            if (!useStrictFormatter)
+                getNumber();
             return true;
         } catch (Exception ex) {
             
@@ -116,7 +143,8 @@ public class NumberEditorExt extends DefaultCellEditor {
     protected Number getNumber() throws Exception {
         Number number = (Number) super.getCellEditorValue();
         if (number==null) return null;
-        return (Number) constructor.newInstance(new Object[]{number.toString()});
+        return useStrictFormatter ? number :
+            (Number) constructor.newInstance(new Object[]{number.toString()});
     }
     
     /** Override and set the border back to normal in case there was an error previously */
@@ -133,6 +161,8 @@ public class NumberEditorExt extends DefaultCellEditor {
                 throw new IllegalStateException("NumberEditor can only handle subclasses of java.lang.Number");
             }
             constructor = type.getConstructor(argTypes);
+            if (useStrictFormatter)
+                ((StrictNumberFormatter) getComponent().getFormatter()).setValueClass(type);
         }
         catch (Exception ex) {
             throw new IllegalStateException("Number subclass must have a constructor which takes a string", ex);
@@ -171,7 +201,66 @@ public class NumberEditorExt extends DefaultCellEditor {
     public JFormattedTextField getComponent() {
         return (JFormattedTextField) super.getComponent();
     }
+    
     /**
+     * Creates and returns a JFormattedTextField configured with SwingX extended
+     * NumberFormat and StrictNumberFormatter. This method is called if
+     * the constructor parameter useStrictFormatter is true.
+     * 
+     * Use a static method so that we can do some stuff before calling the
+     * superclass.
+     */
+    private static JFormattedTextField createFormattedTextFieldX(
+            NumberFormat format) {
+        StrictNumberFormatter formatter = new StrictNumberFormatter(new NumberFormatExt(format));
+        final JFormattedTextField textField = new JFormattedTextField(
+                formatter);
+        /*
+         * FIXME: I am sure there is a better way to do this, but I don't know
+         * what it is. JTable sets up a binding for the ESCAPE key, but
+         * JFormattedTextField overrides that binding with it's own. Remove the
+         * JFormattedTextField binding.
+         */
+        InputMap map = textField.getInputMap();
+        while (map != null) {
+            map.remove(KeyStroke.getKeyStroke("pressed ESCAPE"));
+            map = map.getParent();
+        }
+        /*
+         * Set an input verifier to prevent the cell losing focus when the value
+         * is invalid
+         */
+        textField.setInputVerifier(new InputVerifier() {
+            @Override
+            public boolean verify(JComponent input) {
+                JFormattedTextField ftf = (JFormattedTextField) input;
+                return ftf.isEditValid();
+            }
+        });
+        /*
+         * The formatted text field will not call stopCellEditing() until the
+         * value is valid. So do the red border thing here.
+         */
+        textField.addPropertyChangeListener("editValid",
+                new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent evt) {
+                if (evt.getNewValue() == Boolean.TRUE) {
+                    ((JFormattedTextField) evt.getSource())
+                    .setBorder(new LineBorder(Color.black));
+                } else {
+                    ((JFormattedTextField) evt.getSource())
+                    .setBorder(new LineBorder(Color.red));
+                }
+            }
+        });
+        return textField;
+    }
+    
+    
+    /**
+     * Creates and returns a JFormattedTextField configured with defaults. This
+     * method is called if the contructor useStrictFormatter is false.<p> 
+     * 
      * Use a static method so that we can do some stuff before calling the
      * superclass.
      */

@@ -71,6 +71,22 @@ class StrictNumberFormatter extends NumberFormatter {
         if (getValueClass() == Integer.class) {
             max = Integer.MAX_VALUE;
             min = Integer.MIN_VALUE;
+        } else if (getValueClass() == Long.class) {
+            max = Long.MAX_VALUE;
+            min = Long.MIN_VALUE;
+        } else if (getValueClass() == Short.class) {
+            max = Short.MAX_VALUE;
+            min = Short.MIN_VALUE;
+        } else if (getValueClass() == Byte.class) {
+            max = Byte.MAX_VALUE;
+            min = Byte.MIN_VALUE;
+        } else if (getValueClass() == Float.class) {
+            max = Float.MAX_VALUE;
+            min = Float.MIN_VALUE;
+        } else if (getValueClass() == Double.class) {
+            // don*t understand what's happening here, naive compare with bigDecimal 
+            // fails - so don't do anything for now
+            // JW: revisit!
         }
         setMaximum(max);
         setMinimum(min);
