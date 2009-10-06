@@ -67,8 +67,8 @@ public class NumberEditorExtTest extends InteractiveTestCase {
     public static void main(String[] args) {
         NumberEditorExtTest test = new NumberEditorExtTest();
         try {
-//            test.runInteractiveTests();
-            test.runInteractiveTests("interactive.*Number.*");
+            test.runInteractiveTests();
+//            test.runInteractiveTests("interactive.*Number.*");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -113,7 +113,7 @@ public class NumberEditorExtTest extends InteractiveTestCase {
     }
     
     @Test (expected = ParseException.class)
-    public void testStrictNumberFormatterAutoValueClass() throws ParseException {
+    public void testStrictNumberFormatterAutoRangeInteger() throws ParseException {
         NumberFormat format = NumberFormat.getIntegerInstance();
         NumberFormatter formatter = new StrictNumberFormatter(format);
         formatter.setValueClass(Integer.class);
@@ -121,14 +121,68 @@ public class NumberEditorExtTest extends InteractiveTestCase {
     }
     
     @Test (expected = ParseException.class)
-    public void testStrictNumberFormatterSmallExceed() throws ParseException {
+    public void testStrictNumberFormatterAutoRangeLong() throws ParseException {
+        NumberFormat format = NumberFormat.getIntegerInstance();
+        NumberFormatter formatter = new StrictNumberFormatter(format);
+        formatter.setValueClass(Long.class);
+        String text = new Long(Long.MAX_VALUE).toString() + "9";
+        formatter.stringToValue(text);
+    }
+    
+    @Test (expected = ParseException.class)
+    public void testStrictNumberFormatterAutoRangeFloat() throws ParseException {
+        NumberFormat format = NumberFormat.getInstance();
+        NumberFormatter formatter = new StrictNumberFormatter(format);
+        formatter.setValueClass(Float.class);
+        String text = "9" + new Float(Float.MAX_VALUE).toString();
+        formatter.stringToValue(text);
+    }
+    
+//    @Test (expected = ParseException.class)
+//    public void testStrictNumberFormatterAutoRangeDouble() throws ParseException {
+//        NumberFormat format = NumberFormat.getInstance();
+//        NumberFormatter formatter = new StrictNumberFormatter(format);
+//        formatter.setValueClass(Double.class);
+//        String text = "9" + new Double(Double.MAX_VALUE).toString();
+//        formatter.stringToValue(text);
+//    }
+    
+    /**
+     * Move to issues - core ...
+     */
+//    @Test (expected = ParseException.class)
+//    public void testStrictNumberFormatterAutoRangeDouble() throws ParseException {
+//        NumberFormat format = NumberFormat.getInstance();
+//        // no need to do anything special - parsing of doubles fails if out-off range?
+//        NumberFormatter formatter = new NumberFormatter(format);
+//        String text = "9" + new Double(Double.MAX_VALUE).toString();
+//        formatter.stringToValue(text);
+//    }
+    
+    @Test (expected = ParseException.class)
+    public void testStrictNumberFormatterAutoRangeByte() throws ParseException {
+        NumberFormat format = NumberFormat.getIntegerInstance();
+        NumberFormatter formatter = new StrictNumberFormatter(format);
+        formatter.setValueClass(Byte.class);
+        formatter.stringToValue(TOO_BIG_INTEGER);
+    }
+    
+    @Test (expected = ParseException.class)
+    public void testStrictNumberFormatterAutoRangeShort() throws ParseException {
+        NumberFormat format = NumberFormat.getIntegerInstance();
+        NumberFormatter formatter = new StrictNumberFormatter(format);
+        formatter.setValueClass(Short.class);
+        formatter.stringToValue(TOO_BIG_INTEGER);
+    }
+    
+    @Test (expected = ParseException.class)
+    public void testStrictNumberFormatterSmallExceedInteger() throws ParseException {
         NumberFormat format = NumberFormat.getIntegerInstance();
         NumberFormatter formatter = new StrictNumberFormatter(format);
         formatter.setValueClass(Integer.class);
         String text = new Integer(Integer.MAX_VALUE).toString() + "1";
         formatter.stringToValue(text);
     }
-    
     /**
      * Issue #1183-swingx: NumberEditorExt throws in getCellEditorValue if
      *   Integer (short, byte..) below/above min/max.
