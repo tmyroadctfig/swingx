@@ -182,9 +182,9 @@ class StrictNumberFormatter extends NumberFormatter {
      */
     private boolean isValueInRange(Object orgValue, boolean wantsCCE) {
         if (orgValue == null) return true;
-        
+        if ((getMinimum() == null) && getMaximum() == null) return true;
+
         BigDecimal value = new BigDecimal(orgValue.toString());
-        
         Comparable<BigDecimal> min = getMinimumAsBig();
 
         try {

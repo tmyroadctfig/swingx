@@ -161,9 +161,11 @@ public class NumberEditorExt extends DefaultCellEditor {
             if (!Number.class.isAssignableFrom(type)) {
                 throw new IllegalStateException("NumberEditor can only handle subclasses of java.lang.Number");
             }
-            constructor = type.getConstructor(argTypes);
-            if (useStrictFormatter)
+            if (useStrictFormatter) {
                 ((NumberFormatter) getComponent().getFormatter()).setValueClass(type);
+            } else {
+                constructor = type.getConstructor(argTypes);
+            }
         }
         catch (Exception ex) {
             throw new IllegalStateException("Number subclass must have a constructor which takes a string", ex);
