@@ -36,6 +36,7 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.border.LineBorder;
+import javax.swing.text.NumberFormatter;
 
 
 /**
@@ -162,7 +163,7 @@ public class NumberEditorExt extends DefaultCellEditor {
             }
             constructor = type.getConstructor(argTypes);
             if (useStrictFormatter)
-                ((StrictNumberFormatter) getComponent().getFormatter()).setValueClass(type);
+                ((NumberFormatter) getComponent().getFormatter()).setValueClass(type);
         }
         catch (Exception ex) {
             throw new IllegalStateException("Number subclass must have a constructor which takes a string", ex);

@@ -110,7 +110,7 @@ class StrictNumberFormatter extends NumberFormatter {
     
     /**
      * Returns the <code>Object</code> representation of the
-     * <code>String</code> <code>text</code>.
+     * <code>String</code> <code>text</code>, may be null.
      *
      * @param text <code>String</code> to convert
      * @return <code>Object</code> representation of text
@@ -181,6 +181,8 @@ class StrictNumberFormatter extends NumberFormatter {
      *                 false is returned.
      */
     private boolean isValueInRange(Object orgValue, boolean wantsCCE) {
+        if (orgValue == null) return true;
+        
         BigDecimal value = new BigDecimal(orgValue.toString());
         
         Comparable<BigDecimal> min = getMinimumAsBig();

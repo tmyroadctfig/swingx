@@ -24,9 +24,14 @@ package org.jdesktop.swingx.table;
 import java.text.NumberFormat;
 import java.text.ParseException;
 
+import javax.swing.JFormattedTextField;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.text.InternationalFormatter;
 import javax.swing.text.NumberFormatter;
 
 import org.jdesktop.swingx.InteractiveTestCase;
+import org.jdesktop.swingx.JXTable;
+import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -37,7 +42,107 @@ import org.junit.Test;
 public class NumberEditorExtIssues extends InteractiveTestCase {
 
     private static final String TOO_BIG_INTEGER = "11111111111111111111111111";
+    private static final int INTEGER_COLUMN = 0;
+    /** a table with a model which has column class Integer in INTEGER_COLUMN. */
+    private JXTable table;
+    /** a NumberEditorExt configured with IntegerFormat. */
+    private NumberEditorExt cellEditor;
 
+
+    private NumberEditorExt cellEditorStrict;
+
+    /**
+     * Issue #1183-swingx: NumberEditorExt throws in getCellEditorValue if
+     *   Integer (short, byte..) below/above min/max.
+     *   
+     * Check IllegalStateException as doc'ed - the strict version doesn't. 
+     * Need to check the delegate implementation?
+     */
+    @Test(expected = IllegalStateException.class)
+    public void testEditorStrictValueIllegalState() {
+        JFormattedTextField field = (JFormattedTextField) cellEditorStrict
+                .getTableCellEditorComponent(table, Integer.MAX_VALUE, false, 0, INTEGER_COLUMN);
+        // add valid digit - but exceeds Integer bounds so must not return true
+        field.setText(field.getText() + "9");
+        cellEditorStrict.getCellEditorValue();
+    }
+ 
+    /**
+     * Issue ??-swingx: editor with strict number formatter throws on 
+     *    committing null value.
+     *   
+     *  happens only if active editor in table. Use non-strict for comparison.
+     *  InternationalFormatter with bounds throws as well. But not using
+     *  strict catches this in isValid, that is stopCellEditing returns false.
+     */
+    @Test
+    public void testEditorNullValue() {
+        table.getColumn(INTEGER_COLUMN).setCellEditor(cellEditor);
+        ((InternationalFormatter) cellEditor.getComponent().getFormatter()).setMinimum(0);
+        table.editCellAt(0, INTEGER_COLUMN);
+        assertTrue(cellEditor.stopCellEditing());
+    }
+    
+
+//--------------------- core issues
+    /**
+     * Formatted text field commit can't handle empty string.
+     * 
+     * @throws ParseException
+     */
+    @Test
+    public void testTextFieldWithEmptyString() throws ParseException {
+        NumberFormat format = NumberFormat.getIntegerInstance();
+        JFormattedTextField field = new JFormattedTextField(format);
+        field.setText("");
+        field.commitEdit();
+    }
+    
+    /**
+     * NumberFormatter parsing can't handle null.
+     * 
+     * @throws ParseException
+     */
+    @Test
+    public void testNumberFormatterEmptyStringValue() throws ParseException {
+        NumberFormat format = NumberFormat.getIntegerInstance();
+        NumberFormatter formatter = new NumberFormatter(format);
+        formatter.stringToValue("");
+    }
+    
+    /**
+     * NumberFormat parsing cant handle empty string.
+     * 
+     * @throws ParseException
+     */
+    @Test
+    public void testNumberFormatEmptyStringValue() throws ParseException {
+        NumberFormat format = NumberFormat.getIntegerInstance();
+        format.parse("");
+    }
+    
+    /**
+     * NumberFormatter parsing can't handle null.
+     * @throws ParseException
+     */
+    @Test
+    public void testNumberFormatterNullValue() throws ParseException {
+        NumberFormat format = NumberFormat.getIntegerInstance();
+        NumberFormatter formatter = new NumberFormatter(format);
+        formatter.stringToValue(null);
+    }
+    
+    /**
+     * NumberFormat parse can't handle null.
+     * 
+     * @throws ParseException
+     */
+    @Test
+    public void testNumberFormatNullValue() throws ParseException {
+        NumberFormat format = NumberFormat.getIntegerInstance();
+        format.parse(null);
+    }
+    
 
     @Test (expected = ParseException.class)
     public void testNumberFormatterMinMax() throws ParseException {
@@ -56,5 +161,24 @@ public class NumberEditorExtIssues extends InteractiveTestCase {
         // this blows - must fit into Integer.MIN/MAX
         new Integer(TOO_BIG_INTEGER);
     }
+    
+    @Before
+    @Override
+    public void setUp() throws Exception {
+        DefaultTableModel model = new DefaultTableModel(5, 1) {
+
+            @Override
+            public Class<?> getColumnClass(int columnIndex) {
+                if (columnIndex == INTEGER_COLUMN)
+                    return Integer.class;
+                return super.getColumnClass(columnIndex);
+            }
+            
+        };
+        table = new JXTable(model);
+        cellEditor = new NumberEditorExt(NumberFormat.getIntegerInstance());
+        cellEditorStrict = new NumberEditorExt(NumberFormat.getIntegerInstance(), true);
+    }
+
 
 }

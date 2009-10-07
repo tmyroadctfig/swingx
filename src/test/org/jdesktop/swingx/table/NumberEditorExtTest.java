@@ -80,19 +80,9 @@ public class NumberEditorExtTest extends InteractiveTestCase {
     /** a NumberEditorExt configured with IntegerFormat. */
     private NumberEditorExt cellEditor;
 
-    @Test
-    public void testNumberEditorExt() {
-        NumberFormat format = NumberFormat.getIntegerInstance();
-        JFormattedTextField field = new JFormattedTextField(new NumberEditorNumberFormat(format));
-        field.setText(TOO_BIG_INTEGER);
-        try {
-            field.commitEdit();
-            LOG.info("field: " + field.getValue());
-        } catch (ParseException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
+
+    private NumberEditorExt cellEditorStrict;
+
     @Test (expected = ParseException.class)
     public void testNumberFormatter() throws ParseException {
         NumberFormat format = NumberFormat.getIntegerInstance();
@@ -183,6 +173,7 @@ public class NumberEditorExtTest extends InteractiveTestCase {
         String text = new Integer(Integer.MAX_VALUE).toString() + "1";
         formatter.stringToValue(text);
     }
+    
     /**
      * Issue #1183-swingx: NumberEditorExt throws in getCellEditorValue if
      *   Integer (short, byte..) below/above min/max.
@@ -192,7 +183,7 @@ public class NumberEditorExtTest extends InteractiveTestCase {
     @Test
     public void testEditorValueParsing() {
         JFormattedTextField field = (JFormattedTextField) cellEditor
-                .getTableCellEditorComponent(table, 100, false, 0, INTEGER_COLUMN);
+        .getTableCellEditorComponent(table, 100, false, 0, INTEGER_COLUMN);
         // add valid digit
         field.setText(field.getText() + "9");
         assertTrue("valid input " + field.getText(), cellEditor.stopCellEditing());
@@ -205,15 +196,48 @@ public class NumberEditorExtTest extends InteractiveTestCase {
      * Issue #1183-swingx: NumberEditorExt throws in getCellEditorValue if
      *   Integer (short, byte..) below/above min/max.
      *   
+     *  Sanity: checks that stopCellEditing returns false on parsing errors, use strict.   
+     */
+    @Test
+    public void testEditorStrictValueParsing() {
+        JFormattedTextField field = (JFormattedTextField) cellEditorStrict
+                .getTableCellEditorComponent(table, 100, false, 0, INTEGER_COLUMN);
+        // add valid digit
+        field.setText(field.getText() + "9");
+        assertTrue("valid input " + field.getText(), cellEditorStrict.stopCellEditing());
+        // add invalid character
+        field.setText(field.getText() + "x");
+        assertFalse("invalid input " + field.getText(), cellEditorStrict.stopCellEditing());
+    }
+    
+    /**
+     * Issue #1183-swingx: NumberEditorExt throws in getCellEditorValue if
+     *   Integer (short, byte..) below/above min/max.
+     *   
      * Check that stopCellEditing returns false if bounds exceeded.
      */
     @Test
     public void testEditorValueExceedBounds() {
         JFormattedTextField field = (JFormattedTextField) cellEditor
-            .getTableCellEditorComponent(table, Integer.MAX_VALUE, false, 0, INTEGER_COLUMN);
+        .getTableCellEditorComponent(table, Integer.MAX_VALUE, false, 0, INTEGER_COLUMN);
         // add valid digit - but exceeds Integer bounds so must not return true
         field.setText(field.getText() + "9");
         assertFalse("valid input but exceeds bounds " + field.getText(), cellEditor.stopCellEditing());
+    }
+    
+    /**
+     * Issue #1183-swingx: NumberEditorExt throws in getCellEditorValue if
+     *   Integer (short, byte..) below/above min/max.
+     *   
+     * Check that stopCellEditing returns false if bounds exceeded, use strict
+     */
+    @Test
+    public void testEditorStrictValueExceedBounds() {
+        JFormattedTextField field = (JFormattedTextField) cellEditorStrict
+            .getTableCellEditorComponent(table, Integer.MAX_VALUE, false, 0, INTEGER_COLUMN);
+        // add valid digit - but exceeds Integer bounds so must not return true
+        field.setText(field.getText() + "9");
+        assertFalse("valid input but exceeds bounds " + field.getText(), cellEditorStrict.stopCellEditing());
     }
     
     /**
@@ -225,11 +249,37 @@ public class NumberEditorExtTest extends InteractiveTestCase {
     @Test(expected = IllegalStateException.class)
     public void testEditorValueIllegalState() {
         JFormattedTextField field = (JFormattedTextField) cellEditor
-                .getTableCellEditorComponent(table, Integer.MAX_VALUE, false, 0, INTEGER_COLUMN);
+        .getTableCellEditorComponent(table, Integer.MAX_VALUE, false, 0, INTEGER_COLUMN);
         // add valid digit - but exceeds Integer bounds so must not return true
         field.setText(field.getText() + "9");
         cellEditor.getCellEditorValue();
     }
+    /**
+     * Issue ??-swingx: editor with strict number formatter throws on 
+     *    committing null value.
+     *   
+     *  happens only if active editor in table, so this test fails 
+     */
+    @Test
+    public void testEditorStrictNullValue() {
+        table.getColumn(INTEGER_COLUMN).setCellEditor(cellEditorStrict);
+        table.editCellAt(0, INTEGER_COLUMN);
+        cellEditorStrict.stopCellEditing();
+    }
+    
+    /**
+     * Issue ??-swingx: editor with strict number formatter throws on 
+     *    committing null value.
+     *   
+     */
+    @Test
+    public void testEditorStrictNullValueStandAlone() {
+        cellEditorStrict
+            .getTableCellEditorComponent(table, null, false, 0, INTEGER_COLUMN);
+        cellEditorStrict.getCellEditorValue();
+    }
+
+//----------------- interactive
     
     /**
      * Issue #1183-swingx: NumberEditorExt throws in getCellEditorValue if
@@ -334,35 +384,50 @@ public class NumberEditorExtTest extends InteractiveTestCase {
      * Issue #393-swingx: localized NumberEditor.
      * 
      * Playing ... looks working :-)
-     *
-     *  
+     * 
+     * 
      */
-    public void interactiveFloatingPointEditor(){
-        DefaultTableModel model = new DefaultTableModel(
-                new String[] {"Double-core", "Double-ext", "Integer-core", "Integer-ext", "Object"}, 10) {
+    public void interactiveFloatingPointEditor() {
+        final int doubleColumns = 3;
+        final int integerColumns = 6;
+        DefaultTableModel model = new DefaultTableModel(new String[] {
+                "Double-core", "Double-ext", "Double-extstrict", 
+                "Integer-core", "Integer-ext", "Integer-extstrict",
+                "Object" }, 10) {
 
             @Override
             public Class<?> getColumnClass(int columnIndex) {
-                if ((columnIndex == 0) || (columnIndex == 1)) {
+                if (columnIndex < doubleColumns) {
                     return Double.class;
                 }
-                if ((columnIndex == 2) || (columnIndex == 3)){
+                if (columnIndex < integerColumns) {
                     return Integer.class;
+
                 }
                 return Object.class;
             }
-            
+
         };
         final JXTable table = new JXTable(model);
         table.setSurrendersFocusOnKeystroke(true);
-        table.setValueAt(10.2, 0, 0);
-        table.setValueAt(10.2, 0, 1);
-        table.setValueAt(10, 0, 2);
-        table.setValueAt(10, 0, 3);
-        
+        for (int i = 0; i < table.getColumnCount(); i++) {
+            if (i < doubleColumns) {
+                table.setValueAt(10.2, 0, i);
+            } else {
+                table.setValueAt(10, 0, i);
+
+            }
+
+        }
+        // table.setValueAt(10.2, 0, 1);
+        // table.setValueAt(10, 0, 3);
+
         NumberEditor numberEditor = new NumberEditor();
         table.getColumn(0).setCellEditor(numberEditor);
-        table.getColumn(2).setCellEditor(numberEditor);
+        table.getColumn(doubleColumns).setCellEditor(numberEditor);
+        NumberEditorExt strictEditor = new NumberEditorExt(null, true);
+        table.getColumn(doubleColumns -1).setCellEditor(strictEditor);
+        table.getColumn(integerColumns -1).setCellEditor(strictEditor);
         showWithScrollingInFrame(table, "Extended NumberEditors (col 1/3)");
     }
 
@@ -374,34 +439,35 @@ public class NumberEditorExtTest extends InteractiveTestCase {
      *  and press commit or transfer focus away. 
      */
     public void interactiveFloatingPointEditorDigits(){
+        final int doubleColumns = 4;
         DefaultTableModel model = new DefaultTableModel(
-                new String[] {"Double-default", "Double-customMaxDigits"}, 10) {
+                new String[] {"Double-default", "Double-customMaxDigits", "Double-ext", "Double-customMaxDigits"}, 10) {
 
             @Override
             public Class<?> getColumnClass(int columnIndex) {
-                if ((columnIndex == 0) || (columnIndex == 1)) {
+                if (columnIndex < doubleColumns) {
                     return Double.class;
                 }
-                if ((columnIndex == 2) || (columnIndex == 3)){
-                    return Integer.class;
-                }
-                return Object.class;
+                return Integer.class;
             }
             
         };
         final JXTable table = new JXTable(model);
         table.setSurrendersFocusOnKeystroke(true);
-        table.setValueAt(10.2, 0, 0);
-        table.setValueAt(10.2, 0, 1);
+        for (int i = 0; i < doubleColumns; i++) {
+            table.setValueAt(10.123456789, 0, i);
+        }
         NumberFormat moreFractionalDigits = NumberFormat.getInstance();
         moreFractionalDigits.setMaximumFractionDigits(20);
         NumberEditorExt numberEditor = new NumberEditorExt(moreFractionalDigits);
         table.getColumn(1).setCellEditor(numberEditor);
+        table.getColumn(2).setCellEditor(new NumberEditorExt(null, true));
+        table.getColumn(3).setCellEditor(new NumberEditorExt(moreFractionalDigits, true));
         JXFrame frame = showWithScrollingInFrame(table, "Extended NumberEditors (col 1/3)");
         Format format = NumberFormat.getInstance();
         final JFormattedTextField field = new JFormattedTextField(format);
         field.setColumns(10);
-        final JFormattedTextField target = new JFormattedTextField(format);
+        final JFormattedTextField target = new JFormattedTextField(moreFractionalDigits);
         target.setColumns(10);
         field.addActionListener(new ActionListener() {
 
@@ -441,6 +507,7 @@ public class NumberEditorExtTest extends InteractiveTestCase {
         };
         table = new JXTable(model);
         cellEditor = new NumberEditorExt(NumberFormat.getIntegerInstance());
+        cellEditorStrict = new NumberEditorExt(NumberFormat.getIntegerInstance(), true);
     }
 
     
