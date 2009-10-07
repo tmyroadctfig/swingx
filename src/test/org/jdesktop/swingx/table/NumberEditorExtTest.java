@@ -391,10 +391,8 @@ public class NumberEditorExtTest extends InteractiveTestCase {
         model.setValueAt(new BigDecimal("44444444444444.666666666666666666"), 0, 6);
         final JXTable table = new JXTable(model);
         table.setSurrendersFocusOnKeystroke(true);
-        NumberEditorExt strictEditor = new NumberEditorExt(null, true);
+        NumberEditorExt strictEditor = new NumberEditorExt(true);
         table.setDefaultEditor(Number.class, strictEditor);
-        table.setDefaultEditor(Double.class, strictEditor);
-        table.setDefaultEditor(Float.class, strictEditor);
         showWithScrollingInFrame(table, "Extended NumberEditors: number class");
     }
     
@@ -425,7 +423,7 @@ public class NumberEditorExtTest extends InteractiveTestCase {
         model.setValueAt(new BigDecimal("44444444444444.666666666666666666"), 0, 6);
         final JXTable table = new JXTable(model);
         table.setSurrendersFocusOnKeystroke(true);
-        NumberEditorExt strictEditor = new NumberEditorExt(null, true);
+        NumberEditorExt strictEditor = new NumberEditorExt(true);
         table.setDefaultEditor(Number.class, strictEditor);
         table.setDefaultEditor(Double.class, strictEditor);
         table.setDefaultEditor(Float.class, strictEditor);
@@ -466,7 +464,7 @@ public class NumberEditorExtTest extends InteractiveTestCase {
         NumberEditor numberEditor = new NumberEditor();
         table.getColumn(0).setCellEditor(numberEditor);
         table.getColumn(doubleColumns).setCellEditor(numberEditor);
-        NumberEditorExt strictEditor = new NumberEditorExt(null, true);
+        NumberEditorExt strictEditor = new NumberEditorExt(true);
         table.getColumn(doubleColumns -1).setCellEditor(strictEditor);
         table.getColumn(integerColumns -1).setCellEditor(strictEditor);
         showWithScrollingInFrame(table, "Extended NumberEditors: Number.class");
@@ -513,7 +511,7 @@ public class NumberEditorExtTest extends InteractiveTestCase {
         NumberEditor numberEditor = new NumberEditor();
         table.getColumn(0).setCellEditor(numberEditor);
         table.getColumn(doubleColumns).setCellEditor(numberEditor);
-        NumberEditorExt strictEditor = new NumberEditorExt(null, true);
+        NumberEditorExt strictEditor = new NumberEditorExt(true);
         table.getColumn(doubleColumns -1).setCellEditor(strictEditor);
         table.getColumn(integerColumns -1).setCellEditor(strictEditor);
         showWithScrollingInFrame(table, "Extended NumberEditors: Double/Integer");
@@ -550,7 +548,7 @@ public class NumberEditorExtTest extends InteractiveTestCase {
         moreFractionalDigits.setMaximumFractionDigits(20);
         NumberEditorExt numberEditor = new NumberEditorExt(moreFractionalDigits);
         table.getColumn(1).setCellEditor(numberEditor);
-        table.getColumn(2).setCellEditor(new NumberEditorExt(null, true));
+        table.getColumn(2).setCellEditor(new NumberEditorExt(true));
         table.getColumn(3).setCellEditor(new NumberEditorExt(moreFractionalDigits, true));
         JXFrame frame = showWithScrollingInFrame(table, "Extended NumberEditors: Doubles");
         Format format = NumberFormat.getInstance();

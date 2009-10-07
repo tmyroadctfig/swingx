@@ -70,6 +70,17 @@ public class NumberEditorExt extends DefaultCellEditor {
     }
     
     /**
+     * Instantiates an editor with default NumberFormat and NumberFormatter depending
+     * on useStrictFormatter.
+     * 
+     * @param useStrictFormatter if true, uses a StrictNumberFormatter, else uses
+     *    default NumberFormatter
+     */
+    public NumberEditorExt(boolean useStrictFormatter) {
+        this(null, useStrictFormatter);
+    }
+    
+    /**
      * Instantiates an editor with the given NumberFormat and NumberFormatter depending on
      * useStrictFormatter.
      * 
