@@ -23,6 +23,7 @@ package org.jdesktop.swingx.table;
 
 import java.text.NumberFormat;
 import java.text.ParseException;
+import java.util.logging.Logger;
 
 import javax.swing.JFormattedTextField;
 import javax.swing.table.DefaultTableModel;
@@ -33,14 +34,20 @@ import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXTable;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
 /**
  * TODO add type doc
  * 
  * @author Jeanette Winzenburg
  */
+@RunWith(JUnit4.class)
 public class NumberEditorExtIssues extends InteractiveTestCase {
-
+    @SuppressWarnings("unused")
+    private static final Logger LOG = Logger
+            .getLogger(NumberEditorExtIssues.class.getName());
+    
     private static final String TOO_BIG_INTEGER = "11111111111111111111111111";
     private static final int INTEGER_COLUMN = 0;
     /** a table with a model which has column class Integer in INTEGER_COLUMN. */
@@ -85,6 +92,20 @@ public class NumberEditorExtIssues extends InteractiveTestCase {
     
 
 //--------------------- core issues
+
+    /**
+     * This is not really an issue: Double values exceeding the bounds are Infinity.
+     */
+    @Test (expected = ParseException.class)
+    public void testNumberFormatterDouble() throws ParseException {
+        NumberFormat format = NumberFormat.getInstance();
+        // no need to do anything special - parsing of doubles fails if out-off range?
+        NumberFormatter formatter = new NumberFormatter(format);
+        String text = "9" + new Double(Double.MAX_VALUE).toString();
+        Number number = (Number) formatter.stringToValue(text);
+        LOG.info("number: " + number);
+    }
+
     /**
      * Formatted text field commit can't handle empty string.
      * 
@@ -157,7 +178,7 @@ public class NumberEditorExtIssues extends InteractiveTestCase {
     public void testNumberFormatInteger() throws ParseException {
         NumberFormat format = NumberFormat.getIntegerInstance();
         // this passes - everything fitting into double range is acceptable
-        Number number = format.parse(TOO_BIG_INTEGER);
+        format.parse(TOO_BIG_INTEGER);
         // this blows - must fit into Integer.MIN/MAX
         new Integer(TOO_BIG_INTEGER);
     }
