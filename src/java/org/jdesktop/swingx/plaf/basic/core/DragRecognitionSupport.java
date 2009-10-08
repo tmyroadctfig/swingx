@@ -32,7 +32,9 @@ import java.awt.Toolkit;
 import java.awt.event.*;
 import java.awt.dnd.DragSource;
 import javax.swing.*;
-import sun.awt.dnd.SunDragSourceContextPeer;
+
+import org.jdesktop.swingx.SwingXUtilities;
+//import sun.awt.dnd.SunDragSourceContextPeer;
 import sun.awt.AppContext;
 
 /**
@@ -110,8 +112,8 @@ public class DragRecognitionSupport {
         if (th == null || !SwingUtilities.isLeftMouseButton(me)) {
             return TransferHandler.NONE;
         }
-
-        return SunDragSourceContextPeer.
+        // PENDING JW: c'p from SunDragSourceContextPeer
+        return SwingXUtilities.
             convertModifiersToDropAction(me.getModifiersEx(),
                                          th.getSourceActions(component));
     }
