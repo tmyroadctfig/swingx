@@ -2403,6 +2403,7 @@ public class BasicXListUI  extends BasicListUI
                 else {
                     // casting should be safe since the action is only enabled
                     // for DefaultListSelectionModel
+                    if (lsm instanceof DefaultListSelectionModel)
                     ((DefaultListSelectionModel)lsm).moveLeadSelectionIndex(index);
                 }
             }
