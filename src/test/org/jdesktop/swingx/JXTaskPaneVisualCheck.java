@@ -22,8 +22,6 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.Locale;
 import java.util.logging.Logger;
 
@@ -64,32 +62,6 @@ public class JXTaskPaneVisualCheck extends InteractiveTestCase {
         }
     }
 
-    /**
-     * Trying to resize a top-level window on collapsed state changes of a taskpane.
-     * Need to listen to "animationState" which is fired when animation is complete.
-     * 
-     * Note: works only if animated is true (see Issue ??
-     */
-    public void interactiveDialogWithCollapsible() {
-        JXTaskPane pane = new JXTaskPane();
-        pane.setTitle("Just a TaskPane with animated property false");
-        final JXDialog dialog = new JXDialog(pane);
-        PropertyChangeListener l = new PropertyChangeListener() {
-
-            public void propertyChange(PropertyChangeEvent evt) {
-                if ("animationState".equals(evt.getPropertyName())) {
-                    dialog.pack();
-                }
-            }
-            
-        };
-        pane.addPropertyChangeListener(l);
-        pane.add(new JLabel("to have some content"));
-        dialog.setTitle("pack on expand/collapse");
-        dialog.pack();
-        dialog.setVisible(true);
-    }
-    
 
     public void interactiveMnemonic() {
         JXTaskPane pane = new JXTaskPane();

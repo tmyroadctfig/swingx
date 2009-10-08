@@ -61,7 +61,7 @@ public class JXCollapsiblePaneVisualCheck extends InteractiveTestCase {
 
     
     /**
-     * Issue #??-swingx: inconsistent change notification of "animatedState"
+     * Issue #1185-swingx: inconsistent change notification of "animatedState"
      * 
      * Depends on value of animated: fired only if true, nothing happens on false
      * 
@@ -69,10 +69,36 @@ public class JXCollapsiblePaneVisualCheck extends InteractiveTestCase {
      * Trying to resize a top-level window on collapsed state changes of a taskpane.
      * Need to listen to "animationState" which is fired when animation is complete.
      */
-    public void interactiveDialogWithCollapsible() {
+    public void interactiveDialogWithCollapsibleFalse() {
         JXTaskPane pane = new JXTaskPane();
         pane.setAnimated(false);
         pane.setTitle("Just a TaskPane with animated property false");
+        final JXDialog dialog = new JXDialog(pane);
+        PropertyChangeListener l = new PropertyChangeListener() {
+
+            public void propertyChange(PropertyChangeEvent evt) {
+                if ("animationState".equals(evt.getPropertyName())) {
+                    dialog.pack();
+                }
+            }
+            
+        };
+        pane.addPropertyChangeListener(l);
+        pane.add(new JLabel("to have some content"));
+        dialog.setTitle("pack on expand/collapse");
+        dialog.pack();
+        dialog.setVisible(true);
+    }
+    
+    /**
+     * Trying to resize a top-level window on collapsed state changes of a taskpane.
+     * Need to listen to "animationState" which is fired when animation is complete.
+     * 
+     * Note: works only if animated is true (see Issue #1185-swingx)
+     */
+    public void interactiveDialogWithCollapsibleTrue() {
+        JXTaskPane pane = new JXTaskPane();
+        pane.setTitle("Just a TaskPane with animated property true");
         final JXDialog dialog = new JXDialog(pane);
         PropertyChangeListener l = new PropertyChangeListener() {
 
