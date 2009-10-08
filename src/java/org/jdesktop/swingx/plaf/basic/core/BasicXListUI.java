@@ -41,6 +41,7 @@ import java.awt.geom.Point2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
+import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.CellRendererPane;
 import javax.swing.DefaultListCellRenderer;
@@ -68,12 +69,14 @@ import javax.swing.plaf.basic.BasicListUI;
 import javax.swing.text.Position;
 
 import org.jdesktop.swingx.JXList;
+import org.jdesktop.swingx.SwingXUtilities;
+import org.jdesktop.swingx.UIAction;
 import org.jdesktop.swingx.plaf.LookAndFeelUtils;
 import org.jdesktop.swingx.plaf.basic.core.DragRecognitionSupport.BeforeDrag;
 
 import sun.swing.DefaultLookup;
-import sun.swing.SwingUtilities2;
-import sun.swing.UIAction;
+//import sun.swing.SwingUtilities2;
+//import sun.swing.UIAction;
 
 /**
  * An extensible implementation of {@code ListUI} for JXList.
@@ -1976,7 +1979,7 @@ public class BasicXListUI  extends BasicListUI
      * extend the selection from the anchor to the next index. */
     private static final int EXTEND_SELECTION = 2;
 
-
+    // PENDING JW: this is not a complete replacement of sun.UIAction ...
     private static class Actions extends UIAction {
         private static final String SELECT_PREVIOUS_COLUMN =
                                     "selectPreviousColumn";
@@ -2231,7 +2234,7 @@ public class BasicXListUI  extends BasicListUI
                     list.setSelectionInterval(0, size - 1);
 
                     // this is done to restore the anchor and lead
-                    SwingUtilities2.setLeadAnchorWithoutSelection(lsm, anchor, lead);
+                    SwingXUtilities.setLeadAnchorWithoutSelection(lsm, anchor, lead);
 
                     list.setValueIsAdjusting(false);
                 }
@@ -2865,7 +2868,7 @@ public class BasicXListUI  extends BasicListUI
         private boolean dragPressDidSelection;
 
         public void mousePressed(MouseEvent e) {
-            if (SwingUtilities2.shouldIgnore(e, list)) {
+            if (SwingXUtilities.shouldIgnore(e, list)) {
                 return;
             }
 
@@ -2874,7 +2877,8 @@ public class BasicXListUI  extends BasicListUI
 
             // different behavior if drag is enabled
             if (dragEnabled) {
-                int row = SwingUtilities2.loc2IndexFileList(list, e.getPoint());
+                // PENDING JW: this isn't aware of sorting/filtering - fix!
+                int row = SwingXUtilities.loc2IndexFileList(list, e.getPoint());
                 // if we have a valid row and this is a drag initiating event
                 if (row != -1 && DragRecognitionSupport.mousePressed(e)) {
                     dragPressDidSelection = false;
@@ -2903,14 +2907,15 @@ public class BasicXListUI  extends BasicListUI
             }
 
             if (grabFocus) {
-                SwingUtilities2.adjustFocus(list);
+                SwingXUtilities.adjustFocus(list);
             }
 
             adjustSelection(e);
         }
 
         private void adjustSelection(MouseEvent e) {
-            int row = SwingUtilities2.loc2IndexFileList(list, e.getPoint());
+            // PENDING JW: this isn't aware of sorting/filtering - fix!
+            int row = SwingXUtilities.loc2IndexFileList(list, e.getPoint());
             if (row < 0) {
                 // If shift is down in multi-select, we should do nothing.
                 // For single select or non-shift-click, clear the selection
@@ -2957,13 +2962,14 @@ public class BasicXListUI  extends BasicListUI
 
         public void dragStarting(MouseEvent me) {
             if (me.isControlDown()) {
-                int row = SwingUtilities2.loc2IndexFileList(list, me.getPoint());
+                // PENDING JW: this isn't aware of sorting/filtering - fix!
+                int row = SwingXUtilities.loc2IndexFileList(list, me.getPoint());
                 list.addSelectionInterval(row, row);
             }
         }
 
         public void mouseDragged(MouseEvent e) {
-            if (SwingUtilities2.shouldIgnore(e, list)) {
+            if (SwingXUtilities.shouldIgnore(e, list)) {
                 return;
             }
 
@@ -2994,14 +3000,14 @@ public class BasicXListUI  extends BasicListUI
         }
 
         public void mouseReleased(MouseEvent e) {
-            if (SwingUtilities2.shouldIgnore(e, list)) {
+            if (SwingXUtilities.shouldIgnore(e, list)) {
                 return;
             }
 
             if (list.getDragEnabled()) {
                 MouseEvent me = DragRecognitionSupport.mouseReleased(e);
                 if (me != null) {
-                    SwingUtilities2.adjustFocus(list);
+                    SwingXUtilities.adjustFocus(list);
                     if (!dragPressDidSelection) {
                         adjustSelection(me);
                     }
