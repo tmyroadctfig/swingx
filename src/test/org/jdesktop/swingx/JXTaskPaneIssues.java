@@ -51,7 +51,6 @@ public class JXTaskPaneIssues extends InteractiveTestCase {
         }
     }
     
-    
 
     /**
      * Quick check to see if hidden comps receive a keybinding (no).
