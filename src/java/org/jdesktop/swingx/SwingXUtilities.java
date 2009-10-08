@@ -507,4 +507,38 @@ public final class SwingXUtilities {
             component.requestFocus();
     }
 
+    public static int convertModifiersToDropAction(int modifiers,
+            int sourcActions) {
+        // PENDING JW: c'p from a decompiled SunDragSourceContextPeer
+        // PENDING JW: haha ... completely readable, right ;-)
+        int i = 0;
+
+        switch (modifiers & 0xC0) {
+        case 192:
+            i = 1073741824;
+            break;
+        case 128:
+            i = 1;
+            break;
+        case 64:
+            i = 2;
+            break;
+        default:
+            if ((sourcActions & 0x2) != 0) {
+                i = 2;
+                break;
+            }
+            if ((sourcActions & 0x1) != 0) {
+                i = 1;
+                break;
+            }
+            if ((sourcActions & 0x40000000) == 0)
+                break;
+            i = 1073741824;
+        }
+
+        // label88:
+        return (i & sourcActions);
+    }
+
 }
