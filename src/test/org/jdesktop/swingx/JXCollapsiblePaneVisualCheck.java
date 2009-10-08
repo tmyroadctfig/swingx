@@ -21,22 +21,23 @@
 package org.jdesktop.swingx;
 
 import java.awt.BorderLayout;
-import java.awt.EventQueue;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 
+import javax.swing.Action;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
 import org.jdesktop.swingx.JXCollapsiblePane.Direction;
+import org.jdesktop.swingx.action.AbstractActionExt;
 
 /**
  * @author Karl George Schaefer
@@ -130,6 +131,7 @@ public class JXCollapsiblePaneVisualCheck extends InteractiveTestCase {
     	
         JButton paneButton = new JButton("I do nothing");
         paneButton.addFocusListener(new FocusAdapter() {
+            @Override
             public void focusGained(FocusEvent e) {
             	if (instance.isCollapsed()) {
             		fail("Why am i getting focus?!");
@@ -169,6 +171,33 @@ public class JXCollapsiblePaneVisualCheck extends InteractiveTestCase {
 				tree.expandAll();
 			}
 		});
+    }
+
+    /**
+     * Issue #1181-swingx: scrollRectToVisible not effective if component in JXTaskPane.
+     * Yet another one for the same issue - moved from TaskPaneIssues.
+     * 
+     * example adapted from tjwolf,
+     * http://forums.java.net/jive/thread.jspa?threadID=66759&tstart=0
+     */
+    public void interactiveScrollRectToVisible() {
+        final JXTree tree = new JXTree();
+        tree.expandAll();
+        JXTaskPane pane = new JXTaskPane();
+        pane.add(tree);
+        JComponent component = new JPanel(new BorderLayout());
+        component.add(pane);
+        JXFrame frame = wrapWithScrollingInFrame(component, "scroll to last row must work");
+        Action action = new AbstractActionExt("scrollToLastRow") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                tree.scrollRowToVisible(tree.getRowCount()- 1);
+            }
+        };
+        addAction(frame, action);
+        // small dimension, make sure there is something to scroll
+        show(frame, 300, 200);
     }
 
     /**

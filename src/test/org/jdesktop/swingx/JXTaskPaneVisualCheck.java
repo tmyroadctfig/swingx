@@ -22,15 +22,22 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.Locale;
+import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JScrollPane;
+import javax.swing.KeyStroke;
+
+import org.jdesktop.swingx.action.AbstractActionExt;
 
 /**
  * Simple tests to ensure that the {@code JXTaskPane} can be instantiated and
@@ -39,12 +46,16 @@ import javax.swing.JScrollPane;
  * @author rah003
  */
 public class JXTaskPaneVisualCheck extends InteractiveTestCase {
+    
+    @SuppressWarnings("unused")
+    private static final Logger LOG = Logger
+            .getLogger(JXTaskPaneVisualCheck.class.getName());
+    
     public JXTaskPaneVisualCheck() {
         super("JXLoginPane Test");
     }
 
     public static void main(String[] args) throws Exception {
-        // setSystemLF(true);
         JXTaskPaneVisualCheck test = new JXTaskPaneVisualCheck();
         
         try {
@@ -56,6 +67,43 @@ public class JXTaskPaneVisualCheck extends InteractiveTestCase {
             e.printStackTrace();
         }
     }
+
+    /**
+     * Trying to resize a top-level window on collapsed state changes of a taskpane.
+     * Need to listen to "animationState" which is fired when animation is complete.
+     */
+    public void interactiveDialogWithCollapsible() {
+        JXTaskPane pane = new JXTaskPane();
+        pane.setTitle("dummy ... with a looooooooooooong title");
+        Action action = new AbstractActionExt("something to click") {
+
+            public void actionPerformed(ActionEvent e) {
+                LOG.info("got me");
+            }
+            
+        };
+        JComponent button = (JComponent) pane.add(action);
+        Object actionKey = "dummy";
+        button.getActionMap().put(actionKey, action);
+        KeyStroke keyStroke = KeyStroke.getKeyStroke("F3");
+        button.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(keyStroke, actionKey);
+        final JXDialog dialog = new JXDialog(pane);
+        PropertyChangeListener l = new PropertyChangeListener() {
+
+            public void propertyChange(PropertyChangeEvent evt) {
+                if ("animationState".equals(evt.getPropertyName())) {
+                    dialog.pack();
+                }
+            }
+            
+        };
+        pane.addPropertyChangeListener(l);
+        dialog.setTitle("pack on expand/collapse");
+        dialog.pack();
+        dialog.setVisible(true);
+    }
+    
+
     public void interactiveMnemonic() {
         JXTaskPane pane = new JXTaskPane();
         pane.setTitle("Use Me");
