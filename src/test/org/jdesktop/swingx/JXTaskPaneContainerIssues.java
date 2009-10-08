@@ -21,6 +21,8 @@
  */
 package org.jdesktop.swingx;
 
+import java.util.logging.Logger;
+
 import junit.framework.TestCase;
 
 /**
@@ -28,7 +30,11 @@ import junit.framework.TestCase;
  * @author Jeanette Winzenburg
  */
 public class JXTaskPaneContainerIssues extends TestCase {
+    @SuppressWarnings("unused")
+    private static final Logger LOG = Logger
+            .getLogger(JXTaskPaneContainerIssues.class.getName());
     
+
     /**
      * Empty test method to keep the test runner happy if we have no 
      * open issues.

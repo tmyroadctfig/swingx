@@ -28,16 +28,12 @@ import java.util.Locale;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JScrollPane;
-import javax.swing.KeyStroke;
-
-import org.jdesktop.swingx.action.AbstractActionExt;
 
 /**
  * Simple tests to ensure that the {@code JXTaskPane} can be instantiated and
@@ -71,22 +67,12 @@ public class JXTaskPaneVisualCheck extends InteractiveTestCase {
     /**
      * Trying to resize a top-level window on collapsed state changes of a taskpane.
      * Need to listen to "animationState" which is fired when animation is complete.
+     * 
+     * Note: works only if animated is true (see Issue ??
      */
     public void interactiveDialogWithCollapsible() {
         JXTaskPane pane = new JXTaskPane();
-        pane.setTitle("dummy ... with a looooooooooooong title");
-        Action action = new AbstractActionExt("something to click") {
-
-            public void actionPerformed(ActionEvent e) {
-                LOG.info("got me");
-            }
-            
-        };
-        JComponent button = (JComponent) pane.add(action);
-        Object actionKey = "dummy";
-        button.getActionMap().put(actionKey, action);
-        KeyStroke keyStroke = KeyStroke.getKeyStroke("F3");
-        button.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(keyStroke, actionKey);
+        pane.setTitle("Just a TaskPane with animated property false");
         final JXDialog dialog = new JXDialog(pane);
         PropertyChangeListener l = new PropertyChangeListener() {
 
@@ -98,6 +84,7 @@ public class JXTaskPaneVisualCheck extends InteractiveTestCase {
             
         };
         pane.addPropertyChangeListener(l);
+        pane.add(new JLabel("to have some content"));
         dialog.setTitle("pack on expand/collapse");
         dialog.pack();
         dialog.setVisible(true);
