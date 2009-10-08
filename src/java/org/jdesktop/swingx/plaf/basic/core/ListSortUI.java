@@ -31,9 +31,10 @@ import javax.swing.event.RowSorterEvent;
 import javax.swing.event.RowSorterListener;
 
 import org.jdesktop.swingx.JXList;
+import org.jdesktop.swingx.SwingXUtilities;
 import org.jdesktop.swingx.util.Contract;
 
-import sun.swing.SwingUtilities2;
+//import sun.swing.SwingUtilities2;
 
 /**
  * ListSortUI provides support for managing the synchronization between
@@ -180,7 +181,7 @@ public final class ListSortUI {
             }
             modelIndex = convertRowIndexToModel(sortEvent,
                     viewSelection.getLeadSelectionIndex());
-            SwingUtilities2.setLeadAnchorWithoutSelection(
+            SwingXUtilities.setLeadAnchorWithoutSelection(
                     modelSelection, modelIndex, modelIndex);
         } else if (modelSelection == null) {
             // Sorting changed, haven't cached selection in terms
@@ -275,7 +276,7 @@ public final class ListSortUI {
             if (viewLeadIndex != -1) {
                 viewLeadIndex = sorter.convertRowIndexToView(viewLeadIndex);
             }
-            SwingUtilities2.setLeadAnchorWithoutSelection(
+            SwingXUtilities.setLeadAnchorWithoutSelection(
                     viewSelection, viewLeadIndex, viewLeadIndex);
             viewSelection.setValueIsAdjusting(false);
         }
@@ -309,7 +310,7 @@ public final class ListSortUI {
                                                     selection[i]);
             }
         }
-        SwingUtilities2.setLeadAnchorWithoutSelection(
+        SwingXUtilities.setLeadAnchorWithoutSelection(
                 selectionModel, lead, lead);
         selectionModel.setValueIsAdjusting(false);
     }

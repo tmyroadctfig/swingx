@@ -23,9 +23,13 @@ package org.jdesktop.swingx;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.Window;
 import java.awt.event.InputEvent;
+import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.io.StringReader;
 import java.lang.reflect.Method;
@@ -33,8 +37,12 @@ import java.util.Locale;
 
 import javax.swing.InputMap;
 import javax.swing.JComponent;
+import javax.swing.JList;
 import javax.swing.JPopupMenu;
 import javax.swing.KeyStroke;
+import javax.swing.ListCellRenderer;
+import javax.swing.ListModel;
+import javax.swing.ListSelectionModel;
 import javax.swing.MenuElement;
 import javax.swing.RepaintManager;
 import javax.swing.SwingUtilities;
@@ -420,6 +428,83 @@ public final class SwingXUtilities {
      */
     public static boolean isUIInstallable(Object property) {
        return (property == null) || (property instanceof UIResource);
+    }
+
+//---- methods c&p'ed from SwingUtilities2 to reduce dependencies on sun packages
+    
+    /**
+     * Updates lead and anchor selection index without changing the selection.
+     * 
+     * Note: this is c&p'ed from SwingUtilities2 to not have any direct
+     * dependency.
+     * 
+     * @param selectionModel the selection model to change lead/anchor
+     * @param lead the lead selection index
+     * @param anchor the anchor selectin index
+     */
+    public static void setLeadAnchorWithoutSelection(
+            ListSelectionModel selectionModel, int lead, int anchor) {
+        if (anchor == -1) {
+            anchor = lead;
+        }
+        if (lead == -1) {
+            selectionModel.setAnchorSelectionIndex(-1);
+            selectionModel.setLeadSelectionIndex(-1);
+        } else {
+            if (selectionModel.isSelectedIndex(lead))
+                selectionModel.addSelectionInterval(lead, lead);
+            else {
+                selectionModel.removeSelectionInterval(lead, lead);
+            }
+            selectionModel.setAnchorSelectionIndex(anchor);
+        }
+    }
+
+    public static boolean shouldIgnore(MouseEvent mouseEvent,
+            JComponent component) {
+        return ((component == null) || (!(component.isEnabled()))
+                || (!(SwingUtilities.isLeftMouseButton(mouseEvent))) 
+                || (mouseEvent.isConsumed()));
+    }
+
+    
+    public static int loc2IndexFileList(JList list, Point point) {
+        int i = list.locationToIndex(point);
+        if (i != -1) {
+            Object localObject = list
+                    .getClientProperty("List.isFileList");
+            if ((localObject instanceof Boolean)
+                    && (((Boolean) localObject).booleanValue())
+    // PENDING JW: this isn't aware of sorting/filtering - fix!
+                    && (!(pointIsInActualBounds(list, i, point)))) {
+                i = -1;
+            }
+        }
+        return i;
+    }
+
+    // PENDING JW: this isn't aware of sorting/filtering - fix!
+    private static boolean pointIsInActualBounds(JList list, int index,
+            Point point) {
+        ListCellRenderer renderer = list.getCellRenderer();
+        ListModel model = list.getModel();
+        Object element = model.getElementAt(index);
+        Component comp = renderer.getListCellRendererComponent(list, element,
+                index, false, false);
+
+        Dimension prefSize = comp.getPreferredSize();
+        Rectangle cellBounds = list.getCellBounds(index, index);
+        if (!(comp.getComponentOrientation().isLeftToRight())) {
+            cellBounds.x += cellBounds.width - prefSize.width;
+        }
+        cellBounds.width = prefSize.width;
+
+        return cellBounds.contains(point);
+    }
+
+    public static void adjustFocus(JComponent component) {
+        if ((!(component.hasFocus())) && (component.isRequestFocusEnabled()))
+            component.requestFocus();
     }
 
 }
