@@ -41,7 +41,6 @@ import java.awt.geom.Point2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.CellRendererPane;
 import javax.swing.DefaultListCellRenderer;
@@ -74,7 +73,7 @@ import org.jdesktop.swingx.UIAction;
 import org.jdesktop.swingx.plaf.LookAndFeelUtils;
 import org.jdesktop.swingx.plaf.basic.core.DragRecognitionSupport.BeforeDrag;
 
-import sun.swing.DefaultLookup;
+//import sun.swing.DefaultLookup;
 //import sun.swing.SwingUtilities2;
 //import sun.swing.UIAction;
 
@@ -527,8 +526,9 @@ public class BasicXListUI  extends BasicListUI
         if (loc == null || !loc.isInsert()) {
             return;
         }
-
-        Color c = DefaultLookup.getColor(list, this, "List.dropLineColor", null);
+        // PENDING JW: revisit ... side-effects?
+//        Color c = DefaultLookup.getColor(list, this, "List.dropLineColor", null);
+        Color c = UIManager.getColor("List.dropLineColor");
         if (c != null) {
             g.setColor(c);
             Rectangle rect = getDropLineRect(loc);
@@ -851,13 +851,17 @@ public class BasicXListUI  extends BasicListUI
 
     InputMap getInputMap(int condition) {
         if (condition == JComponent.WHEN_FOCUSED) {
-            InputMap keyMap = (InputMap)DefaultLookup.get(
-                             list, this, "List.focusInputMap");
+            // PENDING JW: side-effect when reverting to ui manager? revisit!
+            InputMap keyMap = (InputMap) UIManager.get("List.focusInputMap");
+//            InputMap keyMap = (InputMap)DefaultLookup.get(
+//                             list, this, "List.focusInputMap");
             InputMap rtlKeyMap;
 
             if (isLeftToRight ||
-                ((rtlKeyMap = (InputMap)DefaultLookup.get(list, this,
-                              "List.focusInputMap.RightToLeft")) == null)) {
+                  ((rtlKeyMap = (InputMap) UIManager.get("List.focusInputMap.RightToLeft")) 
+                          == null)) {
+//                ((rtlKeyMap = (InputMap)DefaultLookup.get(list, this,
+//                              "List.focusInputMap.RightToLeft")) == null)) {
                     return keyMap;
             } else {
                 rtlKeyMap.setParent(keyMap);
