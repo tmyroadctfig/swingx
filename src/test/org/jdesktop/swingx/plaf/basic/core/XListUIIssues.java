@@ -30,11 +30,10 @@ import javax.swing.plaf.synth.SynthContext;
 
 import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXList;
+import org.jdesktop.swingx.plaf.synth.SynthUI;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-
-import sun.swing.plaf.synth.SynthUI;
 
 /**
  * Issues around ListUI replacement.<p>
