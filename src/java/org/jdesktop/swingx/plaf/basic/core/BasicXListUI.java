@@ -101,6 +101,10 @@ import org.jdesktop.swingx.plaf.basic.core.DragRecognitionSupport.BeforeDrag;
  *    which messages the list
  * <li> rename key for shared actionMap to keep core list actions separate 
  *    (just in case somebody wants both) - they point to the wrong delegate
+ * <li> replaced references to SwingUtilities2 in sun packages by references to 
+ *     c&p'ed methods in SwingXUtilities
+ * <li> replaced storage of shared Input/ActionMap in defaultLookup by direct
+ *     storage in UIManager.         
  * </ul>
  * 
  * Differences to achieve extended functionality:

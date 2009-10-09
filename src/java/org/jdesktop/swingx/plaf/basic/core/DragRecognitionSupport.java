@@ -35,14 +35,23 @@ import javax.swing.*;
 
 import org.jdesktop.swingx.SwingXUtilities;
 //import sun.awt.dnd.SunDragSourceContextPeer;
-import sun.awt.AppContext;
+//import sun.awt.AppContext;
 
 /**
  * Drag gesture recognition support for classes that have a
  * <code>TransferHandler</code>. The gesture for a drag in this class is a mouse
  * press followed by movement by <code>DragSource.getDragThreshold()</code>
  * pixels. An instance of this class is maintained per AppContext, and the
- * public static methods call into the appropriate instance.
+ * public static methods call into the appropriate instance. <p>
+ * 
+ * This is a c&p of core (package private) needed for BasicXListUI. It differs from
+ * core in that references to sun packages have been replaced.
+ * <ul>
+ * <li> a static method of SunDragSourceContextPeer has been copied into SwingXUtilities
+ *    and is used here
+ * <li> the shared instance of this class is maintained in the UIManager instead of
+ *   per appContext.
+ * </ul>
  * 
  * @author Shannon Hickey
  * @version 1.2 11/17/05
@@ -64,15 +73,21 @@ public class DragRecognitionSupport {
      * Returns the DragRecognitionSupport for the caller's AppContext.
      */
     private static DragRecognitionSupport getDragRecognitionSupport() {
-        DragRecognitionSupport support =
-            (DragRecognitionSupport)AppContext.getAppContext().
-                get(DragRecognitionSupport.class);
+//        DragRecognitionSupport support =
+//            (DragRecognitionSupport)AppContext.getAppContext().
+//                get(DragRecognitionSupport.class);
+//
+//        if (support == null) {
+//            support = new DragRecognitionSupport();
+//            AppContext.getAppContext().put(DragRecognitionSupport.class, support);
+//        }
 
+        DragRecognitionSupport support = (DragRecognitionSupport) 
+            UIManager.get("sharedInstance.dragRecognitionSupport");
         if (support == null) {
             support = new DragRecognitionSupport();
-            AppContext.getAppContext().put(DragRecognitionSupport.class, support);
+            UIManager.put("sharedInstance.dragRecognitionSupport", support);
         }
-
         return support;
     }
 

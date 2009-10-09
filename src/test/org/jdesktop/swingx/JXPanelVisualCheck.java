@@ -21,6 +21,7 @@
  */
 package org.jdesktop.swingx;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
 
 import javax.imageio.ImageIO;
@@ -45,6 +46,18 @@ public class JXPanelVisualCheck extends InteractiveTestCase {
           e.printStackTrace();
       }
   }
+    /**
+     * Issue #1187-swingx: default scrollable tracks property prevents scrolling.
+     * Problem are the implementations of scrollableTracks: they unconditionally
+     * return true, so forcing the viewport/scrollpane to the size of the contained
+     * component.
+     */
+    public void interactiveScrolling() {
+        JXPanel panel = new JXPanel(new BorderLayout());
+        panel.add(new JXTable(100, 6));
+        JXFrame frame = wrapInFrame(panel, "scrollbar must be showing");
+        show(frame, 400, 400);
+    }
 
     public void interactiveIconPainter() throws Exception {
         ImagePainter imagePainter = new ImagePainter(ImageIO.read(JXPanel.class.getResource("resources/images/kleopatra.jpg")));
