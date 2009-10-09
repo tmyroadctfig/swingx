@@ -35,7 +35,7 @@ import javax.swing.plaf.synth.SynthContext;
  * 
  * @author Jeanette Winzenburg
  */
-interface SynthUI {
+public interface SynthUI {
     
     public SynthContext getContext(JComponent arg0);
 

@@ -93,7 +93,9 @@ public class JXTaskPaneVisualCheck extends InteractiveTestCase {
      *
      */
     public void interactiveDisplay() {
-        sun.awt.AppContext.getAppContext().put("JComponent.defaultLocale", Locale.FRANCE);
+        // PENDING JW: removed while fixing #1186-swingx (no dependency on sun packages)
+        // revisit: why do we do this at all?
+//        sun.awt.AppContext.getAppContext().put("JComponent.defaultLocale", Locale.FRANCE);
         JXTaskPane panel = new JXTaskPane();
         panel.setTitle("Hi there");
         panel.setForeground(Color.RED);
