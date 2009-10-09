@@ -39,8 +39,6 @@ import javax.swing.plaf.synth.SynthStyle;
 import org.jdesktop.swingx.SwingXUtilities;
 import org.jdesktop.swingx.plaf.basic.core.BasicXListUI;
 
-import sun.swing.plaf.synth.SynthUI;
-
 /**
  * TODO add type doc
  * 
@@ -49,7 +47,7 @@ import sun.swing.plaf.synth.SynthUI;
 public class SynthXListUI extends BasicXListUI 
     // PENDING JW: SynthUI is sun package (here: used by c&p'ed SynthBorder) - replace?
     // maybe not: SynthLookUp looks up styles from delegates of type SynthUI only
-    implements SynthUI, SynthConstants /*, PropertyChangeListener */{
+    implements SynthConstants,  SynthUI  /*, PropertyChangeListener */{
 
     private SynthStyle style;
     private boolean useListColors;

@@ -38,8 +38,6 @@ import javax.swing.plaf.UIResource;
 import javax.swing.plaf.synth.SynthContext;
 import javax.swing.plaf.synth.SynthStyle;
 
-import sun.swing.plaf.synth.SynthUI;
-
 /**
  * SynthBorder is a border that delegates to a Painter. The Insets
  * are determined at construction time.<p>
@@ -126,4 +124,5 @@ class SynthBorder extends AbstractBorder implements UIResource {
     public boolean isBorderOpaque() {
         return false;
     }
+
 }
