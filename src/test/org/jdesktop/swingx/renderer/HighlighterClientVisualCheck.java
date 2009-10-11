@@ -84,13 +84,13 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
     
     
     public static void main(String args[]) {
-        UIManager.put("Nimbus.keepAlternateRowColor", Boolean.TRUE);
+//        UIManager.put("Nimbus.keepAlternateRowColor", Boolean.TRUE);
 //      setSystemLF(true);
       HighlighterClientVisualCheck test = new HighlighterClientVisualCheck();
       try {
 //          setLookAndFeel("Nimbus");
 //         test.runInteractiveTests();
-         test.runInteractiveTests(".*Simple.*");
+         test.runInteractiveTests(".*Striping.*");
 //         test.runInteractiveTests("interactive.*Search.*");
 //         test.runInteractiveTests("interactive.*BorderHighlighter");
       } catch (Exception e) {
@@ -693,6 +693,29 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
      * Simple ui-striping.
      *
      */
+    public void interactiveTreeTableSimpleStripingUI() {
+        JXTreeTable table = new JXTreeTable(new FileSystemModel());
+        table.setVisibleRowCount(table.getRowCount() + 3);
+        table.addHighlighter(HighlighterFactory.createSimpleStriping());
+        showWithScrollingInFrame(table, "Simple ui striping");
+    }
+    
+    /**
+     * shows the effect of a simple striping highlighter on a 
+     * colored table.
+     *
+     */
+    public void interactiveTreeTableSimpleStriping() {
+        JXTreeTable table = new JXTreeTable(new FileSystemModel());
+        table.setVisibleRowCount(table.getRowCount() + 3);
+        table.setBackground(new Color(0xC0FFC0));
+        table.addHighlighter(HighlighterFactory.createSimpleStriping());
+        showWithScrollingInFrame(table, "Simple gray striping");
+    }
+    /**
+     * Simple ui-striping.
+     *
+     */
     public void interactiveSimpleStripingUI() {
         JXTable table = new JXTable(tableModel);
         table.setVisibleRowCount(table.getRowCount() + 3);
@@ -708,8 +731,8 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
     public void interactiveSimpleStriping() {
         JXTable table = new JXTable(tableModel);
         table.setVisibleRowCount(table.getRowCount() + 3);
-        table.setBackground(Color.YELLOW);
-        table.addHighlighter(HighlighterFactory.createSimpleStriping(Color.LIGHT_GRAY));
+        table.setBackground(new Color(0xC0FFC0));
+        table.addHighlighter(HighlighterFactory.createSimpleStriping());
         showWithScrollingInFrame(table, "Simple gray striping");
     }
 
