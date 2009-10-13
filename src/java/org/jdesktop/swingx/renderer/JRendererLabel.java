@@ -90,6 +90,11 @@ public class JRendererLabel extends JLabel implements PainterAware {
             back.equals(p.getBackground()) && 
                         p.isOpaque();
         return !colorMatch && super.isOpaque(); 
+        // PENDING JW: Issue #1188-swingx: problems with background in Synth
+        // basically a core issue - nevertheless, evaluate implications of
+        // a simple straight-forward implemenation - return the property
+        // no tricks
+//        return super.isOpaque();
     }
 
     /**
