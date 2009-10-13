@@ -89,8 +89,8 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
       HighlighterClientVisualCheck test = new HighlighterClientVisualCheck();
       try {
 //          setLookAndFeel("Nimbus");
-//         test.runInteractiveTests();
-         test.runInteractiveTests(".*Striping.*");
+         test.runInteractiveTests();
+//         test.runInteractiveTests(".*Striping.*");
 //         test.runInteractiveTests("interactive.*Search.*");
 //         test.runInteractiveTests("interactive.*BorderHighlighter");
       } catch (Exception e) {
