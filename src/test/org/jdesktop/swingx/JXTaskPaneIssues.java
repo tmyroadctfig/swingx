@@ -29,9 +29,11 @@ import java.util.logging.Logger;
 import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 
 import org.jdesktop.swingx.action.AbstractActionExt;
+import org.jdesktop.swingx.hyperlink.AbstractHyperlinkAction;
 
 /**
  * 
@@ -51,6 +53,30 @@ public class JXTaskPaneIssues extends InteractiveTestCase {
         }
     }
     
+    /**
+     * Issue #1190-swingx: hyperlink looses visited visuals in taskpane.
+     *  
+     */
+    public void interactiveVisitedPropertyOnLAFChange() {
+        Action task = new AbstractHyperlinkAction<Object>("AddedAsAction: click - visited doesn't survive LAF") {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                setVisited(true);
+            }
+        };  
+        Action hyperlink = new AbstractHyperlinkAction<Object>("AddedAsHyperlink: click - visited  survives LAF") {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                setVisited(true);
+            }
+        };  
+        JXTaskPane pane = new JXTaskPane();
+        pane.add(task);
+        pane.add(new JXHyperlink(hyperlink));
+        showInFrame(pane, "visit and laf-change");
+    }
 
     /**
      * Quick check to see if hidden comps receive a keybinding (no).
