@@ -57,7 +57,6 @@ public class JXHyperlinkVisualCheck extends InteractiveTestCase {
     }
 
     public static void main(String[] args) throws Exception {
-      setSystemLF(true);
       JXHyperlinkVisualCheck test = new JXHyperlinkVisualCheck();
       try {
           test.runInteractiveTests();
