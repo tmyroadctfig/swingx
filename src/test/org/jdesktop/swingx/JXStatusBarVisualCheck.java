@@ -15,6 +15,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JRootPane;
+import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 
 import org.jdesktop.swingx.action.AbstractActionExt;
@@ -35,6 +36,16 @@ public class JXStatusBarVisualCheck extends InteractiveTestCase {
         }
     }
 
+    /**
+     * Issue #1192-swingx: Cursor not adjusted to text component.
+     */
+    public void interactiveTextComponentCursor() {
+        JTextField field = new JTextField("here we go, move mouse over me - text-cursor as expected");
+        JXFrame frame = wrapInFrame(field, "text cursor");
+        JTextField status = new JTextField("I'm in statusbar - move mouse over me, no text cursor");
+        addStatusComponent(frame, status);
+        show(frame);
+    }
     /**
      * Issue #936-swingx: JXRootPane can't cope with default decoration.
      */
