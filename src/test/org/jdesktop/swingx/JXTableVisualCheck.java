@@ -30,6 +30,7 @@ import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JToolBar;
@@ -47,6 +48,7 @@ import javax.swing.table.TableModel;
 
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.decorator.AbstractHighlighter;
+import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.Highlighter;
@@ -105,6 +107,77 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         // super has LF specific tests...
         setSystemLF(true);
 //        setLookAndFeel("Nimbus");
+    }
+
+    
+
+    /**
+     * Issue #1193-swingx: rollover state not updated on scrolling/mouseWheel
+     * 
+     * visualize behaviour on 
+     * - scrolling (with mouse wheel)
+     * - resizing (added custom actions)
+     */
+    public void interactiveRolloverScroll() {
+        final JXTable table = new JXTable(new AncientSwingTeam());
+        table.setEditable(false);
+        table.setHorizontalScrollEnabled(true);
+        table.addHighlighter(new ColorHighlighter(HighlightPredicate.ROLLOVER_ROW, Color.YELLOW, null));
+        final JXFrame frame = showWithScrollingInFrame(table, "rollover and wheel");
+        Action hd = new AbstractAction("horizontalDecrease") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Dimension dim = frame.getSize();
+                dim.width -= 50;
+                frame.setSize(dim);
+            }
+            
+        };
+        table.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(
+                KeyStroke.getKeyStroke("A"), "horizontalDecrease");
+        table.getActionMap().put("horizontalDecrease", hd);
+        Action hi = new AbstractAction("horizontalDecrease") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Dimension dim = frame.getSize();
+                dim.width += 50;
+                frame.setSize(dim);
+            }
+            
+        };
+        table.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(
+                KeyStroke.getKeyStroke("D"), "horizontalIncrease");
+        table.getActionMap().put("horizontalIncrease", hi);
+        Action vd = new AbstractAction("verticalDecrease") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Dimension dim = frame.getSize();
+                dim.height -= 20;
+                frame.setSize(dim);
+            }
+            
+        };
+        table.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(
+                KeyStroke.getKeyStroke("W"), "verticalDecrease");
+        table.getActionMap().put("verticalDecrease", vd);
+        Action vi = new AbstractAction("verticalIncrease") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Dimension dim = frame.getSize();
+                dim.height += 20;
+                frame.setSize(dim);
+            }
+            
+        };
+        table.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(
+                KeyStroke.getKeyStroke("S"), "verticalIncrease");
+        table.getActionMap().put("verticalIncrease", vi);
+        addStatusComponent(frame, new JLabel("Horizontal Resize: A <--> D "));
+        addStatusComponent(frame, new JLabel("Vertical Resize: W <--> S "));
     }
 
     /**

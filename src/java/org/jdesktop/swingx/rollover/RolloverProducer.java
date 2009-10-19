@@ -21,9 +21,12 @@
 package org.jdesktop.swingx.rollover;
 
 import java.awt.Point;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.util.logging.Logger;
 
 import javax.swing.JComponent;
 
@@ -40,8 +43,13 @@ import javax.swing.JComponent;
  * 
  * @author Jeanette Winzenburg
  */
-public abstract class RolloverProducer implements MouseListener, MouseMotionListener {
+public abstract class RolloverProducer implements MouseListener, MouseMotionListener, 
+   ComponentListener {
 
+    @SuppressWarnings("unused")
+    private static final Logger LOG = Logger.getLogger(RolloverProducer.class
+            .getName());
+    
     /** 
      * Key for client property mapped from mouse-triggered action.
      * Note that the actual mouse-event which results in setting the property
@@ -76,6 +84,7 @@ public abstract class RolloverProducer implements MouseListener, MouseMotionList
      * source is a JComponent. Does nothing otherwise.
      */
     public void mouseExited(MouseEvent e) {
+//        screenLocation = null;
         ((JComponent) e.getSource()).putClientProperty(ROLLOVER_KEY, null);
         ((JComponent) e.getSource()).putClientProperty(CLICKED_KEY, null);
     }
@@ -109,6 +118,40 @@ public abstract class RolloverProducer implements MouseListener, MouseMotionList
         updateRollover(e, ROLLOVER_KEY, false);
     }
 
+    //---------------- ComponentListener
+    
+    
+    @Override
+    public void componentShown(ComponentEvent e) {
+    }
+    
+    @Override
+    public void componentResized(ComponentEvent e) {
+        updateRollover(e);
+    }
+    
+    @Override
+    public void componentMoved(ComponentEvent e) {
+        updateRollover(e);
+    }
+
+    /**
+     * @param e
+     */
+    private void updateRollover(ComponentEvent e) {
+        Point componentLocation = e.getComponent().getMousePosition();
+        if (componentLocation == null) {
+            componentLocation = new Point(-1, -1);
+        }
+//        LOG.info("" + componentLocation + " / " + e);
+        updateRolloverPoint((JComponent) e.getComponent(), componentLocation);
+        updateClientProperty((JComponent) e.getComponent(), ROLLOVER_KEY, true);
+    }
+    
+    @Override
+    public void componentHidden(ComponentEvent e) {
+    }
+
     //---------------- mapping methods
     
     /**
@@ -126,7 +169,7 @@ public abstract class RolloverProducer implements MouseListener, MouseMotionList
     protected void updateRollover(MouseEvent e, String property,
             boolean fireAlways) {
         updateRolloverPoint((JComponent) e.getComponent(), e.getPoint());
-        updateClientProperty((JComponent) e.getSource(), property, fireAlways);
+        updateClientProperty((JComponent) e.getComponent(), property, fireAlways);
     }
 
     /** Current mouse location in client coordinates. */

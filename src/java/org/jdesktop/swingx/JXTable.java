@@ -627,13 +627,17 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
             return;
         if (rolloverEnabled) {
             rolloverProducer = createRolloverProducer();
+            // PENDING JW: asymetric listener reg producer vs. consumer?
+            // consider to add install to producer similar as in consumer
             addMouseListener(rolloverProducer);
             addMouseMotionListener(rolloverProducer);
+            addComponentListener(rolloverProducer);
             getLinkController().install(this);
 
         } else {
             removeMouseListener(rolloverProducer);
             removeMouseMotionListener(rolloverProducer);
+            removeComponentListener(rolloverProducer);
             rolloverProducer = null;
             getLinkController().release();
         }
