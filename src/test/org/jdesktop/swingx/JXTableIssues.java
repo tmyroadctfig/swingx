@@ -20,11 +20,10 @@
  */
 package org.jdesktop.swingx;
 
-import static org.junit.Assert.*;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
@@ -40,8 +39,10 @@ import javax.swing.BorderFactory;
 import javax.swing.CellEditor;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.event.CellEditorListener;
@@ -56,11 +57,13 @@ import org.jdesktop.swingx.decorator.AbstractHighlighter;
 import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
+import org.jdesktop.swingx.rollover.RolloverProducer;
 import org.jdesktop.swingx.table.TableColumnExt;
 import org.jdesktop.test.AncientSwingTeam;
 import org.jdesktop.test.CellEditorReport;
 import org.jdesktop.test.PropertyChangeReport;
 import org.jdesktop.test.SerializableSupport;
+import org.jdesktop.test.TestUtils;
 import org.junit.Test;
 
 /**
@@ -80,8 +83,8 @@ public class JXTableIssues extends InteractiveTestCase {
         JXTableIssues test = new JXTableIssues();
         setSystemLF(true);
         try {
-          test.runInteractiveTests();
-//            test.runInteractiveTests("interactive.*Scroll.*");
+//          test.runInteractiveTests();
+            test.runInteractiveTests("interactive.*Scroll.*");
          //   test.runInteractiveTests("interactive.*Render.*");
 //          test.runInteractiveTests("interactive.*ExtendOnRemoveAdd.*");
 //            test.runInteractiveTests("interactive.*Extend.*");

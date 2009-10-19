@@ -69,6 +69,19 @@ public final class TestUtils extends Assert {
             .getName());
     private TestUtils() {}
     
+    public static void assertContainsType(Object[] objects, Class<?> clazz, int count) {
+        if (objects.length == 0 && count == 0) return;
+        assertTrue("not enough elements: expected == " + count 
+                +" but was == " + objects.length, count <= objects.length);
+        int found = 0;
+        for (Object object : objects) {
+            if (clazz.isAssignableFrom(object.getClass())) {
+                found++;
+            }
+        };
+        assertEquals("unexpected number of elements of type " + clazz, count, found);
+    }
+    
     /**
      * Asserts the last received propertyChangeEvent of the 
      * report against the expected values.
