@@ -5,13 +5,17 @@
 package org.jdesktop.swingx.rollover;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.AbstractListModel;
 import javax.swing.Action;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JPopupMenu;
 import javax.swing.JTree;
+import javax.swing.KeyStroke;
 import javax.swing.ListModel;
 import javax.swing.table.TableModel;
 
@@ -26,8 +30,10 @@ import org.jdesktop.swingx.decorator.CompoundHighlighter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.HighlightPredicate.AndHighlightPredicate;
+import org.jdesktop.swingx.renderer.DefaultTreeRenderer;
 import org.jdesktop.swingx.treetable.FileSystemModel;
 import org.jdesktop.test.AncientSwingTeam;
+import org.jdesktop.test.TestUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -58,12 +64,122 @@ public class RolloverTest extends InteractiveTestCase {
     private ListModel listModel;
     private FileSystemModel treeTableModel;
 
-    @Test
-    public void testDummy() {
-        
+//---------------------------- interactive tests of rollover effects
+
+    
+    /**
+     * Issue #1193-swingx: rollover state not updated on scrolling/mouseWheel
+     * 
+     * visualize behaviour on 
+     * - scrolling (with mouse wheel)
+     * - resizing (added custom actions)
+     */
+    public void interactiveTreeRolloverScroll() {
+        final JXTree table = new JXTree(new FileSystemModel());
+        table.setCellRenderer(new DefaultTreeRenderer());
+        table.setRolloverEnabled(true);
+        table.addHighlighter(new ColorHighlighter(HighlightPredicate.ROLLOVER_ROW, Color.YELLOW, null));
+        final JXFrame frame = getResizableFrame(table);
+        show(frame);
     }
 
-//---------------------------- interactive tests of rollover effects
+    /**
+     * Issue #1193-swingx: rollover state not updated on scrolling/mouseWheel
+     * 
+     * visualize behaviour on 
+     * - scrolling (with mouse wheel)
+     * - resizing (added custom actions)
+     */
+    public void interactiveListRolloverScroll() {
+        final JXList table = new JXList(AncientSwingTeam.createNamedColorListModel());
+        table.setRolloverEnabled(true);
+        table.addHighlighter(new ColorHighlighter(HighlightPredicate.ROLLOVER_ROW, Color.YELLOW, null));
+        final JXFrame frame = getResizableFrame(table);
+        show(frame);
+    }
+    
+    /**
+     * Issue #1193-swingx: rollover state not updated on scrolling/mouseWheel
+     * 
+     * visualize behaviour on 
+     * - scrolling (with mouse wheel)
+     * - resizing (added custom actions)
+     */
+    public void interactiveTableRolloverScroll() {
+        final JXTable table = new JXTable(new AncientSwingTeam());
+        table.setEditable(false);
+        table.setHorizontalScrollEnabled(true);
+        table.addHighlighter(new ColorHighlighter(HighlightPredicate.ROLLOVER_ROW, Color.YELLOW, null));
+        final JXFrame frame = getResizableFrame(table);
+        show(frame);
+    }
+
+
+
+    /**
+     * @param table
+     * @return
+     */
+    private JXFrame getResizableFrame(final JComponent table) {
+        final JXFrame frame = wrapWithScrollingInFrame(table, "rollover and wheel");
+        Action hd = new AbstractAction("horizontalDecrease") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Dimension dim = frame.getSize();
+                dim.width -= 50;
+                frame.setSize(dim);
+            }
+            
+        };
+        table.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(
+                KeyStroke.getKeyStroke("A"), "horizontalDecrease");
+        table.getActionMap().put("horizontalDecrease", hd);
+        Action hi = new AbstractAction("horizontalDecrease") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Dimension dim = frame.getSize();
+                dim.width += 50;
+                frame.setSize(dim);
+            }
+            
+        };
+        table.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(
+                KeyStroke.getKeyStroke("D"), "horizontalIncrease");
+        table.getActionMap().put("horizontalIncrease", hi);
+        Action vd = new AbstractAction("verticalDecrease") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Dimension dim = frame.getSize();
+                dim.height -= 20;
+                frame.setSize(dim);
+            }
+            
+        };
+        table.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(
+                KeyStroke.getKeyStroke("W"), "verticalDecrease");
+        table.getActionMap().put("verticalDecrease", vd);
+        Action vi = new AbstractAction("verticalIncrease") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Dimension dim = frame.getSize();
+                dim.height += 20;
+                frame.setSize(dim);
+            }
+            
+        };
+        table.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(
+                KeyStroke.getKeyStroke("S"), "verticalIncrease");
+        table.getActionMap().put("verticalIncrease", vi);
+        addStatusComponent(frame, new JLabel("Horizontal Resize: A <--> D "));
+        addStatusComponent(frame, new JLabel("Vertical Resize: W <--> S "));
+        return frame;
+    }
+
+
     
     public void interactiveTableRollover() {
         JXTable table = new JXTable(sortableTableModel);
@@ -211,6 +327,53 @@ public class RolloverTest extends InteractiveTestCase {
         frame.setVisible(true);
     }
     
+//---------------------- unit tests
+    
+    /**
+     * Issue #1193-swingx: fix rollover mouse to cell mapping on scrolling/resizing.
+     *  
+     */
+    @Test
+    public void testTableRolloverProducerComponentListener() {
+        JXTable table = new JXTable();
+        assertComponentListener(table, true);
+        table.setRolloverEnabled(false);
+        assertComponentListener(table, false);
+    }
+    /**
+     * Issue #1193-swingx: fix rollover mouse to cell mapping on scrolling/resizing.
+     *  
+     */
+    @Test
+    public void testTreeRolloverProducerComponentListener() {
+        JXTree table = new JXTree();
+        assertComponentListener(table, false);
+        table.setRolloverEnabled(true);
+        assertComponentListener(table, true);
+    }
+    
+    /**
+     * Issue #1193-swingx: fix rollover mouse to cell mapping on scrolling/resizing.
+     *  
+     */
+    @Test
+    public void testListRolloverProducerComponentListener() {
+        JXList table = new JXList();
+        assertComponentListener(table, false);
+        table.setRolloverEnabled(true);
+        assertComponentListener(table, true);
+    }
+    
+
+    /**
+     * @param table
+     */
+    private void assertComponentListener(JComponent table, boolean expected) {
+        TestUtils.assertContainsType(table.getComponentListeners(), 
+                RolloverProducer.class, expected ? 1 : 0);
+    }
+    
+
     @Override
     protected void setUp() throws Exception {
         super.setUp();
@@ -233,5 +396,10 @@ public class RolloverTest extends InteractiveTestCase {
                 null);
      }
     
+
+    @Test
+    public void testXDummy() {
+        
+    }
 
 }

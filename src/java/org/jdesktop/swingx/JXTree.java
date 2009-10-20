@@ -734,12 +734,10 @@ public class JXTree extends JTree {
         if (rolloverEnabled == old) return;
         if (rolloverEnabled) {
             rolloverProducer = createRolloverProducer();
-            addMouseListener(rolloverProducer);
-            addMouseMotionListener(rolloverProducer);
+            rolloverProducer.install(this);
             getLinkController().install(this);
         } else {
-            removeMouseListener(rolloverProducer);
-            removeMouseMotionListener(rolloverProducer);
+            rolloverProducer.release(this);
             rolloverProducer = null;
             getLinkController().release();
         }
