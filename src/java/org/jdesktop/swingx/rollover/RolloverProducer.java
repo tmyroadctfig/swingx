@@ -62,6 +62,30 @@ public abstract class RolloverProducer implements MouseListener, MouseMotionList
 
     //        public static final String PRESSED_KEY = "swingx.pressed";
 
+    /**
+     * Installs all listeners, as required. 
+     * 
+     * @param component target to install required listeners on, must
+     *   not be null.
+     */
+    public void install(JComponent component) {
+        component.addMouseListener(this);
+        component.addMouseMotionListener(this);
+        component.addComponentListener(this);
+    }
+    
+    /**
+     * Removes all listeners.
+     * 
+     * @param component target component to uninstall required listeners from, 
+     *   must not be null
+     */
+    public void release(JComponent component) {
+        component.removeMouseListener(this);
+        component.removeMouseMotionListener(this);
+        component.removeComponentListener(this);
+    }
+    
     //----------------- mouseListener
 
     /**

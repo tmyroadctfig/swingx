@@ -122,18 +122,6 @@ public class JXTableUnitTest extends InteractiveTestCase {
         super("JXTable unit test");
     }
 
-    /**
-     * Issue #1193-swingx: fix rollover mouse to cell mapping on scrolling/resizing.
-     *  
-     */
-    @Test
-    public void testRolloverProducerComponentListener() {
-        JXTable table = new JXTable();
-        TestUtils.assertContainsType(table.getComponentListeners(), RolloverProducer.class, 1);
-        table.setRolloverEnabled(false);
-        TestUtils.assertContainsType(table.getComponentListeners(), RolloverProducer.class, 0);
-    }
-    
 
     /**
      * Issue #1173-swingx: clarify table's responsibities in sorter configuration.

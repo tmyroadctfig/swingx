@@ -436,12 +436,10 @@ public class JXList extends JList {
             return;
         if (rolloverEnabled) {
             rolloverProducer = createRolloverProducer();
-            addMouseListener(rolloverProducer);
-            addMouseMotionListener(rolloverProducer);
+            rolloverProducer.install(this);
             getLinkController().install(this);
         } else {
-            removeMouseListener(rolloverProducer);
-            removeMouseMotionListener(rolloverProducer);
+            rolloverProducer.release(this);
             rolloverProducer = null;
             getLinkController().release();
         }
