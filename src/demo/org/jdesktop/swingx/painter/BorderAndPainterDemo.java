@@ -44,7 +44,7 @@ public class BorderAndPainterDemo {
         l.setHorizontalAlignment(SwingConstants.CENTER);
         p.add(l);
         
-        RectanglePainter<JComponent> bkg = new RectanglePainter<JComponent>();
+        RectanglePainter bkg = new RectanglePainter();
         bkg.setRounded(true);
         bkg.setFillPaint(PaintUtils.BLUE_EXPERIENCE);
         bkg.setStyle(RectanglePainter.Style.FILLED);
@@ -65,9 +65,9 @@ public class BorderAndPainterDemo {
     
     private static final class ComponentPainterAdapter extends AbstractPainter<JComponent>{
         private static final Insets INSETS = new Insets(0, 0, 0, 0);
-        private Painter<JComponent> p;
+        private Painter<? super JComponent> p;
         private Insets insets = null;
-        public ComponentPainterAdapter(Painter<JComponent> p, Insets i) {
+        public ComponentPainterAdapter(Painter<? super JComponent> p, Insets i) {
             this.p = p;
             this.insets = i;
         }
