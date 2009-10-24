@@ -92,12 +92,15 @@ public class MattePainter extends AbstractAreaPainter<Object> {
                 p = calculateSnappedPaint(p,width,height);
             }
             g.setPaint(p);
-            g.fillRect(0, 0, width, height);
+            g.fill(provideShape(g, component, width, height));
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public Shape provideShape(Graphics2D g, Object comp, int width, int height) {
+    protected Shape provideShape(Graphics2D g, Object comp, int width, int height) {
         return new Rectangle(0,0,width,height);
     }
     
