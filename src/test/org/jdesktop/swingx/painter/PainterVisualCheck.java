@@ -91,7 +91,7 @@ public class PainterVisualCheck extends RichInteractiveTestCase {
         final TextPainter text = new TextPainter();
         text.setText(messages[0]);
         CompoundPainter<?> cp = new CompoundPainter<Object>(
-                new RectanglePainter<Object>(),
+                new RectanglePainter(),
                 text
         );
         cp.setFilters(new FastBlurFilter());
