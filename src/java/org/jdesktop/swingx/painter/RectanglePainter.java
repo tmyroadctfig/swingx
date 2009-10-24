@@ -42,7 +42,7 @@ import org.jdesktop.swingx.painter.effects.AreaEffect;
  * @author joshua.marinacci@sun.com
  */
 
-public class RectanglePainter<T> extends AbstractAreaPainter<T> {
+public class RectanglePainter extends AbstractAreaPainter<Object> {
     private boolean rounded = false;
     //private Insets insets = new Insets(0,0,0,0);
     private int roundWidth = 20;
@@ -208,7 +208,7 @@ public class RectanglePainter<T> extends AbstractAreaPainter<T> {
 
 
     @Override
-    protected void doPaint(Graphics2D g, T component, int width, int height) {
+    protected void doPaint(Graphics2D g, Object component, int width, int height) {
         RectangularShape shape = calculateShape(width, height);
         switch (getStyle()) {
         case BOTH:
@@ -279,7 +279,7 @@ public class RectanglePainter<T> extends AbstractAreaPainter<T> {
     }
 
     @Override
-    public Shape provideShape(Graphics2D g, T comp, int width, int height) {
+    public Shape provideShape(Graphics2D g, Object comp, int width, int height) {
         return calculateShape(width,height);
     }
     
