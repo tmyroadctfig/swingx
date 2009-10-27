@@ -38,6 +38,8 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
 import org.jdesktop.swingx.event.TableColumnModelExtListener;
+import org.jdesktop.swingx.plaf.LookAndFeelAddons;
+import org.jdesktop.swingx.plaf.TableHeaderAddon;
 import org.jdesktop.swingx.sort.SortController;
 import org.jdesktop.swingx.table.TableColumnExt;
 
@@ -90,6 +92,11 @@ public class JXTableHeader extends JTableHeader
     @SuppressWarnings("unused")
     private static final Logger LOG = Logger.getLogger(JXTableHeader.class
             .getName());
+    
+    static {
+        LookAndFeelAddons.contribute(new TableHeaderAddon());
+    }
+
     /**
      * The recognizer used for interpreting mouse events as sorting user gestures.
      * @deprecated no longer used internally.
