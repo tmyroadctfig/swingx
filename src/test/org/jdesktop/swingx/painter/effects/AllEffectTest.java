@@ -8,6 +8,8 @@ import java.awt.Color;
 import java.awt.Point;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
 
 /**
@@ -15,6 +17,7 @@ import org.junit.Test;
  * @author had
  *
  */
+@RunWith(JUnit4.class)
 public class AllEffectTest {
 
     @Test

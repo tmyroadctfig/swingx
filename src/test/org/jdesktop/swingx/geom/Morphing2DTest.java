@@ -13,12 +13,15 @@ import java.awt.geom.Point2D;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
 /**
  * Basic tests for Morphing2D
  * @author had
  *
  */
+@RunWith(JUnit4.class)
 public class Morphing2DTest {
 
     Morphing2D morph ;
