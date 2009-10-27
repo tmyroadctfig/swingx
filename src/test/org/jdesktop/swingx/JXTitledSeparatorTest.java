@@ -7,8 +7,11 @@ package org.jdesktop.swingx;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.event.ActionEvent;
 import java.util.logging.Logger;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.JComponent;
@@ -66,6 +69,23 @@ public class JXTitledSeparatorTest extends InteractiveTestCase {
     }
     
     /**
+     * Issue #??-swingx: JXTitledSeparator - no visual clue if disabled
+     */
+    public void interactiveDisabled() {
+        final JXTitledSeparator separator = new JXTitledSeparator("visual clue for disabled?... ");
+        JXFrame frame = showInFrame(separator, "en/disabled");
+        Action action = new AbstractAction("toggleEnabled") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                separator.setEnabled(!separator.isEnabled());
+                
+            }
+        };
+        addAction(frame, action);
+        show(frame, 400, 200);
+    }
+    /**
      * Issue #304-swingx: JXTitledSeparator should have same orientation
      * dependent behaviour as TitledBorder.
      * 
@@ -111,7 +131,7 @@ public class JXTitledSeparatorTest extends InteractiveTestCase {
         left.setBorder(leftBorder);
         box.add(left);
         
-        JXTitledSeparator right = new JXTitledSeparator();
+        final JXTitledSeparator right = new JXTitledSeparator();
         right.setTitle("right");
         right.setHorizontalAlignment(SwingConstants.RIGHT);
         Border rightBorder = new TitledBorder(lineBorder, "right", TitledBorder.RIGHT, TitledBorder.TOP);
@@ -119,11 +139,18 @@ public class JXTitledSeparatorTest extends InteractiveTestCase {
         box.add(right);
         
         final JXFrame frame = wrapInFrame(box, "Bidi-compliance");
+        Action action = new AbstractAction("toggleEnabled") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                right.setEnabled(!right.isEnabled());
+                
+            }
+        };
+        addAction(frame, action);
         addComponentOrientationToggle(frame);
         // titledSeparator freaks with prefSize, need to set fixed
-        frame.setSize(200, 400);
-        frame.setVisible(true);
-        
+        show(frame, 200, 400);
     }
     
     /**
