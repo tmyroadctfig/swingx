@@ -29,7 +29,7 @@ public class JXTableHeaderVisualCheck extends InteractiveTestCase {
         JXTableHeaderVisualCheck test = new JXTableHeaderVisualCheck();
         try {
 //          test.runInteractiveTests();
-            test.runInteractiveTests("interactive.*Visible.*");
+            test.runInteractiveTests("interactive.*AutoScrollR.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
