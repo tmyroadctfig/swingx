@@ -203,7 +203,7 @@ ${build.branch} ${RELEASE_DSTAMP_LONG} ${projectname}</concat>
     -->
     <target name="-javadoc-build" depends="init">
         <property name="javadoc.core.src" value=""/>
-        <property name="javadoc.core.linkexternal" value="http://java.sun.com/j2se/1.5.0/docs/api/"/>
+        <property name="javadoc.core.linkexternal" value="http://java.sun.com/javase/6/docs/api/"/>
         <property name="javadoc.core.packagelist" value=""/>
         <property name="javadoc.verbose" value="false"/>
 
