@@ -601,6 +601,15 @@ public class PainterVisualCheck extends InteractiveTestCase {
             this(null);
         }
         
+        
+        public RelativePainter(Painter<? super T> delegate) {
+            this.painter = delegate;
+        }
+        
+        public RelativePainter(Painter<? super T> delegate, double xPercent) {
+            this(delegate);
+            xFactor = xPercent;
+        }
         public void setPainter(Painter<? super T> painter) {
             Object old = getPainter();
             this.painter = painter;
@@ -610,11 +619,6 @@ public class PainterVisualCheck extends InteractiveTestCase {
         public Painter<? super T> getPainter() {
             return painter;
         }
-        
-        public RelativePainter(Painter<? super T> delegate) {
-            this.painter = delegate;
-        }
-        
         public void setXFactor(double xPercent) {
             double old = getXFactor();
             this.xFactor = xPercent;
