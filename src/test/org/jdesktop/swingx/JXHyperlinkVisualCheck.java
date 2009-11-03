@@ -174,15 +174,21 @@ public class JXHyperlinkVisualCheck extends InteractiveTestCase {
     
  
     public void interactiveLink() throws Exception {
-        EditorPaneLinkVisitor visitor = new EditorPaneLinkVisitor();
-        LinkModel link = new LinkModel("Click me!", null, JXEditorPaneTest.class.getResource("resources/test.html"));
-
-        LinkModelAction<?> linkAction = new LinkModelAction<LinkModel>(link, visitor);
-//        linkAction.setVisitingDelegate(visitor);
-        JXHyperlink hyperlink = new JXHyperlink(linkAction);
+        JXEditorPane pane = new JXEditorPane();
+        pane.setEditable(false);
+        EditorPaneLinkVisitor visitor = new EditorPaneLinkVisitor(pane);
+        LinkModel localLink = new LinkModel("Click me! - local text", null, JXEditorPaneTest.class.getResource("resources/test.html"));
+        LinkModelAction<?> localAction = new LinkModelAction<LinkModel>(localLink, visitor);
+        JXHyperlink localHyperlink = new JXHyperlink(localAction);
+        
+        LinkModel externalLink = new LinkModel("Click me! - external text", null, new URL("https://swingx.dev.java.net"));
+        LinkModelAction<?> externalAction = new LinkModelAction<LinkModel>(externalLink, visitor);
+        JXHyperlink externalHyperlink = new JXHyperlink(externalAction);
         JPanel panel = new JPanel(new BorderLayout());
+        
         panel.add(new JScrollPane(visitor.getOutputComponent()));
-        panel.add(hyperlink, BorderLayout.SOUTH);
+        panel.add(externalHyperlink, BorderLayout.NORTH);
+        panel.add(localHyperlink, BorderLayout.SOUTH);
         JFrame frame = wrapInFrame(panel, "simple hyperlink");
         frame.setSize(200, 200);
         frame.setVisible(true);

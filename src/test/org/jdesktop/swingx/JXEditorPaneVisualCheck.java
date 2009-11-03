@@ -55,20 +55,13 @@ public class JXEditorPaneVisualCheck extends JXEditorPaneTest {
      * applicable.
      * checking action enabled behaviour of core editorpane.
      * Doing nothing to enable/disable depending on editable state?
+     * @throws IOException 
      *
      */
-    public void interactiveXEditorStyledActions() {
-        URL url = JXEditorPaneVisualCheck.class.getResource("resources/test.html");
-        JXEditorPane editor = null;
-        try {
-            editor = new JXEditorPane(url);
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+    public void interactiveXEditorStyledActions() throws IOException {
+        JXEditorPane editor = new JXEditorPane();
         editor.setEditable(false);
         editor.setPreferredSize(new Dimension(600, 400));
-//        JXEditorPane editor = new JXEditorPane();
         Action[] actions = editor.getActions();
         ActionManager manager = ActionManager.getInstance();
         List<Object> actionNames = new ArrayList<Object>();
@@ -99,7 +92,7 @@ public class JXEditorPaneVisualCheck extends JXEditorPaneTest {
       JXList list = new JXList(true);
       list.setModel(createListModel(actionNames));
       
-      JXFrame frame = wrapWithScrollingInFrame(editor, list, "Looking at swingx editor default and styled actions");
+      JXFrame frame = wrapWithScrollingInFrame(editor, list, "Looking at swingx editor default and styled actions (show in editor <--> list)");
       frame.getContentPane().add(toolbar, BorderLayout.WEST);
       frame.setVisible(true);
     }
@@ -138,14 +131,7 @@ public class JXEditorPaneVisualCheck extends JXEditorPaneTest {
      *
      */
     public void interactiveXEditorDefaultActions() {
-        URL url = JXEditorPaneVisualCheck.class.getResource("resources/test.html");
-        JXEditorPane editor = null;
-        try {
-            editor = new JXEditorPane(url);
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        JXEditorPane editor = new JXEditorPane();
         editor.setEditable(false);
         editor.setPreferredSize(new Dimension(600, 400));
         Action[] actions = editor.getActions();
@@ -172,7 +158,7 @@ public class JXEditorPaneVisualCheck extends JXEditorPaneTest {
       editor.setEditable(false);
       editor.setPreferredSize(new Dimension(600, 400));
 
-      JXFrame frame = wrapWithScrollingInFrame(editor, "Looking at swingx editor default actions");
+      JXFrame frame = wrapWithScrollingInFrame(editor, "Looking at swingx editor default actions (show in xeditor)");
       frame.getContentPane().add(toolbar, BorderLayout.WEST);
       frame.setVisible(true);
     }
@@ -209,7 +195,7 @@ public class JXEditorPaneVisualCheck extends JXEditorPaneTest {
       editor.setEditable(false);
       editor.setPreferredSize(new Dimension(600, 400));
 
-      JXFrame frame = wrapWithScrollingInFrame(editor, "Looking at core default actions");
+      JXFrame frame = wrapWithScrollingInFrame(editor, "Looking at core default actions (show in core editor)");
       frame.getContentPane().add(toolbar, BorderLayout.WEST);
       frame.setVisible(true);
     }
