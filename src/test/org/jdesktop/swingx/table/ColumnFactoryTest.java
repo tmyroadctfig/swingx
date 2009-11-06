@@ -6,6 +6,7 @@ package org.jdesktop.swingx.table;
 
 import java.awt.Component;
 
+import javax.swing.BorderFactory;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
@@ -14,6 +15,8 @@ import javax.swing.table.TableModel;
 
 import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXTable;
+import org.jdesktop.swingx.decorator.BorderHighlighter;
+import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.test.AncientSwingTeam;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -27,6 +30,26 @@ import org.junit.runners.JUnit4;
  */
 @RunWith(JUnit4.class)
 public class ColumnFactoryTest extends InteractiveTestCase {
+    
+    /**
+     * Issue #1215-swingx: ColumnFactory must pack with prepareRenderer.
+     * Otherwise, doesn't catch sizing effective highlighters, like f.i. font.
+     */
+    @Test
+    public void testPackWithPrepareRenderer() {
+        JXTable table = new JXTable(1, 1);
+        table.setValueAt("just a long string something utterly meaningless", 0, 0);
+        table.packColumn(0, 0);
+        assertEquals("sanity: no highlighter", table.prepareRenderer(
+                table.getCellRenderer(0, 0), 0, 0).getPreferredSize().width,
+                table.getColumn(0).getPreferredWidth());
+        Highlighter hl = new BorderHighlighter(BorderFactory.createEmptyBorder(0, 50, 0, 50));
+        table.addHighlighter(hl);
+        table.packColumn(0, 0);
+        assertEquals("highlighter which adds 100 px width", table.prepareRenderer(
+                table.getCellRenderer(0, 0), 0, 0).getPreferredSize().width,
+                table.getColumn(0).getPreferredWidth());
+    }
 
     /**
      * Issue #564-swingx: allow custom factories to return null column.
