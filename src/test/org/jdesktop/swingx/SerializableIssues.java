@@ -307,20 +307,6 @@ public class SerializableIssues extends InteractiveTestCase {
         } 
     }
 
-    /**
-     * Issue #423-swingx: all descendants of JComponent must be 
-     * serializable.<p>
-     * 
-     * First blow: inner class ?
-     */
-    public void testGlassBox() {
-        JXGlassBox component = new JXGlassBox();
-        try {
-            SerializableSupport.serialize(component);
-        } catch (Exception e) {
-            fail("not serializable " + e);
-        } 
-    }
 
     /**
      * Issue #423-swingx: all descendants of JComponent must be 

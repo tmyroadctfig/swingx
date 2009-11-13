@@ -55,7 +55,10 @@ import javax.swing.Timer;
  * @author Amy Fowler
  * @author Karl George Schaefer
  * @version 1.0
+ * 
+ * @deprecated (since post-1.6) will be removed without replacement (see Issue #1217-swingx)
  */
+@Deprecated
 public class JXGlassBox extends JXPanel {
     private static final int SHOW_DELAY = 30; // ms
     private static final int TIMER_INCREMENT = 10; // ms
