@@ -129,7 +129,6 @@
  * 
  * <li> {@link org.jdesktop.swingx.JXColorSelectionButton}
  * <li> {@link org.jdesktop.swingx.JXEditorPane}
- * <li> {@link org.jdesktop.swingx.JXGlassBox} (PENDING JW: remove?)
  * <li> {@link org.jdesktop.swingx.JXGradientChooser}
  * <li> {@link org.jdesktop.swingx.JXGraph}
  * <li>Image containers {@link org.jdesktop.swingx.JXImageView ImageView}
