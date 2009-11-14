@@ -8,6 +8,7 @@ import java.awt.Component;
 import java.awt.datatransfer.DataFlavor;
 import java.util.logging.Logger;
 
+import javax.swing.DropMode;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -168,8 +169,8 @@ public class DNDRendererVisualCheck extends InteractiveTestCase {
         installTransferHandler(table);
 //        xTable.setDropMode(DropMode.USE_SELECTION);
 //        table.setDropMode(DropMode.USE_SELECTION);
-//        xTable.setDropMode(DropMode.ON_OR_INSERT);
-//        table.setDropMode(DropMode.ON_OR_INSERT);
+        xTable.setDropMode(DropMode.ON_OR_INSERT);
+        table.setDropMode(DropMode.ON_OR_INSERT);
         JXFrame frame = wrapWithScrollingInFrame(xTable, table,
                 "JXTable (first column core renderer) <-> core table: drop-on appearance");
         JTextField textField = new JTextField("drag me over first column....");
@@ -190,8 +191,8 @@ public class DNDRendererVisualCheck extends InteractiveTestCase {
         installTransferHandler(table);
 //        xTable.setDropMode(DropMode.USE_SELECTION);
 //        table.setDropMode(DropMode.USE_SELECTION);
-//        xTable.setDropMode(DropMode.ON_OR_INSERT);
-//        table.setDropMode(DropMode.ON_OR_INSERT);
+        xTable.setDropMode(DropMode.ON_OR_INSERT);
+        table.setDropMode(DropMode.ON_OR_INSERT);
         JXFrame frame = wrapWithScrollingInFrame(xTable, table,
                 "JXList <-> core list: drop-on appearance");
         JTextField textField = new JTextField("drag me over first column....");
@@ -213,8 +214,8 @@ public class DNDRendererVisualCheck extends InteractiveTestCase {
         installTransferHandler(table);
 //        xTable.setDropMode(DropMode.USE_SELECTION);
 //        table.setDropMode(DropMode.USE_SELECTION);
-//        xTable.setDropMode(DropMode.ON_OR_INSERT);
-//        table.setDropMode(DropMode.ON_OR_INSERT);
+        xTable.setDropMode(DropMode.ON_OR_INSERT);
+        table.setDropMode(DropMode.ON_OR_INSERT);
         JXFrame frame = wrapWithScrollingInFrame(xTable, table,
                 "JXTree <-> core tree: drop-on appearance");
         JTextField textField = new JTextField("drag me over first column....");

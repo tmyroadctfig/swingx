@@ -34,9 +34,9 @@ import javax.swing.ListModel;
  */
 public class JListIssues extends InteractiveTestCase {
 
-    public static void main(String[] args) throws  Exception {
+    public static void main(String[] args)  {
         JListIssues test = new JListIssues();
-        setLookAndFeel("Nimbus");
+        setLAF("Nimbus");
         try {
             test.runInteractiveTests();
         } catch (Exception e) {

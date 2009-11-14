@@ -9,6 +9,7 @@ package org.jdesktop.swingx;
 import java.awt.BorderLayout;
 import java.awt.ComponentOrientation;
 import java.awt.Point;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.lang.reflect.Method;
 import java.util.logging.Level;
@@ -26,6 +27,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JScrollPane;
 import javax.swing.JToolBar;
 import javax.swing.LookAndFeel;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.UIManager.LookAndFeelInfo;
@@ -376,23 +378,51 @@ public abstract class InteractiveTestCase extends junit.framework.TestCase {
     }
 
     /**
+     * @return
+     */
+    protected JMenu createPlafMenu() {
+        return createPlafMenu(null);
+    }
+
+    /**
      * Creates a menu filled with one SetPlafAction for each of the currently
      * installed LFs.
      * 
+     * @param target the toplevel window to update, maybe null to indicate update
+     *   of all application windows
      * @return the menu to use for plaf switching.
      */
-    protected JMenu createPlafMenu() {
+    protected JMenu createPlafMenu(Window target) {
         LookAndFeelInfo[] plafs = UIManager.getInstalledLookAndFeels();
         JMenu menu = new JMenu("Set L&F");
         
         for (LookAndFeelInfo info : plafs) {
-            menu.add(new SetPlafAction(info.getName(), info.getClassName()));
+            menu.add(new SetPlafAction(info.getName(), info.getClassName(), target));
         }
         return menu;
     }
 
-  //---------------------- laf
+    // ---------------------- laf
 
+    /**
+     * 
+     * Sets the lookAndFeel which has a name containing the given snippet.
+     * Throws if none installed. Does not update any component/-tree, just bare
+     * setting. May fail silently (Logging with level FINE) if there is no
+     * installed LAF with the name or the setting fails for other reasons.
+     * 
+     * @param nameSnippet part of the name as published by the LAF.
+     */
+    public static void setLAF(String nameSnippet) {
+        String laf = getLookAndFeelClassName(nameSnippet);
+        if (laf != null) {
+            try {
+                UIManager.setLookAndFeel(laf);
+            } catch (Exception e) {
+                LOG.log(Level.FINE, "problem in setting laf: " + laf, e);
+            }
+        }
+    }
     /**
      * 
      * Sets the lookAndFeel which has a name containing the given snippet. Throws
@@ -449,30 +479,45 @@ public abstract class InteractiveTestCase extends junit.framework.TestCase {
      */
     private static class SetPlafAction extends AbstractAction {
         private String plaf;
+        private Window toplevel;
         
+        
+        @SuppressWarnings("unused")
         public SetPlafAction(String name, String plaf) {
-            super(name);
-            this.plaf = plaf;
+            this(name, plaf, null);
         }
         
+        /**
+         * Instantiates an action which updates the toplevel window to
+         * the given LAF. 
+         * 
+         * @param name the name of the action
+         * @param plaf the class name of the LAF to set
+         * @param toplevel the window to update, may be null to indicate
+         *   update of all application windows
+         */
+        public SetPlafAction(String name, String plaf, Window toplevel) {
+            super(name);
+            this.plaf = plaf;
+            this.toplevel = toplevel;
+        }
         /**
          * {@inheritDoc}
          */
         public void actionPerformed(ActionEvent e) {
             try {
                 UIManager.setLookAndFeel(plaf);
-                SwingXUtilities.updateAllComponentTreeUIs();
+                if (toplevel != null) {
+                    SwingUtilities.updateComponentTreeUI(toplevel);
+                } else {
+                    SwingXUtilities.updateAllComponentTreeUIs();
+                }
                 
-            } catch (ClassNotFoundException e1) {
-                e1.printStackTrace();
-            } catch (InstantiationException e1) {
-                e1.printStackTrace();
-            } catch (IllegalAccessException e1) {
-                e1.printStackTrace();
-            } catch (UnsupportedLookAndFeelException e1) {
-                e1.printStackTrace();
-            }
+            } catch (Exception e1) {
+                LOG.log(Level.FINE, "problem in setting laf: " + plaf, e1);
+            } 
         }
+
     }
     
 
