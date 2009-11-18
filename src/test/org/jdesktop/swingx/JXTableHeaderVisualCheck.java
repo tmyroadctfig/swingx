@@ -14,6 +14,8 @@ import javax.swing.JTable;
 import javax.swing.KeyStroke;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 
 /**
  * Interactive "test" methods for <code>JXTableHeader</code>.
@@ -29,13 +31,23 @@ public class JXTableHeaderVisualCheck extends InteractiveTestCase {
         JXTableHeaderVisualCheck test = new JXTableHeaderVisualCheck();
         try {
 //          test.runInteractiveTests();
-            test.runInteractiveTests("interactive.*AutoScrollR.*");
+            test.runInteractiveTests("interactive.*Core.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
         } 
     }
 
+    /**
+     * Issue #1225-swingx: JXTableHeader throws on rowSorters which are not
+     *   of type SortController when resizing columns with mouse.
+     */
+    public void interactiveHeaderCoreRowSorter() {
+        JXTable table = new JXTable(30, 5);
+        table.setAutoCreateRowSorter(false);
+        table.setRowSorter(new TableRowSorter<TableModel>(table.getModel()));
+        showWithScrollingInFrame(table, "resize columns with mouse");
+    }
     /**
      * Issue #683-swingx: Autoscroll if column dragged outside.
      * 
