@@ -46,9 +46,10 @@ import org.junit.runners.JUnit4;
 public class SearchableTest extends TestCase {
 
     /** 
-     * test that any old matchHighlighter is removed from the
-     * target's pipeline.
-     *
+     * Issue #1209-swingx: SearchPredicate must be updated to last found 
+     *   after dynamic setting of a new highlighter.
+     *   
+     *   
      */
     @Test
     public void testSetMatchHighlighterCleanup() {
@@ -57,19 +58,24 @@ public class SearchableTest extends TestCase {
         // move first column to end
         int firstColumn = 0;
         int row = 39;
-        String firstSearchText = table.getValueAt(row, firstColumn).toString();
+        String firstSearchText = table.getStringAt(row, firstColumn);
         PatternModel model = new PatternModel();
         model.setRawText(firstSearchText);
         // initialize searchable to "found state"
         table.getSearchable().search(model.getPattern(), -1);
         AbstractHighlighter hl = ((AbstractSearchable) table.getSearchable()).getMatchHighlighter();
-        assertSame(hl, table.getHighlighters()[table.getHighlighters().length - 1]);
+        SearchPredicate predicate = (SearchPredicate) hl.getHighlightPredicate();
         AbstractHighlighter replaceHL = new BorderHighlighter();
         ((AbstractSearchable) table.getSearchable()).setMatchHighlighter(replaceHL);
-        // initialize searchable to "found state"
-        table.getSearchable().search(model.getPattern(), -1);
-        assertSame(replaceHL, table.getHighlighters()[table.getHighlighters().length - 1]);
+        assertTrue("replaced highlighter must have searchPredicate ",
+                replaceHL.getHighlightPredicate() instanceof SearchPredicate);
+        assertEquals("replaced search predicate must be installed with old matching row", 
+                predicate.getHighlightRow(), 
+                ((SearchPredicate) replaceHL.getHighlightPredicate()).getHighlightRow());
+        assertSame("replaced renderer must be added", 
+                replaceHL, table.getHighlighters()[table.getHighlighters().length - 1]);
         assertFalse("previous matchhighlighter must be removed", Arrays.asList(table.getHighlighters()).contains(hl));
+        
     }
 
     
