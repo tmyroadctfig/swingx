@@ -479,7 +479,8 @@ public abstract class AbstractSearchable implements Searchable {
         removeHighlighter(matchHighlighter);
         matchHighlighter = hl;
         if (markByHighlighter()) {
-            getConfiguredMatchHighlighter();
+            moveMatchMarker();
+//            getConfiguredMatchHighlighter();
         }
     }
     
