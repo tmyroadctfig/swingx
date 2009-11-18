@@ -570,11 +570,12 @@ public class JXTableHeader extends JTableHeader
          * @param e
          */
         private void disableToggleSortOrder(MouseEvent e) {
+            if (!(getXTable().getRowSorter() instanceof SortController<?>)) return;
             SortController<?> controller = (SortController<?>) getXTable().getRowSorter();
-            if (controller == null) return;
             cachedSortOrderCycle = controller.getSortOrderCycle();
             controller.setSortOrderCycle();
         }
+        
         /**
          * 
          */
