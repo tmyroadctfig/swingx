@@ -25,8 +25,10 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Font;
+import java.awt.GradientPaint;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
+import java.awt.geom.Point2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
@@ -45,7 +47,6 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.ListModel;
-import javax.swing.UIManager;
 import javax.swing.table.TableModel;
 
 import org.jdesktop.swingx.InteractiveTestCase;
@@ -55,6 +56,7 @@ import org.jdesktop.swingx.JXSearchPanel;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.JXTree;
 import org.jdesktop.swingx.JXTreeTable;
+import org.jdesktop.swingx.color.ColorUtil;
 import org.jdesktop.swingx.decorator.AbstractHighlighter;
 import org.jdesktop.swingx.decorator.BorderHighlighter;
 import org.jdesktop.swingx.decorator.ColorHighlighter;
@@ -67,7 +69,9 @@ import org.jdesktop.swingx.decorator.PatternMatcher;
 import org.jdesktop.swingx.decorator.PatternPredicate;
 import org.jdesktop.swingx.decorator.ShadingColorHighlighter;
 import org.jdesktop.swingx.decorator.HighlightPredicate.ColumnHighlightPredicate;
-import org.jdesktop.swingx.renderer.PainterVisualCheck.ValueBasedGradientHighlighter;
+import org.jdesktop.swingx.painter.MattePainter;
+import org.jdesktop.swingx.painter.AbstractLayoutPainter.HorizontalAlignment;
+import org.jdesktop.swingx.renderer.RelativePainterHighlighter.NumberRelativizer;
 import org.jdesktop.swingx.rollover.RolloverProducer;
 import org.jdesktop.swingx.treetable.FileSystemModel;
 import org.jdesktop.test.AncientSwingTeam;
@@ -137,7 +141,7 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
 
     /**
      * Multiple Highlighters (shown as example in Javapolis 2007).
-     *
+     * 
      */
     public void interactiveTablePatternHighlighterJP() {
         JXTable table = new JXTable(tableModel);
@@ -145,7 +149,7 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
         table.setVisibleColumnCount(7);
         table.packAll();
         table.setColumnControlVisible(true);
-        
+
         Font font = table.getFont().deriveFont(Font.BOLD | Font.ITALIC);
         Highlighter simpleStriping = HighlighterFactory.createSimpleStriping();
         PatternPredicate patternPredicate = new PatternPredicate("^M", 1);
@@ -153,14 +157,11 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
                 Color.MAGENTA, null, Color.MAGENTA);
         FontHighlighter derivedFont = new FontHighlighter(patternPredicate,
                 font);
-        Highlighter gradient = new ValueBasedGradientHighlighter();
+        Highlighter gradient = createRelativeGradientHighlighter(HorizontalAlignment.LEFT);
         Highlighter shading = new ShadingColorHighlighter(
                 new HighlightPredicate.ColumnHighlightPredicate(1));
 
-        table.setHighlighters(simpleStriping,
-                magenta,
-                derivedFont,
-                shading,
+        table.setHighlighters(simpleStriping, magenta, derivedFont, shading,
                 gradient);
         showWithScrollingInFrame(table, "Multiple Highlighters");
     }
@@ -185,7 +186,8 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
                 Color.MAGENTA, null, Color.MAGENTA);
         FontHighlighter derivedFont = new FontHighlighter(patternPredicate,
                 font);
-        Highlighter gradient = new ValueBasedGradientHighlighter(true);
+        Highlighter gradient = createRelativeGradientHighlighter(
+                HorizontalAlignment.LEFT);
         Highlighter shading = new ShadingColorHighlighter(
                 new HighlightPredicate.ColumnHighlightPredicate(0));
         // create and configure one JXList per column.
@@ -228,6 +230,26 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
         showInFrame(panel, "Multiple Highlighters");
     }
 
+    /**
+     * @param right
+     * @return
+     */
+    private RelativePainterHighlighter createRelativeGradientHighlighter(
+            HorizontalAlignment right) {
+        Color startColor = ColorUtil.setAlpha(Color.RED, 130);
+        Color endColor = ColorUtil.setAlpha(Color.RED.brighter(), 0);
+        boolean isRightAligned = HorizontalAlignment.RIGHT == right;
+        GradientPaint paint = new GradientPaint(new Point2D.Double(0, 0),
+                isRightAligned ? endColor : startColor, 
+                new Point2D.Double(100, 0), 
+                isRightAligned ? startColor : endColor);
+        MattePainter painter = new MattePainter(paint);
+        painter.setPaintStretched(true);
+        RelativePainterHighlighter p = new RelativePainterHighlighter(painter);
+        p.setHorizontalAlignment(right);
+        p.setRelativizer(new NumberRelativizer(100));
+        return p;
+    }
     
     /**
      * @param tableModel2
