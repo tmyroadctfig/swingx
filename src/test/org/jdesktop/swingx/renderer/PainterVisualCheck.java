@@ -62,6 +62,7 @@ import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.JXTree;
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.action.ActionContainerFactory;
+import org.jdesktop.swingx.color.ColorUtil;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.Highlighter;
@@ -69,7 +70,6 @@ import org.jdesktop.swingx.decorator.HighlighterFactory;
 import org.jdesktop.swingx.decorator.PainterHighlighter;
 import org.jdesktop.swingx.decorator.HighlightPredicate.ColumnHighlightPredicate;
 import org.jdesktop.swingx.decorator.HighlightPredicate.NotHighlightPredicate;
-import org.jdesktop.swingx.painter.AbstractLayoutPainter;
 import org.jdesktop.swingx.painter.AbstractPainter;
 import org.jdesktop.swingx.painter.BusyPainter;
 import org.jdesktop.swingx.painter.ImagePainter;
@@ -79,6 +79,9 @@ import org.jdesktop.swingx.painter.ShapePainter;
 import org.jdesktop.swingx.painter.AbstractLayoutPainter.HorizontalAlignment;
 import org.jdesktop.swingx.painter.AbstractLayoutPainter.VerticalAlignment;
 import org.jdesktop.swingx.painter.effects.InnerGlowPathEffect;
+import org.jdesktop.swingx.renderer.RelativePainterHighlighter.NumberRelativizer;
+import org.jdesktop.swingx.renderer.RelativePainterHighlighter.RelativePainter;
+import org.jdesktop.swingx.sort.DefaultSortController;
 import org.jdesktop.swingx.table.ColumnControlButton;
 import org.jdesktop.swingx.test.XTestUtils;
 import org.jdesktop.swingx.treetable.FileSystemModel;
@@ -103,8 +106,8 @@ public class PainterVisualCheck extends InteractiveTestCase {
 //      setSystemLF(true);
       PainterVisualCheck test = new PainterVisualCheck();
       try {
-        test.runInteractiveTests();
-//         test.runInteractiveTests("interactive.*Gradient.*");
+//        test.runInteractiveTests();
+         test.runInteractiveTests("interactive.*ValueBasedG.*");
 //         test.runInteractiveTests("interactive.*Icon.*");
 //        test.runInteractiveTests("interactive.*Animated.*");
       } catch (Exception e) {
@@ -297,30 +300,31 @@ public class PainterVisualCheck extends InteractiveTestCase {
      * Use highlighter with image painter which is positioned relative to 
      * cell value. 
      */
-    public void interactivePositionedIconPainterHighlight()  {
+    public void interactiveValueBasedRelativePainterHighlight()  {
         TableModel model = new AncientSwingTeam();
         JXTable table = new JXTable(model);
         final ImagePainter imagePainter = new ImagePainter(XTestUtils.loadDefaultImage("green-orb.png"));
         imagePainter.setHorizontalAlignment(HorizontalAlignment.RIGHT);
         imagePainter.setAreaEffects(new InnerGlowPathEffect());
-        ValueBasedPositionalHighlighter iconHighlighter = new ValueBasedPositionalHighlighter();
-        iconHighlighter.setDelegatePainter(imagePainter);
+        RelativePainterHighlighter iconHighlighter = new RelativePainterHighlighter(imagePainter);
         iconHighlighter.setHorizontalAlignment(HorizontalAlignment.LEFT);
+        iconHighlighter.setRelativizer(new NumberRelativizer(100));
         table.getColumnExt(3).addHighlighter(iconHighlighter);
         // re-use component controller and highlighter in a JXList
         JXList list = new JXList(createListNumberModel(), true);
         list.setCellRenderer(new DefaultListRenderer(new LabelProvider(JLabel.RIGHT)));
         list.addHighlighter(iconHighlighter);
+        list.setComparator(DefaultSortController.COMPARABLE_COMPARATOR);
         list.toggleSortOrder();
         showWithScrollingInFrame(table, list, 
-                "value-based image position highlighting");
+            "value-based image position (with relativePainterHighlighter)");
     }
-
+    
     
     
     /**
-     * Use highlighter with image painter which is positioned relative to 
-     * cell value. 
+     * Use highlighter with image painter which is marching across the 
+     * cell range (same for all, independent of value).
      */
     public void interactiveAnimatedIconPainterHighlight()  {
         TableModel model = new AncientSwingTeam();
@@ -533,13 +537,14 @@ public class PainterVisualCheck extends InteractiveTestCase {
      * with SwingX extended default renderer. Shared by table and list with
      * striping.
      */
-    public void interactiveNumberProportionalGradientHighlightPlusStriping() {
+    public void interactiveValueBasedGradientHighlightPlusStriping() {
         TableModel model = new AncientSwingTeam();
         JXTable table = new JXTable(model);
         ComponentProvider<JLabel> controller = new LabelProvider(
                 JLabel.RIGHT) ;
-        final ValueBasedGradientHighlighter gradientHighlighter = createTransparentGradientHighlighter();
-        gradientHighlighter.setHorizontalAlignment(HorizontalAlignment.RIGHT);
+        RelativePainterHighlighter gradientHighlighter = 
+            createRelativeGradientHighlighter(HorizontalAlignment.RIGHT, 100);
+        table.addHighlighter(gradientHighlighter);
         Highlighter alternateRowHighlighter = HighlighterFactory.createSimpleStriping();
         table.addHighlighter(alternateRowHighlighter);
         table.addHighlighter(gradientHighlighter);
@@ -554,8 +559,8 @@ public class PainterVisualCheck extends InteractiveTestCase {
         addStatusMessage(frame,
                 "uses a PainterAwareLabel in renderer");
         // crude binding to play with options - the factory is incomplete...
-        addStatusComponent(frame, createTransparencyToggle(gradientHighlighter));
-        show(frame);
+//        addStatusComponent(frame, createTransparencyToggle(gradientHighlighter));
+//        show(frame);
     }
 
     /**
@@ -563,7 +568,7 @@ public class PainterVisualCheck extends InteractiveTestCase {
      * with SwingX extended default renderer. Shared by table and list with
      * background color.
      */
-    public void interactiveNumberProportionalGradientHighlight() {
+    public void interactiveValueBasedGradientHighlight() {
         TableModel model = new AncientSwingTeam();
         JXTable table = new JXTable(model);
         table.setBackground(HighlighterFactory.LEDGER);
@@ -571,9 +576,10 @@ public class PainterVisualCheck extends InteractiveTestCase {
                 JLabel.RIGHT);
 //        table.setDefaultRenderer(Number.class, new DefaultTableRenderer(
 //                controller));
-        ValueBasedGradientHighlighter gradientHighlighter = createTransparentGradientHighlighter();
-        gradientHighlighter.setHorizontalAlignment(HorizontalAlignment.RIGHT);
+        RelativePainterHighlighter gradientHighlighter = 
+            createRelativeGradientHighlighter(HorizontalAlignment.RIGHT, 100);
         table.addHighlighter(gradientHighlighter);
+        
         // re-use component controller and highlighter in a JXList
         JXList list = new JXList(createListNumberModel(), true);
         list.setBackground(table.getBackground());
@@ -581,308 +587,35 @@ public class PainterVisualCheck extends InteractiveTestCase {
         list.addHighlighter(gradientHighlighter);
         list.toggleSortOrder();
         JXFrame frame = wrapWithScrollingInFrame(table, list,
-                "transparent value relative highlighting");
-        addStatusMessage(frame,
-                "uses the default painter-aware label in renderer");
+            "transparent value relative highlighting (with RelativePH)");
+//        addStatusMessage(frame,
+//        "uses the default painter-aware label in renderer");
         // crude binding to play with options - the factory is incomplete...
-        addStatusComponent(frame, createTransparencyToggle(gradientHighlighter));
+//        addStatusComponent(frame, createTransparencyToggle(gradientHighlighter));
         show(frame);
     }
-
-    //--------- hack around missing size proportional painters
-    
-    public static class RelativePainter<T> extends AbstractLayoutPainter<T> {
-
-        private Painter<? super T> painter;
-        private double xFactor;
-        private double yFactor;
-
-        public RelativePainter() {
-            this(null);
-        }
-        
-        
-        public RelativePainter(Painter<? super T> delegate) {
-            this.painter = delegate;
-        }
-        
-        public RelativePainter(Painter<? super T> delegate, double xPercent) {
-            this(delegate);
-            xFactor = xPercent;
-        }
-        public void setPainter(Painter<? super T> painter) {
-            Object old = getPainter();
-            this.painter = painter;
-            firePropertyChange("painter", old, getPainter());
-        }
-        
-        public Painter<? super T> getPainter() {
-            return painter;
-        }
-        public void setXFactor(double xPercent) {
-            double old = getXFactor();
-            this.xFactor = xPercent;
-            firePropertyChange("xFactor", old, getXFactor());
-        }
-        
-        /**
-         * @return
-         */
-        private double getXFactor() {
-            return xFactor;
-        }
-
-        public void setYFactor(double yPercent) {
-            this.yFactor = yPercent;
-        }
-        @Override
-        protected void doPaint(Graphics2D g, T object, int width, int height) {
-            if (painter == null) return;
-            // use epsilon
-            if (xFactor != 0.0) {
-                int oldWidth = width;
-                width = (int) (xFactor * width);
-                if (getHorizontalAlignment() == HorizontalAlignment.RIGHT) {
-                    g.translate(oldWidth - width, 0);
-                }
-            }
-            if (yFactor != 0.0) {
-                int oldHeight = height;
-                height = (int) (yFactor * height);
-                if (getVerticalAlignment() == VerticalAlignment.BOTTOM) {
-                    g.translate(0, oldHeight - height);
-                }
-            }
-            
-            painter.paint(g, object, width, height);
-        }
-        
-    }
-    // -------------------- Value-based transparent gradient highlighter
-
-    /**
-     * A Highlighter which applies a value-proportional gradient to PainterAware
-     * rendering components if the value is a Number. The gradient is a simple
-     * red to red.brigther paint. The red can be toggled to
-     * half-transparent.<p>
-     * 
-     */
-    public static class ValueBasedGradientHighlighter extends
-            PainterHighlighter {
-        float maxValue = 100;
-
-        private boolean yellowTransparent;
-
-        public ValueBasedGradientHighlighter() {
-            this(false);
-        }
-        
-        /**
-         * @param b
-         */
-        public ValueBasedGradientHighlighter(boolean b) {
-            super(new RelativePainter<JComponent>());
-            setYellowTransparent(b);
-        }
-        
-        /**
-         * Overridden to do nothing if it's not a RelativePainter. We 
-         * roll our own.
-         */
-        @Override
-        public void setPainter(Painter painter) {
-            if (!(painter instanceof RelativePainter)) return; 
-            super.setPainter(painter);
-        }
-
-        @Override
-        public RelativePainter getPainter() {
-            return (RelativePainter) super.getPainter();
-        }
-
-        @Override
-        protected Component doHighlight(Component renderer,
-                ComponentAdapter adapter) {
-            float end = getEndOfGradient((Number) adapter.getValue());
-            if (end > 1) {
-                renderer.setBackground(Color.RED.darker());
-                renderer.setForeground(Color.WHITE);
-            } else if (end > 0.02) {
-                Painter painter = getPainter(end);
-                ((PainterAware) renderer).setPainter(painter);
-            }
-            return renderer;
-        }
-
-        
-        @Override
-        protected boolean canHighlight(Component component,
-                ComponentAdapter adapter) {
-            return (adapter.getValue() instanceof Number) && 
-                super.canHighlight(component, adapter);
-        }
-
-        /**
-         * @param yellowTransparent
-         */
-        public void setYellowTransparent(boolean yellowTransparent) {
-            if (this.yellowTransparent == yellowTransparent) return;
-            this.yellowTransparent = yellowTransparent;
-            getPainter().setPainter(null);
-            fireStateChanged();
-        }
-
-        public void setHorizontalAlignment(HorizontalAlignment align) {
-            getPainter().setHorizontalAlignment(align);
-            fireStateChanged();
-        }
-        
-        public HorizontalAlignment getHorizontalAlignment() {
-            return getPainter().getHorizontalAlignment();
-        }
-        
-        private Painter getPainter(float end) {
-            if (getPainter().getPainter() == null) {
-                Color startColor = getTransparentColor(Color.RED,
-                        yellowTransparent ? 125 : 254);
-                Color endColor = getTransparentColor(Color.RED.brighter(), 0);
-                boolean isRightAligned = HorizontalAlignment.RIGHT == getHorizontalAlignment();
-                GradientPaint paint = new GradientPaint(new Point2D.Double(0, 0),
-                        isRightAligned ? endColor : startColor, 
-                        new Point2D.Double(100, 0), 
-                        isRightAligned ? startColor : endColor);
-                MattePainter painter = new MattePainter(paint);
-                painter.setPaintStretched(true);
-                getPainter().setPainter(painter);
-            } 
-            getPainter().setXFactor(end);
-            return getPainter();
-        }
-
- 
-        private Color getTransparentColor(Color base, int transparency) {
-            return new Color(base.getRed(), base.getGreen(), base.getBlue(),
-                    transparency);
-        }
-
-        private float getEndOfGradient(Number number) {
-            float end = number.floatValue() / maxValue;
-            return end;
-        }
-       
-    }
-
-    
     
     /**
-     * A Highlighter which applies a value-proportional gradient to PainterAware
-     * rendering components if the value is a Number. The gradient is a simple
-     * red to red.brigther paint. The red can be toggled to
-     * half-transparent.<p>
-     * 
-     */
-    public static class ValueBasedPositionalHighlighter extends
-            PainterHighlighter {
-        float maxValue = 100;
-
-        public ValueBasedPositionalHighlighter() {
-            super(new RelativePainter<JComponent>());
-        }
-        
-        /**
-         * Overridden to do nothing if it's not a RelativePainter. We 
-         * roll our own.
-         */
-        @Override
-        public void setPainter(Painter painter) {
-            if (!(painter instanceof RelativePainter)) return; 
-            super.setPainter(painter);
-        }
-        
-        @Override
-        public RelativePainter getPainter() {
-            return (RelativePainter) super.getPainter();
-        }
-
-        public void setDelegatePainter(Painter painter) {
-            getPainter().setPainter(painter);
-        }
-        
-        @Override
-        protected Component doHighlight(Component renderer,
-                ComponentAdapter adapter) {
-            float end = getEndOfGradient((Number) adapter.getValue());
-            if (end > 1) {
-                renderer.setBackground(Color.RED.darker());
-                renderer.setForeground(Color.WHITE);
-            } else if (end > 0.02) {
-                Painter painter = getPainter(end);
-                ((PainterAware) renderer).setPainter(painter);
-            }
-            return renderer;
-        }
-
-        @Override
-        protected boolean canHighlight(Component component,
-                ComponentAdapter adapter) {
-            return (adapter.getValue() instanceof Number) && 
-                super.canHighlight(component, adapter);
-        }
-
-        public void setHorizontalAlignment(HorizontalAlignment align) {
-            getPainter().setHorizontalAlignment(align);
-            fireStateChanged();
-        }
-        
-        public HorizontalAlignment getHorizontalAlignment() {
-            return getPainter().getHorizontalAlignment();
-        }
-        
-        private Painter getPainter(float end) {
-            getPainter().setXFactor(end);
-            return getPainter();
-        }
-        private float getEndOfGradient(Number number) {
-            float end = number.floatValue() / maxValue;
-            return end;
-        }
-        
-    }
-
-    /**
-     * creates and returns a highlighter with a value-based transparent gradient
-     * if the cell content type is a Number.
-     * 
+     * @param right
      * @return
      */
-    private ValueBasedGradientHighlighter createTransparentGradientHighlighter() {
-        return new ValueBasedGradientHighlighter();
+    private RelativePainterHighlighter createRelativeGradientHighlighter(
+            HorizontalAlignment right, Number max) {
+        Color startColor = ColorUtil.setAlpha(Color.RED, 130);
+        Color endColor = ColorUtil.setAlpha(Color.RED.brighter(), 0);
+        boolean isRightAligned = HorizontalAlignment.RIGHT == right;
+        GradientPaint paint = new GradientPaint(new Point2D.Double(0, 0),
+                isRightAligned ? endColor : startColor, 
+                new Point2D.Double(100, 0), 
+                isRightAligned ? startColor : endColor);
+        MattePainter painter = new MattePainter(paint);
+        painter.setPaintStretched(true);
+        RelativePainterHighlighter p = new RelativePainterHighlighter(painter);
+        p.setHorizontalAlignment(right);
+        p.setRelativizer(new NumberRelativizer(max));
+        return p;
     }
 
-    /**
-     * Creates and returns a checkbox to toggle the gradient's yellow
-     * transparency.
-     * 
-     * @param gradientHighlighter
-     * @return
-     */
-    private JCheckBox createTransparencyToggle(
-            final ValueBasedGradientHighlighter gradientHighlighter) {
-        ActionContainerFactory factory = new ActionContainerFactory();
-        // toggle opaque optimatization
-        AbstractActionExt toggleTransparent = new AbstractActionExt(
-                "yellow transparent") {
-
-            public void actionPerformed(ActionEvent e) {
-                gradientHighlighter.setYellowTransparent(isSelected());
-            }
-
-        };
-        toggleTransparent.setStateAction();
-        JCheckBox box = new JCheckBox();
-        factory.configureButton(box, toggleTransparent, null);
-        return box;
-    }
 
 //----------------- Utility    
     /**
