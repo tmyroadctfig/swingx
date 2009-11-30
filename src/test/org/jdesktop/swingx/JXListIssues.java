@@ -7,6 +7,8 @@ package org.jdesktop.swingx;
 import javax.swing.JList;
 import javax.swing.plaf.UIResource;
 
+import org.junit.Test;
+
 public class JXListIssues extends JXListTest {
 
     public static void main(String[] args) {
@@ -27,6 +29,7 @@ public class JXListIssues extends JXListTest {
      * 
      * Expected: plain ol' list does install UIResource (while tree doesn't)
      */
+    @Test
     public void testLAFRendererList() {
         JList list = new JList();
         assertNotNull("default renderer installed", list.getCellRenderer());
@@ -39,6 +42,7 @@ public class JXListIssues extends JXListTest {
      * 
      * Expected: plain ol' list does install UIResource (while tree doesn't)
      */
+    @Test
     public void testLAFRendererXList() {
         JXList list = new JXList();
         assertNotNull("default renderer installed", list.getCellRenderer());
