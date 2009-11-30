@@ -96,6 +96,7 @@ public class JXTreeIssues extends JXTreeUnitTest {
      * 
      * Unexpected: plain ol' tree doesn't install UIResource?
      */
+    @Test
     public void testLAFRendererTree() {
         JTree tree = new JTree();
         assertNotNull("default renderer installed", tree.getCellRenderer());
@@ -108,6 +109,7 @@ public class JXTreeIssues extends JXTreeUnitTest {
      * 
      * Unexpected: plain ol' tree doesn't install UIResource?
      */
+    @Test
     public void testLAFRendererXTree() {
         JXTree tree = new JXTree();
         assertNotNull("default renderer installed", tree.getCellRenderer());
@@ -135,7 +137,7 @@ public class JXTreeIssues extends JXTreeUnitTest {
      * rendererPane? Not true - removed at end of paint.
      * Why is this renderer replaced on LAF-toggle?
      */
-    public void interactiveUpdateUIRendererProvider() {
+     public void interactiveUpdateUIRendererProvider() {
         JXTree tree = new JXTree();
         tree.setCellRenderer(sharedRenderer);
         showWithScrollingInFrame(tree, "updateUI must update renderer??");

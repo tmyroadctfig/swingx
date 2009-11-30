@@ -457,16 +457,27 @@ public abstract class AbstractSearchable implements Searchable {
     protected boolean hasMatch() {
         return hasMatch(lastSearchResult);
     }
+
     /**
-     * Returns a boolean indicating whether a match should be marked with a Highlighter.
+     * Returns a boolean indicating whether a match should be marked with a
+     * Highlighter. Typically, if true, the match highlighter is used, otherwise
+     * a match is indicated by selection.
      * <p>
-     * This implementation returns true if the target component has a client property for
-     * key MATCH_HIGHLIGHTER with value Boolean.TRUE, false otherwise.
      * 
-     * @return a boolean indicating whether a match should be marked by a using a Highlighter.
+     * This implementation returns true if the target component has a client
+     * property for key MATCH_HIGHLIGHTER with value Boolean.TRUE, false
+     * otherwise. The SearchFactory sets that client property in incremental
+     * search mode, that is when triggering a search via the JXFindBar as
+     * installed by the factory. 
+     * 
+     * @return a boolean indicating whether a match should be marked by a using
+     *         a Highlighter.
+     *         
+     * @see SearchFactory        
      */
     protected boolean markByHighlighter() {
-        return Boolean.TRUE.equals(getTarget().getClientProperty(MATCH_HIGHLIGHTER));
+        return Boolean.TRUE.equals(getTarget().getClientProperty(
+                MATCH_HIGHLIGHTER));
     }
 
     /**
@@ -480,7 +491,6 @@ public abstract class AbstractSearchable implements Searchable {
         matchHighlighter = hl;
         if (markByHighlighter()) {
             moveMatchMarker();
-//            getConfiguredMatchHighlighter();
         }
     }
     
