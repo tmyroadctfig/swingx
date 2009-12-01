@@ -58,6 +58,25 @@ public class JXTreeUnitTest extends InteractiveTestCase {
     }
 
     /**
+     * Issue #1231-swingx: tree cell renderer size problems.
+     * 
+     * Cache not invalidated on setCellRenderer due to not firing a 
+     * propertyChange (it's wrapped). Problem or not is LAF dependent ;-)
+     * The not-firing is clearly a bug.
+     * 
+     */
+    @Test
+    public void testRendererNotification() {
+        JXTree tree = new JXTree();
+        TreeCellRenderer renderer = tree.getCellRenderer();
+        assertNotNull("sanity: ", renderer);
+        PropertyChangeReport report = new PropertyChangeReport(tree);
+        tree.setCellRenderer(new DefaultTreeRenderer());
+        assertEquals(1, report.getEventCount());
+        assertEquals(1, report.getEventCount("cellRenderer"));
+        
+    }
+    /**
      * Issue #1061-swingx: renderer/editor inconsistent on startup
      */
     @Test

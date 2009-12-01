@@ -1109,6 +1109,7 @@ public class JXTree extends JTree {
                 (getCellEditor() instanceof DefaultXTreeCellEditor)) {
            ((DefaultXTreeCellEditor) getCellEditor()).setRenderer((DefaultTreeCellRenderer) renderer); 
         }
+        firePropertyChange("cellRenderer", null, delegatingRenderer);
     }
 
     

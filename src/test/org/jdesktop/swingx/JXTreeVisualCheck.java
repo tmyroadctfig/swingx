@@ -72,7 +72,8 @@ public class JXTreeVisualCheck extends JXTreeUnitTest {
       JXTreeVisualCheck test = new JXTreeVisualCheck();
       try {
 //          test.runInteractiveTests();
-          test.runInteractiveTests("interactive.*RToL.*");
+          test.runInteractiveTests("interactive.*Renderer.*");
+//          test.runInteractiveTests("interactive.*RToL.*");
 //          test.runInteractiveTests("interactive.*Revalidate.*");
 //          test.runInteractiveTests("interactiveRootExpansionTest");
 //        test.runInteractiveTests("interactive.*UpdateUI.*");
@@ -81,6 +82,30 @@ public class JXTreeVisualCheck extends JXTreeUnitTest {
           e.printStackTrace();
       }
   }
+
+    /**
+     * Issue #1231-swingx: tree cell renderer size problems.
+     * 
+     * Cache not invalidated on setCellRenderer due to not firing a 
+     * propertyChange (it's wrapped). Problem or not is LAF dependent ;-)
+     * The not-firing is clearly a bug.
+     * 
+     */
+    public void interactiveRendererSize() {
+        JXTree tree = new JXTree();
+        tree.setCellRenderer(new CustomCellRenderer());
+        showWithScrollingInFrame(tree, "sizing problems in renderer");
+    }
+
+    private static class CustomCellRenderer extends DefaultTreeCellRenderer {
+        @Override
+        public Component getTreeCellRendererComponent(JTree tree, Object value,
+                boolean selected, boolean expanded, boolean leaf, int row,
+                boolean hasFocus) {
+            return super.getTreeCellRendererComponent(tree, "XX " + value,
+                    selected, expanded, leaf, row, hasFocus);
+        }
+    }
 
 
 
