@@ -7,6 +7,8 @@ package org.jdesktop.swingx;
 import javax.swing.JList;
 import javax.swing.plaf.UIResource;
 
+import org.jdesktop.swingx.renderer.DefaultListRenderer;
+import org.jdesktop.test.PropertyChangeReport;
 import org.junit.Test;
 
 public class JXListIssues extends JXListTest {
@@ -21,6 +23,22 @@ public class JXListIssues extends JXListTest {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Issue #1232-swingx: JXList must fire property change on setCellRenderer.
+     * 
+     * The very first setting fires twice: once from super, once from 
+     * the forced.
+     * 
+     */
+    @Test
+    public void testRendererNotificationFirst() {
+        JXList list = new JXList();
+        PropertyChangeReport report = new PropertyChangeReport(list);
+        list.setCellRenderer(new DefaultListRenderer());
+        assertEquals(1, report.getEventCount());
+        assertEquals(1, report.getEventCount("cellRenderer"));
     }
 
 

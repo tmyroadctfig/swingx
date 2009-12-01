@@ -76,6 +76,24 @@ public class JXListTest extends InteractiveTestCase {
     private JXList list;
     private StringValue sv;
 
+
+    /**
+     * Issue #1232-swingx: JXList must fire property change on setCellRenderer.
+     * 
+     */
+    @Test
+    public void testRendererNotification() {
+        JXList list = new JXList();
+        ListCellRenderer renderer = list.getCellRenderer();
+        assertNotNull("sanity: ", renderer);
+        // first is okay (super renderer not yet set)
+        list.setCellRenderer(new DefaultListRenderer());
+        PropertyChangeReport report = new PropertyChangeReport(list);
+        list.setCellRenderer(new DefaultListRenderer());
+        assertEquals(1, report.getEventCount());
+        assertEquals(1, report.getEventCount("cellRenderer"));
+        assertEquals(renderer, report.getLastNewValue());
+    }
     /**
      * Issue #1162-swingx: getNextMatch incorrect if sorted.
      */

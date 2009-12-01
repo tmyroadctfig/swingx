@@ -1312,6 +1312,13 @@ public class JXList extends JList {
      */
     @Override
     public void setCellRenderer(ListCellRenderer renderer) {
+        // PENDING JW: super fires for very first setting
+        // as defaults are automagically set (by delegatingRenderer
+        // using this list's factory method) there is no
+        // easy way to _not_ force, this isn't working
+        // but then ... it's only the very first time around. 
+        // Safe enough to wait for complaints ;-)
+        boolean forceFire = (delegatingRenderer != null) ;
         // JW: Pending - probably fires propertyChangeEvent with wrong newValue?
         // how about fixedCellWidths?
         // need to test!!
@@ -1320,6 +1327,8 @@ public class JXList extends JList {
                 renderer instanceof StringValue ? (StringValue) renderer: null, 
                         0);
         super.setCellRenderer(delegatingRenderer);
+        if (forceFire)
+           firePropertyChange("cellRenderer", null, delegatingRenderer);
     }
 
     /**
