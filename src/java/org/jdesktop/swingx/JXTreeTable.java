@@ -403,11 +403,192 @@ public class JXTreeTable extends JXTable {
         return treeTableHacker;
     }
     
+    /**
+     * Hacking around various issues. Subclass and let it return 
+     * your favourite. The current default is TreeTableHackerExt3, the latest
+     * evolution (to work around #1230) is TreeTableHackerExt4. 
+     * 
+     * @return
+     */
     protected TreeTableHacker createTreeTableHacker() {
 //        return new TreeTableHacker();
 //        return new TreeTableHackerExt();
 //        return new TreeTableHackerExt2();
         return new TreeTableHackerExt3();
+//        return new TreeTableHackerExt4();
+    }
+
+    private boolean processMouseMotion = true;
+
+    @Override
+    protected void processMouseMotionEvent(MouseEvent e) {
+        if (processMouseMotion)
+                super.processMouseMotionEvent(e);
+    }
+
+    /**
+     * This class extends TreeTableHackerExt instead of TreeTableHackerExt3 so
+     * as to serve as a clue that it is a complete overhaul and looking in
+     * TreeTableHackerExt2 and TreeTableHackerExt3 for methods to change the
+     * behavior will do you no good.
+     * <p>
+     * The methods previously used are abandoned as they would be misnomers to
+     * the behavior as implemented in this class.
+     * <p>
+     * Changes:
+     * <ol>
+     * <li>
+     * According to TreeTableHackerExt3, clickCounts > 1 are not sent to the
+     * JTree so that double clicks will start edits (Issue #474). Well, mouse
+     * events are only sent to the JTree if they occur within the tree handle
+     * space - so that is not the behavior desired. Double clicks on the
+     * text/margin opposite the tree handle already started edits without that
+     * modification (I checked). The only thing that modification does is
+     * introduce bugs when one actually double clicks on a tree handle... so
+     * that idea was abandoned.</li>
+     * <li>
+     * There is no longer any discrimination between events that cause an
+     * expansion/collapse. Since the event location is check to see if it is in
+     * the tree handle margin area, this doesn't seem necessary. Plus it is more
+     * user friendly: if someone missed the tree handle by 1 pixel, then it
+     * caused a selection change instead of a node expansion/ collapse.</li>
+     * <li>
+     * The consumption of events are handled within this class itself because
+     * the behavior associated with the way that <code>processMoueEvent(MouseEvent)</code> consumed events was incompatible with the way this
+     * class does things. As a consequence,
+     * <code>hitHandleDetectionFromProcessMouse(MouseEvent)</code> 
+     * always returns false so that <code>processMoueEvent(MouseEvent)</code> will not 
+     * doing anything other than call its super
+     * method.</li>
+     * <li>
+     * All events of type MOUSE_PRESSED, MOUSE_RELEASED, and MOUSE_CLICKED, but
+     * excluding when <code>isPopupTrigger()</code> returns true, are sent to
+     * the JTree. This has the added benefit of not having to piggy back a mouse
+     * released event as we can just use the real mouse released event. This
+     * keeps the look and feel consistent for the user of UI's that
+     * expand/collapse nodes on the release of the mouse.</li>
+     * <li>
+     * The previous implementations have a spiel about avoiding events with
+     * modifiers because the UI might try to change the selection. Well that
+     * didn't occur in any of the look and feels I tested. Perhaps that was the
+     * case if events that landed within the content area of a node were sent to
+     * the JTree. If that behavior is actually necessary, then it can be added
+     * to the <code>isTreeHandleEventType(MouseEvent)</code> method. This
+     * implementation sends all events regardless of the modifiers.</li>
+     * <li>
+     * This implementation toggles the processing of mouse motion events. When
+     * events are sent to the tree, it is turned off and turned back on when an
+     * event is not sent to the tree. This fixes selection changes that occur
+     * when one drags the mouse after pressing on a tree handle.</li>
+     * </ol>
+     * 
+     * contributed by member aephyr@dev.java.net
+     */
+    public class TreeTableHackerExt4 extends TreeTableHackerExt {
+
+        /**
+         * Filter to find mouse events that are candidates for node expansion/
+         * collapse. MOUSE_PRESSED and MOUSE_RELEASED are used by default UIs.
+         * MOUSE_CLICKED is included as it may be used by a custom UI.
+         * 
+         * @param e the currently dispatching mouse event
+         * @return true if the event is a candidate for sending to the JTree
+         */
+        protected boolean isTreeHandleEventType(MouseEvent e) {
+            switch (e.getID()) {
+            case MouseEvent.MOUSE_CLICKED:
+            case MouseEvent.MOUSE_PRESSED:
+            case MouseEvent.MOUSE_RELEASED:
+                return !e.isPopupTrigger();
+            }
+            return false;
+        }
+
+        /**
+         * This method checks if the location of the event is in the tree handle
+         * margin and translates the coordinates for the JTree.
+         * 
+         * @param e the currently dispatching mouse event
+         * @return the mouse event to dispatch to the JTree or null if nothing
+         *         should be dispatched
+         */
+        protected MouseEvent getEventForTreeRenderer(MouseEvent e) {
+            Point pt = e.getPoint();
+            int col = columnAtPoint(pt);
+            if (col >= 0 && isHierarchical(col)) {
+                int row = rowAtPoint(pt);
+                if (row >= 0) {
+                    // There will not be a check to see if the y coordinate is
+                    // in range
+                    // because the use of row = rowAtPoint(pt) will only return
+                    // a row
+                    // that has the y coordinates in the range of our point.
+                    Rectangle cellBounds = getCellRect(row, col, false);
+                    int x = e.getX() - cellBounds.x;
+                    Rectangle nodeBounds = renderer.getRowBounds(row);
+                    // The renderer's component orientation is checked because
+                    // that
+                    // is the one that really matters. Though it seems to always
+                    // be
+                    // in sync with the JXTreeTable's component orientation,
+                    // maybe
+                    // someone wants them to be different for some reason.
+                    if (renderer.getComponentOrientation().isLeftToRight() ? x < nodeBounds.x
+                            : x > nodeBounds.x + nodeBounds.width) {
+                        return new MouseEvent(renderer, e.getID(), e.getWhen(),
+                                e.getModifiers(), x, e.getY(),
+                                e.getXOnScreen(), e.getYOnScreen(), e
+                                        .getClickCount(), false, e.getButton());
+                    }
+                }
+            }
+            return null;
+        }
+
+        /**
+         * 
+         * @return this method always returns false, so that processMouseEvent
+         *         always just simply calls its super method
+         */
+        @Override
+        public boolean hitHandleDetectionFromProcessMouse(MouseEvent e) {
+                if (!isHitDetectionFromProcessMouse())
+                        return false;
+                if (isTreeHandleEventType(e)) {
+                        MouseEvent newE = getEventForTreeRenderer(e);
+                        if (newE != null) {
+                                renderer.dispatchEvent(newE);
+                                if (processMouseMotion) {
+                                        // This fixes the issue of drags on tree handles
+                                        // (often unintentional) from selecting all nodes from the
+                                        // anchor to the node of said tree handle.
+                                        processMouseMotion = false;
+                        // part of 561-swingx: if focus elsewhere and dispatching the
+                        // mouseEvent the focus doesn't move from elsewhere
+                        // still doesn't help in very first click after startup
+                        // probably lead of row selection event not correctly updated
+                        // on synch from treeSelectionModel
+                                        requestFocusInWindow();
+                                }
+                                e.consume();
+                                // Return false to prevent JXTreeTable.processMouseEvent(MouseEvent)
+                                // from stopping the processing of the event. This allows the
+                                // listeners to see the event even though it is consumed (perhaps
+                                // useful for a user supplied listener). A proper UI listener will
+                                // ignore consumed events.
+                                return false;
+                                // alternatively, you would have to use:
+                                // return e.getID() == MouseEvent.MOUSE_PRESSED;
+                                // because JXTreeTable.processMouseEvent(MouseEvent) assumes true
+                                // will only be returned for MOUSE_PRESSED events. Also, if true 
+                                // were to be returned, then you'd have to piggy back a released
+                                // event as the previous implementation does, because the actual
+                                // released event would never reach this method.
+                        }
+                }
+                processMouseMotion = true;
+                return false;
+        }
     }
 
     /**
