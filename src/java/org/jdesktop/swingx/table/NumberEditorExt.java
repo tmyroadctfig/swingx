@@ -135,7 +135,7 @@ public class NumberEditorExt extends DefaultCellEditor {
     protected boolean isValid() {
         if (!getComponent().isEditValid()) return false;
         try {
-            if (!useStrictFormatter)
+            if (!hasStrictFormatter())
                 getNumber();
             return true;
         } catch (Exception ex) {
@@ -155,8 +155,15 @@ public class NumberEditorExt extends DefaultCellEditor {
     protected Number getNumber() throws Exception {
         Number number = (Number) super.getCellEditorValue();
         if (number==null) return null;
-        return useStrictFormatter ? number :
+        return hasStrictFormatter() ? number :
             (Number) constructor.newInstance(new Object[]{number.toString()});
+    }
+
+    /**
+     * @return
+     */
+    protected boolean hasStrictFormatter() {
+        return useStrictFormatter;
     }
     
     /** Override and set the border back to normal in case there was an error previously */
@@ -167,21 +174,25 @@ public class NumberEditorExt extends DefaultCellEditor {
         ((JComponent)getComponent()).setBorder(new LineBorder(Color.black));
         try {
             final Class<?> type = table.getColumnClass(column);
-            // Assume that the Number object we are dealing with has a constructor which takes
-            // a single string parameter.
-            if (!Number.class.isAssignableFrom(type)) {
-                throw new IllegalStateException("NumberEditor can only handle subclasses of java.lang.Number");
-            }
-            if (useStrictFormatter) {
+            if (hasStrictFormatter()) {
+                // delegate to formatter which decides at parsing time
+                // then either handles or throws
                 ((NumberFormatter) getComponent().getFormatter()).setValueClass(type);
             } else {
+                // Assume that the Number object we are dealing with has a constructor which takes
+                // a single string parameter.
+                if (!Number.class.isAssignableFrom(type)) {
+                    throw new IllegalStateException("NumberEditor can only handle subclasses of java.lang.Number");
+                }
                 constructor = type.getConstructor(argTypes);
             }
+            // JW: in strict mode this may fail in setting the value in the formatter 
+            return super.getTableCellEditorComponent(table, value, isSelected, row, column);
+        } catch (Exception ex) {
+            // PENDING JW: super generic editor swallows all failures and returns null
+            // should we do so as well?
+            throw new IllegalStateException("value/type not compatible with Number", ex);
         }
-        catch (Exception ex) {
-            throw new IllegalStateException("Number subclass must have a constructor which takes a string", ex);
-        }
-        return super.getTableCellEditorComponent(table, value, isSelected, row, column);
     }
     
     /**
