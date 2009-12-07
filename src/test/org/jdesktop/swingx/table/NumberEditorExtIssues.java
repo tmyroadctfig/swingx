@@ -21,12 +21,16 @@
  */
 package org.jdesktop.swingx.table;
 
+import java.awt.Point;
 import java.text.NumberFormat;
 import java.text.ParseException;
+import java.util.Date;
 import java.util.logging.Logger;
 
 import javax.swing.JFormattedTextField;
+import javax.swing.JLabel;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellEditor;
 import javax.swing.text.InternationalFormatter;
 import javax.swing.text.NumberFormatter;
 
@@ -55,9 +59,69 @@ public class NumberEditorExtIssues extends InteractiveTestCase {
     /** a NumberEditorExt configured with IntegerFormat. */
     private NumberEditorExt cellEditor;
 
-
     private NumberEditorExt cellEditorStrict;
 
+    public static void main(String[] args) {
+        NumberEditorExtIssues test = new NumberEditorExtIssues();
+        try {
+            test.runInteractiveTests();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
+    /**
+     * Issue #1236-swingx: NumberEditorExt only handles columns with type
+     *    Number.
+     *    
+     * Perceived as overly restrictive, fails f.i. in usage in property sheet.   
+     * 
+     */
+//    @Test
+    public void interactiveMixedColumnEditors() {
+        // mixed types in column
+        Object[] values = new Object[] {new Integer(10), new Double(10.5), new Date(),
+                new JLabel("dummy"),
+                new Point(4, 6)};
+        DefaultTableModel model = new DefaultTableModel(10, 2) {
+
+            @Override
+            public Class<?> getColumnClass(int columnIndex) {
+                if (columnIndex == getColumnCount() - 1) {
+                    return Point.class;
+                }
+                return super.getColumnClass(columnIndex);
+            }
+            
+        };
+        for (int i = 0; i < values.length; i++) {
+            model.setValueAt(values[i], i, 0);
+            model.setValueAt(new Point(1, i), i, 1);
+        }
+        
+        JXTable table = new JXTable(model) {
+
+            @Override
+            public TableCellEditor getCellEditor(int row, int column) {
+                Object value = getValueAt(row, column);
+                if (value instanceof Number) {
+                    return getDefaultEditor(Number.class);
+                }
+                if (value instanceof Date) {
+                    return getDefaultEditor(Date.class);
+                }
+                if (value instanceof JLabel) {
+                    // pathological: something with a string param constructor
+                    return getDefaultEditor(Number.class);
+                }
+                return super.getCellEditor(row, column);
+            }
+            
+        };
+        table.setDefaultEditor(Date.class, new DatePickerCellEditor());
+        table.setDefaultEditor(Number.class, new NumberEditorExt(true));
+        showWithScrollingInFrame(table, "per-cell number editor? ");
+    }
     /**
      * Issue #1183-swingx: NumberEditorExt throws in getCellEditorValue if
      *   Integer (short, byte..) below/above min/max.

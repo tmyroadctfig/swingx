@@ -40,6 +40,7 @@ import javax.swing.JFormattedTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellEditor;
 import javax.swing.text.NumberFormatter;
 
 import org.jdesktop.swingx.InteractiveTestCase;
@@ -77,14 +78,57 @@ public class NumberEditorExtTest extends InteractiveTestCase {
     }
 
     private static final int INTEGER_COLUMN = 0;
-    /** a table with a model which has column class Integer in INTEGER_COLUMN. */
+    private static final int NUMBER_COLUMN = 1;
+    private static final int OBJECT_COLUMN = 2;
+    private static final int COLUMN_COUNT = OBJECT_COLUMN + 1;
+    
+    /** a table with a model which has column class Integer in INTEGER_COLUMN and
+     * column class Number in NUMBER_COLUMN. */
     private JXTable table;
     /** a NumberEditorExt configured with IntegerFormat. */
     private NumberEditorExt cellEditor;
 
-
+    /** a NumberEditorExt configured with strict IntegerFormat. */
     private NumberEditorExt cellEditorStrict;
+    
+    
+    
+    /**
+     * Issue #1236-swingx: NumberEditor throws for non-number columns.
+     * 
+     * Strict editor delegates to formatter -  which defaults to string valueclass.
+     */
+    @Test 
+    public void testStrictIsDefault() {
+        TableCellEditor editor = table.getDefaultEditor(Number.class);
+        assertTrue("sanity: expect NumberEditorExt but was " + editor, editor instanceof NumberEditorExt);
+        assertEquals("default formatter is strict", true, 
+                ((NumberEditorExt) editor).hasStrictFormatter());
+    }
+    
+    /**
+     * Issue #1236-swingx: NumberEditor throws for non-number columns.
+     * 
+     * Strict editor delegates to formatter -  which defaults to string valueclass.
+     */
+    @Test 
+    public void testEditorStrictObjectColumn() {
+        cellEditorStrict.getTableCellEditorComponent(table, null, false, 0, OBJECT_COLUMN);
+    }
+    
+    /**
+     * Issue #1236-swingx: NumberEditor throws for non-number columns.
+     * 
+     * Old default: non-strict editor throws IllegalState if column type
+     * is not a subtype of Number.
+     */
+    @Test (expected = IllegalStateException.class)
+    public void testEditorObjectColumn() {
+        cellEditor.getTableCellEditorComponent(table, null, false, 0, OBJECT_COLUMN);
+    }
 
+//---------------- Sanity testing: StrictNumberFormatter - 
+    
     @Test (expected = ParseException.class)
     public void testNumberFormatter() throws ParseException {
         NumberFormat format = NumberFormat.getIntegerInstance();
@@ -155,6 +199,8 @@ public class NumberEditorExtTest extends InteractiveTestCase {
         String text = new Integer(Integer.MAX_VALUE).toString() + "1";
         formatter.stringToValue(text);
     }
+
+//---------- end sanity testing: StrictNumberFormatter
     
     /**
      * Issue #1183-swingx: NumberEditorExt throws in getCellEditorValue if
@@ -583,12 +629,14 @@ public class NumberEditorExtTest extends InteractiveTestCase {
     @Before
     @Override
     public void setUp() throws Exception {
-        DefaultTableModel model = new DefaultTableModel(5, 1) {
+        DefaultTableModel model = new DefaultTableModel(5, COLUMN_COUNT) {
 
             @Override
             public Class<?> getColumnClass(int columnIndex) {
                 if (columnIndex == INTEGER_COLUMN)
                     return Integer.class;
+                if (columnIndex == NUMBER_COLUMN) 
+                    return Number.class;
                 return super.getColumnClass(columnIndex);
             }
             

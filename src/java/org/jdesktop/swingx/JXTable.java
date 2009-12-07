@@ -121,6 +121,7 @@ import org.jdesktop.swingx.sort.TableSortController;
 import org.jdesktop.swingx.table.ColumnControlButton;
 import org.jdesktop.swingx.table.ColumnFactory;
 import org.jdesktop.swingx.table.DefaultTableColumnModelExt;
+import org.jdesktop.swingx.table.NumberEditorExt;
 import org.jdesktop.swingx.table.TableColumnExt;
 import org.jdesktop.swingx.table.TableColumnModelExt;
 
@@ -3691,6 +3692,7 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
      * 
      * @see DefaultCellEditor
      */
+    @SuppressWarnings("unchecked")
     @Override
     protected void createDefaultEditors() {
         Object[] dummies = new Object[] { 1, 0, 2, 0, 3, 0, 4, 0, 5, 0, 6, 0,
@@ -3707,7 +3709,12 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
         // Numbers
         // setLazyEditor(Number.class,
         // "org.jdesktop.swingx.JXTable$NumberEditor");
-        setLazyEditor(Number.class, "org.jdesktop.swingx.table.NumberEditorExt");
+//        setLazyEditor(Number.class, "org.jdesktop.swingx.table.NumberEditorExt");
+        // JW: fix for 
+        // Issue #1183-swingx: NumberEditorExt throws in getCellEditorValue if
+        //   Integer (short, byte..) below/above min/max.
+        // Issue #1236-swingx: NumberEditorExt cannot be used in columns with Object type
+        defaultEditorsByColumnClass.put(Number.class, new NumberEditorExt(true));
 
         // Booleans
         setLazyEditor(Boolean.class,
