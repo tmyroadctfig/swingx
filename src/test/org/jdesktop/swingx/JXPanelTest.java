@@ -61,42 +61,42 @@ public class JXPanelTest extends TestCase {
     @Test
     public void testScrollableWidthTrackProperty() {
         JXPanel panel = new JXPanel();
-        ScrollableSizeTrack oldTrack = panel.getScrollableWidthTrack();
+        ScrollableSizeHint oldTrack = panel.getScrollableWidthHint();
         PropertyChangeReport report = new PropertyChangeReport(panel);
-        ScrollableSizeTrack none = ScrollableSizeTrack.HORIZONTAL_STRETCH;
-        panel.setScrollableWidthTrack(none);
-        assertSame(none, panel.getScrollableWidthTrack());
+        ScrollableSizeHint none = ScrollableSizeHint.HORIZONTAL_STRETCH;
+        panel.setScrollableWidthHint(none);
+        assertSame(none, panel.getScrollableWidthHint());
         TestUtils.assertPropertyChangeEvent(report, "scrollableWidthTrack", oldTrack, none);
     }
     @Test
     public void testScrollableHeightTrackProperty() {
         JXPanel panel = new JXPanel();
-        ScrollableSizeTrack oldTrack = panel.getScrollableHeightTrack();
+        ScrollableSizeHint oldTrack = panel.getScrollableHeightHint();
         PropertyChangeReport report = new PropertyChangeReport(panel);
-        ScrollableSizeTrack none = ScrollableSizeTrack.VERTICAL_STRETCH;
-        panel.setScrollableHeightTrack(none);
-        assertSame(none, panel.getScrollableHeightTrack());
+        ScrollableSizeHint none = ScrollableSizeHint.VERTICAL_STRETCH;
+        panel.setScrollableHeightHint(none);
+        assertSame(none, panel.getScrollableHeightHint());
         TestUtils.assertPropertyChangeEvent(report, "scrollableHeightTrack", oldTrack, none);
     }
     
     @Test (expected = NullPointerException.class)
     public void testScrollableHeightTrackNull() {
-        new JXPanel().setScrollableHeightTrack(null);
+        new JXPanel().setScrollableHeightHint(null);
     }
     
     @Test (expected = IllegalArgumentException.class)
     public void testScrollableHeightTrackIllegal() {
-        new JXPanel().setScrollableHeightTrack(ScrollableSizeTrack.HORIZONTAL_STRETCH);
+        new JXPanel().setScrollableHeightHint(ScrollableSizeHint.HORIZONTAL_STRETCH);
     }
     
     @Test (expected = NullPointerException.class)
     public void testScrollableWidthTrackNull() {
-        new JXPanel().setScrollableWidthTrack(null);
+        new JXPanel().setScrollableWidthHint(null);
     }
     
     @Test (expected = IllegalArgumentException.class)
     public void testScrollableWidthTrackIllegal() {
-        new JXPanel().setScrollableWidthTrack(ScrollableSizeTrack.VERTICAL_STRETCH);
+        new JXPanel().setScrollableWidthHint(ScrollableSizeHint.VERTICAL_STRETCH);
     }
     
     /**
@@ -106,8 +106,8 @@ public class JXPanelTest extends TestCase {
     @Test
     public void testScrollableSizeTrackProperty() {
         JXPanel panel = new JXPanel();
-        assertSame(ScrollableSizeTrack.FIT, panel.getScrollableWidthTrack());
-        assertSame(ScrollableSizeTrack.FIT, panel.getScrollableHeightTrack());
+        assertSame(ScrollableSizeHint.FIT, panel.getScrollableWidthHint());
+        assertSame(ScrollableSizeHint.FIT, panel.getScrollableHeightHint());
     }
     
     /**
@@ -136,26 +136,26 @@ public class JXPanelTest extends TestCase {
     
     @Test
     public void testOrientationCompatible() {
-        assertVerticalCompatible(true, ScrollableSizeTrack.NONE, ScrollableSizeTrack.FIT, 
-                ScrollableSizeTrack.VERTICAL_STRETCH);
-        assertVerticalCompatible(false, ScrollableSizeTrack.HORIZONTAL_STRETCH);
-        assertHorizontalCompatible(true, ScrollableSizeTrack.NONE, ScrollableSizeTrack.FIT, 
-                ScrollableSizeTrack.HORIZONTAL_STRETCH);
-        assertHorizontalCompatible(false, ScrollableSizeTrack.VERTICAL_STRETCH);
+        assertVerticalCompatible(true, ScrollableSizeHint.NONE, ScrollableSizeHint.FIT, 
+                ScrollableSizeHint.VERTICAL_STRETCH);
+        assertVerticalCompatible(false, ScrollableSizeHint.HORIZONTAL_STRETCH);
+        assertHorizontalCompatible(true, ScrollableSizeHint.NONE, ScrollableSizeHint.FIT, 
+                ScrollableSizeHint.HORIZONTAL_STRETCH);
+        assertHorizontalCompatible(false, ScrollableSizeHint.VERTICAL_STRETCH);
     }
     /**
      * 
      */
-    private void assertVerticalCompatible(boolean compatible, ScrollableSizeTrack... tracks) {
-        for (ScrollableSizeTrack track : tracks) {
+    private void assertVerticalCompatible(boolean compatible, ScrollableSizeHint... tracks) {
+        for (ScrollableSizeHint track : tracks) {
             assertEquals("vertical expected on " + track, compatible, track.isVerticalCompatible());
         }
     }
     /**
      * 
      */
-    private void assertHorizontalCompatible(boolean compatible, ScrollableSizeTrack... tracks) {
-        for (ScrollableSizeTrack track : tracks) {
+    private void assertHorizontalCompatible(boolean compatible, ScrollableSizeHint... tracks) {
+        for (ScrollableSizeHint track : tracks) {
             assertEquals("horizontal expected on " + track, compatible, track.isHorizontalCompatible());
         }
     }
@@ -165,7 +165,7 @@ public class JXPanelTest extends TestCase {
      */
     @Test 
     public void testScrollableSizeTrackNPE() {
-        for (ScrollableSizeTrack behaviour : ScrollableSizeTrack.values()) {
+        for (ScrollableSizeHint behaviour : ScrollableSizeHint.values()) {
             try {
                 behaviour.getTracksParentSize(null);
                 fail("null component must throw NPE, didn't on " + behaviour);

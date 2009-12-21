@@ -64,12 +64,12 @@ public class JXPanelVisualCheck extends InteractiveTestCase {
         final JXPanel panel = new JXPanel(new BorderLayout());
         panel.add(createScrollableContent(20));
         JXFrame frame = wrapWithScrollingInFrame(panel, "scrollbar must be showing");
-        Action toggleHeightTrack = new AbstractActionExt("track height: " + panel.getScrollableHeightTrack()) {
+        Action toggleHeightTrack = new AbstractActionExt("track height: " + panel.getScrollableHeightHint()) {
             
-            ScrollableSizeTrack[] tracks = new ScrollableSizeTrack[] {
-                    ScrollableSizeTrack.FIT
-                    , ScrollableSizeTrack.NONE
-                    , ScrollableSizeTrack.VERTICAL_STRETCH
+            ScrollableSizeHint[] tracks = new ScrollableSizeHint[] {
+                    ScrollableSizeHint.FIT
+                    , ScrollableSizeHint.NONE
+                    , ScrollableSizeHint.VERTICAL_STRETCH
             };
             int position;
             
@@ -77,7 +77,7 @@ public class JXPanelVisualCheck extends InteractiveTestCase {
             public void actionPerformed(ActionEvent e) {
                 position++;
                 if (position >= tracks.length) position = 0;
-                panel.setScrollableHeightTrack(tracks[position]);
+                panel.setScrollableHeightHint(tracks[position]);
                 setName("track height: " + tracks[position]);
             }
         }; 

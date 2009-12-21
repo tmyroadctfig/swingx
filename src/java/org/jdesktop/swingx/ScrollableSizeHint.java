@@ -36,7 +36,7 @@ import org.jdesktop.swingx.util.Contract;
  * 
  * @author Jeanette Winzenburg
  */
-public enum ScrollableSizeTrack {
+public enum ScrollableSizeHint {
 
     /**
      * Size should be unchanged.
@@ -91,15 +91,15 @@ public enum ScrollableSizeTrack {
     final boolean tracks;
     final int orientation;
     
-    ScrollableSizeTrack(boolean track) {
+    ScrollableSizeHint(boolean track) {
         this(track, -1);
     }
     
-    ScrollableSizeTrack(int orientation) {
+    ScrollableSizeHint(int orientation) {
         this(false, orientation);
     }
     
-    ScrollableSizeTrack(boolean tracks, int orientation) {
+    ScrollableSizeHint(boolean tracks, int orientation) {
         this.tracks = tracks;
         this.orientation = orientation;
         
