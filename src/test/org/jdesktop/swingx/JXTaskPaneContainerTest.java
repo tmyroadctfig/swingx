@@ -32,10 +32,10 @@ public class JXTaskPaneContainerTest extends TestCase {
     public void testScrollableTracks() {
         JXTaskPaneContainer container = new JXTaskPaneContainer();
         assertTrue(container.getScrollableTracksViewportWidth());
-        assertEquals(ScrollableSizeTrack.FIT, container.getScrollableWidthTrack());
+        assertEquals(ScrollableSizeHint.FIT, container.getScrollableWidthHint());
         // no parent, no tracking
         assertFalse(container.getScrollableTracksViewportHeight());
-        assertEquals(ScrollableSizeTrack.VERTICAL_STRETCH, container.getScrollableHeightTrack());
+        assertEquals(ScrollableSizeHint.VERTICAL_STRETCH, container.getScrollableHeightHint());
     }
     
     /**
