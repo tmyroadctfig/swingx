@@ -260,7 +260,7 @@ public class JXPanel extends JPanel implements Scrollable {
         if (oldValue == hint) return;
         this.scrollableWidthHint = hint;
         revalidate();
-        firePropertyChange("scrollableWidthTrack", oldValue, getScrollableWidthHint());
+        firePropertyChange("scrollableWidthHint", oldValue, getScrollableWidthHint());
     }
     
     
@@ -284,7 +284,7 @@ public class JXPanel extends JPanel implements Scrollable {
         if (oldValue == hint) return;
         this.scrollableHeightHint = hint;
         revalidate();
-        firePropertyChange("scrollableHeightTrack", oldValue, getScrollableHeightHint());
+        firePropertyChange("scrollableHeightHint", oldValue, getScrollableHeightHint());
     }
     
     protected ScrollableSizeHint getScrollableWidthHint() {

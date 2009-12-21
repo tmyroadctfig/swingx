@@ -66,7 +66,7 @@ public class JXPanelTest extends TestCase {
         ScrollableSizeHint none = ScrollableSizeHint.HORIZONTAL_STRETCH;
         panel.setScrollableWidthHint(none);
         assertSame(none, panel.getScrollableWidthHint());
-        TestUtils.assertPropertyChangeEvent(report, "scrollableWidthTrack", oldTrack, none);
+        TestUtils.assertPropertyChangeEvent(report, "scrollableWidthHint", oldTrack, none);
     }
     @Test
     public void testScrollableHeightTrackProperty() {
@@ -76,7 +76,7 @@ public class JXPanelTest extends TestCase {
         ScrollableSizeHint none = ScrollableSizeHint.VERTICAL_STRETCH;
         panel.setScrollableHeightHint(none);
         assertSame(none, panel.getScrollableHeightHint());
-        TestUtils.assertPropertyChangeEvent(report, "scrollableHeightTrack", oldTrack, none);
+        TestUtils.assertPropertyChangeEvent(report, "scrollableHeightHint", oldTrack, none);
     }
     
     @Test (expected = NullPointerException.class)
