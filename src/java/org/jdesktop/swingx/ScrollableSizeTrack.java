@@ -29,10 +29,10 @@ import org.jdesktop.swingx.util.Contract;
 /**
  * Sizing hints for layout, useful f.i. in a Scrollable implementation.<p>
  * 
- * PENDING JW: naming... suggestions?
- * 
  * Inspired by <a href=
  * http://tips4java.wordpress.com/2009/12/20/scrollable-panel/> Rob Camick</a>.
+ * 
+ * PENDING JW: naming... suggestions?
  * 
  * @author Jeanette Winzenburg
  */

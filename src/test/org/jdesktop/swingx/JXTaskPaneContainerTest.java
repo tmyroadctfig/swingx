@@ -28,6 +28,16 @@ public class JXTaskPaneContainerTest extends TestCase {
     TestUtilities.cycleAddons(new JXTaskPaneContainer());
   }
 
+    @Test
+    public void testScrollableTracks() {
+        JXTaskPaneContainer container = new JXTaskPaneContainer();
+        assertTrue(container.getScrollableTracksViewportWidth());
+        assertEquals(ScrollableSizeTrack.FIT, container.getScrollableWidthTrack());
+        // no parent, no tracking
+        assertFalse(container.getScrollableTracksViewportHeight());
+        assertEquals(ScrollableSizeTrack.VERTICAL_STRETCH, container.getScrollableHeightTrack());
+    }
+    
     /**
      * Issue #843-swingx: BasicTaskPaneContainerUI must respect custom Layout.
      */
