@@ -26,17 +26,23 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertThat;
 
 import java.awt.Color;
+import java.util.logging.Logger;
 
 import javax.swing.plaf.ColorUIResource;
 import javax.swing.plaf.UIResource;
+
+import junit.framework.TestCase;
 
 import org.jdesktop.swingx.painter.MattePainter;
 import org.jdesktop.swingx.painter.Painter;
 import org.jdesktop.swingx.plaf.PainterUIResource;
 import org.jdesktop.test.EDTRunner;
+import org.jdesktop.test.PropertyChangeReport;
+import org.jdesktop.test.TestUtils;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -47,7 +53,130 @@ import org.junit.runner.RunWith;
  * @author Karl Schaefer
  */
 @RunWith(EDTRunner.class)
-public class JXPanelTest {
+public class JXPanelTest extends TestCase {
+    @SuppressWarnings("unused")
+    private static final Logger LOG = Logger.getLogger(JXPanelTest.class
+            .getName());
+    
+    @Test
+    public void testScrollableWidthTrackProperty() {
+        JXPanel panel = new JXPanel();
+        ScrollableSizeTrack oldTrack = panel.getScrollableWidthTrack();
+        PropertyChangeReport report = new PropertyChangeReport(panel);
+        ScrollableSizeTrack none = ScrollableSizeTrack.HORIZONTAL_STRETCH;
+        panel.setScrollableWidthTrack(none);
+        assertSame(none, panel.getScrollableWidthTrack());
+        TestUtils.assertPropertyChangeEvent(report, "scrollableWidthTrack", oldTrack, none);
+    }
+    @Test
+    public void testScrollableHeightTrackProperty() {
+        JXPanel panel = new JXPanel();
+        ScrollableSizeTrack oldTrack = panel.getScrollableHeightTrack();
+        PropertyChangeReport report = new PropertyChangeReport(panel);
+        ScrollableSizeTrack none = ScrollableSizeTrack.VERTICAL_STRETCH;
+        panel.setScrollableHeightTrack(none);
+        assertSame(none, panel.getScrollableHeightTrack());
+        TestUtils.assertPropertyChangeEvent(report, "scrollableHeightTrack", oldTrack, none);
+    }
+    
+    @Test (expected = NullPointerException.class)
+    public void testScrollableHeightTrackNull() {
+        new JXPanel().setScrollableHeightTrack(null);
+    }
+    
+    @Test (expected = IllegalArgumentException.class)
+    public void testScrollableHeightTrackIllegal() {
+        new JXPanel().setScrollableHeightTrack(ScrollableSizeTrack.HORIZONTAL_STRETCH);
+    }
+    
+    @Test (expected = NullPointerException.class)
+    public void testScrollableWidthTrackNull() {
+        new JXPanel().setScrollableWidthTrack(null);
+    }
+    
+    @Test (expected = IllegalArgumentException.class)
+    public void testScrollableWidthTrackIllegal() {
+        new JXPanel().setScrollableWidthTrack(ScrollableSizeTrack.VERTICAL_STRETCH);
+    }
+    
+    /**
+     * Initial value (for backward compatibility: FIT)
+     * 
+     */
+    @Test
+    public void testScrollableSizeTrackProperty() {
+        JXPanel panel = new JXPanel();
+        assertSame(ScrollableSizeTrack.FIT, panel.getScrollableWidthTrack());
+        assertSame(ScrollableSizeTrack.FIT, panel.getScrollableHeightTrack());
+    }
+    
+    /**
+     * Sanity: compatibility for width tracking.
+     */
+    @Test
+    public void testScrollableTracksWidth() {
+        JXPanel panel = new JXPanel();
+        assertTrue(panel.getScrollableTracksViewportWidth());
+        panel.setScrollableTracksViewportWidth(false);
+        assertFalse(panel.getScrollableTracksViewportWidth());
+    }
+    
+    /**
+     * Sanity: compatibility for height tracking.
+     */
+    @Test
+    public void testScrollableTracksHeight() {
+        JXPanel panel = new JXPanel();
+        assertTrue(panel.getScrollableTracksViewportHeight());
+        panel.setScrollableTracksViewportHeight(false);
+        assertFalse(panel.getScrollableTracksViewportHeight());
+    }
+
+//----------------- test scrollable Size Track
+    
+    @Test
+    public void testOrientationCompatible() {
+        assertVerticalCompatible(true, ScrollableSizeTrack.NONE, ScrollableSizeTrack.FIT, 
+                ScrollableSizeTrack.VERTICAL_STRETCH);
+        assertVerticalCompatible(false, ScrollableSizeTrack.HORIZONTAL_STRETCH);
+        assertHorizontalCompatible(true, ScrollableSizeTrack.NONE, ScrollableSizeTrack.FIT, 
+                ScrollableSizeTrack.HORIZONTAL_STRETCH);
+        assertHorizontalCompatible(false, ScrollableSizeTrack.VERTICAL_STRETCH);
+    }
+    /**
+     * 
+     */
+    private void assertVerticalCompatible(boolean compatible, ScrollableSizeTrack... tracks) {
+        for (ScrollableSizeTrack track : tracks) {
+            assertEquals("vertical expected on " + track, compatible, track.isVerticalCompatible());
+        }
+    }
+    /**
+     * 
+     */
+    private void assertHorizontalCompatible(boolean compatible, ScrollableSizeTrack... tracks) {
+        for (ScrollableSizeTrack track : tracks) {
+            assertEquals("horizontal expected on " + track, compatible, track.isHorizontalCompatible());
+        }
+    }
+
+    /**
+     * Test contract - NPE on null component
+     */
+    @Test 
+    public void testScrollableSizeTrackNPE() {
+        for (ScrollableSizeTrack behaviour : ScrollableSizeTrack.values()) {
+            try {
+                behaviour.getTracksParentSize(null);
+                fail("null component must throw NPE, didn't on " + behaviour);
+            } catch (NullPointerException e) {
+                // expected
+            }
+        }
+    }
+  
+    
+    
     /**
      * SwingX #962: ensure that background painter is initially {@code null}.
      * <p>

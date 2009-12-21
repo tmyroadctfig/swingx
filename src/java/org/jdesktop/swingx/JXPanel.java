@@ -76,8 +76,11 @@ import org.jdesktop.swingx.painter.Painter;
  * @see Painter
  */
 public class JXPanel extends JPanel implements Scrollable {
-    private boolean scrollableTracksViewportHeight = true;
-    private boolean scrollableTracksViewportWidth = true;
+//    private boolean scrollableTracksViewportHeight = true;
+//    private boolean scrollableTracksViewportWidth = true;
+    
+    private ScrollableSizeTrack scrollableWidthTrack = ScrollableSizeTrack.FIT;
+    private ScrollableSizeTrack scrollableHeightTrack = ScrollableSizeTrack.FIT;
     
     /**
      * The alpha level for this component.
@@ -238,17 +241,66 @@ public class JXPanel extends JPanel implements Scrollable {
     }
     
     /**
+     * Sets the horizontal size tracking behaviour. 
+     * 
+     * @param track the horizontal size tracking behaviour, must not be null
+     *   and must be horizontal.
+     * 
+     * @throws IllegalArgumentException if track not horizontal 
+     * @throws NullPointerException if null
+     */
+    public final void setScrollableWidthTrack(ScrollableSizeTrack track) {
+        if (!track.isHorizontalCompatible()) throw 
+           new IllegalArgumentException("track must be horizontal, but was " + track);
+        ScrollableSizeTrack oldValue = getScrollableWidthTrack();
+        if (oldValue == track) return;
+        this.scrollableWidthTrack = track;
+        revalidate();
+        firePropertyChange("scrollableWidthTrack", oldValue, getScrollableWidthTrack());
+    }
+    
+    
+    /**
+     * Sets the vertical size tracking behaviour. 
+     * 
+     * @param track the vertical size tracking behaviour, must not be null
+     *   and must be vertical.
+     * 
+     * @throws IllegalArgumentException if track not vertical 
+     * @throws NullPointerException if null
+     */
+    public final void setScrollableHeightTrack(ScrollableSizeTrack track) {
+        if (!track.isVerticalCompatible()) throw 
+            new IllegalArgumentException("track must be vertical, but was " + track);
+        ScrollableSizeTrack oldValue = getScrollableHeightTrack();
+        if (oldValue == track) return;
+        this.scrollableHeightTrack = track;
+        revalidate();
+        firePropertyChange("scrollableHeightTrack", oldValue, getScrollableHeightTrack());
+    }
+    
+    protected ScrollableSizeTrack getScrollableWidthTrack() {
+        return scrollableWidthTrack;
+    }
+    
+    protected ScrollableSizeTrack getScrollableHeightTrack() {
+        return scrollableHeightTrack;
+        
+    }
+    
+    
+    /**
      * {@inheritDoc}
      */
     public boolean getScrollableTracksViewportHeight() {
-        return scrollableTracksViewportHeight;
+        return scrollableHeightTrack.getTracksParentSize(this);
     }
     
     /**
      * {@inheritDoc}
      */
     public boolean getScrollableTracksViewportWidth() {
-        return scrollableTracksViewportWidth;
+        return scrollableWidthTrack.getTracksParentSize(this);
     }
     
     /**
@@ -271,17 +323,38 @@ public class JXPanel extends JPanel implements Scrollable {
     public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction) {
         return 10;
     }
+    
     /**
+     * 
+     * Sets the vertical size tracking to either ScrollableSizeTrack.FIT or NONE, if the
+     * boolean parameter is true or false, respectively.<p>
+     * 
+     * <b>NOTE</b>: this method is kept for backward compatibility only, for full 
+     * control use setScrollableHeightTrack.
+     * 
      * @param scrollableTracksViewportHeight The scrollableTracksViewportHeight to set.
+     * 
+     * @see #setScrollableHeightTrack(ScrollableSizeTrack)
      */
     public void setScrollableTracksViewportHeight(boolean scrollableTracksViewportHeight) {
-        this.scrollableTracksViewportHeight = scrollableTracksViewportHeight;
+        setScrollableHeightTrack(scrollableTracksViewportHeight ? 
+                ScrollableSizeTrack.FIT : ScrollableSizeTrack.NONE);
     }
     /**
+     * Sets the horizontal size tracking to either ScrollableSizeTrack.FIT or NONE, if the
+     * boolean parameter is true or false, respectively.<p>
+     * 
+     * <b>NOTE</b>: this method is kept for backward compatibility only, for full 
+     * control use setScrollableWidthTrack.
+     * 
+     * 
      * @param scrollableTracksViewportWidth The scrollableTracksViewportWidth to set.
+     * 
+     * @see #setScrollableWidthTrack(ScrollableSizeTrack)
      */
     public void setScrollableTracksViewportWidth(boolean scrollableTracksViewportWidth) {
-        this.scrollableTracksViewportWidth = scrollableTracksViewportWidth;
+        setScrollableWidthTrack(scrollableTracksViewportWidth ? 
+                ScrollableSizeTrack.FIT : ScrollableSizeTrack.NONE);
     }
 
     /**

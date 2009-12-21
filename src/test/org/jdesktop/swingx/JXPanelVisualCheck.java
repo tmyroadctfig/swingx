@@ -21,11 +21,19 @@
  */
 package org.jdesktop.swingx;
 
+
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
 
 import javax.imageio.ImageIO;
+import javax.swing.Action;
+import javax.swing.BorderFactory;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
 
+import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.painter.ImagePainter;
 
 /**
@@ -53,10 +61,45 @@ public class JXPanelVisualCheck extends InteractiveTestCase {
      * component.
      */
     public void interactiveScrolling() {
-        JXPanel panel = new JXPanel(new BorderLayout());
-        panel.add(new JXTable(100, 6));
-        JXFrame frame = wrapInFrame(panel, "scrollbar must be showing");
+        final JXPanel panel = new JXPanel(new BorderLayout());
+        panel.add(createScrollableContent(20));
+        JXFrame frame = wrapWithScrollingInFrame(panel, "scrollbar must be showing");
+        Action toggleHeightTrack = new AbstractActionExt("track height: " + panel.getScrollableHeightTrack()) {
+            
+            ScrollableSizeTrack[] tracks = new ScrollableSizeTrack[] {
+                    ScrollableSizeTrack.FIT
+                    , ScrollableSizeTrack.NONE
+                    , ScrollableSizeTrack.VERTICAL_STRETCH
+            };
+            int position;
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                position++;
+                if (position >= tracks.length) position = 0;
+                panel.setScrollableHeightTrack(tracks[position]);
+                setName("track height: " + tracks[position]);
+            }
+        }; 
+        addAction(frame, toggleHeightTrack);
         show(frame, 400, 400);
+    }
+    /**
+     * @return
+     */
+    private JComponent createScrollableContent(int rows) {
+        JPanel component = new JPanel();
+        component.setPreferredSize(new Dimension(400, 400));
+        component.setMinimumSize(new Dimension(200, 200));
+        component.setMaximumSize(new Dimension(600, 600));
+        component.setBorder(BorderFactory.createLineBorder(Color.RED, 5));
+        
+//        JButton component = new JButton("gotcha!");
+//        JXTable table = new JXTable(rows, 6);
+//        for (int i = 0; i < table.getRowCount(); i++) {
+//            table.setValueAt("row: " + i, i, 0);
+//        }
+        return component;
     }
 
     public void interactiveIconPainter() throws Exception {
