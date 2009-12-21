@@ -23,9 +23,6 @@ package org.jdesktop.swingx;
 import java.awt.event.ContainerAdapter;
 import java.awt.event.ContainerEvent;
 
-import javax.swing.JViewport;
-import javax.swing.Scrollable;
-
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 import org.jdesktop.swingx.plaf.TaskPaneContainerAddon;
 import org.jdesktop.swingx.plaf.TaskPaneContainerUI;
@@ -119,6 +116,7 @@ public class JXTaskPaneContainer extends JXPanel {
                 repaint();
             }
         });
+        setScrollableHeightTrack(ScrollableSizeTrack.VERTICAL_STRETCH);
     }
 
     /**
@@ -185,23 +183,23 @@ public class JXTaskPaneContainer extends JXPanel {
         super.remove(group);
     }
 
-    /**
-     * @see Scrollable#getScrollableTracksViewportHeight()
-     */
-    @Override
-    public boolean getScrollableTracksViewportHeight() {
-        if (getParent() instanceof JViewport) {
-            return (((JViewport) getParent()).getHeight() > getPreferredSize().height);
-        } else {
-            return false;
-        }
-    }
-  
-    /**
-     * @see Scrollable#getScrollableTracksViewportWidth()
-     */
-    @Override
-    public boolean getScrollableTracksViewportWidth() {
-        return true;
-    }
+//    /**
+//     * @see Scrollable#getScrollableTracksViewportHeight()
+//     */
+//    @Override
+//    public boolean getScrollableTracksViewportHeight() {
+//        if (getParent() instanceof JViewport) {
+//            return (((JViewport) getParent()).getHeight() > getPreferredSize().height);
+//        } else {
+//            return false;
+//        }
+//    }
+//  
+//    /**
+//     * @see Scrollable#getScrollableTracksViewportWidth()
+//     */
+//    @Override
+//    public boolean getScrollableTracksViewportWidth() {
+//        return true;
+//    }
 }
