@@ -35,6 +35,8 @@ import java.util.Locale;
 import java.util.logging.Logger;
 
 import javax.swing.CellRendererPane;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
@@ -62,6 +64,73 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
     @SuppressWarnings("unused")
     private static final int CALENDAR_SPACING = 10;
     
+    @Test
+    public void testLocaleByProviderMonthRendering() {
+        Locale serbianLatin = getLocal("sh");
+        if (serbianLatin == null) {
+            LOG.fine("can't run, no service provider for serbian latin" );
+            return;
+        }
+        JXMonthView monthView = new JXMonthView();
+        monthView.setLocale(serbianLatin);
+        Calendar calendar = monthView.getCalendar();
+        int month = calendar.get(Calendar.MONTH);
+        BasicMonthViewUI ui = (BasicMonthViewUI) monthView.getUI();
+        CalendarRenderingHandler handler = ui.getRenderingHandler();
+        JComponent component = handler.prepareRenderingComponent(monthView, 
+                calendar, CalendarState.TITLE);
+        
+        String[] monthNames = DateFormatSymbols.getInstance(monthView.getLocale()).getMonths();
+        String title = ((JLabel) component).getText();
+        assertTrue("name must be taken from Locale, expected: " + monthNames[month] + " was: " + title, 
+                title.startsWith(monthNames[month]));
+        
+    }
+
+    /**
+     * Issue #1245-swingx: incorrect month/dayofweek names for non-core-supported Locales.
+     */
+    @Test
+    public void testLocaleByProviderDayOfTheWeekName() {
+        if (UIManager.get("JXMonthView.daysOfTheWeek") != null) {
+            LOG.fine("can't test, custom daysoftheweek");
+        }
+        Locale serbianLatin = getLocal("sh");
+        if (serbianLatin == null) {
+            LOG.fine("can't run, no service provider for serbian latin" );
+            return;
+        }
+        JXMonthView monthView = new JXMonthView();
+        monthView.setLocale(serbianLatin);
+        assertWeekdays(monthView, serbianLatin);
+    }
+    
+    /**
+     * Issue #1245-swingx: incorrect month/dayofweek names for non-core-supported Locales.
+     */
+    @Test
+    public void testLocaleByProviderUIMonthNames() {
+        Locale serbianLatin = getLocal("sh");
+        if (serbianLatin == null) {
+            LOG.fine("can't run, no service provider for serbian latin" );
+            return;
+        }
+        JXMonthView monthView = new JXMonthView();
+        monthView.setLocale(serbianLatin);
+        assertMonths(monthView, serbianLatin);
+    }
+    
+    /**
+     * @param string
+     * @return
+     */
+    private Locale getLocal(String language) {
+        Locale[] available = Locale.getAvailableLocales();
+        for (Locale locale : available) {
+            if (language.equals(locale.getLanguage())) return locale;
+        }
+        return null;
+    }
 
     /**
      * Issue #1068-swingx: week numbering broken for some years and locales
@@ -1395,7 +1464,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
         // sanity
         assertEquals(french, monthView.getLocale());
         BasicMonthViewUI ui = (BasicMonthViewUI) monthView.getUI();
-        String[] months = new DateFormatSymbols(french).getMonths();
+        String[] months = DateFormatSymbols.getInstance(french).getMonths();
         for (int i = 0; i < months.length; i++) {
             assertEquals(months[i], ui.monthsOfTheYear[i]);
         }
@@ -1437,7 +1506,7 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
         // sanity
         assertEquals(french, monthView.getLocale());
         String[] weekdays =
-            new DateFormatSymbols(french).getShortWeekdays();
+            DateFormatSymbols.getInstance(french).getShortWeekdays();
         for (int i = Calendar.SUNDAY; i <= Calendar.SATURDAY; i++) {
             assertEquals(weekdays[i], monthView.getDaysOfTheWeek()[i-1]);
         }

@@ -146,7 +146,7 @@ public class BasicCalendarHeaderHandler extends CalendarHeaderHandler {
          */
         private void updateLocale() {
             Locale current = getTarget() != null ? getTarget().getLocale() : Locale.getDefault();
-            monthNames = new DateFormatSymbols(current).getMonths();
+            monthNames = DateFormatSymbols.getInstance(current).getMonths();
         }
 
         /**

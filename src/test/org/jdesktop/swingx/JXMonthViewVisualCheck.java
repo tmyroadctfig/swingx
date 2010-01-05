@@ -29,6 +29,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.text.DateFormat;
+import java.text.DateFormatSymbols;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -75,7 +77,7 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
 //        test.runInteractiveTests(".*Event.*");
 //          test.runInteractiveTests("interactive.*Zoomable.*");
 //          test.runInteractiveTests("interactive.*Title.*");
-        test.runInteractiveTests("interactive.*LastDisplayed.*");
+        test.runInteractiveTests("interactive.*Locale.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
@@ -679,6 +681,17 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
             public void actionPerformed(ActionEvent event) {
                 Locale zone = (Locale) zoneSelector.getSelectedItem();
                 monthView.setLocale(zone);
+                if ("sh".equals(zone.getLanguage()) ){
+                    String[] months = DateFormatSymbols.getInstance(zone).getMonths();
+                    SimpleDateFormat simple = new SimpleDateFormat("MMMM", zone);
+                    DateFormat format = DateFormat.getDateInstance(DateFormat.FULL, zone);
+                    LOG.info("serbian latin: " + zone + 
+                            "/" + format.format(new Date()) +
+                            " / " + months[0] + 
+                            " / " + simple.format(new Date()));
+                }
+                
+                
             }
         });
 

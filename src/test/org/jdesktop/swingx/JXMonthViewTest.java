@@ -128,7 +128,47 @@ public class JXMonthViewTest extends InteractiveTestCase {
             e.printStackTrace();
         }
     }
+
     
+    /**
+     * Issue #1046-swingx: month title not updated when traversing months
+     * (programatically or by navigating in monthView)
+     * Issue #1245-swingx: incorrect month/dayofweek names for non-core-supported Locales.
+     * 
+     */
+    @Test
+    public void testZoomableNameByLocaleProvider() {
+        Locale serbianLatin = getLocal("sh");
+        if (serbianLatin == null) {
+            LOG.fine("can't run, no service provider for serbian latin" );
+            return;
+        }
+        JXMonthView monthView = new JXMonthView();
+        AbstractHyperlinkAction<?> action = (AbstractHyperlinkAction<?>) monthView.getActionMap().get("zoomOut");
+        assertSame(monthView, action.getTarget());
+        monthView.setLocale(serbianLatin);
+        String[] monthNames = DateFormatSymbols.getInstance(monthView.getLocale()).getMonths();
+        Calendar calendar = monthView.getCalendar();
+        int month = calendar.get(Calendar.MONTH);
+        assertTrue("name must be updated with locale, expected: " + monthNames[month] + " was: " + action.getName(), 
+                action.getName().startsWith(monthNames[month]));
+    }
+
+    
+    
+    /**
+     * @param string
+     * @return
+     */
+    private Locale getLocal(String language) {
+        Locale[] available = Locale.getAvailableLocales();
+        for (Locale locale : available) {
+            if (language.equals(locale.getLanguage())) return locale;
+        }
+        return null;
+    }
+
+
     /**
      * Issue #1143-swingx: NPE after setTimeZone/setModel.
      */
@@ -253,7 +293,7 @@ public class JXMonthViewTest extends InteractiveTestCase {
         JXMonthView monthView = new JXMonthView();
         AbstractHyperlinkAction<?> action = (AbstractHyperlinkAction<?>) monthView.getActionMap().get("zoomOut");
         assertSame(monthView, action.getTarget());
-        String[] monthNames = new DateFormatSymbols(monthView.getLocale()).getMonths();
+        String[] monthNames = DateFormatSymbols.getInstance(monthView.getLocale()).getMonths();
         Calendar calendar = monthView.getCalendar();
         int month = calendar.get(Calendar.MONTH);
         assertTrue(action.getName().startsWith(monthNames[month]));
@@ -279,7 +319,7 @@ public class JXMonthViewTest extends InteractiveTestCase {
             locale = Locale.GERMAN;
         }
         monthView.setLocale(locale);
-        String[] monthNames = new DateFormatSymbols(monthView.getLocale()).getMonths();
+        String[] monthNames = DateFormatSymbols.getInstance(monthView.getLocale()).getMonths();
         Calendar calendar = monthView.getCalendar();
         int month = calendar.get(Calendar.MONTH);
         assertTrue("name must be updated with locale, expected: " + monthNames[month] + " was: " + action.getName(), 
