@@ -567,7 +567,7 @@ public class BasicMonthViewUI extends MonthViewUI {
         if (getRenderingHandler() != null) {
             getRenderingHandler().setLocale(locale);
         }
-        monthsOfTheYear = new DateFormatSymbols(locale).getMonths();
+        monthsOfTheYear = DateFormatSymbols.getInstance(locale).getMonths();
 
         // fixed JW: respect property in UIManager if available
         // PENDING JW: what to do if weekdays had been set
@@ -576,7 +576,7 @@ public class BasicMonthViewUI extends MonthViewUI {
 
         if (daysOfTheWeek == null) {
             daysOfTheWeek = new String[7];
-            String[] dateFormatSymbols = new DateFormatSymbols(locale)
+            String[] dateFormatSymbols = DateFormatSymbols.getInstance(locale)
                     .getShortWeekdays();
             daysOfTheWeek = new String[JXMonthView.DAYS_IN_WEEK];
             for (int i = Calendar.SUNDAY; i <= Calendar.SATURDAY; i++) {
