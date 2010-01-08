@@ -58,6 +58,7 @@ import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.event.TreeWillExpandListener;
+import javax.swing.plaf.basic.BasicTreeUI;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
@@ -405,8 +406,10 @@ public class JXTreeTable extends JXTable {
     
     /**
      * Hacking around various issues. Subclass and let it return 
-     * your favourite. The current default is TreeTableHackerExt3, the latest
-     * evolution (to work around #1230) is TreeTableHackerExt4. 
+     * your favourite. The current default is TreeTableHackerExt5 (latest
+     * evolution to work around #1230), the old long-standing default was
+     * TreeTableHackerExt3. If you experience problems with the latest, please
+     * let us know.
      * 
      * @return
      */
@@ -414,8 +417,9 @@ public class JXTreeTable extends JXTable {
 //        return new TreeTableHacker();
 //        return new TreeTableHackerExt();
 //        return new TreeTableHackerExt2();
-        return new TreeTableHackerExt3();
+//        return new TreeTableHackerExt3();
 //        return new TreeTableHackerExt4();
+        return new TreeTableHackerExt5();
     }
 
     private boolean processMouseMotion = true;
@@ -590,6 +594,81 @@ public class JXTreeTable extends JXTable {
                 return false;
         }
     }
+
+    /*
+     * Changed to calculate the area of the tree handle and only forward mouse
+     * events to the tree if the event lands within that area. This keeps the
+     * selection behavior consistent with TreeTableHackerExt3.
+     * 
+     * contributed by member aephyr@dev.java.net
+     */
+    public class TreeTableHackerExt5 extends TreeTableHackerExt4 {
+
+        /**
+         * If a negative number is returned, then all events that occur in the
+         * leading margin will be forwarded to the tree and consumed.
+         * 
+         * @return the width of the tree handle if it can be determined, else -1
+         */
+        protected int getTreeHandleWidth() {
+            if (renderer.getUI() instanceof BasicTreeUI) {
+                BasicTreeUI ui = (BasicTreeUI) renderer.getUI();
+                return ui.getLeftChildIndent() + ui.getRightChildIndent();
+            } else {
+                return -1;
+            }
+        }
+
+        @Override
+        protected MouseEvent getEventForTreeRenderer(MouseEvent e) {
+            Point pt = e.getPoint();
+            int col = columnAtPoint(pt);
+            if (col >= 0 && isHierarchical(col)) {
+                int row = rowAtPoint(pt);
+                // There will not be a check to see if the y coordinate is in
+                // range
+                // because the use of row = rowAtPoint(pt) will only return a
+                // row
+                // that has the y coordinates in the range of our point.
+                if (row >= 0) {
+                    TreePath path = getPathForRow(row);
+                    Object node = path.getLastPathComponent();
+                    // Check if the node has a tree handle and if so, check
+                    // if the event location falls over the tree handle.
+                    if (!getTreeTableModel().isLeaf(node)
+                            && (getTreeTableModel().getChildCount(node) > 0 || !renderer
+                                    .hasBeenExpanded(path))) {
+                        Rectangle cellBounds = getCellRect(row, col, false);
+                        int x = e.getX() - cellBounds.x;
+                        Rectangle nb = renderer.getRowBounds(row);
+                        int thw = getTreeHandleWidth();
+                        // The renderer's component orientation is checked
+                        // because that
+                        // is the one that really matters. Though it seems to
+                        // always be
+                        // in sync with the JXTreeTable's component orientation,
+                        // maybe
+                        // someone wants them to be different for some reason.
+                        if (renderer.getComponentOrientation().isLeftToRight() ? x < nb.x
+                                && (thw < 0 || x > nb.x - thw)
+                                : x > nb.x + nb.width
+                                        && (thw < 0 || x < nb.x + nb.width
+                                                + thw)) {
+                            return new MouseEvent(renderer, e.getID(), e
+                                    .getWhen(), e.getModifiers(), x, e.getY(),
+                                    e.getXOnScreen(), e.getYOnScreen(), e
+                                            .getClickCount(), false, e
+                                            .getButton());
+                        }
+                    }
+                }
+            }
+            return null;
+        }
+
+    }
+
+
 
     /**
      * Temporary class to have all the hacking at one place. Naturally, it will
