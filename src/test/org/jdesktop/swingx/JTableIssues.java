@@ -39,6 +39,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
 import javax.swing.RowSorter;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
@@ -46,6 +47,7 @@ import javax.swing.event.RowSorterEvent;
 import javax.swing.event.TableModelEvent;
 import javax.swing.plaf.ColorUIResource;
 import javax.swing.plaf.UIResource;
+import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
@@ -60,12 +62,16 @@ import org.jdesktop.test.CellEditorReport;
 import org.jdesktop.test.ListSelectionReport;
 import org.jdesktop.test.PropertyChangeReport;
 import org.jdesktop.test.TestUtils;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
 /**
  * @author Jeanette Winzenburg
  */
+@RunWith(JUnit4.class)
 public class JTableIssues extends InteractiveTestCase {
     /**
      * 
@@ -90,13 +96,68 @@ public class JTableIssues extends InteractiveTestCase {
     
 
     @Override
-    @BeforeClass
-    protected void setUp() throws Exception {
+    @Before
+    public void setUp() throws Exception {
         super.setUp();
-        setLookAndFeel("Nimbus");
         
     }
 
+    @BeforeClass
+    public static void setUpClass() throws Exception {
+        setLookAndFeel("Nimbus");
+    }
+    
+    
+    @Test
+    public void testSelectionInsertBefore() {
+        ListSelectionModel model = new DefaultListSelectionModel();
+        model.setSelectionInterval(1, 1);
+        model.insertIndexInterval(1, 1, true);
+        assertTrue(model.isSelectedIndex(1));
+        assertTrue(model.isSelectedIndex(2));
+    }
+    
+    @Test
+    public void testSelectionInsertAfter() {
+        ListSelectionModel model = new DefaultListSelectionModel();
+        model.setSelectionInterval(1, 1);
+        model.insertIndexInterval(1, 1, false);
+        assertTrue(model.isSelectedIndex(1));
+        assertTrue(model.isSelectedIndex(2));
+    }
+    
+    /**
+     * Core issue: editing not terminated on setModel.
+     * 
+     * reported in sun forum:
+     * http://forums.sun.com/thread.jspa?threadID=5422547&tstart=15
+     */
+    @Test
+    public void testTerminateEditOnStructurChanged() {
+        JTable table = new JTable(10, 2);
+        table.setAutoCreateColumnsFromModel(false);
+        table.editCellAt(0, 0);
+        assertTrue("sanity: editing", table.isEditing());
+        ((AbstractTableModel) table.getModel()).fireTableStructureChanged();
+        assertEquals("editing must be terminated on setModel", false, table.isEditing());
+    }  
+    
+    /**
+     * Core issue: editing not terminated on setModel.
+     * 
+     * reported in sun forum:
+     * http://forums.sun.com/thread.jspa?threadID=5422547&tstart=15
+     */
+    @Test
+    public void testTerminateEditOnSetModel() {
+        JTable table = new JTable(10, 2);
+        table.setAutoCreateColumnsFromModel(false);
+        table.editCellAt(0, 0);
+        assertTrue("sanity: editing", table.isEditing());
+        table.setModel(new DefaultTableModel(10, 2));
+        assertEquals("editing must be terminated on setModel", false, table.isEditing());
+    }  
+    
 
     //------------ Nimbus
     

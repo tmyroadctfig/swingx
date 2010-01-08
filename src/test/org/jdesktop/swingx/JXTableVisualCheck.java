@@ -81,8 +81,8 @@ public class JXTableVisualCheck extends JXTableUnitTest {
     public static void main(String args[]) {
       JXTableVisualCheck test = new JXTableVisualCheck();
       try {
-//        test.runInteractiveTests();
-          test.runInteractiveTests("interactive.*FloatingPoint.*");
+        test.runInteractiveTests();
+//          test.runInteractiveTests("interactive.*FloatingPoint.*");
 //          test.runInteractiveTests("interactive.*Header.*");
 //          test.runInteractiveTests("interactive.*ColumnProp.*");
 //          test.runInteractiveTests("interactive.*Multiple.*");

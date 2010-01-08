@@ -669,6 +669,7 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
     public void interactiveUpdateLocale() {
         JComponent panel = Box.createVerticalBox();
 
+        final JXDatePicker picker = new JXDatePicker(new Date());
         final JXMonthView monthView = new JXMonthView();
         monthView.setTraversable(true);
         monthView.setShowingWeekNumber(true);
@@ -681,20 +682,22 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
             public void actionPerformed(ActionEvent event) {
                 Locale zone = (Locale) zoneSelector.getSelectedItem();
                 monthView.setLocale(zone);
-                if ("sh".equals(zone.getLanguage()) ){
-                    String[] months = DateFormatSymbols.getInstance(zone).getMonths();
-                    SimpleDateFormat simple = new SimpleDateFormat("MMMM", zone);
-                    DateFormat format = DateFormat.getDateInstance(DateFormat.FULL, zone);
-                    LOG.info("serbian latin: " + zone + 
-                            "/" + format.format(new Date()) +
-                            " / " + months[0] + 
-                            " / " + simple.format(new Date()));
-                }
-                
+                picker.setLocale(zone);
+//                if ("sh".equals(zone.getLanguage()) ){
+//                    String[] months = DateFormatSymbols.getInstance(zone).getMonths();
+//                    SimpleDateFormat simple = new SimpleDateFormat("MMMM", zone);
+//                    DateFormat format = DateFormat.getDateInstance(DateFormat.FULL, zone);
+//                    LOG.info("serbian latin: " + zone + 
+//                            "/" + format.format(new Date()) +
+//                            " / " + months[0] + 
+//                            " / " + simple.format(new Date()));
+//                }
+//                
                 
             }
         });
 
+        panel.add(picker);
         panel.add(monthView);
         panel.add(zoneSelector);
         showInFrame(panel, "Locale");
