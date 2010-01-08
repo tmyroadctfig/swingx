@@ -98,8 +98,8 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
 //            test.runInteractiveTests();
 //            test.runInteractiveTests("interactive.*Hierarchical.*");
 //               test.runInteractiveTests("interactive.*ToolTip.*");
-           test.runInteractiveTests("interactive.*DnD.*");
-             test.runInteractiveTests("interactive.*ColumnSelection.*");
+//           test.runInteractiveTests("interactive.*DnD.*");
+//             test.runInteractiveTests("interactive.*ColumnSelection.*");
 //             test.runInteractiveTests("interactive.*RowHeightCompare.*");
              test.runInteractiveTests("interactive.*RToL.*");
 //             test.runInteractiveTests("interactive.*Insert.*");
@@ -852,6 +852,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
     public void interactiveRToLTreeTableEditor() {
         final TreeTableModel model = createMutableVisualizeModel();
         final JXTreeTable table = new JXTreeTable(model);
+//        table.setTreeCellRenderer(new DefaultTreeRenderer());
         table.expandAll();
         
         final JXFrame frame = wrapWithScrollingInFrame(table, new JTable(table.getModel()),
@@ -1011,7 +1012,6 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         JXTree renderer = (JXTree) treeTable.getCellRenderer(0, 0);
         tree.setRowHeight(renderer.getRowHeight());
         JXFrame frame = wrapWithScrollingInFrame(treeTable, tree, "toggle dragEnabled (starting with false)");
-        frame.setVisible(true);
         Action action = new AbstractActionExt("Toggle dnd: false") {
 
             public void actionPerformed(ActionEvent e) {
@@ -1024,6 +1024,8 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
             
         };
         addAction(frame, action);
+        addComponentOrientationToggle(frame);
+        show(frame);
     }
 
     /**

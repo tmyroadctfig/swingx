@@ -30,8 +30,8 @@ public class JXTableHeaderVisualCheck extends InteractiveTestCase {
     public static void main(String args[]) {
         JXTableHeaderVisualCheck test = new JXTableHeaderVisualCheck();
         try {
-//          test.runInteractiveTests();
-            test.runInteractiveTests("interactive.*Core.*");
+          test.runInteractiveTests();
+//            test.runInteractiveTests("interactive.*Core.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();

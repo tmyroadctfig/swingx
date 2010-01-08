@@ -93,8 +93,8 @@ public class JXTreeTableIssues extends InteractiveTestCase {
         setSystemLF(true);
         JXTreeTableIssues test = new JXTreeTableIssues();
         try {
-//            test.runInteractiveTests();
-            test.runInteractiveTests(".*Combo.*");
+            test.runInteractiveTests();
+//            test.runInteractiveTests(".*Combo.*");
 //            test.runInteractiveTests(".*Text.*");
 //            test.runInteractiveTests(".*TreeExpand.*");
 //            test.runInteractiveTests("interactive.*EditWith.*");
