@@ -7,6 +7,9 @@ package org.jdesktop.swingx.rollover;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.AbstractListModel;
@@ -42,6 +45,9 @@ import org.junit.runners.JUnit4;
 @RunWith(JUnit4.class)
 public class RolloverTest extends InteractiveTestCase {
 
+    @SuppressWarnings("unused")
+    private static final Logger LOG = Logger.getLogger(RolloverTest.class
+            .getName());
     
     /**
      * @param args
@@ -49,8 +55,8 @@ public class RolloverTest extends InteractiveTestCase {
     public static void main(String[] args) {
         RolloverTest test = new RolloverTest();
         try {
-            test.runInteractiveTests();
-         //   test.runInteractiveTests("interactive.*Rend.*");
+//            test.runInteractiveTests();
+            test.runInteractiveTests("interactive.*Exit.*");
           } catch (Exception e) {
               System.err.println("exception when executing interactive tests:");
               e.printStackTrace();
@@ -66,6 +72,20 @@ public class RolloverTest extends InteractiveTestCase {
 
 //---------------------------- interactive tests of rollover effects
 
+    /**
+     * Issue #1249-swingx: RolloverProducer clears rollover point when inserting child
+     * 
+     * Happens f.i. when starting an edit.
+     * 
+     */
+    public void interactiveExitToChild() {
+        JXTable table = new JXTable(new AncientSwingTeam());
+        table.addHighlighter(new ColorHighlighter(HighlightPredicate.ROLLOVER_ROW, 
+                Color.MAGENTA, null, Color.MAGENTA, null));
+        JXFrame frame = wrapWithScrollingInFrame(table, "rollover child");
+        addStatusMessage(frame, "edit under mouse, move");
+        show(frame);
+    }
     
     /**
      * Issue #1193-swingx: rollover state not updated on scrolling/mouseWheel
