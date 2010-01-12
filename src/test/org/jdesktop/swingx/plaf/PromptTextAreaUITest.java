@@ -7,7 +7,7 @@ import javax.swing.JTextArea;
 import org.jdesktop.swingx.JXTextArea;
 import org.junit.Test;
 
-public class PromptTextAreaUITest extends PromptTextUITest {
+public class PromptTextAreaUITest extends PromptTextUITest_Base {
     JTextArea textArea;
     
     public void setup() {
