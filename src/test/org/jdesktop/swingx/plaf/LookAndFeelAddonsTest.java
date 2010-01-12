@@ -27,6 +27,7 @@ import javax.swing.plaf.basic.BasicLookAndFeel;
 
 import org.jdesktop.swingx.JXMonthView;
 import org.jdesktop.swingx.JXPanel;
+import org.jdesktop.swingx.JXTaskPane;
 import org.jdesktop.swingx.painter.MattePainter;
 import org.jdesktop.swingx.painter.Painter;
 import org.jdesktop.swingx.plaf.basic.BasicLookAndFeelAddons;
@@ -219,6 +220,20 @@ public class LookAndFeelAddonsTest {
     assertEquals(newLFAddon, addon.initializedWith);
   }
 
+    @Test
+    public void testUpdateUIForReferredProperties() {
+    	JXTaskPane pane = new JXTaskPane();
+    	
+    	assertThat(UIManager.getColor("TaskPane.background"), is(UIManager.getColor("List.background")));
+    	assertThat(pane.getBackground(), is(UIManager.getColor("List.background")));
+    	
+    	UIManager.put("List.background", new ColorUIResource(Color.WHITE));
+    	pane.updateUI();
+    	
+    	assertThat(UIManager.getColor("TaskPane.background"), is(UIManager.getColor("List.background")));
+    	assertThat(pane.getBackground(), is(Color.WHITE));
+    }
+    
   static class Addon extends AbstractComponentAddon {
     boolean initialized;
     LookAndFeelAddons initializedWith;
@@ -246,7 +261,8 @@ public class LookAndFeelAddonsTest {
         "Addon.title", "my title",
         "Addon.subtitle", "my subtitle",
         "Addon.border", new BorderUIResource(new EmptyBorder(0, 0, 0, 0)),
-        "Addon.color", new ColorUIResource(Color.blue)};
+        "Addon.color", new ColorUIResource(Color.blue),
+        "Addon.panelBackground", UIManager.getColor("Panel.background")};
     }
   }
 }
