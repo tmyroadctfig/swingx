@@ -53,6 +53,7 @@ import org.jdesktop.swingx.renderer.JRendererLabel;
 import org.jdesktop.swingx.renderer.JXRendererHyperlink;
 import org.jdesktop.swingx.renderer.WrappingIconPanel;
 import org.jdesktop.test.TestUtils;
+import org.junit.Ignore;
 
 /**
  * Reflection based test for testing PCE firing.
@@ -63,6 +64,7 @@ public class BeanEventsTest extends InteractiveTestCase {
     
     static Logger log = Logger.getAnonymousLogger();
 
+    @Ignore
     public void testAllPainterPCEFiring() throws Exception {
         log.setLevel(Level.ALL);
         List<Class<?>> beanClasses = ClassSearchUtils.searchClassPath("org.jdesktop.swingx.");
@@ -72,7 +74,8 @@ public class BeanEventsTest extends InteractiveTestCase {
         beanClasses.remove(JXTextArea.class);
         beanClasses.remove(JXTextField.class);
         beanClasses.remove(BuddyButton.class);
-        
+        System.out.println("BeanEventsTest.testAllPainterPCEFiring()");
+        System.out.println(beanClasses.contains(JXSearchField.class));
         MultiMap excludes = new MultiHashMap();
         // shorthand for getModel.setColumnMargin
         excludes.put(JXTable.class, "columnMargin");
