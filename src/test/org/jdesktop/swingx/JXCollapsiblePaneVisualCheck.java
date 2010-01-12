@@ -52,7 +52,8 @@ public class JXCollapsiblePaneVisualCheck extends InteractiveTestCase {
     public static void main(String[] args) {
         JXCollapsiblePaneVisualCheck test = new JXCollapsiblePaneVisualCheck();
         try {
-            test.runInteractiveTests();
+//            test.runInteractiveTests();
+            test.runInteractiveTests("interactive.*Zero.*");
           } catch (Exception e) {
               System.err.println("exception when executing interactive tests:");
               e.printStackTrace();
@@ -233,7 +234,7 @@ public class JXCollapsiblePaneVisualCheck extends InteractiveTestCase {
 			}
 		});
     }
-
+    
     /**
      * Issue #1181-swingx: scrollRectToVisible not effective if component in JXTaskPane.
      * Yet another one for the same issue - moved from TaskPaneIssues.
@@ -259,6 +260,29 @@ public class JXCollapsiblePaneVisualCheck extends InteractiveTestCase {
         addAction(frame, action);
         // small dimension, make sure there is something to scroll
         show(frame, 300, 200);
+    }
+
+    /**
+     * Test case for bug 433. When the initial size is 0 expansion fails.
+     */
+    public void interactiveZeroInitialHeightTest() {
+    	JPanel panel = new JPanel(new BorderLayout());
+    	
+    	final JXCollapsiblePane collPane = new JXCollapsiblePane();
+//    	collPane.setAnimated(false);
+    	collPane.setCollapsed(true);
+    	collPane.setCollapsed(false);
+    	collPane.add(new JLabel("hello!"));
+
+    	panel.add(collPane, BorderLayout.NORTH);
+
+		JButton button = new JButton("Toggle");
+		button.addActionListener(collPane.getActionMap().get(
+				JXCollapsiblePane.TOGGLE_ACTION));
+
+		panel.add(button, BorderLayout.CENTER);
+		
+		showInFrame(panel, "Initial Sizing Test");
     }
 
     /**
