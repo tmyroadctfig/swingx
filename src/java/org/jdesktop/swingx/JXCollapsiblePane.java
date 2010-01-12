@@ -33,7 +33,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import javax.swing.AbstractAction;
-import javax.swing.CellRendererPane;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JViewport;
