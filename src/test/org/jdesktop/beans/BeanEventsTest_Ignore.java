@@ -60,7 +60,7 @@ import org.junit.Ignore;
  * 
  * @author rah003
  */
-public class BeanEventsTest extends InteractiveTestCase {
+public class BeanEventsTest_Ignore extends InteractiveTestCase {
     
     static Logger log = Logger.getAnonymousLogger();
 
