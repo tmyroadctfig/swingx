@@ -95,7 +95,7 @@ public class ShapePainter extends AbstractAreaPainter<Object> {
     
     /**
      * Create a new ShapePainter with the specified shape and fillPaint. The shape
-     * can be filled or stroked (only the ouline is painted).
+     * can be filled or stroked (only the outline is painted).
      *
      *
      * @param shape the shape to fillPaint
