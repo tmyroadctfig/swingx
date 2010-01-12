@@ -65,7 +65,7 @@ public class BeanEventsTest extends InteractiveTestCase {
     static Logger log = Logger.getAnonymousLogger();
 
     @Ignore
-    public void testAllPainterPCEFiring() throws Exception {
+    public void _testAllPainterPCEFiring() throws Exception {
         log.setLevel(Level.ALL);
         List<Class<?>> beanClasses = ClassSearchUtils.searchClassPath("org.jdesktop.swingx.");
         //can't seem to handle PromptSupport;  f*ck this test
