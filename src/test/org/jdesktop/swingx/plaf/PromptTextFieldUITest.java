@@ -7,7 +7,7 @@ import javax.swing.JTextField;
 import org.jdesktop.swingx.JXTextField;
 import org.junit.Test;
 
-public class PromptTextFieldUITest extends PromptTextUITest {
+public class PromptTextFieldUITest extends PromptTextUITest_Base {
     JTextField txtField;
     
     public void setup() {
