@@ -35,6 +35,7 @@ import java.awt.Rectangle;
 import javax.swing.JPanel;
 import javax.swing.RepaintManager;
 import javax.swing.Scrollable;
+import javax.swing.SwingConstants;
 import javax.swing.plaf.UIResource;
 
 import org.jdesktop.swingx.painter.Painter;
@@ -322,14 +323,20 @@ public class JXPanel extends JPanel implements Scrollable {
      * {@inheritDoc}
      */
     public int getScrollableBlockIncrement(Rectangle visibleRect, int orientation, int direction) {
-        return 10;
+        if (orientation == SwingConstants.VERTICAL) {
+            return visibleRect.height;
+        } else if (orientation == SwingConstants.HORIZONTAL) {
+            return visibleRect.width;
+        } else {
+            throw new IllegalArgumentException("invalid orientation"); //$NON-NLS-1$
+        }
     }
     
     /**
      * {@inheritDoc}
      */
     public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction) {
-        return 10;
+        return getScrollableBlockIncrement(visibleRect, orientation, direction) / 10;
     }
     
     /**
@@ -429,7 +436,7 @@ public class JXPanel extends JPanel implements Scrollable {
      * Returns true if the background painter should paint where the border is
      * or false if it should only paint inside the border. This property is 
      * true by default. This property affects the width, height,
-     * and intial transform passed to the background painter.
+     * and initial transform passed to the background painter.
      */
     public boolean isPaintBorderInsets() {
         return paintBorderInsets;
@@ -440,7 +447,7 @@ public class JXPanel extends JPanel implements Scrollable {
      * Set to true if the background painter should paint where the border is
      * or false if it should only paint inside the border. This property is true by default.
      * This property affects the width, height,
-     * and intial transform passed to the background painter.
+     * and initial transform passed to the background painter.
      * 
      * This is a bound property.
      */
