@@ -264,7 +264,7 @@ public class AutoCompleteDocument implements Document {
                     lookupResult.matchingString = adaptor.getSelectedItemAsString();
                     // imitate no insert (later on offs will be incremented by
                     // str.length(): selection won't move forward)
-                    offs = offs-str.length();
+                    offs = str == null ? offs : offs - str.length();
                     // provide feedback to the user that his input has been received but can not be accepted
                     UIManager.getLookAndFeel().provideErrorFeedback(adaptor.getTextComponent());
                 } else {
@@ -275,9 +275,12 @@ public class AutoCompleteDocument implements Document {
                 }
             }
         }
+        
         setText(lookupResult.matchingString);
+        
         // select the completed part
-        adaptor.markText(offs+str.length());
+        int len = str == null ? 0 : str.length();
+        adaptor.markText(offs + len);
     }
     
     /**

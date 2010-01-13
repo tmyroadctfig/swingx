@@ -110,4 +110,23 @@ public class AutoCompleteDecoratorTest extends TestCase {
         List<String> strings = Arrays.asList("Alpha", "Bravo", "Charlie", "Delta");
         AutoCompleteDecorator.decorate(new JTextPane(), strings, true);
     }
+    
+    @Test
+    public void testAddingItemsAfterDecorating() {
+        AutoCompleteDecorator.decorate(combo);
+        combo.addItem("Echo");
+    }
+    
+    @Test
+    public void testAddingItemsAfterDecoratingEmpty() {
+        JComboBox box = new JComboBox();
+        AutoCompleteDecorator.decorate(box);
+        box.addItem("Alhpa");
+    }
+    
+    @Test
+    public void testRemovingItemsAfterDecorating() {
+        AutoCompleteDecorator.decorate(combo);
+        combo.removeAll();
+    }
 }
