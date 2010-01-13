@@ -22,6 +22,7 @@ package org.jdesktop.swingx.autocomplete;
 
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 
 import org.jdesktop.swingx.InteractiveTestCase;
 
@@ -32,7 +33,7 @@ public class AutoCompleteDecoratorVisualCheck extends InteractiveTestCase {
     public static void main(String[] args) throws Exception {
         AutoCompleteDecoratorVisualCheck test = new AutoCompleteDecoratorVisualCheck();
         try {
-            test.runInteractiveTests("interactive.*Null");
+            test.runInteractiveTests("interactive.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
@@ -50,7 +51,7 @@ public class AutoCompleteDecoratorVisualCheck extends InteractiveTestCase {
         AutoCompleteDecorator.decorate(combo);
         
         JFrame frame = wrapInFrame(combo, "show combo ");
-        frame.setSize(200, 200);
+        frame.pack();
         frame.setVisible(true);
     }
     
@@ -77,6 +78,27 @@ public class AutoCompleteDecoratorVisualCheck extends InteractiveTestCase {
         JFrame frame = wrapInFrame(combo, "combo with null");
         frame.pack();
         frame.setVisible(true);
+    }
+    
+    /**
+     * Issue 1191: Ensure that a beep is not sounded when all of the items are removed.
+     */
+    public void interactiveEnsureNoBeepingForProgramaticRemoval() {
+        final JComboBox combo = new JComboBox(new String[] {
+                "A1", "A2", "A3", "A4", "A5",
+        });
+        
+        AutoCompleteDecorator.decorate(combo);
+        
+        JFrame frame = wrapInFrame(combo, "combo with null");
+        frame.pack();
+        frame.setVisible(true);
+        
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                combo.removeAllItems();
+            }
+        });
     }
     
     /**

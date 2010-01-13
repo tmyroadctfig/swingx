@@ -255,24 +255,28 @@ public class AutoCompleteDocument implements Document {
             setSelectedItem(lookupResult.matchingItem, lookupResult.matchingString);
         } else {
             lookupResult = lookupItem(pattern);
-            if (lookupResult.matchingItem != null) {
-                setSelectedItem(lookupResult.matchingItem, lookupResult.matchingString);
-            } else {
-                if (strictMatching) {
-                    // keep old item selected if there is no match
-                    lookupResult.matchingItem = adaptor.getSelectedItem();
-                    lookupResult.matchingString = adaptor.getSelectedItemAsString();
-                    // imitate no insert (later on offs will be incremented by
-                    // str.length(): selection won't move forward)
-                    offs = str == null ? offs : offs - str.length();
+        }
+        
+        if (lookupResult.matchingItem != null) {
+            setSelectedItem(lookupResult.matchingItem, lookupResult.matchingString);
+        } else {
+            if (strictMatching) {
+                // keep old item selected if there is no match
+                lookupResult.matchingItem = adaptor.getSelectedItem();
+                lookupResult.matchingString = adaptor.getSelectedItemAsString();
+                // imitate no insert (later on offs will be incremented by
+                // str.length(): selection won't move forward)
+                offs = str == null ? offs : offs - str.length();
+                
+                if (str != null && !str.isEmpty()) {
                     // provide feedback to the user that his input has been received but can not be accepted
                     UIManager.getLookAndFeel().provideErrorFeedback(adaptor.getTextComponent());
-                } else {
-                    // no item matches => use the current input as selected item
-                    lookupResult.matchingItem=getText(0, getLength());
-                    lookupResult.matchingString=getText(0, getLength());
-                    setSelectedItem(lookupResult.matchingItem, lookupResult.matchingString);
                 }
+            } else {
+                // no item matches => use the current input as selected item
+                lookupResult.matchingItem=getText(0, getLength());
+                lookupResult.matchingString=getText(0, getLength());
+                setSelectedItem(lookupResult.matchingItem, lookupResult.matchingString);
             }
         }
         
@@ -280,7 +284,8 @@ public class AutoCompleteDocument implements Document {
         
         // select the completed part
         int len = str == null ? 0 : str.length();
-        adaptor.markText(offs + len);
+        offs = lookupResult.matchingString == null ? 0 : offs + len;
+        adaptor.markText(offs);
     }
     
     /**
