@@ -79,6 +79,7 @@ import javax.swing.border.LineBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.RowSorterEvent;
 import javax.swing.event.TableColumnModelEvent;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.JTableHeader;
@@ -1510,18 +1511,21 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
      * {@inheritDoc}
      * <p>
      * 
-     * Overridden to update internal state related to enhanced functionality.
+     * Overridden to update internal state related to enhanced functionality and 
+     * hack around core bugs.
      * <ul>
      * <li> re-calculate intialize column width and preferred
      * scrollable size after a structureChanged if autocreateColumnsFromModel is
      * true.
      * <li> update string representation control after structureChanged
+     * <li> core bug #6791934 logic to force revalidate if appropriate
      * </ul>
      * <p>
      * 
      */
     @Override
     public void tableChanged(TableModelEvent e) {
+        preprocessModelChange(e);
         super.tableChanged(e);
         if (isStructureChanged(e) && getAutoCreateColumnsFromModel()) {
             initializeColumnWidths();
@@ -1530,8 +1534,67 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
         if ((isStructureChanged(e))) {
             updateStringValueRegistryColumnClasses();
         }
+        postprocessModelChange(e);
     }
 
+//----> start hack around core issue 6791934: 
+//      table not updated correctly after updating model
+//      while having a sorter with filter.
+    
+    /**
+     * Overridden to hack around core bug 
+     * http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6791934
+     * 
+     */
+    @Override
+    public void sorterChanged(RowSorterEvent e) {
+        super.sorterChanged(e);
+        postprocessSorterChanged(e);
+    }
+
+
+    /** flag to indicate if forced revalidate is needed. */
+    protected boolean forceRevalidate;
+    /** flag to indicate if a sortOrderChanged has happened between pre- and postProcessModelChange. */
+    protected boolean filteredRowCountChanged;
+    
+    /**
+     * Hack around core issue 6791934: sets flags to force revalidate if appropriate.
+     * Called before processing the event.
+     * @param e the TableModelEvent received from the model
+     */
+    protected void preprocessModelChange(TableModelEvent e) {
+        forceRevalidate = getSortsOnUpdates() && getRowFilter() != null && isUpdate(e) ;
+    }
+
+    /**
+     * Hack around core issue 6791934: forces a revalidate if appropriate and resets
+     * internal flags.
+     * Called after processing the event.
+     * @param e the TableModelEvent received from the model
+     */
+    protected void postprocessModelChange(TableModelEvent e) {
+        if (forceRevalidate && filteredRowCountChanged) {
+            resizeAndRepaint();
+        }
+        filteredRowCountChanged = false;
+        forceRevalidate = false;
+    }
+
+    /**
+     * Hack around core issue 6791934: sets the sorter changed flag if appropriate.
+     * Called after processing the event.
+     * @param e the sorter event received from the sorter
+     */
+    protected void postprocessSorterChanged(RowSorterEvent e) {
+        filteredRowCountChanged = false;
+        if (forceRevalidate && e.getType() == RowSorterEvent.Type.SORTED) {
+            filteredRowCountChanged = e.getPreviousRowCount() != getRowCount();
+        }
+    }    
+
+//----> end hack around core issue 6791934: 
+    
     /**
      * {@inheritDoc} <p>
      * 
