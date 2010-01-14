@@ -30,12 +30,12 @@ import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JToolBar;
 import javax.swing.JViewport;
 import javax.swing.KeyStroke;
+import javax.swing.RowFilter;
 import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
 import javax.swing.RowSorter.SortKey;
@@ -48,7 +48,6 @@ import javax.swing.table.TableModel;
 
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.decorator.AbstractHighlighter;
-import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.Highlighter;
@@ -81,7 +80,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
     public static void main(String args[]) {
       JXTableVisualCheck test = new JXTableVisualCheck();
       try {
-        test.runInteractiveTests();
+//        test.runInteractiveTests();
 //          test.runInteractiveTests("interactive.*FloatingPoint.*");
 //          test.runInteractiveTests("interactive.*Header.*");
 //          test.runInteractiveTests("interactive.*ColumnProp.*");
@@ -92,6 +91,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
           
 //          test.runInteractiveTests("interactive.*Policy.*");
 //        test.runInteractiveTests("interactive.*Rollover.*");
+        test.runInteractiveTests("interactive.*Revalidate.*");
 //        test.runInteractiveTests("interactive.*UpdateUI.*");
 //        test.runInteractiveTests("interactiveColumnHighlighting");
       } catch (Exception e) {
@@ -109,6 +109,37 @@ public class JXTableVisualCheck extends JXTableUnitTest {
 //        setLookAndFeel("Nimbus");
     }
 
+    /**
+     * Issue #1254-swingx: JXTable not revalidated on update if filter.
+     * 
+     * Core JTable issue 
+     * Problem is that the update might change the visible row count.
+     */
+    public void interactiveRevalidateOnUpdateWithFilter() {
+        String data[][] = { { "satuAA", "Satu", "SATU", "1" },
+                { "duaAAB", "Dua", "DUA", "2" },
+                { "tigaBAA", "Tiga", "TIGA", "3" },
+                { "empatBBA", "Empat", "EMPAT", "4" } };
+        String cols[] = { "col1", "col2", "col3", "col4" };
+
+        final JXTable table = new JXTable(data, cols);
+        RowFilter<TableModel, Integer> tm = RowFilter.regexFilter(
+                ".*AA.*", 0);
+        table.setRowFilter(tm);
+        JXFrame frame = wrapWithScrollingInFrame(table, "Update with RowFilter");
+        Action action = new AbstractAction("filter first row") {
+            
+            boolean hasAA = true;
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String newValue = hasAA ? "BB" : "AA";
+                hasAA = !hasAA;
+                table.getModel().setValueAt(newValue, 0, 0);
+            }
+        };
+        addAction(frame, action);
+        show(frame);
+    }
     
     /**
      * Trying to make null biggest value.
