@@ -82,9 +82,9 @@ import org.jdesktop.swingx.plaf.basic.core.DragRecognitionSupport.BeforeDrag;
  * {@code BasicXListUI} instances cannot be shared between multiple
  * lists.<p>
  * 
- * Added functionality is to support sorting/filtering, that is keep model-selection and
- * RowSorter state synchronized. The details are delegated to a ListSortUI, but this
- * class is responsible to manage the sortUI on changes of list properties, model and 
+ * The heart of added functionality is to support sorting/filtering, that is keep 
+ * model-selection and RowSorter state synchronized. The details are delegated to a ListSortUI, 
+ * but this class is responsible to manage the sortUI on changes of list properties, model and 
  * view selection (same strategy as in JXTable).<p>
  * 
  * Note: this delegate is mostly a 1:1 copy of BasicListUI. The difference is that
@@ -110,13 +110,16 @@ import org.jdesktop.swingx.plaf.basic.core.DragRecognitionSupport.BeforeDrag;
  * Differences to achieve extended functionality:
  * <ul>
  * <li> added methods to un/-installSortUI and call in un/installUI(component)
- * <li> changed PropertyChangeHandler to call updateSortUI after calling handler
+ * <li> changed PropertyChangeHandler to call a) hasHandledPropertyChange to 
+ *  allow this class to replace super handler functinality and 
+ *  b) updateSortUI after handling all not-sorter related properties.
  * <li> changed createPropertyChangeListener to return a PropertyChangeHandler
  * <li> changed ListDataHandler to check if event handled by SortUI and delegate
  *    to handler only if not
  * <li> changed createListDataListener to return a ListDataHandler
- * 
- * </ul>
+ * <li> changed ListSelectionHandler to check if event handled by SortUI and 
+ *   delegate to handler only if not
+ * </ul> changed createListSelectionListener to return a ListSelectionHandler
  * 
  * Note: extension of core (instead of implement from scratch) is to keep 
  * external (?) code working which expects a ui delegate of type BasicSomething.
@@ -380,7 +383,19 @@ public class BasicXListUI  extends BasicListUI
         list.repaint();
         return true;
     }
-//---------------------    
+
+    
+//--------------------- enhanced support
+    /**
+     * Invalidates the cell size cache and revalidates/-paints the list.
+     * 
+     */
+    public void invalidateCellSizeCache() {
+        updateLayoutStateNeeded |= 1;
+        redrawList();
+    }
+
+//---------------------  core copy
     
 
     /**
@@ -1942,13 +1957,11 @@ public class BasicXListUI  extends BasicListUI
      */
     public class PropertyChangeHandler implements PropertyChangeListener
     {
-        public void propertyChange(PropertyChangeEvent e)
-        {
+        public void propertyChange(PropertyChangeEvent e) {
             getHandler().propertyChange(e);
             updateSortUI(e.getPropertyName());
         }
     }
-
 
     /**
      * Creates an instance of PropertyChangeHandler that's added to

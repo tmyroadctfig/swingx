@@ -5,6 +5,7 @@
 package org.jdesktop.swingx;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.net.MalformedURLException;
@@ -22,11 +23,16 @@ import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.ListModel;
 import javax.swing.RowFilter;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.plaf.UIResource;
 
 import org.jdesktop.swingx.decorator.ColorHighlighter;
+import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
+import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
 import org.jdesktop.swingx.decorator.PatternPredicate;
 import org.jdesktop.swingx.hyperlink.EditorPaneLinkVisitor;
@@ -34,6 +40,7 @@ import org.jdesktop.swingx.hyperlink.LinkModel;
 import org.jdesktop.swingx.hyperlink.LinkModelAction;
 import org.jdesktop.swingx.renderer.DefaultListRenderer;
 import org.jdesktop.swingx.renderer.HyperlinkProvider;
+import org.jdesktop.swingx.renderer.HighlighterClientVisualCheck.FontHighlighter;
 import org.jdesktop.swingx.sort.RowFilters;
 import org.jdesktop.test.AncientSwingTeam;
 import org.junit.After;
@@ -54,11 +61,50 @@ public class JXListVisualCheck extends InteractiveTestCase { //JXListTest {
 //            setLookAndFeel("Nimbus");
 //            new XRegion("XList", "XListUI", false);
 //          test.runInteractiveTests();
-            test.runInteractiveTests("interactive.*Match.*");
+            test.runInteractiveTests("interactive.*Dynamic.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Issue #1255-swingx: enhance dynamic row sizing.
+     */
+    public void interactiveDynamicCellHeight() {
+        final JXList list = new JXList(AncientSwingTeam.createNamedColorListModel(), true);
+        ListSelectionListener l = new ListSelectionListener() {
+            
+            @Override
+            public void valueChanged(final ListSelectionEvent e) {
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        list.invalidateCellSizeCache();
+                    }
+                });
+            }
+            
+        };
+        list.addListSelectionListener(l);
+        HighlightPredicate selected = new HighlightPredicate() {
+            
+            @Override
+            public boolean isHighlighted(Component renderer, ComponentAdapter adapter) {
+                return adapter.isSelected();
+            }
+        };
+        Highlighter hl = new FontHighlighter(selected, list.getFont().deriveFont(50f));
+        list.addHighlighter(hl);
+        JXFrame frame = wrapWithScrollingInFrame(list, "big font on focus");
+        Action toggleSort = new AbstractAction("toggle sort") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                list.toggleSortOrder();
+            }
+        };
+        addAction(frame, toggleSort);
+        show(frame);
     }
 
     /**
