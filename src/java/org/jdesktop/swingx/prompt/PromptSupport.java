@@ -5,6 +5,11 @@ import java.awt.Font;
 
 import javax.swing.text.JTextComponent;
 
+import org.jdesktop.swingx.JXFormattedTextField;
+import org.jdesktop.swingx.JXTextArea;
+import org.jdesktop.swingx.JXTextField;
+import org.jdesktop.swingx.painter.Painter;
+import org.jdesktop.swingx.painter.Painters;
 import org.jdesktop.swingx.plaf.PromptTextUI;
 import org.jdesktop.swingx.plaf.TextUIWrapper;
 
@@ -46,6 +51,11 @@ public class PromptSupport {
 	 * The prompt background property.
 	 */
 	public static final String BACKGROUND = "promptBackground";
+	
+	/**
+	 * The prompt background property.
+	 */
+	public static final String BACKGROUND_PAINTER = "promptBackgroundPainter";
 
 	/**
 	 * The focus behavior property.
@@ -238,6 +248,45 @@ public class PromptSupport {
 
 		textComponent.putClientProperty(BACKGROUND, background);
 		textComponent.repaint();
+	}
+	
+	/**
+	 * Get the background painter of the <code>textComponent</code>, when no
+	 * text is present. If no painter has been set, then {@code null} will be returned.
+	 * 
+	 * @param textComponent
+	 * @return the background painter of the text component
+	 */
+	public static Painter getBackgroundPainter(JTextComponent textComponent) {
+	    Painter painter = (Painter) textComponent.getClientProperty(BACKGROUND_PAINTER);
+	    
+	    if (painter == null) {
+	        painter = Painters.EMPTY_PAINTER;
+	    }
+	    
+	    return painter;
+	}
+	
+	/**
+	 * <p>
+	 * Sets the prompts background painter on <code>textComponent</code> and
+	 * repaints the component to reflect the changes. This background painter will
+	 * only be used when no text is present.
+	 * </p>
+	 * <p>
+	 * Calls {@link #install(JTextComponent)} to ensure that the
+	 * <code>textComponent</code>s UI is wrapped by the appropriate
+	 * {@link PromptTextUI}.
+	 * </p>
+	 * 
+	 * @param background
+	 * @param textComponent
+	 */
+	public static void setBackgroundPainter(Painter background, JTextComponent textComponent) {
+	    TextUIWrapper.getDefaultWrapper().install(textComponent, true);
+	    
+	    textComponent.putClientProperty(BACKGROUND_PAINTER, background);
+	    textComponent.repaint();
 	}
 
 	/**

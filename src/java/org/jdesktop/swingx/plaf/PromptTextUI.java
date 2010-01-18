@@ -2,6 +2,7 @@ package org.jdesktop.swingx.plaf;
 
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.TextComponent;
@@ -17,12 +18,14 @@ import javax.swing.plaf.TextUI;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Caret;
 import javax.swing.text.EditorKit;
+import javax.swing.text.Highlighter;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.Position;
 import javax.swing.text.View;
 import javax.swing.text.DefaultHighlighter.DefaultHighlightPainter;
 import javax.swing.text.Position.Bias;
 
+import org.jdesktop.swingx.painter.Painter;
 import org.jdesktop.swingx.prompt.PromptSupport;
 import org.jdesktop.swingx.prompt.PromptSupport.FocusBehavior;
 
@@ -40,6 +43,78 @@ import org.jdesktop.swingx.prompt.PromptSupport.FocusBehavior;
  * 
  */
 public abstract class PromptTextUI extends TextUI {
+    protected class PainterHighlighter implements Highlighter {
+        private final Painter painter;
+        private JTextComponent c;
+        
+        public PainterHighlighter(Painter painter) {
+            this.painter = painter;
+        }
+        /**
+         * {@inheritDoc}
+         */
+        public Object addHighlight(int p0, int p1, HighlightPainter p) throws BadLocationException {
+            return new Object();
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public void changeHighlight(Object tag, int p0, int p1) throws BadLocationException {
+            
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public void deinstall(JTextComponent c) {
+            c = null;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public Highlight[] getHighlights() {
+            return null;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public void install(JTextComponent c) {
+            this.c = c;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public void paint(Graphics g) {
+            Graphics2D g2d = (Graphics2D) g.create();
+            
+            try {
+                painter.paint(g2d, c, c.getWidth(), c.getHeight());
+            } finally {
+                g2d.dispose();
+            }
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public void removeAllHighlights() {
+            // TODO Auto-generated method stub
+            
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public void removeHighlight(Object tag) {
+            // TODO Auto-generated method stub
+            
+        }
+    }
+    
 	static final FocusHandler focusHandler = new FocusHandler();
 
 	/**
@@ -131,6 +206,7 @@ public abstract class PromptTextUI extends TextUI {
 		}
 
 		promptComponent.setBackground(PromptSupport.getBackground(txt));
+		promptComponent.setHighlighter(new PainterHighlighter(PromptSupport.getBackgroundPainter(txt)));
 		promptComponent.setEnabled(txt.isEnabled());
 		promptComponent.setOpaque(txt.isOpaque());
 		promptComponent.setBounds(txt.getBounds());
