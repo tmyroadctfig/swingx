@@ -59,6 +59,7 @@ import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.CompoundHighlighter;
 import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.UIDependent;
+import org.jdesktop.swingx.plaf.basic.core.BasicXListUI;
 import org.jdesktop.swingx.renderer.StringValue;
 import org.jdesktop.swingx.renderer.StringValues;
 import org.jdesktop.swingx.rollover.RolloverProducer;
@@ -649,6 +650,7 @@ public class JXTree extends JTree {
         installSelectionColors();
         updateHighlighterUI();
         updateRendererEditorUI();
+        invalidateCellSizeCache();
     }
 
     
@@ -1245,8 +1247,8 @@ public class JXTree extends JTree {
                     && (row >= 0)) {
                 result = compoundHighlighter.highlight(result,
                         getComponentAdapter(row));
-            }
-
+            } 
+            
             return result;
         }
             
@@ -1265,6 +1267,22 @@ public class JXTree extends JTree {
 
     }
 
+    /**
+     * Invalidates cell size caching in the ui delegate. May do nothing if there's no
+     * safe (i.e. without reflection) way to message the delegate. <p>
+     * 
+     * This implementation calls BasicTreeUI setLeftChildIndent with the old indent if available. 
+     * Beware: clearing the cache is an undocumented implementation side-effect of the 
+     * method. Revisit if we ever should have a custom ui delegate.
+     * 
+     * 
+     */
+    public void invalidateCellSizeCache() {
+        if (getUI() instanceof BasicTreeUI) {
+            BasicTreeUI ui = (BasicTreeUI) getUI();
+            ui.setLeftChildIndent(ui.getLeftChildIndent());
+        }
+    }
     
 //----------------------- edit
     
