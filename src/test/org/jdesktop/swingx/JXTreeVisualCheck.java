@@ -32,7 +32,10 @@ import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JTree;
+import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
 import javax.swing.plaf.basic.BasicTreeUI;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellEditor;
@@ -59,8 +62,10 @@ import org.jdesktop.swingx.renderer.IconValues;
 import org.jdesktop.swingx.renderer.StringValue;
 import org.jdesktop.swingx.renderer.StringValues;
 import org.jdesktop.swingx.renderer.WrappingProvider;
+import org.jdesktop.swingx.renderer.HighlighterClientVisualCheck.FontHighlighter;
 import org.jdesktop.swingx.test.ActionMapTreeTableModel;
 import org.jdesktop.swingx.treetable.TreeTableNode;
+import org.jdesktop.test.AncientSwingTeam;
 
 public class JXTreeVisualCheck extends JXTreeUnitTest {
     @SuppressWarnings("all")
@@ -72,16 +77,52 @@ public class JXTreeVisualCheck extends JXTreeUnitTest {
       JXTreeVisualCheck test = new JXTreeVisualCheck();
       try {
 //          test.runInteractiveTests();
-          test.runInteractiveTests("interactive.*Renderer.*");
+//          test.runInteractiveTests("interactive.*Renderer.*");
 //          test.runInteractiveTests("interactive.*RToL.*");
 //          test.runInteractiveTests("interactive.*Revalidate.*");
 //          test.runInteractiveTests("interactiveRootExpansionTest");
 //        test.runInteractiveTests("interactive.*UpdateUI.*");
+        test.runInteractiveTests("interactive.*Dynamic.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
       }
   }
+    
+    public void interactiveDynamicCellHeightTree() {
+      final JXTree tree = new  JXTree(AncientSwingTeam.createNamedColorTreeModel());
+      
+      TreeSelectionListener l = new TreeSelectionListener() {
+          
+          @Override
+          public void valueChanged(TreeSelectionEvent e) {
+              LOG.info("height " + tree.getRowHeight());
+//              tree.setRowHeight(-1);
+              SwingUtilities.invokeLater(new Runnable() {
+                  public void run() {
+                      tree.invalidateCellSizeCache();
+                  }
+              });
+              
+          }
+          
+      };
+      tree.addTreeSelectionListener(l);
+      tree.setCellRenderer(new DefaultTreeRenderer());
+//      tree.setLargeModel(true);
+      tree.setRowHeight(0);
+      HighlightPredicate selected = new HighlightPredicate() {
+          
+          @Override
+          public boolean isHighlighted(Component renderer, ComponentAdapter adapter) {
+              return adapter.isSelected();
+          }
+      };
+      Highlighter hl = new FontHighlighter(selected, tree.getFont().deriveFont(50f));
+      tree.addHighlighter(hl);
+      showWithScrollingInFrame(tree, "big font on focus");
+  }
+
 
     /**
      * Issue #1231-swingx: tree cell renderer size problems.
