@@ -49,6 +49,7 @@ import org.jdesktop.swingx.decorator.CompoundHighlighter;
 import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 import org.jdesktop.swingx.plaf.XListAddon;
+import org.jdesktop.swingx.plaf.basic.core.BasicXListUI;
 import org.jdesktop.swingx.renderer.AbstractRenderer;
 import org.jdesktop.swingx.renderer.DefaultListRenderer;
 import org.jdesktop.swingx.renderer.StringValue;
@@ -1455,6 +1456,20 @@ public class JXList extends JList {
         
     }
 
+    /**
+     * Invalidates cell size caching in the ui delegate. May do nothing if there's no
+     * safe (i.e. without reflection) way to message the delegate. <p>
+     * 
+     * This implementation calls the corresponding method on BasicXListUI if available,
+     * does nothing otherwise.
+     * 
+     */
+    public void invalidateCellSizeCache() {
+        if (getUI() instanceof BasicXListUI) {
+            ((BasicXListUI) getUI()).invalidateCellSizeCache();
+        }
+    }
+    
     // --------------------------- updateUI
 
     
