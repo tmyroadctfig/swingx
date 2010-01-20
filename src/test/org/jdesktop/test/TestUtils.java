@@ -114,7 +114,7 @@ public final class TestUtils extends Assert {
         assertEquals("exactly one event", 1, report.getEventCount());
         assertEquals("property", property, report.getLastProperty());
         assertEquals("last old value", oldValue, report.getLastOldValue());
-        assertEquals("last old value", newValue, report.getLastNewValue());
+        assertEquals("last new value", newValue, report.getLastNewValue());
     }
 
     /**
@@ -136,7 +136,7 @@ public final class TestUtils extends Assert {
             assertEquals("exactly one event", 1, report.getEventCount());
             assertEquals("property", property, report.getLastProperty());
             assertEquals("last old value", oldValue, report.getLastOldValue());
-            assertEquals("last old value", newValue, report.getLastNewValue());
+            assertEquals("last new value", newValue, report.getLastNewValue());
         } else {
             assertEquals("one event of property " + property, 1, report.getEventCount(property));
             assertEquals("old property", oldValue, report.getLastOldValue(property));
@@ -248,7 +248,7 @@ public final class TestUtils extends Assert {
         assertNotNull("event must be not null", event);
         assertEquals("property", property, event.getPropertyName());
         assertEquals("last old value", oldValue, event.getOldValue());
-        assertEquals("last old value", newValue, event.getNewValue());
+        assertEquals("last new value", newValue, event.getNewValue());
     }
     
     public static void assertPropertyChangeNotification(
