@@ -29,7 +29,7 @@ public class JXListIssues extends JXListTest {
      * Issue #1232-swingx: JXList must fire property change on setCellRenderer.
      * 
      * The very first setting fires twice: once from super, once from 
-     * the forced.
+     * the forced. Keep in mind, but do nothing for now (waiting for complaints ;-)
      * 
      */
     @Test

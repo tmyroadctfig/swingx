@@ -84,15 +84,12 @@ public class JXListTest extends InteractiveTestCase {
     @Test
     public void testRendererNotification() {
         JXList list = new JXList();
-        ListCellRenderer renderer = list.getCellRenderer();
-        assertNotNull("sanity: ", renderer);
-        // first is okay (super renderer not yet set)
+        assertNotNull("sanity: ", list.getCellRenderer());
+        // very first setting: fires twice ... a bit annoying but ... waiting for complaints ;-)
         list.setCellRenderer(new DefaultListRenderer());
         PropertyChangeReport report = new PropertyChangeReport(list);
         list.setCellRenderer(new DefaultListRenderer());
-        assertEquals(1, report.getEventCount());
-        assertEquals(1, report.getEventCount("cellRenderer"));
-        assertEquals(renderer, report.getLastNewValue());
+        TestUtils.assertPropertyChangeEvent(report, "cellRenderer", null, list.getCellRenderer());
     }
     /**
      * Issue #1162-swingx: getNextMatch incorrect if sorted.
