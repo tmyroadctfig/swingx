@@ -36,16 +36,18 @@ public class OS {
   private static final boolean osIsWindowsVista;
   private static final boolean osIsLinux;
 
-  static {
-    String os = System.getProperty("os.name").toLowerCase();
+    static {
+        String os = System.getProperty("os.name");
+        if (os != null)
+            os = os.toLowerCase();
 
-    osIsMacOsX = "mac os x".equals(os);
-    osIsWindows = os != null && os.indexOf("windows") != -1;
-    osIsWindowsXP = "windows xp".equals(os);
-    osIsWindows2003 = "windows 2003".equals(os);
-    osIsWindowsVista = "windows vista".equals(os);
-    osIsLinux = os != null && os.indexOf("linux") != -1;
-  }
+        osIsMacOsX = "mac os x".equals(os);
+        osIsWindows = os != null && os.indexOf("windows") != -1;
+        osIsWindowsXP = "windows xp".equals(os);
+        osIsWindows2003 = "windows 2003".equals(os);
+        osIsWindowsVista = "windows vista".equals(os);
+        osIsLinux = os != null && os.indexOf("linux") != -1;
+    }
 
   /**
    * @return true if this VM is running on Mac OS X
