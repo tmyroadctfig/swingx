@@ -61,13 +61,98 @@ public class JXListVisualCheck extends InteractiveTestCase { //JXListTest {
 //            setLookAndFeel("Nimbus");
 //            new XRegion("XList", "XListUI", false);
 //          test.runInteractiveTests();
-            test.runInteractiveTests("interactive.*Dynamic.*");
+            test.runInteractiveTests("interactive.*RowFilter.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
         }
     }
 
+    /**
+     * Issue #1261-swingx: list goes blank after setting model and filter.
+     * 
+     * To reproduce:
+     * - click on setModel: resets the model and turns on filter (expected)
+     * - click on filterOff: clears the list (unexpected - the expected behaviour
+     *   is to show all entries
+     * 
+     * Workaround:
+     * - click on invalidate to explicitly invalidated the cell size cache 
+     *  (should be done automatically)
+     * 
+     * example adjusted from reporter
+     */
+    public void interactiveRowFilterAfterSetModel() {
+        final JXList list = new JXList(true);
+        JXFrame frame = wrapWithScrollingInFrame(list, "filter after model");
+        
+        final Action filterOnAction = new AbstractAction("filter on") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                list.setRowFilter(new RowFilter<ListModel, Integer>() {
+
+                    @Override
+                    public boolean include(
+                            Entry<? extends ListModel, ? extends Integer> entry) {
+                        boolean include = entry.getStringValue(entry.getIdentifier())
+                                .toLowerCase().contains("o");
+                        return include;
+                    }
+
+                });
+            }
+        };
+        
+//        addAction(frame, filterOnAction);
+        
+        Action modelAction = new AbstractAction("setModel") {
+            int count;
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                DefaultListModel model = new DefaultListModel();
+                model.addElement("One" + count++);
+                model.addElement("Two");
+                model.addElement("Three");
+                model.addElement("Four");
+                model.addElement("Five");
+                list.setModel(model);
+                filterOnAction.actionPerformed(e);
+            }
+        };
+        addAction(frame, modelAction);
+        
+        Action filterOffAction = new AbstractAction("filter of") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                list.setRowFilter(new RowFilter<ListModel, Integer>() {
+
+                    @Override
+                    public boolean include(
+                            Entry<? extends ListModel, ? extends Integer> entry) {
+                        return true;
+                    }
+
+                });
+            }
+        };
+        
+        addAction(frame, filterOffAction);
+        
+        Action invalidateCacheAction = new AbstractAction("invalidateCache") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // this shouldn't be necessary
+                list.invalidateCellSizeCache();
+            }
+        };
+        addAction(frame, invalidateCacheAction);
+        addStatusMessage(frame, "setModel == new Model + rowFilter on; filterOff = rowFilter off (should show all)");
+        show(frame, 500, 300);
+    }
+    
     /**
      * Issue #1255-swingx: enhance dynamic row sizing.
      */
