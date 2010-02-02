@@ -14,6 +14,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.Collator;
+import java.util.Arrays;
 import java.util.Vector;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -26,6 +27,7 @@ import javax.swing.ListModel;
 import javax.swing.RowFilter;
 import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
+import javax.swing.RowFilter.Entry;
 import javax.swing.text.Position.Bias;
 
 import org.jdesktop.swingx.JXList.DelegatingRenderer;
@@ -75,6 +77,99 @@ public class JXListTest extends InteractiveTestCase {
     /** empty default list */
     private JXList list;
     private StringValue sv;
+
+    /**
+     * Issue #1263-swingx: JXList selectedValues must convert index to model.
+     */
+    @Test
+    public void testGetSelectedValue() {
+        DefaultListModel model = new DefaultListModel();
+        model.addElement("One");
+        model.addElement("Two");
+        model.addElement("Three");
+        model.addElement("Four");
+        model.addElement("Five");
+        model.addElement("Six");
+        model.addElement("Seven");
+        JXList list = new JXList();
+        list.setAutoCreateRowSorter(true);
+        list.setModel(model);
+        list.setSelectedIndex(2);
+        assertEquals("Three", list.getSelectedValue());
+        list.setRowFilter(new RowFilter<ListModel, Integer>() {
+
+            @Override
+            public boolean include(Entry<? extends ListModel, ? extends Integer> entry) {
+                return entry.getStringValue(entry.getIdentifier()).contains("e");
+            }
+
+        });
+        assertEquals("Three", list.getSelectedValue());
+    }
+
+    /**
+     * Issue #1263-swingx: JXList selectedValues must convert index to model.
+     */
+    @Test
+    public void testGetSelectedValues() {
+        DefaultListModel model = new DefaultListModel();
+        model.addElement("One");
+        model.addElement("Two");
+        model.addElement("Three");
+        model.addElement("Four");
+        model.addElement("Five");
+        model.addElement("Six");
+        model.addElement("Seven");
+        JXList list = new JXList();
+        list.setAutoCreateRowSorter(true);
+        list.setModel(model);
+        list.setSelectedIndex(2);
+        list.addSelectionInterval(0, 2);
+        assertTrue(Arrays.deepEquals(new Object[] {"One", "Two", "Three"}, list.getSelectedValues()));
+        list.setRowFilter(new RowFilter<ListModel, Integer>() {
+
+            @Override
+            public boolean include(Entry<? extends ListModel, ? extends Integer> entry) {
+                return entry.getStringValue(entry.getIdentifier()).contains("e");
+            }
+
+        });
+        assertTrue(Arrays.deepEquals(new Object[] {"One", "Three"}, list.getSelectedValues()));
+        list.clearSelection();
+        list.addSelectionInterval(0, 2);
+        assertTrue(Arrays.deepEquals(new Object[] {"One", "Three", "Five"}, list.getSelectedValues()));
+    }
+
+    /**
+     * Issue #1263-swingx: JXList selectedValues must convert index to model.
+     */
+    @Test
+    public void testSetSelectedValue() {
+        DefaultListModel model = new DefaultListModel();
+        model.addElement("One");
+        model.addElement("Two");
+        model.addElement("Three");
+        model.addElement("Four");
+        model.addElement("Five");
+        model.addElement("Six");
+        model.addElement("Seven");
+        JXList list = new JXList();
+        list.setAutoCreateRowSorter(true);
+        list.setModel(model);
+        list.setSelectedValue("Three", false);
+        assertEquals(2, list.getSelectedIndex());
+        list.setRowFilter(new RowFilter<ListModel, Integer>() {
+
+            @Override
+            public boolean include(Entry<? extends ListModel, ? extends Integer> entry) {
+                return entry.getStringValue(entry.getIdentifier()).contains("e");
+            }
+
+        });
+        assertEquals(1, list.getSelectedIndex());
+        list.setSelectedValue("Five", false);
+        assertEquals(2, list.getSelectedIndex());
+    }
 
 
     /**
