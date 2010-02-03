@@ -78,7 +78,7 @@ public class JXListVisualCheck extends InteractiveTestCase { //JXListTest {
      * 
      * Workaround:
      * - click on invalidate to explicitly invalidated the cell size cache 
-     *  (should be done automatically)
+     *  (should be done automatically) - fixed to now do in ListSortUI.sorterChanged
      * 
      * example adjusted from reporter
      */
@@ -122,7 +122,7 @@ public class JXListVisualCheck extends InteractiveTestCase { //JXListTest {
         };
         addAction(frame, modelAction);
         
-        Action filterOffAction = new AbstractAction("filter of") {
+        Action filterOffAction = new AbstractAction("filter off") {
             
             @Override
             public void actionPerformed(ActionEvent e) {
