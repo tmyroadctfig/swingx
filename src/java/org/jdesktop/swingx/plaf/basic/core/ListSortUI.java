@@ -142,8 +142,13 @@ public final class ListSortUI {
             // rowFilter
             // potentially costly? but how to distinguish a mere sort from a 
             // filterchanged? (only the latter requires a revalidate)
-            list.revalidate();
-            list.repaint();
+            // first fix had only revalidate/repaint but was not 
+            // good enough, see #1261-swingx - no items visible
+            // after setting rowFilter
+            // need to invalidate the cell size cache which might be needed
+            // even after plain sorting as the indi-sizes are now at different
+            // positions
+            list.invalidateCellSizeCache();
         }
     }
 
