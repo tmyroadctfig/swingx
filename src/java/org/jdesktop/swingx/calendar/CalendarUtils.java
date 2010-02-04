@@ -243,6 +243,47 @@ public class CalendarUtils {
         return calendar.getTime();
     }
 
+    
+
+    /**
+     * Adjusts the given Calendar to the start of the year.
+     * 
+     * @param calendar the calendar to adjust.
+     */
+    public static void startOfYear(Calendar calendar) {
+        calendar.set(Calendar.MONTH, Calendar.JANUARY);
+        startOfMonth(calendar);
+    }
+    
+    /**
+     * Adjusts the given Calendar to the start of the year as defined by 
+     * the given date. Returns the calendar's Date.
+     * 
+     * @param calendar
+     * @param date
+     */
+    public static Date startOfYear(Calendar calendar, Date date) {
+        calendar.setTime(date);
+        startOfYear(calendar);
+        return calendar.getTime();
+    }
+
+    /**
+     * Returns a boolean indicating if the given calendar represents the 
+     * start of a year (in the calendar's time zone). Returns true, if the time is 
+     * the start of the first day of the year, false otherwise. The calendar is unchanged.
+     * 
+     * @param calendar the calendar to check.
+     * 
+     * @return true if the calendar's time is the start of the first day of the month,
+     *   false otherwise.
+     */
+    public static boolean isStartOfYear(Calendar calendar) {
+        Calendar temp = (Calendar) calendar.clone();
+        temp.add(Calendar.MILLISECOND, -1);
+        return temp.get(Calendar.YEAR) != calendar.get(Calendar.YEAR);
+    }
+    
     /**
      * Adjusts the calendar to the start of the current month.
      * That is, first day of the month with all time fields cleared.
@@ -326,6 +367,59 @@ public class CalendarUtils {
     }
 
     /**
+     * Adjusts the given calendar to the start of the period as indicated by the
+     * given field. This delegates to startOfDay, -Week, -Month, -Year as appropriate.
+     * 
+     * @param calendar
+     * @param field the period to adjust, allowed are Calendar.DAY_OF_MONTH, -.MONTH, 
+     * -.WEEK and YEAR.
+     */
+    public static void startOf(Calendar calendar, int field) {
+        switch (field) {
+        case Calendar.DAY_OF_MONTH:
+            startOfDay(calendar);
+            break;
+        case Calendar.MONTH:
+            startOfMonth(calendar);
+            break;  
+        case Calendar.WEEK_OF_YEAR:
+            startOfWeek(calendar);
+            break;
+        case Calendar.YEAR:
+            startOfYear(calendar);
+            break;
+        default:
+            throw new IllegalArgumentException("unsupported field: " + field);
+            
+        }
+    }
+    
+    /**
+     * Returns a boolean indicating if the calendar is set to the start of a 
+     * period  as defined by the
+     * given field. This delegates to startOfDay, -Week, -Month, -Year as appropriate.
+     * The calendar is unchanged.
+     * 
+     * @param calendar
+     * @param field the period to adjust, allowed are Calendar.DAY_OF_MONTH, -.MONTH, 
+     * -.WEEK and YEAR.
+     * @throws IllegalArgumentException if the field is not supported.
+     */
+    public static boolean isStartOf(Calendar calendar, int field) {
+        switch (field) {
+            case Calendar.DAY_OF_MONTH:
+                return isStartOfDay(calendar);
+            case Calendar.MONTH:
+                return isStartOfMonth(calendar);  
+            case Calendar.WEEK_OF_YEAR:
+                return isStartOfWeek(calendar);
+            case Calendar.YEAR:
+                return isStartOfYear(calendar);
+            default:
+                throw new IllegalArgumentException("unsupported field: " + field);
+            }
+    }
+    /**
      * Checks the given dates for being equal.
      * 
      * @param current one of the dates to compare
@@ -360,6 +454,25 @@ public class CalendarUtils {
         startOfDay(temp);
         return start.equals(temp.getTime());
     }
-
-
+    
+    /**
+     * Returns a boolean indicating whether the given Date is in the same period as
+     * the Date in the calendar, as defined by the calendar field. 
+     * Calendar and date are unchanged by the check.
+     *
+     * @param today the Calendar representing a date, must not be null.
+     * @param now the date to compare to, must not be null
+     * @return true if the calendar and date represent the same day in the
+     *   given calendar.
+     */
+    public static boolean isSame(Calendar today, Date now, int field) {
+        Calendar temp = (Calendar) today.clone();
+        startOf(temp, field);
+        Date start = temp.getTime();
+        temp.setTime(now);
+        startOf(temp, field);
+        return start.equals(temp.getTime());
+    }
+    
+    
 }
