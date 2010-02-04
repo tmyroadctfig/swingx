@@ -22,6 +22,8 @@
 package org.jdesktop.swingx.calendar;
 
 
+import static org.junit.Assert.*;
+
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -53,14 +55,64 @@ public class CalendarUtilsTest extends InteractiveTestCase {
     private Calendar todayUS;
     private Calendar midJune;
 
-    @Before
-    public void setUpJ4() throws Exception {
-        setUp();
+    @Test
+    public void testSameByDayField() {
+        Date now = todayGerman.getTime();
+        CalendarUtils.endOfDay(todayGerman);
+        Date end = todayGerman.getTime();
+        assertTrue(CalendarUtils.isSame(todayGerman, now, Calendar.DAY_OF_MONTH));
+        assertEquals(end, todayGerman.getTime());
+        todayGerman.add(Calendar.DAY_OF_MONTH, 1);
+        assertFalse(CalendarUtils.isSame(todayGerman, now, Calendar.DAY_OF_MONTH));
     }
     
-    @After
-    public void tearDownJ4() throws Exception {
-        tearDown();
+
+    
+    @Test
+    public void testStartOfYearField() {
+        CalendarUtils.startOf(midJune, Calendar.YEAR);
+        assertTrue(CalendarUtils.isStartOfYear(midJune));
+        assertTrue(CalendarUtils.isStartOf(midJune, Calendar.YEAR));
+    }
+    @Test
+    public void testStartOfDayField() {
+        CalendarUtils.startOf(midJune, Calendar.DAY_OF_MONTH);
+        assertTrue(CalendarUtils.isStartOfDay(midJune));
+        assertTrue(CalendarUtils.isStartOf(midJune, Calendar.DAY_OF_MONTH));
+    }
+    @Test
+    public void testStartOfMonthField() {
+        CalendarUtils.startOf(midJune, Calendar.MONTH);
+        assertTrue(CalendarUtils.isStartOfMonth(midJune));
+        assertTrue(CalendarUtils.isStartOf(midJune, Calendar.MONTH));
+    }
+    
+    @Test
+    public void testStartOfYear() {
+        int year = midJune.get(Calendar.YEAR);
+        CalendarUtils.startOfYear(midJune);
+        assertEquals(Calendar.JANUARY, midJune.get(Calendar.MONTH));
+        assertTrue(CalendarUtils.isStartOfMonth(midJune));
+        assertEquals(year, midJune.get(Calendar.YEAR));
+    }
+    
+    @Test
+    public void testStartOfYearWithReturn() {
+        midJune.add(Calendar.YEAR, 10);
+        Date startOf10YearsFuture = CalendarUtils.startOfYear(todayGerman, midJune.getTime());
+        CalendarUtils.startOfYear(midJune);
+        assertTrue(CalendarUtils.isStartOfMonth(todayGerman));
+        assertEquals(midJune.getTime(), startOf10YearsFuture);
+    }
+    
+    @Test
+    public void testIsStartOfYear() {
+        CalendarUtils.startOfYear(midJune);
+        assertTrue(CalendarUtils.isStartOfYear(midJune));
+        midJune.add(Calendar.MILLISECOND, -1);
+        Date changed = midJune.getTime();
+        assertFalse(CalendarUtils.isStartOfYear(midJune));
+        assertEquals("calendar must be unchanged", changed, midJune.getTime());
     }
     
     @Test
@@ -416,5 +468,15 @@ public class CalendarUtilsTest extends InteractiveTestCase {
         midJune.set(Calendar.DAY_OF_MONTH, 14);
         midJune.set(Calendar.MONTH, Calendar.JUNE);
     }
-   
+ 
+    @Before
+    public void setUpJ4() throws Exception {
+        setUp();
+    }
+    
+    @After
+    public void tearDownJ4() throws Exception {
+        tearDown();
+    }
+
 }
