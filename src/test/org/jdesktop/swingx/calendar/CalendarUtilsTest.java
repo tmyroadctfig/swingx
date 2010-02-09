@@ -56,6 +56,130 @@ public class CalendarUtilsTest extends InteractiveTestCase {
     private Calendar midJune;
 
     @Test
+    public void testGetYearInDecade() {
+        midJune.set(Calendar.YEAR, 2015);
+        assertEquals(5, CalendarUtils.get(midJune, CalendarUtils.YEAR_IN_DECADE));
+    }
+    
+    @Test
+    public void testSetYearInDecade() {
+        midJune.set(Calendar.YEAR, 2015);
+        CalendarUtils.set(midJune, CalendarUtils.YEAR_IN_DECADE, 7);
+        assertEquals(7, CalendarUtils.get(midJune, CalendarUtils.YEAR_IN_DECADE));
+    }
+    
+    @Test
+    public void testAddDecadeField() {
+        todayGerman.set(Calendar.YEAR, 2015);
+        CalendarUtils.add(todayGerman, CalendarUtils.DECADE, 1);
+        assertEquals(2025, todayGerman.get(Calendar.YEAR));
+    }
+    
+    @Test
+    public void testAddDecadeFieldNegative() {
+        todayGerman.set(Calendar.YEAR, 2015);
+        CalendarUtils.add(todayGerman, CalendarUtils.DECADE, -1);
+        assertEquals(2005, todayGerman.get(Calendar.YEAR));
+    }
+    
+    @Test
+    public void testAddNativeField() {
+        todayGerman.set(Calendar.YEAR, 2015);
+        CalendarUtils.add(todayGerman, Calendar.YEAR, 10);
+        assertEquals(2025, todayGerman.get(Calendar.YEAR));
+    }
+    
+    @Test
+    public void testSetDecadeField() {
+        todayGerman.set(Calendar.YEAR, 2015);
+        CalendarUtils.set(todayGerman, CalendarUtils.DECADE, 2020);
+        assertEquals(2025, todayGerman.get(Calendar.YEAR));
+    }
+    
+    @Test
+    public void testSetNativeField() {
+        todayGerman.set(Calendar.YEAR, 2015);
+        CalendarUtils.set(todayGerman, Calendar.YEAR, 2025);
+        assertEquals(2025, todayGerman.get(Calendar.YEAR));
+    }
+    
+    @Test
+    public void testGetDecadeField() {
+        todayGerman.set(Calendar.YEAR, 2025);
+        assertEquals(2020, CalendarUtils.get(todayGerman, CalendarUtils.DECADE));
+    }
+    
+    @Test
+    public void testGetNativeField() {
+        todayGerman.set(Calendar.YEAR, 2015);
+        assertEquals(2015, CalendarUtils.get(todayGerman, Calendar.YEAR));
+    }
+//    
+//    @Test
+//    public void testSetNativeFieldNegative() {
+//        Calendar clone = (Calendar) todayGerman.clone();
+//        clone.add(Calendar.MONTH, -13);
+//        todayGerman.set(Calendar.MONTH, -13);
+//        assertEquals(clone.getTime(), todayGerman.getTime());
+//        assertEquals("adjusted date" + todayGerman.getTime(),-1, todayGerman.get(Calendar.MONTH));
+//    }
+//    
+    
+    @Test
+    public void testStartOfDecade() {
+        todayGerman.set(Calendar.YEAR, 2005);
+        CalendarUtils.startOfDecade(todayGerman);
+        assertTrue(CalendarUtils.isStartOfYear(todayGerman));
+        assertEquals(2000, todayGerman.get(Calendar.YEAR));
+    }
+
+    @Test
+    public void testStartOfDecadeWithReturn() {
+        midJune.add(Calendar.YEAR, 15);
+        Date startOf10YearsFuture = CalendarUtils.startOfDecade(todayGerman, midJune.getTime());
+        CalendarUtils.startOfDecade(midJune);
+        assertTrue(CalendarUtils.isStartOfDecade(todayGerman));
+        assertEquals(midJune.getTime(), startOf10YearsFuture);
+    }
+    
+
+    @Test
+    public void testIsStartOfDecade() {
+        todayGerman.set(Calendar.YEAR, 2000);
+        CalendarUtils.startOfYear(todayGerman);
+        assertTrue(CalendarUtils.isStartOfDecade(todayGerman));
+        todayGerman.add(Calendar.YEAR, 1);
+        assertFalse(CalendarUtils.isStartOfDecade(todayGerman));
+    }
+    
+    @Test
+    public void testStartOfDecadeByField() {
+        todayGerman.set(Calendar.YEAR, 2005);
+        CalendarUtils.startOf(todayGerman, CalendarUtils.DECADE);
+        assertTrue(CalendarUtils.isStartOfYear(todayGerman));
+        assertEquals(2000, todayGerman.get(Calendar.YEAR));
+    }
+    @Test
+    public void testIsStartOfDecadeByField() {
+        todayGerman.set(Calendar.YEAR, 2000);
+        CalendarUtils.startOfYear(todayGerman);
+        assertTrue(CalendarUtils.isStartOf(todayGerman, CalendarUtils.DECADE));
+        todayGerman.add(Calendar.YEAR, 1);
+        assertFalse(CalendarUtils.isStartOf(todayGerman, CalendarUtils.DECADE));
+       
+    }
+    
+    @Test
+    public void testSameByDecadeField() {
+        
+    }
+    
+    @Test
+    public void testSameDecade() {
+        
+    }
+    
+    @Test
     public void testSameByDayField() {
         Date now = todayGerman.getTime();
         CalendarUtils.endOfDay(todayGerman);

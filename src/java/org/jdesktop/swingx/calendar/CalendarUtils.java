@@ -43,6 +43,110 @@ public class CalendarUtils {
     @SuppressWarnings("unused")
     public static final int ONE_DAY    = 24*ONE_HOUR;
     
+    public static final int DECADE = 5467;
+    public static final int YEAR_IN_DECADE = DECADE + 1;
+    
+    /**
+     * Increments the calendar field of the given calendar by amount. 
+     * 
+     * @param calendar
+     * @param field the field to increment, allowed are all fields known to
+     *   Calendar plus DECADE.
+     * @param amount
+     * 
+     * @throws IllegalArgumentException
+     */
+    public static void add(Calendar calendar, int field, int amount) {
+        if (isNativeField(field)) {
+            calendar.add(field, amount);
+        } else {
+            switch (field) {
+            case DECADE:
+                calendar.add(Calendar.YEAR, amount * 10);
+                break;
+            default:
+                throw new IllegalArgumentException("unsupported field: " + field);
+            }
+            
+        }
+    }
+    
+    /**
+     * Gets the calendar field of the given calendar by amount. 
+     * 
+     * @param calendar
+     * @param field the field to get, allowed are all fields known to
+     *   Calendar plus DECADE.
+     * 
+     * @throws IllegalArgumentException
+     */
+    public static int get(Calendar calendar, int field) {
+        if (isNativeField(field)) {
+          return calendar.get(field);
+        } 
+        switch (field) {
+        case DECADE:
+            return decade(calendar.get(Calendar.YEAR));
+        case YEAR_IN_DECADE:
+            return calendar.get(Calendar.YEAR) % 10;
+        default:
+            throw new IllegalArgumentException("unsupported field: " + field);
+        }
+    }
+    
+    
+    /**
+     * Sets the calendar field of the given calendar by amount. <p>
+     * 
+     * NOTE: the custom field implementations are very naive (JSR-310 will do better)
+     * - for decade: value must be positive, value must be a multiple of 10 and is interpreted as the 
+     *    first-year-of-the-decade
+     * - for year-in-decade:  value is added/substracted to/from the start-of-decade of the
+     *   date of the given calendar
+     * 
+     * @param calendar
+     * @param field the field to increment, allowed are all fields known to
+     *   Calendar plus DECADE.
+     * @param value the decade to set, must be a 
+     * 
+     * @throws IllegalArgumentException if the field is unsupported or the value is
+     *    not dividable by 10 or negative.
+     */
+    public static void set(Calendar calendar, int field, int value) {
+        if (isNativeField(field)) {
+            calendar.set(field, value);
+        } else {
+            switch (field) {
+            case DECADE:
+                if(value <= 0 ) {
+                    throw new IllegalArgumentException("value must be a positive but was: " + value); 
+                }
+                if (value % 10 != 0) {
+                    throw new IllegalArgumentException("value must be a multiple of 10 but was: " + value); 
+                }
+                int yearInDecade = get(calendar, YEAR_IN_DECADE);
+                calendar.set(Calendar.YEAR, value + yearInDecade);
+                break;
+            case YEAR_IN_DECADE:
+                int decade = get(calendar, DECADE);
+                calendar.set(Calendar.YEAR, value + decade);
+                break;
+            default:
+                throw new IllegalArgumentException("unsupported field: " + field);
+            }
+            
+        }
+    }
+    
+    
+    /**
+     * @param calendarField
+     * @return
+     */
+    private static boolean isNativeField(int calendarField) {
+        return calendarField < DECADE;
+    }
+
     /**
      * Adjusts the Calendar to the end of the day of the last day in DST in the
      * current year or unchanged if  not using DST. Returns the calendar's date or null, if not 
@@ -244,6 +348,55 @@ public class CalendarUtils {
     }
 
     
+    
+    /**
+     * Adjusts the given Calendar to the start of the year.
+     * 
+     * @param calendar the calendar to adjust.
+     */
+    public static void startOfDecade(Calendar calendar) {
+        calendar.set(Calendar.YEAR, decade(calendar.get(Calendar.YEAR)) );
+        startOfYear(calendar);
+    }
+
+
+    /**
+     * @param year
+     * @return
+     */
+    private static int decade(int year) {
+        return (year / 10) * 10;
+    }
+    
+    /**
+     * Adjusts the given Calendar to the start of the decade as defined by 
+     * the given date. Returns the calendar's Date.
+     * 
+     * @param calendar
+     * @param date
+     */
+    public static Date startOfDecade(Calendar calendar, Date date) {
+        calendar.setTime(date);
+        startOfDecade(calendar);
+        return calendar.getTime();
+    }
+    
+    /**
+     * Returns a boolean indicating if the given calendar represents the 
+     * start of a year (in the calendar's time zone). Returns true, if the time is 
+     * the start of the first day of the year, false otherwise. The calendar is unchanged.
+     * 
+     * @param calendar the calendar to check.
+     * 
+     * @return true if the calendar's time is the start of the first day of the month,
+     *   false otherwise.
+     */
+    public static boolean isStartOfDecade(Calendar calendar) {
+        Calendar temp = (Calendar) calendar.clone();
+        temp.add(Calendar.MILLISECOND, -1);
+        return decade(temp.get(Calendar.YEAR)) != decade(calendar.get(Calendar.YEAR));
+    }
+    
 
     /**
      * Adjusts the given Calendar to the start of the year.
@@ -264,7 +417,7 @@ public class CalendarUtils {
      */
     public static Date startOfYear(Calendar calendar, Date date) {
         calendar.setTime(date);
-        startOfYear(calendar);
+        startOfDecade(calendar);
         return calendar.getTime();
     }
 
@@ -372,7 +525,7 @@ public class CalendarUtils {
      * 
      * @param calendar
      * @param field the period to adjust, allowed are Calendar.DAY_OF_MONTH, -.MONTH, 
-     * -.WEEK and YEAR.
+     * -.WEEK and YEAR and CalendarUtils.DECADE.
      */
     public static void startOf(Calendar calendar, int field) {
         switch (field) {
@@ -388,6 +541,9 @@ public class CalendarUtils {
         case Calendar.YEAR:
             startOfYear(calendar);
             break;
+        case DECADE:
+            startOfDecade(calendar);
+            break;
         default:
             throw new IllegalArgumentException("unsupported field: " + field);
             
@@ -402,7 +558,7 @@ public class CalendarUtils {
      * 
      * @param calendar
      * @param field the period to adjust, allowed are Calendar.DAY_OF_MONTH, -.MONTH, 
-     * -.WEEK and YEAR.
+     * -.WEEK and YEAR and CalendarUtils.DECADE.
      * @throws IllegalArgumentException if the field is not supported.
      */
     public static boolean isStartOf(Calendar calendar, int field) {
@@ -415,6 +571,8 @@ public class CalendarUtils {
                 return isStartOfWeek(calendar);
             case Calendar.YEAR:
                 return isStartOfYear(calendar);
+            case DECADE:
+                return isStartOfDecade(calendar);
             default:
                 throw new IllegalArgumentException("unsupported field: " + field);
             }
