@@ -22,12 +22,19 @@
 package org.jdesktop.swingx;
 
 import java.awt.ComponentOrientation;
+import java.awt.event.ActionEvent;
 import java.util.logging.Logger;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JTree;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
 
 /**
- * Issue with core JTree.
+ * Issues with core JTree.
  * 
  */
 public class JTreeIssues extends InteractiveTestCase {
@@ -65,4 +72,36 @@ public class JTreeIssues extends InteractiveTestCase {
     }
     
 
+    /**
+     * Core Issue: editor not moved if node added above.
+     * 
+     * Start editing a node, press button to insert a row above
+     * expected: editor sticks to node, that is moves one row down
+     * actual: editor sticks to row, now pointing to incorrect node
+     * 
+     * Leads to data corruption as the editing value now it written to 
+     * the newly inserted node.
+     */
+    public void interactiveEditorSticksToRowOnInsert() {
+        final JTree tree = new JTree();
+        tree.setEditable(true);
+        JXFrame frame = wrapWithScrollingInFrame(tree, "editor not moved on insert");
+        Action action = new AbstractAction("insert node") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                TreePath path = tree.getEditingPath();
+                if (path == null) return;
+                TreePath parent = path.getParentPath();
+                DefaultMutableTreeNode node = (DefaultMutableTreeNode)parent.getLastPathComponent();
+                int idx = node.getIndex((TreeNode)path.getLastPathComponent());
+                ((DefaultTreeModel)tree.getModel()).insertNodeInto(new DefaultMutableTreeNode("inserted " + idx), 
+                        node, idx);
+
+            }
+        };
+        addAction(frame, action);
+        show(frame);
+        
+    }
 }

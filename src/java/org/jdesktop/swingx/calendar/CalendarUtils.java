@@ -298,6 +298,7 @@ public class CalendarUtils {
      * Adjusts the calendar to the start of the current week.
      * That is, first day of the week with all time fields cleared.
      * @param calendar the calendar to adjust.
+     * @return the Date the calendar is set to
      */
     public static void startOfWeek(Calendar calendar) {
         calendar.set(Calendar.DAY_OF_WEEK, calendar.getFirstDayOfWeek());
@@ -507,7 +508,9 @@ public class CalendarUtils {
         calendar.set(Calendar.MILLISECOND, 0);
         calendar.set(Calendar.SECOND, 0);
         calendar.set(Calendar.MINUTE, 0);
+        calendar.getTimeInMillis();
     }
+    
     /**
      * Adjust the given calendar to the last millisecond of the specified date.
      * 
@@ -632,5 +635,21 @@ public class CalendarUtils {
         return start.equals(temp.getTime());
     }
     
-    
+    /**
+     * Returns a boolean to indicate whether the given calendar is flushed. <p>
+     * 
+     * The only way to guarantee a flushed state is to let client code call
+     * getTime or getTimeInMillis. See
+     * 
+     * <a href=http://forums.java.net/jive/thread.jspa?threadID=74472&tstart=0>Despairing
+     * in Calendar</a>
+     * <p>
+     * Note: this if for testing only and not entirely safe!
+     * 
+     * @param calendar
+     * @return
+     */
+    public static boolean isFlushed(Calendar calendar) {
+        return !calendar.toString().contains("time=?");
+    }
 }
