@@ -41,8 +41,8 @@ public class DNDRendererVisualCheck extends InteractiveTestCase {
     public static void main(String[] args) {
         DNDRendererVisualCheck test = new DNDRendererVisualCheck();
         try {
-//            test.runInteractiveTests();
-            test.runInteractiveTests("interactive.*DropOnVisuals.*");
+            test.runInteractiveTests();
+//            test.runInteractiveTests("interactive.*DropOnVisuals.*");
         } catch (Exception e) {
             e.printStackTrace();
         }

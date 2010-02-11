@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 import javax.swing.AbstractAction;
@@ -46,6 +47,7 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
+import javax.swing.JTextField;
 import javax.swing.ListModel;
 import javax.swing.table.TableModel;
 
@@ -82,6 +84,11 @@ import org.jdesktop.test.AncientSwingTeam;
  * @author Jeanette Winzenburg
  */
 public class HighlighterClientVisualCheck extends InteractiveTestCase {
+    
+    @SuppressWarnings("unused")
+    private static final Logger LOG = Logger
+            .getLogger(HighlighterClientVisualCheck.class.getName());
+    
     protected TableModel tableModel;
     protected Color background = Color.RED;
     protected Color foreground = Color.BLUE;
@@ -93,8 +100,8 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
       HighlighterClientVisualCheck test = new HighlighterClientVisualCheck();
       try {
 //          setLookAndFeel("Nimbus");
-         test.runInteractiveTests();
-//         test.runInteractiveTests(".*Striping.*");
+//         test.runInteractiveTests();
+         test.runInteractiveTests(".*Striping.*");
 //         test.runInteractiveTests("interactive.*Search.*");
 //         test.runInteractiveTests("interactive.*BorderHighlighter");
       } catch (Exception e) {
@@ -755,9 +762,42 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
         table.setVisibleRowCount(table.getRowCount() + 3);
         table.setBackground(new Color(0xC0FFC0));
         table.addHighlighter(HighlighterFactory.createSimpleStriping());
+        Highlighter disabled = new AbstractHighlighter(HighlightPredicate.READ_ONLY) {
+            
+            @Override
+            protected Component doHighlight(Component component,
+                    ComponentAdapter adapter) {
+                component.setEnabled(false);
+                return component;
+            }
+        };
+        table.getColumnExt(0).setEditable(false);
+        table.getColumnExt(2).setEditable(false);
+        table.getColumnExt(0).setCellRenderer(new DefaultTableRenderer(new TextFieldProvider()));
+        table.addHighlighter(disabled);
         showWithScrollingInFrame(table, "Simple gray striping");
     }
 
+    public static class TextFieldProvider extends ComponentProvider<JTextField> {
+
+        @Override
+        protected void configureState(CellContext context) {
+            // TODO Auto-generated method stub
+            
+        }
+
+        @Override
+        protected JTextField createRendererComponent() {
+            JTextField field = new JTextField(20);
+            return field;
+        }
+
+        @Override
+        protected void format(CellContext context) {
+            rendererComponent.setText(getValueAsString(context));
+        }
+        
+    }
     /**
      * shows the effect of a simple striping highlighter on a 
      * colored table.

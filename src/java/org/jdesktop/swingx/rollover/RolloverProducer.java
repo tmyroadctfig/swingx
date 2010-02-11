@@ -100,6 +100,7 @@ public abstract class RolloverProducer implements MouseListener, MouseMotionList
      * coordinate changed.
      */
     public void mouseEntered(MouseEvent e) {
+        LOG.info("" + e);
         updateRollover(e, ROLLOVER_KEY, false);
     }
 
@@ -109,9 +110,15 @@ public abstract class RolloverProducer implements MouseListener, MouseMotionList
      */
     public void mouseExited(MouseEvent e) {
 //        screenLocation = null;
+        LOG.info("" + e);
+//        if (((JComponent) e.getComponent()).getMousePosition(true) != null)  {
+//            updateRollover(e, ROLLOVER_KEY, false);
+//        } else {
+//        }
         ((JComponent) e.getSource()).putClientProperty(ROLLOVER_KEY, null);
         ((JComponent) e.getSource()).putClientProperty(CLICKED_KEY, null);
-    }
+            
+        }
 
     /**
      * Implemented to do nothing.

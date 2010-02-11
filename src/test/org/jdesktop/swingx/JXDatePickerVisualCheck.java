@@ -65,6 +65,7 @@ import javax.swing.text.DefaultFormatterFactory;
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.calendar.DateSelectionModel;
 import org.jdesktop.swingx.calendar.DaySelectionModel;
+import org.jdesktop.swingx.calendar.DefaultDateSelectionModel;
 import org.jdesktop.swingx.calendar.SingleDaySelectionModel;
 import org.jdesktop.swingx.calendar.DateSelectionModel.SelectionMode;
 import org.jdesktop.test.VerticalLayoutPref;
@@ -98,7 +99,7 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
         try {
 //            test.runInteractiveTests();
 //            test.runInteractiveTests("interactive.*PrefSize.*");
-            test.runInteractiveTests("interactive.*MenuListener.*");
+            test.runInteractiveTests("interactive.*Keep.*");
 //          test.runInteractiveTests("interactive.*Multiple.*");
 //            test.runInteractiveTests("interactive.*Event.*");
         } catch (Exception e) {
@@ -380,7 +381,7 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
      */
     public void interactiveKeepTimeFields() {
         final JXDatePicker picker = new JXDatePicker();
-        SingleDaySelectionModel selectionModel = new SingleDaySelectionModel();
+        DateSelectionModel selectionModel = new SingleDaySelectionModel();
         picker.getMonthView().setSelectionModel(selectionModel);
         picker.setDate(new Date());
         DateFormat format = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.FULL);

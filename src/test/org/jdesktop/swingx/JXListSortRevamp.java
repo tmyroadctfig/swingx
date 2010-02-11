@@ -6,6 +6,8 @@
  */
 package org.jdesktop.swingx;
 
+import static org.junit.Assert.*;
+
 import java.awt.event.ActionEvent;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -14,8 +16,11 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
+import javax.swing.DefaultListSelectionModel;
+import javax.swing.JList;
 import javax.swing.JTable;
 import javax.swing.ListModel;
+import javax.swing.ListSelectionModel;
 import javax.swing.RowFilter;
 import javax.swing.table.DefaultTableModel;
 
@@ -23,8 +28,10 @@ import org.jdesktop.swingx.hyperlink.LinkModel;
 import org.jdesktop.swingx.sort.ListSortController;
 import org.jdesktop.swingx.sort.RowFilters;
 import org.jdesktop.swingx.sort.TableSortController;
+import org.jdesktop.test.ListSelectionReport;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
@@ -53,7 +60,46 @@ public class JXListSortRevamp extends InteractiveTestCase {
         }
     }
     
+    
+    @Test
+    public void testSelectionEventListX() {
+        JXList list = new JXList(ascendingListModel);
+        list.setSelectedIndex(0);
+        ListSelectionReport report = new ListSelectionReport();
+        list.addListSelectionListener(report);
+        list.addSelectionInterval(1, 1);
+        assertEquals(1, report.getEventCount(true));
+        assertEquals(1, report.getLastEvent(true).getLastIndex());
+        assertEquals(1, report.getLastEvent(true).getFirstIndex());
+    }
+    
 
+    @Test
+    public void testSelectionEventList() {
+        JList list = new JList(ascendingListModel);
+        list.setSelectedIndex(0);
+        ListSelectionReport report = new ListSelectionReport();
+        list.addListSelectionListener(report);
+        list.addSelectionInterval(1, 1);
+        assertEquals(1, report.getEventCount(true));
+        assertEquals(1, report.getLastEvent(true).getLastIndex());
+        assertEquals(1, report.getLastEvent(true).getFirstIndex());
+    }
+    
+    @Test
+    public void testSelectionEvent() {
+        DefaultListSelectionModel list = new DefaultListSelectionModel();
+        list.setLeadAnchorNotificationEnabled(false);
+        list.setSelectionInterval(0, 0);
+        ListSelectionReport report = new ListSelectionReport();
+        list.addListSelectionListener(report);
+        list.addSelectionInterval(1, 1);
+        assertEquals(1, report.getEventCount(true));
+        assertEquals(1, report.getLastEvent(true).getLastIndex());
+        assertEquals(1, report.getLastEvent(true).getFirstIndex());
+    }
+    
+    
 //------------------ re-enable
     
     public void interactiveRowSorter() {

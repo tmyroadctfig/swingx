@@ -584,6 +584,69 @@ public class CalendarUtilsTest extends InteractiveTestCase {
             }
         }
     }
+
+    //----------------- semantic startOf/endOf must flush the calendar
+    @Test
+    public void testFlushedStartOfWeek() {
+        CalendarUtils.startOfWeek(midJune);
+        assertFlushed(midJune);
+    }
+    
+    @Test
+    public void testFlushedStartOfDay() {
+        CalendarUtils.startOfDay(midJune);
+        assertFlushed(midJune);
+    }
+    
+    @Test
+    public void testFlushedStartOfMonth() {
+        CalendarUtils.startOfMonth(midJune);
+        assertFlushed(midJune);
+    }
+    
+    @Test
+    public void testFlushedStartOfYear() {
+        CalendarUtils.startOfYear(midJune);
+        assertFlushed(midJune);
+    }
+    
+    @Test
+    public void testFlushedStartOfDecade() {
+        CalendarUtils.startOfDecade(midJune);
+        assertFlushed(midJune);
+    }
+    
+    @Test
+    public void testFlushedEndOfWeek() {
+        CalendarUtils.endOfWeek(midJune);
+        assertFlushed(midJune);
+    }
+    
+    @Test
+    public void testFlushedEndOfDay() {
+       CalendarUtils.endOfDay(midJune); 
+       assertFlushed(midJune);
+    }
+    
+    @Test
+    public void testFlushedEndOfMonth() {
+        CalendarUtils.endOfMonth(midJune);
+        assertFlushed(midJune);
+    }
+    
+    @Test
+    public void testFlushedInitially() {
+        assertFlushed(todayGerman);
+        assertFlushed(todayUS);
+        assertFlushed(midJune);
+    }
+    /**
+     * @param todayGerman2
+     */
+    private void assertFlushed(Calendar calendar) {
+        assertTrue("must be flushed but was: " + calendar, CalendarUtils.isFlushed(calendar));
+        
+    }
     @Override
     protected void setUp() throws Exception {
         todayGerman = Calendar.getInstance(Locale.GERMAN);
@@ -591,6 +654,7 @@ public class CalendarUtilsTest extends InteractiveTestCase {
         midJune = Calendar.getInstance(Locale.GERMAN);
         midJune.set(Calendar.DAY_OF_MONTH, 14);
         midJune.set(Calendar.MONTH, Calendar.JUNE);
+        midJune.getTimeInMillis();
     }
  
     @Before
