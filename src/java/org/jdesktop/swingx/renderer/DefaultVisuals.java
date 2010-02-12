@@ -143,12 +143,15 @@ public class DefaultVisuals<T extends JComponent> implements Serializable {
     protected void configureState(T renderingComponent, CellContext context) {
         renderingComponent.setToolTipText(null);
         configureSizes(renderingComponent, context);
+        // PENDING JW: as of Issue #1269 this was changed to query the
+        // CellContext for the font - should move out off the else?
+        // context takes care of null component
+        renderingComponent.setFont(context.getFont());
         if (context.getComponent() == null) {
             // what to do?
             // we guarantee to cleanup completely - what are the defaults?
             // leave the decistion to the context?
         } else {
-            renderingComponent.setFont(context.getComponent().getFont());
             renderingComponent.setEnabled(context.getComponent().isEnabled());
             renderingComponent.applyComponentOrientation(context.getComponent()
                     .getComponentOrientation());

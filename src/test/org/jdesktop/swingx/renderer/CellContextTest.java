@@ -21,13 +21,20 @@
  */
 package org.jdesktop.swingx.renderer;
 
+import java.awt.Font;
 import java.util.logging.Logger;
 
+import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.LookAndFeel;
 import javax.swing.UIManager;
 
 import org.jdesktop.swingx.InteractiveTestCase;
+import org.jdesktop.swingx.JXTable;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
 /**
  * CellContext related tests.<p>
@@ -37,11 +44,51 @@ import org.junit.Test;
  * 
  * @author Jeanette Winzenburg
  */
+@RunWith(JUnit4.class)
 public class CellContextTest extends InteractiveTestCase {
 
     @SuppressWarnings("unused")
     private static final Logger LOG = Logger.getLogger(CellContextTest.class
             .getName());
+    
+    @Test
+    public void testDefaultVisualsUseContextFont() {
+        JXTable table = new JXTable();
+        final Font font = table.getFont().deriveFont(50f);
+        TableCellContext context = new TableCellContext() {
+
+            @Override
+            protected Font getFont() {
+                return font;
+            }
+            
+        };
+        context.installContext(table, -1, -1, -1, false, false, false, false);
+        JLabel label = new JLabel();
+        new DefaultVisuals<JLabel>().configureVisuals(label, context);
+        assertEquals(font, label.getFont());
+    }
+    
+    @Test
+    public void testFontWithoutComponent() {
+        CellContext context = new CellContext();
+        assertNull(context.getFont());
+    }
+    
+    @Test
+    public void testFontWithComponent() {
+        final JLabel label = new JLabel();
+        CellContext context = new CellContext() {
+
+            @Override
+            public JComponent getComponent() {
+                return label;
+            }
+            
+        };
+        assertNotNull("sanity", label.getFont());
+        assertEquals(label.getFont(), context.getFont());
+    }
     
     /**
      * Issue #1151-swingx: Nimbus border not used in renderer. 
@@ -64,8 +111,7 @@ public class CellContextTest extends InteractiveTestCase {
      * Issue #1151-swingx: Nimbus border not used. 
      * @throws Exception 
      */
-    @Test
-    public void assertNimbusNoFocusBorder(CellContext context) throws Exception {
+    private void assertNimbusNoFocusBorder(CellContext context) throws Exception {
         if (!hasLookAndFeel("Nimbus")) {
             LOG.fine("can't run - no Nimbus");
             return;
@@ -79,4 +125,11 @@ public class CellContextTest extends InteractiveTestCase {
             UIManager.setLookAndFeel(lf);
         }
     }
+
+    @Override
+    @Before
+    public void setUp() throws Exception {
+    }
+    
+    
 }

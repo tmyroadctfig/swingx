@@ -21,6 +21,7 @@
 package org.jdesktop.swingx.renderer;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.io.Serializable;
 
 import javax.swing.Icon;
@@ -65,13 +66,10 @@ import javax.swing.border.EmptyBorder;
  *
  * For a backdoor, the cell location (in horizontal and vertical view coordinates) 
  * and the originating component is accessible as well. Note that they are not necessarily
- * valid for the "life" component. It's not recommened to actually use them. If needed,
+ * valid for the "life" component. It's not recommended to actually use them. If needed,
  * that's probably a sign the api is lacking :-)
  * <p>
  * 
- * PENDING JW: the generic parameterization is useful to have a type-safe
- * installContext but introduces a bunch of generic warnings. Not enough reason to
- * go for, so will be removed in future versions (see Issue 1042-swingx)
  * 
  * <ul>
  * 
@@ -425,6 +423,14 @@ public class CellContext implements Serializable {
      */
     protected String getUIPrefix() {
         return "";
+    }
+
+    /**
+     * Returns the Font of the target component or null if no component installed.
+     * @return
+     */
+    protected Font getFont() {
+        return getComponent() != null ? getComponent().getFont() : null;
     }
 
 }
