@@ -97,6 +97,30 @@ public class HighlightPredicateTest extends InteractiveTestCase {
     /**
      * Issue #858-swingx: predefined focus predicate. 
      * 
+     * Test the IS_SELECTED predicate
+     */
+    @Test
+    public void testIsSelected() {
+        ComponentAdapter adapter = createComponentAdapter(allColored, true);
+        assertTrue("sanity", adapter.isSelected());
+        assertEquals(adapter.isSelected(), HighlightPredicate.IS_SELECTED.isHighlighted(allColored, adapter));
+    }
+    
+    /**
+     * Issue #858-swingx: predefined focus predicate. 
+     * 
+     * Test the IS_SELECTED predicate
+     */
+    @Test
+    public void testNotIsSelected() {
+        ComponentAdapter adapter = createComponentAdapter(allColored, false);
+        assertFalse("sanity", adapter.isSelected());
+        assertEquals(adapter.isSelected(), HighlightPredicate.IS_SELECTED.isHighlighted(allColored, adapter));
+    }
+    
+    /**
+     * Issue #858-swingx: predefined focus predicate. 
+     * 
      * Test the HAS_FOCUS predicate
      */
     @Test

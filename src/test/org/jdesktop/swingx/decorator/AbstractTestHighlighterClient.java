@@ -123,8 +123,9 @@ public abstract class AbstractTestHighlighterClient extends TestCase {
     @Test
     public void testSetHighlightersEmptyArray() {
         HighlighterClient client = createHighlighterClient();
+        int initialCount = client.getHighlighters().length;
         client.setHighlighters(new Highlighter[] {});
-        assertEquals(0, client.getHighlighters().length);
+        assertEquals(initialCount, client.getHighlighters().length);
     }
 
     /**
@@ -134,11 +135,12 @@ public abstract class AbstractTestHighlighterClient extends TestCase {
     @Test
     public void testSetHighlightersNoArgument() {
         HighlighterClient client = createHighlighterClient();
+        int initialCount = client.getHighlighters().length;
         client.addHighlighter(new ColorHighlighter());
         // sanity
-        assertEquals(1, client.getHighlighters().length);
+        assertEquals(initialCount + 1, client.getHighlighters().length);
         client.setHighlighters();
-        assertEquals(0, client.getHighlighters().length);
+        assertEquals(initialCount + 0, client.getHighlighters().length);
     }
 
     /**
@@ -232,16 +234,17 @@ public abstract class AbstractTestHighlighterClient extends TestCase {
     @Test
     public void testAddHighlighter() {
         HighlighterClient client = createHighlighterClient();
+        int initialCount = client.getHighlighters().length;
         Highlighter presetHighlighter = new ColorHighlighter();
         // add the first
         client.addHighlighter(presetHighlighter);
         // assert that it is added
-        assertEquals(1, client.getHighlighters().length);
+        assertEquals(initialCount + 1, client.getHighlighters().length);
         assertAsLast(client.getHighlighters(), presetHighlighter);
         Highlighter highlighter = new ColorHighlighter();
         // add the second
         client.addHighlighter(highlighter);
-        assertEquals(2, client.getHighlighters().length);
+        assertEquals(initialCount + 2, client.getHighlighters().length);
         // assert that it is appended
         assertAsLast(client.getHighlighters(), highlighter);
     }
