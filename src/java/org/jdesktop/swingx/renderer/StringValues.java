@@ -23,6 +23,7 @@ package org.jdesktop.swingx.renderer;
 import java.io.File;
 import java.text.DateFormat;
 import java.text.NumberFormat;
+import java.util.Locale;
 
 import javax.swing.filechooser.FileSystemView;
 
@@ -91,6 +92,24 @@ public final class StringValues {
         }
     };
 
+    
+    /** keep track of default locale. */
+    private static Locale defaultLocale;
+    
+    /**
+     * Returns a boolean to indicate if the default Locale has changed.
+     * Updates internal state to keep track of the default Locale. 
+     * 
+     * @return true if the default Locale has changed.
+     */
+    private static boolean localeChanged() {
+        boolean changed = !Locale.getDefault().equals(defaultLocale);
+        if (changed) {
+            defaultLocale = Locale.getDefault();
+        }
+        return changed;
+    }
+
     /**
      * Default converter for <code>Date</code> types. Uses the default format
      * as returned from <code>DateFormat</code>.
@@ -103,14 +122,14 @@ public final class StringValues {
          */
         @Override
         public String getString(Object value) {
-            if (format == null) {
+            if (format == null || localeChanged()) {
                 format = DateFormat.getDateInstance();
             }
             return super.getString(value);
         }
         
     };
-
+    
     /**
      * Default converter for <code>Number</code> types. Uses the default format
      * as returned from <code>NumberFormat</code>.
@@ -123,7 +142,7 @@ public final class StringValues {
          */
         @Override
         public String getString(Object value) {
-            if (format == null) {
+            if (format == null || localeChanged()) {
                 format = NumberFormat.getNumberInstance();
             }
             return super.getString(value);
