@@ -177,6 +177,18 @@ public interface HighlightPredicate {
     };
     
     /**
+     * Selected predicate.
+     */
+    public static final HighlightPredicate IS_SELECTED = new HighlightPredicate() {
+
+        @Override
+        public boolean isHighlighted(Component renderer,
+                ComponentAdapter adapter) {
+            return adapter.isSelected();
+        }
+        
+    };
+    /**
      * Focus predicate.
      */
     public static final HighlightPredicate HAS_FOCUS = new HighlightPredicate() {
