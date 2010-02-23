@@ -22,6 +22,8 @@
 package org.jdesktop.swingx.renderer;
 
 import java.io.File;
+import java.util.Calendar;
+import java.util.Locale;
 
 import junit.framework.TestCase;
 
@@ -35,6 +37,51 @@ import org.junit.runners.JUnit4;
  */
 @RunWith(JUnit4.class)
 public class StringValuesTest extends TestCase {
+
+
+    /**
+     * Issue #1273-swingx: Locale-dependent StringValues constants 
+     *    not updated on changing default.
+     *    
+     */
+    @Test
+    public void testLocaleDateToString() {
+        Locale locale = Locale.getDefault();
+        try {
+            Calendar number = Calendar.getInstance();
+            number.set(Calendar.MONTH, Calendar.DECEMBER);
+            Locale.setDefault(Locale.GERMAN);
+            String german = StringValues.DATE_TO_STRING.getString(number.getTime());
+            assertTrue("formatted German " + german, german.indexOf(".") >= 0);
+            Locale.setDefault(Locale.US);
+            String us = StringValues.DATE_TO_STRING.getString(number.getTime());
+            assertTrue("formatted us " + us, us.indexOf("Dec") >= 0);
+        } finally {
+            Locale.setDefault(locale);
+        }
+    }
+    
+    /**
+     * Issue #1273-swingx: Locale-dependent StringValues constants 
+     *    not updated on changing default.
+     */
+    @Test
+    public void testLocaleNumberToString() {
+        Locale locale = Locale.getDefault();
+        try {
+            float number = 10.5f;
+            Locale.setDefault(Locale.US);
+            String us = StringValues.NUMBER_TO_STRING.getString(number);
+            assertTrue("formatted us " + us, us.indexOf(".") > 0);
+            Locale.setDefault(Locale.GERMAN);
+            String german = StringValues.NUMBER_TO_STRING.getString(number);
+            assertTrue("formatted German " + german, german.indexOf(",") > 0);
+        } finally {
+            Locale.setDefault(locale);
+        }
+    }
+
+    
     @Test
     public void testFileNameWithNonFile() {
         Object o = new Object();
