@@ -20,6 +20,8 @@
  */
 package org.jdesktop.swingx;
 
+import java.beans.BeanDescriptor;
+
 import org.jdesktop.swingx.editors.PainterPropertyEditor;
 
 /**
@@ -35,6 +37,9 @@ public class JXPanelBeanInfo extends BeanInfoSupport {
 
     @Override
     protected void initialize() {
+        BeanDescriptor bd = getBeanDescriptor();
+        bd.setValue("isContainer", Boolean.TRUE);
+        
         setPreferred(true, "opaque", "alpha", "inheritAlpha", "backgroundPainter");
         setPreferred(false, "foreground");
         setExpert(false, "opaque");
