@@ -69,7 +69,6 @@ public abstract class AbstractAreaPainter<T> extends AbstractLayoutPainter<T> {
     
     private AreaEffect[] areaEffects = new AreaEffect[0];
     
-    
     private Style style = Style.BOTH;
     /**
      * The stroke width to use when painting. If null, the default Stroke for
@@ -94,6 +93,7 @@ public abstract class AbstractAreaPainter<T> extends AbstractLayoutPainter<T> {
     public AbstractAreaPainter() {
         fillPaint = Color.RED;
     }
+    
     /**
      * Creates a new instance of AbstractAreaPainter
      * @param paint the default paint to fill this area painter with
@@ -101,7 +101,6 @@ public abstract class AbstractAreaPainter<T> extends AbstractLayoutPainter<T> {
     public AbstractAreaPainter(Paint paint) {
         this.fillPaint = paint;
     }
-    
     
     /**
      * Gets the current fill paint. This is the Paint object that will be used to fill the path area.
@@ -119,7 +118,7 @@ public abstract class AbstractAreaPainter<T> extends AbstractLayoutPainter<T> {
         Paint old = getFillPaint();
         this.fillPaint = p;
         setDirty(true);
-        firePropertyChange("paint", old, getFillPaint());
+        firePropertyChange("fillPaint", old, getFillPaint());
     }
     
     /**
@@ -131,7 +130,6 @@ public abstract class AbstractAreaPainter<T> extends AbstractLayoutPainter<T> {
     public boolean isPaintStretched() {
         return stretchPaint;
     }
-    
     
     /**
      * Specifies whether this Painter should attempt to resize the Paint to fit the area being painted.
@@ -145,7 +143,7 @@ public abstract class AbstractAreaPainter<T> extends AbstractLayoutPainter<T> {
         boolean old = this.isPaintStretched();
         this.stretchPaint = paintStretched;
         setDirty(true);
-        firePropertyChange("snapPaint",old,this.stretchPaint);
+        firePropertyChange("paintStretched", old, isPaintStretched());
     }
     
     /**
@@ -204,7 +202,7 @@ public abstract class AbstractAreaPainter<T> extends AbstractLayoutPainter<T> {
         float old = getBorderWidth();
         this.borderWidth = s;
         setDirty(true);
-        firePropertyChange("strokeWidth", old, getBorderWidth());
+        firePropertyChange("borderWidth", old, getBorderWidth());
     }
     
     /**
@@ -214,8 +212,6 @@ public abstract class AbstractAreaPainter<T> extends AbstractLayoutPainter<T> {
     public float getBorderWidth() {
         return borderWidth;
     }
-    
-    
     
     /**
      * Resizes the given Paint. By default, only Gradients, LinearGradients, and RadialGradients are resized

@@ -92,13 +92,11 @@ public abstract class AbstractLayoutPainter<T> extends AbstractPainter<T> {
      * An enum which controls horizontalAlignment alignment
      */
     public static enum HorizontalAlignment { LEFT, CENTER, RIGHT }
-
     
     /**
      * An enum which controls verticalAlignment alignment
      */
     public static enum VerticalAlignment { TOP, CENTER, BOTTOM }
-
     
     /**
      * Gets the current horizontalAlignment alignment.
@@ -109,7 +107,6 @@ public abstract class AbstractLayoutPainter<T> extends AbstractPainter<T> {
         return horizontalAlignment;
     }
 
-    
     /**
      * Gets the current whitespace insets.
      * @return the current insets
@@ -118,7 +115,6 @@ public abstract class AbstractLayoutPainter<T> extends AbstractPainter<T> {
         return insets;
     }
 
-    
     /**
      * gets the current verticalAlignment alignment
      * 
@@ -128,7 +124,6 @@ public abstract class AbstractLayoutPainter<T> extends AbstractPainter<T> {
         return verticalAlignment;
     }
 
-    
     /**
      * indicates if the painter content is stretched horizontally
      * 
@@ -138,7 +133,6 @@ public abstract class AbstractLayoutPainter<T> extends AbstractPainter<T> {
         return fillHorizontal;
     }
 
-    
     /**
      * indicates if the painter content is stretched vertically
      * 
@@ -148,7 +142,6 @@ public abstract class AbstractLayoutPainter<T> extends AbstractPainter<T> {
         return fillVertical;
     }
 
-    
     /**
      * Sets a new horizontalAlignment alignment. Used to position the content at the left, right, or center.
      * 
@@ -158,24 +151,21 @@ public abstract class AbstractLayoutPainter<T> extends AbstractPainter<T> {
         HorizontalAlignment old = this.getHorizontalAlignment();
         this.horizontalAlignment = horizontal;
         setDirty(true);
-        firePropertyChange("horizontal",old,this.horizontalAlignment);
+        firePropertyChange("horizontalAlignment", old, getHorizontalAlignment());
     }
 
-    
     /**
      * Sets if the content should be stretched horizontally to fill all available horizontalAlignment
      * space (minus the left and right insets).
      * 
-     * 
-     * @param fillHorizontal new horizonal stretch value
+     * @param fillHorizontal new horizontal stretch value
      */
     public void setFillHorizontal(boolean fillHorizontal) {
         boolean old = this.isFillHorizontal();
         this.fillHorizontal = fillHorizontal;
         setDirty(true);
-        firePropertyChange("horizontalStretch",old,this.fillHorizontal);
+        firePropertyChange("fillHorizontal", old, isFillHorizontal());
     }
-
     
     /**
      * Sets the current whitespace insets.
@@ -185,10 +175,8 @@ public abstract class AbstractLayoutPainter<T> extends AbstractPainter<T> {
         Insets old = this.getInsets();
         this.insets = insets;
         setDirty(true);
-        firePropertyChange("insets",old,this.insets);
+        firePropertyChange("insets", old, getInsets());
     }
-
-    
     
     /**
      * Sets a new verticalAlignment alignment. Used to position the content at the top, bottom, or center.
@@ -199,14 +187,12 @@ public abstract class AbstractLayoutPainter<T> extends AbstractPainter<T> {
         VerticalAlignment old = this.getVerticalAlignment();
         this.verticalAlignment = vertical;
         setDirty(true);
-        firePropertyChange("vertical",old,this.verticalAlignment);
+        firePropertyChange("verticalAlignment", old, getVerticalAlignment());
     }
 
-    
     /**
      * Sets if the content should be stretched vertically to fill all available verticalAlignment
      * space (minus the top and bottom insets).
-     * 
      * 
      * @param verticalStretch new verticalAlignment stretch value
      */
@@ -214,7 +200,7 @@ public abstract class AbstractLayoutPainter<T> extends AbstractPainter<T> {
         boolean old = this.isFillVertical();
         this.fillVertical = verticalStretch;
         setDirty(true);
-        firePropertyChange("verticalStretch",old,this.fillVertical);
+        firePropertyChange("fillVertical", old, isFillVertical());
     }
     
     /**
