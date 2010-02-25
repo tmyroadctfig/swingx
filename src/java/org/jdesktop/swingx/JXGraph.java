@@ -392,10 +392,10 @@ public class JXGraph extends JXPanel {
      * 
      * @param view        the rectangle defining the view boundaries
      * @param majorX      the spacing between two major grid lines on the X axis
-     * @param minorCountX the number of minor grid lines betweek two major
+     * @param minorCountX the number of minor grid lines between two major
      *                    grid lines on the X axis
      * @param majorY      the spacing between two major grid lines on the Y axis
-     * @param minorCountY the number of minor grid lines betweek two major
+     * @param minorCountY the number of minor grid lines between two major
      *                    grid lines on the Y axis
      * @throws IllegalArgumentException if minX >= maxX or minY >= maxY or
      *                                  minorCountX < 0 or minorCountY < 0 or
@@ -430,10 +430,10 @@ public class JXGraph extends JXPanel {
      * @param origin      the coordinates of the main axis origin
      * @param view        the rectangle defining the view boundaries
      * @param majorX      the spacing between two major grid lines on the X axis
-     * @param minorCountX the number of minor grid lines betweek two major
+     * @param minorCountX the number of minor grid lines between two major
      *                    grid lines on the X axis
      * @param majorY      the spacing between two major grid lines on the Y axis
-     * @param minorCountY the number of minor grid lines betweek two major
+     * @param minorCountY the number of minor grid lines between two major
      *                    grid lines on the Y axis
      * @throws IllegalArgumentException if minX >= maxX or minY >= maxY or
      *                                  minorCountX < 0 or minorCountY < 0 or
@@ -458,10 +458,10 @@ public class JXGraph extends JXPanel {
      * @param minY        the minimum coordinate on the Y axis for the view
      * @param maxY        the maximum coordinate on the Y axis for the view
      * @param majorX      the spacing between two major grid lines on the X axis
-     * @param minorCountX the number of minor grid lines betweek two major
+     * @param minorCountX the number of minor grid lines between two major
      *                    grid lines on the X axis
      * @param majorY      the spacing between two major grid lines on the Y axis
-     * @param minorCountY the number of minor grid lines betweek two major
+     * @param minorCountY the number of minor grid lines between two major
      *                    grid lines on the Y axis
      * @throws IllegalArgumentException if minX >= maxX or minY >= maxY or
      *                                  minorCountX < 0 or minorCountY < 0 or
