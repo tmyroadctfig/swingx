@@ -68,8 +68,8 @@ public class TaskPaneAddon extends AbstractComponentAddon {
     defaults.add("TaskPane.specialTitleForeground", new ColorUIResource(SystemColor.menuText.brighter()));
     defaults.add("TaskPane.animate", Boolean.TRUE);
     defaults.add("TaskPane.focusInputMap", new UIDefaults.LazyInputMap(new Object[] {
-            "ENTER", "toggleExpanded",
-            "SPACE", "toggleExpanded"}));
+            "ENTER", "toggleCollapsed",
+            "SPACE", "toggleCollapsed"}));
   }
 
   @Override
