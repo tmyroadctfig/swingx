@@ -16,6 +16,9 @@ public class JXTitledPanelBeanInfo extends BeanInfoSupport {
     @Override
     protected void initialize() {
         BeanDescriptor bd = getBeanDescriptor();
+        bd.setName("JXTitledPanel");
+        bd.setShortDescription("A special type of Panel that has a Title section and a Content section.");
+        bd.setValue("isContainer", Boolean.TRUE);
         bd.setValue("containerDelegate", "getContentContainer");
         setPreferred(true, "title", "titleFont", "titleForeground", "titlePainter");
         setPreferred(true, "leftDecoration", "rightDecoration");
