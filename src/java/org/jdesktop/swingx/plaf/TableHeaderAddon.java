@@ -34,8 +34,7 @@ import javax.swing.plaf.metal.MetalBorders;
  * 
  * @author Jeanette Winzenburg
  */
-public class TableHeaderAddon extends AbstractComponentAddon implements
-        ComponentAddon {
+public class TableHeaderAddon extends AbstractComponentAddon {
 
     /**
      * @param name
