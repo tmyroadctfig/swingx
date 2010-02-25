@@ -22,6 +22,7 @@
 package org.jdesktop.swingx.painter;
 
 import java.awt.Graphics2D;
+import java.awt.Insets;
 import java.awt.Paint;
 import java.awt.Rectangle;
 import java.awt.Shape;
@@ -87,12 +88,19 @@ public class MattePainter extends AbstractAreaPainter<Object> {
     @Override
     protected void doPaint(Graphics2D g, Object component, int width, int height) {
         Paint p = getFillPaint();
+        
         if (p != null) {
-            if(isPaintStretched()) {
-                p = calculateSnappedPaint(p,width,height);
+            Insets insets = getInsets();
+            int w = width - insets.left - insets.right;
+            int h = height - insets.top - insets.bottom;
+
+            if (isPaintStretched()) {
+                p = calculateSnappedPaint(p, w, h);
             }
+
+            g.translate(insets.left, insets.top);
             g.setPaint(p);
-            g.fill(provideShape(g, component, width, height));
+            g.fill(provideShape(g, component, w, h));
         }
     }
 
