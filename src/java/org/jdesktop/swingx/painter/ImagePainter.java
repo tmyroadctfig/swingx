@@ -25,6 +25,7 @@ package org.jdesktop.swingx.painter;
 import java.awt.BasicStroke;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.Insets;
 import java.awt.Paint;
 import java.awt.Rectangle;
 import java.awt.Shape;
@@ -163,6 +164,7 @@ public class ImagePainter extends AbstractAreaPainter<Object> {
         }
         
         Shape shape = provideShape(g, component,width,height);
+        
         switch (getStyle()) {
             case BOTH:
                 drawBackground(g,shape,width,height);
@@ -203,7 +205,8 @@ public class ImagePainter extends AbstractAreaPainter<Object> {
             if (imgWidth == -1 || imgHeight == -1) {
                 //image hasn't completed loading, do nothing
             } else {
-                Rectangle rect = calculateLayout(imgWidth, imgHeight, width, height);
+                Rectangle rect = shape.getBounds();
+                
                 if(verticalRepeat || horizontalRepeat) {
                     Shape oldClip = g.getClip();
                     Shape clip = g.getClip();
@@ -211,17 +214,21 @@ public class ImagePainter extends AbstractAreaPainter<Object> {
                         clip = new Rectangle(0,0,width,height);
                     }
                     Area area = new Area(clip);
-                    TexturePaint tp = new TexturePaint(img,rect);
-                    if(verticalRepeat && horizontalRepeat) {
-                        area.intersect(new Area(new Rectangle(0,0,width,height)));
+                    Insets insets = getInsets();
+                    area.intersect(new Area(new Rectangle(insets.left, insets.top, width - insets.left - insets.right, height - insets.top - insets.bottom)));
+                    
+                    if (verticalRepeat && horizontalRepeat) {
+                        area.intersect(new Area(new Rectangle(0, 0, width, height)));
                         g.setClip(area);
                     } else if (verticalRepeat) {
-                        area.intersect(new Area(new Rectangle(rect.x,0,rect.width,height)));
+                        area.intersect(new Area(new Rectangle(rect.x, 0, rect.width, height)));
                         g.setClip(area);
                     } else {
-                        area.intersect(new Area(new Rectangle(0,rect.y,width,rect.height)));
+                        area.intersect(new Area(new Rectangle(0, rect.y, width, rect.height)));
                         g.setClip(area);
                     }
+                    
+                    TexturePaint tp = new TexturePaint(img, rect);
                     g.setPaint(tp);
                     g.fillRect(0,0,width,height);
                     g.setClip(oldClip);
@@ -378,7 +385,7 @@ public class ImagePainter extends AbstractAreaPainter<Object> {
     public void setBaseURL(String baseURL) {
         this.baseURL = baseURL;
     }*/
-    
+
     /**
      * Indicates if the image will be repeated horizontally.
      * @return if the image will be repeated horizontally
@@ -397,7 +404,7 @@ public class ImagePainter extends AbstractAreaPainter<Object> {
         setDirty(true);
         firePropertyChange("horizontalRepeat",old,this.horizontalRepeat);
     }
-    
+
     /**
      * Indicates if the image will be repeated vertically.
      * @return if the image will be repeated vertically
