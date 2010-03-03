@@ -28,6 +28,8 @@ import java.awt.Font;
 import java.awt.GradientPaint;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
 import java.awt.geom.Point2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -43,12 +45,16 @@ import javax.swing.AbstractListModel;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 import javax.swing.ListModel;
+import javax.swing.ToolTipManager;
+import javax.swing.UIManager;
 import javax.swing.table.TableModel;
 
 import org.jdesktop.swingx.InteractiveTestCase;
@@ -101,7 +107,8 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
       try {
 //          setLookAndFeel("Nimbus");
 //         test.runInteractiveTests();
-         test.runInteractiveTests(".*Striping.*");
+//          test.runInteractiveTests(".*Striping.*");
+         test.runInteractiveTests(".*ToolTip.*");
 //         test.runInteractiveTests("interactive.*Search.*");
 //         test.runInteractiveTests("interactive.*BorderHighlighter");
       } catch (Exception e) {
@@ -569,7 +576,60 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
      *
      */
     public void interactiveValueBasedToolTipAndColorOnHighlighter() {
-        JXTable table = new JXTable(new AncientSwingTeam());
+        ToolTipManager t = ToolTipManager.sharedInstance();
+        LOG.info("initial/reshow/dismiss" + t.getInitialDelay() + " / " + t.getReshowDelay()
+                + " / " + t.getDismissDelay()
+                + " / " + UIManager.getString("ToolTipManager.enableToolTipMode"));
+        final JXTable table = new JXTable(new AncientSwingTeam()) {
+
+//            @Override
+//            public Point getToolTipLocation(MouseEvent event) {
+//                int column = columnAtPoint(event.getPoint());
+//                int row = rowAtPoint(event.getPoint());
+//                Rectangle cellRect = getCellRect(row, column, false);
+//                if (!getComponentOrientation().isLeftToRight()) {
+//                    cellRect.translate(cellRect.width, 0);
+//                }
+//                // PENDING JW: otherwise we get a small (borders only) tooltip for null
+//                // core issue? Yeh, the logic in tooltipManager is crooked.
+//                // but this here is ehem ... rather arbitrary. 
+////                return getValueAt(row, column) == null ? null : cellRect.getLocation();
+//                return getToolTipText(event) == null ? null : cellRect.getLocation();
+////                return null;
+//            }
+//            
+
+        };
+        t.unregisterComponent(table);
+        table.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke('q'), "dummy");
+        t.registerComponent(table);
+        table.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke("F5"), "hideTip");
+        LOG.info("hideTip? " + table.getActionMap().get("hideTip"));
+        
+        PropertyChangeListener l = new PropertyChangeListener() {
+            
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                LOG.info("evt.getP" + evt.getPropertyName());
+                ToolTipManager.sharedInstance().mousePressed(null);
+            }
+        };
+        table.addPropertyChangeListener(RolloverProducer.ROLLOVER_KEY, l);
+//        table.addMouseMotionListener(new MouseMotionAdapter() {
+//            int prevRow = -1;
+//            int prevCol = -1;
+//          
+//            public void mouseMoved(MouseEvent e) {
+//               int row = table.rowAtPoint(e.getPoint());
+//               int col = table.columnAtPoint(e.getPoint());
+//               if (row == prevRow && col == prevCol)
+//                  return;
+//               ToolTipManager.sharedInstance().mousePressed(e);
+////               ToolTipManager.sharedInstance().mouseEntered(e);
+//               prevRow = row;
+//               prevCol = col;
+//            }
+//         });
         HighlightPredicate predicate = new HighlightPredicate() {
 
             public boolean isHighlighted(Component renderer, ComponentAdapter adapter) {

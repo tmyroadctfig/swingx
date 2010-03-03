@@ -29,10 +29,11 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.text.DateFormat;
-import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 import java.util.logging.Logger;
@@ -77,7 +78,7 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
 //        test.runInteractiveTests(".*Event.*");
 //          test.runInteractiveTests("interactive.*Zoomable.*");
 //          test.runInteractiveTests("interactive.*Title.*");
-        test.runInteractiveTests("interactive.*Locale.*");
+        test.runInteractiveTests("interactive.*TimeZone.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
@@ -709,12 +710,60 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
      * timezones.
      * 
      */
+    public void interactiveUpdateWeekOnSetTimeZone() {
+        JComponent panel = Box.createVerticalBox();
+        List<TimeZone> zones = new ArrayList<TimeZone>();
+        for (int i = -14; i < 13; i++) {
+            String id = "GMT" + i;
+            if (i >= 0) {
+                id = "GMT+" + i;
+            }
+            TimeZone zone = TimeZone.getTimeZone(id);
+            zones.add(zone);
+        }
+        final JComboBox zoneSelector = new JComboBox(zones.toArray());
+        
+        final JXMonthView monthView = new JXMonthView();
+        monthView.setTraversable(true);
+        monthView.setShowingWeekNumber(true);
+        // Synchronize the picker and selector's zones.
+        zoneSelector.setSelectedItem(monthView.getTimeZone().getID());
+        
+        // Set the picker's time zone based on the selected time zone.
+        zoneSelector.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+//                String zone = (String) zoneSelector.getSelectedItem();
+                TimeZone tz = (TimeZone) zoneSelector.getSelectedItem();
+                monthView.setTimeZone(tz);
+                DateFormat format = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL);
+                format.setTimeZone(tz);
+                DateFormat week = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
+                week.setTimeZone(tz);
+                ((SimpleDateFormat) week).applyPattern("w");
+                Calendar calendar = Calendar.getInstance(tz);
+                calendar.add(Calendar.HOUR_OF_DAY, - 12);
+                LOG.info("now: " + format.format(calendar.getTime()) + 
+                        " / " + calendar.get(Calendar.WEEK_OF_YEAR) + week.format(calendar.getTime()));
+            }
+        });
+        
+        panel.add(monthView);
+        panel.add(zoneSelector);
+        showInFrame(panel, "today - on custom TimeZones");
+    }
+    
+    /**
+     * Issue #618-swingx: JXMonthView displays problems with non-default
+     * timezones.
+     * 
+     */
     public void interactiveUpdateTodayOnSetTimeZone() {
         JComponent panel = Box.createVerticalBox();
         
         final JComboBox zoneSelector = new JComboBox(TimeZone.getAvailableIDs());
         final JXMonthView monthView = new JXMonthView();
         monthView.setTraversable(true);
+        monthView.setShowingWeekNumber(true);
         // Synchronize the picker and selector's zones.
         zoneSelector.setSelectedItem(monthView.getTimeZone().getID());
         
@@ -745,6 +794,7 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
 
         final JComboBox zoneSelector = new JComboBox(TimeZone.getAvailableIDs());
         final JXMonthView monthView = new JXMonthView();
+        monthView.setShowingWeekNumber(true);
         monthView.setTraversable(true);
         // Synchronize the picker and selector's zones.
         zoneSelector.setSelectedItem(monthView.getTimeZone().getID());
