@@ -95,6 +95,10 @@ public abstract class AbstractTestHighlighterClient extends TestCase {
         }
     }
 
+    /**
+     * Test assumption is incorrect if the client has internal Highlighters which
+     * are always included!
+     */
     @Test
     public void testSetHighlighters() {
         HighlighterClient client = createHighlighterClient();
@@ -197,19 +201,20 @@ public abstract class AbstractTestHighlighterClient extends TestCase {
     @Test
     public void testRemoveHighlighterTable() {
         HighlighterClient client = createHighlighterClient();
+        int initialCount = client.getHighlighters().length;
         // test cope with null
         client.removeHighlighter(null);
         Highlighter presetHighlighter = new ColorHighlighter();
         client.setHighlighters(presetHighlighter);
         Highlighter[] highlighters = client.getHighlighters();
         // sanity
-        assertEquals(1, highlighters.length);
+        assertEquals(initialCount + 1, highlighters.length);
         // remove uncontained
         client.removeHighlighter(new ColorHighlighter());
         // assert no change
         assertSameContent(highlighters, client.getHighlighters());
         client.removeHighlighter(presetHighlighter);
-        assertEquals(0, client.getHighlighters().length);
+        assertEquals(initialCount, client.getHighlighters().length);
     }
 
     /**

@@ -107,10 +107,11 @@ public class RendererIssues extends InteractiveTestCase {
         RendererIssues test = new RendererIssues();
         try {
 //            test.runInteractiveTests();
-          test.runInteractiveTests("interactive.*Alpha.*");
+//          test.runInteractiveTests("interactive.*Alpha.*");
 //          test.runInteractiveTests(".*XLabel.*");
 //          test.runInteractiveTests(".*Color.*");
 //          test.runInteractiveTests("interactive.*ColumnControl.*");
+          test.runInteractiveTests("interactive.*ToolTip.*");
 //          test.runInteractiveTests("interactive.*Hyperlink.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
@@ -441,8 +442,11 @@ public class RendererIssues extends InteractiveTestCase {
                 }
                 // PENDING JW: otherwise we get a small (borders only) tooltip for null
                 // core issue? Yeh, the logic in tooltipManager is crooked.
-                // but this here is ehem ... rather arbitrary. 
+                // but this here is ehem ... rather arbitrary, not working if value
+                // not null without tooltip. 
                 return getValueAt(row, column) == null ? null : cellRect.getLocation();
+                // working - might be costly?
+//                return getToolTipText(event) == null ? null : cellRect.getLocation();
 //                return null;
             }
             
