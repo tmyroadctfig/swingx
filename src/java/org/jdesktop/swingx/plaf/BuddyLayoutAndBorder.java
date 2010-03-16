@@ -204,10 +204,11 @@ public class BuddyLayoutAndBorder implements LayoutManager, Border, PropertyChan
 	 */
 	public Insets getRealBorderInsets() {
 		if (borderDelegate == null) {
-			return null;
+		    //SwingX 1287: null borders are possible and give no insets
+			return new Insets(0, 0, 0, 0);
 		}
 
-		Insets insets = (Insets) borderDelegate.getBorderInsets(textField);
+		Insets insets = borderDelegate.getBorderInsets(textField);
 
 		// for some reason, all LnFs add the margin to the insets.
 		// we want the insets without the margin, so substract the margin here!!
