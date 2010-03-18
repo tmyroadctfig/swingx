@@ -182,7 +182,7 @@ public class ColorUtil {
     /**
      * Blends two colors to create a new color. The {@code origin} color is the
      * base for the new color and regardless of its alpha component, it is
-     * treated a fully opaque (alpha 255).
+     * treated as fully opaque (alpha 255).
      * 
      * @param origin
      *            the base of the new color
@@ -209,19 +209,55 @@ public class ColorUtil {
 
         return new Color((over.getRGB() & 0xff000000) | ((rb | g) >> 8));
     }
-    
+
+    public static Color interpolate(Color b, Color a, float t) {
+        float[] acomp = a.getRGBComponents(null);
+        float[] bcomp = b.getRGBComponents(null);
+        float[] ccomp = new float[4];
+        
+//        log.fine(("a comp ");
+//        for(float f : acomp) {
+//            log.fine((f);
+//        }
+//        for(float f : bcomp) {
+//            log.fine((f);
+//        }
+        for(int i=0; i<4; i++) {
+            ccomp[i] = acomp[i] + (bcomp[i]-acomp[i])*t;
+        }
+//        for(float f : ccomp) {
+//            log.fine((f);
+//        }
+        
+        return new Color(ccomp[0],ccomp[1],ccomp[2],ccomp[3]);
+    }
+
     /**
-     * Obtain a <code>java.awt.Paint</code> instance which draws a checker
-     * background of black and white. 
-     * Note: The returned instance may be shared.
-     * Note: This method should be reimplemented to not use a png resource.
-     *
-     * @return a Paint implementation
+     * Creates a new {@code Paint} that is a checkered effect using the colors {@link Color#GRAY
+     * gray} and {@link Color#WHITE}.
+     * 
+     * @return a the checkered paint
      */
     public static Paint getCheckerPaint() {
-        return getCheckerPaint(Color.white,Color.gray,20);
+        return getCheckerPaint(Color.WHITE, Color.GRAY, 20);
     }
-    
+
+    /**
+     * Creates a new {@code Paint} that is a checkered effect using the specified colors.
+     * <p>
+     * While this method supports transparent colors, this implementation performs painting
+     * operations using the second color after it performs operations using the first color. This
+     * means that to create a checkered paint with a fully-transparent color, you MUST specify that
+     * color first.
+     * 
+     * @param c1
+     *            the first color
+     * @param c2
+     *            the second color
+     * @param size
+     *            the size of the paint
+     * @return a new {@code Paint} checkering the supplied colors
+     */
     public static Paint getCheckerPaint(Color c1, Color c2, int size) {
         BufferedImage img = new BufferedImage(size,size,BufferedImage.TYPE_INT_ARGB);
         Graphics g = img.getGraphics();
@@ -315,27 +351,4 @@ public class ColorUtil {
                     img.getWidth(),       img.getHeight(),
                     null);
     }
-
-    public static Color interpolate(Color b, Color a, float t) {
-        float[] acomp = a.getRGBComponents(null);
-        float[] bcomp = b.getRGBComponents(null);
-        float[] ccomp = new float[4];
-        
-//        log.fine(("a comp ");
-//        for(float f : acomp) {
-//            log.fine((f);
-//        }
-//        for(float f : bcomp) {
-//            log.fine((f);
-//        }
-        for(int i=0; i<4; i++) {
-            ccomp[i] = acomp[i] + (bcomp[i]-acomp[i])*t;
-        }
-//        for(float f : ccomp) {
-//            log.fine((f);
-//        }
-        
-        return new Color(ccomp[0],ccomp[1],ccomp[2],ccomp[3]);
-    }
-
 }
