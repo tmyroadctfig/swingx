@@ -56,6 +56,8 @@ public abstract class DefaultSortController<M> extends DefaultRowSorter<M, Integ
     private boolean sortable;
 
     private StringValueProvider stringValueProvider;
+
+    protected int cachedModelRowCount;
     
     public DefaultSortController() {
         super();
@@ -285,4 +287,107 @@ public abstract class DefaultSortController<M> extends DefaultRowSorter<M, Integ
         }
     }
 
+//-------------------------- replacing super for more consistent conversion/rowCount behaviour
+
+//    /**
+//     * {@inheritDoc} <p>
+//     * 
+//     * Overridden to use check against getViewRowCount for validity.
+//     */
+//    @Override
+//    public int convertRowIndexToModel(int viewIndex) {
+//        if ((viewIndex < 0) || viewIndex >= getViewRowCount()) 
+//            throw new IndexOutOfBoundsException("valid viewIndex: 0 <= index < " 
+//                    + getViewRowCount() 
+//                    + " but was: " + viewIndex);
+//        try {
+//             return super.convertRowIndexToModel(viewIndex);
+//        } catch (Exception e) {
+//            // this will happen only if unsorted/-filtered and super
+//            // incorrectly access the model while it had been changed
+//            // under its feet
+//        }
+//        return viewIndex;
+//    }
+//    
+//    
+//    /**
+//     * {@inheritDoc} <p>
+//     * 
+//     * Overridden to use check against getModelRowCount for validity.
+//     */
+//    @Override
+//    public int convertRowIndexToView(int modelIndex) {
+//        if ((modelIndex < 0) || modelIndex >= getModelRowCount()) 
+//            throw new IndexOutOfBoundsException("valid modelIndex: 0 <= index < " 
+//                    + getModelRowCount() 
+//                    + " but was: " + modelIndex);
+//        try {
+//            return super.convertRowIndexToView(modelIndex);
+//        } catch (Exception e) {
+//            // this will happen only if unsorted/-filtered and super
+//            // incorrectly access the model while it had been changed
+//            // under its feet
+//        }
+//        return modelIndex;
+//    }
+//    
+//    /**
+//     * {@inheritDoc} <p>
+//     * 
+//     * Overridden to return the model row count which corresponds to the currently 
+//     * mapped model instead of accessing the model directly (as super does).
+//     * This may differ from the "real" current model row count if the model has changed
+//     * but this sorter not yet notified.
+//     * 
+//     */
+//    @Override
+//    public int getModelRowCount() {
+//        return cachedModelRowCount;
+//    }
+//
+//    /**
+//     * {@inheritDoc} <p>
+//     * 
+//     * Overridden to return the model row count which corresponds to the currently 
+//     * mapped model instead of accessing the model directly (as super does).
+//     * This may differ from the "real" current model row count if the model has changed
+//     * but this sorter not yet notified.
+//     * 
+//     */
+//    @Override
+//    public int getViewRowCount() {
+//        if (hasRowFilter())
+//            return super.getViewRowCount();
+//        return getModelRowCount();
+//    }
+//    /**
+//     * @return
+//     */
+//    private boolean hasRowFilter() {
+//        return getRowFilter() != null;
+//    }
+//    
+////------------------ overridden notification methods: cache model row count    
+//    @Override
+//    public void allRowsChanged() {
+//        cachedModelRowCount = getModelWrapper().getRowCount();
+//        super.allRowsChanged();
+//    }
+//    @Override
+//    public void modelStructureChanged() {
+//        super.modelStructureChanged();
+//        cachedModelRowCount = getModelWrapper().getRowCount();
+//    }
+//    @Override
+//    public void rowsDeleted(int firstRow, int endRow) {
+//        cachedModelRowCount = getModelWrapper().getRowCount();
+//        super.rowsDeleted(firstRow, endRow);
+//    }
+//    @Override
+//    public void rowsInserted(int firstRow, int endRow) {
+//        cachedModelRowCount = getModelWrapper().getRowCount();
+//        super.rowsInserted(firstRow, endRow);
+//    }
+    
 }

@@ -48,6 +48,8 @@ public class ListSortController<M extends ListModel> extends DefaultSortControll
      */
     public void setModel(M model) {
         listModel = model;
+        if (model != null)
+            cachedModelRowCount = model.getSize();
         setModelWrapper(new ListRowSorterModelWrapper());
     }
 
