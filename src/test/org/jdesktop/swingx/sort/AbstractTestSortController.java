@@ -57,6 +57,7 @@ public abstract class AbstractTestSortController<SC extends DefaultSortControlle
     /** writable version */
     protected StringValueRegistry registry;
 
+    
     @Test
     public void testStringValueProviderNotNull() {
         assertNotNull(controller.getStringValueProvider());

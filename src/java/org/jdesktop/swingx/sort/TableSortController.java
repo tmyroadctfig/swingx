@@ -61,6 +61,8 @@ public class TableSortController<M extends TableModel> extends DefaultSortContro
      */
     public void setModel(M model) {
         tableModel = model;
+        if (model != null)
+            cachedModelRowCount = model.getRowCount();
         setModelWrapper(new TableRowSorterModelWrapper());
     }
 

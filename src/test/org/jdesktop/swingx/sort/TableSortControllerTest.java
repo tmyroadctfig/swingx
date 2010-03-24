@@ -30,6 +30,7 @@ import javax.swing.RowFilter;
 import javax.swing.SortOrder;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 
 import org.jdesktop.test.AncientSwingTeam;
 import org.junit.Test;
@@ -57,6 +58,67 @@ public class TableSortControllerTest extends AbstractTestSortController<TableSor
             e.printStackTrace();
         }
     }
+
+//--------------- start of #1291-swingx related tests
+//--------------- PENDING JW: uncomment if the change is uncommented    
+//    /**
+//     * Core Issue http://forums.sun.com/thread.jspa?messageID=10939199#10939199
+//     * 
+//     * Table looses selection of last row if deleted before last.
+//     * 
+//     * Here: DefaultRowSorter conversion throws too much if not sorted.
+//     */
+//    @Test
+//    public void testViewRowCountAfterRemoveNotSorted() {
+//        int rows = controller.getModelRowCount();
+//        ((AncientSwingTeam) controller.getModel()).removeRows(0, 1);
+//        assertEquals(rows, controller.getViewRowCount());
+//    }
+//    
+//    /**
+//     * Core Issue http://forums.sun.com/thread.jspa?messageID=10939199#10939199
+//     * 
+//     * Table looses selection of last row if deleted before last.
+//     * 
+//     * Here: DefaultRowSorter conversion throws too much if not sorted.
+//     */
+//    @Test
+//    public void testViewRowCountAfterInsertNotSorted() {
+//        int rows = controller.getModelRowCount();
+//        ((AncientSwingTeam) controller.getModel()).insertRows(0, 1);
+//        assertEquals(rows, controller.getViewRowCount());
+//    }
+//    
+//    
+//    /**
+//     * Core Issue http://forums.sun.com/thread.jspa?messageID=10939199#10939199
+//     * 
+//     * Table looses selection of last row if deleted before last.
+//     * 
+//     * Here: DefaultRowSorter conversion throws too much if not sorted.
+//     */
+//    @Test
+//    public void testModelRowCountAfterRemoveNotSorted() {
+//        int rows = controller.getModelRowCount();
+//        ((AncientSwingTeam) controller.getModel()).removeRows(0, 1);
+//        assertEquals(rows, controller.getModelRowCount());
+//    }
+//    
+//    /**
+//     * Core Issue http://forums.sun.com/thread.jspa?messageID=10939199#10939199
+//     * 
+//     * Table looses selection of last row if deleted before last.
+//     * 
+//     * Here: DefaultRowSorter conversion throws too much if not sorted.
+//     */
+//    @Test
+//    public void testModelRowCountAfterInsertNotSorted() {
+//        int rows = controller.getModelRowCount();
+//        ((AncientSwingTeam) controller.getModel()).insertRows(0, 1);
+//        assertEquals(rows, controller.getModelRowCount());
+//    }
+//    
+//--------------- end of #1291 related tests    
 
     /**
      * Issue #1156-swingx: sorter must use comparable if available
