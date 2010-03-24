@@ -93,11 +93,11 @@ public class JXTreeTableIssues extends InteractiveTestCase {
         setSystemLF(true);
         JXTreeTableIssues test = new JXTreeTableIssues();
         try {
-            test.runInteractiveTests();
+//            test.runInteractiveTests();
 //            test.runInteractiveTests(".*Combo.*");
 //            test.runInteractiveTests(".*Text.*");
 //            test.runInteractiveTests(".*TreeExpand.*");
-//            test.runInteractiveTests("interactive.*EditWith.*");
+            test.runInteractiveTests("interactive.*EditWith.*");
 //          test.runInteractiveTests("interactive.*CustomColor.*");
               
         } catch (Exception e) {
@@ -108,7 +108,7 @@ public class JXTreeTableIssues extends InteractiveTestCase {
 
     
     /**
-     * Issue #??: combo editor is closed immediately after starting
+     * Issue #1126: combo editor is closed immediately after starting
      * 
      * Happens if row is not selected at the moment of starting, okay if selected.
      * Inserts on pressed, removes on released. Same for 1.5 and 1.6
