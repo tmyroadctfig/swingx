@@ -108,27 +108,6 @@ public class JXTreeTableIssues extends InteractiveTestCase {
     }
 
     
-    /**
-     * Issue #1126: combo editor is closed immediately after starting
-     * 
-     * Happens if row is not selected at the moment of starting, okay if selected.
-     * Inserts on pressed, removes on released. Same for 1.5 and 1.6
-     */
-    public void interactiveEditWithComboBox() {
-        // quick for having an editable treeTableModel (non hierarchical column)
-        TreeTableModel model = new ComponentTreeTableModel(new JXFrame());
-        JXTreeTable treeTable = new JXTreeTable(model);
-        treeTable.expandAll();
-        JComboBox box = new JComboBox(new Object[] {200, 300, 400});
-//        box.setEditable(true);
-        treeTable.getColumn(3).setCellEditor(new DefaultCellEditor(box));
-        JTable table = new JTable(treeTable.getModel());
-        JComboBox box2 = new JComboBox(new Object[] {200, 300, 400});
-//        box2.setEditable(true);
-        table.getColumnModel().getColumn(3).setCellEditor(new DefaultCellEditor(box2));
-        showWithScrollingInFrame(treeTable, table, "combo editor in column 3");
-    }
-    
 
     /**
      * Custom renderer colors of Swingx DefaultTreeRenderer not respected.
