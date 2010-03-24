@@ -34,6 +34,7 @@ import javax.swing.BorderFactory;
 import javax.swing.DefaultCellEditor;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
+import javax.swing.JTable;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
@@ -119,12 +120,12 @@ public class JXTreeTableIssues extends InteractiveTestCase {
         JXTreeTable treeTable = new JXTreeTable(model);
         treeTable.expandAll();
         JComboBox box = new JComboBox(new Object[] {200, 300, 400});
-        box.setEditable(true);
+//        box.setEditable(true);
         treeTable.getColumn(3).setCellEditor(new DefaultCellEditor(box));
-        JXTable table = new JXTable(treeTable.getModel());
+        JTable table = new JTable(treeTable.getModel());
         JComboBox box2 = new JComboBox(new Object[] {200, 300, 400});
-        box2.setEditable(true);
-        table.getColumn(3).setCellEditor(new DefaultCellEditor(box2));
+//        box2.setEditable(true);
+        table.getColumnModel().getColumn(3).setCellEditor(new DefaultCellEditor(box2));
         showWithScrollingInFrame(treeTable, table, "combo editor in column 3");
     }
     
