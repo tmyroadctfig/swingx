@@ -121,11 +121,22 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
      * Problem was hacker's completeEditing: must only jump in if editing the hierarchical
      * column. Which still leaves the problem if combo editing in hierarchical ... but
      * that's a different issue ... 
+     * 
+     * Back to start: fix introduced regression on expand/collapse
      */
     public void interactiveEditWithComboBox() {
         // quick for having an editable treeTableModel (non hierarchical column)
-        TreeTableModel model = new ComponentTreeTableModel(new JXFrame());
-        JXTreeTable treeTable = new JXTreeTable(model);
+        TreeTableModel model = createEditableTreeTableModel();
+        JXTreeTable treeTable = new JXTreeTable(model) {
+
+            @Override
+            public void removeEditor() {
+                // TODO Auto-generated method stub
+                super.removeEditor();
+            }
+            
+        };
+        treeTable.setExpandsSelectedPaths(false);
         treeTable.expandAll();
         JComboBox box = new JComboBox(new Object[] {200, 300, 400});
         box.setEditable(true);
@@ -135,6 +146,20 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         box2.setEditable(true);
         table.getColumnModel().getColumn(3).setCellEditor(new DefaultCellEditor(box2));
         showWithScrollingInFrame(treeTable, table, "combo editor in column 3");
+    }
+
+
+    /**
+     * @return
+     */
+    private ComponentTreeTableModel createEditableTreeTableModel() {
+        JXFrame frame = new JXFrame();
+        addStatusMessage(frame, "sometext");
+        addStatusMessage(frame, "sometext");
+        addStatusMessage(frame, "sometext");
+        addStatusMessage(frame, "sometext");
+        addStatusMessage(frame, "sometext");
+        return new ComponentTreeTableModel(frame);
     }
     
 

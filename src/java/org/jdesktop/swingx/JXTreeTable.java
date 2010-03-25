@@ -747,7 +747,8 @@ public class JXTreeTable extends JXTable {
          */
         protected void completeEditing() {
             // JW: fix for 1126 - ignore complete if not editing hierarchical
-            if (isEditing() && isHierarchical(getEditingColumn())) {
+            // reverted - introduced regression .... for details please see the bug report
+            if (isEditing()) { // && isHierarchical(getEditingColumn())) {
                 boolean success = getCellEditor().stopCellEditing();
                 if (!success) {
                     getCellEditor().cancelCellEditing();
