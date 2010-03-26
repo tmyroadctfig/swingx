@@ -2831,6 +2831,14 @@ public class JXTreeTable extends JXTable {
 
         @Override
         protected void setExpandedState(TreePath path, boolean state) {
+            // JW: fix for #1126 - CellEditors are removed immediately after starting an
+            // edit if they involve a change of selection and the 
+            // expandsOnSelection property is true
+            // back out if the selection change does not cause a change in 
+            // expansion state
+            if (isExpanded(path) == state) return;
+            // on change of expansion state, the editor's row might be changed
+            // for simplicity, it's stopped always (even if the row is not changed)
             treeTable.getTreeTableHacker().completeEditing();
             super.setExpandedState(path, state);
             treeTable.getTreeTableHacker().expansionChanged();

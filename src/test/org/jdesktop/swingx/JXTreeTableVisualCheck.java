@@ -136,7 +136,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
             }
             
         };
-        treeTable.setExpandsSelectedPaths(false);
+//        treeTable.setExpandsSelectedPaths(false);
         treeTable.expandAll();
         JComboBox box = new JComboBox(new Object[] {200, 300, 400});
         box.setEditable(true);
