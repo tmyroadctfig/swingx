@@ -30,13 +30,17 @@ import java.math.BigInteger;
 import java.text.Format;
 import java.text.NumberFormat;
 import java.text.ParseException;
+import java.util.Date;
 import java.util.logging.Logger;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.InputVerifier;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
+import javax.swing.KeyStroke;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
@@ -47,6 +51,7 @@ import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.JXTable.NumberEditor;
+import org.jdesktop.test.CellEditorReport;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -90,6 +95,16 @@ public class NumberEditorExtTest extends InteractiveTestCase {
 
     /** a NumberEditorExt configured with strict IntegerFormat. */
     private NumberEditorExt cellEditorStrict;
+    
+    /**
+     * Issue #1293-swingx: NumberEditorExt removes Escape binding for all formatted text fields.
+     */
+    @Test
+    public void testFormattedTextFieldHasEscapeBinding() {
+        JFormattedTextField field = new JFormattedTextField(new Date());
+        KeyStroke keyStroke = KeyStroke.getKeyStroke("ESCAPE");
+        assertNotNull("text field must have ESCAPE binding", field.getInputMap().get(keyStroke ));
+    }
     
     
     
@@ -309,7 +324,60 @@ public class NumberEditorExtTest extends InteractiveTestCase {
     }
 
 //----------------- interactive
+
     
+    /**
+     * Issue #1293-swingx: NumberEditorExt removes Escape binding for all formatted text fields.
+     * 
+     * Here we assure that the fix for the issue doesn't effect the table edit - must
+     * pass-through to allow correct cancel processing (non-strict number editor).
+     */
+    public void interactiveEscapeNonStrict() {
+        JXTable table = new JXTable(this.table.getModel());
+        table.setDefaultEditor(Number.class, new NumberEditorExt(false));
+        JXFrame frame = wrapWithScrollingInFrame(table, "non-strict: escape must cancel edit");
+        addStatusMessage(frame, "edit number column, press escape, verify editingCanceled");
+        final CellEditorReport report = new CellEditorReport();
+        table.getDefaultEditor(Number.class).addCellEditorListener(report);
+        Action verify = new AbstractAction("verify cancelled") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int cancelledCount = report.getCanceledEventCount();
+                report.clear();
+                LOG.info("cancelled event count must be > 0, was: " + cancelledCount);
+            }
+        };
+        addAction(frame, verify);
+        show(frame);
+    }
+    
+    /**
+     * Issue #1293-swingx: NumberEditorExt removes Escape binding for all formatted text fields.
+     * 
+     * Here we assure that the fix for the issue doesn't effect the table edit - must
+     * pass-through to allow correct cancel processing (strict number editor).
+     */
+    public void interactiveEscapeStrict() {
+        JXTable table = new JXTable(this.table.getModel());
+        JXFrame frame = wrapWithScrollingInFrame(table, "strict: escape must cancel edit");
+        addStatusMessage(frame, "edit number column, press escape, verify editingCanceled");
+        final CellEditorReport report = new CellEditorReport();
+        table.getDefaultEditor(Number.class).addCellEditorListener(report);
+        Action verify = new AbstractAction("verify cancelled") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int cancelledCount = report.getCanceledEventCount();
+                report.clear();
+                LOG.info("cancelled event count must be > 0, was: " + cancelledCount);
+            }
+        };
+        addAction(frame, verify);
+        show(frame);
+    }
+    
+
     /**
      * Issue #1183-swingx: NumberEditorExt throws in getCellEditorValue if
      *   Integer (short, byte..) below/above min/max.

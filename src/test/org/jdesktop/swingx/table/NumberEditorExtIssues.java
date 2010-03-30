@@ -22,20 +22,26 @@
 package org.jdesktop.swingx.table;
 
 import java.awt.Point;
+import java.awt.event.ActionEvent;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.logging.Logger;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
+import javax.swing.KeyStroke;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellEditor;
 import javax.swing.text.InternationalFormatter;
 import javax.swing.text.NumberFormatter;
 
 import org.jdesktop.swingx.InteractiveTestCase;
+import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXTable;
+import org.jdesktop.test.CellEditorReport;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -65,11 +71,21 @@ public class NumberEditorExtIssues extends InteractiveTestCase {
         NumberEditorExtIssues test = new NumberEditorExtIssues();
         try {
             test.runInteractiveTests();
+//            test.runInteractiveTests("interactive.*Number.*");
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
     
+    public void interactiveNumberEditorKeepsEscape() {
+        JFormattedTextField field = new JFormattedTextField(new Date());
+        KeyStroke keyStroke = KeyStroke.getKeyStroke("ESCAPE");
+        LOG.info("actionForEscape: " + field.getInputMap().get(keyStroke ));
+        new NumberEditorExt(true);
+        LOG.info("actionForEscape: " + field.getInputMap().get(keyStroke ));
+        JXFrame frame = wrapInFrame(field, "textfield escape");
+        show(frame, 400, 300);
+    }
     /**
      * Issue #1236-swingx: NumberEditorExt only handles columns with type
      *    Number.
@@ -119,9 +135,12 @@ public class NumberEditorExtIssues extends InteractiveTestCase {
             
         };
         table.setDefaultEditor(Date.class, new DatePickerCellEditor());
-        table.setDefaultEditor(Number.class, new NumberEditorExt(true));
-        showWithScrollingInFrame(table, "per-cell number editor? ");
+//        table.setDefaultEditor(Number.class, new NumberEditorExt(false));
+        JXFrame frame = showWithScrollingInFrame(table, "per-cell number editor? ");
+        JFormattedTextField field = new JFormattedTextField(new Date());
+        addStatusComponent(frame, field);
     }
+    
     /**
      * Issue #1183-swingx: NumberEditorExt throws in getCellEditorValue if
      *   Integer (short, byte..) below/above min/max.
