@@ -407,7 +407,7 @@ public abstract class InteractiveTestCase extends junit.framework.TestCase {
     /**
      * 
      * Sets the lookAndFeel which has a name containing the given snippet.
-     * Throws if none installed. Does not update any component/-tree, just bare
+     * Does not update any component/-tree, just bare
      * setting. May fail silently (Logging with level FINE) if there is no
      * installed LAF with the name or the setting fails for other reasons.
      * 

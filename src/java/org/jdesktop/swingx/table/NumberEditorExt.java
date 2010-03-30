@@ -247,10 +247,11 @@ public class NumberEditorExt extends DefaultCellEditor {
          * JFormattedTextField binding.
          */
         InputMap map = textField.getInputMap();
-        while (map != null) {
-            map.remove(KeyStroke.getKeyStroke("pressed ESCAPE"));
-            map = map.getParent();
-        }
+        map.put(KeyStroke.getKeyStroke("ESCAPE"), "none");
+//        while (map != null) {
+//            map.remove(KeyStroke.getKeyStroke("pressed ESCAPE"));
+//            map = map.getParent();
+//        }
         /*
          * Set an input verifier to prevent the cell losing focus when the value
          * is invalid
@@ -300,10 +301,11 @@ public class NumberEditorExt extends DefaultCellEditor {
          * JFormattedTextField binding.
          */
         InputMap map = textField.getInputMap();
-        while (map != null) {
-            map.remove(KeyStroke.getKeyStroke("pressed ESCAPE"));
-            map = map.getParent();
-        }
+        map.put(KeyStroke.getKeyStroke("ESCAPE"), "none");
+//        while (map != null) {
+//            map.remove(KeyStroke.getKeyStroke("pressed ESCAPE"));
+//            map = map.getParent();
+//        }
         /*
          * Set an input verifier to prevent the cell losing focus when the value
          * is invalid
