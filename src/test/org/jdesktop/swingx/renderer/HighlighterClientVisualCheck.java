@@ -55,6 +55,7 @@ import javax.swing.KeyStroke;
 import javax.swing.ListModel;
 import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
+import javax.swing.border.MatteBorder;
 import javax.swing.table.TableModel;
 
 import org.jdesktop.swingx.InteractiveTestCase;
@@ -108,16 +109,38 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
 //          setLookAndFeel("Nimbus");
 //         test.runInteractiveTests();
 //          test.runInteractiveTests(".*Striping.*");
-         test.runInteractiveTests(".*ToolTip.*");
+//         test.runInteractiveTests(".*ToolTip.*");
 //         test.runInteractiveTests("interactive.*Search.*");
-//         test.runInteractiveTests("interactive.*BorderHighlighter");
+         test.runInteractiveTests("interactive.*BorderHighlighter.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
       }
   }
 
-    
+    /**
+     * Issue #1295-swingx: JXTable rolloverController repaint incomplete.
+     * Column not repainted.
+     */
+    public void interactiveBorderHighlighterOnRollover() {
+        JXTable table = new JXTable(tableModel);
+        HighlightPredicate rolloverColumn = new HighlightPredicate() {
+            
+            @Override
+            public boolean isHighlighted(Component renderer, ComponentAdapter adapter) {
+                if (!adapter.getComponent().isEnabled()) return false;
+                Point p = (Point) adapter.getComponent().getClientProperty(
+                        RolloverProducer.ROLLOVER_KEY);
+                return p != null &&  p.x == adapter.column;
+            }
+        };
+        Highlighter hlrow = new BorderHighlighter(HighlightPredicate.ROLLOVER_ROW, 
+                new MatteBorder(1, 0, 1, 0, Color.lightGray),false,false);  
+        Highlighter hlColumn = new ColorHighlighter(rolloverColumn, 
+                Color.LIGHT_GRAY, null);
+        table.setHighlighters(hlrow, hlColumn);
+        showWithScrollingInFrame(table, "borderHighlgihter on rollover");
+    }
     /**
      * Show variants of border Highlighters.
      *
