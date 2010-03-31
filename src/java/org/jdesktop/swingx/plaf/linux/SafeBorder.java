@@ -26,6 +26,7 @@ import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Insets;
 
+import javax.swing.JLabel;
 import javax.swing.border.Border;
 
 /**
@@ -44,14 +45,10 @@ class SafeBorder implements Border {
      */
     @Override
     public Insets getBorderInsets(Component c) {
-        Insets insets = delegate.getBorderInsets(c);
+        JLabel label = c instanceof JLabel ? (JLabel) c : new JLabel();
         
-        if (insets == null) {
-            //TODO since Synth is looking for a JLabel, should we try passing one in first?
-            insets = new Insets(0, 0, 0, 0);
-        }
-        
-        return insets;
+        //Synth requires the component to be a JLabel
+        return delegate.getBorderInsets(label);
     }
 
     /**
