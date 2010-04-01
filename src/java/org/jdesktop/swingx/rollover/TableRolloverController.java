@@ -45,8 +45,8 @@ public class TableRolloverController<T extends JTable> extends
     @Override
     protected void rollover(Point oldLocation, Point newLocation) {
         // check which rows are effected and need repaint
-        boolean paintOldRow = paintRow(oldLocation);
-        boolean paintNewRow = paintRow(newLocation);
+        boolean paintOldRow = hasRow(oldLocation);
+        boolean paintNewRow = hasRow(newLocation);
         if (paintOldRow && paintNewRow) {
             if (oldLocation.y == newLocation.y) {
                 // row unchanged, no need for repaint
@@ -55,8 +55,8 @@ public class TableRolloverController<T extends JTable> extends
             }
         }
         // check which columns are effected and need repaint
-        boolean paintOldColumn = paintColumn(oldLocation);
-        boolean paintNewColumn = paintColumn(newLocation);
+        boolean paintOldColumn = hasColumn(oldLocation);
+        boolean paintNewColumn = hasColumn(newLocation);
         if (paintOldColumn && paintNewColumn) {
             if (oldLocation.x == newLocation.x) {
                 // column unchanged, no need for repaint
@@ -65,74 +65,30 @@ public class TableRolloverController<T extends JTable> extends
             }
         }
         
-        List<Rectangle> rectangles = paintRectangles(null, oldLocation, paintOldRow, paintOldColumn);
-        rectangles = paintRectangles(rectangles, newLocation, paintNewRow, paintNewColumn);
+        List<Rectangle> rectangles = getPaintRectangles(null, oldLocation, paintOldRow, paintOldColumn);
+        rectangles = getPaintRectangles(rectangles, newLocation, paintNewRow, paintNewColumn);
         if (rectangles != null) {
             for (Rectangle rectangle : rectangles) {
                 component.repaint(rectangle);
             }
         }
-//        List<Integer> columns = new ArrayList<Integer>();
-//        List<Integer> rows = new ArrayList<Integer>();
-//        List<Rectangle> rowRectangles = new ArrayList<Rectangle>();
-//        List<Rectangle> columnRectangles = new ArrayList<Rectangle>();
-//        if (oldLocation != null) {
-//            Rectangle r = component.getCellRect(oldLocation.y, oldLocation.x,
-//                    false);
-//            if (oldLocation.y >= 0) {
-//                rows.add(oldLocation.y);
-//                rowRectangles.add(new Rectangle(0, r.y, component.getWidth(),
-//                        r.height));
-//            }
-//            if (oldLocation.x >= 0) {
-//                columns.add(oldLocation.x);
-//                columnRectangles.add(new Rectangle(r.x, 0, r.width, component
-//                        .getHeight()));
-//            }
-//        }
-//        if (newLocation != null) {
-//            Rectangle r = component.getCellRect(newLocation.y, newLocation.x,
-//                    false);
-//            if (newLocation.y >= 0) {
-//                rows.add(newLocation.y);
-//                rowRectangles.add(new Rectangle(0, r.y, component.getWidth(),
-//                        r.height));
-//            }
-//            if (newLocation.x >= 0) {
-//                columns.add(newLocation.x);
-//                columnRectangles.add(new Rectangle(r.x, 0, r.width, component
-//                        .getHeight()));
-//            }
-//        }
-//        if ((rows.size() > 1) && (rows.get(0) == rows.get(1))) {
-//            rowRectangles.clear();
-//        }
-//        if ((columns.size() > 1) && (columns.get(0) == columns.get(1))) {
-//            columnRectangles.clear();
-//        }
-//        for (Rectangle rectangle : columnRectangles) {
-//            component.repaint(rectangle);
-//        }
-//        for (Rectangle rectangle : rowRectangles) {
-//            component.repaint(rectangle);
-//        }
         setRolloverCursor(newLocation);
     }
 
     /**
-     * @param object
-     * @param oldLocation
-     * @param paintRow
-     * @param paintNewRow
-     * @return
+     * @param rectangles List of rectangles to paint, maybe null
+     * @param cellLocation the location of the cell, guaranteed to be not null
+     * @param paintRow boolean indicating whether the row should be painted
+     * @param paintColumn boolean indicating whether the column should be painted
+     * @return list of rectangles to paint, maybe null
      */
-    private List<Rectangle> paintRectangles(List<Rectangle> rectangles, Point oldLocation,
+    private List<Rectangle> getPaintRectangles(List<Rectangle> rectangles, Point cellLocation,
             boolean paintRow, boolean paintColumn) {
         if (!paintRow && !paintColumn) return rectangles;
         if (rectangles == null) {
             rectangles = new ArrayList<Rectangle>();
         }
-        Rectangle r = component.getCellRect(oldLocation.y, oldLocation.x,
+        Rectangle r = component.getCellRect(cellLocation.y, cellLocation.x,
                 false);
         if (paintRow) {
             rectangles.add(new Rectangle(0, r.y, component.getWidth(),
@@ -146,18 +102,20 @@ public class TableRolloverController<T extends JTable> extends
     }
 
     /**
-     * @param cellLocation
-     * @return
+     * @param cellLocation the cell location to check, may be null
+     * @return a boolean indicating whether the given cellLocation has a column 
+     *    to paint
      */
-    private boolean paintColumn(Point cellLocation) {
+    private boolean hasColumn(Point cellLocation) {
         return cellLocation != null && cellLocation.x >= 0;
     }
 
     /**
-     * @param cellLocation
-     * @return
+     * @param cellLocation the cell location to check, may be null
+     * @return a boolean indicating whether the given cellLocation has a row 
+     *    to paint
      */
-    private boolean paintRow(Point cellLocation) {
+    private boolean hasRow(Point cellLocation) {
         return cellLocation != null && cellLocation.y >= 0;
     }
 
