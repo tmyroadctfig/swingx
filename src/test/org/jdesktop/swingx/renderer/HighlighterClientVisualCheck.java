@@ -26,6 +26,7 @@ import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.GradientPaint;
+import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
@@ -123,7 +124,17 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
      * Column not repainted.
      */
     public void interactiveBorderHighlighterOnRollover() {
-        JXTable table = new JXTable(tableModel);
+        JXTable table = new JXTable(tableModel) {
+            int count;
+            @Override
+            protected void paintComponent(Graphics g) {
+                // crude check if the logic of column/row painting
+                // in TableRolloverController is working (looks so)
+                LOG.info("paint clip: " + count++ + g.getClip());
+                super.paintComponent(g);
+            }
+            
+        };
         HighlightPredicate rolloverColumn = new HighlightPredicate() {
             
             @Override
@@ -135,7 +146,10 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
             }
         };
         Highlighter hlrow = new BorderHighlighter(HighlightPredicate.ROLLOVER_ROW, 
-                new MatteBorder(1, 0, 1, 0, Color.lightGray),false,false);  
+//                BorderFactory.createCompoundBorder(
+                new MatteBorder(1, 0, 1, 0, Color.lightGray)
+//                , BorderFactory.createEmptyBorder(0, 1, 0, 1))
+                , true, false );  
         Highlighter hlColumn = new ColorHighlighter(rolloverColumn, 
                 Color.LIGHT_GRAY, null);
         table.setHighlighters(hlrow, hlColumn);
