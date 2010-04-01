@@ -135,25 +135,31 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
             }
             
         };
-        HighlightPredicate rolloverColumn = new HighlightPredicate() {
-            
-            @Override
-            public boolean isHighlighted(Component renderer, ComponentAdapter adapter) {
-                if (!adapter.getComponent().isEnabled()) return false;
-                Point p = (Point) adapter.getComponent().getClientProperty(
-                        RolloverProducer.ROLLOVER_KEY);
-                return p != null &&  p.x == adapter.column;
-            }
-        };
-        Highlighter hlrow = new BorderHighlighter(HighlightPredicate.ROLLOVER_ROW, 
+        final AbstractHighlighter hlRow = new BorderHighlighter(HighlightPredicate.ROLLOVER_ROW, 
 //                BorderFactory.createCompoundBorder(
                 new MatteBorder(1, 0, 1, 0, Color.lightGray)
 //                , BorderFactory.createEmptyBorder(0, 1, 0, 1))
                 , true, false );  
-        Highlighter hlColumn = new ColorHighlighter(rolloverColumn, 
+        final AbstractHighlighter hlColumn = new ColorHighlighter(HighlightPredicate.ROLLOVER_COLUMN, 
                 Color.LIGHT_GRAY, null);
-        table.setHighlighters(hlrow, hlColumn);
-        showWithScrollingInFrame(table, "borderHighlgihter on rollover");
+        table.setHighlighters(hlRow, hlColumn);
+        JXFrame frame = wrapWithScrollingInFrame(table, "borderHighlgihter on rollover");
+        Action toggleCell = new AbstractAction("toggle cell-rollover") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (hlRow.getHighlightPredicate() == HighlightPredicate.ROLLOVER_ROW) {
+                    hlRow.setHighlightPredicate(HighlightPredicate.NEVER);
+                    hlColumn.setHighlightPredicate(HighlightPredicate.ROLLOVER_CELL);
+                } else {
+                    hlRow.setHighlightPredicate(HighlightPredicate.ROLLOVER_ROW);
+                    hlColumn.setHighlightPredicate(HighlightPredicate.ROLLOVER_COLUMN);
+                }
+                
+            }
+        };
+        addAction(frame, toggleCell);
+        show(frame);
     }
     /**
      * Show variants of border Highlighters.

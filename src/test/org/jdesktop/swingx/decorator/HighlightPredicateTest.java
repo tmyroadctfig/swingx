@@ -524,7 +524,47 @@ public class HighlightPredicateTest extends InteractiveTestCase {
     
 
     /**
-     * test rollover
+     * test ROLLOVER_CELL
+     *
+     */
+    @Test
+    public void testRolloverCell() {
+        ComponentAdapter adapter = createComponentAdapter(allColored, true);
+        // rollover and adapter at 0, 0
+        int row = 0; 
+        int col = 0;
+        allColored.putClientProperty(RolloverProducer.ROLLOVER_KEY, new Point(row, col));
+        assertTrue(HighlightPredicate.ROLLOVER_CELL.isHighlighted(allColored, adapter));
+        // move adapter row in same row
+        adapter.row = 3;
+        assertFalse(HighlightPredicate.ROLLOVER_CELL.isHighlighted(allColored, adapter));
+        // move adapter row 
+        adapter.column = 1;
+        assertFalse(HighlightPredicate.ROLLOVER_CELL.isHighlighted(allColored, adapter));
+    }
+    
+    /**
+     * test ROLLOVER_COLUMN
+     *
+     */
+    @Test
+    public void testRolloverColumn() {
+        ComponentAdapter adapter = createComponentAdapter(allColored, true);
+        // rollover and adapter at 0, 0
+        int row = 0; 
+        int col = 0;
+        allColored.putClientProperty(RolloverProducer.ROLLOVER_KEY, new Point(row, col));
+        assertTrue(HighlightPredicate.ROLLOVER_COLUMN.isHighlighted(allColored, adapter));
+        // move adapter row in same row
+        adapter.row = 3;
+        assertTrue(HighlightPredicate.ROLLOVER_COLUMN.isHighlighted(allColored, adapter));
+        // move adapter row 
+        adapter.column = 1;
+        assertFalse(HighlightPredicate.ROLLOVER_COLUMN.isHighlighted(allColored, adapter));
+    }
+    
+    /**
+     * test ROLLOVER_ROW
      *
      */
     @Test
@@ -548,7 +588,7 @@ public class HighlightPredicateTest extends InteractiveTestCase {
      * 
      */
     @Test
-    public void testRolloverDisabledComponent() {
+    public void testRolloverRowDisabledComponent() {
         ComponentAdapter adapter = createComponentAdapter(allColored, true);
         // rollover and adapter at 0, 0
         int row = 0; 

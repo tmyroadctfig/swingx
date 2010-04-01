@@ -121,6 +121,49 @@ public interface HighlightPredicate {
     };
     
     /**
+     * Rollover  Column.
+     */
+    public static final HighlightPredicate ROLLOVER_COLUMN = new HighlightPredicate() {
+        
+        /**
+         * @inheritDoc
+         * Implemented to return true if the adapter's component is enabled and
+         * the column of its rollover property equals the adapter's columns, returns
+         * false otherwise.
+         * 
+         * @see org.jdesktop.swingx.rollover.RolloverProducer
+         */
+        public boolean isHighlighted(Component renderer, ComponentAdapter adapter) {
+            if (!adapter.getComponent().isEnabled()) return false;
+            Point p = (Point) adapter.getComponent().getClientProperty(
+                    RolloverProducer.ROLLOVER_KEY);
+            return p != null &&  p.x == adapter.column;
+        }
+        
+    };
+    /**
+     * Rollover  Cell.
+     */
+    public static final HighlightPredicate ROLLOVER_CELL = new HighlightPredicate() {
+        
+        /**
+         * @inheritDoc
+         * Implemented to return true if the adapter's component is enabled and
+         * the column of its rollover property equals the adapter's columns, returns
+         * false otherwise.
+         * 
+         * @see org.jdesktop.swingx.rollover.RolloverProducer
+         */
+        public boolean isHighlighted(Component renderer, ComponentAdapter adapter) {
+            if (!adapter.getComponent().isEnabled()) return false;
+            Point p = (Point) adapter.getComponent().getClientProperty(
+                    RolloverProducer.ROLLOVER_KEY);
+            return p != null  && p.y == adapter.row &&  p.x == adapter.column;
+        }
+        
+    };
+    
+    /**
      * Is editable.
      */
     public static final HighlightPredicate EDITABLE = new HighlightPredicate() {
