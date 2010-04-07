@@ -507,17 +507,30 @@ public class BasicDatePickerUI extends DatePickerUI {
         return b;
     }
 
+    /**
+     * 
+     * A subclass of JFormattedTextField which calculates a "reasonable"
+     * minimum preferred size, independent of value/text.<p>
+     * 
+     * Note: how to find the "reasonable" width is open to discussion.
+     * This implementation creates another datepicker, feeds it with 
+     * the formats and asks its prefWidth. <p>
+     * 
+     * PENDING: there's a resource property JXDatePicker.numColumns - why 
+     *   don't we use it?
+     */
     private class DefaultEditor extends JFormattedTextField implements UIResource {
 
-        private Dimension prefSizeCache;
-        private int prefEmptyInset;
-        private Dimension minSizeCache;
 
         public DefaultEditor(AbstractFormatter formatter) {
             super(formatter);
         }
 
-
+        /**
+         * {@inheritDoc} <p>
+         * 
+         * Overridden to return a preferred size which has a reasonable lower bound. 
+         */
         @Override
         public Dimension getPreferredSize() {
             Dimension preferredSize = super.getPreferredSize();
@@ -526,21 +539,18 @@ public class BasicDatePickerUI extends DatePickerUI {
                 if (preferredSize.width < compare.width) {
                     return compare;
                 }
-//                if (getValue() == null) {
-//                    if (prefSizeCache != null) {
-//                        preferredSize.width = prefSizeCache.width;
-//                        preferredSize.height = prefSizeCache.height;
-//                    } else {
-//                        prefEmptyInset = preferredSize.width;
-////                        prefEmptyInset = getEmptyInsets();
-//                        preferredSize.width = prefEmptyInset + getNullWidth();
-//                    }
-//                } else {
-//                    preferredSize.width += Math.max(prefEmptyInset, 4);
-//                    prefSizeCache = new Dimension(preferredSize);
-//                }
             }
             return preferredSize;
+        }
+
+        /**
+         * {@inheritDoc} <p>
+         * 
+         * Overridden to return the preferred size.
+         */
+        @Override
+        public Dimension getMinimumSize() {
+            return getPreferredSize();
         }
 
         private Dimension getCompareMinimumSize() {
@@ -553,35 +563,9 @@ public class BasicDatePickerUI extends DatePickerUI {
             field.setValue(null);
             min.width += Math.max(field.getPreferredSize().width, 4);
             return min;
-            
-        }
-
-        @Override
-        public Dimension getMinimumSize() {
-            return getPreferredSize();
         }
 
 
-        /**
-         * @return
-         */
-        private int getNullWidth() {
-            JFormattedTextField field = new JFormattedTextField(getFormatter());
-            field.setMargin(getMargin());
-            field.setBorder(getBorder());
-            field.setFont(getFont());
-            field.setValue(new Date());
-            return field.getPreferredSize().width;
-        }
-        
-        private int getEmptyInsets() {
-            JFormattedTextField field = new JFormattedTextField(getFormatter());
-            field.setMargin(getMargin());
-            field.setBorder(getBorder());
-            field.setFont(getFont());
-            return field.getPreferredSize().width;
-            
-        }
     }
 
 // ---------------- Layout    
@@ -598,7 +582,7 @@ public class BasicDatePickerUI extends DatePickerUI {
      */
     @Override
     public Dimension getPreferredSize(JComponent c) {
-        Dimension dim = getEditorPreferredSize();
+        Dimension dim = datePicker.getEditor().getPreferredSize();
         if (popupButton != null) {
             dim.width += popupButton.getPreferredSize().width;
         }
@@ -608,39 +592,6 @@ public class BasicDatePickerUI extends DatePickerUI {
         return (Dimension)dim.clone();
     }
 
-    /**
-     * Returns a preferred size for the editor. If the selected date
-     * is null, returns a reasonable minimal width. <p>
-     * 
-     * PENDING: how to find the "reasonable" width is open to discussion.
-     * This implementation creates another datepicker, feeds it with 
-     * the formats and asks its prefWidth. <p>
-     * 
-     * That hack blows in some contexts (see Issue #763) - as a very quick
-     * replacement create a editor only.
-     * 
-     * PENDING: there's a resource property JXDatePicker.numColumns - why 
-     *   don't we use it?
-     * 
-     * @return the editor's preferred size
-     */
-    private Dimension getEditorPreferredSize() {
-        Dimension dim = datePicker.getEditor().getPreferredSize();
-        if (datePicker.getDate() == null) {
-//            JFormattedTextField field = createEditor(new DatePickerFormatterUIResource(
-//                            datePicker.getFormats(), 
-//                            datePicker.getLocale()));
-//            field.setValue(new Date());
-//            dim.width = Math.max(field.getPreferredSize().width, dim.width);
-            // the editor tends to collapsing for empty values
-            // JW: better do this in a custom editor?
-            // seems to produce #763
-//            JXDatePicker picker = new JXDatePicker(new Date());
-//            picker.setFormats(datePicker.getFormats());
-//            dim.width = picker.getEditor().getPreferredSize().width;
-        }
-        return dim;
-    }
 
     @Override
     public int getBaseline(int width, int height) {
