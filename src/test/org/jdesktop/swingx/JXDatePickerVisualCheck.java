@@ -68,7 +68,6 @@ import javax.swing.text.JTextComponent;
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.calendar.DateSelectionModel;
 import org.jdesktop.swingx.calendar.DaySelectionModel;
-import org.jdesktop.swingx.calendar.DefaultDateSelectionModel;
 import org.jdesktop.swingx.calendar.SingleDaySelectionModel;
 import org.jdesktop.swingx.calendar.DateSelectionModel.SelectionMode;
 import org.jdesktop.test.VerticalLayoutPref;
@@ -96,7 +95,7 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
 
     public static void main(String[] args) throws Exception {
        UIManager.put("JXDatePicker.forceZoomable", Boolean.TRUE);
-         setSystemLF(true);
+//         setSystemLF(true);
         JXDatePickerVisualCheck test = new JXDatePickerVisualCheck();
         
         try {
@@ -517,6 +516,8 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
      * If not, the initial size might appear kind of collapsed.
      *  
      * adapted code example from bug report: revalidate on text insert/remove  
+     * Note: this simulation doesn't survive a LAF change - picker's editor is recreated
+     * and listener not re-wired. 
      */
     public void interactivePrefSizeOnInsert() {
         final JPanel panel = new JPanel();
@@ -526,12 +527,19 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
 
             @Override
             public void insertUpdate(DocumentEvent e) {
-                panel.revalidate();
+                revalidate();
                 
             }
+            /**
+             * @param panel
+             */
+            private void revalidate() {
+                panel.revalidate();
+            }
+            
             @Override
             public void removeUpdate(DocumentEvent e) {
-                panel.revalidate();
+                revalidate();
             }
 
 
