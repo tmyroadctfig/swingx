@@ -57,10 +57,13 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.JSpinner.DefaultEditor;
 import javax.swing.UIManager.LookAndFeelInfo;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 import javax.swing.text.DateFormatter;
 import javax.swing.text.DefaultFormatterFactory;
+import javax.swing.text.JTextComponent;
 
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.calendar.DateSelectionModel;
@@ -506,6 +509,49 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
         frame.pack();
     };
     
+
+    /**
+     * Issue #1292-swingx: prefsize growing on inserting text into empty editor.
+     * 
+     * PrefSize should be independent of empty/filled picker. 
+     * If not, the initial size might appear kind of collapsed.
+     *  
+     * adapted code example from bug report: revalidate on text insert/remove  
+     */
+    public void interactivePrefSizeOnInsert() {
+        final JPanel panel = new JPanel();
+        final JXDatePicker picker = new JXDatePicker();
+        final JFormattedTextField field = new JFormattedTextField();
+        DocumentListener l = new DocumentListener() {
+
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                panel.revalidate();
+                
+            }
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                panel.revalidate();
+            }
+
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+            }
+        };
+        picker.getEditor().getDocument().addDocumentListener(l);
+        field.getDocument().addDocumentListener(l);
+        
+        JComboBox box = new JComboBox(new Object[] {});
+        box.setEditable(true);
+        ((JTextComponent) box.getEditor().getEditorComponent()).getDocument().addDocumentListener(l);
+        panel.add(field);
+        panel.add(picker);
+        panel.add(box);
+        JXFrame frame = wrapInFrame(panel, "compare prefSize on insert");
+        addMessage(frame, "type text and compare formatted/picker/combo");
+        show(frame);
+    }
     
     /**
      * Issue #764-swingx: JXDatePicker sizing.
