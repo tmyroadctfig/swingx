@@ -98,9 +98,10 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
         
         try {
 //            test.runInteractiveTests();
-//            test.runInteractiveTests("interactive.*PrefSize.*");
-            test.runInteractiveTests("interactive.*Keep.*");
+            test.runInteractiveTests("interactive.*PrefSize.*");
+//            test.runInteractiveTests("interactive.*Keep.*");
 //          test.runInteractiveTests("interactive.*Multiple.*");
+//            test.runInteractiveTests("interactive.*Editable.*");
 //            test.runInteractiveTests("interactive.*Event.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
@@ -547,8 +548,7 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
         outer.add(fieldsNull);
         JXFrame frame = wrapInFrame(outer, "Sizing DatePicker");
         addMessage(frame, "rows: locales, columns: picker/formatted field");
-        frame.pack();
-        frame.setVisible(true);
+        show(frame);
     }
     
     /**
@@ -566,7 +566,7 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
         String formatString = "EEE MM/dd/yyyy";
         LayoutManager layout = new VerticalLayoutPref();
         
-        JComponent german = new JPanel(layout);
+        final JComponent german = new JPanel(layout);
         addFormattedTextField(german, Locale.GERMAN, date, formatString);
         addDatePickerWithLocaleSet(german, Locale.GERMAN, date, formatString);
         addDatePickerWithLocaleSet(german, Locale.GERMAN, null, formatString);
@@ -595,10 +595,19 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
         outer.add(uk);
         outer.add(german);
         outer.add(italian);
-        JXFrame frame = wrapInFrame(outer, "Sizing DatePicker");
+        final JXFrame frame = wrapInFrame(outer, "Sizing DatePicker");
+        Action pack = new AbstractAction("pack") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JFormattedTextField field = ((JXDatePicker) german.getComponent(1)).getEditor();
+                LOG.info("pref " + field.getValue() + field.getText() + field.getPreferredSize());
+                frame.pack();
+            }
+        };
+        addAction(frame, pack);
         addMessage(frame, "rows: picker/formatted field, columns: locales");
-        frame.pack();
-        frame.setVisible(true);
+        show(frame);
     }
 
     

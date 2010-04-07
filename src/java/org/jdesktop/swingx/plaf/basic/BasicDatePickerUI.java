@@ -511,7 +511,7 @@ public class BasicDatePickerUI extends DatePickerUI {
 
         private Dimension prefSizeCache;
         private int prefEmptyInset;
-
+        private Dimension minSizeCache;
 
         public DefaultEditor(AbstractFormatter formatter) {
             super(formatter);
@@ -522,20 +522,43 @@ public class BasicDatePickerUI extends DatePickerUI {
         public Dimension getPreferredSize() {
             Dimension preferredSize = super.getPreferredSize();
             if (getColumns() <= 0) {
-                if (getValue() == null) {
-                    if (prefSizeCache != null) {
-                        preferredSize.width = prefSizeCache.width;
-                        preferredSize.height = prefSizeCache.height;
-                    } else {
-                        prefEmptyInset = preferredSize.width;
-                        preferredSize.width = prefEmptyInset + getNullWidth();
-                    }
-                } else {
-                    preferredSize.width += Math.max(prefEmptyInset, 4);
-                    prefSizeCache = new Dimension(preferredSize);
+                Dimension compare = getCompareMinimumSize();
+                if (preferredSize.width < compare.width) {
+                    return compare;
                 }
+//                if (getValue() == null) {
+//                    if (prefSizeCache != null) {
+//                        preferredSize.width = prefSizeCache.width;
+//                        preferredSize.height = prefSizeCache.height;
+//                    } else {
+//                        prefEmptyInset = preferredSize.width;
+////                        prefEmptyInset = getEmptyInsets();
+//                        preferredSize.width = prefEmptyInset + getNullWidth();
+//                    }
+//                } else {
+//                    preferredSize.width += Math.max(prefEmptyInset, 4);
+//                    prefSizeCache = new Dimension(preferredSize);
+//                }
             }
             return preferredSize;
+        }
+
+        private Dimension getCompareMinimumSize() {
+            JFormattedTextField field = new JFormattedTextField(getFormatter());
+            field.setMargin(getMargin());
+            field.setBorder(getBorder());
+            field.setFont(getFont());
+            field.setValue(new Date());
+            Dimension min = field.getPreferredSize();
+            field.setValue(null);
+            min.width += Math.max(field.getPreferredSize().width, 4);
+            return min;
+            
+        }
+
+        @Override
+        public Dimension getMinimumSize() {
+            return getPreferredSize();
         }
 
 
@@ -551,7 +574,14 @@ public class BasicDatePickerUI extends DatePickerUI {
             return field.getPreferredSize().width;
         }
         
-        
+        private int getEmptyInsets() {
+            JFormattedTextField field = new JFormattedTextField(getFormatter());
+            field.setMargin(getMargin());
+            field.setBorder(getBorder());
+            field.setFont(getFont());
+            return field.getPreferredSize().width;
+            
+        }
     }
 
 // ---------------- Layout    

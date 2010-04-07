@@ -1747,6 +1747,65 @@ public class JXDatePickerTest extends InteractiveTestCase {
         assertSynchAll(picker, selectedDate);
     }
     
+    /**
+     * Issue #1292-swingx: prefsize growing on inserting text into empty editor.
+     * 
+     * PrefSize should be independent of empty/filled picker. 
+     * If not, the initial size might appear kind of collapsed.
+     *
+     */
+    @Test
+    public void testMinSizeEqualsPrefSize() {
+        JXDatePicker picker = new JXDatePicker(new Date());
+        assertEquals("pref/min expected equal", 
+                picker.getEditor().getPreferredSize().width, 
+                picker.getEditor().getMinimumSize().width);
+        picker.getEditor().setText("1");
+        assertEquals("pref/min expected equal", 
+                picker.getEditor().getPreferredSize().width, 
+                picker.getEditor().getMinimumSize().width);
+        picker.setDate(null);
+        assertEquals("pref/min expected equal", 
+                picker.getEditor().getPreferredSize().width, 
+                picker.getEditor().getMinimumSize().width);
+    }
+    
+    
+    /**
+     * Issue #1292-swingx: prefsize growing on inserting text into empty editor.
+     * 
+     * PrefSize should be independent of empty/filled picker. 
+     * If not, the initial size might appear kind of collapsed.
+     *
+     */
+    @Test
+    public void testPrefSizeEmptyInsertText() {
+        JXDatePicker picker = new JXDatePicker();
+        Dimension empty = picker.getPreferredSize();
+        // simulate editing (uncommitted)
+        picker.getEditor().setText("1");
+        assertEquals("pref width must be same while editing", 
+                empty.width, picker.getPreferredSize().width);
+    }
+    
+    /**
+     * Issue #1292-swingx: prefsize growing on inserting text into empty editor.
+     * 
+     * PrefSize should be independent of empty/filled picker. 
+     * If not, the initial size might appear kind of collapsed.
+     *
+     */
+    @Test
+    public void testPrefSizeValueInsertText() {
+        // initial size with value
+        JXDatePicker picker = new JXDatePicker(new Date());
+        Dimension withValue = picker.getPreferredSize();
+        // simulate editing (uncommitted)
+        picker.getEditor().setText("1");
+        assertEquals("pref width must be same while editing", 
+                withValue.width, picker.getPreferredSize().width);
+    }
+    
 
     /**
      * PrefSize should be independent of empty/filled picker. 
@@ -1756,12 +1815,11 @@ public class JXDatePickerTest extends InteractiveTestCase {
     @Test
     public void testPrefSizeEmptyEditor() {
         JXDatePicker picker = new JXDatePicker(new Date());
-        // sanity 
-        assertNotNull(picker.getDate());
-        Dimension filled = picker.getPreferredSize();
+        Dimension withValue = picker.getPreferredSize();
+        // null value
         picker.setDate(null);
-        Dimension empty = picker.getPreferredSize();
-        assertEquals("pref width must be same for empty/filled", filled.width, empty.width);
+        assertEquals("pref width must be same null value", 
+                withValue.width, picker.getPreferredSize().width);
     }
     
     @Test
