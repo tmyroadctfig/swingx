@@ -78,7 +78,8 @@ public class BuddyTextFieldUI extends PromptTextFieldUI {
 	 * 
 	 * @see javax.swing.plaf.ComponentUI#getPreferredSize(javax.swing.JComponent)
 	 */
-	public Dimension getPreferredSize(JComponent c) {
+	@Override
+    public Dimension getPreferredSize(JComponent c) {
 		Dimension d = new Dimension();
 		Dimension cd = super.getPreferredSize(c);
 		Dimension ld = c.getLayout().preferredLayoutSize(c);

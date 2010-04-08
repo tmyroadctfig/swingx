@@ -10,10 +10,12 @@ import org.junit.Test;
 public class PromptTextFieldUITest extends PromptTextUITest_Base {
     JTextField txtField;
     
+    @Override
     public void setup() {
         textComponent = txtField = new JXTextField();
     }
     
+    @Override
     @Test
     public void testGetLabelComponent() {
         super.testGetLabelComponent();

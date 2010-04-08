@@ -22,8 +22,6 @@
 package org.jdesktop.swingx.calendar;
 
 
-import static org.junit.Assert.*;
-
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;

@@ -32,6 +32,7 @@ import org.jdesktop.swingx.painter.AbstractLayoutPainter;
 import org.jdesktop.swingx.painter.Painter;
 import org.jdesktop.swingx.painter.AbstractLayoutPainter.HorizontalAlignment;
 
+@SuppressWarnings("unchecked")
 public class RelativePainterHighlighter extends PainterHighlighter {
     // the fixed value to compare against (should be Comparable)
     private Relativizer relativizer;

@@ -27,7 +27,6 @@ import javax.swing.UIManager;
 
 import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXTable;
-import org.jdesktop.swingx.decorator.HighlighterFactory.UIColorHighlighter;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

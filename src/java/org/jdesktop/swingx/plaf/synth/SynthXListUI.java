@@ -50,7 +50,9 @@ public class SynthXListUI extends BasicXListUI
     implements SynthConstants,  SynthUI  /*, PropertyChangeListener */{
 
     private SynthStyle style;
+    @SuppressWarnings("unused")
     private boolean useListColors;
+    @SuppressWarnings("unused")
     private boolean useUIBorder;
 
     /**

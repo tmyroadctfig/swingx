@@ -57,6 +57,7 @@ public class VerticalLayoutPref implements LayoutManager {
   public void layoutContainer(Container parent) {
     Insets insets = parent.getInsets();
     Dimension size = parent.getSize();
+    @SuppressWarnings("unused")
     int width = size.width - insets.left - insets.right;
     int height = insets.top;
 

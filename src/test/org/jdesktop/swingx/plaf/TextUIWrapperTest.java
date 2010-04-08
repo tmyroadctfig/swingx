@@ -31,7 +31,7 @@ public class TextUIWrapperTest {
 	
 	@Test
     public void testUninstall() {
-    	Class defaultUiClass = txt.getUI().getClass();
+    	Class<?> defaultUiClass = txt.getUI().getClass();
     	wrapper.install(txt, true);
     	wrapper.uninstall(txt);
     	assertEquals(defaultUiClass, txt.getUI().getClass());

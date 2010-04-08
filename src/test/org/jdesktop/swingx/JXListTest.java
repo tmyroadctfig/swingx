@@ -27,7 +27,6 @@ import javax.swing.ListModel;
 import javax.swing.RowFilter;
 import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
-import javax.swing.RowFilter.Entry;
 import javax.swing.text.Position.Bias;
 
 import org.jdesktop.swingx.JXList.DelegatingRenderer;
