@@ -6,9 +6,13 @@ package org.jdesktop.swingx.action;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.logging.Logger;
 
+import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
+import javax.swing.Action;
 import javax.swing.JCheckBox;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JRadioButton;
@@ -368,4 +372,35 @@ public class ActionTest extends TestCase {
         AbstractActionExt action = createStateAction();
         action.setLongDescription("some");
     }
+
+    /**
+     * core issue: 
+     * set enabled via putValue leads to inconsistent state.
+     * fixed in jdk6
+     */
+    @Test
+    public void testFireEnabled() {
+        Action action = new AbstractAction("dummy") {
+
+            public void actionPerformed(ActionEvent e) {
+                // nothing to do
+                
+            }
+            
+        };
+        PropertyChangeListener l = new PropertyChangeListener() {
+
+            public void propertyChange(PropertyChangeEvent evt) {
+                if ("enabled".equals(evt.getPropertyName())) {
+                    assertEquals(evt.getNewValue(), ((Action) evt.getSource()).isEnabled());
+                }
+                
+            }
+            
+        };
+        action.addPropertyChangeListener(l);
+        action.putValue("enabled", false);
+        
+    }
+
 }
