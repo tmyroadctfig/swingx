@@ -15,7 +15,6 @@ import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
-import java.awt.LinearGradientPaint;
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.util.logging.Logger;
@@ -185,7 +184,6 @@ public class JXTitledPanelTest extends InteractiveTestCase {
      * the painter. See Issue #1163-swingx
      */
     public void interactiveGradient() {
-        LinearGradientPaint l;
         GradientPaint paint = new GradientPaint(0f, 0f, Color.WHITE, 500f, 
                 500f, Color.BLUE);
         JXTitledPanel panel = new JXTitledPanel("want a gradient");

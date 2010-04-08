@@ -17,45 +17,49 @@ import org.jdesktop.swingx.plaf.SearchFieldUI;
  * 
  */
 public class BuddyButton extends JButton {
-	public BuddyButton() {
-		this(null);
-	}
+    public BuddyButton() {
+        this(null);
+    }
 
-	public BuddyButton(String text) {
-		super(text);
-		setFocusable(false);
-		setMargin(SearchFieldUI.NO_INSETS);
+    public BuddyButton(String text) {
+        super(text);
+        setFocusable(false);
+        setMargin(SearchFieldUI.NO_INSETS);
 
-		// Windows UI will add 1 pixel for width and height, if this is true
-		setFocusPainted(false);
+        // Windows UI will add 1 pixel for width and height, if this is true
+        setFocusPainted(false);
 
-		setBorderPainted(false);
-		setContentAreaFilled(false);
-		setIconTextGap(0);
+        setBorderPainted(false);
+        setContentAreaFilled(false);
+        setIconTextGap(0);
 
-		setBorder(null);
+        setBorder(null);
 
-		setOpaque(false);
+        setOpaque(false);
 
-		setCursor(Cursor.getDefaultCursor());
-	}
+        setCursor(Cursor.getDefaultCursor());
+    }
 
-	// Windows UI overrides Insets.
-	// Who knows what other UIs are doing...
-	public Insets getInsets() {
-		return SearchFieldUI.NO_INSETS;
-	}
+    // Windows UI overrides Insets.
+    // Who knows what other UIs are doing...
+    @Override
+    public Insets getInsets() {
+        return SearchFieldUI.NO_INSETS;
+    }
 
-	public Insets getInsets(Insets insets) {
-		return getInsets();
-	}
+    @Override
+    public Insets getInsets(Insets insets) {
+        return getInsets();
+    }
 
-	public Insets getMargin() {
-		return getInsets();
-	}
+    @Override
+    public Insets getMargin() {
+        return getInsets();
+    }
 
-	public void setBorder(Border border) {
-		// Don't let Motif overwrite my Border
-		super.setBorder(BorderFactory.createEmptyBorder());
-	}
+    @Override
+    public void setBorder(Border border) {
+        // Don't let Motif overwrite my Border
+        super.setBorder(BorderFactory.createEmptyBorder());
+    }
 }

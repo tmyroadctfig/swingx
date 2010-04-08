@@ -45,23 +45,27 @@ import org.jdesktop.swingx.prompt.PromptSupport.FocusBehavior;
 public abstract class PromptTextUI extends TextUI {
     protected class PainterHighlighter implements Highlighter {
         private final Painter painter;
+
         private JTextComponent c;
-        
+
         public PainterHighlighter(Painter painter) {
             this.painter = painter;
         }
+
         /**
          * {@inheritDoc}
          */
-        public Object addHighlight(int p0, int p1, HighlightPainter p) throws BadLocationException {
+        public Object addHighlight(int p0, int p1, HighlightPainter p)
+                throws BadLocationException {
             return new Object();
         }
 
         /**
          * {@inheritDoc}
          */
-        public void changeHighlight(Object tag, int p0, int p1) throws BadLocationException {
-            
+        public void changeHighlight(Object tag, int p0, int p1)
+                throws BadLocationException {
+
         }
 
         /**
@@ -90,7 +94,7 @@ public abstract class PromptTextUI extends TextUI {
          */
         public void paint(Graphics g) {
             Graphics2D g2d = (Graphics2D) g.create();
-            
+
             try {
                 painter.paint(g2d, c, c.getWidth(), c.getHeight());
             } finally {
@@ -103,7 +107,7 @@ public abstract class PromptTextUI extends TextUI {
          */
         public void removeAllHighlights() {
             // TODO Auto-generated method stub
-            
+
         }
 
         /**
@@ -111,295 +115,331 @@ public abstract class PromptTextUI extends TextUI {
          */
         public void removeHighlight(Object tag) {
             // TODO Auto-generated method stub
-            
+
         }
     }
-    
-	static final FocusHandler focusHandler = new FocusHandler();
 
-	/**
-	 * Delegate the hard work to this object.
-	 */
-	protected final TextUI delegate;
+    static final FocusHandler focusHandler = new FocusHandler();
 
-	/**
-	 * This component ist painted when rendering the prompt text.
-	 */
-	protected JTextComponent promptComponent;
+    /**
+     * Delegate the hard work to this object.
+     */
+    protected final TextUI delegate;
 
-	/**
-	 * Creates a new {@link PromptTextUI} which delegates most work to another
-	 * {@link TextUI}.
-	 * 
-	 * @param delegate
-	 */
-	public PromptTextUI(TextUI delegate) {
-		this.delegate = delegate;
-	}
+    /**
+     * This component ist painted when rendering the prompt text.
+     */
+    protected JTextComponent promptComponent;
 
-	/**
-	 * Creates a component which should be used to render the prompt text.
-	 * 
-	 * @return
-	 */
-	protected abstract JTextComponent createPromptComponent();
+    /**
+     * Creates a new {@link PromptTextUI} which delegates most work to another
+     * {@link TextUI}.
+     * 
+     * @param delegate
+     */
+    public PromptTextUI(TextUI delegate) {
+        this.delegate = delegate;
+    }
 
-	/**
-	 * Calls TextUI#installUI(JComponent) on the delegate and installs a focus
-	 * listener on <code>c</code> which repaints the component when it gains
-	 * or loses the focus.
-	 */
-	public void installUI(JComponent c) {
-		delegate.installUI(c);
+    /**
+     * Creates a component which should be used to render the prompt text.
+     * 
+     * @return
+     */
+    protected abstract JTextComponent createPromptComponent();
 
-		JTextComponent txt = (JTextComponent) c;
+    /**
+     * Calls TextUI#installUI(JComponent) on the delegate and installs a focus
+     * listener on <code>c</code> which repaints the component when it gains or
+     * loses the focus.
+     */
+    @Override
+    public void installUI(JComponent c) {
+        delegate.installUI(c);
 
-		// repaint to correctly highlight text if FocusBehavior is
-		// HIGHLIGHT_LABEL in Metal and Windows LnF
-		txt.addFocusListener(focusHandler);
-	}
+        JTextComponent txt = (JTextComponent) c;
 
-	/**
-	 * Delegates, then uninstalls the focus listener.
-	 */
-	public void uninstallUI(JComponent c) {
-		delegate.uninstallUI(c);
-		c.removeFocusListener(focusHandler);
-		promptComponent = null;
-	}
+        // repaint to correctly highlight text if FocusBehavior is
+        // HIGHLIGHT_LABEL in Metal and Windows LnF
+        txt.addFocusListener(focusHandler);
+    }
 
-	/**
-	 * Creates a label component, if none has already been created. Sets the
-	 * prompt components properties to reflect the given {@link JTextComponent}s
-	 * properties and returns it.
-	 * 
-	 * @param txt
-	 * @return the adjusted prompt component
-	 */
-	public JTextComponent getPromptComponent(JTextComponent txt) {
-		if (promptComponent == null) {
-			promptComponent = createPromptComponent();
-		}
-		if (txt.isFocusOwner() && PromptSupport.getFocusBehavior(txt) == FocusBehavior.HIDE_PROMPT) {
-			promptComponent.setText(null);
-		} else {
-			promptComponent.setText(PromptSupport.getPrompt(txt));
-		}
+    /**
+     * Delegates, then uninstalls the focus listener.
+     */
+    @Override
+    public void uninstallUI(JComponent c) {
+        delegate.uninstallUI(c);
+        c.removeFocusListener(focusHandler);
+        promptComponent = null;
+    }
 
-		promptComponent.getHighlighter().removeAllHighlights();
-		if (txt.isFocusOwner() && PromptSupport.getFocusBehavior(txt) == FocusBehavior.HIGHLIGHT_PROMPT) {
-			promptComponent.setForeground(txt.getSelectedTextColor());
-			try {
-				promptComponent.getHighlighter().addHighlight(0, promptComponent.getText().length(),
-						new DefaultHighlightPainter(txt.getSelectionColor()));
-			} catch (BadLocationException e) {
-				e.printStackTrace();
-			}
-		} else {
-			promptComponent.setForeground(PromptSupport.getForeground(txt));
-		}
+    /**
+     * Creates a label component, if none has already been created. Sets the
+     * prompt components properties to reflect the given {@link JTextComponent}s
+     * properties and returns it.
+     * 
+     * @param txt
+     * @return the adjusted prompt component
+     */
+    public JTextComponent getPromptComponent(JTextComponent txt) {
+        if (promptComponent == null) {
+            promptComponent = createPromptComponent();
+        }
+        if (txt.isFocusOwner()
+                && PromptSupport.getFocusBehavior(txt) == FocusBehavior.HIDE_PROMPT) {
+            promptComponent.setText(null);
+        } else {
+            promptComponent.setText(PromptSupport.getPrompt(txt));
+        }
 
-		if (PromptSupport.getFontStyle(txt) == null) {
-			promptComponent.setFont(txt.getFont());
-		} else {
-			promptComponent.setFont(txt.getFont().deriveFont(PromptSupport.getFontStyle(txt)));
-		}
+        promptComponent.getHighlighter().removeAllHighlights();
+        if (txt.isFocusOwner()
+                && PromptSupport.getFocusBehavior(txt) == FocusBehavior.HIGHLIGHT_PROMPT) {
+            promptComponent.setForeground(txt.getSelectedTextColor());
+            try {
+                promptComponent.getHighlighter().addHighlight(0,
+                        promptComponent.getText().length(),
+                        new DefaultHighlightPainter(txt.getSelectionColor()));
+            } catch (BadLocationException e) {
+                e.printStackTrace();
+            }
+        } else {
+            promptComponent.setForeground(PromptSupport.getForeground(txt));
+        }
 
-		promptComponent.setBackground(PromptSupport.getBackground(txt));
-		promptComponent.setHighlighter(new PainterHighlighter(PromptSupport.getBackgroundPainter(txt)));
-		promptComponent.setEnabled(txt.isEnabled());
-		promptComponent.setOpaque(txt.isOpaque());
-		promptComponent.setBounds(txt.getBounds());
-		promptComponent.setBorder(txt.getBorder());
-		promptComponent.setSelectedTextColor(txt.getSelectedTextColor());
-		promptComponent.setSelectionColor(txt.getSelectionColor());
-		promptComponent.setEditable(txt.isEditable());
-		promptComponent.setMargin(txt.getMargin());
+        if (PromptSupport.getFontStyle(txt) == null) {
+            promptComponent.setFont(txt.getFont());
+        } else {
+            promptComponent.setFont(txt.getFont().deriveFont(
+                    PromptSupport.getFontStyle(txt)));
+        }
 
-		return promptComponent;
-	}
+        promptComponent.setBackground(PromptSupport.getBackground(txt));
+        promptComponent.setHighlighter(new PainterHighlighter(PromptSupport
+                .getBackgroundPainter(txt)));
+        promptComponent.setEnabled(txt.isEnabled());
+        promptComponent.setOpaque(txt.isOpaque());
+        promptComponent.setBounds(txt.getBounds());
+        promptComponent.setBorder(txt.getBorder());
+        promptComponent.setSelectedTextColor(txt.getSelectedTextColor());
+        promptComponent.setSelectionColor(txt.getSelectionColor());
+        promptComponent.setEditable(txt.isEditable());
+        promptComponent.setMargin(txt.getMargin());
 
-	/**
-	 * When {@link #shouldPaintPrompt(JTextComponent)} returns true, the prompt
-	 * component is retrieved by calling
-	 * {@link #getPromptComponent(JTextComponent)} and it's preferred size is
-	 * returned. Otherwise super{@link #getPreferredSize(JComponent)} is
-	 * called.
-	 */
-	public Dimension getPreferredSize(JComponent c) {
-		JTextComponent txt = (JTextComponent) c;
-		if (shouldPaintPrompt(txt)) {
-			return getPromptComponent(txt).getPreferredSize();
-		}
-		return delegate.getPreferredSize(c);
-	}
+        return promptComponent;
+    }
 
-	/**
-	 * Delegates painting when {@link #shouldPaintPrompt(JTextComponent)}
-	 * returns false. Otherwise the prompt component is retrieved by calling
-	 * {@link #getPromptComponent(JTextComponent)} and painted. Then the caret
-	 * of the given text component is painted.
-	 */
-	public void paint(Graphics g, final JComponent c) {
-		JTextComponent txt = (JTextComponent) c;
+    /**
+     * When {@link #shouldPaintPrompt(JTextComponent)} returns true, the prompt
+     * component is retrieved by calling
+     * {@link #getPromptComponent(JTextComponent)} and it's preferred size is
+     * returned. Otherwise super{@link #getPreferredSize(JComponent)} is called.
+     */
+    @Override
+    public Dimension getPreferredSize(JComponent c) {
+        JTextComponent txt = (JTextComponent) c;
+        if (shouldPaintPrompt(txt)) {
+            return getPromptComponent(txt).getPreferredSize();
+        }
+        return delegate.getPreferredSize(c);
+    }
 
-		if (shouldPaintPrompt(txt)) {
-			paintPromptComponent(g, txt);
-		} else {
-			delegate.paint(g, c);
-		}
-	}
+    /**
+     * Delegates painting when {@link #shouldPaintPrompt(JTextComponent)}
+     * returns false. Otherwise the prompt component is retrieved by calling
+     * {@link #getPromptComponent(JTextComponent)} and painted. Then the caret
+     * of the given text component is painted.
+     */
+    @Override
+    public void paint(Graphics g, final JComponent c) {
+        JTextComponent txt = (JTextComponent) c;
 
-	protected void paintPromptComponent(Graphics g, JTextComponent txt) {
-		JTextComponent lbl = getPromptComponent(txt);
-		lbl.paint(g);
+        if (shouldPaintPrompt(txt)) {
+            paintPromptComponent(g, txt);
+        } else {
+            delegate.paint(g, c);
+        }
+    }
 
-		if (txt.getCaret() != null) {
-			txt.getCaret().paint(g);
-		}
-	}
+    protected void paintPromptComponent(Graphics g, JTextComponent txt) {
+        JTextComponent lbl = getPromptComponent(txt);
+        lbl.paint(g);
 
-	/**
-	 * Returns if the prompt or the text field should be painted, depending on
-	 * the state of <code>txt</code>.
-	 * 
-	 * @param txt
-	 * @return true when <code>txt</code> contains not text, otherwise false
-	 */
-	public boolean shouldPaintPrompt(JTextComponent txt) {
-		return txt.getText() == null || txt.getText().length() == 0;
-	}
+        if (txt.getCaret() != null) {
+            txt.getCaret().paint(g);
+        }
+    }
 
-	/**
-	 * Calls super.{@link #update(Graphics, JComponent)}, which in turn calls
-	 * the paint method of this object.
-	 */
-	public void update(Graphics g, JComponent c) {
-		super.update(g, c);
-	}
+    /**
+     * Returns if the prompt or the text field should be painted, depending on
+     * the state of <code>txt</code>.
+     * 
+     * @param txt
+     * @return true when <code>txt</code> contains not text, otherwise false
+     */
+    public boolean shouldPaintPrompt(JTextComponent txt) {
+        return txt.getText() == null || txt.getText().length() == 0;
+    }
 
-	/**
-	 * Delegate when {@link #shouldPaintPrompt(JTextComponent)} returns false.
-	 * Otherwise get the prompt component's UI and delegate to it. This ensures
-	 * that the {@link Caret} is painted on the correct position (this is
-	 * important when the text is centered, so that the caret will not be
-	 * painted inside the label text)
-	 */
-	public Rectangle modelToView(JTextComponent t, int pos, Bias bias) throws BadLocationException {
-		if (shouldPaintPrompt(t)) {
-			return getPromptComponent(t).getUI().modelToView(t, pos, bias);
-		} else {
-			return delegate.modelToView(t, pos, bias);
-		}
-	}
+    /**
+     * Calls super.{@link #update(Graphics, JComponent)}, which in turn calls
+     * the paint method of this object.
+     */
+    @Override
+    public void update(Graphics g, JComponent c) {
+        super.update(g, c);
+    }
 
-	/**
-	 * Calls {@link #modelToView(JTextComponent, int, Bias)} with
-	 * {@link Bias#Forward}.
-	 */
-	public Rectangle modelToView(JTextComponent t, int pos) throws BadLocationException {
-		return modelToView(t, pos, Position.Bias.Forward);
-	}
+    /**
+     * Delegate when {@link #shouldPaintPrompt(JTextComponent)} returns false.
+     * Otherwise get the prompt component's UI and delegate to it. This ensures
+     * that the {@link Caret} is painted on the correct position (this is
+     * important when the text is centered, so that the caret will not be
+     * painted inside the label text)
+     */
+    @Override
+    public Rectangle modelToView(JTextComponent t, int pos, Bias bias)
+            throws BadLocationException {
+        if (shouldPaintPrompt(t)) {
+            return getPromptComponent(t).getUI().modelToView(t, pos, bias);
+        } else {
+            return delegate.modelToView(t, pos, bias);
+        }
+    }
 
-	// ********************* Delegate methods *************************///
-	// ****************************************************************///
+    /**
+     * Calls {@link #modelToView(JTextComponent, int, Bias)} with
+     * {@link Bias#Forward}.
+     */
+    @Override
+    public Rectangle modelToView(JTextComponent t, int pos)
+            throws BadLocationException {
+        return modelToView(t, pos, Position.Bias.Forward);
+    }
 
-	public boolean contains(JComponent c, int x, int y) {
-		return delegate.contains(c, x, y);
-	}
+    // ********************* Delegate methods *************************///
+    // ****************************************************************///
 
-	public void damageRange(JTextComponent t, int p0, int p1, Bias firstBias, Bias secondBias) {
-		delegate.damageRange(t, p0, p1, firstBias, secondBias);
-	}
+    @Override
+    public boolean contains(JComponent c, int x, int y) {
+        return delegate.contains(c, x, y);
+    }
 
-	public void damageRange(JTextComponent t, int p0, int p1) {
-		delegate.damageRange(t, p0, p1);
-	}
+    @Override
+    public void damageRange(JTextComponent t, int p0, int p1, Bias firstBias,
+            Bias secondBias) {
+        delegate.damageRange(t, p0, p1, firstBias, secondBias);
+    }
 
-	public boolean equals(Object obj) {
-		return delegate.equals(obj);
-	}
+    @Override
+    public void damageRange(JTextComponent t, int p0, int p1) {
+        delegate.damageRange(t, p0, p1);
+    }
 
-	public Accessible getAccessibleChild(JComponent c, int i) {
-		return delegate.getAccessibleChild(c, i);
-	}
+    @Override
+    public boolean equals(Object obj) {
+        return delegate.equals(obj);
+    }
 
-	public int getAccessibleChildrenCount(JComponent c) {
-		return delegate.getAccessibleChildrenCount(c);
-	}
+    @Override
+    public Accessible getAccessibleChild(JComponent c, int i) {
+        return delegate.getAccessibleChild(c, i);
+    }
 
-	public EditorKit getEditorKit(JTextComponent t) {
-		return delegate.getEditorKit(t);
-	}
+    @Override
+    public int getAccessibleChildrenCount(JComponent c) {
+        return delegate.getAccessibleChildrenCount(c);
+    }
 
-	public Dimension getMaximumSize(JComponent c) {
-		return delegate.getMaximumSize(c);
-	}
+    @Override
+    public EditorKit getEditorKit(JTextComponent t) {
+        return delegate.getEditorKit(t);
+    }
 
-	public Dimension getMinimumSize(JComponent c) {
-		return delegate.getMinimumSize(c);
-	}
+    @Override
+    public Dimension getMaximumSize(JComponent c) {
+        return delegate.getMaximumSize(c);
+    }
 
-	public int getNextVisualPositionFrom(JTextComponent t, int pos, Bias b, int direction, Bias[] biasRet)
-			throws BadLocationException {
-		return delegate.getNextVisualPositionFrom(t, pos, b, direction, biasRet);
-	}
+    @Override
+    public Dimension getMinimumSize(JComponent c) {
+        return delegate.getMinimumSize(c);
+    }
 
-	public View getRootView(JTextComponent t) {
-		return delegate.getRootView(t);
-	}
+    @Override
+    public int getNextVisualPositionFrom(JTextComponent t, int pos, Bias b,
+            int direction, Bias[] biasRet) throws BadLocationException {
+        return delegate
+                .getNextVisualPositionFrom(t, pos, b, direction, biasRet);
+    }
 
-	public String getToolTipText(JTextComponent t, Point pt) {
-		return delegate.getToolTipText(t, pt);
-	}
+    @Override
+    public View getRootView(JTextComponent t) {
+        return delegate.getRootView(t);
+    }
 
-	public int hashCode() {
-		return delegate.hashCode();
-	}
+    @Override
+    public String getToolTipText(JTextComponent t, Point pt) {
+        return delegate.getToolTipText(t, pt);
+    }
 
-	public String toString() {
-		return String.format("%s (%s)", getClass().getName(), delegate.toString());
-	}
+    @Override
+    public int hashCode() {
+        return delegate.hashCode();
+    }
 
-	public int viewToModel(JTextComponent t, Point pt, Bias[] biasReturn) {
-		return delegate.viewToModel(t, pt, biasReturn);
-	}
+    @Override
+    public String toString() {
+        return String.format("%s (%s)", getClass().getName(), delegate
+                .toString());
+    }
 
-	public int viewToModel(JTextComponent t, Point pt) {
-		return delegate.viewToModel(t, pt);
-	}
+    @Override
+    public int viewToModel(JTextComponent t, Point pt, Bias[] biasReturn) {
+        return delegate.viewToModel(t, pt, biasReturn);
+    }
 
-	/**
-	 * Tries to call {@link ComponentUI#getBaseline(int, int)} on the delegate
-	 * via Reflection. Workaround to maintain compatibility with Java 5. Ideally
-	 * we should also override {@link #getBaselineResizeBehavior(JComponent)},
-	 * but that's impossible since the {@link BaselineResizeBehavior} class,
-	 * which does not exist in Java 5, is involved.
-	 * 
-	 * @return the baseline, or -2 if <code>getBaseline</code> could not be
-	 *         invoked on the delegate.
-	 */
-	public int getBaseline(JComponent c, int width, int height) {
-		try {
-			Method m = delegate.getClass().getMethod("getBaseline", JComponent.class, int.class, int.class);
-			Object o = m.invoke(delegate, new Object[] { c, width, height });
-			return (Integer) o;
-		} catch (Exception ex) {
-			// ignore
-			return -2;
-		}
-	}
+    @Override
+    public int viewToModel(JTextComponent t, Point pt) {
+        return delegate.viewToModel(t, pt);
+    }
 
-	/**
-	 * Repaint the {@link TextComponent} when it loses or gains the focus.
-	 */
-	private static final class FocusHandler extends FocusAdapter {
-		public void focusGained(FocusEvent e) {
-			e.getComponent().repaint();
-		}
+    /**
+     * Tries to call {@link ComponentUI#getBaseline(int, int)} on the delegate
+     * via Reflection. Workaround to maintain compatibility with Java 5. Ideally
+     * we should also override {@link #getBaselineResizeBehavior(JComponent)},
+     * but that's impossible since the {@link BaselineResizeBehavior} class,
+     * which does not exist in Java 5, is involved.
+     * 
+     * @return the baseline, or -2 if <code>getBaseline</code> could not be
+     *         invoked on the delegate.
+     */
+    @Override
+    public int getBaseline(JComponent c, int width, int height) {
+        try {
+            Method m = delegate.getClass().getMethod("getBaseline",
+                    JComponent.class, int.class, int.class);
+            Object o = m.invoke(delegate, new Object[] { c, width, height });
+            return (Integer) o;
+        } catch (Exception ex) {
+            // ignore
+            return -2;
+        }
+    }
 
-		public void focusLost(FocusEvent e) {
-			e.getComponent().repaint();
-		}
-	}
+    /**
+     * Repaint the {@link TextComponent} when it loses or gains the focus.
+     */
+    private static final class FocusHandler extends FocusAdapter {
+        @Override
+        public void focusGained(FocusEvent e) {
+            e.getComponent().repaint();
+        }
+
+        @Override
+        public void focusLost(FocusEvent e) {
+            e.getComponent().repaint();
+        }
+    }
 }

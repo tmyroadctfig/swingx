@@ -70,8 +70,8 @@ public class PropertyChangeReport implements PropertyChangeListener {
     public int getEventCount(String property) {
         if (property == null) return getMultiCastEventCount();
         int count = 0;
-        for (Iterator iter = events.iterator(); iter.hasNext();) {
-            PropertyChangeEvent event = (PropertyChangeEvent) iter.next();
+        for (Iterator<PropertyChangeEvent> iter = events.iterator(); iter.hasNext();) {
+            PropertyChangeEvent event = iter.next();
             if (property.equals(event.getPropertyName())) {
                 count++;
             }
@@ -85,8 +85,8 @@ public class PropertyChangeReport implements PropertyChangeListener {
     
     public int getMultiCastEventCount() {
         int count = 0;
-        for (Iterator i = events.iterator(); i.hasNext();) {
-            PropertyChangeEvent event = (PropertyChangeEvent) i.next();
+        for (Iterator<PropertyChangeEvent> i = events.iterator(); i.hasNext();) {
+            PropertyChangeEvent event =  i.next();
             if (event.getPropertyName() == null)
                 count++;
         }

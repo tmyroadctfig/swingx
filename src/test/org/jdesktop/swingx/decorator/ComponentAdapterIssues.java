@@ -60,6 +60,7 @@ public class ComponentAdapterIssues extends InteractiveTestCase {
         }
     }
 
+    @SuppressWarnings("unused")
     private StringValue sv;
     
     /**

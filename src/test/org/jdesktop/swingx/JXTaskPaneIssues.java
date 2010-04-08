@@ -29,7 +29,6 @@ import java.util.logging.Logger;
 import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 
 import org.jdesktop.swingx.action.AbstractActionExt;

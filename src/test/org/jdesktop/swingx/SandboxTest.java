@@ -37,6 +37,7 @@ public class SandboxTest extends TestCase {
             LOG.info("cannot run testSecurityManager - no SecurityManager installed");
             return;
         }
+        @SuppressWarnings("unused")
         JXTable table = new JXTable();
         try {
             System.getProperty("user.home", "not specified");

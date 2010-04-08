@@ -10,10 +10,12 @@ import org.junit.Test;
 public class PromptTextAreaUITest extends PromptTextUITest_Base {
     JTextArea textArea;
     
+    @Override
     public void setup() {
         textComponent = textArea = new JXTextArea();
     }
     
+    @Override
     @Test
     public void testGetLabelComponent() {
         super.testGetLabelComponent();

@@ -45,8 +45,6 @@ import java.util.logging.Logger;
 
 import javax.swing.Action;
 import javax.swing.DefaultListModel;
-import javax.swing.JCheckBox;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
@@ -61,7 +59,6 @@ import org.jdesktop.swingx.JXList;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.JXTree;
 import org.jdesktop.swingx.action.AbstractActionExt;
-import org.jdesktop.swingx.action.ActionContainerFactory;
 import org.jdesktop.swingx.color.ColorUtil;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
