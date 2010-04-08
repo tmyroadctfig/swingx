@@ -26,9 +26,22 @@ import javax.swing.Icon;
 import javax.swing.JLabel;
 
 /**
- * Highlighter which decorates by setting the icon property of a label.
+ * Highlighter which decorates by setting the icon property of a JLabel.<p>
+ * 
+ * Note: The limitation to JLabel icons (vs. covering AbstractButton as well) 
+ * is intentional. Highlighters are allowed to touch only those properties of the 
+ * rendering component which are guaranteed to be reset by the corresponding 
+ * ComponentProvider, this implementation is safe enough - LabelProvider guarantees
+ * to reset both text and icon. On the other hand, CheckBoxProvider doesn't touch
+ * the icon (which is LAF depend), consequently this Highlighter must not touch
+ * it as well. Custom subclasses trying to cover AbstractButton 
+ * must take care that their custom providers reset the icon property.
  *  
  * @author Jeanette Winzenburg
+ * 
+ * @see ComponentProvider
+ * @see LabelProvider
+ * @see CheckBoxProvider
  */
 public class IconHighlighter extends AbstractHighlighter {
 
