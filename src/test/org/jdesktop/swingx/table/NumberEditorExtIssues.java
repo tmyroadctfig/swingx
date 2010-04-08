@@ -22,14 +22,11 @@
 package org.jdesktop.swingx.table;
 
 import java.awt.Point;
-import java.awt.event.ActionEvent;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.logging.Logger;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.KeyStroke;
@@ -41,7 +38,6 @@ import javax.swing.text.NumberFormatter;
 import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXTable;
-import org.jdesktop.test.CellEditorReport;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

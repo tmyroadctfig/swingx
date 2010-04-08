@@ -21,7 +21,8 @@
  */
 package org.jdesktop.swingx.sort;
 
-import javax.swing.DefaultComboBoxModel;
+import java.util.logging.Logger;
+
 import javax.swing.DefaultRowSorter;
 import javax.swing.JTable;
 import javax.swing.RowFilter;
@@ -30,8 +31,6 @@ import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
 import org.jdesktop.swingx.InteractiveTestCase;
-import org.jdesktop.swingx.JXList;
-import org.jdesktop.swingx.JXTable;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -45,10 +44,66 @@ import org.junit.runners.JUnit4;
 @RunWith(JUnit4.class)
 public class DefaultRowSorterIssues extends InteractiveTestCase {
 
+    @SuppressWarnings("unused")
+    private static final Logger LOG = Logger
+            .getLogger(DefaultRowSorterIssues.class.getName());
+    
     int rows;
     DefaultTableModel model;
     DefaultRowSorter<TableModel, ?> sorter;
 
+    /**
+     * RowSorter not shareable!
+     */
+    @Test
+    public void testSimulateShareSorter() {
+        sorter.toggleSortOrder(0);
+        int last = model.getRowCount() - 1;
+        model.removeRow(last);
+        // notification by first table
+        sorter.rowsDeleted(last, last);
+        // notification by second table
+        sorter.rowsDeleted(last, last);
+        sorter.convertRowIndexToModel(last - 1);
+    }
+    
+    /**
+     * RowSorter not shareable!
+     * Here: remove last row of model - fails immediately with OOB exception
+     */
+    @Test
+    public void testShareSorterRemoveLastRow() {
+        DefaultTableModel model = new DefaultTableModel(10, 1);
+        TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<DefaultTableModel>(model);
+        int last = model.getRowCount() - 1;
+        JTable table = new JTable(model);
+        table.setRowSorter(sorter);
+        JTable other = new JTable(model);
+        other.setRowSorter(sorter);
+        sorter.toggleSortOrder(0);
+        sorter.toggleSortOrder(0);
+        model.removeRow(last);
+    }
+    
+    /**
+     * RowSorter not shareable!
+     * 
+     * Here: remove first row of model - no exception, incorrect view row count
+     */
+    @Test
+    public void testShareSorterRemoveFirstRow() {
+        DefaultTableModel model = new DefaultTableModel(10, 1);
+        TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<DefaultTableModel>(model);
+        int last = model.getRowCount() - 1;
+        JTable table = new JTable(model);
+        table.setRowSorter(sorter);
+        JTable other = new JTable(model);
+        other.setRowSorter(sorter);
+        sorter.toggleSortOrder(0);
+        sorter.toggleSortOrder(0);
+        model.removeRow(0);
+        assertEquals(last, table.getRowCount());
+    }
     
     /**
      * Selection of last row lost if a row above is removed.
@@ -143,7 +198,7 @@ public class DefaultRowSorterIssues extends InteractiveTestCase {
      */
     @Test (expected = IndexOutOfBoundsException.class)
     public void testToViewAfterRemoveAllPassFilter() {
-        RowFilter filter = RowFilter.regexFilter(".*");
+        RowFilter<Object, Object> filter = RowFilter.regexFilter(".*");
         sorter.setRowFilter(filter);
         model.removeRow(rows - 1);
         sorter.rowsDeleted(rows - 1, rows - 1);
@@ -295,7 +350,7 @@ public class DefaultRowSorterIssues extends InteractiveTestCase {
      */
     @Test
     public void testToViewAfterSilentRemoveAllPassFilter() {
-        RowFilter filter = RowFilter.regexFilter(".*");
+        RowFilter<Object, Object> filter = RowFilter.regexFilter(".*");
         sorter.setRowFilter(filter);
         model.removeRow(rows - 1);
         assertEquals(rows - 1, sorter.convertRowIndexToView(rows - 1));
@@ -312,7 +367,7 @@ public class DefaultRowSorterIssues extends InteractiveTestCase {
      */
     @Test (expected = IndexOutOfBoundsException.class)
     public void testToViewAfterSilentInsertAllPassFilter() {
-        RowFilter filter = RowFilter.regexFilter(".*");
+        RowFilter<Object, Object> filter = RowFilter.regexFilter(".*");
         sorter.setRowFilter(filter);
         model.addRow(new Object[] {rows});
         assertEquals(rows, sorter.convertRowIndexToView(rows));

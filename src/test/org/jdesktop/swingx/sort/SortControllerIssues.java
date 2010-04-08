@@ -22,17 +22,12 @@
 package org.jdesktop.swingx.sort;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ListModel;
-import javax.swing.RowFilter;
-import javax.swing.RowSorter;
 import javax.swing.SortOrder;
 import javax.swing.RowSorter.SortKey;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableRowSorter;
 
 import org.jdesktop.swingx.InteractiveTestCase;
 import org.junit.Test;

@@ -26,7 +26,6 @@ import javax.swing.JTable;
 import javax.swing.RowFilter;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
-import javax.swing.table.TableRowSorter;
 
 import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXList;
@@ -48,6 +47,55 @@ public class DefaultSortControllerIssues extends InteractiveTestCase {
     DefaultTableModel model;
     DefaultSortController<TableModel> sorter;
 
+    /**
+     * RowSorter not shareable!
+     */
+    @Test
+    public void testShareSorter() {
+        sorter.toggleSortOrder(0);
+        int last = model.getRowCount() - 1;
+        model.removeRow(0);
+        // notification by first table
+        sorter.rowsDeleted(last, last);
+        // notification by second table
+        sorter.rowsDeleted(last, last);
+        sorter.convertRowIndexToModel(last - 1);
+    }
+
+    /**
+     * RowSorter not shareable!
+     * Here: remove last row of model - fails immediately with OOB exception
+     */
+    @Test
+    public void testShareSorterRemoveLastRow() {
+        int last = model.getRowCount() - 1;
+        JTable table = new JTable(model);
+        table.setRowSorter(sorter);
+        JTable other = new JTable(model);
+        other.setRowSorter(sorter);
+        sorter.toggleSortOrder(0);
+        sorter.toggleSortOrder(0);
+        model.removeRow(last);
+    }
+    
+    /**
+     * RowSorter not shareable!
+     * 
+     * Here: remove first row of model - no exception, incorrect view row count
+     */
+    @Test
+    public void testShareSorterRemoveFirstRow() {
+        int last = model.getRowCount() - 1;
+        JTable table = new JTable(model);
+        table.setRowSorter(sorter);
+        JTable other = new JTable(model);
+        other.setRowSorter(sorter);
+        sorter.toggleSortOrder(0);
+        sorter.toggleSortOrder(0);
+        model.removeRow(0);
+        assertEquals(last, table.getRowCount());
+    }
+    
     
     /**
      * Selection of last row lost if a row above is removed.
@@ -163,7 +211,7 @@ public class DefaultSortControllerIssues extends InteractiveTestCase {
      */
     @Test (expected = IndexOutOfBoundsException.class)
     public void testToViewAfterRemoveAllPassFilter() {
-        RowFilter filter = RowFilter.regexFilter(".*");
+        RowFilter<Object, Object> filter = RowFilter.regexFilter(".*");
         sorter.setRowFilter(filter);
         model.removeRow(rows - 1);
         sorter.rowsDeleted(rows - 1, rows - 1);
@@ -315,7 +363,7 @@ public class DefaultSortControllerIssues extends InteractiveTestCase {
      */
     @Test
     public void testToViewAfterSilentRemoveAllPassFilter() {
-        RowFilter filter = RowFilter.regexFilter(".*");
+        RowFilter<Object, Object> filter = RowFilter.regexFilter(".*");
         sorter.setRowFilter(filter);
         model.removeRow(rows - 1);
         assertEquals(rows - 1, sorter.convertRowIndexToView(rows - 1));
@@ -332,7 +380,7 @@ public class DefaultSortControllerIssues extends InteractiveTestCase {
      */
     @Test (expected = IndexOutOfBoundsException.class)
     public void testToViewAfterSilentInsertAllPassFilter() {
-        RowFilter filter = RowFilter.regexFilter(".*");
+        RowFilter<Object, Object> filter = RowFilter.regexFilter(".*");
         sorter.setRowFilter(filter);
         model.addRow(new Object[] {rows});
         assertEquals(rows, sorter.convertRowIndexToView(rows));

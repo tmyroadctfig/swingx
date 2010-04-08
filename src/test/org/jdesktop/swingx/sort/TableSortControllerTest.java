@@ -30,7 +30,6 @@ import javax.swing.RowFilter;
 import javax.swing.SortOrder;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
-import javax.swing.table.TableRowSorter;
 
 import org.jdesktop.test.AncientSwingTeam;
 import org.junit.Test;
