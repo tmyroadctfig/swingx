@@ -9,6 +9,7 @@ package org.jdesktop.swingx.decorator;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Font;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
@@ -22,6 +23,7 @@ import javax.swing.border.CompoundBorder;
 import javax.swing.plaf.ColorUIResource;
 
 import org.jdesktop.swingx.InteractiveTestCase;
+import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.decorator.HighlighterFactory.UIColorHighlighter;
 import org.jdesktop.swingx.painter.AbstractAreaPainter;
 import org.jdesktop.swingx.painter.MattePainter;
@@ -65,6 +67,7 @@ public class HighlighterTest extends InteractiveTestCase {
     // flag used in setup to explicitly choose LF
     protected boolean defaultToSystemLF;
 
+    protected Font tableFont;
     @Override
     @Before
        public void setUp() {
@@ -88,6 +91,11 @@ public class HighlighterTest extends InteractiveTestCase {
         
         
         emptyHighlighter = new ColorHighlighter();
+        
+        tableFont = new JXTable().getFont();
+        if (tableFont.equals(allColored.getFont())) {
+            tableFont = tableFont.deriveFont(50.f);
+        }
         // make sure we have the same default for each test
         defaultToSystemLF = false;
         InteractiveTestCase.setSystemLF(defaultToSystemLF);
@@ -311,6 +319,55 @@ public class HighlighterTest extends InteractiveTestCase {
         assertEquals(predicate, hl.getHighlightPredicate());
         assertEquals(icon, hl.getIcon());
     }
+
+//-------------- FontHighlighter
+    
+    @Test
+    public void testFontHighlighterConstructors() {
+        FontHighlighter hl = new FontHighlighter();
+        assertSame(HighlightPredicate.ALWAYS, hl.getHighlightPredicate());
+        assertNull(hl.getFont());
+        hl = new FontHighlighter(HighlightPredicate.NEVER);
+        assertSame(HighlightPredicate.NEVER, hl.getHighlightPredicate());
+        assertNull(hl.getFont());
+        hl = new FontHighlighter(tableFont);
+        assertSame(HighlightPredicate.ALWAYS, hl.getHighlightPredicate());
+        assertNotNull(hl.getFont());
+        assertEquals(tableFont, hl.getFont());
+        hl = new FontHighlighter(HighlightPredicate.NEVER, tableFont);
+        assertSame(HighlightPredicate.NEVER, hl.getHighlightPredicate());
+        assertEquals(tableFont, hl.getFont());
+    }
+    
+    @Test
+    public void testFontHighlighterSetFont() {
+        FontHighlighter hl = new FontHighlighter();
+        ChangeReport report = new ChangeReport();
+        hl.addChangeListener(report);
+        hl.setFont(tableFont);
+        assertEquals(1, report.getEventCount());
+        assertEquals(tableFont, hl.getFont());
+        report.clear();
+        hl.setFont(tableFont);
+        assertEquals(0, report.getEventCount());
+    }
+    
+    @Test
+    public void testFontHighlighterDecorate() {
+        FontHighlighter hl = new FontHighlighter(tableFont);
+        hl.highlight(allColored, createComponentAdapter(allColored));
+        assertEquals(tableFont, allColored.getFont());
+    }
+    
+    @Test
+    public void testFontHighlighterDecorateNotWithNullFont() {
+        FontHighlighter hl = new FontHighlighter();
+        Font old = allColored.getFont();
+        hl.highlight(allColored, createComponentAdapter(allColored));
+        assertEquals(old, allColored.getFont());
+    }
+    
+    
 //-------------- BorderHighlighter
     
     /**
