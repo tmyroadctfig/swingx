@@ -31,9 +31,6 @@ import org.jdesktop.swingx.decorator.HighlightPredicate;
 /**
  * A Highlighter which sets the Font of the component.<p>
  * 
- * PENDING JW: null might be a valid value to set? Maybe add a property to decide whether
- * or not a null font should be ignored, with default to do nothing?
- * 
  * @author Karl George Schaefer
  *
  */
