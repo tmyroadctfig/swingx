@@ -23,11 +23,13 @@ package org.jdesktop.swingx;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.GraphicsEnvironment;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.lang.reflect.InvocationTargetException;
 import java.text.DateFormatSymbols;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -54,9 +56,11 @@ import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.SpinnerDateModel;
+import javax.swing.SwingUtilities;
 
 import org.jdesktop.swingx.calendar.CalendarUtils;
 import org.jdesktop.swingx.calendar.DatePickerFormatter;
+import org.jdesktop.test.PopupMenuReport;
 import org.junit.Test;
 
 /**
@@ -489,6 +493,40 @@ public class JXDatePickerIssues extends InteractiveTestCase {
         frame.setVisible(true);
     }
 //-------------------- unit tests
+    
+    /**
+     * Issue #1301-swingx: Picker must be source of popupMenuEvent.
+     * 
+     * Tests event source on notification.
+     * 
+     * @throws InvocationTargetException 
+     * @throws InterruptedException 
+     */
+    @Test
+    public void testPopupMenuListenerNotificationPickerIsSource() 
+        throws InterruptedException, InvocationTargetException {
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.fine("cannot run testLinkPanelNull - headless");
+            return;
+        }
+        final JXDatePicker picker = new JXDatePicker();
+        final JXFrame frame = new JXFrame("showing", false);
+        frame.add(picker);
+        frame.pack();
+        frame.setVisible(true);
+        final PopupMenuReport report = new PopupMenuReport();
+        picker.addPopupMenuListener(report);
+        Action togglePopup = picker.getActionMap().get("TOGGLE_POPUP");
+        togglePopup.actionPerformed(null);
+        SwingUtilities.invokeAndWait(new Runnable() {
+            public void run() {
+                assertEquals(picker, report.getLastEvent().getSource());
+                assertEquals(1, report.getVisibleEventCount());
+                frame.dispose();
+                
+            }
+        });
+    }
     
     
     /**

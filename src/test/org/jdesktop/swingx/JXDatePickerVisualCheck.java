@@ -105,8 +105,9 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
 //            test.runInteractiveTests("interactive.*PrefSize.*");
 //            test.runInteractiveTests("interactive.*Keep.*");
 //          test.runInteractiveTests("interactive.*Multiple.*");
-            test.runInteractiveTests("interactive.*Editable.*");
-            test.runInteractiveTests("interactive.*Enable.*");
+//            test.runInteractiveTests("interactive.*Editable.*");
+//            test.runInteractiveTests("interactive.*Enable.*");
+            test.runInteractiveTests("interactive.*Popup.*");
 //            test.runInteractiveTests("interactive.*Event.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
