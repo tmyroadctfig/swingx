@@ -21,104 +21,44 @@
  */
 package org.jdesktop.swingx.sort;
 
-import java.util.logging.Logger;
-
-import javax.swing.DefaultRowSorter;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JTable;
 import javax.swing.RowFilter;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
-import javax.swing.table.TableRowSorter;
 
 import org.jdesktop.swingx.InteractiveTestCase;
+import org.jdesktop.swingx.JXList;
+import org.jdesktop.swingx.JXTable;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 /**
- * Test the DefaultRowSorter, to expose facets of core 
+ * Test the DefaultSortController, mainly the fix of core  
  * <a href=http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6894632>Issue 6894632</a>.
  * <p>
- * Compare with DefaultSortControllerTest to see the effect of the fix in SwingX.
+ * Compare with DefaultRowSorterIssues to see the difference.
  * 
  * @author Jeanette Winzenburg
  */
 @RunWith(JUnit4.class)
-public class DefaultRowSorterIssues extends InteractiveTestCase {
+public class DefaultSortControllerTest extends InteractiveTestCase {
 
-    @SuppressWarnings("unused")
-    private static final Logger LOG = Logger
-            .getLogger(DefaultRowSorterIssues.class.getName());
-    
     int rows;
     DefaultTableModel model;
-    DefaultRowSorter<TableModel, ?> sorter;
+    DefaultSortController<TableModel> sorter;
 
-    /**
-     * RowSorter not shareable!
-     */
-    @Test
-    public void testSimulateShareSorter() {
-        sorter.toggleSortOrder(0);
-        int last = model.getRowCount() - 1;
-        model.removeRow(last);
-        // notification by first table
-        sorter.rowsDeleted(last, last);
-        // notification by second table
-        sorter.rowsDeleted(last, last);
-        sorter.convertRowIndexToModel(last - 1);
-    }
-    
-    /**
-     * RowSorter not shareable!
-     * Here: remove last row of model - fails immediately with OOB exception
-     */
-    @Test
-    public void testShareSorterRemoveLastRow() {
-        DefaultTableModel model = new DefaultTableModel(10, 1);
-        TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<DefaultTableModel>(model);
-        int last = model.getRowCount() - 1;
-        JTable table = new JTable(model);
-        table.setRowSorter(sorter);
-        JTable other = new JTable(model);
-        other.setRowSorter(sorter);
-        sorter.toggleSortOrder(0);
-        sorter.toggleSortOrder(0);
-        model.removeRow(last);
-    }
-    
-    /**
-     * RowSorter not shareable!
-     * 
-     * Here: remove first row of model - no exception, incorrect view row count
-     */
-    @Test
-    public void testShareSorterRemoveFirstRow() {
-        DefaultTableModel model = new DefaultTableModel(10, 1);
-        TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<DefaultTableModel>(model);
-        int last = model.getRowCount() - 1;
-        JTable table = new JTable(model);
-        table.setRowSorter(sorter);
-        JTable other = new JTable(model);
-        other.setRowSorter(sorter);
-        sorter.toggleSortOrder(0);
-        sorter.toggleSortOrder(0);
-        model.removeRow(0);
-        assertEquals(last, table.getRowCount());
-    }
-    
     /**
      * Selection of last row lost if a row above is removed.
      * 
      * Core issue: http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6894632
      */
     @Test
-    public void testRemoveSelected() {
+    public void testXTableRemoveSelected() {
         DefaultTableModel model = new DefaultTableModel(10, 1);
-        JTable table = new JTable(model);
-        // install a rowSorter
-        table.setAutoCreateRowSorter(true);
+        JTable table = new JXTable(model);
         int last = table.getRowCount() - 1;
         // select that last row
         table.setRowSelectionInterval(last, last);
@@ -128,6 +68,29 @@ public class DefaultRowSorterIssues extends InteractiveTestCase {
         assertEquals("last row must be still selected", 
                 table.getRowCount() - 1, table.getSelectedRow());
     }
+    
+    /**
+     * Selection of last row lost if a row above is removed.
+     * 
+     * Core issue: http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6894632
+     */
+    @Test
+    public void testListRemoveSelected() {
+        DefaultComboBoxModel model = new DefaultComboBoxModel(new Object[]{1, 2, 3, 4});
+        JXList list = new JXList(model, true);
+        int l = list.getElementCount() - 1;
+        // select that last row
+        list.setSelectionInterval(l, l);
+        assertTrue("sanity: really selected", list.getSelectionModel().isSelectedIndex(l));
+        // remove the second last
+        model.removeElementAt(l - 1);
+        assertEquals("last row must be still selected", 
+                list.getElementCount() - 1, list.getSelectedIndex());
+        
+    }
+
+
+    
 //------------------------ model changes with notification    
 //-------------------- conversion methods: to model
     /**
@@ -498,7 +461,7 @@ public class DefaultRowSorterIssues extends InteractiveTestCase {
         super.setUp();
         rows = 10;
         model = createAscendingTableModel(rows);
-        sorter = new TableRowSorter<TableModel>(model);
+        sorter = new TableSortController<TableModel>(model);
     }
 
     
