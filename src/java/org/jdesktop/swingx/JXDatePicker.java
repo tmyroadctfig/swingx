@@ -685,17 +685,18 @@ public class JXDatePicker extends JComponent {
     }
 
     /**
-     * Sets the editor. <p>
+     * Sets the editor. The editor's editable and enabled properties are 
+     * set the corresponding properties of the JXDatePicker.<p>
      * 
      * The default is created and set by the UI delegate.
      * <p>
      * Clients should NOT use this method. It is provided to temporarily support
-     * the PLAF code.
+     * the PLAF code. 
      * 
      * @param editor the formatted input.
      * @throws NullPointerException if editor is null.
      * 
-     * @see #getEditor
+     * @see #getEditor()
      */
 //    @Deprecated
     public void setEditor(JFormattedTextField editor) {

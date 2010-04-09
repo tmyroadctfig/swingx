@@ -216,17 +216,69 @@ public class JXDatePickerTest extends InteractiveTestCase {
         picker.setEditable(!picker.isEditable());
         assertEquals(picker.isEditable(), delegate.isEnabled());
     }
+    
     /**
-     * Sanity: report in forum that editor not disabled if picker disabled.
-     * Looks okay.
+     * Issue #1196-swingx: JXDatePicker editor must be disabled if picker disabled.
+     * Enabled must be kept in synch on updateUI.
      */
     @Test
-    public void testEnabled() {
+    public void testEnabledKeptOnUpdateUI() {
         JXDatePicker picker = new JXDatePicker();
         picker.setEnabled(false);
         assertFalse("sanity: picker disabled", picker.isEnabled());
         assertEquals("editor enabled must follow picker enabled", 
                 picker.isEnabled(), picker.getEditor().isEnabled());
+        picker.updateUI();
+        assertFalse("sanity: picker disabled", picker.isEnabled());
+        for (int i = 0; i < picker.getComponentCount(); i++) {
+            assertEquals("child enabled must follow picker enabled", 
+                    picker.isEnabled(), picker.getComponent(i).isEnabled());
+        }
+    }
+    
+    /**
+     * Issue #1196-swingx: JXDatePicker editor must be disabled if picker disabled.
+     * Enabled must be kept in synch on setEditor.
+     */
+    @Test
+    public void testEnabledKeptOnSetEditor() {
+        JXDatePicker picker = new JXDatePicker();
+        picker.setEnabled(false);
+        picker.setEditor(new JFormattedTextField());
+        assertFalse("sanity: picker disabled", picker.isEnabled());
+        assertEquals("editor enabled must follow picker enabled", 
+                picker.isEnabled(), picker.getEditor().isEnabled());
+    }
+    
+    /**
+     * Issue #1196-swingx: JXDatePicker editor must be disabled if picker disabled.
+     * Editable must be kept in synch on updateUI.
+     */
+    @Test
+    public void testEditableKeptOnUpdateUI() {
+        JXDatePicker picker = new JXDatePicker();
+        picker.setEditable(false);
+        assertFalse("sanity: picker disabled", picker.isEditable());
+        assertEquals("editor enabled must follow picker enabled", 
+                picker.isEditable(), picker.getEditor().isEditable());
+        picker.updateUI();
+        assertFalse("sanity: picker disabled", picker.isEditable());
+        assertEquals("editor enabled must follow picker enabled", 
+                picker.isEditable(), picker.getEditor().isEditable());
+    }
+    
+    /**
+     * Issue #1196-swingx: JXDatePicker editor must be disabled if picker disabled.
+     * Editable must be kept in synch on setEditor.
+     */
+    @Test
+    public void testEditableSynchedOnSetEditor() {
+        JXDatePicker picker = new JXDatePicker();
+        picker.setEditable(false);
+        picker.setEditor(new JFormattedTextField());
+        assertFalse("sanity: picker disabled", picker.isEditable());
+        assertEquals("editor enabled must follow picker enabled", 
+                picker.isEditable(), picker.getEditor().isEditable());
     }
     
     /**
