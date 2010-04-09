@@ -26,6 +26,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.awt.event.InputEvent;
+import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.text.DateFormat;
@@ -100,9 +102,9 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
         
         try {
 //            test.runInteractiveTests();
-            test.runInteractiveTests("interactive.*PrefSize.*");
+//            test.runInteractiveTests("interactive.*PrefSize.*");
 //            test.runInteractiveTests("interactive.*Keep.*");
-//          test.runInteractiveTests("interactive.*Multiple.*");
+          test.runInteractiveTests("interactive.*Multiple.*");
 //            test.runInteractiveTests("interactive.*Editable.*");
 //            test.runInteractiveTests("interactive.*Event.*");
         } catch (Exception e) {
@@ -135,10 +137,90 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
     }
     /**
      * Issue #940-swingx: support multiple selection in picker.
-     * Nothing out-off-the-box, trying to implement custom 
-     * dateSelectionModel.
+     * Nothing out-off-the-box, trying to manipulate the mouseEvent.
+     * 
+     * No success: no way to unselect
      */
-    public void interactiveMultipleSelection() {
+    public void interactiveMultipleSelectionWithoutCtrl() {
+        JXMonthView monthView = new JXMonthView(new Date()) {
+
+            @Override
+            protected void processMouseEvent(MouseEvent e) {
+                // change the modifiers to believe that control key is down
+//                int modifiers = e.getModifiers() | InputEvent.CTRL_DOWN_MASK;
+                int modifiers = e.getModifiers() | InputEvent.CTRL_MASK;
+                
+                MouseEvent myME = new MouseEvent(
+                    (Component) e.getSource(), 
+                    e.getID(), 
+                    e.getWhen(), 
+                    modifiers, // my changed modifier
+                    e.getX(), 
+                    e.getY(), 
+                    e.getXOnScreen(), 
+                    e.getYOnScreen(), 
+                    e.getClickCount(), 
+                    e.isPopupTrigger(), 
+                    e.getButton());
+                super.processMouseEvent(myME);
+//                super.processMouseEvent(e);
+            }
+            
+        };
+        monthView.setSelectionMode(SelectionMode.MULTIPLE_INTERVAL_SELECTION);
+        JXDatePicker picker = new JXDatePicker();
+        picker.setMonthView(monthView);
+        JXFrame frame = showInFrame(picker, "multiple selection without ctrl");
+        show(frame);
+    }
+    
+    /**
+     * Issue #940-swingx: support multiple selection in picker.
+     * Nothing out-off-the-box, trying to implement custom 
+     * dateSelectionModel with overridden setSelectionInterval. 
+     * Looks halfway okay for mouse-interaction, completely
+     * unusable with keyboard interaction.
+     */
+    public void interactiveMultipleSelectionTogglingModel() {
+        DateSelectionModel model = new ToggleSelectionModel();
+        model.setSelectionMode(SelectionMode.MULTIPLE_INTERVAL_SELECTION);
+        JXMonthView monthView = new JXMonthView(new Date(), model);
+        JXDatePicker picker = new JXDatePicker();
+        picker.setMonthView(monthView);
+        JXFrame frame = showInFrame(picker, "multiple selection - toggle");
+        show(frame);
+    }
+    
+    /**
+     * Trying to interfere in setSelectionInterval. Idea from Sunacle dev forum:
+     * <a href=http://forums.sun.com/thread.jspa?threadID=5431797&tstart=0> 
+     * MultiSelect JList without ctrl
+     * </a>
+     */
+    public static class ToggleSelectionModel extends DaySelectionModel {
+
+        @Override
+        public void setSelectionInterval(Date startDate, Date endDate) {
+            if (!isSameDay(startDate, endDate)) {
+                super.setSelectionInterval(startDate, endDate);
+                return;
+            }
+            if (isSelected(startDate)) {
+                removeSelectionInterval(startDate, startDate);
+            } else {
+                addSelectionInterval(startDate, startDate);
+            }
+        }
+        
+        
+    }
+    
+    /**
+     * Issue #940-swingx: support multiple selection in picker.
+     * Nothing out-off-the-box, trying to implement custom 
+     * dateSelectionModel. No success.
+     */
+    public void interactiveMultipleSelectionAddingModel() {
         DateSelectionModel model = new AddingDaySelectionModel();
         model.setSelectionMode(SelectionMode.MULTIPLE_INTERVAL_SELECTION);
         JXMonthView monthView = new JXMonthView(new Date(), model) {
