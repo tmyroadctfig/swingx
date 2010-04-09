@@ -104,8 +104,9 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
 //            test.runInteractiveTests();
 //            test.runInteractiveTests("interactive.*PrefSize.*");
 //            test.runInteractiveTests("interactive.*Keep.*");
-          test.runInteractiveTests("interactive.*Multiple.*");
-//            test.runInteractiveTests("interactive.*Editable.*");
+//          test.runInteractiveTests("interactive.*Multiple.*");
+            test.runInteractiveTests("interactive.*Editable.*");
+            test.runInteractiveTests("interactive.*Enable.*");
 //            test.runInteractiveTests("interactive.*Event.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
@@ -277,6 +278,28 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
             return lastAdded;
         }
     }
+    /**
+     * Issue #1196-swingx: must not allow edits if disabled.
+     * 
+     */
+    public void interactiveNotEnabled() {
+        final JXDatePicker picker = new JXDatePicker();
+        Calendar cal = picker.getMonthView().getCalendar();
+        cal.add(Calendar.MONTH, 5);
+        picker.setDate(cal.getTime());
+        JXFrame frame = wrapInFrame(picker, "enabled?");
+        Action enabled = new AbstractAction("toggle enabled") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                picker.setEnabled(!picker.isEnabled());
+                
+            }
+        };
+        addAction(frame, enabled);
+        show(frame);
+    }
+    
     /**
      * Issue #910-swingx: commitToday must not be allowed if field not editable.
      * 

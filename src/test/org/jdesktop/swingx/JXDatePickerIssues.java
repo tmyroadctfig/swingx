@@ -76,8 +76,8 @@ public class JXDatePickerIssues extends InteractiveTestCase {
         try {
 //            test.runInteractiveTests();
 //          test.runInteractiveTests("interactive.*UpdateUI.*");
-          test.runInteractiveTests("interactive.*Symbols.*");
-//          test.runInteractiveTests("interactive.*Visible.*");
+//          test.runInteractiveTests("interactive.*Symbols.*");
+          test.runInteractiveTests("interactive.*Visuals.*");
           
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");

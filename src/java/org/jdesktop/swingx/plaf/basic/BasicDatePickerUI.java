@@ -176,6 +176,7 @@ public class BasicDatePickerUI extends DatePickerUI {
             Object preventHide = box.getClientProperty("doNotCancelPopup");
             popupButton.putClientProperty("doNotCancelPopup", preventHide);
             datePicker.add(popupButton);
+            popupButton.setEnabled(datePicker.isEnabled());
         }
             updateChildLocale(datePicker.getLocale());
         
@@ -748,12 +749,22 @@ public class BasicDatePickerUI extends DatePickerUI {
         datePicker.getEditor().putClientProperty("doNotCancelPopup", preventHide);
 
         updateEditorValue();
+        updateEditorProperties();
         if (updateListeners) {
             updateEditorListeners(oldEditor);
             datePicker.revalidate();
         }
     }
 
+
+    /**
+     * Synchronizes the properties of the current editor to the properties of
+     * the JXDatePicker. 
+     */
+    private void updateEditorProperties() {
+        datePicker.getEditor().setEnabled(datePicker.isEnabled());
+        datePicker.getEditor().setEditable(datePicker.isEditable());
+    }
 
     /**
      * Updates internals after the selection model changed.
@@ -781,6 +792,7 @@ public class BasicDatePickerUI extends DatePickerUI {
      */
     protected void updateFromEditableChanged() {
         boolean isEditable = datePicker.isEditable();
+        // PENDING JW: revisit - align with combo's editable?
         datePicker.getMonthView().setEnabled(isEditable);
         datePicker.getEditor().setEditable(isEditable);
         /*
@@ -790,6 +802,16 @@ public class BasicDatePickerUI extends DatePickerUI {
         // for consistency, synch navigation as well 
         setActionEnabled(JXDatePicker.HOME_NAVIGATE_KEY, isEditable);
     }
+
+    /**
+     * Update properties which depend on the picker's enabled.
+     */
+    protected void updateFromEnabledChanged() {
+        boolean isEnabled = datePicker.isEnabled();
+        popupButton.setEnabled(isEnabled);
+        datePicker.getEditor().setEnabled(isEnabled);
+    }
+
 
     /**
      * 
@@ -1322,9 +1344,7 @@ public class BasicDatePickerUI extends DatePickerUI {
             if ("date".equals(property)) {
                 updateFromDateChanged();
             } else if ("enabled".equals(property)) {
-                boolean isEnabled = datePicker.isEnabled();
-                popupButton.setEnabled(isEnabled);
-                datePicker.getEditor().setEnabled(isEnabled);
+                updateFromEnabledChanged();
             } else if ("editable".equals(property)) {
                 updateFromEditableChanged();
             } else if (JComponent.TOOL_TIP_TEXT_KEY.equals(property)) {
