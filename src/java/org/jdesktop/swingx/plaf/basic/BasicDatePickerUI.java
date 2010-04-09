@@ -1135,7 +1135,7 @@ public class BasicDatePickerUI extends DatePickerUI {
                 PopupMenuEvent retargeted = null;
                 for (PopupMenuListener listener : ls) {
                     if (retargeted == null) {
-                        retargeted = new PopupMenuEvent(this);
+                        retargeted = new PopupMenuEvent(datePicker);
                     }
                     listener.popupMenuCanceled(retargeted);
                 }
@@ -1147,7 +1147,7 @@ public class BasicDatePickerUI extends DatePickerUI {
                 PopupMenuEvent retargeted = null;
                 for (PopupMenuListener listener : ls) {
                     if (retargeted == null) {
-                        retargeted = new PopupMenuEvent(this);
+                        retargeted = new PopupMenuEvent(datePicker);
                     }
                     listener.popupMenuWillBecomeInvisible(retargeted);
                 }
@@ -1159,7 +1159,7 @@ public class BasicDatePickerUI extends DatePickerUI {
                 PopupMenuEvent retargeted = null;
                 for (PopupMenuListener listener : ls) {
                     if (retargeted == null) {
-                        retargeted = new PopupMenuEvent(this);
+                        retargeted = new PopupMenuEvent(datePicker);
                     }
                     listener.popupMenuWillBecomeVisible(retargeted);
                 }
