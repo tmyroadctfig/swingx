@@ -94,6 +94,82 @@ public class JXDatePickerTest extends InteractiveTestCase {
     }
 
     /**
+     * Issue #1301-swingx: Picker must be source of popupMenuEvent.
+     * 
+     * Tests event source on notification.
+     * 
+     * @throws InvocationTargetException 
+     * @throws InterruptedException 
+     */
+    @Test
+    public void testPopupMenuListenerNotificationPickerIsSourceOnShowing() 
+    throws InterruptedException, InvocationTargetException {
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.fine("cannot run testLinkPanelNull - headless");
+            return;
+        }
+        final JXDatePicker picker = new JXDatePicker();
+        final JXFrame frame = new JXFrame("showing", false);
+        frame.add(picker);
+        frame.pack();
+        frame.setVisible(true);
+        final PopupMenuReport report = new PopupMenuReport();
+        picker.addPopupMenuListener(report);
+        Action togglePopup = picker.getActionMap().get("TOGGLE_POPUP");
+        togglePopup.actionPerformed(null);
+        SwingUtilities.invokeAndWait(new Runnable() {
+            public void run() {
+                assertEquals(1, report.getVisibleEventCount());
+                assertEquals(picker, report.getLastEvent().getSource());
+                frame.dispose();
+                
+            }
+        });
+    }
+    
+    /**
+     * Issue #1301-swingx: Picker must be source of popupMenuEvent.
+     * 
+     * Tests event source on notification.
+     * 
+     * @throws InvocationTargetException 
+     * @throws InterruptedException 
+     */
+    @Test
+    public void testPopupMenuListenerNotificationPickerIsSourceOnHiding() 
+        throws InterruptedException, InvocationTargetException {
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.fine("cannot run testLinkPanelNull - headless");
+            return;
+        }
+        final JXDatePicker picker = new JXDatePicker();
+        final JXFrame frame = new JXFrame("showing", false);
+        frame.add(picker);
+        frame.pack();
+        frame.setVisible(true);
+        final Action togglePopup = picker.getActionMap().get("TOGGLE_POPUP");
+        togglePopup.actionPerformed(null);
+        final PopupMenuReport report = new PopupMenuReport();
+        SwingUtilities.invokeAndWait(new Runnable() {
+            public void run() {
+                picker.addPopupMenuListener(report);
+                togglePopup.actionPerformed(null);
+                
+            }
+        });
+        
+        SwingUtilities.invokeAndWait(new Runnable() {
+            public void run() {
+                assertEquals(1, report.getInvisibleEventCount());
+                assertEquals(picker, report.getLastEvent().getSource());
+                frame.dispose();
+                
+            }
+        });
+    }
+    
+
+    /**
      * Issue #1171-swingx: support popupMenuListeners.
      * 
      * Tests notification on showing.
@@ -119,6 +195,45 @@ public class JXDatePickerTest extends InteractiveTestCase {
             public void run() {
                 assertEquals(1, report.getEventCount());
                 assertEquals(1, report.getVisibleEventCount());
+                frame.dispose();
+                
+            }
+        });
+    }
+    
+    
+    /**
+     * Issue #1171-swingx: support popupMenuListeners.
+     * 
+     * Tests notification on showing.
+     * @throws InvocationTargetException 
+     * @throws InterruptedException 
+     */
+    @Test
+    public void testPopupMenuListenerNotificationInvisible() throws InterruptedException, InvocationTargetException {
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.fine("cannot run testLinkPanelNull - headless");
+            return;
+        }
+        final JXDatePicker picker = new JXDatePicker();
+        final JXFrame frame = new JXFrame("showing", false);
+        frame.add(picker);
+        frame.pack();
+        frame.setVisible(true);
+        final Action togglePopup = picker.getActionMap().get("TOGGLE_POPUP");
+        togglePopup.actionPerformed(null);
+        final PopupMenuReport report = new PopupMenuReport();
+        SwingUtilities.invokeAndWait(new Runnable() {
+            public void run() {
+                picker.addPopupMenuListener(report);
+                togglePopup.actionPerformed(null);
+                
+            }
+        });
+        SwingUtilities.invokeAndWait(new Runnable() {
+            public void run() {
+                assertEquals(1, report.getEventCount());
+                assertEquals(1, report.getInvisibleEventCount());
                 frame.dispose();
                 
             }
