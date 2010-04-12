@@ -204,6 +204,48 @@ public class JXDatePickerTest extends InteractiveTestCase {
     
     /**
      * Issue #1171-swingx: support popupMenuListeners.
+     * Issue #1172-swingx: missing cancel notification.
+     * 
+     * Tests notification on cancel.
+     * 
+     * @throws InvocationTargetException 
+     * @throws InterruptedException 
+     */
+    @Test
+    public void testPopupMenuListenerNotificationCancel() throws InterruptedException, InvocationTargetException {
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.fine("cannot run testLinkPanelNull - headless");
+            return;
+        }
+        final JXDatePicker picker = new JXDatePicker();
+        final JXFrame frame = new JXFrame("showing", false);
+        frame.add(picker);
+        frame.pack();
+        frame.setVisible(true);
+        final Action togglePopup = picker.getActionMap().get("TOGGLE_POPUP");
+        togglePopup.actionPerformed(null);
+        final PopupMenuReport report = new PopupMenuReport();
+        SwingUtilities.invokeAndWait(new Runnable() {
+            public void run() {
+                picker.addPopupMenuListener(report);
+                picker.getMonthView().cancelSelection();
+                
+            }
+        });
+        SwingUtilities.invokeAndWait(new Runnable() {
+            public void run() {
+                assertEquals(2, report.getEventCount());
+                assertEquals(1, report.getInvisibleEventCount());
+                assertEquals(1, report.getCanceledEventCount());
+                frame.dispose();
+                
+            }
+        });
+    }
+    
+    
+    /**
+     * Issue #1171-swingx: support popupMenuListeners.
      * 
      * Tests notification on showing.
      * @throws InvocationTargetException 

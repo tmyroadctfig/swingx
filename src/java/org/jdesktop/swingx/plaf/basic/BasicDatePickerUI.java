@@ -919,6 +919,9 @@ public class BasicDatePickerUI extends DatePickerUI {
      * 
      */
     protected void cancel() {
+        if (isPopupVisible()) {
+            popup.putClientProperty("JPopupMenu.firePopupMenuCanceled", Boolean.TRUE);
+        }
         hidePopup();
         datePicker.cancelEdit();
     }

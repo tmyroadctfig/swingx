@@ -52,6 +52,7 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JSpinner;
 import javax.swing.JTabbedPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SpinnerDateModel;
 import javax.swing.SwingUtilities;
@@ -135,7 +136,33 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
             }
         };
         picker.addPopupMenuListener(l);
-        showInFrame(picker, "notification?");
+        showInFrame(picker, "picker: notification?");
+    }
+    
+    public void interactivePopupMenuListenerCompare() {
+        JTextArea textArea = new JTextArea(10, 20);
+        JPopupMenu picker = new JPopupMenu();
+        picker.add("just something");
+        PopupMenuListener l = new PopupMenuListener() {
+            
+            @Override
+            public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+                LOG.info("visible");
+            }
+            
+            @Override
+            public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
+                LOG.info("invisible");
+            }
+            
+            @Override
+            public void popupMenuCanceled(PopupMenuEvent e) {
+                LOG.info("canceled");
+            }
+        };
+        textArea.setComponentPopupMenu(picker);
+        picker.addPopupMenuListener(l);
+        showInFrame(textArea, "plain Popup: notification");
     }
     /**
      * Issue #940-swingx: support multiple selection in picker.
