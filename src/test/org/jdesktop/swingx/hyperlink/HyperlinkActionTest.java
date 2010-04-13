@@ -46,6 +46,23 @@ public class HyperlinkActionTest extends TestCase {
         tearDown();
     }
     
+    /**
+     * Issue #1227-swingx: HyperlinkAction - update visited property
+     * @throws URISyntaxException
+     */
+    @Test
+    public void testVisited() throws URISyntaxException {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.fine("cannot run ui test - headless environment");
+            return;
+        }
+        URI uri = new URI("http://someserver.de");
+        HyperlinkAction action = HyperlinkAction.createHyperlinkAction(uri);
+        action.actionPerformed(null);
+        assertEquals(true, action.isVisited());
+    }
+    
     @Test
     public void testURIActionFactoryMail() throws URISyntaxException {
         // This test will not work in a headless configuration.
