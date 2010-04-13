@@ -140,9 +140,25 @@ public class HyperlinkAction extends AbstractHyperlinkAction<URI> {
         setTarget(uri);
     }
     
+    /**
+     * {@inheritDoc} <p>
+     * 
+     * Implemented to perform the appropriate Desktop action if supported on the current
+     * target. Sets the visited property to true if the desktop action doesn't throw
+     * an exception or to false if it did. 
+     * 
+     * Does nothing if the action isn't supported.  
+     */
     @Override
     public void actionPerformed(ActionEvent e) {
-        getURIVisitor().visit(getTarget());
+        if (!getURIVisitor().isEnabled(getTarget())) return;
+        try {
+            getURIVisitor().visit(getTarget());
+            setVisited(true);
+        } catch (IOException e1) {
+            setVisited(false);
+            LOG.fine("cant visit Desktop " + e);
+        }
     }
     
     /**
@@ -187,42 +203,78 @@ public class HyperlinkAction extends AbstractHyperlinkAction<URI> {
                 new BrowseVisitor() : new MailVisitor();
     }
 
+    /**
+     * Thin wrapper around Desktop functionality to allow uniform handling of
+     * different actions in HyperlinkAction.
+     * 
+     */
     private abstract class URIVisitor {
         protected boolean desktopSupported = Desktop.isDesktopSupported();
         
+        /**
+         * Returns a boolean indicating whether the action is supported on the
+         * given URI. This implementation returns true if both the Desktop is 
+         * generally supported and <code>isActionSupported()</code>.
+         * 
+         * PENDING JW: hmm ... which class exactly has to check for valid combination
+         * of Action and URI?
+         * 
+         * @param uri
+         * @return
+         * 
+         * @see #isActionSupported()
+         */
         public boolean isEnabled(URI uri) {
             return desktopSupported && isActionSupported();
         }
         
-
-        public void visit(URI uri) {
-            if (!isEnabled(uri)) return;
-            try {
-                doVisit(uri);
-            } catch (IOException e) {
-                LOG.fine("cant visit Desktop " + e);
-            }
-        }
+        /**
+         * Visits the given URI via Desktop functionality. Must not be called if not
+         * enabled.
+         * 
+         * @param uri the URI to visit
+         * @throws IOException if the Desktop method throws IOException.
+         * 
+         */
+        public abstract void visit(URI uri) throws IOException;
         
         /**
-         * @return
+         * Returns a boolean indicating if the action is supported by the current 
+         * Desktop.
+         * 
+         * @return true if the Action is supported by the current desktop, false
+         * otherwise.
          */
         protected abstract boolean isActionSupported();
-        protected abstract void doVisit(URI uri) throws IOException;
     }
     
     private class BrowseVisitor extends URIVisitor {
 
+        /**
+         * {@inheritDoc} <p>
+         * 
+         * Implemented to message the browse method of Desktop.
+         */
         @Override
-        protected void doVisit(URI uri) throws IOException {
+        public void visit(URI uri) throws IOException {
             Desktop.getDesktop().browse(uri);
         }
 
+        /**
+         * {@inheritDoc} <p>
+         * 
+         * Implemented to query the Desktop for support of BROWSE action.
+         */
         @Override
         protected boolean isActionSupported() {
             return Desktop.getDesktop().isSupported(Desktop.Action.BROWSE);
         }
 
+        /**
+         * {@inheritDoc} <p>
+         * 
+         * Implemented to guard against null URI in addition to super.
+         */
         @Override
         public boolean isEnabled(URI uri) {
             return uri != null && super.isEnabled(uri);
@@ -233,15 +285,24 @@ public class HyperlinkAction extends AbstractHyperlinkAction<URI> {
     
     private class MailVisitor extends URIVisitor {
 
+        /**
+         * {@inheritDoc} <p>
+         * 
+         * Implemented to message the mail function of Desktop.
+         */
         @Override
-        protected void doVisit(URI uri) throws IOException {
+        public void visit(URI uri) throws IOException {
             if (uri == null) {
                 Desktop.getDesktop().mail();
             } else {
                 Desktop.getDesktop().mail(uri);
             }
         }
-
+        /**
+         * {@inheritDoc} <p>
+         * 
+         * Implemented to query the Desktop for support of MAIL action.
+         */
         @Override
         protected boolean isActionSupported() {
             return Desktop.getDesktop().isSupported(Desktop.Action.MAIL);
