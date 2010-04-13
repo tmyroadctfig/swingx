@@ -71,6 +71,7 @@ public class ImagePainter extends AbstractAreaPainter<Object> {
     /**
      * Logger to use
      */
+    @SuppressWarnings("unused")
     private static final Logger LOG = Logger.getLogger(ImagePainter.class.getName());
     
     /**

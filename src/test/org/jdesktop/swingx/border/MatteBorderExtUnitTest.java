@@ -107,6 +107,7 @@ public class MatteBorderExtUnitTest extends junit.framework.TestCase {
             return frame;
         }
 
+        @SuppressWarnings("unused")
         public JComponent component;
         public final JFrame frame;
 

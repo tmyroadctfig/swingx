@@ -39,7 +39,8 @@ import org.jdesktop.swingx.JXMonthViewVisualCheck;
  */
 public class BlenderVisualCheck extends InteractiveTestCase {
 
-	   private static final Logger LOG = Logger.getLogger(JXMonthViewVisualCheck.class
+	   @SuppressWarnings("unused")
+    private static final Logger LOG = Logger.getLogger(JXMonthViewVisualCheck.class
 	            .getName());
 	    public static void main(String[] args) {
 //	      setSystemLF(true);
