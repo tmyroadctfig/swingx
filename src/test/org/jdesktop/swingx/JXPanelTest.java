@@ -57,6 +57,20 @@ public class JXPanelTest extends TestCase {
     private static final Logger LOG = Logger.getLogger(JXPanelTest.class
             .getName());
     
+    /**
+     * Issue #1199-swingx: must listen to change on painter
+     */
+    @Test
+    public void testPainterChangeListener() {
+        JXPanel panel = new JXPanel();
+        final MattePainter painter = new MattePainter(Color.RED);
+        int listenerCount = painter.getPropertyChangeListeners().length;
+        panel.setBackgroundPainter(painter);
+        assertEquals(listenerCount +1, painter.getPropertyChangeListeners().length);
+        panel.setBackgroundPainter(null);
+        assertEquals(listenerCount, painter.getPropertyChangeListeners().length);
+    }
+    
     @Test
     public void testScrollableWidthTrackProperty() {
         JXPanel panel = new JXPanel();
