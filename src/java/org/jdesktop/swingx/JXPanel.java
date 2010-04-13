@@ -31,6 +31,8 @@ import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.LayoutManager;
 import java.awt.Rectangle;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 import javax.swing.JPanel;
 import javax.swing.RepaintManager;
@@ -38,6 +40,7 @@ import javax.swing.Scrollable;
 import javax.swing.SwingConstants;
 import javax.swing.plaf.UIResource;
 
+import org.jdesktop.swingx.painter.AbstractPainter;
 import org.jdesktop.swingx.painter.Painter;
 
 /**
@@ -106,6 +109,11 @@ public class JXPanel extends JPanel implements Scrollable {
      * backgroundPainter is specified
      */
     private Painter backgroundPainter;
+    
+    /**
+     * The listener installed on the current backgroundPainter, if any.
+     */
+    private PropertyChangeListener painterChangeListener;
     
     /**
      * Creates a new <code>JXPanel</code> with a double buffer
@@ -413,11 +421,33 @@ public class JXPanel extends JPanel implements Scrollable {
      */
     public void setBackgroundPainter(Painter p) {
         Painter old = getBackgroundPainter();
+        if (old instanceof AbstractPainter) {
+            ((AbstractPainter) old).removePropertyChangeListener(painterChangeListener);
+        }
         backgroundPainter = p;
+        if (backgroundPainter instanceof AbstractPainter) {
+            ((AbstractPainter) backgroundPainter).addPropertyChangeListener(getPainterChangeListener());
+        }
         firePropertyChange("backgroundPainter", old, getBackgroundPainter());
         repaint();
     }
     
+    /**
+     * @return
+     */
+    protected PropertyChangeListener getPainterChangeListener() {
+        if (painterChangeListener == null) {
+            painterChangeListener = new PropertyChangeListener() {
+                
+                @Override
+                public void propertyChange(PropertyChangeEvent evt) {
+                    repaint();
+                }
+            };
+        }
+        return painterChangeListener;
+    }
+
     /**
      * Returns the current background painter. The default value of this property 
      * is a painter which draws the normal JPanel background according to the current look and feel.

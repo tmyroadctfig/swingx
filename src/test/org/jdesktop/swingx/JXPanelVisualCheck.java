@@ -25,9 +25,11 @@ package org.jdesktop.swingx;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Paint;
 import java.awt.event.ActionEvent;
 
 import javax.imageio.ImageIO;
+import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
@@ -35,6 +37,7 @@ import javax.swing.JPanel;
 
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.painter.ImagePainter;
+import org.jdesktop.swingx.painter.MattePainter;
 
 /**
  * Contains methods to visually test JXPanel.
@@ -54,6 +57,27 @@ public class JXPanelVisualCheck extends InteractiveTestCase {
           e.printStackTrace();
       }
   }
+    
+    /**
+     * Issue #1199-swingx: JXPanel - must repaint on changes to background painter.
+     */
+    public void interactivePainterUpdate() {
+        JXPanel panel = new JXPanel();
+        final MattePainter painter = new MattePainter(Color.RED);
+        panel.setBackgroundPainter(painter);
+        JXFrame frame = wrapInFrame(panel, "background");
+        Action toggleColor = new AbstractAction("toggle background") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Paint old = painter.getFillPaint();
+                painter.setFillPaint(old == Color.RED ? Color.YELLOW : Color.RED);
+                
+            }
+        };
+        addAction(frame, toggleColor);
+        show(frame, 200, 200);
+    }
     /**
      * Issue #1187-swingx: default scrollable tracks property prevents scrolling.
      * Problem are the implementations of scrollableTracks: they unconditionally
