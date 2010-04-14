@@ -14,9 +14,11 @@ import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
+import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
@@ -320,6 +322,80 @@ public class HighlighterTest extends InteractiveTestCase {
         assertEquals(icon, hl.getIcon());
     }
 
+//--------------AlignmentHighlighter  
+    
+    @Test
+    public void testAlignmentHighlighterConstructors() {
+        AlignmentHighlighter hl = new AlignmentHighlighter();
+        assertSame(HighlightPredicate.ALWAYS, hl.getHighlightPredicate());
+        assertEquals(SwingConstants.LEADING, hl.getHorizontalAlignment());
+        hl = new AlignmentHighlighter(SwingConstants.TRAILING);
+        assertSame(HighlightPredicate.ALWAYS, hl.getHighlightPredicate());
+        assertEquals(SwingConstants.TRAILING, hl.getHorizontalAlignment());
+        hl = new AlignmentHighlighter(HighlightPredicate.NEVER);
+        assertSame(HighlightPredicate.NEVER, hl.getHighlightPredicate());
+        assertEquals(SwingConstants.LEADING, hl.getHorizontalAlignment());
+        hl = new AlignmentHighlighter(HighlightPredicate.NEVER, SwingConstants.TRAILING);
+        assertSame(HighlightPredicate.NEVER, hl.getHighlightPredicate());
+        assertEquals(SwingConstants.TRAILING, hl.getHorizontalAlignment());
+    }
+    
+    @Test
+    public void testAlignmentHighlighterSetAlignment() {
+        AlignmentHighlighter hl = new AlignmentHighlighter();
+        ChangeReport report = new ChangeReport();
+        hl.addChangeListener(report);
+        hl.setHorizontalAlignment(SwingConstants.TRAILING);
+        assertEquals(SwingConstants.TRAILING, hl.getHorizontalAlignment());
+        assertEquals(1, report.getEventCount());
+        assertEquals(SwingConstants.TRAILING, hl.getHorizontalAlignment());
+        report.clear();
+        hl.setHorizontalAlignment(SwingConstants.TRAILING);
+        assertEquals(0, report.getEventCount());
+    }
+    
+    
+    @Test(expected = IllegalArgumentException.class)
+    public void testAlignmentHighlighterSetAlignmentInvalid() {
+        AlignmentHighlighter hl = new AlignmentHighlighter();
+        hl.setHorizontalAlignment(SwingConstants.TOP);
+    }
+    
+    @Test(expected = IllegalArgumentException.class)
+    public void testAlignmentHighlighterConstructorAlignmentInvalid() {
+        new AlignmentHighlighter(SwingConstants.TOP);
+    }
+    
+    @Test(expected = IllegalArgumentException.class)
+    public void testAlignmentHighlighterConstructorAlignmentInvalid2() {
+        new AlignmentHighlighter(null, SwingConstants.TOP);
+    }
+    
+    
+    @Test
+    public void testAlignmentHighlighterDecorateLabel() {
+        AlignmentHighlighter hl = new AlignmentHighlighter(SwingConstants.TRAILING);
+        hl.highlight(allColored, createComponentAdapter(allColored));
+        assertEquals(SwingConstants.TRAILING, allColored.getHorizontalAlignment());
+    }
+    
+    @Test
+    public void testAlignmentHighlighterDecorateButton() {
+        AlignmentHighlighter hl = new AlignmentHighlighter(SwingConstants.TRAILING);
+        JCheckBox box = new JCheckBox("dummy");
+        hl.highlight(box, createDummyComponentAdapter(box));
+        assertEquals(SwingConstants.TRAILING, box.getHorizontalAlignment());
+    }
+    
+    @Test
+    public void testAlignmentHighlighterDecorateTextField() {
+        AlignmentHighlighter hl = new AlignmentHighlighter(SwingConstants.TRAILING);
+        JTextField box = new JTextField("dummy");
+        hl.highlight(box, createDummyComponentAdapter(box));
+        assertEquals(SwingConstants.TRAILING, box.getHorizontalAlignment());
+    }
+    
+    
 //-------------- FontHighlighter
     
     @Test
