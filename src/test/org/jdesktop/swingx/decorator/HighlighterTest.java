@@ -17,6 +17,7 @@ import javax.swing.Icon;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JSlider;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
@@ -322,6 +323,46 @@ public class HighlighterTest extends InteractiveTestCase {
         assertEquals(icon, hl.getIcon());
     }
 
+//-------------- EnabledHighlighter
+    
+    @Test
+    public void testEnabledHighlighterConstructors() {
+        EnabledHighlighter hl = new EnabledHighlighter();
+        assertSame(HighlightPredicate.ALWAYS, hl.getHighlightPredicate());
+        assertEquals(false, hl.isEnabled());
+        hl = new EnabledHighlighter(true);
+        assertSame(HighlightPredicate.ALWAYS, hl.getHighlightPredicate());
+        assertEquals(true, hl.isEnabled());
+        hl = new EnabledHighlighter(HighlightPredicate.NEVER);
+        assertSame(HighlightPredicate.NEVER, hl.getHighlightPredicate());
+        assertEquals(false, hl.isEnabled());
+        hl = new EnabledHighlighter(HighlightPredicate.NEVER, true);
+        assertSame(HighlightPredicate.NEVER, hl.getHighlightPredicate());
+        assertEquals(true, hl.isEnabled());
+    }
+    
+    @Test
+    public void testEnableHighlighterSetEnabled() {
+        EnabledHighlighter hl = new EnabledHighlighter();
+        ChangeReport report = new ChangeReport();
+        hl.addChangeListener(report);
+        hl.setEnabled(true);
+        assertEquals(true, hl.isEnabled());
+        assertEquals(1, report.getEventCount());
+        report.clear();
+        hl.setEnabled(true);
+        assertEquals(0, report.getEventCount());
+    }
+    
+    @Test
+    public void testEnabledHighlighterDecorate() {
+        EnabledHighlighter hl = new EnabledHighlighter();
+        JSlider box = new JSlider();
+        hl.highlight(box, createDummyComponentAdapter(box));
+        assertEquals(false, box.isEnabled());
+    }
+   
+    
 //--------------AlignmentHighlighter  
     
     @Test
@@ -346,7 +387,6 @@ public class HighlighterTest extends InteractiveTestCase {
         ChangeReport report = new ChangeReport();
         hl.addChangeListener(report);
         hl.setHorizontalAlignment(SwingConstants.TRAILING);
-        assertEquals(SwingConstants.TRAILING, hl.getHorizontalAlignment());
         assertEquals(1, report.getEventCount());
         assertEquals(SwingConstants.TRAILING, hl.getHorizontalAlignment());
         report.clear();
