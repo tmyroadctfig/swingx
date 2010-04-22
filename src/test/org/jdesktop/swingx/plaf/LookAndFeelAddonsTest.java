@@ -13,6 +13,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import java.awt.Color;
+import java.util.logging.Logger;
 
 import javax.swing.JPanel;
 import javax.swing.LookAndFeel;
@@ -35,9 +36,25 @@ import org.jdesktop.test.EDTRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-
 @RunWith(EDTRunner.class)
 public class LookAndFeelAddonsTest {
+    
+    
+    @SuppressWarnings("unused")
+    private static final Logger LOG = Logger
+            .getLogger(LookAndFeelAddonsTest.class.getName());
+    
+    /**
+     * PENDING JW: something fishy here - not trackingLAF changes? This test
+     * passes but a test related to WindowsLookAndFeelAddons fails with
+     * incomplete initialize?
+     * Moved the failing test into its own class - where it passes ...
+     */
+    @Test
+    public void testTrackingTrue() {
+        assertTrue(LookAndFeelAddons.isTrackingLookAndFeelChanges());
+    }
+    
     /**
      * Ensure that an exception is thrown when a component is passed in that does
      * not contain get/setBackgroundPainter.
