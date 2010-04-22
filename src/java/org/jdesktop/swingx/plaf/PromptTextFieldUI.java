@@ -14,72 +14,66 @@ import org.jdesktop.swingx.search.NativeSearchFieldSupport;
  * 
  */
 public class PromptTextFieldUI extends PromptTextUI {
-    /**
-     * Shared prompt renderer.
-     */
-    private final static LabelField txt = new LabelField();
+	/**
+	 * Creates a new {@link PromptTextFieldUI}.
+	 * 
+	 * @param delegate
+	 */
+	public PromptTextFieldUI(TextUI delegate) {
+		super(delegate);
+	}
 
-    /**
-     * Creates a new {@link PromptTextFieldUI}.
-     * 
-     * @param delegate
-     */
-    public PromptTextFieldUI(TextUI delegate) {
-        super(delegate);
-    }
-
-    /**
-     * Overrides {@link #getPromptComponent(JTextComponent)} to additionally
-     * update {@link JTextField} specific properties.
-     */
+	/**
+	 * Overrides {@link #getPromptComponent(JTextComponent)} to additionally
+	 * update {@link JTextField} specific properties.
+	 */
     @Override
-    public JTextComponent getPromptComponent(JTextComponent txt) {
-        LabelField lbl = (LabelField) super.getPromptComponent(txt);
-        JTextField txtField = (JTextField) txt;
+	public JTextComponent getPromptComponent(JTextComponent txt) {
+		LabelField lbl = (LabelField) super.getPromptComponent(txt);
+		JTextField txtField = (JTextField) txt;
 
-        lbl.setHorizontalAlignment(txtField.getHorizontalAlignment());
-        lbl.setColumns(txtField.getColumns());
+		lbl.setHorizontalAlignment(txtField.getHorizontalAlignment());
+		lbl.setColumns(txtField.getColumns());
 
-        // Make search field in Leopard paint focused border.
+		// Make search field in Leopard paint focused border.
         lbl.hasFocus = txtField.hasFocus()
                 && NativeSearchFieldSupport.isNativeSearchField(txtField);
 
-        // leopard client properties. see
-        // http://developer.apple.com/technotes/tn2007/tn2196.html#JTEXTFIELD_VARIANT
+		// leopard client properties. see
+		// http://developer.apple.com/technotes/tn2007/tn2196.html#JTEXTFIELD_VARIANT
         NativeSearchFieldSupport.setSearchField(lbl, NativeSearchFieldSupport
                 .isSearchField(txtField));
         NativeSearchFieldSupport.setFindPopupMenu(lbl, NativeSearchFieldSupport
                 .getFindPopupMenu(txtField));
-
+		
         // here we need to copy the border again for Mac OS X, because the above
         // calls may have replaced it.
-        lbl.setBorder(txtField.getBorder());
+		lbl.setBorder(txtField.getBorder());
 
         // buddy support: not needed, because BuddyLayoutAndBorder queries
         // original text field
         // BuddySupport.setOuterMargin(lbl,
         // BuddySupport.getOuterMargin(txtField));
-        // BuddySupport.setLeft(lbl, BuddySupport.getLeft(txtField));
-        // BuddySupport.setRight(lbl, BuddySupport.getRight(txtField));
+		// BuddySupport.setLeft(lbl, BuddySupport.getLeft(txtField));
+		// BuddySupport.setRight(lbl, BuddySupport.getRight(txtField));
 
-        return lbl;
-    }
+		return lbl;
+	}
 
-    /**
-     * Returns a shared {@link JTextField}.
-     */
+	/**
+	 * Returns a shared {@link JTextField}.
+	 */
     @Override
-    protected JTextComponent createPromptComponent() {
-        txt.updateUI();
-        return txt;
-    }
+	protected JTextComponent createPromptComponent() {
+	    return new LabelField();
+	}
 
-    private static final class LabelField extends JTextField {
-        boolean hasFocus;
+	private static final class LabelField extends JTextField {
+		boolean hasFocus;
 
-        @Override
-        public boolean hasFocus() {
-            return hasFocus;
-        }
-    }
+		@Override
+		public boolean hasFocus() {
+			return hasFocus;
+		}
+	}
 }

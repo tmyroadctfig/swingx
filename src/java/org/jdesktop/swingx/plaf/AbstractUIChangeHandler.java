@@ -1,14 +1,14 @@
 package org.jdesktop.swingx.plaf;
 
 import java.beans.PropertyChangeListener;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Map;
+import java.util.WeakHashMap;
 
 import javax.swing.JComponent;
 
 public abstract class AbstractUIChangeHandler implements PropertyChangeListener {
 	//prevent double installation.
-	private final Set<JComponent> installed = new HashSet<JComponent>();
+	private final Map<JComponent, Boolean> installed = new WeakHashMap<JComponent, Boolean>();
 	
 	public void install(JComponent c){
 		if(isInstalled(c)){
@@ -16,11 +16,11 @@ public abstract class AbstractUIChangeHandler implements PropertyChangeListener 
 		}
 		
 		c.addPropertyChangeListener("UI", this);
-		installed.add(c);
+		installed.put(c, Boolean.FALSE);
 	}
 	
 	public boolean isInstalled(JComponent c) {
-		return installed.contains(c);
+		return installed.containsKey(c);
 	}
 
 	public void uninstall(JComponent c){
