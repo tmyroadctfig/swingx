@@ -6,8 +6,6 @@
  */
 package org.jdesktop.swingx;
 
-import static org.junit.Assert.*;
-
 import java.awt.event.ActionEvent;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -20,9 +18,10 @@ import javax.swing.DefaultListSelectionModel;
 import javax.swing.JList;
 import javax.swing.JTable;
 import javax.swing.ListModel;
-import javax.swing.ListSelectionModel;
 import javax.swing.RowFilter;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 
 import org.jdesktop.swingx.hyperlink.LinkModel;
 import org.jdesktop.swingx.sort.ListSortController;
@@ -189,7 +188,151 @@ public class JXListSortRevamp extends InteractiveTestCase {
         show(frame);
     }
     
-    public void interactiveRowCoreSorterCore() {
+    @SuppressWarnings("unchecked")
+    public void interactiveXRowSorterShared() {
+        final DefaultTableModel tableModel = new DefaultTableModel(list.getElementCount(), 1) {
+            
+            @Override
+            public Class<?> getColumnClass(int columnIndex) {
+                return Integer.class;
+            }
+            
+        };
+        for (int i = 0; i < tableModel.getRowCount(); i++) {
+            tableModel.setValueAt(i, i, 0);
+        }
+        final JTable table = new JTable(tableModel);
+        final JTable core = new JTable(table.getModel());
+        final TableSortController<TableModel> rowSorter = new TableSortController<TableModel>(table.getModel());
+        table.setRowSorter(rowSorter);
+        core.setRowSorter(rowSorter);
+        core.setSelectionModel(table.getSelectionModel());
+        JXFrame frame = showWithScrollingInFrame(table, core, "core tables (sortController): shared model/sorter/selection");
+        Action fireAllChanged = new AbstractAction("fireDataChanged") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                tableModel.fireTableDataChanged();
+            }
+            
+        };
+        addAction(frame, fireAllChanged);
+        Action removeFirst = new AbstractAction("remove firstM") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                tableModel.removeRow(0);
+                
+            }
+        };
+        addAction(frame, removeFirst);
+        Action filter = new AbstractAction("toggle filter") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                RowFilter filter = rowSorter.getRowFilter();
+                if (filter == null) {
+                    rowSorter.setRowFilter(RowFilter.regexFilter("^1", 0));
+                } else {
+                    rowSorter.setRowFilter(null);
+                }
+                
+            }
+        };
+        addAction(frame, filter);
+        Action shareSelection = new AbstractAction("toggle selection share") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (table.getSelectionModel() == core.getSelectionModel()) {
+                    core.setSelectionModel(new DefaultListSelectionModel());
+                } else {
+                    core.setSelectionModel(table.getSelectionModel());
+                }
+            }
+        };
+        addAction(frame, shareSelection);
+        show(frame);
+    }
+    
+    @SuppressWarnings("unchecked")
+    public void interactiveRowSorterShared() {
+        final DefaultTableModel tableModel = new DefaultTableModel(list.getElementCount(), 1) {
+            
+            @Override
+            public Class<?> getColumnClass(int columnIndex) {
+                return Integer.class;
+            }
+            
+        };
+        for (int i = 0; i < tableModel.getRowCount(); i++) {
+            tableModel.setValueAt(i, i, 0);
+        }
+        final JTable table = new JTable(tableModel);
+        final JTable core = new JTable(table.getModel());
+        final TableRowSorter<TableModel> rowSorter = new TableRowSorter<TableModel>(table.getModel());
+        table.setRowSorter(rowSorter);
+        core.setRowSorter(rowSorter);
+        core.setSelectionModel(table.getSelectionModel());
+        JXFrame frame = showWithScrollingInFrame(table, core, "core tables: shared model/sorter/selection");
+        Action fireAllChanged = new AbstractAction("fireDataChanged") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                tableModel.fireTableDataChanged();
+            }
+            
+        };
+        addAction(frame, fireAllChanged);
+        Action removeFirst = new AbstractAction("remove firstM") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                tableModel.removeRow(0);
+                
+            }
+        };
+        addAction(frame, removeFirst);
+        Action removeLast = new AbstractAction("remove lastM") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                tableModel.removeRow(tableModel.getRowCount() - 1);
+                
+            }
+        };
+        addAction(frame, removeLast);
+        Action filter = new AbstractAction("toggle filter") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                RowFilter filter = rowSorter.getRowFilter();
+                if (filter == null) {
+                    rowSorter.setRowFilter(RowFilter.regexFilter("^1", 0));
+                } else {
+                    rowSorter.setRowFilter(null);
+                }
+                
+            }
+        };
+        addAction(frame, filter);
+        Action shareSelection = new AbstractAction("toggle selection share") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (table.getSelectionModel() == core.getSelectionModel()) {
+                    core.setSelectionModel(new DefaultListSelectionModel());
+                } else {
+                    core.setSelectionModel(table.getSelectionModel());
+                }
+            }
+        };
+        addAction(frame, shareSelection);
+        show(frame);
+    }
+    
+    @SuppressWarnings("unchecked")
+    public void interactiveRowSorterCore() {
         final DefaultTableModel tableModel = new DefaultTableModel(list.getElementCount(), 1) {
 
             @Override
@@ -203,7 +346,9 @@ public class JXListSortRevamp extends InteractiveTestCase {
         }
         final JXTable table = new JXTable(tableModel);
         final JTable core = new JTable(table.getModel());
-        core.setAutoCreateRowSorter(true);
+        final TableRowSorter<TableModel> rowSorter = new TableRowSorter<TableModel>(table.getModel());
+        core.setRowSorter(rowSorter);
+        JXFrame frame = showWithScrollingInFrame(table, core, "xTable <> core");
         Action fireAllChanged = new AbstractAction("fireDataChanged") {
 
             @Override
@@ -212,8 +357,52 @@ public class JXListSortRevamp extends InteractiveTestCase {
             }
             
         };
-        JXFrame frame = showWithScrollingInFrame(table, core, "dataChanged");
         addAction(frame, fireAllChanged);
+        Action removeFirst = new AbstractAction("remove firstM") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                tableModel.removeRow(0);
+                
+            }
+        };
+        addAction(frame, removeFirst);
+        Action removeLast = new AbstractAction("remove lastM") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                tableModel.removeRow(tableModel.getRowCount() - 1);
+                
+            }
+        };
+        addAction(frame, removeLast);
+        Action filter = new AbstractAction("toggle filter") {
+            RowFilter regex = RowFilter.regexFilter("^1", 0);
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                RowFilter filter = rowSorter.getRowFilter();
+                if (filter == null) {
+                    rowSorter.setRowFilter(regex);
+                    table.setRowFilter(regex);
+                } else {
+                    rowSorter.setRowFilter(null);
+                }
+                
+            }
+        };
+        addAction(frame, filter);
+        Action shareSelection = new AbstractAction("toggle selection share") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (table.getSelectionModel() == core.getSelectionModel()) {
+                    core.setSelectionModel(new DefaultListSelectionModel());
+                } else {
+                    core.setSelectionModel(table.getSelectionModel());
+                }
+            }
+        };
+        addAction(frame, shareSelection);
         show(frame);
     }
 
@@ -391,7 +580,7 @@ public class JXListSortRevamp extends InteractiveTestCase {
     protected void setUp() throws Exception {
         super.setUp();
         listModel = createListModel();
-        ascendingListModel = createAscendingListModel(0, 20);
+        ascendingListModel = createAscendingListModel(0, 22);
         list = new JXList(ascendingListModel);
         controller = new ListSortController<ListModel>(list.getModel());
         controller.setComparator(0, TableSortController.COMPARABLE_COMPARATOR);
