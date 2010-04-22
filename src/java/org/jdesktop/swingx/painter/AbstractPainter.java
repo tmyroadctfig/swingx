@@ -325,7 +325,7 @@ public abstract class AbstractPainter<T> extends AbstractBean implements Painter
      * implementation sets the rendering hints that have been specified for
      * this <code>AbstractPainter</code>.</p>
      *
-     * <p>This method can be overriden by subclasses to modify the drawing
+     * <p>This method can be overridden by subclasses to modify the drawing
      * surface before any painting happens.</p>
      *
      * @param g the graphics surface to configure. This will never be null.
