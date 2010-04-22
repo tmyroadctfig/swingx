@@ -34,6 +34,11 @@ import javax.swing.UIManager;
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.error.ErrorInfo;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
 /**
  * Test to expose known issues around <code>Locale</code> setting.
@@ -44,15 +49,19 @@ import org.jdesktop.swingx.plaf.LookAndFeelAddons;
  * 
  * @author Jeanette Winzenburg
  */
+@RunWith(JUnit4.class)
 public class XLocalizeIssues extends InteractiveTestCase {
     @SuppressWarnings("all")
     private static final Logger LOG = Logger.getLogger(XLocalizeIssues.class
             .getName());
-    private static final Locale A_LOCALE = Locale.FRENCH;
-    private static final Locale OTHER_LOCALE = Locale.GERMAN;
+    private static final Locale A_LOCALE = Locale.FRANCE;
+    private static final Locale OTHER_LOCALE = Locale.GERMANY;
 
-
+    private static Locale defaultLocale = Locale.getDefault();
+    
     private Locale originalLocale;
+    private Locale alternativeLocale;
+    
     // test scope is static anyway...
     static {
         // force the addon to load
@@ -71,20 +80,48 @@ public class XLocalizeIssues extends InteractiveTestCase {
 
     }
 
+//    @BeforeClass
+//    public static void classSetUp() {
+//        defaultLocale = Locale.getDefault();
+//    }
+    
     @Override
-    protected void setUp() throws Exception {
-        originalLocale = Locale.getDefault();
+    @Before
+    public void setUp() throws Exception {
+        originalLocale = defaultLocale;
+        alternativeLocale = OTHER_LOCALE.equals(originalLocale) ? A_LOCALE : OTHER_LOCALE;
         super.setUp();
     }
     
     
 
     @Override
-    protected void tearDown() throws Exception {
-        Locale.setDefault(originalLocale);
+    @After
+    public void tearDown() throws Exception {
+        Locale.setDefault(defaultLocale);
+        UIManager.getDefaults().setDefaultLocale(defaultLocale);
+        JComponent.setDefaultLocale(defaultLocale);
         super.tearDown();
     }
 
+    @Test
+    public void testComponentDefault() {
+        Locale.setDefault(alternativeLocale);
+        UIManager.getDefaults().setDefaultLocale(alternativeLocale);
+        JComponent.setDefaultLocale(Locale.getDefault());
+    }
+    
+    @Test
+    public void testDefaultLocales() {
+        assertDefaults();
+    }
+    
+    
+    private void assertDefaults() {
+        assertEquals(defaultLocale, Locale.getDefault());
+        assertEquals(defaultLocale, UIManager.getDefaults().getDefaultLocale());
+        assertEquals(defaultLocale, JComponent.getDefaultLocale());
+    }
     /**
      * similar to Issue #459-swingx: errorPane properties not updated on setLocale.<p>
      * 
@@ -93,6 +130,7 @@ public class XLocalizeIssues extends InteractiveTestCase {
      */
     public void interactiveErrorPane() {
         final JXTable table = new JXTable(10, 3);
+        table.setColumnControlVisible(true);
         table.getColumnExt(0).setTitle(Locale.getDefault().getLanguage());
         final JXFrame frame = wrapWithScrollingInFrame(table,
                 "ErrorPane and default locale?");
@@ -108,6 +146,7 @@ public class XLocalizeIssues extends InteractiveTestCase {
                 JComponent.setDefaultLocale(Locale.getDefault());
                 table.getColumnExt(0).setTitle(
                         Locale.getDefault().getLanguage());
+                table.setLocale(Locale.getDefault());
 
             }
 
@@ -176,7 +215,10 @@ public class XLocalizeIssues extends InteractiveTestCase {
                 // Note: this does not effect components which are already
                 // created
                 JComponent.setDefaultLocale(Locale.getDefault());
-                UIManager.getDefaults().setDefaultLocale(Locale.getDefault());
+                // as of 1.4 the defaults defaultLocale is for backward compatibility
+                // only - newer delegates should use the getters with the local param
+                // so shouldn't need to do this
+//                UIManager.getDefaults().setDefaultLocale(Locale.getDefault());
                 table.getColumnExt(0).setTitle(
                         Locale.getDefault().getLanguage());
 
@@ -196,7 +238,7 @@ public class XLocalizeIssues extends InteractiveTestCase {
                     chooser.setLocale(Locale.getDefault());
                     // need to explicitly trigger re-install to pick up the new
                     // locale-dependent state
-                    chooser.updateUI();
+//                    chooser.updateUI();
                 }
                 chooser.showOpenDialog(frame);
             }
