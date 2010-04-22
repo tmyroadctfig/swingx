@@ -388,7 +388,7 @@ public class Morphing2D implements Shape {
              *   fact that the areas on each side of the self-intersection
              *   are bounded by segments which have opposite winding
              *   direction.  Thus, those areas will have opposite signs
-             *   on the acccumulation of their area summations and end
+             *   on the accumulation of their area summations and end
              *   up canceling each other out partially.
              * - This failure mode of the algorithm in determining the
              *   exact magnitude of the area is not actually a big problem
