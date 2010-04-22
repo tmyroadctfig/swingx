@@ -126,14 +126,6 @@ public class PatternPredicate implements HighlightPredicate {
             return false;
         }
         return pattern.matcher(value).find();
-     // this is pre-767-swingx: consistent string api
-//        Object value = adapter.getValue(testColumn);
-//
-//        if (value == null) {
-//            return false;
-//        } else {
-//            return pattern.matcher(value.toString()).find();
-//        }
     }
 
     /**
