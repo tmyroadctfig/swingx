@@ -191,18 +191,6 @@ public class SearchPredicate implements HighlightPredicate {
              return false;
          }
          return pattern.matcher(value).find();
-         // PENDING JW: change to adapter.getString to use uniform string rep
-      // this is pre-767-swingx: consistent string api
-//        Object  value = adapter.getValue(columnToTest);
-//        
-//        if (value == null) {
-//            return false;
-//        }
-//        else {
-//            return pattern.matcher(value.toString()).find();
-//        }
-         
-         
      }
 
     /**
