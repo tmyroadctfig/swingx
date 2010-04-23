@@ -1207,7 +1207,7 @@ public class JXGraph extends JXPanel {
      * @see #yPixelToPosition(double)
      */
     protected double yPositionToPixel(double position) {
-        double height = (double) getHeight();
+        double height = getHeight();
         return height - ((position - minY) * height / (maxY - minY));
     }
 
@@ -1224,7 +1224,7 @@ public class JXGraph extends JXPanel {
      * @see #xPixelToPosition(double)
      */
     protected double xPositionToPixel(double position) {
-        return (position - minX) * (double) getWidth() / (maxX - minX);
+        return (position - minX) * getWidth() / (maxX - minX);
     }
     
     /**
@@ -1242,7 +1242,7 @@ public class JXGraph extends JXPanel {
     protected double xPixelToPosition(double pixel) {
 //        double axisV = xPositionToPixel(originX);
 //        return (pixel - axisV) * (maxX - minX) / (double) getWidth();
-        return minX + pixel * (maxX - minX) / (double) getWidth();
+        return minX + pixel * (maxX - minX) / getWidth();
     }
     
     /**
@@ -1260,7 +1260,7 @@ public class JXGraph extends JXPanel {
     protected double yPixelToPosition(double pixel) {
 //        double axisH = yPositionToPixel(originY);
 //        return (getHeight() - pixel - axisH) * (maxY - minY) / (double) getHeight();
-        return minY + (getHeight() - pixel) * (maxY - minY) / (double) getHeight();
+        return minY + (getHeight() - pixel) * (maxY - minY) / getHeight();
     }
 
     /**
@@ -1285,7 +1285,7 @@ public class JXGraph extends JXPanel {
     }
     
     /**
-     * <p>This painting method is meant to be overriden by subclasses of
+     * <p>This painting method is meant to be overridden by subclasses of
      * <code>JXGraph</code>. This method is called after all the painting
      * is done. By overriding this method, a subclass can display extra
      * information on top of the graph.</p>
@@ -1318,7 +1318,7 @@ public class JXGraph extends JXPanel {
         GeneralPath path = new GeneralPath();
         path.moveTo(x, y);
         
-        float width = (float) getWidth();
+        float width = getWidth();
         for (x = 0.0f; x < width; x += 1.0f) {
             double position = xPixelToPosition(x);
             y = (float) yPositionToPixel(equation.compute(position));
@@ -1348,7 +1348,7 @@ public class JXGraph extends JXPanel {
             double axisH = yPositionToPixel(originY);
             double axisV = xPositionToPixel(originX);
 
-            if (!isAxisPainted()) {
+            if (isAxisPainted()) {
                 Stroke stroke = g2.getStroke();
                 g2.setStroke(new BasicStroke(STROKE_AXIS));
                 g2.setColor(getAxisColor());
@@ -1426,9 +1426,11 @@ public class JXGraph extends JXPanel {
                 g2.setColor(getMajorGridColor());
                 g2.drawLine(clip.x, position, clip.x + clip.width, position);
 
-                g2.setStroke(axisStroke);
-                g2.setColor(getAxisColor());
-                g2.drawLine((int) axisV - 3, position, (int) axisV + 3, position);
+                if (isAxisPainted()) {
+                    g2.setStroke(axisStroke);
+                    g2.setColor(getAxisColor());
+                    g2.drawLine((int) axisV - 3, position, (int) axisV + 3, position);
+                }
             }
         }
     }
@@ -1490,9 +1492,11 @@ public class JXGraph extends JXPanel {
                 g2.setColor(getMajorGridColor());
                 g2.drawLine(position, clip.y, position, clip.y + clip.height);
 
-                g2.setStroke(axisStroke);
-                g2.setColor(getAxisColor());
-                g2.drawLine(position, (int) axisH - 3, position, (int) axisH + 3);
+                if (isAxisPainted()) {
+                    g2.setStroke(axisStroke);
+                    g2.setColor(getAxisColor());
+                    g2.drawLine(position, (int) axisH - 3, position, (int) axisH + 3);
+                }
             }
         }
     }
@@ -1580,7 +1584,7 @@ public class JXGraph extends JXPanel {
      * value defines the Y coordinates at which the graph must draw a spot of
      * color.</p>
      *
-     * <p>Here is a sample implemention of this class that draws a straight line
+     * <p>Here is a sample implementation of this class that draws a straight line
      * once added to a graph (it follows the well-known equation y=a.x+b):</p>
      *
      * <pre>
