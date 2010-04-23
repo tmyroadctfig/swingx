@@ -44,7 +44,6 @@ public class WindowsLookAndFeelAddons extends BasicLookAndFeelAddons {
         super.initialize();
         // fix Issue #1305-swingx: wrapper for core issue #6753637
         // set ui property to prevent eating mousePressed when closing popup
-        System.out.println(UIManager.getLookAndFeel().getClass().getName() + UIManager.get("PopupMenu.consumeEventOnClose"));
         UIManager.put("PopupMenu.consumeEventOnClose", Boolean.FALSE);
     }
 
