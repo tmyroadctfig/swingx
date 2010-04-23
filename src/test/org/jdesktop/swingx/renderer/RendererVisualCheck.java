@@ -131,7 +131,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
         try {
 //            test.runInteractiveTests();
 //          test.runInteractiveTests(".*CustomIcons.*");
-          test.runInteractiveTests(".*TextArea.*");
+          test.runInteractiveTests(".*Text.*");
 //          test.runInteractiveTests(".*Color.*");
 //          test.runInteractiveTests("interactive.*ColumnControl.*");
         } catch (Exception e) {
@@ -140,6 +140,18 @@ public class RendererVisualCheck extends InteractiveTestCase {
         }
     }
 
+    /**
+     * Requirement: left aligned icon and right aligned text.
+     * http://forums.java.net/jive/thread.jspa?messageID=398448#398448
+     */
+    public void interactiveIconTextAlignment() {
+        ListModel files = createFileListModel();
+        JXList list = new JXList(files);
+        ComponentProvider<?> text = new LabelProvider(StringValues.FILE_NAME, JLabel.TRAILING);
+        WrappingProvider wrapper = new WrappingProvider(IconValues.FILE_ICON, text, true);
+        list.setCellRenderer(new DefaultListRenderer(wrapper));
+        showWithScrollingInFrame(list, "alignment in wrappingProvider");
+    }
     
     /**
      * Issue #897-swingx: Opacity issues of JRendererCheckBox - striping lost.
