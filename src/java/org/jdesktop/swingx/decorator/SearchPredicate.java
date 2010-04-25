@@ -30,9 +30,9 @@ import java.util.regex.Pattern;
  * row. <p>
  * 
  * Note: this differs from PatternPredicate in that it is focused
- * on the current cell (highlight coordinates == test coordiates)
+ * on the current cell (highlight coordinates == test coordinates)
  * while the PatternPredicate can have separate test and highlight
- * coordiates. <p>
+ * coordinates. <p>
  * 
  * 
  * @author Jeanette Winzenburg
@@ -71,7 +71,7 @@ public class SearchPredicate implements HighlightPredicate {
      * is limited to matching cells in the given column and row. A
      * value of -1 indicates all rows/columns. <p>
      * 
-     * Note: the coordinates are asymetric - rows are in view- and
+     * Note: the coordinates are asymmetric - rows are in view- and
      * column in model-coordinates - due to corresponding methods in
      * ComponentAdapter. Hmm... no need to? This happens on the
      * current adapter state which is view always, so could use view
@@ -120,7 +120,7 @@ public class SearchPredicate implements HighlightPredicate {
      * is limited to matching cells in the given column and row. A
      * value of ALL indicates all rows/columns. <p>
      * 
-     * Note: the coordinates are asymetric - rows are in view- and
+     * Note: the coordinates are asymmetric - rows are in view- and
      * column in model-coordinates - due to corresponding methods in
      * ComponentAdapter. Hmm... no need to? This happens on the
      * current adapter state which is view always, so could use view
