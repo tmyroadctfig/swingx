@@ -416,13 +416,13 @@ public abstract class ComponentAdapter {
      * coordinates.
      * <p>
      * 
-     * @param row
+     * @param rowViewIndex
      *            the row in view coordinates
-     * @param column
+     * @param columnViewIndex
      *            the column in view coordinates
      * @return the bounds of the cell identified by this adapter
      */
-    public abstract Rectangle getCellBounds(int row, int column);
+    public abstract Rectangle getCellBounds(int rowViewIndex, int columnViewIndex);
 
     /**
      * Returns true if the cell identified by this adapter currently has focus.
@@ -506,13 +506,13 @@ public abstract class ComponentAdapter {
      * other types of target components, this method returns the columnIndex
      * unchanged.
      *
-     * @param columnIndex index of a column in model coordinates
+     * @param columnModelIndex index of a column in model coordinates
      * @return index of the specified column in view coordinates
      * @deprecated (pre-1.6.1) use {@link #convertColumnIndexToView(int)}
      */
     @Deprecated
-    public int modelToView(int columnIndex) {
-        return convertColumnIndexToView(columnIndex);
+    public int modelToView(int columnModelIndex) {
+        return convertColumnIndexToView(columnModelIndex);
     }
 
    /**
@@ -522,13 +522,13 @@ public abstract class ComponentAdapter {
      * types of target components, this method returns the columnIndex
      * unchanged.
      * 
-     * @param columnIndex index of a column in view coordinates
+     * @param columnViewIndex index of a column in view coordinates
      * @return index of the specified column in model coordinates
      * @deprecated (pre-1.6.1) use {@link #convertColumnIndexToModel(int)}
      */
     @Deprecated
-    public int viewToModel(int columnIndex) {
-        return convertColumnIndexToModel(columnIndex);
+    public int viewToModel(int columnViewIndex) {
+        return convertColumnIndexToModel(columnViewIndex);
     }
     
     /**
@@ -538,11 +538,11 @@ public abstract class ComponentAdapter {
      * other types of target components, this method returns the columnIndex
      * unchanged.
      *
-     * @param columnIndex index of a column in model coordinates
+     * @param columnModelIndex index of a column in model coordinates
      * @return index of the specified column in view coordinates
      */
-    public int convertColumnIndexToView(int columnIndex) {
-        return columnIndex; // sensible default for JList and JTree
+    public int convertColumnIndexToView(int columnModelIndex) {
+        return columnModelIndex; // sensible default for JList and JTree
     }
     
     /**
@@ -552,11 +552,31 @@ public abstract class ComponentAdapter {
      * types of target components, this method returns the columnIndex
      * unchanged.
      * 
-     * @param columnIndex index of a column in view coordinates
+     * @param columnViewIndex index of a column in view coordinates
      * @return index of the specified column in model coordinates
      */
-    public int convertColumnIndexToModel(int columnIndex) {
-        return columnIndex; // sensible default for JList and JTree
+    public int convertColumnIndexToModel(int columnViewIndex) {
+        return columnViewIndex; // sensible default for JList and JTree
+    }
+    
+    /**
+     * Converts a row index in model coordinates to an index in view coordinates.
+     *
+     * @param rowModelIndex index of a row in model coordinates
+     * @return index of the specified row in view coordinates
+     */
+    public int convertRowIndexToView(int rowModelIndex) {
+        return rowModelIndex; // sensible default for JTree
+    }
+    
+    /**
+     * Converts a row index in view coordinates to an index in model coordinates.
+     * 
+     * @param rowViewIndex index of a row in view coordinates
+     * @return index of the specified row in model coordinates
+     */
+    public int convertRowIndexToModel(int rowViewIndex) {
+        return rowViewIndex; // sensible default for JTree
     }
 
     /**

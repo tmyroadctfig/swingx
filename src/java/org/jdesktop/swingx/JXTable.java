@@ -3181,7 +3181,7 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
          */
         @Override
         public Object getFilteredValueAt(int row, int column) {
-            return getValueAt(table.convertRowIndexToModel(row), column);
+            return getValueAt(convertRowIndexToModel(row), column);
         }
 
         /**
@@ -3199,7 +3199,7 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
          */
         @Override
         public String getFilteredStringAt(int row, int column) {
-            return getStringAt(table.convertRowIndexToModel(row), column);
+            return getStringAt(convertRowIndexToModel(row), column);
         }
 
         /**
@@ -3272,6 +3272,22 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
         @Override
         public int convertColumnIndexToModel(int columnIndex) {
             return table.convertColumnIndexToModel(columnIndex);
+        }
+        
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public int convertRowIndexToView(int rowModelIndex) {
+            return table.convertRowIndexToView(rowModelIndex);
+        }
+        
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public int convertRowIndexToModel(int rowViewIndex) {
+            return table.convertRowIndexToModel(rowViewIndex);
         }
 
     }
