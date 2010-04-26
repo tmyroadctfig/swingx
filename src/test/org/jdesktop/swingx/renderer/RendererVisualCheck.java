@@ -143,6 +143,8 @@ public class RendererVisualCheck extends InteractiveTestCase {
     /**
      * Requirement: left aligned icon and right aligned text.
      * http://forums.java.net/jive/thread.jspa?messageID=398448#398448
+     * 
+     * Issue #1309-swingx: WrappingProvider needs option to "highlight" the icon as well.
      */
     public void interactiveIconTextAlignment() {
         ListModel files = createFileListModel();
@@ -150,6 +152,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
         ComponentProvider<?> text = new LabelProvider(StringValues.FILE_NAME, JLabel.TRAILING);
         WrappingProvider wrapper = new WrappingProvider(IconValues.FILE_ICON, text, true);
         list.setCellRenderer(new DefaultListRenderer(wrapper));
+        list.addHighlighter(HighlighterFactory.createSimpleStriping());
         showWithScrollingInFrame(list, "alignment in wrappingProvider");
     }
     
