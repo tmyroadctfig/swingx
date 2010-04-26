@@ -72,7 +72,6 @@ import org.jdesktop.swingx.decorator.CompoundHighlighter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
-import org.jdesktop.swingx.decorator.PatternMatcher;
 import org.jdesktop.swingx.decorator.PatternPredicate;
 import org.jdesktop.swingx.decorator.ShadingColorHighlighter;
 import org.jdesktop.swingx.decorator.HighlightPredicate.ColumnHighlightPredicate;
@@ -80,6 +79,7 @@ import org.jdesktop.swingx.painter.MattePainter;
 import org.jdesktop.swingx.painter.AbstractLayoutPainter.HorizontalAlignment;
 import org.jdesktop.swingx.renderer.RelativePainterHighlighter.NumberRelativizer;
 import org.jdesktop.swingx.rollover.RolloverProducer;
+import org.jdesktop.swingx.search.PatternMatcher;
 import org.jdesktop.swingx.treetable.FileSystemModel;
 import org.jdesktop.test.AncientSwingTeam;
 
@@ -107,9 +107,9 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
 //          setLookAndFeel("Nimbus");
 //         test.runInteractiveTests();
 //          test.runInteractiveTests(".*Striping.*");
-//         test.runInteractiveTests(".*ToolTip.*");
+         test.runInteractiveTests(".*ToolTip.*");
 //         test.runInteractiveTests("interactive.*Search.*");
-         test.runInteractiveTests("interactive.*BorderHighlighter.*");
+//         test.runInteractiveTests("interactive.*BorderHighlighter.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
