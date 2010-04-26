@@ -1173,7 +1173,22 @@ public class JXList extends JList {
             /** TODO: Think through printing implications */
             return list.isSelectedIndex(row);
         }
-
+        
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public int convertRowIndexToView(int rowModelIndex) {
+            return list.convertIndexToView(rowModelIndex);
+        }
+        
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public int convertRowIndexToModel(int rowViewIndex) {
+            return list.convertIndexToModel(rowViewIndex);
+        }
     }
 
     // ------------------------------ renderers
