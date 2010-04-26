@@ -3262,15 +3262,15 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
          * {@inheritDoc}
          */
         @Override
-        public int modelToView(int columnIndex) {
+        public int convertColumnIndexToView(int columnIndex) {
             return table.convertColumnIndexToView(columnIndex);
         }
-
+        
         /**
          * {@inheritDoc}
          */
         @Override
-        public int viewToModel(int columnIndex) {
+        public int convertColumnIndexToModel(int columnIndex) {
             return table.convertColumnIndexToModel(columnIndex);
         }
 

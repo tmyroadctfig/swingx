@@ -184,7 +184,7 @@ public class SearchPredicate implements HighlightPredicate {
     private boolean test(Component renderer, ComponentAdapter adapter) {
         // PENDING JW: why convert here? we are focused on the adapter's cell
         // looks like an oversight as of ol' days ;-)
-         int  columnToTest = adapter.viewToModel(adapter.column);
+         int  columnToTest = adapter.convertColumnIndexToModel(adapter.column);
          String value = adapter.getString(columnToTest);
          
          if ((value == null) || (value.length() == 0)) {
@@ -207,7 +207,7 @@ public class SearchPredicate implements HighlightPredicate {
         }
         return 
             ((highlightColumn < 0) ||
-               (highlightColumn == adapter.viewToModel(adapter.column)));
+               (highlightColumn == adapter.convertColumnIndexToModel(adapter.column)));
     }
 
     private boolean isEnabled() {

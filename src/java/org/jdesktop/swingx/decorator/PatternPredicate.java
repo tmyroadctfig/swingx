@@ -138,7 +138,7 @@ public class PatternPredicate implements HighlightPredicate {
     private boolean isHighlightCandidate(Component renderer, ComponentAdapter adapter) {
         return (pattern != null) && 
             ((highlightColumn < 0) ||
-               (highlightColumn == adapter.viewToModel(adapter.column)));
+               (highlightColumn == adapter.convertColumnIndexToModel(adapter.column)));
     }
 
     /**

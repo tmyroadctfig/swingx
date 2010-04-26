@@ -503,7 +503,7 @@ public interface HighlightPredicate {
          * 
          */
         public boolean isHighlighted(Component renderer, ComponentAdapter adapter) {
-            int modelIndex = adapter.viewToModel(adapter.column);
+            int modelIndex = adapter.convertColumnIndexToModel(adapter.column);
             return columnList.contains(modelIndex);
         }
 
@@ -548,7 +548,7 @@ public interface HighlightPredicate {
          * 
          */
         public boolean isHighlighted(Component renderer, ComponentAdapter adapter) {
-            int modelIndex = adapter.viewToModel(adapter.column);
+            int modelIndex = adapter.convertColumnIndexToModel(adapter.column);
             Object identifier = adapter.getColumnIdentifierAt(modelIndex);
             return identifier != null ? columnList.contains(identifier) : false;
         }

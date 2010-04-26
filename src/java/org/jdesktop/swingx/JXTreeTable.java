@@ -3182,7 +3182,7 @@ public class JXTreeTable extends JXTable {
         @Override
         public String getFilteredStringAt(int row, int column) {
             if (table.getTreeTableModel().getHierarchicalColumn() == column) {
-                if (modelToView(column) < 0) {
+                if (convertColumnIndexToView(column) < 0) {
                     // hidden hierarchical column, access directly
                     // PENDING JW: after introducing and wiring StringValueRegistry, 
                     // had to change to query the hierarchicalString always
@@ -3204,7 +3204,7 @@ public class JXTreeTable extends JXTable {
         @Override
         public String getStringAt(int row, int column) {
             if (table.getTreeTableModel().getHierarchicalColumn() == column) {
-                if (modelToView(column) < 0) {
+                if (convertColumnIndexToView(column) < 0) {
                     // hidden hierarchical column, access directly
                     // PENDING JW: after introducing and wiring StringValueRegistry, 
                     // had to change to query the hierarchicalString always

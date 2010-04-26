@@ -29,13 +29,13 @@ import org.jdesktop.swingx.renderer.StringValues;
 
 /**
  * Abstract base class for all component data adapter classes. A
- * <code>ComponentAdapter</code> allows a {@link Filter}, {@link Sorter}, or
+ * <code>ComponentAdapter</code> allows a {@link javax.swing.RowFilter}, {@link javax.swing.RowSorter}, or
  * {@link Highlighter} to interact with a {@link #target} component through a
  * common API.
  * 
  * It has two aspects:
  * <ul>
- * <li> interact with the view state for a given data element. The row/cloumn
+ * <li> interact with the view state for a given data element. The row/column
  * fields and the parameterless methods service this aspect. The coordinates are
  * in view coordinate system. Typical clients of this service are
  * HighlightPredicates and Highlighters.
@@ -71,20 +71,22 @@ import org.jdesktop.swingx.renderer.StringValues;
  * 
  * The adapter is responsible for mapping column coordinates.
  * 
- * All input column indices are in model coordinates with exactly two
+ * All input column indices are in model coordinates with exactly three
  * exceptions:
  * <ul>
  * <li> {@link #column} in column view coordinates
- * <li> the mapping method {@link #viewToModel(int)} in view coordinates
+ * <li> the mapping method {@link #convertColumnIndexToModel(int)} in view coordinates
+ * <li> the view-specific method {@link #getCellBounds(int, int)} in view coordinates
  * </ul>
  * 
- * All input row indices are in model coordinates with exactly three exceptions:
+ * All input row indices are in model coordinates with exactly four exceptions:
  * <ul>
  * <li> {@link #row} in row view coordinates
  * <li> the getter for the filtered value {@link #getFilteredValueAt(int, int)}
  * takes the row in view coordinates.
   * <li> the getter for the filtered string representation {@link #getFilteredStringAt(int, int)}
  * takes the row in view coordinates.
+ * <li> the view-specific method {@link #getCellBounds(int, int)} in view coordinates
 * </ul>
  * 
  * 
@@ -265,7 +267,7 @@ public abstract class ComponentAdapter {
      * @return true if the column should be included in testing
      */
     public boolean isTestable(int column) {
-        return modelToView(column) >= 0;
+        return convertColumnIndexToView(column) >= 0;
     }
     
 
@@ -506,9 +508,11 @@ public abstract class ComponentAdapter {
      *
      * @param columnIndex index of a column in model coordinates
      * @return index of the specified column in view coordinates
+     * @deprecated (pre-1.6.1) use {@link #convertColumnIndexToView(int)}
      */
+    @Deprecated
     public int modelToView(int columnIndex) {
-        return columnIndex; // sensible default for JList and JTree
+        return convertColumnIndexToView(columnIndex);
     }
 
    /**
@@ -520,8 +524,38 @@ public abstract class ComponentAdapter {
      * 
      * @param columnIndex index of a column in view coordinates
      * @return index of the specified column in model coordinates
+     * @deprecated (pre-1.6.1) use {@link #convertColumnIndexToModel(int)}
      */
+    @Deprecated
     public int viewToModel(int columnIndex) {
+        return convertColumnIndexToModel(columnIndex);
+    }
+    
+    /**
+     * For target components that support multiple columns in their model,
+     * along with column reordering in the view, this method transforms the
+     * specified columnIndex from model coordinates to view coordinates. For all
+     * other types of target components, this method returns the columnIndex
+     * unchanged.
+     *
+     * @param columnIndex index of a column in model coordinates
+     * @return index of the specified column in view coordinates
+     */
+    public int convertColumnIndexToView(int columnIndex) {
+        return columnIndex; // sensible default for JList and JTree
+    }
+    
+    /**
+     * For target components that support multiple columns in their model, along
+     * with column reordering in the view, this method transforms the specified
+     * columnIndex from view coordinates to model coordinates. For all other
+     * types of target components, this method returns the columnIndex
+     * unchanged.
+     * 
+     * @param columnIndex index of a column in view coordinates
+     * @return index of the specified column in model coordinates
+     */
+    public int convertColumnIndexToModel(int columnIndex) {
         return columnIndex; // sensible default for JList and JTree
     }
 
