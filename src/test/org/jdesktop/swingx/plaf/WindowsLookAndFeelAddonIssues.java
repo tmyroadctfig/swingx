@@ -42,17 +42,22 @@ import org.junit.runners.JUnit4;
  * @author Jeanette Winzenburg
  */
 @RunWith(JUnit4.class)
-public class WindowsLookAndFeelAddonTest extends InteractiveTestCase {
+public class WindowsLookAndFeelAddonIssues extends InteractiveTestCase {
 
     @SuppressWarnings("unused")
     private static final Logger LOG = Logger
-            .getLogger(WindowsLookAndFeelAddonTest.class.getName());
+            .getLogger(WindowsLookAndFeelAddonIssues.class.getName());
     
     /**
      * Issue #1305-swingx: popup closing must not consume mousePressed.
      * 
      * It's a core issue (#6753637) which is easily fixed by setting 
-     * the ui property. Test if it's done.
+     * the ui property. Test if it's done. 
+     * 
+     * Reverted: different native behaviour of combos vs standalone popups. A 
+     * single ui property can serve one of those only, core opted for combos.
+     * Should be consistent.
+     * 
      * @throws UnsupportedLookAndFeelException 
      */
     @Test
@@ -79,7 +84,7 @@ public class WindowsLookAndFeelAddonTest extends InteractiveTestCase {
  
     
     public static void main(String[] args) {
-        WindowsLookAndFeelAddonTest test = new WindowsLookAndFeelAddonTest();
+        WindowsLookAndFeelAddonIssues test = new WindowsLookAndFeelAddonIssues();
         try {
             test.runInteractiveTests();
         } catch (Exception e) {
