@@ -27,7 +27,9 @@ import java.util.regex.Pattern;
  * Implemented by classes that work with {@link java.util.regex.Pattern} objects.
 
  * @author Ramesh Gupta
+ * @deprecated (since post-1.6) replaced by PatternMatcher in search package
  */
+@Deprecated
 public interface PatternMatcher {
     public Pattern getPattern();
     public void setPattern(Pattern pattern);

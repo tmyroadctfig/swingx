@@ -31,7 +31,7 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 
 import org.jdesktop.swingx.decorator.Highlighter;
-import org.jdesktop.swingx.decorator.PatternMatcher;
+import org.jdesktop.swingx.search.PatternMatcher;
 
 /**
  * <p>
