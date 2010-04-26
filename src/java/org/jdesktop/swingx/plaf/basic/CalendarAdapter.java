@@ -21,6 +21,7 @@
  */
 package org.jdesktop.swingx.plaf.basic;
 
+import java.awt.Rectangle;
 import java.util.Calendar;
 
 import org.jdesktop.swingx.JXMonthView;
@@ -110,6 +111,11 @@ class CalendarAdapter extends ComponentAdapter {
         return calendar;
     }
 
+    @Override
+    public Rectangle getCellBounds(int row, int column) {
+        throw new UnsupportedOperationException("no way to query cell bounds");
+    }
+    
     @Override
     public boolean hasFocus() {
         return false;

@@ -21,6 +21,8 @@
 
 package org.jdesktop.swingx.decorator;
 
+import java.awt.Rectangle;
+
 import javax.swing.JComponent;
 
 import org.jdesktop.swingx.renderer.StringValues;
@@ -279,7 +281,7 @@ public abstract class ComponentAdapter {
      * coordinate transformation. <p>
      * 
      * This implementation messages the StringValue.TO_STRING with the getValue,
-     * subclasses should re-implement and use the api appropriate for the target component type.
+     * subclasses should re-implement and use the API appropriate for the target component type.
      * 
      * @return the String representation of value of the cell identified by this adapter
      * @see #getValueAt(int, int)
@@ -316,7 +318,7 @@ public abstract class ComponentAdapter {
      * query the count of visible rows.<p>
      * 
      * This implementation messages the StringValue.TO_STRING with the filteredValue,
-     * subclasses should re-implement and use the api appropriate for the target component type.<p>
+     * subclasses should re-implement and use the API appropriate for the target component type.<p>
      * 
      * PENDING JW: what about null cell values? StringValue has a contract to return a 
      * empty string then, would that be okay here as well?
@@ -324,7 +326,7 @@ public abstract class ComponentAdapter {
      * @param row the row of the cell in view coordinates
      * @param column the column of the cell in model coordinates.
      * @return the String representation of the filtered value of the cell identified by the row
-     * in view coordinate and the column in model coordiantes
+     * in view coordinate and the column in model coordinates
      */
     public String getFilteredStringAt(int row, int column) {
         return StringValues.TO_STRING.getString(getFilteredValueAt(row, column));
@@ -383,7 +385,7 @@ public abstract class ComponentAdapter {
      * Returns the filtered value of the cell identified by the row
      * in view coordinate and the column in model coordinates.
      * 
-     * Note: the asymetry of the coordinates is intentional - clients like
+     * Note: the asymmetry of the coordinates is intentional - clients like
      * Highlighters are interested in view values but might need to access
      * non-visible columns for testing. While it is possible to access 
      * row coordinates different from the current (that is this.row) it is not
@@ -393,9 +395,32 @@ public abstract class ComponentAdapter {
      * @param row the row of the cell in view coordinates
      * @param column the column of the cell in model coordinates.
      * @return the filtered value of the cell identified by the row
-     * in view coordinate and the column in model coordiantes
+     * in view coordinate and the column in model coordinates
      */
     public abstract Object getFilteredValueAt(int row, int column);
+    
+    /**
+     * Returns the bounds of the cell identified by this adapter. That is,
+     * for the at position (adapter.row, adapter.column) in view coordinates.<p>
+     * 
+     * @return the bounds of the cell identified by this adapter
+     */
+    public Rectangle getCellBounds() {
+        return getCellBounds(row, column);
+    }
+
+    /**
+     * Returns the bounds of the cell identified by the specified row and column in view
+     * coordinates.
+     * <p>
+     * 
+     * @param row
+     *            the row in view coordinates
+     * @param column
+     *            the column in view coordinates
+     * @return the bounds of the cell identified by this adapter
+     */
+    public abstract Rectangle getCellBounds(int row, int column);
 
     /**
      * Returns true if the cell identified by this adapter currently has focus.

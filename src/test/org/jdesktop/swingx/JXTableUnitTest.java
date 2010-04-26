@@ -12,6 +12,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
 import java.awt.KeyboardFocusManager;
+import java.awt.Rectangle;
 import java.beans.PropertyChangeListener;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
@@ -1095,7 +1096,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
                 table.getModel().getValueAt(0, 0), originalFirstRowValue);
         // sort first column - actually does not change anything order 
         table.toggleSortOrder(0);
-        // sanity asssert
+        // sanity assert
         assertEquals("view order must be unchanged ", 
                 table.getValueAt(0, 0), originalFirstRowValue);
         // invert sort
@@ -1138,6 +1139,11 @@ public class JXTableUnitTest extends InteractiveTestCase {
             @Override
             public Object getValue() {
                 return getValueAt(table.convertRowIndexToModel(row), viewToModel(column));
+            }
+
+            @Override
+            public Rectangle getCellBounds(int row, int column) {
+                return getComponent().getBounds();
             }
 
             @Override

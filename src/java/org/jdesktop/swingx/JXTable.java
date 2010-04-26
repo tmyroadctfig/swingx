@@ -3226,6 +3226,14 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
          * {@inheritDoc}
          */
         @Override
+        public Rectangle getCellBounds(int row, int column) {
+            return table.getCellRect(row, column, false);
+        }
+        
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public boolean isEditable() {
             return table.isCellEditable(row, column);
         }

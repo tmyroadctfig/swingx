@@ -22,6 +22,7 @@
 package org.jdesktop.swingx;
 
 import java.awt.Component;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -1140,6 +1141,14 @@ public class JXList extends JList {
             return sv.getString(getValueAt(row, column));
         }
 
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Rectangle getCellBounds(int row, int column) {
+            return list.getCellBounds(row, row);
+        }
+        
         /**
          * {@inheritDoc}
          */

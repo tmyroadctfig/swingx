@@ -22,6 +22,7 @@
 package org.jdesktop.swingx.decorator;
 
 import java.awt.Color;
+import java.awt.Rectangle;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
@@ -498,6 +499,11 @@ public class CompoundHighlighterTest extends InteractiveTestCase {
                 return getValueAt(row, column);
             }
 
+            @Override
+            public Rectangle getCellBounds(int row, int column) {
+                return getComponent().getBounds();
+            }
+            
             @Override
             public boolean isCellEditable(int row, int column) {
                 // TODO Auto-generated method stub
