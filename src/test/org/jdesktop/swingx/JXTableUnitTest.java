@@ -1138,7 +1138,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
             
             @Override
             public Object getValue() {
-                return getValueAt(table.convertRowIndexToModel(row), viewToModel(column));
+                return getValueAt(table.convertRowIndexToModel(row), convertColumnIndexToModel(column));
             }
 
             @Override
