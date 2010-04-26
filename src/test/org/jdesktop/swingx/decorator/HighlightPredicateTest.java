@@ -9,6 +9,7 @@ package org.jdesktop.swingx.decorator;
 
 import java.awt.Color;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -1056,6 +1057,11 @@ public class HighlightPredicateTest extends InteractiveTestCase {
             }
 
             @Override
+            public Rectangle getCellBounds(int row, int column) {
+                return getComponent().getBounds();
+            }
+
+            @Override
             public boolean isCellEditable(int row, int column) {
                 return isEditable();
             }
@@ -1114,6 +1120,11 @@ public class HighlightPredicateTest extends InteractiveTestCase {
             @Override
             public Object getValue() {
                 return getValueAt(row, column);
+            }
+
+            @Override
+            public Rectangle getCellBounds(int row, int column) {
+                return getComponent().getBounds();
             }
 
             @Override

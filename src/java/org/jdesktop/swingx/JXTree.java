@@ -25,6 +25,7 @@ import java.applet.Applet;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.KeyboardFocusManager;
+import java.awt.Rectangle;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
@@ -1615,6 +1616,14 @@ public class JXTree extends JTree {
         @Override
         public String getStringAt(int row, int column) {
             return tree.getStringAt(row);
+        }
+        
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Rectangle getCellBounds(int row, int column) {
+            return tree.getRowBounds(row);
         }
         
         /**
