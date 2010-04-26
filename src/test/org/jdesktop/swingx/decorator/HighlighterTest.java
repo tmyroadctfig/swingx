@@ -32,6 +32,7 @@ import org.jdesktop.swingx.painter.AbstractAreaPainter;
 import org.jdesktop.swingx.painter.MattePainter;
 import org.jdesktop.swingx.painter.Painter;
 import org.jdesktop.swingx.renderer.JRendererLabel;
+import org.jdesktop.swingx.renderer.StringValues;
 import org.jdesktop.swingx.test.XTestUtils;
 import org.jdesktop.test.ChangeReport;
 import org.jdesktop.test.PropertyChangeReport;
@@ -481,6 +482,54 @@ public class HighlighterTest extends InteractiveTestCase {
         Font old = allColored.getFont();
         hl.highlight(allColored, createComponentAdapter(allColored));
         assertEquals(old, allColored.getFont());
+    }
+    
+//-------------- ToolTipHighlighter
+    
+    @Test
+    public void testToolTipHighlighterConstructors() {
+        ToolTipHighlighter hl = new ToolTipHighlighter();
+        assertSame(HighlightPredicate.ALWAYS, hl.getHighlightPredicate());
+        assertNull(hl.getToolTipValue());
+        hl = new ToolTipHighlighter(HighlightPredicate.NEVER);
+        assertSame(HighlightPredicate.NEVER, hl.getHighlightPredicate());
+        assertNull(hl.getToolTipValue());
+        hl = new ToolTipHighlighter(StringValues.TO_STRING);
+        assertSame(HighlightPredicate.ALWAYS, hl.getHighlightPredicate());
+        assertNotNull(hl.getToolTipValue());
+        assertEquals(StringValues.TO_STRING, hl.getToolTipValue());
+        hl = new ToolTipHighlighter(HighlightPredicate.NEVER, StringValues.TO_STRING);
+        assertSame(HighlightPredicate.NEVER, hl.getHighlightPredicate());
+        assertEquals(StringValues.TO_STRING, hl.getToolTipValue());
+    }
+    
+    @Test
+    public void testFontHighlighterSetToolTipValue() {
+        ToolTipHighlighter hl = new ToolTipHighlighter();
+        ChangeReport report = new ChangeReport();
+        hl.addChangeListener(report);
+        hl.setToolTipValue(StringValues.TO_STRING);
+        assertEquals(1, report.getEventCount());
+        assertEquals(StringValues.TO_STRING, hl.getToolTipValue());
+        report.clear();
+        hl.setToolTipValue(StringValues.TO_STRING);
+        assertEquals(0, report.getEventCount());
+    }
+    
+    @Test
+    public void testToolTipHighlighterDecorate() {
+        ToolTipHighlighter hl = new ToolTipHighlighter(StringValues.EMPTY);
+        ComponentAdapter adapter = createComponentAdapter(allColored);
+        hl.highlight(allColored, adapter);
+        assertEquals(StringValues.EMPTY.getString(adapter.getValue()), allColored.getToolTipText());
+    }
+    
+    @Test
+    public void testToolTipHighlighterDecorateWithNullStringValue() {
+        ToolTipHighlighter hl = new ToolTipHighlighter();
+        ComponentAdapter adapter = createComponentAdapter(allColored);
+        hl.highlight(allColored, adapter);
+        assertEquals(adapter.getString(), allColored.getToolTipText());
     }
     
     
