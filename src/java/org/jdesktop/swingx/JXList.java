@@ -1145,7 +1145,7 @@ public class JXList extends JList {
          * {@inheritDoc}
          */
         @Override
-        public Rectangle getCellBounds(int row, int column) {
+        public Rectangle getCellBounds() {
             return list.getCellBounds(row, row);
         }
         

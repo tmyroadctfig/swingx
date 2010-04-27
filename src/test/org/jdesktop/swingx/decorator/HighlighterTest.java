@@ -986,11 +986,6 @@ public class HighlighterTest extends InteractiveTestCase {
             }
 
             @Override
-            public Rectangle getCellBounds(int row, int column) {
-                return getComponent().getBounds();
-            }
-
-            @Override
             public boolean isCellEditable(int row, int column) {
                 // TODO Auto-generated method stub
                 return false;
@@ -1035,11 +1030,6 @@ public class HighlighterTest extends InteractiveTestCase {
             public Object getValueAt(int row, int column) {
                 // TODO Auto-generated method stub
                 return null;
-            }
-
-            @Override
-            public Rectangle getCellBounds(int row, int column) {
-                return getComponent().getBounds();
             }
 
             @Override

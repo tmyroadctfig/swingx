@@ -3226,7 +3226,7 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
          * {@inheritDoc}
          */
         @Override
-        public Rectangle getCellBounds(int row, int column) {
+        public Rectangle getCellBounds() {
             return table.getCellRect(row, column, false);
         }
         

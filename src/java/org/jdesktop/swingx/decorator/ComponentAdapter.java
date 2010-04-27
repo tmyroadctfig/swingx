@@ -71,22 +71,20 @@ import org.jdesktop.swingx.renderer.StringValues;
  * 
  * The adapter is responsible for mapping column coordinates.
  * 
- * All input column indices are in model coordinates with exactly three
+ * All input column indices are in model coordinates with exactly two
  * exceptions:
  * <ul>
  * <li> {@link #column} in column view coordinates
  * <li> the mapping method {@link #convertColumnIndexToModel(int)} in view coordinates
- * <li> the view-specific method {@link #getCellBounds(int, int)} in view coordinates
  * </ul>
  * 
- * All input row indices are in model coordinates with exactly four exceptions:
+ * All input row indices are in model coordinates with exactly three exceptions:
  * <ul>
  * <li> {@link #row} in row view coordinates
  * <li> the getter for the filtered value {@link #getFilteredValueAt(int, int)}
  * takes the row in view coordinates.
   * <li> the getter for the filtered string representation {@link #getFilteredStringAt(int, int)}
  * takes the row in view coordinates.
- * <li> the view-specific method {@link #getCellBounds(int, int)} in view coordinates
 * </ul>
  * 
  * 
@@ -402,27 +400,13 @@ public abstract class ComponentAdapter {
     public abstract Object getFilteredValueAt(int row, int column);
     
     /**
-     * Returns the bounds of the cell identified by this adapter. That is,
-     * for the at position (adapter.row, adapter.column) in view coordinates.<p>
+     * Returns the bounds of the cell identified by this adapter.<p>
      * 
      * @return the bounds of the cell identified by this adapter
      */
     public Rectangle getCellBounds() {
-        return getCellBounds(row, column);
+        return target.getBounds();
     }
-
-    /**
-     * Returns the bounds of the cell identified by the specified row and column in view
-     * coordinates.
-     * <p>
-     * 
-     * @param rowViewIndex
-     *            the row in view coordinates
-     * @param columnViewIndex
-     *            the column in view coordinates
-     * @return the bounds of the cell identified by this adapter
-     */
-    public abstract Rectangle getCellBounds(int rowViewIndex, int columnViewIndex);
 
     /**
      * Returns true if the cell identified by this adapter currently has focus.

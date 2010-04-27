@@ -498,11 +498,6 @@ public class CompoundHighlighterTest extends InteractiveTestCase {
             public Object getValue() {
                 return getValueAt(row, column);
             }
-
-            @Override
-            public Rectangle getCellBounds(int row, int column) {
-                return getComponent().getBounds();
-            }
             
             @Override
             public boolean isCellEditable(int row, int column) {

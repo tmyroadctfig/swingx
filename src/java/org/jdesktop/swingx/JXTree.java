@@ -1622,7 +1622,7 @@ public class JXTree extends JTree {
          * {@inheritDoc}
          */
         @Override
-        public Rectangle getCellBounds(int row, int column) {
+        public Rectangle getCellBounds() {
             return tree.getRowBounds(row);
         }
         
