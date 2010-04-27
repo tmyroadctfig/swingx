@@ -1142,11 +1142,6 @@ public class JXTableUnitTest extends InteractiveTestCase {
             }
 
             @Override
-            public Rectangle getCellBounds(int row, int column) {
-                return getComponent().getBounds();
-            }
-
-            @Override
             public boolean hasFocus() {
                 return false;
             }

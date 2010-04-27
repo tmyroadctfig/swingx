@@ -110,11 +110,6 @@ class CalendarAdapter extends ComponentAdapter {
     public Object getValueAt(int row, int column) {
         return calendar;
     }
-
-    @Override
-    public Rectangle getCellBounds(int row, int column) {
-        throw new UnsupportedOperationException("no way to query cell bounds");
-    }
     
     @Override
     public boolean hasFocus() {
