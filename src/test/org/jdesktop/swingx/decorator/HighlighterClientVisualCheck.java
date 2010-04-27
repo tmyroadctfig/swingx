@@ -89,5 +89,12 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase  {
         showWithScrollingInFrame(table, "UpdateUI - table highlighter in second, column highlighter in third");
     }
 
-
+    /**
+     * Issue 1314: visual interaction of truncated text and tool tip highlighter.
+     */
+    public void interactiveToolTipOnTruncatedText() {
+        JXTable table = new JXTable(new AncientSwingTeam());
+        table.addHighlighter(new ToolTipHighlighter(HighlightPredicate.IS_TEXT_TRUNCATED));
+        showWithScrollingInFrame(table, "ToolTip on truncated text");
+    }
 }
