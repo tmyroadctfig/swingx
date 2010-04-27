@@ -144,6 +144,30 @@ public class HighlightPredicateTest extends InteractiveTestCase {
      }
     
     /**
+     * Issue #1314: predefined truncated text predicate. 
+     * 
+     * Test the IS_TEXT_TRUNCATED predicate
+     */
+    @Test
+    public void testIsTextTruncated() {
+        allColored.setSize(1, 1); //ensure the size is too small to display full String
+        ComponentAdapter adapter = createComponentAdapter(allColored, true, true);
+        assertTrue(HighlightPredicate.IS_TEXT_TRUNCATED.isHighlighted(allColored, adapter));
+    }
+    
+    /**
+     * Issue #1314: predefined truncated text predicate. 
+     * 
+     * Test the IS_TEXT_TRUNCATED predicate
+     */
+    @Test
+    public void testNotIsTextTruncated() {
+        allColored.setSize(allColored.getPreferredSize()); // ensure enough space to display text
+        ComponentAdapter adapter = createComponentAdapter(allColored, true, true);
+        assertFalse(HighlightPredicate.IS_TEXT_TRUNCATED.isHighlighted(allColored, adapter));
+    }
+    
+    /**
      * test the IS_FOLDER predicate.
      *
      */

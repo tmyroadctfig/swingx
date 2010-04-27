@@ -22,11 +22,19 @@ package org.jdesktop.swingx.decorator;
 
 import java.awt.Component;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+
+import javax.swing.AbstractButton;
+import javax.swing.Icon;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 
 import org.jdesktop.swingx.rollover.RolloverProducer;
 import org.jdesktop.swingx.util.Contract;
@@ -231,6 +239,42 @@ public interface HighlightPredicate {
         }
         
     };
+    
+    /**
+     * Determines if the displayed text is truncated.
+     *
+     * @author Karl Schaefer
+     */
+    public static final HighlightPredicate IS_TEXT_TRUNCATED = new HighlightPredicate() {
+        @Override
+        public boolean isHighlighted(Component renderer, ComponentAdapter adapter) {
+            JComponent c = renderer instanceof JComponent ? (JComponent) renderer : null;
+            String text = adapter.getString();
+            Icon icon = null;
+            //defaults from JLabel
+            int verticalAlignment = SwingConstants.CENTER;
+            int horizontalAlignment = SwingConstants.LEADING;
+            int verticalTextPosition = SwingConstants.CENTER;
+            int horizontalTextPosition = SwingConstants.TRAILING;
+            int gap = 0;
+            
+            if (renderer instanceof JLabel) {
+                icon = ((JLabel) renderer).getIcon();
+                gap = ((JLabel) renderer).getIconTextGap();
+            } else if (renderer instanceof AbstractButton) {
+                icon = ((AbstractButton) renderer).getIcon();
+                gap = ((AbstractButton) renderer).getIconTextGap();
+            }
+            
+            String result = SwingUtilities.layoutCompoundLabel(c, renderer
+                    .getFontMetrics(renderer.getFont()), text, icon, verticalAlignment,
+                    horizontalAlignment, verticalTextPosition, horizontalTextPosition, adapter.getCellBounds(),
+                    new Rectangle(), new Rectangle(), gap);
+            
+            return !text.equals(result);
+        }
+    };
+    
     /**
      * Focus predicate.
      */
@@ -627,7 +671,7 @@ public interface HighlightPredicate {
             this(null);
         }
         /**
-         * Instantitates a predicate with the given compare value.
+         * Instantiates a predicate with the given compare value.
          * PENDING JW: support array? 
          * @param compareValue the fixed value to compare the 
          *   adapter against.
@@ -637,7 +681,7 @@ public interface HighlightPredicate {
         }
         
         /**
-         * @inheritDoc
+         * {@inheritDoc}
          * 
          * Implemented to return true if the adapter value equals the 
          * this predicate's compare value.
@@ -658,14 +702,14 @@ public interface HighlightPredicate {
 
     /**
      * Predicate testing the componentAdapter value type against a given
-     * Clazz. 
+     * Class. 
      */
     public static class TypeHighlightPredicate implements HighlightPredicate {
 
         private Class<?> clazz;
         
         /**
-         * Instantitates a predicate with Object.clazz. This is essentially the
+         * Instantiates a predicate with Object.clazz. This is essentially the
          * same as testing against null.
          *
          */
@@ -673,7 +717,7 @@ public interface HighlightPredicate {
             this(Object.class);
         }
         /**
-         * Instantitates a predicate with the given compare class.<p>
+         * Instantiates a predicate with the given compare class.<p>
          * 
          * PENDING JW: support array? 
          * 
@@ -685,7 +729,7 @@ public interface HighlightPredicate {
         }
         
         /**
-         * @inheritDoc
+         * {@inheritDoc}
          * 
          * Implemented to return true if the adapter value is an instance
          * of this predicate's class type.
