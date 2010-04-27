@@ -202,9 +202,9 @@ public class ColorUtil {
 
         int a = over.getAlpha();
         
-        int rb = (((over.getRGB() & 0x00ff00ff) * a)
+        int rb = (((over.getRGB() & 0x00ff00ff) * (a + 1))
                     + ((origin.getRGB() & 0x00ff00ff) * (0xff - a))) & 0xff00ff00;
-        int g = (((over.getRGB() & 0x0000ff00) * a)
+        int g = (((over.getRGB() & 0x0000ff00) * (a + 1))
                     + ((origin.getRGB() & 0x0000ff00) * (0xff - a))) & 0x00ff0000;
 
         return new Color((over.getRGB() & 0xff000000) | ((rb | g) >> 8));
