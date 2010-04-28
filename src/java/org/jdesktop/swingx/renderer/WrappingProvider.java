@@ -39,28 +39,8 @@ import org.jdesktop.swingx.treetable.TreeTableNode;
  * display names
  * 
  * <pre><code>
- * StringValue sv = new StringValue() {
- * 
- *     public String getString(Object value) {
- *         if (value instanceof File) {
- *             return FileSystemView.getFileSystemView().getSystemDisplayName(
- *                     (File) value);
- *         }
- *         return TO_STRING.getString(value);
- *     }
- * 
- * };
- * IconValue iv = new IconValue() {
- * 
- *     public Icon getIcon(Object value) {
- *         if (value instanceof File) {
- *             return FileSystemView.getFileSystemView().getSystemIcon(
- *                     (File) value);
- *         }
- *         return null;
- *     }
- * };
- * TreeCellRenderer r = new DefaultTreeRenderer(iv, sv);
+ * TreeCellRenderer r = new DefaultTreeRenderer(
+ *         IconValues.FILE_ICON, StringValues.FILE_NAME);
  * tree.setCellRenderer(r);
  * treeTable.setTreeCellRenderer(r);
  * </code></pre>
