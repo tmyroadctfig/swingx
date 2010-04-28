@@ -30,6 +30,7 @@ import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JToolBar;
@@ -39,7 +40,10 @@ import javax.swing.RowFilter;
 import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
 import javax.swing.RowSorter.SortKey;
+import javax.swing.event.RowSorterEvent;
+import javax.swing.event.RowSorterListener;
 import javax.swing.event.TableColumnModelEvent;
+import javax.swing.event.RowSorterEvent.Type;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
@@ -57,8 +61,10 @@ import org.jdesktop.swingx.hyperlink.LinkModelAction;
 import org.jdesktop.swingx.renderer.CheckBoxProvider;
 import org.jdesktop.swingx.renderer.DefaultTableRenderer;
 import org.jdesktop.swingx.renderer.HyperlinkProvider;
+import org.jdesktop.swingx.renderer.StringValue;
 import org.jdesktop.swingx.search.SearchFactory;
 import org.jdesktop.swingx.sort.DefaultSortController;
+import org.jdesktop.swingx.sort.SortUtils;
 import org.jdesktop.swingx.table.ColumnFactory;
 import org.jdesktop.swingx.table.DatePickerCellEditor;
 import org.jdesktop.swingx.table.TableColumnExt;
@@ -82,7 +88,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
       try {
 //        test.runInteractiveTests();
 //          test.runInteractiveTests("interactive.*FloatingPoint.*");
-//          test.runInteractiveTests("interactive.*Header.*");
+          test.runInteractiveTests("interactive.*Header.*");
 //          test.runInteractiveTests("interactive.*ColumnProp.*");
 //          test.runInteractiveTests("interactive.*Multiple.*");
 //          test.runInteractiveTests("interactive.*RToL.*");
@@ -91,7 +97,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
           
 //          test.runInteractiveTests("interactive.*Policy.*");
 //        test.runInteractiveTests("interactive.*Rollover.*");
-        test.runInteractiveTests("interactive.*Revalidate.*");
+//        test.runInteractiveTests("interactive.*Revalidate.*");
 //        test.runInteractiveTests("interactive.*UpdateUI.*");
 //        test.runInteractiveTests("interactiveColumnHighlighting");
       } catch (Exception e) {
@@ -107,6 +113,123 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         // super has LF specific tests...
         setSystemLF(true);
 //        setLookAndFeel("Nimbus");
+    }
+
+    
+    /**
+     * Issue #35-swingx: visual indicators of secondary sort columns
+     * 
+     * Trick by David Hall: use unicode char 
+     * http://forums.java.net/jive/thread.jspa?threadID=71090
+     * 
+     * As he already noted: it's not necessarily pretty looking ;-)
+     */
+    public void interactiveHeaderSecondarySortIndicator() {
+        DefaultTableModel model = new DefaultTableModel(0, 3) {
+
+            /** 
+             * @inherited <p>
+             */
+            @Override
+            public Class<?> getColumnClass(int columnIndex) {
+                if (columnIndex < getColumnCount() - 1) {
+                    return Integer.class;
+                }
+                return super.getColumnClass(columnIndex);
+            }
+            
+        };
+        int min = hexToInt("25A0");
+        int max = hexToInt("25FF");
+        for (int i = min; i <= max; i++) {
+            Object[] row = new Object[3];
+            row[0] = i;
+            row[1] = i;
+            row[2] = (char) i + ""; 
+            model.addRow(row);
+        }
+        final JXTable table = new JXTable();
+        ColumnFactory factory = new ColumnFactory() {
+
+            /** 
+             * @inherited <p>
+             */
+            @Override
+            public TableColumnExt createTableColumn(int modelIndex) {
+                // TODO Auto-generated method stub
+                TableColumnExt tableColumn = new SortAwareTableColumnExt();
+                tableColumn.setModelIndex(modelIndex);
+                return tableColumn;
+            }
+            
+        };
+        table.setColumnControlVisible(true);
+        table.setColumnFactory(factory);
+        table.setModel(model);
+        RowSorterListener l = new RowSorterListener() {
+            
+            @Override
+            public void sorterChanged(RowSorterEvent e) {
+                if (e.getType() == Type.SORT_ORDER_CHANGED) {
+                    List<TableColumn> list = table.getColumns(true);
+                    List<? extends SortKey> sortKeys = new ArrayList<SortKey>(e.getSource().getSortKeys());
+                    // remove primary
+                    List<? extends SortKey> secondary = sortKeys.subList(1, sortKeys.size());
+                    for (TableColumn tableColumn : list) {
+                        if (tableColumn instanceof TableColumnExt) {
+                            SortKey key = SortUtils.getFirstSortKeyForColumn(secondary, tableColumn.getModelIndex());
+                            Object property = null;
+                            if (key != null && SortUtils.isSorted(key.getSortOrder())) {
+                                property = key.getSortOrder();
+                            }
+                            ((TableColumnExt) tableColumn).putClientProperty(SortAwareTableColumnExt.SORT_ORDER_KEY, property);
+                        }
+                    }
+                }
+                
+            }
+        };
+        table.getRowSorter().addRowSorterListener(l);
+        StringValue sv = new StringValue() {
+
+            @Override
+            public String getString(Object value) {
+                return Integer.toHexString(((Integer) value).intValue());
+            }
+            
+        };
+        table.getColumn(1).setCellRenderer(new DefaultTableRenderer(sv, JLabel.RIGHT));
+        JXFrame frame = showWithScrollingInFrame(table, "Geometric shapes");
+        addComponentOrientationToggle(frame);
+    }
+    
+    public static class SortAwareTableColumnExt extends TableColumnExt {
+        
+        public final static String DESCENDING_CHAR = " \u25bf";
+        public final static String ASCENDING_CHAR = " \u25b5";
+        
+        public final static String SORT_ORDER_KEY = "columnExt.SortOrder";
+
+        /**
+         * @inherited <p>
+         */
+        @Override
+        public Object getHeaderValue() {
+            Object header = super.getHeaderValue();
+            Object sortOrder = getClientProperty(SORT_ORDER_KEY);
+            if (SortOrder.ASCENDING == sortOrder) {
+                header = header + ASCENDING_CHAR;
+            } else if (SortOrder.DESCENDING == sortOrder){
+                header = header + DESCENDING_CHAR;
+            }
+            return header;
+        }
+        
+        
+    }
+    
+    private int hexToInt(String s) {
+        return Integer.parseInt(s, 16);
     }
 
     /**
