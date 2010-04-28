@@ -3178,40 +3178,6 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
 
         /**
          * {@inheritDoc}
-         */
-        @Override
-        public Object getFilteredValueAt(int row, int column) {
-            return getValueAt(convertRowIndexToModel(row), column);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public Object getValue() {
-            return table.getValueAt(row, column);
-        }
-
-        /**
-         * {@inheritDoc}
-         * <p>
-         * 
-         */
-        @Override
-        public String getFilteredStringAt(int row, int column) {
-            return getStringAt(convertRowIndexToModel(row), column);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public String getString() {
-            return table.getStringAt(row, column);
-        }
-
-        /**
-         * {@inheritDoc}
          * 
          * This is implemented to query the table's StringValueRegistry for an appropriate
          * StringValue and use that for getting the string representation.

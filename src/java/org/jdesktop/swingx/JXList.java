@@ -1089,45 +1089,11 @@ public class JXList extends JList {
         }
 
         /**
-         * {@inheritDoc} <p>
-         * Overridden to return value at implicit view coordinates.
-         */
-        @Override
-        public Object getValue() {
-            return getFilteredValueAt(row, 0);
-        }
-
-        /**
          * {@inheritDoc}
          */
         @Override
         public Object getValueAt(int row, int column) {
             return list.getModel().getElementAt(row);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public Object getFilteredValueAt(int row, int column) {
-            return list.getElementAt(row);
-        }
-
-        
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public String getFilteredStringAt(int row, int column) {
-            return list.getStringAt(row);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public String getString() {
-            return getFilteredStringAt(row, 0);
         }
 
         /**
