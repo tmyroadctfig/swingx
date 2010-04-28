@@ -99,7 +99,7 @@ import org.jdesktop.swingx.renderer.StringValues;
  * 
  * @see org.jdesktop.swingx.decorator.HighlightPredicate
  * @see org.jdesktop.swingx.decorator.Highlighter
- * @see org.jdesktop.swingx.decorator.Filter
+ * @see javax.swing.RowFilter
  */
 public abstract class ComponentAdapter {
     public static final Object DEFAULT_COLUMN_IDENTIFIER = "Column0";
@@ -289,7 +289,7 @@ public abstract class ComponentAdapter {
      * @see #getValue(int)
      */
     public String getString() {
-        return StringValues.TO_STRING.getString(getValue());
+        return getString(convertColumnIndexToModel(column));
     }
 
     /**
@@ -329,7 +329,7 @@ public abstract class ComponentAdapter {
      * in view coordinate and the column in model coordinates
      */
     public String getFilteredStringAt(int row, int column) {
-        return StringValues.TO_STRING.getString(getFilteredValueAt(row, column));
+        return getStringAt(convertRowIndexToModel(row), column);
     }
     
     /**
@@ -363,7 +363,7 @@ public abstract class ComponentAdapter {
      * @see #getValue(int)
      */
     public Object getValue() {
-        return getValueAt(row, column);
+        return getValue(convertColumnIndexToModel(column));
     }
 
     
@@ -397,7 +397,9 @@ public abstract class ComponentAdapter {
      * @return the filtered value of the cell identified by the row
      * in view coordinate and the column in model coordinates
      */
-    public abstract Object getFilteredValueAt(int row, int column);
+    public Object getFilteredValueAt(int row, int column) {
+        return getValueAt(convertRowIndexToModel(row), column);
+    }
     
     /**
      * Returns the bounds of the cell identified by this adapter.<p>

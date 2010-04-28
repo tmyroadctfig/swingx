@@ -1564,52 +1564,7 @@ public class JXTree extends JTree {
             TreePath path = tree.getPathForRow(row);
             return path.getLastPathComponent();
         }
-
-        /**
-         * {@inheritDoc} <p>
-         * 
-         * JXTree doesn't support filtering/sorting. This implies that
-         * model and view coordinates are the same. So this method is
-         * implemented to call getValueAt(row, column).
-         * 
-         */
-        @Override
-        public Object getFilteredValueAt(int row, int column) {
-            /** TODO: Implement filtering */
-            return getValueAt(row, column);
-        }
         
-        
-        /**
-         * {@inheritDoc} <p>
-         * 
-         * JXTree doesn't support filtering/sorting. This implies that
-         * model and view coordinates are the same. So this method is
-         * implemented to call getValueAt(row, column).
-         * 
-         */
-        @Override
-        public Object getValue() {
-            return getValueAt(row, column);
-        }
-        
-        
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public String getFilteredStringAt(int row, int column) {
-            return tree.getStringAt(row);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public String getString() {
-            return tree.getStringAt(row);
-        }
-
         /**
          * {@inheritDoc}
          */
