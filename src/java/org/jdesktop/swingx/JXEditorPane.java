@@ -85,7 +85,10 @@ import org.jdesktop.swingx.search.Searchable;
 /**
  * <p>
  * {@code JXEditorPane} offers enhanced functionality over the standard {@code
- * JEditorPane}.
+ * JEditorPane}.  Unlike its parent, {@code JXEdtiorPane} {@link 
+ * JEditorPane#HONOR_DISPLAY_PROPERTIES honors display properties} by default.  
+ * Users can revert to the behavior of {@code JEditorPane} by setting the 
+ * property to {@code false}.
  * </p>
  * <h3>Additional Features</h3>
  * <dl>
@@ -221,6 +224,7 @@ public class JXEditorPane extends JEditorPane implements /*Searchable, */Targeta
     }
 
     private void init() {
+        putClientProperty(HONOR_DISPLAY_PROPERTIES, true);
         setEditorKitForContentType("text/html", new SloppyHTMLEditorKit());
         addPropertyChangeListener(new PropertyHandler());
         getDocument().addUndoableEditListener(getUndoableEditListener());
