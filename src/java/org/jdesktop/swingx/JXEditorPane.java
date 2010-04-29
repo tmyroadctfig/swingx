@@ -22,6 +22,7 @@
 package org.jdesktop.swingx;
 
 import java.awt.Component;
+import java.awt.Rectangle;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
@@ -51,6 +52,7 @@ import javax.swing.JComponent;
 import javax.swing.JEditorPane;
 import javax.swing.JList;
 import javax.swing.KeyStroke;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
@@ -771,7 +773,22 @@ public class JXEditorPane extends JEditorPane implements /*Searchable, */Targeta
     public boolean doCommand(Object command, Object value) {
         return targetSupport.doCommand(command, value);
     }
-
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction) {
+        switch(orientation) {
+        case SwingConstants.VERTICAL:
+            return getFontMetrics(getFont()).getHeight();
+        case SwingConstants.HORIZONTAL:
+            return getFontMetrics(getFont()).charWidth('M');
+        default:
+            throw new IllegalArgumentException("Invalid orientation: " + orientation);
+        }
+    }
+    
     /**
      * Listens to the caret placement and adjusts the editing
      * properties as appropriate.
