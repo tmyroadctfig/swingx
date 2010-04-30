@@ -16,6 +16,7 @@ import javax.swing.ListModel;
 import javax.swing.UIManager;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 
 import org.jdesktop.swingx.JXEditorPaneTest;
@@ -26,6 +27,7 @@ import org.jdesktop.swingx.decorator.HighlighterFactory.UIColorHighlighter;
 import org.jdesktop.swingx.hyperlink.LinkModel;
 import org.jdesktop.swingx.renderer.DefaultTreeRenderer;
 import org.jdesktop.test.AncientSwingTeam;
+import org.junit.Test;
 
 
 public class HighlighterIssues extends org.jdesktop.swingx.InteractiveTestCase {
@@ -50,7 +52,25 @@ public class HighlighterIssues extends org.jdesktop.swingx.InteractiveTestCase {
             e.printStackTrace();
         }
     }
-    
+
+    /**
+     * Issue #1317-swingx: PatternPredicate causes exception with testColumn -1 (ALL)
+     * 
+     */
+    @Test
+    public void testPatternPredicateAllColumns() {
+        JXTable table = new JXTable(new AncientSwingTeam());
+        PatternPredicate predicate = new PatternPredicate(".*e.*", -1);
+        table.addHighlighter(new ColorHighlighter(predicate, Color.BLUE, null));
+        for (int i = 0; i < table.getRowCount(); i++) {
+            for (int j = 0; j < table.getColumnCount(); j++) {
+                TableCellRenderer renderer = table.getCellRenderer(i, j);
+                table.prepareRenderer(renderer, i, j);
+            }
+        }
+    }
+
+
     //---------------- uidependent
     
 
