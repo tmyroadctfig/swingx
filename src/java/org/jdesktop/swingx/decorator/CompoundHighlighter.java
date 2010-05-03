@@ -28,6 +28,7 @@ import java.util.List;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.jdesktop.swingx.plaf.UIDependent;
 import org.jdesktop.swingx.util.Contract;
 
 /**
