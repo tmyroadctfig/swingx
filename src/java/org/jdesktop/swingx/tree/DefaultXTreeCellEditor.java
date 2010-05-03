@@ -32,7 +32,7 @@ import javax.swing.tree.DefaultTreeCellEditor;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeCellEditor;
 
-import org.jdesktop.swingx.decorator.UIDependent;
+import org.jdesktop.swingx.plaf.UIDependent;
 
 /**
  * Subclassed to hack around core bug with RtoL editing (#4980473).

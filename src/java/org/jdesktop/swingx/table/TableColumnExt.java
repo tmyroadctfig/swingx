@@ -37,7 +37,7 @@ import javax.swing.table.TableColumn;
 
 import org.jdesktop.swingx.decorator.CompoundHighlighter;
 import org.jdesktop.swingx.decorator.Highlighter;
-import org.jdesktop.swingx.decorator.UIDependent;
+import org.jdesktop.swingx.plaf.UIDependent;
 import org.jdesktop.swingx.renderer.AbstractRenderer;
 
 /**
@@ -102,7 +102,7 @@ import org.jdesktop.swingx.renderer.AbstractRenderer;
  * 
  * @see TableColumnModelExt
  * @see ColumnFactory
- * @see org.jdesktop.swingx.decorator.UIDependent
+ * @see org.jdesktop.swingx.plaf.UIDependent
  * @see javax.swing.JComponent#putClientProperty
  */
 public class TableColumnExt extends TableColumn implements UIDependent {

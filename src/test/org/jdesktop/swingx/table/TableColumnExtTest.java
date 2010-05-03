@@ -19,7 +19,7 @@ import junit.framework.TestCase;
 import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.CompoundHighlighter;
 import org.jdesktop.swingx.decorator.Highlighter;
-import org.jdesktop.swingx.decorator.UIDependent;
+import org.jdesktop.swingx.plaf.UIDependent;
 import org.jdesktop.swingx.renderer.DefaultTableRenderer;
 import org.jdesktop.test.PropertyChangeReport;
 import org.jdesktop.test.SerializableSupport;
