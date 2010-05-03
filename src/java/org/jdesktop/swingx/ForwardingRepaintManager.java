@@ -20,10 +20,12 @@
  */
 package org.jdesktop.swingx;
 
+import java.applet.Applet;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.Rectangle;
+import java.awt.Window;
 
 import javax.swing.JComponent;
 import javax.swing.RepaintManager;
@@ -62,13 +64,13 @@ public class ForwardingRepaintManager extends RepaintManager {
         this.delegate = Contract.asNotNull(delegate, "delegate is null");
     }
     
-    //TODO in 1.6
-//    /**
-//     * {@inheritDoc}
-//     */
-//    public void addDirtyRegion(Applet applet, int x, int y, int w, int h) {
-//        delegate.addDirtyRegion(applet, x, y, w, h);
-//    }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void addDirtyRegion(Applet applet, int x, int y, int w, int h) {
+        delegate.addDirtyRegion(applet, x, y, w, h);
+    }
 
     /**
      * {@inheritDoc}
@@ -78,19 +80,19 @@ public class ForwardingRepaintManager extends RepaintManager {
         delegate.addDirtyRegion(c, x, y, w, h);
     }
 
-    //TODO in 1.6
-//    /**
-//     * {@inheritDoc}
-//     */
-//    public void addDirtyRegion(Window window, int x, int y, int w, int h) {
-//        delegate.addDirtyRegion(window, x, y, w, h);
-//    }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void addDirtyRegion(Window window, int x, int y, int w, int h) {
+        delegate.addDirtyRegion(window, x, y, w, h);
+    }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void addInvalidComponent(JComponent invalidComponent) {
+    public synchronized void addInvalidComponent(JComponent invalidComponent) {
         delegate.addInvalidComponent(invalidComponent);
     }
 
@@ -170,7 +172,7 @@ public class ForwardingRepaintManager extends RepaintManager {
      * {@inheritDoc}
      */
     @Override
-    public void removeInvalidComponent(JComponent component) {
+    public synchronized void removeInvalidComponent(JComponent component) {
         delegate.removeInvalidComponent(component);
     }
 
@@ -194,7 +196,7 @@ public class ForwardingRepaintManager extends RepaintManager {
      * {@inheritDoc}
      */
     @Override
-    public String toString() {
+    public synchronized String toString() {
         return delegate.toString();
     }
 
