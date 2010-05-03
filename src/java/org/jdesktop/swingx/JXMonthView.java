@@ -1671,7 +1671,9 @@ public class JXMonthView extends JComponent {
      */
     @Override
     public void removeNotify() {
-        todayTimer.stop();
+        if (todayTimer != null) {
+            todayTimer.stop();
+        }
         super.removeNotify();
     }
 
