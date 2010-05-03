@@ -25,7 +25,9 @@ package org.jdesktop.swingx.decorator;
  * to be updated on LookAndFeel change.
  * 
  * @author Jeanette Winzenburg
+ * @deprecated (pre-1.6.1) moved; use {@link org.jdesktop.swingx.plaf.UIDependent} instead
  */
+@Deprecated
 public interface UIDependent {
     /**
      * method to call after the LookAndFeel changed. 
