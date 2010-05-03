@@ -129,6 +129,28 @@ public class JXMonthViewTest extends InteractiveTestCase {
         }
     }
 
+    /**
+     * Issue #1318-swingx: NPE in removeNotify
+     * @throws InvocationTargetException 
+     * @throws InterruptedException 
+     */
+    @Test
+    public void testTodayTimerNPE() throws InterruptedException, InvocationTargetException {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.fine("cannot run ui test - headless environment");
+            return;
+        }
+        JXMonthView monthView = new JXMonthView();
+        final JXFrame frame = new JXFrame();
+        frame.add(monthView);
+        SwingUtilities.invokeAndWait(new Runnable() {
+            public void run() {
+                frame.dispose();
+                
+            }
+        });
+    }
     
     /**
      * Issue #1046-swingx: month title not updated when traversing months
