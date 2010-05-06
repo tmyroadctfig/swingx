@@ -20,6 +20,9 @@
  */
 package org.jdesktop.swingx.autocomplete;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+
 import java.awt.Component;
 import java.util.Arrays;
 import java.util.List;
@@ -27,34 +30,22 @@ import java.util.List;
 import javax.swing.JComboBox;
 import javax.swing.JTextPane;
 
-import junit.framework.TestCase;
-
-import org.junit.After;
+import org.jdesktop.test.EDTRunner;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
 
 /**
- * @author Karl George Schaefer
  *
+ * @author Karl George Schaefer
  */
-@RunWith(JUnit4.class)
-public class AutoCompleteDecoratorTest extends TestCase {
+@RunWith(EDTRunner.class)
+public class AutoCompleteDecoratorTest  {
     private JComboBox combo;
     
     @Before
-    public void setUpJ4() throws Exception {
-        setUp();
-    }
-    
-    @After
-    public void tearDownJ4() throws Exception {
-        tearDown();
-    }
-    
-    @Override
-    protected void setUp() {
+    public void setUp() {
         combo = new JComboBox(new String[]{"Alpha", "Bravo", "Charlie", "Delta"});
     }
     
@@ -67,11 +58,11 @@ public class AutoCompleteDecoratorTest extends TestCase {
         //current count plus 2 from UI delegate and 1 from AutoComplete
         int expectedFocusListenerCount = editor.getFocusListeners().length + 3;
         AutoCompleteDecorator.decorate(combo);
-        assertEquals(expectedFocusListenerCount, editor.getFocusListeners().length);
+        assertThat(editor.getFocusListeners().length, is(expectedFocusListenerCount));
         
         //redecorating should not increase listener count
         AutoCompleteDecorator.decorate(combo);
-        assertEquals(expectedFocusListenerCount, editor.getFocusListeners().length);
+        assertThat(editor.getFocusListeners().length, is(expectedFocusListenerCount));
     }
     
     /**
@@ -83,11 +74,11 @@ public class AutoCompleteDecoratorTest extends TestCase {
         //current count 1 from AutoComplete
         int expectedKeyListenerCount = editor.getKeyListeners().length + 1;
         AutoCompleteDecorator.decorate(combo);
-        assertEquals(expectedKeyListenerCount, editor.getKeyListeners().length);
+        assertThat(editor.getKeyListeners().length, is(expectedKeyListenerCount));
         
         //redecorating should not increase listener count
         AutoCompleteDecorator.decorate(combo);
-        assertEquals(expectedKeyListenerCount, editor.getKeyListeners().length);
+        assertThat(editor.getKeyListeners().length, is(expectedKeyListenerCount));
     }
     
     /**
@@ -98,11 +89,27 @@ public class AutoCompleteDecoratorTest extends TestCase {
         //current count 1 from AutoComplete
         int expectedPropListenerCount = combo.getPropertyChangeListeners("editor").length + 1;
         AutoCompleteDecorator.decorate(combo);
-        assertEquals(expectedPropListenerCount, combo.getPropertyChangeListeners("editor").length);
+        assertThat(combo.getPropertyChangeListeners("editor").length, is(expectedPropListenerCount));
         
         //redecorating should not increase listener count
         AutoCompleteDecorator.decorate(combo);
-        assertEquals(expectedPropListenerCount, combo.getPropertyChangeListeners("editor").length);
+        assertThat(combo.getPropertyChangeListeners("editor").length, is(expectedPropListenerCount));
+    }
+    
+    /**
+     * SwingX Issue #299.
+     */
+    @Test
+    @Ignore("Fixed c&p error in test, exposed problem with #299 solution")
+    public void testDecorationActionListeners() {
+        //current count 1 from AutoComplete
+        int expectedActionListenerCount = combo.getActionListeners().length + 1;
+        AutoCompleteDecorator.decorate(combo);
+        assertThat(combo.getActionListeners().length, is(expectedActionListenerCount));
+        
+        //redecorating should not increase listener count
+        AutoCompleteDecorator.decorate(combo);
+        assertThat(combo.getActionListeners().length, is(expectedActionListenerCount));
     }
     
     @Test
