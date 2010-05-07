@@ -45,9 +45,9 @@ import javax.swing.ComboBoxEditor;
 public class AutoCompleteComboBoxEditor implements ComboBoxEditor {
 
     /** the original combo box editor*/
-    private final ComboBoxEditor wrapped;
+    final ComboBoxEditor wrapped;
     /** the converter used to convert items into their string representation */
-    private final ObjectToStringConverter stringConverter;
+    final ObjectToStringConverter stringConverter;
     /** last selected item */
     private Object oldItem;
 

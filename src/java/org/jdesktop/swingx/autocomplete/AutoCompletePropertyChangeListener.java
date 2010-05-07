@@ -24,8 +24,9 @@ import java.beans.PropertyChangeListener;
 
 /**
  * @author Karl George Schaefer
- *
+ * @deprecated (pre-1.6.1) accidentally exposed non-public API
  */
+@Deprecated
 public interface AutoCompletePropertyChangeListener extends
         PropertyChangeListener {
 
