@@ -20,19 +20,28 @@
  */
 package org.jdesktop.swingx.autocomplete;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 
 import java.awt.Component;
+import java.awt.event.ActionListener;
+import java.awt.event.FocusListener;
+import java.awt.event.KeyListener;
+import java.beans.PropertyChangeListener;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.swing.InputMap;
 import javax.swing.JComboBox;
 import javax.swing.JTextPane;
+import javax.swing.text.JTextComponent;
 
 import org.jdesktop.test.EDTRunner;
+import org.jdesktop.test.SerializableSupport;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -53,62 +62,61 @@ public class AutoCompleteDecoratorTest  {
      * SwingX Issue #299.
      */
     @Test
-    public void testDecorationFocusListeners() {
+    public void testUndecorateComboBox() {
+        combo.setEditable(false);
+        AutoCompleteDecorator.decorate(combo);
+        AutoCompleteDecorator.undecorate(combo);
+        
+        for (PropertyChangeListener l : combo.getPropertyChangeListeners("editor")) {
+            assertThat(l, is(not(instanceOf(AutoComplete.PropertyChangeListener.class))));
+        }
+        
+        assertThat(combo.getEditor(), is(not(instanceOf(AutoCompleteComboBoxEditor.class))));
+        
+        JTextComponent editorComponent = (JTextComponent) combo.getEditor().getEditorComponent();
+        
+        for (KeyListener l : editorComponent.getKeyListeners()) {
+            assertThat(l, is(not(instanceOf(AutoComplete.KeyAdapter.class))));
+        }
+        
+        for (InputMap map = editorComponent.getInputMap(); map != null; map = map.getParent()) {
+            assertThat(map, is(not(instanceOf(AutoComplete.InputMap.class))));
+        }
+        
+        assertThat(editorComponent.getActionMap().get("nonstrict-backspace"), is(nullValue()));
+        
+        for (FocusListener l : editorComponent.getFocusListeners()) {
+            assertThat(l, is(not(instanceOf(AutoComplete.FocusAdapter.class))));
+        }
+        
+        assertThat(editorComponent.getDocument(), is(not(instanceOf(AutoCompleteDocument.class))));
+        
+        for (ActionListener l : combo.getActionListeners()) {
+            assertThat(l, is(not(instanceOf(ComboBoxAdaptor.class))));
+        }
+        
+    }
+    
+    /**
+     * SwingX Issue #299.
+     */
+    @Test
+    public void testRedecorateComboBox() {
+        AutoCompleteDecorator.decorate(combo);
         Component editor = combo.getEditor().getEditorComponent();
-        //current count plus 2 from UI delegate and 1 from AutoComplete
-        int expectedFocusListenerCount = editor.getFocusListeners().length + 3;
+        
+        int expectedFocusListenerCount = editor.getFocusListeners().length;
+        int expectedKeyListenerCount = editor.getKeyListeners().length;
+        int expectedPropListenerCount = combo.getPropertyChangeListeners("editor").length;
+        int expectedActionListenerCount = combo.getActionListeners().length;
+        
+        
         AutoCompleteDecorator.decorate(combo);
+        editor = combo.getEditor().getEditorComponent();
+        
         assertThat(editor.getFocusListeners().length, is(expectedFocusListenerCount));
-        
-        //redecorating should not increase listener count
-        AutoCompleteDecorator.decorate(combo);
-        assertThat(editor.getFocusListeners().length, is(expectedFocusListenerCount));
-    }
-    
-    /**
-     * SwingX Issue #299.
-     */
-    @Test
-    public void testDecorationKeyListeners() {
-        Component editor = combo.getEditor().getEditorComponent();
-        //current count 1 from AutoComplete
-        int expectedKeyListenerCount = editor.getKeyListeners().length + 1;
-        AutoCompleteDecorator.decorate(combo);
         assertThat(editor.getKeyListeners().length, is(expectedKeyListenerCount));
-        
-        //redecorating should not increase listener count
-        AutoCompleteDecorator.decorate(combo);
-        assertThat(editor.getKeyListeners().length, is(expectedKeyListenerCount));
-    }
-    
-    /**
-     * SwingX Issue #299.
-     */
-    @Test
-    public void testDecorationPropertyListeners() {
-        //current count 1 from AutoComplete
-        int expectedPropListenerCount = combo.getPropertyChangeListeners("editor").length + 1;
-        AutoCompleteDecorator.decorate(combo);
         assertThat(combo.getPropertyChangeListeners("editor").length, is(expectedPropListenerCount));
-        
-        //redecorating should not increase listener count
-        AutoCompleteDecorator.decorate(combo);
-        assertThat(combo.getPropertyChangeListeners("editor").length, is(expectedPropListenerCount));
-    }
-    
-    /**
-     * SwingX Issue #299.
-     */
-    @Test
-    @Ignore("Fixed c&p error in test, exposed problem with #299 solution")
-    public void testDecorationActionListeners() {
-        //current count 1 from AutoComplete
-        int expectedActionListenerCount = combo.getActionListeners().length + 1;
-        AutoCompleteDecorator.decorate(combo);
-        assertThat(combo.getActionListeners().length, is(expectedActionListenerCount));
-        
-        //redecorating should not increase listener count
-        AutoCompleteDecorator.decorate(combo);
         assertThat(combo.getActionListeners().length, is(expectedActionListenerCount));
     }
     
