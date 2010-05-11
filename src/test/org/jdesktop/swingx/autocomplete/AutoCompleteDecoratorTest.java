@@ -20,15 +20,28 @@
  */
 package org.jdesktop.swingx.autocomplete;
 
+import static java.awt.event.KeyEvent.CHAR_UNDEFINED;
+import static java.awt.event.KeyEvent.KEY_PRESSED;
+import static java.awt.event.KeyEvent.VK_DOWN;
+import static java.awt.event.KeyEvent.VK_END;
+import static java.awt.event.KeyEvent.VK_HOME;
+import static java.awt.event.KeyEvent.VK_PAGE_DOWN;
+import static java.awt.event.KeyEvent.VK_PAGE_UP;
+import static java.awt.event.KeyEvent.VK_UP;
+import static java.lang.System.currentTimeMillis;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
+import static org.junit.Assume.assumeThat;
 
 import java.awt.Component;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.beans.PropertyChangeListener;
 import java.util.Arrays;
@@ -36,11 +49,11 @@ import java.util.List;
 
 import javax.swing.InputMap;
 import javax.swing.JComboBox;
+import javax.swing.JFrame;
 import javax.swing.JTextPane;
 import javax.swing.text.JTextComponent;
 
 import org.jdesktop.test.EDTRunner;
-import org.jdesktop.test.SerializableSupport;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -143,5 +156,51 @@ public class AutoCompleteDecoratorTest  {
     public void testRemovingItemsAfterDecorating() {
         AutoCompleteDecorator.decorate(combo);
         combo.removeAll();
+    }
+    
+    /**
+     * SwingX Issue #1322.
+     */
+    @Test
+    public void testNonStrictCompletionWithKeyMovement() {
+        combo.setEditable(true);
+        AutoCompleteDecorator.decorate(combo);
+        combo.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if ("".equals(combo.getSelectedItem())) {
+                    fail("received illegal value");
+                }
+            }
+        });
+        
+        JFrame frame = new JFrame();
+        frame.add(combo);
+        frame.pack();
+        frame.setVisible(true);
+        
+        assertThat((String) combo.getSelectedItem(), is("Alpha"));
+        assumeThat(combo.isPopupVisible(), is(false));
+        
+        combo.processKeyEvent(new KeyEvent(combo, KEY_PRESSED, currentTimeMillis(), 0, VK_DOWN, CHAR_UNDEFINED));
+        assertThat(combo.isPopupVisible(), is(true));
+        
+        combo.processKeyEvent(new KeyEvent(combo, KEY_PRESSED, currentTimeMillis(), 0, VK_DOWN, CHAR_UNDEFINED));
+        assertThat((String) combo.getSelectedItem(), is("Bravo"));
+        
+        combo.processKeyEvent(new KeyEvent(combo, KEY_PRESSED, currentTimeMillis(), 0, VK_PAGE_DOWN, CHAR_UNDEFINED));
+        assertThat((String) combo.getSelectedItem(), is("Delta"));
+        
+        combo.processKeyEvent(new KeyEvent(combo, KEY_PRESSED, currentTimeMillis(), 0, VK_UP, CHAR_UNDEFINED));
+        assertThat((String) combo.getSelectedItem(), is("Charlie"));
+        
+        combo.processKeyEvent(new KeyEvent(combo, KEY_PRESSED, currentTimeMillis(), 0, VK_PAGE_UP, CHAR_UNDEFINED));
+        assertThat((String) combo.getSelectedItem(), is("Alpha"));
+        
+        combo.processKeyEvent(new KeyEvent(combo, KEY_PRESSED, currentTimeMillis(), 0, VK_END, CHAR_UNDEFINED));
+        assertThat((String) combo.getSelectedItem(), is("Delta"));
+        
+        combo.processKeyEvent(new KeyEvent(combo, KEY_PRESSED, currentTimeMillis(), 0, VK_HOME, CHAR_UNDEFINED));
+        assertThat((String) combo.getSelectedItem(), is("Alpha"));
     }
 }

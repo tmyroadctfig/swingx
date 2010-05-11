@@ -149,17 +149,19 @@ public class AutoCompleteDocument implements Document {
         }
     }
     
-    /** Flag to indicate if adaptor.setSelectedItem has been called.
-     * Subsequent calls to remove/insertString should be ignored
-     * as they are likely have been caused by the adapted Component that
-     * is trying to set the text for the selected component.*/
-    boolean selecting=false;
-    
     /**
      * true, if only items from the adaptors's list can be entered
      * false, otherwise (selected item might not be in the adaptors's list)
      */
     protected boolean strictMatching;
+    
+    protected final Document delegate;
+    
+    /** Flag to indicate if adaptor.setSelectedItem has been called.
+     * Subsequent calls to remove/insertString should be ignored
+     * as they are likely have been caused by the adapted Component that
+     * is trying to set the text for the selected component.*/
+    boolean selecting = false;
     
     /**
      * The adaptor that is used to find and select items.
@@ -169,8 +171,6 @@ public class AutoCompleteDocument implements Document {
     ObjectToStringConverter stringConverter;
     
     private final Handler handler;
-    
-    protected final Document delegate;
     
     /**
      * Creates a new AutoCompleteDocument for the given AbstractAutoCompleteAdaptor.

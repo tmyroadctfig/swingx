@@ -20,6 +20,9 @@
  */
 package org.jdesktop.swingx.autocomplete;
 
+import static java.util.Arrays.asList;
+import static java.util.Collections.unmodifiableList;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusListener;
@@ -61,8 +64,13 @@ import org.jdesktop.swingx.autocomplete.workarounds.MacOSXPopupLocationFix;
  * </code></pre></p>
  *
  * @author Thomas Bierhance
+ * @author Karl Schaefer
  */
 public class AutoCompleteDecorator {
+    //these keys were pulled from BasicComboBoxUI from Sun JDK 1.6.0_20
+    private static final List<String> COMBO_BOX_ACTIONS = unmodifiableList(asList("selectNext",
+            "selectNext2", "selectPrevious", "selectPrevious2", "pageDownPassThrough",
+            "pageUpPassThrough", "homePassThrough", "endPassThrough"));
     /**
      * A TextAction that provides an error feedback for the text component that invoked
      * the action. The error feedback is most likely a "beep".
@@ -128,7 +136,7 @@ public class AutoCompleteDecorator {
      * the {@code JComboBox} to be editable. This can cause side effects with
      * layouts and sizing. {@code JComboBox} caches the size, which differs
      * depending on the component's editability. Therefore, if the component's
-     * size is accesed prior to being decorated and then the cached size is
+     * size is accessed prior to being decorated and then the cached size is
      * forced to be recalculated, the size of the component will change.
      * <p>
      * Because the size of the component can be altered (recalculated), the
@@ -165,12 +173,31 @@ public class AutoCompleteDecorator {
         // Changing the l&f can change the combobox' editor which in turn
         // would not be autocompletion-enabled. The new editor needs to be set-up.
         comboBox.addPropertyChangeListener("editor", new AutoComplete.PropertyChangeListener(comboBox));
+        
+        if (!strictMatching) {
+            ActionMap map = comboBox.getActionMap();
+            
+            for (String key : COMBO_BOX_ACTIONS) {
+                Action a = map.get(key);
+                map.put(key, new AutoComplete.SelectionAction(a));
+            }
+        }
     }
 
-    public static void undecorate(JComboBox comboBox) {
+    static void undecorate(JComboBox comboBox) {
         JTextComponent editorComponent = (JTextComponent) comboBox.getEditor().getEditorComponent();
         
         if (editorComponent.getDocument() instanceof AutoCompleteDocument) {
+            AutoCompleteDocument doc = (AutoCompleteDocument) editorComponent.getDocument();
+            
+            if (doc.strictMatching) {
+                ActionMap map = comboBox.getActionMap();
+                
+                for (String key : COMBO_BOX_ACTIONS) {
+                    map.put(key, null);
+                }
+            }
+            
             //remove old property change listener
             for (PropertyChangeListener l : comboBox.getPropertyChangeListeners("editor")) {
                 if (l instanceof AutoComplete.PropertyChangeListener) {
@@ -297,7 +324,7 @@ public class AutoCompleteDecorator {
                 adaptor));
     }
     
-    public static void undecorate(JTextComponent textComponent) {
+    static void undecorate(JTextComponent textComponent) {
         Document doc = textComponent.getDocument();
         
         if (doc instanceof AutoCompleteDocument) {

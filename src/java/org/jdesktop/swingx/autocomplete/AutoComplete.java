@@ -24,11 +24,13 @@ import static org.jdesktop.swingx.autocomplete.AutoCompleteDecorator.createAutoC
 import static org.jdesktop.swingx.autocomplete.AutoCompleteDecorator.decorate;
 import static org.jdesktop.swingx.autocomplete.AutoCompleteDecorator.undecorate;
 
+import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.beans.PropertyChangeEvent;
 
+import javax.swing.Action;
 import javax.swing.JComboBox;
 import javax.swing.text.JTextComponent;
 
@@ -126,6 +128,81 @@ final class AutoComplete {
         }
     }
 
+    static class SelectionAction implements Action {
+        private Action delegate;
+        
+        public SelectionAction(Action delegate) {
+            this.delegate = delegate;
+        }
+        
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            JComboBox comboBox = (JComboBox) e.getSource();
+            JTextComponent textComponent = (JTextComponent) comboBox.getEditor().getEditorComponent();
+            AutoCompleteDocument doc = (AutoCompleteDocument) textComponent.getDocument();
+            
+            // doing this prevents the updating of the selected item to "" during the remove prior
+            // to the insert in JTextComponent.setText
+            doc.strictMatching = true;
+            try {
+                delegate.actionPerformed(e);
+            } finally {
+                doc.strictMatching = false;
+            }
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void addPropertyChangeListener(java.beans.PropertyChangeListener listener) {
+            delegate.addPropertyChangeListener(listener);
+        }
+        
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void removePropertyChangeListener(java.beans.PropertyChangeListener listener) {
+            delegate.removePropertyChangeListener(listener);
+        }
+        
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Object getValue(String key) {
+            return delegate.getValue(key);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void putValue(String key, Object value) {
+            delegate.putValue(key, value);
+        }
+        
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public boolean isEnabled() {
+            return delegate.isEnabled();
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void setEnabled(boolean b) {
+            delegate.setEnabled(b);
+        }
+    }
+    
     private AutoComplete() {
         // prevent instantiation
     }
