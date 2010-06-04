@@ -139,7 +139,7 @@ public class BuddyLayoutAndBorder implements LayoutManager, Border, PropertyChan
 	 * 
 	 */
 	protected Rectangle getVisibleRect() {
-		Rectangle alloc = (Rectangle) SwingUtilities.getLocalBounds(textField);
+		Rectangle alloc = SwingUtilities.getLocalBounds(textField);
 
 		substractInsets(alloc, getRealBorderInsets());
 		substractInsets(alloc, BuddySupport.getOuterMargin(textField));

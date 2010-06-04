@@ -1,6 +1,11 @@
 package org.jdesktop.swingx.plaf;
 
+import static javax.swing.BorderFactory.createEmptyBorder;
+
+import java.awt.Insets;
+
 import javax.swing.JTextField;
+import javax.swing.border.Border;
 import javax.swing.plaf.TextUI;
 import javax.swing.text.JTextComponent;
 
@@ -48,7 +53,16 @@ public class PromptTextFieldUI extends PromptTextUI {
 		
         // here we need to copy the border again for Mac OS X, because the above
         // calls may have replaced it.
-		lbl.setBorder(txtField.getBorder());
+        Border b = txt.getBorder();
+        
+        if (b == null) {
+            lbl.setBorder(txt.getBorder());
+        } else {
+            Insets insets = b.getBorderInsets(txt);
+            lbl.setBorder(
+                    createEmptyBorder(insets.top, insets.left, insets.bottom, insets.right));
+        }
+//		lbl.setBorder(txtField.getBorder());
 
         // buddy support: not needed, because BuddyLayoutAndBorder queries
         // original text field

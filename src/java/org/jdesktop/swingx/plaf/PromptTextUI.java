@@ -1,8 +1,11 @@
 package org.jdesktop.swingx.plaf;
 
+import static javax.swing.BorderFactory.createEmptyBorder;
+
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.TextComponent;
@@ -13,6 +16,7 @@ import java.lang.reflect.Method;
 
 import javax.accessibility.Accessible;
 import javax.swing.JComponent;
+import javax.swing.border.Border;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.TextUI;
 import javax.swing.text.BadLocationException;
@@ -221,7 +225,16 @@ public abstract class PromptTextUI extends TextUI {
         promptComponent.setEnabled(txt.isEnabled());
         promptComponent.setOpaque(txt.isOpaque());
         promptComponent.setBounds(txt.getBounds());
-        promptComponent.setBorder(txt.getBorder());
+        Border b = txt.getBorder();
+        
+        if (b == null) {
+            promptComponent.setBorder(txt.getBorder());
+        } else {
+            Insets insets = b.getBorderInsets(txt);
+            promptComponent.setBorder(
+                    createEmptyBorder(insets.top, insets.left, insets.bottom, insets.right));
+        }
+        
         promptComponent.setSelectedTextColor(txt.getSelectedTextColor());
         promptComponent.setSelectionColor(txt.getSelectionColor());
         promptComponent.setEditable(txt.isEditable());
