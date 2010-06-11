@@ -38,6 +38,7 @@ import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeThat;
 
 import java.awt.Component;
+import java.awt.GraphicsEnvironment;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusListener;
@@ -163,6 +164,8 @@ public class AutoCompleteDecoratorTest  {
      */
     @Test
     public void testNonStrictCompletionWithKeyMovement() {
+        assumeThat(GraphicsEnvironment.isHeadless(), is(false));
+        
         combo.setEditable(true);
         AutoCompleteDecorator.decorate(combo);
         combo.addActionListener(new ActionListener() {
