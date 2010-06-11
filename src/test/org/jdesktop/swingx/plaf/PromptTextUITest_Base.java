@@ -93,7 +93,8 @@ public abstract class PromptTextUITest_Base {
         assertEquals(PromptSupport.getForeground(textComponent), lbl.getForeground());
         assertEquals(PromptSupport.getBackground(textComponent), lbl.getBackground());
         
-        assertEquals(textComponent.getBorder(), lbl.getBorder());
+        assertEquals(textComponent.getBorder().getBorderInsets(textComponent),
+                lbl.getBorder().getBorderInsets(lbl));
         assertEquals(textComponent.isEnabled(), lbl.isEnabled());
         assertEquals(textComponent.isEditable(), lbl.isEditable());
         assertEquals(textComponent.isOpaque(), lbl.isOpaque());
