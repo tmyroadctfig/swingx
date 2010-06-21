@@ -10,7 +10,6 @@ package org.jdesktop.swingx.decorator;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
-import java.awt.Rectangle;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
@@ -62,11 +61,21 @@ public class HighlighterTest extends InteractiveTestCase {
     protected Color background = Color.RED;
     protected Color foreground = Color.BLUE;
     
+    // JW: opaque Highlighter colors
     protected Color unselectedBackground = Color.CYAN;
     protected Color unselectedForeground = Color.GREEN;
     
     protected Color selectedBackground = Color.LIGHT_GRAY;
     protected Color selectedForeground = Color.MAGENTA;
+    
+    
+    // JW: use these to expose Issue #1327-swingx:
+    // Regression: ColorHighlighter must not blend by default
+//    protected Color unselectedBackground = ColorUtil.setAlpha(Color.CYAN, 100);
+//    protected Color unselectedForeground = ColorUtil.setAlpha(Color.GREEN, 100);
+//    
+//    protected Color selectedBackground = ColorUtil.setAlpha(Color.LIGHT_GRAY, 100);
+//    protected Color selectedForeground = ColorUtil.setAlpha(Color.MAGENTA, 100);
     
     protected ColorHighlighter emptyHighlighter;
     // flag used in setup to explicitly choose LF
