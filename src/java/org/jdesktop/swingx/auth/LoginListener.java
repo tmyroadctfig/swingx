@@ -22,7 +22,7 @@ package org.jdesktop.swingx.auth;
 
 import java.util.EventListener;
 
-/*
+/**
  * <b>LoginListener</b> provides a listener for the actual login
  * process.
  *

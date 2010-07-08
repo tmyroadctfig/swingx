@@ -220,7 +220,7 @@ public class JXErrorPane extends JComponent {
     //------------------------------------------------------------- UI Logic
     
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public ErrorPaneUI getUI() {
         return (ErrorPaneUI)ui;

@@ -27,6 +27,7 @@ import javax.swing.Action;
 import javax.swing.JComponent;
 
 import org.jdesktop.swingx.action.AbstractActionExt;
+import org.jdesktop.swingx.plaf.UIDependent;
 
 /**
  * Encapsulates the popup component which is the delegate for
@@ -36,22 +37,7 @@ import org.jdesktop.swingx.action.AbstractActionExt;
  * Usage will drive further evolution.
  * 
  */
-public interface ColumnControlPopup {
-
-    /**
-     * Updates all internal visuals after changing a UI-delegate. <p>
-     * 
-     * The method called by ColumnControlButton in it's updateUI.
-     * As there is a good probability that at the time of a
-     * ColumnControlButton is updated after a ui-delegate change the
-     * popup is not visible/part of the container hierarchy, this
-     * method must be messaged manually. 
-     * 
-     * @see javax.swing.JComponent#updateUI()
-     *
-     */
-    void updateUI();
-
+public interface ColumnControlPopup extends UIDependent {
     /**
      * Toggles the popup's visibility. This method is responsible for
      * placing itself relative to the given owner if toggled to visible.

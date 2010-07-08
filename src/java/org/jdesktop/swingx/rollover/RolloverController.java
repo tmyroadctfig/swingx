@@ -38,7 +38,7 @@ import javax.swing.KeyStroke;
  * state based on the component's rollover properties. Rollover
  * client properties are Points with cell coordinates 
  * in the view coordinate
- * system as approriate for the concrete component 
+ * system as appropriate for the concrete component 
  * (Point.x == column, Point.y == row).
  * 
  * Repaints effected component regions. Updates
