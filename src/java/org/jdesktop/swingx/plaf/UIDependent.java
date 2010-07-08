@@ -28,8 +28,9 @@ package org.jdesktop.swingx.plaf;
  */
 public interface UIDependent {
     /**
-     * method to call after the LookAndFeel changed. 
-     *
+     * Updates all internal visuals after changing a UI-delegate.
+     * 
+     * @see javax.swing.JComponent#updateUI()
      */
     void updateUI();
 }

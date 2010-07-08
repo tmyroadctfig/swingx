@@ -96,15 +96,15 @@ import org.jdesktop.swingx.plaf.TaskPaneContainerUI;
  */
 public class JXTaskPaneContainer extends JXPanel {
 
-  public final static String uiClassID = "swingx/TaskPaneContainerUI";
-  
+    public final static String uiClassID = "swingx/TaskPaneContainerUI";
+
     // ensure at least the default ui is registered
     static {
         LookAndFeelAddons.contribute(new TaskPaneContainerAddon());
     }
 
     /**
-     * Creates a new empty taskpane.
+     * Creates a new empty task pane.
      */
     public JXTaskPaneContainer() {
         super(null);
@@ -118,7 +118,7 @@ public class JXTaskPaneContainer extends JXPanel {
         });
         setScrollableHeightHint(ScrollableSizeHint.VERTICAL_STRETCH);
     }
-
+    
     /**
      * {@inheritDoc}
      */
@@ -169,7 +169,9 @@ public class JXTaskPaneContainer extends JXPanel {
      * Adds a <code>JXTaskPane</code> to this JXTaskPaneContainer.
      * 
      * @param group
+     * @deprecated (pre-1.6.2) useless API, same as {@link #add(java.awt.Component)}
      */
+    @Deprecated
     public void add(JXTaskPane group) {
         super.add(group);
     }
@@ -178,28 +180,10 @@ public class JXTaskPaneContainer extends JXPanel {
      * Removes a <code>JXTaskPane</code> from this JXTaskPaneContainer.
      * 
      * @param group
+     * @deprecated (pre-1.6.2) useless API, same as {@link #remove(java.awt.Component)}
      */
+    @Deprecated
     public void remove(JXTaskPane group) {
         super.remove(group);
     }
-
-//    /**
-//     * @see Scrollable#getScrollableTracksViewportHeight()
-//     */
-//    @Override
-//    public boolean getScrollableTracksViewportHeight() {
-//        if (getParent() instanceof JViewport) {
-//            return (((JViewport) getParent()).getHeight() > getPreferredSize().height);
-//        } else {
-//            return false;
-//        }
-//    }
-//  
-//    /**
-//     * @see Scrollable#getScrollableTracksViewportWidth()
-//     */
-//    @Override
-//    public boolean getScrollableTracksViewportWidth() {
-//        return true;
-//    }
 }

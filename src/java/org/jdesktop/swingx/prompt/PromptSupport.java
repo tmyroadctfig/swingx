@@ -34,7 +34,7 @@ import org.jdesktop.swingx.plaf.TextUIWrapper;
  * @see PromptTextUI
  * 
  * @author Peter Weishapl <petw@gmx.net>
- * 
+ * @author Karl Schaefer
  */
 public class PromptSupport {
 	/**
@@ -43,7 +43,7 @@ public class PromptSupport {
 	public static final String PROMPT = "promptText";
 
 	/**
-	 * The color of the prompt text poroperty.
+	 * The color of the prompt text property.
 	 */
 	public static final String FOREGROUND = "promptForeground";
 
@@ -257,8 +257,9 @@ public class PromptSupport {
 	 * @param textComponent
 	 * @return the background painter of the text component
 	 */
-	public static Painter getBackgroundPainter(JTextComponent textComponent) {
-	    Painter painter = (Painter) textComponent.getClientProperty(BACKGROUND_PAINTER);
+	@SuppressWarnings("unchecked")
+    public static <T extends JTextComponent> Painter<? super T> getBackgroundPainter(T textComponent) {
+	    Painter<? super T> painter = (Painter<? super T>) textComponent.getClientProperty(BACKGROUND_PAINTER);
 	    
 	    if (painter == null) {
 	        painter = Painters.EMPTY_PAINTER;
@@ -282,7 +283,7 @@ public class PromptSupport {
 	 * @param background
 	 * @param textComponent
 	 */
-	public static void setBackgroundPainter(Painter background, JTextComponent textComponent) {
+	public static <T extends JTextComponent> void setBackgroundPainter(Painter<? super T> background, T textComponent) {
 	    TextUIWrapper.getDefaultWrapper().install(textComponent, true);
 	    
 	    textComponent.putClientProperty(BACKGROUND_PAINTER, background);

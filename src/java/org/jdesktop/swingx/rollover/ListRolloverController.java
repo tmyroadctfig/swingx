@@ -29,13 +29,12 @@ import javax.swing.ListCellRenderer;
 
 
 /**
-     * listens to rollover properties. Repaints effected component regions.
-     * Updates link cursor.
-     * 
-     * @author Jeanette Winzenburg
-     */
-    public class ListRolloverController<T extends JList> extends
-            RolloverController<T> {
+ * listens to rollover properties. Repaints effected component regions.
+ * Updates link cursor.
+ * 
+ * @author Jeanette Winzenburg
+ */
+public class ListRolloverController<T extends JList> extends RolloverController<T> {
 
         private Cursor oldCursor;
 
