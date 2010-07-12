@@ -25,6 +25,9 @@ import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
 import org.jdesktop.swingx.InteractiveTestCase;
+import org.jdesktop.swingx.JXComboBox;
+import org.jdesktop.swingx.JXTable;
+import org.jdesktop.test.AncientSwingTeam;
 
 /**
  * @author Karl George Schaefer
@@ -33,7 +36,7 @@ public class AutoCompleteDecoratorVisualCheck extends InteractiveTestCase {
     public static void main(String[] args) throws Exception {
         AutoCompleteDecoratorVisualCheck test = new AutoCompleteDecoratorVisualCheck();
         try {
-            test.runInteractiveTests("interactive.*");
+            test.runInteractiveTests("interactiveEnsureCellEditorRespondsToFirstKeyPress");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
@@ -50,7 +53,7 @@ public class AutoCompleteDecoratorVisualCheck extends InteractiveTestCase {
         
         AutoCompleteDecorator.decorate(combo);
         
-        JFrame frame = wrapInFrame(combo, "show combo ");
+        JFrame frame = wrapInFrame(combo, "default decorator check");
         frame.pack();
         frame.setVisible(true);
     }
@@ -90,7 +93,7 @@ public class AutoCompleteDecoratorVisualCheck extends InteractiveTestCase {
         
         AutoCompleteDecorator.decorate(combo);
         
-        JFrame frame = wrapInFrame(combo, "combo with null");
+        JFrame frame = wrapInFrame(combo, "combo with all items removed");
         frame.pack();
         frame.setVisible(true);
         
@@ -99,6 +102,16 @@ public class AutoCompleteDecoratorVisualCheck extends InteractiveTestCase {
                 combo.removeAllItems();
             }
         });
+    }
+    
+    public void interactiveEnsureCellEditorRespondsToFirstKeyPress() {
+        JXTable table = new JXTable(new AncientSwingTeam(5));
+        table.setSurrendersFocusOnKeystroke(true);
+        JXComboBox combo = new JXComboBox(new String[] {"Mark", "Tom", "Alan", "Jeff", "Amy"});
+        AutoCompleteDecorator.decorate(combo);
+        table.getColumn(0).setCellEditor(new ComboBoxCellEditor(combo));
+        
+        showInFrame(table, "Ensure Editor Responds to First Key Press");
     }
     
     /**
