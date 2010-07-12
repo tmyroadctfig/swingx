@@ -79,8 +79,6 @@ public class ImagePainter extends AbstractAreaPainter<Object> {
      */
     private transient BufferedImage img;
     
-    private URL imageURL;
-    
     private boolean horizontalRepeat;
     private boolean verticalRepeat;
     
@@ -123,9 +121,18 @@ public class ImagePainter extends AbstractAreaPainter<Object> {
         this.setBorderPaint(null);
     }
     
+    /**
+     * @deprecated (pre-1.6.2) no replacement, see Issue 1023
+     */
+    @Deprecated
     public ImagePainter(URL url) throws IOException {
         this(ImageIO.read(url));
     }
+    
+    /**
+     * @deprecated (pre-1.6.2) no replacement, see Issue 1023
+     */
+    @Deprecated
     public ImagePainter(URL url, HorizontalAlignment horizontal, VerticalAlignment vertical) throws IOException {
         this(ImageIO.read(url),horizontal,vertical);
     }
@@ -149,9 +156,6 @@ public class ImagePainter extends AbstractAreaPainter<Object> {
      * @return the image used for painting
      */
     public BufferedImage getImage() {
-        if(img == null && imageURL != null) {
-            loadImage();
-        }
         return img;
     }
     
@@ -160,10 +164,6 @@ public class ImagePainter extends AbstractAreaPainter<Object> {
      */
     @Override
     protected void doPaint(Graphics2D g, Object component, int width, int height) {
-        if (img == null && imageURL != null) {
-            loadImage();
-        }
-        
         Shape shape = provideShape(g, component,width,height);
         
         switch (getStyle()) {
@@ -288,8 +288,8 @@ public class ImagePainter extends AbstractAreaPainter<Object> {
                         int sw = rect.width;
                         int sh = rect.height;
                         if(imageScale != 1.0) {
-                            sw = (int)((double)sw * imageScale);
-                            sh = (int)((double)sh * imageScale);
+                            sw = (int)(sw * imageScale);
+                            sh = (int)(sh * imageScale);
                         }
                         g.drawImage(img, rect.x, rect.y, sw, sh, null);
                     }
@@ -342,6 +342,7 @@ public class ImagePainter extends AbstractAreaPainter<Object> {
         return imageScale;
     }
     
+    @Deprecated
     private void loadImage() {
         try {
             String img = getImageString();
@@ -360,14 +361,20 @@ public class ImagePainter extends AbstractAreaPainter<Object> {
     
     /**
      * Used by the persistence mechanism.
+     * 
+     * @deprecated (pre-1.6.2) no replacement, see Issue 1023
      */
+    @Deprecated
     public String getImageString() {
         return imageString;
     }
     
     /**
      * Used by the persistence mechanism.
+     * 
+     * @deprecated (pre-1.6.2) no replacement, see Issue 1023
      */
+    @Deprecated
     public void setImageString(String imageString) {
         log.fine("setting image string to: " + imageString);
         String old = this.getImageString();
@@ -451,5 +458,4 @@ public class ImagePainter extends AbstractAreaPainter<Object> {
         setDirty(true);
         firePropertyChange("scaleType", old, getScaleType());
     }
-    
 }
