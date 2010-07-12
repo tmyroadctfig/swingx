@@ -30,11 +30,15 @@ import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.font.FontRenderContext;
+import java.awt.font.TextAttribute;
 import java.awt.font.TextLayout;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Logger;
 
+import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.JComponent;
@@ -226,4 +230,35 @@ public class JXLabelVisualCheck extends InteractiveTestCase {
         frame.setVisible(true);
     }
     
+    /**
+     * Issue #??-swingx: default foreground painter not guaranteed after change.
+     *
+     * JXLabel restore default foreground painter.
+     * Sequence: 
+     *   compose the default with a transparent overlay
+     *   try to reset to default
+     *   try to compose the overlay again.
+     */
+    public void interactiveUnderlinedFontWithWrapping() {
+        final JXLabel label = new JXLabel("A really long sentence to display the text wrapping features of JXLabel.");
+        // when lineWrap is true, can't see underline effects 
+        // when lineWrap is false, underline is ok
+        label.setLineWrap(true);
+        label.setBounds(31, 48, 91, 18);
+        // set font underline
+        Map<TextAttribute, Integer> map = new HashMap<TextAttribute, Integer>();
+        map.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
+        label.setFont(label.getFont().deriveFont(map));
+        
+        final JXFrame frame = wrapInFrame(label, "Underlined Font with wrapping");
+        addAction(frame, new AbstractAction("Toggle wrapping") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                label.setLineWrap(!label.isLineWrap());
+                frame.repaint();
+            }
+        });
+        frame.pack();
+        frame.setVisible(true);
+    }
 }

@@ -34,6 +34,7 @@ import java.awt.Shape;
 import java.awt.Window;
 import java.awt.event.HierarchyBoundsAdapter;
 import java.awt.event.HierarchyEvent;
+import java.awt.font.TextAttribute;
 import java.awt.geom.Point2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -1107,6 +1108,12 @@ public class JXLabel extends JLabel {
 
                 attr = new SimpleAttributeSet();
                 StyleConstants.setItalic(attr, font.isItalic());
+                getStyle("default").addAttributes(attr);
+                
+                attr = new SimpleAttributeSet();
+                Object underline = font.getAttributes().get(TextAttribute.UNDERLINE);
+                boolean canUnderline = underline instanceof Integer && (Integer) underline != -1;
+                StyleConstants.setUnderline(attr,  canUnderline);
                 getStyle("default").addAttributes(attr);
             }
 
