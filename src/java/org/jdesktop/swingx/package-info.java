@@ -46,7 +46,6 @@
  * 
  * <h3>Painter-enabled components</h3>
  * 
- * Note: this feature is currently disabled (see SwingX #964)
  * <p>
  * Components that use painters for background rendering alter the functionality
  * of how {@link java.awt.Component#setBackground(java.awt.Color)} works.  
