@@ -321,11 +321,7 @@ public class ActionContainerFactory {
      * Convenience method to get the action from an ActionManager.
      */
     private Action getAction(Object id) {
-        Action action = getActionManager().get(id);
-        if (action == null) {
-            throw new RuntimeException("ERROR: No Action for " + id);
-        }
-        return action;
+        return getActionManager().get(id);
     }
 
     /**
