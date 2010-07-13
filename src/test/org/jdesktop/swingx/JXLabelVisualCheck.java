@@ -231,13 +231,7 @@ public class JXLabelVisualCheck extends InteractiveTestCase {
     }
     
     /**
-     * Issue #??-swingx: default foreground painter not guaranteed after change.
-     *
-     * JXLabel restore default foreground painter.
-     * Sequence: 
-     *   compose the default with a transparent overlay
-     *   try to reset to default
-     *   try to compose the overlay again.
+     * Issue #1330-swingx: underlined font does not retain underline during wrapping.
      */
     public void interactiveUnderlinedFontWithWrapping() {
         final JXLabel label = new JXLabel("A really long sentence to display the text wrapping features of JXLabel.");
@@ -260,5 +254,16 @@ public class JXLabelVisualCheck extends InteractiveTestCase {
         });
         frame.pack();
         frame.setVisible(true);
+    }
+    
+    /**
+     * Issue #978: Setting background color has no effect
+     */
+    public void interactiveBackgroundColorSetting() {
+        final JXLabel label = new JXLabel("A simple label.");
+        label.setOpaque(true);
+        label.setBackground(Color.CYAN);
+        
+        showInFrame(label, "Background Color Check");
     }
 }
