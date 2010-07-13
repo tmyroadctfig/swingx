@@ -257,7 +257,7 @@ public class JXPanelTest extends TestCase {
     public void testSetUIResourceColorDoesNotOverrideBackgroundPainter() {
         JXPanel panel = new JXPanel();
         
-        Painter<Object> painter = new MattePainter(Color.BLACK);
+        Painter painter = new MattePainter(Color.BLACK);
         panel.setBackgroundPainter(painter);
         
         panel.setBackground(new ColorUIResource(Color.BLACK));
