@@ -21,22 +21,18 @@
 
 package org.jdesktop.swingx;
 
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Insets;
-
 import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.JButton;
+import javax.swing.plaf.ButtonUI;
 
-import org.jdesktop.swingx.painter.AbstractPainter;
 import org.jdesktop.swingx.painter.Painter;
+import org.jdesktop.swingx.plaf.LookAndFeelAddons;
+import org.jdesktop.swingx.plaf.XButtonAddon;
 
 /**
  * <p>A {@link org.jdesktop.swingx.painter.Painter} enabled subclass of {@link javax.swing.JButton}.
- * This class supports setting the foreground and background painters of the button separately. By default,
- * <code>JXButton</code> creates and installs two <code>Painter</code>s; one for the foreground, and one
- * for the background. These default <code>Painter</code>s delegate to the installed UI delegate.</p>
+ * This class supports setting the foreground and background painters of the button separately.</p>
  *
  * <p>For example, if you wanted to blur <em>just the text</em> on the button, and let everything else be
  * handled by the UI delegate for your look and feel, then you could:
@@ -54,106 +50,55 @@ import org.jdesktop.swingx.painter.Painter;
  * thus achieving the same look as a typical JButton, but at the cost of some additional painting
  * overhead.</p>
  *
- * <div class="examples">
- * <h3>Examples</h3>
- * {@demo org.jdesktop.swingx.JXButtonDemo ../../../../../demo}
- * </div>
- *
  * @author rbair
  * @author rah003
  * @author Jan Stola
+ * @author Karl George Schaefer
  */
 public class JXButton extends JButton {
-    //properties used to split foreground and background painting.
-    //overwritten to suppress event notification while painting
-    private String text = "";
-    private boolean borderPainted;
-    private boolean contentAreaFilled;
-
-    private Painter<JXButton> fgPainter = new DefaultForegroundPainter();
-    private Painter<JXButton> bgPainter = new DefaultBackgroundPainter();
+    /**
+     * @see #getUIClassID
+     * @see #readObject
+     */
+    public static final String uiClassID = "XButtonUI";
+    
+    private Painter<JXButton> fgPainter;
+    private Painter<JXButton> bgPainter;
+    
+    static {
+        LookAndFeelAddons.contribute(new XButtonAddon());
+    }
 
     /** Creates a new instance of JXButton */
     public JXButton() {}
     public JXButton(String text) {
         super(text);
-        this.text = text;
     }
     public JXButton(Action a) {
-        super();
-        // swingx-849 Has to set action explicitly after UI resources are already initialized by
-        //implicit constructor to ensure properties defined in action are initialized properly.
-        setAction(a);
+        super(a);
     }
-    public JXButton(Icon icon) { super(icon); }
+    public JXButton(Icon icon) {
+        super(icon);
+    }
     public JXButton(String text, Icon icon) {
         super(text, icon);
-        this.text = text;
     }
 
-    @Override
-    protected void init(String text, Icon icon) {
-        borderPainted = true;
-        contentAreaFilled = true;
-        super.init(text, icon);
-    }
-
-    @Override
-    public void setText(String text) {
-        this.text = text;
-        super.setText(text);
-    }
-    @Override
-    public void repaint() {
-        if (painting) {
-            // skip repaint requests while painting
-            return;
-        }
-        super.repaint();
-    }
-
-    @Override
-    public String getText() {
-        return this.text;
-    }
-
-    @Override
-    public void setBorderPainted(boolean b) {
-        this.borderPainted = b;
-        super.setBorderPainted(b);
-    }
-
-    @Override
-    public boolean isBorderPainted() {
-        return this.borderPainted;
-    }
-
-    @Override
-    public void setContentAreaFilled(boolean b) {
-        this.contentAreaFilled = b;
-        super.setContentAreaFilled(b);
-    }
-
-    @Override
-    public boolean isContentAreaFilled() {
-        return this.contentAreaFilled;
-    }
-
-    public Painter<JXButton> getBackgroundPainter() {
+    public Painter getBackgroundPainter() {
         return bgPainter;
     }
 
-    public void setBackgroundPainter(Painter<JXButton> p) {
+    public void setBackgroundPainter(Painter p) {
         Painter old = getBackgroundPainter();
         this.bgPainter = p;
         firePropertyChange("backgroundPainter", old, getBackgroundPainter());
         repaint();
     }
-    public Painter<JXButton> getForegroundPainter() {
+    public Painter getForegroundPainter() {
         return fgPainter;
     }
 
-    public void setForegroundPainter(Painter<JXButton> p) {
+    public void setForegroundPainter(Painter p) {
         Painter old = getForegroundPainter();
         this.fgPainter = p;
         firePropertyChange("foregroundPainter", old, getForegroundPainter());
@@ -161,14 +106,12 @@ public class JXButton extends JButton {
     }
 
     private boolean paintBorderInsets = true;
-    private boolean painting;
-    private boolean opaque = true;
 
     /**
      * Returns true if the background painter should paint where the border is
      * or false if it should only paint inside the border. This property is
      * true by default. This property affects the width, height,
-     * and intial transform passed to the background painter.
+     * and initial transform passed to the background painter.
      */
     public boolean isPaintBorderInsets() {
         return paintBorderInsets;
@@ -179,7 +122,7 @@ public class JXButton extends JButton {
      * Set to true if the background painter should paint where the border is
      * or false if it should only paint inside the border. This property is true by default.
      * This property affects the width, height,
-     * and intial transform passed to the background painter.
+     * and initial transform passed to the background painter.
      *
      * This is a bound property.
      */
@@ -189,107 +132,23 @@ public class JXButton extends JButton {
         firePropertyChange("paintBorderInsets", old, isPaintBorderInsets());
     }
 
+    /**
+     * Returns a string that specifies the name of the L&F class
+     * that renders this component.
+     */
     @Override
-    public boolean isOpaque() {
-        return painting ? opaque : super.isOpaque();
+    public String getUIClassID() {
+        return uiClassID;
     }
-
+    
+    /**
+     * Notification from the <code>UIManager</code> that the L&F has changed.
+     * Replaces the current UI object with the latest version from the <code>UIManager</code>.
+     * 
+     * @see javax.swing.JComponent#updateUI
+     */
     @Override
-    protected void paintComponent(Graphics g) {
-        Painter<JXButton> bgPainter = getBackgroundPainter();
-        Painter<JXButton> fgPainter = getForegroundPainter();
-        if (painting || (bgPainter == null && fgPainter == null)) {
-            super.paintComponent(g);
-        } else {
-            invokePainter(g, bgPainter);
-            invokePainter(g, fgPainter);
-        }
+    public void updateUI() {
+      setUI((ButtonUI)LookAndFeelAddons.getUI(this, ButtonUI.class));
     }
-
-    private void invokePainter(Graphics g, Painter<JXButton> ptr) {
-        if(ptr == null) return;
-
-        Graphics2D g2d = (Graphics2D) g.create();
-
-        try {
-            if(isPaintBorderInsets()) {
-                ptr.paint(g2d, this, getWidth(), getHeight());
-            } else {
-                Insets ins = this.getInsets();
-                g2d.translate(ins.left, ins.top);
-                ptr.paint(g2d, this,
-                        this.getWidth() - ins.left - ins.right,
-                        this.getHeight() - ins.top - ins.bottom);
-            }
-        } finally {
-            g2d.dispose();
-        }
-    }
-    // paint anything but text and icon
-    private static final class DefaultBackgroundPainter extends AbstractPainter<JXButton> {
-        @Override
-        protected void doPaint(Graphics2D g, JXButton b, int width, int height) {
-            boolean op = b.opaque;
-            // have to read this before setting painting == true !!!
-            b.opaque = b.isOpaque();
-            b.setPainting(true);
-            String tmp = b.text;
-            // #swingx-874
-            Icon tmpIcon = b.getIcon();
-            b.setIcon(null);
-            b.text = "";
-            try {
-                b.paint(g);
-            } finally {
-                // restore original values no matter what
-                b.opaque = op;
-                b.text = tmp;
-                b.setIcon(tmpIcon);
-                b.setPainting(false);
-            }
-        }
-
-        //if any of the state of the JButton that affects the background has changed,
-        //then I must clear the cache. This is really hard to get right, there are
-        //bound to be bugs. An alternative is to NEVER cache.
-        @Override
-        protected boolean shouldUseCache() {
-            return false;
-        }
-    }
-    // paint only a text and icon (if any)
-    private static final class DefaultForegroundPainter extends AbstractPainter<JXButton> {
-        @Override
-        protected void doPaint(Graphics2D g, JXButton b, int width, int height) {
-            b.setPainting(true);
-            boolean t1 = b.isBorderPainted();
-            boolean t2 = b.isContentAreaFilled();
-            boolean op = b.opaque;
-            b.borderPainted = false;
-            b.contentAreaFilled = false;
-            b.opaque = false;
-            try {
-                b.paint(g);
-            } finally {
-                // restore original values no matter what
-                b.opaque = op;
-                b.borderPainted = t1;
-                b.contentAreaFilled = t2;
-                b.setPainting(false);
-            }
-        }
-
-        //if any of the state of the JButton that affects the foreground has changed,
-        //then I must clear the cache. This is really hard to get right, there are
-        //bound to be bugs. An alternative is to NEVER cache.
-        @Override
-        protected boolean shouldUseCache() {
-            return false;
-        }
-    }
-
-    protected void setPainting(boolean b) {
-        painting = b;
-    }
-
 }
