@@ -28,7 +28,6 @@ import java.awt.Composite;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Insets;
 import java.awt.LayoutManager;
 import java.awt.Rectangle;
 import java.beans.PropertyChangeEvent;
@@ -38,7 +37,6 @@ import javax.swing.JPanel;
 import javax.swing.RepaintManager;
 import javax.swing.Scrollable;
 import javax.swing.SwingConstants;
-import javax.swing.plaf.UIResource;
 
 import org.jdesktop.swingx.painter.AbstractPainter;
 import org.jdesktop.swingx.painter.Painter;
@@ -79,7 +77,7 @@ import org.jdesktop.swingx.painter.Painter;
  * @see Scrollable
  * @see Painter
  */
-public class JXPanel extends JPanel implements Scrollable {
+public class JXPanel extends JPanel implements BackgroundPaintable, Scrollable {
 //    private boolean scrollableTracksViewportHeight = true;
 //    private boolean scrollableTracksViewportWidth = true;
     
@@ -398,19 +396,7 @@ public class JXPanel extends JPanel implements Scrollable {
     public void setBackground(Color bg) {
         super.setBackground(bg);
         
-        //TODO problem with SwingX #964.  Had to undo changes.
-        //Change causes background to be painter when using setOpaque=false hack
-//        if (canInstallBackgroundUIResourceAsPainter(bg)) {
-//            setBackgroundPainter(new PainterUIResource(new MattePainter<JXPanel>(bg)));
-//        } else {
-//            setBackgroundPainter(new MattePainter<JXPanel>(bg));
-//        }
-    }
-
-    private boolean canInstallBackgroundUIResourceAsPainter(Color bg) {
-        Painter<?> p = getBackgroundPainter();
-        
-        return bg instanceof UIResource && (p == null || p instanceof UIResource);
+        SwingXUtilities.installBackground(this, bg);
     }
     
     /**
@@ -488,18 +474,22 @@ public class JXPanel extends JPanel implements Scrollable {
     }
     
     /**
-     * Overriden paint method to take into account the alpha setting
+     * Overridden paint method to take into account the alpha setting
      * @param g 
      */
     @Override
     public void paint(Graphics g) {
         Graphics2D g2d = (Graphics2D)g;
         Composite oldComp = g2d.getComposite();
-        float alpha = getEffectiveAlpha();
-        Composite alphaComp = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);
-        g2d.setComposite(alphaComp);
-        super.paint(g2d);
-        g2d.setComposite(oldComp);
+        
+        try {
+            float alpha = getEffectiveAlpha();
+            Composite alphaComp = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);
+            g2d.setComposite(alphaComp);
+            super.paint(g2d);
+        } finally {
+            g2d.setComposite(oldComp);
+        }
     }
     
     /**
@@ -509,21 +499,14 @@ public class JXPanel extends JPanel implements Scrollable {
     @Override
     protected void paintComponent(Graphics g) {
         if(backgroundPainter != null) {
-            if (isOpaque()) super.paintComponent(g);
+            if (isOpaque()) {
+                super.paintComponent(g);
+            }
             
             Graphics2D g2 = (Graphics2D)g.create();
             
             try {
-                // account for the insets
-                if(isPaintBorderInsets()) {
-                    backgroundPainter.paint(g2, this, this.getWidth(), this.getHeight());
-                } else {
-                    Insets ins = this.getInsets();
-                    g2.translate(ins.left, ins.top);            
-                    backgroundPainter.paint(g2, this,
-                                            this.getWidth() - ins.left - ins.right,
-                                            this.getHeight() - ins.top - ins.bottom);
-                }
+                SwingXUtilities.paintBackground(this, g2);
             } finally {
                 g2.dispose();
             }

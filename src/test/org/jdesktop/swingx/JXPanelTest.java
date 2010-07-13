@@ -26,6 +26,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 
 import java.awt.Color;
@@ -42,7 +43,6 @@ import org.jdesktop.swingx.plaf.PainterUIResource;
 import org.jdesktop.test.EDTRunner;
 import org.jdesktop.test.PropertyChangeReport;
 import org.jdesktop.test.TestUtils;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -187,14 +187,9 @@ public class JXPanelTest extends TestCase {
             }
         }
     }
-  
-    
     
     /**
      * SwingX #962: ensure that background painter is initially {@code null}.
-     * <p>
-     * Added this test with the rollback of changes for SwingX #964. Remove when
-     * #964 is solved.
      */
     @Test
     public void testBackgroundPainterIsNull() {
@@ -204,30 +199,29 @@ public class JXPanelTest extends TestCase {
     }
     
     /**
-     * SwingX #962: ensure that background painter is initially {@code null}.
-     * <p>
-     * SwingX #964: UI-delegate Painters can hide user-specified background
-     * color. No longer return {@code null}, we now pass the background color to
-     * the painter. Painter should start as {@code UIResource}.
+     * SwingX #964: ensure setting background color sets painter.
      */
     @Test
-    @Ignore("reactivate with #964")
-    public void testBackgroundPainterIsUIResource() {
-        Painter<?> painter = new JXPanel().getBackgroundPainter();
+    public void testSetColorOverridesNullBackgroundPainter() {
+        JXPanel panel = new JXPanel();
         
-        assertThat(painter, is(instanceOf(UIResource.class)));
+        //assure painter is null
+        panel.setBackgroundPainter(null);
+        
+        panel.setBackground(Color.BLACK);
+        
+        assertThat(panel.getBackgroundPainter(), is(notNullValue()));
     }
     
     /**
      * SwingX #964: ensure setting background color sets painter.
      */
     @Test
-    @Ignore("reactivate with #964")
-    public void testSetBackgroundSetsPainter() {
+    public void testSetColorOverridesUIResourceBackgroundPainter() {
         JXPanel panel = new JXPanel();
         
         //assure painter is null
-        panel.setBackgroundPainter(null);
+        panel.setBackgroundPainter(new PainterUIResource<JXPanel>(new MattePainter(Color.RED)));
         
         panel.setBackground(Color.BLACK);
         
@@ -241,23 +235,33 @@ public class JXPanelTest extends TestCase {
      */
     @Test
     @SuppressWarnings("unchecked")
-    @Ignore("reactivate with #964")
-    public void testSetBackgroundWithUIResourceSetsPainterWithUIResource() {
+    public void testSetUIResourceColorOverridesUIResourceBackgroundPainter() {
         JXPanel panel = new JXPanel();
         
-        //assure painter is null
-        panel.setBackgroundPainter(null);
-        
-        panel.setBackground(new ColorUIResource(Color.BLACK));
-        
-        assertThat(panel.getBackgroundPainter(), is(instanceOf(UIResource.class)));
-        
-        Painter myResource = new PainterUIResource(new MattePainter(Color.BLACK));
+        Painter<JXPanel> myResource = new PainterUIResource<JXPanel>(new MattePainter(Color.BLACK));
         panel.setBackgroundPainter(myResource);
         
         panel.setBackground(new ColorUIResource(Color.BLACK));
         
         assertThat(panel.getBackgroundPainter(), is(instanceOf(UIResource.class)));
         assertThat(panel.getBackgroundPainter(), is(not(myResource)));
+    }
+    
+    /**
+     * SwingX #964: ensure setting background color sets painter with a {@code
+     * UIResource} set the background painter with a {@code UIResource} if the
+     * background painter is {@code null} or a {@code UIResource}.
+     */
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testSetUIResourceColorDoesNotOverrideBackgroundPainter() {
+        JXPanel panel = new JXPanel();
+        
+        Painter<Object> painter = new MattePainter(Color.BLACK);
+        panel.setBackgroundPainter(painter);
+        
+        panel.setBackground(new ColorUIResource(Color.BLACK));
+        
+        assertThat(panel.getBackgroundPainter(), is(sameInstance(painter)));
     }
 }
