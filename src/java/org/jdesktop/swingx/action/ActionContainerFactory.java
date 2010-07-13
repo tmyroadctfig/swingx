@@ -138,9 +138,9 @@ public class ActionContainerFactory {
      * @param list a list of action ids used to construct the toolbar.
      * @return the toolbar or null
      */
-    public JToolBar createToolBar(List<? extends Object> list) {
+    public JToolBar createToolBar(List<?> list) {
         JToolBar toolbar = new JToolBar();
-        Iterator<? extends Object> iter = list.iterator();
+        Iterator<?> iter = list.iterator();
         while(iter.hasNext()) {
             Object element = iter.next();
 
@@ -182,9 +182,9 @@ public class ActionContainerFactory {
      * @param list a list of action ids used to construct the popup.
      * @return the popup or null
      */
-    public JPopupMenu createPopup(List<? extends Object> list) {
+    public JPopupMenu createPopup(List<?> list) {
         JPopupMenu popup = new JPopupMenu();
-        Iterator<? extends Object> iter = list.iterator();
+        Iterator<?> iter = list.iterator();
         while(iter.hasNext()) {
             Object element = iter.next();
 
@@ -204,17 +204,6 @@ public class ActionContainerFactory {
 
     /**
      * Constructs a menu tree from a list of actions or lists of lists or actions.
-     * 
-     * TODO This method is broken. It <em>should</em> expect either that every
-     * entry is a List (thus, the sub menus off the main MenuBar), or it should
-     * handle normal actions properly. By submitting a List of all Actions, nothing
-     * is created....
-     * <p>
-     * For example, If my list is [action, action, action], then nothing is added
-     * to the menu bar. However, if my list is [list[action], action, action, action] then
-     * I get a menu and under it the tree actions. This should not be, because if I
-     * wanted those actions to be on the sub menu, then they should have been
-     * listed within the sub list!
      *
      * @param actionIds an array which represents the root item.
      * @return a menu bar which represents the menu bar tree
@@ -225,43 +214,33 @@ public class ActionContainerFactory {
 
     /**
      * Constructs a menu tree from a list of actions or lists of lists or actions.
-     * TODO This method is broken. It <em>should</em> expect either that every
-     * entry is a List (thus, the sub menus off the main MenuBar), or it should
-     * handle normal actions properly. By submitting a List of all Actions, nothing
-     * is created....
-     * <p>
-     * For example, If my list is [action, action, action], then nothing is added
-     * to the menu bar. However, if my list is [list[action], action, action, action] then
-     * I get a menu and under it the tree actions. This should not be, because if I
-     * wanted those actions to be on the sub menu, then they should have been
-     * listed within the sub list!
      *
      * @param list a list which represents the root item.
      * @return a menu bar which represents the menu bar tree
      */
-    public JMenuBar createMenuBar(List<? extends Object> list) {
-        JMenuBar menubar = new JMenuBar();
-        JMenu menu = null;
+    public JMenuBar createMenuBar(List<?> list) {
+        final JMenuBar menubar = new JMenuBar();
 
-        Iterator<? extends Object> iter = list.iterator();
-        while(iter.hasNext()) {
-            Object element = iter.next();
-
+        for (Object element : list) {
             if (element == null) {
-                if (menu != null) {
-                    menu.addSeparator();
-                }
+                continue;
+            }
+
+            JMenuItem menu;
+
+            if (element instanceof Object[]) {
+                menu = createMenu((Object[]) element);
             } else if (element instanceof List) {
-                menu = createMenu((List)element);
-                if (menu != null) {
-                    menubar.add(menu);
-                }
-            } else  {
-                if (menu != null) {
-                    menu.add(createMenuItem(element, menu));
-                }
+                menu = createMenu((List<?>) element);
+            } else {
+                menu = createMenuItem(element, menubar);
+            }
+
+            if (menu != null) {
+                menubar.add(menu);
             }
         }
+        
         return menubar;
     }
 
@@ -290,32 +269,39 @@ public class ActionContainerFactory {
      *             the first element represents the action used for the menu,
      * @return the constructed JMenu or null
      */
-    public JMenu createMenu(List<? extends Object> list) {
+    public JMenu createMenu(List<?> list) {
         // The first item will be the action for the JMenu
         Action action = getAction(list.get(0));
+        
         if (action == null) {
             return null;
         }
+        
         JMenu menu = new JMenu(action);
 
         // The rest of the items represent the menu items.
-        Iterator<? extends Object> iter = list.listIterator(1);
-        while(iter.hasNext()) {
-            Object element = iter.next();
+        for (Object element : list.subList(1, list.size())) {
             if (element == null) {
                 menu.addSeparator();
-            } else if (element instanceof List) {
-                JMenu newMenu = createMenu((List)element);
+            } else {
+                JMenuItem newMenu;
+
+                if (element instanceof Object[]) {
+                    newMenu = createMenu((Object[]) element);
+                } else if (element instanceof List<?>) {
+                    newMenu = createMenu((List<?>) element);
+                } else {
+                    newMenu = createMenuItem(element, menu);
+                }
+
                 if (newMenu != null) {
                     menu.add(newMenu);
                 }
-            } else  {
-                menu.add(createMenuItem(element, menu));
             }
         }
+        
         return menu;
     }
-
 
     /**
      * Convenience method to get the action from an ActionManager.
