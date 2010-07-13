@@ -30,6 +30,7 @@ import java.util.Map;
 
 import javax.swing.AbstractButton;
 import javax.swing.Action;
+import javax.swing.ActionMap;
 import javax.swing.ButtonGroup;
 import javax.swing.Icon;
 import javax.swing.JButton;
@@ -75,10 +76,10 @@ public class ActionContainerFactory {
      */
     private static Insets TOOLBAR_BUTTON_MARGIN = new Insets(1, 1, 1, 1);
     
-    private ActionManager manager;
+    private ActionMap manager;
 
     // Map between group id + component and the ButtonGroup
-    private Map groupMap;
+    private Map<Integer, ButtonGroup> groupMap;
 
     /**
      * Constructs an container factory which uses the default 
@@ -93,7 +94,7 @@ public class ActionContainerFactory {
      * @param manager use the actions managed with this manager for
      *                constructing ui componenents.
      */
-    public ActionContainerFactory(ActionManager manager) {
+    public ActionContainerFactory(ActionMap manager) {
         setActionManager(manager);
     }
 
@@ -104,7 +105,7 @@ public class ActionContainerFactory {
      * @return the ActionManager used by the ActionContainerFactory.
      * @see #setActionManager
      */
-    public ActionManager getActionManager() {
+    public ActionMap getActionManager() {
         if (manager == null) {
             manager = ActionManager.getInstance();
         }
@@ -115,7 +116,7 @@ public class ActionContainerFactory {
      * Sets the ActionManager instance that will be used by this
      * ActionContainerFactory
      */
-    public void setActionManager(ActionManager manager) {
+    public void setActionManager(ActionMap manager) {
         this.manager = manager;
     }
 
@@ -137,9 +138,9 @@ public class ActionContainerFactory {
      * @param list a list of action ids used to construct the toolbar.
      * @return the toolbar or null
      */
-    public JToolBar createToolBar(List list) {
+    public JToolBar createToolBar(List<Object> list) {
         JToolBar toolbar = new JToolBar();
-        Iterator iter = list.iterator();
+        Iterator<Object> iter = list.iterator();
         while(iter.hasNext()) {
             Object element = iter.next();
 
@@ -181,9 +182,9 @@ public class ActionContainerFactory {
      * @param list a list of action ids used to construct the popup.
      * @return the popup or null
      */
-    public JPopupMenu createPopup(List list) {
+    public JPopupMenu createPopup(List<Object> list) {
         JPopupMenu popup = new JPopupMenu();
-        Iterator iter = list.iterator();
+        Iterator<Object> iter = list.iterator();
         while(iter.hasNext()) {
             Object element = iter.next();
 
@@ -238,11 +239,11 @@ public class ActionContainerFactory {
      * @param list a list which represents the root item.
      * @return a menu bar which represents the menu bar tree
      */
-    public JMenuBar createMenuBar(List list) {
+    public JMenuBar createMenuBar(List<Object> list) {
         JMenuBar menubar = new JMenuBar();
         JMenu menu = null;
 
-        Iterator iter = list.iterator();
+        Iterator<Object> iter = list.iterator();
         while(iter.hasNext()) {
             Object element = iter.next();
 
@@ -289,7 +290,7 @@ public class ActionContainerFactory {
      *             the first element represents the action used for the menu,
      * @return the constructed JMenu or null
      */
-    public JMenu createMenu(List list) {
+    public JMenu createMenu(List<Object> list) {
         // The first item will be the action for the JMenu
         Action action = getAction(list.get(0));
         if (action == null) {
@@ -298,7 +299,7 @@ public class ActionContainerFactory {
         JMenu menu = new JMenu(action);
 
         // The rest of the items represent the menu items.
-        Iterator iter = list.listIterator(1);
+        Iterator<Object> iter = list.listIterator(1);
         while(iter.hasNext()) {
             Object element = iter.next();
             if (element == null) {
@@ -320,7 +321,7 @@ public class ActionContainerFactory {
      * Convenience method to get the action from an ActionManager.
      */
     private Action getAction(Object id) {
-        Action action = getActionManager().getAction(id);
+        Action action = getActionManager().get(id);
         if (action == null) {
             throw new RuntimeException("ERROR: No Action for " + id);
         }
@@ -335,7 +336,7 @@ public class ActionContainerFactory {
      */
     private ButtonGroup getGroup(String groupid, JComponent container) {
         if (groupMap == null) {
-            groupMap = new HashMap();
+            groupMap = new HashMap<Integer, ButtonGroup>();
         }
         int intCode = groupid.hashCode();
         if (container != null) {
@@ -343,7 +344,7 @@ public class ActionContainerFactory {
         }
         Integer hashCode = new Integer(intCode);
 
-        ButtonGroup group = (ButtonGroup)groupMap.get(hashCode);
+        ButtonGroup group = groupMap.get(hashCode);
         if (group == null) {
             group = new ButtonGroup();
             groupMap.put(hashCode, group);
