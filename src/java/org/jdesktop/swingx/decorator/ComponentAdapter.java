@@ -494,38 +494,6 @@ public abstract class ComponentAdapter {
      *
      * @param columnModelIndex index of a column in model coordinates
      * @return index of the specified column in view coordinates
-     * @deprecated (pre-1.6.1) use {@link #convertColumnIndexToView(int)}
-     */
-    @Deprecated
-    public int modelToView(int columnModelIndex) {
-        return convertColumnIndexToView(columnModelIndex);
-    }
-
-   /**
-     * For target components that support multiple columns in their model, along
-     * with column reordering in the view, this method transforms the specified
-     * columnIndex from view coordinates to model coordinates. For all other
-     * types of target components, this method returns the columnIndex
-     * unchanged.
-     * 
-     * @param columnViewIndex index of a column in view coordinates
-     * @return index of the specified column in model coordinates
-     * @deprecated (pre-1.6.1) use {@link #convertColumnIndexToModel(int)}
-     */
-    @Deprecated
-    public int viewToModel(int columnViewIndex) {
-        return convertColumnIndexToModel(columnViewIndex);
-    }
-    
-    /**
-     * For target components that support multiple columns in their model,
-     * along with column reordering in the view, this method transforms the
-     * specified columnIndex from model coordinates to view coordinates. For all
-     * other types of target components, this method returns the columnIndex
-     * unchanged.
-     *
-     * @param columnModelIndex index of a column in model coordinates
-     * @return index of the specified column in view coordinates
      */
     public int convertColumnIndexToView(int columnModelIndex) {
         return columnModelIndex; // sensible default for JList and JTree
