@@ -111,7 +111,7 @@ import org.jdesktop.swingx.painter.Painter;
  * @author rah
  * @author mario_cesar
  */
-public class JXLabel extends JLabel {
+public class JXLabel extends JLabel implements BackgroundPaintable {
     
     /**
      * Text alignment enums. Controls alignment of the text when line wrapping is enabled.
@@ -322,7 +322,17 @@ public class JXLabel extends JLabel {
         }
 
     }
-
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setBackground(Color bg) {
+        super.setBackground(bg);
+        
+        SwingXUtilities.installBackground(this, bg);
+    }
+    
     /**
      * Sets a new foregroundPainter on the label. This will replace the existing foreground painter. Existing painters
      * can be wrapped by using a CompoundPainter.
@@ -685,7 +695,7 @@ public class JXLabel extends JLabel {
      * Returns true if the background painter should paint where the border is
      * or false if it should only paint inside the border. This property is
      * true by default. This property affects the width, height,
-     * and intial transform passed to the background painter.
+     * and initial transform passed to the background painter.
      * @return current value of the paintBorderInsets property
      */
     public boolean isPaintBorderInsets() {
@@ -731,22 +741,17 @@ public class JXLabel extends JLabel {
         } else {
             pWidth = getWidth();
             pHeight = getHeight();
-            Insets i = getInsets();
             if (backgroundPainter != null) {
                 Graphics2D tmp = (Graphics2D) g.create();
                 
                 try {
-                    if (!isPaintBorderInsets()) {
-                        tmp.translate(i.left, i.top);
-                        pWidth = pWidth - i.left - i.right;
-                        pHeight = pHeight - i.top - i.bottom;
-                    }
-                    backgroundPainter.paint(tmp, this, pWidth, pHeight);
+                    SwingXUtilities.paintBackground(this, tmp);
                 } finally {
                     tmp.dispose();
                 }
             }
             if (foregroundPainter != null) {
+                Insets i = getInsets();
                 pWidth = getWidth() - i.left - i.right;
                 pHeight = getHeight() - i.top - i.bottom;
 
