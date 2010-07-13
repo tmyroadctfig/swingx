@@ -138,9 +138,9 @@ public class ActionContainerFactory {
      * @param list a list of action ids used to construct the toolbar.
      * @return the toolbar or null
      */
-    public JToolBar createToolBar(List<Object> list) {
+    public JToolBar createToolBar(List<? extends Object> list) {
         JToolBar toolbar = new JToolBar();
-        Iterator<Object> iter = list.iterator();
+        Iterator<? extends Object> iter = list.iterator();
         while(iter.hasNext()) {
             Object element = iter.next();
 
@@ -182,9 +182,9 @@ public class ActionContainerFactory {
      * @param list a list of action ids used to construct the popup.
      * @return the popup or null
      */
-    public JPopupMenu createPopup(List<Object> list) {
+    public JPopupMenu createPopup(List<? extends Object> list) {
         JPopupMenu popup = new JPopupMenu();
-        Iterator<Object> iter = list.iterator();
+        Iterator<? extends Object> iter = list.iterator();
         while(iter.hasNext()) {
             Object element = iter.next();
 
@@ -239,11 +239,11 @@ public class ActionContainerFactory {
      * @param list a list which represents the root item.
      * @return a menu bar which represents the menu bar tree
      */
-    public JMenuBar createMenuBar(List<Object> list) {
+    public JMenuBar createMenuBar(List<? extends Object> list) {
         JMenuBar menubar = new JMenuBar();
         JMenu menu = null;
 
-        Iterator<Object> iter = list.iterator();
+        Iterator<? extends Object> iter = list.iterator();
         while(iter.hasNext()) {
             Object element = iter.next();
 
@@ -290,7 +290,7 @@ public class ActionContainerFactory {
      *             the first element represents the action used for the menu,
      * @return the constructed JMenu or null
      */
-    public JMenu createMenu(List<Object> list) {
+    public JMenu createMenu(List<? extends Object> list) {
         // The first item will be the action for the JMenu
         Action action = getAction(list.get(0));
         if (action == null) {
@@ -299,7 +299,7 @@ public class ActionContainerFactory {
         JMenu menu = new JMenu(action);
 
         // The rest of the items represent the menu items.
-        Iterator<Object> iter = list.listIterator(1);
+        Iterator<? extends Object> iter = list.listIterator(1);
         while(iter.hasNext()) {
             Object element = iter.next();
             if (element == null) {
