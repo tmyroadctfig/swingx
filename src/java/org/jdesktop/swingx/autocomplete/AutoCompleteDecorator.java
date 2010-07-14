@@ -172,7 +172,9 @@ public class AutoCompleteDecorator {
         
         // Changing the l&f can change the combobox' editor which in turn
         // would not be autocompletion-enabled. The new editor needs to be set-up.
-        comboBox.addPropertyChangeListener("editor", new AutoComplete.PropertyChangeListener(comboBox));
+        AutoComplete.PropertyChangeListener pcl = new AutoComplete.PropertyChangeListener(comboBox);
+        comboBox.addPropertyChangeListener("editor", pcl);
+        comboBox.addPropertyChangeListener("enabled", pcl);
         
         if (!strictMatching) {
             ActionMap map = comboBox.getActionMap();
@@ -202,6 +204,12 @@ public class AutoCompleteDecorator {
             for (PropertyChangeListener l : comboBox.getPropertyChangeListeners("editor")) {
                 if (l instanceof AutoComplete.PropertyChangeListener) {
                     comboBox.removePropertyChangeListener("editor", l);
+                }
+            }
+            
+            for (PropertyChangeListener l : comboBox.getPropertyChangeListeners("enabled")) {
+                if (l instanceof AutoComplete.PropertyChangeListener) {
+                    comboBox.removePropertyChangeListener("enabled", l);
                 }
             }
             

@@ -94,6 +94,25 @@ final class AutoComplete {
          */
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
+            if ("editor".equals(evt.getPropertyName())) {
+                handleEditor(evt);
+            } else if ("enabled".equals(evt.getPropertyName())) {
+                handleEnabled(evt);
+            }
+        }
+        
+        private void handleEnabled(PropertyChangeEvent evt) {
+            if (Boolean.TRUE.equals(evt.getNewValue())) {
+                comboBox.setEditable(true);
+            } else {
+                JTextComponent textComponent = (JTextComponent) comboBox.getEditor().getEditorComponent();
+                boolean strictMatching = ((AutoCompleteDocument) textComponent.getDocument()).strictMatching;
+                
+                comboBox.setEditable(!strictMatching);
+            }
+        }
+
+        private void handleEditor(PropertyChangeEvent evt) {
             if (evt.getNewValue() instanceof AutoCompleteComboBoxEditor) {
                 return;
             }

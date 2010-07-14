@@ -20,12 +20,21 @@
  */
 package org.jdesktop.swingx.autocomplete;
 
+import java.awt.event.ActionEvent;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.DefaultCellEditor;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellEditor;
 
 import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXComboBox;
+import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.test.AncientSwingTeam;
 
@@ -36,7 +45,7 @@ public class AutoCompleteDecoratorVisualCheck extends InteractiveTestCase {
     public static void main(String[] args) throws Exception {
         AutoCompleteDecoratorVisualCheck test = new AutoCompleteDecoratorVisualCheck();
         try {
-            test.runInteractiveTests("interactiveEnsureCellEditorRespondsToFirstKeyPress");
+            test.runInteractiveTests("interactiveForegroundColorCheck");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
@@ -103,7 +112,11 @@ public class AutoCompleteDecoratorVisualCheck extends InteractiveTestCase {
             }
         });
     }
-    
+
+    /**
+     * Issue 1330: Ensure that a combo box will respond to the first key press. Had to work around
+     * core (mis)behavior.
+     */
     public void interactiveEnsureCellEditorRespondsToFirstKeyPress() {
         JXTable table = new JXTable(new AncientSwingTeam(5));
         table.setSurrendersFocusOnKeystroke(true);
@@ -114,6 +127,70 @@ public class AutoCompleteDecoratorVisualCheck extends InteractiveTestCase {
         showInFrame(table, "Ensure Editor Responds to First Key Press");
     }
     
+    /**
+     * Issue 394: Mac is unable to perform keyboard navigation on decorated combo box.
+     */
+    public void interactiveKeyboardTest() {
+        final JComboBox undecoratedBox = new JComboBox(new String[] {"ONE", "TWO", "THREE"});
+        undecoratedBox.setEditable(true);
+        final DefaultCellEditor undecoratedEditor = new DefaultCellEditor(undecoratedBox);
+
+        final JComboBox decoratedBox = new JComboBox(new String[] {"ONE", "TWO", "THREE"});
+        AutoCompleteDecorator.decorate(decoratedBox);
+        final ComboBoxCellEditor decoratedEditor = new ComboBoxCellEditor(decoratedBox);
+
+        final JXTable table = new JXTable() {
+            @Override
+            public TableCellEditor getCellEditor(int row, int column) {
+                if (column == 0) {
+                    return undecoratedEditor;
+                }
+                return decoratedEditor;
+            }
+        };
+        table.setModel(new DefaultTableModel(new Object[][] { new Object[] { "ONE", "ONE" } },
+                new Object[] { "1", "2" }));
+        table.setSurrendersFocusOnKeystroke(true);
+
+        showWithScrollingInFrame(table, "Keyboard Navigation Check");
+    }
+
+    /**
+     * Issue 721: disabled foreground does not look the same for decorated combo box
+     */
+    public void interactiveForegroundColorCheck() {
+        JPanel panel = new JPanel();
+        final JComboBox comboNormal = new JComboBox(new String[] { "Normal Combo", "BB" });
+        final JComboBox comboAuto = new JComboBox(new String[] { "AutoComplete", "BB" });
+
+        comboNormal.setEnabled(false);
+        comboAuto.setEnabled(false);
+        
+        AutoCompleteDecorator.decorate(comboAuto);
+        comboAuto.setEditable(false);
+        
+        panel.add(comboNormal);
+        panel.add(comboAuto);
+
+        
+        JXFrame frame = wrapInFrame(panel, "Disabled Foreground Check");
+        addAction(frame, new AbstractAction("Enable Combos") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (comboAuto.isEnabled()) {
+                    comboAuto.setEnabled(false);
+                    comboNormal.setEnabled(false);
+                    putValue(Action.NAME, "Enable Combos");
+                } else {
+                    comboAuto.setEnabled(true);
+                    comboNormal.setEnabled(true);
+                    putValue(Action.NAME, "Disable Combos");
+                }
+            }
+        });
+        show(frame);
+    }
+
     /**
      * do nothing test - keep the testrunner happy.
      */
