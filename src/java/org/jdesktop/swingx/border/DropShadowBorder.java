@@ -70,38 +70,6 @@ public class DropShadowBorder implements Border, Serializable {
             = new HashMap<Double,Map<Position,BufferedImage>>();
                         
     private Color shadowColor;
-    public void setShadowColor(Color shadowColor) {
-        this.shadowColor = shadowColor;
-    }
-
-    public void setShadowSize(int shadowSize) {
-        this.shadowSize = shadowSize;
-    }
-
-    public void setShadowOpacity(float shadowOpacity) {
-        this.shadowOpacity = shadowOpacity;
-    }
-
-    public void setCornerSize(int cornerSize) {
-        this.cornerSize = cornerSize;
-    }
-
-    public void setShowTopShadow(boolean showTopShadow) {
-        this.showTopShadow = showTopShadow;
-    }
-
-    public void setShowLeftShadow(boolean showLeftShadow) {
-        this.showLeftShadow = showLeftShadow;
-    }
-
-    public void setShowBottomShadow(boolean showBottomShadow) {
-        this.showBottomShadow = showBottomShadow;
-    }
-
-    public void setShowRightShadow(boolean showRightShadow) {
-        this.showRightShadow = showRightShadow;
-    }
-
     private int shadowSize;
     private float shadowOpacity;
     private int cornerSize;
@@ -139,6 +107,7 @@ public class DropShadowBorder implements Border, Serializable {
      * {@inheritDoc}
      */
     public void paintBorder(Component c, Graphics graphics, int x, int y, int width, int height) {
+        long time = System.currentTimeMillis();
         /*
          * 1) Get images for this border
          * 2) Paint the images for each side of the border that should be painted
@@ -273,6 +242,7 @@ public class DropShadowBorder implements Border, Serializable {
         } finally {
             g2.dispose();
         }
+        System.out.println((System.currentTimeMillis() - time) + "ms");
     }
     
     private Map<Position,BufferedImage> getImages(Graphics2D g2) {
@@ -439,5 +409,37 @@ public class DropShadowBorder implements Border, Serializable {
     
     public int getCornerSize() {
         return cornerSize;
+    }
+    
+    public void setShadowColor(Color shadowColor) {
+        this.shadowColor = shadowColor;
+    }
+
+    public void setShadowSize(int shadowSize) {
+        this.shadowSize = shadowSize;
+    }
+
+    public void setShadowOpacity(float shadowOpacity) {
+        this.shadowOpacity = shadowOpacity;
+    }
+
+    public void setCornerSize(int cornerSize) {
+        this.cornerSize = cornerSize;
+    }
+
+    public void setShowTopShadow(boolean showTopShadow) {
+        this.showTopShadow = showTopShadow;
+    }
+
+    public void setShowLeftShadow(boolean showLeftShadow) {
+        this.showLeftShadow = showLeftShadow;
+    }
+
+    public void setShowBottomShadow(boolean showBottomShadow) {
+        this.showBottomShadow = showBottomShadow;
+    }
+
+    public void setShowRightShadow(boolean showRightShadow) {
+        this.showRightShadow = showRightShadow;
     }
 }

@@ -51,10 +51,9 @@ import org.jdesktop.swingx.plaf.MultiThumbSliderUI;
  * no default visual representation. To customize the look of the thumbs and the
  * track behind the thumbs you must provide a ThumbRenderer and a TrackRenderer 
  * implementation. To listen for changes to the thumbs you must provide an 
- * implemention of ThumbDataListener.
+ * implementation of ThumbDataListener.
  * 
  * TODOs:
- * move public inner classes (interfaces, etc) to subpackage
  * add min/maxvalue convenience methods to jxmultithumbslider
  * add plafs for windows, mac, and basic (if necessary)
  * make way to properly control the height.
@@ -63,11 +62,25 @@ import org.jdesktop.swingx.plaf.MultiThumbSliderUI;
  * @author joshy
  */
 public class JXMultiThumbSlider<E> extends JComponent {
+    public static final String uiClassID = "MultiThumbSliderUI";
+    
+    private ThumbDataListener tdl;
+    
+    private List<ThumbComp> thumbs;
+    
+    private ThumbRenderer thumbRenderer;
+    
+    private TrackRenderer trackRenderer;
+    
+    private MultiThumbModel<E> model;
+    
+    private List<ThumbListener> listeners = new ArrayList<ThumbListener>();
+    
+    private ThumbComp selected;
+    
     static {
         LookAndFeelAddons.contribute(new MultiThumbSliderAddon());
     }
-
-    public static final String uiClassID = "MultiThumbSliderUI";
     
     /** Creates a new instance of JMultiThumbSlider */
     public JXMultiThumbSlider() {
@@ -88,6 +101,14 @@ public class JXMultiThumbSlider<E> extends JComponent {
         updateUI();
     }
     
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getUIClassID() {
+        return uiClassID;
+    }
+    
     public MultiThumbSliderUI getUI() {
         return (MultiThumbSliderUI)ui;
     }
@@ -101,28 +122,6 @@ public class JXMultiThumbSlider<E> extends JComponent {
         setUI((MultiThumbSliderUI)LookAndFeelAddons.getUI(this, MultiThumbSliderUI.class));
         invalidate();
     }
-    
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getUIClassID() {
-        return uiClassID;
-    }
-
-    private ThumbDataListener tdl;
-    
-    private List<ThumbComp> thumbs;
-    
-    private ThumbRenderer thumbRenderer;
-    
-    private TrackRenderer trackRenderer;
-    
-    private MultiThumbModel<E> model;
-
-    private List<ThumbListener> listeners = new ArrayList<ThumbListener>();
-        
-    private ThumbComp selected;
     
     @Override
     protected void paintComponent(Graphics g) {
@@ -379,7 +378,6 @@ public class JXMultiThumbSlider<E> extends JComponent {
     }
 
     private class ThumbHandler implements ThumbDataListener {
-
         public void positionChanged(ThumbDataEvent e) {
             ThumbComp comp = thumbs.get(e.getIndex());
             clipThumbPosition(comp);
@@ -408,6 +406,4 @@ public class JXMultiThumbSlider<E> extends JComponent {
             repaint();
         }
     }
-
-
 }
