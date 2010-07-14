@@ -30,6 +30,7 @@ import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.lang.ref.WeakReference;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -41,6 +42,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 
 import org.jdesktop.swingx.JXDialog;
 import org.jdesktop.swingx.JXFindBar;
@@ -48,6 +50,7 @@ import org.jdesktop.swingx.JXFindPanel;
 import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXRootPane;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
+import org.jdesktop.swingx.plaf.UIDependent;
 import org.jdesktop.swingx.util.Utilities;
 
 /**
@@ -76,7 +79,29 @@ import org.jdesktop.swingx.util.Utilities;
  * 
  * @author Jeanette Winzenburg
  */
-public class SearchFactory {
+public class SearchFactory implements UIDependent {
+    private static class LaFListener implements PropertyChangeListener {
+        private final WeakReference<SearchFactory> ref;
+        
+        public LaFListener(SearchFactory sf) {
+            this.ref = new WeakReference<SearchFactory>(sf);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void propertyChange(PropertyChangeEvent evt) {
+            SearchFactory sf = ref.get();
+            
+            if (sf == null) {
+                UIManager.removePropertyChangeListener(this);
+            } else if ("lookAndFeel".equals(evt.getPropertyName())) {
+                sf.updateUI();
+            }
+        }
+    }
+    
     // PENDING: rename methods to batch/incremental instead of dialog/toolbar
 
     static {
@@ -122,6 +147,10 @@ public class SearchFactory {
         searchFactory = factory;
     }
 
+    public SearchFactory() {
+        UIManager.addPropertyChangeListener(new LaFListener(this));
+    }
+    
     /**
      * Returns a common Keystroke for triggering 
      * a search. Tries to be OS-specific. <p>
@@ -520,4 +549,17 @@ public class SearchFactory {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void updateUI() {
+        if (findBar != null) {
+            SwingUtilities.updateComponentTreeUI(findBar);
+        }
+        
+        if (findPanel != null) {
+            SwingUtilities.updateComponentTreeUI(findPanel);
+        }
+    }
 }
