@@ -354,7 +354,9 @@ public class ActionContainerFactory {
      * @param action a mangaged Action
      * @param container the parent container may be null for non-group actions.
      * @return a JMenuItem or subclass depending on type.
+     * @deprecated API will be made private; see Issue #313
      */
+    @Deprecated
     public JMenuItem createMenuItem(Action action, JComponent container) {
         JMenuItem menuItem = null;
         if (action instanceof AbstractActionExt) {
