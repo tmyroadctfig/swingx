@@ -23,12 +23,23 @@ package org.jdesktop.swingx;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 
+import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+
+import org.jdesktop.swingx.image.FastBlurFilter;
+import org.jdesktop.swingx.painter.MattePainter;
+import org.jdesktop.swingx.util.PaintUtils;
 
 /**
  * Visual tests of JXButton issues.
@@ -75,14 +86,110 @@ public class JXButtonVisualCheck extends InteractiveTestCase {
         f.setTitle("JFrame");
         f.setVisible(true);
     }
+    
+    /**
+     * SwingX Issue 1158
+     */
+    public void interactiveStatusBarCheck() {
+        final JXButton button = new JXButton("Sample");
+        MattePainter p = new MattePainter(PaintUtils.BLUE_EXPERIENCE, true);
+        button.setForegroundPainter(p);
+        BufferedImage im;
+        try {
+            im = ImageIO.read(JXButton.class.getResource("plaf/basic/resources/error16.png"));
+        } catch (IOException ignore) {
+            System.out.println(ignore);
+            im = null;
+        }
+        button.setIcon(new ImageIcon(im));
+        
+        JXFrame frame = wrapInFrame(button, "Painter testing");
+        frame.setStatusBar(new JXStatusBar());
+        show(frame);
+    }
+    
+    public void interactiveForegroundCheck() {
+        final JXButton button = new JXButton("Sample");
+//        MattePainter p = new MattePainter(PaintUtils.AERITH, true);
+        final MattePainter p = new MattePainter(PaintUtils.BLUE_EXPERIENCE, true);
+        p.setFilters(new FastBlurFilter());
+        button.setForegroundPainter(p);
+        button.addActionListener(new ActionListener(){
+            private String[] values = new String[] {"Hello", "Goodbye", "SwingLabs", "Turkey Bowl"};
+            private int index = 1;
+            public void actionPerformed(ActionEvent ae) {
+                button.setText(values[index]);
+                index++;
+                if (index >= values.length) {
+                    index = 0;
+                }
+            }
+        });
+        BufferedImage im;
+        try {
+            im = ImageIO.read(JXButton.class.getResource("plaf/basic/resources/error16.png"));
+        } catch (IOException ignore) {
+            System.out.println(ignore);
+            im = null;
+        }
+        button.setIcon(new ImageIcon(im));
+        button.addMouseListener(new MouseAdapter() {
 
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                p.setFilters(null);
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public void mouseExited(MouseEvent e) {
+                p.setFilters(new FastBlurFilter());
+            }
+            
+        });
+        
+        showInFrame(button, "Painter testing");
+    }
+
+    public void interactiveBackgroundCheck() {
+        final JXButton button = new JXButton("Sample");
+        MattePainter p = new MattePainter(PaintUtils.AERITH, true);
+        button.setBackgroundPainter(p);
+        button.addActionListener(new ActionListener(){
+            private String[] values = new String[] {"Hello", "Goodbye", "SwingLabs", "Turkey Bowl"};
+            private int index = 1;
+            public void actionPerformed(ActionEvent ae) {
+                button.setText(values[index]);
+                index++;
+                if (index >= values.length) {
+                    index = 0;
+                }
+            }
+        });
+        BufferedImage im;
+        try {
+            im = ImageIO.read(JXButton.class.getResource("plaf/basic/resources/error16.png"));
+        } catch (IOException ignore) {
+            System.out.println(ignore);
+            im = null;
+        }
+        button.setIcon(new ImageIcon(im));
+        
+        showInFrame(button, "Painter testing");
+    }
+    
     /**
      * @param args
      */
     public static void main(String[] args) {
         JXButtonVisualCheck test = new JXButtonVisualCheck();
         try {
-            test.runInteractiveTests();
+            test.runInteractiveTests("interactiveStatusBarCheck");
           } catch (Exception e) {
               System.err.println("exception when executing interactive tests:");
               e.printStackTrace();

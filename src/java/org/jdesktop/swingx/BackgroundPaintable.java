@@ -28,6 +28,13 @@ import org.jdesktop.swingx.painter.Painter;
  * @author kschaefer
  */
 interface BackgroundPaintable {
+    /**
+     * Returns the current background painter.
+     * 
+     * @return the current painter
+     * @see #setBackgroundPainter(Painter)
+     * @see #isPaintBorderInsets()
+     */
     Painter getBackgroundPainter();
     
     void setBackgroundPainter(Painter painter);

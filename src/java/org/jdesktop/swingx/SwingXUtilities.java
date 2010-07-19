@@ -183,6 +183,7 @@ public final class SwingXUtilities {
                 g.translate(insets.left, insets.top);
                 painter.paint(g, comp, comp.getWidth() - insets.left - insets.right,
                         comp.getHeight() - insets.top - insets.bottom);
+                g.translate(-insets.left, -insets.top);
             }
         }
     }

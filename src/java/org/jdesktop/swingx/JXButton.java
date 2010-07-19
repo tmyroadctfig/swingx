@@ -21,22 +21,33 @@
 
 package org.jdesktop.swingx;
 
+import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
+import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
+import java.awt.image.BufferedImageOp;
 
 import javax.swing.Action;
+import javax.swing.ButtonModel;
+import javax.swing.CellRendererPane;
 import javax.swing.Icon;
 import javax.swing.JButton;
+import javax.swing.SwingUtilities;
+import javax.swing.plaf.basic.BasicGraphicsUtils;
 
+import org.jdesktop.swingx.color.ColorUtil;
+import org.jdesktop.swingx.graphics.GraphicsUtilities;
 import org.jdesktop.swingx.painter.AbstractPainter;
 import org.jdesktop.swingx.painter.Painter;
+import org.jdesktop.swingx.painter.PainterPaint;
+import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 
 /**
  * <p>A {@link org.jdesktop.swingx.painter.Painter} enabled subclass of {@link javax.swing.JButton}.
- * This class supports setting the foreground and background painters of the button separately. By default,
- * <code>JXButton</code> creates and installs two <code>Painter</code>s; one for the foreground, and one
- * for the background. These default <code>Painter</code>s delegate to the installed UI delegate.</p>
+ * This class supports setting the foreground and background painters of the button separately.</p>
  *
  * <p>For example, if you wanted to blur <em>just the text</em> on the button, and let everything else be
  * handled by the UI delegate for your look and feel, then you could:
@@ -49,121 +60,535 @@ import org.jdesktop.swingx.painter.Painter;
  *
  * <p>If <em>either</em> the foreground painter or the background painter is set,
  * then super.paintComponent() is not called. By setting both the foreground and background
- * painters to null, you get <em>exactly</em> the same painting behavior as JButton.
- * By contrast, the <code>Painters</code> installed by default will delegate to the UI delegate,
- * thus achieving the same look as a typical JButton, but at the cost of some additional painting
- * overhead.</p>
+ * painters to null, you get <em>exactly</em> the same painting behavior as JButton.</p>
  *
  * @author rbair
  * @author rah003
  * @author Jan Stola
+ * @author Karl George Schaefer
  */
-public class JXButton extends JButton {
-    //properties used to split foreground and background painting.
-    //overwritten to suppress event notification while painting
-    private String text = "";
-    private boolean borderPainted;
-    private boolean contentAreaFilled;
+public class JXButton extends JButton implements BackgroundPaintable {
+    private class BackgroundButton extends JButton {
 
-    private Painter<JXButton> fgPainter = new DefaultForegroundPainter();
-    private Painter<JXButton> bgPainter = new DefaultBackgroundPainter();
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public boolean isDefaultButton() {
+            return JXButton.this.isDefaultButton();
+        }
 
-    /** Creates a new instance of JXButton */
-    public JXButton() {}
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Icon getDisabledIcon() {
+            return null;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Icon getDisabledSelectedIcon() {
+            return null;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public int getDisplayedMnemonicIndex() {
+            return -1;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public int getHorizontalAlignment() {
+            return JXButton.this.getHorizontalAlignment();
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public int getHorizontalTextPosition() {
+            return JXButton.this.getHorizontalTextPosition();
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Icon getIcon() {
+            return null;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public int getIconTextGap() {
+            return JXButton.this.getIconTextGap();
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Insets getMargin() {
+            return JXButton.this.getMargin();
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public int getMnemonic() {
+            return -1;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public ButtonModel getModel() {
+            return JXButton.this.getModel();
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Icon getPressedIcon() {
+            return null;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Icon getRolloverIcon() {
+            return null;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Icon getRolloverSelectedIcon() {
+            return null;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Icon getSelectedIcon() {
+            return null;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String getText() {
+            return "";
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public int getVerticalAlignment() {
+            return JXButton.this.getVerticalAlignment();
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public int getVerticalTextPosition() {
+            return JXButton.this.getVerticalTextPosition();
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public boolean isBorderPainted() {
+            return JXButton.this.isBorderPainted();
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public boolean isContentAreaFilled() {
+            return JXButton.this.isContentAreaFilled();
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public boolean isFocusPainted() {
+            return false;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public boolean isRolloverEnabled() {
+            return JXButton.this.isRolloverEnabled();
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public boolean isSelected() {
+            return JXButton.this.isSelected();
+        }
+        
+    }
+    
+    private class ForegroundButton extends JButton {
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Color getForeground() {
+            if (fgPainter == null) {
+                return JXButton.this.getForeground();
+            }
+            
+            return ColorUtil.setAlpha(JXButton.this.getForeground(), 0);
+        }
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public boolean isDefaultButton() {
+            return JXButton.this.isDefaultButton();
+        }
+        
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Icon getDisabledIcon() {
+            return JXButton.this.getDisabledIcon();
+        }
+        
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Icon getDisabledSelectedIcon() {
+            return JXButton.this.getDisabledSelectedIcon();
+        }
+        
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public int getDisplayedMnemonicIndex() {
+            return JXButton.this.getDisplayedMnemonicIndex();
+        }
+        
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public int getHorizontalAlignment() {
+            return JXButton.this.getHorizontalAlignment();
+        }
+        
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public int getHorizontalTextPosition() {
+            return JXButton.this.getHorizontalTextPosition();
+        }
+        
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Icon getIcon() {
+            return JXButton.this.getIcon();
+        }
+        
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public int getIconTextGap() {
+            return JXButton.this.getIconTextGap();
+        }
+        
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Insets getMargin() {
+            return JXButton.this.getMargin();
+        }
+        
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public int getMnemonic() {
+            return JXButton.this.getMnemonic();
+        }
+        
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public ButtonModel getModel() {
+            return JXButton.this.getModel();
+        }
+        
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Icon getPressedIcon() {
+            return JXButton.this.getPressedIcon();
+        }
+        
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Icon getRolloverIcon() {
+            return JXButton.this.getRolloverIcon();
+        }
+        
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Icon getRolloverSelectedIcon() {
+            return JXButton.this.getRolloverSelectedIcon();
+        }
+        
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Icon getSelectedIcon() {
+            return JXButton.this.getSelectedIcon();
+        }
+        
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String getText() {
+            return JXButton.this.getText();
+        }
+        
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public int getVerticalAlignment() {
+            return JXButton.this.getVerticalAlignment();
+        }
+        
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public int getVerticalTextPosition() {
+            return JXButton.this.getVerticalTextPosition();
+        }
+        
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public boolean isBorderPainted() {
+            return JXButton.this.isBorderPainted();
+        }
+        
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public boolean isContentAreaFilled() {
+            return false;
+        }
+        
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public boolean hasFocus() {
+            return JXButton.this.hasFocus();
+        }
+        
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public boolean isFocusPainted() {
+            return JXButton.this.isFocusPainted();
+        }
+        
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public boolean isRolloverEnabled() {
+            return JXButton.this.isRolloverEnabled();
+        }
+        
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public boolean isSelected() {
+            return JXButton.this.isSelected();
+        }
+    }
+    
+    /**
+     * @see #getUIClassID
+     * @see #readObject
+     */
+    public static final String uiClassID = "XButtonUI";
+    
+    private ForegroundButton fgStamp;
+    private Painter fgPainter;
+    private PainterPaint fgPaint;
+    private BackgroundButton bgStamp;
+    private Painter bgPainter;
+    
+    private boolean paintBorderInsets = true;
+
+    private Rectangle viewRect = new Rectangle();
+    private Rectangle textRect = new Rectangle();
+    private Rectangle iconRect = new Rectangle();
+    
+    /**
+     * Creates a button with no set text or icon.
+     */
+    public JXButton() {
+        init();
+    }
+
+    /**
+     * Creates a button with text.
+     * 
+     * @param text
+     *            the text of the button
+     */
     public JXButton(String text) {
         super(text);
-        this.text = text;
+        init();
     }
+
+    /**
+     * Creates a button where properties are taken from the {@code Action} supplied.
+     * 
+     * @param a
+     *            the {@code Action} used to specify the new button
+     */
     public JXButton(Action a) {
-        super();
-        // swingx-849 Has to set action explicitly after UI resources are already initialized by
-        //implicit constructor to ensure properties defined in action are initialized properly.
-        setAction(a);
+        super(a);
+        init();
     }
-    public JXButton(Icon icon) { super(icon); }
+
+    /**
+     * Creates a button with an icon.
+     * 
+     * @param icon
+     *            the Icon image to display on the button
+     */
+    public JXButton(Icon icon) {
+        super(icon);
+        init();
+    }
+
+    /**
+     * Creates a button with initial text and an icon.
+     * 
+     * @param text
+     *            the text of the button
+     * @param icon
+     *            the Icon image to display on the button
+     */
     public JXButton(String text, Icon icon) {
         super(text, icon);
-        this.text = text;
+        init();
     }
-
+    
+    private void init() {
+        fgStamp = new ForegroundButton();
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    protected void init(String text, Icon icon) {
-        borderPainted = true;
-        contentAreaFilled = true;
-        super.init(text, icon);
-    }
-
-    @Override
-    public void setText(String text) {
-        this.text = text;
-        super.setText(text);
-    }
-    @Override
-    public void repaint() {
-        if (painting) {
-            // skip repaint requests while painting
-            return;
-        }
-        super.repaint();
-    }
-
-    @Override
-    public String getText() {
-        return this.text;
-    }
-
-    @Override
-    public void setBorderPainted(boolean b) {
-        this.borderPainted = b;
-        super.setBorderPainted(b);
-    }
-
-    @Override
-    public boolean isBorderPainted() {
-        return this.borderPainted;
-    }
-
-    @Override
-    public void setContentAreaFilled(boolean b) {
-        this.contentAreaFilled = b;
-        super.setContentAreaFilled(b);
-    }
-
-    @Override
-    public boolean isContentAreaFilled() {
-        return this.contentAreaFilled;
-    }
-
-    public Painter<JXButton> getBackgroundPainter() {
+    @SuppressWarnings("unchecked")
+    public Painter getBackgroundPainter() {
         return bgPainter;
     }
 
-    public void setBackgroundPainter(Painter<JXButton> p) {
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @SuppressWarnings("unchecked")
+    public void setBackgroundPainter(Painter p) {
         Painter old = getBackgroundPainter();
         this.bgPainter = p;
         firePropertyChange("backgroundPainter", old, getBackgroundPainter());
         repaint();
     }
-    public Painter<JXButton> getForegroundPainter() {
+    
+    /**
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    public Painter getForegroundPainter() {
         return fgPainter;
     }
 
-    public void setForegroundPainter(Painter<JXButton> p) {
+    @SuppressWarnings("unchecked")
+    public void setForegroundPainter(Painter p) {
         Painter old = getForegroundPainter();
         this.fgPainter = p;
+        
+        if (fgPainter == null) {
+            fgPaint = null;
+        } else {
+            fgPaint = new PainterPaint(fgPainter, this);
+            
+            if (bgStamp == null) {
+                bgStamp = new BackgroundButton();
+            }
+        }
+        
         firePropertyChange("foregroundPainter", old, getForegroundPainter());
         repaint();
     }
-
-    private boolean paintBorderInsets = true;
-    private boolean painting;
-    private boolean opaque = true;
 
     /**
      * Returns true if the background painter should paint where the border is
      * or false if it should only paint inside the border. This property is
      * true by default. This property affects the width, height,
-     * and intial transform passed to the background painter.
+     * and initial transform passed to the background painter.
      */
     public boolean isPaintBorderInsets() {
         return paintBorderInsets;
@@ -174,7 +599,7 @@ public class JXButton extends JButton {
      * Set to true if the background painter should paint where the border is
      * or false if it should only paint inside the border. This property is true by default.
      * This property affects the width, height,
-     * and intial transform passed to the background painter.
+     * and initial transform passed to the background painter.
      *
      * This is a bound property.
      */
@@ -183,108 +608,159 @@ public class JXButton extends JButton {
         this.paintBorderInsets = paintBorderInsets;
         firePropertyChange("paintBorderInsets", old, isPaintBorderInsets());
     }
-
+    
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public boolean isOpaque() {
-        return painting ? opaque : super.isOpaque();
+    public Dimension getPreferredSize() {
+        if (getComponentCount() == 1 && getComponent(0) instanceof CellRendererPane) {
+            return BasicGraphicsUtils.getPreferredButtonSize(fgStamp, getIconTextGap());
+        }
+        
+        return super.getPreferredSize();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void paintComponent(Graphics g) {
-        Painter<JXButton> bgPainter = getBackgroundPainter();
-        Painter<JXButton> fgPainter = getForegroundPainter();
-        if (painting || (bgPainter == null && fgPainter == null)) {
+        if (fgPainter == null && bgPainter == null) {
             super.paintComponent(g);
         } else {
-            invokePainter(g, bgPainter);
-            invokePainter(g, fgPainter);
-        }
-    }
-
-    private void invokePainter(Graphics g, Painter<JXButton> ptr) {
-        if(ptr == null) return;
-
-        Graphics2D g2d = (Graphics2D) g.create();
-
-        try {
-            if(isPaintBorderInsets()) {
-                ptr.paint(g2d, this, getWidth(), getHeight());
+            if (fgPainter == null) {
+                Graphics2D g2d = (Graphics2D) g.create();
+                
+                try{
+                    paintWithoutForegroundPainter(g2d);
+                } finally {
+                    g2d.dispose();
+                }
+            } else if (fgPainter instanceof AbstractPainter && ((AbstractPainter) fgPainter).getFilters().length > 0) {
+                paintWithForegroundPainterWithFilters(g);
             } else {
-                Insets ins = this.getInsets();
-                g2d.translate(ins.left, ins.top);
-                ptr.paint(g2d, this,
-                        this.getWidth() - ins.left - ins.right,
-                        this.getHeight() - ins.top - ins.bottom);
+                Graphics2D g2d = (Graphics2D) g.create();
+                
+                try {
+                    paintWithForegroundPainterWithoutFilters(g2d);
+                } finally {
+                    g2d.dispose();
+                }
             }
-        } finally {
-            g2d.dispose();
+            
+//            Graphics2D g2d = (Graphics2D) g.create();
+//            
+//            try {
+//                if (bgPainter == null) {
+//                    SwingUtilities.paintComponent(g, bgStamp, this, 0, 0, getWidth(), getHeight());
+//                } else {
+//                    SwingXUtilities.paintBackground(this, g2d);
+//                }
+//                
+//                SwingUtilities.paintComponent(g, fgStamp, this, 0, 0, getWidth(), getHeight());
+//                
+//                if (fgPainter != null && getText() != null && !getText().isEmpty()) {
+//                    Insets i = getInsets();
+//                    viewRect.x = i.left;
+//                    viewRect.y = i.top;
+//                    viewRect.width = getWidth() - (i.right + viewRect.x);
+//                    viewRect.height = getHeight() - (i.bottom + viewRect.y);
+//
+//                    textRect.x = textRect.y = textRect.width = textRect.height = 0;
+//                    iconRect.x = iconRect.y = iconRect.width = iconRect.height = 0;
+//
+//                    // layout the text and icon
+//                    String text = SwingUtilities.layoutCompoundLabel(
+//                        this, g2d.getFontMetrics(), getText(), getIcon(), 
+//                        getVerticalAlignment(), getHorizontalAlignment(),
+//                        getVerticalTextPosition(), getHorizontalTextPosition(),
+//                        viewRect, iconRect, textRect, 
+//                        getText() == null ? 0 : getIconTextGap());
+//                    
+//                    if (!isPaintBorderInsets()) {
+//                        g2d.translate(i.left, i.top);
+//                    }
+//                    
+//                    g2d.setPaint(fgPaint);
+//                    BasicGraphicsUtils.drawStringUnderlineCharAt(g2d, text, getDisplayedMnemonicIndex(),
+//                            textRect.x, textRect.y + g2d.getFontMetrics().getAscent());
+//                }
+//            } finally {
+//                g2d.dispose();
+//            }
         }
     }
-    // paint anything but text and icon
-    private static final class DefaultBackgroundPainter extends AbstractPainter<JXButton> {
-        @Override
-        protected void doPaint(Graphics2D g, JXButton b, int width, int height) {
-            boolean op = b.opaque;
-            // have to read this before setting painting == true !!!
-            b.opaque = b.isOpaque();
-            b.setPainting(true);
-            String tmp = b.text;
-            // #swingx-874
-            Icon tmpIcon = b.getIcon();
-            b.setIcon(null);
-            b.text = "";
-            try {
-                b.paint(g);
-            } finally {
-                // restore original values no matter what
-                b.opaque = op;
-                b.text = tmp;
-                b.setIcon(tmpIcon);
-                b.setPainting(false);
+    
+    private void paintWithoutForegroundPainter(Graphics2D g2d) {
+        if (bgPainter == null) {
+            SwingUtilities.paintComponent(g2d, bgStamp, this, 0, 0, getWidth(), getHeight());
+        } else {
+            SwingXUtilities.paintBackground(this, g2d);
+        }
+        
+        SwingUtilities.paintComponent(g2d, fgStamp, this, 0, 0, getWidth(), getHeight());
+    }
+    
+    private void paintWithForegroundPainterWithoutFilters(Graphics2D g2d) {
+        paintWithoutForegroundPainter(g2d);
+        
+        if (getText() != null && !getText().isEmpty()) {
+            Insets i = getInsets();
+            viewRect.x = i.left;
+            viewRect.y = i.top;
+            viewRect.width = getWidth() - (i.right + viewRect.x);
+            viewRect.height = getHeight() - (i.bottom + viewRect.y);
+
+            textRect.x = textRect.y = textRect.width = textRect.height = 0;
+            iconRect.x = iconRect.y = iconRect.width = iconRect.height = 0;
+
+            // layout the text and icon
+            String text = SwingUtilities.layoutCompoundLabel(
+                this, g2d.getFontMetrics(), getText(), getIcon(), 
+                getVerticalAlignment(), getHorizontalAlignment(),
+                getVerticalTextPosition(), getHorizontalTextPosition(),
+                viewRect, iconRect, textRect, 
+                getText() == null ? 0 : getIconTextGap());
+            
+            if (!isPaintBorderInsets()) {
+                g2d.translate(i.left, i.top);
             }
-        }
-
-        //if any of the state of the JButton that affects the background has changed,
-        //then I must clear the cache. This is really hard to get right, there are
-        //bound to be bugs. An alternative is to NEVER cache.
-        @Override
-        protected boolean shouldUseCache() {
-            return false;
+            
+            g2d.setPaint(fgPaint);
+            BasicGraphicsUtils.drawStringUnderlineCharAt(g2d, text, getDisplayedMnemonicIndex(),
+                    textRect.x, textRect.y + g2d.getFontMetrics().getAscent());
         }
     }
-    // paint only a text and icon (if any)
-    private static final class DefaultForegroundPainter extends AbstractPainter<JXButton> {
-        @Override
-        protected void doPaint(Graphics2D g, JXButton b, int width, int height) {
-            b.setPainting(true);
-            boolean t1 = b.isBorderPainted();
-            boolean t2 = b.isContentAreaFilled();
-            boolean op = b.opaque;
-            b.borderPainted = false;
-            b.contentAreaFilled = false;
-            b.opaque = false;
-            try {
-                b.paint(g);
-            } finally {
-                // restore original values no matter what
-                b.opaque = op;
-                b.borderPainted = t1;
-                b.contentAreaFilled = t2;
-                b.setPainting(false);
-            }
+    
+    private void paintWithForegroundPainterWithFilters(Graphics g) {
+        BufferedImage im = GraphicsUtilities.createCompatibleImage(getWidth(), getHeight());
+        Graphics2D g2d = im.createGraphics();
+        paintWithForegroundPainterWithoutFilters(g2d);
+        
+        for (BufferedImageOp filter : ((AbstractPainter) fgPainter).getFilters()) {
+            im = filter.filter(im, null);
         }
-
-        //if any of the state of the JButton that affects the foreground has changed,
-        //then I must clear the cache. This is really hard to get right, there are
-        //bound to be bugs. An alternative is to NEVER cache.
-        @Override
-        protected boolean shouldUseCache() {
-            return false;
+        
+        g.drawImage(im, 0, 0, this);
+    }
+    
+    /**
+     * Notification from the <code>UIManager</code> that the L&F has changed.
+     * Replaces the current UI object with the latest version from the <code>UIManager</code>.
+     * 
+     * @see javax.swing.JComponent#updateUI
+     */
+    @Override
+    public void updateUI() {
+        super.updateUI();
+        
+        if (bgStamp != null) {
+            bgStamp.updateUI();
+        }
+        
+        if (fgStamp != null) {
+            fgStamp.updateUI();
         }
     }
-
-    protected void setPainting(boolean b) {
-        painting = b;
-    }
-
 }

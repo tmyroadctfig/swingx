@@ -97,6 +97,7 @@ public abstract class AbstractPainter<T> extends AbstractBean implements Painter
     private boolean antialiasing = true;
     private Interpolation interpolation = Interpolation.NearestNeighbor;
     private boolean visible = true;
+    private boolean inPaintContext;
 
     /**
      * Creates a new instance of AbstractPainter.
@@ -306,6 +307,14 @@ public abstract class AbstractPainter<T> extends AbstractBean implements Painter
             clearCache();
         }
     }
+    
+    boolean isInPaintContext() {
+        return inPaintContext;
+    }
+
+    void setInPaintContext(boolean inPaintContext) {
+        this.inPaintContext = inPaintContext;
+    }
 
     /**
      * <p>Returns true if the painter should use caching. This method allows subclasses to
@@ -404,8 +413,10 @@ public abstract class AbstractPainter<T> extends AbstractBean implements Painter
                     gfx.dispose();
                 }
 
-                for (BufferedImageOp f : getFilters()) {
-                    cache = f.filter(cache, null);
+                if (!isInPaintContext()) {
+                    for (BufferedImageOp f : getFilters()) {
+                        cache = f.filter(cache, null);
+                    }
                 }
 
                 //only save the temporary image as the cacheable if I'm caching
