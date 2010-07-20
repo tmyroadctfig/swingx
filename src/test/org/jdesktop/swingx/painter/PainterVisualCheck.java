@@ -36,42 +36,15 @@ import javax.swing.Timer;
 import org.jdesktop.swingx.JXButton;
 import org.jdesktop.swingx.JXPanel;
 import org.jdesktop.swingx.image.FastBlurFilter;
+import org.jdesktop.swingx.util.PaintUtils;
+import org.junit.Test;
 
 /**
  * JW: renamed from PainterInteractiveTest to fix the build failure. Revisit!
  * @author rbair
  */
 public class PainterVisualCheck extends RichInteractiveTestCase {
-
-    public void testJXButtonTextChangeWithBlur() {
-        //Creates a button with a blur on the text. On click events, the
-        //button changes its text. If things are working, then the text
-        //on the button will be changed, and reblurred. In other words,
-        //the painter will be invalid (cache cleared), and updated on the
-        //next paint.
-        final JXButton button = new JXButton();
-        AbstractPainter<?> p = (AbstractPainter<?>)button.getForegroundPainter();
-        p.setFilters(new FastBlurFilter());
-        button.addActionListener(new ActionListener(){
-            private String[] values = new String[] {"Hello", "Goodbye", "SwingLabs", "Turkey Bowl"};
-            private int index = 1;
-            public void actionPerformed(ActionEvent ae) {
-                button.setText(values[index]);
-                index++;
-                if (index >= values.length) {
-                    index = 0;
-                }
-            }
-        });
-
-        JPanel pa = new JPanel();
-        pa.add(button);
-        assertTrue(showTest(pa, "JXButton text-change with a blur",
-                "On click events, the button changes its text. " +
-                "If things are working, then the text on the button " +
-                "will be changed, and reblurred."));
-    }
-
+    @Test
     public void testCacheWithBlurAndAnimation() {
         //This test is also covered (more or less) by the regression tests.
         //This is a second line of defense test, because if the regression test
