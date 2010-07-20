@@ -23,6 +23,9 @@ package org.jdesktop.swingx.painter;
 
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.lang.ref.WeakReference;
 
 /**
  * <p>A {@link Painter} implementation composed of an array of <code>Painter</code>s.
@@ -58,6 +61,37 @@ import java.awt.geom.AffineTransform;
  * @author rbair
  */
 public class CompoundPainter<T> extends AbstractPainter<T> {
+    private static class Handler implements PropertyChangeListener {
+        private final WeakReference<CompoundPainter<?>> ref;
+        
+        public Handler(CompoundPainter<?> painter) {
+            ref = new WeakReference<CompoundPainter<?>>(painter);
+        }
+        
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void propertyChange(PropertyChangeEvent evt) {
+            CompoundPainter<?> painter = ref.get();
+            
+            if (painter == null) {
+                AbstractPainter<?> src = (AbstractPainter<?>) evt.getSource();
+                src.removePropertyChangeListener(this);
+            } else {
+                String property = evt.getPropertyName();
+                
+                if ("dirty".equals(property) && evt.getNewValue() == Boolean.FALSE) {
+                    return;
+                }
+                
+                painter.setDirty(true);
+            }
+        }
+    }
+    
+    private Handler handler;
+    
     private Painter[] painters = new Painter[0];
     private AffineTransform transform;
     private boolean clipPreserved = false;
@@ -66,6 +100,7 @@ public class CompoundPainter<T> extends AbstractPainter<T> {
 
     /** Creates a new instance of CompoundPainter */
     public CompoundPainter() {
+        this(null);
     }
     
     /**
@@ -76,10 +111,9 @@ public class CompoundPainter<T> extends AbstractPainter<T> {
      * @param painters array of painters, which will be painted in order
      */
     public CompoundPainter(Painter... painters) {
-        this.painters = new Painter[painters == null ? 0 : painters.length];
-        if (painters != null) {
-            System.arraycopy(painters, 0, this.painters, 0, painters.length);
-        }
+        handler = new Handler(this);
+        
+        setPainters(painters);
     }
     
     /**
@@ -92,10 +126,24 @@ public class CompoundPainter<T> extends AbstractPainter<T> {
      */
     public void setPainters(Painter... painters) {
         Painter[] old = getPainters();
+        
+        for (Painter p : old) {
+            if (p instanceof AbstractPainter) {
+                ((AbstractPainter<?>) p).removePropertyChangeListener(handler);
+            }
+        }
+        
         this.painters = new Painter[painters == null ? 0 : painters.length];
         if (painters != null) {
             System.arraycopy(painters, 0, this.painters, 0, this.painters.length);
         }
+        
+        for (Painter p : this.painters) {
+            if (p instanceof AbstractPainter) {
+                ((AbstractPainter<?>) p).addPropertyChangeListener(handler);
+            }
+        }
+        
         setDirty(true);
         firePropertyChange("painters", old, getPainters());
     }
@@ -248,6 +296,22 @@ public class CompoundPainter<T> extends AbstractPainter<T> {
             }
         }
         return false;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void setDirty(boolean d) {
+        boolean old = super.isDirty();
+        boolean ours = isDirty();
+        
+        super.setDirty(d);
+        
+        //must perform this check to ensure we do not double notify
+        if (d != old && d == ours) {
+            firePropertyChange("dirty", old, isDirty());
+        }
     }
 
     /**
