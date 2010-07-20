@@ -69,30 +69,4 @@ public class CompoundPainterIssues extends InteractiveTestCase {
         assertTrue("painter must have fired change event", report.hasEvents());
         
     }
-    /**
-     * Issue #??-swingx: must fire property change if contained painter
-     *    changed.
-     * @throws IOException 
-     *
-     */
-    public void testDirtyNotification() throws IOException {
-        BufferedImage img = new BufferedImage(10, 10, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g = img.createGraphics();
-
-        final ImagePainter imagePainter = new ImagePainter(ImageIO.read(JXPanel.class
-                .getResource("resources/images/kleopatra.jpg")));
-        assertNotNull(imagePainter);
-        assertTrue("initial state of dirty must be true? was: " + imagePainter.isDirty(), imagePainter.isDirty());
-        imagePainter.paint(g, null, 10, 10);
-        assertFalse(imagePainter.isDirty());
-        CompoundPainter<?> compound = new CompoundPainter<Object>(imagePainter);
-        assertFalse(compound.isDirty());
-        PropertyChangeReport report = new PropertyChangeReport();
-        compound.addPropertyChangeListener(report);
-        imagePainter.setBorderWidth(imagePainter.getBorderWidth() + 2);
-        assertTrue(imagePainter.isDirty());
-        assertTrue(compound.isDirty());
-        assertEquals("compound painter must fire exactly one property change", 1, report.getEventCount());
-        assertEquals("compound painter must fire dirty property", 1, report.getEventCount("dirty"));
-    }
 }
