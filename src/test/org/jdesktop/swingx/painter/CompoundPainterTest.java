@@ -183,8 +183,8 @@ public class CompoundPainterTest extends TestCase {
         assertTrue(cp1.painted);
         assertTrue(f1.filtered);
         assertTrue(p1.painted);
-        assertFalse(p2.painted);
-        assertFalse(f2.filtered);
+        assertTrue(p2.painted);
+        assertTrue(f2.filtered);
         assertTrue(cp2.painted);
         assertTrue(p3.painted);
         assertTrue(p4.painted);
@@ -232,11 +232,11 @@ public class CompoundPainterTest extends TestCase {
         assertTrue(cp1.painted);
         assertTrue(p1.painted);
         // p2 has filters therefore is cacheable by default (inherited from AbstractPainter)
-        assertFalse(p2.painted);
+        assertTrue(p2.painted);
         assertTrue(cp2.painted);
         assertTrue(p3.painted);
         // p4 has filters therefore is cacheable by default (inherited from AbstractPainter)
-        assertFalse(p4.painted);
+        assertTrue(p4.painted);
         assertTrue(p5.painted);
     }
 
@@ -268,7 +268,7 @@ public class CompoundPainterTest extends TestCase {
         base.paint(g, null, 10, 10);
         assertTrue(base.painted);
         // this can be false only as long as background is set cachable BEFORE it is painted!
-        assertFalse(background.painted);
+        assertTrue(background.painted);
         assertTrue(iris.painted);
     }
     
