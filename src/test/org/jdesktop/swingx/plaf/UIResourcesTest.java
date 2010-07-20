@@ -63,12 +63,16 @@ public class UIResourcesTest extends TestCase {
         LookAndFeelAddons.contribute(new LoginPaneAddon());
         LookAndFeelAddons.contribute(new MonthViewAddon());
         LookAndFeelAddons.contribute(new MultiThumbSliderAddon());
+        LookAndFeelAddons.contribute(new SearchFieldAddon());
         LookAndFeelAddons.contribute(new StatusBarAddon());
+        LookAndFeelAddons.contribute(new TableAddon());
+        LookAndFeelAddons.contribute(new TableHeaderAddon());
         LookAndFeelAddons.contribute(new TaskPaneAddon());
         LookAndFeelAddons.contribute(new TaskPaneContainerAddon());
         LookAndFeelAddons.contribute(new TipOfTheDayAddon());
         LookAndFeelAddons.contribute(new TitledPanelAddon());
         LookAndFeelAddons.contribute(new UIColorHighlighterAddon());
+        LookAndFeelAddons.contribute(new XListAddon());
     }
     
     /**
