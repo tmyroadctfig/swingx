@@ -22,6 +22,9 @@
 package org.jdesktop.swingx;
 
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.junit.Assert.assertThat;
 import junit.framework.TestCase;
 
 import org.junit.Test;
@@ -38,19 +41,13 @@ import org.junit.runners.JUnit4;
  */
 @RunWith(JUnit4.class)
 public class JXButtonTest extends TestCase {
-
     /**
-     * Issue #621-swingx: JXButton shares default fg/bg painters between instances.
      *
      */
     @Test
-    public void testNonStaticPainters() {
-        JXButton b1 = new JXButton();
-        JXButton b2 = new JXButton();
-    	assertNotSame("the painters must be unique", 
-                b1.getForegroundPainter(), b2.getForegroundPainter());
-    	assertNotSame("the painters must be unique", 
-                b1.getBackgroundPainter(), b2.getBackgroundPainter());
+    public void testDefaultIsNoPainters() {
+        JXButton b = new JXButton();
+    	assertThat(b.getForegroundPainter(), is(nullValue()));
+    	assertThat(b.getBackgroundPainter(), is(nullValue()));
     }
-
  }
