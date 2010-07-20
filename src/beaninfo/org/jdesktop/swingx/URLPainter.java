@@ -93,7 +93,7 @@ public class URLPainter extends CompoundPainter {
     }
 
     @Override
-    public void doPaint(Graphics2D g, Object component, int width, int height) {
+    protected void doPaint(Graphics2D g, Object component, int width, int height) {
         if(!loaded) {
             load();
         }

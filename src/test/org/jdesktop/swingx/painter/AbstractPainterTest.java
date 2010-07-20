@@ -22,6 +22,7 @@ package org.jdesktop.swingx.painter;
 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -342,6 +343,34 @@ public class AbstractPainterTest extends TestCase {
                 }
             }
         }
+    }
+    
+    /**
+     * Issue #??-swingx: clearCache has no detectable effect. Test was poorly designed. It has had
+     * an effect for a long time, but the member is not bound, so the test was failing erroneously.
+     * 
+     * @throws IOException
+     */
+    public void testClearCacheDetectable() throws IOException {
+        BufferedImage img = new BufferedImage(10, 10, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = img.createGraphics();
+
+        AbstractPainter<Object> painter = new ShapePainter() {
+            @Override
+            protected boolean shouldUseCache() {
+                return isCacheable();
+            }
+
+        };
+        assertFalse("cacheable is false by default", painter.isCacheable());
+        painter.setCacheable(true);
+        painter.paint(g, null, 10, 10);
+        // sanity
+        assertFalse("clean after paint", painter.isDirty());
+        assertTrue("cacheable is enabled", painter.isCacheable());
+        assertFalse("has a cached image", painter.isCacheCleared());
+        painter.clearCache();
+        assertTrue("has a cached image", painter.isCacheCleared());
     }
     
     //tests that compound behaviors, such as caching in compound situations, works
