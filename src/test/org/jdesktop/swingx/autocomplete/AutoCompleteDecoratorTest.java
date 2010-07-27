@@ -52,6 +52,7 @@ import javax.swing.InputMap;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JTextPane;
+import javax.swing.UIManager;
 import javax.swing.text.JTextComponent;
 
 import org.jdesktop.test.EDTRunner;
@@ -68,7 +69,8 @@ public class AutoCompleteDecoratorTest  {
     private JComboBox combo;
     
     @Before
-    public void setUp() {
+    public void setUp() throws Exception {
+        UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
         combo = new JComboBox(new String[]{"Alpha", "Bravo", "Charlie", "Delta"});
     }
     

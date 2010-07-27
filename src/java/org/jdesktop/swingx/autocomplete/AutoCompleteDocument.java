@@ -193,7 +193,11 @@ public class AutoCompleteDocument implements Document {
         
         // Handle initially selected object
         Object selected = adaptor.getSelectedItem();
-        if (selected!=null) setText(this.stringConverter.getPreferredStringForItem(selected));
+        if (selected != null) {
+            String itemAsString = this.stringConverter.getPreferredStringForItem(selected);
+            setText(itemAsString);
+            adaptor.setSelectedItemAsString(itemAsString);
+        }
         this.adaptor.markEntireText();
     }
     
