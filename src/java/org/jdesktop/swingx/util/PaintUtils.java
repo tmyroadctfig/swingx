@@ -219,51 +219,51 @@ public class PaintUtils {
         
         // if it is near 0 degrees
         if(Math.abs(angle) < Math.toRadians(e) ||
-                Math.abs(angle) > Math.toRadians(360-e)) {
-            start = new Point2D.Float(0,0);
-            end = new Point2D.Float(width,0);
+                Math.abs(angle) > Math.toRadians(360 - e)) {
+            start = new Point2D.Float(0, 0);
+            end = new Point2D.Float(normalize(end.getX(), width), 0);
         }
-        
+
         // near 45
-        if(isNear(a2, 45, e)) {
-            start = new Point2D.Float(0,0);
-            end = new Point2D.Float(width,height);
+        if (isNear(a2, 45, e)) {
+            start = new Point2D.Float(0, 0);
+            end = new Point2D.Float(normalize(end.getX(), width), normalize(end.getY(), height));
         }
-        
+
         // near 90
-        if(isNear(a2,  90, e)) {
-            start = new Point2D.Float(0,0);
-            end = new Point2D.Float(0,height);
+        if (isNear(a2, 90, e)) {
+            start = new Point2D.Float(0, 0);
+            end = new Point2D.Float(0, normalize(end.getY(), height));
         }
-        
+
         // near 135
-        if(isNear(a2, 135, e)) {
-            start = new Point2D.Float(width,0);
-            end = new Point2D.Float(0,height);
+        if (isNear(a2, 135, e)) {
+            start = new Point2D.Float(normalize(start.getX(), width), 0);
+            end = new Point2D.Float(0, normalize(end.getY(), height));
         }
-        
+
         // near 180
-        if(isNear(a2, 180, e)) {
-            start = new Point2D.Float(width,0);
-            end = new Point2D.Float(0,0);
+        if (isNear(a2, 180, e)) {
+            start = new Point2D.Float(normalize(start.getX(), width), 0);
+            end = new Point2D.Float(0, 0);
         }
-        
+
         // near 225
-        if(isNear(a2, 225, e)) {
-            start = new Point2D.Float(width,height);
-            end = new Point2D.Float(0,0);
+        if (isNear(a2, 225, e)) {
+            start = new Point2D.Float(normalize(start.getX(), width), normalize(start.getY(), height));
+            end = new Point2D.Float(0, 0);
         }
-        
+
         // near 270
-        if(isNear(a2, 270, e)) {
-            start = new Point2D.Float(0,height);
-            end = new Point2D.Float(0,0);
+        if (isNear(a2, 270, e)) {
+            start = new Point2D.Float(0, normalize(start.getY(), height));
+            end = new Point2D.Float(0, 0);
         }
-        
+
         // near 315
-        if(isNear(a2, 315, e)) {
-            start = new Point2D.Float(0,height);
-            end = new Point2D.Float(width,0);
+        if (isNear(a2, 315, e)) {
+            start = new Point2D.Float(0, normalize(start.getY(), height));
+            end = new Point2D.Float(normalize(end.getX(), width), 0);
         }
         
         return new Point2D[] { start, end };
@@ -271,6 +271,14 @@ public class PaintUtils {
     
     private static boolean isNear(double angle, double target, double error) {
         return Math.abs(target - Math.abs(angle)) < error;
+    }
+    
+    private static float normalize(double original, float target) {
+        if (original < 1f) {
+            return target * (float) original;
+        }
+        
+        return target;
     }
     
     private static double calcAngle(Point2D p1, Point2D p2) {
