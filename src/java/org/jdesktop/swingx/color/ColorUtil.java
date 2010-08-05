@@ -37,8 +37,11 @@ import javax.swing.JComponent;
  * @author joshua.marinacci@sun.com
  * @author Karl George Schaefer
  */
-public class ColorUtil {
-
+public final class ColorUtil {
+    private ColorUtil() {
+        //prevent instantiation
+    }
+    
     /**
      * Returns a new color equal to the old one, except that there is no alpha
      * (transparency) channel.

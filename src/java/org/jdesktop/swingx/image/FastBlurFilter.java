@@ -48,7 +48,7 @@ import org.jdesktop.swingx.graphics.GraphicsUtilities;
  * default radius is 3. Since the blur clamps values on the edges of the
  * source picture, you might need to provide a picture with empty borders
  * to avoid artifacts at the edges. The performance of this filter are
- * independant from the radius.</p>
+ * independent from the radius.</p>
  *
  * @author Romain Guy <romain.guy@mac.com>
  */

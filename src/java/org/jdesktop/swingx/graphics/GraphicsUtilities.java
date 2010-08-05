@@ -69,11 +69,11 @@ import javax.imageio.ImageIO;
  *
  * <p>This class provides a number of methods to easily scale down images.
  * Some of these methods offer a trade-off between speed and result quality and
- * shouuld be used all the time. They also offer the advantage of producing
+ * should be used all the time. They also offer the advantage of producing
  * compatible images, thus automatically resulting into better runtime
  * performance.</p>
  *
- * <p>All these methodes are both faster than
+ * <p>All these methods are both faster than
  * {@link java.awt.Image#getScaledInstance(int, int, int)} and produce
  * better-looking results than the various <code>drawImage()</code> methods
  * in {@link java.awt.Graphics}, which can be used for image scaling.</p>
@@ -737,17 +737,16 @@ public class GraphicsUtilities {
     }
 
     /**
-     * Sets the clip on a graphics object by merging a supplied clip with the
-     * existing one. The new clip will be an intersection of the old clip and
-     * the supplied clip. The old clip shape will be returned. This is useful
-     * for resetting the old clip after an operation is performed.
+     * Sets the clip on a graphics object by merging a supplied clip with the existing one. The new
+     * clip will be an intersection of the old clip and the supplied clip. The old clip shape will
+     * be returned. This is useful for resetting the old clip after an operation is performed.
      * 
      * @param g
      *            the graphics object to update
      * @param clip
-     *            a new clipping region to add to the graphics clip. This may
-     *            return {@code null} if the current clip is {@code null}.
-     * @return the current clipping region of the supplied graphics object
+     *            a new clipping region to add to the graphics clip.
+     * @return the current clipping region of the supplied graphics object. This may return {@code
+     *         null} if the current clip is {@code null}.
      * @throws NullPointerException
      *             if any parameter is {@code null}
      */

@@ -34,12 +34,12 @@ import java.beans.PropertyChangeSupport;
  * <p>A shadow is defined by three properties:
  * <ul>
  *   <li><i>size</i>: The size, in pixels, of the shadow. This property also
- *   defines the fuzzyness.</li>
+ *   defines the fuzziness.</li>
  *   <li><i>opacity</i>: The opacity, between 0.0 and 1.0, of the shadow.</li>
  *   <li><i>color</i>: The color of the shadow. Shadows are not meant to be
  *   black only.</li>
  * </ul>
- * You can set these properties using the provided mutaters or the appropriate
+ * You can set these properties using the provided mutators or the appropriate
  * constructor. Here are two ways of creating a green shadow of size 10 and
  * with an opacity of 50%:
  * <pre>
@@ -73,7 +73,7 @@ import java.beans.PropertyChangeSupport;
  * <h2>Properties Changes</h2>
  * <p>This renderer allows to register property change listeners with
  * {@link #addPropertyChangeListener}. Listening to properties changes is very
- * useful when you emebed the renderer in a graphical component and give the API
+ * useful when you embed the renderer in a graphical component and give the API
  * user the ability to access the renderer. By listening to properties changes,
  * you can easily repaint the component when needed.</p>
  * <h2>Threading Issues</h2>
@@ -133,7 +133,7 @@ public class ShadowRenderer {
      * These properties are:</p> 
      * <ul>
      *   <li><i>size</i>: The size, in pixels, of the shadow. This property also
-     *   defines the fuzzyness.</li>
+     *   defines the fuzziness.</li>
      *   <li><i>opacity</i>: The opacity, between 0.0 and 1.0, of the shadow.</li>
      *   <li><i>color</i>: The color of the shadow. Shadows are not meant to be
      *   black only.</li>

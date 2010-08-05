@@ -16,6 +16,7 @@ import javax.swing.JFrame;
 
 import org.jdesktop.swingx.JXPanel;
 import org.jdesktop.swingx.painter.AbstractPainter;
+import org.jdesktop.swingx.painter.ShapePainter;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,13 +42,7 @@ public class Star2DTest {
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         JXPanel p = new JXPanel();
         p.setPreferredSize(new Dimension(65,65));
-        p.setBackgroundPainter(new AbstractPainter() {
-
-            @Override
-            protected void doPaint(Graphics2D g, Object object, int width, int height) {
-                g.setColor(Color.RED);
-                g.fill(new Star2D(50,50,10,15,16));
-            }});
+        p.setBackgroundPainter(new ShapePainter(new Star2D(50,50,10,15,16), Color.RED));
         f.add(p);
         f.pack();
         f.setVisible(true);

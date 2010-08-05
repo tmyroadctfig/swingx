@@ -36,7 +36,7 @@ import org.jdesktop.swingx.plaf.TextUIWrapper;
  * @author Peter Weishapl <petw@gmx.net>
  * @author Karl Schaefer
  */
-public class PromptSupport {
+public final class PromptSupport {
 	/**
 	 * The prompt text property.
 	 */
@@ -87,6 +87,10 @@ public class PromptSupport {
 		 */
 		HIDE_PROMPT
 	};
+	
+	private PromptSupport() {
+	    //prevent instantiation
+	}
 
 	/**
 	 * <p>

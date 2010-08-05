@@ -57,7 +57,7 @@ import org.jdesktop.swingx.image.StackBlurFilter;
  *   <li><i>blur enabled</i>: perfect reflections are hardly natural. You can
  *    blur the reflection to make it look a bit more natural.</li>
  * </ul>
- * You can set these properties using the provided mutaters or the appropriate
+ * You can set these properties using the provided mutators or the appropriate
  * constructor. Here are two ways of creating a blurred reflection, with an
  * opacity of 50% and a length of 30% the height of the original image:
  * <pre>
@@ -96,7 +96,7 @@ import org.jdesktop.swingx.image.StackBlurFilter;
  * <h2>Properties Changes</h2>
  * <p>This renderer allows to register property change listeners with
  * {@link #addPropertyChangeListener}. Listening to properties changes is very
- * useful when you emebed the renderer in a graphical component and give the API
+ * useful when you embed the renderer in a graphical component and give the API
  * user the ability to access the renderer. By listening to properties changes,
  * you can easily repaint the component when needed.</p>
  * <h2>Threading Issues</h2>
@@ -467,7 +467,7 @@ public class ReflectionRenderer {
      * then the reflection will be 246 (480 * 0.5 + 3 * 2) pixels high.</p>
      * <p>The returned image contains <strong>only</strong>
      * the reflection. You will have to append it to the source image to produce
-     * the illusion of a reflective environement. The method
+     * the illusion of a reflective environment. The method
      * {@link #appendReflection(java.awt.image.BufferedImage)} provides an easy
      * way to create an image containing both the source and the reflection.</p>
      *

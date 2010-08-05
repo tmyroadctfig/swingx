@@ -328,7 +328,7 @@ public abstract class ComponentProvider<T extends JComponent>
     protected abstract void format(CellContext context);
 
     /**
-     * Configures the renderering component's state from the
+     * Configures the rendering component's state from the
      * given cell context.
      * @param context the cell context to configure from, must not be null.
      */

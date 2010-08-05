@@ -43,7 +43,6 @@ import org.jdesktop.swingx.graphics.GraphicsUtilities;
 import org.jdesktop.swingx.painter.AbstractPainter;
 import org.jdesktop.swingx.painter.Painter;
 import org.jdesktop.swingx.painter.PainterPaint;
-import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 
 /**
  * <p>A {@link org.jdesktop.swingx.painter.Painter} enabled subclass of {@link javax.swing.JButton}.
