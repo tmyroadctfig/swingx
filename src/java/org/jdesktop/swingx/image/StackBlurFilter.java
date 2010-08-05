@@ -40,7 +40,7 @@ import org.jdesktop.swingx.graphics.GraphicsUtilities;
 
 /**
  * <p>A stack blur filter can be used to create an approximation of a
- * gaussian blur. The approximation is controlled by the number of times the
+ * Gaussian blur. The approximation is controlled by the number of times the
  * {@link org.jdesktop.swingx.image.FastBlurFilter} is applied onto the source
  * picture. The default number of iterations, 3, provides a decent compromise
  * between speed and rendering quality.</p>
@@ -48,7 +48,7 @@ import org.jdesktop.swingx.graphics.GraphicsUtilities;
  * default radius is 3. Since the blur clamps values on the edges of the
  * source picture, you might need to provide a picture with empty borders
  * to avoid artifacts at the edges. The performance of this filter are
- * independant from the radius.</p>
+ * independent from the radius.</p>
  *
  * @author Romain Guy <romain.guy@mac.com>
 */
@@ -76,12 +76,12 @@ public class StackBlurFilter extends AbstractFilter {
     /**
      * <p>Creates a new blur filter with the specified radius. If the radius
      * is lower than 1, a radius of 1 will be used automatically. The number
-     * of iterations controls the approximation to a gaussian blur. If the
+     * of iterations controls the approximation to a Gaussian blur. If the
      * number of iterations is lower than 1, one iteration will be used
      * automatically.</p>
      *
      * @param radius the radius, in pixels, of the blur
-     * @param iterations the number of iterations to approximate a gaussian blur
+     * @param iterations the number of iterations to approximate a Gaussian blur
      */
     public StackBlurFilter(int radius, int iterations) {
         if (radius < 1) {
@@ -115,7 +115,7 @@ public class StackBlurFilter extends AbstractFilter {
     }
 
     /**
-     * <p>Returns the number of iterations used to approximate a gaussian
+     * <p>Returns the number of iterations used to approximate a Gaussian
      * blur.</p>
      *
      * @return the number of iterations used by this blur

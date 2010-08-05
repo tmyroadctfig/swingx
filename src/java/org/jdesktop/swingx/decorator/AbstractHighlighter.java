@@ -256,8 +256,7 @@ public abstract class AbstractHighlighter implements Highlighter {
      * @since 1.4
      */
     public final ChangeListener[] getChangeListeners() {
-        return (ChangeListener[]) listenerList
-                .getListeners(ChangeListener.class);
+        return listenerList.getListeners(ChangeListener.class);
     }
 
     /** 

@@ -203,7 +203,9 @@ public final class WindowUtils {
      * @param window
      * @param minWidth
      * @param minHeight
+     * @deprecated (pre-1.6.2) no replacement; use {@link Window#setMinimumSize(java.awt.Dimension)}
      */
+    @Deprecated
     public static void setMinimumSizeManager(Window window, int minWidth,
                                              int minHeight) {
         ComponentListener[] listeners = window.getComponentListeners();
@@ -227,7 +229,9 @@ public final class WindowUtils {
      * Resets window size to minSize if needed.
      *
      * @author Patrick Wright
+     * @deprecated (pre-1.6.2) no replacement
      */
+    @Deprecated
     public static class MinSizeComponentListener extends ComponentAdapter {
         private Window window;
         private int minHeight;

@@ -39,7 +39,7 @@ public class BuddySupport {
 		setRight(textField, rightBuddies);
 
 		// check if component is already here
-		if (leftBuddies.contains(c) || rightBuddies.contains(c)) {
+		if (isBuddy(c, textField)) {
 			throw new IllegalStateException("Component already added.");
 		}
 
