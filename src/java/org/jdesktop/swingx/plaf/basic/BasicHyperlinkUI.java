@@ -299,7 +299,7 @@ public class BasicHyperlinkUI extends BasicButtonUI {
 
     @Override
     protected void paintButtonPressed(Graphics g, AbstractButton b) {
-        // setTextShiftOffset();
+         setTextShiftOffset();
     }
 
     

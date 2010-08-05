@@ -25,23 +25,16 @@ import org.jdesktop.swingx.JXHyperlink;
 
 /**
  * Addon for <code>JXHyperlink</code>.<br>
- *
  */
 public class HyperlinkAddon extends AbstractComponentAddon {
-
-  public HyperlinkAddon() {
-    super("JXHyperlink");
-  }
-
-  @Override
-  protected void addBasicDefaults(LookAndFeelAddons addon, DefaultsList defaults) {
-      super.addBasicDefaults(addon, defaults);
-      
-    if (isMetal(addon)) {
-        defaults.add(JXHyperlink.uiClassID, "org.jdesktop.swingx.plaf.basic.BasicHyperlinkUI");
-    } else {
-        defaults.add(JXHyperlink.uiClassID, "org.jdesktop.swingx.plaf.windows.WindowsHyperlinkUI");
+    public HyperlinkAddon() {
+        super("JXHyperlink");
     }
-  }
 
+    @Override
+    protected void addBasicDefaults(LookAndFeelAddons addon, DefaultsList defaults) {
+        super.addBasicDefaults(addon, defaults);
+
+        defaults.add(JXHyperlink.uiClassID, "org.jdesktop.swingx.plaf.basic.BasicHyperlinkUI");
+    }
 }
