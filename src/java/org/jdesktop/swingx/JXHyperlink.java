@@ -39,7 +39,7 @@ import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 
 /**
  * A hyperlink component that derives from JButton to provide compatibility
- * mostly for binding actions enabled/disabled behavior accesilibity i18n etc...
+ * mostly for binding actions enabled/disabled behavior accessibility i18n etc...
  * <p>
  *
  * This button has visual state related to a notion of "clicked": 
@@ -75,8 +75,6 @@ import org.jdesktop.swingx.plaf.LookAndFeelAddons;
  * auto-click only if it has no action. Developers can change the
  * behaviour by overriding {@link JXHyperlink#isAutoSetClicked()};
  * 
- * 
- * 
  * @author Richard Bair
  * @author Shai Almog
  * @author Jeanette Winzenburg
@@ -101,14 +99,14 @@ public class JXHyperlink extends JButton {
      * be set both in code, and through the UIManager with the property
      * "JXHyperlink.unclickedColor".
      */
-    private Color unclickedColor = new Color(0, 0x33, 0xFF);
+    private Color unclickedColor;
 
     /**
      * Color for the hyper link if it has already been clicked. This color can
      * be set both in code, and through the UIManager with the property
      * "JXHyperlink.clickedColor".
      */
-    private Color clickedColor = new Color(0x99, 0, 0x99);
+    private Color clickedColor;
 
     private boolean overrulesActionOnClick;
 
@@ -259,7 +257,7 @@ public class JXHyperlink extends JButton {
 
     /**
      * {@inheritDoc} <p>
-     * Overriden to respect the overrulesActionOnClick property.
+     * Overridden to respect the overrulesActionOnClick property.
      */
     @Override
     protected void fireActionPerformed(ActionEvent event) {
@@ -306,7 +304,7 @@ public class JXHyperlink extends JButton {
     }
 
     /**
-     * Read all the essentional properties from the provided <code>Action</code>
+     * Read all the essential properties from the provided <code>Action</code>
      * and apply it to the <code>JXHyperlink</code>
      */
     @Override
@@ -347,5 +345,4 @@ public class JXHyperlink extends JButton {
     public void updateUI() {
       setUI((ButtonUI)LookAndFeelAddons.getUI(this, ButtonUI.class));
     }
-
 }
