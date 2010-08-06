@@ -40,8 +40,9 @@ import javax.swing.table.TableCellRenderer;
  * 
  * @author Amy Fowler
  * @version 1.0
+ * @deprecated (pre-1.6.2) no replacement
  */
-
+@Deprecated
 public class LabelProperties extends JLabel {
     private static final int BACKGROUND_SET = 1;
     private static final int FOREGROUND_SET = 2;
