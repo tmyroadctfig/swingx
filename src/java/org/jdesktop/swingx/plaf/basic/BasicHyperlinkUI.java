@@ -44,6 +44,7 @@ import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JToolBar;
 import javax.swing.LookAndFeel;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
@@ -65,6 +66,7 @@ import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.ImageView;
 import javax.swing.text.html.StyleSheet;
 
+import org.jdesktop.swingx.JXHyperlink;
 import org.jdesktop.swingx.SwingXUtilities;
 
 /**
@@ -114,9 +116,21 @@ public class BasicHyperlinkUI extends BasicButtonUI {
     protected void installDefaults(AbstractButton b) {
         super.installDefaults(b);
 
+        JXHyperlink link = (JXHyperlink) b;
+        
         LookAndFeel.installProperty(b, "opaque", false);
+        
+        if (SwingXUtilities.isUIInstallable(link.getUnclickedColor())) {
+            link.setUnclickedColor(UIManager.getColor("Hyperlink.linkColor"));
+        }
+        
+        if (SwingXUtilities.isUIInstallable(link.getClickedColor())) {
+            link.setClickedColor(UIManager.getColor("Hyperlink.visitedColor"));
+        }
+        
         b.setBorderPainted(false);
         b.setRolloverEnabled(true);
+        
         if (SwingXUtilities.isUIInstallable(b.getBorder())) {
             b.setBorder(new BorderUIResource(BorderFactory.createEmptyBorder(0, 1, 0, 0)));
         }
@@ -127,7 +141,7 @@ public class BasicHyperlinkUI extends BasicButtonUI {
         dashedRectGapHeight = UIManager.getInt("ButtonUI.dashedRectGapHeight");
         focusColor = UIManager.getColor("ButtonUI.focus");
 
-        b.setHorizontalAlignment(AbstractButton.LEADING);
+        b.setHorizontalAlignment(SwingConstants.LEADING);
     }
 
     @Override
@@ -342,7 +356,7 @@ public class BasicHyperlinkUI extends BasicButtonUI {
             return null;
         }
 
-        Icon icon = (Icon) b.getIcon();
+        Icon icon = b.getIcon();
         String text = b.getText();
 
         Font font = b.getFont();
@@ -352,7 +366,7 @@ public class BasicHyperlinkUI extends BasicButtonUI {
         Rectangle textR = new Rectangle();
         Rectangle viewR = new Rectangle(b.getSize());
 
-        SwingUtilities.layoutCompoundLabel((JComponent) b, fm, text, icon,
+        SwingUtilities.layoutCompoundLabel(b, fm, text, icon,
                 b.getVerticalAlignment(), b.getHorizontalAlignment(), b
                         .getVerticalTextPosition(), b
                         .getHorizontalTextPosition(), viewR, iconR, textR,
