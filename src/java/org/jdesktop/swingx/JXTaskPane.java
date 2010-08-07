@@ -190,24 +190,59 @@ public class JXTaskPane extends JPanel implements
    * Creates a new empty <code>JXTaskPane</code>.
    */
   public JXTaskPane() {
-    collapsePane = new JXCollapsiblePane();
-    super.setLayout(new BorderLayout(0, 0));
-    super.addImpl(collapsePane, BorderLayout.CENTER, -1);
-    
-    updateUI();
-    setFocusable(true);
+      this((String) null);
+  }
 
-    // disable animation if specified in UIManager
-    setAnimated(!Boolean.FALSE.equals(UIManager.get("TaskPane.animate")));
-    
-    // listen for animation events and forward them to registered listeners
-    collapsePane.addPropertyChangeListener(
-      JXCollapsiblePane.ANIMATION_STATE_KEY, new PropertyChangeListener() {
-        public void propertyChange(PropertyChangeEvent evt) {
-          JXTaskPane.this.firePropertyChange(evt.getPropertyName(), evt
-            .getOldValue(), evt.getNewValue());
-        }
-      });
+    /**
+     * Creates a new task pane with the specified title.
+     * 
+     * @param title
+     *            the title to use
+     */
+    public JXTaskPane(String title) {
+        this(title, null);
+    }
+
+    /**
+     * Creates a new task pane with the specified icon.
+     * 
+     * @param icon
+     *            the icon to use
+     */
+    public JXTaskPane(Icon icon) {
+        this(null, icon);
+    }
+
+    /**
+     * Creates a new task pane with the specified title and icon.
+     * 
+     * @param title
+     *            the title to use
+     * @param icon
+     *            the icon to use
+     */
+    public JXTaskPane(String title, Icon icon) {
+      collapsePane = new JXCollapsiblePane();
+      super.setLayout(new BorderLayout(0, 0));
+      super.addImpl(collapsePane, BorderLayout.CENTER, -1);
+      
+      setTitle(title);
+      setIcon(icon);
+      
+      updateUI();
+      setFocusable(true);
+
+      // disable animation if specified in UIManager
+      setAnimated(!Boolean.FALSE.equals(UIManager.get("TaskPane.animate")));
+      
+      // listen for animation events and forward them to registered listeners
+      collapsePane.addPropertyChangeListener(
+        JXCollapsiblePane.ANIMATION_STATE_KEY, new PropertyChangeListener() {
+          public void propertyChange(PropertyChangeEvent evt) {
+            JXTaskPane.this.firePropertyChange(evt.getPropertyName(), evt
+              .getOldValue(), evt.getNewValue());
+          }
+        });
   }
 
   /**
