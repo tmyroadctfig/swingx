@@ -324,7 +324,7 @@ public class JXTree extends JTree {
     }
 
     /**
-     * Instantiats JXTree state which is new compared to super. Installs the
+     * Instantiates JXTree state which is new compared to super. Installs the
      * Delegating renderer and editor, registers actions and keybindings.
      * 
      * This must be called from each constructor.

@@ -21,8 +21,9 @@
  */
 package org.jdesktop.swingx;
 
+import java.awt.Adjustable;
+
 import javax.swing.JComponent;
-import javax.swing.JScrollBar;
 
 import org.jdesktop.swingx.util.Contract;
 
@@ -44,17 +45,16 @@ public enum ScrollableSizeHint {
     NONE(false), 
     
     /**
-     * Size should be ajusted to parent size. 
+     * Size should be adjusted to parent size. 
      */
     FIT(true), 
     
     /**
-     * Width should be streched to parent width if smaller, unchanged otherwise.
+     * Width should be stretched to parent width if smaller, unchanged otherwise.
      */
-    HORIZONTAL_STRETCH(JScrollBar.HORIZONTAL) {
+    HORIZONTAL_STRETCH(Adjustable.HORIZONTAL) {
         /**
-         * @param component
-         * @return
+         * {@inheritDoc}
          */
         @Override
         boolean isSmallerThanParent(JComponent component) {
@@ -69,14 +69,13 @@ public enum ScrollableSizeHint {
     },
     
     /**
-     * Width should be streched to parent height if smaller, unchanged otherwise.
+     * Width should be stretched to parent height if smaller, unchanged otherwise.
      */
-    VERTICAL_STRETCH(JScrollBar.VERTICAL) {
+    VERTICAL_STRETCH(Adjustable.VERTICAL) {
         /**
-         * @param component
-         * @return
+         * {@inheritDoc}
          */
-         @Override
+        @Override
         boolean isSmallerThanParent(JComponent component) {
             if (component.getParent() != null) {
                 return component.getParent().getHeight() > 
@@ -131,7 +130,7 @@ public enum ScrollableSizeHint {
      *   orientation. 
      */
     public boolean isHorizontalCompatible() {
-        return (orientation < 0) ? true : JScrollBar.HORIZONTAL == orientation;
+        return (orientation < 0) ? true : Adjustable.HORIZONTAL == orientation;
     }
     
     /**
@@ -142,10 +141,17 @@ public enum ScrollableSizeHint {
      *   orientation. 
      */
     public boolean isVerticalCompatible() {
-        return (orientation < 0) ? true : JScrollBar.VERTICAL == orientation;
+        return (orientation < 0) ? true : Adjustable.VERTICAL == orientation;
     }
-    
-    
+
+    /**
+     * Determines whether the supplied component is smaller than its parent; used to determine
+     * whether to track with the parents size.
+     * 
+     * @param component
+     *            the component to test
+     * @return {@code true} to track; {@code false} otherwise
+     */
     boolean isSmallerThanParent(JComponent component) {
         return tracks;
     }

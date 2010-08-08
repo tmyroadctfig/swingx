@@ -22,7 +22,7 @@ package org.jdesktop.swingx.combobox;
 
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -52,7 +52,7 @@ public class MapComboBoxModel<K, V> extends ListComboBoxModel<K> {
      * Creates an empty model.
      */
     public MapComboBoxModel() {
-        this(new HashMap<K, V>());
+        this(new LinkedHashMap<K, V>());
     }
     
     /**
