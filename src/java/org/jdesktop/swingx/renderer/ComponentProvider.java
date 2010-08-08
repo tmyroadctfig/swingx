@@ -25,6 +25,9 @@ import java.io.Serializable;
 import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.SwingUtilities;
+
+import org.jdesktop.swingx.plaf.UIDependent;
 
 /**
  * Abstract base class of a provider for a cell rendering component. Configures
@@ -112,7 +115,7 @@ import javax.swing.JLabel;
  * @see DefaultVisuals
  */
 public abstract class ComponentProvider<T extends JComponent> 
-    implements Serializable {
+    implements Serializable, UIDependent {
     /** component to render with. */
     protected T rendererComponent;
     /** configurator of default visuals. */
@@ -362,5 +365,10 @@ public abstract class ComponentProvider<T extends JComponent>
         return defaultVisuals;
     }
 
-
+    /**
+     * {@inheritDoc}
+     */
+    public void updateUI() {
+        SwingUtilities.updateComponentTreeUI(rendererComponent);
+    }
 }
