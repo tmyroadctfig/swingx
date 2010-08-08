@@ -23,15 +23,16 @@ package org.jdesktop.swingx.renderer;
 import java.awt.Color;
 import java.io.Serializable;
 
+import org.jdesktop.swingx.plaf.UIDependent;
 import org.jdesktop.swingx.rollover.RolloverRenderer;
 
 /**
- * Convience common ancestor for SwingX renderers.
+ * Convenience common ancestor for SwingX renderers.
  * 
  * @author Jeanette Winzenburg
  */
 public abstract class AbstractRenderer 
-    implements  RolloverRenderer, StringValue, Serializable {
+    implements  RolloverRenderer, StringValue, Serializable, UIDependent {
 
     protected ComponentProvider<?> componentController;
 
@@ -86,6 +87,12 @@ public abstract class AbstractRenderer
                 && ((RolloverRenderer) componentController).isEnabled();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public void updateUI() {
+        componentController.updateUI();
+    }
 
 //-------------------- legacy: configure arbitrary visuals    
     /**
