@@ -37,6 +37,7 @@ import javax.swing.JComboBox;
 import javax.swing.JList;
 import javax.swing.KeyStroke;
 import javax.swing.UIManager;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.plaf.UIResource;
 import javax.swing.text.DefaultEditorKit;
 import javax.swing.text.Document;
@@ -123,7 +124,7 @@ public class AutoCompleteDecorator {
      * @param comboBox a combo box
      * @see #decorate(JComboBox, ObjectToStringConverter)
      */
-    public static void decorate(final JComboBox comboBox) {
+    public static void decorate(JComboBox comboBox) {
         decorate(comboBox, null);
     }
     
@@ -149,7 +150,7 @@ public class AutoCompleteDecorator {
      * @param stringConverter
      *                the converter used to transform items to strings
      */
-    public static void decorate(final JComboBox comboBox, final ObjectToStringConverter stringConverter) {
+    public static void decorate(JComboBox comboBox, ObjectToStringConverter stringConverter) {
         undecorate(comboBox);
         
         boolean strictMatching = !comboBox.isEditable();
@@ -261,11 +262,22 @@ public class AutoCompleteDecorator {
      * @param stringConverter the converter used to transform items to strings
      */
     public static void decorate(JList list, JTextComponent textComponent, ObjectToStringConverter stringConverter) {
+        undecorate(list);
+        
         AbstractAutoCompleteAdaptor adaptor = new ListAdaptor(list, textComponent, stringConverter);
         AutoCompleteDocument document = createAutoCompleteDocument(adaptor, true, stringConverter, textComponent.getDocument());
         decorate(textComponent, document, adaptor);
     }
 
+    static void undecorate(JList list) {
+        for (ListSelectionListener l : list.getListSelectionListeners()) {
+            if (l instanceof ListAdaptor) {
+                list.removeListSelectionListener(l);
+                break;
+            }
+        }
+    }
+    
     /**
      * Enables automatic completion for the given JTextComponent based on the
      * items contained in the given <tt>List</tt>.
@@ -301,7 +313,7 @@ public class AutoCompleteDecorator {
      * @param document the AutoCompleteDocument to be installed on the text component
      * @param adaptor the AbstractAutoCompleteAdaptor to be used
      */
-    public static void decorate(JTextComponent textComponent, AutoCompleteDocument document, final AbstractAutoCompleteAdaptor adaptor) {
+    public static void decorate(JTextComponent textComponent, AutoCompleteDocument document, AbstractAutoCompleteAdaptor adaptor) {
         undecorate(textComponent);
         
         // install the document on the text component

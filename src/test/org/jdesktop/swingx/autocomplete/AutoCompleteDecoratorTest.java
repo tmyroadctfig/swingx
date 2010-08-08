@@ -46,13 +46,17 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.beans.PropertyChangeListener;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import javax.swing.InputMap;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
+import javax.swing.JList;
+import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.UIManager;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.text.JTextComponent;
 
 import org.jdesktop.test.EDTRunner;
@@ -134,6 +138,71 @@ public class AutoCompleteDecoratorTest  {
         assertThat(editor.getKeyListeners().length, is(expectedKeyListenerCount));
         assertThat(combo.getPropertyChangeListeners("editor").length, is(expectedPropListenerCount));
         assertThat(combo.getActionListeners().length, is(expectedActionListenerCount));
+    }
+    
+    /**
+     * SwingX Issue #299.
+     */
+    @Test
+    public void testUndecorateList() {
+        JList list = new JList();
+        JTextField textField = new JTextField();
+        AutoCompleteDecorator.decorate(list, textField);
+        AutoCompleteDecorator.undecorate(list);
+        
+        for (ListSelectionListener l : list.getListSelectionListeners()) {
+            assertThat(l, is(not(instanceOf(ListAdaptor.class))));
+        }
+    }
+    
+    /**
+     * SwingX Issue #299.
+     */
+    @Test
+    public void testRedecorateList() {
+        JList list = new JList();
+        JTextField textField = new JTextField();
+        AutoCompleteDecorator.decorate(list, textField);
+        
+        int expectedListSelectionListenerCount = list.getListSelectionListeners().length;
+        
+        AutoCompleteDecorator.decorate(list, textField);
+        
+        assertThat(list.getListSelectionListeners().length, is(expectedListSelectionListenerCount));
+    }
+    
+    /**
+     * SwingX Issue #299.
+     */
+    @Test
+    public void testUndecorateTextComponent() {
+        JTextField textField = new JTextField();
+        
+        AutoCompleteDecorator.decorate(textField, Collections.emptyList(), true);
+        
+        AutoCompleteDecorator.undecorate(textField);
+        
+        assertThat(textField.getInputMap(), is(not(instanceOf(AutoComplete.InputMap.class))));
+        assertThat(textField.getActionMap().get("nonstrict-backspace"), is(nullValue()));
+        for (FocusListener l : textField.getFocusListeners()) {
+            assertThat(l, is(not(instanceOf(AutoComplete.FocusAdapter.class))));
+        }
+        assertThat(textField.getDocument(), is(not(instanceOf(AutoCompleteDocument.class))));
+    }
+    
+    /**
+     * SwingX Issue #299.
+     */
+    @Test
+    public void testRedecorateTextComponent() {
+        JTextField textField = new JTextField();
+        AutoCompleteDecorator.decorate(textField, Collections.emptyList(), true);
+        
+        int expectedFocusListenerLength = textField.getFocusListeners().length;
+        
+        AutoCompleteDecorator.decorate(textField, Collections.emptyList(), true);
+        
+        assertThat(textField.getFocusListeners().length, is(expectedFocusListenerLength));
     }
     
     @Test
