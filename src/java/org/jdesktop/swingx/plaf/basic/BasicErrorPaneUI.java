@@ -932,7 +932,7 @@ public class BasicErrorPaneUI extends ErrorPaneUI {
 
         w.addWindowListener(new WindowAdapter() {
             @Override
-            public void windowClosed(WindowEvent e) {
+            public void windowClosing(WindowEvent e) {
                 //remove the action listener
                 closeButton.removeActionListener(closeAction);
                 detailButton.removeActionListener(resizeListener);
