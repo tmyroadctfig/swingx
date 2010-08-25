@@ -65,7 +65,8 @@ public class JXLoginPaneVisualCheck extends InteractiveTestCase {
         JXLoginPaneVisualCheck test = new JXLoginPaneVisualCheck();
 
         try {
-            test.runInteractiveTests();
+//            test.runInteractiveTests();
+            test.runInteractiveTests("interactiveComparativeDialogs");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
@@ -319,6 +320,13 @@ public class JXLoginPaneVisualCheck extends InteractiveTestCase {
         frame.setVisible(true);
     }
 
+    public void interactiveComparativeDialogs() {
+        JXDialog dialog = new JXDialog(new JXLoginPane());
+        dialog.pack();
+        dialog.setVisible(true);
+        JXLoginPane.showLoginDialog(null, new JXLoginPane());
+    }
+    
 	/**
      * Do nothing, make the test runner happy
      * (would output a warning without a test fixture).
