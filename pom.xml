@@ -1,12 +1,16 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <parent>
+    <groupId>org.sonatype.oss</groupId>
+    <artifactId>oss-parent</artifactId>
+    <version>3</version>
+  </parent>
   <modelVersion>4.0.0</modelVersion>
-	<groupId>org.swinglabs</groupId>
-	<artifactId>swingx</artifactId>
-    <packaging>jar</packaging>
-	<name>SwingX Main Project</name>
-	<version>0.9.5-SNAPSHOT</version>
+  <groupId>org.swinglabs</groupId>
+  <artifactId>swingx-project</artifactId>
+  <packaging>pom</packaging>
+  <name>SwingX</name>
+  <version>1.6.2-SNAPSHOT</version>
     <url>http://www.swinglabs.org/</url>
     <licenses>
         <license>
@@ -14,117 +18,37 @@
             <url>http://www.gnu.org/copyleft/lesser.html</url>
         </license>
     </licenses>
+    <issueManagement>
+      <system>Bugzilla</system>
+      <url>https://swingx.dev.java.net/issues/</url>
+    </issueManagement>
     <scm>
-        <url>https://swingx.dev.java.net/source/browse/swingx/</url>
+        <connection>scm:svn:https://swingx.dev.java.net/svn/swingx/branches/swingx-r3734-mavenized</connection>
+        <developerConnection>scm:svn:https://swingx.dev.java.net/svn/swingx/branches/swingx-r3734-mavenized</developerConnection>
+        <url>https://swingx.dev.java.net/source/browse/swingx/branches/swingx-r3734-mavenized</url>
     </scm>
     <description>Contains extensions to the Swing GUI toolkit, including new and enhanced components that provide functionality commonly required by rich client applications.</description>
   <build>
-    <directory>target</directory>
-    <outputDirectory>target/classes</outputDirectory>
-    <finalName>${project.artifactId}-${project.version}</finalName>
-    <testOutputDirectory>target/test-classes</testOutputDirectory>
-    <sourceDirectory>src/java</sourceDirectory>
-    <scriptSourceDirectory>src/main/scripts</scriptSourceDirectory>
-    <testSourceDirectory>src/test</testSourceDirectory>
-    <resources>
-      <resource>
-        <directory>src/java</directory>
-        <excludes>
-          <exclude>**/*.java</exclude>
-        </excludes>
-      </resource>
-    </resources>
-    <testResources>
-      <testResource>
-        <directory>src/test</directory>
-        <excludes>
-          <exclude>**/*.java</exclude>
-        </excludes>
-      </testResource>
-    </testResources>
     <plugins>
-      <plugin>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <source>1.5</source>
-          <target>1.5</target>
-          <showDeprecation>true</showDeprecation>
-          <showWarnings>true</showWarnings>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <inherited>true</inherited>
-        <configuration>
-          <!-- useSystemClassLoader>true</useSystemClassLoader-->
-          <includes>
-            <include>**/*Test.java</include>
-          </includes>
-          <forkMode>always</forkMode>
-          <!--reportFormat>xml</reportFormat-->
-          <!--classesDirectory>${project.build.directory}/emma-classes</classesDirectory-->    
-        </configuration>        
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>emma-maven-plugin</artifactId>
-        <version>1.0-SNAPSHOT</version>
-        <inherited>true</inherited>
-        <executions>
-          <execution>
-            <goals>
-              <goal>instrument</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>net.sf.jmd</groupId>
-        <artifactId>maven-crap4j-plugin</artifactId>
-        <version>0.1.1-SNAPSHOT</version>
-        <configuration>
-            <projectDir>${basedir}</projectDir>
-            <crap4jHome>lib/build-only/crap4j</crap4jHome>
-            <reportsCrap4j>target/site/crap4j-reports</reportsCrap4j>
-            <libClasspath>lib</libClasspath>
-        </configuration>
-        <executions>
-            <execution>
-                <phase>site</phase>
-                <goals>
-                    <goal>crap4j</goal>
-                    <goal>crap4jAnt</goal>
-                </goals>
-            </execution>
-        </executions>
-      </plugin>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <configuration>
+                <source>1.6</source>
+                <target>1.6</target>
+            </configuration>
+        </plugin>
     </plugins>
   </build>
+  <dependencyManagement>
     <dependencies>
-		<dependency>
-			<groupId>com.jhlabs</groupId>
-			<artifactId>filters</artifactId>
-			<version>2.0.235</version>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-            <groupId>org.swinglabs</groupId>
-            <artifactId>swing-worker</artifactId>
-            <version>1.1</version>
-            <!--scope>compile</scope-->
+        <dependency>
+            <groupId>com.jhlabs</groupId>
+            <artifactId>filters</artifactId>
+            <version>2.0.235</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.swinglabs</groupId>
-            <artifactId>multiplegradientpaint</artifactId>
-            <version>1.0</version>
-            <scope>compile</scope>
-        </dependency> 
-		<dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.5</version>
@@ -143,141 +67,57 @@
             </exclusions>
         </dependency>
         <dependency>
-        	<groupId>commons-collections</groupId>
-        	<artifactId>commons-collections</artifactId>
-        	<version>3.2.1</version>
+          <groupId>commons-collections</groupId>
+          <artifactId>commons-collections</artifactId>
+          <version>3.2.1</version>
+          <scope>test</scope>
         </dependency>
         <dependency>
-        	<groupId>commons-lang</groupId>
-        	<artifactId>commons-lang</artifactId>
-        	<version>2.4</version>
+          <groupId>commons-lang</groupId>
+          <artifactId>commons-lang</artifactId>
+          <version>2.4</version>
+          <scope>test</scope>
         </dependency>
-        <!-- Preferably we should use this jmock configuration with junit 4 -->
-        <!--dependency>
-            <groupId>org.jmock</groupId>
-            <artifactId>jmock-junit4</artifactId>
-            <version>2.4.0</version>
-            <scope>test</scope>
-        </dependency-->
-	</dependencies>
-    <profiles>
-		<profile>
-    		<activation>
-      			<jdk>1.5</jdk>
-    		</activation>
-    		<dependencies>
-                <dependency>
-                    <groupId>org.swinglabs</groupId>
-                    <artifactId>swing-layout</artifactId>
-                    <version>1.0.3</version>
-                    <scope>compile</scope>
-                </dependency>
-            </dependencies>
-        </profile>
-    </profiles>
-  <reporting>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-checkstyle-plugin</artifactId>
-        <configuration>
-            <configLocation>checkstyle.xml</configLocation>
-            <enableRulesSummary>true</enableRulesSummary>
-        </configuration>
-      </plugin>
-      <plugin>
-        <artifactId>maven-changes-plugin</artifactId>
-        <configuration>
-          <xmlPath>${basedir}/xdocs/changes.xml</xmlPath>
-        </configuration>
-      </plugin>
-      <plugin>
-        <artifactId>maven-javadoc-plugin</artifactId>
-        <configuration>
-          <quiet>true</quiet>
-          <aggregate>true</aggregate>
-        </configuration>
-      </plugin>
-      <plugin>
-        <artifactId>maven-surefire-report-plugin</artifactId>
-      </plugin>
-      <plugin> 
-        <groupId>org.codehaus.mojo</groupId> 
-        <artifactId>surefire-report-maven-plugin</artifactId> 
-        <inherited>true</inherited>
-      </plugin>       
-    <plugin>      
-      <groupId>org.codehaus.mojo</groupId>
-      <artifactId>emma-maven-plugin</artifactId>
-      <version>1.0-SNAPSHOT</version>
-      <inherited>true</inherited>          
-    </plugin>
-    <plugin>
-      <groupId>org.codehaus.mojo</groupId>
-      <artifactId>findbugs-maven-plugin</artifactId>
-      <version>1.2.1</version>
-      <configuration>
-        <xmlOutput>true</xmlOutput>
-        <xmlOutputDirectory>target</xmlOutputDirectory>
-        <threshold>Normal</threshold>
-        <effort>Default</effort>
-        <!--excludeFilterFile>findbugs-exclude.xml</excludeFilterFile>
-        <includeFilterFile>findbugs-include.xml</includeFilterFile-->
-        <visitors>FindDeadLocalStores,UnreadFields</visitors>
-        <onlyAnalyze>org.jdesktop.*</onlyAnalyze>
-        <!-- pluginList>/libs/fb-contrib/fb-contrib-2.8.0.jar</pluginList-->
-        <findbugsXmlOutput>true</findbugsXmlOutput>
-        <findbugsXmlOutputDirectory>target</findbugsXmlOutputDirectory>
-      </configuration>
-    </plugin>
-    </plugins>
-  </reporting>
-  <!--repositories>
-    <repository>
-      <id>ibiblio</id>
-      <name>Ibiblio</name>
-      <layout>default</layout>
-      <url>http://mirrors.ibiblio.org/pub/mirrors/maven2</url>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
-  </repositories>
-  <pluginRepositories>
-    <pluginRepository>
-      <id>ibiblio</id>
-      <name>Ibiblio Plugin Repository</name>
-      <url>http://mirrors.ibiblio.org/pub/mirrors/maven2</url>
-      <layout>default</layout>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-      <releases>
-        <updatePolicy>never</updatePolicy>
-      </releases>
-    </pluginRepository>
-  </pluginRepositories-->
-  <pluginRepositories>
-    <pluginRepository>
-      <id>codehaus</id>
-      <name>Codehaus Plugin Repository</name>
-      <url>http://snapshots.repository.codehaus.org</url>
-      <layout>default</layout>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-      <releases>
-        <updatePolicy>never</updatePolicy>
-      </releases>
-    </pluginRepository>
-    <!-- crap4j plugin-->
-    <pluginRepository>
+    </dependencies>
+  </dependencyManagement>
+    <repositories>
+        <repository>
+            <id>swinglabs-snapshots</id>
+            <url>http://oss.sonatype.org/content/repositories/swinglabs-snapshots/</url>
+            <releases>
+              <enabled>false</enabled>
+            </releases>
+            <snapshots>
+              <enabled>true</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>swinglabs-snapshots</id>
+            <url>http://oss.sonatype.org/content/repositories/swinglabs-releases/</url>
+            <releases>
+              <enabled>true</enabled>
+            </releases>
+            <snapshots>
+              <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+    <pluginRepositories>
+      <pluginRepository>
         <id>jmd.sf.net</id>
         <url>http://jmd.sf.net/m2repository</url>
         <snapshots>
           <enabled>true</enabled>
         </snapshots>
-    </pluginRepository>
-  </pluginRepositories>
-
+      </pluginRepository>
+    </pluginRepositories>
+    <modules>
+      <module>swingx-core</module>
+      <module>swingx-beaninfo</module>
+      <!--module>swingx-datecal</module-->
+      <!--module>swingx-treetable</module-->
+      <!--module>swingx-painters</module-->
+      <!--module>swingx-graphics</module-->
+      <!--module>swingx-all</module-->
+    </modules>
 </project>
