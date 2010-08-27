@@ -60,8 +60,10 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.text.JTextComponent;
 
 import org.jdesktop.test.EDTRunner;
+import org.jdesktop.test.categories.Visual;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 
 /**
@@ -234,6 +236,7 @@ public class AutoCompleteDecoratorTest  {
      * SwingX Issue #1322.
      */
     @Test
+    @Category(Visual.class)
     public void testNonStrictCompletionWithKeyMovement() {
         assumeThat(GraphicsEnvironment.isHeadless(), is(false));
         

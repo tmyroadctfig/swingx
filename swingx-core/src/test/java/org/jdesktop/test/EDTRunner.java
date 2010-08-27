@@ -38,6 +38,7 @@ public class EDTRunner extends BlockJUnit4ClassRunner {
         } else {
             try {
                 SwingUtilities.invokeAndWait(new Runnable() {
+                    @Override
                     public void run() {
                         EDTRunner.super.run(notifier);
                     }
