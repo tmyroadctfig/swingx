@@ -45,6 +45,19 @@ public class TableColumnModelTest extends InteractiveTestCase {
             .getLogger(TableColumnModelTest.class.getName());
     protected static final int COLUMN_COUNT = 3;
 
+    /**
+     * Issue #1340-swingx: DefaultTableColumnModelExt must fire columnRemoved for hidden columns.
+     */
+    @Test
+    public void testDefaultTableColumnModelExtRemoveHiddenColumns() {
+        DefaultTableColumnModelExt columnModel = (DefaultTableColumnModelExt) new JXTable(10, 2).getColumnModel();
+        TableColumnExt column = columnModel.getColumnExt(0);
+        column.setVisible(false);
+        ColumnModelReport report = new ColumnModelReport(columnModel);
+        columnModel.removeColumn(column);
+        assertTrue("columnModel must fire removed for hidden columns", report.hasRemovedEvent());
+    }
+    
     
 
     /**
