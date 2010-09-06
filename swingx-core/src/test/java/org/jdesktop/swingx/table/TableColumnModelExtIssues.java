@@ -14,6 +14,10 @@ import javax.swing.table.TableColumn;
 import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.action.AbstractActionExt;
+import org.jdesktop.swingx.test.ColumnModelReport;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
 /**
  * Test to exposed known issues of <code>TableColumnModelExt</code>
@@ -25,6 +29,7 @@ import org.jdesktop.swingx.action.AbstractActionExt;
  * 
  * @author Jeanette Winzenburg
  */
+@RunWith(JUnit4.class)
 public class TableColumnModelExtIssues extends TableColumnModelTest {
 
     public static void main(String args[]) {
@@ -43,6 +48,17 @@ public class TableColumnModelExtIssues extends TableColumnModelTest {
    }
 
     
+    @Test
+    public void testDefaultTableColumnModelExtRemoveHiddenColumns() {
+        DefaultTableColumnModelExt columnModel = (DefaultTableColumnModelExt) new JXTable(10, 2).getColumnModel();
+        TableColumnExt column = columnModel.getColumnExt(0);
+        column.setVisible(false);
+        ColumnModelReport report = new ColumnModelReport(columnModel);
+        columnModel.removeColumn(column);
+        assertTrue("columnModel must fire removed for hidden columns", report.hasRemovedEvent());
+    }
+    
+   
     /**
      * Issue #624-swingx: support use-case to store/restore column sequence.
      */
