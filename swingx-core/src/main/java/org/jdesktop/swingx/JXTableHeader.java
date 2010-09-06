@@ -339,6 +339,35 @@ public class JXTableHeader extends JTableHeader
         return height;
     }
     
+
+    /**
+     * @inherited <p>
+     * 
+     * Overridden to fire a propertyChange for draggedColumn. 
+     */
+    @Override
+    public void setDraggedColumn(TableColumn column) {
+        if (getDraggedColumn() == column) return;
+        TableColumn old = getDraggedColumn();
+        super.setDraggedColumn(column);
+        firePropertyChange("draggedColumn", old, getDraggedColumn());
+    }
+
+    
+    /**
+     * @inherited <p>
+     * 
+     * Overridden to fire a propertyChange for resizingColumn. 
+     */
+    @Override
+    public void setResizingColumn(TableColumn aColumn) {
+        if (getResizingColumn() == aColumn) return;
+        TableColumn old = getResizingColumn();
+        super.setResizingColumn(aColumn);
+        firePropertyChange("resizingColumn", old, getResizingColumn());
+    }
+    
+    
     
     /**
      * {@inheritDoc} <p>
