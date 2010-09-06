@@ -21,6 +21,8 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 
 import org.jdesktop.swingx.table.TableColumnExt;
+import org.jdesktop.test.PropertyChangeReport;
+import org.jdesktop.test.TestUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -32,16 +34,42 @@ import org.junit.runners.JUnit4;
 public class JXTableHeaderTest extends InteractiveTestCase {
     private static final Logger LOG = Logger.getLogger(JXTableHeaderTest.class
             .getName());
-
     
-    @Before
-    public void setUpJ4() throws Exception {
-        setUp();
+    private JXTableHeader header;
+
+    /**
+     * Issue #1341-swingx: resizing/dragged/column/distance bound properties.
+     */
+    @Test
+    public void testNotifyResizingColumn() {
+        assertNull(header.getResizingColumn());
+        PropertyChangeReport report = new PropertyChangeReport(header);
+        TableColumn tableColumn = header.getColumnModel().getColumn(0);
+        header.setResizingColumn(tableColumn);
+        TestUtils.assertPropertyChangeEvent(report, "resizingColumn", null, tableColumn);
+        
     }
     
-    @After
-    public void tearDownJ4() throws Exception {
-        tearDown();
+    /**
+     * Issue #1341-swingx: resizing/dragged/column/distance bound properties.
+     */
+    @Test
+    public void testNotifyDraggedDistance() {
+        PropertyChangeReport report = new PropertyChangeReport(header);
+        header.setDraggedDistance(10);
+        TestUtils.assertPropertyChangeEvent(report, "draggedDistance", 0, 10);
+    }
+    
+    /**
+     * Issue #1341-swingx: resizing/dragged/column/distance bound properties.
+     */
+    @Test
+    public void testNotifyDraggedColumn() {
+        assertNull(header.getDraggedColumn());
+        PropertyChangeReport report = new PropertyChangeReport(header);
+        TableColumn tableColumn = header.getColumnModel().getColumn(0);
+        header.setDraggedColumn(tableColumn);
+        TestUtils.assertPropertyChangeEvent(report, "draggedColumn", null, tableColumn);
     }
     
 
@@ -322,5 +350,22 @@ public class JXTableHeaderTest extends InteractiveTestCase {
             e.printStackTrace();
         } 
     }
+
+    
+    @Override
+    @Before
+    public void setUp() {
+        JXTable table = new JXTable(10, 5); 
+        header = new JXTableHeader(table.getColumnModel());
+    }
+
+
+    
+    @After
+    public void tearDownJ4() throws Exception {
+        tearDown();
+    }
+    
+
 
 }
