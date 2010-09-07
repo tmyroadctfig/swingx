@@ -33,9 +33,8 @@ import org.jdesktop.swingx.rollover.RolloverRenderer;
  *  <ul>
  *  <li> provide a bunch of convenience constructors as appropriate for the type of 
  *      collection component
- *  <li> create a default ComponentProvider to use if none is given  
+ *  <li> create a reasonable default ComponentProvider if none is given  
  *  <li> implement the getXXCellRenderer by delegating to the ComponentProvider
- *  <li> reset the renderering component's name as expected by Synth-based LAFs   
  *  </ul>
  * 
  * @author Jeanette Winzenburg

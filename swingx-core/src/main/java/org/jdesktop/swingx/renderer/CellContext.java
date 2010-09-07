@@ -433,4 +433,8 @@ public class CellContext implements Serializable {
         return getComponent() != null ? getComponent().getFont() : null;
     }
 
+    public String getCellRendererName() {
+        return getUIPrefix() + "cellRenderer";
+    }
+
 }

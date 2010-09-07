@@ -184,8 +184,6 @@ public class DefaultListRenderer extends AbstractRenderer
         Component comp = componentController.getRendererComponent(cellContext);
         // fix issue #1040-swingx: memory leak if value not released
         cellContext.replaceValue(null);
-        // fix issue #1339-swingx: set name for the sake of Synth-based LAFs
-        comp.setName("List.cellRenderer");
         return comp;
     }
 

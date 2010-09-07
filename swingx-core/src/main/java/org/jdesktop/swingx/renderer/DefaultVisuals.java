@@ -45,6 +45,7 @@ import javax.swing.JComponent;
  * <li> componentOrientation
  * <li> toolTipText
  * <li> minimum-, maximum-, preferredSize
+ * <li> name
  * </ul>
  * 
  * Client code will rarely need to be aware of this class. It's the single
@@ -130,7 +131,8 @@ public class DefaultVisuals<T extends JComponent> implements Serializable {
      * 
      * Here: synch <code>Font</code>, <code>ComponentOrientation</code> and
      * <code>enabled</code> to context's component. Resets toolTipText to null.
-     * Calls configureSizes to reset xxSize if appropriate.
+     * Calls configureSizes to reset xxSize if appropriate. Resets the component's
+     * name property.
      * <p>
      * 
      * PENDING: not fully defined - "divers" means everything that's not 
@@ -141,6 +143,7 @@ public class DefaultVisuals<T extends JComponent> implements Serializable {
      * @param context the cell context to configure from, must not be null
      */
     protected void configureState(T renderingComponent, CellContext context) {
+        renderingComponent.setName(context.getCellRendererName());
         renderingComponent.setToolTipText(null);
         configureSizes(renderingComponent, context);
         // PENDING JW: as of Issue #1269 this was changed to query the

@@ -52,6 +52,22 @@ public class CellContextTest extends InteractiveTestCase {
             .getName());
     
     @Test
+    public void testNameInContext() {
+        assertEquals("cellRenderer", new CellContext().getCellRendererName());
+        assertEquals("Table.cellRenderer", new TableCellContext().getCellRendererName());
+        assertEquals("Tree.cellRenderer", new TreeCellContext().getCellRendererName());
+        assertEquals("List.cellRenderer", new ListCellContext().getCellRendererName());
+    }
+    
+    @Test
+    public void testDefaultVisualsSetName() {
+        CellContext context = new TableCellContext();
+        JLabel label = new JLabel();
+        new DefaultVisuals<JLabel>().configureVisuals(label, context);
+        assertEquals("DefaultVisuals must set name", "Table.cellRenderer", label.getName());
+    }
+    
+    @Test
     public void testDefaultVisualsUseContextFont() {
         JXTable table = new JXTable();
         final Font font = table.getFont().deriveFont(50f);
