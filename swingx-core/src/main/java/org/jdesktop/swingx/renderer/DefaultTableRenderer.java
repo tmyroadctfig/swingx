@@ -148,7 +148,10 @@ public class DefaultTableRenderer extends AbstractRenderer
     /**
      * 
      * Returns a configured component, appropriate to render the given
-     * list cell.  
+     * list cell. <p> 
+     * 
+     * Note: The component's name is set to "Table.cellRenderer" for the sake
+     * of Synth-based LAFs.
      * 
      * @param table the <code>JTable</code>
      * @param value the value to assign to the cell at
@@ -166,6 +169,8 @@ public class DefaultTableRenderer extends AbstractRenderer
         Component comp = componentController.getRendererComponent(cellContext);
         // fix issue #1040-swingx: memory leak if value not released
         cellContext.replaceValue(null);
+        // fix issue #1339-swingx: set name for the sake of Synth-based LAFs
+        comp.setName("Table.cellRenderer");
         return comp;
     }
 

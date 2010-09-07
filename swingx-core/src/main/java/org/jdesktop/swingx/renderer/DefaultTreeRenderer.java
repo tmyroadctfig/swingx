@@ -128,7 +128,10 @@ public class DefaultTreeRenderer extends AbstractRenderer
     /**
      * 
      * Returns a configured component, appropriate to render the given tree
-     * cell.
+     * cell. <p>
+     * 
+     * Note: The component's name is set to "Tree.cellRenderer" for the sake
+     * of Synth-based LAFs.
      * 
      * @param tree the <code>JTree</code>
      * @param value the value to assign to the cell
@@ -147,6 +150,8 @@ public class DefaultTreeRenderer extends AbstractRenderer
         Component comp = componentController.getRendererComponent(cellContext);
         // fix issue #1040-swingx: memory leak if value not released
         cellContext.replaceValue(null);
+        // fix issue #1339-swingx: set name for the sake of Synth-based LAFs
+        comp.setName("Tree.cellRenderer");
         return comp;
     }
 
