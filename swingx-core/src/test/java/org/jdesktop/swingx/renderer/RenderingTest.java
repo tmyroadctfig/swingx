@@ -34,11 +34,20 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JTable;
+import javax.swing.JTree;
+import javax.swing.ListCellRenderer;
+import javax.swing.LookAndFeel;
 import javax.swing.ToolTipManager;
+import javax.swing.UIManager;
+import javax.swing.table.TableCellRenderer;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreeCellRenderer;
 
 import junit.framework.TestCase;
 
+import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXHyperlink;
 import org.jdesktop.swingx.JXPanel;
 import org.jdesktop.swingx.JXTable;
@@ -69,6 +78,54 @@ public class RenderingTest extends TestCase {
     private static final Logger LOG = Logger.getLogger(RenderingTest.class
             .getName());
 
+    /**
+     * Issue #1339-swingx: set name of rendering component for Synth-based LAFs.
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void testRenderingComponentNames() throws Exception {
+        ComponentProvider<?> provider = new LabelProvider();
+        assertEquals("default name expected null", null, provider
+                .getRendererComponent(null).getName());
+        // use the same provider for all types of renderers
+        DefaultTableRenderer rendererTable = new DefaultTableRenderer(provider);
+        DefaultListRenderer rendererList = new DefaultListRenderer(provider);
+        DefaultTreeRenderer rendererTree = new DefaultTreeRenderer(provider);
+        LookAndFeel old = UIManager.getLookAndFeel();
+        try {
+            InteractiveTestCase.setLookAndFeel("Nimbus");
+            // table
+            JTable table = new JTable(4, 3);
+            TableCellRenderer tableT = table.getDefaultRenderer(Object.class);
+            String nameT = tableT.getTableCellRendererComponent(table, null, false, false, 0, 0).getName();
+            assertEquals("sanity: checking default name", "Table.cellRenderer", nameT);
+            assertEquals(nameT, rendererTable
+                    .getTableCellRendererComponent(null, null, false, false, 0,
+                            0).getName());
+            // list
+            JList list = new JList();
+            ListCellRenderer listR = list.getCellRenderer();
+            String nameL =
+                     listR.getListCellRendererComponent(list, null, 0, false,
+                            false).getName();
+            assertEquals("sanity: checking default name", "List.cellRenderer", nameL);
+            assertEquals(nameL, rendererList.
+                    getListCellRendererComponent(list, null, 0, false, false).getName());
+            // tree
+            JTree tree = new JTree();
+            TreeCellRenderer treeR = tree.getCellRenderer();
+            String nameTree =
+                     treeR.getTreeCellRendererComponent(tree, null, false,
+                            false, false, 1, false).getName();
+            assertEquals("sanity: checking default name", "Tree.cellRenderer", nameTree);
+            assertEquals(nameTree, rendererTree.
+                    getTreeCellRendererComponent(tree, null, false, false, false, 0, false).getName());
+            
+        } finally {
+            UIManager.setLookAndFeel(old);
+        }
+    }
     /**
      * Issue #766-swingx: flickering cursor on drop over.
      * 
