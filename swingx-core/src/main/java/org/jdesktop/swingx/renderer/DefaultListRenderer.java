@@ -20,13 +20,10 @@
  */
 package org.jdesktop.swingx.renderer;
 
-
 import java.awt.Component;
 
-import javax.swing.Icon;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
-
 
 /**
  * Adapter to glue SwingX renderer support to core API. It has convenience
@@ -177,6 +174,7 @@ public class DefaultListRenderer extends AbstractRenderer
      * @param index the row index (in view coordinates) of the cell to render
      * @return a component to render the given list cell.
      */
+    @Override
     public Component getListCellRendererComponent(JList list, Object value,
             int index, boolean isSelected, boolean cellHasFocus) {
         cellContext.installContext(list, value, index, 0, isSelected,
@@ -204,20 +202,6 @@ public class DefaultListRenderer extends AbstractRenderer
      * @return the StringValue to use by default.
      */
     private StringValue createDefaultStringValue() {
-        StringValue sv = new StringValue() {
-
-            public String getString(Object value) {
-                if (value instanceof Icon) {
-                    return "";
-                }
-                return StringValues.TO_STRING.getString(value);
-            }
-
-        };
-        return new MappedValue(sv, IconValues.ICON);
+        return MappedValues.STRING_OR_ICON_ONLY;
     }
-
-
 }
-
-
