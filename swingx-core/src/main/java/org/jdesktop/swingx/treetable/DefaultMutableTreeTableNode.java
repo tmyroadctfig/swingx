@@ -57,6 +57,7 @@ public class DefaultMutableTreeTableNode extends AbstractMutableTreeTableNode {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Object getValueAt(int column) {
         return getUserObject();
     }
@@ -64,6 +65,7 @@ public class DefaultMutableTreeTableNode extends AbstractMutableTreeTableNode {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getColumnCount() {
         return 1;
     }

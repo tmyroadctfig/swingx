@@ -82,6 +82,7 @@ public abstract class AbstractMutableTreeTableNode implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public void insert(MutableTreeTableNode child, int index) {
         if (!allowsChildren) {
             throw new IllegalStateException("this node cannot accept children");
@@ -102,6 +103,7 @@ public abstract class AbstractMutableTreeTableNode implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public void remove(int index) {
         children.remove(index).setParent(null);
     }
@@ -109,6 +111,7 @@ public abstract class AbstractMutableTreeTableNode implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public void remove(MutableTreeTableNode node) {
         children.remove(node);
         node.setParent(null);
@@ -117,6 +120,7 @@ public abstract class AbstractMutableTreeTableNode implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public void removeFromParent() {
         parent.remove(this);
     }
@@ -124,6 +128,7 @@ public abstract class AbstractMutableTreeTableNode implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setParent(MutableTreeTableNode newParent) {
         if (newParent == null || newParent.getAllowsChildren()) {
             if (parent != null && parent.getIndex(this) != -1) {
@@ -148,6 +153,7 @@ public abstract class AbstractMutableTreeTableNode implements
      * @see #setUserObject
      * @see #toString
      */
+    @Override
     public Object getUserObject() {
         return userObject;
     }
@@ -155,6 +161,7 @@ public abstract class AbstractMutableTreeTableNode implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setUserObject(Object object) {
         userObject = object;
     }
@@ -162,6 +169,7 @@ public abstract class AbstractMutableTreeTableNode implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public TreeTableNode getChildAt(int childIndex) {
         return children.get(childIndex);
     }
@@ -169,6 +177,7 @@ public abstract class AbstractMutableTreeTableNode implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getIndex(TreeNode node) {
         return children.indexOf(node);
     }
@@ -176,6 +185,7 @@ public abstract class AbstractMutableTreeTableNode implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public TreeTableNode getParent() {
         return parent;
     }
@@ -183,6 +193,7 @@ public abstract class AbstractMutableTreeTableNode implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public Enumeration<? extends MutableTreeTableNode> children() {
         return Collections.enumeration(children);
     }
@@ -190,6 +201,7 @@ public abstract class AbstractMutableTreeTableNode implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean getAllowsChildren() {
         return allowsChildren;
     }
@@ -215,6 +227,7 @@ public abstract class AbstractMutableTreeTableNode implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getChildCount() {
         return children.size();
     }
@@ -222,6 +235,7 @@ public abstract class AbstractMutableTreeTableNode implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isLeaf() {
         return getChildCount() == 0;
     }
@@ -233,6 +247,7 @@ public abstract class AbstractMutableTreeTableNode implements
      *            the column to query
      * @return always returns {@code false}
      */
+    @Override
     public boolean isEditable(int column) {
         return false;
     }
@@ -246,6 +261,7 @@ public abstract class AbstractMutableTreeTableNode implements
      * @param column
      *            the column to set the value on
      */
+    @Override
     public void setValueAt(Object aValue, int column) {
         // does nothing
     }
