@@ -27,8 +27,9 @@ import javax.swing.tree.TreePath;
 
 /**
  * {@code DefaultTreeTableModel} is a concrete implementation of
- * {@code AbstractTreeTableModel} and is provided purely as a convenience.
- * Applications that use {@code JXTreeTable} are expected to provide their own
+ * {@code AbstractTreeTableModel} and is provided purely as a convenience for 
+ * use with {@code TreeTableNode}s. Applications that use {@code JXTreeTable}
+ * without {@code TreeTableNode}s are expected to provide their own
  * implementation of a {@code TreeTableModel}.
  * <p>
  * The {@code DefaultTreeTableModel} is designed to be used with
@@ -172,6 +173,7 @@ public class DefaultTreeTableModel extends AbstractTreeTableModel {
      *             or is not managed by this model, or {@code column} is not a
      *             valid column index
      */
+    @Override
     public Object getValueAt(Object node, int column) {
         if (!isValidTreeTableNode(node)) {
             throw new IllegalArgumentException(
@@ -217,6 +219,7 @@ public class DefaultTreeTableModel extends AbstractTreeTableModel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getColumnCount() {
         return columnIdentifiers.size();
     }
@@ -242,6 +245,7 @@ public class DefaultTreeTableModel extends AbstractTreeTableModel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Object getChild(Object parent, int index) {
         if (!isValidTreeTableNode(parent)) {
             throw new IllegalArgumentException(
@@ -254,6 +258,7 @@ public class DefaultTreeTableModel extends AbstractTreeTableModel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getChildCount(Object parent) {
         if (!isValidTreeTableNode(parent)) {
             throw new IllegalArgumentException(
@@ -266,6 +271,7 @@ public class DefaultTreeTableModel extends AbstractTreeTableModel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getIndexOfChild(Object parent, Object child) {
         if (!isValidTreeTableNode(parent) || !isValidTreeTableNode(child)) {
             return -1;
@@ -329,7 +335,7 @@ public class DefaultTreeTableModel extends AbstractTreeTableModel {
         while (node != root) {
             path.add(0, node);
 
-            node = (TreeTableNode) node.getParent();
+            node = node.getParent();
         }
 
         if (node == root) {
