@@ -26,6 +26,10 @@ import java.text.NumberFormat;
 import java.util.Locale;
 
 import javax.swing.filechooser.FileSystemView;
+import javax.swing.plaf.UIResource;
+
+import org.jdesktop.swingx.util.Contract;
+
 
 /**
  * A collection of common {@code StringValue} implementations.
@@ -149,6 +153,32 @@ public final class StringValues {
         }
         
     };
+    
+    
+
+    public static final StringValue TO_STRING_UI = new StringValueUIResource(StringValues.TO_STRING);
+    public static final StringValue EMPTY_UI = new StringValueUIResource(StringValues.EMPTY);
+    
+    /**
+     * StringValue wrapper of type UIResource to tag LAF installed converters.
+     * 
+     * @author Jeanette Winzenburg, Berlin
+     */
+    public static class StringValueUIResource implements StringValue, UIResource {
+
+        private StringValue delegate;
+
+        public StringValueUIResource(StringValue toString) {
+            Contract.asNotNull(toString, "delegate StringValue must not be null");
+            this.delegate = toString;
+        }
+
+        @Override
+        public String getString(Object value) {
+            return delegate.getString(value);
+        }
+        
+    }
     
     private StringValues() {
         // does nothing

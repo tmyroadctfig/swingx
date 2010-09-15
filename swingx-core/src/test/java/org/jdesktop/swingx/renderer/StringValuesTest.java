@@ -23,10 +23,12 @@ package org.jdesktop.swingx.renderer;
 
 import java.io.File;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.Locale;
 
 import junit.framework.TestCase;
 
+import org.jdesktop.swingx.renderer.StringValues.StringValueUIResource;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -38,7 +40,49 @@ import org.junit.runners.JUnit4;
 @RunWith(JUnit4.class)
 public class StringValuesTest extends TestCase {
 
+    
+    @Test
+    public void testLocaleSVDefaultLocale() {
+        Locale old = Locale.getDefault();
+        try {
+            LocalizableStringValue sv = new LocalizableStringValue(new HashMap());
+            assertEquals(old, sv.getLocale());
+            Locale other = Locale.CHINESE;
+            if (old.equals(other)) {
+                other = Locale.ENGLISH;
+            }
+            Locale.setDefault(other);
+            assertEquals(other, sv.getLocale());
+        } finally {
+            Locale.setDefault(old);
+        }
+    }
+    
+    @Test (expected = NullPointerException.class)
+    public void testLocaleStringValueConstructor() {
+        new LocalizableStringValue(null);
+    }
+    
+    @Test
+    public void testUIResource() {
+        final String constant = "dummy";
+        StringValue sv = new StringValue() {
 
+            @Override
+            public String getString(Object value) {
+                return constant;
+            }
+            
+        };
+        StringValue wrapper = new StringValueUIResource(sv);
+        assertEquals(constant, wrapper.getString("whatever"));
+    }
+    
+    @Test (expected = NullPointerException.class)
+    public void testUIResourceConstructor() {
+        new StringValueUIResource(null);
+    }
+    
     /**
      * Issue #1273-swingx: Locale-dependent StringValues constants 
      *    not updated on changing default.
