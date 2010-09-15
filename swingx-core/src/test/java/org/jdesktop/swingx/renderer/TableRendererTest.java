@@ -21,6 +21,8 @@
  */
 package org.jdesktop.swingx.renderer;
 
+import static org.junit.Assert.*;
+
 import java.awt.Color;
 import java.awt.Component;
 import java.io.Serializable;
@@ -42,6 +44,7 @@ import javax.swing.table.TableModel;
 
 import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXTable;
+import org.jdesktop.swingx.plaf.UIManagerExt;
 import org.jdesktop.swingx.test.XTestUtils;
 import org.jdesktop.test.SerializableSupport;
 import org.junit.After;
@@ -78,6 +81,63 @@ public class TableRendererTest extends InteractiveTestCase {
     @After
     public void tearDownJ4() throws Exception {
         tearDown();
+    }
+    
+    /**
+     * Issue #1345-swingx: TableCellContext optional handling of LAF provided alternateRowColor 
+     */
+    @Test
+    public void testNotHandleAlternateColor() {
+        TableCellRenderer renderer = new DefaultTableRenderer();
+        Color oldColor = UIManager.getColor("Table.alternateRowColor");
+        Object oldHandle = UIManager.get(TableCellContext.HANDLE_ALTERNATE_ROW_BACKGROUND);
+        try {
+            // alternate color
+            UIManager.put("Table.alternateRowColor", Color.MAGENTA);
+            // remove handle flag
+            UIManager.put(TableCellContext.HANDLE_ALTERNATE_ROW_BACKGROUND, null);
+            JTable table = new JTable(10, 2);
+            Component comp = renderer.getTableCellRendererComponent(table, null, false, false, 0, -1);
+            // even row has table background
+            assertEquals(table.getBackground(), comp.getBackground());
+            // odd row has alternate background if handle active - here it is not, so expect 
+            // stable background
+            renderer.getTableCellRendererComponent(table, null, false, false, 1, -1);
+            assertEquals(table.getBackground(), comp.getBackground());
+        } finally {
+            UIManager.put("Table.alternateRowColor", oldColor);
+            UIManager.put(TableCellContext.HANDLE_ALTERNATE_ROW_BACKGROUND, oldHandle);
+        }
+    }
+    
+    /**
+     * Issue #1345-swingx: TableCellContext optional handling of LAF provided alternateRowColor 
+     */
+    @Test
+    public void testAlternateColor() {
+        TableCellRenderer renderer = new DefaultTableRenderer();
+        Color oldColor = UIManager.getColor("Table.alternateRowColor");
+        Object oldHandle = UIManager.get(TableCellContext.HANDLE_ALTERNATE_ROW_BACKGROUND);
+        try {
+            
+            UIManager.put("Table.alternateRowColor", Color.MAGENTA);
+            UIManager.put(TableCellContext.HANDLE_ALTERNATE_ROW_BACKGROUND, Boolean.TRUE);
+            JTable table = new JTable(10, 2);
+            Component comp = renderer.getTableCellRendererComponent(table, null, false, false, 0, -1);
+            // even row has table background
+            assertEquals(table.getBackground(), comp.getBackground());
+            // odd row has alternate background
+            renderer.getTableCellRendererComponent(table, null, false, false, 1, -1);
+            assertEquals(Color.MAGENTA, comp.getBackground());
+        } finally {
+            UIManager.put("Table.alternateRowColor", oldColor);
+            UIManager.put(TableCellContext.HANDLE_ALTERNATE_ROW_BACKGROUND, oldHandle);
+        }
+    }
+    
+    @Test
+    public void testUIPropertyHandleAlternateRowColor() {
+        assertNull(UIManager.get(TableCellContext.HANDLE_ALTERNATE_ROW_BACKGROUND));
     }
     
     @Override
