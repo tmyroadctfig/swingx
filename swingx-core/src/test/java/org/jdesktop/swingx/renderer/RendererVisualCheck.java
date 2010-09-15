@@ -69,6 +69,7 @@ import javax.swing.ListCellRenderer;
 import javax.swing.ListModel;
 import javax.swing.SwingConstants;
 import javax.swing.UIDefaults;
+import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ListSelectionEvent;
@@ -129,15 +130,52 @@ public class RendererVisualCheck extends InteractiveTestCase {
         setSystemLF(true);
         RendererVisualCheck test = new RendererVisualCheck();
         try {
-//            test.runInteractiveTests();
+            test.runInteractiveTests();
 //          test.runInteractiveTests(".*CustomIcons.*");
-          test.runInteractiveTests(".*Text.*");
+//          test.runInteractiveTests(".*Text.*");
 //          test.runInteractiveTests(".*Color.*");
 //          test.runInteractiveTests("interactive.*ColumnControl.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
         }
+    }
+    
+    /**
+     * Issue #1345-swingx: make TableCellContext handle LAF provided alternateRowColor.
+     * 
+     * Note: running this method has static side-effects, run in isolation or press cleanup.
+     */
+    public void interactiveOptionalAlternateRowBackground() {
+        final Color original = UIManager.getColor("Table.alternateRowColor");
+        final JXTable table = new JXTable(new AncientSwingTeam());
+        JXFrame frame = wrapWithScrollingInFrame(table, "toggle handle alternateRow");
+        Action toggle = new AbstractAction("toggle alternate row as default visual") {
+            boolean isHandling;
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                isHandling = !isHandling;
+                UIManager.put(TableCellContext.HANDLE_ALTERNATE_ROW_BACKGROUND, isHandling);
+                if (UIManager.getColor("Table.alternateRowColor") == null) {
+                    UIManager.put("Table.alternateRowColor", HighlighterFactory.FLORAL_WHITE);
+                }
+                table.repaint();
+            }
+        };
+        addAction(frame, toggle);
+        
+        Action cleanup = new AbstractAction("cleanup alternateRowHandling") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                UIManager.put(TableCellContext.HANDLE_ALTERNATE_ROW_BACKGROUND, false);
+                UIManager.put("Table.alternateRowColor", original);
+                table.repaint();
+            }
+        };
+        addAction(frame, cleanup);
+        show(frame);
     }
 
     /**
