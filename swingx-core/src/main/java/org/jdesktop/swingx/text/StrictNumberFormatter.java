@@ -19,7 +19,7 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
-package org.jdesktop.swingx.table;
+package org.jdesktop.swingx.text;
 
 import java.math.BigDecimal;
 import java.text.Format;
@@ -34,11 +34,8 @@ import javax.swing.text.NumberFormatter;
  * number type exceeds its range.
  * 
  * @author Jeanette Winzenburg
- * 
- * @deprecated (pre-1.6.2) moved to text package
  */
-@Deprecated
-class StrictNumberFormatter extends NumberFormatter {
+public class StrictNumberFormatter extends NumberFormatter {
 
     
     private BigDecimal maxAsBig;

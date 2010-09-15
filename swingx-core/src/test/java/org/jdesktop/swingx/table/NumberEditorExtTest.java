@@ -48,6 +48,7 @@ import javax.swing.table.TableCellEditor;
 import javax.swing.text.NumberFormatter;
 
 import org.jdesktop.swingx.InteractiveTestCase;
+import org.jdesktop.swingx.text.StrictNumberFormatter;
 import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.JXTable.NumberEditor;
@@ -76,7 +77,7 @@ public class NumberEditorExtTest extends InteractiveTestCase {
         NumberEditorExtTest test = new NumberEditorExtTest();
         try {
             test.runInteractiveTests();
-//            test.runInteractiveTests("interactive.*Number.*");
+//            test.runInteractiveTests("interactive.*AllTypes.*");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -479,7 +480,9 @@ public class NumberEditorExtTest extends InteractiveTestCase {
     
     /**
      * Issue ??-swingx: localized NumberEditor using strict.
+     * Default for JXTable. 
      * 
+     * Here: all column classes are Number.
      * 
      */
     public void interactiveStrictNumberEditorAllTypesAsNumber() {
@@ -505,14 +508,48 @@ public class NumberEditorExtTest extends InteractiveTestCase {
         model.setValueAt(new BigDecimal("44444444444444.666666666666666666"), 0, 6);
         final JXTable table = new JXTable(model);
         table.setSurrendersFocusOnKeystroke(true);
-        NumberEditorExt strictEditor = new NumberEditorExt(true);
+        JXFrame frame = showWithScrollingInFrame(table, "Extended NumberEditors: number class");
+        addStatusMessage(frame, "number class: no error, commit any number");
+    }
+    
+    /**
+     * Issue ??-swingx: localized NumberEditor not using strict.
+     * 
+     * Column class is concrete type.
+     * 
+     */
+    public void interactiveNonStrictNumberEditorAllTypes() {
+        final Class<?>[] classes = new Class[] {Byte.class, Short.class, Integer.class,
+                Float.class, Double.class, BigInteger.class, BigDecimal.class, Number.class};
+        DefaultTableModel model = new DefaultTableModel(new String[] {
+                "Byte", "Short", "Integer", "Float", "Double", "BigInteger", 
+                "BigDecimal", "Number"}, 10) {
+            
+            @Override
+            public Class<?> getColumnClass(int columnIndex) {
+                return classes[columnIndex];
+            }
+            
+        };
+        model.setValueAt(Byte.MAX_VALUE, 0, 0);
+        model.setValueAt(Short.MAX_VALUE, 0, 1);
+        model.setValueAt(Integer.MAX_VALUE, 0, 2);
+        model.setValueAt(Float.MAX_VALUE, 0, 3);
+        model.setValueAt(Double.MAX_VALUE, 0, 4);
+        model.setValueAt(new BigInteger(TOO_BIG_INTEGER), 0, 5);
+        model.setValueAt(new BigDecimal("44444444444444.666666666666666666"), 0, 6);
+        final JXTable table = new JXTable(model);
+        table.setSurrendersFocusOnKeystroke(true);
+        NumberEditorExt strictEditor = new NumberEditorExt(false);
         table.setDefaultEditor(Number.class, strictEditor);
-        showWithScrollingInFrame(table, "Extended NumberEditors: number class");
+        JXFrame frame = showWithScrollingInFrame(table, "Extended NumberEditors(non-strict): concrete Number classes");
+        addStatusMessage(frame, "concrete number classes and non-strict formatter: error not shown, fails on commit");
     }
     
     /**
      * Issue ??-swingx: localized NumberEditor using strict.
      * 
+     * Column class is concrete type.
      * 
      */
     public void interactiveStrictNumberEditorAllTypes() {
@@ -537,17 +574,14 @@ public class NumberEditorExtTest extends InteractiveTestCase {
         model.setValueAt(new BigDecimal("44444444444444.666666666666666666"), 0, 6);
         final JXTable table = new JXTable(model);
         table.setSurrendersFocusOnKeystroke(true);
-        NumberEditorExt strictEditor = new NumberEditorExt(true);
-        table.setDefaultEditor(Number.class, strictEditor);
-        table.setDefaultEditor(Double.class, strictEditor);
-        table.setDefaultEditor(Float.class, strictEditor);
-        showWithScrollingInFrame(table, "Extended NumberEditors: concrete Number classes");
+        JXFrame frame = showWithScrollingInFrame(table, "Extended NumberEditors(strict): concrete Number classes");
+        addStatusMessage(frame, "concrete number classes and strict formatter: error shown on typing");
     }
     
     /**
      * Issue #393-swingx: localized NumberEditor.
      * 
-     * Playing ... looks working :-)
+     * Column type is Number, editors as noted in header text 
      * 
      * 
      */
@@ -555,8 +589,8 @@ public class NumberEditorExtTest extends InteractiveTestCase {
         final int doubleColumns = 3;
         final int integerColumns = 6;
         DefaultTableModel model = new DefaultTableModel(new String[] {
-                "Double-core", "Double-ext", "Double-extstrict", 
-                "Integer-core", "Integer-ext", "Integer-extstrict",
+                "Double-core", "Double-extstrict", "Double-extnonstrict", 
+                "Integer-core", "Integer-extstrict", "Integer-extnonstrict",
         "Object" }, 10) {
             
             @Override
@@ -569,25 +603,26 @@ public class NumberEditorExtTest extends InteractiveTestCase {
         table.setSurrendersFocusOnKeystroke(true);
         for (int i = 0; i < table.getColumnCount(); i++) {
             if (i < doubleColumns) {
-                table.setValueAt(10.2, 0, i);
+                table.setValueAt(Double.MAX_VALUE-1, 0, i);
             } else {
-                table.setValueAt(10, 0, i);
+                table.setValueAt(Integer.MAX_VALUE-1, 0, i);
             }
             
         }
         NumberEditor numberEditor = new NumberEditor();
         table.getColumn(0).setCellEditor(numberEditor);
         table.getColumn(doubleColumns).setCellEditor(numberEditor);
-        NumberEditorExt strictEditor = new NumberEditorExt(true);
-        table.getColumn(doubleColumns -1).setCellEditor(strictEditor);
-        table.getColumn(integerColumns -1).setCellEditor(strictEditor);
-        showWithScrollingInFrame(table, "Extended NumberEditors: Number.class");
+        NumberEditorExt nonStrictEditor = new NumberEditorExt(false);
+        table.getColumn(doubleColumns -1).setCellEditor(nonStrictEditor);
+        table.getColumn(integerColumns -1).setCellEditor(nonStrictEditor);
+        JXFrame frame = showWithScrollingInFrame(table, "Extended NumberEditors: Number.class");
+        addStatusMessage(frame, "number-class: has no constructor with string, core/nonstrict can't handle");
     }
     
     /**
      * Issue #393-swingx: localized NumberEditor.
      * 
-     * Playing ... looks working :-)
+     * Column type is Number, editors as noted in header text 
      * 
      * 
      */
@@ -595,8 +630,8 @@ public class NumberEditorExtTest extends InteractiveTestCase {
         final int doubleColumns = 3;
         final int integerColumns = 6;
         DefaultTableModel model = new DefaultTableModel(new String[] {
-                "Double-core", "Double-ext", "Double-extstrict", 
-                "Integer-core", "Integer-ext", "Integer-extstrict",
+                "Double-core", "Double-extstrict", "Double-extnonstrict", 
+                "Integer-core", "Integer-extstrict", "Integer-extnonstrict",
                 "Object" }, 10) {
 
             @Override
@@ -616,19 +651,19 @@ public class NumberEditorExtTest extends InteractiveTestCase {
         table.setSurrendersFocusOnKeystroke(true);
         for (int i = 0; i < table.getColumnCount(); i++) {
             if (i < doubleColumns) {
-                table.setValueAt(10.2, 0, i);
+                table.setValueAt(Double.MAX_VALUE, 0, i);
             } else {
-                table.setValueAt(10, 0, i);
+                table.setValueAt(Integer.MAX_VALUE, 0, i);
             }
 
         }
         NumberEditor numberEditor = new NumberEditor();
         table.getColumn(0).setCellEditor(numberEditor);
         table.getColumn(doubleColumns).setCellEditor(numberEditor);
-        NumberEditorExt strictEditor = new NumberEditorExt(true);
-        table.getColumn(doubleColumns -1).setCellEditor(strictEditor);
-        table.getColumn(integerColumns -1).setCellEditor(strictEditor);
-        showWithScrollingInFrame(table, "Extended NumberEditors: Double/Integer");
+        NumberEditorExt nonStrictEditor = new NumberEditorExt(false);
+        table.getColumn(doubleColumns -1).setCellEditor(nonStrictEditor);
+        table.getColumn(integerColumns -1).setCellEditor(nonStrictEditor);
+        showWithScrollingInFrame(table, "Extended NumberEditors: concrete classes Double/Integer");
     }
 
     /**
@@ -639,9 +674,10 @@ public class NumberEditorExtTest extends InteractiveTestCase {
      *  and press commit or transfer focus away. 
      */
     public void interactiveFloatingPointEditorDigits(){
-        final int doubleColumns = 4;
+        final int doubleColumns = 3;
         DefaultTableModel model = new DefaultTableModel(
-                new String[] {"Double-default", "Double-customMaxDigits", "Double-ext", "Double-customMaxDigits"}, 10) {
+                new String[] {"Double-defaultstrict", "Double-customMaxDigits-nonstrict", 
+                         "Double-customMaxDigitsstrict"}, 10) {
 
             @Override
             public Class<?> getColumnClass(int columnIndex) {
@@ -656,14 +692,13 @@ public class NumberEditorExtTest extends InteractiveTestCase {
         table.setSurrendersFocusOnKeystroke(true);
         for (int i = 0; i < doubleColumns; i++) {
             table.setValueAt(10.123456789, 0, i);
-            table.setValueAt(Double.MAX_VALUE, 1, i);
+            table.setValueAt(10, 1, i);
         }
         NumberFormat moreFractionalDigits = NumberFormat.getInstance();
         moreFractionalDigits.setMaximumFractionDigits(20);
         NumberEditorExt numberEditor = new NumberEditorExt(moreFractionalDigits);
         table.getColumn(1).setCellEditor(numberEditor);
-        table.getColumn(2).setCellEditor(new NumberEditorExt(true));
-        table.getColumn(3).setCellEditor(new NumberEditorExt(moreFractionalDigits, true));
+        table.getColumn(2).setCellEditor(new NumberEditorExt(moreFractionalDigits, true));
         JXFrame frame = showWithScrollingInFrame(table, "Extended NumberEditors: Doubles");
         Format format = NumberFormat.getInstance();
         final JFormattedTextField field = new JFormattedTextField(format);

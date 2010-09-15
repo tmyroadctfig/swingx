@@ -88,7 +88,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
       try {
 //        test.runInteractiveTests();
 //          test.runInteractiveTests("interactive.*FloatingPoint.*");
-          test.runInteractiveTests("interactive.*Header.*");
+          test.runInteractiveTests("interactive.*Disable.*");
 //          test.runInteractiveTests("interactive.*ColumnProp.*");
 //          test.runInteractiveTests("interactive.*Multiple.*");
 //          test.runInteractiveTests("interactive.*RToL.*");
@@ -168,6 +168,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         table.setModel(model);
         RowSorterListener l = new RowSorterListener() {
             
+            @SuppressWarnings("unchecked")
             @Override
             public void sorterChanged(RowSorterEvent e) {
                 if (e.getType() == Type.SORT_ORDER_CHANGED) {
