@@ -38,6 +38,8 @@ import javax.swing.text.NumberFormatter;
 import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXTable;
+import org.jdesktop.swingx.table.DatePickerCellEditor;
+import org.jdesktop.swingx.table.NumberEditorExt;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

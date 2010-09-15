@@ -38,6 +38,9 @@ import javax.swing.KeyStroke;
 import javax.swing.border.LineBorder;
 import javax.swing.text.NumberFormatter;
 
+import org.jdesktop.swingx.text.StrictNumberFormatter;
+import org.jdesktop.swingx.text.NumberFormatExt;
+
 
 /**
  * 
@@ -237,7 +240,8 @@ public class NumberEditorExt extends DefaultCellEditor {
      */
     private static JFormattedTextField createFormattedTextFieldX(
             NumberFormat format) {
-        StrictNumberFormatter formatter = new StrictNumberFormatter(new NumberFormatExt(format));
+       StrictNumberFormatter formatter = new StrictNumberFormatter(
+                new NumberFormatExt(format));
         final JFormattedTextField textField = new JFormattedTextField(
                 formatter);
         /*
@@ -293,7 +297,7 @@ public class NumberEditorExt extends DefaultCellEditor {
     private static JFormattedTextField createFormattedTextField(
             NumberFormat formatter) {
         final JFormattedTextField textField = new JFormattedTextField(
-                new NumberEditorNumberFormat(formatter));
+                new NumberFormatExt(formatter));
         /*
          * FIXME: I am sure there is a better way to do this, but I don't know
          * what it is. JTable sets up a binding for the ESCAPE key, but

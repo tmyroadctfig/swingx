@@ -19,7 +19,7 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
-package org.jdesktop.swingx.table;
+package org.jdesktop.swingx.text;
 
 import java.text.AttributedCharacterIterator;
 import java.text.AttributedString;
@@ -33,11 +33,8 @@ import java.text.ParsePosition;
  * 
  * @author Noel Grandin
  * @author Jeanette Winzenburg
- * 
- * @deprecated (pre-1.6.2) moved to org.jdesktop.swingx.text
  */
-@Deprecated
-class NumberFormatExt extends NumberFormat {
+public class NumberFormatExt extends NumberFormat {
     
     private NumberFormat childFormat;
 

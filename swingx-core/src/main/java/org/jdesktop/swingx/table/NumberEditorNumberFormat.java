@@ -32,7 +32,10 @@ import java.text.ParsePosition;
  * strings.
  * 
  * @author Noel Grandin
+ * 
+ * @deprecated (pre-1.6.2) replaced by NumberEditorExt, no longer used internally
  */
+@Deprecated
 class NumberEditorNumberFormat extends Format {
     private final NumberFormat childFormat;
 
