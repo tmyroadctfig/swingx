@@ -34,6 +34,7 @@ import javax.swing.border.Border;
 import javax.swing.plaf.UIResource;
 
 import org.jdesktop.swingx.painter.Painter;
+import org.jdesktop.swingx.renderer.StringValue;
 import org.jdesktop.swingx.util.Contract;
 
 /**
@@ -125,6 +126,7 @@ public final class DefaultsList {
             shouldThrow |= value instanceof InputMap;
             shouldThrow |= value instanceof Insets;
             shouldThrow |= value instanceof Painter<?>;
+            shouldThrow |= value instanceof StringValue;
             
             if (shouldThrow) {
                 throw new IllegalArgumentException(message);
