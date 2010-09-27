@@ -30,6 +30,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.LayoutManager;
 import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
@@ -38,6 +39,7 @@ import javax.swing.RepaintManager;
 import javax.swing.Scrollable;
 import javax.swing.SwingConstants;
 
+import org.jdesktop.swingx.graphics.GraphicsUtilities;
 import org.jdesktop.swingx.painter.AbstractPainter;
 import org.jdesktop.swingx.painter.Painter;
 
@@ -77,6 +79,7 @@ import org.jdesktop.swingx.painter.Painter;
  * @see Scrollable
  * @see Painter
  */
+@SuppressWarnings("nls")
 public class JXPanel extends JPanel implements BackgroundPaintable, Scrollable {
 //    private boolean scrollableTracksViewportHeight = true;
 //    private boolean scrollableTracksViewportWidth = true;
@@ -166,7 +169,7 @@ public class JXPanel extends JPanel implements BackgroundPaintable, Scrollable {
      */
     public void setAlpha(float alpha) {
         if (this.alpha != alpha) {
-            assert alpha >= 0 && alpha <= 1.0;
+            assert alpha >= 0f && alpha <= 1f;
             float oldAlpha = this.alpha;
             this.alpha = alpha;
             if (alpha > 0f && alpha < 1f) {
@@ -179,11 +182,12 @@ public class JXPanel extends JPanel implements BackgroundPaintable, Scrollable {
                 RepaintManager manager = RepaintManager.currentManager(this);
                 RepaintManager trm = SwingXUtilities.getTranslucentRepaintManager(manager);
                 RepaintManager.setCurrentManager(trm);
-            } else if (alpha == 1) {
+            } else if (alpha == 1f) {
                 //restore the oldOpaque if it was true (since opaque is false now)
                 if (oldOpaque) {
                     setOpaque(true);
                 }
+                //TODO uninstall TranslucentRepaintManager when no more non-opaque JXPanel's exist
             }
             firePropertyChange("alpha", oldAlpha, alpha);
             repaint();
@@ -202,7 +206,7 @@ public class JXPanel extends JPanel implements BackgroundPaintable, Scrollable {
      * Unlike other properties, alpha can be set on a component, or on one of
      * its parents. If the alpha of a parent component is .4, and the alpha on
      * this component is .5, effectively the alpha for this component is .4
-     * because the lowest alpha in the heirarchy &quot;wins&quot;
+     * because the lowest alpha in the hierarchy &quot;wins&quot;
      */
     public float getEffectiveAlpha() {
         if (inheritAlpha) {
@@ -307,6 +311,7 @@ public class JXPanel extends JPanel implements BackgroundPaintable, Scrollable {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean getScrollableTracksViewportHeight() {
         return scrollableHeightHint.getTracksParentSize(this);
     }
@@ -314,6 +319,7 @@ public class JXPanel extends JPanel implements BackgroundPaintable, Scrollable {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean getScrollableTracksViewportWidth() {
         return scrollableWidthHint.getTracksParentSize(this);
     }
@@ -321,6 +327,7 @@ public class JXPanel extends JPanel implements BackgroundPaintable, Scrollable {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Dimension getPreferredScrollableViewportSize() {
         return getPreferredSize();
     }
@@ -328,6 +335,7 @@ public class JXPanel extends JPanel implements BackgroundPaintable, Scrollable {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getScrollableBlockIncrement(Rectangle visibleRect, int orientation, int direction) {
         if (orientation == SwingConstants.VERTICAL) {
             return visibleRect.height;
@@ -341,6 +349,7 @@ public class JXPanel extends JPanel implements BackgroundPaintable, Scrollable {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction) {
         return getScrollableBlockIncrement(visibleRect, orientation, direction) / 10;
     }
@@ -405,14 +414,15 @@ public class JXPanel extends JPanel implements BackgroundPaintable, Scrollable {
      * @param p the new painter
      * @see #getBackgroundPainter()
      */
+    @Override
     public void setBackgroundPainter(Painter p) {
         Painter old = getBackgroundPainter();
         if (old instanceof AbstractPainter) {
-            ((AbstractPainter) old).removePropertyChangeListener(painterChangeListener);
+            ((AbstractPainter<?>) old).removePropertyChangeListener(painterChangeListener);
         }
         backgroundPainter = p;
         if (backgroundPainter instanceof AbstractPainter) {
-            ((AbstractPainter) backgroundPainter).addPropertyChangeListener(getPainterChangeListener());
+            ((AbstractPainter<?>) backgroundPainter).addPropertyChangeListener(getPainterChangeListener());
         }
         firePropertyChange("backgroundPainter", old, getBackgroundPainter());
         repaint();
@@ -441,6 +451,7 @@ public class JXPanel extends JPanel implements BackgroundPaintable, Scrollable {
      * @see #setBackgroundPainter(Painter)
      * @see #isPaintBorderInsets()
      */
+    @Override
     public Painter getBackgroundPainter() {
         return backgroundPainter;
     }
@@ -454,6 +465,7 @@ public class JXPanel extends JPanel implements BackgroundPaintable, Scrollable {
      * true by default. This property affects the width, height,
      * and initial transform passed to the background painter.
      */
+    @Override
     public boolean isPaintBorderInsets() {
         return paintBorderInsets;
     }
@@ -467,52 +479,73 @@ public class JXPanel extends JPanel implements BackgroundPaintable, Scrollable {
      * 
      * This is a bound property.
      */
+    @Override
     public void setPaintBorderInsets(boolean paintBorderInsets) {
         boolean old = this.isPaintBorderInsets();
         this.paintBorderInsets = paintBorderInsets;
         firePropertyChange("paintBorderInsets", old, isPaintBorderInsets());
     }
-    
+
     /**
-     * Overridden paint method to take into account the alpha setting
-     * @param g 
+     * Overridden paint method to take into account the alpha setting.
+     * 
+     * @param g
+     *            the <code>Graphics</code> context in which to paint
      */
     @Override
     public void paint(Graphics g) {
-        Graphics2D g2d = (Graphics2D)g;
-        Composite oldComp = g2d.getComposite();
-        
-        try {
-            float alpha = getEffectiveAlpha();
-            Composite alphaComp = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);
-            g2d.setComposite(alphaComp);
-            super.paint(g2d);
-        } finally {
-            g2d.setComposite(oldComp);
+        //short circuit painting if no transparency
+        if (getAlpha() == 1f) {
+            super.paint(g);
+        } else {
+            //the component is translucent, so we need to render to
+            //an intermediate image before painting
+            BufferedImage img = GraphicsUtilities.createCompatibleTranslucentImage(getWidth(), getHeight());
+            Graphics2D gfx = img.createGraphics();
+            
+            try {
+                super.paint(gfx);
+            } finally {
+                gfx.dispose();
+            }
+            
+            Graphics2D g2d = (Graphics2D) g;
+            Composite oldComp = g2d.getComposite();
+            
+            try {
+                Composite alphaComp = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, getEffectiveAlpha());
+                g2d.setComposite(alphaComp);
+                //TODO should we cache the image?
+                g2d.drawImage(img, null, 0, 0);
+            } finally {
+                g2d.setComposite(oldComp);
+            }
         }
     }
     
     /**
      * Overridden to provide Painter support. It will call backgroundPainter.paint()
      * if it is not null, else it will call super.paintComponent().
+     * 
+     * @param g
+     *            the <code>Graphics</code> context in which to paint
      */
     @Override
     protected void paintComponent(Graphics g) {
-        if(backgroundPainter != null) {
+        if (backgroundPainter == null) {
+            super.paintComponent(g);
+        } else {
             if (isOpaque()) {
                 super.paintComponent(g);
             }
             
-            Graphics2D g2 = (Graphics2D)g.create();
+            Graphics2D g2 = (Graphics2D) g.create();
             
             try {
                 SwingXUtilities.paintBackground(this, g2);
             } finally {
                 g2.dispose();
             }
-        } else {
-            super.paintComponent(g);
         }
     }
-    
 }
