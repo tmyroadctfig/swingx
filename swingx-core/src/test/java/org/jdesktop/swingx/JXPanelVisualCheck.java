@@ -32,12 +32,14 @@ import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
+import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.painter.ImagePainter;
 import org.jdesktop.swingx.painter.MattePainter;
+import org.jdesktop.swingx.util.PaintUtils;
 
 /**
  * Contains methods to visually test JXPanel.
@@ -50,7 +52,7 @@ public class JXPanelVisualCheck extends InteractiveTestCase {
 //      setSystemLF(true);
       JXPanelVisualCheck test = new JXPanelVisualCheck();
       try {
-         test.runInteractiveTests();
+         test.runInteractiveTests("interactiveAlphaCheck");
 //         test.runInteractiveTests(".*List.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
@@ -133,6 +135,19 @@ public class JXPanelVisualCheck extends InteractiveTestCase {
 //        panel.setOpaque(false);
         panel.setPreferredSize(new Dimension(200, 200));
         showWithScrollingInFrame(panel, "icon painter in jxpanel");
+    }
+    
+    public void interactiveAlphaCheck() {
+        JXPanel xp = new JXPanel();
+        xp.setBackgroundPainter(new MattePainter(PaintUtils.AERITH, true));
+        xp.setAlpha(.5f);
+        xp.add(new JButton("Press Me"));
+        
+        JPanel p = new JPanel(new BorderLayout());
+        p.setBackground(Color.BLACK);
+        p.add(xp);
+        
+        show(wrapInFrame(p, "Alpha Check"), 200, 200);
     }
 
     /**

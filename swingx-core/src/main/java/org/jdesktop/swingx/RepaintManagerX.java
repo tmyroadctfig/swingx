@@ -21,11 +21,11 @@
 
 package org.jdesktop.swingx;
 
-import java.awt.Container;
-import java.awt.Rectangle;
+import java.awt.Point;
 
 import javax.swing.JComponent;
 import javax.swing.RepaintManager;
+import javax.swing.SwingUtilities;
 
 /**
  * <p>An implementation of {@link RepaintManager} which adds support for transparency
@@ -36,51 +36,34 @@ import javax.swing.RepaintManager;
  *
  * @author zixle
  * @author rbair
+ * @author Karl Schaefer
  */
 @TranslucentRepaintManager
 public class RepaintManagerX extends ForwardingRepaintManager {
     /**
+     * Creates a new manager that forwards all calls to the delegate.
+     * 
      * @param delegate
+     *            the manager backing this {@code RepaintManagerX}
+     * @throws NullPointerException
+     *             if {@code delegate} is {@code null}
      */
     public RepaintManagerX(RepaintManager delegate) {
         super(delegate);
     }
-
-    /** 
-     * Add a component in the list of components that should be refreshed.
-     * If <i>c</i> already has a dirty region, the rectangle <i>(x,y,w,h)</i> 
-     * will be unioned with the region that should be redrawn. 
-     * 
-     * @param c Component to repaint, null results in nothing happening.
-     * @param x X coordinate of the region to repaint
-     * @param y Y coordinate of the region to repaint
-     * @param w Width of the region to repaint
-     * @param h Height of the region to repaint
-     * @see JComponent#repaint
+    
+    /**
+     * {@inheritDoc}
      */
     @Override
     public void addDirtyRegion(JComponent c, int x, int y, int w, int h) {
-        Rectangle dirtyRegion = getDirtyRegion(c);
-        if (dirtyRegion.width == 0 && dirtyRegion.height == 0) {
-            int lastDeltaX = c.getX();
-            int lastDeltaY = c.getY();
-            Container parent = c.getParent();
-            while (parent instanceof JComponent) {
-                if (!parent.isVisible() || !parent.isDisplayable()) {
-                    return;
-                }
-                if (parent instanceof JXPanel && (((JXPanel)parent).getAlpha() < 1f ||
-                    !parent.isOpaque())) {
-                    x += lastDeltaX;
-                    y += lastDeltaY;
-                    lastDeltaX = lastDeltaY = 0;
-                    c = (JComponent)parent;
-                }
-                lastDeltaX += parent.getX();
-                lastDeltaY += parent.getY();
-                parent = parent.getParent();
-            }
+        JXPanel panel = SwingXUtilities.getAncestor(JXPanel.class, c);
+        
+        if (panel != null && !panel.isOpaque()) {
+            Point p = SwingUtilities.convertPoint(c, x, y, panel);
+            addDirtyRegion(panel, p.x, p.y, w, h);
+        } else {
+            super.addDirtyRegion(c, x, y, w, h);
         }
-        super.addDirtyRegion(c, x, y, w, h);
     }
 }
