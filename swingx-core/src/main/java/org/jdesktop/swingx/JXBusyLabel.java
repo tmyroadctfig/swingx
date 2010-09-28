@@ -108,31 +108,16 @@ public class JXBusyLabel extends JLabel {
     public final static String uiClassID = "BusyLabelUI";
 
     /**
-     * Direction is used to set the initial direction in which the
-     * animation starts.
-     * 
-     * @see JXBusyLabel#setDirection(org.jdesktop.swingx.JXBusyLabel.Direction)
-     */
-    public static enum Direction {
-        /**
-         * cycle proceeds forward
-         */
-    RIGHT,
-        /** cycle proceeds backward */
-    LEFT,
-    };
-
-    /**
      * Sets direction of rotation. <code>Direction.RIGHT</code> is the default 
      * value. Direction is taken from the very top point so <code>Direction.RIGHT</code> enables rotation clockwise.
      * @param dir Direction of rotation.
      */
-    public void setDirection(Direction dir) {
+    public void setDirection(BusyPainter.Direction dir) {
         direction = dir;
         getBusyPainter().setDirection(dir);
     }
     
-    private Direction direction;
+    private BusyPainter.Direction direction;
 
     /**
      * Creates a default JXLoginPane instance
@@ -251,7 +236,7 @@ public class JXBusyLabel extends JLabel {
             int frame = busyPainter.getPoints();
             public void actionPerformed(ActionEvent e) {
                 frame = (frame+1)%busyPainter.getPoints();
-                busyPainter.setFrame(direction == Direction.LEFT ? busyPainter.getPoints() - frame : frame);
+                busyPainter.setFrame(direction == BusyPainter.Direction.LEFT ? busyPainter.getPoints() - frame : frame);
                 frameChanged();
             }
         });

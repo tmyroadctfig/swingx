@@ -35,8 +35,6 @@ import java.awt.geom.RoundRectangle2D;
 import org.jdesktop.swingx.graphics.GraphicsUtilities;
 import org.jdesktop.swingx.painter.effects.AreaEffect;
 
-
-
 /**
  * A painter which paints square and rounded rectangles
  * 
