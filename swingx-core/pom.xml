@@ -35,6 +35,12 @@
   		<type>jar</type>
   		<scope>test</scope>
   	</dependency>
+  	<dependency>
+  		<groupId>org.swinglabs</groupId>
+  		<artifactId>swingx-painters</artifactId>
+  		<version>1.6.2-SNAPSHOT</version>
+  		<scope>compile</scope>
+  	</dependency>
   </dependencies>
   <build>
     <plugins>

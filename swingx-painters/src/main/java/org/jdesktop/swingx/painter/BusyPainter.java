@@ -28,13 +28,12 @@ import java.awt.Shape;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
-import java.awt.geom.RoundRectangle2D;
 import java.awt.geom.Point2D.Float;
+import java.awt.geom.RoundRectangle2D;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import org.jdesktop.swingx.JXBusyLabel.Direction;
 import org.jdesktop.swingx.color.ColorUtil;
 
 /**
@@ -42,6 +41,21 @@ import org.jdesktop.swingx.color.ColorUtil;
  * more details see {@link org.jdesktop.swingx.JXBusyLabel}
  */
 public class BusyPainter extends AbstractPainter<Object> {
+
+    /**
+     * Direction is used to set the initial direction in which the
+     * animation starts.
+     * 
+     * @see JXBusyLabel#setDirection(org.jdesktop.swingx.painter.BusyPainter.Direction)
+     */
+    public static enum Direction {
+        /**
+         * cycle proceeds forward
+         */
+        RIGHT,
+        /** cycle proceeds backward */
+        LEFT,
+    }
 
     private int frame = -1;
 
