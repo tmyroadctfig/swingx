@@ -144,7 +144,7 @@ public final class SwingXUtilities {
             map.clear();
             
             //TODO is ALT_MASK right for all platforms?
-            map.put(KeyStroke.getKeyStroke(m, InputEvent.ALT_MASK, false),
+            map.put(KeyStroke.getKeyStroke(m,  InputEvent.ALT_MASK, false),
                     pressed);
             map.put(KeyStroke.getKeyStroke(m, InputEvent.ALT_MASK, true),
                     released);
@@ -170,7 +170,7 @@ public final class SwingXUtilities {
     
     @SuppressWarnings("unchecked")
     static <C extends JComponent & BackgroundPaintable> void paintBackground(C comp, Graphics2D g) {
-        Painter painter = comp.getBackgroundPainter();
+        Painter<? super C> painter = comp.getBackgroundPainter();
         
         if (painter instanceof BackgroundPainter) {
             //ignore paintBorderInsets for BackgroundPainter
@@ -477,7 +477,7 @@ public final class SwingXUtilities {
      * 
      * @param selectionModel the selection model to change lead/anchor
      * @param lead the lead selection index
-     * @param anchor the anchor selectin index
+     * @param anchor the anchor selection index
      */
     public static void setLeadAnchorWithoutSelection(
             ListSelectionModel selectionModel, int lead, int anchor) {
