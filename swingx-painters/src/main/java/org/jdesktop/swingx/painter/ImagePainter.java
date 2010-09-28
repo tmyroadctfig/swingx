@@ -32,11 +32,7 @@ import java.awt.Shape;
 import java.awt.TexturePaint;
 import java.awt.geom.Area;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.net.URL;
 import java.util.logging.Logger;
-
-import javax.imageio.ImageIO;
 
 import org.jdesktop.swingx.painter.effects.AreaEffect;
 
@@ -119,22 +115,6 @@ public class ImagePainter extends AbstractAreaPainter<Object> {
         this.setHorizontalAlignment(horizontal);
         this.setFillPaint(null);
         this.setBorderPaint(null);
-    }
-    
-    /**
-     * @deprecated (pre-1.6.2) no replacement, see Issue 1023
-     */
-    @Deprecated
-    public ImagePainter(URL url) throws IOException {
-        this(ImageIO.read(url));
-    }
-    
-    /**
-     * @deprecated (pre-1.6.2) no replacement, see Issue 1023
-     */
-    @Deprecated
-    public ImagePainter(URL url, HorizontalAlignment horizontal, VerticalAlignment vertical) throws IOException {
-        this(ImageIO.read(url),horizontal,vertical);
     }
     
     /**
@@ -342,58 +322,6 @@ public class ImagePainter extends AbstractAreaPainter<Object> {
         return imageScale;
     }
     
-    @Deprecated
-    private void loadImage() {
-        try {
-            String img = getImageString();
-            // use the resolver if it's there
-            if(img != null) {
-                URL url = new URL(img);
-                setImage(ImageIO.read(url));
-            }
-        } catch (IOException ex) {
-            log.severe("ex: " + ex.getMessage());
-            ex.printStackTrace();
-        }
-    }
-    
-    private String imageString;
-    
-    /**
-     * Used by the persistence mechanism.
-     * 
-     * @deprecated (pre-1.6.2) no replacement, see Issue 1023
-     */
-    @Deprecated
-    public String getImageString() {
-        return imageString;
-    }
-    
-    /**
-     * Used by the persistence mechanism.
-     * 
-     * @deprecated (pre-1.6.2) no replacement, see Issue 1023
-     */
-    @Deprecated
-    public void setImageString(String imageString) {
-        log.fine("setting image string to: " + imageString);
-        String old = this.getImageString();
-        this.imageString = imageString;
-        loadImage();
-        setDirty(true);
-        firePropertyChange("imageString",old,imageString);
-    }
-    /*
-    public String getBaseURL() {
-        return baseURL;
-    }
-     
-    private String baseURL;
-     
-    public void setBaseURL(String baseURL) {
-        this.baseURL = baseURL;
-    }*/
-
     /**
      * Indicates if the image will be repeated horizontally.
      * @return if the image will be repeated horizontally

@@ -269,7 +269,7 @@ public class PainterUtil {
             PersistenceOwner owner = (PersistenceOwner)((XMLEncoder)out).getOwner();
             ImagePainter ip = (ImagePainter)oldInstance;
 //            p("need to convert string: " + ip.getImageString());
-            String s = owner.toXMLURL(ip.getImageString());
+//            String s = owner.toXMLURL(ip.getImageString());
 //            p("converted to: " + s);
                 //out.writeExpression(new Expression(oldInstance,owner,"fromXMLURL",new Object[]{ip.getImageString()}));
                 //out.writeStatement(new Statement(owner,"fromXMLURL",new Object[]{ip.getImageString()}));
@@ -278,7 +278,7 @@ public class PainterUtil {
                 //}));
                 
             out.writeStatement(new Statement(oldInstance,"setResolver",new Object[]{owner}));
-            out.writeStatement(new Statement(oldInstance,"setImageString",new Object[]{s}));
+//            out.writeStatement(new Statement(oldInstance,"setImageString",new Object[]{s}));
         }
     }
     
