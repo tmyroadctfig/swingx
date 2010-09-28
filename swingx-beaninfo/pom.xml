@@ -31,7 +31,8 @@
     <dependency>
       <groupId>org.swinglabs</groupId>
       <artifactId>swingx-core</artifactId>
-      <version>1.6.2-SNAPSHOT</version>
+      <version>${project.version}</version>
+      <optional>true</optional>
     </dependency>
   </dependencies>
 </project>
