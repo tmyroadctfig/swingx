@@ -92,7 +92,9 @@ public class PaintUtils {
     /**
      * Returns the bounds that the text of a label will be drawn into.
      * Takes into account the current font metrics.
+     * @deprecated (pre-1.6.3) no replacement
      */
+    @Deprecated
     public static Rectangle getTextBounds(Graphics g, JLabel label) {
         FontMetrics fm = g.getFontMetrics();
         Rectangle2D r2d = fm.getStringBounds(label.getText(), g);
@@ -130,7 +132,9 @@ public class PaintUtils {
     /**
      * Paints a top to bottom gradient fill over the component bounds
      * from color1 to color2.
+     * @deprecated (pre-1.6.3) no replacement
      */
+    @Deprecated
     public static void paintGradient(Graphics g, JComponent comp,
             Color color1, Color color2) {
         GradientPaint paint = new GradientPaint(0, 0, color1,

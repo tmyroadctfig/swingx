@@ -81,13 +81,13 @@ public class PainterPaint<T> implements Paint {
                 
                 try {
                     if (painter instanceof AbstractPainter) {
-                        ((AbstractPainter) painter).setInPaintContext(true);
+                        ((AbstractPainter<?>) painter).setInPaintContext(true);
                     }
                     painter.paint(g2d, object, w, h);
                 } finally {
                     g2d.dispose();
                     if (painter instanceof AbstractPainter) {
-                        ((AbstractPainter) painter).setInPaintContext(false);
+                        ((AbstractPainter<?>) painter).setInPaintContext(false);
                     }
                 }
             }

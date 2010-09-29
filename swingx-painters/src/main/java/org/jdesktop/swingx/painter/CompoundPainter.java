@@ -100,7 +100,7 @@ public class CompoundPainter<T> extends AbstractPainter<T> {
 
     /** Creates a new instance of CompoundPainter */
     public CompoundPainter() {
-        this(null);
+        this((Painter[]) null);
     }
     
     /**
@@ -217,7 +217,7 @@ public class CompoundPainter<T> extends AbstractPainter<T> {
         boolean dirty = false;
         for (Painter p : painters) {
             if (p instanceof AbstractPainter) {
-                AbstractPainter ap = (AbstractPainter)p;
+                AbstractPainter ap = (AbstractPainter) p;
                 ap.validate(object);
                 if (ap.isDirty()) {
                     dirty = true;
@@ -288,7 +288,7 @@ public class CompoundPainter<T> extends AbstractPainter<T> {
         else if (isCheckingDirtyChildPainters()) {
             for (Painter p : painters) {
                 if (p instanceof AbstractPainter) {
-                    AbstractPainter ap = (AbstractPainter)p;
+                    AbstractPainter<?> ap = (AbstractPainter<?>) p;
                     if (ap.isDirty()) {
                         return true;
                     }
@@ -330,7 +330,7 @@ public class CompoundPainter<T> extends AbstractPainter<T> {
         if (!clearLocalCacheOnly) {
             for (Painter p : painters) {
                 if (p instanceof AbstractPainter) {
-                    AbstractPainter ap = (AbstractPainter)p;
+                    AbstractPainter<?> ap = (AbstractPainter<?>) p;
                     ap.clearCache();
                 }
             }
@@ -381,6 +381,6 @@ public class CompoundPainter<T> extends AbstractPainter<T> {
      */
     @Override
     protected boolean shouldUseCache() {
-        return (isCacheable() && painters != null && painters.length > 0) || super.shouldUseCache();
+        return super.shouldUseCache(); // || (painters != null && painters.length > 1);
     }
 }
