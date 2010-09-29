@@ -36,6 +36,7 @@
             <configuration>
                 <source>1.6</source>
                 <target>1.6</target>
+                <showWarnings>true</showWarnings>
             </configuration>
         </plugin>
     </plugins>
@@ -65,6 +66,13 @@
         	<groupId>com.jhlabs</groupId>
         	<artifactId>filters</artifactId>
         	<version>2.0.235</version>
+        	<type>jar</type>
+        	<scope>test</scope>
+        </dependency>
+        <dependency>
+        	<groupId>org.mockito</groupId>
+        	<artifactId>mockito-all</artifactId>
+        	<version>1.8.5</version>
         	<type>jar</type>
         	<scope>test</scope>
         </dependency>
