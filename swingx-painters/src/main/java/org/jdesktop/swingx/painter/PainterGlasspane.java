@@ -42,7 +42,9 @@ import javax.swing.SwingUtilities;
  * which does not already support painters on it's own.
  * 
  * @author joshy
+ * @deprecated (pre-1.6.3) no replacement
  */
+@Deprecated
 public class PainterGlasspane extends JComponent {
     private Painter painter;
     private List<JComponent>targets;

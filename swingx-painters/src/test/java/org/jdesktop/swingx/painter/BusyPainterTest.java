@@ -20,25 +20,24 @@
  */
 package org.jdesktop.swingx.painter;
 
-import junit.framework.TestCase;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.jdesktop.test.TestUtils;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
 
 /**
- * Test for AbstractPainter
+ * Test for BusyPainter.
  */
-@RunWith(JUnit4.class)
-public class BusyPainterTest extends TestCase {
+public class BusyPainterTest extends AbstractPainterTest {
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected BusyPainter createTestingPainter() {
+        return new BusyPainter();
+    }
 
     /**
      * Issue #861-swingx: must fire PCE on property change.
      */
-    @Test
-    public void testPaint() {
-        TestUtils.assertPCEFiring(new BusyPainter(), CollectionUtils.EMPTY_COLLECTION);
-    }
+//    @Test
+//    public void testPaint() {
+//        TestUtils.assertPCEFiring(new BusyPainter(), CollectionUtils.EMPTY_COLLECTION);
+//    }
 }

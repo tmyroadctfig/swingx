@@ -226,8 +226,6 @@ public abstract class AbstractAreaPainter<T> extends AbstractLayoutPainter<T> {
         return PaintUtils.resizeGradient(p, width, height);
     }
     
-    
-    
     /**
      * Returns the outline shape of this painter. Subclasses must implement this method. This shape
      * will be used for filling, stroking, and clipping.

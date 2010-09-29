@@ -77,9 +77,11 @@ public abstract class AbstractPainter<T> extends AbstractBean implements Painter
         NearestNeighbor(RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
 
         private Object value;
+        
         Interpolation(Object value) {
             this.value = value;
         }
+        
         private void configureGraphics(Graphics2D g) {
             g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, value);
         }
@@ -352,7 +354,6 @@ public abstract class AbstractPainter<T> extends AbstractBean implements Painter
 
         getInterpolation().configureGraphics(g);
     }
-    
     
     /**
      * Subclasses must implement this method and perform custom painting operations
