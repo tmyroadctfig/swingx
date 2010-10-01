@@ -6,21 +6,48 @@
     <version>1.6.2-SNAPSHOT</version>
   </parent>
   <artifactId>swingx-all</artifactId>
-  <packaging>pom</packaging>
+  <packaging>jar</packaging>
+  <name>SwingX</name>
+  <description>A Maven project to aggregate all modules into a single artifact.</description>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.2-beta-5</version>
+                <executions>
+                    <execution>
+                        <id>repackage</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>src/main/assembly/repackage.xml</descriptor>
+                            </descriptors>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
   <dependencies>
   	<dependency>
-  		<groupId>org.swinglabs</groupId>
+  		<groupId>${project.groupId}</groupId>
   		<artifactId>swingx-painters</artifactId>
   		<version>${project.version}</version>
   		<type>jar</type>
   		<scope>compile</scope>
+  		<optional>true</optional>
   	</dependency>
   	<dependency>
-  		<groupId>org.swinglabs</groupId>
+  		<groupId>${project.groupId}</groupId>
   		<artifactId>swingx-core</artifactId>
   		<version>${project.version}</version>
   		<type>jar</type>
   		<scope>compile</scope>
+  		<optional>true</optional>
   	</dependency>
   </dependencies>
 </project>

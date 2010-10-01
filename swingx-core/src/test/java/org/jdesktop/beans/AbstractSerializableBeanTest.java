@@ -34,7 +34,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-
 /**
  * @author <a href="mailto:jesse@swank.ca">Jesse Wilson</a>
  */

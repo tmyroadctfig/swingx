@@ -36,7 +36,7 @@
   		<scope>test</scope>
   	</dependency>
   	<dependency>
-  		<groupId>org.swinglabs</groupId>
+  		<groupId>${project.groupId}</groupId>
   		<artifactId>swingx-painters</artifactId>
   		<version>${project.version}</version>
   		<scope>compile</scope>
