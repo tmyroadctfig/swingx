@@ -27,6 +27,7 @@
                             <descriptors>
                                 <descriptor>src/main/assembly/repackage.xml</descriptor>
                             </descriptors>
+                            <appendAssemblyId>false</appendAssemblyId>
                         </configuration>
                     </execution>
                 </executions>
