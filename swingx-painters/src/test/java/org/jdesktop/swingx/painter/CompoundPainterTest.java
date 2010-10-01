@@ -115,7 +115,7 @@ public class CompoundPainterTest extends AbstractPainterTest {
      *    changed.
      */
     public void testDirtyNotification() {
-        AbstractPainter<Object> child = spy(new TestablePainter());
+        AbstractPainter<Object> child = spy(new DummyPainter());
         ((CompoundPainter<?>) p).setPainters(child);
         
         assertThat(p.isDirty(), is(true));

@@ -26,13 +26,9 @@ import java.awt.Graphics2D;
  * A useful Painter implementation for Testing purposes
  * @author rbair
  */
-class TestablePainter extends AbstractPainter<Object> {
-    public TestablePainter() {
+class DummyPainter extends AbstractPainter<Object> {
+    public DummyPainter() {
         super();
-    }
-
-    public TestablePainter(boolean cacheable) {
-        super(cacheable);
     }
 
     @Override
