@@ -118,5 +118,6 @@
       <!--module>swingx-graphics</module-->
       <!--module>swingx-all</module-->
       <!-- module>swingx-validation</module -->
+      <module>swingx-all</module>
     </modules>
 </project>

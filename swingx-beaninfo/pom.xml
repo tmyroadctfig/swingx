@@ -20,7 +20,7 @@
   </build>
   <dependencies>
     <dependency>
-      <groupId>org.swinglabs</groupId>
+      <groupId>${project.groupId}</groupId>
       <artifactId>swingx-core</artifactId>
       <version>${project.version}</version>
       <optional>true</optional>
