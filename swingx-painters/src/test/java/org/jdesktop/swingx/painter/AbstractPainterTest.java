@@ -56,7 +56,7 @@ public class AbstractPainterTest {
     }
 
     protected AbstractPainter createTestingPainter() {
-        return new TestablePainter();
+        return new DummyPainter();
     }
     
     @Test
