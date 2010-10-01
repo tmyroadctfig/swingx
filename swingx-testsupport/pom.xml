@@ -10,4 +10,12 @@
   <packaging>jar</packaging>
   <name>SwingX Test Support</name>
   <description>Code and classes to support testing SwingX.</description>
+  <dependencies>
+  	<dependency>
+  		<groupId>junit</groupId>
+  		<artifactId>junit</artifactId>
+  		<type>jar</type>
+  		<scope>compile</scope>
+  	</dependency>
+  </dependencies>
 </project>
