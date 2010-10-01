@@ -4,10 +4,11 @@
     <artifactId>swingx-project</artifactId>
     <groupId>org.swinglabs</groupId>
     <version>1.6.2-SNAPSHOT</version>
+    <relativePath>../pom.xml</relativePath>
   </parent>
   <artifactId>swingx-all</artifactId>
-  <packaging>jar</packaging>
-  <name>SwingX</name>
+  <packaging>pom</packaging>
+  <name>SwingX Complete</name>
   <description>A Maven project to aggregate all modules into a single artifact.</description>
     <build>
         <plugins>
