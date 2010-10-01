@@ -4,6 +4,7 @@
     <artifactId>swingx-project</artifactId>
     <groupId>org.swinglabs</groupId>
     <version>1.6.2-SNAPSHOT</version>
+    <relativePath>../pom.xml</relativePath>
   </parent>
   <artifactId>swingx-painters</artifactId>
   <name>SwingX Painter Support</name>
