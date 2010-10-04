@@ -1,5 +1,5 @@
-Manifest-Version: 1.0
-X-COMMENT: Main-Class will be added automatically by build
+Name: org/jdesktop/swingx/JXBusyLabel.class
+Java-Bean: True
 
 Name: org/jdesktop/swingx/JXCollapsiblePane.class
 Java-Bean: True
@@ -22,9 +22,6 @@ Java-Bean: True
 Name: org/jdesktop/swingx/JXFrame.class
 Java-Bean: True
 
-Name: org/jdesktop/swingx/JXGlassBox.class
-Java-Bean: True
-
 Name: org/jdesktop/swingx/JXGradientChooser.class
 Java-Bean: True
 
@@ -37,13 +34,13 @@ Java-Bean: True
 Name: org/jdesktop/swingx/JXHyperlink.class
 Java-Bean: True
 
-Name: org/jdesktop/swingx/JXImagePanel.class
+Name: org/jdesktop/swingx/JXImageView.class
+Java-Bean: True
+
+Name: org/jdesktop/swingx/JXLabel.class
 Java-Bean: True
 
 Name: org/jdesktop/swingx/JXList.class
-Java-Bean: True
-
-Name: org/jdesktop/swingx/JXLoginDialog.class
 Java-Bean: True
 
 Name: org/jdesktop/swingx/JXLoginPane.class
@@ -92,12 +89,6 @@ Name: org/jdesktop/swingx/JXTitledSeparator.class
 Java-Bean: True
 
 Name: org/jdesktop/swingx/JXTree.class
-Java-Bean: True
-
-Name: org/jdesktop/swingx/JXBusyLabel.class
-Java-Bean: True
-
-Name: org/jdesktop/swingx/JXLabel.class
 Java-Bean: True
 
 Name: org/jdesktop/swingx/JXTreeTable.class
