@@ -24,6 +24,7 @@ package org.jdesktop.swingx;
 import java.awt.AWTEvent;
 import java.awt.Component;
 import java.awt.Cursor;
+import java.awt.GraphicsConfiguration;
 import java.awt.Toolkit;
 import java.awt.event.AWTEventListener;
 import java.awt.event.ActionEvent;
@@ -110,6 +111,46 @@ public class JXFrame extends JFrame {
     }
 
     /**
+     * Creates a <code>JXFrame</code> in the specified
+     * <code>GraphicsConfiguration</code> of
+     * a screen device, a blank title and default closing behaviour.
+     * <p>
+     *
+     * @param gc the <code>GraphicsConfiguration</code> that is used
+     *          to construct the new <code>Frame</code>;
+     *          if <code>gc</code> is <code>null</code>, the system
+     *          default <code>GraphicsConfiguration</code> is assumed
+     * @exception IllegalArgumentException if <code>gc</code> is not from
+     *          a screen device.  This exception is always thrown when
+     *      GraphicsEnvironment.isHeadless() returns true.
+     */
+    public JXFrame(GraphicsConfiguration gc) {
+        this(null, gc, false);
+    }
+
+    
+    /**
+     * Creates a <code>JXFrame</code> with the specified title, the
+     * specified <code>GraphicsConfiguration</code> of a screen device and
+     * default closing behaviour.
+     * <p>
+     *
+     * @param title the title to be displayed in the
+     *          frame's border. A <code>null</code> value is treated as
+     *          an empty string, "".
+     * @param gc the <code>GraphicsConfiguration</code> that is used
+     *          to construct the new <code>JFrame</code> with;
+     *          if <code>gc</code> is <code>null</code>, the system
+     *          default <code>GraphicsConfiguration</code> is assumed
+     * @exception IllegalArgumentException if <code>gc</code> is not from
+     *          a screen device.  This exception is always thrown when
+     *      GraphicsEnvironment.isHeadless() returns true.
+     */
+    public JXFrame(String title, GraphicsConfiguration gc) {
+        this(title, gc, false);
+     }
+
+    /**
      * Creates a {@code JXFrame} with the specified title and closing behavior.
      * 
      * @param title
@@ -120,7 +161,26 @@ public class JXFrame extends JFrame {
      *            instead; {@code false} to use the default behavior
      */
     public JXFrame(String title, boolean exitOnClose) {
-        super(title);
+        this(title, null, exitOnClose);
+    }
+
+    /**
+     * Creates a {@code JXFrame} with the specified title, GraphicsConfiguration
+     * and closing behavior.
+     * 
+     * @param title the frame title
+     * @param gc the <code>GraphicsConfiguration</code> of the target screen
+     *        device. If <code>gc</code> is <code>null</code>, the system
+     *        default <code>GraphicsConfiguration</code> is assumed.
+     * @param exitOnClose {@code true} to override the default ({@link JFrame})
+     *        closing behavior and use {@link JFrame#EXIT_ON_CLOSE
+     *        EXIT_ON_CLOSE} instead; {@code false} to use the default behavior
+     * @exception IllegalArgumentException if <code>gc</code> is not from a
+     *            screen device.
+     * 
+     */
+   public JXFrame(String title, GraphicsConfiguration gc, boolean exitOnClose) {
+        super(title, gc);
         if (exitOnClose) {
             setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         }
