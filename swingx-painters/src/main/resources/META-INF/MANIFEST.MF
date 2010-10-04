@@ -1,0 +1,29 @@
+Name: org/jdesktop/swingx/painter/AlphaPainter.class
+Java-Bean: True
+
+Name: org/jdesktop/swingx/painter/CheckerboardPainter.class
+Java-Bean: True
+
+Name: org/jdesktop/swingx/painter/CompoundPainter.class
+Java-Bean: True
+
+Name: org/jdesktop/swingx/painter/GlossPainter.class
+Java-Bean: True
+
+Name: org/jdesktop/swingx/painter/ImagePainter.class
+Java-Bean: True
+
+Name: org/jdesktop/swingx/painter/MattePainter.class
+Java-Bean: True
+
+Name: org/jdesktop/swingx/painter/PinstripePainter.class
+Java-Bean: True
+
+Name: org/jdesktop/swingx/painter/RectanglePainter.class
+Java-Bean: True
+
+Name: org/jdesktop/swingx/painter/ShapePainter.class
+Java-Bean: True
+
+Name: org/jdesktop/swingx/painter/TextPainter.class
+Java-Bean: True
