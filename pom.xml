@@ -125,15 +125,14 @@
       </pluginRepository>
     </pluginRepositories>
     <modules>
-      <module>swingx-core</module>
-      <module>swingx-beaninfo</module>
+      <module>swingx-testsupport</module>
       <module>swingx-painters</module>
+      <module>swingx-core</module>
       <!--module>swingx-datecal</module-->
       <!--module>swingx-treetable</module-->
       <!--module>swingx-graphics</module-->
-      <!--module>swingx-all</module-->
       <!-- module>swingx-validation</module -->
       <module>swingx-all</module>
-      <module>swingx-testsupport</module>
+      <module>swingx-beaninfo</module>
     </modules>
 </project>
