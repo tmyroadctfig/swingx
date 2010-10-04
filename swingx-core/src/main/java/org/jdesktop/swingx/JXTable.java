@@ -1426,11 +1426,10 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
 
 
     /**
-     * Overridden to account for row index mapping. This implementation respects
-     * the cell's editability, that is it has no effect if
+     * {@inheritDoc}<p> 
+     * Overridden to respect the cell's editability, that is it has no effect if
      * <code>!isCellEditable(row, column)</code>.
      * 
-     * {@inheritDoc}
      * 
      * @see #isCellEditable(int, int)
      */
