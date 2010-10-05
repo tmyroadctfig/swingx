@@ -218,13 +218,7 @@ public class JXTableIssues extends InteractiveTestCase {
      */
     public void testSerializationRollover() {
         JXTable table = new JXTable();
-        try {
-            SerializableSupport.serialize(table);
-        } catch (IOException e) {
-            fail("not serializable " + e);
-        } catch (ClassNotFoundException e) {
-            fail("not serializable " + e);
-        }
+        JXTable serialized = SerializableSupport.serialize(table);
     }
 
     /**
@@ -243,13 +237,7 @@ public class JXTableIssues extends InteractiveTestCase {
                 actionMap.remove(keys[i]);
             }
         }
-        try {
-            SerializableSupport.serialize(table);
-        } catch (IOException e) {
-            fail("not serializable " + e);
-        } catch (ClassNotFoundException e) {
-            fail("not serializable " + e);
-        }
+        JXTable serialized = SerializableSupport.serialize(table);
     }
 
 
