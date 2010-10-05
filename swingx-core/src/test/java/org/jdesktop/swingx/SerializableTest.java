@@ -150,11 +150,8 @@ public class SerializableTest extends InteractiveTestCase {
             LOG.warning("Table header is not serializable on Linux when using Synth or derived LaFs due to javax.swing.plaf.synth.SynthLabelUI being non serializable.");
             return;
         }
-        try {
-            SerializableSupport.serialize(component);
-        } catch (NotSerializableException e) {
-            fail("not serializable " + e);
-        } 
+        
+        JXTableHeader serialized = SerializableSupport.serialize(component);
     }
 
     /**

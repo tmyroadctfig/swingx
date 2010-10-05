@@ -37,13 +37,7 @@ public class ActionIssues extends ActionTest implements Serializable {
     public void testSerializationBoundAction() {
         BoundAction action = new BoundAction("some");
         action.registerCallback(this, "testSerializationRolloverFalse");
-        try {
-            SerializableSupport.serialize(action);
-        } catch (IOException e) {
-            fail("not serializable " + e);
-        } catch (ClassNotFoundException e) {
-            fail("not serializable " + e);
-        }
+        BoundAction serialized = SerializableSupport.serialize(action);
     }
 
     /**

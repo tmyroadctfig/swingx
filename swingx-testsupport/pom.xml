@@ -9,7 +9,7 @@
   <artifactId>swingx-testsupport</artifactId>
   <packaging>jar</packaging>
   <name>SwingX Test Support</name>
-  <description>Code and classes to support testing SwingX.</description>
+  <description>Code and classes to support testing SwingX.  Classes contained in this module are for internal SwingX use only.</description>
   <dependencies>
   	<dependency>
   		<groupId>junit</groupId>
