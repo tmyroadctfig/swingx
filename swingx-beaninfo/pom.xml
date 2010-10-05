@@ -17,5 +17,18 @@
       <version>${project.version}</version>
       <optional>true</optional>
     </dependency>
+    <dependency>
+    	<groupId>${project.groupId}</groupId>
+    	<artifactId>swingx-testsupport</artifactId>
+    	<version>${project.version}</version>
+    	<type>jar</type>
+    	<scope>test</scope>
+    </dependency>
+    <dependency>
+    	<groupId>commons-collections</groupId>
+    	<artifactId>commons-collections</artifactId>
+    	<type>jar</type>
+    	<scope>test</scope>
+    </dependency>
   </dependencies>
 </project>
