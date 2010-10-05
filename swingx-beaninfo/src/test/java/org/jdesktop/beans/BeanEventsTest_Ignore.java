@@ -32,7 +32,6 @@ import junit.framework.TestCase;
 
 import org.apache.commons.collections.MultiHashMap;
 import org.apache.commons.collections.MultiMap;
-import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXCollapsiblePane;
 import org.jdesktop.swingx.JXDatePicker;
 import org.jdesktop.swingx.JXFormattedTextField;
@@ -54,16 +53,18 @@ import org.jdesktop.swingx.renderer.JXRendererHyperlink;
 import org.jdesktop.swingx.renderer.WrappingIconPanel;
 import org.jdesktop.test.TestUtils;
 import org.junit.Ignore;
+import org.junit.Test;
 
 /**
  * Reflection based test for testing PCE firing.
  * 
  * @author rah003
  */
-public class BeanEventsTest_Ignore extends InteractiveTestCase {
+public class BeanEventsTest_Ignore {
     
     static Logger log = Logger.getAnonymousLogger();
 
+    @Test
     @Ignore
     public void _testAllPainterPCEFiring() throws Exception {
         log.setLevel(Level.ALL);
