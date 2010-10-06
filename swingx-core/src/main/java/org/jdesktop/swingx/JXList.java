@@ -740,7 +740,7 @@ public class JXList extends JList {
      *        included
      */
     @SuppressWarnings("unchecked")
-    public <R extends ListModel> void setRowFilter(RowFilter<? super ListModel, ? super Integer> filter) {
+    public <R extends ListModel> void setRowFilter(RowFilter<? super R, ? super Integer> filter) {
         if (hasSortController()) {
             // all fine, because R is a ListModel (R extends TableModel)
             SortController<R> controller = (SortController<R>) getSortController();
