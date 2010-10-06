@@ -739,9 +739,13 @@ public class JXList extends JList {
      * @param filter the filter used to determine what entries should be
      *        included
      */
-    public void setRowFilter(RowFilter<? super ListModel, ? super Integer> filter) {
-        if (hasSortController())
-            getSortController().setRowFilter(filter);
+    @SuppressWarnings("unchecked")
+    public <R extends ListModel> void setRowFilter(RowFilter<? super ListModel, ? super Integer> filter) {
+        if (hasSortController()) {
+            // all fine, because R is a ListModel (R extends TableModel)
+            SortController<R> controller = (SortController<R>) getSortController();
+            controller.setRowFilter(filter);
+        }
     }
     
     /**

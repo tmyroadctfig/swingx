@@ -1869,9 +1869,12 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
      * @param filter the filter used to determine what entries should be
      *        included
      */
-    public void setRowFilter(RowFilter<? super TableModel, ? super Integer> filter) {
+    @SuppressWarnings("unchecked")
+    public <R extends TableModel> void setRowFilter(RowFilter<? super R, ? super Integer> filter) {
         if (hasSortController()) {
-            getSortController().setRowFilter(filter);
+            // all fine, because R is a TableModel (R extends TableModel)
+            SortController<R> controller = (SortController<R>) getSortController();
+            controller.setRowFilter(filter);
         }
     }
     
@@ -2143,7 +2146,7 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
     @SuppressWarnings("unchecked")
     protected SortController<? extends TableModel> getSortController() {
         if (hasSortController()) {
-            // JW: the RowSorter is always of type <? extends ListModel>
+            // JW: the RowSorter is always of type <? extends TableModel>
             // so the unchecked cast is safe
             return  (SortController<? extends TableModel>) getRowSorter();
         }
