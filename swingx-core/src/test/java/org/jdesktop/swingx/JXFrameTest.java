@@ -31,55 +31,54 @@ public class JXFrameTest extends InteractiveTestCase {
             return;
         }
         JXFrame compare = new JXFrame();
-        GraphicsConfiguration gc = new DummyGraphicsConfiguration();
+        GraphicsConfiguration gc = new DummyGraphicsConfiguration(compare.getGraphicsConfiguration());
         JXFrame frame = new JXFrame(gc);
         assertEquals(gc, frame.getGraphicsConfiguration());
         assertEquals(compare.getDefaultCloseOperation(), frame.getDefaultCloseOperation());
-        assertEquals("", frame.getTitle());
+        assertEquals(compare.getTitle(), frame.getTitle());
     }
     
     public static class DummyGraphicsConfiguration extends GraphicsConfiguration {
+        
+        GraphicsConfiguration delegate;
+        
+        public DummyGraphicsConfiguration(GraphicsConfiguration delegate) {
+            this.delegate = delegate;
+        }
 
         @Override
         public BufferedImage createCompatibleImage(int width, int height) {
-            // TODO Auto-generated method stub
-            return null;
+            return delegate.createCompatibleImage(width, height);
         }
 
         @Override
         public Rectangle getBounds() {
-            // TODO Auto-generated method stub
-            return null;
+            return delegate.getBounds();
         }
 
         @Override
         public ColorModel getColorModel() {
-            // TODO Auto-generated method stub
-            return null;
+            return delegate.getColorModel();
         }
 
         @Override
         public ColorModel getColorModel(int transparency) {
-            // TODO Auto-generated method stub
-            return null;
+            return delegate.getColorModel(transparency);
         }
 
         @Override
         public AffineTransform getDefaultTransform() {
-            // TODO Auto-generated method stub
-            return null;
+            return delegate.getDefaultTransform();
         }
 
         @Override
         public GraphicsDevice getDevice() {
-            // TODO Auto-generated method stub
-            return null;
+            return delegate.getDevice();
         }
 
         @Override
         public AffineTransform getNormalizingTransform() {
-            // TODO Auto-generated method stub
-            return null;
+            return delegate.getNormalizingTransform();
         }
         
     }
