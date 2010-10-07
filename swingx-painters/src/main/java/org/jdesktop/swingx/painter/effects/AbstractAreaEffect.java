@@ -56,6 +56,7 @@ public class AbstractAreaEffect implements AreaEffect {
         setShapeMasked(true);
     }
     
+    @Override
     public void apply(Graphics2D g, Shape clipShape, int width, int height) {
         // create a rect to hold the bounds
         width = (int)(clipShape.getBounds2D().getWidth() + clipShape.getBounds2D().getX());

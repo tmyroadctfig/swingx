@@ -44,7 +44,7 @@
             <artifactId>maven-surefire-plugin</artifactId>
             <inherited>true</inherited>
             <configuration>
-            	<parallel>classes</parallel>
+            	<!-- parallel>classes</parallel -->
                 <!-- useSystemClassLoader>true</useSystemClassLoader -->
                 <includes>
                     <include>**/*Test.java</include>
@@ -58,12 +58,6 @@
   </build>
   <dependencyManagement>
     <dependencies>
-        <dependency>
-          <groupId>commons-collections</groupId>
-          <artifactId>commons-collections</artifactId>
-          <version>3.2.1</version>
-          <scope>test</scope>
-        </dependency>
         <dependency>
           <groupId>commons-lang</groupId>
           <artifactId>commons-lang</artifactId>
