@@ -131,7 +131,7 @@ public class BusyPainter extends AbstractPainter<Object> {
         int tw = width - r.width - 2*r.x;
         int th = height - r.height - 2*r.y;
         if (isPaintCentered()) {
-            ((Graphics2D) g).translate(tw/2, th/2);
+            g.translate(tw/2, th/2);
         }
 
         PathIterator pi = trajectory.getPathIterator(null);
@@ -219,7 +219,7 @@ public class BusyPainter extends AbstractPainter<Object> {
         g.translate(-center.x, -center.y);
 
         if (isPaintCentered()) {
-            ((Graphics2D) g).translate(-tw/2, -th/2);
+            g.translate(-tw/2, -th/2);
         }
     }
 

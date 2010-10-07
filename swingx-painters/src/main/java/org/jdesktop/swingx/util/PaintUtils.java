@@ -39,7 +39,7 @@ import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 
 /**
- * A collection of utilties for painting visual effects.
+ * A collection of utilities for painting visual effects.
  *
  * @author Mark Davidson
  */
@@ -84,7 +84,6 @@ public class PaintUtils {
             new Color(129, 138, 155),
             new Point2D.Double(0, 1),
             new Color(58, 66, 82));
-    
     
     private PaintUtils() {
     }
