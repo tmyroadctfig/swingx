@@ -21,9 +21,11 @@
 package org.jdesktop.swingx.decorator;
 
 import java.awt.Color;
+import java.awt.Component;
 
 import javax.swing.UIManager;
 
+import org.jdesktop.swingx.color.ColorUtil;
 import org.jdesktop.swingx.decorator.HighlightPredicate.NotHighlightPredicate;
 import org.jdesktop.swingx.decorator.HighlightPredicate.RowGroupHighlightPredicate;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
@@ -40,7 +42,26 @@ import org.jdesktop.swingx.plaf.UIDependent;
  * @author Jeanette Winzenburg
  */
 public final class HighlighterFactory {
+    private static Highlighter COMPUTED_FOREGROUND_HIGHLIGHTER = new AbstractHighlighter() {
+        @Override
+        protected Component doHighlight(Component component, ComponentAdapter adapter) {
+            component.setForeground(ColorUtil.computeForeground(component.getBackground()));
+            
+            return component;
+        }
+    };
 
+    /**
+     * Creates a highlighter that sets the foreground color to WHITE or BLACK by computing the best
+     * match based on the current background color. It is recommended that no background changing
+     * highlighters be added after this highlighter, lest the computation be incorrect.
+     * 
+     * @return a highlighter that computes the appropriate foreground color
+     */
+    public static Highlighter createComputedForegroundHighlighter() {
+        return COMPUTED_FOREGROUND_HIGHLIGHTER;
+    }
+        
     /**
      * Creates and returns a Highlighter which highlights every second row
      * background with a color depending on the LookAndFeel. The rows between
