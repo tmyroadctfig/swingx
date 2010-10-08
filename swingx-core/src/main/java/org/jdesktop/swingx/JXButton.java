@@ -589,6 +589,7 @@ public class JXButton extends JButton implements BackgroundPaintable {
      * true by default. This property affects the width, height,
      * and initial transform passed to the background painter.
      */
+    @Override
     public boolean isPaintBorderInsets() {
         return paintBorderInsets;
     }
@@ -602,6 +603,7 @@ public class JXButton extends JButton implements BackgroundPaintable {
      *
      * This is a bound property.
      */
+    @Override
     public void setPaintBorderInsets(boolean paintBorderInsets) {
         boolean old = this.isPaintBorderInsets();
         this.paintBorderInsets = paintBorderInsets;
@@ -636,7 +638,7 @@ public class JXButton extends JButton implements BackgroundPaintable {
                 } finally {
                     g2d.dispose();
                 }
-            } else if (fgPainter instanceof AbstractPainter && ((AbstractPainter) fgPainter).getFilters().length > 0) {
+            } else if (fgPainter instanceof AbstractPainter && ((AbstractPainter<?>) fgPainter).getFilters().length > 0) {
                 paintWithForegroundPainterWithFilters(g);
             } else {
                 Graphics2D g2d = (Graphics2D) g.create();

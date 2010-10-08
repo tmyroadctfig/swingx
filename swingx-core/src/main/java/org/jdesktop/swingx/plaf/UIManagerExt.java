@@ -141,7 +141,7 @@ public class UIManagerExt {
             }
 
             synchronized(this) {
-                return getResourceCache(l).get((String)key);
+                return getResourceCache(l).get(key);
             }
         }
 
@@ -149,12 +149,12 @@ public class UIManagerExt {
          * Returns a Map of the known resources for the given locale.
          */
         private Map<String, String> getResourceCache(Locale l) {
-            Map<String, String> values = (Map<String, String>) resourceCache.get(l);
+            Map<String, String> values = resourceCache.get(l);
 
             if (values == null) {
                 values = new HashMap<String, String>();
                 for (int i=resourceBundles.size()-1; i >= 0; i--) {
-                    String bundleName = (String)resourceBundles.get(i);
+                    String bundleName = resourceBundles.get(i);
                     
                     try {
                         ResourceBundle b = ResourceBundle.
@@ -162,7 +162,7 @@ public class UIManagerExt {
                         Enumeration<String> keys = b.getKeys();
 
                         while (keys.hasMoreElements()) {
-                            String key = (String)keys.nextElement();
+                            String key = keys.nextElement();
 
                             if (values.get(key) == null) {
                                 Object value = b.getObject(key);
@@ -233,7 +233,7 @@ public class UIManagerExt {
     public static void removeResourceBundle(String bundleName) {
         uiDefaultsExt.removeResourceBundle(bundleName);
     }
-    
+
     /**
      * Returns a string from the defaults. If the value for {@code key} is not a
      * {@code String}, {@code null} is returned.
@@ -255,7 +255,7 @@ public class UIManagerExt {
      * @param key
      *                an {@code Object} specifying the string
      * @param l
-     *                the {@code Locale} for which the painter is desired; refer
+     *                the {@code Locale} for which the string is desired; refer
      *                to {@code UIDefaults} for details on how a {@code null}
      *                {@code Locale} is handled
      * @return the {@code String} object

@@ -27,6 +27,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.awt.image.BufferedImageOp;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
@@ -47,8 +48,6 @@ import org.jdesktop.swingx.util.PaintUtils;
  *
  */
 public class JXButtonVisualCheck extends InteractiveTestCase {
-
-
 
     /**
      * Test for issue #761.
@@ -140,7 +139,7 @@ public class JXButtonVisualCheck extends InteractiveTestCase {
              */
             @Override
             public void mouseEntered(MouseEvent e) {
-                p.setFilters(null);
+                p.setFilters((BufferedImageOp[]) null);
             }
 
             /**
