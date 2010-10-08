@@ -106,8 +106,8 @@ public class DropShadowBorder implements Border, Serializable {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void paintBorder(Component c, Graphics graphics, int x, int y, int width, int height) {
-        long time = System.currentTimeMillis();
         /*
          * 1) Get images for this border
          * 2) Paint the images for each side of the border that should be painted
@@ -242,7 +242,6 @@ public class DropShadowBorder implements Border, Serializable {
         } finally {
             g2.dispose();
         }
-        System.out.println((System.currentTimeMillis() - time) + "ms");
     }
     
     private Map<Position,BufferedImage> getImages(Graphics2D g2) {
@@ -282,7 +281,7 @@ public class DropShadowBorder implements Border, Serializable {
                 buffer.dispose();
             }
             
-            float blurry = 1.0f / (float)(shadowSize * shadowSize);
+            float blurry = 1.0f / (shadowSize * shadowSize);
             float[] blurKernel = new float[shadowSize * shadowSize];
             for (int i=0; i<blurKernel.length; i++) {
                 blurKernel[i] = blurry;
@@ -364,6 +363,7 @@ public class DropShadowBorder implements Border, Serializable {
     /**
      * @inheritDoc
      */
+    @Override
     public Insets getBorderInsets(Component c) {
         int top = showTopShadow ? shadowSize : 0;
         int left = showLeftShadow ? shadowSize : 0;
@@ -375,6 +375,7 @@ public class DropShadowBorder implements Border, Serializable {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isBorderOpaque() {
         return false;
     }
