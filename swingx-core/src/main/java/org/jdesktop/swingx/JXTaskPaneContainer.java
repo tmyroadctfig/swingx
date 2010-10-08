@@ -164,26 +164,4 @@ public class JXTaskPaneContainer extends JXPanel {
     public String getUIClassID() {
         return uiClassID;
     }
-
-    /**
-     * Adds a <code>JXTaskPane</code> to this JXTaskPaneContainer.
-     * 
-     * @param group
-     * @deprecated (pre-1.6.2) useless API, same as {@link #add(java.awt.Component)}
-     */
-    @Deprecated
-    public void add(JXTaskPane group) {
-        super.add(group);
-    }
-
-    /**
-     * Removes a <code>JXTaskPane</code> from this JXTaskPaneContainer.
-     * 
-     * @param group
-     * @deprecated (pre-1.6.2) useless API, same as {@link #remove(java.awt.Component)}
-     */
-    @Deprecated
-    public void remove(JXTaskPane group) {
-        super.remove(group);
-    }
 }

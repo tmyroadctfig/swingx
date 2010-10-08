@@ -304,6 +304,7 @@ public class JXLabel extends JLabel implements BackgroundPaintable {
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     public void reshape(int x, int y, int w, int h) {
         int oldH = getHeight();
         super.reshape(x, y, w, h);
@@ -320,7 +321,6 @@ public class JXLabel extends JLabel implements BackgroundPaintable {
         if (view != null && view instanceof Renderer) {
             view.setSize(w - occupiedWidth, h);
         }
-
     }
     
     /**
