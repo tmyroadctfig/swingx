@@ -62,7 +62,12 @@ public abstract class AbstractAreaPainter<T> extends AbstractLayoutPainter<T> {
      * the shape should be outlined, but not filled. NONE indicates that neither
      * the fill area nor the outline should be painted.
      */
-    public enum Style {BOTH, FILLED, OUTLINE, NONE}
+    public enum Style {BOTH, FILLED, OUTLINE,
+        /**
+         * @deprecated (pre-1.6.3) use {@link AbstractPainter#setVisible(boolean) setVisible(false)}
+         *             instead.
+         */
+        @Deprecated NONE}
     
     // controls if the paint should be stretched to fill the available area
     private boolean stretchPaint;
