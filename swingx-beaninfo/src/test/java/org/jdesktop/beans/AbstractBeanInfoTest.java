@@ -80,7 +80,7 @@ public abstract class AbstractBeanInfoTest<T> {
     }
     
     private boolean isUnhandledType(Class<?> type) {
-        return type == Insets.class;
+        return type == null;
     }
     
     @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -109,6 +109,14 @@ public abstract class AbstractBeanInfoTest<T> {
             result = Boolean.FALSE.equals(defaultValue);
         } else if (propertyType == float.class) {
             result = ((Float) defaultValue) + 1f;
+        } else if (propertyType == String.class) {
+            result = "original string: " + defaultValue;
+        } else if (propertyType == Insets.class) {
+            if (new Insets(0, 0, 0, 0).equals(defaultValue)) {
+                result = new Insets(1, 1, 1, 1);
+            } else {
+                result = mock(propertyType);
+            }
         } else {
             result = mock(propertyType);
         }
