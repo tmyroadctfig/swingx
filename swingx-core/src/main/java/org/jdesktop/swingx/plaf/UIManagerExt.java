@@ -105,6 +105,7 @@ import org.jdesktop.swingx.util.Contract;
  * @see UIManager
  * @see UIDefaults
  */
+@SuppressWarnings("nls")
 public class UIManagerExt {
     /**
      * Used to replicate the resource bundle behavior from the
