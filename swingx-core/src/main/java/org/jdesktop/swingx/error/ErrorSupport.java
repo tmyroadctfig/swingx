@@ -72,12 +72,13 @@ public class ErrorSupport {
     }
 
     /**
-     * Report that an error has occured
+     * Report that an error has occurred
      * @param throwable The <CODE>{@link Error}</CODE> or <CODE>{@link Exception}</CODE> which occured.
      */
     public void fireErrorEvent(final Throwable throwable) {
         final ErrorEvent evt = new ErrorEvent(throwable, source);
         SwingUtilities.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 for(ErrorListener el : listeners) {
                     el.errorOccured(evt);

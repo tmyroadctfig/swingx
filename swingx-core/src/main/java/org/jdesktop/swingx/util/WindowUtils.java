@@ -32,8 +32,6 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.Window;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -41,7 +39,6 @@ import java.util.logging.Logger;
 
 import javax.swing.JInternalFrame;
 import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
 
 /**
  * Encapsulates various utilities for windows (ie: <code>Frame</code> and
@@ -194,86 +191,5 @@ public final class WindowUtils {
             }
         }
         return compList;
-    }
-
-    /**
-     * Installs/resets a ComponentListener to resize the
-     * given window to minWidth/Height if needed.
-     *
-     * @param window
-     * @param minWidth
-     * @param minHeight
-     * @deprecated (pre-1.6.2) no replacement; use {@link Window#setMinimumSize(java.awt.Dimension)}
-     */
-    @Deprecated
-    public static void setMinimumSizeManager(Window window, int minWidth,
-                                             int minHeight) {
-        ComponentListener[] listeners = window.getComponentListeners();
-        ComponentListener listener = null;
-        for (ComponentListener l : listeners) {
-            if (l instanceof MinSizeComponentListener) {
-                listener = l;
-                break;
-            }
-        }
-        if (listener == null) {
-            window.addComponentListener(new MinSizeComponentListener(
-                    window, minWidth, minHeight));
-        } else {
-            ((MinSizeComponentListener) listener).resetSizes(minWidth,
-                                                             minHeight);
-        }
-    }
-
-    /**
-     * Resets window size to minSize if needed.
-     *
-     * @author Patrick Wright
-     * @deprecated (pre-1.6.2) no replacement
-     */
-    @Deprecated
-    public static class MinSizeComponentListener extends ComponentAdapter {
-        private Window window;
-        private int minHeight;
-        private int minWidth;
-
-        MinSizeComponentListener(Window frame, int minWidth, int minHeight) {
-            this.window = frame;
-            resetSizes(minWidth, minHeight);
-        }
-
-        public void resetSizes(int minWidth, int minHeight) {
-            this.minWidth = minWidth;
-            this.minHeight = minHeight;
-            adjustIfNeeded(window);
-        }
-
-        @Override
-        public void componentResized(java.awt.event.ComponentEvent evt) {
-            adjustIfNeeded((Window) evt.getComponent());
-        }
-
-        private void adjustIfNeeded(final Window window) {
-            boolean doSize = false;
-            int newWidth = window.getWidth();
-            int newHeight = window.getHeight();
-            if (newWidth < minWidth) {
-                newWidth = minWidth;
-                doSize = true;
-            }
-            if (newHeight < minHeight) {
-                newHeight = minHeight;
-                doSize = true;
-            }
-            if (doSize) {
-                final int w = newWidth;
-                final int h = newHeight;
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        window.setSize(w, h);
-                    }
-                });
-            }
-        }
     }
 }
