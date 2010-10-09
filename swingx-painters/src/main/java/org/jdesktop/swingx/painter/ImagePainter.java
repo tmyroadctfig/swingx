@@ -157,8 +157,6 @@ public class ImagePainter extends AbstractAreaPainter<Object> {
             case OUTLINE:
                 drawBorder(g,shape,width,height);
                 break;
-            case NONE:
-                break;
         }
     }
     
