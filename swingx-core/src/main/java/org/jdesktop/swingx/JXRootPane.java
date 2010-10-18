@@ -26,6 +26,7 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Insets;
+import java.awt.KeyboardFocusManager;
 import java.awt.LayoutManager;
 import java.awt.LayoutManager2;
 import java.awt.Rectangle;
@@ -301,10 +302,17 @@ public class JXRootPane extends JRootPane {
              * nor compare against core behaviour, UIAction has
              * sun package scope. <p>
              * 
-             * 
+             * Cont'd (Issue #1358-swingx: popup menus not closed)
+             * The extended hack is inspired by Rob Camick's
+             * <a href="http://tips4java.wordpress.com/2010/10/17/escape-key-and-dialog/"> Blog </a>
+             * and consists in checking if the the rootpane has a popup's actionMap "inserted". 
+             * NOTE: this does not work if the popup or any of its children is focusOwner.
              */
             @Override
             public boolean isEnabled() {
+                Component component = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
+                Action cancelPopup = ((JComponent)component).getActionMap().get("cancel");
+                if (cancelPopup != null) return false;
                 return (cancelButton != null) && (cancelButton.isEnabled());
             }
         };
