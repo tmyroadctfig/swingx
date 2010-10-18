@@ -4,22 +4,31 @@
  */
 package org.jdesktop.swingx;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.util.Date;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.JButton;
+import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JPopupMenu;
 import javax.swing.JRootPane;
+import javax.swing.JTable;
 import javax.swing.JToolBar;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.table.DefaultTableModel;
 
 import org.jdesktop.swingx.JXRootPane.XRootLayout;
+import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.test.AncientSwingTeam;
 import org.jdesktop.test.PropertyChangeReport;
 import org.junit.Test;
@@ -237,6 +246,44 @@ public class JXRootPaneTest extends InteractiveTestCase {
         JXRootPane rootPane = new JXRootPane();
         rootPane.setStatusBar(null);
     }
+    /**
+     * Issue #1358-swingx: popups not closed if has cancelButton.
+     * 
+     * To reproduce: open popup on any of the components, press escape. 
+     * expected: popup closed, cancel action not triggered
+     * bug: popup still open, cancel action triggered
+     */
+    public void interactiveDefaultCancelButton() {
+        Action cancel = new AbstractActionExt("cancel") {
+
+            public void actionPerformed(ActionEvent e) {
+                LOG.info("performed: cancel action");
+                
+            }
+            
+        };
+        JPopupMenu menu = new JPopupMenu();
+        menu.add("dummy");
+        menu.add("other");
+        final JButton cancelButton = new JButton(cancel);
+        cancelButton.setComponentPopupMenu(menu);
+        JXTree tree = new JXTree();
+        tree.expandAll();
+        tree.setComponentPopupMenu(menu);
+        JXFrame frame = wrapWithScrollingInFrame(tree, "??-swingx - popup not closed with cancelButton");
+        frame.setCancelButton(cancelButton);
+        frame.add(cancelButton, BorderLayout.SOUTH);
+        JFormattedTextField formatted = new JFormattedTextField(new Date());
+        formatted.setComponentPopupMenu(menu);
+        frame.add(formatted, BorderLayout.NORTH);
+        JXDatePicker picker = new JXDatePicker(new Date());
+        picker.setComponentPopupMenu(menu);
+        addStatusComponent(frame, picker);
+        addStatusMessage(frame, "open popup, press escape");
+        show(frame, 600, 400);
+        
+    }
+    
     
     public void interactiveTestStatusBar() {
         JXTable table = new JXTable(new DefaultTableModel(10, 3));
@@ -258,12 +305,8 @@ public class JXRootPaneTest extends InteractiveTestCase {
         setSystemLF(true);
         JXRootPaneTest test = new JXRootPaneTest();
         try {
-          test.runInteractiveTests();
-//            test.runInteractiveTests("interactive.*ColumnControlColumnModel.*");
-//            test.runInteractiveTests("interactive.*TableHeader.*");
-       //     test.runInteractiveTests("interactive.*Sort.*");
-//            test.runInteractiveTests("interactive.*ColumnControlAndF.*");
-//            test.runInteractiveTests("interactive.*RowHeight.*");
+//          test.runInteractiveTests();
+            test.runInteractiveTests("interactive.*Cancel.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
