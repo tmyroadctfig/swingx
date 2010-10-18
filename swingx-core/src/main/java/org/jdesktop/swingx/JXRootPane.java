@@ -38,7 +38,6 @@ import javax.swing.Action;
 import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JMenuBar;
 import javax.swing.JRootPane;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
@@ -156,7 +155,7 @@ public class JXRootPane extends JRootPane {
             Rectangle b = parent.getBounds();
             Insets i = getInsets();
             int w = b.width - i.right - i.left;
-            int h = b.height - i.top - i.bottom;
+//            int h = b.height - i.top - i.bottom;
             Dimension statusPref = statusBar.getPreferredSize();
             statusBar.setBounds(i.right, b.height - i.bottom
                     - statusPref.height, w, statusPref.height);
@@ -326,14 +325,6 @@ public class JXRootPane extends JRootPane {
         if (statusBar == null || comp == null) {
             return;
         }
-//        if (comp instanceof MessageSource) {
-//            MessageSource source = (MessageSource) comp;
-//            source.addMessageListener(statusBar);
-//        }
-//        if (comp instanceof ProgressSource) {
-//            ProgressSource source = (ProgressSource) comp;
-//            source.addProgressListener(statusBar);
-//        }
         if (comp instanceof Container) {
             Component[] comps = ((Container) comp).getComponents();
             for (int i = 0; i < comps.length; i++) {
@@ -346,14 +337,6 @@ public class JXRootPane extends JRootPane {
         if (statusBar == null || comp == null) {
             return;
         }
-//        if (comp instanceof MessageSource) {
-//            MessageSource source = (MessageSource) comp;
-//            source.removeMessageListener(statusBar);
-//        }
-//        if (comp instanceof ProgressSource) {
-//            ProgressSource source = (ProgressSource) comp;
-//            source.removeProgressListener(statusBar);
-//        }
         if (comp instanceof Container) {
             Component[] comps = ((Container) comp).getComponents();
             for (int i = 0; i < comps.length; i++) {
@@ -373,22 +356,6 @@ public class JXRootPane extends JRootPane {
     public void setStatusBar(JXStatusBar statusBar) {
         JXStatusBar oldStatusBar = this.statusBar;
         this.statusBar = statusBar;
-
-//        if (statusBar != null) {
-//            if (handler == null) {
-                // Create the new mouse handler and register the toolbar
-                // and menu components.
-//                handler = new MouseMessagingHandler(this, statusBar);
-//                if (toolBar != null) {
-//                    handler.registerListeners(toolBar.getComponents());
-//                }
-//                if (menuBar != null) {
-//                    handler.registerListeners(menuBar.getSubElements());
-//                }
-//            } else {
-//                handler.setMessageListener(statusBar);
-//            }
-//        }
 
         Component[] comps = getContentPane().getComponents();
         for (int i = 0; i < comps.length; i++) {
@@ -416,8 +383,6 @@ public class JXRootPane extends JRootPane {
         return statusBar;
     }
 
-//    private MouseMessagingHandler handler;
-
     /**
      * Set the toolbar bar for this root pane. If a tool bar is currently registered with this
      * {@code JXRootPane}, then it is removed prior to setting the new tool
@@ -434,16 +399,8 @@ public class JXRootPane extends JRootPane {
 
         if (oldToolBar != null) {
             getContentPane().remove(oldToolBar);
-            
-//            if (handler != null) {
-//                handler.unregisterListeners(oldToolBar.getComponents());
-//            }
         }
         
-//        if (handler != null && this.toolBar != null) {
-//            handler.registerListeners(this.toolBar.getComponents());
-//        }
-
         getContentPane().add(BorderLayout.NORTH, this.toolBar);
         
         //ensure the new toolbar is correctly sized and displayed
@@ -461,23 +418,6 @@ public class JXRootPane extends JRootPane {
         return toolBar;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setJMenuBar(JMenuBar menuBar) {
-        JMenuBar oldMenuBar = this.menuBar;
-
-        super.setJMenuBar(menuBar);
-
-//        if (handler != null && oldMenuBar != null) {
-//            handler.unregisterListeners(oldMenuBar.getSubElements());
-//        }
-//
-//        if (handler != null && menuBar != null) {
-//            handler.registerListeners(menuBar.getSubElements());
-//        }
-    }
 
     /**
      * Sets the <code>cancelButton</code> property,
