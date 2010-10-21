@@ -25,6 +25,7 @@ import java.beans.BeanDescriptor;
 import javax.swing.SwingConstants;
 
 import org.jdesktop.beans.BeanInfoSupport;
+import org.jdesktop.beans.EnumerationValue;
 
 /**
  * BeanInfo class for JXTitledSeparator.

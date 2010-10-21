@@ -1,5 +1,6 @@
 package org.jdesktop.swingx;
 
+import org.jdesktop.beans.EnumerationValue;
 import org.jdesktop.swingx.JXSearchField.LayoutStyle;
 import org.jdesktop.swingx.JXSearchField.SearchMode;
 

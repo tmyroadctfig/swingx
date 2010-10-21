@@ -1,4 +1,4 @@
-package org.jdesktop.swingx;
+package org.jdesktop.beans;
 
 
 
