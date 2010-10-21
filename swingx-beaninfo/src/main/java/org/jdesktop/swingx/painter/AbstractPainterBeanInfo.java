@@ -1,7 +1,7 @@
 package org.jdesktop.swingx.painter;
 
 import org.jdesktop.beans.BeanInfoSupport;
-import org.jdesktop.swingx.editors.EnumPropertyEditor;
+import org.jdesktop.beans.editors.EnumPropertyEditor;
 
 /**
  * BeanInfo of AbstractPainter.

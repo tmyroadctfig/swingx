@@ -1,7 +1,7 @@
 package org.jdesktop.swingx.painter;
 
 import org.jdesktop.beans.BeanInfoSupport;
-import org.jdesktop.swingx.editors.ShapePropertyEditor;
+import org.jdesktop.beans.editors.ShapePropertyEditor;
 
 /**
  * BeanInfo of ShapePainter.

@@ -7,7 +7,7 @@
  * and open the template in the editor.
  */
 
-package org.jdesktop.swingx.editors;
+package org.jdesktop.beans.editors;
 
 import java.awt.Rectangle;
 import java.beans.PropertyEditorSupport;

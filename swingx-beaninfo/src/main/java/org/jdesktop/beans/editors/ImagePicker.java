@@ -4,7 +4,7 @@
  * Created on July 21, 2006, 1:42 AM
  */
 
-package org.jdesktop.swingx.editors;
+package org.jdesktop.beans.editors;
 
 /**
  *

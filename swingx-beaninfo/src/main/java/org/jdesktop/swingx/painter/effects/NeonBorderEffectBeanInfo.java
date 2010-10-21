@@ -9,8 +9,8 @@
 
 package org.jdesktop.swingx.painter.effects;
 
-import org.jdesktop.swingx.editors.EnumPropertyEditor;
-import org.jdesktop.swingx.editors.Paint2PropertyEditor;
+import org.jdesktop.beans.editors.EnumPropertyEditor;
+import org.jdesktop.beans.editors.Paint2PropertyEditor;
 import org.jdesktop.swingx.painter.AbstractPainterBeanInfo;
 
 /**

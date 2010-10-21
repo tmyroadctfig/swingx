@@ -23,7 +23,7 @@ package org.jdesktop.swingx;
 import java.beans.BeanDescriptor;
 
 import org.jdesktop.beans.BeanInfoSupport;
-import org.jdesktop.swingx.editors.PainterPropertyEditor;
+import org.jdesktop.beans.editors.PainterPropertyEditor;
 
 /**
  * BeanInfo class for JXPanel.

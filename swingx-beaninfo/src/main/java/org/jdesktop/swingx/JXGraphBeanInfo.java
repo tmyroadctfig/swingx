@@ -21,8 +21,8 @@
 package org.jdesktop.swingx;
 
 import org.jdesktop.beans.BeanInfoSupport;
-import org.jdesktop.swingx.editors.Point2DPropertyEditor;
-import org.jdesktop.swingx.editors.Rectangle2DPropertyEditor;
+import org.jdesktop.beans.editors.Point2DPropertyEditor;
+import org.jdesktop.beans.editors.Rectangle2DPropertyEditor;
 
 /**
  * Bean info for {@link org.jdesktop.swingx.JXGraph} component.

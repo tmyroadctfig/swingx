@@ -23,7 +23,7 @@ package org.jdesktop.swingx;
 import java.beans.BeanDescriptor;
 
 import org.jdesktop.beans.BeanInfoSupport;
-import org.jdesktop.swingx.editors.EnumPropertyEditor;
+import org.jdesktop.beans.editors.EnumPropertyEditor;
 
 /**
  * BeanInfo class for JXHeader.

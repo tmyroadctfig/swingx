@@ -4,7 +4,7 @@
  * Created on July 19, 2006, 7:13 PM
  */
 
-package org.jdesktop.swingx.editors;
+package org.jdesktop.beans.editors;
 
 import java.awt.Color;
 import java.awt.Component;
