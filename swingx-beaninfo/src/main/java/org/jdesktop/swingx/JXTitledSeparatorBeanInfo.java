@@ -24,6 +24,8 @@ import java.beans.BeanDescriptor;
 
 import javax.swing.SwingConstants;
 
+import org.jdesktop.beans.BeanInfoSupport;
+
 /**
  * BeanInfo class for JXTitledSeparator.
  *

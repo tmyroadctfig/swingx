@@ -1,6 +1,6 @@
 package org.jdesktop.swingx.painter;
 
-import org.jdesktop.swingx.BeanInfoSupport;
+import org.jdesktop.beans.BeanInfoSupport;
 import org.jdesktop.swingx.editors.EnumPropertyEditor;
 import org.jdesktop.swingx.editors.Paint2PropertyEditor;
 
