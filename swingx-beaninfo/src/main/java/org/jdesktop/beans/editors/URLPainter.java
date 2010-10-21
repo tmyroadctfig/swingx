@@ -20,14 +20,13 @@
  */
 
 
-package org.jdesktop.swingx;
+package org.jdesktop.beans.editors;
 
 import java.awt.Graphics2D;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import org.jdesktop.beans.editors.PainterUtil;
 import org.jdesktop.swingx.painter.CompoundPainter;
 import org.jdesktop.swingx.painter.Painter;
 

@@ -21,7 +21,6 @@ import java.io.StringWriter;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
-import org.jdesktop.swingx.URLPainter;
 import org.jdesktop.swingx.painter.MattePainter;
 import org.jdesktop.swingx.painter.Painter;
 
