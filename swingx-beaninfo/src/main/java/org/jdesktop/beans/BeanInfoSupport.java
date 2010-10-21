@@ -37,7 +37,6 @@ import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
 
-import org.jdesktop.swingx.EnumerationValue;
 
 /**
  * Useful baseclass for BeanInfos. With this class, normal introspection occurs

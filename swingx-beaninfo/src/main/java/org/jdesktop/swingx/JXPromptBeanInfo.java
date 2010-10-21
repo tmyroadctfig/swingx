@@ -5,6 +5,7 @@ import java.awt.Font;
 import javax.swing.text.JTextComponent;
 
 import org.jdesktop.beans.BeanInfoSupport;
+import org.jdesktop.beans.EnumerationValue;
 import org.jdesktop.swingx.prompt.PromptSupport.FocusBehavior;
 
 public abstract class JXPromptBeanInfo extends BeanInfoSupport {
