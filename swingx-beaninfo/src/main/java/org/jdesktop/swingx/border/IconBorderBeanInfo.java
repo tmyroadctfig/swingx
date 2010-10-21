@@ -2,7 +2,7 @@ package org.jdesktop.swingx.border;
 
 import javax.swing.SwingConstants;
 
-import org.jdesktop.swingx.BeanInfoSupport;
+import org.jdesktop.beans.BeanInfoSupport;
 import org.jdesktop.swingx.EnumerationValue;
 
 /**

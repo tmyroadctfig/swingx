@@ -1,6 +1,6 @@
 package org.jdesktop.swingx.border;
 
-import org.jdesktop.swingx.BeanInfoSupport;
+import org.jdesktop.beans.BeanInfoSupport;
 
 /**
  * BeanInfo class for DropShadowBorder.

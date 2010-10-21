@@ -9,6 +9,8 @@
 
 package org.jdesktop.swingx;
 
+import org.jdesktop.beans.BeanInfoSupport;
+
 /**
  *
  * @author joshy

@@ -18,7 +18,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-package org.jdesktop.swingx;
+package org.jdesktop.beans;
 
 import java.awt.Image;
 import java.beans.BeanDescriptor;
@@ -36,6 +36,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
+
+import org.jdesktop.swingx.EnumerationValue;
 
 /**
  * Useful baseclass for BeanInfos. With this class, normal introspection occurs
