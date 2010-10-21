@@ -27,7 +27,7 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import org.jdesktop.swingx.editors.PainterUtil;
+import org.jdesktop.beans.editors.PainterUtil;
 import org.jdesktop.swingx.painter.CompoundPainter;
 import org.jdesktop.swingx.painter.Painter;
 

@@ -1,7 +1,7 @@
 package org.jdesktop.swingx.painter;
 
 import org.jdesktop.beans.BeanInfoSupport;
-import org.jdesktop.swingx.editors.PaintPropertyEditor;
+import org.jdesktop.beans.editors.PaintPropertyEditor;
 
 /**
  * BeanInfo of CheckerboardPainter.

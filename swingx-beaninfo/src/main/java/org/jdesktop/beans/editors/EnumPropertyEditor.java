@@ -7,7 +7,7 @@
  * and open the template in the editor.
  */
 
-package org.jdesktop.swingx.editors;
+package org.jdesktop.beans.editors;
 
 import java.beans.PropertyEditorSupport;
 import java.util.ArrayList;

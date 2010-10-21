@@ -1,7 +1,7 @@
 package org.jdesktop.swingx.painter;
 
 import org.jdesktop.beans.BeanInfoSupport;
-import org.jdesktop.swingx.editors.Paint2PropertyEditor;
+import org.jdesktop.beans.editors.Paint2PropertyEditor;
 
 /**
  * BeanInfo of PinstripePainter.

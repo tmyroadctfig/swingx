@@ -1,9 +1,9 @@
 package org.jdesktop.swingx.painter;
 
 import org.jdesktop.beans.BeanInfoSupport;
-import org.jdesktop.swingx.editors.EnumPropertyEditor;
-import org.jdesktop.swingx.editors.ImageEditor;
-import org.jdesktop.swingx.editors.ImageURLEditor;
+import org.jdesktop.beans.editors.EnumPropertyEditor;
+import org.jdesktop.beans.editors.ImageEditor;
+import org.jdesktop.beans.editors.ImageURLEditor;
 
 /**
  * BeanInfo of ImagePainter.

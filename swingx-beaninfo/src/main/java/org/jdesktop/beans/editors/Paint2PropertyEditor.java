@@ -1,4 +1,4 @@
-package org.jdesktop.swingx.editors;
+package org.jdesktop.beans.editors;
 
 import java.awt.Color;
 import java.awt.Component;
