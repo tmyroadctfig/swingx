@@ -148,6 +148,7 @@ public class Morphing2D implements Shape {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Rectangle getBounds() {
         return getBounds2D().getBounds();
     }
@@ -155,6 +156,7 @@ public class Morphing2D implements Shape {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Rectangle2D getBounds2D() {
         int n = startGeometry.getNumCoords();
         double xmin, ymin, xmax, ymax;
@@ -186,6 +188,7 @@ public class Morphing2D implements Shape {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean contains(double x, double y) {
         throw new InternalError("unimplemented");
     }
@@ -193,6 +196,7 @@ public class Morphing2D implements Shape {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean contains(Point2D p) {
         return contains(p.getX(), p.getY());
     }
@@ -200,6 +204,7 @@ public class Morphing2D implements Shape {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean intersects(double x, double y, double w, double h) {
         throw new InternalError("unimplemented");
     }
@@ -207,6 +212,7 @@ public class Morphing2D implements Shape {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean intersects(Rectangle2D r) {
         return intersects(r.getX(), r.getY(), r.getWidth(), r.getHeight());
     }
@@ -214,6 +220,7 @@ public class Morphing2D implements Shape {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean contains(double x, double y, double w, double h) {
         throw new InternalError("unimplemented");
     }
@@ -221,6 +228,7 @@ public class Morphing2D implements Shape {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean contains(Rectangle2D r) {
         return contains(r.getX(), r.getY(), r.getWidth(), r.getHeight());
     }
@@ -228,6 +236,7 @@ public class Morphing2D implements Shape {
     /**
      * {@inheritDoc}
      */
+    @Override
     public PathIterator getPathIterator(AffineTransform at) {
         return new Iterator(at, startGeometry, endGeometry, morph);
     }
@@ -235,6 +244,7 @@ public class Morphing2D implements Shape {
     /**
      * {@inheritDoc}
      */
+    @Override
     public PathIterator getPathIterator(AffineTransform at, double flatness) {
         return new FlatteningPathIterator(getPathIterator(at), flatness);
     }
@@ -619,6 +629,7 @@ public class Morphing2D implements Shape {
         /**
          * {@inheritDoc}
          */
+        @Override
         public int getWindingRule() {
             return g0.getWindingRule();
         }
@@ -626,6 +637,7 @@ public class Morphing2D implements Shape {
         /**
          * {@inheritDoc}
          */
+        @Override
         public boolean isDone() {
             return (cindex > g0.getNumCoords());
         }
@@ -633,6 +645,7 @@ public class Morphing2D implements Shape {
         /**
          * {@inheritDoc}
          */
+        @Override
         public void next() {
             if (cindex == 0) {
                 cindex = 2;
@@ -646,6 +659,7 @@ public class Morphing2D implements Shape {
         /**
          * {@inheritDoc}
          */
+        @Override
         public int currentSegment(float[] coords) {
             if (dcoords == null) {
                 dcoords = new double[6];
@@ -667,6 +681,7 @@ public class Morphing2D implements Shape {
         /**
          * {@inheritDoc}
          */
+        @Override
         public int currentSegment(double[] coords) {
             int type;
             int n;
