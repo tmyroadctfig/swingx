@@ -55,9 +55,6 @@ import java.awt.Graphics2D;
  * @author rbair
  * @see AbstractPainter
  * @see CompoundPainter
- * @see org.jdesktop.swingx.JXPanel
- * @see org.jdesktop.swingx.JXLabel
- * @see org.jdesktop.swingx.JXButton
  */
 public interface Painter<T> {
     /**

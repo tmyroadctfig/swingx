@@ -42,7 +42,7 @@ import org.jdesktop.swingx.graphics.GraphicsUtilities;
  *
  * <p>Subclasses of <code>AbstractPainter</code> generally need only override the
  * {@link #doPaint(Graphics2D, Object, int, int)} method. If a subclass requires more control
- * over whether cacheing is enabled, or for configuring the graphics state, then it
+ * over whether caching is enabled, or for configuring the graphics state, then it
  * may override the appropriate protected methods to interpose its own behavior.</p>
  * 
  * <p>For example, here is the doPaint method of a simple <code>Painter</code> that
@@ -215,7 +215,7 @@ public abstract class AbstractPainter<T> extends AbstractBean implements Painter
 
     /**
      * <p>Gets whether this <code>AbstractPainter</code> can be cached as an image.
-     * If cacheing is enabled, then it is the responsibility of the developer to
+     * If caching is enabled, then it is the responsibility of the developer to
      * invalidate the painter (via {@link #clearCache}) if external state has
      * changed in such a way that the painter is invalidated and needs to be
      * repainted.</p>
