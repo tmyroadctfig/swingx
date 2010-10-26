@@ -174,7 +174,7 @@ public abstract class BeanInfoSupport extends SimpleBeanInfo {
      * 
      * if any of the icons is missing, an attempt is made to
      * get an icon via introspection. If that fails, the icon
-     * will be set to placeholder16.png or one of the derivitives
+     * will be set to placeholder16.png or one of the derivatives
      */
     private Image loadStandardImage(BeanInfo info, int size) {
         String s = "";
