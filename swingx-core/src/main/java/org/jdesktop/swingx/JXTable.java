@@ -42,7 +42,6 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.EventObject;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -3665,7 +3664,7 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
      *         type
      * @see #getDefaultRenderer(Class)
      * 
-     * @deprecated not working anyway - no replacement. 
+     * @deprecated (since pre-1.6) not working anyway - no replacement. 
      */
     @Deprecated
     public TableCellRenderer getNewDefaultRenderer(Class<?> columnClass) {
@@ -3696,20 +3695,7 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
      */
     @Override
     protected void createDefaultRenderers() {
-         super.createDefaultRenderers();
-        // This duplicates JTable's functionality in order to make the renderers
-        // available in getNewDefaultRenderer(); If JTable's renderers either
-        // were public, or it provided a factory for *new* renderers, this would
-        // not be needed
-
-        // hack around #6345050 - new UIDefaults()
-        // is created with a huge initialCapacity
-        // giving a dummy key/value array as parameter reduces that capacity
-        // to length/2.
-        Object[] dummies = new Object[] { 1, 0, 2, 0, 3, 0, 4, 0, 5, 0, 6, 0,
-                7, 0, 8, 0, 9, 0, 10, 0, };
-        defaultRenderersByColumnClass = new UIDefaults(dummies);
-        defaultRenderersByColumnClass.clear();
+        defaultRenderersByColumnClass = new UIDefaults(8, 0.75f);
         // configured default table renderer (internally LabelProvider)
         setDefaultRenderer(Object.class, new DefaultTableRenderer());
         setDefaultRenderer(Number.class, new DefaultTableRenderer(
@@ -3724,18 +3710,6 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
         // use a ButtonProvider for booleans
         setDefaultRenderer(Boolean.class, new DefaultTableRenderer(
                 new CheckBoxProvider()));
-
-    }
-
-    /** c&p'ed from super */
-    @SuppressWarnings("unchecked")
-    private void setLazyValue(Hashtable h, Class c, String s) {
-        h.put(c, new UIDefaults.ProxyLazyValue(s));
-    }
-
-    /** c&p'ed from super */
-    private void setLazyEditor(Class<?> c, String s) {
-        setLazyValue(defaultEditorsByColumnClass, c, s);
     }
 
     /**
@@ -3750,30 +3724,16 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
     @SuppressWarnings("unchecked")
     @Override
     protected void createDefaultEditors() {
-        Object[] dummies = new Object[] { 1, 0, 2, 0, 3, 0, 4, 0, 5, 0, 6, 0,
-                7, 0, 8, 0, 9, 0, 10, 0,
-
-        };
-        defaultEditorsByColumnClass = new UIDefaults(dummies);
-        defaultEditorsByColumnClass.clear();
-        // defaultEditorsByColumnClass = new UIDefaults();
-
-        // Objects
-        setLazyEditor(Object.class, "org.jdesktop.swingx.JXTable$GenericEditor");
-
+        defaultEditorsByColumnClass = new UIDefaults(3, 0.75f);
+        defaultEditorsByColumnClass.put(Object.class, new GenericEditor());
         // Numbers
-        // setLazyEditor(Number.class,
-        // "org.jdesktop.swingx.JXTable$NumberEditor");
-//        setLazyEditor(Number.class, "org.jdesktop.swingx.table.NumberEditorExt");
         // JW: fix for 
         // Issue #1183-swingx: NumberEditorExt throws in getCellEditorValue if
         //   Integer (short, byte..) below/above min/max.
         // Issue #1236-swingx: NumberEditorExt cannot be used in columns with Object type
         defaultEditorsByColumnClass.put(Number.class, new NumberEditorExt(true));
-
         // Booleans
-        setLazyEditor(Boolean.class,
-                "org.jdesktop.swingx.JXTable$BooleanEditor");
+        defaultEditorsByColumnClass.put(Boolean.class, new BooleanEditor());
 
     }
 
