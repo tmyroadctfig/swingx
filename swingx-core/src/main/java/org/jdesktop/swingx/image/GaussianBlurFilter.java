@@ -74,7 +74,6 @@ public class GaussianBlurFilter extends AbstractFilter {
     /**
      * {@inheritDoc}
      */
-    @SuppressWarnings({ "SuspiciousNameCombination" })
     @Override
     public BufferedImage filter(BufferedImage src, BufferedImage dst) {
         int width = src.getWidth();

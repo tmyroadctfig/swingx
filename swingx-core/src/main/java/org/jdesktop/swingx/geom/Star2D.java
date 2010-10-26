@@ -266,6 +266,7 @@ public class Star2D implements Shape {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Rectangle getBounds() {
         return starShape.getBounds();
     }
@@ -273,6 +274,7 @@ public class Star2D implements Shape {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Rectangle2D getBounds2D() {
         return starShape.getBounds2D();
     }
@@ -280,6 +282,7 @@ public class Star2D implements Shape {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean contains(double x, double y) {
         return starShape.contains(x, y);
     }
@@ -287,6 +290,7 @@ public class Star2D implements Shape {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean contains(Point2D p) {
         return starShape.contains(p);
     }
@@ -294,6 +298,7 @@ public class Star2D implements Shape {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean intersects(double x, double y, double w, double h) {
         return starShape.intersects(x, y, w, h);
     }
@@ -301,6 +306,7 @@ public class Star2D implements Shape {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean intersects(Rectangle2D r) {
         return starShape.intersects(r);
     }
@@ -308,6 +314,7 @@ public class Star2D implements Shape {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean contains(double x, double y, double w, double h) {
         return starShape.contains(x, y, w, h);
     }
@@ -315,6 +322,7 @@ public class Star2D implements Shape {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean contains(Rectangle2D r) {
         return starShape.contains(r);
     }
@@ -322,6 +330,7 @@ public class Star2D implements Shape {
     /**
      * {@inheritDoc}
      */
+    @Override
     public PathIterator getPathIterator(AffineTransform at) {
         return starShape.getPathIterator(at);
     }
@@ -329,6 +338,7 @@ public class Star2D implements Shape {
     /**
      * {@inheritDoc}
      */
+    @Override
     public PathIterator getPathIterator(AffineTransform at, double flatness) {
         return starShape.getPathIterator(at, flatness);
     }
