@@ -35,7 +35,9 @@ import java.awt.image.BufferedImage;
 /**
  *
  * @author joshy
+ * @deprecated (pre-1.6.3) moved; used {@link org.jdesktop.swingx.graphics.ShapeUtils}
  */
+@Deprecated
 public final class ShapeUtils {
     
     /** Creates a new instance of ShapeUtils */
