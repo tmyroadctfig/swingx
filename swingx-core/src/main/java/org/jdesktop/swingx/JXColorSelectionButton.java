@@ -45,6 +45,7 @@ import javax.swing.event.ChangeListener;
 
 import org.jdesktop.swingx.color.ColorUtil;
 import org.jdesktop.swingx.color.EyeDropperColorChooserPanel;
+import org.jdesktop.swingx.graphics.GraphicsUtilities;
 import org.jdesktop.swingx.plaf.UIManagerExt;
 import org.jdesktop.swingx.util.OS;
 
@@ -122,7 +123,7 @@ public class JXColorSelectionButton extends JButton {
         // draw the colorwell image (should only be on OSX)
         if(OS.isMacOSX() && colorwell != null) {
             Insets ins = new Insets(5,5,5,5);
-            ColorUtil.tileStretchPaint(g, this, colorwell, ins);
+            GraphicsUtilities.tileStretchPaint(g, this, colorwell, ins);
             
             // fill in the color area
             g.setColor(FILL_COLOR);

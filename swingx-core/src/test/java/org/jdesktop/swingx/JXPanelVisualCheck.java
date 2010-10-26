@@ -37,9 +37,9 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 
 import org.jdesktop.swingx.action.AbstractActionExt;
+import org.jdesktop.swingx.graphics.PaintUtils;
 import org.jdesktop.swingx.painter.ImagePainter;
 import org.jdesktop.swingx.painter.MattePainter;
-import org.jdesktop.swingx.util.PaintUtils;
 
 /**
  * Contains methods to visually test JXPanel.
