@@ -31,6 +31,8 @@ import java.awt.image.BufferedImage;
 
 import javax.swing.JComponent;
 
+import org.jdesktop.swingx.graphics.GraphicsUtilities;
+
 /**
  * A collection of utility methods for working with {@code Color}s.
  * 
@@ -213,6 +215,14 @@ public final class ColorUtil {
         return new Color((over.getRGB() & 0xff000000) | ((rb | g) >> 8));
     }
 
+    /**
+     * Interpolates a color.
+     * 
+     * @param b
+     * @param a
+     * @param t
+     * @return
+     */
     public static Color interpolate(Color b, Color a, float t) {
         float[] acomp = a.getRGBComponents(null);
         float[] bcomp = b.getRGBComponents(null);
@@ -262,7 +272,7 @@ public final class ColorUtil {
      * @return a new {@code Paint} checkering the supplied colors
      */
     public static Paint getCheckerPaint(Color c1, Color c2, int size) {
-        BufferedImage img = new BufferedImage(size,size,BufferedImage.TYPE_INT_ARGB);
+        BufferedImage img = GraphicsUtilities.createCompatibleTranslucentImage(size, size);
         Graphics g = img.getGraphics();
         
         try {
