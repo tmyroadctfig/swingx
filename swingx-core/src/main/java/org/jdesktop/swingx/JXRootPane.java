@@ -310,8 +310,10 @@ public class JXRootPane extends JRootPane {
             @Override
             public boolean isEnabled() {
                 Component component = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
-                Action cancelPopup = ((JComponent)component).getActionMap().get("cancel");
-                if (cancelPopup != null) return false;
+                if (component instanceof JComponent) {
+                    Action cancelPopup = ((JComponent)component).getActionMap().get("cancel");
+                    if (cancelPopup != null) return false;
+                }
                 return (cancelButton != null) && (cancelButton.isEnabled());
             }
         };
