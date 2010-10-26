@@ -83,7 +83,7 @@ public class JXColorSelectionButton extends JButton {
         this.setOpaque(false);
         
         try {
-            colorwell = ImageIO.read(this.getClass().getResourceAsStream("color/colorwell.png"));
+            colorwell = ImageIO.read(JXColorSelectionButton.class.getResourceAsStream("color/colorwell.png"));
         } catch (Exception ex) {
             ex.printStackTrace();
         }
