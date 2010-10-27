@@ -8,11 +8,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.IOException;
 import java.io.Serializable;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
 
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenuItem;
@@ -27,6 +27,22 @@ import org.junit.runners.JUnit4;
 
 @RunWith(JUnit4.class)
 public class ActionIssues extends ActionTest implements Serializable {
+    
+    /**
+     * Issue #1364-swingx: AbstractActionExt - incorrect parameter type in setActionCommand
+     */
+    @Test
+    public void testActionCommand() {
+        AbstractActionExt action = new AbstractActionExt("something"){
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // TODO Auto-generated method stub
+                
+            }};
+        action.setActionCommand(new Object());
+        new JButton(action);
+    }
 
     /**
      * Issue #349-swingx: table not serializable
