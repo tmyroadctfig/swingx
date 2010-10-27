@@ -26,7 +26,7 @@ public abstract class JXPromptBeanInfo extends BeanInfoSupport {
 						"java.awt.Font.BOLD | java.awt.Font.ITALIC") }, "promptFontStyle");
 		setEnumerationValues(new EnumerationValue[] {
 				new EnumerationValue("Show", FocusBehavior.SHOW_PROMPT,
-						"org.jdesktop.xwingx.prompt.PromptSupport.FocusBehavior.SHOW_PROMPT"),
+						"org.jdesktop.swingx.prompt.PromptSupport.FocusBehavior.SHOW_PROMPT"),
 				new EnumerationValue("Hide", FocusBehavior.HIDE_PROMPT,
 						"org.jdesktop.swingx.prompt.PromptSupport.FocusBehavior.HIDE_PROMPT"),
 				new EnumerationValue("Highlight", FocusBehavior.HIGHLIGHT_PROMPT,
