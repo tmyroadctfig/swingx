@@ -83,6 +83,7 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.plaf.basic.BasicHTML;
 import javax.swing.text.View;
@@ -440,6 +441,7 @@ public class JXLoginPane extends JXPanel {
         if (Boolean.parseBoolean(System.getProperty("swingx.enableCapslockTesting"))) {
             capsOnTest = new CapsOnTest();
             capsOnListener = new KeyEventDispatcher() {
+                @Override
                 public boolean dispatchKeyEvent(KeyEvent e) {
                     if (e.getID() != KeyEvent.KEY_PRESSED) {
                         return false;
@@ -1392,6 +1394,7 @@ public class JXLoginPane extends JXPanel {
             super(UIManagerExt.getString(CLASS_NAME + ".loginString", p.getLocale()), LOGIN_ACTION_COMMAND);
             this.panel = p;
         }
+        @Override
         public void actionPerformed(ActionEvent e) {
             panel.startLogin();
         }
@@ -1410,6 +1413,7 @@ public class JXLoginPane extends JXPanel {
             this.panel = p;
             this.setEnabled(false);
         }
+        @Override
         public void actionPerformed(ActionEvent e) {
             panel.cancelLogin();
         }
@@ -1520,12 +1524,15 @@ public class JXLoginPane extends JXPanel {
 	    }
 	}
         
+        @Override
         public String getUserName() {
             return getText();
         }
+        @Override
         public void setUserName(String userName) {
             setText(userName);
         }
+        @Override
         public JComponent getComponent() {
             return this;
         }
@@ -1558,23 +1565,27 @@ public class JXLoginPane extends JXPanel {
         	});
         	
         	super.addItemListener(new ItemListener() {
-        	    public void itemStateChanged(ItemEvent e) {
+        	    @Override
+                public void itemStateChanged(ItemEvent e) {
         		updatePassword((String)getSelectedItem());
         	    }
         	});
             }
         }
         
+        @Override
         public String getUserName() {
             Object item = getModel().getSelectedItem();
             return item == null ? null : item.toString();
         }
+        @Override
         public void setUserName(String userName) {
             getModel().setSelectedItem(userName);
         }
         public void setUserNames(String[] names) {
             setModel(new DefaultComboBoxModel(names));
         }
+        @Override
         public JComponent getComponent() {
             return this;
         }
@@ -1582,16 +1593,24 @@ public class JXLoginPane extends JXPanel {
         private final class NameComboBoxModel extends AbstractListModel implements ComboBoxModel {
             private static final long serialVersionUID = 7097674687536018633L;
             private Object selectedItem;
+            @Override
             public void setSelectedItem(Object anItem) {
                 selectedItem = anItem;
                 fireContentsChanged(this, -1, -1);
             }
+            @Override
             public Object getSelectedItem() {
                 return selectedItem;
             }
+            @Override
             public Object getElementAt(int index) {
+                if (index == -1) {
+                    return null;
+                }
+                
                 return userNameStore.getUserNames()[index];
             }
+            @Override
             public int getSize() {
                 return userNameStore.getUserNames().length;
             }
@@ -1738,6 +1757,7 @@ public class JXLoginPane extends JXPanel {
         final JButton cancelButton = new JButton(
                 UIManagerExt.getString(CLASS_NAME + ".cancelString", panel.getLocale()));
         cancelButton.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 //change panel status to canceled!
                 panel.status = JXLoginPane.Status.CANCELLED;
@@ -1746,6 +1766,7 @@ public class JXLoginPane extends JXPanel {
             }
         });
         panel.addPropertyChangeListener("status", new PropertyChangeListener() {
+            @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 JXLoginPane.Status status = (JXLoginPane.Status)evt.getNewValue();
                 switch (status) {
@@ -1796,9 +1817,10 @@ public class JXLoginPane extends JXPanel {
             final JFrame f = (JFrame)w;
             f.getRootPane().setDefaultButton(okButton);
             f.setResizable(false);
-            f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+            f.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
             KeyStroke ks = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
             ActionListener closeAction = new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     f.setVisible(false);
                     f.dispose();
@@ -1811,6 +1833,7 @@ public class JXLoginPane extends JXPanel {
             d.setResizable(false);
             KeyStroke ks = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
             ActionListener closeAction = new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     d.setVisible(false);
                 }
@@ -1954,6 +1977,7 @@ public class JXLoginPane extends JXPanel {
             this.cot = capsOnTest;
         }
 
+        @Override
         public boolean dispatchKeyEvent(KeyEvent e) {
             tested = true;
             if (e.getID() != KeyEvent.KEY_PRESSED) {
@@ -1983,6 +2007,7 @@ public class JXLoginPane extends JXPanel {
         void cleanOnBogusFocus() {
             // #799 happens on windows when focus is lost during initialization of program since focusLost() even is not issued by jvm in this case (WinXP-WinVista only)
             SwingUtilities.invokeLater(new Runnable() {
+                @Override
                 public void run() {
                     if (!tested) {
                         uninstall();
