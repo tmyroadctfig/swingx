@@ -44,6 +44,7 @@ import javax.swing.colorchooser.AbstractColorChooserPanel;
 import javax.swing.event.MouseInputAdapter;
 
 import org.jdesktop.swingx.JXColorSelectionButton;
+import org.jdesktop.swingx.graphics.PaintUtils;
 
 /**
  * <p>EyeDropperColorChooserPanel is a pluggable panel for the 
@@ -122,7 +123,7 @@ public class EyeDropperColorChooserPanel extends AbstractColorChooserPanel {
             public void propertyChange(PropertyChangeEvent evt) {
                 Color color = new Color(((MagnifyingPanel)magPanel).activeColor);
                 activeColor.setBackground(color);
-                hexColor.setText(ColorUtil.toHexString(color).substring(1));
+                hexColor.setText(PaintUtils.toHexString(color).substring(1));
                 rgbColor.setText(color.getRed() +"," + color.getGreen() + "," + color.getBlue());
             }
         });

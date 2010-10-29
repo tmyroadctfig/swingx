@@ -34,6 +34,7 @@ import java.util.List;
 import javax.swing.JComponent;
 
 import org.jdesktop.swingx.JXMultiThumbSlider;
+import org.jdesktop.swingx.graphics.PaintUtils;
 import org.jdesktop.swingx.multislider.Thumb;
 import org.jdesktop.swingx.multislider.TrackRenderer;
 
@@ -45,7 +46,7 @@ public class GradientTrackRenderer extends JComponent implements TrackRenderer {
     private Paint checker_paint;
 
     public GradientTrackRenderer() {
-        checker_paint = ColorUtil.getCheckerPaint();
+        checker_paint = PaintUtils.getCheckerPaint();
     }
     
     private JXMultiThumbSlider slider;

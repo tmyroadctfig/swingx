@@ -43,7 +43,6 @@ import java.awt.Insets;
 import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.Transparency;
-import java.awt.geom.Area;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.Raster;
@@ -751,17 +750,10 @@ public class GraphicsUtilities {
      *         null} if the current clip is {@code null}.
      * @throws NullPointerException
      *             if any parameter is {@code null}
+     * @deprecated Use {@link ShapeUtils#mergeClip(Graphics,Shape)} instead
      */
     public static Shape mergeClip(Graphics g, Shape clip) {
-        Shape oldClip = g.getClip();
-        if(oldClip == null) {
-            g.setClip(clip);
-            return null;
-        }
-        Area area = new Area(oldClip);
-        area.intersect(new Area(clip));//new Rectangle(0,0,width,height)));
-        g.setClip(area);
-        return oldClip;
+        return ShapeUtils.mergeClip(g, clip);
     }
 
     /**

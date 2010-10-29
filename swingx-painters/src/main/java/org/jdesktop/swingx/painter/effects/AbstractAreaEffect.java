@@ -22,6 +22,8 @@
 
 package org.jdesktop.swingx.painter.effects;
 
+import static org.jdesktop.swingx.graphics.GraphicsUtilities.createCompatibleTranslucentImage;
+
 import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -125,9 +127,7 @@ public class AbstractAreaEffect implements AreaEffect {
         if(_clipImage == null ||
                 _clipImage.getWidth() != effectBounds.width ||
                 _clipImage.getHeight() != effectBounds.height) {
-            _clipImage = new BufferedImage(
-                    effectBounds.width,
-                    effectBounds.height, BufferedImage.TYPE_INT_ARGB);
+            _clipImage = createCompatibleTranslucentImage(effectBounds.width, effectBounds.height);
         }
         _clipImage.getGraphics().clearRect(0,0,_clipImage.getWidth(), _clipImage.getHeight());
         return _clipImage;

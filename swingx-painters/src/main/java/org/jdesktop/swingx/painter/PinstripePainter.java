@@ -29,8 +29,6 @@ import java.awt.Shape;
 import java.awt.geom.Area;
 import java.awt.geom.Line2D;
 
-import javax.swing.JComponent;
-
 /**
  * <p>A fun Painter that paints pinstripes. You can specify the Paint to paint
  * those pinstripes in (could even be a texture paint!), the angle at which
@@ -210,14 +208,8 @@ public class PinstripePainter extends AbstractPainter<Object> {
         area.intersect(new Area(new Rectangle(0,0,width,height)));
         g.setClip(area);
         //g.setClip(oldClip.intersection(new Rectangle(0,0,width,height)));
-        Paint p = getPaint();
-        if (p == null) {
-            if(component instanceof JComponent) {
-                g.setColor(((JComponent)component).getForeground());
-            }
-        } else {
-            g.setPaint(p);
-        }
+        Paint p = PainterUtils.getForegroundPaint(getPaint(), component);
+        g.setPaint(p);
         
         g.setStroke(new BasicStroke((float)getStripeWidth()));
         

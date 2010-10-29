@@ -20,12 +20,11 @@
  */
 package org.jdesktop.swingx.decorator;
 
-import static org.jdesktop.swingx.color.ColorUtil.blend;
+
+import static org.jdesktop.swingx.graphics.PaintUtils.blend;
 
 import java.awt.Color;
 import java.awt.Component;
-
-import org.jdesktop.swingx.color.ColorUtil;
 
 /**
  * A Highlighter to modify component colors.
@@ -38,7 +37,7 @@ import org.jdesktop.swingx.color.ColorUtil;
  * of blending, by using the legacy property methods.  These methods were added
  * and immediately deprecated.  They exist to provide a bridge to the old
  * behavior, but are not recommended.  If you are supplying a non-opaque color 
- * and need it to be considered opaque, use {@link ColorUtil#removeAlpha(Color)}.
+ * and need it to be considered opaque, use {@link org.jdesktop.swingx.graphics.PaintUtils#removeAlpha(Color)}.
  * 
  * @author Jeanette Winzenburg
  * @author Karl Schaefer

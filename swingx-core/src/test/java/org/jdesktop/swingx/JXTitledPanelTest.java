@@ -33,7 +33,7 @@ import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
 
-import org.jdesktop.swingx.color.ColorUtil;
+import org.jdesktop.swingx.graphics.PaintUtils;
 import org.jdesktop.swingx.painter.MattePainter;
 import org.jdesktop.test.PropertyChangeReport;
 import org.junit.Test;
@@ -375,11 +375,11 @@ public class JXTitledPanelTest extends InteractiveTestCase {
                     RenderingHints.VALUE_ANTIALIAS_ON);
             
             Color color = Color.RED;
-            g2.setColor(ColorUtil.setAlpha(color, 40));        
+            g2.setColor(PaintUtils.setAlpha(color, 40));        
             g2.drawRoundRect(x, y + 2, width - 1, height - 3, cornerRadius, cornerRadius);
-            g2.setColor(ColorUtil.setAlpha(color, 90));        
+            g2.setColor(PaintUtils.setAlpha(color, 90));        
             g2.drawRoundRect(x, y + 1, width - 1, height - 2, cornerRadius, cornerRadius); 
-            g2.setColor(ColorUtil.setAlpha(color, 255));        
+            g2.setColor(PaintUtils.setAlpha(color, 255));        
             g2.drawRoundRect(x, y, width - 1, height - 1, cornerRadius, cornerRadius);
 
             g2.dispose();            

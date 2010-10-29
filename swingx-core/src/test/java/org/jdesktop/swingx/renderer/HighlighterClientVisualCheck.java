@@ -63,7 +63,6 @@ import org.jdesktop.swingx.JXSearchPanel;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.JXTree;
 import org.jdesktop.swingx.JXTreeTable;
-import org.jdesktop.swingx.color.ColorUtil;
 import org.jdesktop.swingx.decorator.AbstractHighlighter;
 import org.jdesktop.swingx.decorator.BorderHighlighter;
 import org.jdesktop.swingx.decorator.ColorHighlighter;
@@ -75,6 +74,7 @@ import org.jdesktop.swingx.decorator.HighlighterFactory;
 import org.jdesktop.swingx.decorator.PatternPredicate;
 import org.jdesktop.swingx.decorator.ShadingColorHighlighter;
 import org.jdesktop.swingx.decorator.HighlightPredicate.ColumnHighlightPredicate;
+import org.jdesktop.swingx.graphics.PaintUtils;
 import org.jdesktop.swingx.painter.MattePainter;
 import org.jdesktop.swingx.painter.AbstractLayoutPainter.HorizontalAlignment;
 import org.jdesktop.swingx.renderer.RelativePainterHighlighter.NumberRelativizer;
@@ -290,8 +290,8 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
      */
     private RelativePainterHighlighter createRelativeGradientHighlighter(
             HorizontalAlignment right) {
-        Color startColor = ColorUtil.setAlpha(Color.RED, 130);
-        Color endColor = ColorUtil.setAlpha(Color.RED.brighter(), 0);
+        Color startColor = PaintUtils.setAlpha(Color.RED, 130);
+        Color endColor = PaintUtils.setAlpha(Color.RED.brighter(), 0);
         boolean isRightAligned = HorizontalAlignment.RIGHT == right;
         GradientPaint paint = new GradientPaint(new Point2D.Double(0, 0),
                 isRightAligned ? endColor : startColor, 

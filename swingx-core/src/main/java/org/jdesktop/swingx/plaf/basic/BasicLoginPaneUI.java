@@ -34,6 +34,7 @@ import javax.swing.UIManager;
 import javax.swing.plaf.ComponentUI;
 
 import org.jdesktop.swingx.JXLoginPane;
+import org.jdesktop.swingx.graphics.GraphicsUtilities;
 import org.jdesktop.swingx.plaf.LoginPaneUI;
 import org.jdesktop.swingx.plaf.UIManagerExt;
 /**
@@ -95,7 +96,7 @@ public class BasicLoginPaneUI extends LoginPaneUI {
         float loginStringX = w * .05f;
         float loginStringY = h * .75f;
 
-        BufferedImage img = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
+        BufferedImage img = GraphicsUtilities.createCompatibleImage(w, h);
         Graphics2D g2 = img.createGraphics();
         try {
             Font font = UIManager.getFont("JXLoginPane.bannerFont");

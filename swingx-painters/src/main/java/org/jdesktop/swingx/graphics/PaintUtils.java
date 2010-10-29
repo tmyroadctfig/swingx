@@ -29,8 +29,10 @@ import java.awt.Graphics2D;
 import java.awt.LinearGradientPaint;
 import java.awt.Paint;
 import java.awt.Rectangle;
+import java.awt.TexturePaint;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -40,9 +42,11 @@ import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 
 /**
- * A collection of utilities for painting visual effects.
+ * A collection of utilities for working with Paints and Colors.
  *
  * @author Mark Davidson
+ * @author joshua.marinacci@sun.com
+ * @author Karl George Schaefer
  */
 public class PaintUtils {
     public static final GradientPaint BLUE_EXPERIENCE = new GradientPaint(
@@ -354,9 +358,248 @@ public class PaintUtils {
         
         return buffer.toString();
     }*/
-    
-//    private static void p(String string) {
-//        log.fine((string);
-//    }
 
+    /**
+     * Creates a new {@code Paint} that is a checkered effect using the colors {@link Color#GRAY
+     * gray} and {@link Color#WHITE}.
+     * 
+     * @return a the checkered paint
+     */
+    public static Paint getCheckerPaint() {
+        return getCheckerPaint(Color.WHITE, Color.GRAY, 20);
+    }
+
+    /**
+     * Creates a new {@code Paint} that is a checkered effect using the specified colors.
+     * <p>
+     * While this method supports transparent colors, this implementation performs painting
+     * operations using the second color after it performs operations using the first color. This
+     * means that to create a checkered paint with a fully-transparent color, you MUST specify that
+     * color first.
+     * 
+     * @param c1
+     *            the first color
+     * @param c2
+     *            the second color
+     * @param size
+     *            the size of the paint
+     * @return a new {@code Paint} checkering the supplied colors
+     */
+    public static Paint getCheckerPaint(Paint c1, Paint c2, int size) {
+        BufferedImage img = GraphicsUtilities.createCompatibleTranslucentImage(size, size);
+        Graphics2D g = img.createGraphics();
+        
+        try {
+            g.setPaint(c1);
+            g.fillRect(0, 0, size, size);
+            g.setPaint(c2);
+            g.fillRect(0, 0, size / 2, size / 2);
+            g.fillRect(size / 2, size / 2, size / 2, size / 2);
+        } finally {
+            g.dispose();
+        }
+        
+        return new TexturePaint(img,new Rectangle(0,0,size,size));
+    }
+
+    /**
+     * Creates a {@code String} that represents the supplied color as a
+     * hex-value RGB triplet, including the "#". The return value is suitable
+     * for use in HTML. The alpha (transparency) channel is neither include nor
+     * used in producing the string.
+     * 
+     * @param color
+     *            the color to convert
+     * @return the hex {@code String}
+     */
+    public static String toHexString(Color color) {
+        return "#" + Integer.toHexString(color.getRGB() | 0xFF000000).substring(2);
+    }
+
+    /**
+     * Returns a new color equal to the old one, except that there is no alpha
+     * (transparency) channel.
+     * <p>
+     * This method is a convenience and has the same effect as {@code
+     * setAlpha(color, 255)}.
+     * 
+     * @param color
+     *            the color to remove the alpha (transparency) from
+     * @return a new non-transparent {@code Color}
+     * @throws NullPointerException
+     *             if {@code color} is {@code null}
+     */
+    public static Color removeAlpha(Color color) {
+        return setAlpha(color, 255);
+    }
+
+    /**
+     * Returns a new color equal to the old one, except alpha (transparency)
+     * channel is set to the new value.
+     * 
+     * @param color
+     *            the color to modify
+     * @param alpha
+     *            the new alpha (transparency) level. Must be an int between 0
+     *            and 255
+     * @return a new alpha-applied {@code Color}
+     * @throws IllegalArgumentException
+     *             if {@code alpha} is not between 0 and 255 inclusive
+     * @throws NullPointerException
+     *             if {@code color} is {@code null}
+     */
+    public static Color setAlpha(Color color, int alpha) {
+        if (alpha < 0 || alpha > 255) {
+            throw new IllegalArgumentException("invalid alpha value");
+        }
+    
+        return new Color(
+                color.getRed(), color.getGreen(), color.getBlue(), alpha);
+    }
+
+    /**
+     * Returns a new color equal to the old one, except the saturation is set to
+     * the new value. The new color will have the same alpha (transparency) as
+     * the original color.
+     * <p>
+     * The color is modified using HSB calculations. The saturation must be a
+     * float between 0 and 1. If 0 the resulting color will be gray. If 1 the
+     * resulting color will be the most saturated possible form of the passed in
+     * color.
+     * 
+     * @param color
+     *            the color to modify
+     * @param saturation
+     *            the saturation to use in the new color
+     * @return a new saturation-applied {@code Color}
+     * @throws IllegalArgumentException
+     *             if {@code saturation} is not between 0 and 1 inclusive
+     * @throws NullPointerException
+     *             if {@code color} is {@code null}
+     */
+    public static Color setSaturation(Color color, float saturation) {
+        if (saturation < 0f || saturation > 1f) {
+            throw new IllegalArgumentException("invalid saturation value");
+        }
+    
+        int alpha = color.getAlpha();
+        
+        float[] hsb = Color.RGBtoHSB(
+                color.getRed(), color.getGreen(), color.getBlue(), null);
+        Color c = Color.getHSBColor(hsb[0], saturation, hsb[2]);
+        
+        return setAlpha(c, alpha);
+    }
+
+    /**
+     * Returns a new color equal to the old one, except the brightness is set to
+     * the new value. The new color will have the same alpha (transparency) as
+     * the original color.
+     * <p>
+     * The color is modified using HSB calculations. The brightness must be a
+     * float between 0 and 1. If 0 the resulting color will be black. If 1 the
+     * resulting color will be the brightest possible form of the passed in
+     * color.
+     * 
+     * @param color
+     *            the color to modify
+     * @param brightness
+     *            the brightness to use in the new color
+     * @return a new brightness-applied {@code Color}
+     * @throws IllegalArgumentException
+     *             if {@code brightness} is not between 0 and 1 inclusive
+     * @throws NullPointerException
+     *             if {@code color} is {@code null}
+     */
+    public static Color setBrightness(Color color, float brightness) {
+        if (brightness < 0f || brightness > 1f) {
+            throw new IllegalArgumentException("invalid brightness value");
+        }
+    
+        int alpha = color.getAlpha();
+    
+        float[] hsb = Color.RGBtoHSB(
+                color.getRed(), color.getGreen(), color.getBlue(), null);
+        Color c = Color.getHSBColor(hsb[0], hsb[1], brightness);
+    
+        return setAlpha(c, alpha);
+    }
+
+    /**
+     * Blends two colors to create a new color. The {@code origin} color is the
+     * base for the new color and regardless of its alpha component, it is
+     * treated as fully opaque (alpha 255).
+     * 
+     * @param origin
+     *            the base of the new color
+     * @param over
+     *            the alpha-enabled color to add to the {@code origin} color
+     * @return a new color comprised of the {@code origin} and {@code over}
+     *         colors
+     */
+    public static Color blend(Color origin, Color over) {
+        if (over == null) {
+            return origin;
+        }
+    
+        if (origin == null) {
+            return over;
+        }
+    
+        int a = over.getAlpha();
+        
+        int rb = (((over.getRGB() & 0x00ff00ff) * (a + 1))
+                    + ((origin.getRGB() & 0x00ff00ff) * (0xff - a))) & 0xff00ff00;
+        int g = (((over.getRGB() & 0x0000ff00) * (a + 1))
+                    + ((origin.getRGB() & 0x0000ff00) * (0xff - a))) & 0x00ff0000;
+    
+        return new Color((over.getRGB() & 0xff000000) | ((rb | g) >> 8));
+    }
+
+    /**
+         * Interpolates a color.
+         * 
+         * @param b
+         * @param a
+         * @param t
+         * @return
+         */
+        public static Color interpolate(Color b, Color a, float t) {
+            float[] acomp = a.getRGBComponents(null);
+            float[] bcomp = b.getRGBComponents(null);
+            float[] ccomp = new float[4];
+            
+    //        log.fine(("a comp ");
+    //        for(float f : acomp) {
+    //            log.fine((f);
+    //        }
+    //        for(float f : bcomp) {
+    //            log.fine((f);
+    //        }
+            for(int i=0; i<4; i++) {
+                ccomp[i] = acomp[i] + (bcomp[i]-acomp[i])*t;
+            }
+    //        for(float f : ccomp) {
+    //            log.fine((f);
+    //        }
+            
+            return new Color(ccomp[0],ccomp[1],ccomp[2],ccomp[3]);
+        }
+
+    /**
+     * Computes an appropriate foreground color (either white or black) for the
+     * given background color.
+     * 
+     * @param bg
+     *            the background color
+     * @return {@code Color.WHITE} or {@code Color.BLACK}
+     * @throws NullPointerException
+     *             if {@code bg} is {@code null}
+     */
+    public static Color computeForeground(Color bg) {
+        float[] rgb = bg.getRGBColorComponents(null);
+        float y = .3f * rgb[0] + .59f * rgb[1] + .11f * rgb[2];
+        
+        return y > .5f ? Color.BLACK : Color.WHITE;
+    }
 }

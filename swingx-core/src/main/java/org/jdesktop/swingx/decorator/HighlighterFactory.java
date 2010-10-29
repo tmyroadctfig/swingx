@@ -25,9 +25,9 @@ import java.awt.Component;
 
 import javax.swing.UIManager;
 
-import org.jdesktop.swingx.color.ColorUtil;
 import org.jdesktop.swingx.decorator.HighlightPredicate.NotHighlightPredicate;
 import org.jdesktop.swingx.decorator.HighlightPredicate.RowGroupHighlightPredicate;
+import org.jdesktop.swingx.graphics.PaintUtils;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 import org.jdesktop.swingx.plaf.UIColorHighlighterAddon;
 import org.jdesktop.swingx.plaf.UIDependent;
@@ -45,7 +45,7 @@ public final class HighlighterFactory {
     private static Highlighter COMPUTED_FOREGROUND_HIGHLIGHTER = new AbstractHighlighter() {
         @Override
         protected Component doHighlight(Component component, ComponentAdapter adapter) {
-            component.setForeground(ColorUtil.computeForeground(component.getBackground()));
+            component.setForeground(PaintUtils.computeForeground(component.getBackground()));
             
             return component;
         }

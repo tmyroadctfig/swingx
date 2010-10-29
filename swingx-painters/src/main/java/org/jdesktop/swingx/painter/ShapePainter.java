@@ -21,6 +21,9 @@
 
 package org.jdesktop.swingx.painter;
 
+import static org.jdesktop.swingx.painter.PainterUtils.getBackgroundPaint;
+import static org.jdesktop.swingx.painter.PainterUtils.getForegroundPaint;
+
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -29,8 +32,6 @@ import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.geom.Ellipse2D;
-
-import javax.swing.JComponent;
 
 import org.jdesktop.swingx.painter.effects.AreaEffect;
 
@@ -188,12 +189,7 @@ public class ShapePainter extends AbstractAreaPainter<Object> {
     }
     
     private Paint calculateStrokePaint(Object component, int width, int height) {
-        Paint p = getBorderPaint();
-        if (p == null) {
-            if(component instanceof JComponent) {
-                p = ((JComponent)component).getForeground();
-            }
-        }
+        Paint p = getForegroundPaint(getBorderPaint(), component);
         if(isPaintStretched()) {
             p = calculateSnappedPaint(p, width, height);
         }
@@ -202,15 +198,9 @@ public class ShapePainter extends AbstractAreaPainter<Object> {
     
     private Paint calculateFillPaint(Object component, int width, int height) {
         //set the fillPaint
-        Paint p = getFillPaint();
+        Paint p = getBackgroundPaint(getFillPaint(), component);
         if(isPaintStretched()) {
             p = calculateSnappedPaint(p, width, height);
-        } else {
-        }
-        if (p == null) {
-            if(component instanceof JComponent) {
-                p = ((JComponent)component).getBackground();
-            }
         }
         return p;
     }

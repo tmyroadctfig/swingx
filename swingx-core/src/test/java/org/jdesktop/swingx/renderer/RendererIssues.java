@@ -71,13 +71,13 @@ import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.JXTree;
 import org.jdesktop.swingx.JXTreeTable;
 import org.jdesktop.swingx.border.DropShadowBorder;
-import org.jdesktop.swingx.color.ColorUtil;
 import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.PainterHighlighter;
 import org.jdesktop.swingx.decorator.PatternPredicate;
+import org.jdesktop.swingx.graphics.PaintUtils;
 import org.jdesktop.swingx.painter.MattePainter;
 import org.jdesktop.swingx.rollover.RolloverProducer;
 import org.jdesktop.swingx.rollover.RolloverRenderer;
@@ -129,7 +129,7 @@ public class RendererIssues extends InteractiveTestCase {
      * 
      */
     public void interactiveAlphaBackground() {
-        Color color = ColorUtil.setAlpha(Color.ORANGE, 60);
+        Color color = PaintUtils.setAlpha(Color.ORANGE, 60);
         
         JCheckBox check = new JCheckBox("what's my color?");
 //        check.setOpaque(true);
@@ -179,7 +179,7 @@ public class RendererIssues extends InteractiveTestCase {
         Font BOLD_FONT;
 
         RowHighlighter(HighlightPredicate predicate) {
-            super(predicate, ColorUtil.setAlpha(Color.ORANGE, 60), Color.RED);
+            super(predicate, PaintUtils.setAlpha(Color.ORANGE, 60), Color.RED);
             setSelectedForeground(getForeground());
         }
 
