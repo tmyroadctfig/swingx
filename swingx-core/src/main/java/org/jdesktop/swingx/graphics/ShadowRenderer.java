@@ -20,6 +20,8 @@
  */
 package org.jdesktop.swingx.graphics;
 
+import static org.jdesktop.swingx.graphics.GraphicsUtilities.createCompatibleTranslucentImage;
+
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeListener;
@@ -298,8 +300,7 @@ public class ShadowRenderer {
 
         int aSum;
 
-        BufferedImage dst = new BufferedImage(dstWidth, dstHeight,
-                                              BufferedImage.TYPE_INT_ARGB);
+        BufferedImage dst = createCompatibleTranslucentImage(dstWidth, dstHeight);
 
         int[] dstBuffer = new int[dstWidth * dstHeight];
         int[] srcBuffer = new int[srcWidth * srcHeight];

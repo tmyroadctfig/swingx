@@ -25,20 +25,21 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Insets;
 import java.awt.Paint;
-import java.awt.Rectangle;
-import java.awt.TexturePaint;
 import java.awt.image.BufferedImage;
 
 import javax.swing.JComponent;
 
 import org.jdesktop.swingx.graphics.GraphicsUtilities;
+import org.jdesktop.swingx.graphics.PaintUtils;
 
 /**
  * A collection of utility methods for working with {@code Color}s.
  * 
  * @author joshua.marinacci@sun.com
  * @author Karl George Schaefer
+ * @deprecated (pre-1.6.3) all methods moved
  */
+@Deprecated
 public final class ColorUtil {
     private ColorUtil() {
         //prevent instantiation
@@ -56,9 +57,10 @@ public final class ColorUtil {
      * @return a new non-transparent {@code Color}
      * @throws NullPointerException
      *             if {@code color} is {@code null}
+     * @deprecated Use {@link PaintUtils#removeAlpha(Color)} instead
      */
     public static Color removeAlpha(Color color) {
-        return setAlpha(color, 255);
+        return PaintUtils.removeAlpha(color);
     }
 
     /**
@@ -75,14 +77,10 @@ public final class ColorUtil {
      *             if {@code alpha} is not between 0 and 255 inclusive
      * @throws NullPointerException
      *             if {@code color} is {@code null}
+     * @deprecated Use {@link PaintUtils#setAlpha(Color,int)} instead
      */
     public static Color setAlpha(Color color, int alpha) {
-        if (alpha < 0 || alpha > 255) {
-            throw new IllegalArgumentException("invalid alpha value");
-        }
-
-        return new Color(
-                color.getRed(), color.getGreen(), color.getBlue(), alpha);
+        return PaintUtils.setAlpha(color, alpha);
     }
 
     /**
@@ -104,19 +102,10 @@ public final class ColorUtil {
      *             if {@code saturation} is not between 0 and 1 inclusive
      * @throws NullPointerException
      *             if {@code color} is {@code null}
+     * @deprecated Use {@link PaintUtils#setSaturation(Color,float)} instead
      */
     public static Color setSaturation(Color color, float saturation) {
-        if (saturation < 0f || saturation > 1f) {
-            throw new IllegalArgumentException("invalid saturation value");
-        }
-
-        int alpha = color.getAlpha();
-        
-        float[] hsb = Color.RGBtoHSB(
-                color.getRed(), color.getGreen(), color.getBlue(), null);
-        Color c = Color.getHSBColor(hsb[0], saturation, hsb[2]);
-        
-        return setAlpha(c, alpha);
+        return PaintUtils.setSaturation(color, saturation);
     }
 
     /**
@@ -138,19 +127,10 @@ public final class ColorUtil {
      *             if {@code brightness} is not between 0 and 1 inclusive
      * @throws NullPointerException
      *             if {@code color} is {@code null}
+     * @deprecated Use {@link PaintUtils#setBrightness(Color,float)} instead
      */
     public static Color setBrightness(Color color, float brightness) {
-        if (brightness < 0f || brightness > 1f) {
-            throw new IllegalArgumentException("invalid brightness value");
-        }
-
-        int alpha = color.getAlpha();
-
-        float[] hsb = Color.RGBtoHSB(
-                color.getRed(), color.getGreen(), color.getBlue(), null);
-        Color c = Color.getHSBColor(hsb[0], hsb[1], brightness);
-
-        return setAlpha(c, alpha);
+        return PaintUtils.setBrightness(color, brightness);
     }
 
     /**
@@ -162,9 +142,10 @@ public final class ColorUtil {
      * @param color
      *            the color to convert
      * @return the hex {@code String}
+     * @deprecated Use {@link PaintUtils#toHexString(Color)} instead
      */
     public static String toHexString(Color color) {
-        return "#" + Integer.toHexString(color.getRGB() | 0xFF000000).substring(2);
+        return PaintUtils.toHexString(color);
     }
 
     /**
@@ -176,12 +157,10 @@ public final class ColorUtil {
      * @return {@code Color.WHITE} or {@code Color.BLACK}
      * @throws NullPointerException
      *             if {@code bg} is {@code null}
+     * @deprecated Use {@link PaintUtils#computeForeground(Color)} instead
      */
     public static Color computeForeground(Color bg) {
-        float[] rgb = bg.getRGBColorComponents(null);
-        float y = .3f * rgb[0] + .59f * rgb[1] + .11f * rgb[2];
-        
-        return y > .5f ? Color.BLACK : Color.WHITE;
+        return PaintUtils.computeForeground(bg);
     }
 
     /**
@@ -195,24 +174,10 @@ public final class ColorUtil {
      *            the alpha-enabled color to add to the {@code origin} color
      * @return a new color comprised of the {@code origin} and {@code over}
      *         colors
+     * @deprecated Use {@link PaintUtils#blend(Color,Color)} instead
      */
     public static Color blend(Color origin, Color over) {
-        if (over == null) {
-            return origin;
-        }
-
-        if (origin == null) {
-            return over;
-        }
-
-        int a = over.getAlpha();
-        
-        int rb = (((over.getRGB() & 0x00ff00ff) * (a + 1))
-                    + ((origin.getRGB() & 0x00ff00ff) * (0xff - a))) & 0xff00ff00;
-        int g = (((over.getRGB() & 0x0000ff00) * (a + 1))
-                    + ((origin.getRGB() & 0x0000ff00) * (0xff - a))) & 0x00ff0000;
-
-        return new Color((over.getRGB() & 0xff000000) | ((rb | g) >> 8));
+        return PaintUtils.blend(origin, over);
     }
 
     /**
@@ -222,27 +187,10 @@ public final class ColorUtil {
      * @param a
      * @param t
      * @return
+     * @deprecated Use {@link PaintUtils#interpolate(Color,Color,float)} instead
      */
     public static Color interpolate(Color b, Color a, float t) {
-        float[] acomp = a.getRGBComponents(null);
-        float[] bcomp = b.getRGBComponents(null);
-        float[] ccomp = new float[4];
-        
-//        log.fine(("a comp ");
-//        for(float f : acomp) {
-//            log.fine((f);
-//        }
-//        for(float f : bcomp) {
-//            log.fine((f);
-//        }
-        for(int i=0; i<4; i++) {
-            ccomp[i] = acomp[i] + (bcomp[i]-acomp[i])*t;
-        }
-//        for(float f : ccomp) {
-//            log.fine((f);
-//        }
-        
-        return new Color(ccomp[0],ccomp[1],ccomp[2],ccomp[3]);
+        return PaintUtils.interpolate(b, a, t);
     }
 
     /**
@@ -250,9 +198,10 @@ public final class ColorUtil {
      * gray} and {@link Color#WHITE}.
      * 
      * @return a the checkered paint
+     * @deprecated Use {@link PaintUtils#getCheckerPaint()} instead
      */
     public static Paint getCheckerPaint() {
-        return getCheckerPaint(Color.WHITE, Color.GRAY, 20);
+        return PaintUtils.getCheckerPaint();
     }
 
     /**
@@ -270,22 +219,10 @@ public final class ColorUtil {
      * @param size
      *            the size of the paint
      * @return a new {@code Paint} checkering the supplied colors
+     * @deprecated Use {@link PaintUtils#getCheckerPaint(Paint,Paint,int)} instead
      */
     public static Paint getCheckerPaint(Color c1, Color c2, int size) {
-        BufferedImage img = GraphicsUtilities.createCompatibleTranslucentImage(size, size);
-        Graphics g = img.getGraphics();
-        
-        try {
-            g.setColor(c1);
-            g.fillRect(0, 0, size, size);
-            g.setColor(c2);
-            g.fillRect(0, 0, size / 2, size / 2);
-            g.fillRect(size / 2, size / 2, size / 2, size / 2);
-        } finally {
-            g.dispose();
-        }
-        
-        return new TexturePaint(img,new Rectangle(0,0,size,size));
+        return PaintUtils.getCheckerPaint(c1, c2, size);
     }
     
     /**

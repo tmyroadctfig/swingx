@@ -21,11 +21,13 @@
 package org.jdesktop.swingx.graphics;
 
 import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Polygon;
 import java.awt.Shape;
 import java.awt.font.GlyphVector;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Area;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
@@ -85,7 +87,7 @@ public final class ShapeUtils {
     }
     
     public static Shape generateShapeFromText(Font font, String string) {
-        BufferedImage img = GraphicsUtilities.createCompatibleTranslucentImage(100, 100);
+        BufferedImage img = GraphicsUtilities.createCompatibleTranslucentImage(1, 1);
         Graphics2D g2 = img.createGraphics();
 
         try {
@@ -96,5 +98,31 @@ public final class ShapeUtils {
         } finally {
             g2.dispose();
        }
+    }
+
+    /**
+     * Sets the clip on a graphics object by merging a supplied clip with the existing one. The new
+     * clip will be an intersection of the old clip and the supplied clip. The old clip shape will
+     * be returned. This is useful for resetting the old clip after an operation is performed.
+     * 
+     * @param g
+     *            the graphics object to update
+     * @param clip
+     *            a new clipping region to add to the graphics clip.
+     * @return the current clipping region of the supplied graphics object. This may return {@code
+     *         null} if the current clip is {@code null}.
+     * @throws NullPointerException
+     *             if any parameter is {@code null}
+     */
+    public static Shape mergeClip(Graphics g, Shape clip) {
+        Shape oldClip = g.getClip();
+        if(oldClip == null) {
+            g.setClip(clip);
+            return null;
+        }
+        Area area = new Area(oldClip);
+        area.intersect(new Area(clip));//new Rectangle(0,0,width,height)));
+        g.setClip(area);
+        return oldClip;
     }
 }

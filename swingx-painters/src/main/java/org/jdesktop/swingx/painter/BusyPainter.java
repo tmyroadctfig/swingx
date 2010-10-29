@@ -34,7 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import org.jdesktop.swingx.color.ColorUtil;
+import org.jdesktop.swingx.graphics.PaintUtils;
 
 /**
  * A specific painter that paints an "infinite progress" like animation. For
@@ -458,12 +458,12 @@ public class BusyPainter extends AbstractPainter<Object> {
                     && i == (frame - t + getPoints()) % getPoints()) {
                 float terp = 1 - ((float) (getTrailLength() - t))
                         / (float) getTrailLength();
-                return ColorUtil.interpolate(getBaseColor(),
+                return PaintUtils.interpolate(getBaseColor(),
                         getHighlightColor(), terp);
             } else if (direction == Direction.LEFT
                     && i == (frame + t) % getPoints()) {
                 float terp = ((float) (t)) / (float) getTrailLength();
-                return ColorUtil.interpolate(getBaseColor(),
+                return PaintUtils.interpolate(getBaseColor(),
                         getHighlightColor(), terp);
             }
         }

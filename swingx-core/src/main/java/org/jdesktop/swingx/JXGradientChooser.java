@@ -59,10 +59,10 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.jdesktop.swingx.action.AbstractActionExt;
-import org.jdesktop.swingx.color.ColorUtil;
 import org.jdesktop.swingx.color.GradientPreviewPanel;
 import org.jdesktop.swingx.color.GradientThumbRenderer;
 import org.jdesktop.swingx.color.GradientTrackRenderer;
+import org.jdesktop.swingx.graphics.PaintUtils;
 import org.jdesktop.swingx.multislider.Thumb;
 import org.jdesktop.swingx.multislider.ThumbListener;
 
@@ -588,7 +588,7 @@ public class JXGradientChooser extends JXPanel {
                 
                 // calc new color and set it on thumb
                 Color col = thumb.getObject();
-                col = ColorUtil.setAlpha(col, alpha*255/100);
+                col = PaintUtils.setAlpha(col, alpha*255/100);
                 thumb.setObject(col);
                 
                 // set the new alpha value on the other alpha control

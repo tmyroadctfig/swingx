@@ -38,8 +38,8 @@ import javax.swing.JButton;
 import javax.swing.SwingUtilities;
 import javax.swing.plaf.basic.BasicGraphicsUtils;
 
-import org.jdesktop.swingx.color.ColorUtil;
 import org.jdesktop.swingx.graphics.GraphicsUtilities;
+import org.jdesktop.swingx.graphics.PaintUtils;
 import org.jdesktop.swingx.painter.AbstractPainter;
 import org.jdesktop.swingx.painter.Painter;
 import org.jdesktop.swingx.painter.PainterPaint;
@@ -265,7 +265,7 @@ public class JXButton extends JButton implements BackgroundPaintable {
                 return JXButton.this.getForeground();
             }
             
-            return ColorUtil.setAlpha(JXButton.this.getForeground(), 0);
+            return PaintUtils.setAlpha(JXButton.this.getForeground(), 0);
         }
         /**
          * {@inheritDoc}

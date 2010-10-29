@@ -28,6 +28,7 @@ import javax.imageio.ImageIO;
 import javax.swing.JComponent;
 
 import org.jdesktop.swingx.JXMultiThumbSlider;
+import org.jdesktop.swingx.graphics.PaintUtils;
 import org.jdesktop.swingx.multislider.ThumbRenderer;
 
 public class GradientThumbRenderer extends JComponent implements ThumbRenderer {
@@ -61,7 +62,7 @@ public class GradientThumbRenderer extends JComponent implements ThumbRenderer {
 
     public JComponent getThumbRendererComponent(JXMultiThumbSlider slider, int index, boolean selected) {
         Color c = (Color)slider.getModel().getThumbAt(index).getObject();
-        c = ColorUtil.removeAlpha(c);
+        c = PaintUtils.removeAlpha(c);
         this.setForeground(c);
         this.selected = selected;
         return this;

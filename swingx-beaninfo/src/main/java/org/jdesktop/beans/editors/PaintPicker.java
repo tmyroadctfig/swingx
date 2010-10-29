@@ -21,8 +21,8 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.jdesktop.swingx.JXGradientChooser;
-import org.jdesktop.swingx.color.ColorUtil;
 import org.jdesktop.swingx.color.EyeDropperColorChooserPanel;
+import org.jdesktop.swingx.graphics.PaintUtils;
 
 /**
  *
@@ -194,7 +194,7 @@ public class PaintPicker extends javax.swing.JPanel {
         public void stateChanged(ChangeEvent e) {
             lastPickerUsed = colorPicker;
             Paint old = selectedPaint;
-            selectedPaint = ColorUtil.setAlpha(colorPicker.getSelectionModel().getSelectedColor(), alphaSlider.getValue());
+            selectedPaint = PaintUtils.setAlpha(colorPicker.getSelectionModel().getSelectedColor(), alphaSlider.getValue());
             firePropertyChange("paint", old, selectedPaint);
         }
     }

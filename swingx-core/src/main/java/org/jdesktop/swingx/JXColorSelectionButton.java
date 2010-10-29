@@ -43,9 +43,9 @@ import javax.swing.JDialog;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import org.jdesktop.swingx.color.ColorUtil;
 import org.jdesktop.swingx.color.EyeDropperColorChooserPanel;
 import org.jdesktop.swingx.graphics.GraphicsUtilities;
+import org.jdesktop.swingx.graphics.PaintUtils;
 import org.jdesktop.swingx.plaf.UIManagerExt;
 import org.jdesktop.swingx.util.OS;
 
@@ -117,7 +117,7 @@ public class JXColorSelectionButton extends JButton {
     @Override
     protected void paintComponent(Graphics g) {
         // want disabledForeground when disabled, current colour otherwise
-        final Color FILL_COLOR = isEnabled() ? ColorUtil.removeAlpha(getBackground())
+        final Color FILL_COLOR = isEnabled() ? PaintUtils.removeAlpha(getBackground())
                 : UIManagerExt.getSafeColor("Button.disabledForeground", Color.LIGHT_GRAY);
         
         // draw the colorwell image (should only be on OSX)
@@ -131,7 +131,7 @@ public class JXColorSelectionButton extends JButton {
                     getWidth()  - ins.left - ins.right,
                     getHeight() - ins.top - ins.bottom);
             // draw the borders
-            g.setColor(ColorUtil.setBrightness(FILL_COLOR,0.85f));
+            g.setColor(PaintUtils.setBrightness(FILL_COLOR,0.85f));
             g.drawRect(ins.left, ins.top,
                     getWidth() - ins.left - ins.right - 1,
                     getHeight() - ins.top - ins.bottom - 1);

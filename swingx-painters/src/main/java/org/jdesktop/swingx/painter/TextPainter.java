@@ -21,6 +21,9 @@
 
 package org.jdesktop.swingx.painter;
 
+import static org.jdesktop.swingx.painter.PainterUtils.getComponentFont;
+import static org.jdesktop.swingx.painter.PainterUtils.getForegroundPaint;
+
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
@@ -30,7 +33,6 @@ import java.awt.Shape;
 import java.awt.font.GlyphVector;
 
 import javax.swing.AbstractButton;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.text.JTextComponent;
 
@@ -137,13 +139,7 @@ public class TextPainter extends AbstractAreaPainter<Object> {
             g.setFont(font);
         }
         
-        Paint paint = getFillPaint();
-        if(paint == null) {
-            if(component instanceof JComponent) {
-                paint = ((JComponent)component).getForeground();
-            }
-        }
-        
+        Paint paint = getForegroundPaint(getFillPaint(), component);
         String text = calculateText(component);
         
         // get the font metrics
@@ -195,12 +191,7 @@ public class TextPainter extends AbstractAreaPainter<Object> {
     
     private Font calculateFont(final Object component) {
         // prep the various text attributes
-        Font font = getFont();
-        if (font == null) {
-            if(component instanceof JComponent) {
-                font = ((JComponent)component).getFont();
-            }
-        }
+        Font font = getComponentFont(getFont(), component);
         if (font == null) {
             font = new Font("Dialog", Font.PLAIN, 18);
         }

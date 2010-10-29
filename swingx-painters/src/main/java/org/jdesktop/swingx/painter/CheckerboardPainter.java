@@ -28,7 +28,7 @@ import java.awt.Rectangle;
 import java.awt.TexturePaint;
 import java.awt.image.BufferedImage;
 
-import javax.swing.JComponent;
+import org.jdesktop.swingx.graphics.PaintUtils;
 
 /**
  * <p>A Painter implementation that paints a checkerboard pattern. The light
@@ -179,33 +179,10 @@ public class CheckerboardPainter extends AbstractPainter<Object> {
      */
     private Paint getCheckerPaint(Object c) {
         if (checkerPaint == null) {
-            double sqlength = getSquareSize();
-            int length = (int)(sqlength * 2);
-            BufferedImage image = new BufferedImage(length, length, BufferedImage.TYPE_INT_ARGB);
-            Graphics2D gfx = image.createGraphics();
+            Paint p1 = PainterUtils.getForegroundPaint(getLightPaint(), c);
+            Paint p2 = PainterUtils.getBackgroundPaint(getDarkPaint(), c);
             
-            try {
-            Paint p = getLightPaint();
-                if (p == null && c instanceof JComponent) {
-                    p = ((JComponent)c).getForeground();
-                }
-            gfx.setPaint(p);
-            gfx.fillRect(0, 0, length, length);
-            p = getDarkPaint();
-            if (p == null) {
-                if(c instanceof JComponent) {
-                    p = ((JComponent)c).getBackground();
-                }
-            }
-            gfx.setPaint(p);
-            gfx.fillRect(0, 0, (int)(sqlength - 1), (int)(sqlength - 1));
-                gfx.fillRect((int) sqlength, (int) sqlength,
-                        (int) sqlength - 1, (int) sqlength - 1);
-            } finally {
-            gfx.dispose();
-            }
-            
-            checkerPaint = new TexturePaint(image, new Rectangle(0, 0, image.getWidth(), image.getHeight()));
+            checkerPaint = PaintUtils.getCheckerPaint(p1, p2, (int)(getSquareSize() * 2));
         }
         return checkerPaint;
     }

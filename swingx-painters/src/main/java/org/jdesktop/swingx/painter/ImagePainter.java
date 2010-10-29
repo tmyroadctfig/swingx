@@ -21,7 +21,6 @@
 
 package org.jdesktop.swingx.painter;
 
-//import org.jdesktop.swingx.editors.PainterUtil;
 import java.awt.BasicStroke;
 import java.awt.Graphics2D;
 import java.awt.Image;

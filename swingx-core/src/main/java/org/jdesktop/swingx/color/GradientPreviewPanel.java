@@ -38,6 +38,7 @@ import javax.swing.event.MouseInputAdapter;
 
 import org.jdesktop.swingx.JXGradientChooser;
 import org.jdesktop.swingx.JXPanel;
+import org.jdesktop.swingx.graphics.PaintUtils;
 import org.jdesktop.swingx.multislider.MultiThumbModel;
 import org.jdesktop.swingx.multislider.Thumb;
 
@@ -62,7 +63,7 @@ public class GradientPreviewPanel extends JXPanel {
     public GradientPreviewPanel() {
         start = new Point2D.Float(10,10);
         end = new Point2D.Float(80,10);
-        checker_texture = ColorUtil.getCheckerPaint();
+        checker_texture = PaintUtils.getCheckerPaint();
         MouseInputAdapter ma = new GradientMouseHandler();
         this.addMouseListener(ma);
         this.addMouseMotionListener(ma);
