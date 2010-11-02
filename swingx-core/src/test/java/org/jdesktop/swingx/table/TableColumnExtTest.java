@@ -23,6 +23,8 @@ import org.jdesktop.swingx.plaf.UIDependent;
 import org.jdesktop.swingx.renderer.DefaultTableRenderer;
 import org.jdesktop.test.PropertyChangeReport;
 import org.jdesktop.test.SerializableSupport;
+import org.jdesktop.test.TestUtils;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -35,13 +37,37 @@ import org.junit.runners.JUnit4;
  */
 @RunWith(JUnit4.class)
 public class TableColumnExtTest extends TestCase {
+    
+    private TableColumnExt columnExt;
+
+    @Test
+    public void testHideableOnHidden() {
+        columnExt.setVisible(false);
+        PropertyChangeReport report = new PropertyChangeReport();
+        columnExt.addPropertyChangeListener(report);
+        columnExt.setHideable(false);
+        assertTrue("visibility must be forced to true", columnExt.isVisible());
+        assertEquals(1, report.getEventCount("visible"));
+        report.clear();
+        columnExt.setHideable(true);
+        assertFalse("real visibility value must be returned if hideable", columnExt.isVisible());
+        assertEquals(1, report.getEventCount("visible"));
+    }
+    
+    @Test
+    public void testHideable() {
+        assertTrue(columnExt.isHideable());
+        PropertyChangeReport report = new PropertyChangeReport();
+        columnExt.addPropertyChangeListener(report);
+        columnExt.setHideable(false);
+        TestUtils.assertPropertyChangeEvent(report, "hideable", true, false);
+    }
 
     /**
      * api change: let TableColumnExt implement UIDependent.
      */
     @Test
     public void testUIDependent() {
-        TableColumnExt columnExt = new TableColumnExt();
         assertTrue(columnExt instanceof UIDependent);
     }
     
@@ -65,7 +91,6 @@ public class TableColumnExtTest extends TestCase {
      */
     @Test
     public void testPutClientPropertyNullValue() {
-        TableColumnExt columnExt = new TableColumnExt();
         Object value = new Object();
         String key = "some";
         columnExt.putClientProperty(key, value);
@@ -82,15 +107,9 @@ public class TableColumnExtTest extends TestCase {
      * test doc'ed exceptions in putClientProperty.
      *
      */
-    @Test
+    @Test(expected= IllegalArgumentException.class)
     public void testPutClientPropertyExc() {
-        TableColumnExt columnExt = new TableColumnExt();
-        try {
-            columnExt.putClientProperty(null, "somevalue");
-            fail("put client property with null key must throw");
-        } catch (IllegalArgumentException e) {
-            // expected behaviour
-        }        
+        columnExt.putClientProperty(null, "somevalue");
     }
     /**
      * Sanity test Serializable.
@@ -101,7 +120,6 @@ public class TableColumnExtTest extends TestCase {
      */
     @Test
     public void testSerializable() throws IOException, ClassNotFoundException {
-        TableColumnExt columnExt = new TableColumnExt();
         Object value = new Date();
         columnExt.putClientProperty("date", value);
         TableColumnExt serialized = SerializableSupport.serialize(columnExt);
@@ -120,7 +138,6 @@ public class TableColumnExtTest extends TestCase {
      */
     @Test
     public void testHeaderTooltip() {
-        TableColumnExt columnExt = new TableColumnExt();
         columnExt.setTitle("mytitle");
         assertNull("tooltip is null initially", columnExt.getToolTipText());
         String toolTip = "some column text";
@@ -142,7 +159,6 @@ public class TableColumnExtTest extends TestCase {
      */
     @Test
     public void testSortable() {
-        TableColumnExt columnExt = new TableColumnExt();
         boolean sortable = columnExt.isSortable();
         assertTrue("columnExt isSortable by default", sortable);
         PropertyChangeReport report = new PropertyChangeReport();
@@ -165,11 +181,10 @@ public class TableColumnExtTest extends TestCase {
      */
     @Test
     public void testComparatorBoundProperty() {
-        TableColumnExt tableColumn = new TableColumnExt();
         PropertyChangeReport report = new PropertyChangeReport();
-        tableColumn.addPropertyChangeListener(report);
+        columnExt.addPropertyChangeListener(report);
         Comparator<?> comparator = Collator.getInstance();
-        tableColumn.setComparator(comparator);
+        columnExt.setComparator(comparator);
         assertTrue(report.hasEvents());
         assertEquals(1, report.getEventCount("comparator"));
     }
@@ -183,10 +198,9 @@ public class TableColumnExtTest extends TestCase {
      */
     @Test
     public void testCopyComparator() {
-        TableColumnExt tableColumn = new TableColumnExt();
         Comparator<?> comparator = Collator.getInstance();
-        tableColumn.setComparator(comparator);
-        TableColumnExt clone = new TableColumnExt(tableColumn);
+        columnExt.setComparator(comparator);
+        TableColumnExt clone = new TableColumnExt(columnExt);
         assertEquals(comparator, clone.getComparator());
     }
    /**
@@ -196,11 +210,10 @@ public class TableColumnExtTest extends TestCase {
      */
     @Test
     public void testClientPropertyNotification() {
-        TableColumnExt tableColumn = new TableColumnExt();
         PropertyChangeReport report = new PropertyChangeReport();
-        tableColumn.addPropertyChangeListener(report);
+        columnExt.addPropertyChangeListener(report);
         Object value = new Integer(3);
-        tableColumn.putClientProperty("somevalue", value);
+        columnExt.putClientProperty("somevalue", value);
         assertTrue(report.hasEvents());
         assertEquals(1, report.getEventCount("somevalue"));
     }
@@ -211,8 +224,7 @@ public class TableColumnExtTest extends TestCase {
      */
     @Test
     public void testTitle() {
-        TableColumnExt tableColumn = new TableColumnExt();
-        tableColumn.getTitle();
+        columnExt.getTitle();
     }
     
     
@@ -222,14 +234,13 @@ public class TableColumnExtTest extends TestCase {
      */
     @Test
     public void testResizable() {
-        TableColumnExt column = new TableColumnExt(0);
         //sanity assert
-        assertTrue("min < max", column.getMinWidth() < column.getMaxWidth());
+        assertTrue("min < max", columnExt.getMinWidth() < columnExt.getMaxWidth());
         // sanity assert
-        assertTrue("resizable default", column.getResizable());
-        column.setMinWidth(column.getMaxWidth());
-        assertFalse("must not be resizable with equal min-max", column.getResizable());
-        TableColumnExt copy = new TableColumnExt(column);
+        assertTrue("resizable default", columnExt.getResizable());
+        columnExt.setMinWidth(columnExt.getMaxWidth());
+        assertFalse("must not be resizable with equal min-max", columnExt.getResizable());
+        TableColumnExt copy = new TableColumnExt(columnExt);
         // sanity
         assertEquals("min-max of clone", copy.getMinWidth(), copy.getMaxWidth());
         assertFalse("must not be resizable with equal min-max", copy.getResizable());
@@ -246,17 +257,16 @@ public class TableColumnExtTest extends TestCase {
      */
     @Test
     public void testCopyClientProperty() {
-        TableColumnExt column = new TableColumnExt(0);
         String key = "property";
         Object value = new Object();
-        column.putClientProperty(key, value);
-        TableColumnExt copy = new TableColumnExt(column);
+        columnExt.putClientProperty(key, value);
+        TableColumnExt copy = new TableColumnExt(columnExt);
         assertEquals("client property must be in cloned", value, copy.getClientProperty(key));
         
         key = "single";
-        column.putClientProperty(key, value);
+        columnExt.putClientProperty(key, value);
         //sanity check
-        assertSame(value, column.getClientProperty(key));
+        assertSame(value, columnExt.getClientProperty(key));
         
         assertNull("cloned client properties must be in independant",
                 copy.getClientProperty(key));
@@ -270,9 +280,8 @@ public class TableColumnExtTest extends TestCase {
      */
     @Test
     public void testSetHighlighters() {
-        TableColumnExt column = new TableColumnExt(0);
         PropertyChangeReport hcl = new PropertyChangeReport();
-        column.addPropertyChangeListener(hcl);
+        columnExt.addPropertyChangeListener(hcl);
         
         Highlighter h1 = new ColorHighlighter();
         Highlighter h2 = new ColorHighlighter();
@@ -281,34 +290,34 @@ public class TableColumnExtTest extends TestCase {
         assertEquals(0, hcl.getEventCount());
         
         //base case no highlighters
-        assertSame(CompoundHighlighter.EMPTY_HIGHLIGHTERS, column.getHighlighters());
+        assertSame(CompoundHighlighter.EMPTY_HIGHLIGHTERS, columnExt.getHighlighters());
         
-        column.setHighlighters(h1);
+        columnExt.setHighlighters(h1);
         assertEquals(1, hcl.getEventCount());
         assertEquals("highlighters", hcl.getLastProperty());
-        assertEquals(1, column.getHighlighters().length);
-        assertSame(h1, column.getHighlighters()[0]);
+        assertEquals(1, columnExt.getHighlighters().length);
+        assertSame(h1, columnExt.getHighlighters()[0]);
         
         //reset state
         hcl.clear();
         
-        column.removeHighlighter(h1);
+        columnExt.removeHighlighter(h1);
         assertEquals(1, hcl.getEventCount());
         assertEquals("highlighters", hcl.getLastProperty());
         //we have a compound, but empty highlighter
-        assertEquals(0, column.getHighlighters().length);
+        assertEquals(0, columnExt.getHighlighters().length);
         // JW: changed CompoundHighlighter to return its EMPTY_HIGHLIGHTERS if empty
-        assertSame(CompoundHighlighter.EMPTY_HIGHLIGHTERS, column.getHighlighters());
+        assertSame(CompoundHighlighter.EMPTY_HIGHLIGHTERS, columnExt.getHighlighters());
         
         //reset state
         hcl.clear();
         
-        column.setHighlighters(h1, h2);
+        columnExt.setHighlighters(h1, h2);
         assertEquals(1, hcl.getEventCount());
         assertEquals("highlighters", hcl.getLastProperty());
-        assertEquals(2, column.getHighlighters().length);
-        assertSame(h1, column.getHighlighters()[0]);
-        assertSame(h2, column.getHighlighters()[1]);
+        assertEquals(2, columnExt.getHighlighters().length);
+        assertSame(h1, columnExt.getHighlighters()[0]);
+        assertSame(h2, columnExt.getHighlighters()[1]);
     }
     
     /**
@@ -316,9 +325,8 @@ public class TableColumnExtTest extends TestCase {
      */
     @Test
     public void testAddHighlighter() {
-        TableColumnExt column = new TableColumnExt(0);
         PropertyChangeReport hcl = new PropertyChangeReport();
-        column.addPropertyChangeListener(hcl);
+        columnExt.addPropertyChangeListener(hcl);
         
         Highlighter h1 = new ColorHighlighter();
         Highlighter h2 = new ColorHighlighter();
@@ -327,36 +335,36 @@ public class TableColumnExtTest extends TestCase {
         assertEquals(0, hcl.getEventCount());
         
         //base case no highlighters
-        assertSame(CompoundHighlighter.EMPTY_HIGHLIGHTERS, column.getHighlighters());
+        assertSame(CompoundHighlighter.EMPTY_HIGHLIGHTERS, columnExt.getHighlighters());
         
-        column.addHighlighter(h1);
+        columnExt.addHighlighter(h1);
         assertEquals(1, hcl.getEventCount());
         assertEquals("highlighters", hcl.getLastProperty());
-        assertEquals(1, column.getHighlighters().length);
-        assertSame(h1, column.getHighlighters()[0]);
+        assertEquals(1, columnExt.getHighlighters().length);
+        assertSame(h1, columnExt.getHighlighters()[0]);
         
         //reset state
         hcl.clear();
         
-        column.removeHighlighter(h1);
+        columnExt.removeHighlighter(h1);
         assertEquals(1, hcl.getEventCount());
         assertEquals("highlighters", hcl.getLastProperty());
         //we have a compound, but empty highlighter
-        assertEquals(0, column.getHighlighters().length);
+        assertEquals(0, columnExt.getHighlighters().length);
         // JW: changed CompoundHighlighter to return its EMPTY_HIGHLIGHTERS if empty
-        assertSame(CompoundHighlighter.EMPTY_HIGHLIGHTERS, column.getHighlighters());
+        assertSame(CompoundHighlighter.EMPTY_HIGHLIGHTERS, columnExt.getHighlighters());
         
-        column.setHighlighters(h1);
+        columnExt.setHighlighters(h1);
         
         //reset state
         hcl.clear();
         
-        column.addHighlighter(h2);
+        columnExt.addHighlighter(h2);
         assertEquals(1, hcl.getEventCount());
         assertEquals("highlighters", hcl.getLastProperty());
-        assertEquals(2, column.getHighlighters().length);
-        assertSame(h1, column.getHighlighters()[0]);
-        assertSame(h2, column.getHighlighters()[1]);
+        assertEquals(2, columnExt.getHighlighters().length);
+        assertSame(h1, columnExt.getHighlighters()[0]);
+        assertSame(h2, columnExt.getHighlighters()[1]);
     }
     
     /**
@@ -364,9 +372,8 @@ public class TableColumnExtTest extends TestCase {
      */
     @Test
     public void testRemoveHighlighter() {
-        TableColumnExt column = new TableColumnExt(0);
         PropertyChangeReport hcl = new PropertyChangeReport();
-        column.addPropertyChangeListener(hcl);
+        columnExt.addPropertyChangeListener(hcl);
         
         Highlighter h1 = new ColorHighlighter();
         Highlighter h2 = new ColorHighlighter();
@@ -376,20 +383,20 @@ public class TableColumnExtTest extends TestCase {
         assertEquals(0, hcl.getEventCount());
         
         //ensure that nothing goes awry
-        column.removeHighlighter(h1);
+        columnExt.removeHighlighter(h1);
         assertEquals(0, hcl.getEventCount());
         
-        column.setHighlighters(h1, h2, h3);
+        columnExt.setHighlighters(h1, h2, h3);
         
         //reset state
         hcl.clear();
         
-        column.removeHighlighter(h2);
+        columnExt.removeHighlighter(h2);
         assertEquals(1, hcl.getEventCount());
         assertEquals("highlighters", hcl.getLastProperty());
-        assertEquals(2, column.getHighlighters().length);
-        assertSame(h1, column.getHighlighters()[0]);
-        assertSame(h3, column.getHighlighters()[1]);
+        assertEquals(2, columnExt.getHighlighters().length);
+        assertSame(h1, columnExt.getHighlighters()[0]);
+        assertSame(h3, columnExt.getHighlighters()[1]);
     }
     
     /**
@@ -397,16 +404,15 @@ public class TableColumnExtTest extends TestCase {
      */
     @Test
     public void testCopyHighlighters() {
-        TableColumnExt column = new TableColumnExt(0);
         Highlighter h1 = new ColorHighlighter();
         Highlighter h2 = new ColorHighlighter();
         Highlighter h3 = new ColorHighlighter();
         
-        column.setHighlighters(h1, h2);
+        columnExt.setHighlighters(h1, h2);
         
-        TableColumnExt clone = new TableColumnExt(column);
+        TableColumnExt clone = new TableColumnExt(columnExt);
         
-        Highlighter[] columnHighlighters = column.getHighlighters();
+        Highlighter[] columnHighlighters = columnExt.getHighlighters();
         Highlighter[] cloneHighlighters = clone.getHighlighters();
         
         assertEquals(2, columnHighlighters.length);
@@ -416,9 +422,9 @@ public class TableColumnExtTest extends TestCase {
         assertSame(h2, columnHighlighters[1]);
         assertSame(columnHighlighters[1], cloneHighlighters[1]);
         
-        column.addHighlighter(h3);
+        columnExt.addHighlighter(h3);
         
-        columnHighlighters = column.getHighlighters();
+        columnHighlighters = columnExt.getHighlighters();
         cloneHighlighters = clone.getHighlighters();
         
         assertEquals(3, columnHighlighters.length);
@@ -429,4 +435,15 @@ public class TableColumnExtTest extends TestCase {
         assertSame(columnHighlighters[1], cloneHighlighters[1]);
         assertSame(h3, columnHighlighters[2]);
     }
+
+    /** 
+     * @inherited <p>
+     */
+    @Before
+    @Override
+    public void setUp() throws Exception {
+        columnExt = new TableColumnExt();
+    }
+    
+    
 }

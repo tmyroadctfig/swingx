@@ -286,6 +286,7 @@ public class ColumnControlButton extends JButton {
         public synchronized void setSelected(boolean newValue) {
             super.setSelected(newValue);
             if (canControlColumn()) {
+                if (!fromColumn)
                 ((TableColumnExt) column).setVisible(newValue);
             }
         }
@@ -313,7 +314,12 @@ public class ColumnControlButton extends JButton {
             setSelected(visible);
             fromColumn = false;
         }
-        
+
+
+        protected void updateFromColumnHideable(boolean hideable) {
+            setEnabled(hideable);
+        }
+
         /**
          * Synchs name property to value. This is called on change of 
          * tableColumn's <code>headerValue</code> property.
@@ -380,6 +386,8 @@ public class ColumnControlButton extends JButton {
                         updateFromColumnVisible((Boolean) evt.getNewValue());
                     } else if ("headerValue".equals(evt.getPropertyName())) {
                         updateFromColumnHeader(evt.getNewValue());
+                    } else if ("hideable".equals(evt.getPropertyName())) {
+                        updateFromColumnHideable((Boolean) evt.getNewValue());
                     }
                 }
             };

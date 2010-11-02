@@ -109,6 +109,8 @@ public class TableColumnExt extends TableColumn implements UIDependent {
     
     /** visible property. Initialized to <code>true</code>.*/
     protected boolean visible = true;
+    /** hideable property. Initialized to <code>true</code>.*/
+    protected boolean hideable = true;
     
     /** prototype property. */
     protected Object prototypeValue;
@@ -134,6 +136,7 @@ public class TableColumnExt extends TableColumn implements UIDependent {
     private ChangeListener highlighterChangeListener;
 
     private boolean ignoreHighlighterStateChange;
+
     
     /**
      * Creates new table view column with a model index = 0.
@@ -498,15 +501,17 @@ public class TableColumnExt extends TableColumn implements UIDependent {
      * @see #setVisible
      */
     public void setVisible(boolean visible) {
-        boolean oldVisible = this.visible;
+        boolean oldVisible = isVisible();
         this.visible = visible;
-        firePropertyChange("visible",
-                           Boolean.valueOf(oldVisible),
-                           Boolean.valueOf(visible));
+        firePropertyChange("visible", oldVisible, isVisible());
     }
 
     /**
-     * Returns the visible property.
+     * Returns a boolean indicating whether or not this column is visible. 
+     * The bare property value is constrained by this column's hideable setting,
+     * that is a not hideable column is always visible, irrespective of the
+     * property setting. 
+     * <p>
      * The default is <code>true</code>.
      * 
      * @return boolean indicating whether or not this view column is
@@ -514,9 +519,39 @@ public class TableColumnExt extends TableColumn implements UIDependent {
      * @see #setVisible
      */
     public boolean isVisible() {
+        if (!isHideable()) return true;
         return visible;
     }
 
+    /**
+     * Sets the hideable property. This property controls whether the column can
+     * be hidden. This is a bound property. If the column's visibilty is affected, 
+     * listeners are notified about that change as well..
+     * <p>
+     * 
+     * The default value is true.
+     * 
+     * @param hideable
+     */
+    public void setHideable(boolean hideable) {
+        boolean old = isHideable();
+        boolean oldVisible = isVisible();
+        this.hideable = hideable;
+        firePropertyChange("visible", oldVisible, isVisible());
+        firePropertyChange("hideable", old, isHideable());
+    }
+    
+    /**
+     * Returns the hideable property.
+     * 
+     * @return the hideable property.
+     * 
+     * @see #setHideable(boolean)
+     */
+    public boolean isHideable() {
+        return hideable;
+    }
+    
     /**
      * Sets the client property "key" to <code>value</code>. 
      * If <code>value</code> is <code>null</code> this method will remove the property. 
