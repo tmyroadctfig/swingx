@@ -66,6 +66,23 @@ public class ColumnControlButtonTest extends InteractiveTestCase {
         tearDown();
     }
     
+    
+    @Test
+    public void testColumnVisibilityActionOnHideable() {
+        JXTable table = new JXTable(10, 3);
+        table.setColumnControlVisible(true);
+        ColumnControlButton columnControl = (ColumnControlButton) table.getColumnControl();
+        ColumnVisibilityAction action = columnControl.getColumnVisibilityActions().get(0);
+        TableColumnExt columnExt = table.getColumnExt(0);
+        // visible property is false
+        columnExt.setVisible(false);
+        columnExt.setHideable(false);
+        assertTrue("visibility action must be selected if not hideable", action.isSelected());
+        assertFalse("action must be disabled", action.isEnabled());
+        columnExt.setHideable(true);
+        assertFalse("visibility action must be unselected if hideable", action.isSelected());
+    }
+
     /**
      * Issue #404-swingx: load column control margin from ui.
      * Test that column control configures itself with the icon from the ui.
@@ -486,7 +503,7 @@ public class ColumnControlButtonTest extends InteractiveTestCase {
 
                    @Override
                    protected ColumnVisibilityAction createColumnVisibilityAction(TableColumn column) {
-                       if (column.getModelIndex() == 0) return null;
+                       if (column instanceof TableColumnExt && !((TableColumnExt) column).isHideable()) return null;
                        return super.createColumnVisibilityAction(column);
                    }
            
@@ -494,6 +511,22 @@ public class ColumnControlButtonTest extends InteractiveTestCase {
        };
        table.setColumnControl(columnControl);
        table.setColumnControlVisible(true);
+       ColumnFactory factory = new ColumnFactory() {
+
+        /** 
+         * @inherited <p>
+         */
+        @Override
+        public void configureTableColumn(TableModel model,
+                TableColumnExt columnExt) {
+            super.configureTableColumn(model, columnExt);
+            if (columnExt.getModelIndex() == 0) {
+                columnExt.setHideable(false);
+            }
+        }
+           
+       };
+       table.setColumnFactory(factory);
        table.setModel(sortableTableModel);
        JXFrame frame = wrapWithScrollingInFrame(table, "first model column not togglable");
        frame.setVisible(true);
@@ -580,8 +613,17 @@ public class ColumnControlButtonTest extends InteractiveTestCase {
         table.setColumnControlVisible(true);
         final TableColumnExt firstNameColumn = table.getColumnExt("First Name");
         firstNameColumn.setVisible(false);
-        JFrame frame = wrapWithScrollingInFrame(table, "ColumnControl (#192, #38-swingx) first enable ColumnControl then column invisible");
-        frame.setVisible(true);
+        JXFrame frame = wrapWithScrollingInFrame(table, "ColumnControl (#192, #38-swingx) first enable ColumnControl then column invisible");
+        Action toggleHideable = new AbstractActionExt("toggle hideable first Name") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                firstNameColumn.setHideable(!firstNameColumn.isHideable());
+                
+            }
+        };
+        addAction(frame, toggleHideable);
+        show(frame);
     }
 
 
