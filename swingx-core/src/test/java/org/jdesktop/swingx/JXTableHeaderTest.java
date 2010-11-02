@@ -35,8 +35,27 @@ public class JXTableHeaderTest extends InteractiveTestCase {
     private static final Logger LOG = Logger.getLogger(JXTableHeaderTest.class
             .getName());
     
+    /**
+     * the table used to instantiate a TableColumnModel used in the header.
+     */
+    private JXTable table;
+    /**
+     * A header instantiated with the same TableColumnModel as the table.
+     * NOTE: this is a standalone header, except for the model unrelated
+     * to the table.
+     */
     private JXTableHeader header;
 
+    @Test
+    public void testSortsOnDoubleClick() {
+        assertFalse(header.getResortsOnDoubleClick());
+        header.setResortsOnDoubleClick(true);
+        assertEquals(header.getXTable() != null, header.getResortsOnDoubleClick());
+        header.setTable(table);
+        assertEquals(header.getXTable() != null, header.getResortsOnDoubleClick());
+        
+    }
+    
     /**
      * Issue #1341-swingx: resizing/dragged/column/distance bound properties.
      */
@@ -355,7 +374,7 @@ public class JXTableHeaderTest extends InteractiveTestCase {
     @Override
     @Before
     public void setUp() {
-        JXTable table = new JXTable(10, 5); 
+        table = new JXTable(10, 5); 
         header = new JXTableHeader(table.getColumnModel());
     }
 
