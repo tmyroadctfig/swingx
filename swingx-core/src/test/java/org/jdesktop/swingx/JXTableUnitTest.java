@@ -12,7 +12,6 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
 import java.awt.KeyboardFocusManager;
-import java.awt.Rectangle;
 import java.beans.PropertyChangeListener;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
@@ -123,6 +122,17 @@ public class JXTableUnitTest extends InteractiveTestCase {
         super("JXTable unit test");
     }
 
+    @Test
+    public void testSortedColumnIndex() {
+        table.setModel(sortableTableModel);
+        assertEquals(-1, table.getSortedColumnIndex());
+        table.toggleSortOrder(0);
+        assertEquals(0, table.getSortedColumnIndex());
+        TableColumnExt columnExt = table.getColumnExt(0);
+        columnExt.setVisible(false);
+        assertEquals(-1, table.getSortedColumnIndex());
+        columnExt.setVisible(true);
+    }
 
     /**
      * Issue #1173-swingx: clarify table's responsibities in sorter configuration.

@@ -30,14 +30,23 @@ public class JXTableHeaderVisualCheck extends InteractiveTestCase {
     public static void main(String args[]) {
         JXTableHeaderVisualCheck test = new JXTableHeaderVisualCheck();
         try {
-          test.runInteractiveTests();
-//            test.runInteractiveTests("interactive.*Core.*");
+//          test.runInteractiveTests();
+            test.runInteractiveTests("interactive.*DoubleSort.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
         } 
     }
 
+    /**
+     * Issue #271-swingx: optionally support double sort on double click.
+     * 
+     */
+    public void interactiveDoubleSort() {
+        JXTable table = new JXTable(30, 5);
+        showWithScrollingInFrame(table, "support double sort on double click");
+    }
+    
     /**
      * Issue #1225-swingx: JXTableHeader throws on rowSorters which are not
      *   of type SortController when resizing columns with mouse.
@@ -46,7 +55,7 @@ public class JXTableHeaderVisualCheck extends InteractiveTestCase {
         JXTable table = new JXTable(30, 5);
         table.setAutoCreateRowSorter(false);
         table.setRowSorter(new TableRowSorter<TableModel>(table.getModel()));
-        showWithScrollingInFrame(table, "resize columns with mouse");
+        showWithScrollingInFrame(table, "core resize columns with mouse");
     }
     /**
      * Issue #683-swingx: Autoscroll if column dragged outside.

@@ -50,34 +50,27 @@ import org.jdesktop.swingx.table.TableColumnExt;
  * <h2> Extended user interaction </h2>
  * 
  * <ul>
- * <li> Note: this is currently (?) disabled due to missing core functionality. 
- * Supports column sorting by mouse clicks into a header cell 
- *  (outside the resize region). The concrete gestures are configurable 
- *  by providing a custom SortGestureRecognizer.  The default recognizer
- *  toggles sort order on mouseClicked. On shift-mouseClicked, it resets any column sorting. 
- * Both are done by invoking the corresponding methods of JXTable, 
- * <code> toggleSortOrder(int) </code> and <code> resetSortOrder() </code>
  * <li> Supports column pack (== auto-resize to exactly fit the contents)
  *  on double-click in resize region.
- *  Note: this is only fully effective if the JXTable has control over the row sorter,
- *  that is if the row sorter is of type SortController.
+ *  <li> Configurable to resort a column on the second click of a mouseClicked event
+ *  (feature request #271-swingx)
+ * <li> Does its best to not sort if the mouse click happens in the resize region.
  *  <li> Supports horizontal auto-scroll if a column is dragged outside visible rectangle. 
  *  This feature is enabled if the autoscrolls property is true. The default is false 
  *  (because of Issue #788-swingx which still isn't fixed for jdk1.6).
  * </ul>
  * 
+ * Note: extended sort and resize related functionality is fully effective only if the header's
+ * table is of type JXTable and has control over the row sorter, that is the row sorter
+ * is of type SortController.
+ * 
  * <h2> Extended functionality </h2>
  * 
  * <ul>
- * <li> Installs a default header renderer which is able to show sort icons. 
- *   LAF provided special effects are uneffected.
  * <li> Listens to TableColumn propertyChanges to update itself accordingly.
  * <li> Supports per-column header ToolTips. 
  * <li> Guarantees reasonable minimal height > 0 for header preferred height.
- * <li> Does its best to not sort if the mouse click happens in the resize region.
- *  Note: this is only fully effective if the JXTable has control over the row sorter,
- *  that is if the row sorter is of type SortController.
- * </ul>
+* </ul>
  * 
  * 
  * @author Jeanette Winzenburg
@@ -104,6 +97,7 @@ public class JXTableHeader extends JTableHeader
     @Deprecated
     private SortGestureRecognizer sortGestureRecognizer;
     private PropertyChangeListener tablePropertyChangeListener;
+    private boolean resortsOnDoubleClick;
 
     /**
      *  Constructs a <code>JTableHeader</code> with a default 
@@ -256,6 +250,38 @@ public class JXTableHeader extends JTableHeader
         return (JXTable) getTable();
     }
 
+    /**
+     * Returns the resortsOnDoubleClick property. 
+     * 
+     * @return a flag indicating whether or not the second click in a mouseClicked
+     * event should toggle the sort order again.
+     * 
+     * @see #setResortsOnDoubleClick(boolean)
+     */
+    public boolean getResortsOnDoubleClick() {
+        return getXTable() != null && resortsOnDoubleClick;
+    }
+    
+    /**
+     * Sets the resortsOnDoubleClick property. If enabled, the second click
+     * of a mouseClicked event will toggle the sort order again if the
+     * column has been unsorted before. This is introduced to support
+     * feature request #271-swingx. It is effective only if the coupled table
+     * is of type JXTable and has full control about its RowSorter's properties.
+     * 
+     * The default value is false. 
+     * 
+     * @param resortsOnDoubleClick a boolean indicating whether or not the
+     *    second click in a mouseClicked event should resort the column.
+     *    
+     *  @see #getResortsOnDoubleClick()  
+     */
+    public void setResortsOnDoubleClick(boolean resortsOnDoubleClick) {
+        boolean old = getResortsOnDoubleClick();
+        this.resortsOnDoubleClick = resortsOnDoubleClick;
+        firePropertyChange("resortsOnDoubleClick", old, getResortsOnDoubleClick());
+    }
+    
     /**
      * Returns the TableCellRenderer to use for the column with the given index. This
      * implementation returns the column's header renderer if available or this header's
@@ -521,6 +547,8 @@ public class JXTableHeader extends JTableHeader
      * restore sorting enablement. 
      * <p>
      * 
+     * Supports resort on double click if enabled in the JXTableHeader (Issue #271-swingx). 
+     * 
      * Is fully effective only if JXTable has control over the row sorter, that is
      * if the row sorter is of type SortController.
      * 
@@ -528,16 +556,29 @@ public class JXTableHeader extends JTableHeader
     private class HeaderListener implements MouseInputListener, Serializable {
         private TableColumn cachedResizingColumn;
         private SortOrder[] cachedSortOrderCycle;
+        private int sortColumn = -1;
         
         /**
-         * Packs column on double click in resize region.
+         * Packs column on double click in resize region. Resorts 
+         * column on double click if enabled and not in resize region.
          */
         public void mouseClicked(MouseEvent e) {
             if (shouldIgnore(e)) {
                 return;
             }
             doResize(e);
+            doDoubleSort(e);
             uncacheResizingColumn();
+        }
+
+        private void doDoubleSort(MouseEvent e) {
+            if (!hasCachedSortColumn() || e.getClickCount() % 2 == 1) return;
+            getXTable().toggleSortOrder(sortColumn);
+            uncacheSortColumn();
+        }
+
+        private boolean hasCachedSortColumn() {
+            return sortColumn >= 0;
         }
 
         /**
@@ -560,11 +601,38 @@ public class JXTableHeader extends JTableHeader
                 return;
             }
             cacheResizingColumn(e);
+            cacheSortColumn(e);
             if (isInResizeRegion(e) && e.getClickCount() % 2 == 1) {
                 disableToggleSortOrder(e);
-            }
+            } 
         }
 
+        private void cacheSortColumn(MouseEvent e) {
+            if (!canCacheSortColumn(e)) uncacheSortColumn();
+            if (e.getClickCount() % 2 == 1) {
+                int column = columnAtPoint(e.getPoint());
+                if (column >= 0) {
+                    int primarySortIndex = getXTable().getSortedColumnIndex();
+                    if (primarySortIndex == column) {
+                        column = -1;
+                    }
+                }
+                sortColumn = column;
+            }
+            
+        }
+
+        private void uncacheSortColumn() {
+            sortColumn = -1;
+        }
+
+        private boolean canCacheSortColumn(MouseEvent e) {
+            if (hasSortController() && !isInResizeRegion(e) && getResortsOnDoubleClick()) {
+                return true;
+            }
+            return false;
+        }
+        
         /**
          * Returns a boolean indication if the mouse event should be ignored.
          * Here: returns true if table not enabled or not an event from the left mouse
@@ -599,10 +667,17 @@ public class JXTableHeader extends JTableHeader
          * @param e
          */
         private void disableToggleSortOrder(MouseEvent e) {
-            if (!(getXTable().getRowSorter() instanceof SortController<?>)) return;
+            if (!hasSortController()) return;
             SortController<?> controller = (SortController<?>) getXTable().getRowSorter();
             cachedSortOrderCycle = controller.getSortOrderCycle();
             controller.setSortOrderCycle();
+        }
+
+        /**
+         * @return
+         */
+        private boolean hasSortController() {
+            return (getXTable().getRowSorter() instanceof SortController<?>);
         }
         
         /**
@@ -651,6 +726,7 @@ public class JXTableHeader extends JTableHeader
          * Resets all cached state.
          */
         public void mouseExited(MouseEvent e) {
+            uncacheSortColumn();
             uncacheResizingColumn();
             resetToggleSortOrder(e);
         }
@@ -659,6 +735,7 @@ public class JXTableHeader extends JTableHeader
          * Resets all cached state.
          */
         public void mouseDragged(MouseEvent e) {
+            uncacheSortColumn();
             uncacheResizingColumn();
             resetToggleSortOrder(e);
         }
@@ -667,6 +744,7 @@ public class JXTableHeader extends JTableHeader
          * Resets all cached state.
          */
         public void mouseMoved(MouseEvent e) {
+            uncacheSortColumn();
             resetToggleSortOrder(e);
         }
     }

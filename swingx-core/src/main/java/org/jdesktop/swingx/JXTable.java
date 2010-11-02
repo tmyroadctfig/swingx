@@ -2217,6 +2217,22 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
     }
 
     /**
+     * Returns the view column index of the primary sort column. 
+     * 
+     * @return the view column index of the primary sort column or -1 if nothing
+     * sorted or the primary sort column not visible.
+     */
+    public int getSortedColumnIndex() {
+        RowSorter<?> controller = getRowSorter();
+        if (controller != null) {
+            SortKey sortKey = SortUtils.getFirstSortingKey(controller.getSortKeys());
+            if (sortKey != null) {
+                return convertColumnIndexToView(sortKey.getColumn());
+            }
+        }
+        return -1;
+    }
+    /**
      * {@inheritDoc} <p>
      * 
      * Overridden to propagate sort-related column properties to the SortController and 
