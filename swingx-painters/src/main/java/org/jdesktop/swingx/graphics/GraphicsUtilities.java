@@ -752,6 +752,7 @@ public class GraphicsUtilities {
      *             if any parameter is {@code null}
      * @deprecated Use {@link ShapeUtils#mergeClip(Graphics,Shape)} instead
      */
+    @Deprecated
     public static Shape mergeClip(Graphics g, Shape clip) {
         return ShapeUtils.mergeClip(g, clip);
     }
