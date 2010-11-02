@@ -59,6 +59,7 @@ public final class ColorUtil {
      *             if {@code color} is {@code null}
      * @deprecated Use {@link PaintUtils#removeAlpha(Color)} instead
      */
+    @Deprecated
     public static Color removeAlpha(Color color) {
         return PaintUtils.removeAlpha(color);
     }
@@ -79,6 +80,7 @@ public final class ColorUtil {
      *             if {@code color} is {@code null}
      * @deprecated Use {@link PaintUtils#setAlpha(Color,int)} instead
      */
+    @Deprecated
     public static Color setAlpha(Color color, int alpha) {
         return PaintUtils.setAlpha(color, alpha);
     }
@@ -104,6 +106,7 @@ public final class ColorUtil {
      *             if {@code color} is {@code null}
      * @deprecated Use {@link PaintUtils#setSaturation(Color,float)} instead
      */
+    @Deprecated
     public static Color setSaturation(Color color, float saturation) {
         return PaintUtils.setSaturation(color, saturation);
     }
@@ -129,6 +132,7 @@ public final class ColorUtil {
      *             if {@code color} is {@code null}
      * @deprecated Use {@link PaintUtils#setBrightness(Color,float)} instead
      */
+    @Deprecated
     public static Color setBrightness(Color color, float brightness) {
         return PaintUtils.setBrightness(color, brightness);
     }
@@ -144,6 +148,7 @@ public final class ColorUtil {
      * @return the hex {@code String}
      * @deprecated Use {@link PaintUtils#toHexString(Color)} instead
      */
+    @Deprecated
     public static String toHexString(Color color) {
         return PaintUtils.toHexString(color);
     }
@@ -159,6 +164,7 @@ public final class ColorUtil {
      *             if {@code bg} is {@code null}
      * @deprecated Use {@link PaintUtils#computeForeground(Color)} instead
      */
+    @Deprecated
     public static Color computeForeground(Color bg) {
         return PaintUtils.computeForeground(bg);
     }
@@ -176,6 +182,7 @@ public final class ColorUtil {
      *         colors
      * @deprecated Use {@link PaintUtils#blend(Color,Color)} instead
      */
+    @Deprecated
     public static Color blend(Color origin, Color over) {
         return PaintUtils.blend(origin, over);
     }
@@ -189,6 +196,7 @@ public final class ColorUtil {
      * @return
      * @deprecated Use {@link PaintUtils#interpolate(Color,Color,float)} instead
      */
+    @Deprecated
     public static Color interpolate(Color b, Color a, float t) {
         return PaintUtils.interpolate(b, a, t);
     }
@@ -200,6 +208,7 @@ public final class ColorUtil {
      * @return a the checkered paint
      * @deprecated Use {@link PaintUtils#getCheckerPaint()} instead
      */
+    @Deprecated
     public static Paint getCheckerPaint() {
         return PaintUtils.getCheckerPaint();
     }
@@ -221,6 +230,7 @@ public final class ColorUtil {
      * @return a new {@code Paint} checkering the supplied colors
      * @deprecated Use {@link PaintUtils#getCheckerPaint(Paint,Paint,int)} instead
      */
+    @Deprecated
     public static Paint getCheckerPaint(Color c1, Color c2, int size) {
         return PaintUtils.getCheckerPaint(c1, c2, size);
     }
