@@ -21,8 +21,6 @@
  */
 package org.jdesktop.swingx.renderer;
 
-import static org.junit.Assert.*;
-
 import java.awt.Color;
 import java.awt.Component;
 import java.io.Serializable;
@@ -44,7 +42,6 @@ import javax.swing.table.TableModel;
 
 import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXTable;
-import org.jdesktop.swingx.plaf.UIManagerExt;
 import org.jdesktop.swingx.test.XTestUtils;
 import org.jdesktop.test.SerializableSupport;
 import org.junit.After;

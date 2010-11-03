@@ -21,7 +21,6 @@
  */
 package org.jdesktop.swingx;
 
-import java.io.NotSerializableException;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractButton;
@@ -151,7 +150,7 @@ public class SerializableTest extends InteractiveTestCase {
             return;
         }
         
-        JXTableHeader serialized = SerializableSupport.serialize(component);
+        SerializableSupport.serialize(component);
     }
 
     /**

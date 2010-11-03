@@ -47,6 +47,7 @@ import javax.swing.text.View;
 import org.jdesktop.swingx.JXHeader;
 import org.jdesktop.swingx.JXLabel;
 import org.jdesktop.swingx.JXHeader.IconPosition;
+import org.jdesktop.swingx.JXLabel.MultiLineSupport;
 import org.jdesktop.swingx.painter.MattePainter;
 import org.jdesktop.swingx.painter.Painter;
 import org.jdesktop.swingx.plaf.HeaderUI;
@@ -381,7 +382,7 @@ public class BasicHeaderUI extends HeaderUI {
                     // view might get lost on LAF change ...
                     if (v == null) {
                         descriptionPane.putClientProperty(BasicHTML.propertyKey, 
-                                descriptionPane.getMultiLineSupport().createView(descriptionPane));
+                                MultiLineSupport.createView(descriptionPane));
                         v = (View) descriptionPane.getClientProperty(BasicHTML.propertyKey);
                     }
                     if (v != null) {

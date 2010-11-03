@@ -22,7 +22,6 @@
 package org.jdesktop.swingx.decorator;
 
 import java.awt.Color;
-import java.awt.Rectangle;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;

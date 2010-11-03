@@ -9,7 +9,6 @@ package org.jdesktop.swingx.decorator;
 
 import java.awt.Color;
 import java.awt.Point;
-import java.awt.Rectangle;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
