@@ -23,7 +23,6 @@ package org.jdesktop.swingx.plaf.basic;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Insets;
 import java.awt.LayoutManager;
@@ -56,7 +55,6 @@ import javax.swing.KeyStroke;
 import javax.swing.LookAndFeel;
 import javax.swing.UIManager;
 import javax.swing.plaf.ComponentUI;
-import javax.swing.plaf.UIResource;
 
 import org.jdesktop.swingx.JXMonthView;
 import org.jdesktop.swingx.SwingXUtilities;
@@ -140,16 +138,6 @@ public class BasicMonthViewUI extends MonthViewUI {
     protected static final int FIRST_WEEK_ROW = DAY_HEADER_ROW + 1;
     protected static final int LAST_WEEK_ROW = FIRST_WEEK_ROW + WEEKS_IN_MONTH - 1;
 
-
-    /** localized names of all months.
-     * protected for testing only!
-     * PENDING: JW - should be property on JXMonthView, for symmetry with
-     *   daysOfTheWeek? 
-     * @deprecated pre-0.9.6
-     *    no longer used in paint/layout with renderer. 
-     */
-    @Deprecated
-    protected String[] monthsOfTheYear;
 
     /** the component we are installed for. */
     protected JXMonthView monthView;
@@ -359,20 +347,6 @@ public class BasicMonthViewUI extends MonthViewUI {
         setFirstDisplayedDay(monthView.getFirstDisplayedDay());
     }
 
-    /**
-     * Checks and returns whether the given property should be replaced
-     * by the UI's default value.
-     * 
-     * @param property the property to check.
-     * @return true if the given property should be replaced by the UI#s
-     *   default value, false otherwise. 
-     *   
-     * @deprecated pre-0.9.6 use {@link org.jdesktop.swingx.SwingXUtilities#isUIInstallable(Object)}
-     */
-    @Deprecated
-    protected boolean isUIInstallable(Object property) {
-       return (property == null) || (property instanceof UIResource);
-    }
     
     protected void uninstallDefaults() {}
 
@@ -567,7 +541,6 @@ public class BasicMonthViewUI extends MonthViewUI {
         if (getRenderingHandler() != null) {
             getRenderingHandler().setLocale(locale);
         }
-        monthsOfTheYear = DateFormatSymbols.getInstance(locale).getMonths();
 
         // fixed JW: respect property in UIManager if available
         // PENDING JW: what to do if weekdays had been set
@@ -2350,23 +2323,5 @@ public class BasicMonthViewUI extends MonthViewUI {
         return calendarHeaderHandler;
     }
     
-//--------------------- deprecated painting api
-//--------------------- this is still serviced (if a ui doesn't install a renderingHandler)
-//--------------------- but no longer actively maintained    
-
-
-    /**
-     * Create a derived font used to when painting various pieces of the
-     * month view component.  This method will be called whenever
-     * the font on the component is set so a new derived font can be created.
-     * @deprecated KEEP re-added usage in preliminary zoomable support
-     *    no longer used in paint/layout with renderer.
-     */
-    @Deprecated
-    protected Font createDerivedFont() {
-        return monthView.getFont().deriveFont(Font.BOLD);
-    }
-    
-
 
 }

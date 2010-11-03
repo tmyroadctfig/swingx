@@ -994,17 +994,6 @@ public class JXList extends JList {
     }
 
     /**
-     * 
-     * @return the underlying model, same as getModel().
-     * @deprecated no longer used - custom ui-delegate does-the-right-thing when
-     *   accessing elements.
-     */
-    @Deprecated
-    public ListModel getWrappedModel() {
-        return getModel();
-    }
-
-    /**
      * {@inheritDoc} <p>
      * 
      * Sets the underlying data model. Note that if isFilterEnabled you must
