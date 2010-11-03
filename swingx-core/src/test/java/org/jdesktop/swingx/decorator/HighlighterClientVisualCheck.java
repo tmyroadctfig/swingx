@@ -30,6 +30,7 @@ import javax.swing.Action;
 import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXTable;
+import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.decorator.HighlightPredicate.ColumnHighlightPredicate;
 import org.jdesktop.swingx.decorator.HighlighterFactory.UIColorHighlighter;
 import org.jdesktop.test.AncientSwingTeam;
@@ -53,6 +54,49 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase  {
             e.printStackTrace();
         }
     }
+
+    
+
+    /**
+     * Issue #1317-swingx: PatternPredicate throws exception if testColumn -1 (== all)
+     */
+    public void interactivePatternPredicate() {
+        JXTable table = new JXTable(new AncientSwingTeam());
+        final ColorHighlighter hl = new ColorHighlighter(HighlightPredicate.NEVER, Color.LIGHT_GRAY, null);
+        table.addHighlighter(hl);
+        JXFrame frame = wrapWithScrollingInFrame(table, "use pattern predicate");
+        Action action = new AbstractActionExt("togglePredicate") {
+            
+            PatternPredicate testFirstHighlightAll = new PatternPredicate(".*a.*", 0, PatternPredicate.ALL);
+            PatternPredicate testFirstHighlightFirst = new PatternPredicate(".*a.*", 0, 0);
+            PatternPredicate testFirstHighlightSecond = new PatternPredicate(".*a.*", 0, 1);
+            PatternPredicate testAllHighlightFirst = new PatternPredicate(".*a.*", PatternPredicate.ALL, 0);
+            PatternPredicate testAllHighlightAll = new PatternPredicate(".*a.*", PatternPredicate.ALL, PatternPredicate.ALL);
+            int current;
+            
+            HighlightPredicate[] predicates = new HighlightPredicate[] {
+               HighlightPredicate.NEVER,
+               testFirstHighlightAll,
+               testFirstHighlightFirst,
+               testFirstHighlightSecond,
+               testAllHighlightFirst,
+               testAllHighlightAll,
+            };
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                current++;
+                if (current == predicates.length) {
+                    current = 0;
+                }
+                hl.setHighlightPredicate(predicates[current]);
+            }
+        };
+        addAction(frame, action);
+        show(frame);
+    }
+    
+    
 
     /**
      * Regression Issue ?? swingx: column highlighter change must update view.

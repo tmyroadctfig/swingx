@@ -16,8 +16,10 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import javax.swing.JLabel;
+import javax.swing.table.TableCellRenderer;
 
 import org.jdesktop.swingx.InteractiveTestCase;
+import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.decorator.HighlightPredicate.AndHighlightPredicate;
 import org.jdesktop.swingx.decorator.HighlightPredicate.ColumnHighlightPredicate;
 import org.jdesktop.swingx.decorator.HighlightPredicate.DepthHighlightPredicate;
@@ -28,6 +30,7 @@ import org.jdesktop.swingx.decorator.HighlightPredicate.OrHighlightPredicate;
 import org.jdesktop.swingx.decorator.HighlightPredicate.RowGroupHighlightPredicate;
 import org.jdesktop.swingx.decorator.HighlightPredicate.TypeHighlightPredicate;
 import org.jdesktop.swingx.rollover.RolloverProducer;
+import org.jdesktop.test.AncientSwingTeam;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -810,6 +813,27 @@ public class HighlightPredicateTest extends InteractiveTestCase {
     }
     
 // ------ stand-alone predicates    
+    
+    
+    /**
+     * Issue #1317-swingx: PatternPredicate causes exception with testColumn -1 (ALL)
+     * 
+     */
+    @Test
+    public void testPatternPredicateAllColumns() {
+        JXTable table = new JXTable(new AncientSwingTeam());
+        PatternPredicate predicate = new PatternPredicate(".*e.*");
+        table.addHighlighter(new ColorHighlighter(predicate, Color.BLUE, null));
+        for (int i = 0; i < table.getRowCount(); i++) {
+            for (int j = 0; j < table.getColumnCount(); j++) {
+                TableCellRenderer renderer = table.getCellRenderer(i, j);
+                table.prepareRenderer(renderer, i, j);
+            }
+        }
+    }
+
+
+
     @Test
     public void testPattern() {
         // start with "t"
