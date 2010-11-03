@@ -190,8 +190,8 @@ public class ActionContainerFactory {
 
             if (element == null) {
                 popup.addSeparator();
-            } else if (element instanceof List) {
-                JMenu newMenu= createMenu((List)element);
+            } else if (element instanceof List<?>) {
+                JMenu newMenu= createMenu((List<?>)element);
                 if (newMenu!= null) {
                     popup.add(newMenu);
                 }
@@ -230,7 +230,7 @@ public class ActionContainerFactory {
 
             if (element instanceof Object[]) {
                 menu = createMenu((Object[]) element);
-            } else if (element instanceof List) {
+            } else if (element instanceof List<?>) {
                 menu = createMenu((List<?>) element);
             } else {
                 menu = createMenuItem(element, menubar);

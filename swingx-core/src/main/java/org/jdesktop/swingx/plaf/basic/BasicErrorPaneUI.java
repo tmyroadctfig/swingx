@@ -752,8 +752,6 @@ public class BasicErrorPaneUI extends ErrorPaneUI {
      * of changes to the text of the button and its language.
      */
     private static final class EqualSizeJButton extends JButton {
-        public EqualSizeJButton() {
-        }
 
         public EqualSizeJButton(String text) {
             super(text);

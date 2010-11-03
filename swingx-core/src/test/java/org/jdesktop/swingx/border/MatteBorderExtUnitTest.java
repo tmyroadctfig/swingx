@@ -67,7 +67,7 @@ public class MatteBorderExtUnitTest extends junit.framework.TestCase {
             new TestCase() {	// 1
                 @Override
                 public JComponent define() {
-                    Class	klass = MatteBorderExtUnitTest.class;
+                    Class<?>	klass = MatteBorderExtUnitTest.class;
 					Icon[]	icons = new Icon[] {
                         new ImageIcon(klass.getResource("resources/images/wellTopLeft.gif")),
                         new ImageIcon(klass.getResource("resources/images/wellTop.gif")),

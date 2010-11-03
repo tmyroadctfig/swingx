@@ -45,7 +45,7 @@ public class StringValuesTest extends TestCase {
     public void testLocaleSVDefaultLocale() {
         Locale old = Locale.getDefault();
         try {
-            LocalizableStringValue sv = new LocalizableStringValue(new HashMap());
+            LocalizableStringValue sv = new LocalizableStringValue(new HashMap<Object, String>());
             assertEquals(old, sv.getLocale());
             Locale other = Locale.CHINESE;
             if (old.equals(other)) {

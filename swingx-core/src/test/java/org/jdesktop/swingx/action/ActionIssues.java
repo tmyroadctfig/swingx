@@ -53,7 +53,7 @@ public class ActionIssues extends ActionTest implements Serializable {
     public void testSerializationBoundAction() {
         BoundAction action = new BoundAction("some");
         action.registerCallback(this, "testSerializationRolloverFalse");
-        BoundAction serialized = SerializableSupport.serialize(action);
+        SerializableSupport.serialize(action);
     }
 
     /**

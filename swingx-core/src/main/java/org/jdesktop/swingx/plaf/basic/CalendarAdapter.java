@@ -21,7 +21,6 @@
  */
 package org.jdesktop.swingx.plaf.basic;
 
-import java.awt.Rectangle;
 import java.util.Calendar;
 
 import org.jdesktop.swingx.JXMonthView;
