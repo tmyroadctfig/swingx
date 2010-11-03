@@ -2059,77 +2059,6 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
     }
 
     /**
-     * Decides if the column at columnIndex can be interactively sorted.
-     * <p>
-     * 
-     * Here: delegates to the SortController, if available. If not, returns 
-     * true if both this table and the column sortable property is
-     * enabled, false otherwise.<p>
-     * 
-     * Note: as of post-1.0 this method is no longer used internally, as the 
-     * responsibility to respect per-column/per-table sortability is moved 
-     * to the SortController. 
-     * 
-     * 
-     * @param columnIndex column in view coordinates
-     * @return boolean indicating whether or not the column is sortable in this
-     *         table.
-     * @deprecated        
-     */
-    @Deprecated
-    protected boolean isSortable(int columnIndex) {
-        if (hasSortController()) {
-            return getSortController().isSortable(convertColumnIndexToModel(columnIndex));
-        }
-        //PENDING JW: the fall-back implementation (== no sortController) is rather meaningless. 
-        // Remove?
-        boolean sortable = isSortable();
-        TableColumnExt tableColumnExt = getColumnExt(columnIndex);
-        if (tableColumnExt != null) {
-            sortable = sortable && tableColumnExt.isSortable();
-        }
-        return sortable;
-    }
-
-
-    /**
-     * Decides if the column with identifier can be interactively sorted.
-     * <p>
-     * Here: delegates to the SortController, if available. If not, returns 
-     * true if both this table and the column sortable property is
-     * enabled, false otherwise.<p>
-     * 
-     * Note: as of post-1.0 this method is no longer used internally, as the 
-     * responsibility to respect per-column/per-table sortability is moved 
-     * to the SortController. 
-     * 
-     * 
-     * @param identifier the column's identifier
-     * @return boolean indicating whether or not the column is sortable in this
-     *         table.
-     * @deprecated        
-     */
-    @Deprecated
-    protected boolean isSortable(Object identifier) {
-        if (hasSortController()) {
-            TableColumn columnExt = null; 
-            columnExt = getColumnByIdentifier(identifier);
-            if (columnExt != null) {
-                return getSortController().isSortable(columnExt.getModelIndex());
-            }
-            return getSortController().isSortable();
-        }
-        //PENDING JW: the fall-back implementation (== no sortController) is rather meaningless. 
-        // Remove?
-        boolean sortable = isSortable();
-        TableColumnExt tableColumnExt = getColumnExt(identifier);
-        if (tableColumnExt != null) {
-            sortable = sortable && tableColumnExt.isSortable();
-        }
-        return sortable;
-    }
-
-    /**
      * Returns the currently active SortController. May be null, if the current RowSorter
      * is not an instance of SortController. <p>
      * 
@@ -3591,6 +3520,19 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
     }
 
     /**
+     * Convenience method to get the rendering component for the given cell.
+     * 
+     * @param row the row of the cell to render, where 0 is the first row
+     * @param column the column of the cell to render, where 0 is the first
+     *        column
+     * @return the decorated <code>Component</code> used as a stamp to render
+     *         the specified cell
+     */
+    public Component prepareRenderer(int row, int col) {
+        return prepareRenderer(getCellRenderer(row, col), row, col);
+    }
+    
+    /**
      * 
      * Method to apply a hack around DefaultTableCellRenderer "color memory"
      * (Issue #258-swingx). Applies the hack if the client property
@@ -3662,38 +3604,6 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
         if (stamp.getComponentOrientation().equals(getComponentOrientation()))
             return;
         stamp.applyComponentOrientation(getComponentOrientation());
-    }
-
-    /**
-     * Returns a new instance of the default renderer for the specified class.
-     * This differs from <code>getDefaultRenderer()</code> in that it returns a
-     * <b>new </b> instance each time so that the renderer may be set and
-     * customized on a particular column.
-     * <p>
-     * 
-     * NOTE: this doesn't work with swingx renderers! Do we really need it? It
-     * had been used in JNTable which is practically obsolete. If needed, we
-     * could make all renderer support classes clonable.
-     * 
-     * @param columnClass Class of value being rendered
-     * @return TableCellRenderer instance which renders values of the specified
-     *         type
-     * @see #getDefaultRenderer(Class)
-     * 
-     * @deprecated (since pre-1.6) not working anyway - no replacement. 
-     */
-    @Deprecated
-    public TableCellRenderer getNewDefaultRenderer(Class<?> columnClass) {
-        TableCellRenderer renderer = getDefaultRenderer(columnClass);
-        if (renderer != null) {
-            try {
-                return renderer.getClass().newInstance();
-            } catch (Exception e) {
-                LOG.fine("could not create renderer for " + columnClass);
-            }
-        }
-        // JW PENDING: must not return null!
-        return null;
     }
 
     /**
@@ -4397,38 +4307,6 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
         if (rowHeight > 0) {
             isXTableRowHeightSet = true;
         }
-    }
-
-    /**
-     * Sets enablement of individual rowHeight support. Enabling the support
-     * involves reflective access to super's private field rowModel which may
-     * fail due to security issues. If failing the support is not enabled.
-     * <p>
-     * The default value is <code>false</code>.
-     * 
-     * @param enabled a boolean to indicate whether per-row heights should be
-     *        enabled.
-     * @see #isRowHeightEnabled()
-     * @see #setRowHeight(int, int)
-     * 
-     * @deprecated no longer necessary (switched to 1.6)
-     */
-    @Deprecated
-    public void setRowHeightEnabled(boolean enabled) {
-    }
-
-    /**
-     * Returns a boolean to indicate whether individual row height is enabled.
-     * 
-     * @return a boolean to indicate whether individual row height support is
-     *         enabled, always true
-     * @see #setRowHeightEnabled(boolean)
-     * 
-     * @deprecated no longer necessary (switched to 1.6)
-     */
-    @Deprecated
-    public boolean isRowHeightEnabled() {
-        return true;
     }
 
     /**

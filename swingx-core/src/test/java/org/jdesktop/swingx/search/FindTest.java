@@ -86,31 +86,6 @@ public class FindTest extends InteractiveTestCase {
     /**
      * Issue #718-swingx: shared FindPanel not updated on LF change.
      * 
-     * Here: check that containing dialog is disposed, old api (no boolean).
-     */
-    @SuppressWarnings("deprecation")
-    @Test
-    public void testFindDialogDisposeDeprecated() {
-        // This test will not work in a headless configuration.
-        if (GraphicsEnvironment.isHeadless()) {
-            LOG.fine("cannot run test - headless environment");
-            return;
-        }
-        JXFrame frame = new JXFrame();
-        JXTable table = new JXTable();
-        frame.add(table);
-        JComponent findPanel = SearchFactory.getInstance().getSharedFindPanel();
-        SearchFactory.getInstance().showFindDialog(table, table.getSearchable());
-        Window window = SwingUtilities.getWindowAncestor(findPanel);
-        assertSame(frame, window.getOwner());
-        SearchFactory.getInstance().hideSharedFindPanel(true);
-        assertFalse("window must not be displayable", window.isDisplayable());
-        assertNull("findPanel must be unparented", findPanel.getParent());
-    }
-    
-    /**
-     * Issue #718-swingx: shared FindPanel not updated on LF change.
-     * 
      * Here: check that containing dialog is disposed, new api with flag.
      */
     @Test

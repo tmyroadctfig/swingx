@@ -104,22 +104,6 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
         monthView.setLocale(serbianLatin);
         assertWeekdays(monthView, serbianLatin);
     }
-    
-    /**
-     * Issue #1245-swingx: incorrect month/dayofweek names for non-core-supported Locales.
-     */
-    @Test
-    public void testLocaleByProviderUIMonthNames() {
-        Locale serbianLatin = getLocal("sh");
-        if (serbianLatin == null) {
-            LOG.fine("can't run, no service provider for serbian latin" );
-            return;
-        }
-        JXMonthView monthView = new JXMonthView();
-        monthView.setLocale(serbianLatin);
-        assertMonths(monthView, serbianLatin);
-    }
-    
     /**
      * @param string
      * @return
@@ -1447,28 +1431,6 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
         assertEquals(first, ((BasicMonthViewUI) monthView.getUI()).getToday());
     }
 
-    /**
-     * test localized month names.
-     */
-    @Test
-    public void testLocaleMonths() {
-        Locale french = Locale.FRENCH;
-        JXMonthView monthView = new JXMonthView(french);
-        assertMonths(monthView, french);
-        Locale german = Locale.GERMAN;
-        monthView.setLocale(german);
-        assertMonths(monthView, german);
-    }
-
-    private void assertMonths(JXMonthView monthView, Locale french) {
-        // sanity
-        assertEquals(french, monthView.getLocale());
-        BasicMonthViewUI ui = (BasicMonthViewUI) monthView.getUI();
-        String[] months = DateFormatSymbols.getInstance(french).getMonths();
-        for (int i = 0; i < months.length; i++) {
-            assertEquals(months[i], ui.monthsOfTheYear[i]);
-        }
-    }
 
     @Test
     public void testCustomWeekdays() {

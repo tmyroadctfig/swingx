@@ -122,6 +122,15 @@ public class JXTableUnitTest extends InteractiveTestCase {
         super("JXTable unit test");
     }
 
+    
+    @Test
+    public void testPrepareRenderer() {
+        table.setModel(sortableTableModel);
+        TableCellRenderer renderer = table.getCellRenderer(0, AncientSwingTeam.INTEGER_COLUMN);
+        Component comp = table.prepareRenderer(renderer, 0, AncientSwingTeam.INTEGER_COLUMN);
+        assertSame(comp, table.prepareRenderer(0, AncientSwingTeam.INTEGER_COLUMN));
+    }
+    
     @Test
     public void testSortedColumnIndex() {
         table.setModel(sortableTableModel);
@@ -609,23 +618,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
         factory.assertSortableColumnState(table);
     }
     
-    /**
-     * Issue ??-swingx: JXTable isSortable by index must convert index
-     * 
-     */
-    @Test
-    public void testIsSortableColumn() {
-        SortableTestFactory factory = new SortableTestFactory();
-        table.setColumnFactory(factory);
-        table.setModel(sortableTableModel);
-        TableColumnExt columnExt = table.getColumnExt(1);
-        assertFalse("sanity: second column not sortable", columnExt.isSortable());
-        table.moveColumn(0, 1);
-        assertSame("sanity: moved", columnExt, table.getColumnExt(0));
-        assertEquals("isSortable by index must convert column index", 
-                false, table.isSortable(0));
-    }
-
+ 
     /**
      * Convenience factory for testing. Configures every odd column as not sortable
      * and has a method to assert that the sortable state is as configured.
@@ -781,22 +774,6 @@ public class JXTableUnitTest extends InteractiveTestCase {
  * Doing so because the pre-Mustang implementation worked on columns of extended type only.
  *    
  */
-    /**
-     * beware: test internals! While isSortable(Object) is no longer used internally, 
-     * subclasses still might, so need to work without throwing up. Which might have happened
-     * if the column is not of extended type.  
-     */
-    @Test
-    public void testSortableByIdentifier() {
-        JXTable table = createTableWithCoreColumns();
-        TableColumn column = table.getColumn(table.getColumnCount() -1);
-        Object id = column.getIdentifier();
-        // here we provoke a crash  (crazy core behaviour if id not found)
-        column.setIdentifier("changed: " + id);
-        // PENDING JW: what to return if no column found? current fallback is to 
-        // overall-sortable
-        assertEquals(getSortController(table).isSortable(), table.isSortable(id));
-    }
     /**
      * add api to access the sorted column.
      *

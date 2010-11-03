@@ -24,6 +24,7 @@ package org.jdesktop.swingx.plaf.basic;
 import java.awt.ComponentOrientation;
 import java.awt.GraphicsEnvironment;
 import java.util.Calendar;
+import java.util.Locale;
 import java.util.TimeZone;
 import java.util.logging.Logger;
 
@@ -31,6 +32,7 @@ import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXMonthView;
 import org.jdesktop.swingx.calendar.CalendarUtils;
+import org.junit.Test;
 
 /**
  * Tests to expose known issues of BasicMonthViewUI.
@@ -53,7 +55,38 @@ public class BasicMonthViewUIIssues extends InteractiveTestCase {
           e.printStackTrace();
       }
   }
- 
+
+    
+    /**
+     * Issue #1245-swingx: incorrect month/dayofweek names for non-core-supported Locales.
+     */
+    @Test
+    public void testLocaleByProviderUIMonthNames() {
+        fail("TBD: need test that Locales from service providers are used");
+        Locale serbianLatin = getLocal("sh");
+        if (serbianLatin == null) {
+            LOG.fine("can't run, no service provider for serbian latin" );
+            return;
+        }
+        JXMonthView monthView = new JXMonthView();
+        monthView.setLocale(serbianLatin);
+        // deprecation removal
+//        assertMonths(monthView, serbianLatin);
+    }
+    
+    /**
+     * @param string
+     * @return
+     */
+    private Locale getLocal(String language) {
+        Locale[] available = Locale.getAvailableLocales();
+        for (Locale locale : available) {
+            if (language.equals(locale.getLanguage())) return locale;
+        }
+        return null;
+    }
+
+
     /**
      * Issue #786-swingx: IllegalStateException when paintDays of April 2008.
      * 

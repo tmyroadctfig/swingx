@@ -20,6 +20,8 @@
  */
 package org.jdesktop.swingx;
 
+import java.util.logging.Logger;
+
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
@@ -31,6 +33,11 @@ import org.jdesktop.swingx.decorator.HighlighterFactory;
  * @author kschaefer
  */
 public class JXComboBoxVisualCheck extends InteractiveTestCase {
+    
+    @SuppressWarnings("unused")
+    private static final Logger LOG = Logger
+            .getLogger(JXComboBoxVisualCheck.class.getName());
+    
     private ComboBoxModel model;
     
     /**
@@ -42,7 +49,7 @@ public class JXComboBoxVisualCheck extends InteractiveTestCase {
     }
     
     public static void main(String[] args) {
-        setSystemLF(true);
+//        setSystemLF(true);
         
         JXComboBoxVisualCheck test = new JXComboBoxVisualCheck();
         

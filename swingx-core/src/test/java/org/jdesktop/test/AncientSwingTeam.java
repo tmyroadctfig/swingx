@@ -23,6 +23,10 @@ import org.jdesktop.swingx.treetable.TreeTableModel;
  */
 public class AncientSwingTeam extends AbstractTableModel {
 
+    public static final int COLOR_COLUMN = 2;
+    public static final int INTEGER_COLUMN = 3;
+    public static final int BOOLEAN_COLUMN = 4;
+
     /**
      * 
      * Creates and returns a listModel with items of type NamedColor.
