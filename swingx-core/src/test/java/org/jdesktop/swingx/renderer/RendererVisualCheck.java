@@ -130,8 +130,9 @@ public class RendererVisualCheck extends InteractiveTestCase {
         setSystemLF(true);
         RendererVisualCheck test = new RendererVisualCheck();
         try {
-            test.runInteractiveTests();
+//            test.runInteractiveTests();
 //          test.runInteractiveTests(".*CustomIcons.*");
+          test.runInteractiveTests(".*IconText.*");
 //          test.runInteractiveTests(".*Text.*");
 //          test.runInteractiveTests(".*Color.*");
 //          test.runInteractiveTests("interactive.*ColumnControl.*");
@@ -186,12 +187,25 @@ public class RendererVisualCheck extends InteractiveTestCase {
      */
     public void interactiveIconTextAlignment() {
         ListModel files = createFileListModel();
-        JXList list = new JXList(files);
+        final JXList list = new JXList(files);
         ComponentProvider<?> text = new LabelProvider(StringValues.FILE_NAME, JLabel.TRAILING);
-        WrappingProvider wrapper = new WrappingProvider(IconValues.FILE_ICON, text, true);
+        final WrappingProvider wrapper = new WrappingProvider(IconValues.FILE_ICON, text, true);
+        wrapper.getRendererComponent(null).setExtendsComponentOpacity(true);
         list.setCellRenderer(new DefaultListRenderer(wrapper));
         list.addHighlighter(HighlighterFactory.createSimpleStriping());
-        showWithScrollingInFrame(list, "alignment in wrappingProvider");
+        JXFrame frame =showWithScrollingInFrame(list, "alignment in wrappingProvider");
+        Action action = new AbstractAction("toggle icon opacity") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                WrappingIconPanel panel = wrapper.getRendererComponent(null);
+                panel.setExtendsComponentOpacity(!panel.getExtendsComponentOpacity());
+                list.repaint();
+            }
+        };
+        addAction(frame, action);
+        JLabel label = new JLabel(IconValues.FILE_ICON.getIcon(list.getElementAt(1)));
+        addStatusComponent(frame, label);
     }
     
     /**

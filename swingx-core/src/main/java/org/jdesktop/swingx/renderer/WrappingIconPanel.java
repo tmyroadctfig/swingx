@@ -53,6 +53,7 @@ public class WrappingIconPanel extends JXPanel implements PainterAware {
     private Border ltorBorder;
     private Border rtolBorder;
     private boolean dropHackEnabled;
+    private boolean extendsComponentOpacity;
     
     
     /**
@@ -142,6 +143,11 @@ public class WrappingIconPanel extends JXPanel implements PainterAware {
             remove(delegate);
         }
         delegate = comp;
+        if (extendsComponentOpacity) {
+            iconLabel.setOpaque(comp.isOpaque());
+        } else {
+            iconLabel.setOpaque(false);
+        }
         add(delegate, labelPosition);
         validate();
         firePropertyChange("component", old, getComponent());
@@ -281,6 +287,24 @@ public class WrappingIconPanel extends JXPanel implements PainterAware {
         this.dropHackEnabled = dropHackEnabled;
     }
 
+    /**
+     * Sets a boolean indicating whether or not the main component's opacity
+     * should be applied to the Icon region.<p>
+     * 
+     * The default value is false. This covers the main use case in a JTree.
+     * 
+     * @param extendsComponentOpacity
+     */
+    public void setExtendsComponentOpacity(boolean extendsComponentOpacity) {
+        this.extendsComponentOpacity = extendsComponentOpacity;
+        
+    }
+    /**
+     * @return the extendsComponentOpacity
+     */
+    public boolean getExtendsComponentOpacity() {
+        return extendsComponentOpacity;
+    }
     
     
 }
