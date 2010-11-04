@@ -32,7 +32,9 @@ import javax.swing.border.Border;
 /**
  * 
  * @author kschaefer
+ * @deprecated replaced by SafeBorder in package plaf
  */
+@Deprecated
 class SafeBorder implements Border {
     private Border delegate;
     

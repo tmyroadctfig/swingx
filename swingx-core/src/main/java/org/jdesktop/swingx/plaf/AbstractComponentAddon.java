@@ -159,6 +159,8 @@ public abstract class AbstractComponentAddon implements ComponentAddon {
       addMacDefaults(addon, defaults);
     } else if (isMotif(addon)) {
       addMotifDefaults(addon, defaults);
+      // PENDING JW: the separation line here looks fishy
+      // what about Nimbus on Linux systems?
     } else if (isLinux(addon)) {
       addLinuxDefaults(addon, defaults);
     } else if (isNimbus(addon)) {

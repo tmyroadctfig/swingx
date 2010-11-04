@@ -22,6 +22,7 @@
 package org.jdesktop.swingx.border;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.ComponentOrientation;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
@@ -29,14 +30,19 @@ import java.awt.event.ActionEvent;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
+import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
+import javax.swing.border.AbstractBorder;
+import javax.swing.border.BevelBorder;
 import javax.swing.border.Border;
 
 import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.icon.ColumnControlIcon;
+import org.jdesktop.swingx.plaf.SafeBorder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -49,6 +55,51 @@ import org.junit.runners.JUnit4;
  */
 @RunWith(JUnit4.class)
 public class IconBorderTest extends InteractiveTestCase {
+    
+    
+    @Test
+    public void testSafeBorderMisbehavingDelegate() {
+        JComponent comp = new JButton();
+        MisbehavingBorder delegate = new MisbehavingBorder();
+        assertNull("sanity", delegate.getBorderInsets(comp));
+        assertNull("sanity", delegate.getBorderInsets(comp, null));
+        SafeBorder border = new SafeBorder(delegate);
+        assertNotNull(border.getBorderInsets(comp));
+        assertNotNull(border.getBorderInsets(comp, null));
+    }
+    
+    @Test
+    public void testSafeBorderBehavingDelegate() {
+        JComponent comp = new JButton();
+        AbstractBorder delegate = new BevelBorder(BevelBorder.LOWERED);
+        SafeBorder border = new SafeBorder(delegate);
+        assertNotNull(border.getBorderInsets(comp));
+        assertNotNull(border.getBorderInsets(comp, null));
+    }
+    
+    public static class MisbehavingBorder extends  AbstractBorder {
+
+        /**
+         * 
+         * @inherited <p>
+         * 
+         * Here's the mis-behaviour: returns null
+         */
+        @Override
+        public Insets getBorderInsets(Component c) {
+            return null;
+        }
+
+        /** 
+         * @inherited <p>
+         */
+        @Override
+        public Insets getBorderInsets(Component c, Insets insets) {
+            return null;
+        }
+
+        
+    }
 
     /**
      * Issue ??-swingx: IconBorder must handle null icon.
