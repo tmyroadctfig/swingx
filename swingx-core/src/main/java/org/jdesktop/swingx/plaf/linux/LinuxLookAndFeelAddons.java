@@ -20,13 +20,6 @@
  */
 package org.jdesktop.swingx.plaf.linux;
 
-import javax.swing.BorderFactory;
-import javax.swing.UIManager;
-import javax.swing.border.Border;
-import javax.swing.plaf.BorderUIResource;
-import javax.swing.plaf.UIResource;
-
-import org.jdesktop.swingx.plaf.UIManagerExt;
 import org.jdesktop.swingx.plaf.basic.BasicLookAndFeelAddons;
 
 public class LinuxLookAndFeelAddons extends BasicLookAndFeelAddons {
@@ -38,10 +31,12 @@ public class LinuxLookAndFeelAddons extends BasicLookAndFeelAddons {
         super.initialize();
         
         //Issue 1297: added border to ensure non-null insets
-        Border b = UIManagerExt.getSafeBorder("Table.focusSelectedCellHighlightBorder", BorderFactory.createEmptyBorder());
-        
-        if (b instanceof UIResource) {
-            UIManager.put("Table.focusSelectedCellHighlightBorder", new BorderUIResource(b));
-        }
+        // JW: moved into Table/ListAddon
+        // 
+//        Border b = UIManagerExt.getSafeBorder("Table.focusSelectedCellHighlightBorder", BorderFactory.createEmptyBorder());
+//        
+//        if (b instanceof UIResource) {
+//            UIManager.put("Table.focusSelectedCellHighlightBorder", new BorderUIResource(b));
+//        }
     }
 }
