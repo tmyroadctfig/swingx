@@ -24,7 +24,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.GraphicsEnvironment;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -218,7 +217,7 @@ public class JXTableIssues extends InteractiveTestCase {
      */
     public void testSerializationRollover() {
         JXTable table = new JXTable();
-        JXTable serialized = SerializableSupport.serialize(table);
+        SerializableSupport.serialize(table);
     }
 
     /**
@@ -237,7 +236,7 @@ public class JXTableIssues extends InteractiveTestCase {
                 actionMap.remove(keys[i]);
             }
         }
-        JXTable serialized = SerializableSupport.serialize(table);
+        SerializableSupport.serialize(table);
     }
 
 

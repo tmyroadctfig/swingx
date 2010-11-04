@@ -88,7 +88,8 @@ public class JXTableVisualCheck extends JXTableUnitTest {
       try {
 //        test.runInteractiveTests();
 //          test.runInteractiveTests("interactive.*FloatingPoint.*");
-          test.runInteractiveTests("interactive.*Disable.*");
+//          test.runInteractiveTests("interactive.*Disable.*");
+          test.runInteractiveTests("interactive.*Remove.*");
 //          test.runInteractiveTests("interactive.*ColumnProp.*");
 //          test.runInteractiveTests("interactive.*Multiple.*");
 //          test.runInteractiveTests("interactive.*RToL.*");
@@ -115,7 +116,28 @@ public class JXTableVisualCheck extends JXTableUnitTest {
 //        setLookAndFeel("Nimbus");
     }
 
-    
+    /**
+     * Issue #1195-swingx: keep selection on remove
+     * Basically, this is a core issue - fixed in DefaultSortController during
+     * last cleanup round.
+     * 
+     */
+    public void interactiveRemoveAndSelected() {
+        final JXTable table = new JXTable(10, 5);
+        JXFrame frame = wrapWithScrollingInFrame(table, "Issue #1195-swingx - keep selection on remove");
+        Action action = new AbstractAction("remove row before selected") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int selected = table.getSelectedRow();
+                if (selected < 1) return;
+                ((DefaultTableModel) table.getModel()).removeRow(selected - 1);
+                
+            }
+        };
+        addAction(frame, action);
+        show(frame);
+    }
     /**
      * Issue #35-swingx: visual indicators of secondary sort columns
      * 

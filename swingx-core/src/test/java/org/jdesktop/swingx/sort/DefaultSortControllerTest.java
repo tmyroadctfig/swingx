@@ -51,6 +51,9 @@ public class DefaultSortControllerTest extends InteractiveTestCase {
     DefaultSortController<TableModel> sorter;
 
     /**
+     * 
+     * Issue #1195-swingx
+     * 
      * Selection of last row lost if a row above is removed.
      * 
      * Core issue: http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6894632

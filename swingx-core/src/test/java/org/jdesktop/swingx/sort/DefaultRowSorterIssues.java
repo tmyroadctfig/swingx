@@ -128,7 +128,8 @@ public class DefaultRowSorterIssues extends InteractiveTestCase {
         assertEquals("last row must be still selected", 
                 table.getRowCount() - 1, table.getSelectedRow());
     }
-//------------------------ model changes with notification    
+
+    //------------------------ model changes with notification    
 //-------------------- conversion methods: to model
     /**
      * Core Issue http://forums.sun.com/thread.jspa?messageID=10939199#10939199
