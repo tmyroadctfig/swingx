@@ -21,6 +21,7 @@
 package org.jdesktop.swingx.renderer;
 
 import javax.swing.Icon;
+import javax.swing.plaf.UIResource;
 
 /**
  * A collection of common {@code MappedValue} implementations.
@@ -43,6 +44,38 @@ public final class MappedValues {
         }
     }, IconValues.ICON);
     
+    /**
+     * MappedValue wrapper of type UIResource to tag LAF installed converters.
+     * 
+     * @author (Jeanette Winzenburg, Berlin
+     */
+    public static class MappedValueUIResource extends MappedValue implements UIResource {
+        
+        public MappedValueUIResource(MappedValue delegate) {
+            this(delegate, delegate, delegate);
+        }
+
+        /**
+         * @param stringDelegate
+         * @param iconDelegate
+         * @param booleanDelegate
+         */
+        public MappedValueUIResource(StringValue stringDelegate,
+                IconValue iconDelegate, BooleanValue booleanDelegate) {
+            super(stringDelegate, iconDelegate, booleanDelegate);
+        }
+
+        /**
+         * @param stringDelegate
+         * @param iconDelegate
+         */
+        public MappedValueUIResource(StringValue stringDelegate,
+                IconValue iconDelegate) {
+            super(stringDelegate, iconDelegate);
+        }
+        
+    }
+
     private MappedValues() {
         //prevent instantiation
     }
