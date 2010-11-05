@@ -45,7 +45,7 @@ import org.jdesktop.swingx.painter.Painter;
  * This implements the PainterAware by delegating to the delegate component if that
  * is of type PainterAware. Does nothing if not.
  */
-public class WrappingIconPanel extends JXPanel implements PainterAware {
+public class WrappingIconPanel extends JXPanel implements PainterAware, IconAware {
     protected JComponent delegate;
     JLabel iconLabel;
     String labelPosition = BorderLayout.CENTER; //2;

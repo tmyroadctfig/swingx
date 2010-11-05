@@ -61,7 +61,7 @@ import org.jdesktop.swingx.painter.Painter;
  * 
  * @author Jeanette Winzenburg
  */
-public class JRendererLabel extends JLabel implements PainterAware {
+public class JRendererLabel extends JLabel implements PainterAware, IconAware {
 
     protected Painter painter;
 

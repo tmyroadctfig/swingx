@@ -31,8 +31,10 @@ import org.jdesktop.swingx.decorator.HighlighterFactory.UIColorHighlighter;
 import org.jdesktop.swingx.painter.AbstractAreaPainter;
 import org.jdesktop.swingx.painter.MattePainter;
 import org.jdesktop.swingx.painter.Painter;
+import org.jdesktop.swingx.renderer.IconAware;
 import org.jdesktop.swingx.renderer.JRendererLabel;
 import org.jdesktop.swingx.renderer.StringValues;
+import org.jdesktop.swingx.renderer.WrappingIconPanel;
 import org.jdesktop.swingx.test.XTestUtils;
 import org.jdesktop.test.ChangeReport;
 import org.jdesktop.test.PropertyChangeReport;
@@ -269,12 +271,61 @@ public class HighlighterTest extends InteractiveTestCase {
 //-------------- IconHighlighter
 
     @Test
+    public void testIconHighlighterWithIconAwareTextField() {
+        Icon icon = XTestUtils.loadDefaultIcon();
+        IconAwareTextField field = new IconAwareTextField();
+        IconHighlighter hl = new IconHighlighter(icon);
+        ComponentAdapter adapter = createDummyComponentAdapter(field);
+        assertNotNull(hl.highlight(field, adapter));
+        assertEquals(icon, field.getIcon());
+    }
+    
+    @Test
+    public void testIconHighlighterWithWrappingIconPanel() {
+        Icon icon = XTestUtils.loadDefaultIcon();
+        WrappingIconPanel field = new WrappingIconPanel();
+        IconHighlighter hl = new IconHighlighter(icon);
+        ComponentAdapter adapter = createDummyComponentAdapter(field);
+        assertNotNull(hl.highlight(field, adapter));
+        assertEquals(icon, field.getIcon());
+    }
+    
+    @Test
+    public void testIconAwareTextField() {
+        // sanity...
+        Icon icon = XTestUtils.loadDefaultIcon();
+        IconAwareTextField field = new IconAwareTextField();
+        assertNull(field.getIcon());
+        field.setIcon(icon);
+        assertEquals(icon, field.getIcon());
+    }
+    
+    /**
+     * Test class implementing IconAware.
+     */
+    public static class IconAwareTextField extends JTextField implements IconAware {
+        private Icon icon;
+        
+        @Override
+        public Icon getIcon() {
+            return icon;
+        }
+
+        @Override
+        public void setIcon(Icon icon) {
+            this.icon = icon;
+        }
+        
+    }
+    
+    
+    @Test
     public void testIconHighlighterNotHighlightUnable() {
         Icon icon = XTestUtils.loadDefaultIcon();
-        JTextField allColored = new JTextField();
+        JTextField field = new JTextField();
         IconHighlighter hl = new IconHighlighter(icon);
-        ComponentAdapter adapter = createDummyComponentAdapter(allColored);
-        assertNotNull(hl.highlight(allColored, adapter));
+        ComponentAdapter adapter = createDummyComponentAdapter(field);
+        assertNotNull(hl.highlight(field, adapter));
     }
 
 
