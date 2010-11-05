@@ -225,6 +225,26 @@ public class WrappingProvider extends
     }
 
     /**
+     * Sets a boolean indicating whether or not the main component's opacity
+     * should be applied to the Icon region.<p>
+     * 
+     * The default value is false. This covers the main use case in a JTree.
+     * 
+     * @param extendsComponentOpacity
+     */
+    public void setExtendsComponentOpacity(boolean extendsComponentOpacity) {
+        rendererComponent.setExtendsComponentOpacity(extendsComponentOpacity);
+        
+    }
+    /**
+     * @return the extendsComponentOpacity
+     */
+    public boolean getExtendsComponentOpacity() {
+        return rendererComponent.getExtendsComponentOpacity();
+    }
+    
+
+    /**
      * Returns the value as it should be passed to the delegate. If the unwrapUserObject
      * property is true, tries return a userObject as appropriate for the value type.
      * Returns the given value itself, ff the property is false or the type does 

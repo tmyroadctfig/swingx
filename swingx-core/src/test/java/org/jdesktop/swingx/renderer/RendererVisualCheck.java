@@ -190,7 +190,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
         final JXList list = new JXList(files);
         ComponentProvider<?> text = new LabelProvider(StringValues.FILE_NAME, JLabel.TRAILING);
         final WrappingProvider wrapper = new WrappingProvider(IconValues.FILE_ICON, text, true);
-        wrapper.getRendererComponent(null).setExtendsComponentOpacity(true);
+        wrapper.setExtendsComponentOpacity(true);
         list.setCellRenderer(new DefaultListRenderer(wrapper));
         list.addHighlighter(HighlighterFactory.createSimpleStriping());
         JXFrame frame =showWithScrollingInFrame(list, "alignment in wrappingProvider");
@@ -198,8 +198,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
             
             @Override
             public void actionPerformed(ActionEvent e) {
-                WrappingIconPanel panel = wrapper.getRendererComponent(null);
-                panel.setExtendsComponentOpacity(!panel.getExtendsComponentOpacity());
+                wrapper.setExtendsComponentOpacity(!wrapper.getExtendsComponentOpacity());
                 list.repaint();
             }
         };
