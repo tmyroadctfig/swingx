@@ -25,6 +25,11 @@ import java.awt.Component;
 import javax.swing.Icon;
 import javax.swing.JLabel;
 
+import org.jdesktop.swingx.renderer.CheckBoxProvider;
+import org.jdesktop.swingx.renderer.ComponentProvider;
+import org.jdesktop.swingx.renderer.IconAware;
+import org.jdesktop.swingx.renderer.LabelProvider;
+
 /**
  * Highlighter which decorates by setting the icon property of a JLabel.<p>
  * 
@@ -124,7 +129,11 @@ public class IconHighlighter extends AbstractHighlighter {
     protected Component doHighlight(Component component,
             ComponentAdapter adapter) {
         if (getIcon() != null) {
-            ((JLabel) component).setIcon(getIcon());
+            if (component instanceof IconAware) {
+                ((IconAware) component).setIcon(getIcon());
+            } else if (component instanceof JLabel) {
+                ((JLabel) component).setIcon(getIcon());
+            }
         }
         return component;
     }
@@ -132,11 +141,16 @@ public class IconHighlighter extends AbstractHighlighter {
     /**
      * {@inheritDoc} <p>
      * 
-     * Overridden to return true if the component is of type JLabel, false otherwise.
+     * Overridden to return true if the component is of type IconAware or
+     * of type JLabel, false otherwise. <p>
+     * 
+     * Note: special casing JLabel is for backward compatibility - application
+     * highlighting code which doesn't use the Swingx renderers would stop working
+     * otherwise.
      */
     @Override
     protected boolean canHighlight(Component component, ComponentAdapter adapter) {
-        return component instanceof JLabel;
+        return component instanceof IconAware || component instanceof JLabel;
     }
 
     

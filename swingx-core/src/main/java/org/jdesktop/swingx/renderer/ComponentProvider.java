@@ -36,6 +36,15 @@ import org.jdesktop.swingx.plaf.UIDependent;
  * all types of renderees (JTable, JList, JTree).
  * <p>
  * 
+ * <h2> Content </h2>
+ * 
+ * A provider guarantees to configure the "content" properties completely
+ * for any given object. The most frequent mappings are to text and/or icon
+ * properties of the rendering components. The former is controlled by a 
+ * StringValue (see below), the latter by an IconValue. Subclasses which
+ * hand out component of type IconAware guarantee to reset its icon property
+ * always. <p>
+ * 
  * To ease content configuration, it supports a pluggable
  * <code>StringValue</code> which purpose is to create and return a string
  * representation of a given object. Implemenations of a ComponentProvider can
@@ -81,6 +90,9 @@ import org.jdesktop.swingx.plaf.UIDependent;
  * 
  * 
  * <p>
+ * 
+ * 
+ * <h2> Default Visuals </h2>
  * 
  * Guarantees to completely configure the visual properties listed below. As a
  * consequence, client code (f.i. in <code>Highlighter</code>s) can safely
