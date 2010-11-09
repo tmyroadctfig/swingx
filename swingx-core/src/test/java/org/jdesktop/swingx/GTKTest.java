@@ -4,6 +4,7 @@
  */
 package org.jdesktop.swingx;
 
+import java.awt.GraphicsEnvironment;
 import java.util.logging.Logger;
 
 import javax.swing.LookAndFeel;
@@ -11,9 +12,6 @@ import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.border.Border;
 
-import org.jdesktop.swingx.InteractiveTestCase;
-import org.jdesktop.swingx.JXList;
-import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.plaf.SafeBorder;
 import org.jdesktop.test.AncientSwingTeam;
 import org.junit.BeforeClass;
@@ -102,6 +100,13 @@ public class GTKTest extends InteractiveTestCase {
     
     @BeforeClass
     public static void beforeClass() {
+        // This test will not work in a headless configuration.
+        // need to check before trying to install GTK (any LAF?)
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.fine("cannot run ui test - headless environment");
+            return;
+        }
+        
         LookAndFeelInfo info = new LookAndFeelInfo("GTK plain",
                 "com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
         try {
