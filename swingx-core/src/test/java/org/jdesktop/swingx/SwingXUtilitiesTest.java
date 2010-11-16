@@ -32,6 +32,8 @@ import java.awt.GraphicsEnvironment;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.FutureTask;
 import java.util.logging.Logger;
 
 import javax.swing.JButton;
@@ -42,10 +44,12 @@ import javax.swing.JRootPane;
 import javax.swing.JWindow;
 import javax.swing.RepaintManager;
 import javax.swing.RootPaneContainer;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.plaf.ColorUIResource;
 import javax.swing.plaf.UIResource;
 
+import org.hamcrest.CoreMatchers;
 import org.jdesktop.swingx.JXCollapsiblePane.CollapsiblePaneContainer;
 import org.jdesktop.test.EDTRunner;
 import org.junit.After;
@@ -53,6 +57,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import org.mockito.Matchers;
 
 
 /**
@@ -194,6 +199,48 @@ public class SwingXUtilitiesTest extends InteractiveTestCase {
         
         assertNotSame(frm, rm);
         assertTrue(rm.getClass().isAnnotationPresent(TranslucentRepaintManager.class));
+    }
+    
+    @Test
+    public void testInvokeLater() {
+        assertThat(SwingUtilities.isEventDispatchThread(), is(false));
+        
+        Callable<Void> callable = new Callable<Void>() {
+            @Override
+            public Void call() throws Exception {
+                assertThat(SwingUtilities.isEventDispatchThread(), is(true));
+                
+                //wait a long time
+                Thread.sleep(1000);
+                
+                return null;
+            }
+        };
+        
+        long start = System.currentTimeMillis();
+        FutureTask<Void> task = SwingXUtilities.invokeLater(callable);
+        assertThat((System.currentTimeMillis() - start) < 100, is(true));
+    }
+    
+    @Test
+    public void testInvokeAndWait() throws Exception {
+        assertThat(SwingUtilities.isEventDispatchThread(), is(false));
+        
+        Callable<Boolean> callable = new Callable<Boolean>() {
+            @Override
+            public Boolean call() throws Exception {
+                assertThat(SwingUtilities.isEventDispatchThread(), is(true));
+                
+                //wait a long time
+                Thread.sleep(1000);
+                
+                return true;
+            }
+        };
+        
+        long start = System.currentTimeMillis();
+        assertThat(SwingXUtilities.invokeAndWait(callable), is(true));
+        assertThat((System.currentTimeMillis() - start) > 1000, is(true));
     }
     
     @RunWith(EDTRunner.class)
