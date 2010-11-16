@@ -34,8 +34,12 @@ import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.io.StringReader;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Locale;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.FutureTask;
 
 import javax.swing.InputMap;
 import javax.swing.JComponent;
@@ -368,6 +372,57 @@ public final class SwingXUtilities {
         SwingUtilities.updateComponentTreeUI(window);
         for (Window owned : window.getOwnedWindows()) {
             updateAllComponentTreeUIs(owned);
+        }
+    }
+
+    /**
+     * A version of {@link SwingUtilities#invokeLater(Runnable)} that supports return values.
+     * 
+     * @param <T>
+     *            the return type of the callable
+     * @param callable
+     *            the callable to execute
+     * @return a future task for accessing the return value
+     * @see Callable
+     */
+    public static <T> FutureTask<T> invokeLater(Callable<T> callable) {
+        FutureTask<T> task = new FutureTask<T>(callable);
+        
+        SwingUtilities.invokeLater(task);
+        
+        return task;
+    }
+
+    /**
+     * A version of {@link SwingUtilities#invokeAndWait(Runnable)} that supports return values.
+     * 
+     * @param <T>
+     *            the return type of the callable
+     * @param callable
+     *            the callable to execute
+     * @return the value returned by the callable
+     * @throws InterruptedException
+     *             if we're interrupted while waiting for the event dispatching thread to finish
+     *             executing {@code callable.call()}
+     * @throws InvocationTargetException
+     *                if an exception is thrown while running {@code callable}
+     * @see Callable
+     */
+    public static <T> T invokeAndWait(Callable<T> callable) throws InterruptedException,
+            InvocationTargetException {
+        try {
+            //blocks until future returns
+            return invokeLater(callable).get();
+        } catch (ExecutionException e) {
+            Throwable t = e.getCause();
+            
+            if (t instanceof RuntimeException) {
+                throw (RuntimeException) t;
+            } else if (t instanceof InvocationTargetException) {
+                throw (InvocationTargetException) t;
+            } else {
+                throw new InvocationTargetException(t);
+            }
         }
     }
 
