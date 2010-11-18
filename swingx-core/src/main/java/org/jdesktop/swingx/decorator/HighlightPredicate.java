@@ -21,6 +21,7 @@
 package org.jdesktop.swingx.decorator;
 
 import java.awt.Component;
+import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.math.BigDecimal;
@@ -275,9 +276,16 @@ public interface HighlightPredicate {
                 gap = ((AbstractButton) renderer).getIconTextGap();
             }
             
+            Rectangle cellBounds = adapter.getCellBounds();
+            if (c != null && c.getBorder() != null) {
+                Insets insets = c.getBorder().getBorderInsets(c);
+                cellBounds.width -= insets.left + insets.right;
+                cellBounds.height -= insets.top + insets.bottom;
+            }
+            
             String result = SwingUtilities.layoutCompoundLabel(c, renderer
                     .getFontMetrics(renderer.getFont()), text, icon, verticalAlignment,
-                    horizontalAlignment, verticalTextPosition, horizontalTextPosition, adapter.getCellBounds(),
+                    horizontalAlignment, verticalTextPosition, horizontalTextPosition, cellBounds,
                     new Rectangle(), new Rectangle(), gap);
             
             return !text.equals(result);
