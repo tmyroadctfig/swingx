@@ -26,6 +26,7 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.Icon;
 
 import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXFrame;
@@ -33,6 +34,10 @@ import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.decorator.HighlightPredicate.ColumnHighlightPredicate;
 import org.jdesktop.swingx.decorator.HighlighterFactory.UIColorHighlighter;
+import org.jdesktop.swingx.renderer.DefaultTableRenderer;
+import org.jdesktop.swingx.renderer.IconValue;
+import org.jdesktop.swingx.renderer.StringValues;
+import org.jdesktop.swingx.test.XTestUtils;
 import org.jdesktop.test.AncientSwingTeam;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -139,7 +144,17 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase  {
      */
     public void interactiveToolTipOnTruncatedText() {
         JXTable table = new JXTable(new AncientSwingTeam());
+        final Icon icon = XTestUtils.loadDefaultIcon();
+        IconValue iv = new IconValue() {
+            
+            @Override
+            public Icon getIcon(Object value) {
+                return icon;
+            }
+        };
+        table.getColumn(AncientSwingTeam.COLOR_COLUMN).setCellRenderer(new DefaultTableRenderer(StringValues.TO_STRING, iv));
         table.addHighlighter(new ToolTipHighlighter(HighlightPredicate.IS_TEXT_TRUNCATED));
-        showWithScrollingInFrame(table, "ToolTip on truncated text");
+        JXFrame frame = showWithScrollingInFrame(table, "ToolTip on truncated text");
+        addComponentOrientationToggle(frame);
     }
 }

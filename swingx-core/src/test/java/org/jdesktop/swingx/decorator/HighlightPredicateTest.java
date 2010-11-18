@@ -8,6 +8,8 @@
 package org.jdesktop.swingx.decorator;
 
 import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Insets;
 import java.awt.Point;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -15,6 +17,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.table.TableCellRenderer;
 
@@ -144,7 +147,22 @@ public class HighlightPredicateTest extends InteractiveTestCase {
         assertFalse("sanity", adapter.hasFocus());
         assertEquals(adapter.hasFocus(), HighlightPredicate.HAS_FOCUS.isHighlighted(allColored, adapter));
      }
-    
+
+    /**
+     * Issue #1371-swingx: IS_TEXT_TRUNCATED must respect insets
+     */
+    @Test
+    public void testIsTextTruncatedRespectsBorder() {
+        allColored.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        Insets insets = allColored.getBorder().getBorderInsets(allColored);
+        Dimension preferredSize = allColored.getPreferredSize();
+        preferredSize.width -= insets.left + insets.right;
+        preferredSize.height -= insets.top + insets.bottom;
+        allColored.setSize(preferredSize);
+        ComponentAdapter adapter = createComponentAdapter(allColored, true, true);
+        assertTrue(HighlightPredicate.IS_TEXT_TRUNCATED.isHighlighted(allColored, adapter));
+    }
+
     /**
      * Issue #1314: predefined truncated text predicate. 
      * 
