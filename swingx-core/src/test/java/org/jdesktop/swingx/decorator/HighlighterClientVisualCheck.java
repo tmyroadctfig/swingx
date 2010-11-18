@@ -49,7 +49,8 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase  {
     public static void main(String[] args) {
         HighlighterClientVisualCheck test = new HighlighterClientVisualCheck();
         try {
-            test.runInteractiveTests();
+//            test.runInteractiveTests();
+            test.runInteractiveTests("interactive.*ToolTip.*");
         } catch (Exception e) {
             e.printStackTrace();
         }
