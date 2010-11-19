@@ -198,7 +198,7 @@ public class JXComboBox extends JComboBox {
     }
     
     protected static class ComboBoxAdapter extends ComponentAdapter {
-        private final JComboBox comboBox;
+        private final JXComboBox comboBox;
 
         /**
          * Constructs a <code>ListAdapter</code> for the specified target
@@ -206,7 +206,7 @@ public class JXComboBox extends JComboBox {
          * 
          * @param component  the target list.
          */
-        public ComboBoxAdapter(JComboBox component) {
+        public ComboBoxAdapter(JXComboBox component) {
             super(component);
             comboBox = component;
         }
@@ -216,16 +216,29 @@ public class JXComboBox extends JComboBox {
          * 
          * @return the target component as a {@link org.jdesktop.swingx.JXComboBox}
          */
-        public JComboBox getComboBox() {
+        public JXComboBox getComboBox() {
             return comboBox;
         }
 
+        /**
+         * A safe way to access the combo box's popup visibility.
+         * 
+         * @return {@code true} if the popup is visible; {@code false} otherwise
+         */
+        protected boolean isPopupVisible() {
+            if (comboBox.updatingUI) {
+                return false;
+            }
+            
+            return comboBox.isPopupVisible();
+        }
+        
         /**
          * {@inheritDoc}
          */
         @Override
         public boolean hasFocus() {
-            if (comboBox.isPopupVisible()) {
+            if (isPopupVisible()) {
                 JList list = getPopupListFor(comboBox);
                 
                 return list != null && list.isFocusOwner() && (row == list.getLeadSelectionIndex());
@@ -306,7 +319,7 @@ public class JXComboBox extends JComboBox {
          */
         @Override
         public boolean isSelected() {
-            if (comboBox.isPopupVisible()) {
+            if (isPopupVisible()) {
                 JList list = getPopupListFor(comboBox);
                 
                 return list != null && row == list.getLeadSelectionIndex();
@@ -326,9 +339,11 @@ public class JXComboBox extends JComboBox {
 
     private ChangeListener highlighterChangeListener;
 
-    private List<KeyEvent> pendingEvents = new ArrayList<KeyEvent>();
+    private List<KeyEvent> pendingEvents;
 
     private boolean isDispatching;
+
+    private boolean updatingUI;
 
     /**
      * Creates a <code>JXComboBox</code> with a default data model. The default data model is an
@@ -339,6 +354,7 @@ public class JXComboBox extends JComboBox {
      */
     public JXComboBox() {
         super();
+        init();
     }
 
     /**
@@ -353,6 +369,7 @@ public class JXComboBox extends JComboBox {
      */
     public JXComboBox(ComboBoxModel model) {
         super(model);
+        init();
     }
 
     /**
@@ -365,6 +382,7 @@ public class JXComboBox extends JComboBox {
      */
     public JXComboBox(Object[] items) {
         super(items);
+        init();
     }
 
     /**
@@ -377,8 +395,13 @@ public class JXComboBox extends JComboBox {
      */
     public JXComboBox(Vector<?> items) {
         super(items);
+        init();
     }
 
+    private void init() {
+        pendingEvents = new ArrayList<KeyEvent>();
+    }
+    
     protected static JList getPopupListFor(JComboBox comboBox) {
         int count = comboBox.getUI().getAccessibleChildrenCount(comboBox);
 
@@ -693,7 +716,7 @@ public class JXComboBox extends JComboBox {
             }
         };
     }
-
+    
     /**
      * {@inheritDoc}
      * <p>
@@ -701,18 +724,24 @@ public class JXComboBox extends JComboBox {
      */
     @Override
     public void updateUI() {
-        super.updateUI();
+        updatingUI = true;
         
-        ListCellRenderer renderer = getRenderer();
-        
-        if (renderer instanceof UIDependent) {
-            ((UIDependent) renderer).updateUI();
-        } else if (renderer instanceof Component) {
-            SwingUtilities.updateComponentTreeUI((Component) renderer);
-        }
-        
-        if (compoundHighlighter != null) {
-            compoundHighlighter.updateUI();
+        try {
+            super.updateUI();
+            
+            ListCellRenderer renderer = getRenderer();
+            
+            if (renderer instanceof UIDependent) {
+                ((UIDependent) renderer).updateUI();
+            } else if (renderer instanceof Component) {
+                SwingUtilities.updateComponentTreeUI((Component) renderer);
+            }
+            
+            if (compoundHighlighter != null) {
+                compoundHighlighter.updateUI();
+            }
+        } finally {
+            updatingUI = false;
         }
     }
 }
