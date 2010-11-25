@@ -54,9 +54,12 @@ import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.SpinnerDateModel;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
 
 import org.jdesktop.swingx.calendar.CalendarUtils;
 import org.jdesktop.swingx.calendar.DatePickerFormatter;
+import org.jdesktop.swingx.table.DatePickerCellEditor;
 import org.junit.Test;
 
 /**
@@ -70,19 +73,50 @@ public class JXDatePickerIssues extends InteractiveTestCase {
     private static final Logger LOG = Logger.getLogger(JXDatePickerIssues.class
             .getName());
     public static void main(String[] args) {
-        setSystemLF(true);
+//        setSystemLF(true);
 //        Trace14.keyboardFocusManager(true);
         JXDatePickerIssues  test = new JXDatePickerIssues();
         try {
 //            test.runInteractiveTests();
 //          test.runInteractiveTests("interactive.*UpdateUI.*");
 //          test.runInteractiveTests("interactive.*Symbols.*");
-          test.runInteractiveTests("interactive.*Visuals.*");
+          test.runInteractiveTests("interactive.*AsEditor.*");
           
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Issue #1372-swingx: DatePickerCellEditor on 2 different tables with clickCountToStart = 1 
+     * throws IllegalComponentStateException
+     * 
+     * Metal only?
+     */
+    public void interactiveIllegalComponentStateAsEditor() {
+        TableModel model = new DefaultTableModel(10, 1) {
+
+            /** 
+             * @inherited <p>
+             */
+            @Override
+            public Class<?> getColumnClass(int columnIndex) {
+                return Date.class;
+            }
+             
+        };
+        JXTable one = createTableWithEditor(model);
+        JXTable other = createTableWithEditor(model);
+        showWithScrollingInFrame(one, other, "click to left of cell");
+    }
+    
+    private JXTable createTableWithEditor(TableModel model) {
+        JXTable table = new JXTable(model);
+        DatePickerCellEditor editor = new DatePickerCellEditor();
+        editor.setClickCountToStart(1);
+        table.setDefaultEditor(Date.class, editor);
+        return table;
     }
 
     public void interactiveDateSymbols() {
