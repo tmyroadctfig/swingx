@@ -20,18 +20,37 @@
  */
 package org.jdesktop.swingx.painter;
 
-import java.awt.Graphics2D;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+
+import java.awt.Insets;
+
+import org.junit.Test;
+
 
 /**
- * A useful Painter implementation for Testing purposes
- * @author rbair
+ * Test for AbstractLayoutPainter.
  */
-class DummyPainter extends AbstractPainter<Object> {
-    public DummyPainter() {
-        super();
-    }
-
+@SuppressWarnings({"rawtypes"})
+public class AbstractLayoutPainterTest extends AbstractPainterTest {
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    protected void doPaint(Graphics2D g, Object obj, int width, int height) {
+    protected AbstractLayoutPainter createTestingPainter() {
+        return new DummyLayoutPainter();
+    }
+    
+    @Test
+    @Override
+    public void testDefaults() {
+        super.testDefaults();
+        
+        AbstractLayoutPainter alp = (AbstractLayoutPainter) p;
+        assertThat(alp.getHorizontalAlignment(), is(AbstractLayoutPainter.HorizontalAlignment.CENTER));
+        assertThat(alp.getInsets(), is(new Insets(0, 0, 0, 0)));
+        assertThat(alp.getVerticalAlignment(), is(AbstractLayoutPainter.VerticalAlignment.CENTER));
+        assertThat(alp.isFillHorizontal(), is(false));
+        assertThat(alp.isFillVertical(), is(false));
     }
 }
