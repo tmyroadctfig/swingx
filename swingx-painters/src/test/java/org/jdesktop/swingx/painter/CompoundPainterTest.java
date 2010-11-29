@@ -21,6 +21,7 @@
 package org.jdesktop.swingx.painter;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
@@ -30,6 +31,7 @@ import static org.mockito.Mockito.verify;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Collections;
 
 import org.hamcrest.CoreMatchers;
 import org.junit.Ignore;
@@ -51,13 +53,9 @@ public class CompoundPainterTest extends AbstractPainterTest {
     }
     
     /**
-     * {@inheritDoc}
-     * <p>
-     * Overridden for CompoundPainter defaults.
+     * TODO remove when the compound painter does not start dirty 
      */
-    @Test
-    @Override
-    public void testDefaults() {
+    private void copyOfSuper_testDefaultsWithCorrectedValues() {
         assertThat(p.getFilters().length, is(0));
         assertThat(p.getInterpolation(), is(AbstractPainter.Interpolation.NearestNeighbor));
         assertThat(p.isAntialiasing(), is(true));
@@ -68,6 +66,25 @@ public class CompoundPainterTest extends AbstractPainterTest {
         assertThat(p.isInPaintContext(), is(false));
         assertThat(p.isVisible(), is(true));
         assertThat(p.shouldUseCache(), is(false));
+    }
+    
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Overridden for CompoundPainter defaults.
+     */
+    @Test
+    @Override
+    public void testDefaults() {
+        //TODO replace with super.testDefaults() when corrected
+        copyOfSuper_testDefaultsWithCorrectedValues();
+//        super.testDefaults();
+        
+        CompoundPainter cp = (CompoundPainter) p;
+        assertThat(cp.getPainters(), is(new Painter[0]));
+        assertThat(cp.getTransform(), is(nullValue()));
+        assertThat(cp.isCheckingDirtyChildPainters(), is(true));
+        assertThat(cp.isClipPreserved(), is(false));
     }
 
     /**

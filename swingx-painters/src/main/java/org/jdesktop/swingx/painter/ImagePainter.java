@@ -63,6 +63,8 @@ import org.jdesktop.swingx.painter.effects.AreaEffect;
  * @author Richard
  */
 public class ImagePainter extends AbstractAreaPainter<Object> {
+    public enum ScaleType { InsideFit, OutsideFit, Distort }
+    
     /**
      * Logger to use
      */
@@ -79,9 +81,9 @@ public class ImagePainter extends AbstractAreaPainter<Object> {
     
     private boolean scaleToFit = false;
     private ScaleType scaleType = ScaleType.InsideFit;
-    
-    public enum ScaleType { InsideFit, OutsideFit, Distort }
-    
+
+    private double imageScale = 1.0;
+
     /**
      * Create a new ImagePainter. By default there is no image, and the alignment
      * is centered.
@@ -284,6 +286,10 @@ public class ImagePainter extends AbstractAreaPainter<Object> {
         }
     }
     
+    public boolean isScaleToFit() {
+        return scaleToFit;
+    }
+    
     public void setScaleToFit(boolean scaleToFit) {
         boolean old = isScaleToFit(); 
         this.scaleToFit = scaleToFit;
@@ -291,15 +297,24 @@ public class ImagePainter extends AbstractAreaPainter<Object> {
         firePropertyChange("scaleToFit", old, isScaleToFit());
     }
     
+    public ScaleType getScaleType() {
+        return scaleType;
+    }
     
-    public boolean isScaleToFit() {
-        return scaleToFit;
+    public void setScaleType(ScaleType scaleType) {
+        ScaleType old = getScaleType();
+        this.scaleType = scaleType;
+        setDirty(true);
+        firePropertyChange("scaleType", old, getScaleType());
     }
 
-
-    private double imageScale = 1.0;
-
-    private Logger log = Logger.getLogger(ImagePainter.class.getName());
+    /**
+     * Gets the current scaling factor used when drawing an image.
+     * @return the current scaling factor
+     */
+    public double getImageScale() {
+        return imageScale;
+    }
     
     /**
      * Sets the scaling factor used when drawing the image
@@ -310,13 +325,6 @@ public class ImagePainter extends AbstractAreaPainter<Object> {
         this.imageScale = imageScale;
         setDirty(true);
         firePropertyChange("imageScale",old,this.imageScale);
-    }
-    /**
-     * Gets the current scaling factor used when drawing an image.
-     * @return the current scaling factor
-     */
-    public double getImageScale() {
-        return imageScale;
     }
     
     /**
@@ -363,24 +371,13 @@ public class ImagePainter extends AbstractAreaPainter<Object> {
     @Override
     protected Shape provideShape(Graphics2D g, Object comp, int width, int height) {
         if(getImage() != null) {
-            BufferedImage img = getImage();
-            int imgWidth = img.getWidth();
-            int imgHeight = img.getHeight();
+            BufferedImage bi = getImage();
+            int imgWidth = bi.getWidth();
+            int imgHeight = bi.getHeight();
             
             return calculateLayout(imgWidth, imgHeight, width, height);
         }
         return new Rectangle(0,0,0,0);
         
-    }
-    
-    public ScaleType getScaleType() {
-        return scaleType;
-    }
-    
-    public void setScaleType(ScaleType scaleType) {
-        ScaleType old = getScaleType();
-        this.scaleType = scaleType;
-        setDirty(true);
-        firePropertyChange("scaleType", old, getScaleType());
     }
 }

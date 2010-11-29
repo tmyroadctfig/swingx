@@ -21,23 +21,28 @@
 package org.jdesktop.swingx.painter;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 
 import java.awt.Color;
+import java.awt.Paint;
 
+import org.hamcrest.CoreMatchers;
+import org.jdesktop.swingx.painter.effects.AreaEffect;
 import org.junit.Test;
 
 
 /**
- * Test for BusyPainter.
+ * Test for AbstractAreaPainter.
  */
-public class BusyPainterTest extends AbstractPainterTest {
+@SuppressWarnings({"rawtypes"})
+public class AbstractAreaPainterTest extends AbstractLayoutPainterTest {
     /**
      * {@inheritDoc}
      */
     @Override
-    protected BusyPainter createTestingPainter() {
-        return new BusyPainter();
+    protected AbstractAreaPainter createTestingPainter() {
+        return new DummyAreaPainter();
     }
     
     @Test
@@ -45,15 +50,11 @@ public class BusyPainterTest extends AbstractPainterTest {
     public void testDefaults() {
         super.testDefaults();
         
-        BusyPainter bp = (BusyPainter) p;
-        assertThat(bp.getBaseColor(), is(Color.LIGHT_GRAY));
-        assertThat(bp.getDirection(), is(BusyPainter.Direction.RIGHT));
-        assertThat(bp.getFrame(), is(-1));
-        assertThat(bp.getHighlightColor(), is(Color.BLACK));
-        assertThat(bp.getPoints(), is(8));
-        assertThat(bp.getPointShape(), is(BusyPainter.getScaledDefaultPoint(26)));
-        assertThat(bp.getTrailLength(), is(4));
-        assertThat(bp.getTrajectory(), is(BusyPainter.getScaledDefaultTrajectory(26)));
-        assertThat(bp.isPaintCentered(), is(false));
+        AbstractAreaPainter alp = (AbstractAreaPainter) p;
+        assertThat(alp.getAreaEffects(), is(new AreaEffect[0]));
+        assertThat(alp.getBorderPaint(), is(nullValue()));
+        assertThat(alp.getBorderWidth(), is(0f));
+        assertThat(alp.getFillPaint(), CoreMatchers.<Paint>is(Color.RED));
+        assertThat(alp.getStyle(), is(AbstractAreaPainter.Style.BOTH));
     }
 }

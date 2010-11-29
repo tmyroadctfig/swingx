@@ -30,7 +30,9 @@ import java.awt.geom.RoundRectangle2D;
  * Draws a capsule. This is a rectangle capped by two semi circles. You can draw only a
  * portion of a capsule using the portion property.
  * @author joshy
+ * @deprecated no replacement
  */
+@Deprecated
 public class CapsulePainter extends AbstractAreaPainter<Object> {
     public enum Portion { Top, Full, Bottom, Left, Right }
     private Portion portion;

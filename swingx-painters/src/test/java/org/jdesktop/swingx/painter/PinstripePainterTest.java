@@ -20,6 +20,12 @@
  */
 package org.jdesktop.swingx.painter;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.junit.Assert.assertThat;
+
+import org.junit.Test;
+
 
 /**
  * Test for PinstripePainter.
@@ -31,5 +37,17 @@ public class PinstripePainterTest extends AbstractPainterTest {
     @Override
     protected PinstripePainter createTestingPainter() {
         return new PinstripePainter();
+    }
+    
+    @Test
+    @Override
+    public void testDefaults() {
+        super.testDefaults();
+        
+        PinstripePainter pp = (PinstripePainter) p;
+        assertThat(pp.getAngle(), is(45d));
+        assertThat(pp.getPaint(), is(nullValue()));
+        assertThat(pp.getSpacing(), is(8d));
+        assertThat(pp.getStripeWidth(), is(1d));
     }
 }

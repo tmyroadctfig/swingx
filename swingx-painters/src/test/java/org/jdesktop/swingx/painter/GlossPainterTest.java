@@ -23,11 +23,15 @@ package org.jdesktop.swingx.painter;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
+import java.awt.Color;
+import java.awt.Paint;
+
+import org.hamcrest.CoreMatchers;
 import org.junit.Test;
 
 
 /**
- * Test for BusyPainter.
+ * Test for GlossPainter.
  */
 public class GlossPainterTest extends AbstractPainterTest {
     /**
@@ -38,9 +42,10 @@ public class GlossPainterTest extends AbstractPainterTest {
         return new GlossPainter();
     }
     
-    @Test
-    @Override
-    public void testDefaults() {
+    /**
+     * TODO remove when the compound painter does not start dirty 
+     */
+    private void copyOfSuper_testDefaultsWithCorrectedValues() {
         assertThat(p.getFilters().length, is(0));
         assertThat(p.getInterpolation(), is(AbstractPainter.Interpolation.NearestNeighbor));
         assertThat(p.isAntialiasing(), is(true));
@@ -51,5 +56,22 @@ public class GlossPainterTest extends AbstractPainterTest {
         assertThat(p.isInPaintContext(), is(false));
         assertThat(p.isVisible(), is(true));
         assertThat(p.shouldUseCache(), is(false));
+    }
+    
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Overridden for GlossPainter defaults.
+     */
+    @Test
+    @Override
+    public void testDefaults() {
+        //TODO replace with super.testDefaults() when corrected
+        copyOfSuper_testDefaultsWithCorrectedValues();
+//        super.testDefaults();
+        
+        GlossPainter gp = (GlossPainter) p;
+        assertThat(gp.getPaint(), CoreMatchers.<Paint>is(new Color(1f, 1f, 1f, .2f)));
+        assertThat(gp.getPosition(), is(GlossPainter.GlossPosition.TOP));
     }
 }
