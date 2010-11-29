@@ -87,6 +87,7 @@ public class CheckerboardPainter extends AbstractPainter<Object> {
      * @param lightPaint the paint used to draw the light squares
      * @param squareSize the squareSize of the checker board squares
      */
+    //TODO squareSize should become int? only ever treated as one
     public CheckerboardPainter(Paint darkPaint, Paint lightPaint, double squareSize) {
         this.darkPaint = darkPaint;
         this.lightPaint = lightPaint;
