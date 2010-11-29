@@ -87,8 +87,16 @@ public class BusyPainter extends AbstractPainter<Object> {
      * @param height Painter height.
      */
     public BusyPainter(int height) {
-        this(getScaledDefaultPoint(height),
-        getScaledDefaultTrajectory(height));
+        this(getScaledDefaultPoint(height), getScaledDefaultTrajectory(height));
+    }
+    
+    /**
+     * Initializes painter to the specified trajectory and and point shape. Bounds are dynamically calculated to so the specified trajectory fits in.
+     * @param point Point shape.
+     * @param trajectory Trajectory shape.
+     */
+    public BusyPainter(Shape point, Shape trajectory) {
+        init(point, trajectory, Color.LIGHT_GRAY, Color.BLACK);
     }
 
     protected static Shape getScaledDefaultTrajectory(int height) {
@@ -99,15 +107,6 @@ public class BusyPainter extends AbstractPainter<Object> {
     protected static Shape getScaledDefaultPoint(int height) {
         return new RoundRectangle2D.Float(0, 0, (height * 8) / 26, 4,
                 4, 4);
-    }
-
-    /**
-     * Initializes painter to the specified trajectory and and point shape. Bounds are dynamically calculated to so the specified trajectory fits in.
-     * @param point Point shape.
-     * @param trajectory Trajectory shape.
-     */
-    public BusyPainter(Shape point, Shape trajectory) {
-        init(point, trajectory, Color.LIGHT_GRAY, Color.BLACK);
     }
 
     /**
@@ -229,6 +228,16 @@ public class BusyPainter extends AbstractPainter<Object> {
      */
     public boolean isPaintCentered() {
         return this.paintCentered;
+    }
+
+    /**
+     * Centers shape in the area covered by the painter.
+     * @param paintCentered Centering hint.
+     */
+    public void setPaintCentered(boolean paintCentered) {
+        boolean old = isPaintCentered();
+        this.paintCentered = paintCentered;
+        firePropertyChange("paintCentered", old, isPaintCentered());
     }
 
     private void drawAt(Graphics2D g, int i, Point2D.Float p, Float c) {
@@ -574,10 +583,7 @@ public class BusyPainter extends AbstractPainter<Object> {
     public final void setPointShape(Shape pointShape) {
         Shape old = getPointShape();
         this.pointShape = pointShape;
-        if (getPointShape() != old && getPointShape() != null
-                && !getPointShape().equals(old)) {
-            firePropertyChange("pointShape", old, getPointShape());
-        }
+        firePropertyChange("pointShape", old, getPointShape());
     }
 
     /**
@@ -595,10 +601,15 @@ public class BusyPainter extends AbstractPainter<Object> {
     public final void setTrajectory(Shape trajectory) {
         Shape old = getTrajectory();
         this.trajectory = trajectory;
-        if (getTrajectory() != old && getTrajectory() != null
-                && !getTrajectory().equals(old)) {
-            firePropertyChange("trajectory", old, getTrajectory());
-        }
+        firePropertyChange("trajectory", old, getTrajectory());
+    }
+    
+    /**
+     * Gets current direction of spinning.
+     * @return Current spinning direction.
+     */
+    public Direction getDirection() {
+        return direction;
     }
 
     /**
@@ -608,32 +619,14 @@ public class BusyPainter extends AbstractPainter<Object> {
     public void setDirection(Direction dir) {
         Direction old = getDirection();
         this.direction = dir;
-        if (getDirection() != old && getDirection() != null
-                && !getDirection().equals(old)) {
-            firePropertyChange("direction", old, getDirection());
-        }
+        firePropertyChange("direction", old, getDirection());
     }
 
     /**
-     * Gets current direction of spinning.
-     * @return Current spinning direction.
+     * @deprecated (pre-1.6.3) unused; no replacement
      */
-    public Direction getDirection() {
-        return this.direction;
-    }
-
+    @Deprecated
     protected Shape provideShape(Graphics2D g, Object comp, int width, int height) {
         return new Rectangle(0,0,width,height);
     }
-
-    /**
-     * Centers shape in the area covered by the painter.
-     * @param paintCentered Centering hint.
-     */
-    public void setPaintCentered(boolean paintCentered) {
-        boolean old = isPaintCentered();
-        this.paintCentered = paintCentered;
-        firePropertyChange("paintCentered", old, isPaintCentered());
-    }
-
 }
