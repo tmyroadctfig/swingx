@@ -32,12 +32,4 @@ public class BusyPainterTest extends AbstractPainterTest {
     protected BusyPainter createTestingPainter() {
         return new BusyPainter();
     }
-
-    /**
-     * Issue #861-swingx: must fire PCE on property change.
-     */
-//    @Test
-//    public void testPaint() {
-//        TestUtils.assertPCEFiring(new BusyPainter(), CollectionUtils.EMPTY_COLLECTION);
-//    }
 }
