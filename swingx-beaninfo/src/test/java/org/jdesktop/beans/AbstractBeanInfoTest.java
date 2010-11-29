@@ -109,6 +109,8 @@ public abstract class AbstractBeanInfoTest<T> {
             result = Boolean.FALSE.equals(defaultValue);
         } else if (propertyType == float.class) {
             result = ((Float) defaultValue) + 1f;
+        } else if (propertyType == int.class) {
+            result = ((Integer) defaultValue) + 1;
         } else if (propertyType == String.class) {
             result = "original string: " + defaultValue;
         } else if (propertyType == Insets.class) {
