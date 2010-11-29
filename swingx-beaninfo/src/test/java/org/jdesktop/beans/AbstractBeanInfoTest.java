@@ -105,12 +105,17 @@ public abstract class AbstractBeanInfoTest<T> {
                     result = iter.next();
                 }
             }
-        } else if (propertyType == boolean.class) {
-            result = Boolean.FALSE.equals(defaultValue);
-        } else if (propertyType == float.class) {
-            result = ((Float) defaultValue) + 1f;
-        } else if (propertyType == int.class) {
-            result = ((Integer) defaultValue) + 1;
+        } else if (propertyType.isPrimitive()) {
+            //help short circuit all of these checks
+            if (propertyType == boolean.class) {
+                result = Boolean.FALSE.equals(defaultValue);
+            } else if (propertyType == int.class) {
+                result = ((Integer) defaultValue) + 1;
+            } else if (propertyType == double.class) {
+                result = ((Double) defaultValue) + 1d;
+            } else if (propertyType == float.class) {
+                result = ((Float) defaultValue) + 1f;
+            }
         } else if (propertyType == String.class) {
             result = "original string: " + defaultValue;
         } else if (propertyType == Insets.class) {
