@@ -24,9 +24,6 @@ package org.jdesktop.swingx.painter;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Paint;
-import java.awt.Rectangle;
-import java.awt.TexturePaint;
-import java.awt.image.BufferedImage;
 
 import org.jdesktop.swingx.graphics.PaintUtils;
 
