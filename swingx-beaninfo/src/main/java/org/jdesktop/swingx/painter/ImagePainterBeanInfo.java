@@ -3,7 +3,6 @@ package org.jdesktop.swingx.painter;
 import org.jdesktop.beans.BeanInfoSupport;
 import org.jdesktop.beans.editors.EnumPropertyEditor;
 import org.jdesktop.beans.editors.ImageEditor;
-import org.jdesktop.beans.editors.ImageURLEditor;
 
 /**
  * BeanInfo of ImagePainter.
@@ -20,9 +19,8 @@ public class ImagePainterBeanInfo extends BeanInfoSupport {
     @Override
     protected void initialize() {
         setPropertyEditor(ImageEditor.class,"image");
-        setPropertyEditor(ImageURLEditor.class,"imageString");
         setPropertyEditor(ScaleTypePropertyEditor.class, "scaleType");
-        setPreferred(true, "image", "imageString", "scaleType", "scaleToFit");
+        setPreferred(true, "image", "scaleType", "scaleToFit");
     }
 
     public static final class ScaleTypePropertyEditor extends EnumPropertyEditor<ImagePainter.ScaleType> {
