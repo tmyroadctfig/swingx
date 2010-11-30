@@ -57,6 +57,11 @@ public abstract class AbstractBeanInfoTest<T> {
                 }
                 
                 if (descriptor.getWriteMethod() == null) {
+                    //special-case this read-only property
+                    if ("UIClassID".equals(descriptor.getName())) {
+                        return;
+                    }
+                    
                     fail("bound read-only property: " + descriptor.getName());
                 }
                 
