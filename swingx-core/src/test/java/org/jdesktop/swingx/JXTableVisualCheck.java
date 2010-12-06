@@ -52,10 +52,12 @@ import javax.swing.table.TableModel;
 
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.decorator.AbstractHighlighter;
+import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
+import org.jdesktop.swingx.hyperlink.AbstractHyperlinkAction;
 import org.jdesktop.swingx.hyperlink.LinkModel;
 import org.jdesktop.swingx.hyperlink.LinkModelAction;
 import org.jdesktop.swingx.renderer.CheckBoxProvider;
@@ -88,8 +90,8 @@ public class JXTableVisualCheck extends JXTableUnitTest {
       try {
 //        test.runInteractiveTests();
 //          test.runInteractiveTests("interactive.*FloatingPoint.*");
-//          test.runInteractiveTests("interactive.*Disable.*");
-          test.runInteractiveTests("interactive.*Remove.*");
+          test.runInteractiveTests("interactive.*Disable.*");
+//          test.runInteractiveTests("interactive.*Remove.*");
 //          test.runInteractiveTests("interactive.*ColumnProp.*");
 //          test.runInteractiveTests("interactive.*Multiple.*");
 //          test.runInteractiveTests("interactive.*RToL.*");
@@ -706,13 +708,26 @@ public class JXTableVisualCheck extends JXTableUnitTest {
     /**
      * Issue #282-swingx: compare disabled appearance of
      * collection views.
+     * 
+     * Issue #1374-swingx: rollover effects on disabled collection views
      *
      */
     public void interactiveDisabledCollectionViews() {
         final JXTable table = new JXTable(new AncientSwingTeam());
+        AbstractHyperlinkAction<Object> hyperlink = new AbstractHyperlinkAction<Object>() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+               LOG.info("pressed link");
+            }
+        };
+        table.getColumnExt(0).setCellRenderer(new DefaultTableRenderer(new HyperlinkProvider(hyperlink)));
+        table.getColumnExt(0).setEditable(false);
+        table.addHighlighter(new ColorHighlighter(HighlightPredicate.ROLLOVER_ROW, Color.MAGENTA, null));
         table.setEnabled(false);
         final JXList list = new JXList(new String[] {"one", "two", "and something longer"});
         list.setEnabled(false);
+        list.setToolTipText("myText ... showing when disnabled?");
         final JXTree tree = new JXTree(new FileSystemModel());
         tree.setEnabled(false);
         JComponent box = Box.createHorizontalBox();
@@ -730,8 +745,11 @@ public class JXTableVisualCheck extends JXTableUnitTest {
             
         };
         addAction(frame, action);
-        frame.setVisible(true);
-        
+        JLabel label = new JLabel("disable label");
+        label.setEnabled(false);
+        label.setToolTipText("tooltip of disabled label");
+        addStatusComponent(frame, label);
+        show(frame);
     }
 
     /**
