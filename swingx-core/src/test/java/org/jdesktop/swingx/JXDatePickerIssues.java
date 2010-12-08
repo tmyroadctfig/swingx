@@ -51,6 +51,7 @@ import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
+import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.SpinnerDateModel;
@@ -74,7 +75,7 @@ public class JXDatePickerIssues extends InteractiveTestCase {
             .getName());
     public static void main(String[] args) {
 //        setSystemLF(true);
-//        Trace14.keyboardFocusManager(true);
+//        Trace14.keyboardFocusManager(false);
         JXDatePickerIssues  test = new JXDatePickerIssues();
         try {
 //            test.runInteractiveTests();
@@ -93,9 +94,11 @@ public class JXDatePickerIssues extends InteractiveTestCase {
      * throws IllegalComponentStateException
      * 
      * Metal only?
+     * Same behaviour for JTable (and terminateEditOnFocusLost) and JXTable
+     * hot fix: backing out if parent null - leaves arrowButton in pressed?
      */
     public void interactiveIllegalComponentStateAsEditor() {
-        TableModel model = new DefaultTableModel(10, 1) {
+        TableModel model = new DefaultTableModel(10, 2) {
 
             /** 
              * @inherited <p>
@@ -106,14 +109,16 @@ public class JXDatePickerIssues extends InteractiveTestCase {
             }
              
         };
-        JXTable one = createTableWithEditor(model);
-        JXTable other = createTableWithEditor(model);
+        JTable one = createTableWithEditor(model, "picker 1 ");
+        JTable other = createTableWithEditor(model, "picker 2");
         showWithScrollingInFrame(one, other, "click to left of cell");
     }
     
-    private JXTable createTableWithEditor(TableModel model) {
-        JXTable table = new JXTable(model);
+    private JTable createTableWithEditor(TableModel model, String name) {
+        JTable table = new JXTable(model);
+//        table.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
         DatePickerCellEditor editor = new DatePickerCellEditor();
+        editor.getTableCellEditorComponent(table, null, false, 0, 0).setName(name);
         editor.setClickCountToStart(1);
         table.setDefaultEditor(Date.class, editor);
         return table;
