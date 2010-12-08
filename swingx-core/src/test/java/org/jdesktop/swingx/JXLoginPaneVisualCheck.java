@@ -65,8 +65,8 @@ public class JXLoginPaneVisualCheck extends InteractiveTestCase {
         JXLoginPaneVisualCheck test = new JXLoginPaneVisualCheck();
 
         try {
-//            test.runInteractiveTests();
-            test.runInteractiveTests("interactiveComparativeDialogs");
+            test.runInteractiveTests();
+//            test.runInteractiveTests("interactiveComparativeDialogs");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();

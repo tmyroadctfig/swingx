@@ -1063,7 +1063,7 @@ public class BasicDatePickerUI extends DatePickerUI {
     /**
      * Toggles the popups visibility after preparing internal state.
      * 
-     *
+     * 
      */
     public void toggleShowPopup() {
         if (popup == null) {
@@ -1072,18 +1072,44 @@ public class BasicDatePickerUI extends DatePickerUI {
         if (popup.isVisible()) {
             popup.setVisible(false);
         } else {
-            // PENDING JW: Issue 757-swing - datePicker firing focusLost on opening
+            // PENDING JW: Issue 757-swing - datePicker firing focusLost on
+            // opening
             // not with following line - but need to run tests
             datePicker.getEditor().requestFocusInWindow();
 //            datePicker.requestFocusInWindow();
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    popup.show(datePicker,
-                            0, datePicker.getHeight());
+//                    if (datePicker.getParent() == null) {
+//                        // Tracking #1372-swingx - parent is null if used as
+//                        // DatePickerCellEditor,
+//                        // two different editors, clickCountToStart == 1 and
+//                        // Metal
+//                        // as a first hot fix, we back out
+//                         LOG.info("couldn't show popup for: " + datePicker.getName());
+//                        return;
+//                    }
+                    popup.show(datePicker, 0, datePicker.getHeight());
                 }
             });
         }
 
+    }
+
+    
+    private void invokeShowPopup() {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                if (datePicker.getParent() == null) {
+                    // Tracking #1372-swingx - parent is null if used as DatePickerCellEditor,
+                    // two different editors, clickCountToStart == 1 and Metal
+                    // as a first hot fix, we back out
+//                    LOG.info("datePicker name: " + datePicker.getName() + datePicker.getParent());
+                    return;
+                }
+                popup.show(datePicker,
+                        0, datePicker.getHeight());
+            }
+        });
     }
 
     /**
