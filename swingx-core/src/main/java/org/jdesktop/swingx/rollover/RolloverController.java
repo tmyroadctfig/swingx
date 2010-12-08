@@ -139,27 +139,27 @@ public abstract class RolloverController<T extends JComponent> implements
             boolean prepare);
 
     /**
-     * checks and returns if the cell at the given location is 
-     * clickable. Here: same as isRolloverCell.
+     * Returns a boolean indicating whether or not the cell at the given 
+     * location is clickable. <p>
+     * 
+     * This implementation returns true if the target is enabled and the
+     * cell has a rollover renderer.
      * 
      * @param location in cell coordinates, p.x == column, p.y == row.
-     * 
      * @return true if the cell at the given location is clickable
+     * 
+     * @see #hasRollover(Point)
      */
     protected boolean isClickable(Point location) {
-        return hasRollover(location);
+        return component.isEnabled() && hasRollover(location);
     }
 
     /**
-     * checks and returns if the cell at the given location has  
-     * rollover effects. <p> 
-     * 
-     * Always returns false if the location
+     * Returns a boolean indicating whether the or not the cell at the 
+     * given has a rollover renderer. Always returns false if the location
      * is not valid.
      * 
-     * 
      * @param location in cell coordinates, p.x == column, p.y == row.
-     * 
      * @return true if the location is valid and has rollover effects, false
      *   otherwise.
      *    
