@@ -3023,6 +3023,7 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
             return table;
         }
 
+//----------------- column meta data        
         /**
          * {@inheritDoc}
          */
@@ -3080,6 +3081,25 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
             return column != null ? column.getModelIndex() : -1;
         }
 
+        /**
+         * @inherited <p>
+         */
+        @Override
+        public Class<?> getColumnClass() {
+            return getColumnClass(convertColumnIndexToModel(column));
+        }
+        
+        
+
+        /** 
+         * @inherited <p>
+         */
+        @Override
+        public Class<?> getColumnClass(int column) {
+            return table.getModel().getColumnClass(column);
+        }
+
+        //--------------------- model meta data        
         /**
          * {@inheritDoc}
          */

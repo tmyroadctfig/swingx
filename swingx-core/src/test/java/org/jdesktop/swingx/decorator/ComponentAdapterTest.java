@@ -21,6 +21,8 @@
  */
 package org.jdesktop.swingx.decorator;
 
+import static org.junit.Assert.*;
+
 import java.awt.Color;
 
 import javax.swing.ListModel;
@@ -62,15 +64,30 @@ public class ComponentAdapterTest extends TestCase {
      * prefix "R/G/B: " and the Color's rgb value.
      */
     private StringValue sv;
-
-    @Before
-    public void setUpJ4() throws Exception {
-        setUp();
+    
+    @Test
+    public void testColumnClassTable() {
+        JXTableT table = new JXTableT(new AncientSwingTeam());
+        for (int column = 0; column < table.getColumnCount(); column++) {
+            ComponentAdapter adapter = table.getComponentAdapter(0, column);
+            assertEquals(table.getModel().getColumnClass(column), adapter.getColumnClass());
+        }
     }
     
-    @After
-    public void tearDownJ4() throws Exception {
-        tearDown();
+    @Test
+    public void testColumnClassByIndexTable() {
+        JXTableT table = new JXTableT(new AncientSwingTeam());
+        ComponentAdapter adapter = table.getComponentAdapter(0, 0);
+        for (int column = 0; column < table.getColumnCount(); column++) {
+            assertEquals(table.getModel().getColumnClass(column), adapter.getColumnClass(column));
+        }
+    }
+
+    @Test
+    public void testColumnClass() {
+        JXListT list = new JXListT(new Object[] {"one"});
+        ComponentAdapter adapter = list.getComponentAdapter(0);
+        assertEquals(Object.class, adapter.getColumnClass());
     }
     
     /**
@@ -695,6 +712,17 @@ public class ComponentAdapterTest extends TestCase {
     @Override
     protected void setUp() throws Exception {
         sv = createColorStringValue();
+    }
+    
+
+    @Before
+    public void setUpJ4() throws Exception {
+        setUp();
+    }
+    
+    @After
+    public void tearDownJ4() throws Exception {
+        tearDown();
     }
     
 

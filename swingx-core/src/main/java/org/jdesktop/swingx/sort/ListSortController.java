@@ -24,7 +24,7 @@ package org.jdesktop.swingx.sort;
 import javax.swing.ListModel;
 
 /**
- * TODO add type doc
+ * A SortController to use with JXList.
  * 
  * @author Jeanette Winzenburg
  */

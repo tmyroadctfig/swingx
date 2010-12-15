@@ -29,9 +29,6 @@ import javax.swing.table.TableModel;
 /**
  * A SortController to use for a JXTable.<p>
  * 
- * PENDING JW: should move up to DefaultRowSorter for re-use in ListRowSorter, but as long
- * as we don't have the latter ... 
- * 
  * @author Jeanette Winzenburg
  */
 public class TableSortController<M extends TableModel> extends DefaultSortController<M>  {
