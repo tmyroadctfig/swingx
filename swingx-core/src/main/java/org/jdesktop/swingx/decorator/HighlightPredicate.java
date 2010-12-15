@@ -740,22 +740,25 @@ public interface HighlightPredicate {
         
         /**
          * Instantiates a predicate with Object.clazz. This is essentially the
-         * same as testing against null.
+         * same as testing the adapter's value against null.
          *
          */
         public TypeHighlightPredicate() {
             this(Object.class);
         }
+        
         /**
          * Instantiates a predicate with the given compare class.<p>
          * 
          * PENDING JW: support array? 
          * 
          * @param compareValue the fixed class to compare the 
-         *   adapter value against.
+         *   adapter value against, must not be null
+         *   
+         * @throws NullPointerException if the class is null.
          */
         public TypeHighlightPredicate(Class<?> compareValue) {
-            this.clazz = compareValue;
+            this.clazz = Contract.asNotNull(compareValue, "compare class must not be null");
         }
         
         /**
@@ -769,6 +772,7 @@ public interface HighlightPredicate {
             return adapter.getValue() != null ? 
                     clazz.isAssignableFrom(adapter.getValue().getClass()) : false;
         }
+        
         /**
          * @return type of predicate compare class
          */
@@ -780,41 +784,50 @@ public interface HighlightPredicate {
 
     /**
      * Predicate testing the componentAdapter column type against a given
-     * Clazz. Would be nice-to-have - but can't because the ComponentAdapter doesn't
-     * expose the columnClass. Should it?
+     * Class. 
      */
-    // @KEEP
-//    public static class ColumnTypeHighlightPredicate implements HighlightPredicate {
-//
-//        private Class clazz;
-//        
-//        /**
-//         * Instantitates a predicate with Object.clazz. This is essentially the
-//         * same as testing against null.
-//         *
-//         */
-//        public ColumnTypeHighlightPredicate() {
-//            this(Object.class);
-//        }
-//        /**
-//         * Instantitates a predicate with the given compare class.
-//         * @param compareValue the fixed class to compare the 
-//         *   adapter value against.
-//         */
-//        public ColumnTypeHighlightPredicate(Class compareValue) {
-//            this.clazz = compareValue;
-//        }
-//        
-//        /**
-//         * @inheritDoc
-//         * 
-//         * Implemented to return true if the adapter value is an instance
-//         * of this predicate's class type.
-//         */
-//        public boolean isHighlighted(Component renderer, ComponentAdapter adapter) {
-//            int modelColumn = adapter.viewToModel(columnIndex)
-//            return clazz.isAssignableFrom(adapter.getColumnClass(columnIndex));
-//        }
-//        
-//    }
+    public static class ColumnTypeHighlightPredicate implements HighlightPredicate {
+
+        private Class<?> clazz;
+        
+        /**
+         * Instantitates a predicate with Object.class. <p>
+         * 
+         * PENDING JW: this constructor is not very useful ... concrete implementations of 
+         * ComponentAdapter are required  to return a not-null from their 
+         * getColumnClass() methods). 
+         *
+         */
+        public ColumnTypeHighlightPredicate() {
+            this(Object.class);
+        }
+        
+        /**
+         * Instantitates a predicate with the given compare class.
+         * 
+         * @param compareValue the fixed class to compare the 
+         *   adapter's column class against, must not be null
+         *   
+         * @throws NullPointerException if the class is null.
+         *   
+         */
+        public ColumnTypeHighlightPredicate(Class<?> compareValue) {
+            this.clazz = Contract.asNotNull(compareValue, "compare class must not be null");
+        }
+        
+        /**
+         * @inheritDoc
+         * 
+         * Implemented to return true if the adapter value is an instance
+         * of this predicate's class type.
+         */
+        public boolean isHighlighted(Component renderer, ComponentAdapter adapter) {
+            return clazz.isAssignableFrom(adapter.getColumnClass());
+        }
+        
+        public Class<?> getType() {
+            return clazz;
+        }
+        
+    }
 }

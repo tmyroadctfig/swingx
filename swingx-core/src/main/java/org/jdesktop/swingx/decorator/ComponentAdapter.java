@@ -235,6 +235,8 @@ public abstract class ComponentAdapter {
      * implement as appropriate.
      * 
      * @return the common class of all data given column in model coordinates.
+     * 
+     * @see #getColumnClass()
      */
     public Class<?> getColumnClass(int column) {
         return Object.class;
@@ -244,13 +246,14 @@ public abstract class ComponentAdapter {
     /**
      * Returns the common class of all data in the current column.<p>
      * 
-     * This implementation returns <code>Object.class</code>. Subclasses should
-     * implement as appropriate.
+     * This implementation delegates to getColumnClass(int) with the current
+     * column converted to model coordinates.
      * 
      * @return the common class of all data in the current column.
+     * @see #getColumnClass(int)
      */
     public Class<?> getColumnClass() {
-        return Object.class;
+        return getColumnClass(convertColumnIndexToModel(column));
     }
     
     
