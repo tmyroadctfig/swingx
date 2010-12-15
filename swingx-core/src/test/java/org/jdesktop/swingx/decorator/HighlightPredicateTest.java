@@ -25,6 +25,7 @@ import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.decorator.HighlightPredicate.AndHighlightPredicate;
 import org.jdesktop.swingx.decorator.HighlightPredicate.ColumnHighlightPredicate;
+import org.jdesktop.swingx.decorator.HighlightPredicate.ColumnTypeHighlightPredicate;
 import org.jdesktop.swingx.decorator.HighlightPredicate.DepthHighlightPredicate;
 import org.jdesktop.swingx.decorator.HighlightPredicate.EqualsHighlightPredicate;
 import org.jdesktop.swingx.decorator.HighlightPredicate.IdentifierHighlightPredicate;
@@ -801,7 +802,15 @@ public class HighlightPredicateTest extends InteractiveTestCase {
         ComponentAdapter adapter = createComponentAdapter(allColored, false);
         assertFalse("unknown identifier must not highlight", predicate.isHighlighted(allColored, adapter));
     }
+
+//--------------------- TypeHighlightPredicate
+ 
+    @Test (expected = NullPointerException.class)
+    public void testTypeNull() {
+        new TypeHighlightPredicate(null);
+    }
     
+
     @Test
     public void testTypeProperty() {
         Class<?> clazz = String.class;
@@ -815,17 +824,52 @@ public class HighlightPredicateTest extends InteractiveTestCase {
         ComponentAdapter adapter = createComponentAdapter(allColored, false);
         assertTrue("string class must be highlighted", predicate.isHighlighted(allColored, adapter));
     }
-
+    
     @Test
     public void testTypeSubclass() {
         HighlightPredicate predicate = new TypeHighlightPredicate();
         ComponentAdapter adapter = createComponentAdapter(allColored, false);
         assertTrue("string class must be highlighted", predicate.isHighlighted(allColored, adapter));
     }
-
+    
     @Test
     public void testTypeFalse() {
         HighlightPredicate predicate = new TypeHighlightPredicate(Integer.class);
+        ComponentAdapter adapter = createComponentAdapter(allColored, false);
+        assertFalse("string class must be highlighted", predicate.isHighlighted(allColored, adapter));
+    }
+    
+//----------------------- ColumnTypePredicate
+    
+    @Test (expected = NullPointerException.class)
+    public void testColumnTypeNull() {
+        new ColumnTypeHighlightPredicate(null);
+    }
+    
+    @Test
+    public void testColumnTypeProperty() {
+        Class<?> clazz = String.class;
+        ColumnTypeHighlightPredicate predicate = new ColumnTypeHighlightPredicate(clazz);
+        assertEquals(clazz, predicate.getType());
+    }
+    
+    @Test
+    public void testColumnTypeExact() {
+        HighlightPredicate predicate = new ColumnTypeHighlightPredicate(String.class);
+        ComponentAdapter adapter = createComponentAdapter(allColored, false);
+        assertTrue("string class must be highlighted", predicate.isHighlighted(allColored, adapter));
+    }
+
+    @Test
+    public void testColumnTypeSubclass() {
+        HighlightPredicate predicate = new ColumnTypeHighlightPredicate();
+        ComponentAdapter adapter = createComponentAdapter(allColored, false);
+        assertTrue("string class must be highlighted", predicate.isHighlighted(allColored, adapter));
+    }
+
+    @Test
+    public void testColumnTypeFalse() {
+        HighlightPredicate predicate = new ColumnTypeHighlightPredicate(Integer.class);
         ComponentAdapter adapter = createComponentAdapter(allColored, false);
         assertFalse("string class must be highlighted", predicate.isHighlighted(allColored, adapter));
     }
@@ -1150,6 +1194,14 @@ public class HighlightPredicateTest extends InteractiveTestCase {
             @Override
             public String getColumnName(int columnIndex) {
                 return null;
+            }
+
+            /** 
+             * @inherited <p>
+             */
+            @Override
+            public Class<?> getColumnClass(int column) {
+                return String.class;
             }
 
             
