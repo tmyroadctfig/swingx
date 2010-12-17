@@ -16,6 +16,7 @@ import java.lang.reflect.Method;
 
 import javax.accessibility.Accessible;
 import javax.swing.JComponent;
+import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.TextUI;
@@ -277,7 +278,7 @@ public abstract class PromptTextUI extends TextUI {
 
     protected void paintPromptComponent(Graphics g, JTextComponent txt) {
         JTextComponent lbl = getPromptComponent(txt);
-        lbl.paint(g);
+        SwingUtilities.paintComponent(g, lbl, txt, 0, 0, txt.getWidth(), txt.getHeight());
 
         if (txt.getCaret() != null) {
             txt.getCaret().paint(g);
