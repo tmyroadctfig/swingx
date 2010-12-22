@@ -9,49 +9,12 @@
 
 package org.jdesktop.test;
 
-import java.awt.Color;
-import java.awt.ComponentOrientation;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Image;
-import java.awt.Insets;
-import java.awt.Paint;
-import java.awt.Rectangle;
-import java.awt.Shape;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyDescriptor;
-import java.io.File;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.net.URL;
-import java.sql.Connection;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Collection;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Properties;
-import java.util.TimeZone;
 import java.util.logging.Logger;
-import java.util.prefs.AbstractPreferences;
-import java.util.prefs.BackingStoreException;
-import java.util.prefs.Preferences;
-
-import javax.imageio.ImageIO;
-import javax.swing.BorderFactory;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-import javax.swing.JComponent;
-import javax.swing.border.Border;
 
 import junit.framework.Assert;
 
