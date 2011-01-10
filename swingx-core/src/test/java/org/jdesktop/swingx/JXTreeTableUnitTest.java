@@ -79,6 +79,21 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
     public JXTreeTableUnitTest() {
         super("JXTreeTable Unit Test");
     }
+    
+    /**
+     * Issue #1275-swingx: getToolTipText(MouseEvent) throws IllegalArgumentException.
+     * 
+     * Happens if the given mouse location doesn't map to a valid column, aka: is
+     * outside of the tree table (in which case the documented return value for columnAtPoint
+     * is -1). Code must cope with that.
+     * 
+     */
+    @Test
+    public void testSafeHierarchicalColumnOnToolTip() {
+        JXTreeTable table = new JXTreeTable(treeTableModel);
+        MouseEvent event = new MouseEvent(table, 0, 0, 0, -1, -1, 1, false);
+        table.getToolTipText(event);
+    }
 
     /**
      * Issue #876-swingx: add support for adding/removing expansion listeners.
