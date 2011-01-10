@@ -1456,7 +1456,7 @@ public class JXTreeTable extends JXTable {
     @Override
     public String getToolTipText(MouseEvent event) {
         int column = columnAtPoint(event.getPoint());
-        if (isHierarchical(column)) {
+        if (column >= 0 && isHierarchical(column)) {
             int row = rowAtPoint(event.getPoint());
             return renderer.getToolTipText(event, row, column);
         }
