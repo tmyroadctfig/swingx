@@ -44,6 +44,8 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreePath;
 
+import org.jdesktop.swingx.JXTreeTable.TreeTableModelAdapter;
+import org.jdesktop.swingx.JXTreeTableUnitTest.JXTreeTableA;
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
@@ -71,6 +73,7 @@ import org.jdesktop.swingx.treetable.MutableTreeTableNode;
 import org.jdesktop.swingx.treetable.TreeTableModel;
 import org.jdesktop.swingx.treetable.TreeTableNode;
 import org.jdesktop.test.TableModelReport;
+import org.junit.Test;
 
 /**
  * Test to exposed known issues of <code>JXTreeTable</code>. <p>
@@ -105,6 +108,21 @@ public class JXTreeTableIssues extends InteractiveTestCase {
     }
 
     
+    /**
+     * Issue #1379-swingx: support access to underlying TreeTableModel in TreeTableModelAdapter.
+     * 
+     * PENDING JW:
+     * The bind isn't really fool-proof tight: its possible for subclasses to bind an
+     * arbitrary tree to a TreeTableModelAdapter.
+     * Dont want to change, though, as client code might have mis-used ... 
+     */
+    @Test(expected = IllegalStateException.class)
+    public void testTreeTableAdapterBind() {
+        JXTreeTableA table = new JXTreeTableA(createActionTreeModel());
+        TreeTableModelAdapter model = table.createAdapter(new JTree()); 
+        model.bind(table);
+    }
+   
 
     /**
      * Custom renderer colors of Swingx DefaultTreeRenderer not respected.
