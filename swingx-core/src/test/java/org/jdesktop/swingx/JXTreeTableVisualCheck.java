@@ -56,6 +56,7 @@ import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeExpansionListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableModel;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreePath;
@@ -73,6 +74,8 @@ import org.jdesktop.swingx.decorator.HighlightPredicate.AndHighlightPredicate;
 import org.jdesktop.swingx.decorator.HighlightPredicate.ColumnHighlightPredicate;
 import org.jdesktop.swingx.decorator.HighlightPredicate.DepthHighlightPredicate;
 import org.jdesktop.swingx.renderer.DefaultTreeRenderer;
+import org.jdesktop.swingx.table.ColumnFactory;
+import org.jdesktop.swingx.table.TableColumnExt;
 import org.jdesktop.swingx.test.ComponentTreeTableModel;
 import org.jdesktop.swingx.test.XTestUtils;
 import org.jdesktop.swingx.treetable.AbstractTreeTableModel;
@@ -80,6 +83,7 @@ import org.jdesktop.swingx.treetable.DefaultMutableTreeTableNode;
 import org.jdesktop.swingx.treetable.DefaultTreeTableModel;
 import org.jdesktop.swingx.treetable.FileSystemModel;
 import org.jdesktop.swingx.treetable.TreeTableModel;
+import org.jdesktop.swingx.treetable.TreeTableModelProvider;
 import org.jdesktop.test.AncientSwingTeam;
 
 /**
@@ -103,7 +107,8 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
 //             test.runInteractiveTests("interactive.*ColumnSelection.*");
 //             test.runInteractiveTests("interactive.*RowHeightCompare.*");
 //             test.runInteractiveTests("interactive.*RToL.*");
-             test.runInteractiveTests("interactive.*ScrollPath.*");
+            test.runInteractiveTests("interactive.*ColumnFactory.*");
+//             test.runInteractiveTests("interactive.*ScrollPath.*");
 //             test.runInteractiveTests("interactive.*Insert.*");
 //             test.runInteractiveTests("interactive.*WinP.*");
         } catch (Exception ex) {
@@ -111,6 +116,34 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         }
     }
 
+    /**
+     * Issue #1379-swingx: support access to underlying treeTableModel of TreeTableModelAdapter.
+     * 
+     * Needed f.i. in a custom ColumnFactory to configure the hierarchical column specifically.
+     */
+    public void interactiveCustomColumnFactory() {
+        JXTreeTable table = new JXTreeTable();
+        ColumnFactory factory = new ColumnFactory() {
+
+            /** 
+             * @inherited <p>
+             */
+            @Override
+            public void configureTableColumn(TableModel model,
+                    TableColumnExt columnExt) {
+                super.configureTableColumn(model, columnExt);
+                if (model instanceof TreeTableModelProvider) {
+                    TreeTableModel treeTableModel = ((TreeTableModelProvider) model).getTreeTableModel();
+                    if (treeTableModel.getHierarchicalColumn() == columnExt.getModelIndex()) {
+                        columnExt.setTitle("Hierarchical: " + columnExt.getTitle());
+                    }
+                }
+            }
+        };
+        table.setColumnFactory(factory);
+        table.setTreeTableModel(new FileSystemModel());
+        showWithScrollingInFrame(table, "custom columnFactory");
+    }
     
     /**
      * Issue #1126: combo editor is closed immediately after starting

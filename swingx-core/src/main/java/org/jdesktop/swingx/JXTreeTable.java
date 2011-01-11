@@ -80,6 +80,8 @@ import org.jdesktop.swingx.tree.DefaultXTreeCellRenderer;
 import org.jdesktop.swingx.treetable.DefaultTreeTableModel;
 import org.jdesktop.swingx.treetable.TreeTableCellEditor;
 import org.jdesktop.swingx.treetable.TreeTableModel;
+import org.jdesktop.swingx.treetable.TreeTableModelProvider;
+import org.jdesktop.swingx.util.Contract;
 
 /**
  * <p><code>JXTreeTable</code> is a specialized {@link javax.swing.JTable table}
@@ -2219,23 +2221,23 @@ public class JXTreeTable extends JXTable {
     /**
      * 
      */
-    protected static class TreeTableModelAdapter extends AbstractTableModel {
+    protected static class TreeTableModelAdapter extends AbstractTableModel 
+        implements TreeTableModelProvider {
         private TreeModelListener treeModelListener;
+        private final JTree tree; // immutable
+        private JXTreeTable treeTable; // logically immutable
         
         /**
          * Maintains a TreeTableModel and a JTree as purely implementation details.
          * Developers can plug in any type of custom TreeTableModel through a
          * JXTreeTable constructor or through setTreeTableModel().
          *
-         * @param model Underlying data model for the JXTreeTable that will ultimately
-         * be bound to this TreeTableModelAdapter
          * @param tree TreeTableCellRenderer instantiated with the same model as
-         * specified by the model parameter of this constructor
-         * @throws IllegalArgumentException if a null model argument is passed
+         * the driving JXTreeTable's TreeTableModel.
          * @throws IllegalArgumentException if a null tree argument is passed
          */
         TreeTableModelAdapter(JTree tree) {
-            assert tree != null;
+            Contract.asNotNull(tree, "tree must not be null");
 
             this.tree = tree; // need tree to implement getRowCount()
             tree.getModel().addTreeModelListener(getTreeModelListener());
@@ -2305,22 +2307,33 @@ public class JXTreeTable extends JXTable {
                 throw new IllegalArgumentException("adapter already bound");
             }
         }
+        
+        /**
+         * 
+         * @inherited <p>
+         * 
+         * Implemented to return the the underlying TreeTableModel. 
+         */
+        @Override
+        public TreeTableModel getTreeTableModel() {
+            return (TreeTableModel) tree.getModel();
+        }
 
         // Wrappers, implementing TableModel interface.
         // TableModelListener management provided by AbstractTableModel superclass.
 
         @Override
         public Class<?> getColumnClass(int column) {
-            return ((TreeTableModel) tree.getModel()).getColumnClass(column);
+            return getTreeTableModel().getColumnClass(column);
         }
 
         public int getColumnCount() {
-            return ((TreeTableModel) tree.getModel()).getColumnCount();
+            return getTreeTableModel().getColumnCount();
         }
 
         @Override
         public String getColumnName(int column) {
-            return ((TreeTableModel) tree.getModel()).getColumnName(column);
+            return getTreeTableModel().getColumnName(column);
         }
 
         public int getRowCount() {
@@ -2330,14 +2343,14 @@ public class JXTreeTable extends JXTable {
         public Object getValueAt(int row, int column) {
             // Issue #270-swingx: guard against invisible row
             Object node = nodeForRow(row);
-            return node != null ? ((TreeTableModel) tree.getModel()).getValueAt(node, column) : null;
+            return node != null ? getTreeTableModel().getValueAt(node, column) : null;
         }
 
         @Override
         public boolean isCellEditable(int row, int column) {
             // Issue #270-swingx: guard against invisible row
             Object node = nodeForRow(row);
-            return node != null ? ((TreeTableModel) tree.getModel()).isCellEditable(node, column) : false;
+            return node != null ? getTreeTableModel().isCellEditable(node, column) : false;
         }
 
         @Override
@@ -2345,7 +2358,7 @@ public class JXTreeTable extends JXTable {
             // Issue #270-swingx: guard against invisible row
             Object node = nodeForRow(row);
             if (node != null) {
-                ((TreeTableModel) tree.getModel()).setValueAt(value, node, column);
+                getTreeTableModel().setValueAt(value, node, column);
             }
         }
 
@@ -2551,8 +2564,6 @@ public class JXTreeTable extends JXTable {
 
         }
 
-        private final JTree tree; // immutable
-        private JXTreeTable treeTable = null; // logically immutable
     }
 
     static class TreeTableCellRenderer extends JXTree implements

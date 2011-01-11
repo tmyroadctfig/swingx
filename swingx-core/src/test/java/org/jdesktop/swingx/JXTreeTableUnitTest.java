@@ -34,6 +34,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TreeSelectionEvent;
@@ -55,6 +56,7 @@ import org.jdesktop.swingx.treetable.DefaultTreeTableModel;
 import org.jdesktop.swingx.treetable.FileSystemModel;
 import org.jdesktop.swingx.treetable.MutableTreeTableNode;
 import org.jdesktop.swingx.treetable.TreeTableModel;
+import org.jdesktop.swingx.treetable.TreeTableModelProvider;
 import org.jdesktop.swingx.treetable.TreeTableNode;
 import org.jdesktop.test.AncientSwingTeam;
 import org.jdesktop.test.PropertyChangeReport;
@@ -78,6 +80,42 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
     
     public JXTreeTableUnitTest() {
         super("JXTreeTable Unit Test");
+    }
+    
+    /**
+     * Issue #1379-swingx: support access to the underlying TreeTableModel.
+     */
+    @Test (expected= NullPointerException.class)
+    public void testTreeTableModelAdapter() {
+        JXTreeTableA table = new JXTreeTableA();
+        table.createAdapter(null);
+    }
+    /**
+     * Subclass to test model adapter properties.
+     */
+    public static class JXTreeTableA extends JXTreeTable {
+        
+        public JXTreeTableA() {
+            super();
+        }
+        
+        public JXTreeTableA(TreeTableModel model) {
+            super(model);
+        }
+        
+        public TreeTableModelAdapter createAdapter(JTree tree) {
+            return new TreeTableModelAdapter(tree);
+        }
+    }
+    
+    /**
+     * Issue #1379-swingx: support access to the underlying TreeTableModel.
+     */
+    @Test
+    public void testTreeTableModelProvider() {
+        JXTreeTable table = new JXTreeTable(treeTableModel);
+        assertTrue(table.getModel() instanceof TreeTableModelProvider);
+        assertSame(treeTableModel, ((TreeTableModelProvider) table.getModel()).getTreeTableModel());
     }
     
     /**
