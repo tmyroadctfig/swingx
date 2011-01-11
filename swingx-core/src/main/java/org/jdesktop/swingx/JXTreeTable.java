@@ -268,6 +268,7 @@ public class JXTreeTable extends JXTable {
             }
         }
     }
+    
 
     /** 
      * {@inheritDoc} <p>
@@ -283,8 +284,6 @@ public class JXTreeTable extends JXTable {
         // no-op
     }
 
-    
-    
     /** 
      * {@inheritDoc} <p>
      * Overridden to do nothing. 
@@ -312,6 +311,54 @@ public class JXTreeTable extends JXTable {
     }
 
     /**
+     * Hook into super's setAutoCreateRowSorter for use in sub-classes which want to experiment
+     * with tree table sorting/filtering.<p>
+     *
+     * <strong> NOTE: While subclasses may use this method to allow access to 
+     * super that usage alone will not magically turn sorting/filtering on! They have 
+     * to implement an appropriate RowSorter/SortController
+     * as well. This is merely a hook to hang themselves, as requested in Issue #479-swingx
+     * </strong> 
+     * 
+     * @param autoCreateRowSorter
+     */
+    protected void superSetAutoCreateRowSorter(boolean autoCreateRowSorter) {
+        super.setAutoCreateRowSorter(autoCreateRowSorter);
+    }
+    
+    /**
+     * Hook into super's setSortable for use in sub-classes which want to experiment
+     * with tree table sorting/filtering.<p>
+     *
+     * <strong> NOTE: While subclasses may use this method to allow access to 
+     * super that usage alone will not magically turn sorting/filtering on! They have 
+     * to implement an appropriate RowSorter/SortController
+     * as well. This is merely a hook to hang themselves, as requested in Issue #479-swingx
+     * </strong> 
+     * 
+     * @param sortable
+     */
+    protected void superSetSortable(boolean sortable) {
+        super.setSortable(sortable);
+    }
+    
+    /**
+     * Hook into super's setRowSorter for use in sub-classes which want to experiment
+     * with tree table sorting/filtering.<p>
+     *
+     * <strong> NOTE: While subclasses may use this method to allow access to 
+     * super that usage alone will not magically turn sorting/filtering on! They have 
+     * to implement an appropriate RowSorter/SortController
+     * as well. This is merely a hook to hang themselves, as requested in Issue #479-swingx
+     * </strong> 
+     * 
+     * @param sorter
+     */
+    protected void superSetRowSorter(RowSorter <? extends TableModel> sorter) {
+        super.setRowSorter(sorter);
+    }
+    
+    /**
      * {@inheritDoc} <p>
      * 
      * Overridden to keep the tree's enabled in synch.
@@ -321,7 +368,6 @@ public class JXTreeTable extends JXTable {
         renderer.setEnabled(enabled);
         super.setEnabled(enabled);
     }
-    
 
     /**
      * {@inheritDoc} <p>

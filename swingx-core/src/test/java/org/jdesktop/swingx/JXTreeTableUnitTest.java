@@ -35,6 +35,7 @@ import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JTree;
+import javax.swing.RowSorter;
 import javax.swing.SwingUtilities;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TreeSelectionEvent;
@@ -48,6 +49,7 @@ import org.jdesktop.swingx.decorator.ComponentAdapterTest.JXTreeTableT;
 import org.jdesktop.swingx.renderer.DefaultTreeRenderer;
 import org.jdesktop.swingx.renderer.StringValue;
 import org.jdesktop.swingx.renderer.StringValues;
+import org.jdesktop.swingx.sort.TableSortController;
 import org.jdesktop.swingx.table.TableColumnExt;
 import org.jdesktop.swingx.test.ComponentTreeTableModel;
 import org.jdesktop.swingx.test.TreeTableUtils;
@@ -80,6 +82,63 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
     
     public JXTreeTableUnitTest() {
         super("JXTreeTable Unit Test");
+    }
+    
+    @Test
+    public void testFakeSortable() {
+        JXTreeTable table = new FakeSortableTreeTable();
+        table.setSortable(true);
+        assertTrue("table sortable must be true", table.isSortable());
+    }
+    
+    
+    @Test
+    public void testFakeAutoCreateRowSorter() {
+        JXTreeTable table = new FakeSortableTreeTable();
+        table.setAutoCreateRowSorter(true);
+        assertTrue("table autocreateRowsorter must be true", table.getAutoCreateRowSorter());
+    }
+    
+    
+    @Test
+    public void testFakeSetRowSorter() {
+        JXTreeTable table = new FakeSortableTreeTable();
+        TableSortController<TableModel> controller = new TableSortController<TableModel>(table.getModel());
+        table.setRowSorter(controller);
+        assertEquals("table sorter must be set", controller, table.getRowSorter());
+    }
+    
+    /**
+     * Test subclass access to super sortable models, Issue #479-swingx.
+     */
+    public static class FakeSortableTreeTable extends JXTreeTable {
+
+        /** 
+         * @inherited <p>
+         */
+        @Override
+        public void setAutoCreateRowSorter(boolean autoCreateRowSorter) {
+            superSetAutoCreateRowSorter(autoCreateRowSorter);
+        }
+
+        /** 
+         * @inherited <p>
+         */
+        @Override
+        public void setRowSorter(RowSorter<? extends TableModel> sorter) {
+            superSetRowSorter(sorter);
+        }
+
+        /** 
+         * @inherited <p>
+         */
+        @Override
+        public void setSortable(boolean sortable) {
+            superSetSortable(sortable);
+        }
+
+        
+        
     }
     
     /**
