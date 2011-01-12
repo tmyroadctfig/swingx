@@ -25,6 +25,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
+import org.junit.Test;
+
 import junit.framework.TestCase;
 
 /**
@@ -33,6 +35,13 @@ import junit.framework.TestCase;
  */
 public class CalendarUtilsIssues extends TestCase {
 
+    
+    @Test
+    public void testSameDecade() {
+        // PENDING JW: implement CalendarUtils.sameDecade
+        fail("implement CalendarUtils.sameDecade");
+    }
+    
     /**
      */
     public void testStartOfDSTBerlin() {
