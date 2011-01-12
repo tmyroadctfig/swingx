@@ -140,7 +140,6 @@ public class CalendarUtilsTest extends InteractiveTestCase {
         assertEquals(midJune.getTime(), startOf10YearsFuture);
     }
     
-
     @Test
     public void testIsStartOfDecade() {
         todayGerman.set(Calendar.YEAR, 2000);
@@ -157,6 +156,7 @@ public class CalendarUtilsTest extends InteractiveTestCase {
         assertTrue(CalendarUtils.isStartOfYear(todayGerman));
         assertEquals(2000, todayGerman.get(Calendar.YEAR));
     }
+    
     @Test
     public void testIsStartOfDecadeByField() {
         todayGerman.set(Calendar.YEAR, 2000);
@@ -164,17 +164,17 @@ public class CalendarUtilsTest extends InteractiveTestCase {
         assertTrue(CalendarUtils.isStartOf(todayGerman, CalendarUtils.DECADE));
         todayGerman.add(Calendar.YEAR, 1);
         assertFalse(CalendarUtils.isStartOf(todayGerman, CalendarUtils.DECADE));
-       
     }
     
     @Test
     public void testSameByDecadeField() {
-        
-    }
-    
-    @Test
-    public void testSameDecade() {
-        
+        Date now = todayGerman.getTime();
+        CalendarUtils.startOfDecade(todayGerman);
+        Date start = todayGerman.getTime();
+        assertTrue(CalendarUtils.isSame(todayGerman, now, CalendarUtils.DECADE));
+        assertEquals("Calendar unchanged by same decade query", start, todayGerman.getTime());
+        todayGerman.add(Calendar.YEAR, -1);
+        assertFalse(CalendarUtils.isSame(todayGerman, now, CalendarUtils.DECADE));
     }
     
     @Test
@@ -188,20 +188,20 @@ public class CalendarUtilsTest extends InteractiveTestCase {
         assertFalse(CalendarUtils.isSame(todayGerman, now, Calendar.DAY_OF_MONTH));
     }
     
-
-    
     @Test
     public void testStartOfYearField() {
         CalendarUtils.startOf(midJune, Calendar.YEAR);
         assertTrue(CalendarUtils.isStartOfYear(midJune));
         assertTrue(CalendarUtils.isStartOf(midJune, Calendar.YEAR));
     }
+    
     @Test
     public void testStartOfDayField() {
         CalendarUtils.startOf(midJune, Calendar.DAY_OF_MONTH);
         assertTrue(CalendarUtils.isStartOfDay(midJune));
         assertTrue(CalendarUtils.isStartOf(midJune, Calendar.DAY_OF_MONTH));
     }
+
     @Test
     public void testStartOfMonthField() {
         CalendarUtils.startOf(midJune, Calendar.MONTH);
@@ -224,7 +224,8 @@ public class CalendarUtilsTest extends InteractiveTestCase {
         Date startOf10YearsFuture = CalendarUtils.startOfYear(todayGerman, midJune.getTime());
         CalendarUtils.startOfYear(midJune);
         assertTrue(CalendarUtils.isStartOfMonth(todayGerman));
-        assertEquals(midJune.getTime(), startOf10YearsFuture);
+        assertEquals("start of year with return must be same as changing start-of-year", 
+                startOf10YearsFuture, midJune.getTime());
     }
     
     @Test
@@ -246,7 +247,6 @@ public class CalendarUtilsTest extends InteractiveTestCase {
         assertTrue(CalendarUtils.isStartOfMonth(todayGerman));
         Date startOfFirstOfFeb = todayGerman.getTime();
         CalendarUtils.startOfWeek(todayGerman);
-//        assertEquals(startOfFirstOfFeb, todayGerman.getTime());
         assertTrue("expected calendar before firstOfFeb " 
                 + todayGerman.getTime() + " / " + startOfFirstOfFeb , 
                 todayGerman.getTime().before(startOfFirstOfFeb));
@@ -437,7 +437,6 @@ public class CalendarUtilsTest extends InteractiveTestCase {
         todayGerman.add(Calendar.MILLISECOND, 1);
         assertFalse(CalendarUtils.isStartOfMonth(todayGerman));
     }
-    
     
     @Test
     public void testIsEndOfMonth() {

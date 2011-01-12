@@ -94,7 +94,6 @@ public class CalendarUtils {
         }
     }
     
-    
     /**
      * Sets the calendar field of the given calendar by amount. <p>
      * 
@@ -138,7 +137,6 @@ public class CalendarUtils {
         }
     }
     
-    
     /**
      * @param calendarField
      * @return
@@ -173,7 +171,6 @@ public class CalendarUtils {
         return null;
     }
 
-    
     /**
      * Adjusts the Calendar to the end of the day of the first day in DST in the
      * current year or unchanged if  not using DST. Returns the calendar's date or null, if not 
@@ -200,6 +197,7 @@ public class CalendarUtils {
         calendar.setTimeInMillis(old);
         return null;
     }
+
     /**
      * Returns a boolean indicating if the given calendar represents the 
      * start of a day (in the calendar's time zone). The calendar is unchanged.
@@ -348,10 +346,8 @@ public class CalendarUtils {
         return calendar.getTime();
     }
 
-    
-    
     /**
-     * Adjusts the given Calendar to the start of the year.
+     * Adjusts the given Calendar to the start of the decade.
      * 
      * @param calendar the calendar to adjust.
      */
@@ -359,7 +355,6 @@ public class CalendarUtils {
         calendar.set(Calendar.YEAR, decade(calendar.get(Calendar.YEAR)) );
         startOfYear(calendar);
     }
-
 
     /**
      * @param year
@@ -373,8 +368,9 @@ public class CalendarUtils {
      * Adjusts the given Calendar to the start of the decade as defined by 
      * the given date. Returns the calendar's Date.
      * 
-     * @param calendar
-     * @param date
+     * @param calendar calendar to adjust.
+     * @param date the Date to use.
+     * @return the start of the decade of the given date
      */
     public static Date startOfDecade(Calendar calendar, Date date) {
         calendar.setTime(date);
@@ -384,8 +380,8 @@ public class CalendarUtils {
     
     /**
      * Returns a boolean indicating if the given calendar represents the 
-     * start of a year (in the calendar's time zone). Returns true, if the time is 
-     * the start of the first day of the year, false otherwise. The calendar is unchanged.
+     * start of a decade (in the calendar's time zone). Returns true, if the time is 
+     * the start of the first day of the decade, false otherwise. The calendar is unchanged.
      * 
      * @param calendar the calendar to check.
      * 
@@ -398,7 +394,6 @@ public class CalendarUtils {
         return decade(temp.get(Calendar.YEAR)) != decade(calendar.get(Calendar.YEAR));
     }
     
-
     /**
      * Adjusts the given Calendar to the start of the year.
      * 
@@ -413,12 +408,13 @@ public class CalendarUtils {
      * Adjusts the given Calendar to the start of the year as defined by 
      * the given date. Returns the calendar's Date.
      * 
-     * @param calendar
-     * @param date
+     * @param calendar calendar to adjust.
+     * @param date the Date to use.
+     * @return the start of the year of the given date
      */
     public static Date startOfYear(Calendar calendar, Date date) {
         calendar.setTime(date);
-        startOfDecade(calendar);
+        startOfYear(calendar);
         return calendar.getTime();
     }
 
@@ -441,7 +437,8 @@ public class CalendarUtils {
     /**
      * Adjusts the calendar to the start of the current month.
      * That is, first day of the month with all time fields cleared.
-     * @param calendar
+     * 
+     * @param calendar calendar to adjust.
      */
     public static void startOfMonth(Calendar calendar) {
         calendar.set(Calendar.DAY_OF_MONTH, 1);
@@ -453,7 +450,7 @@ public class CalendarUtils {
      * That is the last day of the month with all time-fields
      * at max.
      * 
-     * @param calendar
+     * @param calendar calendar to adjust.
      */
     public static void endOfMonth(Calendar calendar) {
         // start of next month
@@ -462,8 +459,6 @@ public class CalendarUtils {
         // one millisecond back
         calendar.add(Calendar.MILLISECOND, -1);
     }
-
-
 
     /**
      * Adjust the given calendar to the first millisecond of the given date.
@@ -480,7 +475,6 @@ public class CalendarUtils {
         return calendar.getTime();
     }
 
-
     /**
      * Adjust the given calendar to the last millisecond of the given date.
      * that is all time fields cleared. The Date of the adjusted Calendar is
@@ -495,7 +489,6 @@ public class CalendarUtils {
         endOfDay(calendar);
         return calendar.getTime();
     }
-
 
     /**
      * Adjust the given calendar to the first millisecond of the current day.
@@ -580,6 +573,7 @@ public class CalendarUtils {
                 throw new IllegalArgumentException("unsupported field: " + field);
             }
     }
+
     /**
      * Checks the given dates for being equal.
      * 
