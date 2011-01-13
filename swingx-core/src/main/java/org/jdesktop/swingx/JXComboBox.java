@@ -558,6 +558,16 @@ public class JXComboBox extends JComboBox {
         }
     }
 
+    /**
+     * PENDING JW to KS: review method naming - doesn't sound like valid English to me (no 
+     * native speaker of course :-). Options are to 
+     * change the property name to usingHighlightersForCurrentValue (as we did in JXMonthView
+     * after some debate) or stick to getXX. Thinking about it: maybe then the property should be
+     * usesHighlightersXX, that is third person singular instead of imperative, 
+     * like in tracksVerticalViewport of JTable?
+     * 
+     * @return
+     */
     public boolean isUseHighlightersForCurrentValue() {
         return useHighlightersForCurrentValue;
     }
