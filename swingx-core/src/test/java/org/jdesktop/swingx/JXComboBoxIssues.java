@@ -20,8 +20,11 @@
  */
 package org.jdesktop.swingx;
 
+import java.awt.event.ActionEvent;
 import java.util.logging.Logger;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
@@ -29,6 +32,9 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 
 import org.jdesktop.swingx.decorator.HighlighterFactory;
+import org.jdesktop.swingx.decorator.PainterHighlighter;
+import org.jdesktop.swingx.painter.ImagePainter;
+import org.jdesktop.swingx.test.XTestUtils;
 
 /**
  *
@@ -55,7 +61,6 @@ public class JXComboBoxIssues extends InteractiveTestCase {
     }
     
     public static void main(String[] args) {
-        setLAF("Motif");
         JXComboBoxIssues test = new JXComboBoxIssues();
         
         try {
@@ -68,16 +73,38 @@ public class JXComboBoxIssues extends InteractiveTestCase {
 
     public void testDummy() { }
 
+    
+    
+    public void interactiveHighlightSelectedItemNotInList() {
+        final JXComboBox combo = new JXComboBox(createComboBoxModel());
+        combo.getModel().setSelectedItem("not-in-list");
+        PainterHighlighter hl = new PainterHighlighter(new ImagePainter(XTestUtils.loadDefaultImage()));
+        combo.addHighlighter(hl);
+        JComponent panel = new JXPanel();
+        panel.add(new JButton("something to focus"));
+        panel.add(combo);
+        showInFrame(panel, "Painter");
+    }
+    
     public void interactiveComboBoxHighlighterNotEditable() {
-        JXComboBox combo = new JXComboBox(createComboBoxModel());
+        final JXComboBox combo = new JXComboBox(createComboBoxModel());
         combo.addHighlighter(HighlighterFactory.createSimpleStriping(HighlighterFactory.LINE_PRINTER));
         
         JComponent panel = new JXPanel();
         panel.add(new JButton("something to focus"));
         panel.add(combo);
         panel.add(new JComboBox(combo.getModel()));
-        JXFrame frame = showInFrame(panel, "Highlighter - not editable");
+        JXFrame frame = wrapInFrame(panel, "Highlighter - not editable");
+        Action action = new AbstractAction("toggle useHighlighterOnCurrent") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                combo.setUseHighlightersForCurrentValue(!combo.isUseHighlightersForCurrentValue());
+            }
+        };
+        addAction(frame, action);
         addStatusMessage(frame, "incorrect not-editable xcombo appearance");
+        show(frame);
     }
     
     public void interactiveComboBoxHighlighterEditable() {
