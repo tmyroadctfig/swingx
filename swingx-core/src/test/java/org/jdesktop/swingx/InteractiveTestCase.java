@@ -77,6 +77,14 @@ public abstract class InteractiveTestCase extends junit.framework.TestCase {
 //----------------- run
     
     /**
+     * Runs all tests which are prefixed by "interactive" and contain the given snippet.
+     * @throws Exception 
+     */
+    public void runInteractive(String snippet) throws Exception {
+        runInteractiveTests("interactive.*" + snippet + ".*");
+    }
+    
+    /**
      * Runs all tests whose method names match the specified regex pattern.
      * @param regexPattern regular expression pattern used to match test method names
      * @throws java.lang.Exception
