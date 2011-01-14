@@ -5,9 +5,13 @@
 package org.jdesktop.swingx.rollover;
 
 import java.awt.Color;
+import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.util.logging.Logger;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.TransferHandler;
@@ -126,13 +130,28 @@ public class RolloverVisualCheck extends InteractiveTestCase {
     }
     
     /**
-     * Issue #456-swingx: Rollover highlighter not showing while dragging.
+     * Issue #1387-swingx: Rollover click-on-release-after drag.
+     * 
+     * PENDING JW: what's the expected behaviour?
      */
     public void interactiveRolloverClickAfterDrag() {
         JXList list = new JXList(AncientSwingTeam.createNamedColorListModel());
         list.setVisibleRowCount(list.getElementCount());
         list.setRolloverEnabled(true);
-        final JXFrame frame = showWithScrollingInFrame(list, "disable table must not trigger rollover renderer");
+
+        TransferHandler handler = new TransferHandler() {
+
+            /** 
+             * @inherited <p>
+             */
+            @Override
+            public boolean canImport(TransferSupport support) {
+                return true;
+            }
+            
+        };
+        list.setTransferHandler(handler);
+        final JXFrame frame = wrapWithScrollingInFrame(list, "release-after-drag must not trigger clicked");
         // rollover-enabled default renderer
         DefaultListRenderer renderer = new DefaultListRenderer() {
             @Override
@@ -146,6 +165,19 @@ public class RolloverVisualCheck extends InteractiveTestCase {
             }
         };
         list.setCellRenderer(renderer);
+        JTextField textField = new JTextField("just something to drag ...", 40);
+        textField.setDragEnabled(true);
+        addStatusComponent(frame, textField);
+        Action action = new AbstractAction("drag into me - am I called on release?") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                LOG.info("triggered...");
+            }
+        };
+        JButton button = new JButton(action);
+        addStatusComponent(frame, button);
+        show(frame);
     }
     
     /**
