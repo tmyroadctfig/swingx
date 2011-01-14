@@ -92,6 +92,7 @@ public abstract class RolloverProducer implements MouseListener, MouseMotionList
      * Implemented to map to client property clicked and fire always.
      */
     public void mouseReleased(MouseEvent e) {
+        updateRollover(e, ROLLOVER_KEY, false);
         updateRollover(e, CLICKED_KEY, true);
     }
 
