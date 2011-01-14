@@ -62,6 +62,8 @@ public abstract class RolloverProducer implements MouseListener, MouseMotionList
 
     //        public static final String PRESSED_KEY = "swingx.pressed";
 
+    private boolean isDragging;
+    
     /**
      * Installs all listeners, as required. 
      * 
@@ -89,10 +91,15 @@ public abstract class RolloverProducer implements MouseListener, MouseMotionList
     //----------------- mouseListener
 
     /**
-     * Implemented to map to client property clicked and fire always.
+     * Implemented to map to Rollover properties as needed. This implemenation calls
+     * updateRollover with both ROLLOVER_KEY and CLICKED_KEY properties. 
      */
     public void mouseReleased(MouseEvent e) {
+        // JW: fix for #456-swingx - rollover not updated after end of dragging
         updateRollover(e, ROLLOVER_KEY, false);
+        if (!isDragging) {
+            // PENDING JW: Issue 1387-swingx - trigger click on release-after-drag?
+        }
         updateRollover(e, CLICKED_KEY, true);
     }
 
