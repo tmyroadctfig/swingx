@@ -5,11 +5,9 @@
 package org.jdesktop.swingx.rollover;
 
 import java.awt.Color;
-import java.awt.event.ActionEvent;
+import java.awt.event.MouseEvent;
 import java.util.logging.Logger;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.TransferHandler;
@@ -35,10 +33,66 @@ public class RolloverVisualCheck extends InteractiveTestCase {
     public static void main(String[] args) {
         RolloverVisualCheck test = new RolloverVisualCheck();
         try {
-            test.runInteractive("While");
+            test.runInteractive("Drag");
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+    
+    /**
+     * Issue #456-swingx: Rollover highlighter not showing while dragging.
+     * 
+     * Example how to force rollover while dragging (NOT dnd - in that case the visuals
+     * are controlled by the dnd mechanism): subclass JXList to install a custom 
+     * RolloverProducer
+     */
+    public void interactiveEnforceRolloverWhileDragging() {
+        final JXList list = new JXList(AncientSwingTeam.createNamedColorListModel()) {
+
+            /** 
+             * @inherited <p>
+             */
+            @Override
+            protected RolloverProducer createRolloverProducer() {
+                ListRolloverProducer producer = new ListRolloverProducer() {
+
+                    /** 
+                     * @inherited <p>
+                     */
+                    @Override
+                    public void mouseDragged(MouseEvent e) {
+                        super.mouseDragged(e);
+                        updateRollover(e, ROLLOVER_KEY, false);
+                    }
+                    
+                };
+                return producer;
+            }
+            
+        };
+        list.setVisibleRowCount(list.getElementCount());
+        list.setRolloverEnabled(true);
+        list.addHighlighter(new ColorHighlighter(
+                HighlightPredicate.ROLLOVER_ROW, 
+                Color.MAGENTA, null, Color.MAGENTA, null));
+        
+        TransferHandler handler = new TransferHandler() {
+            
+            /** 
+             * @inherited <p>
+             */
+            @Override
+            public boolean canImport(TransferSupport support) {
+                return true;
+            }
+            
+        };
+        list.setTransferHandler(handler);
+        JXFrame frame = wrapWithScrollingInFrame(list, "force Rollover while dragging");
+        JTextField textField = new JTextField("just something to drag ...", 40);
+        textField.setDragEnabled(true);
+        addStatusComponent(frame, textField);
+        show(frame);
     }
     
     /**
@@ -69,6 +123,29 @@ public class RolloverVisualCheck extends InteractiveTestCase {
         textField.setDragEnabled(true);
         addStatusComponent(frame, textField);
         show(frame);
+    }
+    
+    /**
+     * Issue #456-swingx: Rollover highlighter not showing while dragging.
+     */
+    public void interactiveRolloverClickAfterDrag() {
+        JXList list = new JXList(AncientSwingTeam.createNamedColorListModel());
+        list.setVisibleRowCount(list.getElementCount());
+        list.setRolloverEnabled(true);
+        final JXFrame frame = showWithScrollingInFrame(list, "disable table must not trigger rollover renderer");
+        // rollover-enabled default renderer
+        DefaultListRenderer renderer = new DefaultListRenderer() {
+            @Override
+            public void doClick() {
+                JOptionPane.showMessageDialog(frame, "Click");
+            }
+            
+            @Override
+            public boolean isEnabled() {
+                return true;
+            }
+        };
+        list.setCellRenderer(renderer);
     }
     
     /**
