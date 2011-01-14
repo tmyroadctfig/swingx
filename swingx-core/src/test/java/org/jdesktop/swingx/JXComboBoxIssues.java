@@ -48,18 +48,6 @@ public class JXComboBoxIssues extends InteractiveTestCase {
     
     private ComboBoxModel model;
     
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setUp() {
-        model = createComboBoxModel();
-    }
-
-    private DefaultComboBoxModel createComboBoxModel() {
-        return new DefaultComboBoxModel(new JComboBox().getActionMap().allKeys());
-    }
-    
     public static void main(String[] args) {
         JXComboBoxIssues test = new JXComboBoxIssues();
         
@@ -71,7 +59,6 @@ public class JXComboBoxIssues extends InteractiveTestCase {
         }
     }
 
-    public void testDummy() { }
 
     
     
@@ -83,6 +70,7 @@ public class JXComboBoxIssues extends InteractiveTestCase {
         JComponent panel = new JXPanel();
         panel.add(new JButton("something to focus"));
         panel.add(combo);
+        panel.add(new JComboBox(combo.getModel()));
         showInFrame(panel, "Painter");
     }
     
@@ -123,4 +111,17 @@ public class JXComboBoxIssues extends InteractiveTestCase {
     }
     
     
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setUp() {
+        model = createComboBoxModel();
+    }
+    
+    private DefaultComboBoxModel createComboBoxModel() {
+        return new DefaultComboBoxModel(new JComboBox().getActionMap().allKeys());
+    }
+    
+    public void testDummy() { }
 }
