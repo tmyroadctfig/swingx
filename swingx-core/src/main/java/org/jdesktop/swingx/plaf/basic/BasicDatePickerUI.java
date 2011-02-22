@@ -970,6 +970,7 @@ public class BasicDatePickerUI extends DatePickerUI {
     private Action createCommitAction() {
         Action action = new AbstractAction() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 commit();
             }
@@ -987,6 +988,7 @@ public class BasicDatePickerUI extends DatePickerUI {
     private Action createCancelAction() {
         Action action = new AbstractAction() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 cancel();
             }
@@ -998,6 +1000,7 @@ public class BasicDatePickerUI extends DatePickerUI {
     private Action createHomeAction(final boolean commit) {
         Action action = new AbstractAction( ) {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 home(commit);
                 
@@ -1043,6 +1046,7 @@ public class BasicDatePickerUI extends DatePickerUI {
             editor.getActionMap().put(TEXT_CANCEL_KEY, this);
         }
         
+        @Override
         public void actionPerformed(ActionEvent e) {
             cancelAction.actionPerformed(null);
             cancel();
@@ -1078,6 +1082,7 @@ public class BasicDatePickerUI extends DatePickerUI {
             datePicker.getEditor().requestFocusInWindow();
 //            datePicker.requestFocusInWindow();
             SwingUtilities.invokeLater(new Runnable() {
+                @Override
                 public void run() {
 //                    if (datePicker.getParent() == null) {
 //                        // Tracking #1372-swingx - parent is null if used as
@@ -1098,6 +1103,7 @@ public class BasicDatePickerUI extends DatePickerUI {
     
     private void invokeShowPopup() {
         SwingUtilities.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 if (datePicker.getParent() == null) {
                     // Tracking #1372-swingx - parent is null if used as DatePickerCellEditor,
@@ -1216,6 +1222,7 @@ public class BasicDatePickerUI extends DatePickerUI {
             super("TogglePopup");
         }
 
+        @Override
         public void actionPerformed(ActionEvent ev) {
             toggleShowPopup();
         }
@@ -1263,9 +1270,11 @@ public class BasicDatePickerUI extends DatePickerUI {
 //------------- implement Mouse/MotionListener        
         private boolean _forwardReleaseEvent = false;
 
+        @Override
         public void mouseClicked(MouseEvent ev) {
         }
 
+        @Override
         public void mousePressed(MouseEvent ev) {
             if (!datePicker.isEnabled()) {
                 return;
@@ -1279,6 +1288,7 @@ public class BasicDatePickerUI extends DatePickerUI {
             toggleShowPopup();
         }
 
+        @Override
         public void mouseReleased(MouseEvent ev) {
             if (!datePicker.isEnabled() || !datePicker.isEditable()) {
                 return;
@@ -1294,12 +1304,15 @@ public class BasicDatePickerUI extends DatePickerUI {
             }
         }
 
+        @Override
         public void mouseEntered(MouseEvent ev) {
         }
 
+        @Override
         public void mouseExited(MouseEvent ev) {
         }
 
+        @Override
         public void mouseDragged(MouseEvent ev) {
             if (!datePicker.isEnabled() || !datePicker.isEditable()) {
                 return;
@@ -1317,10 +1330,12 @@ public class BasicDatePickerUI extends DatePickerUI {
             monthView.dispatchEvent(ev);
         }
 
+        @Override
         public void mouseMoved(MouseEvent ev) {
         }
 //------------------ implement DateSelectionListener
         
+        @Override
         public void valueChanged(DateSelectionEvent ev) {
             updateFromSelectionChanged(ev.getEventType(), ev.isAdjusting());
         }
@@ -1329,6 +1344,7 @@ public class BasicDatePickerUI extends DatePickerUI {
         /**
          * {@inheritDoc}
          */
+        @Override
         public void propertyChange(PropertyChangeEvent e) {
             if (e.getSource() == datePicker) {
                 datePickerPropertyChange(e);
@@ -1432,18 +1448,23 @@ public class BasicDatePickerUI extends DatePickerUI {
 
 //-------------- implement LayoutManager
         
+        @Override
         public void addLayoutComponent(String name, Component comp) { }
 
+        @Override
         public void removeLayoutComponent(Component comp) { }
 
+        @Override
         public Dimension preferredLayoutSize(Container parent) {
             return parent.getPreferredSize();
         }
 
+        @Override
         public Dimension minimumLayoutSize(Container parent) {
             return parent.getMinimumSize();
         }
 
+        @Override
         public void layoutContainer(Container parent) {
             Insets insets = datePicker.getInsets();
             int width = datePicker.getWidth() - insets.left - insets.right;
@@ -1468,6 +1489,7 @@ public class BasicDatePickerUI extends DatePickerUI {
 
 // ------------- implement actionListener (listening to monthView actionEvent)
         
+        @Override
         public void actionPerformed(ActionEvent e) {
             if (e == null) return;
             if (e.getSource() == datePicker.getMonthView()) {
@@ -1508,6 +1530,7 @@ public class BasicDatePickerUI extends DatePickerUI {
          * Do the same as combo: manually pass-on the focus to the editor.
          * 
          */
+        @Override
         public void focusGained(FocusEvent e) {
             if (e.isTemporary()) return;
             popupRemover.load();
@@ -1538,6 +1561,7 @@ public class BasicDatePickerUI extends DatePickerUI {
          * 
          * listen to keyboardFocusManager?
          */
+        @Override
         public void focusLost(FocusEvent e) {
             
         }
@@ -1576,6 +1600,7 @@ public class BasicDatePickerUI extends DatePickerUI {
             unload(true);
         }
         
+        @Override
         public void propertyChange(PropertyChangeEvent evt) {
             if (!isPopupVisible()) {
                 unload(false);

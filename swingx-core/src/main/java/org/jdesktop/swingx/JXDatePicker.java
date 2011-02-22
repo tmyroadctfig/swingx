@@ -372,6 +372,7 @@ public class JXDatePicker extends JComponent {
         if (monthViewListener == null) {
             monthViewListener = new PropertyChangeListener() {
 
+                @Override
                 public void propertyChange(PropertyChangeEvent evt) {
                     if ("timeZone".equals(evt.getPropertyName())) {
                         updateTimeZone((TimeZone) evt.getOldValue(), (TimeZone) evt.getNewValue());
@@ -1005,6 +1006,7 @@ public class JXDatePicker extends JComponent {
                 putValue(NAME, getLinkFormat().format(new Object[] {cal.getTime()}));
             }
 
+            @Override
             public void actionPerformed(ActionEvent ae) {
                 String key = select ? JXDatePicker.HOME_COMMIT_KEY : JXDatePicker.HOME_NAVIGATE_KEY;
                 select = false;

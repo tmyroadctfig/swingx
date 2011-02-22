@@ -103,6 +103,7 @@ public abstract class TextUIWrapper<UI extends TextUI> {
     private final TextUIChangeHandler uiChangeHandler = new TextUIChangeHandler();
 
     private final class TextUIChangeHandler extends AbstractUIChangeHandler {
+        @Override
         public void propertyChange(PropertyChangeEvent evt) {
             JTextComponent txt = (JTextComponent) evt.getSource();
 

@@ -232,6 +232,7 @@ public class JXTreeTable extends JXTable {
         // propagate the lineStyle property to the renderer
         PropertyChangeListener l = new PropertyChangeListener() {
 
+            @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 JXTreeTable.this.renderer.putClientProperty(evt.getPropertyName(), evt.getNewValue());
                 
@@ -259,6 +260,7 @@ public class JXTreeTable extends JXTable {
             super(name);
         }
 
+        @Override
         public void actionPerformed(ActionEvent evt) {
             if ("expand-all".equals(getName())) {
         expandAll();
@@ -2256,6 +2258,7 @@ public class JXTreeTable extends JXTable {
          * when the selection of the list changse.
          */
         class ListSelectionHandler implements ListSelectionListener {
+            @Override
             public void valueChanged(ListSelectionEvent e) {
                 if (!e.getValueIsAdjusting()) {
                     updateSelectedPathsFromSelectedRows();
@@ -2290,15 +2293,18 @@ public class JXTreeTable extends JXTable {
             tree.addTreeExpansionListener(new TreeExpansionListener() {
                 // Don't use fireTableRowsInserted() here; the selection model
                 // would get updated twice.
+                @Override
                 public void treeExpanded(TreeExpansionEvent event) {
                     updateAfterExpansionEvent(event);
                 }
 
+                @Override
                 public void treeCollapsed(TreeExpansionEvent event) {
                     updateAfterExpansionEvent(event);
                 }
             });
             tree.addPropertyChangeListener("model", new PropertyChangeListener() {
+                @Override
                 public void propertyChange(PropertyChangeEvent evt) {
                     TreeTableModel model = (TreeTableModel) evt.getOldValue();
                     model.removeTreeModelListener(getTreeModelListener());
@@ -2373,6 +2379,7 @@ public class JXTreeTable extends JXTable {
             return getTreeTableModel().getColumnClass(column);
         }
 
+        @Override
         public int getColumnCount() {
             return getTreeTableModel().getColumnCount();
         }
@@ -2382,10 +2389,12 @@ public class JXTreeTable extends JXTable {
             return getTreeTableModel().getColumnName(column);
         }
 
+        @Override
         public int getRowCount() {
             return tree.getRowCount();
         }
 
+        @Override
         public Object getValueAt(int row, int column) {
             // Issue #270-swingx: guard against invisible row
             Object node = nodeForRow(row);
@@ -2421,6 +2430,7 @@ public class JXTreeTable extends JXTable {
             if (treeModelListener == null) {
                 treeModelListener = new TreeModelListener() {
                     
+                    @Override
                     public void treeNodesChanged(TreeModelEvent e) {
 //                        LOG.info("got tree event: changed " + e);
                         delayedFireTableDataUpdated(e);
@@ -2429,15 +2439,18 @@ public class JXTreeTable extends JXTable {
                     // We use delayedFireTableDataChanged as we can
                     // not be guaranteed the tree will have finished processing
                     // the event before us.
+                    @Override
                     public void treeNodesInserted(TreeModelEvent e) {
                         delayedFireTableDataChanged(e, 1);
                     }
 
+                    @Override
                     public void treeNodesRemoved(TreeModelEvent e) {
 //                        LOG.info("got tree event: removed " + e);
                        delayedFireTableDataChanged(e, 2);
                     }
 
+                    @Override
                     public void treeStructureChanged(TreeModelEvent e) {
                         // ?? should be mapped to structureChanged -- JW
                         if (isTableStructureChanged(e)) {
@@ -2476,6 +2489,7 @@ public class JXTreeTable extends JXTable {
          */
         private void delayedFireTableStructureChanged() {
             SwingUtilities.invokeLater(new Runnable() {
+                @Override
                 public void run() {
                     fireTableStructureChanged();
                 }
@@ -2488,6 +2502,7 @@ public class JXTreeTable extends JXTable {
          */
         private void delayedFireTableDataChanged() {
             SwingUtilities.invokeLater(new Runnable() {
+                @Override
                 public void run() {
                     fireTableDataChanged();
                 }
@@ -2508,6 +2523,7 @@ public class JXTreeTable extends JXTable {
             // quick test if tree throws for unrelated path. Seems like not.
 //            tree.getRowForPath(new TreePath("dummy"));
             SwingUtilities.invokeLater(new Runnable() {
+                @Override
                 public void run() {
                     int indices[] = tme.getChildIndices();
                     TreePath path = tme.getTreePath();
@@ -2564,6 +2580,7 @@ public class JXTreeTable extends JXTable {
         protected void delayedFireTableDataUpdated(final TreeModelEvent tme) {
             final boolean expanded = tree.isExpanded(tme.getTreePath());
             SwingUtilities.invokeLater(new Runnable() {
+                @Override
                 public void run() {
                     int indices[] = tme.getChildIndices();
                     TreePath path = tme.getTreePath();
@@ -2802,6 +2819,7 @@ public class JXTreeTable extends JXTable {
         protected PropertyChangeListener createRolloverListener() {
             PropertyChangeListener l = new PropertyChangeListener() {
 
+                @Override
                 public void propertyChange(PropertyChangeEvent evt) {
                     if ((treeTable == null) || (treeTable != evt.getSource()))
                         return;
@@ -3017,6 +3035,7 @@ public class JXTreeTable extends JXTable {
         }
 
 
+        @Override
         public Component getTableCellRendererComponent(JTable table,
             Object value,
             boolean isSelected, boolean hasFocus, int row, int column) {
@@ -3129,6 +3148,7 @@ public class JXTreeTable extends JXTable {
             /**
              * {@inheritDoc} <p>
              */
+            @Override
             public String getString(Object node) {
 //                int treeColumn = treeTable.getTreeTableModel().getHierarchicalColumn();
 //                if (treeColumn >= 0) {

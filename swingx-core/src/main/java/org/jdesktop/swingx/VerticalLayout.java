@@ -49,9 +49,11 @@ public class VerticalLayout implements LayoutManager {
     this.gap = gap;
   }
 
-  public void addLayoutComponent(String name, Component c) {}
+  @Override
+public void addLayoutComponent(String name, Component c) {}
 
-  public void layoutContainer(Container parent) {
+  @Override
+public void layoutContainer(Container parent) {
     Insets insets = parent.getInsets();
     Dimension size = parent.getSize();
     int width = size.width - insets.left - insets.right;
@@ -66,11 +68,13 @@ public class VerticalLayout implements LayoutManager {
     }
   }
 
-  public Dimension minimumLayoutSize(Container parent) {
+  @Override
+public Dimension minimumLayoutSize(Container parent) {
     return preferredLayoutSize(parent);
   }
 
-  public Dimension preferredLayoutSize(Container parent) {
+  @Override
+public Dimension preferredLayoutSize(Container parent) {
     Insets insets = parent.getInsets();
     Dimension pref = new Dimension(0, 0);
 
@@ -90,6 +94,7 @@ public class VerticalLayout implements LayoutManager {
     return pref;
   }
 
-  public void removeLayoutComponent(Component c) {}
+  @Override
+public void removeLayoutComponent(Component c) {}
 
 }

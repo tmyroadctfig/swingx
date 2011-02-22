@@ -124,6 +124,7 @@ public class JXLabel extends JLabel implements BackgroundPaintable {
             value = val;
         }
         
+        @Override
         public int getValue() {
             return value;
         }
@@ -359,6 +360,7 @@ public class JXLabel extends JLabel implements BackgroundPaintable {
      * @param p the new painter
      * @see #getBackgroundPainter()
      */
+    @Override
     public void setBackgroundPainter(Painter p) {
         Painter old = getBackgroundPainter();
         backgroundPainter = p;
@@ -373,6 +375,7 @@ public class JXLabel extends JLabel implements BackgroundPaintable {
      * @return the current painter
      * @see #setBackgroundPainter(Painter)
      */
+    @Override
     public final Painter getBackgroundPainter() {
         return backgroundPainter;
     }
@@ -404,9 +407,10 @@ public class JXLabel extends JLabel implements BackgroundPaintable {
             View view = getWrappingView();
             if (view == null) {
                 if (isLineWrap() && !MultiLineSupport.isHTML(getText())) {
+                    getMultiLineSupport();
                     // view might get lost on LAF change ...
                     putClientProperty(BasicHTML.propertyKey, 
-                            getMultiLineSupport().createView(this));
+                            MultiLineSupport.createView(this));
                     view = (View) getClientProperty(BasicHTML.propertyKey);
                 } else {
                     return size;
@@ -698,6 +702,7 @@ public class JXLabel extends JLabel implements BackgroundPaintable {
      * and initial transform passed to the background painter.
      * @return current value of the paintBorderInsets property
      */
+    @Override
     public boolean isPaintBorderInsets() {
         return paintBorderInsets;
     }
@@ -717,6 +722,7 @@ public class JXLabel extends JLabel implements BackgroundPaintable {
      * This is a bound property.
      * @param paintBorderInsets new value of the paintBorderInsets property
      */
+    @Override
     public void setPaintBorderInsets(boolean paintBorderInsets) {
         boolean old = this.isPaintBorderInsets();
         this.paintBorderInsets = paintBorderInsets;
@@ -953,6 +959,7 @@ public class JXLabel extends JLabel implements BackgroundPaintable {
 
         private static BasicEditorKit basicFactory;
 
+        @Override
         public void propertyChange(PropertyChangeEvent evt) {
             String name = evt.getPropertyName();
             JXLabel src = (JXLabel) evt.getSource();
@@ -1055,6 +1062,7 @@ public class JXLabel extends JLabel implements BackgroundPaintable {
     }
 
     private static class BasicViewFactory implements ViewFactory {
+        @Override
         public View create(Element elem) {
 
             String kind = elem.getName();

@@ -47,6 +47,7 @@ public class BasicLoginPaneUI extends LoginPaneUI {
         /**
          * {@inheritDoc}
          */
+        @Override
         public void propertyChange(PropertyChangeEvent evt) {
             Object src = evt.getSource();
             

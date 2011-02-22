@@ -388,6 +388,7 @@ public class JXErrorPane extends JComponent {
      */
     public static void showDialog(final Component owner, final JXErrorPane pane) {
         Runnable r = new Runnable() {
+            @Override
             public void run() {
                 JDialog dlg = createDialog(owner, pane);
                 dlg.setVisible(true);
@@ -493,6 +494,7 @@ public class JXErrorPane extends JComponent {
      */
     public static void showFrame(final Component owner, final JXErrorPane pane) {
         Runnable r = new Runnable() {
+            @Override
             public void run() {
                 JFrame window = createFrame(owner, pane);
                 window.setVisible(true);
@@ -598,6 +600,7 @@ public class JXErrorPane extends JComponent {
      */
     public static void showInternalFrame(final Component owner, final JXErrorPane pane) {
         Runnable r = new Runnable() {
+            @Override
             public void run() {
                 JInternalFrame window = createInternalFrame(owner, pane);
                 window.setVisible(true);                

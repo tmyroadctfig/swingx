@@ -212,6 +212,7 @@ public class SpinningCalendarHeaderHandler extends CalendarHeaderHandler {
         if (monthPropertyListener == null) {
             monthPropertyListener = new PropertyChangeListener() {
 
+                @Override
                 public void propertyChange(PropertyChangeEvent evt) {
                     if ("firstDisplayedDay".equals(evt.getPropertyName())) {
                         firstDisplayedDayChanged();
@@ -289,18 +290,22 @@ public class SpinningCalendarHeaderHandler extends CalendarHeaderHandler {
      */
     private class YearSpinnerModel extends AbstractSpinnerModel {
 
+        @Override
         public Object getNextValue() {
             return getNextYear();
         }
 
+        @Override
         public Object getPreviousValue() {
             return getPreviousYear();
         }
 
+        @Override
         public Object getValue() {
             return getYear();
         }
 
+        @Override
         public void setValue(Object value) {
             if (setYear(value)) {
                 fireStateChanged();

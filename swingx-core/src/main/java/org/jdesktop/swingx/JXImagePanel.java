@@ -283,6 +283,7 @@ public class JXImagePanel extends JXPanel {
                     super.done();
                     
                     SwingUtilities.invokeLater(new Runnable() {
+                        @Override
                         public void run() {
                             try {
                                 JXImagePanel.this.setImage(get());

@@ -402,6 +402,7 @@ public class JXTree extends JTree {
             super(name);
         }
 
+        @Override
         public void actionPerformed(ActionEvent evt) {
             if ("expand-all".equals(getName())) {
                 expandAll();
@@ -422,6 +423,7 @@ public class JXTree extends JTree {
      */
     private Action createFindAction() {
         return new UIAction("find") {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 doFind();
             }
@@ -908,6 +910,7 @@ public class JXTree extends JTree {
      */
     protected ChangeListener createHighlighterChangeListener() {
         return new ChangeListener() {
+            @Override
             public void stateChanged(ChangeEvent e) {
                 repaint();
             }
@@ -1237,6 +1240,7 @@ public class JXTree extends JTree {
          * Overridden to apply the highlighters, if any, after calling the delegate.
          * The decorators are not applied if the row is invalid.
          */
+        @Override
         public Component getTreeCellRendererComponent(JTree tree, Object value,
                 boolean selected, boolean expanded, boolean leaf, int row,
                 boolean hasFocus) {
@@ -1254,11 +1258,13 @@ public class JXTree extends JTree {
             
             // ------------------ RolloverRenderer
 
+        @Override
         public boolean isEnabled() {
             return (delegate instanceof RolloverRenderer)
                     && ((RolloverRenderer) delegate).isEnabled();
         }
             
+        @Override
         public void doClick() {
             if (isEnabled()) {
                 ((RolloverRenderer) delegate).doClick();
@@ -1313,6 +1319,7 @@ public class JXTree extends JTree {
         if (editorListener == null) {
             editorListener = new CellEditorListener() {
 
+                @Override
                 public void editingCanceled(ChangeEvent e) {
                     terminated(e);
                 }
@@ -1325,6 +1332,7 @@ public class JXTree extends JTree {
                     ((CellEditor) e.getSource()).removeCellEditorListener(editorListener);
                 }
 
+                @Override
                 public void editingStopped(ChangeEvent e) {
                     terminated(e);
                 }
@@ -1455,6 +1463,7 @@ public class JXTree extends JTree {
             }
 
         }
+        @Override
         public void propertyChange(PropertyChangeEvent ev) {
             if (!isEditing()) {
                 return;

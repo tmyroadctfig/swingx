@@ -110,6 +110,7 @@ public class DatePickerCellEditor extends AbstractCellEditor implements
      * Note: the date is only meaningful after a stopEditing and 
      *   before the next call to getTableCellEditorComponent.
      */
+    @Override
     public Date getCellEditorValue() {
         return datePicker.getDate();
     }
@@ -165,6 +166,7 @@ public class DatePickerCellEditor extends AbstractCellEditor implements
 
 //------------------------ TableCellEditor   
     
+    @Override
     public Component getTableCellEditorComponent(JTable table, Object value,
             boolean isSelected, int row, int column) {
         // PENDING JW: can remove the ignore flags here?
@@ -183,6 +185,7 @@ public class DatePickerCellEditor extends AbstractCellEditor implements
 
     //-------------------------  TreeCellEditor
     
+    @Override
     public Component getTreeCellEditorComponent(JTree tree, Object value, boolean isSelected, boolean expanded, boolean leaf, int row) {
         // PENDING JW: can remove the ignore flags here?
         // the picker learnde to behave ...
@@ -305,6 +308,7 @@ public class DatePickerCellEditor extends AbstractCellEditor implements
      */
     protected ActionListener createPickerActionListener() {
         ActionListener l = new ActionListener() {
+            @Override
             public void actionPerformed(final ActionEvent e) {
                 // avoid duplicate trigger from
                 // commit in stopCellEditing

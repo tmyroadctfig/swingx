@@ -64,7 +64,7 @@ public class StrictNumberFormatter extends NumberFormatter {
     /**
      * 
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     private void updateMinMax() {
         Comparable min = null;
         Comparable max = null;
@@ -93,14 +93,14 @@ public class StrictNumberFormatter extends NumberFormatter {
     }
 
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
     public void setMaximum(Comparable max) {
         super.setMaximum(max);
         this.maxAsBig = max != null ? new BigDecimal(max.toString()) : null;
     }
     
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
     public void setMinimum(Comparable minimum) {
         super.setMinimum(minimum);

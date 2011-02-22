@@ -238,7 +238,8 @@ public class JXTaskPane extends JPanel implements
       // listen for animation events and forward them to registered listeners
       collapsePane.addPropertyChangeListener(
         JXCollapsiblePane.ANIMATION_STATE_KEY, new PropertyChangeListener() {
-          public void propertyChange(PropertyChangeEvent evt) {
+          @Override
+        public void propertyChange(PropertyChangeEvent evt) {
             JXTaskPane.this.firePropertyChange(evt.getPropertyName(), evt
               .getOldValue(), evt.getNewValue());
           }
@@ -602,7 +603,8 @@ public class JXTaskPane extends JPanel implements
   /**
    * @see JXCollapsiblePane.CollapsiblePaneContainer
    */
-  public Container getValidatingContainer() {
+  @Override
+public Container getValidatingContainer() {
     return getParent();
   }
   

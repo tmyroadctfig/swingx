@@ -139,6 +139,7 @@ public class DefaultTreeRenderer extends AbstractRenderer
      * @param row the row of the cell to render
      * @return a component to render the given list cell.
      */
+    @Override
     public Component getTreeCellRendererComponent(JTree tree, Object value,
             boolean selected, boolean expanded, boolean leaf, int row,
             boolean hasFocus) {

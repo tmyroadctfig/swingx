@@ -100,12 +100,15 @@ protected void installComponents() {
   }
   
   public static class TipAreaBorder implements Border {
+    @Override
     public Insets getBorderInsets(Component c) {
       return new Insets(2, 2, 2, 2);
     }
+    @Override
     public boolean isBorderOpaque() {
       return false;
     }
+    @Override
     public void paintBorder(Component c, Graphics g, int x, int y, int width,
       int height) {
       g.setColor(UIManager.getColor("TipOfTheDay.background"));

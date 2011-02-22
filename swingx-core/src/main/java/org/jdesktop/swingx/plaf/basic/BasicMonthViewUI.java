@@ -381,6 +381,7 @@ public class BasicMonthViewUI extends MonthViewUI {
         // additional navigation actions
         AbstractActionExt prev = new AbstractActionExt() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 previousMonth();
             }
@@ -389,6 +390,7 @@ public class BasicMonthViewUI extends MonthViewUI {
         monthView.getActionMap().put("scrollToPreviousMonth", prev);
         AbstractActionExt next = new AbstractActionExt() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 nextMonth();
             }
@@ -1677,8 +1679,10 @@ public class BasicMonthViewUI extends MonthViewUI {
         private Date startDate;
         private Date endDate;
 
+        @Override
         public void mouseClicked(MouseEvent e) {}
 
+        @Override
         public void mousePressed(MouseEvent e) {
             // If we were using the keyboard we aren't anymore.
             setUsingKeyboard(false);
@@ -1732,6 +1736,7 @@ public class BasicMonthViewUI extends MonthViewUI {
         }
 
         
+        @Override
         public void mouseReleased(MouseEvent e) {
             // If we were using the keyboard we aren't anymore.
             setUsingKeyboard(false);
@@ -1750,10 +1755,13 @@ public class BasicMonthViewUI extends MonthViewUI {
             armed = false;
         }
 
+        @Override
         public void mouseEntered(MouseEvent e) {}
 
+        @Override
         public void mouseExited(MouseEvent e) {}
 
+        @Override
         public void mouseDragged(MouseEvent e) {
             // If we were using the keyboard we aren't anymore.
             setUsingKeyboard(false);
@@ -1805,6 +1813,7 @@ public class BasicMonthViewUI extends MonthViewUI {
             armed = true;
         }
 
+        @Override
         public void mouseMoved(MouseEvent e) {}
 
 //------------------------ layout
@@ -1812,19 +1821,24 @@ public class BasicMonthViewUI extends MonthViewUI {
         
         private Dimension preferredSize = new Dimension();
 
+        @Override
         public void addLayoutComponent(String name, Component comp) {}
 
+        @Override
         public void removeLayoutComponent(Component comp) {}
 
+        @Override
         public Dimension preferredLayoutSize(Container parent) {
             layoutContainer(parent);
             return new Dimension(preferredSize);
         }
 
+        @Override
         public Dimension minimumLayoutSize(Container parent) {
             return preferredLayoutSize(parent);
         }
 
+        @Override
         public void layoutContainer(Container parent) {
 
             int maxMonthWidth = 0;
@@ -1925,6 +1939,7 @@ public class BasicMonthViewUI extends MonthViewUI {
 
 
 
+        @Override
         public void propertyChange(PropertyChangeEvent evt) {
             String property = evt.getPropertyName();
 
@@ -1966,6 +1981,7 @@ public class BasicMonthViewUI extends MonthViewUI {
             }
         }
 
+        @Override
         public void valueChanged(DateSelectionEvent ev) {
             monthView.repaint();
         }
@@ -1994,6 +2010,7 @@ public class BasicMonthViewUI extends MonthViewUI {
             this.action = action;
         }
 
+        @Override
         public void actionPerformed(ActionEvent ev) {
             if (!canSelectByMode())
                 return;

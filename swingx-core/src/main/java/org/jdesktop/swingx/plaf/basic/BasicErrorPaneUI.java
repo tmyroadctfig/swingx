@@ -190,6 +190,7 @@ public class BasicErrorPaneUI extends ErrorPaneUI {
         if (a == null) {
             final JXErrorPane pane = (JXErrorPane)c;
             AbstractActionExt reportAction = new AbstractActionExt() {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     ErrorReporter reporter = pane.getErrorReporter();
                     if (reporter != null) {
@@ -293,6 +294,7 @@ public class BasicErrorPaneUI extends ErrorPaneUI {
         copyToClipboardButton = new JButton(UIManagerExt.getString(
                 CLASS_NAME + ".copy_to_clipboard_button_text", errorMessage.getLocale()));
         copyToClipboardListener = new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent ae) {
                 details.copy();
             }
@@ -696,6 +698,7 @@ public class BasicErrorPaneUI extends ErrorPaneUI {
         /**
          * @inheritDoc
          */
+        @Override
         public void actionPerformed(ActionEvent e) {
             w.setVisible(false);
             w.dispose();
@@ -714,6 +717,7 @@ public class BasicErrorPaneUI extends ErrorPaneUI {
         /* (non-Javadoc)
          * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
          */
+        @Override
         public void actionPerformed(ActionEvent e) {
             setDetailsVisible(!detailsPanel.isVisible());
         }
@@ -728,6 +732,7 @@ public class BasicErrorPaneUI extends ErrorPaneUI {
             this.w = w;
         }
 
+        @Override
         public void actionPerformed(ActionEvent ae) {
             Dimension contentSize = null;
             if (w instanceof JDialog) {
@@ -866,6 +871,7 @@ public class BasicErrorPaneUI extends ErrorPaneUI {
             setLayout(new BorderLayout());
             add(p, BorderLayout.CENTER);
             final Action closeAction = new AbstractAction() {
+                @Override
                 public void actionPerformed(ActionEvent evt) {
                     setVisible(false);
                     dispose();
@@ -955,6 +961,7 @@ public class BasicErrorPaneUI extends ErrorPaneUI {
     }
 
     private final class ErrorPaneListener implements PropertyChangeListener {
+        @Override
         public void propertyChange(PropertyChangeEvent evt) {
             reinit();
         }
@@ -966,7 +973,9 @@ public class BasicErrorPaneUI extends ErrorPaneUI {
     private final class ErrorPaneLayout implements LayoutManager {
         private JEditorPane dummy = new JEditorPane();
 
+        @Override
         public void addLayoutComponent(String name, Component comp) {}
+        @Override
         public void removeLayoutComponent(Component comp) {}
 
         /**
@@ -979,6 +988,7 @@ public class BasicErrorPaneUI extends ErrorPaneUI {
          * The preferred height changes depending on whether the details
          * are visible, or not.
          */
+        @Override
         public Dimension preferredLayoutSize(Container parent) {
             int prefWidth = parent.getWidth();
             int prefHeight = parent.getHeight();
@@ -1021,10 +1031,12 @@ public class BasicErrorPaneUI extends ErrorPaneUI {
                     prefHeight + insets.top + insets.bottom);
         }
 
+        @Override
         public Dimension minimumLayoutSize(Container parent) {
             return preferredLayoutSize(parent);
         }
 
+        @Override
         public void layoutContainer(Container parent) {
             final Insets insets = parent.getInsets();
             int x = insets.left;

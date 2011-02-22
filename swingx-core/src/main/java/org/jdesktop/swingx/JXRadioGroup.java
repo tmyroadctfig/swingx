@@ -178,10 +178,12 @@ public class JXRadioGroup<T> extends JPanel {
 
     private class ActionSelectionListener implements ActionListener, ItemListener
     {
+        @Override
         public void actionPerformed(ActionEvent e) {
             fireActionEvent(e);
         }
 
+        @Override
         public void itemStateChanged(ItemEvent e) {
             fireActionEvent(null);
         }

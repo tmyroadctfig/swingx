@@ -247,6 +247,7 @@ public class BasicTitledPanelUI extends TitledPanelUI {
     
     protected void installListeners(final JXTitledPanel titledPanel) {
         titleChangeListener = new PropertyChangeListener() {
+            @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 if (evt.getPropertyName().equals("title")) {
                     caption.setText((String)evt.getNewValue());

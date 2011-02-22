@@ -350,6 +350,7 @@ public class SearchFactory implements UIDependent {
     protected void configureSharedFindBar() {
         Action removeAction = new AbstractAction() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 removeFromParent(findBar);
 //                stopSearching();
@@ -530,6 +531,7 @@ public class SearchFactory implements UIDependent {
             focusManager.addPropertyChangeListener("permanentFocusOwner", this);
         }
 
+        @Override
         public void propertyChange(PropertyChangeEvent ev) {
 
             Component c = focusManager.getPermanentFocusOwner();

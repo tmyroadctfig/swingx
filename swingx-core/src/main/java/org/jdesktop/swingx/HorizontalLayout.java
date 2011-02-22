@@ -50,9 +50,11 @@ public class HorizontalLayout implements LayoutManager {
         this.gap = gap;
     }
 
+    @Override
     public void addLayoutComponent(String name, Component c) {
     }
 
+    @Override
     public void layoutContainer(Container parent) {
         Insets insets = parent.getInsets();
         Dimension size = parent.getSize();
@@ -68,10 +70,12 @@ public class HorizontalLayout implements LayoutManager {
         }
     }
 
+    @Override
     public Dimension minimumLayoutSize(Container parent) {
         return preferredLayoutSize(parent);
     }
 
+    @Override
     public Dimension preferredLayoutSize(Container parent) {
         Insets insets = parent.getInsets();
         Dimension pref = new Dimension(0, 0);
@@ -89,6 +93,7 @@ public class HorizontalLayout implements LayoutManager {
         return pref;
     }
 
+    @Override
     public void removeLayoutComponent(Component c) {
     }
 }

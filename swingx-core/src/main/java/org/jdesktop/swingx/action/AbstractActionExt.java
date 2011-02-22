@@ -439,6 +439,7 @@ public abstract class AbstractActionExt extends AbstractAction
      * @param e the ItemEvent fired by a ItemSelectable on changing the selected 
      *    state.
      */
+    @Override
     public void itemStateChanged(ItemEvent e) {
         if (isStateAction()) {
             setSelected(ItemEvent.SELECTED == e.getStateChange());

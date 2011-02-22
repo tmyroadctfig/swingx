@@ -200,6 +200,7 @@ public class PainterHighlighter extends AbstractHighlighter {
     protected PropertyChangeListener createPainterListener() {
         PropertyChangeListener l = new PropertyChangeListener() {
 
+            @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 if (isAdjusting) return;
                 fireStateChanged();

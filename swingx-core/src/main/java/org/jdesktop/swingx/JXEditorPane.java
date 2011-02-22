@@ -232,6 +232,7 @@ public class JXEditorPane extends JEditorPane implements /*Searchable, */Targeta
     }
 
     private class PropertyHandler implements PropertyChangeListener {
+        @Override
         public void propertyChange(PropertyChangeEvent evt) {
             String name = evt.getPropertyName();
             if (name.equals("document")) {
@@ -297,6 +298,7 @@ public class JXEditorPane extends JEditorPane implements /*Searchable, */Targeta
     // undo/redo implementation
 
     private class UndoHandler implements UndoableEditListener {
+        @Override
         public void undoableEditHappened(UndoableEditEvent evt) {
             undoManager.addEdit(evt.getEdit());
             updateActionState();
@@ -318,6 +320,7 @@ public class JXEditorPane extends JEditorPane implements /*Searchable, */Targeta
         // really cares about enabled as it should. 
         //
         Runnable doEnabled = new Runnable() {
+                @Override
                 public void run() {
                     ActionManager manager = ActionManager.getInstance();
                     manager.setEnabled(ACTION_UNDO, undoManager.canUndo());
@@ -338,6 +341,7 @@ public class JXEditorPane extends JEditorPane implements /*Searchable, */Targeta
             super(name);
         }
 
+        @Override
         public void actionPerformed(ActionEvent evt) {
             String name = getName();
             if (ACTION_FIND.equals(name)) {
@@ -469,6 +473,7 @@ public class JXEditorPane extends JEditorPane implements /*Searchable, */Targeta
             setFocusable(false);
         }
 
+        @Override
         public void itemStateChanged(ItemEvent evt) {
             if (evt.getStateChange() == ItemEvent.SELECTED) {
                 applyTag((HTML.Tag)evt.getItem());
@@ -578,14 +583,17 @@ public class JXEditorPane extends JEditorPane implements /*Searchable, */Targeta
      * A {@code Searchable} implementation for {@code Document}s.
      */
     public class DocumentSearchable implements Searchable {
+        @Override
         public int search(String searchString) {
             return search(searchString, -1);
         }
 
+        @Override
         public int search(String searchString, int columnIndex) {
             return search(searchString, columnIndex, false);
         }
         
+        @Override
         public int search(String searchString, int columnIndex, boolean backward) {
             Pattern pattern = null;
             if (!isEmpty(searchString)) {
@@ -607,10 +615,12 @@ public class JXEditorPane extends JEditorPane implements /*Searchable, */Targeta
             return (searchString == null) || searchString.length() == 0;
         }
 
+        @Override
         public int search(Pattern pattern) {
             return search(pattern, -1);
         }
 
+        @Override
         public int search(Pattern pattern, int startIndex) {
             return search(pattern, startIndex, false);
         }
@@ -622,6 +632,7 @@ public class JXEditorPane extends JEditorPane implements /*Searchable, */Targeta
         /**
          * @return start position of matching string or -1
          */
+        @Override
         public int search(Pattern pattern, final int startIndex,
                 boolean backwards) {
             if ((pattern == null)
@@ -766,14 +777,17 @@ public class JXEditorPane extends JEditorPane implements /*Searchable, */Targeta
 
     }
     
+    @Override
     public boolean hasCommand(Object command) {
         return targetSupport.hasCommand(command);
     }
 
+    @Override
     public Object[] getCommands() {
         return targetSupport.getCommands();
     }
 
+    @Override
     public boolean doCommand(Object command, Object value) {
         return targetSupport.doCommand(command, value);
     }
@@ -800,6 +814,7 @@ public class JXEditorPane extends JEditorPane implements /*Searchable, */Targeta
      * Should add more attributes as required.
      */
     private class CaretHandler implements CaretListener {
+        @Override
         public void caretUpdate(CaretEvent evt) {
             StyledDocument document = (StyledDocument)getDocument();
             int dot = evt.getDot();

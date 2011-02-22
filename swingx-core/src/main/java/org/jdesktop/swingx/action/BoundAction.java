@@ -153,6 +153,7 @@ public class BoundAction extends AbstractActionExt {
                                           new Object[] { Boolean.TRUE });
         }
 
+        @Override
         public void itemStateChanged(ItemEvent evt) {
             Statement statement = (evt.getStateChange() == ItemEvent.DESELECTED) ? falseStatement
                     : trueStatement;
@@ -224,6 +225,7 @@ public class BoundAction extends AbstractActionExt {
     /**
      * Callback for command actions.
      */
+    @Override
     public void actionPerformed(ActionEvent evt) {
         ActionListener[] alist = getActionListeners();
         if (alist != null) {

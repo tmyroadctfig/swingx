@@ -331,10 +331,12 @@ public class JXCollapsiblePane extends JXPanel {
             }
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             setCollapsed(!isCollapsed());
         }
 
+        @Override
         public void propertyChange(PropertyChangeEvent evt) {
             updateIcon();
         }
@@ -765,6 +767,7 @@ public class JXCollapsiblePane extends JXPanel {
         @SuppressWarnings({"FieldCanBeLocal"})
         private float animateAlpha = 1.0f;
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             /*
             * Pre-1) If startDimension == finalDimension, then we're done so stop the timer

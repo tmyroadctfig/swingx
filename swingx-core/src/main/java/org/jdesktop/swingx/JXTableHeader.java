@@ -179,6 +179,7 @@ public class JXTableHeader extends JTableHeader
      * 
      * 
      */
+    @Override
     public void columnPropertyChange(PropertyChangeEvent event) {
        if (isColumnEvent(event)) return;
        resizeAndRepaint(); 
@@ -556,6 +557,7 @@ public class JXTableHeader extends JTableHeader
          * Packs column on double click in resize region. Resorts 
          * column on double click if enabled and not in resize region.
          */
+        @Override
         public void mouseClicked(MouseEvent e) {
             if (shouldIgnore(e)) {
                 return;
@@ -578,6 +580,7 @@ public class JXTableHeader extends JTableHeader
         /**
          * Resets sort enablement always, set resizing marker if available.
          */
+        @Override
         public void mousePressed(MouseEvent e) {
             resetToggleSortOrder(e);
             if (shouldIgnore(e)) {
@@ -590,6 +593,7 @@ public class JXTableHeader extends JTableHeader
          * Sets resizing marker if available, disables table sorting if in 
          * resize region and sort gesture (aka: single click).
          */
+        @Override
         public void mouseReleased(MouseEvent e) {
             if (shouldIgnore(e)) {
                 return;
@@ -713,12 +717,14 @@ public class JXTableHeader extends JTableHeader
             return cachedResizingColumn != null; // inResize;
         }
 
+        @Override
         public void mouseEntered(MouseEvent e) {
         }
 
         /**
          * Resets all cached state.
          */
+        @Override
         public void mouseExited(MouseEvent e) {
             uncacheSortColumn();
             uncacheResizingColumn();
@@ -728,6 +734,7 @@ public class JXTableHeader extends JTableHeader
         /**
          * Resets all cached state.
          */
+        @Override
         public void mouseDragged(MouseEvent e) {
             uncacheSortColumn();
             uncacheResizingColumn();
@@ -737,6 +744,7 @@ public class JXTableHeader extends JTableHeader
         /**
          * Resets all cached state.
          */
+        @Override
         public void mouseMoved(MouseEvent e) {
             uncacheSortColumn();
             resetToggleSortOrder(e);

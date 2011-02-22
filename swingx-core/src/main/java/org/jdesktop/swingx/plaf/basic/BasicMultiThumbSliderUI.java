@@ -73,6 +73,7 @@ public class BasicMultiThumbSliderUI extends MultiThumbSliderUI {
             g.fillPolygon(poly);
         }
 
+        @Override
         public JComponent getThumbRendererComponent(JXMultiThumbSlider slider, int index, boolean selected) {
             return this;
         }
@@ -89,6 +90,7 @@ public class BasicMultiThumbSliderUI extends MultiThumbSliderUI {
             g.drawLine(0,slider.getHeight()/2+1,slider.getWidth(),slider.getHeight()/2+1);
         }
 
+        @Override
         public JComponent getRendererComponent(JXMultiThumbSlider slider) {
             this.slider = slider;
             return this;

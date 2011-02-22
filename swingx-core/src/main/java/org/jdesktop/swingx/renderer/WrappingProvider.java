@@ -378,6 +378,7 @@ public class WrappingProvider extends
     /**
      * {@inheritDoc}
      */
+    @Override
     public void doClick() {
         if (isEnabled()) {
             ((RolloverRenderer) wrappee).doClick(); 
@@ -387,6 +388,7 @@ public class WrappingProvider extends
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isEnabled() {
         return (wrappee instanceof RolloverRenderer) && 
            ((RolloverRenderer) wrappee).isEnabled();

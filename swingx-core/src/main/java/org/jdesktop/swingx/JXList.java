@@ -358,6 +358,7 @@ public class JXList extends JList {
 
     private Action createFindAction() {
         return new UIAction("find") {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 doFind();
             }
@@ -1257,6 +1258,7 @@ public class JXList extends JList {
      */
     protected ChangeListener createHighlighterChangeListener() {
         return new ChangeListener() {
+            @Override
             public void stateChanged(ChangeEvent e) {
                 repaint();
             }
@@ -1474,7 +1476,8 @@ public class JXList extends JList {
          * Overridden to apply the highlighters, if any, after calling the delegate.
          * The decorators are not applied if the row is invalid.
          */
-       public Component getListCellRendererComponent(JList list, Object value,
+       @Override
+    public Component getListCellRendererComponent(JList list, Object value,
                 int index, boolean isSelected, boolean cellHasFocus) {
             Component comp = delegateRenderer.getListCellRendererComponent(list, value, index,
                     isSelected, cellHasFocus);
@@ -1491,6 +1494,7 @@ public class JXList extends JList {
          * {@inheritDoc}
          * 
          */
+        @Override
         public boolean isEnabled() {
             return (delegateRenderer instanceof RolloverRenderer) && 
                ((RolloverRenderer) delegateRenderer).isEnabled();
@@ -1499,6 +1503,7 @@ public class JXList extends JList {
         /**
          * {@inheritDoc}
          */
+        @Override
         public void doClick() {
             if (isEnabled()) {
                 ((RolloverRenderer) delegateRenderer).doClick();

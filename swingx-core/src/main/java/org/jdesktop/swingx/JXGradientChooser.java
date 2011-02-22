@@ -513,6 +513,7 @@ public class JXGradientChooser extends JXPanel {
         addThumbButton.setAction(addThumbAction);
         deleteThumbButton.setAction(deleteThumbAction);
         changeColorButton.addPropertyChangeListener("background", new PropertyChangeListener() {
+            @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 selectColorForThumb();
                 updateGradientProperty();
@@ -553,6 +554,7 @@ public class JXGradientChooser extends JXPanel {
         
         // called when the gradient property of the preview pane changes
         gradientPreview.addPropertyChangeListener("gradient", new PropertyChangeListener() {
+            @Override
             public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
                 recalcGradientFromStops();
             }
@@ -564,6 +566,7 @@ public class JXGradientChooser extends JXPanel {
     
     // called whenever the color location spinner is changed
     private final class ChangeLocationListener implements ChangeListener {
+        @Override
         public void stateChanged(ChangeEvent evt) {
             if(slider.getSelectedIndex() >= 0) {
                 Thumb<Color> thumb = slider.getModel().getThumbAt(slider.getSelectedIndex());
@@ -576,6 +579,7 @@ public class JXGradientChooser extends JXPanel {
     
     // called when the alpha slider moves
     private final class ChangeAlphaListener implements ChangeListener {
+        @Override
         public void stateChanged(ChangeEvent changeEvent) {
             if(slider.getSelectedIndex() >= 0 && !thumbsMoving) {
                 // get the selected thumb
@@ -609,6 +613,7 @@ public class JXGradientChooser extends JXPanel {
             super("Add");
         }
         
+        @Override
         public void actionPerformed(ActionEvent actionEvent) {
             float pos = 0.2f;
             Color color = Color.black;
@@ -634,6 +639,7 @@ public class JXGradientChooser extends JXPanel {
             super("Delete");
         }
         
+        @Override
         public void actionPerformed(ActionEvent actionEvent) {
             int index = slider.getSelectedIndex();
             if (index >= 0) {
@@ -649,6 +655,7 @@ public class JXGradientChooser extends JXPanel {
             super();
         }
         
+        @Override
         public void thumbMoved(int thumb, float pos) {
             log.fine("moved: " + thumb + " " + pos);
             Color color = slider.getModel().getThumbAt(thumb).getObject();
@@ -659,6 +666,7 @@ public class JXGradientChooser extends JXPanel {
             
         }
         
+        @Override
         public void thumbSelected(int thumb) {
             
             if(thumb == -1) {
@@ -676,6 +684,7 @@ public class JXGradientChooser extends JXPanel {
              
         }
         
+        @Override
         public void mousePressed(MouseEvent e) {
             if(e.getClickCount() > 1) {
                 selectColorForThumb();
@@ -684,6 +693,7 @@ public class JXGradientChooser extends JXPanel {
     }
     
     private final class RepaintOnEventListener implements ActionListener, ItemListener {
+        @Override
         public void actionPerformed(ActionEvent e) {
             gradientPreview.setReflected(reflectedRadio.isSelected());
             gradientPreview.setReversed(reversedCheck.isSelected());
@@ -693,6 +703,7 @@ public class JXGradientChooser extends JXPanel {
             gradientPreview.repaint();
         }
         
+        @Override
         public void itemStateChanged(ItemEvent e) {
             if(styleCombo.getSelectedItem() == GradientStyle.Radial) {
                 gradientPreview.setRadial(true);
@@ -735,12 +746,14 @@ public class JXGradientChooser extends JXPanel {
         JPanel panel = new JPanel();
         JButton cancel = new JButton("Cancel");
         cancel.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 dialog.setVisible(false);
             }
         });
         JButton okay = new JButton("Ok");
         okay.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 dialog.setVisible(false);
             }

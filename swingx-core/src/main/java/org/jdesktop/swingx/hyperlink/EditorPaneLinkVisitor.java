@@ -63,10 +63,12 @@ public class EditorPaneLinkVisitor implements ActionListener {
         return editorPane;
     }
     
+    @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() instanceof LinkModel) {
             final LinkModel link = (LinkModel) e.getSource();
             SwingUtilities.invokeLater(new Runnable() {
+                @Override
                 public void run() {
                     visit(link);
 
@@ -105,6 +107,7 @@ public class EditorPaneLinkVisitor implements ActionListener {
 
     protected HyperlinkListener createHyperlinkListener() {
         return new HyperlinkListener() {
+            @Override
             public void hyperlinkUpdate(HyperlinkEvent e) {
                 if (HyperlinkEvent.EventType.ACTIVATED == e.getEventType()) {
                     visitInternal(e.getURL());

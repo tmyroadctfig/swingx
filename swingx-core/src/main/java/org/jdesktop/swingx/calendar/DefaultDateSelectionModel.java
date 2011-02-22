@@ -60,6 +60,7 @@ public class DefaultDateSelectionModel extends AbstractDateSelectionModel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public SelectionMode getSelectionMode() {
         return selectionMode;
     }
@@ -67,6 +68,7 @@ public class DefaultDateSelectionModel extends AbstractDateSelectionModel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setSelectionMode(final SelectionMode selectionMode) {
         this.selectionMode = selectionMode;
         clearSelection();
@@ -77,6 +79,7 @@ public class DefaultDateSelectionModel extends AbstractDateSelectionModel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void addSelectionInterval(Date startDate, Date endDate) {
         if (startDate.after(endDate)) {
             return;
@@ -108,6 +111,7 @@ public class DefaultDateSelectionModel extends AbstractDateSelectionModel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setSelectionInterval(final Date startDate, Date endDate) {
         if (SelectionMode.SINGLE_SELECTION.equals(selectionMode)) {
            if (isSelected(startDate)) return;
@@ -138,6 +142,7 @@ public class DefaultDateSelectionModel extends AbstractDateSelectionModel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void removeSelectionInterval(final Date startDate, final Date endDate) {
         if (startDate.after(endDate)) {
             return;
@@ -162,6 +167,7 @@ public class DefaultDateSelectionModel extends AbstractDateSelectionModel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void clearSelection() {
         if (isSelectionEmpty()) return;
         clearSelectionImpl();
@@ -175,6 +181,7 @@ public class DefaultDateSelectionModel extends AbstractDateSelectionModel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public SortedSet<Date> getSelection() {
         return new TreeSet<Date>(selectedDates);
     }
@@ -182,6 +189,7 @@ public class DefaultDateSelectionModel extends AbstractDateSelectionModel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Date getFirstSelectionDate() {
         return isSelectionEmpty() ? null : selectedDates.first();
     }
@@ -189,6 +197,7 @@ public class DefaultDateSelectionModel extends AbstractDateSelectionModel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Date getLastSelectionDate() {
         return isSelectionEmpty() ? null : selectedDates.last();
     }
@@ -196,6 +205,7 @@ public class DefaultDateSelectionModel extends AbstractDateSelectionModel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isSelected(final Date date) {
         Contract.asNotNull(date, "date must not be null");
         return selectedDates.contains(date);
@@ -204,6 +214,7 @@ public class DefaultDateSelectionModel extends AbstractDateSelectionModel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Date getNormalizedDate(Date date) {
         return new Date(date.getTime());
     }
@@ -211,6 +222,7 @@ public class DefaultDateSelectionModel extends AbstractDateSelectionModel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isSelectionEmpty() {
         return selectedDates.isEmpty();
     }
@@ -219,6 +231,7 @@ public class DefaultDateSelectionModel extends AbstractDateSelectionModel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public SortedSet<Date> getUnselectableDates() {
         return new TreeSet<Date>(unselectableDates);
     }
@@ -226,6 +239,7 @@ public class DefaultDateSelectionModel extends AbstractDateSelectionModel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setUnselectableDates(SortedSet<Date> unselectableDates) {
         this.unselectableDates = unselectableDates;
         for (Date unselectableDate : this.unselectableDates) {
@@ -237,6 +251,7 @@ public class DefaultDateSelectionModel extends AbstractDateSelectionModel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isUnselectableDate(Date date) {
         return upperBound != null && upperBound.getTime() < date.getTime() ||
                 lowerBound != null && lowerBound.getTime() > date.getTime() ||

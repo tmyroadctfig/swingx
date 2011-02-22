@@ -532,6 +532,7 @@ public class JXGraph extends JXPanel {
         setForeground(Color.BLACK);
         
         plotChangeListener = new PropertyChangeListener() {
+            @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 repaint();
             }
@@ -1669,6 +1670,7 @@ public class JXGraph extends JXPanel {
     // Shrinks or expand the view depending on the mouse wheel direction.
     // When the wheel moves down, the view is expanded. Otherwise it is shrunk.
     private class ZoomHandler implements MouseWheelListener {
+        @Override
         public void mouseWheelMoved(MouseWheelEvent e) {
             double distanceX = maxX - minX;
             double distanceY = maxY - minY;

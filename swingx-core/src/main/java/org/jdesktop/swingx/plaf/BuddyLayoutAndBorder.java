@@ -62,14 +62,17 @@ public class BuddyLayoutAndBorder implements LayoutManager, Border, PropertyChan
 	 * 
 	 * @see BuddySupport#add(javax.swing.JComponent, Position, JTextField)
 	 */
-	public void addLayoutComponent(String name, Component comp) {
+	@Override
+    public void addLayoutComponent(String name, Component comp) {
 	}
 
-	public Dimension minimumLayoutSize(Container parent) {
+	@Override
+    public Dimension minimumLayoutSize(Container parent) {
 		return preferredLayoutSize(parent);
 	}
 
-	public Dimension preferredLayoutSize(Container parent) {
+	@Override
+    public Dimension preferredLayoutSize(Container parent) {
 		Dimension d = new Dimension();
 
 		// height of highest buddy.
@@ -98,10 +101,12 @@ public class BuddyLayoutAndBorder implements LayoutManager, Border, PropertyChan
 	 * 
 	 * @see BuddySupport#remove(javax.swing.JComponent, JTextField)
 	 */
-	public void removeLayoutComponent(Component comp) {
+	@Override
+    public void removeLayoutComponent(Component comp) {
 	}
 
-	public void layoutContainer(Container parent) {
+	@Override
+    public void layoutContainer(Container parent) {
 		Rectangle visibleRect = getVisibleRect();
 		Dimension size;
 
@@ -162,7 +167,8 @@ public class BuddyLayoutAndBorder implements LayoutManager, Border, PropertyChan
 	 * 
 	 * @see javax.swing.border.Border#getBorderInsets(java.awt.Component)
 	 */
-	public Insets getBorderInsets(Component c) {
+	@Override
+    public Insets getBorderInsets(Component c) {
 		Insets insets = null;
 		if (borderDelegate != null) {
 			// Original insets are cloned to make it work in Mac OS X Aqua LnF.
@@ -228,20 +234,23 @@ public class BuddyLayoutAndBorder implements LayoutManager, Border, PropertyChan
 		return insets;
 	}
 
-	public boolean isBorderOpaque() {
+	@Override
+    public boolean isBorderOpaque() {
 		if (borderDelegate == null) {
 			return false;
 		}
 		return borderDelegate.isBorderOpaque();
 	}
 
-	public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
+	@Override
+    public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
 		if (borderDelegate != null) {
 			borderDelegate.paintBorder(c, g, x, y, width, height);
 		}
 	}
 
-	public void propertyChange(PropertyChangeEvent evt) {
+	@Override
+    public void propertyChange(PropertyChangeEvent evt) {
 		replaceBorderIfNecessary();
 	}
 

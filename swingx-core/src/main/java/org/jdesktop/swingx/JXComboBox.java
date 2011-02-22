@@ -121,6 +121,7 @@ public class JXComboBox extends JComboBox {
         /**
          * {@inheritDoc}
          */
+        @Override
         public void updateUI() {
              wrapper.updateUI();
              
@@ -146,6 +147,7 @@ public class JXComboBox extends JComboBox {
          * Overridden to apply the highlighters, if any, after calling the delegate.
          * The decorators are not applied if the row is invalid.
          */
+        @Override
         public Component getListCellRendererComponent(JList list, Object value, int index,
                 boolean isSelected, boolean cellHasFocus) {
             Component comp = null;
@@ -182,6 +184,7 @@ public class JXComboBox extends JComboBox {
          * {@inheritDoc}
          * 
          */
+        @Override
         public boolean isEnabled() {
             return (delegateRenderer instanceof RolloverRenderer) && 
                ((RolloverRenderer) delegateRenderer).isEnabled();
@@ -190,6 +193,7 @@ public class JXComboBox extends JComboBox {
         /**
          * {@inheritDoc}
          */
+        @Override
         public void doClick() {
             if (isEnabled()) {
                 ((RolloverRenderer) delegateRenderer).doClick();
@@ -432,6 +436,7 @@ public class JXComboBox extends JComboBox {
                 isDispatching = true;
 
                 SwingUtilities.invokeLater(new Runnable() {
+                    @Override
                     public void run() {
                         try {
                             for (KeyEvent event : pendingEvents) {
@@ -719,6 +724,7 @@ public class JXComboBox extends JComboBox {
      */
     protected ChangeListener createHighlighterChangeListener() {
         return new ChangeListener() {
+            @Override
             public void stateChanged(ChangeEvent e) {
                 // need to fire change so JXComboBox can update
                 firePropertyChange("highlighters", null, getHighlighters());

@@ -183,7 +183,8 @@ public class JXSearchField extends JXTextField {
 		// action that hides the tooltip every time the tooltip is changed and
 		// then the ClearAction will never be called.
 		addKeyListener(new KeyAdapter() {
-			public void keyPressed(KeyEvent e) {
+			@Override
+            public void keyPressed(KeyEvent e) {
 				if (CANCEL_KEY.equals(KeyStroke.getKeyStroke(e.getKeyCode(), e.getModifiers()))) {
 					getCancelAction().actionPerformed(
 							new ActionEvent(JXSearchField.this, e.getID(), KeyEvent.getKeyText(e.getKeyCode())));
@@ -193,19 +194,22 @@ public class JXSearchField extends JXTextField {
 
 		// Map specific native properties to general JXSearchField properties.
 		addPropertyChangeListener(NativeSearchFieldSupport.FIND_POPUP_PROPERTY, new PropertyChangeListener() {
-			public void propertyChange(PropertyChangeEvent evt) {
+			@Override
+            public void propertyChange(PropertyChangeEvent evt) {
 				JPopupMenu oldPopup = (JPopupMenu) evt.getOldValue();
 				firePropertyChange("findPopupMenu", oldPopup, evt.getNewValue());
 			}
 		});
 		addPropertyChangeListener(NativeSearchFieldSupport.CANCEL_ACTION_PROPERTY, new PropertyChangeListener() {
-			public void propertyChange(PropertyChangeEvent evt) {
+			@Override
+            public void propertyChange(PropertyChangeEvent evt) {
 				ActionListener oldAction = (ActionListener) evt.getOldValue();
 				firePropertyChange("cancelAction", oldAction, evt.getNewValue());
 			}
 		});
 		addPropertyChangeListener(NativeSearchFieldSupport.FIND_ACTION_PROPERTY, new PropertyChangeListener() {
-			public void propertyChange(PropertyChangeEvent evt) {
+			@Override
+            public void propertyChange(PropertyChangeEvent evt) {
 				ActionListener oldAction = (ActionListener) evt.getOldValue();
 				firePropertyChange("findAction", oldAction, evt.getNewValue());
 			}
@@ -333,7 +337,8 @@ public class JXSearchField extends JXTextField {
 	 * 
 	 * @see javax.swing.text.JTextComponent#setMargin(java.awt.Insets)
 	 */
-	public void setMargin(Insets m) {
+	@Override
+    public void setMargin(Insets m) {
 		super.setMargin(m);
 	}
 
@@ -375,7 +380,8 @@ public class JXSearchField extends JXTextField {
 		if (cancelButton == null) {
 			cancelButton = createCancelButton();
 			cancelButton.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
+				@Override
+                public void actionPerformed(ActionEvent e) {
 					getCancelAction().actionPerformed(e);
 				}
 			});
@@ -435,7 +441,8 @@ public class JXSearchField extends JXTextField {
 		if (findButton == null) {
 			findButton = createFindButton();
 			findButton.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
+				@Override
+                public void actionPerformed(ActionEvent e) {
 					getFindAction().actionPerformed(e);
 				}
 			});
@@ -527,7 +534,8 @@ public class JXSearchField extends JXTextField {
 	 * @see #updateButtonState()
 	 * @see javax.swing.text.JTextComponent#setEditable(boolean)
 	 */
-	public void setEditable(boolean b) {
+	@Override
+    public void setEditable(boolean b) {
 		super.setEditable(b);
 		updateButtonState();
 	}
@@ -539,7 +547,8 @@ public class JXSearchField extends JXTextField {
 	 * @see #updateButtonState()
 	 * @see javax.swing.text.JTextComponent#setEnabled(boolean)
 	 */
-	public void setEnabled(boolean enabled) {
+	@Override
+    public void setEnabled(boolean enabled) {
 		super.setEnabled(enabled);
 		updateButtonState();
 	}
@@ -671,7 +680,8 @@ public class JXSearchField extends JXTextField {
 	public Timer getInstantSearchTimer() {
 		if (instantSearchTimer == null) {
 			instantSearchTimer = new Timer(0, new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
+				@Override
+                public void actionPerformed(ActionEvent e) {
 					postActionEvent();
 				}
 			});
@@ -690,7 +700,8 @@ public class JXSearchField extends JXTextField {
 	 * @return <code>true</code> if this search field is the focus owner or
 	 *         the find popup menu is visible
 	 */
-	public boolean hasFocus() {
+	@Override
+    public boolean hasFocus() {
 		if (getFindPopupMenu() != null && getFindPopupMenu().isVisible()) {
 			return true;
 		}
@@ -700,7 +711,8 @@ public class JXSearchField extends JXTextField {
 	/**
 	 * Overriden to also update the find popup menu if set.
 	 */
-	public void updateUI() {
+	@Override
+    public void updateUI() {
 		super.updateUI();
 		if (getFindPopupMenu() != null) {
 			SwingUtilities.updateComponentTreeUI(getFindPopupMenu());
@@ -711,7 +723,8 @@ public class JXSearchField extends JXTextField {
 	 * Hack to enable the UI delegate to set default values depending on the
 	 * current Look and Feel, without overriding custom values.
 	 */
-	public void setPromptFontStyle(Integer fontStyle) {
+	@Override
+    public void setPromptFontStyle(Integer fontStyle) {
 		super.setPromptFontStyle(fontStyle);
 		promptFontStyleSet = true;
 	}
@@ -772,7 +785,8 @@ public class JXSearchField extends JXTextField {
 	 * be invoked after the instant search delay, if we would not prevent it
 	 * here.
 	 */
-	public void postActionEvent() {
+	@Override
+    public void postActionEvent() {
 		getInstantSearchTimer().stop();
 		super.postActionEvent();
 	}
@@ -790,7 +804,8 @@ public class JXSearchField extends JXTextField {
 		/**
 		 * Calls {@link #clear()}.
 		 */
-		public void actionPerformed(ActionEvent e) {
+		@Override
+        public void actionPerformed(ActionEvent e) {
 			clear();
 		}
 
@@ -818,7 +833,8 @@ public class JXSearchField extends JXTextField {
 		 * Also requests the focus for the search field and selects the whole
 		 * text.
 		 */
-		public void actionPerformed(ActionEvent e) {
+		@Override
+        public void actionPerformed(ActionEvent e) {
 			if (isFocusOwner() && isRegularSearchMode()) {
 				postActionEvent();
 			}

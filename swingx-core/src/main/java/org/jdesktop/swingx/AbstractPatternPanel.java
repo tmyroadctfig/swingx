@@ -294,6 +294,7 @@ public abstract class AbstractPatternPanel extends JXPanel {
      */
     protected PropertyChangeListener getPatternModelListener() {
         return new PropertyChangeListener() {    
+            @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 String property = evt.getPropertyName();
                 if ("pattern".equals(property)) {
@@ -350,6 +351,7 @@ public abstract class AbstractPatternPanel extends JXPanel {
     protected void refreshDocumentFromModel() {
         if (searchField.getText().equals(getPatternModel().getRawText())) return;
         SwingUtilities.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 searchField.setText(getPatternModel().getRawText());
             }
@@ -364,15 +366,18 @@ public abstract class AbstractPatternPanel extends JXPanel {
      */
     protected DocumentListener getSearchFieldListener() {
         return new DocumentListener() {
+            @Override
             public void changedUpdate(DocumentEvent ev) {
                 // JW - really?? we've a PlainDoc without Attributes
                 refreshModelFromDocument();
             }
     
+            @Override
             public void insertUpdate(DocumentEvent ev) {
                 refreshModelFromDocument();
             }
     
+            @Override
             public void removeUpdate(DocumentEvent ev) {
                 refreshModelFromDocument();
             }

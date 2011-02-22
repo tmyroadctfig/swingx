@@ -76,6 +76,7 @@ public class SingleDaySelectionModel extends AbstractDateSelectionModel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public SelectionMode getSelectionMode() {
         return SelectionMode.SINGLE_SELECTION;
     }
@@ -86,6 +87,7 @@ public class SingleDaySelectionModel extends AbstractDateSelectionModel {
      * Implemented to do nothing.
      * 
      */
+    @Override
     public void setSelectionMode(final SelectionMode selectionMode) {
     }
 
@@ -97,6 +99,7 @@ public class SingleDaySelectionModel extends AbstractDateSelectionModel {
      * Implemented to call setSelectionInterval with startDate for both 
      * parameters.
      */
+    @Override
     public void addSelectionInterval(Date startDate, Date endDate) {
         setSelection(startDate);
     }
@@ -107,6 +110,7 @@ public class SingleDaySelectionModel extends AbstractDateSelectionModel {
      * PENDING JW: define what happens if we have a selection but the interval
      * isn't selectable. 
      */
+    @Override
     public void setSelectionInterval(Date startDate, Date endDate) {
         setSelection(startDate);
     }
@@ -114,6 +118,7 @@ public class SingleDaySelectionModel extends AbstractDateSelectionModel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void removeSelectionInterval(Date startDate, Date endDate) {
         Contract.asNotNull(startDate, "date must not be null");
         if (isSelectionEmpty()) return;
@@ -181,6 +186,7 @@ public class SingleDaySelectionModel extends AbstractDateSelectionModel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Date getFirstSelectionDate() {
         return isSelectionEmpty() ? null : selectedDates.first();
     }
@@ -188,6 +194,7 @@ public class SingleDaySelectionModel extends AbstractDateSelectionModel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Date getLastSelectionDate() {
         return isSelectionEmpty() ? null : selectedDates.last();
     }
@@ -253,6 +260,7 @@ public class SingleDaySelectionModel extends AbstractDateSelectionModel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void clearSelection() {
         if (isSelectionEmpty()) return;
         selectedDates.clear();
@@ -263,6 +271,7 @@ public class SingleDaySelectionModel extends AbstractDateSelectionModel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public SortedSet<Date> getSelection() {
         return new TreeSet<Date>(selectedDates);
     }
@@ -270,6 +279,7 @@ public class SingleDaySelectionModel extends AbstractDateSelectionModel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isSelected(Date date) {
         Contract.asNotNull(date, "date must not be null");
         if (isSelectionEmpty()) return false;
@@ -283,6 +293,7 @@ public class SingleDaySelectionModel extends AbstractDateSelectionModel {
      * 
      * Implemented to return the date itself.
      */
+    @Override
     public Date getNormalizedDate(Date date) {
         return new Date(date.getTime());
     }
@@ -291,6 +302,7 @@ public class SingleDaySelectionModel extends AbstractDateSelectionModel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isSelectionEmpty() {
         return selectedDates.isEmpty();
     }
@@ -299,6 +311,7 @@ public class SingleDaySelectionModel extends AbstractDateSelectionModel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public SortedSet<Date> getUnselectableDates() {
         return new TreeSet<Date>(unselectableDates);
     }
@@ -306,6 +319,7 @@ public class SingleDaySelectionModel extends AbstractDateSelectionModel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setUnselectableDates(SortedSet<Date> unselectables) {
         Contract.asNotNull(unselectables, "unselectable dates must not be null");
         this.unselectableDates.clear();
@@ -319,6 +333,7 @@ public class SingleDaySelectionModel extends AbstractDateSelectionModel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isUnselectableDate(Date date) {
         return !isSelectable(date);
     }

@@ -60,6 +60,7 @@ public abstract class PromptTextUI extends TextUI {
         /**
          * {@inheritDoc}
          */
+        @Override
         public Object addHighlight(int p0, int p1, HighlightPainter p)
                 throws BadLocationException {
             return new Object();
@@ -68,6 +69,7 @@ public abstract class PromptTextUI extends TextUI {
         /**
          * {@inheritDoc}
          */
+        @Override
         public void changeHighlight(Object tag, int p0, int p1)
                 throws BadLocationException {
 
@@ -76,6 +78,7 @@ public abstract class PromptTextUI extends TextUI {
         /**
          * {@inheritDoc}
          */
+        @Override
         public void deinstall(JTextComponent c) {
             c = null;
         }
@@ -83,6 +86,7 @@ public abstract class PromptTextUI extends TextUI {
         /**
          * {@inheritDoc}
          */
+        @Override
         public Highlight[] getHighlights() {
             return null;
         }
@@ -90,6 +94,7 @@ public abstract class PromptTextUI extends TextUI {
         /**
          * {@inheritDoc}
          */
+        @Override
         public void install(JTextComponent c) {
             this.c = c;
         }
@@ -97,6 +102,7 @@ public abstract class PromptTextUI extends TextUI {
         /**
          * {@inheritDoc}
          */
+        @Override
         public void paint(Graphics g) {
             Graphics2D g2d = (Graphics2D) g.create();
 
@@ -110,6 +116,7 @@ public abstract class PromptTextUI extends TextUI {
         /**
          * {@inheritDoc}
          */
+        @Override
         public void removeAllHighlights() {
             // TODO Auto-generated method stub
 
@@ -118,6 +125,7 @@ public abstract class PromptTextUI extends TextUI {
         /**
          * {@inheritDoc}
          */
+        @Override
         public void removeHighlight(Object tag) {
             // TODO Auto-generated method stub
 
