@@ -646,7 +646,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
     public void interactiveKeybindingColumnControl() {
         JXTable table = new JXTable(sortableTableModel);
         // JW: currently the CCB must be visible
-//        table.setColumnControlVisible(true);
+        table.setColumnControlVisible(true);
         Action openCCPopup = ((AbstractButton) table.getColumnControl()).getAction();
         String actionKey = "popupColumnControl";
         table.getActionMap().put(actionKey, openCCPopup);
