@@ -37,6 +37,7 @@ import javax.swing.JToolBar;
 import javax.swing.JViewport;
 import javax.swing.KeyStroke;
 import javax.swing.RowFilter;
+import javax.swing.ScrollPaneLayout;
 import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
 import javax.swing.RowSorter.SortKey;
@@ -90,7 +91,8 @@ public class JXTableVisualCheck extends JXTableUnitTest {
       try {
 //        test.runInteractiveTests();
 //          test.runInteractiveTests("interactive.*FloatingPoint.*");
-          test.runInteractiveTests("interactive.*Disable.*");
+//          test.runInteractiveTests("interactive.*Disable.*");
+          test.runInteractiveTests("interactive.*ColumnControl.*");
 //          test.runInteractiveTests("interactive.*Remove.*");
 //          test.runInteractiveTests("interactive.*ColumnProp.*");
 //          test.runInteractiveTests("interactive.*Multiple.*");
@@ -108,15 +110,37 @@ public class JXTableVisualCheck extends JXTableUnitTest {
           e.printStackTrace();
       }
   }
-
     
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-        // super has LF specific tests...
-        setSystemLF(true);
-//        setLookAndFeel("Nimbus");
+    /**
+     * Issue #1392- swingx: columnControl lost on toggle CO and LAF
+     * 
+     * Not easily reproducible - happens
+     * if the scrollPane's layout is re-created on updateUI.
+     */
+    public void interactiveColumnControlLAF() {
+        JXTable table = new JXTable(new AncientSwingTeam());
+        table.setColumnControlVisible(true);
+        JScrollPane scrollPane = new JScrollPane(table) {
+
+            /** 
+             * @inherited <p>
+             */
+            @Override
+            public void updateUI() {
+                super.updateUI();
+                setLayout(new ScrollPaneLayout());
+            }
+            
+        };
+        JTable rowHeader = new JTable(10, 1);
+        scrollPane.setRowHeaderView(rowHeader);
+        JLabel label = new JLabel("rowHeader");
+        scrollPane.setCorner(JScrollPane.UPPER_LEADING_CORNER, label);
+        JXFrame frame = wrapInFrame(scrollPane, "xTable, coreScrollPane");
+        addComponentOrientationToggle(frame);
+        show(frame);
     }
+    
 
     /**
      * Issue #1195-swingx: keep selection on remove
@@ -467,6 +491,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
 //        mini.setMinWidth(5);
         Action structureChanged = new AbstractAction("fire structure changed") {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 table.tableChanged(null);
             }
@@ -488,6 +513,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
     public void interactiveDialogCancelOnEscape() {
         Action cancel = new AbstractActionExt("cancel") {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 LOG.info("performed: cancel action");
                 
@@ -520,6 +546,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         addMessage(frame, "initial size: " + table.getPreferredScrollableViewportSize());
         Action action = new AbstractActionExt("toggle model") {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 table.setModel(table.getModel() == tableModel ? ancientSwingTeam : tableModel);
                 frame.pack();
@@ -543,7 +570,8 @@ public class JXTableVisualCheck extends JXTableUnitTest {
          final JXFrame frame = wrapWithScrollingInFrame(table, "Dynamic pref scrollable");
          Action action = new AbstractActionExt("vis row") {
              
-             public void actionPerformed(ActionEvent e) {
+             @Override
+            public void actionPerformed(ActionEvent e) {
                  int visRowCount = table.getVisibleRowCount() + 5;
                  if (visRowCount > 30) {
                      visRowCount = 10;
@@ -556,7 +584,8 @@ public class JXTableVisualCheck extends JXTableUnitTest {
          addAction(frame, action);
          Action columnAction = new AbstractActionExt("vis column") {
              
-             public void actionPerformed(ActionEvent e) {
+             @Override
+            public void actionPerformed(ActionEvent e) {
                  int visColumnCount = table.getVisibleColumnCount();
                  if (visColumnCount > 8) {
                      visColumnCount = -1;
@@ -589,6 +618,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         final JXTable table = new JXTable(sortableTableModel);
         Action findAction = new AbstractActionExt() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 SearchFactory.getInstance().showFindDialog(table, table.getSearchable());
                 
@@ -651,6 +681,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
                 "JXTable: toggle terminate/autoStart on left (right is dummy) ");
         Action toggleTerminate = new AbstractAction("toggleTerminate") {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 table.setTerminateEditOnFocusLost(!table.isTerminateEditOnFocusLost());
                 
@@ -660,6 +691,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         addAction(frame, toggleTerminate);
         Action toggleAutoStart = new AbstractAction("toggleAutoStart") {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 table.setAutoStartEditOnKeyStroke(!table.isAutoStartEditOnKeyStroke());
                 
@@ -737,6 +769,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         JXFrame frame = wrapInFrame(box, "disabled collection views");
         AbstractAction action = new AbstractAction("toggle disabled") {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 table.setEnabled(!table.isEnabled());
                 list.setEnabled(!list.isEnabled());
@@ -763,6 +796,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         JXFrame frame = wrapWithScrollingInFrame(table, "update header");
         Action action = new AbstractAction("update headervalue") {
             int count;
+            @Override
             public void actionPerformed(ActionEvent e) {
                 table.getColumn(0).setHeaderValue("A" + count++);
                 
@@ -772,6 +806,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         addAction(frame, action);
         action = new AbstractAction("update column title") {
             int count;
+            @Override
             public void actionPerformed(ActionEvent e) {
                 table.getColumnExt(0).setTitle("A" + count++);
                 
@@ -804,6 +839,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         JXFrame frame = wrapWithScrollingInFrame(table, "update header");
         Action action = new AbstractAction("update headervalue") {
             boolean first;
+            @Override
             public void actionPerformed(ActionEvent e) {
                 table.getColumn(1).setHeaderValue(first ? alternate[0] : alternate[1]);
                 first = !first;
@@ -845,6 +881,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         JXFrame frame = wrapWithScrollingInFrame(table, "expand to width");
         Action toggleModel = new AbstractAction("toggle model") {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 table.setModel(table.getModel() == sortableTableModel ? 
                         new DefaultTableModel(20, 4) : sortableTableModel);
@@ -876,6 +913,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         table.getColumnModel().getSelectionModel().setLeadSelectionIndex(0);
         Action toggleAction = new AbstractAction("Toggle TableModel") {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 TableModel model = table.getModel();
                 table.setModel(model.equals(tableModel) ? sortableTableModel : tableModel);
@@ -887,6 +925,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         frame.setVisible(true);
         frame.pack();
         SwingUtilities.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 // sanity - focus is on table
                 LOG.info("isFocused? " + table.hasFocus());
@@ -947,6 +986,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         addComponentOrientationToggle(frame);
         Action toggleColumnControl = new AbstractAction("toggle column control") {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 table.setColumnControlVisible(!table.isColumnControlVisible());
                 
@@ -996,6 +1036,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         final JXTable table = new JXTable();
         Action toggleAction = new AbstractAction("Toggle Control") {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 table.setColumnControlVisible(!table.isColumnControlVisible());
                 
@@ -1012,6 +1053,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         addAction(frame, toggleAction);
         Action packAction = new AbstractAction("Pack frame") {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 frame.remove(scrollPane1);
                 frame.add(scrollPane1);
@@ -1031,6 +1073,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         final JXTable table = new JXTable();
         Action toggleAction = new AbstractAction("Toggle Control") {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 table.setColumnControlVisible(!table.isColumnControlVisible());
                 
@@ -1047,6 +1090,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         addAction(frame, toggleAction);
         Action packAction = new AbstractAction("Pack frame") {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 frame.remove(scrollPane1);
                 frame.add(scrollPane1);
@@ -1065,6 +1109,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         final JXTable table = new JXTable();
         Action toggleAction = new AbstractAction("Toggle Control") {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 table.setColumnControlVisible(!table.isColumnControlVisible());
                 
@@ -1086,6 +1131,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         final JXTable table = new JXTable();
         Action toggleAction = new AbstractAction("Toggle Control") {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 table.setColumnControlVisible(!table.isColumnControlVisible());
                 
@@ -1111,6 +1157,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         final JXFrame frame = wrapInFrame(table, "JXTable: Toggle ScrollPane with Columncontrol on");
         Action toggleAction = new AbstractAction("Toggle ScrollPane") {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 Container parent = table.getParent();
                 boolean inScrollPane = parent instanceof JViewport;
@@ -1142,6 +1189,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         JXFrame frame = wrapWithScrollingInFrame(table, "JXTable: Column with Min=Max not resizable");
         Action action = new AbstractAction("Toggle MinMax of FirstName") {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 // user-friendly resizable flag
                 if (priorityColumn.getMinWidth() == priorityColumn.getMaxWidth()) {
@@ -1165,6 +1213,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         table.setColumnControlVisible(true);
         Action toggleSortableAction = new AbstractAction("Toggle Sortable") {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 table.setSortable(!table.isSortable());
                 
@@ -1311,6 +1360,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         bar.add(new AbstractAction("Toggle") {
             boolean state = false;
             
+            @Override
             public void actionPerformed(ActionEvent e) {
                 if (state) {
                     table.getColumnExt("No.").setHighlighters(new Highlighter[0]);
@@ -1318,6 +1368,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
                 } else {
                     table.getColumnExt("No.").addHighlighter(
                         new AbstractHighlighter(new HighlightPredicate() {
+                            @Override
                             public boolean isHighlighted(Component renderer, ComponentAdapter adapter) {
                                 return adapter.getValue().toString().contains("8");
                             }
@@ -1338,7 +1389,18 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         frame.add(bar, BorderLayout.NORTH);
         frame.setVisible(true);
     }
+ 
+
     
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        // super has LF specific tests...
+        setSystemLF(true);
+//        setLookAndFeel("Nimbus");
+    }
+
+
     /**
      * dummy
      */

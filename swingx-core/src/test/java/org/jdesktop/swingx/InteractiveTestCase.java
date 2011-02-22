@@ -281,9 +281,10 @@ public abstract class InteractiveTestCase extends junit.framework.TestCase {
     public void addComponentOrientationToggle(final JXFrame frame) {
         Action toggleComponentOrientation = new AbstractAction("toggle orientation") {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 ComponentOrientation current = frame.getComponentOrientation();
-                if (current == ComponentOrientation.LEFT_TO_RIGHT) {
+                if (current.isLeftToRight()) {
                     frame.applyComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
                 } else {
                     frame.applyComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
@@ -305,6 +306,7 @@ public abstract class InteractiveTestCase extends junit.framework.TestCase {
      */
     public void addSearchModeToggle(final JXFrame frame) {
         Action action = new AbstractAction("toggle batch/incremental"){
+            @Override
             public void actionPerformed(ActionEvent e) {
                 boolean useFindBar = !SearchFactory.getInstance().isUseFindBar(null, null);
                 SearchFactory.getInstance().setUseFindBar(useFindBar);
@@ -530,6 +532,7 @@ public abstract class InteractiveTestCase extends junit.framework.TestCase {
         /**
          * {@inheritDoc}
          */
+        @Override
         public void actionPerformed(ActionEvent e) {
             try {
                 UIManager.setLookAndFeel(plaf);

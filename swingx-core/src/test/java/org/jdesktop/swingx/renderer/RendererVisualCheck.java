@@ -132,10 +132,10 @@ public class RendererVisualCheck extends InteractiveTestCase {
         try {
 //            test.runInteractiveTests();
 //          test.runInteractiveTests(".*CustomIcons.*");
-          test.runInteractiveTests(".*IconText.*");
+//          test.runInteractiveTests(".*XLabel.*");
 //          test.runInteractiveTests(".*Text.*");
 //          test.runInteractiveTests(".*Color.*");
-//          test.runInteractiveTests("interactive.*ColumnControl.*");
+          test.runInteractiveTests("interactive.*ColumnControl.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
@@ -230,6 +230,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
         JXList table = new JXList(files);
         StringValue sv = new StringValue() {
 
+            @Override
             public String getString(Object value) {
                 if (value instanceof File) {
                     return FileSystemView.getFileSystemView().getSystemDisplayName((File) value)
@@ -258,6 +259,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
         // install value based highlighter 
         final HighlightPredicate valueBased = new HighlightPredicate() {
 
+            @Override
             public boolean isHighlighted(Component renderer,
                     ComponentAdapter adapter) {
                 if (!(adapter.getValue() instanceof File)) return false;
@@ -275,6 +277,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
                 BorderFactory.createLineBorder(Color.BLUE)));
         final HighlightPredicate valueBasedUnwrap = new HighlightPredicate() {
 
+            @Override
             public boolean isHighlighted(Component renderer,
                     ComponentAdapter adapter) {
                 File file = getUserObject(adapter.getValue());
@@ -293,11 +296,13 @@ public class RendererVisualCheck extends InteractiveTestCase {
                 }
                 return null;
             }
+
             
         };
         JXFrame frame = showWithScrollingInFrame(tree, table, "Tree/List: same string/icon values ");
         Action toggleUnwrap = new AbstractAction("toggle unwrapUserObject") {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 WrappingProvider provider = (WrappingProvider) treeRenderer.getComponentProvider();
                 provider.setUnwrapUserObject(!provider.getUnwrapUserObject());
@@ -309,6 +314,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
         addAction(frame, toggleUnwrap);
         Action togglePredicate = new AbstractAction("toggle predicateUnwrap") {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 HighlightPredicate old = back.getHighlightPredicate();
                 back.setHighlightPredicate(old == valueBased ? valueBasedUnwrap : valueBased);
@@ -318,6 +324,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
         addAction(frame, togglePredicate);
         Action toggleLargeModel = new AbstractAction("toggle largeModel") {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 tree.setLargeModel(!tree.isLargeModel());
                 tree.revalidate();
@@ -384,6 +391,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
         JXTreeTable table = new JXTreeTable(model);
         StringValue sv = new StringValue() {
 
+            @Override
             public String getString(Object value) {
                 if (value instanceof File) {
                     return FileSystemView.getFileSystemView().getSystemDisplayName((File) value)
@@ -397,6 +405,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
         };
         IconValue iv = new IconValue() {
 
+            @Override
             public Icon getIcon(Object value) {
                 if (value instanceof File) {
                     return  FileSystemView.getFileSystemView().getSystemIcon((File) value);
@@ -422,6 +431,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
         // install value based highlighter 
         HighlightPredicate valueBased = new HighlightPredicate() {
 
+            @Override
             public boolean isHighlighted(Component renderer,
                     ComponentAdapter adapter) {
                 if (!(adapter.getValue() instanceof File)) return false;
@@ -521,23 +531,28 @@ public class RendererVisualCheck extends InteractiveTestCase {
         updateRowHeight(table);
         TableColumnModelListener columnListener = new TableColumnModelListener() {
 
+            @Override
             public void columnAdded(TableColumnModelEvent e) {
                 updateRowHeight(table);
             }
 
+            @Override
             public void columnMarginChanged(ChangeEvent e) {
                 // here we rely on an implementation detail of DefaultTableColumnModel:
                 // which fires a marginChanged is column widths are changed
                 updateRowHeight(table);
             }
 
+            @Override
             public void columnMoved(TableColumnModelEvent e) {
             }
 
+            @Override
             public void columnRemoved(TableColumnModelEvent e) {
                 updateRowHeight(table);
             }
 
+            @Override
             public void columnSelectionChanged(ListSelectionEvent e) {
             }
             
@@ -647,7 +662,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
         @Override
         protected JXLabel createRendererComponent() {
             JXLabel label = new JXLabel();
-            label.setOpaque(true);
+//            label.setOpaque(true);
             label.setLineWrap(true);
             return label;
         }
@@ -667,6 +682,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
         // 
         ListModel listModel = new AbstractListModel() {
 
+            @Override
             public Object getElementAt(int index) {
                 if (index == 0) {
                     return "dummy";
@@ -674,6 +690,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
                 return model.getValueAt(index - 1, 4);
             }
 
+            @Override
             public int getSize() {
                 return model.getRowCount() + 1;
             }
@@ -685,6 +702,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
 
         AbstractAction action = new AbstractAction("toggle disabled") {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 standard.setEnabled(!standard.isEnabled());
                 enhanced.setEnabled(!enhanced.isEnabled());
@@ -721,6 +739,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
         };
         AbstractAction action = new AbstractAction("toggle disabled") {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 standard.setEnabled(!standard.isEnabled());
                 enhanced.setEnabled(!enhanced.isEnabled());
@@ -844,6 +863,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
         JXFrame frame = wrapInFrame(box, "disabled collection views");
         AbstractAction action = new AbstractAction("toggle disabled") {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 table.setEnabled(!table.isEnabled());
                 list.setEnabled(!list.isEnabled());
@@ -868,14 +888,17 @@ public class RendererVisualCheck extends InteractiveTestCase {
         final ListModel players = createPlayerModel();
         TableModel tableModel = new AbstractTableModel() {
             String[] columnNames = {"Name", "Score", "Player.toString"};
+            @Override
             public int getColumnCount() {
                 return 3;
             }
 
+            @Override
             public int getRowCount() {
                 return players.getSize();
             }
 
+            @Override
             public Object getValueAt(int rowIndex, int columnIndex) {
                 return players.getElementAt(rowIndex);
             }
@@ -920,6 +943,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
          * {@inheritDoc} <p>
          * Implemented to return the toString of the named property value.
          */
+        @Override
         public String getString(Object value) {
             try {
                 PropertyDescriptor desc = getPropertyDescriptor(value.getClass(), property);
@@ -941,6 +965,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
         JXTable table = new JXTable();
         StringValue converter = new StringValue() {
 
+            @Override
             public String getString(Object value) {
                 if (value instanceof Point) {
                     Point p = (Point) value;
@@ -1015,9 +1040,9 @@ public class RendererVisualCheck extends InteractiveTestCase {
         frame.setVisible(true);
     }
     
-//----------------------- experiments with "CheckList" fakes
- 
-    
+
+    // ----------------------- experiments with "CheckList" fakes
+
     /**
      * Use a custom button controller to show both checkbox icon and text to
      * render Actions in a JXList.
@@ -1031,29 +1056,34 @@ public class RendererVisualCheck extends InteractiveTestCase {
         configureList(list, table, true);
         StringValue sv = new StringValue() {
 
+            @Override
             public String getString(Object value) {
                 if (value instanceof AbstractActionExt) {
                     return ((AbstractActionExt) value).getName();
                 }
                 return StringValues.TO_STRING.getString(value);
             }
-            
+
         };
         BooleanValue bv = new BooleanValue() {
 
+            @Override
             public boolean getBoolean(Object value) {
                 if (value instanceof AbstractActionExt) {
                     return ((AbstractActionExt) value).isSelected();
                 }
                 return false;
             }
-            
+
         };
-        CheckBoxProvider provider = new CheckBoxProvider(new MappedValue(sv, null, bv), JLabel.LEADING);
+        CheckBoxProvider provider = new CheckBoxProvider(new MappedValue(sv,
+                null, bv), JLabel.LEADING);
         list.setCellRenderer(new DefaultListRenderer(provider));
         JXFrame frame = showWithScrollingInFrame(table, list,
                 "rollover checkbox list-renderer");
-        addStatusMessage(frame, "CheckList renderer (not completely active - no hotspot, doubleclick only)");
+        addComponentOrientationToggle(frame);
+        addStatusMessage(frame,
+                "CheckList renderer (not completely active - no hotspot, doubleclick only)");
     }
 
 
@@ -1086,6 +1116,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
         final Action toggleSelected = new AbstractActionExt(
                 "toggle column visibility") {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 if (list.isSelectionEmpty())
                     return;
@@ -1138,6 +1169,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
             
             PropertyChangeListener l = new PropertyChangeListener() {
                 
+                @Override
                 public void propertyChange(PropertyChangeEvent evt) {
                     int index = indexOf(evt.getSource());
                     if (index >= 0) {
@@ -1222,6 +1254,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
     private Highlighter createPropertyRespectingHighlighter(final Highlighter delegate) {
         HighlightPredicate predicate = new HighlightPredicate() {
 
+            @Override
             public boolean isHighlighted(Component renderer, ComponentAdapter adapter) {
                 return ((JComponent) renderer).getClientProperty("renderer-dont-touch") == null;
             }
@@ -1473,6 +1506,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
             putClientProperty("renderer-dont-touch", "color");
         }
 
+        @Override
         public Component getTableCellRendererComponent(JTable table,
                 Object color, boolean isSelected, boolean hasFocus, int row,
                 int column) {
