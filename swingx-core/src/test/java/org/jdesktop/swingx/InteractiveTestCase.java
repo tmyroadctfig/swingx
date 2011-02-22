@@ -300,6 +300,17 @@ public abstract class InteractiveTestCase extends junit.framework.TestCase {
         addAction(frame, toggleComponentOrientation);
     }
     
+    public void toggleComponentOrientation(JComponent frame) {
+        ComponentOrientation current = frame.getComponentOrientation();
+        if (current.isLeftToRight()) {
+            frame.applyComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+        } else {
+            frame.applyComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+        }
+        frame.revalidate();
+        frame.repaint();
+    }
+    
     /**
      * Creates and adds a button toggling the frame's componentOrientation.
      * @param frame

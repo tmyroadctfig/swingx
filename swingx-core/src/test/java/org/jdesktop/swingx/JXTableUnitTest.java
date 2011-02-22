@@ -44,10 +44,11 @@ import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.RowFilter;
 import javax.swing.RowSorter;
+import javax.swing.RowSorter.SortKey;
+import javax.swing.ScrollPaneLayout;
 import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
-import javax.swing.RowSorter.SortKey;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -65,9 +66,9 @@ import org.jdesktop.swingx.action.BoundAction;
 import org.jdesktop.swingx.decorator.AbstractHighlighter;
 import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
+import org.jdesktop.swingx.decorator.ComponentAdapterTest.JXTableT;
 import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.PatternPredicate;
-import org.jdesktop.swingx.decorator.ComponentAdapterTest.JXTableT;
 import org.jdesktop.swingx.hyperlink.LinkModel;
 import org.jdesktop.swingx.renderer.DefaultTableRenderer;
 import org.jdesktop.swingx.renderer.StringValue;
@@ -122,7 +123,43 @@ public class JXTableUnitTest extends InteractiveTestCase {
         super("JXTable unit test");
     }
 
+    /**
+     * Issue #1392-swingx: ColumnControl lost on change of CO and LAF
+     */
+    @Test
+    public void testColumnControlOnUpdateCO() {
+        JXTable table = new JXTable(10, 2);
+        JScrollPane scrollPane = new JScrollPane(table);
+        table.setColumnControlVisible(true);
+        toggleComponentOrientation(scrollPane);
+        //        scrollPane.setLayout(new ScrollPaneLayout());
+        assertSame("sanity: column control in trailing corner", 
+                table.getColumnControl(), scrollPane.getCorner(JScrollPane.UPPER_TRAILING_CORNER));
+        assertNull("column control must not be in leading corner", 
+                scrollPane.getCorner(JScrollPane.UPPER_LEADING_CORNER));
+        
+    }
     
+        /**
+         * Issue #1392-swingx: ColumnControl lost on change of CO and LAF
+         */
+        @Test
+        public void testColumnControlOnUpdateUI() {
+            JXTable table = new JXTable(10, 2);
+            JScrollPane scrollPane = new JScrollPane(table);
+            table.setColumnControlVisible(true);
+            scrollPane.setLayout(new ScrollPaneLayout());
+            assertSame("sanity: column control survives setLayout", 
+                    table.getColumnControl(), scrollPane.getCorner(JScrollPane.UPPER_TRAILING_CORNER));
+            toggleComponentOrientation(scrollPane);
+    //        scrollPane.setLayout(new ScrollPaneLayout());
+            assertSame("sanity: column control in trailing corner", 
+                    table.getColumnControl(), scrollPane.getCorner(JScrollPane.UPPER_TRAILING_CORNER));
+            assertNull("column control must not be in leading corner", 
+                    scrollPane.getCorner(JScrollPane.UPPER_LEADING_CORNER));
+            
+        }
+        
     @Test
     public void testPrepareRenderer() {
         table.setModel(sortableTableModel);
@@ -1296,6 +1333,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
         frame.add(scrollPane);
         frame.pack();
         SwingUtilities.invokeAndWait(new Runnable() {
+            @Override
             public void run() {
                 JPanel panel = new JPanel();
                 scrollPane.setCorner(JScrollPane.UPPER_TRAILING_CORNER, panel);
@@ -1332,6 +1370,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
         frame.add(scrollPane);
         frame.pack();
         SwingUtilities.invokeAndWait(new Runnable() {
+            @Override
             public void run() {
                 scrollPane.setCorner(JScrollPane.UPPER_TRAILING_CORNER, new JPanel());
                 assertNotNull("sanity ...", scrollPane.getCorner(JScrollPane.UPPER_TRAILING_CORNER));
@@ -1361,6 +1400,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
         frame.add(scrollPane);
         frame.pack();
         SwingUtilities.invokeAndWait(new Runnable() {
+            @Override
             public void run() {
                 frame.remove(scrollPane);
                 frame.add(scrollPane);
@@ -1411,6 +1451,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
         JXTable table = new JXTable(new AncientSwingTeam());
         StringValue sv = new StringValue() {
 
+            @Override
             public String getString(Object value) {
                 if (value instanceof Color) {
                     Color color = (Color) value;
@@ -3265,6 +3306,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
         // w/o this the test will intermittently fail on systems using kernel 2.6 and sun java 6
         Thread.sleep(500);
         SwingUtilities.invokeAndWait(new Runnable() {
+            @Override
             public void run() {
                 ComponentAdapter adapter = table.getComponentAdapter();
                 adapter.row = leadRow;
@@ -3397,14 +3439,17 @@ public class JXTableUnitTest extends InteractiveTestCase {
         public RowObject getRowObject(int row) {
             return (RowObject) data.get(row);
         }
+        @Override
         public int getColumnCount() {
             return 2;
         }
 
+        @Override
         public int getRowCount() {
             return data.size();
         }
 
+        @Override
         public Object getValueAt(int row, int col) {
             RowObject object = getRowObject(row);
             switch (col) {
@@ -3434,6 +3479,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
     private StringValue createColorStringValue() {
         StringValue sv = new StringValue() {
 
+            @Override
             public String getString(Object value) {
                 if (value instanceof Color) {
                     Color color = (Color) value;
@@ -3501,14 +3547,17 @@ public class JXTableUnitTest extends InteractiveTestCase {
             return columnSamples[column].getClass();
         }
 
+        @Override
         public int getRowCount() {
             return 1000;
         }
 
+        @Override
         public int getColumnCount() {
             return columnSamples.length;
         }
 
+        @Override
         public Object getValueAt(int row, int column) {
             Object value;
             if (row % 3 == 0) {

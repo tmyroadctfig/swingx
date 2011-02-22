@@ -295,6 +295,7 @@ public class ColumnControlButton extends JButton {
          * Does nothing. Synch from action state to TableColumn state
          * is done in itemStateChanged.
          */
+        @Override
         public void actionPerformed(ActionEvent e) {
 
         }
@@ -381,6 +382,7 @@ public class ColumnControlButton extends JButton {
          */
         protected PropertyChangeListener createPropertyChangeListener() {
             return new PropertyChangeListener() {
+                @Override
                 public void propertyChange(PropertyChangeEvent evt) {
                     if ("visible".equals(evt.getPropertyName())) {
                         updateFromColumnVisible((Boolean) evt.getNewValue());
@@ -413,6 +415,7 @@ public class ColumnControlButton extends JButton {
          * @inheritDoc
          * 
          */
+        @Override
         public void updateUI() {
             SwingUtilities.updateComponentTreeUI(getPopupMenu());
         }
@@ -421,6 +424,7 @@ public class ColumnControlButton extends JButton {
          * @inheritDoc
          * 
          */
+        @Override
         public void toggleVisibility(JComponent owner) {
             JPopupMenu popupMenu = getPopupMenu();
             if (popupMenu.isVisible()) {
@@ -443,6 +447,7 @@ public class ColumnControlButton extends JButton {
          * @inheritDoc
          * 
          */
+        @Override
         public void applyComponentOrientation(ComponentOrientation o) {
             getPopupMenu().applyComponentOrientation(o);
 
@@ -454,6 +459,7 @@ public class ColumnControlButton extends JButton {
          * @inheritDoc
          * 
          */
+        @Override
         public void removeAll() {
             getPopupMenu().removeAll();
         }
@@ -463,6 +469,7 @@ public class ColumnControlButton extends JButton {
          * @inheritDoc
          * 
          */
+        @Override
         public void addVisibilityActionItems(
                 List<? extends AbstractActionExt> actions) {
             addItems(new ArrayList<Action>(actions));
@@ -474,6 +481,7 @@ public class ColumnControlButton extends JButton {
          * @inheritDoc
          * 
          */
+        @Override
         public void addAdditionalActionItems(List<? extends Action> actions) {
             if (actions.size() == 0)
                 return;
@@ -746,7 +754,7 @@ public class ColumnControlButton extends JButton {
      * @return the action keys of table's actionMap entries whose
      *   action should be included into the popup.
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     protected List getColumnControlActionKeys() {
         Object[] allKeys = table.getActionMap().allKeys();
         List columnKeys = new ArrayList();
@@ -811,6 +819,7 @@ public class ColumnControlButton extends JButton {
         
         Action control = new AbstractAction() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 togglePopup();
             }
@@ -846,6 +855,7 @@ public class ColumnControlButton extends JButton {
      */
     protected PropertyChangeListener createTablePropertyChangeListener() {
         return new PropertyChangeListener() {
+            @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 if ("columnModel".equals(evt.getPropertyName())) {
                     updateFromColumnModelChange((TableColumnModel) evt
@@ -883,6 +893,7 @@ public class ColumnControlButton extends JButton {
     protected TableColumnModelListener createColumnModelListener() {
         return new TableColumnModelListener() {
             /** Tells listeners that a column was added to the model. */
+            @Override
             public void columnAdded(TableColumnModelEvent e) {
                 // quickfix for #192
                 if (!isVisibilityChange(e, true)) {
@@ -891,6 +902,7 @@ public class ColumnControlButton extends JButton {
             }
 
             /** Tells listeners that a column was removed from the model. */
+            @Override
             public void columnRemoved(TableColumnModelEvent e) {
                 if (!isVisibilityChange(e, false)) {
                     populatePopup();
@@ -924,10 +936,12 @@ public class ColumnControlButton extends JButton {
             }
 
             /** Tells listeners that a column was repositioned. */
+            @Override
             public void columnMoved(TableColumnModelEvent e) {
             }
 
             /** Tells listeners that a column was moved due to a margin change. */
+            @Override
             public void columnMarginChanged(ChangeEvent e) {
             }
 
@@ -935,6 +949,7 @@ public class ColumnControlButton extends JButton {
              * Tells listeners that the selection model of the TableColumnModel
              * changed.
              */
+            @Override
             public void columnSelectionChanged(ListSelectionEvent e) {
             }
         };

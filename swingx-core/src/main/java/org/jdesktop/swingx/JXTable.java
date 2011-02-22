@@ -815,8 +815,25 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
      */
     @Override
     public void setComponentOrientation(ComponentOrientation o) {
+        removeColumnControlFromCorners();
         super.setComponentOrientation(o);
         configureColumnControl();
+    }
+
+
+    private void removeColumnControlFromCorners() {
+        JScrollPane scrollPane = getEnclosingScrollPane();
+        if ((scrollPane == null) || !isColumnControlVisible()) return;
+        removeColumnControlFromCorners(scrollPane, 
+                JScrollPane.UPPER_LEFT_CORNER, JScrollPane.UPPER_RIGHT_CORNER);
+    }
+
+    private void removeColumnControlFromCorners(JScrollPane scrollPane, String... corners) {
+       for (String object : corners) {
+           if (scrollPane.getCorner(object) == getColumnControl()) {
+               scrollPane.setCorner(object, null);
+           }
+       }
     }
 
     /**
@@ -861,34 +878,20 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
      * @see #setColumnControl(JComponent)
      */
     protected void unconfigureColumnControl() {
-        Container p = getParent();
-        if (p instanceof JViewport) {
-            Container gp = p.getParent();
-            if (gp instanceof JScrollPane) {
-                JScrollPane scrollPane = (JScrollPane) gp;
-                // Make certain we are the viewPort's view and not, for
-                // example, the rowHeaderView of the scrollPane -
-                // an implementor of fixed columns might do this.
-                JViewport viewport = scrollPane.getViewport();
-                if (viewport == null || viewport.getView() != this) {
-                    return;
-                }
-                if (verticalScrollPolicy != 0) {
-                    // Fix #155-swingx: reset only if we had force always before
-                    // PENDING: JW - doesn't cope with dynamically changing the
-                    // policy
-                    // shouldn't be much of a problem because doesn't happen too
-                    // often??
-                    scrollPane.setVerticalScrollBarPolicy(verticalScrollPolicy);
-                    verticalScrollPolicy = 0;
-                }
-                if (isColumnControlVisible()) {
-                    scrollPane.setCorner(JScrollPane.UPPER_TRAILING_CORNER,
-                            null);
-                }
-            }
+        JScrollPane scrollPane = getEnclosingScrollPane();
+        if (scrollPane == null) return;
+        if (verticalScrollPolicy != 0) {
+            // Fix #155-swingx: reset only if we had forced always before
+            // PENDING: JW - doesn't cope with dynamically changing the
+            // policy
+            // shouldn't be much of a problem because doesn't happen too
+            // often??
+            scrollPane.setVerticalScrollBarPolicy(verticalScrollPolicy);
+            verticalScrollPolicy = 0;
         }
-
+        if (isColumnControlVisible()) {
+            scrollPane.setCorner(JScrollPane.UPPER_TRAILING_CORNER, null);
+        }
     }
 
     /**
@@ -903,6 +906,27 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
      * @see #setColumnControl(JComponent)
      */
     protected void configureColumnControl() {
+        if (!isColumnControlVisible())
+            return;
+        JScrollPane scrollPane = getEnclosingScrollPane();
+        if (scrollPane == null) return;
+        if (verticalScrollPolicy == 0) {
+            verticalScrollPolicy = scrollPane.getVerticalScrollBarPolicy();
+        }
+        scrollPane.setCorner(JScrollPane.UPPER_TRAILING_CORNER,
+                getColumnControl());
+        scrollPane
+                .setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+    }
+
+    /**
+     * Returns the enclosing JScrollPane of this table, or null if not 
+     * contained in a JScrollPane or not the main view of the scrollPane.
+     * 
+     * @return the enclosing JScrollPane if this table is the main view or 
+     *   null if not.
+     */
+    protected JScrollPane getEnclosingScrollPane() {
         Container p = getParent();
         if (p instanceof JViewport) {
             Container gp = p.getParent();
@@ -913,22 +937,14 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
                 // an implementor of fixed columns might do this.
                 JViewport viewport = scrollPane.getViewport();
                 if (viewport == null || viewport.getView() != this) {
-                    return;
+                    return null;
                 }
-                if (isColumnControlVisible()) {
-                    if (verticalScrollPolicy == 0) {
-                        verticalScrollPolicy = scrollPane
-                                .getVerticalScrollBarPolicy();
-                    }
-                    scrollPane.setCorner(JScrollPane.UPPER_TRAILING_CORNER,
-                            getColumnControl());
-
-                    scrollPane
-                            .setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-                }
+                return scrollPane;
             }
         }
+        return null;
     }
+
 
     // --------------------- actions
     /**
@@ -980,6 +996,7 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
             super(name);
         }
 
+        @Override
         public void actionPerformed(ActionEvent evt) {
             if ("print".equals(getName())) {
                 try {
@@ -1035,6 +1052,7 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
     private Action createCancelAction() {
         Action action = new AbstractActionExt() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 if (!isEditing())
                     return;
@@ -2411,6 +2429,7 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
      * Listens to column property changes.
      * 
      */
+    @Override
     public void columnPropertyChange(PropertyChangeEvent event) {
         if (event.getPropertyName().equals("editable")) {
             updateEditingAfterColumnChanged((TableColumn) event.getSource(),
@@ -3326,6 +3345,7 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
      */
     protected ChangeListener createHighlighterChangeListener() {
         return new ChangeListener() {
+            @Override
             public void stateChanged(ChangeEvent e) {
                 repaint();
             }
@@ -4060,6 +4080,7 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
             focusManager = null;
         }
 
+        @Override
         public void propertyChange(PropertyChangeEvent ev) {
             if (ev == null)
                 return;
