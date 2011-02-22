@@ -80,6 +80,7 @@ public abstract class AbstractDateSelectionModel implements DateSelectionModel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Calendar getCalendar() {
         return (Calendar) calendar.clone();
     }
@@ -87,6 +88,7 @@ public abstract class AbstractDateSelectionModel implements DateSelectionModel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getFirstDayOfWeek() {
         return calendar.getFirstDayOfWeek();
     }
@@ -94,6 +96,7 @@ public abstract class AbstractDateSelectionModel implements DateSelectionModel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setFirstDayOfWeek(final int firstDayOfWeek) {
         if (firstDayOfWeek == getFirstDayOfWeek()) return;
         calendar.setFirstDayOfWeek(firstDayOfWeek);
@@ -103,6 +106,7 @@ public abstract class AbstractDateSelectionModel implements DateSelectionModel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getMinimalDaysInFirstWeek() {
         return calendar.getMinimalDaysInFirstWeek();
     }
@@ -110,6 +114,7 @@ public abstract class AbstractDateSelectionModel implements DateSelectionModel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setMinimalDaysInFirstWeek(int minimalDays) {
         if (minimalDays == getMinimalDaysInFirstWeek()) return;
         calendar.setMinimalDaysInFirstWeek(minimalDays);
@@ -120,6 +125,7 @@ public abstract class AbstractDateSelectionModel implements DateSelectionModel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public TimeZone getTimeZone() {
         return calendar.getTimeZone();
     }
@@ -127,6 +133,7 @@ public abstract class AbstractDateSelectionModel implements DateSelectionModel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setTimeZone(TimeZone timeZone) {
         if (getTimeZone().equals(timeZone)) return;
         TimeZone oldTimeZone = getTimeZone();
@@ -155,6 +162,7 @@ public abstract class AbstractDateSelectionModel implements DateSelectionModel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Locale getLocale() {
         return locale;
     }
@@ -162,6 +170,7 @@ public abstract class AbstractDateSelectionModel implements DateSelectionModel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setLocale(Locale locale) {
         if (locale == null) {
             locale = Locale.getDefault();
@@ -217,6 +226,7 @@ public abstract class AbstractDateSelectionModel implements DateSelectionModel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Date getUpperBound() {
         return upperBound;
     }
@@ -224,6 +234,7 @@ public abstract class AbstractDateSelectionModel implements DateSelectionModel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setUpperBound(Date upperBound) {
         if (upperBound != null) {
             upperBound = getNormalizedDate(upperBound);
@@ -242,6 +253,7 @@ public abstract class AbstractDateSelectionModel implements DateSelectionModel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Date getLowerBound() {
         return lowerBound;
     }
@@ -249,6 +261,7 @@ public abstract class AbstractDateSelectionModel implements DateSelectionModel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setLowerBound(Date lowerBound) {
         if (lowerBound != null) {
             lowerBound = getNormalizedDate(lowerBound);
@@ -269,6 +282,7 @@ public abstract class AbstractDateSelectionModel implements DateSelectionModel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isAdjusting() {
         return adjusting;
     }
@@ -276,6 +290,7 @@ public abstract class AbstractDateSelectionModel implements DateSelectionModel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setAdjusting(boolean adjusting) {
         if (adjusting == isAdjusting()) return;
         this.adjusting = adjusting;
@@ -287,6 +302,7 @@ public abstract class AbstractDateSelectionModel implements DateSelectionModel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void addDateSelectionListener(DateSelectionListener l) {
         listenerMap.add(DateSelectionListener.class, l);
     }
@@ -294,6 +310,7 @@ public abstract class AbstractDateSelectionModel implements DateSelectionModel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void removeDateSelectionListener(DateSelectionListener l) {
         listenerMap.remove(DateSelectionListener.class, l);
     }

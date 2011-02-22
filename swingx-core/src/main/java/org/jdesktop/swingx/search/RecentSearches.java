@@ -278,7 +278,8 @@ public class RecentSearches implements ActionListener {
 	 * Calls {@link #put(String)} with the {@link ActionEvent}s action command
 	 * as the search string.
 	 */
-	public void actionPerformed(ActionEvent e) {
+	@Override
+    public void actionPerformed(ActionEvent e) {
 		put(e.getActionCommand());
 	}
 
@@ -344,7 +345,8 @@ public class RecentSearches implements ActionListener {
 		 * menu item. If the source is the clear menu item, all recent searches
 		 * will be removed.
 		 */
-		public void actionPerformed(ActionEvent e) {
+		@Override
+        public void actionPerformed(ActionEvent e) {
 			if (e.getSource() == clear) {
 				recentSearches.removeAll();
 			} else {
@@ -357,7 +359,8 @@ public class RecentSearches implements ActionListener {
 		 * Every time the recent searches fires a {@link ChangeEvent} call
 		 * {@link #buildMenu()} to rebuild the whole menu.
 		 */
-		public void stateChanged(ChangeEvent e) {
+		@Override
+        public void stateChanged(ChangeEvent e) {
 			buildMenu();
 		}
 	}

@@ -86,6 +86,7 @@ public class FileSystemModel extends AbstractTreeTableModel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public File getChild(Object parent, int index) {
         if (!isValidFileNode(parent)) {
             throw new IllegalArgumentException("parent is not a file governed by this model");
@@ -104,6 +105,7 @@ public class FileSystemModel extends AbstractTreeTableModel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getChildCount(Object parent) {
         if (parent instanceof File) {
             String[] children = ((File) parent).list();
@@ -135,6 +137,7 @@ public class FileSystemModel extends AbstractTreeTableModel {
         }
     }
 
+    @Override
     public int getColumnCount() {
         return 4;
     }
@@ -155,6 +158,7 @@ public class FileSystemModel extends AbstractTreeTableModel {
         }
     }
 
+    @Override
     public Object getValueAt(Object node, int column) {
         if (node instanceof File) {
             File file = (File) node;
@@ -176,6 +180,7 @@ public class FileSystemModel extends AbstractTreeTableModel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getIndexOfChild(Object parent, Object child) {
         if (parent instanceof File && child instanceof File) {
             File parentFile = (File) parent;

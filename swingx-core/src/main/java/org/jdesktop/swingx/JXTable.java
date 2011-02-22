@@ -820,8 +820,13 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
         configureColumnControl();
     }
 
-
-    private void removeColumnControlFromCorners() {
+    /**
+     * Sets upper corners in JScrollPane to null if same as getColumnControl(). 
+     * This is a hack around core not coping correctly with component orientation.
+     * 
+     *  @see #setComponentOrientation(ComponentOrientation)
+     */
+    protected void removeColumnControlFromCorners() {
         JScrollPane scrollPane = getEnclosingScrollPane();
         if ((scrollPane == null) || !isColumnControlVisible()) return;
         removeColumnControlFromCorners(scrollPane, 
@@ -829,9 +834,9 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
     }
 
     private void removeColumnControlFromCorners(JScrollPane scrollPane, String... corners) {
-       for (String object : corners) {
-           if (scrollPane.getCorner(object) == getColumnControl()) {
-               scrollPane.setCorner(object, null);
+       for (String corner : corners) {
+           if (scrollPane.getCorner(corner) == getColumnControl()) {
+               scrollPane.setCorner(corner, null);
            }
        }
     }

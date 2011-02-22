@@ -234,6 +234,7 @@ public class JXBusyLabel extends JLabel {
         busy = new Timer(delay, new ActionListener() {
             BusyPainter busyPainter = getBusyPainter();
             int frame = busyPainter.getPoints();
+            @Override
             public void actionPerformed(ActionEvent e) {
                 frame = (frame+1)%busyPainter.getPoints();
                 busyPainter.setFrame(direction == BusyPainter.Direction.LEFT ? busyPainter.getPoints() - frame : frame);

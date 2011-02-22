@@ -156,6 +156,7 @@ public abstract class CalendarHeaderHandler {
         if (monthViewPropertyChangeListener == null) {
             monthViewPropertyChangeListener = new PropertyChangeListener() {
 
+                @Override
                 public void propertyChange(PropertyChangeEvent evt) {
                     if ("componentOrientation".equals(evt.getPropertyName())) {
                         componentOrientationChanged();
@@ -265,6 +266,7 @@ public abstract class CalendarHeaderHandler {
             Icon icon) {
         AbstractActionExt wrapper = new AbstractActionExt(null, icon) {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 Action action = monthView.getActionMap().get(actionKey);
                 if (action != null) {

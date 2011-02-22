@@ -468,6 +468,7 @@ public class JXMonthView extends JComponent {
         if (modelListener == null) {
             modelListener = new DateSelectionListener() {
 
+                @Override
                 public void valueChanged(DateSelectionEvent ev) {
                     if (EventType.CALENDAR_CHANGED.equals(ev.getEventType())) {
                         updateCalendar();
@@ -1692,6 +1693,7 @@ public class JXMonthView extends JComponent {
         if (todayTimer == null) {
             todayTimer = new Timer(secondsTillTomorrow * 1000,
                     new ActionListener() {
+                        @Override
                         public void actionPerformed(ActionEvent e) {
                             incrementToday();
                         }

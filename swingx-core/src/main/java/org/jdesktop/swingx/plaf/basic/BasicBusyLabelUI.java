@@ -48,6 +48,7 @@ public class BasicBusyLabelUI extends BasicLabelUI implements BusyLabelUI {
     return new BasicBusyLabelUI((JXBusyLabel)c);
   }
 
+    @Override
     public BusyPainter getBusyPainter(final Dimension dim) {
         BusyPainter p = new BusyPainter() {
             @Override
@@ -61,6 +62,7 @@ public class BasicBusyLabelUI extends BasicLabelUI implements BusyLabelUI {
         return p;
     }
 
+    @Override
     public int getDelay() {
         return UIManager.getInt("JXBusyLabel.delay");
     }

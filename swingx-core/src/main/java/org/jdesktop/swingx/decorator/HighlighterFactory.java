@@ -220,6 +220,7 @@ public final class HighlighterFactory {
     /**
      * @inheritDoc
      */
+    @Override
     public void updateUI() {
          setBackground(getUIColor());
      }

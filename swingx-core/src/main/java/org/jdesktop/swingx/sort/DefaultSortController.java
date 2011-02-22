@@ -53,7 +53,7 @@ public abstract class DefaultSortController<M> extends DefaultRowSorter<M, Integ
     /**
      * Comparator that uses compareTo on the contents.
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     public static final Comparator COMPARABLE_COMPARATOR =
             new ComparableComparator();
 
@@ -288,8 +288,9 @@ public abstract class DefaultSortController<M> extends DefaultRowSorter<M, Integ
     };
     
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     private static class ComparableComparator implements Comparator {
+        @Override
         public int compare(Object o1, Object o2) {
             return ((Comparable)o1).compareTo(o2);
         }

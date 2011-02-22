@@ -103,7 +103,8 @@ public class NativeSearchFieldSupport {
 	private static final SearchFieldUIChangeHandler uiChangeHandler = new SearchFieldUIChangeHandler();
 
 	private static final class SearchFieldUIChangeHandler extends AbstractUIChangeHandler {
-		public void propertyChange(PropertyChangeEvent evt) {
+		@Override
+        public void propertyChange(PropertyChangeEvent evt) {
 			JTextField txt = (JTextField) evt.getSource();
 			// Leopard hack to make appear correctly in search variant when
 			// changing LnF.

@@ -187,6 +187,7 @@ public class SynthXListUI extends BasicXListUI
      * Paints border with the context's style's painter.
      * Implemented for SynthUI interface.
      */
+    @Override
     public void paintBorder(SynthContext context, Graphics g, int x, int y,
             int w, int h) {
         SynthUtils.getPainter(context).paintListBorder(context, g, x, y, w, h);
@@ -203,6 +204,7 @@ public class SynthXListUI extends BasicXListUI
      * @throws IllegalArgumentException if the component is not controlled by this 
      *    delegate
      */
+    @Override
     public SynthContext getContext(JComponent c) {
         if (c != list) throw new IllegalArgumentException("must be ui-delegate for component");
         return getContext();

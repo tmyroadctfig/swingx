@@ -94,6 +94,7 @@ public abstract class RolloverProducer implements MouseListener, MouseMotionList
      * Implemented to map to Rollover properties as needed. This implemenation calls
      * updateRollover with both ROLLOVER_KEY and CLICKED_KEY properties. 
      */
+    @Override
     public void mouseReleased(MouseEvent e) {
         // JW: fix for #456-swingx - rollover not updated after end of dragging
         updateRollover(e, ROLLOVER_KEY, false);
@@ -107,6 +108,7 @@ public abstract class RolloverProducer implements MouseListener, MouseMotionList
      * Implemented to map to client property rollover and fire only if client
      * coordinate changed.
      */
+    @Override
     public void mouseEntered(MouseEvent e) {
 //        LOG.info("" + e);
         updateRollover(e, ROLLOVER_KEY, false);
@@ -116,6 +118,7 @@ public abstract class RolloverProducer implements MouseListener, MouseMotionList
      * Implemented to remove client properties rollover and clicked. if the
      * source is a JComponent. Does nothing otherwise.
      */
+    @Override
     public void mouseExited(MouseEvent e) {
 //        screenLocation = null;
 //        LOG.info("" + e);
@@ -131,12 +134,14 @@ public abstract class RolloverProducer implements MouseListener, MouseMotionList
     /**
      * Implemented to do nothing.
      */
+    @Override
     public void mouseClicked(MouseEvent e) {
     }
 
     /**
      * Implemented to do nothing.
      */
+    @Override
     public void mousePressed(MouseEvent e) {
     }
 
@@ -146,6 +151,7 @@ public abstract class RolloverProducer implements MouseListener, MouseMotionList
      * PENDING JW: probably should do something? Mapped coordinates will be out of synch
      * after a drag.
      */
+    @Override
     public void mouseDragged(MouseEvent e) {
     }
 
@@ -153,6 +159,7 @@ public abstract class RolloverProducer implements MouseListener, MouseMotionList
      * Implemented to map to client property rollover and fire only if client
      * coordinate changed.
      */
+    @Override
     public void mouseMoved(MouseEvent e) {
         updateRollover(e, ROLLOVER_KEY, false);
     }

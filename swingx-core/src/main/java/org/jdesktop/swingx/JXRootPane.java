@@ -283,6 +283,7 @@ public class JXRootPane extends JRootPane {
      */
     private void installKeyboardActions() {
         Action escAction = new AbstractAction() {
+            @Override
             public void actionPerformed(ActionEvent evt) {
                 JButton cancelButton = getCancelButton();
                 if (cancelButton != null) {

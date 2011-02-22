@@ -187,6 +187,7 @@ public class JXFrame extends JFrame {
         
         //create the event handler for key preview functionality
         keyEventListener = new AWTEventListener() {
+            @Override
             public void eventDispatched(AWTEvent aWTEvent) {
                 if (aWTEvent instanceof KeyEvent) {
                     KeyEvent evt = (KeyEvent)aWTEvent;
@@ -211,6 +212,7 @@ public class JXFrame extends JFrame {
         };
         
         idleTimer = new Timer(100, new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 setIdle(true);
             }
@@ -218,6 +220,7 @@ public class JXFrame extends JFrame {
         
         //create the event handler for key preview functionality
         idleListener = new AWTEventListener() {
+            @Override
             public void eventDispatched(AWTEvent aWTEvent) {
                 //reset the timer
                 idleTimer.stop();

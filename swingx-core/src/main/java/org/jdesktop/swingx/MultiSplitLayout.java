@@ -477,7 +477,8 @@ public class MultiSplitLayout implements LayoutManager
    * @param child the component to be added
    * @see #removeLayoutComponent
    */
-  public void addLayoutComponent(String name, Component child) {
+  @Override
+public void addLayoutComponent(String name, Component child) {
     if (name == null) {
       throw new IllegalArgumentException("name not specified");
     }
@@ -490,7 +491,8 @@ public class MultiSplitLayout implements LayoutManager
    * @param child the component to be removed
    * @see #addLayoutComponent
    */
-  public void removeLayoutComponent(Component child) {    
+  @Override
+public void removeLayoutComponent(Component child) {    
     String name = getNameForComponent( child );
   
     if ( name != null ) {
@@ -748,12 +750,14 @@ public class MultiSplitLayout implements LayoutManager
     return new Dimension(width, height);
   }
   
-  public Dimension preferredLayoutSize(Container parent) {
+  @Override
+public Dimension preferredLayoutSize(Container parent) {
     Dimension size = preferredNodeSize(getModel());
     return sizeWithInsets(parent, size);
   }
   
-  public Dimension minimumLayoutSize(Container parent) {
+  @Override
+public Dimension minimumLayoutSize(Container parent) {
     Dimension size = minimumNodeSize(getModel());
     return sizeWithInsets(parent, size);
   }
@@ -1377,7 +1381,8 @@ public class MultiSplitLayout implements LayoutManager
    * the layout model, and then set the bounds of each child component
    * with a matching Leaf Node.
    */
-  public void layoutContainer(Container parent)
+  @Override
+public void layoutContainer(Container parent)
   {
     if ( layoutByWeight && floatingDividers )
       doLayoutByWeight( parent );

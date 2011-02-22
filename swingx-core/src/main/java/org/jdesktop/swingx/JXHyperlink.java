@@ -291,6 +291,7 @@ public class JXHyperlink extends JButton {
         // no way to hook into super
         return new PropertyChangeListener() {
 
+            @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 if (AbstractHyperlinkAction.VISITED_KEY.equals(evt.getPropertyName())) {
                     configureClickedPropertyFromAction(a);

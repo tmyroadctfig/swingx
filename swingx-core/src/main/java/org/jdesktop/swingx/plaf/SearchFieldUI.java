@@ -406,6 +406,7 @@ public class SearchFieldUI extends BuddyTextFieldUI {
 
     class Handler implements PropertyChangeListener, ActionListener,
             DocumentListener {
+        @Override
         public void propertyChange(PropertyChangeEvent evt) {
             String prop = evt.getPropertyName();
             Object src = evt.getSource();
@@ -433,6 +434,7 @@ public class SearchFieldUI extends BuddyTextFieldUI {
         /**
          * Shows the search popup menu, if installed.
          */
+        @Override
         public void actionPerformed(ActionEvent e) {
             if (searchField.getFindPopupMenu() != null) {
                 Component src = SearchFieldAddon.SEARCH_FIELD_SOURCE
@@ -449,14 +451,17 @@ public class SearchFieldUI extends BuddyTextFieldUI {
             }
         }
 
+        @Override
         public void changedUpdate(DocumentEvent e) {
             update();
         }
 
+        @Override
         public void insertUpdate(DocumentEvent e) {
             update();
         }
 
+        @Override
         public void removeUpdate(DocumentEvent e) {
             update();
         }

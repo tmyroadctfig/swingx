@@ -32,42 +32,44 @@ import java.util.List;
  */
 public class DefaultTipOfTheDayModel implements TipOfTheDayModel {
 
-  private List<Tip> tips = new ArrayList<Tip>();
+    private List<Tip> tips = new ArrayList<Tip>();
 
-  public DefaultTipOfTheDayModel() {
-  }
-  
-  public DefaultTipOfTheDayModel(Tip[] tips) {
-    this(Arrays.asList(tips));
-  }
+    public DefaultTipOfTheDayModel() {
+    }
 
-  public DefaultTipOfTheDayModel(Collection<Tip> tips) {
-    this.tips.addAll(tips);
-  }
+    public DefaultTipOfTheDayModel(Tip[] tips) {
+        this(Arrays.asList(tips));
+    }
 
-  public Tip getTipAt(int index) {
-    return tips.get(index);
-  }
+    public DefaultTipOfTheDayModel(Collection<Tip> tips) {
+        this.tips.addAll(tips);
+    }
 
-  public int getTipCount() {
-    return tips.size();
-  }
+    @Override
+    public Tip getTipAt(int index) {
+        return tips.get(index);
+    }
 
-  public void add(Tip tip) {
-    tips.add(tip);
-  }
-  
-  public void remove(Tip tip) {
-    tips.remove(tip);
-  }
-  
-  public Tip[] getTips() {
-    return tips.toArray(new Tip[tips.size()]);
-  }
-  
-  public void setTips(Tip[] tips) {
-    this.tips.clear();
-    this.tips.addAll(Arrays.asList(tips));
-  }
-  
+    @Override
+    public int getTipCount() {
+        return tips.size();
+    }
+
+    public void add(Tip tip) {
+        tips.add(tip);
+    }
+
+    public void remove(Tip tip) {
+        tips.remove(tip);
+    }
+
+    public Tip[] getTips() {
+        return tips.toArray(new Tip[tips.size()]);
+    }
+
+    public void setTips(Tip[] tips) {
+        this.tips.clear();
+        this.tips.addAll(Arrays.asList(tips));
+    }
+
 }

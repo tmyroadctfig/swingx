@@ -121,6 +121,7 @@ class BasicCalendarRenderingHandler implements CalendarRenderingHandler {
         final String[] monthNames = DateFormatSymbols.getInstance(locale).getMonths();
         StringValue tsv = new StringValue() {
 
+            @Override
             public String getString(Object value) {
                 if (value instanceof Calendar) {
                     String month = monthNames[((Calendar) value)
@@ -147,6 +148,7 @@ class BasicCalendarRenderingHandler implements CalendarRenderingHandler {
     protected StringValue createWeekOfYearStringValue(Locale locale) {
         StringValue wsv = new StringValue() {
 
+            @Override
             public String getString(Object value) {
                 if (value instanceof Calendar) {
                     value = ((Calendar) value).get(Calendar.WEEK_OF_YEAR);
@@ -191,6 +193,7 @@ class BasicCalendarRenderingHandler implements CalendarRenderingHandler {
      * 
      * @param locale the new Locale.
      */
+    @Override
     public void setLocale(Locale locale) {
         StringValue dayValue = createDayStringValue(locale);
         providers.get(CalendarState.IN_MONTH).setStringValue(dayValue);
@@ -210,6 +213,7 @@ class BasicCalendarRenderingHandler implements CalendarRenderingHandler {
      * @param dayState the DayState of the cell
      * @return a component configured for rendering the given cell
      */
+    @Override
     public JComponent prepareRenderingComponent(JXMonthView monthView, Calendar calendar, CalendarState dayState) {
         cellContext.installContext(monthView, calendar, 
                 isSelected(monthView, calendar, dayState), 
@@ -256,6 +260,7 @@ class BasicCalendarRenderingHandler implements CalendarRenderingHandler {
     private void installHighlighters() {
         HighlightPredicate boldPredicate = new HighlightPredicate() {
 
+            @Override
             public boolean isHighlighted(Component renderer,
                     ComponentAdapter adapter) {
                 if (!(adapter instanceof CalendarAdapter))
@@ -280,6 +285,7 @@ class BasicCalendarRenderingHandler implements CalendarRenderingHandler {
         
         HighlightPredicate unselectable = new HighlightPredicate() {
 
+            @Override
             public boolean isHighlighted(Component renderer,
                     ComponentAdapter adapter) {
                 if (!(adapter instanceof CalendarAdapter)) 

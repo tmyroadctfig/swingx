@@ -105,6 +105,7 @@ public class BasicHyperlinkUI extends BasicButtonUI {
 
     private PropertyChangeListener pcListener = new PropertyChangeListener() {
 
+        @Override
         public void propertyChange(PropertyChangeEvent evt) {
             // this method is called from the edt. only other place where ulv is used is in 
             // painting which also happens on edt so it should be safe even without synchronization

@@ -31,27 +31,31 @@ import javax.swing.Icon;
  */
 public final class EmptyIcon implements Icon, Serializable {
 
-  private int width;
-  private int height;
-  
-  public EmptyIcon() {
-    this(0, 0);
-  }
-  
-  public EmptyIcon(int width, int height) {
-    this.width = width;
-    this.height = height;
-  }
+    private int width;
 
-  public int getIconHeight() {
-    return height;
-  }
+    private int height;
 
-  public int getIconWidth() {
-    return width;
-  }
+    public EmptyIcon() {
+        this(0, 0);
+    }
 
-  public void paintIcon(Component c, Graphics g, int x, int y) {
-  }
+    public EmptyIcon(int width, int height) {
+        this.width = width;
+        this.height = height;
+    }
+
+    @Override
+    public int getIconHeight() {
+        return height;
+    }
+
+    @Override
+    public int getIconWidth() {
+        return width;
+    }
+
+    @Override
+    public void paintIcon(Component c, Graphics g, int x, int y) {
+    }
 
 }

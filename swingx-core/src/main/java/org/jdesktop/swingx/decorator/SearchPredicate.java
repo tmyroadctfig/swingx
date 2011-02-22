@@ -166,6 +166,7 @@ public class SearchPredicate implements HighlightPredicate {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isHighlighted(Component renderer, ComponentAdapter adapter) {
         if (isHighlightCandidate(renderer, adapter)) {
             return test(renderer, adapter);

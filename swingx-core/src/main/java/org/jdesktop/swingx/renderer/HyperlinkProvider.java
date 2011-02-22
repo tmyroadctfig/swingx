@@ -168,6 +168,7 @@ public class HyperlinkProvider
     protected AbstractHyperlinkAction createDefaultLinkAction() {
         return new AbstractHyperlinkAction<Object>(null) {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 // TODO Auto-generated method stub
                 
@@ -178,10 +179,12 @@ public class HyperlinkProvider
 
 //----------------------- Implement RolloverRenderer
     
+    @Override
     public boolean isEnabled() {
         return true;
     }
 
+    @Override
     public void doClick() {
         rendererComponent.doClick();
     }

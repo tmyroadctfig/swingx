@@ -158,7 +158,8 @@ public class BasicTipOfTheDayUI extends TipOfTheDayUI {
     buttons.add(closeButton);
     
     final ActionListener saveChoice = new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
+      @Override
+    public void actionPerformed(ActionEvent e) {
         if (choice != null) {
           choice.setShowingOnStartup(showOnStartupBox.isSelected());
         }
@@ -167,7 +168,8 @@ public class BasicTipOfTheDayUI extends TipOfTheDayUI {
     };
 
     closeButton.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {        
+      @Override
+    public void actionPerformed(ActionEvent e) {        
         dialog.setVisible(false);
         saveChoice.actionPerformed(null);
       }
@@ -340,6 +342,7 @@ public class BasicTipOfTheDayUI extends TipOfTheDayUI {
   protected void uninstallDefaults() {}
 
   class ChangeListener implements PropertyChangeListener {
+    @Override
     public void propertyChange(PropertyChangeEvent evt) {
       if (JXTipOfTheDay.CURRENT_TIP_CHANGED_KEY.equals(evt.getPropertyName())) {
         showCurrentTip();
@@ -351,6 +354,7 @@ public class BasicTipOfTheDayUI extends TipOfTheDayUI {
     public PreviousTipAction() {
       super("previousTip");
     }
+    @Override
     public void actionPerformed(ActionEvent e) {
       tipPane.previousTip();
     }
@@ -364,6 +368,7 @@ public class BasicTipOfTheDayUI extends TipOfTheDayUI {
     public NextTipAction() {
       super("nextTip");
     }
+    @Override
     public void actionPerformed(ActionEvent e) {
       tipPane.nextTip();
     }

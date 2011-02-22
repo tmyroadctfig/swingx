@@ -106,6 +106,7 @@ public class OpenBrowserAction extends AbstractAction {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void actionPerformed(ActionEvent e) {
         if (uri == null || !Desktop.isDesktopSupported()) {
             return;

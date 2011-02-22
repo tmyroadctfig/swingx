@@ -316,6 +316,7 @@ public class JXImageView extends JXPanel {
     @Deprecated
     public Action getOpenAction() {
         Action action = new AbstractAction() {
+            @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 FileDialog fd = getSafeFileDialog(JXImageView.this);
                 fd.setMode(FileDialog.LOAD);
@@ -359,6 +360,7 @@ public class JXImageView extends JXPanel {
     @Deprecated
     public Action getSaveAction() {
         Action action = new AbstractAction() {
+            @Override
             public void actionPerformed(ActionEvent evt) {
                 Image img = getImage();
                 BufferedImage dst = new BufferedImage(
@@ -414,6 +416,7 @@ public class JXImageView extends JXPanel {
     @Deprecated
     public Action getRotateClockwiseAction() {
         Action action = new AbstractAction() {
+            @Override
             public void actionPerformed(ActionEvent evt) {
                 Image img = getImage();
                 BufferedImage src = new BufferedImage(
@@ -452,6 +455,7 @@ public class JXImageView extends JXPanel {
     @Deprecated
     public Action getRotateCounterClockwiseAction() {
         Action action = new AbstractAction() {
+            @Override
             public void actionPerformed(ActionEvent evt) {
                 Image img = getImage();
                 BufferedImage src = new BufferedImage(
@@ -489,6 +493,7 @@ public class JXImageView extends JXPanel {
     @Deprecated
     public Action getZoomOutAction() {
         Action action = new AbstractAction() {
+            @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 setScale(getScale()*0.5);
             }
@@ -505,6 +510,7 @@ public class JXImageView extends JXPanel {
     @Deprecated
     public Action getZoomInAction() {
         Action action = new AbstractAction() {
+            @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 setScale(getScale()*2);
             }
@@ -690,11 +696,13 @@ public class JXImageView extends JXPanel {
             this.exportFormat = exportFormat;
         }
 
+        @Override
         public DataFlavor[] getTransferDataFlavors() {
             return new DataFlavor[] { DataFlavor.imageFlavor,
                 DataFlavor.javaFileListFlavor };
         }
 
+        @Override
         public boolean isDataFlavorSupported(DataFlavor flavor) {
             if(flavor == DataFlavor.imageFlavor) {
                 return true;
@@ -702,6 +710,7 @@ public class JXImageView extends JXPanel {
             return flavor == DataFlavor.javaFileListFlavor;
         }
 
+        @Override
         public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
             //log.fine("doing get trans data: " + flavor);
             if(flavor == DataFlavor.imageFlavor) {

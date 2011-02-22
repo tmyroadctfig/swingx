@@ -370,6 +370,7 @@ public class BasicHeaderUI extends HeaderUI {
 
     protected void installListeners(final JXHeader header) {
         propListener = new PropertyChangeListener() {
+            @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 onPropertyChange(header, evt.getPropertyName(), evt.getOldValue(), evt.getNewValue());
             }

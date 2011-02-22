@@ -66,6 +66,7 @@ public class DaySelectionModel extends AbstractDateSelectionModel {
     /**
      * 
      */
+    @Override
     public SelectionMode getSelectionMode() {
         return selectionMode;
     }
@@ -73,6 +74,7 @@ public class DaySelectionModel extends AbstractDateSelectionModel {
     /**
      * 
      */
+    @Override
     public void setSelectionMode(final SelectionMode selectionMode) {
         this.selectionMode = selectionMode;
         clearSelection();
@@ -82,6 +84,7 @@ public class DaySelectionModel extends AbstractDateSelectionModel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void addSelectionInterval(Date startDate, Date endDate) {
         if (startDate.after(endDate)) {
             return;
@@ -115,6 +118,7 @@ public class DaySelectionModel extends AbstractDateSelectionModel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setSelectionInterval(Date startDate, Date endDate) {
         startDate = startOfDay(startDate);
         endDate = startOfDay(endDate);
@@ -149,6 +153,7 @@ public class DaySelectionModel extends AbstractDateSelectionModel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void removeSelectionInterval(Date startDate, Date endDate) {
         if (startDate.after(endDate)) {
             return;
@@ -175,6 +180,7 @@ public class DaySelectionModel extends AbstractDateSelectionModel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void clearSelection() {
         if (isSelectionEmpty()) return;
         clearSelectionImpl();
@@ -188,6 +194,7 @@ public class DaySelectionModel extends AbstractDateSelectionModel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public SortedSet<Date> getSelection() {
         return new TreeSet<Date>(selectedDates);
     }
@@ -195,6 +202,7 @@ public class DaySelectionModel extends AbstractDateSelectionModel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Date getFirstSelectionDate() {
         return isSelectionEmpty() ? null : selectedDates.first();
     }
@@ -202,6 +210,7 @@ public class DaySelectionModel extends AbstractDateSelectionModel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Date getLastSelectionDate() {
         return isSelectionEmpty() ? null : selectedDates.last();
     }
@@ -209,6 +218,7 @@ public class DaySelectionModel extends AbstractDateSelectionModel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isSelected(Date date) {
         // JW: don't need Contract ... startOfDay will throw NPE if null
         return selectedDates.contains(startOfDay(date));
@@ -217,6 +227,7 @@ public class DaySelectionModel extends AbstractDateSelectionModel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isSelectionEmpty() {
         return selectedDates.isEmpty();
     }
@@ -224,6 +235,7 @@ public class DaySelectionModel extends AbstractDateSelectionModel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public SortedSet<Date> getUnselectableDates() {
         return new TreeSet<Date>(unselectableDates);
     }
@@ -231,6 +243,7 @@ public class DaySelectionModel extends AbstractDateSelectionModel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setUnselectableDates(SortedSet<Date> unselectables) {
         this.unselectableDates.clear();
         for (Date date : unselectables) {
@@ -245,6 +258,7 @@ public class DaySelectionModel extends AbstractDateSelectionModel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isUnselectableDate(Date date) {
         date = startOfDay(date);
         return upperBound != null && upperBound.getTime() < date.getTime() ||
@@ -278,6 +292,7 @@ public class DaySelectionModel extends AbstractDateSelectionModel {
      * 
      * Implemented to return the start of the day which contains the date.
      */
+    @Override
     public Date getNormalizedDate(Date date) {
         Contract.asNotNull(date, "date must not be null");
         return startOfDay(date);

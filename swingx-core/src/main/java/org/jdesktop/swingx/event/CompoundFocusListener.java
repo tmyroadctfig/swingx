@@ -161,6 +161,7 @@ public class CompoundFocusListener extends AbstractBean {
         if (managerListener == null) {
             managerListener = new PropertyChangeListener() {
 
+                @Override
                 public void propertyChange(PropertyChangeEvent evt) {
                     if ("permanentFocusOwner".equals(evt.getPropertyName())) {
                         permanentFocusOwnerChanged((Component) evt.getNewValue());

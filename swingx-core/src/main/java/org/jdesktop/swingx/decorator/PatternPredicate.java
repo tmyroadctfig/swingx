@@ -142,6 +142,7 @@ public class PatternPredicate implements HighlightPredicate {
      * decorateColumn/s. Otherwise returns false.
      * 
      */
+    @Override
     public boolean isHighlighted(Component renderer, ComponentAdapter adapter) {
         if (isHighlightCandidate(adapter)) {
             return test(adapter);

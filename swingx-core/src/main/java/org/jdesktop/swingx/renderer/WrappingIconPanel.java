@@ -116,6 +116,7 @@ public class WrappingIconPanel extends JXPanel implements PainterAware, IconAwar
      * 
      * @param icon the icon to use.
      */
+    @Override
     public void setIcon(Icon icon) {
         iconLabel.setIcon(icon);
         iconLabel.setText(null);
@@ -127,6 +128,7 @@ public class WrappingIconPanel extends JXPanel implements PainterAware, IconAwar
      * 
      * @return the icon used in this panel, may be null.
      */
+    @Override
     public Icon getIcon() {
         return iconLabel.getIcon();
     }
@@ -240,6 +242,7 @@ public class WrappingIconPanel extends JXPanel implements PainterAware, IconAwar
      * 
      * @return the delegate's Painter or null.
      */
+    @Override
     public Painter<?> getPainter() {
         if (delegate instanceof PainterAware) {
             return ((PainterAware) delegate).getPainter();
@@ -253,6 +256,7 @@ public class WrappingIconPanel extends JXPanel implements PainterAware, IconAwar
      * 
      * @param painter the Painter to apply to the delegate.
      */
+    @Override
     public void setPainter(Painter<?> painter) {
         if (delegate instanceof PainterAware) {
             ((PainterAware) delegate).setPainter(painter);

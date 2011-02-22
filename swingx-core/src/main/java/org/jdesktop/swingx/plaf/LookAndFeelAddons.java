@@ -361,6 +361,7 @@ public abstract class LookAndFeelAddons {
   // TRACKING OF THE CURRENT LOOK AND FEEL
   //
   private static class UpdateAddon implements PropertyChangeListener {
+    @Override
     public void propertyChange(PropertyChangeEvent evt) {
       try {
         setAddon(getBestMatchAddonClassName());

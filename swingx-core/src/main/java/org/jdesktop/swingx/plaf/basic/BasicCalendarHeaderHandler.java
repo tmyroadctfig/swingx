@@ -109,6 +109,7 @@ public class BasicCalendarHeaderHandler extends CalendarHeaderHandler {
             super();
             tsv = new StringValue() {
                 
+                @Override
                 public String getString(Object value) {
                     if (value instanceof Calendar) {
                         String month = monthNames[((Calendar) value)
@@ -122,6 +123,7 @@ public class BasicCalendarHeaderHandler extends CalendarHeaderHandler {
             };
         }
         
+        @Override
         public void actionPerformed(ActionEvent e) {
             // TODO Auto-generated method stub
             
@@ -174,6 +176,7 @@ public class BasicCalendarHeaderHandler extends CalendarHeaderHandler {
             if (linkListener == null) {
              linkListener = new PropertyChangeListener() {
 
+                @Override
                 public void propertyChange(PropertyChangeEvent evt) {
                     if ("firstDisplayedDay".equals(evt.getPropertyName())) {
                         updateFromTarget();

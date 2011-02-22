@@ -821,6 +821,7 @@ public interface HighlightPredicate {
          * Implemented to return true if the adapter value is an instance
          * of this predicate's class type.
          */
+        @Override
         public boolean isHighlighted(Component renderer, ComponentAdapter adapter) {
             return clazz.isAssignableFrom(adapter.getColumnClass());
         }

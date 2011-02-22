@@ -66,6 +66,7 @@ public abstract class AbstractSearchable implements Searchable {
      * @return the position of the match in appropriate coordinates or -1 if
      *   no match found.
      */
+    @Override
     public int search(String searchString) {
         return search(searchString, -1);
     }
@@ -81,6 +82,7 @@ public abstract class AbstractSearchable implements Searchable {
      * @return the position of the match in appropriate coordinates or -1 if
      *   no match found.
      */
+    @Override
     public int search(String searchString, int startIndex) {
         return search(searchString, startIndex, false);
     }
@@ -98,6 +100,7 @@ public abstract class AbstractSearchable implements Searchable {
      * @return the position of the match in appropriate coordinates or -1 if
      *   no match found.
      */
+    @Override
     public int search(String searchString, int startIndex, boolean backward) {
         Pattern pattern = null;
         if (!isEmpty(searchString)) {
@@ -114,6 +117,7 @@ public abstract class AbstractSearchable implements Searchable {
      * @return the position of the match in appropriate coordinates or -1 if
      *   no match found.
      */
+    @Override
     public int search(Pattern pattern) {
         return search(pattern, -1);
     }
@@ -128,6 +132,7 @@ public abstract class AbstractSearchable implements Searchable {
      * @return the position of the match in appropriate coordinates or -1 if
      *   no match found.
      */
+    @Override
     public int search(Pattern pattern, int startIndex) {
         return search(pattern, startIndex, false);
     }
@@ -147,6 +152,7 @@ public abstract class AbstractSearchable implements Searchable {
      * @return the position of the match in appropriate coordinates or -1 if
      *   no match found.
      */
+    @Override
     public int search(Pattern pattern, int startIndex, boolean backwards) {
         int matchingRow = doSearch(pattern, startIndex, backwards);
         moveMatchMarker();
