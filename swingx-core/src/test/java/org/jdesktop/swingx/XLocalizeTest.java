@@ -95,6 +95,68 @@ public class XLocalizeTest extends InteractiveTestCase {
     }
 
     /**
+     * Issue #1394-swingx: missing properties for _en
+     * 
+     * fix - added empty properties file named swingx_en
+     */
+    @Test
+    public void testEnglishLocaleSwingX() {
+        String close = UIManagerExt.getString("Search.close", Locale.US);
+        assertEquals("Close", close);
+    }
+    
+    /**
+     * Issue #1394-swingx: missing properties for _en
+     * 
+     * fix - added empty properties file named TipOfTheDay_en
+     */
+    @Test
+    public void testEnglishLocaleTipOfTheDay() {
+        new JXTipOfTheDay();
+        String close = UIManagerExt.getString("TipOfTheDay.closeText", Locale.US);
+        assertEquals("Close", close);
+    }
+    
+    
+    /**
+     * Issue #1394-swingx: missing properties for _en
+     * 
+     * fix - added empty properties file named LoginPane_en
+     */
+    @Test
+    public void testEnglishLogin() {
+        new JXLoginPane();
+        String close = UIManagerExt.getString("JXLoginPane.cancelString", Locale.US);
+        assertEquals("Cancel", close);
+    }
+    
+    /**
+     * Issue #1394-swingx: missing properties for _en
+     * 
+     * fix - added empty properties file named ErrorPane_en
+     */
+    @Test
+    public void testEnglishError() {
+        new JXErrorPane();
+        String close = UIManagerExt.getString("JXErrorPane.ok_button_text", Locale.US);
+        assertEquals("Close", close);
+    }
+    
+    
+    /**
+     * Issue #1394-swingx: missing properties for _en
+     * 
+     * fix - added empty properties file named SearchField_en
+     */
+    @Test
+    public void testEnglishSearchFile() {
+        new JXSearchField();
+        String close = UIManagerExt.getString("SearchField.prompt", Locale.US);
+        assertEquals("Search", close);
+    }
+    
+
+    /**
      * test correct PropertyChangeNotification: must fire after
      * all internal state is set ... dooohhh.
      * 
@@ -129,6 +191,7 @@ public class XLocalizeTest extends InteractiveTestCase {
         final Locale alternative = getAlternativeLocale(dialog);
         PropertyChangeListener report = new PropertyChangeListener() {
 
+            @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 // sanity
                 // wrong assumption: find widgets name is changed as well
@@ -176,6 +239,7 @@ public class XLocalizeTest extends InteractiveTestCase {
         final Locale alternative = getAlternativeLocale(findPanel);
         PropertyChangeListener report = new PropertyChangeListener() {
 
+            @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 // sanity
 //                assertTrue("locale property changed", "locale".equals(evt.getPropertyName()));
@@ -220,6 +284,7 @@ public class XLocalizeTest extends InteractiveTestCase {
         final Locale alternative = getAlternativeLocale(findPanel);
         PropertyChangeListener report = new PropertyChangeListener() {
 
+            @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 // sanity
                 // wrong assumption: find widgets name is changed as well
@@ -287,6 +352,7 @@ public class XLocalizeTest extends InteractiveTestCase {
         final Locale alternative = getAlternativeLocale(table);
         PropertyChangeListener report = new PropertyChangeListener() {
 
+            @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 // sanity
                 assertTrue("locale property changed", "locale".equals(evt.getPropertyName()));
@@ -410,6 +476,7 @@ public class XLocalizeTest extends InteractiveTestCase {
         table.getColumnExt(0).setTitle(table.getLocale().getLanguage());
         Action toggleLocale = new AbstractActionExt("toggleLocale") {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 Locale old = table.getLocale();
                 table.setLocale(old == A_LOCALE ? OTHER_LOCALE : A_LOCALE);
