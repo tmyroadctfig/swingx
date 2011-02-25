@@ -1,0 +1,88 @@
+/*
+ * Created on 25.02.2011
+ *
+ */
+package org.jdesktop.swingx.table;
+
+import static org.jdesktop.swingx.table.TableUtilities.isDataChanged;
+import static org.jdesktop.swingx.table.TableUtilities.isInsert;
+import static org.jdesktop.swingx.table.TableUtilities.isStructureChanged;
+import static org.jdesktop.swingx.table.TableUtilities.isUpdate;
+
+import javax.swing.JTable;
+import javax.swing.event.TableModelEvent;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
+
+import org.jdesktop.swingx.InteractiveTestCase;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+
+@RunWith(JUnit4.class)
+public class TableUtilitiesTest extends InteractiveTestCase {
+    
+    
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void testPrefRowHeightInvalidRow() {
+        JTable table = new JTable(10, 3);
+        assertEquals(table.getRowHeight(), TableUtilities.getPreferredRowHeight(table, -1));
+    }
+    
+    @Test
+    public void testZeroHeight() {
+        JTable table = new JTable();
+        assertEquals(table.getRowHeight(), TableUtilities.getPreferredRowHeight(table, -1));
+    }
+    
+    @Test (expected = NullPointerException.class)
+    public void testPrefRowHeightMustBarkOnNull() {
+        TableUtilities.getPreferredRowHeight(null, -1);
+    }
+    
+    
+    /**
+     * Issue ??-swingx: NPE if tableChanged is messaged with a null event.
+     *
+     */
+    @Test
+    public void testNullTableEventNPE() {
+        // don't throw null events
+        assertFalse(isUpdate(null));
+        assertFalse(isDataChanged(null));
+        assertTrue(isStructureChanged(null));
+        // correct detection of structureChanged
+        TableModelEvent structureChanged = new TableModelEvent(getModel(), -1, -1);
+        assertFalse(isUpdate(structureChanged));
+        assertFalse(isDataChanged(structureChanged));
+        assertTrue(isStructureChanged(structureChanged));
+        // correct detection of insert/remove
+        TableModelEvent insert = new TableModelEvent(getModel(), 0, 10, -1, TableModelEvent.INSERT);
+        assertFalse(isUpdate(insert));
+        assertFalse(isDataChanged(insert));
+        assertFalse(isStructureChanged(insert));
+        assertTrue(isInsert(insert));
+        // correct detection of update
+        TableModelEvent update = new TableModelEvent(getModel(), 0, 10);
+        assertTrue(isUpdate(update));
+        assertFalse(isDataChanged(update));
+        assertFalse(isStructureChanged(update));
+        // correct detection of dataChanged
+        TableModelEvent dataChanged = new TableModelEvent(getModel());
+        assertFalse(isUpdate(dataChanged));
+        assertTrue(isDataChanged(dataChanged));
+        assertFalse(isStructureChanged(dataChanged));
+        
+    }
+    
+    private TableModel getModel() {
+        return new DefaultTableModel();
+    }
+
+    @Override
+    @Before
+    public void setUp() throws Exception {
+    }
+    
+}
