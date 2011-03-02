@@ -32,21 +32,17 @@
  * 
  * <h3>Auto-completion for TextFields and ComboBoxes</h3>
  * 
+ * For more information, see the
+ * <a href="autocomplete/package.html">AutoComplete</a> documentation.
+ * 
  * <h3>Enhanced Rendering Support for Collection Components</h3>
  * 
  * <h3>Built-In Search Support for Collection Components and JXEditorPane</h3>
  * 
- * <h3>Filtering/Sorting for Tables and Lists</h3>
- * 
- * <b>NOTE:</b> Currently on the move to core (JDK 6+) sorting/filtering. Trunk
- * has all SwingX specials removed, JXTable sort api back again. JXList still
- * disabled.
- * 
  * <h3>Login/Authentication Framework</h3>
  * 
- * <h3>Painter-enabled components</h3>
+ * <h3>Painter-Enabled Components</h3>
  * 
- * <p>
  * Components that use painters for background rendering alter the functionality
  * of how {@link java.awt.Component#setBackground(java.awt.Color)} works.  
  * Setting the background color of a painter-enabled component effectively sets 
