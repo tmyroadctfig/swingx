@@ -58,14 +58,7 @@
           </execution>
         </executions>
       </plugin-->
-      <plugin>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <showDeprecation>true</showDeprecation>
-          <showWarnings>true</showWarnings>
-        </configuration>
-      </plugin>
-      <plugin>
+      <!-- plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>emma-maven-plugin</artifactId>
         <version>1.0-alpha-2</version>
@@ -77,8 +70,8 @@
             </goals>
           </execution>
         </executions>
-      </plugin>
-      <plugin>
+      </plugin -->
+      <!-- plugin>
         <groupId>net.sf.jmd</groupId>
         <artifactId>maven-crap4j-plugin</artifactId>
         <version>0.1.1-SNAPSHOT</version>
@@ -97,7 +90,7 @@
                 </goals>
             </execution>
         </executions>
-      </plugin>
+      </plugin -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
@@ -106,13 +99,6 @@
             <manifestFile>src/main/resources/META-INF/MANIFEST.MF</manifestFile> 
           </archive>
         </configuration>
-        <executions>
-          <execution>
-            <goals>
-              <goal>test-jar</goal>
-            </goals>
-          </execution>
-        </executions>
       </plugin>
     </plugins>
   </build>
