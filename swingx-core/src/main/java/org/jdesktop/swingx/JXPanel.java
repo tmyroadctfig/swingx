@@ -80,7 +80,7 @@ import org.jdesktop.swingx.painter.Painter;
  * @see Painter
  */
 @SuppressWarnings("nls")
-public class JXPanel extends JPanel implements BackgroundPaintable, Scrollable {
+public class JXPanel extends JPanel implements AlphaPaintable, BackgroundPaintable, Scrollable {
 //    private boolean scrollableTracksViewportHeight = true;
 //    private boolean scrollableTracksViewportWidth = true;
     
@@ -160,13 +160,9 @@ public class JXPanel extends JPanel implements BackgroundPaintable, Scrollable {
     }
     
     /**
-     * Set the alpha transparency level for this component. This automatically
-     * causes a repaint of the component.
-     *
-     * <p>TODO add support for animated changes in translucency</p>
-     *
-     * @param alpha must be a value between 0 and 1 inclusive.
+     * {@inheritDoc}
      */
+    @Override
     public void setAlpha(float alpha) {
         if (this.alpha != alpha) {
             assert alpha >= 0f && alpha <= 1f;
@@ -195,26 +191,24 @@ public class JXPanel extends JPanel implements BackgroundPaintable, Scrollable {
     }
     
     /**
-     * @return the alpha translucency level for this component. This will be
-     * a value between 0 and 1, inclusive.
+     * {@inheritDoc}
      */
+    @Override
     public float getAlpha() {
         return alpha;
     }
     
     /**
-     * Unlike other properties, alpha can be set on a component, or on one of
-     * its parents. If the alpha of a parent component is .4, and the alpha on
-     * this component is .5, effectively the alpha for this component is .4
-     * because the lowest alpha in the hierarchy &quot;wins&quot;
+     * {@inheritDoc}
      */
+    @Override
     public float getEffectiveAlpha() {
         if (inheritAlpha) {
             float a = alpha;
             Component c = this;
             while ((c = c.getParent()) != null) {
-                if (c instanceof JXPanel) {
-                    a = Math.min(((JXPanel)c).getAlpha(), a);
+                if (c instanceof AlphaPaintable) {
+                    a = Math.min(((AlphaPaintable)c).getAlpha(), a);
                 }
             }
             return a;
@@ -224,26 +218,17 @@ public class JXPanel extends JPanel implements BackgroundPaintable, Scrollable {
     }
 
     /**
-     * Returns the state of the panel with respect to inheriting alpha values.
-     * 
-     * @return {@code true} if this panel inherits alpha values; {@code false}
-     *         otherwise
-     * @see JXPanel#setInheritAlpha(boolean)
+     * {@inheritDoc}
      */
+    @Override
     public boolean isInheritAlpha() {
         return inheritAlpha;
     }
 
     /**
-     * Determines if the effective alpha of this component should include the
-     * alpha of ancestors.
-     * 
-     * @param val
-     *            {@code true} to include ancestral alpha data; {@code false}
-     *            otherwise
-     * @see #isInheritAlpha()
-     * @see #getEffectiveAlpha()
+     * {@inheritDoc}
      */
+    @Override
     public void setInheritAlpha(boolean val) {
         if (inheritAlpha != val) {
             inheritAlpha = val;
