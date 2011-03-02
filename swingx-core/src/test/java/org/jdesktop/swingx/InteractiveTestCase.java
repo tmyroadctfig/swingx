@@ -554,6 +554,7 @@ public abstract class InteractiveTestCase extends junit.framework.TestCase {
                 }
                 
             } catch (Exception e1) {
+                e1.printStackTrace();
                 LOG.log(Level.FINE, "problem in setting laf: " + plaf, e1);
             } 
         }

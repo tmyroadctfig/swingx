@@ -554,7 +554,7 @@ public interface HighlightPredicate {
         
         /**
          * Instantiates a predicate which returns true for the
-         * given columns in model coodinates.
+         * given columns in model coordinates.
          * 
          * @param columns the columns to highlight in model coordinates.
          */

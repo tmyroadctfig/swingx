@@ -32,7 +32,7 @@ import java.util.List;
  *
  * @author joshy
  */
-public class DefaultMultiThumbModel<E> extends AbstractMultiThumbModel<E> implements MultiThumbModel<E> {
+public class DefaultMultiThumbModel<E> extends AbstractMultiThumbModel<E> {
     
     protected List<Thumb<E>>thumbs = new ArrayList<Thumb<E>>();
     
@@ -42,6 +42,7 @@ public class DefaultMultiThumbModel<E> extends AbstractMultiThumbModel<E> implem
         setMaximumValue(1.0f);
     }
     // returns the index of the newly added thumb
+    @Override
     public int addThumb(float value, E obj) {
         Thumb<E> thumb = new Thumb<E>(this);
         thumb.setPosition(value);
@@ -55,6 +56,7 @@ public class DefaultMultiThumbModel<E> extends AbstractMultiThumbModel<E> implem
         return n-1;
     }
 
+    @Override
     public void insertThumb(float value, E obj, int index) {
         Thumb<E> thumb = new Thumb<E>(this);
         thumb.setPosition(value);
@@ -66,6 +68,7 @@ public class DefaultMultiThumbModel<E> extends AbstractMultiThumbModel<E> implem
         }
     }
 
+    @Override
     public void removeThumb(int index) {
         Thumb<E> thumb = thumbs.remove(index);
         ThumbDataEvent evt = new ThumbDataEvent(this,-1,index,thumb);
@@ -74,18 +77,22 @@ public class DefaultMultiThumbModel<E> extends AbstractMultiThumbModel<E> implem
         }
     }
 
+    @Override
     public int getThumbCount() {
         return thumbs.size();
     }
 
+    @Override
     public Thumb<E> getThumbAt(int index) {
         return thumbs.get(index);
     }
 
+    @Override
     public List<Thumb<E>> getSortedThumbs() {
         List<Thumb<E>> list = new ArrayList<Thumb<E>>();
         list.addAll(thumbs);
         Collections.sort(list, new Comparator<Thumb<E>>() {
+            @Override
             public int compare(Thumb<E> o1, Thumb<E> o2) {
                 float f1 = o1.getPosition();
                 float f2 = o2.getPosition();
@@ -101,10 +108,12 @@ public class DefaultMultiThumbModel<E> extends AbstractMultiThumbModel<E> implem
         return list;
     }
 
+    @Override
     public Iterator<Thumb<E>> iterator() {
         return thumbs.iterator();
     }
 
+    @Override
     public int getThumbIndex(Thumb<E> thumb) {
         return thumbs.indexOf(thumb);
     }
