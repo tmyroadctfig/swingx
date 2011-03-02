@@ -4,6 +4,8 @@
  */
 package org.jdesktop.test;
 
+import java.beans.XMLDecoder;
+import java.beans.XMLEncoder;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -45,5 +47,30 @@ public final class SerializableSupport {
         ByteArrayInputStream bytesIn = new ByteArrayInputStream(bytes);
         ObjectInputStream objectsIn = new ObjectInputStream(bytesIn);
         return objectsIn.readObject();
+    }
+
+    /**
+     * Encodes an object as XML and then decodes it.
+     * 
+     * @param <T>
+     *            the type to operate on
+     * @param object
+     *            the object to encode/decode
+     * @return a copy of the original object that was encoded and decoded
+     * @see XMLEncoder
+     * @see XMLDecoder
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> T encode(T object) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        XMLEncoder encoder = new XMLEncoder(baos);
+        encoder.writeObject(object);
+        encoder.close();
+        
+        XMLDecoder decoder = new XMLDecoder(new ByteArrayInputStream(baos.toByteArray()));
+        T copy = (T) decoder.readObject();
+        decoder.close();
+        
+        return copy;
     }
 }
