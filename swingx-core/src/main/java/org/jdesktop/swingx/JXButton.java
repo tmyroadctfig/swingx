@@ -460,12 +460,6 @@ public class JXButton extends JButton implements BackgroundPaintable {
         }
     }
     
-    /**
-     * @see #getUIClassID
-     * @see #readObject
-     */
-    public static final String uiClassID = "XButtonUI";
-    
     private ForegroundButton fgStamp;
     private Painter fgPainter;
     private PainterPaint fgPaint;
@@ -533,6 +527,27 @@ public class JXButton extends JButton implements BackgroundPaintable {
     
     private void init() {
         fgStamp = new ForegroundButton();
+    }
+
+    /**
+     * Sets the background color for this component by
+     * 
+     * @param bg
+     *            the desired background <code>Color</code>
+     * @see java.swing.JComponent#getBackground
+     * @see #setOpaque
+     * 
+    * @beaninfo
+    *    preferred: true
+    *        bound: true
+    *    attribute: visualUpdate true
+    *  description: The background color of the component.
+     */
+    @Override
+    public void setBackground(Color bg) {
+        super.setBackground(bg);
+        
+        SwingXUtilities.installBackground(this, bg);
     }
     
     /**
@@ -649,47 +664,6 @@ public class JXButton extends JButton implements BackgroundPaintable {
                     g2d.dispose();
                 }
             }
-            
-//            Graphics2D g2d = (Graphics2D) g.create();
-//            
-//            try {
-//                if (bgPainter == null) {
-//                    SwingUtilities.paintComponent(g, bgStamp, this, 0, 0, getWidth(), getHeight());
-//                } else {
-//                    SwingXUtilities.paintBackground(this, g2d);
-//                }
-//                
-//                SwingUtilities.paintComponent(g, fgStamp, this, 0, 0, getWidth(), getHeight());
-//                
-//                if (fgPainter != null && getText() != null && !getText().isEmpty()) {
-//                    Insets i = getInsets();
-//                    viewRect.x = i.left;
-//                    viewRect.y = i.top;
-//                    viewRect.width = getWidth() - (i.right + viewRect.x);
-//                    viewRect.height = getHeight() - (i.bottom + viewRect.y);
-//
-//                    textRect.x = textRect.y = textRect.width = textRect.height = 0;
-//                    iconRect.x = iconRect.y = iconRect.width = iconRect.height = 0;
-//
-//                    // layout the text and icon
-//                    String text = SwingUtilities.layoutCompoundLabel(
-//                        this, g2d.getFontMetrics(), getText(), getIcon(), 
-//                        getVerticalAlignment(), getHorizontalAlignment(),
-//                        getVerticalTextPosition(), getHorizontalTextPosition(),
-//                        viewRect, iconRect, textRect, 
-//                        getText() == null ? 0 : getIconTextGap());
-//                    
-//                    if (!isPaintBorderInsets()) {
-//                        g2d.translate(i.left, i.top);
-//                    }
-//                    
-//                    g2d.setPaint(fgPaint);
-//                    BasicGraphicsUtils.drawStringUnderlineCharAt(g2d, text, getDisplayedMnemonicIndex(),
-//                            textRect.x, textRect.y + g2d.getFontMetrics().getAscent());
-//                }
-//            } finally {
-//                g2d.dispose();
-//            }
         }
     }
     
@@ -739,7 +713,7 @@ public class JXButton extends JButton implements BackgroundPaintable {
         Graphics2D g2d = im.createGraphics();
         paintWithForegroundPainterWithoutFilters(g2d);
         
-        for (BufferedImageOp filter : ((AbstractPainter) fgPainter).getFilters()) {
+        for (BufferedImageOp filter : ((AbstractPainter<?>) fgPainter).getFilters()) {
             im = filter.filter(im, null);
         }
         
