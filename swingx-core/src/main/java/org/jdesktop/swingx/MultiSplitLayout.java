@@ -525,7 +525,7 @@ public void removeLayoutComponent(Component child) {
             Split p = s.getParent();
             if ( p == null ) {
               if ( s.getChildren().size() > 0 )
-              model = (Node)s.getChildren().get( 0 );
+              model = s.getChildren().get( 0 );
               else 
                 model = null;
               return;
@@ -549,7 +549,7 @@ public void removeLayoutComponent(Component child) {
   
   /**
    * Show/Hide nodes. Any dividers that are no longer required due to one of the 
-   * nodes being made visible/invisible are also shown/hidder. The visibility of 
+   * nodes being made visible/invisible are also shown/hidden. The visibility of 
    * the component managed by the node is also changed by this method
    * @param name the node name
    * @param visible the new node visible state
@@ -850,7 +850,7 @@ public Dimension minimumLayoutSize(Container parent) {
           minSplitChildWidth = minimumNodeSize(splitChild).getWidth();
         double splitChildWeight = (onlyShrinkWeightedComponents)
         ? splitChild.getWeight()
-        : (splitChildBounds.getWidth() / (double)totalWidth);
+        : (splitChildBounds.getWidth() / totalWidth);
         
         if (!splitChildren.hasNext()) {
           double newWidth = Math.max(minSplitChildWidth, bounds.getMaxX() - x);
@@ -923,7 +923,7 @@ public Dimension minimumLayoutSize(Container parent) {
           minSplitChildHeight = minimumNodeSize(splitChild).getHeight();
         double splitChildWeight = (onlyShrinkWeightedComponents)
         ? splitChild.getWeight()
-        : (splitChildBounds.getHeight() / (double)totalHeight);
+        : (splitChildBounds.getHeight() / totalHeight);
         
         // If this split child is the last visible node it should all the 
         // remaining space
