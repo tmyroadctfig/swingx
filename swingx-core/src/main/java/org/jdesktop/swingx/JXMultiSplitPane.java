@@ -26,7 +26,6 @@ import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -51,11 +50,12 @@ import org.jdesktop.swingx.painter.Painter;
  * @author Hans Muller
  * @author Luan O'Carroll
  */
-public class JXMultiSplitPane extends JPanel {
+public class JXMultiSplitPane extends JPanel implements BackgroundPaintable {
     private AccessibleContext accessibleContext = null;
     private boolean continuousLayout = true;
     private DividerPainter dividerPainter = new DefaultDividerPainter();
     private Painter backgroundPainter;
+    private boolean paintBorderInsets;
 
     /**
      * Creates a MultiSplitPane with it's LayoutManager set to 
@@ -246,20 +246,23 @@ public class JXMultiSplitPane extends JPanel {
     @Override
     protected void paintComponent(Graphics g)
     {
-      if (backgroundPainter != null) {
-          Graphics2D g2 = (Graphics2D)g.create();
-          
-            try {
-          Insets ins = this.getInsets();
-          g2.translate(ins.left, ins.top);
-                backgroundPainter.paint(g2, this, this.getWidth() - ins.left
-                        - ins.right, this.getHeight() - ins.top - ins.bottom);
-            } finally {
-          g2.dispose();
+        if (backgroundPainter == null) {
+            super.paintComponent(g);
+        } else {
+            if (isOpaque()) {
+                super.paintComponent(g);
             }
-      } else {
-          super.paintComponent(g);
-      }
+            
+            Graphics2D g2 = (Graphics2D) g.create();
+            
+            try {
+                SwingXUtilities.paintBackground(this, g2);
+            } finally {
+                g2.dispose();
+            }
+            
+            getUI().paint(g, this);
+        }
     }
     
     /**
@@ -269,6 +272,7 @@ public class JXMultiSplitPane extends JPanel {
      * being used, because Painters may paint transparent pixels or not
      * paint certain pixels, such as around the border insets.
      */
+    @Override
     public void setBackgroundPainter(Painter p)
     {
         Painter old = getBackgroundPainter();
@@ -282,9 +286,29 @@ public class JXMultiSplitPane extends JPanel {
         repaint();
     }
     
+    @Override
     public Painter getBackgroundPainter() {
         return backgroundPainter;
-    }    
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isPaintBorderInsets() {
+        return paintBorderInsets;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setPaintBorderInsets(boolean paintBorderInsets) {
+        boolean oldValue = isPaintBorderInsets();
+        this.paintBorderInsets = paintBorderInsets;
+        firePropertyChange("paintBorderInsets", oldValue, isPaintBorderInsets());
+    }
+
     /**
      * Uses the DividerPainter (if any) to paint each Divider that
      * overlaps the clip Rectangle.  This is done after the call to
