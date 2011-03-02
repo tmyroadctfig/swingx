@@ -531,6 +531,8 @@ public class JXPanel extends JPanel implements AlphaPaintable, BackgroundPaintab
             } finally {
                 g2.dispose();
             }
+            
+            getUI().paint(g, this);
         }
     }
 }
