@@ -80,6 +80,7 @@ public class ListComboBoxModel<E> extends AbstractListModel implements ComboBoxM
      * @throws ClassCastException
      *                 if {@code item} is not of type {@code E}
      */
+    @Override
     @SuppressWarnings("unchecked")
     public void setSelectedItem(Object item) {
         if ((selected != null && !selected.equals(item))
@@ -92,6 +93,7 @@ public class ListComboBoxModel<E> extends AbstractListModel implements ComboBoxM
     /**
      * {@inheritDoc}
      */
+    @Override
     public E getSelectedItem() {
         return this.selected;
     }
@@ -99,6 +101,7 @@ public class ListComboBoxModel<E> extends AbstractListModel implements ComboBoxM
     /**
      * {@inheritDoc}
      */
+    @Override
     public E getElementAt(int index) {
         return data.get(index);
     }
@@ -106,6 +109,7 @@ public class ListComboBoxModel<E> extends AbstractListModel implements ComboBoxM
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getSize() {
         return data.size();
     }
@@ -113,6 +117,7 @@ public class ListComboBoxModel<E> extends AbstractListModel implements ComboBoxM
     /**
      * {@inheritDoc}
      */
+    @Override
     public void actionPerformed(ActionEvent evt) {
         if(evt.getActionCommand().equals(UPDATE)) {
             this.fireContentsChanged(this, 0, getSize() - 1);
