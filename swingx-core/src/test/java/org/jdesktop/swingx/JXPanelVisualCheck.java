@@ -52,8 +52,7 @@ public class JXPanelVisualCheck extends InteractiveTestCase {
 //      setSystemLF(true);
       JXPanelVisualCheck test = new JXPanelVisualCheck();
       try {
-         test.runInteractiveTests("interactiveAlphaCheck");
-//         test.runInteractiveTests(".*List.*");
+         test.runInteractiveTests("interactive.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
@@ -140,6 +139,19 @@ public class JXPanelVisualCheck extends InteractiveTestCase {
     public void interactiveAlphaCheck() {
         JXPanel xp = new JXPanel();
         xp.setBackgroundPainter(new MattePainter(PaintUtils.AERITH, true));
+        xp.setAlpha(.5f);
+        xp.add(new JButton("Press Me"));
+        
+        JPanel p = new JPanel(new BorderLayout());
+        p.setBackground(Color.BLACK);
+        p.add(xp);
+        
+        show(wrapInFrame(p, "Alpha Check"), 200, 200);
+    }
+    
+    public void interactiveBackgroundAndAlphaCheck() {
+        final JXPanel xp = new JXPanel();
+        xp.setBackground(Color.RED);
         xp.setAlpha(.5f);
         xp.add(new JButton("Press Me"));
         

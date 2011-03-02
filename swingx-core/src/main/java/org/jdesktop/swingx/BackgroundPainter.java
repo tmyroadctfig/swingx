@@ -29,10 +29,10 @@ import javax.swing.UIManager;
 import org.jdesktop.swingx.painter.Painter;
 
 /**
+ * A painter for handling backgrounds.
+ * 
  * @author kschaefer
- *
  */
-
 class BackgroundPainter implements Painter<JComponent> {
     private final Color color;
     
@@ -49,7 +49,7 @@ class BackgroundPainter implements Painter<JComponent> {
             return;
         }
         
-        if (object.isOpaque() || UIManager.getLookAndFeel().getID().equals("Nimbus")) {
+        if (object.isOpaque() || object instanceof AlphaPaintable || UIManager.getLookAndFeel().getID().equals("Nimbus")) {
             g.setColor(color);
             g.fillRect(0, 0, width, height);
         }
