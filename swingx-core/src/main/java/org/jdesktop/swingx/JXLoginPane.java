@@ -37,10 +37,7 @@ import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.Insets;
-import java.awt.KeyEventDispatcher;
-import java.awt.KeyboardFocusManager;
 import java.awt.LayoutManager;
-import java.awt.Robot;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -49,9 +46,6 @@ import java.awt.event.ItemListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowFocusListener;
-import java.awt.event.WindowListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
@@ -102,6 +96,7 @@ import org.jdesktop.swingx.plaf.LoginPaneAddon;
 import org.jdesktop.swingx.plaf.LoginPaneUI;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 import org.jdesktop.swingx.plaf.UIManagerExt;
+import org.jdesktop.swingx.plaf.basic.CapsLockSupport;
 import org.jdesktop.swingx.util.WindowUtils;
 
 /**
@@ -291,24 +286,11 @@ public class JXLoginPane extends JXPanel {
      * The default login listener used by this panel.
      */
     private LoginListener defaultLoginListener;
-    private final CapsOnTest capsOnTest;
-    private boolean caps;
-    private boolean isTestingCaps;
-    private final KeyEventDispatcher capsOnListener;
-    /**
-     * Caps lock detection support
-     */
-    private boolean capsLockSupport = true;
 
     /**
      * Login/cancel control pane;
      */
     private JXBtnPanel buttonPanel;
-    /**
-     * Window event listener responsible for triggering caps lock test on vindow activation and
-     * focus changes.
-     */
-    private final CapsOnWinListener capsOnWinListener;
     
     /**
      * Card pane holding user/pwd fields view and the progress view.
@@ -437,27 +419,6 @@ public class JXLoginPane extends JXPanel {
      *            a list of servers to authenticate against
      */
     public JXLoginPane(LoginService service, PasswordStore passwordStore, UserNameStore userStore, List<String> servers) {
-        //init capslock detection support
-        if (Boolean.parseBoolean(System.getProperty("swingx.enableCapslockTesting"))) {
-            capsOnTest = new CapsOnTest();
-            capsOnListener = new KeyEventDispatcher() {
-                @Override
-                public boolean dispatchKeyEvent(KeyEvent e) {
-                    if (e.getID() != KeyEvent.KEY_PRESSED) {
-                        return false;
-                    }
-                    if (e.getKeyCode() == 20) {
-                        setCapsLock(!isCapsLockOn());
-                    }
-                    return false;
-                }};
-            capsOnWinListener = new CapsOnWinListener(capsOnTest);
-        } else {
-            capsOnTest = null;
-            capsOnListener = null;
-            capsOnWinListener = null;
-            capsLockSupport = false;
-        }
         setLoginService(service);
         setPasswordStore(passwordStore);
         setUserNameStore(userStore);
@@ -481,16 +442,19 @@ public class JXLoginPane extends JXPanel {
 
         // #732 set all internal components opacity to false in order to allow top level (frame's content pane) background painter to have any effect.
         setOpaque(false);
+        CapsLockSupport.getInstance().addPropertyChangeListener("capsLockEnabled", new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                if (capsOn != null) {
+                    if (Boolean.TRUE.equals(evt.getNewValue())) {
+                        capsOn.setText(UIManagerExt.getString(CLASS_NAME + ".capsOnWarning", getLocale()));
+                    } else {
+                        capsOn.setText(" ");
+                    }
+                }
+            }
+        });
         initComponents();
-    }
-
-    /**
-     * Sets current state of the caps lock key as detected by the component.
-     * @param b True when caps lock is turned on, false otherwise.
-     */
-    private void setCapsLock(boolean b) {
-        caps = b;
-        capsOn.setText(caps ? UIManagerExt.getString(CLASS_NAME + ".capsOnWarning", getLocale()) : " ");
     }
 
     /**
@@ -503,21 +467,7 @@ public class JXLoginPane extends JXPanel {
      * <code>isCapsLockDetectionSupported()</code> returns false.
      */
     public boolean isCapsLockOn() {
-        return caps;
-    }
-
-    /**
-     * Check current state of the caps lock state detection. Note that the value can change after
-     * component have been made visible. Due to current problems in locking key state detection by
-     * core java detection of the changes in caps lock can be always reliably determined. When
-     * component can't guarantee reliable detection it will switch it off. This is usually the case
-     * for unsigned applets and webstart invoked application. Since your users are going to pass
-     * their password in the component you should always sign it when distributing application over
-     * the network.
-     * @return True if changes in caps lock state can be monitored by the component, false otherwise.
-     */
-    public boolean isCapsLockDetectionSupported() {
-        return capsLockSupport;
+        return CapsLockSupport.getInstance().isCapsLockEnabled();
     }
 
     //------------------------------------------------------------- UI Logic
@@ -639,8 +589,8 @@ public class JXLoginPane extends JXPanel {
         saveCB.setVisible(saveMode == SaveMode.PASSWORD || saveMode == SaveMode.BOTH);
         saveCB.setOpaque(false);
 
-        capsOn = new JLabel(" ");
-        // don't show by default. We perform test when login panel gets focus.
+        capsOn = new JLabel();
+        capsOn.setText(isCapsLockOn() ? UIManagerExt.getString(CLASS_NAME + ".capsOnWarning", getLocale()) : " ");
 
         int lShift = 3;// lShift is used to align all other components with the checkbox
         GridLayout grid = new GridLayout(2,1);
@@ -1235,50 +1185,6 @@ public class JXLoginPane extends JXPanel {
         }
     }
 
-    @Override
-    public void removeNotify() {
-        try {
-            // TODO: keep it here until all ui stuff is moved to uidelegate.
-            if (capsLockSupport)
-                KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(capsOnListener);
-            Container c = getTLA();
-            if (c instanceof Window) {
-                Window w = (Window) c;
-                w.removeWindowFocusListener(capsOnWinListener );
-                w.removeWindowListener(capsOnWinListener );
-            }
-        } catch (Exception e) {
-            // bail out; probably running unsigned app distributed over web
-        }
-        super.removeNotify();
-    }
-
-    private Window getTLA() {
-        Container c = JXLoginPane.this;
-        // #810 bail out on first window found up the hierarchy (modal dialogs)
-        while (!(c.getParent() == null || c instanceof Window)) {
-            c = c.getParent();
-        }
-        return (Window) c;
-    }
-
-    @Override
-    public void addNotify() {
-        try {
-            KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(
-                    capsOnListener);
-            Container c = getTLA();
-            if (c instanceof Window) {
-                Window w = (Window) c;
-                w.addWindowFocusListener(capsOnWinListener );
-                w.addWindowListener(capsOnWinListener);
-            }
-        } catch (Exception e) {
-            // probably unsigned app over web, disable capslock support and bail out
-            capsLockSupport = false;
-        }
-        super.addNotify();
-    }
     //--------------------------------------------- Listener Implementations
     /*
 
@@ -1878,151 +1784,5 @@ public class JXLoginPane extends JXPanel {
             return ok;
         }
 
-    }
-
-    private final class CapsOnTest {
-
-        RemovableKeyEventDispatcher ked;
-
-        public void runTest() {
-            boolean success = false;
-            // there's an issue with this - http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4414164
-            // TODO: check the progress from time to time
-            //try {
-            //     java.awt.Toolkit.getDefaultToolkit().getLockingKeyState(java.awt.event.KeyEvent.VK_CAPS_LOCK);
-            //} catch (Exception ex) {
-            //ex.printStackTrace();
-            //success = false;
-            //}
-            if (!success) {
-                try {
-                    KeyboardFocusManager kfm = KeyboardFocusManager.getCurrentKeyboardFocusManager();
-                    // #swingx-697
-                    // In some cases panel is not focused after the creation leaving bogus dispatcher in place. If found remove it.
-                    if (ked != null) {
-                        kfm.removeKeyEventDispatcher(ked);
-                    }
-                    // Temporarily installed listener with auto-uninstall after
-                    // test is finished.
-                    ked = new RemovableKeyEventDispatcher(this);
-                    kfm.addKeyEventDispatcher(ked);
-                    Robot r = new Robot();
-                    isTestingCaps = true;
-                    r.keyPress(65);
-                    r.keyRelease(65);
-                    r.keyPress(KeyEvent.VK_BACK_SPACE);
-                    r.keyRelease(KeyEvent.VK_BACK_SPACE);
-                } catch (Exception e1) {
-                    // this can happen for example due to security reasons in unsigned applets
-                    // when we can't test caps lock state programatically bail out silently
-
-                    // no matter what's the cause - uninstall
-                    ked.uninstall();
-                }
-            }
-        }
-
-        public void clean() {
-            if (ked != null) {
-                ked.cleanOnBogusFocus();
-            }
-        }
-    }
-
-    /**
-     * Window event listener to invoke capslock test when login panel get
-     * activated.
-     */
-    private final class CapsOnWinListener extends WindowAdapter implements
-            WindowFocusListener, WindowListener {
-        private CapsOnTest cot;
-
-        private long stamp;
-
-        public CapsOnWinListener(CapsOnTest cot) {
-            this.cot = cot;
-        }
-
-        @Override
-        public void windowActivated(WindowEvent e) {
-            cot.runTest();
-            stamp = System.currentTimeMillis();
-        }
-
-        @Override
-        public void windowGainedFocus(WindowEvent e) {
-            // repeat test only if more then 20ms passed between activation test
-            // and now.
-            if (stamp + 20 < System.currentTimeMillis()) {
-                cot.runTest();
-            }
-        }
-
-        @Override
-        public void windowOpened(WindowEvent arg0) {
-            cot.clean();
-        }
-
-    }
-
-    private class RemovableKeyEventDispatcher implements KeyEventDispatcher {
-
-        private CapsOnTest cot;
-
-        private boolean tested = false;
-
-        private int retry = 0;
-
-        public RemovableKeyEventDispatcher(CapsOnTest capsOnTest) {
-            this.cot = capsOnTest;
-        }
-
-        @Override
-        public boolean dispatchKeyEvent(KeyEvent e) {
-            tested = true;
-            if (e.getID() != KeyEvent.KEY_PRESSED) {
-                return true;
-            }
-            if (isTestingCaps && e.getKeyCode() > 64 && e.getKeyCode() < 91) {
-                setCapsLock(!e.isShiftDown()
-                        && Character.isUpperCase(e.getKeyChar()));
-            }
-            if (isTestingCaps && (e.getKeyCode() == KeyEvent.VK_BACK_SPACE)) {
-                // uninstall
-                uninstall();
-                retry = 0;
-            }
-            return true;
-        }
-
-        void uninstall() {
-            isTestingCaps = false;
-            KeyboardFocusManager.getCurrentKeyboardFocusManager()
-                    .removeKeyEventDispatcher(this);
-            if (cot.ked == this) {
-                cot.ked = null;
-            }
-        }
-
-        void cleanOnBogusFocus() {
-            // #799 happens on windows when focus is lost during initialization of program since focusLost() even is not issued by jvm in this case (WinXP-WinVista only)
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    if (!tested) {
-                        uninstall();
-                        if (retry < 3) {
-                            // try 3 times to regain the focus
-                            Window w = JXLoginPane.this.getTLA();
-                            if (w != null) {
-                                w.toFront();
-                            }
-                            cot.runTest();
-                            retry++;
-                        }
-                    }
-                }
-            });
-        }
     }
 }

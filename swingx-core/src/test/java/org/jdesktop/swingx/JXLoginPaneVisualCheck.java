@@ -39,6 +39,7 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
+import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
 import org.jdesktop.swingx.JXLoginPane.JXLoginFrame;
@@ -48,6 +49,7 @@ import org.jdesktop.swingx.auth.SimpleLoginService;
 import org.jdesktop.swingx.graphics.GraphicsUtilities;
 import org.jdesktop.swingx.painter.MattePainter;
 import org.jdesktop.swingx.plaf.basic.BasicLoginPaneUI;
+import org.jdesktop.swingx.plaf.basic.CapsLockSupport;
 
 /**
  * Simple tests to ensure that the {@code JXLoginPane} can be instantiated and
@@ -65,8 +67,8 @@ public class JXLoginPaneVisualCheck extends InteractiveTestCase {
         JXLoginPaneVisualCheck test = new JXLoginPaneVisualCheck();
 
         try {
-            test.runInteractiveTests();
-//            test.runInteractiveTests("interactiveComparativeDialogs");
+//            test.runInteractiveTests();
+            test.runInteractiveTests("interactiveDisplay");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
@@ -326,11 +328,24 @@ public class JXLoginPaneVisualCheck extends InteractiveTestCase {
         dialog.setVisible(true);
         JXLoginPane.showLoginDialog(null, new JXLoginPane());
     }
+
+    public void interactiveCapsLockTest() {
+        CapsLockSupport cls = CapsLockSupport.getInstance();
+        cls.addPropertyChangeListener(new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                System.out.println(evt);
+                System.out.println(CapsLockSupport.getInstance().isCapsLockEnabled());
+                System.out.println();
+            }
+        });
+        showInFrame(new JTextField(), "Caps Lock Test");
+    }
     
 	/**
      * Do nothing, make the test runner happy
      * (would output a warning without a test fixture).
-     *
+     *  
      */
     public void testDummy() {
 
