@@ -31,7 +31,6 @@ import static org.mockito.Mockito.verify;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.Collections;
 
 import org.hamcrest.CoreMatchers;
 import org.junit.Ignore;
