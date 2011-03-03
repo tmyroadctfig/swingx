@@ -622,7 +622,10 @@ public class JXCollapsiblePane extends JXPanel {
     @Override
     public void setOpaque(boolean opaque) {
         super.setOpaque(opaque);
-        wrapper.setOpaque(opaque);
+        
+        if (wrapper != null) {
+            wrapper.setOpaque(opaque);
+        }
     }
 
     /**
