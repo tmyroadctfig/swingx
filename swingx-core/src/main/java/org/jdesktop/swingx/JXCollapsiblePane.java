@@ -381,6 +381,7 @@ public class JXCollapsiblePane extends JXPanel {
         }
         wrapper = new WrapperContainer(contentPanel);
         wrapper.collapsedState = isCollapsed();
+        wrapper.getView().setVisible(!wrapper.collapsedState);
         super.addImpl(wrapper, BorderLayout.CENTER, -1);
     }
 
