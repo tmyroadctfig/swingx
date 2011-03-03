@@ -611,6 +611,21 @@ public class JXCollapsiblePane extends JXPanel {
     }
 
     /**
+     * {@inheritDoc}
+     * <p>
+     * Internals of JXCollasiplePane are designed to be opaque because some Look and Feel
+     * implementations having painting issues otherwise. JXCollapsiblePane and its internals will
+     * respect {@code setOpaque}, calling this method will not only update the collapsible pane, but
+     * also all internals. This method does not modify the {@link #getContentPane() content pane},
+     * as it is not considered an internal.
+     */
+    @Override
+    public void setOpaque(boolean opaque) {
+        super.setOpaque(opaque);
+        wrapper.setOpaque(opaque);
+    }
+
+    /**
      * A collapsible pane always returns its preferred size for the minimum size
      * to ensure that the collapsing happens correctly.
      * <p>
