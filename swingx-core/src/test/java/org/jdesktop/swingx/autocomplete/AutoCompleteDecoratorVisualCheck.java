@@ -45,11 +45,23 @@ public class AutoCompleteDecoratorVisualCheck extends InteractiveTestCase {
     public static void main(String[] args) throws Exception {
         AutoCompleteDecoratorVisualCheck test = new AutoCompleteDecoratorVisualCheck();
         try {
-            test.runInteractiveTests("interactiveForegroundColorCheck");
+            test.runInteractiveTests("interactiveCaseSensitivityTest");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
         }
+    }
+
+    public void interactiveCaseSensitivityTest() {
+        JComboBox combo = new JComboBox(new String[] {
+                "Index", "index", "INDEX", "iNdEx", "in", "IN", "iN"
+        });
+
+        AutoCompleteDecorator.decorate(combo);
+
+        JFrame frame = wrapInFrame(combo, "interactiveCaseSensitivityTest");
+        frame.pack();
+        frame.setVisible(true);
     }
 
     public void interactiveCompletionAtTopTest() {

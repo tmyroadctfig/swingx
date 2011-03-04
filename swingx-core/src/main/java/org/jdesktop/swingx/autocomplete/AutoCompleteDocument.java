@@ -8,18 +8,19 @@
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 package org.jdesktop.swingx.autocomplete;
 
+import java.util.Comparator;
 import static org.jdesktop.swingx.autocomplete.ObjectToStringConverter.DEFAULT_IMPLEMENTATION;
 
 import javax.swing.UIManager;
@@ -67,13 +68,13 @@ public class AutoCompleteDocument implements Document {
         public void removeUndoableEditListener(UndoableEditListener listener) {
             listenerList.remove(UndoableEditListener.class, listener);
         }
-        
+
         /**
          * {@inheritDoc}
          */
         public void changedUpdate(DocumentEvent e) {
             e = new DelegatingDocumentEvent(AutoCompleteDocument.this, e);
-            
+
             // Guaranteed to return a non-null array
             Object[] listeners = listenerList.getListenerList();
             // Process the listeners last to first, notifying
@@ -84,7 +85,7 @@ public class AutoCompleteDocument implements Document {
                     // if (e == null)
                     // e = new ListSelectionEvent(this, firstIndex, lastIndex);
                     ((DocumentListener)listeners[i+1]).changedUpdate(e);
-                }          
+                }
             }
         }
 
@@ -93,7 +94,7 @@ public class AutoCompleteDocument implements Document {
          */
         public void insertUpdate(DocumentEvent e) {
             e = new DelegatingDocumentEvent(AutoCompleteDocument.this, e);
-            
+
             // Guaranteed to return a non-null array
             Object[] listeners = listenerList.getListenerList();
             // Process the listeners last to first, notifying
@@ -104,7 +105,7 @@ public class AutoCompleteDocument implements Document {
                     // if (e == null)
                     // e = new ListSelectionEvent(this, firstIndex, lastIndex);
                     ((DocumentListener)listeners[i+1]).insertUpdate(e);
-                }          
+                }
             }
         }
 
@@ -113,7 +114,7 @@ public class AutoCompleteDocument implements Document {
          */
         public void removeUpdate(DocumentEvent e) {
             e = new DelegatingDocumentEvent(AutoCompleteDocument.this, e);
-            
+
             // Guaranteed to return a non-null array
             Object[] listeners = listenerList.getListenerList();
             // Process the listeners last to first, notifying
@@ -124,7 +125,7 @@ public class AutoCompleteDocument implements Document {
                     // if (e == null)
                     // e = new ListSelectionEvent(this, firstIndex, lastIndex);
                     ((DocumentListener)listeners[i+1]).removeUpdate(e);
-                }          
+                }
             }
         }
 
@@ -133,7 +134,7 @@ public class AutoCompleteDocument implements Document {
          */
         public void undoableEditHappened(UndoableEditEvent e) {
             e = new UndoableEditEvent(AutoCompleteDocument.this, e.getEdit());
-            
+
             // Guaranteed to return a non-null array
             Object[] listeners = listenerList.getListenerList();
             // Process the listeners last to first, notifying
@@ -144,34 +145,64 @@ public class AutoCompleteDocument implements Document {
                 // if (e == null)
                 // e = new ListSelectionEvent(this, firstIndex, lastIndex);
                 ((UndoableEditListener)listeners[i+1]).undoableEditHappened(e);
-                }          
+                }
             }
         }
     }
-    
+
     /**
      * true, if only items from the adaptors's list can be entered
      * false, otherwise (selected item might not be in the adaptors's list)
      */
     protected boolean strictMatching;
-    
+
     protected final Document delegate;
-    
+
     /** Flag to indicate if adaptor.setSelectedItem has been called.
      * Subsequent calls to remove/insertString should be ignored
      * as they are likely have been caused by the adapted Component that
      * is trying to set the text for the selected component.*/
     boolean selecting = false;
-    
+
     /**
      * The adaptor that is used to find and select items.
      */
     AbstractAutoCompleteAdaptor adaptor;
-    
+
     ObjectToStringConverter stringConverter;
-    
+
     private final Handler handler;
-    
+
+    // Note: these comparators do not impose any ordering - e.g. they do not ensure that sgn(compare(x, y)) == -sgn(compare(y, x))
+    private static final Comparator<String> EQUALS_IGNORE_CASE = new Comparator<String>() {
+        @Override
+        public int compare(String o1, String o2) {
+            return o1.equalsIgnoreCase(o2) ? 0 : -1;
+        }
+    };
+
+    private static final Comparator<String> STARTS_WITH_IGNORE_CASE = new Comparator<String>() {
+        @Override
+        public int compare(String o1, String o2) {
+            if (o1.length() < o2.length()) return -1;
+            return o1.regionMatches(true, 0, o2, 0, o2.length()) ? 0 : -1;
+        }
+    };
+
+    private static final Comparator<String> EQUALS = new Comparator<String>() {
+        @Override
+        public int compare(String o1, String o2) {
+            return o1.equals(o2) ? 0 : -1;
+        }
+    };
+
+    private static final Comparator<String> STARTS_WITH = new Comparator<String>() {
+        @Override
+        public int compare(String o1, String o2) {
+            return o1.startsWith(o2) ? 0 : -1;
+        }
+    };
+
     /**
      * Creates a new AutoCompleteDocument for the given AbstractAutoCompleteAdaptor.
      * @param adaptor The adaptor that will be used to find and select matching
@@ -187,10 +218,10 @@ public class AutoCompleteDocument implements Document {
         this.strictMatching = strictMatching;
         this.stringConverter = stringConverter == null ? DEFAULT_IMPLEMENTATION : stringConverter;
         this.delegate = delegate == null ? createDefaultDocument() : delegate;
-        
+
         handler = new Handler();
         this.delegate.addDocumentListener(handler);
-        
+
         // Handle initially selected object
         Object selected = adaptor.getSelectedItem();
         if (selected != null) {
@@ -200,8 +231,8 @@ public class AutoCompleteDocument implements Document {
         }
         this.adaptor.markEntireText();
     }
-    
-    
+
+
     /**
      * Creates a new AutoCompleteDocument for the given AbstractAutoCompleteAdaptor.
      * @param adaptor The adaptor that will be used to find and select matching
@@ -213,7 +244,7 @@ public class AutoCompleteDocument implements Document {
     public AutoCompleteDocument(AbstractAutoCompleteAdaptor adaptor, boolean strictMatching, ObjectToStringConverter stringConverter) {
         this(adaptor, strictMatching, stringConverter, null);
     }
-    
+
     /**
      * Creates a new AutoCompleteDocument for the given AbstractAutoCompleteAdaptor.
      * @param strictMatching true, if only items from the adaptor's list should
@@ -228,13 +259,13 @@ public class AutoCompleteDocument implements Document {
     /**
      * Creates the default backing document when no delegate is passed to this
      * document.
-     * 
+     *
      * @return the default backing document
      */
     protected Document createDefaultDocument() {
         return new PlainDocument();
     }
-    
+
     public void remove(int offs, int len) throws BadLocationException {
         // return immediately when selecting an item
         if (selecting) return;
@@ -244,7 +275,7 @@ public class AutoCompleteDocument implements Document {
             adaptor.getTextComponent().setCaretPosition(offs);
         }
     }
-    
+
     public void insertString(int offs, String str, AttributeSet a) throws BadLocationException {
         // return immediately when selecting an item
         if (selecting) return;
@@ -253,14 +284,14 @@ public class AutoCompleteDocument implements Document {
         // lookup and select a matching item
         LookupResult lookupResult;
         String pattern = getText(0, getLength());
-        
+
         if(pattern == null || pattern.length() == 0) {
             lookupResult = new LookupResult(null, "");
             setSelectedItem(lookupResult.matchingItem, lookupResult.matchingString);
         } else {
             lookupResult = lookupItem(pattern);
         }
-        
+
         if (lookupResult.matchingItem != null) {
             setSelectedItem(lookupResult.matchingItem, lookupResult.matchingString);
         } else {
@@ -271,7 +302,7 @@ public class AutoCompleteDocument implements Document {
                 // imitate no insert (later on offs will be incremented by
                 // str.length(): selection won't move forward)
                 offs = str == null ? offs : offs - str.length();
-                
+
                 if (str != null && !str.isEmpty()) {
                     // provide feedback to the user that his input has been received but can not be accepted
                     UIManager.getLookAndFeel().provideErrorFeedback(adaptor.getTextComponent());
@@ -283,18 +314,18 @@ public class AutoCompleteDocument implements Document {
                 setSelectedItem(lookupResult.matchingItem, lookupResult.matchingString);
             }
         }
-        
+
         setText(lookupResult.matchingString);
-        
+
         // select the completed part
         int len = str == null ? 0 : str.length();
         offs = lookupResult.matchingString == null ? 0 : offs + len;
         adaptor.markText(offs);
     }
-    
+
     /**
      * Sets the text of this AutoCompleteDocument to the given text.
-     * 
+     *
      * @param text the text that will be set for this document
      */
     private void setText(String text) {
@@ -306,7 +337,7 @@ public class AutoCompleteDocument implements Document {
             throw new RuntimeException(e.toString());
         }
     }
-    
+
     /**
      * Selects the given item using the AbstractAutoCompleteAdaptor.
      * @param itemAsString string representation of the item to be selected
@@ -318,58 +349,68 @@ public class AutoCompleteDocument implements Document {
         adaptor.setSelectedItemAsString(itemAsString);
         selecting = false;
     }
-    
+
     /**
      * Searches for an item that matches the given pattern. The AbstractAutoCompleteAdaptor
      * is used to access the candidate items. The match is not case-sensitive
      * and will only match at the beginning of each item's string representation.
-     * 
+     *
      * @param pattern the pattern that should be matched
      * @return the first item that matches the pattern or <code>null</code> if no item matches
      */
     private LookupResult lookupItem(String pattern) {
         Object selectedItem = adaptor.getSelectedItem();
-        
-        String[] possibleStrings;
 
-        // iterate over all items to find an exact match
-        for (int i=0, n=adaptor.getItemCount(); i < n; i++) {
-            Object currentItem = adaptor.getItem(i);
-            possibleStrings = stringConverter.getPossibleStringsForItem(currentItem);
-            if (possibleStrings!=null) {
-                // current item exactly matches the pattern?
-                for (int j=0; j<possibleStrings.length; j++) {
-                    if (possibleStrings[j].equalsIgnoreCase(pattern)) {
-                        return new LookupResult(currentItem, possibleStrings[j]);
-                    }
-                }
-            }
-        }
-        // check if the currently selected item matches
-        possibleStrings = stringConverter.getPossibleStringsForItem(selectedItem);
-        if (possibleStrings!=null) {
-            for (int i=0; i<possibleStrings.length; i++) {
-                if (startsWithIgnoreCase(possibleStrings[i], pattern)) {
-                    return new LookupResult(selectedItem, possibleStrings[i]);
-                }
-            }
-        }
-        // search for any matching item, if the currently selected does not match
-        for (int i=0, n=adaptor.getItemCount(); i < n; i++) {
-            Object currentItem = adaptor.getItem(i);
-            possibleStrings = stringConverter.getPossibleStringsForItem(currentItem);
-            if (possibleStrings!=null) {
-                for (int j=0; j<possibleStrings.length; j++) {
-                    if (startsWithIgnoreCase(possibleStrings[j], pattern)) {
-                        return new LookupResult(currentItem, possibleStrings[j]);
-                    }
-                }
-            }
-        }
+        LookupResult lookupResult;
+
+        // first try: case sensitive
+
+        lookupResult = lookupItem(pattern, EQUALS);
+        if (lookupResult != null) return lookupResult;
+
+        lookupResult = lookupOneItem(selectedItem, pattern, STARTS_WITH);
+        if (lookupResult != null) return lookupResult;
+
+        lookupResult = lookupItem(pattern, STARTS_WITH);
+        if (lookupResult != null) return lookupResult;
+
+        // second try: ignore case
+
+        lookupResult = lookupItem(pattern, EQUALS_IGNORE_CASE);
+        if (lookupResult != null) return lookupResult;
+
+        lookupResult = lookupOneItem(selectedItem, pattern, STARTS_WITH_IGNORE_CASE);
+        if (lookupResult != null) return lookupResult;
+
+        lookupResult = lookupItem(pattern, STARTS_WITH_IGNORE_CASE);
+        if (lookupResult != null) return lookupResult;
+
         // no item starts with the pattern => return null
         return new LookupResult(null, "");
     }
-    
+
+    private LookupResult lookupOneItem(Object item, String pattern, Comparator<String> comparator) {
+        String[] possibleStrings = stringConverter.getPossibleStringsForItem(item);
+        if (possibleStrings != null) {
+            for (int j = 0; j < possibleStrings.length; j++) {
+                if (comparator.compare(possibleStrings[j], pattern) == 0) {
+                    return new LookupResult(item, possibleStrings[j]);
+                }
+            }
+        }
+        return null;
+    }
+
+    private LookupResult lookupItem(String pattern, Comparator<String> comparator) {
+        // iterate over all items and return first match
+        for (int i = 0, n = adaptor.getItemCount(); i < n; i++) {
+            Object currentItem = adaptor.getItem(i);
+            LookupResult result = lookupOneItem(currentItem, pattern, comparator);
+            if (result != null) return result;
+        }
+        return null;
+    }
+
     private static class LookupResult {
         Object matchingItem;
         String matchingString;
@@ -377,18 +418,6 @@ public class AutoCompleteDocument implements Document {
             this.matchingItem = matchingItem;
             this.matchingString = matchingString;
         }
-    }
-    
-    /**
-     * Returns true if <code>base</code> starts with <code>prefix</code> (ignoring case).
-     * @param base the string to be checked
-     * @param prefix the prefix to check for
-     * @return true if <code>base</code> starts with <code>prefix</code>; false otherwise
-     */
-    //TODO entry point for handling 739
-    private boolean startsWithIgnoreCase(String base, String prefix) {
-        if (base.length() < prefix.length()) return false;
-        return base.regionMatches(true, 0, prefix, 0, prefix.length());
     }
 
     /**
