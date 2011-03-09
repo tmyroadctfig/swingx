@@ -20,6 +20,8 @@
  */
 package org.jdesktop.swingx;
 
+import static org.jdesktop.swingx.JXCollapsiblePane.ANIMATION_STATE_KEY;
+
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
@@ -236,13 +238,19 @@ public class JXTaskPane extends JPanel implements
       setAnimated(!Boolean.FALSE.equals(UIManager.get("TaskPane.animate")));
       
       // listen for animation events and forward them to registered listeners
-      collapsePane.addPropertyChangeListener(
-        JXCollapsiblePane.ANIMATION_STATE_KEY, new PropertyChangeListener() {
-          @Override
-        public void propertyChange(PropertyChangeEvent evt) {
-            JXTaskPane.this.firePropertyChange(evt.getPropertyName(), evt
-              .getOldValue(), evt.getNewValue());
-          }
+        collapsePane.addPropertyChangeListener(ANIMATION_STATE_KEY, new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                JXTaskPane.this.firePropertyChange(evt.getPropertyName(), evt.getOldValue(),
+                        evt.getNewValue());
+            }
+        });
+        collapsePane.addPropertyChangeListener("collapsed", new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                JXTaskPane.this.firePropertyChange(evt.getPropertyName(), evt.getOldValue(),
+                        evt.getNewValue());
+            }
         });
   }
 
@@ -406,6 +414,10 @@ public class JXTaskPane extends JPanel implements
   
     /**
      * Expands or collapses this group.
+     * <p>
+     * As of SwingX 1.6.3, the property change event only fires when the
+     * state is accurate.  As such, animated task pane fire once the 
+     * animation is complete.
      * 
      * @param collapsed
      *                true to collapse the group, false to expand it
@@ -417,7 +429,6 @@ public class JXTaskPane extends JPanel implements
         boolean oldValue = isCollapsed();
         this.collapsed = collapsed;
         collapsePane.setCollapsed(collapsed);
-        firePropertyChange("collapsed", oldValue, isCollapsed());
     }
     
     /**

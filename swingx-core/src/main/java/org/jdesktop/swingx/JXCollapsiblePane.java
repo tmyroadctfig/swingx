@@ -213,7 +213,11 @@ public class JXCollapsiblePane extends JXPanel {
      * <li><code>collapsed</code> when the animation ends and the pane is
      * collapsed
      * </ul>
+     * @deprecated (pre-1.6.3) will no longer be supported with improved collapse 
+     * notification
+     * @see #setCollapsed(boolean)
      */
+    @Deprecated
     public final static String ANIMATION_STATE_KEY = "animationState";
 
     /**
@@ -254,6 +258,7 @@ public class JXCollapsiblePane extends JXPanel {
     private WrapperContainer wrapper;
     private boolean useAnimation = true;
     private AnimationParams animationParams;
+    private boolean collapseFiringState;
 
     /**
      * Constructs a new JXCollapsiblePane with a {@link JXPanel} as content pane
@@ -397,7 +402,7 @@ public class JXCollapsiblePane extends JXPanel {
     }
 
     /**
-     * Overriden to redirect call to the content pane.
+     * Overridden to redirect call to the content pane.
      */
     @Override
     public void setLayout(LayoutManager mgr) {
@@ -408,7 +413,7 @@ public class JXCollapsiblePane extends JXPanel {
     }
 
     /**
-     * Overriden to redirect call to the content pane.
+     * Overridden to redirect call to the content pane.
      */
     @Override
     protected void addImpl(Component comp, Object constraints, int index) {
@@ -416,7 +421,7 @@ public class JXCollapsiblePane extends JXPanel {
     }
 
     /**
-     * Overriden to redirect call to the content pane
+     * Overridden to redirect call to the content pane
      */
     @Override
     public void remove(Component comp) {
@@ -424,7 +429,7 @@ public class JXCollapsiblePane extends JXPanel {
     }
 
     /**
-     * Overriden to redirect call to the content pane.
+     * Overridden to redirect call to the content pane.
      */
     @Override
     public void remove(int index) {
@@ -432,7 +437,7 @@ public class JXCollapsiblePane extends JXPanel {
     }
 
     /**
-     * Overriden to redirect call to the content pane.
+     * Overridden to redirect call to the content pane.
      */
     @Override
     public void removeAll() {
@@ -547,6 +552,11 @@ public class JXCollapsiblePane extends JXPanel {
      * this call collapses the JXCollapsiblePane, such that the entire
      * JXCollapsiblePane will be invisible. If {@link #isAnimated()} returns true,
      * the collapse will be accompanied by an animation.
+     * 
+     * <p>
+     * As of SwingX 1.6.3, JXCollapsiblePane only fires property change events when
+     * the component's state is accurate.  This means that animated collapsible 
+     * pane's only fire events once the animation is complete.
      *
      * @see #isAnimated()
      * @see #setAnimated(boolean)
@@ -555,36 +565,43 @@ public class JXCollapsiblePane extends JXPanel {
      *    preferred="true"
      */
     public void setCollapsed(boolean val) {
-        if (collapsed != val) {
-            collapsed = val;
-            if (isAnimated()) {
-                if (collapsed) {
-                    int dimension = direction.isVertical() ?
-                                    wrapper.getHeight() : wrapper.getWidth();
-                    setAnimationParams(new AnimationParams(30,
-                                                           Math.max(8, dimension / 10), 1.0f, 0.01f));
-                    animator.reinit(dimension, 0);
-                    animateTimer.start();
-                } else {
-                    int dimension = direction.isVertical() ?
-                                    wrapper.getHeight() : wrapper.getWidth();
-                    int preferredDimension = direction.isVertical() ?
-                                             getContentPane().getPreferredSize().height :
-                                             getContentPane().getPreferredSize().width;
-                    int delta = Math.max(8, preferredDimension / 10);
-
-                    setAnimationParams(new AnimationParams(30, delta, 0.01f, 1.0f));
-                    animator.reinit(dimension, preferredDimension);
-                    wrapper.getView().setVisible(true);
-                    animateTimer.start();
-                }
-            } else {
-                wrapper.collapsedState = collapsed;
-                wrapper.getView().setVisible(!collapsed);
-                revalidate();
+        boolean oldValue = isCollapsed();
+        this.collapsed = val;
+        
+        if (isAnimated()) {
+            if (oldValue == isCollapsed()) {
+                return;
             }
+            
+            // this ensures that if the user reverses the animation
+            // before completion that no property change is fired
+            if (!animateTimer.isRunning()) {
+                collapseFiringState = oldValue;
+            }
+            
+            if (oldValue) {
+                int dimension = direction.isVertical() ? wrapper.getHeight() : wrapper.getWidth();
+                int preferredDimension = direction.isVertical() ? getContentPane()
+                        .getPreferredSize().height : getContentPane().getPreferredSize().width;
+                int delta = Math.max(8, preferredDimension / 10);
+
+                setAnimationParams(new AnimationParams(30, delta, 0.01f, 1.0f));
+                animator.reinit(dimension, preferredDimension);
+                wrapper.getView().setVisible(true);
+            } else {
+                int dimension = direction.isVertical() ? wrapper.getHeight() : wrapper.getWidth();
+                setAnimationParams(new AnimationParams(30, Math.max(8, dimension / 10), 1.0f, 0.01f));
+                animator.reinit(dimension, 0);
+            }
+            
+            animateTimer.start();
+        } else {
+            wrapper.collapsedState = isCollapsed();
+            wrapper.getView().setVisible(!isCollapsed());
+            revalidate();
             repaint();
-            firePropertyChange("collapsed", !collapsed, collapsed);
+            
+            firePropertyChange("collapsed", oldValue, isCollapsed());
         }
     }
 
@@ -807,12 +824,14 @@ public class JXCollapsiblePane extends JXPanel {
                         validate();
                         JXCollapsiblePane.this.firePropertyChange(ANIMATION_STATE_KEY, null,
                                                                   "expanded");
+                        JXCollapsiblePane.this.firePropertyChange("collapsed", collapseFiringState, false);
                         return;
                     } else {
                         wrapper.collapsedState = true;
                         wrapper.getView().setVisible(false);
                         JXCollapsiblePane.this.firePropertyChange(ANIMATION_STATE_KEY, null,
                                                                   "collapsed");
+                        JXCollapsiblePane.this.firePropertyChange("collapsed", collapseFiringState, true);
                     }
                 }
 
