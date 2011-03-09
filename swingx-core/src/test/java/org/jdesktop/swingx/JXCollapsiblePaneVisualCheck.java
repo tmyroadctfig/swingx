@@ -53,7 +53,7 @@ public class JXCollapsiblePaneVisualCheck extends InteractiveTestCase {
         JXCollapsiblePaneVisualCheck test = new JXCollapsiblePaneVisualCheck();
         try {
 //            test.runInteractiveTests();
-            test.runInteractiveTests("interactive.*Zero.*");
+            test.runInteractiveTests("interactiveDialogWithCollapsible.*");
           } catch (Exception e) {
               System.err.println("exception when executing interactive tests:");
               e.printStackTrace();
@@ -78,7 +78,7 @@ public class JXCollapsiblePaneVisualCheck extends InteractiveTestCase {
         PropertyChangeListener l = new PropertyChangeListener() {
 
             public void propertyChange(PropertyChangeEvent evt) {
-                if ("animationState".equals(evt.getPropertyName())) {
+                if ("collapsed".equals(evt.getPropertyName())) {
                     dialog.pack();
                 }
             }
@@ -104,7 +104,7 @@ public class JXCollapsiblePaneVisualCheck extends InteractiveTestCase {
         PropertyChangeListener l = new PropertyChangeListener() {
 
             public void propertyChange(PropertyChangeEvent evt) {
-                if ("animationState".equals(evt.getPropertyName())) {
+                if ("collapsed".equals(evt.getPropertyName())) {
                     dialog.pack();
                 }
             }
