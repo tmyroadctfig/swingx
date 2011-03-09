@@ -21,6 +21,7 @@
 package org.jdesktop.swingx;
 
 import java.awt.BorderLayout;
+import java.awt.ComponentOrientation;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusAdapter;
@@ -28,11 +29,14 @@ import java.awt.event.FocusEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
+import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingConstants;
@@ -53,14 +57,40 @@ public class JXCollapsiblePaneVisualCheck extends InteractiveTestCase {
         JXCollapsiblePaneVisualCheck test = new JXCollapsiblePaneVisualCheck();
         try {
 //            test.runInteractiveTests();
-            test.runInteractiveTests("interactiveDialogWithCollapsible.*");
+            test.runInteractiveTests("interactiveBidiDirectionTest");
           } catch (Exception e) {
               System.err.println("exception when executing interactive tests:");
               e.printStackTrace();
           } 
     }
-
     
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void createAndAddMenus(JMenuBar bar, final JComponent component) {
+        super.createAndAddMenus(bar, component);
+        
+        JMenu menu = new JMenu("Tools");
+        menu.add(new AbstractAction("Toggle Orientation") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (component.getParent().getComponentOrientation().isLeftToRight()) {
+                    component.getParent().applyComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+                } else {
+                    component.getParent().applyComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+                }
+                
+                if (component.getParent() instanceof JComponent) {
+                    ((JComponent) component.getParent()).revalidate();
+                } else {
+                    component.getParent().invalidate();
+                }
+            }
+        });
+        bar.add(menu);
+    }
+
     /**
      * Issue #1185-swingx: inconsistent change notification of "animatedState"
      * 
@@ -117,8 +147,6 @@ public class JXCollapsiblePaneVisualCheck extends InteractiveTestCase {
         dialog.setVisible(true);
     }
     
-   
-
     /**
      * SwingX 578: Ensure that the directions work correctly.
      */
@@ -159,6 +187,45 @@ public class JXCollapsiblePaneVisualCheck extends InteractiveTestCase {
     	frame.setVisible(true);
     }
     
+    /**
+     * SwingX 839: Ensure that the directions work correctly.
+     */
+    public void interactiveBidiDirectionTest() {
+        JXCollapsiblePane start = new JXCollapsiblePane(Direction.START);
+        JLabel label = new JLabel("<html>start1<br>start2<br>start3<br>start4<br>start5<br>start6</html>");
+        label.setHorizontalAlignment(SwingConstants.CENTER);
+        start.add(label);
+        JXCollapsiblePane end = new JXCollapsiblePane(Direction.END);
+        label = new JLabel("<html>end1<br>end2<br>end3<br>end4<br>end5<br>end6</html>");
+        label.setHorizontalAlignment(SwingConstants.CENTER);
+        end.add(label);
+        JXCollapsiblePane leading = new JXCollapsiblePane(Direction.LEADING);
+        leading.add(new JLabel("leading1leading2leading3leading4leading5leading6"));
+        JXCollapsiblePane trailing = new JXCollapsiblePane(Direction.TRAILING);
+        trailing.add(new JLabel("traling1trailing2trailing3trailing4trailing5trailing6"));
+        
+        JPanel panel = new JPanel(new GridLayout(2, 2));
+        JButton button = new JButton(start.getActionMap().get(JXCollapsiblePane.TOGGLE_ACTION));
+        button.setText("START");
+        panel.add(button);
+        button = new JButton(end.getActionMap().get(JXCollapsiblePane.TOGGLE_ACTION));
+        button.setText("END");
+        panel.add(button);
+        button = new JButton(leading.getActionMap().get(JXCollapsiblePane.TOGGLE_ACTION));
+        button.setText("LEADING");
+        panel.add(button);
+        button = new JButton(trailing.getActionMap().get(JXCollapsiblePane.TOGGLE_ACTION));
+        button.setText("TRAILING");
+        panel.add(button);
+        
+        JFrame frame = wrapInFrame(panel, "Direction Animation Test");
+        frame.add(start, BorderLayout.PAGE_START);
+        frame.add(end, BorderLayout.PAGE_END);
+        frame.add(leading, BorderLayout.LINE_START);
+        frame.add(trailing, BorderLayout.LINE_END);
+        frame.pack();
+        frame.setVisible(true);
+    }
     
     /**
      * Test case for bug 1076.
