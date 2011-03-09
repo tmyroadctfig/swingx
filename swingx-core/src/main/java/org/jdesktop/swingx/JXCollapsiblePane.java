@@ -22,6 +22,7 @@ package org.jdesktop.swingx;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.ComponentOrientation;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.LayoutManager;
@@ -183,7 +184,48 @@ public class JXCollapsiblePane extends JXPanel {
         /**
          * Collapses down. Suitable for {@link BorderLayout#SOUTH}.
          */
-        DOWN(true);
+        DOWN(true),
+        
+        /**
+         * Collapses toward the leading edge. Suitable for {@link BorderLayout#LINE_START}.
+         */
+        LEADING(false) {
+            @Override
+            Direction getFixedDirection(ComponentOrientation co) {
+                return co.isLeftToRight() ? LEFT : RIGHT;
+            }
+        },
+        
+        /**
+         * Collapses toward the trailing edge. Suitable for {@link BorderLayout#LINE_END}.
+         */
+        TRAILING(false) {
+            @Override
+            Direction getFixedDirection(ComponentOrientation co) {
+                return co.isLeftToRight() ? RIGHT : LEFT;
+            }
+        },
+        
+        /**
+         * Collapses toward the starting edge. Suitable for {@link BorderLayout#PAGE_START}.
+         */
+        START(true) {
+            @Override
+            Direction getFixedDirection(ComponentOrientation co) {
+                return UP;
+            }
+        },
+        
+        /**
+         * Collapses toward the ending edge. Suitable for {@link BorderLayout#PAGE_END}.
+         */
+        END(true) {
+            @Override
+            Direction getFixedDirection(ComponentOrientation co) {
+                return DOWN;
+            }
+        },
+        ;
 
         private final boolean vertical;
 
@@ -199,6 +241,10 @@ public class JXCollapsiblePane extends JXPanel {
          */
         public boolean isVertical() {
             return vertical;
+        }
+        
+        Direction getFixedDirection(ComponentOrientation co) {
+            return this;
         }
     }
     
@@ -492,6 +538,18 @@ public class JXCollapsiblePane extends JXPanel {
         return useAnimation;
     }
     
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setComponentOrientation(ComponentOrientation o) {
+        if (animateTimer.isRunning()) {
+            throw new IllegalStateException("cannot be change component orientation while collapsing.");
+        }
+        
+        super.setComponentOrientation(o);
+    }
+
     /**
      * Changes the direction of this collapsible pane. Doing so changes the
      * layout of the underlying content pane. If the chosen direction is
@@ -868,7 +926,7 @@ public class JXCollapsiblePane extends JXPanel {
                     bounds.height = newDimension;
                     wrapper.setBounds(bounds);
                     
-                    if (direction == Direction.DOWN) {
+                    if (direction.getFixedDirection(getComponentOrientation()) == Direction.DOWN) {
                         wrapper.setViewPosition(new Point(0, wrapper.getView().getPreferredSize().height - newDimension));
                     } else {
                         wrapper.setViewPosition(new Point(0, newDimension));
@@ -882,7 +940,7 @@ public class JXCollapsiblePane extends JXPanel {
                     bounds.width = newDimension;
                     wrapper.setBounds(bounds);
                     
-                    if (direction == Direction.RIGHT) {
+                    if (direction.getFixedDirection(getComponentOrientation()) == Direction.RIGHT) {
                         wrapper.setViewPosition(new Point(wrapper.getView().getPreferredSize().width - newDimension, 0));
                     } else {
                         wrapper.setViewPosition(new Point(newDimension, 0));
