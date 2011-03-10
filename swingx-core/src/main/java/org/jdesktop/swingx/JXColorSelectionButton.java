@@ -65,6 +65,7 @@ public class JXColorSelectionButton extends JButton {
     private BufferedImage colorwell;
     private JDialog dialog = null;
     private JColorChooser chooser = null;
+    private Color initialColor = null;
     
     /**
      * Creates a new instance of JXColorSelectionButton
@@ -179,8 +180,6 @@ public class JXColorSelectionButton extends JButton {
      * Conditionally create and show the color chooser dialog.
      */
     private void showDialog() {
-        final Color oldColor = getBackground();
-        
         if (dialog == null) {
             dialog = JColorChooser.createDialog(JXColorSelectionButton.this,
                     "Choose a color", true, getChooser(),
@@ -194,7 +193,7 @@ public class JXColorSelectionButton extends JButton {
             },
             new ActionListener() {
                 public void actionPerformed(ActionEvent actionEvent) {
-                    setBackground(oldColor);
+                    setBackground(initialColor);
                 }
             });
             dialog.getContentPane().add(getChooser());
@@ -202,6 +201,7 @@ public class JXColorSelectionButton extends JButton {
                     new ColorChangeListener(JXColorSelectionButton.this));
         }
         
+        initialColor = getBackground();
         dialog.setVisible(true);
 
     }
