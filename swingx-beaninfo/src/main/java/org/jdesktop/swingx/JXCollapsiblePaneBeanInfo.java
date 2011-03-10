@@ -44,8 +44,8 @@ public class JXCollapsiblePaneBeanInfo extends BeanInfoSupport {
         bd.setValue("isContainer", Boolean.TRUE);
         bd.setValue("containerDelegate", "getContentPane");
         
-        setPreferred(true, "animated", "collapsed", "orientation", "direction");
-        setBound(true, "animated", "collapsed", "orientation", "direction");
+        setPreferred(true, "animated", "collapsed", "direction");
+        setBound(true, "animated", "collapsed", "direction");
         setPropertyEditor(DirectionPropertyEditor.class, "direction");
     }
 
