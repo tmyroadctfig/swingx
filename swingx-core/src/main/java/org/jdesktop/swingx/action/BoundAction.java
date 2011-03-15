@@ -309,7 +309,7 @@ public class BoundAction extends AbstractActionExt {
         while (null != (classOrNull = s.readObject())) {
             Object listenerOrHandler = s.readObject();
             
-            if (listenerOrHandler instanceof EventListener) {
+            if (((Class) classOrNull).isInstance(listenerOrHandler)) {
                 addListener((Class) classOrNull, (EventListener) listenerOrHandler);
             } else {
                 Object method = s.readObject();
