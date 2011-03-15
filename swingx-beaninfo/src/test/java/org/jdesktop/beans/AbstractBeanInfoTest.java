@@ -7,6 +7,7 @@ import static org.jdesktop.test.matchers.Matchers.property;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.argThat;
+import static org.mockito.Mockito.RETURNS_MOCKS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
@@ -138,7 +139,7 @@ public abstract class AbstractBeanInfoTest<T> {
                 result = mock(propertyType);
             }
         } else {
-            result = mock(propertyType);
+            result = mock(propertyType, RETURNS_MOCKS);
         }
         
         return result;
