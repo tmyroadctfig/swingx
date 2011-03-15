@@ -1,7 +1,10 @@
 package org.jdesktop.beans;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.jdesktop.test.SerializableSupport.serialize;
+import static org.jdesktop.test.matchers.Matchers.equivalentTo;
 import static org.jdesktop.test.matchers.Matchers.property;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.mock;
@@ -15,6 +18,7 @@ import java.beans.EventSetDescriptor;
 import java.beans.Introspector;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyDescriptor;
+import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -138,6 +142,21 @@ public abstract class AbstractBeanInfoTest<T> {
         }
         
         return result;
+    }
+
+    /**
+     * A simple serialization check. Ensures that the reconstituted object is equivalent to the
+     * original.
+     */
+    @Test
+    public void testSerialization() {
+        if (!Serializable.class.isInstance(instance)) {
+            return;
+        }
+        
+        T serialized = serialize(instance);
+        
+        assertThat(serialized, is(equivalentTo(instance)));
     }
     
     @After
