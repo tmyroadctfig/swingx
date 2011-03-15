@@ -27,6 +27,12 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.beans.EventHandler;
 import java.beans.Statement;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Proxy;
 import java.util.EventListener;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -42,12 +48,13 @@ import javax.swing.event.EventListenerList;
  * the TargetManager.
  *
  * @author Mark Davidson
+ * @author Karl Schaefer (serialization support)
  */
 public class BoundAction extends AbstractActionExt {
-    private static final Logger LOG = Logger.getLogger(BoundAction.class
-            .getName());
+    private static final Logger LOG = Logger.getLogger(BoundAction.class .getName());
+    
     // Holds the listeners
-    private EventListenerList listeners;
+    private transient EventListenerList listeners;
 
     public BoundAction() {
         this("BoundAction");
@@ -124,11 +131,11 @@ public class BoundAction extends AbstractActionExt {
      */
     public void registerCallback(Object handler, String method) {
         if (isStateAction()) {
-            // Create a handler for toogle type actions.
+            // Create a handler for toggle type actions.
             addItemListener(new BooleanInvocationHandler(handler, method));
         } else {
-            // Create a new ActionListener using the dynamic proxy api.
-            addActionListener((ActionListener)EventHandler.create(ActionListener.class,
+            // Create a new ActionListener using the dynamic proxy API.
+            addActionListener(EventHandler.create(ActionListener.class,
                                                                   handler, method));
         }
     }
@@ -259,4 +266,56 @@ public class BoundAction extends AbstractActionExt {
         }
     }
 
+    private void writeObject(ObjectOutputStream s) throws IOException {
+        s.defaultWriteObject();
+
+        if (listeners != null) {
+            Object[] list = listeners.getListenerList();
+            
+            for (int i = 1; i < list.length; i += 2) {
+                if (Proxy.isProxyClass(list[i].getClass())) {
+                    InvocationHandler h = Proxy.getInvocationHandler(list[i]);
+                    
+                    if (h instanceof EventHandler && ((EventHandler) h).getTarget() instanceof Serializable) {
+                        EventHandler eh = (EventHandler) h;
+                        
+                        s.writeObject(list[i - 1]);
+                        s.writeObject(eh.getTarget());
+                        s.writeObject(eh.getAction());
+                    }
+                } else if (list[i] instanceof Serializable) {
+                    s.writeObject(list[i - 1]);
+                    s.writeObject(list[i]);
+                } else if (list[i] instanceof BooleanInvocationHandler) {
+                    BooleanInvocationHandler bih = (BooleanInvocationHandler) list[i];
+                    
+                    s.writeObject(list[i - 1]);
+                    s.writeObject(bih.trueStatement.getTarget());
+                    s.writeObject(bih.trueStatement.getMethodName());
+                }
+            }
+        }
+
+        s.writeObject(null);
+    }
+
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    private void readObject(ObjectInputStream s) throws ClassNotFoundException,
+            IOException {
+        s.defaultReadObject();
+
+        Object classOrNull;
+        
+        while (null != (classOrNull = s.readObject())) {
+            Object listenerOrHandler = s.readObject();
+            
+            if (listenerOrHandler instanceof EventListener) {
+                addListener((Class) classOrNull, (EventListener) listenerOrHandler);
+            } else {
+                Object method = s.readObject();
+                
+                registerCallback(listenerOrHandler, (String) method);
+            }
+        }
+    }
 }
