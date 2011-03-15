@@ -22,6 +22,7 @@ package org.jdesktop.swingx;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.io.Serializable;
 
 import javax.swing.JComponent;
 import javax.swing.UIManager;
@@ -33,7 +34,7 @@ import org.jdesktop.swingx.painter.Painter;
  * 
  * @author kschaefer
  */
-class BackgroundPainter implements Painter<JComponent> {
+class BackgroundPainter implements Painter<JComponent>, Serializable {
     private final Color color;
     
     public BackgroundPainter(Color color) {
