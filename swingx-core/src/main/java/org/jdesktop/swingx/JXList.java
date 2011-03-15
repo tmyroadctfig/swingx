@@ -219,7 +219,7 @@ public class JXList extends JList {
     private ListRolloverController<JXList> linkController;
 
     /** A wrapper around the default renderer enabling decoration. */
-    private DelegatingRenderer delegatingRenderer;
+    private transient DelegatingRenderer delegatingRenderer;
 
     private Searchable searchable;
 
