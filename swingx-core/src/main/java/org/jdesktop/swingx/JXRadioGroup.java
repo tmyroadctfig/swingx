@@ -83,8 +83,6 @@ public class JXRadioGroup<T> extends JPanel {
 
     private ActionSelectionListener actionHandler;
 
-    private List<ActionListener> actionListeners;
-
     /**
      * Create a default JXRadioGroup with a default layout axis of {@link BoxLayout#X_AXIS}.
      */
@@ -284,10 +282,7 @@ public class JXRadioGroup<T> extends JPanel {
      * @see #setSelectedItem
      */
     public void addActionListener(ActionListener l) {
-        if (actionListeners == null) {
-            actionListeners = new ArrayList<ActionListener>();
-        }
-        actionListeners.add(l);
+        listenerList.add(ActionListener.class, l);
     }
 
     /**
@@ -297,9 +292,7 @@ public class JXRadioGroup<T> extends JPanel {
      *            the <code>ActionListener</code> to remove
      */
     public void removeActionListener(ActionListener l) {
-        if (actionListeners != null) {
-            actionListeners.remove(l);
-        }
+        listenerList.remove(ActionListener.class, l);
     }
 
     /**
@@ -310,10 +303,7 @@ public class JXRadioGroup<T> extends JPanel {
      *         array if no listeners have been added
      */
     public ActionListener[] getActionListeners() {
-        if (actionListeners != null) {
-            return actionListeners.toArray(new ActionListener[0]);
-        }
-        return new ActionListener[0];
+        return listenerList.getListeners(ActionListener.class);
     }
 
     /**
@@ -325,11 +315,8 @@ public class JXRadioGroup<T> extends JPanel {
      * @see EventListenerList
      */
     protected void fireActionEvent(ActionEvent e) {
-        if (actionListeners != null) {
-            for (int i = 0; i < actionListeners.size(); i++) {
-                ActionListener l = actionListeners.get(i);
-                l.actionPerformed(e);
-            }
+        for (ActionListener l : getActionListeners()) {
+            l.actionPerformed(e);
         }
     }
 
