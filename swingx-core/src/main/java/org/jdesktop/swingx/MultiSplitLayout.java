@@ -31,6 +31,7 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.IOException;
 import java.io.Reader;
+import java.io.Serializable;
 import java.io.StreamTokenizer;
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -78,7 +79,7 @@ import javax.swing.UIManager;
  * Changes by Luan O'Carroll 
  * 1 Support for visibility added.
  */
-public class MultiSplitLayout implements LayoutManager
+public class MultiSplitLayout implements LayoutManager, Serializable
 {
   public static final int DEFAULT_LAYOUT = 0;
   public static final int NO_MIN_SIZE_LAYOUT = 1;
@@ -1474,7 +1475,7 @@ public void layoutContainer(Container parent)
   /**
    * Base class for the nodes that model a MultiSplitLayout.
    */
-  public static abstract class Node {
+  public static abstract class Node implements Serializable {
     private Split parent = null;
     private Rectangle bounds = new Rectangle();
     private double weight = 0.0;

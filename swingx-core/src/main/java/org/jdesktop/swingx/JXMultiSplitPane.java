@@ -30,6 +30,7 @@ import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
+import java.io.Serializable;
 
 import javax.accessibility.AccessibleContext;
 import javax.accessibility.AccessibleRole;
@@ -174,7 +175,7 @@ public class JXMultiSplitPane extends JPanel implements BackgroundPaintable {
     public static abstract class DividerPainter extends AbstractPainter<Divider> {
     }
 
-    private class DefaultDividerPainter extends DividerPainter {
+    private class DefaultDividerPainter extends DividerPainter implements Serializable {
         @Override
         protected void doPaint(Graphics2D g, Divider divider, int width, int height) {
             if ((divider == activeDivider()) && !isContinuousLayout()) {
