@@ -90,7 +90,7 @@ public class JXTableHeader extends JTableHeader
         LookAndFeelAddons.contribute(new TableHeaderAddon());
     }
 
-    private PropertyChangeListener tablePropertyChangeListener;
+    private transient PropertyChangeListener tablePropertyChangeListener;
     private boolean resortsOnDoubleClick;
 
     /**

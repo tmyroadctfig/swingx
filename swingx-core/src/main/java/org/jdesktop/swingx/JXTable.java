@@ -445,13 +445,13 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
     /**
      * Mouse/Motion/Listener keeping track of mouse moved in cell coordinates.
      */
-    private RolloverProducer rolloverProducer;
+    private transient RolloverProducer rolloverProducer;
 
     /**
      * RolloverController: listens to cell over events and repaints
      * entered/exited rows.
      */
-    private TableRolloverController<JXTable> linkController;
+    private transient TableRolloverController<JXTable> linkController;
 
     /**
      * field to store the autoResizeMode while interactively setting horizontal
@@ -499,7 +499,7 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
     /** flag to indicate that it's unsafe to update sortable-related sorter properties. */
     private boolean ignoreAddColumn;
     /** Registry of per-cell string representation. */
-    private StringValueRegistry stringValueRegistry;
+    private transient StringValueRegistry stringValueRegistry;
 
     private SortOrder[] sortOrderCycle;
     

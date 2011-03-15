@@ -26,10 +26,11 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.logging.Logger;
 
-import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JComponent;
 import javax.swing.KeyStroke;
+
+import org.jdesktop.swingx.UIAction;
 
 /**
  * Controller for "live" behaviour of XXRenderers.
@@ -219,14 +220,14 @@ public abstract class RolloverController<T extends JComponent> implements
      *
      */
     protected Action createExecuteButtonAction() {
-        return new AbstractAction() {
+        return new UIAction(null) {
             @Override
             public void actionPerformed(ActionEvent e) {
                 click(getFocusedCell());
             }
 
             @Override
-            public boolean isEnabled() {
+            public boolean isEnabled(Object sender) {
                 if (component == null || !component.isEnabled() || !component.hasFocus())
                     return false;
                 return isClickable(getFocusedCell());
