@@ -279,19 +279,22 @@ public class BoundAction extends AbstractActionExt {
                     if (h instanceof EventHandler && ((EventHandler) h).getTarget() instanceof Serializable) {
                         EventHandler eh = (EventHandler) h;
                         
-                        s.writeObject(list[i - 1]);
+                        s.writeObject("callback");
                         s.writeObject(eh.getTarget());
                         s.writeObject(eh.getAction());
                     }
-                } else if (list[i] instanceof Serializable) {
-                    s.writeObject(list[i - 1]);
-                    s.writeObject(list[i]);
                 } else if (list[i] instanceof BooleanInvocationHandler) {
                     BooleanInvocationHandler bih = (BooleanInvocationHandler) list[i];
+                    Object target = bih.trueStatement.getTarget();
                     
-                    s.writeObject(list[i - 1]);
-                    s.writeObject(bih.trueStatement.getTarget());
-                    s.writeObject(bih.trueStatement.getMethodName());
+                    if (target instanceof Serializable) {
+                        s.writeObject(BooleanInvocationHandler.class.getName());
+                        s.writeObject(target);
+                        s.writeObject(bih.trueStatement.getMethodName());
+                    }
+                } else if (list[i] instanceof Serializable) {
+                    s.writeObject(((Class<?>) list[i - 1]).getName());
+                    s.writeObject(list[i]);
                 }
             }
         }
@@ -299,22 +302,28 @@ public class BoundAction extends AbstractActionExt {
         s.writeObject(null);
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @SuppressWarnings("unchecked")
     private void readObject(ObjectInputStream s) throws ClassNotFoundException,
             IOException {
         s.defaultReadObject();
 
-        Object classOrNull;
+        Object typeOrNull;
         
-        while (null != (classOrNull = s.readObject())) {
-            Object listenerOrHandler = s.readObject();
-            
-            if (((Class) classOrNull).isInstance(listenerOrHandler)) {
-                addListener((Class) classOrNull, (EventListener) listenerOrHandler);
-            } else {
-                Object method = s.readObject();
+        while (null != (typeOrNull = s.readObject())) {
+            if ("callback".equals(typeOrNull)) {
+                Object handler = s.readObject();
+                String method = (String) s.readObject();
                 
-                registerCallback(listenerOrHandler, (String) method);
+                addActionListener(EventHandler.create(ActionListener.class, handler, method));
+            } else if (BooleanInvocationHandler.class.getName().equals(typeOrNull)) {
+                Object handler = s.readObject();
+                String method = (String) s.readObject();
+                
+                addItemListener(new BooleanInvocationHandler(handler, method));
+            } else {
+                ClassLoader cl = Thread.currentThread().getContextClassLoader();
+                EventListener l = (EventListener) s.readObject();
+                addListener((Class<EventListener>)Class.forName((String)typeOrNull, true, cl), l);
             }
         }
     }
