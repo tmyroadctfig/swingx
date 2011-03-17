@@ -45,18 +45,6 @@ public class ActionIssues extends ActionTest implements Serializable {
     }
 
     /**
-     * Issue #349-swingx: table not serializable
-     * 
-     *
-     */
-    @Test
-    public void testSerializationBoundAction() {
-        BoundAction action = new BoundAction("some");
-        action.registerCallback(this, "testSerializationRolloverFalse");
-        SerializableSupport.serialize(action);
-    }
-
-    /**
      * core issue: 
      * set selected via putValue leads to inconsistent state.
      *
