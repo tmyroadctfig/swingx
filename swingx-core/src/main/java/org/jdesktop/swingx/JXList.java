@@ -49,6 +49,7 @@ import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.CompoundHighlighter;
 import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
+import org.jdesktop.swingx.plaf.UIAction;
 import org.jdesktop.swingx.plaf.XListAddon;
 import org.jdesktop.swingx.plaf.basic.core.BasicXListUI;
 import org.jdesktop.swingx.renderer.AbstractRenderer;
