@@ -37,7 +37,7 @@ public interface BusyLabelUI {
     public BusyPainter getBusyPainter(Dimension dim);
     
     /**
-     * Delay between moving from one point to another. The exact timing will be close to the selected value but is not guearantied to be precise (subject to the timing precision of underlaying jvm).
+     * Delay between moving from one point to another. The exact timing will be close to the selected value but is not guaranteed to be precise (subject to the timing precision of underlaying jvm).
      * @return Delay in ms.
      */
     public int getDelay();
