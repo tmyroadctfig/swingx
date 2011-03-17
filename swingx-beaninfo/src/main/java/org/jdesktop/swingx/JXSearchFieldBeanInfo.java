@@ -9,7 +9,8 @@ public class JXSearchFieldBeanInfo extends JXTextFieldBeanInfo {
 		super(JXSearchField.class);
 	}
 
-	protected void initialize() {
+	@Override
+    protected void initialize() {
 		super.initialize();
 		setPreferred(true, "layoutStyle", "searchMode", "instantSearchDelay", "findPopupMenu", "useNativeSearchFieldIfPossible", "recentSearchesSaveKey");
 
