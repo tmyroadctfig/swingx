@@ -24,77 +24,94 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Insets;
-import java.awt.LayoutManager;
 
 /**
  * Organizes components in a vertical layout.
  * 
  * @author fred
  */
-public class VerticalLayout implements LayoutManager {
+public class VerticalLayout extends AbstractLayoutManager {
+    private static final long serialVersionUID = 5342270033773736441L;
+    
+    private int gap;
 
-  private int gap = 0;
-
-  public VerticalLayout() {}
-
-  public VerticalLayout(int gap) {
-    this.gap = gap;
-  }
-
-  public int getGap() {
-    return gap;
-  }
-
-  public void setGap(int gap) {
-    this.gap = gap;
-  }
-
-  @Override
-public void addLayoutComponent(String name, Component c) {}
-
-  @Override
-public void layoutContainer(Container parent) {
-    Insets insets = parent.getInsets();
-    Dimension size = parent.getSize();
-    int width = size.width - insets.left - insets.right;
-    int height = insets.top;
-
-    for (int i = 0, c = parent.getComponentCount(); i < c; i++) {
-      Component m = parent.getComponent(i);
-      if (m.isVisible()) {
-        m.setBounds(insets.left, height, width, m.getPreferredSize().height);
-        height += m.getSize().height + gap;
-      }
-    }
-  }
-
-  @Override
-public Dimension minimumLayoutSize(Container parent) {
-    return preferredLayoutSize(parent);
-  }
-
-  @Override
-public Dimension preferredLayoutSize(Container parent) {
-    Insets insets = parent.getInsets();
-    Dimension pref = new Dimension(0, 0);
-
-    for (int i = 0, c = parent.getComponentCount(); i < c; i++) {
-      Component m = parent.getComponent(i);
-      if (m.isVisible()) {
-        Dimension componentPreferredSize =
-          parent.getComponent(i).getPreferredSize(); 
-        pref.height += componentPreferredSize.height + gap;
-        pref.width = Math.max(pref.width, componentPreferredSize.width);
-      }
+    /**
+     * Creates a layout without a gap between components.
+     */
+    public VerticalLayout() {
+        this(0);
     }
 
-    pref.width += insets.left + insets.right;
-    pref.height += insets.top + insets.bottom;
+    /**
+     * Creates a layout with the specified gap between components.
+     * 
+     * @param gap
+     *            the gap between components
+     */
+    //TODO should we allow negative gaps?
+    public VerticalLayout(int gap) {
+        this.gap = gap;
+    }
 
-    return pref;
-  }
+    /**
+     * The current gap to place between components.
+     * 
+     * @return the current gap
+     */
+    public int getGap() {
+        return gap;
+    }
 
-  @Override
-public void removeLayoutComponent(Component c) {}
+    /**
+     * The new gap to place between components.
+     * 
+     * @param gap
+     *            the new gap
+     */
+    //TODO should we allow negative gaps?
+    public void setGap(int gap) {
+        this.gap = gap;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Dimension preferredLayoutSize(Container parent) {
+        Insets insets = parent.getInsets();
+        Dimension pref = new Dimension(0, 0);
+        
+        for (int i = 0, c = parent.getComponentCount(); i < c; i++) {
+            Component m = parent.getComponent(i);
+            if (m.isVisible()) {
+                Dimension componentPreferredSize = parent.getComponent(i).getPreferredSize();
+                pref.height += componentPreferredSize.height + gap;
+                pref.width = Math.max(pref.width, componentPreferredSize.width);
+            }
+        }
+        
+        pref.width += insets.left + insets.right;
+        pref.height += insets.top + insets.bottom;
+        
+        return pref;
+    }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void layoutContainer(Container parent) {
+        Insets insets = parent.getInsets();
+        Dimension size = parent.getSize();
+        int width = size.width - insets.left - insets.right;
+        int height = insets.top;
+
+        for (int i = 0, c = parent.getComponentCount(); i < c; i++) {
+            Component m = parent.getComponent(i);
+            if (m.isVisible()) {
+                m.setBounds(insets.left, height, width, m.getPreferredSize().height);
+                height += m.getSize().height + gap;
+            }
+        }
+    }
 }
