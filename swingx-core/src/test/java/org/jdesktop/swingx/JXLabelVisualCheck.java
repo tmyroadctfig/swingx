@@ -41,10 +41,7 @@ import org.jdesktop.swingx.painter.CompoundPainter;
 import org.jdesktop.swingx.painter.MattePainter;
 import org.jdesktop.swingx.painter.ShapePainter;
 
-import com.jhlabs.image.CausticsFilter;
-import com.jhlabs.image.ChromeFilter;
-import com.jhlabs.image.ShadowFilter;
-import com.jhlabs.image.SparkleFilter;
+import com.jhlabs.image.BlurFilter;
 
 /**
  * Base test class for JXLabel related code and issues.
@@ -59,7 +56,7 @@ public class JXLabelVisualCheck extends InteractiveTestCase {
     public static void main(String[] args) {
         JXLabelVisualCheck test = new JXLabelVisualCheck();
         try {
-            test.runInteractiveTests();
+            test.runInteractiveTests("interactiveUnderlinedFontWithWrapping");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -72,14 +69,10 @@ public class JXLabelVisualCheck extends InteractiveTestCase {
     public void interactiveFancyFilter() {
         JXLabel label = new JXLabel("that's the real text");
         label.setFont(new Font("SansSerif", Font.BOLD, 80));
-        AbstractPainter<?> fg = (AbstractPainter<Object>) label.getForegroundPainter();
-        fg.setFilters(new ChromeFilter(), new ShadowFilter(5, 5, 2, .7f));
-        JXPanel panel = new JXPanel();
-        MattePainter background = new MattePainter(Color.BLUE);
-        background.setFilters(new CausticsFilter(), new SparkleFilter());
-        panel.setBackgroundPainter(background);
-        panel.add(label);
-        JXFrame frame = wrapInFrame(panel, "fancy filter");
+        AbstractPainter<?> fg = new MattePainter(Color.RED);
+        fg.setFilters(new BlurFilter());
+        label.setForegroundPainter(fg);
+        JXFrame frame = wrapInFrame(label, "fancy filter");
         show(frame,400, 400);
     }
     

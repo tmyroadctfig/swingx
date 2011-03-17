@@ -53,9 +53,10 @@ public class JXTaskPaneVisualCheck extends InteractiveTestCase {
         JXTaskPaneVisualCheck test = new JXTaskPaneVisualCheck();
         
         try {
-            test.runInteractiveTests();
+//            test.runInteractiveTests();
 //            test.runInteractiveTests("interactiveDisplay");
 //            test.runInteractiveTests("interactiveMnemonic");
+            test.runInteractiveTests("interactiveEnablingTest");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
@@ -103,7 +104,7 @@ public class JXTaskPaneVisualCheck extends InteractiveTestCase {
         panel.add(new JLabel("Hi there again"));
         showInFrame(panel, "JXTaskPane interactive", true);
     }
-
+    
     /**
      * Ensure that resizing scroll pane's properly enables/disables scrollbars.
      * <p>
@@ -117,6 +118,25 @@ public class JXTaskPaneVisualCheck extends InteractiveTestCase {
         showInFrame(panel, "Ensure scrolling works");
     }
 
+    /**
+     * Add enabled/disabled state to JXTaskPane.
+     * <p>
+     * SwingX issue #400
+     */
+    public void interactiveEnablingTest() {
+        final JXTaskPane pane = new JXTaskPane();
+        pane.add(new AbstractAction("Disable") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                pane.setEnabled(false);
+                System.out.println(pane.isEnabled());
+            }
+        });
+        pane.add(new JButton("wow!!"));
+        JXTaskPaneContainer container = new JXTaskPaneContainer();
+        container.add(pane);
+        showInFrame(container, "Ensure enabling/disabling updates");
+    }
     
     @Override
     protected void createAndAddMenus(JMenuBar menuBar, final JComponent component) {
