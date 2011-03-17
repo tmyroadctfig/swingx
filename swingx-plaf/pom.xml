@@ -7,4 +7,20 @@
   </parent>
   <artifactId>swingx-plaf</artifactId>
   <name>SwingX Look and Feel Support</name>
+  <dependencies>
+    <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>swingx-painters</artifactId>
+        <version>${project.version}</version>
+        <scope>compile</scope>
+        <optional>true</optional>
+    </dependency>
+    <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>swingx-testsupport</artifactId>
+        <version>${project.version}</version>
+        <type>jar</type>
+        <scope>test</scope>
+    </dependency>
+  </dependencies>
 </project>
