@@ -79,6 +79,7 @@ import javax.swing.undo.UndoManager;
 import org.jdesktop.swingx.action.ActionManager;
 import org.jdesktop.swingx.action.Targetable;
 import org.jdesktop.swingx.action.TargetableSupport;
+import org.jdesktop.swingx.plaf.UIAction;
 import org.jdesktop.swingx.search.SearchFactory;
 import org.jdesktop.swingx.search.Searchable;
 
