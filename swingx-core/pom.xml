@@ -31,6 +31,12 @@
   	</dependency>
   	<dependency>
   		<groupId>${project.groupId}</groupId>
+  		<artifactId>swingx-action</artifactId>
+  		<version>${project.version}</version>
+  		<scope>compile</scope>
+  	</dependency>
+  	<dependency>
+  		<groupId>${project.groupId}</groupId>
   		<artifactId>swingx-painters</artifactId>
   		<version>${project.version}</version>
   		<scope>compile</scope>
