@@ -45,6 +45,14 @@
   	</dependency>
   	<dependency>
   		<groupId>${project.groupId}</groupId>
+  		<artifactId>swingx-action</artifactId>
+  		<version>${project.version}</version>
+  		<type>jar</type>
+  		<scope>compile</scope>
+  		<optional>true</optional>
+  	</dependency>
+  	<dependency>
+  		<groupId>${project.groupId}</groupId>
   		<artifactId>swingx-core</artifactId>
   		<version>${project.version}</version>
   		<type>jar</type>
