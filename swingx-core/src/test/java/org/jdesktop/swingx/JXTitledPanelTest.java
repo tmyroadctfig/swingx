@@ -39,6 +39,7 @@ import org.jdesktop.test.PropertyChangeReport;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+
 @RunWith(JUnit4.class)
 public class JXTitledPanelTest extends InteractiveTestCase {
     private static final Logger LOG = Logger.getLogger(JXTitledPanelTest.class
@@ -100,61 +101,6 @@ public class JXTitledPanelTest extends InteractiveTestCase {
         }
         SwingUtilities.updateComponentTreeUI(titledPanel);
         assertTrue(titledPanel.getContentContainer().getLayout() instanceof BorderLayout);
-    }
-    
-    /**
-     * Issue ??: notifications missing on all "title"XX properties.
-     *
-     */
-    @Test
-    public void testTitlePropertiesNotify() {
-        String title = "starting title";
-        final JXTitledPanel panel = new JXTitledPanel(title);
-        PropertyChangeReport report = new PropertyChangeReport();
-        panel.addPropertyChangeListener(report);
-        Font deriveFont = panel.getTitleFont().deriveFont(27f);
-        panel.setTitleFont(deriveFont);
-        assertTrue("panel must notify on titleFont change", report.hasEvents("titleFont"));
-// TODO: Whoever owns this please fix this.  The tests should run clean.        
-//        fail("JXTitledPanelTest must be updated to new api");
-//        panel.setTitleForeground(Color.black);
-//        assertTrue("panel must notify on titleForeground change", report.hasEvents("titleForeground"));
-//        panel.setTitleDarkBackground(Color.black);
-//        assertTrue("panel must notify on titleDarkBackground change", report.hasEvents("titleDarkBackground"));
-//        panel.setTitleLightBackground(Color.black);
-//        assertTrue("panel must notify on titleLightBackground change", report.hasEvents("titleLightBackground"));
-        
-    }
-    
-    /**
-     * SwingX Issue #9: missing notification on title change.
-     * happens if a generic property change listener (== one who 
-     * wants to get all property changes) is registered.
-     */
-    @Test
-    public void testTitleNotify() {
-        String title = "starting title";
-        final JXTitledPanel panel = new JXTitledPanel(title);
-        PropertyChangeReport report = new PropertyChangeReport();
-        panel.addPropertyChangeListener(report);
-        panel.setTitle("new title");
-        assertTrue("panel must have fired propertyChange", report.hasEvents());
-        
-    }
-    /**
-     * SwingX Issue #9: missing notification on title change.
-     * Notification is correct, if a named propertyChangeListener is
-     * registered.
-     */
-    @Test
-    public void testTitleNotifyNamed() {
-        String title = "starting title";
-        final JXTitledPanel panel = new JXTitledPanel(title);
-        PropertyChangeReport report = new PropertyChangeReport();
-        panel.addPropertyChangeListener( "title", report);
-        panel.setTitle("new title");
-        assertTrue("panel must have fired propertyChange", report.hasEvents());
-        
     }
     
     /**
@@ -270,7 +216,6 @@ public class JXTitledPanelTest extends InteractiveTestCase {
 
 //                Color oldFont = panel.getTitleLightBackground();
 //                panel.setTitleLightBackground(oldFont.darker());
-                
             }
             
         };
@@ -389,7 +334,7 @@ public class JXTitledPanelTest extends InteractiveTestCase {
     public static void main(String args[]) {
         JXTitledPanelTest test = new JXTitledPanelTest();
         try {
-          test.runInteractiveTests();
+          test.runInteractiveTests("interactiveRoundedBorder");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
