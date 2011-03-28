@@ -59,7 +59,7 @@ import javax.swing.JToolBar;
  * the configuration of menus. 
  * </li>
  * The order of elements in an action-list determines the arrangement of the ui 
- * components which are contructed from the action-list.
+ * components which are constructed from the action-list.
  * <p>
  * For a menu or submenu, the first element in the action-list represents a menu 
  * and subsequent elements represent menu items or separators (if null). 
@@ -351,13 +351,11 @@ public class ActionContainerFactory {
      * Will return a JMenuItem, JRadioButtonMenuItem or a JCheckBoxMenuItem
      * depending on the context of the Action.
      *
-     * @param action a mangaged Action
+     * @param action a managed Action
      * @param container the parent container may be null for non-group actions.
      * @return a JMenuItem or subclass depending on type.
-     * @deprecated API will be made private; see Issue #313
      */
-    @Deprecated
-    public JMenuItem createMenuItem(Action action, JComponent container) {
+    private JMenuItem createMenuItem(Action action, JComponent container) {
         JMenuItem menuItem = null;
         if (action instanceof AbstractActionExt) {
             AbstractActionExt ta = (AbstractActionExt)action;
@@ -402,7 +400,7 @@ public class ActionContainerFactory {
      * registered with the ActionManger by the given id.
      * Will return a JButton or a JToggleButton.
      * 
-     * @param id the identifer 
+     * @param id the identifier 
      * @param container the JComponent which parents the group, if any.
      * @return an AbstractButton based on the 
      */
