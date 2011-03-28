@@ -5,7 +5,7 @@ import static org.jdesktop.test.SerializableSupport.serialize;
 import static org.jdesktop.test.matchers.Matchers.equivalentTo;
 import static org.junit.Assert.assertThat;
 
-import javax.swing.JDialog;
+import javax.swing.JLabel;
 
 import org.jdesktop.test.EDTRunner;
 import org.junit.Before;
@@ -30,7 +30,7 @@ public class BoundActionTest {
     
     @Test
     public void testSerializationWithCallback() {
-        action.registerCallback(new JDialog(), "dispose");
+        action.registerCallback(new JLabel(), "updateUI");
         BoundAction serialized = serialize(action);
         
         assertThat(serialized, is(equivalentTo(action)));
@@ -40,7 +40,7 @@ public class BoundActionTest {
     @Test
     public void testSerializationForToggleWithCallback() {
         action.setStateAction(true);
-        action.registerCallback(new JDialog(), "dispose");
+        action.registerCallback(new JLabel(), "updateUI");
         BoundAction serialized = serialize(action);
         
         assertThat(serialized, is(equivalentTo(action)));
