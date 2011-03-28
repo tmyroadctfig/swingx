@@ -143,52 +143,6 @@ public class JXTaskPaneTest extends TestCase {
     assertEquals(1, taskPane.getContentPane().getComponentCount());
   }
 
-    // PENDING JW: added ignore tag - otherwise this method blocks the runner
-    // @Karl - any idea as to the why?
-    @Test @Ignore
-  public void testAnimationListeners() throws Exception {
-    JXTaskPane taskPane = new JXTaskPane();
-    // start with a not expanded or animated taskPane
-    taskPane.setAnimated(false);
-    taskPane.setCollapsed(true);
-    assertTrue(taskPane.isCollapsed());
-
-    class ListenForEvents implements PropertyChangeListener {
-      private boolean expandedEventReceived;
-      private boolean collapsedEventReceived;
-      private int animationStart;
-      
-      public void propertyChange(java.beans.PropertyChangeEvent evt) {
-        if ("expanded".equals(evt.getNewValue())) {
-          expandedEventReceived = true;
-        } else if ("collapsed".equals(evt.getNewValue())) {
-          collapsedEventReceived = true;
-        } else if ("reinit".equals(evt.getNewValue())) {
-          animationStart++;
-        }
-      }
-    }
-
-    ListenForEvents listener = new ListenForEvents();
-
-    // register a listener on the animation
-    taskPane.addPropertyChangeListener(JXCollapsiblePane.ANIMATION_STATE_KEY,
-      listener);
-    taskPane.setAnimated(true);
-    
-    // expand the taskPane and...
-    taskPane.setCollapsed(false);
-    // ...wait until listener has been notified
-    while (!listener.expandedEventReceived) { Thread.sleep(100); }
-    
-    // collapse the taskPane and...
-    // ...wait until listener has been notified
-    taskPane.setCollapsed(true);
-    while (!listener.collapsedEventReceived) { Thread.sleep(100); }
-    
-    assertEquals(2, listener.animationStart);
-  }
-
     @Test
   public void testAddon() throws Exception {
     // move around all addons
