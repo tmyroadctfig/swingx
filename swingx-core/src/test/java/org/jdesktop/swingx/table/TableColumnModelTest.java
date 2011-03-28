@@ -46,6 +46,19 @@ public class TableColumnModelTest extends InteractiveTestCase {
     protected static final int COLUMN_COUNT = 3;
 
     /**
+     * Issue 1423 - remove column must not change its visibility state
+     */
+    @Test
+    public void testRemoveHidden() {
+        TableColumnModelExt model = createColumnModel(4);
+        TableColumnExt column = model.getColumnExt(0);
+        column.setVisible(false);
+        model.removeColumn(column);
+        assertEquals(false, column.isVisible());
+    }
+   
+
+    /**
      * Issue #1340-swingx: DefaultTableColumnModelExt must fire columnRemoved for hidden columns.
      */
     @Test

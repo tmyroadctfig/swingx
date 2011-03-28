@@ -167,8 +167,10 @@ public class DefaultTableColumnModelExt extends DefaultTableColumnModel
      */
     @Override
     public void removeColumn(TableColumn column) {
+        boolean oldVisible = true;
         //remove the visibility listener if appropriate
         if (column instanceof TableColumnExt) {   
+            oldVisible = ((TableColumnExt) column).isVisible();
             ((TableColumnExt) column).setVisible(true);
             ((TableColumnExt)column).removePropertyChangeListener(visibilityListener);
         }
@@ -176,6 +178,9 @@ public class DefaultTableColumnModelExt extends DefaultTableColumnModel
         initialColumns.remove(column);
         //let the superclass handle notification etc
         super.removeColumn(column);
+        if (column instanceof TableColumnExt) {
+            ((TableColumnExt) column).setVisible(oldVisible);
+        }
     }
 
     /**
