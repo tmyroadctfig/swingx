@@ -21,6 +21,7 @@ import java.sql.Timestamp;
 import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
@@ -121,6 +122,29 @@ public class JXTableUnitTest extends InteractiveTestCase {
     private JXTable table;
     public JXTableUnitTest() {
         super("JXTable unit test");
+    }
+
+    
+    /**
+     * Issue #1422-swingx: setColumnSequence works incorrectly
+     */
+    @Test
+    public void testSetColumnSequence() {
+        int numColumns = 5;
+        JXTable table = new JXTable(10, numColumns);
+        //hide first column
+        TableColumnExt columnExt = table.getColumnExt(0);
+        columnExt.setVisible(false);
+        List<TableColumn> allColumns = table.getColumns(true);
+        List<Object> identifiers = new ArrayList<Object>();
+        for (TableColumn tableColumn : allColumns) {
+            identifiers.add(tableColumn.getIdentifier());
+        }
+        Collections.reverse(identifiers);
+        table.setColumnSequence(identifiers.toArray());
+        assertEquals(numColumns, table.getColumnCount(true));
+        assertEquals(false, columnExt.isVisible());
+        assertEquals(numColumns -1, table.getColumnCount());
     }
 
     /**
