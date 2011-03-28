@@ -31,8 +31,7 @@ import org.jdesktop.swingx.JXList;
  * Addon for <code>JXList</code>.
  * <p>
  * 
- * Will install a custom ui if JXList will be sortable/filterable again.
- * Currently unused, does nothing.
+ * Install a custom ui to support sorting/filtering in JXList.
  */
 public class XListAddon extends AbstractComponentAddon {
 

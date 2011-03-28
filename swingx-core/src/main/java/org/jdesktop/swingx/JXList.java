@@ -188,7 +188,6 @@ public class JXList extends JList {
     /**
      * Registers a Addon for JXList.
      */
-    // @KEEP JW- will be used if sortable/filterable again
     static {
         LookAndFeelAddons.contribute(new XListAddon());
     }
