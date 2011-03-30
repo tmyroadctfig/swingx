@@ -15,6 +15,7 @@ import java.awt.KeyboardFocusManager;
 import java.beans.PropertyChangeListener;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.sql.Time;
 import java.sql.Timestamp;
@@ -72,6 +73,7 @@ import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.PatternPredicate;
 import org.jdesktop.swingx.hyperlink.LinkModel;
 import org.jdesktop.swingx.renderer.DefaultTableRenderer;
+import org.jdesktop.swingx.renderer.HyperlinkProvider;
 import org.jdesktop.swingx.renderer.StringValue;
 import org.jdesktop.swingx.renderer.StringValues;
 import org.jdesktop.swingx.rollover.RolloverController;
@@ -124,6 +126,17 @@ public class JXTableUnitTest extends InteractiveTestCase {
         super("JXTable unit test");
     }
 
+    @Test
+    public void testHyperlinkDefaultRenderer() {
+        assertHyperlinkProvider(URI.class);
+//        assertHyperlinkProvider(URL.class);
+    }
+
+    private void assertHyperlinkProvider(Class<?> clazz) {
+        DefaultTableRenderer renderer = (DefaultTableRenderer) table.getDefaultRenderer(clazz);
+        assertTrue("expected hyperlinkProvider but was:" + renderer.getComponentProvider(),
+               renderer.getComponentProvider() instanceof HyperlinkProvider );
+    }
     
     /**
      * Issue #1422-swingx: setColumnSequence works incorrectly

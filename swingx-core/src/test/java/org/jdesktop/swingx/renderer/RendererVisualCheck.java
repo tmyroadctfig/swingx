@@ -37,6 +37,8 @@ import java.beans.PropertyDescriptor;
 import java.io.File;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.sql.Time;
 import java.sql.Timestamp;
@@ -105,6 +107,7 @@ import org.jdesktop.swingx.decorator.HighlighterFactory;
 import org.jdesktop.swingx.decorator.PainterHighlighter;
 import org.jdesktop.swingx.decorator.PatternPredicate;
 import org.jdesktop.swingx.hyperlink.EditorPaneLinkVisitor;
+import org.jdesktop.swingx.hyperlink.HyperlinkAction;
 import org.jdesktop.swingx.hyperlink.LinkModel;
 import org.jdesktop.swingx.hyperlink.LinkModelAction;
 import org.jdesktop.swingx.painter.BusyPainter;
@@ -135,7 +138,9 @@ public class RendererVisualCheck extends InteractiveTestCase {
 //          test.runInteractiveTests(".*XLabel.*");
 //          test.runInteractiveTests(".*Text.*");
 //          test.runInteractiveTests(".*Color.*");
-          test.runInteractiveTests("interactive.*ColumnControl.*");
+//          test.runInteractiveTests("interactive.*ColumnControl.*");
+          test.runInteractive("Link");
+          test.runInteractive("URI");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
@@ -755,22 +760,38 @@ public class RendererVisualCheck extends InteractiveTestCase {
      * @return
      */
     private TableModel createTableModelWithDefaultTypes() {
-        String[] names = {"Object", "Number", "Double", "Date", "ImageIcon", "Boolean"};
-        final Class<?>[] types = {Object.class, Number.class, Double.class, Date.class, ImageIcon.class, Boolean.class};
+        String[] names = {"Object", "Number", "Double", "Date", "ImageIcon", "Boolean", "URI"};
+        final Class<?>[] types = {Object.class, Number.class, Double.class, Date.class, ImageIcon.class, Boolean.class, URI.class};
         DefaultTableModel model = new DefaultTableModel(names, 0) {
 
             @Override
             public Class<?> getColumnClass(int columnIndex) {
                 return types[columnIndex];
             }
+
+            /** 
+             * @inherited <p>
+             */
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return getColumnClass(column) != URI.class;
+            }
+            
+            
             
         };
         Date today = new Date();
         Icon icon = XTestUtils.loadDefaultIcon();
         for (int i = 0; i < 10; i++) {
-            Object[] values = new Object[] {"row " + i, i, Math.random() * 100, 
-                    new Date(today.getTime() + i * 1000000), icon, i % 2 == 0};
-            model.addRow(values);
+            Object[] values;
+            try {
+                values = new Object[] {"row " + i, i, Math.random() * 100, 
+                        new Date(today.getTime() + i * 1000000), icon, i % 2 == 0, new URI("http://swingx.java.net")};
+                model.addRow(values);
+            } catch (URISyntaxException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
         }
         return model;
     }
@@ -994,6 +1015,13 @@ public class RendererVisualCheck extends InteractiveTestCase {
     }
     
 //---------------- hyperlink rendering    
+    
+    public void interactiveTableURIRenderer() {
+        JXTable table = new JXTable(createTableModelWithURI());
+        JXFrame frame = wrapWithScrollingInFrame(table, "default renderer: URI");
+        addStatusMessage(frame, "Note: hyperlinks only clickable if !editable");
+        show(frame);
+    }
     /**
      * extended link renderer in table.
      *
@@ -1004,11 +1032,19 @@ public class RendererVisualCheck extends InteractiveTestCase {
         LinkModelAction<LinkModel> action = new LinkModelAction<LinkModel>(visitor);
         ComponentProvider<JXHyperlink> controller = new HyperlinkProvider(action, LinkModel.class);
         table.setDefaultRenderer(LinkModel.class, new DefaultTableRenderer(controller));
-        JFrame frame = wrapWithScrollingInFrame(table, visitor.getOutputComponent(), "show link renderer in table");
+        JXFrame frame = wrapWithScrollingInFrame(table, visitor.getOutputComponent(), "show link renderer in table");
+        addStatusMessage(frame, "Note: hyperlinks only clickable if !editable");
         frame.setVisible(true);
 
     }
     
+    public void interactiveListURIRenderer() {
+        JXList list = new JXList(createListModelWithURI(20));
+        list.setRolloverEnabled(true);
+        ComponentProvider<?> provider = new HyperlinkProvider(new HyperlinkAction());
+        list.setCellRenderer(new DefaultListRenderer(provider));
+        showWithScrollingInFrame(list, "list with uri renderer");
+    }
     /**
      * extended link renderer in list.
      *
@@ -1025,6 +1061,14 @@ public class RendererVisualCheck extends InteractiveTestCase {
 
     }
 
+    public void interactiveTreeURIRenderer() {
+        JXTree tree = new JXTree(createTreeModelWithURI(20));
+        tree.setRolloverEnabled(true);
+        // PENDING JW: how to have "mixed" user object types? HyperlinkAction throws on f.i. String ..
+        ComponentProvider<?> provider = new HyperlinkProvider(new HyperlinkAction());
+        tree.setCellRenderer(new DefaultTreeRenderer(new WrappingProvider(provider)));
+        showWithScrollingInFrame(tree, "tree with uri renderer");
+    }
     /**
      * extended link renderer in tree.
      *
@@ -1389,18 +1433,8 @@ public class RendererVisualCheck extends InteractiveTestCase {
     private ListModel createListModelWithLinks(int count) {
         DefaultListModel model = new DefaultListModel();
         for (int i = 0; i < count; i++) {
-            try {
-                LinkModel link = new LinkModel("a link text " + i, null, new URL("http://some.dummy.url" + i));
-                if (i == 1) {
-                    URL url = JXEditorPaneTest.class.getResource("resources/test.html");
-
-                    link = new LinkModel("a link text " + i, null, url);
-                }
-                model.addElement(link);
-            } catch (MalformedURLException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
+            LinkModel link = createLinkModel(i);
+            model.addElement(link);
         }
  
         return model;
@@ -1409,18 +1443,8 @@ public class RendererVisualCheck extends InteractiveTestCase {
     private TreeModel createTreeModelWithLinks(int count) {
         DefaultMutableTreeNode root = new DefaultMutableTreeNode("Links");
         for (int i = 0; i < count; i++) {
-            try {
-                LinkModel link = new LinkModel("a link text " + i, null, new URL("http://some.dummy.url" + i));
-                if (i == 1) {
-                    URL url = JXEditorPaneTest.class.getResource("resources/test.html");
-
-                    link = new LinkModel("a link text " + i, null, url);
-                }
-                root.add(new DefaultMutableTreeNode(link));
-            } catch (MalformedURLException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
+            LinkModel link = createLinkModel(i);
+            root.add(new DefaultMutableTreeNode(link));
         }
         return new DefaultTreeModel(root);
     }
@@ -1443,23 +1467,93 @@ public class RendererVisualCheck extends InteractiveTestCase {
 
         };
         for (int i = 0; i < 4; i++) {
-            try {
-                LinkModel link = new LinkModel("a link text " + i, null,
-                        new URL("http://some.dummy.url" + i));
-                if (i == 1) {
-                    URL url = JXEditorPaneTest.class
-                            .getResource("resources/test.html");
+            LinkModel link = createLinkModel(i);
+            model.addRow(new Object[] { "text only " + i, link, link,
+                    Boolean.TRUE, Boolean.TRUE });
+        }
+        return model;
+    }
 
-                    link = new LinkModel("a link text " + i, null, url);
-                }
-                model.addRow(new Object[] { "text only " + i, link, link,
-                        Boolean.TRUE, Boolean.TRUE });
-            } catch (MalformedURLException e) {
+    private LinkModel createLinkModel(int i) {
+        LinkModel link = null;
+        try {
+            link = new LinkModel("a link text " + i, null,
+                    new URL("http://some.dummy.url" + i));
+        } catch (MalformedURLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        if (i == 1) {
+            URL url = JXEditorPaneTest.class
+                    .getResource("resources/test.html");
+
+            link = new LinkModel("a link text " + i, null, url);
+        }
+        return link;
+    }
+    
+    private ListModel createListModelWithURI(int count) {
+        DefaultListModel model = new DefaultListModel();
+        for (int i = 0; i < count; i++) {
+            model.addElement(createURI(i));
+        }
+        return model;
+    }
+    
+    private TreeModel createTreeModelWithURI(int count) {
+        DefaultMutableTreeNode root = new DefaultMutableTreeNode(null);
+        for (int i = 0; i < count; i++) {
+            root.add(new DefaultMutableTreeNode(createURI(i)));
+        }
+        
+        return new DefaultTreeModel(root );
+    }
+    
+    private TableModel createTableModelWithURI() {
+        String[] columnNames = { "text only", "URI editable",
+                "URI not-editable", "Bool editable", "Bool not-editable" };
+
+        DefaultTableModel model = new DefaultTableModel(columnNames, 0) {
+
+            @Override
+            public Class<?> getColumnClass(int columnIndex) {
+                return getValueAt(0, columnIndex).getClass();
+            }
+
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return !getColumnName(column).contains("not");
+            }
+
+        };
+        for (int i = 0; i < 4; i++) {
+            URI link = createURI(i);
+            model.addRow(new Object[] { "text only " + i, link, link,
+                    Boolean.TRUE, Boolean.TRUE });
+        }
+        return model;
+    }
+
+    private URI createURI(int i) {
+        URI link = null;
+        try {
+            link = new URI("http://some.dummy.url" + i);
+        } catch (URISyntaxException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        if (i == 1) {
+            URL url = JXEditorPaneTest.class
+                    .getResource("resources/test.html");
+
+            try {
+                link = url.toURI();
+            } catch (URISyntaxException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
         }
-        return model;
+        return link;
     }
     /**
      * 
