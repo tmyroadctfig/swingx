@@ -211,6 +211,11 @@ import org.jdesktop.swingx.table.TableColumnModelExt;
  * table.setCellRenderer(File.class, new DefaultTableRenderer(sv));
  * </code></pre>
  * 
+ * In addition to super default per-class registration, JXTable registers a default
+ * renderer for <code>URI</code>s which opens the default application to view the related
+ * document as supported by <code>Desktop</code>. Note: this action is triggered only if 
+ * rolloverEnabled is true (default value) and the cell is not editable.
+ * 
  * <p>
  * <b>Note</b>: DefaultTableCellRenderer and subclasses require a hack to play
  * nicely with Highlighters because it has an internal "color memory" in
@@ -3647,11 +3652,14 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
 
     /**
      * Creates default cell renderers for <code>Object</code>s,
-     * <code>Number</code>s, <code>Date</code>s, <code>Boolean</code>s, and
-     * <code>Icon/Image/</code>s.
+     * <code>Number</code>s, <code>Date</code>s, <code>Boolean</code>s, 
+     * <code>Icon/Image/</code>s and <code>URI</code>s.
      * <p>
-     * Overridden to install SwingX renderers plus hacking around huge memory
-     * consumption of UIDefaults (see #6345050 in core Bug parade)
+     * Overridden to replace all super default renderers with SwingX variants and
+     * additionally register a default for <code>URI</code> types. Note: the latter
+     * registration will fail silently in headless environments or when the runtime
+     * context doesn't support Desktop.
+     * 
      * <p>
      * {@inheritDoc}
      * 
@@ -3676,17 +3684,19 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
         setDefaultRenderer(Boolean.class, new DefaultTableRenderer(
                 new CheckBoxProvider()));
         
-        setDefaultRenderer(URI.class, new DefaultTableRenderer(
-                new HyperlinkProvider(new HyperlinkAction())
-                ));
+        try {
+            setDefaultRenderer(URI.class, new DefaultTableRenderer(
+                    new HyperlinkProvider(new HyperlinkAction())
+            ));
+        } catch (Exception e) {
+            // TODO: handle exception
+        }
     }
 
     /**
      * Creates default cell editors for objects, numbers, and boolean values.
      * <p>
      * Overridden to hook enhanced editors (f.i. <code>NumberEditorExt</code>
-     * )plus hacking around huge memory consumption of UIDefaults (see #6345050
-     * in core Bug parade)
      * 
      * @see DefaultCellEditor
      */
