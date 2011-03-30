@@ -98,7 +98,7 @@ public abstract class RolloverProducer implements MouseListener, MouseMotionList
     public void mouseReleased(MouseEvent e) {
         Point oldCell = new Point(rollover); 
         // JW: fix for #456-swingx - rollover not updated after end of dragging
-        updateRollover(e, ROLLOVER_KEY, true);
+        updateRollover(e, ROLLOVER_KEY, false);
         // Fix Issue 1387-swingx - no click on release-after-drag
         if (isClick(e, oldCell, isDragging)) {
             updateRollover(e, CLICKED_KEY, true);
