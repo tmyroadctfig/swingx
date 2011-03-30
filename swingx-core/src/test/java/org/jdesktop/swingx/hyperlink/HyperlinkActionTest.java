@@ -156,6 +156,7 @@ public class HyperlinkActionTest extends TestCase {
         final boolean visitedIsTrue = true;
         AbstractHyperlinkAction<Object> linkAction = new AbstractHyperlinkAction<Object>(target) {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 // TODO Auto-generated method stub
                 
@@ -182,6 +183,7 @@ public class HyperlinkActionTest extends TestCase {
         Object target = new Object();
         AbstractHyperlinkAction<Object> linkAction = new AbstractHyperlinkAction<Object>(target) {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 // TODO Auto-generated method stub
                 
@@ -199,6 +201,7 @@ public class HyperlinkActionTest extends TestCase {
     public void testLinkAction() {
        AbstractHyperlinkAction<Object> linkAction = new AbstractHyperlinkAction<Object>(null) {
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             // TODO Auto-generated method stub
             
