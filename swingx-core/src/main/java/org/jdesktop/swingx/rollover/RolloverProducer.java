@@ -96,12 +96,39 @@ public abstract class RolloverProducer implements MouseListener, MouseMotionList
      */
     @Override
     public void mouseReleased(MouseEvent e) {
+        Point oldCell = new Point(rollover); 
         // JW: fix for #456-swingx - rollover not updated after end of dragging
-        updateRollover(e, ROLLOVER_KEY, false);
-        if (!isDragging) {
-            // PENDING JW: Issue 1387-swingx - trigger click on release-after-drag?
+        updateRollover(e, ROLLOVER_KEY, true);
+        // Fix Issue 1387-swingx - no click on release-after-drag
+        if (isClick(e, oldCell, isDragging)) {
+            updateRollover(e, CLICKED_KEY, true);
         }
-        updateRollover(e, CLICKED_KEY, true);
+        isDragging = false;
+    }
+
+    /**
+     * Returns a boolean indicating whether or not the given mouse event should
+     * be interpreted as a click. This method is called from mouseReleased
+     * after the cell coordiates were updated. While the ID of mouse event
+     * is not formally enforced, it is assumed to be a MOUSE_RELEASED. Calling
+     * for other types might or might not work as expected. <p>
+     * 
+     * This implementation returns true if the current rollover point is the same
+     * cell as the given oldRollover, that is ending a drag inside the same cell
+     * triggers the action while ending a drag somewhere does not. <p>
+     * 
+     * PENDING JW: open to more complex logic in case it clashes with existing code,
+     * see Issue #1387. 
+     * 
+     * @param e the mouseEvent which triggered calling this, assumed to be 
+     *    a mouseReleased, must not be null
+     * @param oldRollover the cell before the mouseEvent was mapped, must not be null
+     * @param wasDragging true if the release happened
+     * @return a boolean indicating whether or not the given mouseEvent should
+     *   be interpreted as a click.
+     */
+    protected boolean isClick(MouseEvent e, Point oldRollover, boolean wasDragging) {
+        return oldRollover.equals(rollover);
     }
 
     /**
@@ -111,6 +138,7 @@ public abstract class RolloverProducer implements MouseListener, MouseMotionList
     @Override
     public void mouseEntered(MouseEvent e) {
 //        LOG.info("" + e);
+        isDragging = false;
         updateRollover(e, ROLLOVER_KEY, false);
     }
 
@@ -120,6 +148,7 @@ public abstract class RolloverProducer implements MouseListener, MouseMotionList
      */
     @Override
     public void mouseExited(MouseEvent e) {
+        isDragging = false;
 //        screenLocation = null;
 //        LOG.info("" + e);
 //        if (((JComponent) e.getComponent()).getMousePosition(true) != null)  {
@@ -147,12 +176,11 @@ public abstract class RolloverProducer implements MouseListener, MouseMotionList
 
     // ---------------- MouseMotionListener
     /**
-     * Implemented to do nothing.
-     * PENDING JW: probably should do something? Mapped coordinates will be out of synch
-     * after a drag.
+     * Implemented to set a dragging flag to true.
      */
     @Override
     public void mouseDragged(MouseEvent e) {
+        isDragging = true;
     }
 
     /**
