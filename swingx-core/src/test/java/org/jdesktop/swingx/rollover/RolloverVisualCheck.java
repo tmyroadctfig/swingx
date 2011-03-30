@@ -5,6 +5,7 @@
 package org.jdesktop.swingx.rollover;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.util.logging.Logger;
@@ -101,6 +102,10 @@ public class RolloverVisualCheck extends InteractiveTestCase {
     
     /**
      * Issue #456-swingx: Rollover highlighter not showing while dragging.
+     * 
+     * The expected behaviour: 
+     * - don't show the xRollover while dragging during a dnd,
+     * - update the rollover to the released.
      */
     public void interactiveRolloverWhileDragging() {
         final JXList list = new JXList(AncientSwingTeam.createNamedColorListModel());
@@ -138,6 +143,9 @@ public class RolloverVisualCheck extends InteractiveTestCase {
         JXList list = new JXList(AncientSwingTeam.createNamedColorListModel());
         list.setVisibleRowCount(list.getElementCount());
         list.setRolloverEnabled(true);
+        list.addHighlighter(new ColorHighlighter(
+                HighlightPredicate.ROLLOVER_ROW, 
+                Color.MAGENTA, null, Color.MAGENTA, null));
 
         TransferHandler handler = new TransferHandler() {
 
@@ -153,10 +161,11 @@ public class RolloverVisualCheck extends InteractiveTestCase {
         list.setTransferHandler(handler);
         final JXFrame frame = wrapWithScrollingInFrame(list, "release-after-drag must not trigger clicked");
         // rollover-enabled default renderer
+        // Note JW: this implicitly changes the cursor to the hand-cursor
         DefaultListRenderer renderer = new DefaultListRenderer() {
             @Override
             public void doClick() {
-                JOptionPane.showMessageDialog(frame, "Click");
+                JOptionPane.showMessageDialog(frame, "Clicked");
             }
             
             @Override
@@ -172,11 +181,15 @@ public class RolloverVisualCheck extends InteractiveTestCase {
             
             @Override
             public void actionPerformed(ActionEvent e) {
-                LOG.info("triggered...");
+                LOG.info("triggered..." + ((Component) e.getSource()).getName());
             }
         };
         JButton button = new JButton(action);
+        button.setName("first");
         addStatusComponent(frame, button);
+        JButton other = new JButton(action);
+        other.setName("second");
+        addStatusComponent(frame, other);
         show(frame);
     }
     
