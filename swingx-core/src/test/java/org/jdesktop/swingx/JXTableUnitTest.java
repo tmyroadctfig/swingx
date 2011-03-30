@@ -128,6 +128,12 @@ public class JXTableUnitTest extends InteractiveTestCase {
 
     @Test
     public void testHyperlinkDefaultRenderer() {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.fine("cannot run ui test - headless environment: URI-renderer not registered");
+            return;
+        }
+        
         assertHyperlinkProvider(URI.class);
 //        assertHyperlinkProvider(URL.class);
     }
