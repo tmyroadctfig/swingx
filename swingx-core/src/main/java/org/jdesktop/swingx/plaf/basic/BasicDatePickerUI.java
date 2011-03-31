@@ -1258,7 +1258,7 @@ public class BasicDatePickerUI extends DatePickerUI {
 
         @Override
         public void mousePressed(MouseEvent ev) {
-            if (!datePicker.isEnabled()) {
+            if (!datePicker.isEnabled() || !SwingUtilities.isLeftMouseButton(ev)) {
                 return;
             }
             // PENDING JW: why do we need a mouseListener? the
@@ -1267,6 +1267,7 @@ public class BasicDatePickerUI extends DatePickerUI {
             // reason might be that we want to open on pressed
             // typically (or LF-dependent?),
             // the button's action is invoked on released.
+            LOG.info("opening on mousePressed?");
             toggleShowPopup();
         }
 

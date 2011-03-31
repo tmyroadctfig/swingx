@@ -344,6 +344,27 @@ public abstract class InteractiveTestCase extends junit.framework.TestCase {
         addAction(frame, action);
     }
     
+    /**
+     * Creates and adds a button toggling the target's and its direct children's
+     * enabled property.
+     * 
+     * @param frame
+     * @param target
+     */
+    public void addEnabledToggleWithChildren(JXFrame frame, final JComponent target) {
+        Action action = new AbstractAction("toggle enabled (with children)") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                target.setEnabled(!target.isEnabled());
+                for (int i = 0; i < target.getComponentCount(); i++) {
+                    target.getComponent(i).setEnabled(target.isEnabled());
+                }
+            }
+        };
+        addAction(frame, action);
+    }
+    
 
     public void addMessage(JXFrame frame, String message) {
         JXStatusBar statusBar = getStatusBar(frame);
