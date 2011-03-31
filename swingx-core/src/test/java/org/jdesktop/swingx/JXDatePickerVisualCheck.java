@@ -119,14 +119,17 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
     /**
      * Issue #1393-swingx: inherited popup not shown on editor/arrow button.
      * Issue #1427-swingx: right click on arrow must not open monthView
-     * 
+     * Issue ??: tooltip on children - okay (JW, Mar 2011).
      */
     public void interactiveParentPopup() {
         JXDatePicker picker = new JXDatePicker(new Date());
+        picker.setToolTipText("picker toolTip");
         picker.setInheritsPopupMenu(true);
         JComboBox compareBox = new JComboBox(new Object[]{"some", "items", "are ", "better ....."});
+        compareBox.setToolTipText("combo toolTip");
         compareBox.setInheritsPopupMenu(true);
         JComboBox compareBoxEditable = new JComboBox(new Object[]{"some", "items", "are ", "better ....."});
+        compareBoxEditable.setToolTipText("editable combo toolTip");
         compareBoxEditable.setEditable(true);
         compareBoxEditable.setInheritsPopupMenu(true);
         JTextField compareField = new JTextField("just for comparing");
@@ -140,6 +143,7 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
         panel.add(compareBox);
         panel.add(compareField);
         JXFrame frame = wrapInFrame(panel, "inherited popup");
+        addEnabledToggleWithChildren(frame, panel);
         addStatusMessage(frame, "right click in components to show parent popup");
         show(frame);
         
