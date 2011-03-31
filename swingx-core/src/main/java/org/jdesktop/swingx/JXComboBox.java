@@ -580,6 +580,7 @@ public class JXComboBox extends JComboBox {
     public void setUseHighlightersForCurrentValue(boolean useHighlightersForCurrentValue) {
         boolean oldValue = isUseHighlightersForCurrentValue();
         this.useHighlightersForCurrentValue = useHighlightersForCurrentValue;
+        repaint();
         firePropertyChange("useHighlightersForCurrentValue", oldValue,
                 isUseHighlightersForCurrentValue());
     }
