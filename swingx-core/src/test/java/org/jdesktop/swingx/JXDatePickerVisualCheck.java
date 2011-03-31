@@ -120,9 +120,10 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
      * Issue #1393-swingx: inherited popup not shown on editor/arrow button.
      * Issue #1427-swingx: right click on arrow must not open monthView
      * Issue ??: tooltip on children - okay (JW, Mar 2011).
+     * Issue #1329-swingx: editor border different from textfield border in win7
      */
     public void interactiveParentPopup() {
-        JXDatePicker picker = new JXDatePicker(new Date());
+        final JXDatePicker picker = new JXDatePicker(new Date());
         picker.setToolTipText("picker toolTip");
         picker.setInheritsPopupMenu(true);
         JComboBox compareBox = new JComboBox(new Object[]{"some", "items", "are ", "better ....."});
@@ -143,6 +144,18 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
         panel.add(compareBox);
         panel.add(compareField);
         JXFrame frame = wrapInFrame(panel, "inherited popup");
+        Action printBorder = new AbstractAction("print borders ") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String text = "picker border: " + picker.getBorder() 
+                + "\n editor border: " + picker.getEditor().getBorder()
+                    + "\n FormattedTextField border: " + new JFormattedTextField().getBorder()
+                ;    
+                LOG.info(text);
+            }
+        };
+        addAction(frame, printBorder);
         addEnabledToggleWithChildren(frame, panel);
         addStatusMessage(frame, "right click in components to show parent popup");
         show(frame);
