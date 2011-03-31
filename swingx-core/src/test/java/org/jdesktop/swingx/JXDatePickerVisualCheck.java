@@ -116,6 +116,34 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
         }
     }
 
+    /**
+     * Issue #1393-swingx: inherited popup not shown on editor/arrow button.
+     * Issue #1427-swingx: right click on arrow must not open monthView
+     * 
+     */
+    public void interactiveParentPopup() {
+        JXDatePicker picker = new JXDatePicker(new Date());
+        picker.setInheritsPopupMenu(true);
+        JComboBox compareBox = new JComboBox(new Object[]{"some", "items", "are ", "better ....."});
+        compareBox.setInheritsPopupMenu(true);
+        JComboBox compareBoxEditable = new JComboBox(new Object[]{"some", "items", "are ", "better ....."});
+        compareBoxEditable.setEditable(true);
+        compareBoxEditable.setInheritsPopupMenu(true);
+        JTextField compareField = new JTextField("just for comparing");
+        compareField.setInheritsPopupMenu(true);
+        JPanel panel = new JPanel();
+        JPopupMenu menu = new JPopupMenu();
+        menu.add("dummy");
+        panel.setComponentPopupMenu(menu);
+        panel.add(picker);
+        panel.add(compareBoxEditable);
+        panel.add(compareBox);
+        panel.add(compareField);
+        JXFrame frame = wrapInFrame(panel, "inherited popup");
+        addStatusMessage(frame, "right click in components to show parent popup");
+        show(frame);
+        
+    }
     public void interactivePopupMenuListener() {
         JXDatePicker picker = new JXDatePicker();
         PopupMenuListener l = new PopupMenuListener() {
@@ -351,6 +379,7 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
         field.setEditable(false);
         PropertyChangeListener l = new PropertyChangeListener() {
 
+            @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 if ("date".equals(evt.getPropertyName())) {
                     if (picker.getDate() != null)
@@ -381,6 +410,7 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
                 new DefaultFormatterFactory(new DateFormatter(format)));
         PropertyChangeListener l = new PropertyChangeListener() {
 
+            @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 if ("date".equals(evt.getPropertyName())) {
                     if (picker.getDate() != null)
@@ -476,12 +506,14 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
         box.setEditable(true);
         FocusListener l = new FocusListener() {
 
+            @Override
             public void focusGained(FocusEvent e) {
                 if (e.isTemporary()) return;
                 String source = e.getSource().getClass().getSimpleName();
                 LOG.info("focus gained from: " + source);
             }
 
+            @Override
             public void focusLost(FocusEvent e) {
                 if (e.isTemporary()) return;
                 String source = e.getSource().getClass().getSimpleName();
@@ -526,6 +558,7 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
         field.setValue(picker.getDate());
         PropertyChangeListener l = new PropertyChangeListener() {
 
+            @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 if ("date".equals(evt.getPropertyName())) {
                     field.setValue(evt.getNewValue());
@@ -540,6 +573,7 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
         picker.addPropertyChangeListener(l);
         Action setDate = new AbstractActionExt("set date") {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 picker.setDate(new Date());
                 
@@ -587,6 +621,7 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
         field.setValue(picker.getDate());
         PropertyChangeListener l = new PropertyChangeListener() {
 
+            @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 if ("date".equals(evt.getPropertyName())) {
                     field.setValue(evt.getNewValue());
@@ -601,6 +636,7 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
         picker.addPropertyChangeListener(l);
         Action setDate = new AbstractActionExt("set date") {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 picker.setDate(new Date());
                 
@@ -624,6 +660,7 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
         final JXDatePicker picker = new JXDatePicker();
         JXFrame frame = showInFrame(picker, "picker update ui");
         Action action = new AbstractActionExt("toggleUI") {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 String uiClass = (String) UIManager.get(JXMonthView.uiClassID);
                 boolean custom = uiClass.indexOf("Custom") > 0;
@@ -957,6 +994,7 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
         JXFrame frame = showInFrame(picker, "null panel");
         Action toggleLinkPanel = new AbstractAction("toggleLinkPanel <-> null") {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 boolean hasLinkPanel = picker.getLinkPanel() != null;
                 picker.setLinkPanel(hasLinkPanel ? null : panel);
@@ -978,6 +1016,7 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
         
         PropertyChangeListener l = new PropertyChangeListener() {
 
+            @Override
             public void propertyChange(PropertyChangeEvent e) {
                 LOG.info("got pce from: " + e.getSource().getClass().getSimpleName() + 
                         "\n" + e.getPropertyName() + e.getNewValue());
@@ -1036,6 +1075,7 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
         JComboBox nonEditableBox = new JComboBox(new Object[] {"one", "two", "three"});
         final Action l = new AbstractActionExt("recived") {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 LOG.info("got action from: " + e.getSource().getClass().getName() + 
                         "\n" + e);
@@ -1060,6 +1100,7 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
         JXFrame frame = wrapInFrame(panel, "SetAction - Compare action events: keyboard/mouse");
         Action toggleEnabled = new AbstractActionExt("toggleEnabledAction") {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 l.setEnabled(!l.isEnabled());
             }
@@ -1086,6 +1127,7 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
         
         ActionListener l = new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 LOG.info("got action from: " + e.getSource().getClass().getName() + 
                         "\n" + e);
@@ -1099,6 +1141,7 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
         box.addActionListener(l);
         Action action = new AbstractAction("set new value") {
             int dayToAdd = 1;
+            @Override
             public void actionPerformed(ActionEvent e) {
                 Calendar cal = Calendar.getInstance();
                 cal.add(Calendar.DAY_OF_MONTH, dayToAdd++);
@@ -1174,6 +1217,7 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
         /**
          * {@inheritDoc}
          */
+        @Override
         public void actionPerformed(ActionEvent e) {
             try {
                 Component c = (Component) e.getSource();

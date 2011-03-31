@@ -177,6 +177,7 @@ public class BasicDatePickerUI extends DatePickerUI {
             popupButton.putClientProperty("doNotCancelPopup", preventHide);
             datePicker.add(popupButton);
             popupButton.setEnabled(datePicker.isEnabled());
+            popupButton.setInheritsPopupMenu(true);
         }
             updateChildLocale(datePicker.getLocale());
         
@@ -747,6 +748,7 @@ public class BasicDatePickerUI extends DatePickerUI {
         JComboBox box = new JComboBox();
         Object preventHide = box.getClientProperty("doNotCancelPopup");
         datePicker.getEditor().putClientProperty("doNotCancelPopup", preventHide);
+        datePicker.getEditor().setInheritsPopupMenu(true);
 
         updateEditorValue();
         updateEditorProperties();
@@ -1063,7 +1065,6 @@ public class BasicDatePickerUI extends DatePickerUI {
         return new TogglePopupAction();
     }
 
-
     /**
      * Toggles the popups visibility after preparing internal state.
      * 
@@ -1097,25 +1098,6 @@ public class BasicDatePickerUI extends DatePickerUI {
                 }
             });
         }
-
-    }
-
-    
-    private void invokeShowPopup() {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                if (datePicker.getParent() == null) {
-                    // Tracking #1372-swingx - parent is null if used as DatePickerCellEditor,
-                    // two different editors, clickCountToStart == 1 and Metal
-                    // as a first hot fix, we back out
-//                    LOG.info("datePicker name: " + datePicker.getName() + datePicker.getParent());
-                    return;
-                }
-                popup.show(datePicker,
-                        0, datePicker.getHeight());
-            }
-        });
     }
 
     /**

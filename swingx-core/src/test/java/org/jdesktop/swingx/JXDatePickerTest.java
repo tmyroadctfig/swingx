@@ -41,9 +41,11 @@ import java.util.logging.Logger;
 import javax.swing.Action;
 import javax.swing.InputMap;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
@@ -81,18 +83,55 @@ public class JXDatePickerTest extends InteractiveTestCase {
             .getName());
     
     private Calendar calendar;
-
-    @Override
-    @Before
-       public void setUp() {
-        calendar = Calendar.getInstance();
+    
+    /**
+     * Issue #1393-swingx: JXDatePicker children must show parent popup if inherits true
+     * 
+     * Here: sanity test of JComboBox for comparison
+     */
+    @Test
+    public void testComboInheritsComponentPopup() {
+        JComboBox box = new JComboBox(new Object[] {"some", "other"});
+        box.setInheritsPopupMenu(true);
+        box.setEditable(true);
+        JPanel parent = new JPanel();
+        JPopupMenu popup = new JPopupMenu();
+        popup.add("dummy");
+        parent.setComponentPopupMenu(popup);
+        parent.add(box);
+        // sanity: combobox
+        assertInheritedPopup(box, popup);
+    }
+    
+    /**
+     * Issue #1393-swingx: JXDatePicker children must show parent popup if inherits true
+     * 
+     * Here: sanity test of JComboBox for comparison
+     */
+    @Test
+    public void testDatePickerInheritsComponentPopup() {
+        JXDatePicker box = new JXDatePicker();
+        box.setInheritsPopupMenu(true);
+        JPanel parent = new JPanel();
+        JPopupMenu popup = new JPopupMenu();
+        popup.add("dummy");
+        parent.setComponentPopupMenu(popup);
+        parent.add(box);
+        // sanity: combobox
+        assertInheritedPopup(box, popup);
     }
 
-    @Override
-    @After
-       public void tearDown() {
-    }
 
+    private void assertInheritedPopup(JComponent box, JPopupMenu popup) {
+        assertSame("inherited popup expected on " + box.getClass(), popup,  box.getComponentPopupMenu());
+        for (int i = 0; i < box.getComponentCount(); i++) {
+            if (box.getComponent(i) instanceof JComponent)
+                assertSame("inherited popup expected on " + box.getComponent(i).getClass(),
+                        popup, ((JComponent) box.getComponent(i)).getComponentPopupMenu());
+        }
+    }
+    
+    
     /**
      * Issue #1301-swingx: Picker must be source of popupMenuEvent.
      * 
@@ -118,6 +157,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
         Action togglePopup = picker.getActionMap().get("TOGGLE_POPUP");
         togglePopup.actionPerformed(null);
         SwingUtilities.invokeAndWait(new Runnable() {
+            @Override
             public void run() {
                 assertEquals(1, report.getVisibleEventCount());
                 assertEquals(picker, report.getLastEvent().getSource());
@@ -151,6 +191,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
         togglePopup.actionPerformed(null);
         final PopupMenuReport report = new PopupMenuReport();
         SwingUtilities.invokeAndWait(new Runnable() {
+            @Override
             public void run() {
                 picker.addPopupMenuListener(report);
                 togglePopup.actionPerformed(null);
@@ -159,6 +200,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
         });
         
         SwingUtilities.invokeAndWait(new Runnable() {
+            @Override
             public void run() {
                 assertEquals(1, report.getInvisibleEventCount());
                 assertEquals(picker, report.getLastEvent().getSource());
@@ -192,6 +234,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
         Action togglePopup = picker.getActionMap().get("TOGGLE_POPUP");
         togglePopup.actionPerformed(null);
         SwingUtilities.invokeAndWait(new Runnable() {
+            @Override
             public void run() {
                 assertEquals(1, report.getEventCount());
                 assertEquals(1, report.getVisibleEventCount());
@@ -226,6 +269,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
         togglePopup.actionPerformed(null);
         final PopupMenuReport report = new PopupMenuReport();
         SwingUtilities.invokeAndWait(new Runnable() {
+            @Override
             public void run() {
                 picker.addPopupMenuListener(report);
                 picker.getMonthView().cancelSelection();
@@ -233,6 +277,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
             }
         });
         SwingUtilities.invokeAndWait(new Runnable() {
+            @Override
             public void run() {
                 assertEquals(2, report.getEventCount());
                 assertEquals(1, report.getInvisibleEventCount());
@@ -266,6 +311,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
         togglePopup.actionPerformed(null);
         final PopupMenuReport report = new PopupMenuReport();
         SwingUtilities.invokeAndWait(new Runnable() {
+            @Override
             public void run() {
                 picker.addPopupMenuListener(report);
                 togglePopup.actionPerformed(null);
@@ -273,6 +319,7 @@ public class JXDatePickerTest extends InteractiveTestCase {
             }
         });
         SwingUtilities.invokeAndWait(new Runnable() {
+            @Override
             public void run() {
                 assertEquals(1, report.getEventCount());
                 assertEquals(1, report.getInvisibleEventCount());
@@ -2094,4 +2141,18 @@ public class JXDatePickerTest extends InteractiveTestCase {
         cal.set(Calendar.MILLISECOND, 0);
         return cal.getTime();
     }
+    
+
+    @Override
+    @Before
+       public void setUp() {
+        calendar = Calendar.getInstance();
+    }
+
+    @Override
+    @After
+       public void tearDown() {
+    }
+
+
 }
