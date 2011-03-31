@@ -9,6 +9,7 @@ package org.jdesktop.swingx.decorator;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.ComponentOrientation;
 import java.awt.Font;
 import java.util.logging.Logger;
 
@@ -385,6 +386,47 @@ public class HighlighterTest extends InteractiveTestCase {
         assertEquals(icon, hl.getIcon());
     }
 
+//-------------- EnabledHighlighter
+    
+    @Test
+    public void testOrientationHighlighterConstructors() {
+        ComponentOrientationHighlighter hl = new ComponentOrientationHighlighter();
+        assertSame(HighlightPredicate.ALWAYS, hl.getHighlightPredicate());
+        assertEquals(true, hl.getComponentOrientation().isLeftToRight());
+        hl = new ComponentOrientationHighlighter(ComponentOrientation.RIGHT_TO_LEFT);
+        assertSame(HighlightPredicate.ALWAYS, hl.getHighlightPredicate());
+        assertEquals(ComponentOrientation.RIGHT_TO_LEFT, hl.getComponentOrientation());
+        hl = new ComponentOrientationHighlighter(HighlightPredicate.NEVER);
+        assertSame(HighlightPredicate.NEVER, hl.getHighlightPredicate());
+        assertEquals(true, hl.getComponentOrientation().isLeftToRight());
+        hl = new ComponentOrientationHighlighter(HighlightPredicate.NEVER, ComponentOrientation.RIGHT_TO_LEFT);
+        assertSame(HighlightPredicate.NEVER, hl.getHighlightPredicate());
+        assertEquals(ComponentOrientation.RIGHT_TO_LEFT, hl.getComponentOrientation());
+    }
+    
+    @Test
+    public void testOrientationHighlighterSetCO() {
+        ComponentOrientationHighlighter hl = new ComponentOrientationHighlighter();
+        ChangeReport report = new ChangeReport();
+        hl.addChangeListener(report);
+        hl.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+        assertEquals(ComponentOrientation.RIGHT_TO_LEFT, hl.getComponentOrientation());
+        assertEquals(1, report.getEventCount());
+        report.clear();
+        hl.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+        assertEquals(0, report.getEventCount());
+    }
+    
+    @Test
+    public void testOrientationHighlighterDecorate() {
+        JSlider box = new JSlider();
+        ComponentOrientation orientation = box.getComponentOrientation().isLeftToRight() ? 
+                ComponentOrientation.RIGHT_TO_LEFT : ComponentOrientation.LEFT_TO_RIGHT;
+        ComponentOrientationHighlighter hl = new ComponentOrientationHighlighter(orientation);
+        hl.highlight(box, createDummyComponentAdapter(box));
+        assertEquals(orientation, box.getComponentOrientation());
+    }
+    
 //-------------- EnabledHighlighter
     
     @Test
