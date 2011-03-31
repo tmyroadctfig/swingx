@@ -27,6 +27,7 @@ import java.awt.Paint;
 import java.awt.Shape;
 
 import org.jdesktop.swingx.graphics.PaintUtils;
+import org.jdesktop.swingx.painter.effects.AbstractAreaEffect;
 import org.jdesktop.swingx.painter.effects.AreaEffect;
 
 
@@ -64,10 +65,11 @@ public abstract class AbstractAreaPainter<T> extends AbstractLayoutPainter<T> {
      */
     public enum Style {BOTH, FILLED, OUTLINE,
         /**
-         * @deprecated (pre-1.6.3) use {@link AbstractPainter#setVisible(boolean) setVisible(false)}
-         *             instead.
+         * {@code NONE} has different semantics that {@link AbstractAreaPainter#setVisible(boolean)
+         * setVisible(false)}. With {@code setVisible(false)}, nothing is painted. With style
+         * {@code NONE}, any {@link AreaEffect effects} are still painted.
          */
-        @Deprecated NONE}
+        NONE}
     
     // controls if the paint should be stretched to fill the available area
     private boolean stretchPaint;
