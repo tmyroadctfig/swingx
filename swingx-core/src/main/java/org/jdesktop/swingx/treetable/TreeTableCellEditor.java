@@ -27,13 +27,14 @@ import java.awt.event.MouseEvent;
 import java.util.EventObject;
 import java.util.logging.Logger;
 
-import javax.swing.DefaultCellEditor;
 import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.tree.TreeCellRenderer;
+
+import org.jdesktop.swingx.JXTable.GenericEditor;
 
 /**
  * An editor that can be used to edit the tree column. This extends
@@ -74,8 +75,11 @@ import javax.swing.tree.TreeCellRenderer;
  * @author Scott Violet
  * @author Ramesh Gupta
  */
-public class TreeTableCellEditor extends DefaultCellEditor {
-
+public class TreeTableCellEditor extends GenericEditor {
+    //DefaultCellEditor {
+// JW: changed to extends GenericEditor to fix #1365-swingx - 
+//    borders different in hierarchical column vs. table column
+//    
     @SuppressWarnings("unused")
     private static final Logger LOG = Logger
             .getLogger(TreeTableCellEditor.class.getName());
@@ -106,6 +110,7 @@ public class TreeTableCellEditor extends DefaultCellEditor {
         initEditorOffset(table, row, column, isSelected);
         return component;
     }
+
 
     /**
      * @param row

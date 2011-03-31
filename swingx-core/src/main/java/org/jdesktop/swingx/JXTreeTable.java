@@ -2112,7 +2112,6 @@ public class JXTreeTable extends JXTable {
         return super.getCellEditor(row, column);
     }
     
-    
     @Override
     public void updateUI() {
         super.updateUI();
