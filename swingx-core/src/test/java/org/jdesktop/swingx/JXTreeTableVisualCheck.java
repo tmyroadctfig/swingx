@@ -107,10 +107,11 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
 //             test.runInteractiveTests("interactive.*ColumnSelection.*");
 //             test.runInteractiveTests("interactive.*RowHeightCompare.*");
 //             test.runInteractiveTests("interactive.*RToL.*");
-            test.runInteractiveTests("interactive.*ColumnFactory.*");
+//            test.runInteractiveTests("interactive.*ColumnFactory.*");
 //             test.runInteractiveTests("interactive.*ScrollPath.*");
 //             test.runInteractiveTests("interactive.*Insert.*");
 //             test.runInteractiveTests("interactive.*WinP.*");
+             test.runInteractiveTests("interactive.*EditorIcon.*");
         } catch (Exception ex) {
 
         }
@@ -208,6 +209,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         JXFrame frame = wrapWithScrollingInFrame(treeTable, table, "columnSelection in treetable");
         Action action = new AbstractActionExt("Toggle dnd: false") {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 
                 boolean dragEnabled = !treeTable.getDragEnabled();
@@ -235,22 +237,27 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
             super(root);
         }
  
+        @Override
         public int getColumnCount() {
             return 4;
         }
  
+        @Override
         public Object getValueAt(Object o, int i) {
             return o + ":" + i;
         }
  
+        @Override
         public Object getChild(Object parent, int index) {
             return parent == root ? String.valueOf(index) : null;
         }
  
+        @Override
         public int getChildCount(Object parent) {
             return parent == root ? 10000 : 0;
         }
  
+        @Override
         public int getIndexOfChild(Object parent, Object child) {
             return parent == root ? Integer.valueOf((String) child) : -1;
         }
@@ -301,11 +308,13 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         CellEditor editor = xTable.getCellEditor(0, 0);
         CellEditorListener l =  new CellEditorListener() {
 
+            @Override
             public void editingCanceled(ChangeEvent e) {
                 field.setText("canceled");
                 LOG.info("canceled");
             }
 
+            @Override
             public void editingStopped(ChangeEvent e) {
                 field.setText("stopped");
                 LOG.info("stopped");
@@ -315,6 +324,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         JXFrame frame = wrapWithScrollingInFrame(xTable, "#730-swingx: click sometimes cancels");
         Action toggleExpansion = new AbstractAction("toggle") {
 
+            @Override
             public void actionPerformed(ActionEvent arg0) {
                 boolean isExpanded = xTable.isExpanded(0);
                 if (isExpanded) {
@@ -348,6 +358,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         final Color uiForeground = tree.getSelectionForeground();
         Action toggleSelectionColors = new AbstractAction("toggle selection colors") {
             
+            @Override
             public void actionPerformed(ActionEvent e) {
                 if (tree.getSelectionBackground() == uiBackground) {
                     tree.setSelectionBackground(Color.BLUE);
@@ -376,6 +387,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         JXFrame frame = showWithScrollingInFrame(treeTable, "disabled - tree follows table");
         Action action = new AbstractActionExt("toggle enabled") {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 treeTable.setEnabled(!treeTable.isEnabled());
                 
@@ -448,6 +460,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         final JXFrame frame = wrapWithScrollingInFrame(treeTable, table, "update ui-specific striping");
         Action toggle = new AbstractActionExt("toggle LF") {
             boolean system;
+            @Override
             public void actionPerformed(ActionEvent e) {
                 String lfName = system ? UIManager.getSystemLookAndFeelClassName() :
                     UIManager.getCrossPlatformLookAndFeelClassName();
@@ -493,6 +506,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         ToolTipManager.sharedInstance().unregisterComponent(treeTable);
         Action action = new AbstractAction("toggle largeModel") {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 treeTable.setLargeModel(!treeTable.isLargeModel());
                
@@ -543,6 +557,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         tree.setRowHeight(treeTable.getRowHeight());
         Action toggleScrolls = new AbstractAction("Toggle Scroll") {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 tree.setScrollsOnExpand(!tree.getScrollsOnExpand());
                 treeTable.setScrollsOnExpand(tree.getScrollsOnExpand());
@@ -551,6 +566,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         };
          Action expand = new AbstractAction("Expand") {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 int[] selectedRows = tree.getSelectionRows();
                 if (selectedRows.length > 0) {
@@ -593,6 +609,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         final JXTree tree = new JXTree(model);
         Action action = new AbstractAction("path visible") {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 Rectangle visible = table.getVisibleRect();
                 int lastRow = table.rowAtPoint(new Point(5, visible.y + visible.height + 100));
@@ -633,16 +650,19 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         
         renderer.addTreeExpansionListener(new TreeExpansionListener(){
 
-           public void treeCollapsed(TreeExpansionEvent event) {
+           @Override
+        public void treeCollapsed(TreeExpansionEvent event) {
            }
 
-           public void treeExpanded(TreeExpansionEvent event) {
+           @Override
+        public void treeExpanded(TreeExpansionEvent event) {
               
               final JTree renderer = (JTree)event.getSource();
               
               SwingUtilities.invokeLater(new Runnable(){
                  
-                 public void run() {
+                 @Override
+                public void run() {
                     tree.getColumnModel().getColumn(0).setPreferredWidth(renderer.getPreferredSize().width);
 
                  }
@@ -707,6 +727,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         JXFrame frame = wrapWithScrollingInFrame(tree, treeTable, "JTree vs. JXTreeTable: insert into empty model");
         Action insertAction = new AbstractAction("insert node") {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 model.addChild(root);
                 
@@ -715,6 +736,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         };
         addAction(frame, insertAction);
         Action toggleRoot = new AbstractAction("toggle root visible") {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 boolean rootVisible = !tree.isRootVisible();
                 treeTable.setRootVisible(rootVisible);
@@ -757,6 +779,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         // treetable root invisible by default
         JXFrame frame = wrapWithScrollingInFrame(tree, treeTable, "collaps/expand root");
         Action toggleRoot = new AbstractAction("toggle root") {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 boolean rootVisible = !tree.isRootVisible();
                 treeTable.setRootVisible(rootVisible);
@@ -766,6 +789,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         };
         addAction(frame, toggleRoot);
         Action expandAll = new AbstractAction("expandAll") {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 treeTable.expandAll();
                 tree.expandAll();
@@ -774,6 +798,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         };
         addAction(frame, expandAll);
         Action collapseAll = new AbstractAction("collapseAll") {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 treeTable.collapseAll();
                 tree.collapseAll();
@@ -814,6 +839,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         JXFrame frame = wrapWithScrollingInFrame(tree, treeTable, "JXTree vs. JXTreeTable insert node to nested child");
         Action insertAction = new AbstractAction("insert node") {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 model.addChild(childB);
            
@@ -872,6 +898,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         JXFrame frame = wrapWithScrollingInFrame(tree, treeTable, "JXTree vs. JXTreeTable - update parent on insert child");
         Action insertAction = new AbstractAction("insert node selected treetable") {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 int selected = treeTable.getSelectedRow();
                 if (selected < 0 ) return;
@@ -910,6 +937,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         JXFrame frame = wrapWithScrollingInFrame(tree, treeTable, "JTree vs. JXTreeTable - insert to collapsed root");
         Action insertAction = new AbstractAction("insert node") {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 int selected = treeTable.getSelectedRow();
                 DefaultMutableTreeTableNode parent;
@@ -966,6 +994,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         final TreeTableModel model = createMutableVisualizeModel();
         final JXTreeTable table = new JXTreeTable(model);
         JXFrame frame = wrapWithScrollingInFrame(table, "Editor: icons showing");
+        addComponentOrientationToggle(frame);
         frame.setVisible(true);
     }
 
@@ -987,6 +1016,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         final TreeTableModel model = new ComponentTreeTableModel(frame);
         Action action = new AbstractAction("Toggle model") {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 TreeTableModel myModel = treeTable.getTreeTableModel();
                 treeTable.setTreeTableModel(myModel == model ? treeTableModel : model);
@@ -1101,6 +1131,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         JXFrame frame = wrapWithScrollingInFrame(treeTable, tree, "toggle dragEnabled (starting with false)");
         Action action = new AbstractActionExt("Toggle dnd: false") {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 
                 boolean dragEnabled = !treeTable.getDragEnabled();
@@ -1141,6 +1172,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         final TableCellRenderer delegate = new DefaultTableCellRenderer();
         TableCellRenderer l = new TableCellRenderer() {
 
+            @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 Component result = delegate.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
                 ((JComponent) result).setToolTipText(String.valueOf(value));
@@ -1159,6 +1191,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         final TreeCellRenderer delegate = new DefaultTreeCellRenderer();
         TreeCellRenderer renderer = new TreeCellRenderer() {
 
+            @Override
             public Component getTreeCellRendererComponent(JTree tree, Object value, 
                     boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
                 Component result = delegate.getTreeCellRendererComponent(tree, value, 
@@ -1179,6 +1212,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         final JXTreeTable treeTable = new JXTreeTable(treeTableModel);
         Action toggleHandles = new AbstractAction("Toggle Handles") {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 treeTable.setShowsRootHandles(!treeTable.getShowsRootHandles());
                 
@@ -1187,6 +1221,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         };
         Action toggleRoot = new AbstractAction("Toggle Root") {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 treeTable.setRootVisible(!treeTable.isRootVisible());
                 
@@ -1214,6 +1249,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         final Icon upIcon = XTestUtils.loadDefaultIcon("welltop.gif");
         Action toggleClosedIcon = new AbstractAction("Toggle closed icon") {
             boolean down;
+            @Override
             public void actionPerformed(ActionEvent e) {
                 if (down) {
                     treeTable.setClosedIcon(downIcon);
@@ -1327,6 +1363,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         treeTable.addHighlighter(new ShadingColorHighlighter(hierarchical));
         HighlightPredicate predicate = new HighlightPredicate() {
 
+            @Override
             public boolean isHighlighted(Component renderer, ComponentAdapter adapter) {
                 return adapter.isLeaf();
             }
@@ -1412,6 +1449,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
 
         HighlightPredicate predicate = new HighlightPredicate() {
 
+            @Override
             public boolean isHighlighted(Component renderer, ComponentAdapter adapter) {
                 return adapter.hasFocus();
             }
