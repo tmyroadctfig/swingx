@@ -22,6 +22,7 @@
 package org.jdesktop.swingx.decorator;
 
 import java.awt.Color;
+import java.awt.ComponentOrientation;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
@@ -54,14 +55,20 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase  {
     public static void main(String[] args) {
         HighlighterClientVisualCheck test = new HighlighterClientVisualCheck();
         try {
-//            test.runInteractiveTests();
-            test.runInteractiveTests("interactive.*ToolTip.*");
+            test.runInteractiveTests();
+//            test.runInteractiveTests("interactive.*ToolTip.*");
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    
+    public void interactiveComponentOrientation() {
+        JXTable table = new JXTable(new AncientSwingTeam());
+        ComponentOrientation orientation = table.getComponentOrientation().isLeftToRight() ? 
+                ComponentOrientation.RIGHT_TO_LEFT : ComponentOrientation.LEFT_TO_RIGHT;
+        table.getColumnExt(0).addHighlighter(new ComponentOrientationHighlighter(orientation ));
+        showWithScrollingInFrame(table, "Alternative CO in first column");
+    }
 
     /**
      * Issue #1317-swingx: PatternPredicate throws exception if testColumn -1 (== all)
@@ -113,6 +120,7 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase  {
         table.getColumnExt(0).addHighlighter(hl);
         Action action = new AbstractAction("toggle column color") {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 Color old = hl.getBackground();
                 hl.setBackground(old == Color.red ? Color.ORANGE : Color.RED);
