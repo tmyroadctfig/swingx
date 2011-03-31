@@ -122,5 +122,21 @@ public class TableUtilities {
         }
     }
     
+    /**
+     * Returns an array containing the ordinals of the given values of an Enum.<p>
+     * 
+     * Convience for clients which define TableColumns as Enums (Issue #1304-swingx).
+     * 
+     * @param values the enums to map to its ordinals
+     * @return an array of ordinals, guaranteed to be not null
+     */
+    public static int[] ordinalsOf(Enum<?>... values) {
+        int[] cols = new int[values.length];
+        for (int i = 0; i < values.length; i++) {
+            cols[i] = values[i].ordinal();
+        }
+        return cols;
+    }
+    
     private TableUtilities() {}
 }

@@ -8,6 +8,7 @@ import static org.jdesktop.swingx.table.TableUtilities.isDataChanged;
 import static org.jdesktop.swingx.table.TableUtilities.isInsert;
 import static org.jdesktop.swingx.table.TableUtilities.isStructureChanged;
 import static org.jdesktop.swingx.table.TableUtilities.isUpdate;
+import static org.jdesktop.swingx.table.TableUtilities.ordinalsOf;
 
 import javax.swing.JTable;
 import javax.swing.event.TableModelEvent;
@@ -19,10 +20,29 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-
 @RunWith(JUnit4.class)
 public class TableUtilitiesTest extends InteractiveTestCase {
     
+    @Test
+    public void testOrdinals() {
+        int[] ordinals = ordinalsOf(Dummy.THIRD, Dummy.SECOND, Dummy.FIRST);
+        for (int i = 0; i < ordinals.length; i++) {
+            assertEquals(Dummy.values().length - 1 - i, ordinals[i]);
+        }
+    }
+    
+    @Test
+    public void testOrdinalsEmpty() {
+        int[] ordinals = ordinalsOf();
+        assertNotNull(ordinals);
+        assertEquals(0, ordinals.length);
+    }
+    
+    enum Dummy {
+        FIRST,
+        SECOND,
+        THIRD
+    }
     
     @Test(expected = IndexOutOfBoundsException.class)
     public void testPrefRowHeightInvalidRow() {
