@@ -84,6 +84,15 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
         super("JXTreeTable Unit Test");
     }
     
+    /**
+     * Issue #1430-swingx: throwing on access of getEditingRow
+     */
+    @Test
+    public void testEditingRow() {
+        JXTreeTable table = new JXTreeTable();
+        table.getEditingRow();
+    }
+    
     @Test
     public void testFakeSortable() {
         JXTreeTable table = new FakeSortableTreeTable();
@@ -349,6 +358,7 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
         JXTreeTable table = new JXTreeTableT(AncientSwingTeam.createNamedColorTreeTableModel());
         StringValue sv = new StringValue() {
 
+            @Override
             public String getString(Object value) {
                 if (value instanceof Color) {
                     Color color = (Color) value;
@@ -513,6 +523,7 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
         table.getModel().addTableModelListener(report);
         ((DefaultTreeTableModel) model).setRoot(null);
         SwingUtilities.invokeAndWait(new Runnable() {
+            @Override
             public void run() {
                 assertEquals("tableModel must have fired", 1, report.getEventCount());
                 assertTrue("event type must be structureChanged " + TableModelReport.printEvent(report.getLastEvent()), 
@@ -544,6 +555,7 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
         table.getModel().addTableModelListener(report);
         ((DefaultTreeTableModel) model).setRoot(new DefaultMutableTreeTableNode("other"));  
         SwingUtilities.invokeAndWait(new Runnable() {
+            @Override
             public void run() {
                 assertEquals("tableModel must have fired", 1, report.getEventCount());
                 assertTrue("event type must be structureChanged " + TableModelReport.printEvent(report.getLastEvent()), 
@@ -591,6 +603,7 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
         table.getModel().addTableModelListener(report);
         model.removeNodeFromParent(node);
         SwingUtilities.invokeAndWait(new Runnable() {
+            @Override
             public void run() {
                 assertEquals("tableModel must have fired", 1, report.getEventCount());
                 assertTrue("event type must be dataChanged " + TableModelReport.printEvent(report.getLastEvent()), 
@@ -620,6 +633,7 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
         table.getModel().addTableModelListener(report);
         table.setTreeTableModel(createCustomTreeTableModelFromDefault());  
         SwingUtilities.invokeAndWait(new Runnable() {
+            @Override
             public void run() {
                 assertEquals("tableModel must have fired", 1, report.getEventCount());
                 assertTrue("event type must be structureChanged " + TableModelReport.printEvent(report.getLastEvent()), 
@@ -688,6 +702,7 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
         model.setValueAt("games",
                 table.getPathForRow(6).getLastPathComponent(), 0);   
         SwingUtilities.invokeAndWait(new Runnable() {
+            @Override
             public void run() {
                 assertEquals("tableModel must have fired", 1, report.getEventCount());
                 assertEquals("the event type must be update", 1, report.getUpdateEventCount());
@@ -732,6 +747,7 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
         MutableTreeTableNode firstChild = (MutableTreeTableNode) sportsNode.getChildAt(0);
         ((DefaultTreeTableModel) model).removeNodeFromParent(firstChild);
         SwingUtilities.invokeAndWait(new Runnable() {
+            @Override
             public void run() {
                 assertEquals("tableModel must have fired exactly one event", 1, report.getEventCount());
                 TableModelEvent event = report.getLastEvent();
@@ -766,6 +782,7 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
         // Problem was: model was not-editable.
         table.setValueAt("games", row, 0);
         SwingUtilities.invokeAndWait(new Runnable() {
+            @Override
             public void run() {
                 assertEquals("tableModel must have fired", 1, report.getEventCount());
                 assertEquals("the event type must be update", 1, report.getUpdateEventCount());
@@ -1236,6 +1253,7 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
         model.addChild(childB);
         // need to invoke - the tableEvent is fired delayed as well
         SwingUtilities.invokeAndWait(new Runnable() {
+            @Override
             public void run() {
                 int selectedAfterInsert = treeTable.getSelectedRow();
                 assertEquals(selected, selectedAfterInsert);

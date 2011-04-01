@@ -1210,6 +1210,7 @@ public class JXTreeTable extends JXTable {
      */
     @Override
     public int getEditingRow() {
+        if (editingRow == -1) return -1;
         return isHierarchical(editingColumn) ? -1 : editingRow;
     }
 
