@@ -22,17 +22,22 @@
 package org.jdesktop.swingx;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.JComboBox;
 
 import org.jdesktop.swingx.decorator.Highlighter;
+import org.jdesktop.swingx.renderer.DefaultListRenderer;
+import org.jdesktop.swingx.renderer.LocalizableStringValue;
+import org.jdesktop.swingx.renderer.StringValue;
 import org.jdesktop.swingx.search.PatternMatcher;
-
+import org.jdesktop.swingx.search.PatternModel;
 /**
  * <p>
  * {@code JXSearchPanel} provides complex searching features. Users are able to
@@ -76,7 +81,7 @@ public class JXSearchPanel extends AbstractPatternPanel {
      */
     public static final String MATCH_RULE_ACTION_COMMAND = "selectMatchRule";
 
-    private JComboBox searchCriteria;
+    private JXComboBox searchCriteria;
 
     private List<PatternMatcher> patternMatchers;
     
@@ -219,13 +224,38 @@ public class JXSearchPanel extends AbstractPatternPanel {
         model.setSelectedItem(getPatternModel().getMatchRule());
         searchCriteria.setModel(model);
         searchCriteria.setAction(getAction(MATCH_RULE_ACTION_COMMAND));
+        searchCriteria.setRenderer(new DefaultListRenderer(createStringValue(getLocale())));
         
     }
-    
 
+    
+    private StringValue createStringValue(Locale locale) {
+        // TODO Auto-generated method stub
+        Map<Object, String> keys = new HashMap<Object, String>();
+        keys.put(PatternModel.MATCH_RULE_CONTAINS, 
+                PatternModel.MATCH_RULE_CONTAINS);
+        keys.put(PatternModel.MATCH_RULE_ENDSWITH, 
+                PatternModel.MATCH_RULE_ENDSWITH);
+        keys.put(PatternModel.MATCH_RULE_EQUALS, 
+                PatternModel.MATCH_RULE_EQUALS);
+        keys.put(PatternModel.MATCH_RULE_STARTSWITH, 
+                PatternModel.MATCH_RULE_STARTSWITH);
+        return new LocalizableStringValue(keys, PatternModel.SEARCH_PREFIX, locale);
+    }
+
+    
+    
+    /** 
+     * @inherited <p>
+     */
+    @Override
+    protected void updateLocaleState(Locale locale) {
+        // TODO Auto-generated method stub
+        super.updateLocaleState(locale);
+        searchCriteria.setRenderer(new DefaultListRenderer(createStringValue(locale)));
+    }
 
     //------------------------ init ui
-    
     /**
      * build container by adding all components.
      * PRE: all components created.
@@ -245,7 +275,7 @@ public class JXSearchPanel extends AbstractPatternPanel {
     @Override
     protected void initComponents() {
         super.initComponents();
-        searchCriteria = new JComboBox();
+        searchCriteria = new JXComboBox();
     }
 
 

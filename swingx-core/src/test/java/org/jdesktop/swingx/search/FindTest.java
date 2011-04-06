@@ -16,6 +16,7 @@ import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 import javax.swing.AbstractListModel;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
@@ -23,11 +24,13 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.text.BadLocationException;
 
 import org.jdesktop.swingx.InteractiveTestCase;
+import org.jdesktop.swingx.JXComboBox;
 import org.jdesktop.swingx.JXEditorPane;
 import org.jdesktop.swingx.JXFindBar;
 import org.jdesktop.swingx.JXFindPanel;
 import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXList;
+import org.jdesktop.swingx.JXSearchPanel;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.JXTree;
 import org.junit.Test;
@@ -67,6 +70,24 @@ public class FindTest extends InteractiveTestCase {
         SearchFactory.setInstance(new SearchFactory());
     }
 
+    
+    @Test
+    public void testSearchPanelHasXComboBox() {
+        JXSearchPanel searchPanel = new JXSearchPanel();
+        assertEquals(true, getChildOfType(searchPanel, JXComboBox.class) != null);
+    }
+    
+    @SuppressWarnings("unchecked")
+    public static <T extends JComponent> T getChildOfType(JComponent container, Class<T> clazz ) {
+        for (int i = 0; i < container.getComponentCount(); i++) {
+            Component child = container.getComponent(i);
+            if (clazz.isAssignableFrom(child.getClass())) {
+                return (T) child;
+            }
+        }
+        return null;
+        
+    }
     /**
      * Findbugs: NPE in SearchFactory - showFindDialog for null target component.
      * 
