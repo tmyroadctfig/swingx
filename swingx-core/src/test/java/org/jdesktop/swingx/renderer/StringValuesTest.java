@@ -58,7 +58,7 @@ public class StringValuesTest extends TestCase {
     @Test
     public void testLocaleSVPrefixContained() {
         Map<Object, String> lookup = new HashMap<Object, String>();
-        lookup.put(PatternModel.MATCH_RULE_ENDSWITH, PatternModel.MATCH_RULE_CONTAINS);
+        lookup.put(PatternModel.MATCH_RULE_ENDSWITH, PatternModel.MATCH_RULE_ENDSWITH);
         StringValue sv = new LocalizableStringValue(lookup, PatternModel.SEARCH_PREFIX, Locale.GERMAN);
         assertEquals("endet mit", sv.getString(PatternModel.MATCH_RULE_ENDSWITH));
     }
@@ -66,7 +66,7 @@ public class StringValuesTest extends TestCase {
     @Test
     public void testLocaleSVDirectContained() {
         Map<Object, String> lookup = new HashMap<Object, String>();
-        lookup.put(PatternModel.MATCH_RULE_ENDSWITH, PatternModel.SEARCH_PREFIX + PatternModel.MATCH_RULE_CONTAINS);
+        lookup.put(PatternModel.MATCH_RULE_ENDSWITH, PatternModel.SEARCH_PREFIX + PatternModel.MATCH_RULE_ENDSWITH);
         StringValue sv = new LocalizableStringValue(lookup,  Locale.GERMAN);
         assertEquals("endet mit", sv.getString(PatternModel.MATCH_RULE_ENDSWITH));
     }
