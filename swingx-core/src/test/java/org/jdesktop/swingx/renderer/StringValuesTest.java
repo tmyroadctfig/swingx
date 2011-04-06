@@ -25,10 +25,14 @@ import java.io.File;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 import junit.framework.TestCase;
 
+import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.renderer.StringValues.StringValueUIResource;
+import org.jdesktop.swingx.search.PatternModel;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -40,6 +44,41 @@ import org.junit.runners.JUnit4;
 @RunWith(JUnit4.class)
 public class StringValuesTest extends TestCase {
 
+    @Test
+    public void testLocaleSVPrefixNotContained() {
+        Map<Object, String> lookup = new HashMap<Object, String>();
+        String value = "not contained";
+        lookup.put(value, "unreasonableDummyKey");
+//        StringValue sv = new LocalizableStringValue(lookup, "prefix.", Locale.GERMANY);
+        StringValue sv = new LocalizableStringValue(lookup, "prefix.");
+        
+        assertEquals(value, sv.getString(value));
+    }
+    
+    @Test
+    public void testLocaleSVPrefixContained() {
+        Map<Object, String> lookup = new HashMap<Object, String>();
+        lookup.put(PatternModel.MATCH_RULE_ENDSWITH, PatternModel.MATCH_RULE_CONTAINS);
+        StringValue sv = new LocalizableStringValue(lookup, PatternModel.SEARCH_PREFIX, Locale.GERMAN);
+        assertEquals("endet mit", sv.getString(PatternModel.MATCH_RULE_ENDSWITH));
+    }
+    
+    @Test
+    public void testLocaleSVDirectContained() {
+        Map<Object, String> lookup = new HashMap<Object, String>();
+        lookup.put(PatternModel.MATCH_RULE_ENDSWITH, PatternModel.SEARCH_PREFIX + PatternModel.MATCH_RULE_CONTAINS);
+        StringValue sv = new LocalizableStringValue(lookup,  Locale.GERMAN);
+        assertEquals("endet mit", sv.getString(PatternModel.MATCH_RULE_ENDSWITH));
+    }
+    
+    @Test
+    public void testLocaleSVNotContained() {
+        Map<Object, String> lookup = new HashMap<Object, String>();
+        String value = "not contained";
+        lookup.put(value, "unreasonableDummyKey");
+        StringValue sv = new LocalizableStringValue(lookup);
+        assertEquals(value, sv.getString(value));
+    }
     
     @Test
     public void testLocaleSVDefaultLocale() {
@@ -162,5 +201,11 @@ public class StringValuesTest extends TestCase {
         
         assertNotSame(StringValues.EMPTY.getString(f),
                 StringValues.FILE_TYPE.getString(f));
+    }
+    
+    @BeforeClass
+    public static void beforeClass() {
+        // force loading of resource files
+        new JXTable();
     }
 }

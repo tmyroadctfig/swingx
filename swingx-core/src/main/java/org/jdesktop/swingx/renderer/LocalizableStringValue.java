@@ -15,6 +15,8 @@ public class LocalizableStringValue implements StringValue {
 
     private Locale locale;
 
+    private String prefix;
+
     /**
      * Instantiates a LocaleStringValue which looks up localized String
      * representations for items in the map using the JComponent defaultLocale.
@@ -23,7 +25,7 @@ public class LocalizableStringValue implements StringValue {
      *        look up its string representation in the UIManager
      */
     public LocalizableStringValue(Map<Object, String> lookup) {
-        this(lookup, null);
+        this(lookup, null, null);
     }
 
     /**
@@ -36,7 +38,37 @@ public class LocalizableStringValue implements StringValue {
      *        denote using JComponent.defaultLocale
      */
     public LocalizableStringValue(Map<Object, String> lookup, Locale locale) {
+        this(lookup, null, locale);
+    }
+
+    /**
+     * Instantiates a LocaleStringValue which looks up localized String
+     * representations for items in the map using the JComponent defaultLocale.
+     * 
+     * @param lookup a map containing Entries of objects and a string key to
+     *        look up its string representation in the UIManager
+     * @param prefix a common prefix for all string keys in the map, may be null
+     *    to denote that the keys should be use as are 
+     */
+    public LocalizableStringValue(Map<Object, String> lookup, String prefix) {
+        this(lookup, prefix, null);
+    }
+
+    /**
+     * Instantiates a LocaleStringValue which looks up localized String
+     * representations for items in the map using the given Locale.
+     * 
+     * @param lookup a map containing Entries of objects and a string key to
+     *        look up its string representation in the UIManager
+     * @param prefix a common prefix for all string keys in the map, may be null
+     *    to denote that the keys should be use as are 
+     * @param locale the locale to lookup the localized strings, may be null to
+     *        denote using JComponent.defaultLocale
+     */
+    public LocalizableStringValue(Map<Object, String> lookup, String prefix,
+            Locale locale) {
         this.lookup = Contract.asNotNull(lookup, "map must not be null");
+        this.prefix = prefix;
         setLocale(locale);
     }
 
@@ -53,6 +85,9 @@ public class LocalizableStringValue implements StringValue {
     public String getString(Object value) {
         String key = lookup.get(value);
         if (key != null) {
+            if (prefix != null) {
+                key = prefix + key;
+            }
             String text = UIManagerExt.getString(key, getLocale());
             if (text != null)
                 return text;
