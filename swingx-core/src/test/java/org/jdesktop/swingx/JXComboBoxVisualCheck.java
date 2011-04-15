@@ -27,6 +27,9 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 
 import org.jdesktop.swingx.decorator.HighlighterFactory;
+import org.jdesktop.swingx.renderer.DefaultListRenderer;
+import org.jdesktop.swingx.renderer.StringValue;
+import org.jdesktop.swingx.renderer.StringValues;
 
 /**
  *
@@ -61,6 +64,28 @@ public class JXComboBoxVisualCheck extends InteractiveTestCase {
         }
     }
 
+    /**
+     * Issue #1438-swingx: key selection doesn't respect StringValue 
+     */
+    public void interactiveSelectWithKey() {
+        JXComboBox box = new JXComboBox(new Object[] {"alice", "berta", "carola"});
+        StringValue sv = new StringValue() {
+
+            @Override
+            public String getString(Object value) {
+                String temp = StringValues.TO_STRING.getString(value);
+                if (temp.length() > 1) {
+                    temp = temp.charAt(1) + temp;
+                }
+                return temp;
+            }
+            
+        };
+        
+        box.setRenderer(new DefaultListRenderer(sv));
+        showInFrame(box, "navigation");
+    }
+    
     public void testDummy() { }
 
     public void interactiveTestComboBoxAlternateHighlighter1() {
