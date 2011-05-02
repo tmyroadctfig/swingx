@@ -4,6 +4,11 @@
  */
 package org.jdesktop.swingx.action;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemListener;
 import java.beans.PropertyChangeEvent;
@@ -19,35 +24,21 @@ import javax.swing.JRadioButton;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JToggleButton;
 
-import junit.framework.TestCase;
-
-import org.junit.After;
+import org.jdesktop.test.EDTRunner;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
 
-@RunWith(JUnit4.class)
-public class ActionTest extends TestCase {
+@RunWith(EDTRunner.class)
+@SuppressWarnings("nls")
+public class AbstractActionExtTest {
     @SuppressWarnings("all")
-    private static final Logger LOG = Logger.getLogger(ActionTest.class
-            .getName());
+    private static final Logger LOG = Logger.getLogger(AbstractActionExtTest.class.getName());
+    
     protected ActionContainerFactory factory;
     
     @Before
-    public void setUpJ4() throws Exception {
-        setUp();
-    }
-    
-    @After
-    public void tearDownJ4() throws Exception {
-        tearDown();
-    }
-    
-   
-    
-    @Override
-    protected void setUp() throws Exception {
+    public void setUp() throws Exception {
         factory = new ActionContainerFactory(null);
     }
 
@@ -402,5 +393,4 @@ public class ActionTest extends TestCase {
         action.putValue("enabled", false);
         
     }
-
 }

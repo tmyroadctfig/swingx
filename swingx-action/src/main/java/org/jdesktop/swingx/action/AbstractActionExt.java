@@ -32,15 +32,22 @@ import javax.swing.KeyStroke;
 
 /**
  * Extends the concept of the Action to include toggle or group states.
- *
+ * <p>
+ * SwingX 1.6.3 updates {@code AbstractActionExt} to use new features of {@link Action} that were
+ * added in {@code Java 1.6}. The selection is now managed with {@link Action#SELECTED_KEY}, which
+ * allows the action to correctly configured Swing buttons. The {@link #LARGE_ICON} has also been
+ * changed to correspond to {@link Action#LARGE_ICON_KEY}.
+ * 
  */
 public abstract class AbstractActionExt extends AbstractAction
     implements ItemListener {
 
     /**
      * The key for the large icon
+     * <p>
+     * As of SwingX 1.6.3 is now has the same value as {@link Action#LARGE_ICON_KEY}, which is new to 1.6.
      */
-    public static final String LARGE_ICON = "__LargeIcon__";
+    public static final String LARGE_ICON = Action.LARGE_ICON_KEY;
 
     /**
      * The key for the button group
@@ -53,17 +60,12 @@ public abstract class AbstractActionExt extends AbstractAction
     public static final String IS_STATE = "__State__";
 
     /**
-     * Specified whether the action is selected; the default is false
-     */
-    private boolean selected = false;
-
-    /**
      * Default constructor, does nothing.
-     *
      */
     public AbstractActionExt() {
-        // default constructor
+        this((String) null);
     }
+    
     /**
      * Copy constructor copies the state.
      */
@@ -72,7 +74,6 @@ public abstract class AbstractActionExt extends AbstractAction
         for (int i = 0; i < keys.length; i++) {
             putValue((String)keys[i], action.getValue((String)keys[i]));
         }
-        this.selected = action.selected;
         this.enabled = action.enabled;
 
         // Copy change listeners.
@@ -281,16 +282,37 @@ public abstract class AbstractActionExt extends AbstractAction
      * @param key the action command
      * @see Action#ACTION_COMMAND_KEY
      * @see Action#putValue
+     * @deprecated (pre-1.6.3) replace by {@link #setActionCommand(String)} cf.
+     *             {@link Action#ACTION_COMMAND_KEY}
      */
+    @Deprecated
     public void setActionCommand(Object key) {
+        putValue(Action.ACTION_COMMAND_KEY, key == null ? null : String.valueOf(key));
+    }
+    
+    /**
+     * Sets the action command key. The action command key
+     * is used to identify the action.
+     * <p>
+     * This is a convenience method for <code>putValue</code> with the
+     * <code>Action.ACTION_COMMAND_KEY</code> key.
+     *
+     * @param key the action command
+     * @see Action#ACTION_COMMAND_KEY
+     * @see Action#putValue
+     */
+    public void setActionCommand(String key) {
         putValue(Action.ACTION_COMMAND_KEY, key);
     }
 
     /**
      * Returns the action command.
-     *
+     * 
      * @return the action command or null
+     * @deprecated (pre-1.6.3) return type will change to String, cf.
+     *             {@link Action#ACTION_COMMAND_KEY}
      */
+    @Deprecated
     public Object getActionCommand() {
         return getValue(Action.ACTION_COMMAND_KEY);
     }
@@ -381,21 +403,26 @@ public abstract class AbstractActionExt extends AbstractAction
     /**
      * @return true if the action is in the selected state
      */
-    public boolean isSelected()  {
-        return selected;
+    public boolean isSelected() {
+        Boolean selected = (Boolean) getValue(SELECTED_KEY);
+        
+        if (selected == null) {
+            return false;
+        }
+        
+        return selected.booleanValue();
     }
 
     /**
-     * Changes the state of the action
-     * @param newValue true to set the action as selected of the action.
+     * Changes the state of the action. This is a convenience method for updating the Action via the
+     * value map.
+     * 
+     * @param newValue
+     *            true to set the action as selected of the action.
+     * @see Action#SELECTED_KEY
      */
-    public synchronized void setSelected(boolean newValue) {
-        boolean oldValue = this.selected;
-        if (oldValue != newValue) {
-            this.selected = newValue;
-            firePropertyChange("selected", Boolean.valueOf(oldValue),
-                               Boolean.valueOf(newValue));
-        }
+    public void setSelected(boolean newValue) {
+        putValue(SELECTED_KEY, newValue);
     }
 
     @Override

@@ -4,11 +4,13 @@
  */
 package org.jdesktop.swingx.action;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.Serializable;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
 
@@ -19,14 +21,13 @@ import javax.swing.JMenuItem;
 import javax.swing.JRadioButton;
 import javax.swing.JToggleButton;
 
+import org.jdesktop.test.EDTRunner;
 import org.jdesktop.test.PropertyChangeReport;
-import org.jdesktop.test.SerializableSupport;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
 
-@RunWith(JUnit4.class)
-public class ActionIssues extends ActionTest implements Serializable {
+@RunWith(EDTRunner.class)
+public class ActionIssues {
     
     /**
      * Issue #1364-swingx: AbstractActionExt - incorrect parameter type in setActionCommand
@@ -151,6 +152,4 @@ public class ActionIssues extends ActionTest implements Serializable {
         // soft reference should now be enqueued (no leak)
         assertTrue(ref.isEnqueued());
     }
-    
-
 }
