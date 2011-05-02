@@ -4,12 +4,14 @@ import java.awt.Color;
 import java.util.Arrays;
 
 import javax.swing.AbstractListModel;
+import javax.swing.ComboBoxModel;
 import javax.swing.ListModel;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
+import org.jdesktop.swingx.combobox.ListModelComboBoxWrapper;
 import org.jdesktop.swingx.treetable.AbstractMutableTreeTableNode;
 import org.jdesktop.swingx.treetable.DefaultMutableTreeTableNode;
 import org.jdesktop.swingx.treetable.DefaultTreeTableModel;
@@ -47,6 +49,10 @@ public class AncientSwingTeam extends AbstractTableModel {
         };
         return model;
     };
+    
+    public static ComboBoxModel createNamedColorComboBoxModel() {
+        return new ListModelComboBoxWrapper(createNamedColorListModel());
+    }
     
     /**
      * 

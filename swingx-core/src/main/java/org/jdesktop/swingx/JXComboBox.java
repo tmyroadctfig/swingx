@@ -50,6 +50,7 @@ import org.jdesktop.swingx.renderer.DefaultListRenderer;
 import org.jdesktop.swingx.renderer.JRendererPanel;
 import org.jdesktop.swingx.renderer.StringValue;
 import org.jdesktop.swingx.rollover.RolloverRenderer;
+import org.jdesktop.swingx.sort.StringValueRegistry;
 import org.jdesktop.swingx.util.Contract;
 
 /**
@@ -201,6 +202,7 @@ public class JXComboBox extends JComboBox {
         }
     }
     
+    @SuppressWarnings("hiding")
     protected static class ComboBoxAdapter extends ComponentAdapter {
         private final JXComboBox comboBox;
 
@@ -274,17 +276,9 @@ public class JXComboBox extends JComboBox {
          */
         @Override
         public String getStringAt(int row, int column) {
-            ListCellRenderer renderer = comboBox.getRenderer();
+            StringValue sv = comboBox.getStringValueRegistry().getStringValue(row, column);
             
-            if (renderer instanceof DelegatingRenderer) {
-                renderer = ((DelegatingRenderer) renderer).getDelegateRenderer();
-            }
-            
-            if (renderer instanceof StringValue) {
-                return ((StringValue) renderer).getString(getValueAt(row, column));
-            }
-            
-            return super.getStringAt(row, column);
+            return sv.getString(getValueAt(row, column));
         }
         
         /**
@@ -337,6 +331,8 @@ public class JXComboBox extends JComboBox {
     
     private DelegatingRenderer delegatingRenderer;
     
+    private StringValueRegistry stringValueRegistry;
+
     private boolean useHighlightersForCurrentValue = true;
     
     private CompoundHighlighter compoundHighlighter;
@@ -490,6 +486,45 @@ public class JXComboBox extends JComboBox {
         return adapter;
     }
     
+    /**
+     * Returns the StringValueRegistry which defines the string representation for
+     * each cells. This is strictly for internal use by the table, which has the 
+     * responsibility to keep in synch with registered renderers.<p>
+     * 
+     * Currently exposed for testing reasons, client code is recommended to not use nor override.
+     * 
+     * @return
+     */
+    protected StringValueRegistry getStringValueRegistry() {
+        if (stringValueRegistry == null) {
+            stringValueRegistry = createDefaultStringValueRegistry();
+        }
+        return stringValueRegistry;
+    }
+
+    /**
+     * Creates and returns the default registry for StringValues.<p>
+     * 
+     * @return the default registry for StringValues.
+     */
+    protected StringValueRegistry createDefaultStringValueRegistry() {
+        return new StringValueRegistry();
+    }
+    
+    /**
+     * Returns the string representation of the cell value at the given position. 
+     * 
+     * @param row the row index of the cell in view coordinates
+     * @return the string representation of the cell value as it will appear in the 
+     *   table. 
+     */
+    public String getStringAt(int row) {
+        // changed implementation to use StringValueRegistry
+        StringValue stringValue = getStringValueRegistry().getStringValue(row, 0);
+        
+        return stringValue.getString(getItemAt(row));
+    }
+
     private DelegatingRenderer getDelegatingRenderer() {
         if (delegatingRenderer == null) {
             // only called once... to get hold of the default?
@@ -556,6 +591,8 @@ public class JXComboBox extends JComboBox {
         // == multiple delegation...
         ListCellRenderer oldValue = super.getRenderer();
         getDelegatingRenderer().setDelegateRenderer(renderer);
+        getStringValueRegistry().setStringValue(
+                renderer instanceof StringValue ? (StringValue) renderer : null, 0);
         super.setRenderer(delegatingRenderer);
         
         if (oldValue == delegatingRenderer) {
