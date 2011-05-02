@@ -34,6 +34,8 @@
 
 package org.jdesktop.swingx.graphics;
 
+import java.awt.AlphaComposite;
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GraphicsConfiguration;
@@ -78,6 +80,7 @@ import javax.swing.JComponent;
  * {@link java.awt.Image#getScaledInstance(int, int, int)} and produce
  * better-looking results than the various <code>drawImage()</code> methods
  * in {@link java.awt.Graphics}, which can be used for image scaling.</p>
+ * 
  * <h2>Image Manipulation</h2>
  *
  * <p>This class provides two methods to get and set pixels in a buffered image.
@@ -737,6 +740,22 @@ public class GraphicsUtilities {
         }
     }
 
+    public static void clear(Image img) {
+        Graphics g = img.getGraphics();
+        
+        try {
+            if (g instanceof Graphics2D) {
+                ((Graphics2D) g).setComposite(AlphaComposite.Clear);
+            } else {
+                g.setColor(new Color(0, 0, 0, 0));
+            }
+            
+            g.fillRect(0, 0, img.getWidth(null), img.getHeight(null));
+        } finally {
+            g.dispose();
+        }
+    }
+    
     /**
      * Sets the clip on a graphics object by merging a supplied clip with the existing one. The new
      * clip will be an intersection of the old clip and the supplied clip. The old clip shape will
