@@ -24,14 +24,22 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+
+import java.awt.Color;
 
 import javax.swing.ListCellRenderer;
 
 import org.jdesktop.swingx.JXComboBox.DelegatingRenderer;
 import org.jdesktop.swingx.JXListTest.CustomDefaultRenderer;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
+import org.jdesktop.swingx.decorator.ComponentAdapterTest.JXListT;
 import org.jdesktop.swingx.renderer.DefaultListRenderer;
+import org.jdesktop.swingx.renderer.StringValue;
+import org.jdesktop.swingx.renderer.StringValues;
+import org.jdesktop.swingx.sort.StringValueRegistry;
+import org.jdesktop.test.AncientSwingTeam;
 import org.jdesktop.test.EDTRunner;
 import org.jdesktop.test.PropertyChangeReport;
 import org.jdesktop.test.TestUtils;
@@ -193,5 +201,65 @@ public class JXComboBoxTest {
         combo.setRenderer(custom);
         
         assertThat(custom, is(sameInstance(combo.getWrappedRenderer())));
+    }
+    
+    private StringValue createColorStringValue() {
+        StringValue sv = new StringValue() {
+
+            public String getString(Object value) {
+                if (value instanceof Color) {
+                    Color color = (Color) value;
+                    return "R/G/B: " + color.getRGB();
+                }
+                return StringValues.TO_STRING.getString(value);
+            }
+            
+        };
+        return sv;
+    }
+    
+    /**
+     * Issue #1382-swingx: use StringValueRegistry and supply getStringAt.
+     * <p>
+     * Here: test updates on renderer change.
+     */
+    @Test
+    public void testStringValueRegistryFromRendererChange() {
+        JXComboBox combo = new JXComboBox(AncientSwingTeam.createNamedColorComboBoxModel());
+        StringValueRegistry provider = combo.getStringValueRegistry();
+        combo.setRenderer(new DefaultListRenderer(createColorStringValue()));
+        assertEquals(combo.getWrappedRenderer(), provider.getStringValue(0, 0));
+    }
+
+    /**
+     * Issue #1382-swingx: use StringValueRegistry and supply getStringAt.
+     * 
+     * Here: test getStringAt use provider (sanity, trying to pull the rag failed
+     * during re-enable)
+     */
+    @Test
+    public void testStringAtUseProvider() {
+        JXComboBox combo = new JXComboBox(AncientSwingTeam.createNamedColorComboBoxModel());
+        combo.setRenderer(new DefaultListRenderer(createColorStringValue()));
+        combo.getStringValueRegistry().setStringValue(StringValues.TO_STRING, 0);
+        assertEquals(StringValues.TO_STRING.getString(combo.getItemAt(0)),
+                combo.getStringAt(0));
+        
+    }
+    /**
+     * Issue #1382-swingx: use StringValueRegistry and supply getStringAt.
+     * 
+     * Here: test getStringAt of ComponentAdapter use provider 
+     * (sanity, trying to pull the rag failed during re-enable)
+     */
+    @Test
+    public void testStringAtComponentAdapterUseProvider() {
+        JXComboBox combo = new JXComboBox(AncientSwingTeam.createNamedColorComboBoxModel());
+        combo.setRenderer(new DefaultListRenderer(createColorStringValue()));
+        combo.getStringValueRegistry().setStringValue(StringValues.TO_STRING, 0);
+        ComponentAdapter adapter = combo.getComponentAdapter();
+        assertEquals(StringValues.TO_STRING.getString(combo.getItemAt(0)),
+                adapter.getStringAt(0, 0));
+        
     }
 }
