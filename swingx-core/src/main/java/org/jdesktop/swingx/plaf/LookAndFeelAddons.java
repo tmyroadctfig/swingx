@@ -309,27 +309,38 @@ public abstract class LookAndFeelAddons {
 
     if (expectedUIClass.isInstance(ui)) {
       return ui;
+    } else if (ui == null) {
+        barkOnUIError("no ComponentUI class for: " + component);
     } else {
       String realUI = ui.getClass().getName();
-      Class<?> realUIClass;
+      Class<?> realUIClass = null;
+      
       try {
-        realUIClass = expectedUIClass.getClassLoader()
-        .loadClass(realUI);
+        realUIClass = expectedUIClass.getClassLoader().loadClass(realUI);
       } catch (ClassNotFoundException e) {
-        throw new RuntimeException("Failed to load class " + realUI, e);
+        barkOnUIError("failed to load class " + realUI);
       }
-      Method createUIMethod = null;
-      try {
-        createUIMethod = realUIClass.getMethod("createUI", new Class[]{JComponent.class});
-      } catch (NoSuchMethodException e1) {
-        throw new RuntimeException("Class " + realUI + " has no method createUI(JComponent)");
-      }
-      try {
-        return (ComponentUI)createUIMethod.invoke(null, new Object[]{component});
-      } catch (Exception e2) {
-        throw new RuntimeException("Failed to invoke " + realUI + "#createUI(JComponent)");
+      
+      if (realUIClass != null) {
+          try {
+              Method createUIMethod = realUIClass.getMethod("createUI", new Class[]{JComponent.class});
+              
+              return (ComponentUI) createUIMethod.invoke(null, new Object[]{component});
+          } catch (NoSuchMethodException e) {
+              barkOnUIError("static createUI() method not found in " + realUIClass);
+          } catch (Exception e) {
+              barkOnUIError("createUI() failed for " + component + " " + e);
+          }
       }
     }
+    
+    return null;
+  }
+  
+  //this is how core UIDefaults yells about bad components; we do the same
+  private static void barkOnUIError(String message) {
+      System.err.println(message);
+      new Error().printStackTrace();
   }
 
   /**
