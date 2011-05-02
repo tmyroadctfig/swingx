@@ -22,8 +22,10 @@ package org.jdesktop.swingx;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.EventQueue;
 import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
@@ -37,8 +39,10 @@ import javax.swing.JTable;
 import javax.swing.KeyStroke;
 import javax.swing.ListCellRenderer;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.plaf.UIResource;
 import javax.swing.plaf.basic.ComboPopup;
 import javax.swing.tree.TreeCellRenderer;
 
@@ -327,6 +331,80 @@ public class JXComboBox extends JComboBox {
         }
     }
     
+    class StringValueKeySelectionManager implements KeySelectionManager, Serializable, UIDependent {
+        private long timeFactor;
+        private long lastTime = 0L;
+        private String prefix = "";
+        private String typedString = "";
+        
+        public StringValueKeySelectionManager() {
+            updateUI();
+        }
+
+        @Override
+        public int selectionForKey(char aKey, ComboBoxModel aModel) {
+            if (lastTime == 0L) {
+                prefix = "";
+                typedString = "";
+            }
+            
+            int startIndex = getSelectedIndex();
+            
+            if (EventQueue.getMostRecentEventTime() - lastTime < timeFactor) {
+                typedString += aKey;
+                if ((prefix.length() == 1) && (aKey == prefix.charAt(0))) {
+                    // Subsequent same key presses move the keyboard focus to the next
+                    // object that starts with the same letter.
+                    startIndex++;
+                } else {
+                    prefix = typedString;
+                }
+            } else {
+                startIndex++;
+                typedString = "" + aKey;
+                prefix = typedString;
+            }
+            
+            lastTime = EventQueue.getMostRecentEventTime();
+
+            if (startIndex < 0 || startIndex >= aModel.getSize()) {
+                startIndex = 0;
+            }
+            
+            for (int i = startIndex, c = aModel.getSize(); i < c; i++) {
+                String v = getStringAt(i).toLowerCase();
+                
+                if (v.length() > 0 && v.charAt(0) == aKey) {
+                    return i;
+                }
+            }
+            
+            for (int i = startIndex, c = aModel.getSize(); i < c; i++) {
+                String v = getStringAt(i).toLowerCase();
+                
+                if (v.length() > 0 && v.charAt(0) == aKey) {
+                    return i;
+                }
+            }
+
+            for (int i = 0; i < startIndex; i++) {
+                String v = getStringAt(i).toLowerCase();
+                
+                if (v.length() > 0 && v.charAt(0) == aKey) {
+                    return i;
+                }
+            }
+            
+            return -1;
+        }
+
+        @Override
+        public void updateUI() {
+            Long l = (Long) UIManager.get("ComboBox.timeFactor");
+            timeFactor = l == null ? 1000L : l.longValue();
+        }
+    }
+
     private ComboBoxAdapter dataAdapter;
     
     private DelegatingRenderer delegatingRenderer;
@@ -400,6 +478,10 @@ public class JXComboBox extends JComboBox {
 
     private void init() {
         pendingEvents = new ArrayList<KeyEvent>();
+        
+        if (keySelectionManager == null || keySelectionManager instanceof UIResource) {
+            setKeySelectionManager(createDefaultKeySelectionManager());
+        }
     }
     
     protected static JList getPopupListFor(JComboBox comboBox) {
@@ -414,6 +496,17 @@ public class JXComboBox extends JComboBox {
         }
 
         return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * This implementation uses the {@code StringValue} representation of the elements to determine
+     * the selected item.
+     */
+    @Override
+    protected KeySelectionManager createDefaultKeySelectionManager() {
+        return new StringValueKeySelectionManager();
     }
     
     /**
@@ -782,6 +875,10 @@ public class JXComboBox extends JComboBox {
         
         try {
             super.updateUI();
+            
+            if (keySelectionManager instanceof UIDependent) {
+                ((UIDependent) keySelectionManager).updateUI();
+            }
             
             ListCellRenderer renderer = getRenderer();
             
