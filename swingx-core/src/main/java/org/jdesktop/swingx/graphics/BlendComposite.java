@@ -82,54 +82,597 @@ import java.awt.image.WritableRaster;
  *   <li>Use a factory method: {@link #getInstance(BlendingMode)} or
  *     {@link #getInstance(BlendingMode, float)}.</li>
  * </ul>
- * <h2>Implementation Caveat</h2>
- * <p>TThe blending mode <em>SoftLight</em> has not been implemented yet.</p>
- *
+ * <h2>Functionality Change in SwingX 1.6.3</h2>
+ * <p>Due to incorrect implementations of various blending modes incompatible changes have occurred.
+ * The following will help users alleviate problems during migration:
+ * <ul>
+ * <li>{@link BlendingMode#BLUE} and {@link BlendingMode#GREEN} have been swapped.</li>
+ * </ul>
+ * <p>
+ * 
  * @see org.jdesktop.swingx.graphics.BlendComposite.BlendingMode
  * @see java.awt.Graphics2D
  * @see java.awt.Composite
  * @see java.awt.AlphaComposite
  * @author Romain Guy <romain.guy@mac.com>
+ * @author Karl Schaefer (support and additional modes)
  */
 public final class BlendComposite implements Composite {
     /**
-     * <p>A blending mode defines the compositing rule of a
-     * {@link org.jdesktop.swingx.graphics.BlendComposite}.</p>
-     *
+     * A blending mode defines the compositing rule of a
+     * {@link org.jdesktop.swingx.graphics.BlendComposite}.
+     * 
      * @author Romain Guy <romain.guy@mac.com>
+     * @author Karl Schaefer (support and additional modes)
      */
     public enum BlendingMode {
-        AVERAGE,
-        MULTIPLY,
-        SCREEN,
-        DARKEN,
-        LIGHTEN,
-        OVERLAY,
-        HARD_LIGHT,
-        SOFT_LIGHT,
-        DIFFERENCE,
-        NEGATION,
-        EXCLUSION,
-        COLOR_DODGE,
-        INVERSE_COLOR_DODGE,
-        SOFT_DODGE,
-        COLOR_BURN,
-        INVERSE_COLOR_BURN,
-        SOFT_BURN,
-        REFLECT,
-        GLOW,
-        FREEZE,
-        HEAT,
-        ADD,
-        SUBTRACT,
-        STAMP,
-        RED,
-        GREEN,
-        BLUE,
-        HUE,
-        SATURATION,
-        COLOR,
-        LUMINOSITY
+        /**
+         * The {@code Average} blending mode produces an average of the source and blend colors. The
+         * image will push colors toward the middle, reducing the extremes.
+         */
+        AVERAGE {
+            @Override
+            void blend(int[] src, int[] dst, int[] result) {
+                result[0] = (src[0] + dst[0]) >> 1;
+                result[1] = (src[1] + dst[1]) >> 1;
+                result[2] = (src[2] + dst[2]) >> 1;
+                result[3] = Math.min(255, src[3] + dst[3] - (src[3] * dst[3]) / 255);
+            }
+        },
+        
+        /**
+         * Similar to {@link #AVERAGE}, but more severely lightens or darkens the edge colors.
+         */
+        STAMP {
+            @Override
+            void blend(int[] src, int[] dst, int[] result) {
+                result[0] = Math.max(0, Math.min(255, dst[0] + 2 * src[0] - 256));
+                result[1] = Math.max(0, Math.min(255, dst[1] + 2 * src[1] - 256));
+                result[2] = Math.max(0, Math.min(255, dst[2] + 2 * src[2] - 256));
+                result[3] = Math.min(255, src[3] + dst[3] - (src[3] * dst[3]) / 255);
+            }
+        },
+        
+        /**
+         * The {@code Darken} blend mode compares the color information for each pixel of the base
+         * and the blend color and applies the darker color as the result. Any pixels in the base
+         * image that are lighter than the blend color are replaced, and pixels that are darker are
+         * left unchanged. No part of the image will become lighter.
+         */
+        DARKEN {
+            @Override
+            void blend(int[] src, int[] dst, int[] result) {
+                result[0] = Math.min(src[0], dst[0]);
+                result[1] = Math.min(src[1], dst[1]);
+                result[2] = Math.min(src[2], dst[2]);
+                result[3] = Math.min(255, src[3] + dst[3] - (src[3] * dst[3]) / 255);
+            }
+        },
+
+        /**
+         * The {@code Multiply} blend mode multiplies the base color with the blend color. The
+         * resulting color will always be darker, unless the blend color is white, which will result
+         * in no change. 100% opaque black multiplied with any color will result in black. As you
+         * overlay strokes of color with the Multiply blending mode, each stroke will result in
+         * darker and darker color.
+         */
+        MULTIPLY {
+            @Override
+            void blend(int[] src, int[] dst, int[] result) {
+                result[0] = (src[0] * dst[0] + 2) >> 8;
+                result[1] = (src[1] * dst[1] + 2) >> 8;
+                result[2] = (src[2] * dst[2] + 2) >> 8;
+                result[3] = Math.min(255, src[3] + dst[3] - (src[3] * dst[3]) / 255);
+            }
+        },
+
+        /**
+         * The {@code Color Burn} blending mode increases the contrast to darken the base color
+         * while reflecting the blend color. The darker the blend color, the more intensely the
+         * color will be applied in the base image. White as the blend color produces no change.
+         */
+        COLOR_BURN {
+            @Override
+            void blend(int[] src, int[] dst, int[] result) {
+                result[0] = src[0] == 0 ? 0 : Math.max(0, 255 - (((255 - dst[0]) << 8) / src[0]));
+                result[1] = src[1] == 0 ? 0 : Math.max(0, 255 - (((255 - dst[1]) << 8) / src[1]));
+                result[2] = src[2] == 0 ? 0 : Math.max(0, 255 - (((255 - dst[2]) << 8) / src[2]));
+                result[3] = Math.min(255, src[3] + dst[3] - (src[3] * dst[3]) / 255);
+            }
+        },
+
+        /**
+         * {@code Inverse Color Burn} is the same as {@link #COLOR_BURN Color Burn} with the source
+         * and destination swapped.
+         */
+        INVERSE_COLOR_BURN {
+            @Override
+            void blend(int[] src, int[] dst, int[] result) {
+                result[0] = dst[0] == 0 ? 0 : Math.max(0, 255 - (((255 - src[0]) << 8) / dst[0]));
+                result[1] = dst[1] == 0 ? 0 : Math.max(0, 255 - (((255 - src[1]) << 8) / dst[1]));
+                result[2] = dst[2] == 0 ? 0 : Math.max(0, 255 - (((255 - src[2]) << 8) / dst[2]));
+                result[3] = Math.min(255, src[3] + dst[3] - (src[3] * dst[3]) / 255);
+            }
+        },
+        
+        SOFT_BURN {
+            @Override
+            void blend(int[] src, int[] dst, int[] result) {
+                result[0] = dst[0] + src[0] < 256
+                        ? (dst[0] == 255 ? 255 : Math.min(255, (src[0] << 7) / (255 - dst[0])))
+                        : Math.max(0, 255 - (((255 - dst[0]) << 7) / src[0]));
+                result[1] = dst[1] + src[1] < 256 
+                        ? (dst[1] == 255 ? 255 : Math.min(255, (src[1] << 7) / (255 - dst[1]))) 
+                        : Math.max(0, 255 - (((255 - dst[1]) << 7) / src[1]));
+                result[2] = dst[2] + src[2] < 256 
+                        ? (dst[2] == 255 ? 255 : Math.min(255, (src[2] << 7) / (255 - dst[2]))) 
+                        : Math.max(0, 255 - (((255 - dst[2]) << 7) / src[2]));
+                result[3] = Math.min(255, src[3] + dst[3] - (src[3] * dst[3]) / 255);
+            }
+        },
+        
+        /**
+         * The {@code Subtract} blend mode is similar to {@link #COLOR_BURN Color Burn} but instead of increasing
+         * contrast, it decreases brightness to darken the base color and reflect the blend color.
+         * It is also similar to the Multiply blend mode, but produces a much more intense result.
+         * White as the blend color produces no change.
+         * <p>
+         * This mode is also known as {@code Linear Burn}.
+         */
+        SUBTRACT {
+            @Override
+            void blend(int[] src, int[] dst, int[] result) {
+                result[0] = Math.max(0, src[0] + dst[0] - 256);
+                result[1] = Math.max(0, src[1] + dst[1] - 256);
+                result[2] = Math.max(0, src[2] + dst[2] - 256);
+                result[3] = Math.min(255, src[3] + dst[3] - (src[3] * dst[3]) / 255);
+            }
+        },
+
+        /**
+         * The {@code Lighten} blending mode compares the color information for each pixel of the
+         * base and the blend color and applies the lighter color as the result. Any pixels in the
+         * base image that are darker than the blend color are replaced, and pixels that are lighter
+         * are left unchanged. No part of the image will become darker.
+         */
+        LIGHTEN {
+            @Override
+            void blend(int[] src, int[] dst, int[] result) {
+                result[0] = Math.max(src[0], dst[0]);
+                result[1] = Math.max(src[1], dst[1]);
+                result[2] = Math.max(src[2], dst[2]);
+                result[3] = Math.min(255, src[3] + dst[3] - (src[3] * dst[3]) / 255);
+            }
+        },
+
+        /**
+         * The {@code Screen} blending mode is the opposite of the {@link #MULTIPLY Multiply} mode
+         * in that it multiples the inverse of the base color with the blend color. What this means
+         * is that your image will get lighter overall. In areas where the blend color is black, the
+         * base image will be unchanged, and in areas where the blend or base color is white, the
+         * result will be no change. Dark areas in the base image will become significantly lighter,
+         * and bright areas will become only slightly lighter.
+         */
+        SCREEN {
+            @Override
+            void blend(int[] src, int[] dst, int[] result) {
+                result[0] = 255 - ((255 - src[0]) * (255 - dst[0]) >> 8);
+                result[1] = 255 - ((255 - src[1]) * (255 - dst[1]) >> 8);
+                result[2] = 255 - ((255 - src[2]) * (255 - dst[2]) >> 8);
+                result[3] = Math.min(255, src[3] + dst[3] - (src[3] * dst[3]) / 255);
+            }
+        },
+
+        /**
+         * The {@code Color Dodge} blending mode is essentially the opposite of {@link #COLOR_BURN
+         * Color Burn}. The {@code Color Dodge} blending mode decreases the contrast to brighten the
+         * base color while reflecting the blend color. The lighter the blend color, the more
+         * significant the color dodge effect will be making the result brighter, with less
+         * contrast, and tinted toward the blend color. Black as the blend color produces no change.
+         */
+        COLOR_DODGE {
+            @Override
+            void blend(int[] src, int[] dst, int[] result) {
+                result[0] = src[0] == 255 ? 255 : Math.min((dst[0] << 8) / (255 - src[0]), 255);
+                result[1] = src[1] == 255 ? 255 : Math.min((dst[1] << 8) / (255 - src[1]), 255);
+                result[2] = src[2] == 255 ? 255 : Math.min((dst[2] << 8) / (255 - src[2]), 255);
+                result[3] = Math.min(255, src[3] + dst[3] - (src[3] * dst[3]) / 255);
+            }
+        },
+
+        /**
+         * {@code Inverse Color Dodge} is the same as {@link #COLOR_DODGE Color Dodge} with the
+         * source and destination swapped.
+         */
+        INVERSE_COLOR_DODGE {
+            @Override
+            void blend(int[] src, int[] dst, int[] result) {
+                result[0] = dst[0] == 255 ? 255 : Math.min((src[0] << 8) / (255 - dst[0]), 255);
+                result[1] = dst[1] == 255 ? 255 : Math.min((src[1] << 8) / (255 - dst[1]), 255);
+                result[2] = dst[2] == 255 ? 255 : Math.min((src[2] << 8) / (255 - dst[2]), 255);
+                result[3] = Math.min(255, src[3] + dst[3] - (src[3] * dst[3]) / 255);
+            }
+        },
+
+        SOFT_DODGE {
+            @Override
+            void blend(int[] src, int[] dst, int[] result) {
+                result[0] = dst[0] + src[0] < 256
+                        ? (src[0] == 255 ? 255 : Math.min(255, (dst[0] << 7) / (255 - src[0])))
+                        : Math.max(0, 255 - (((255 - src[0]) << 7) / dst[0]));
+                result[1] = dst[1] + src[1] < 256 
+                        ? (src[1] == 255 ? 255 : Math.min(255, (dst[1] << 7) / (255 - src[1])))
+                        : Math.max(0, 255 - (((255 - src[1]) << 7) / dst[1]));
+                result[2] = dst[2] + src[2] < 256 
+                        ? (src[2] == 255 ? 255 : Math.min(255, (dst[2] << 7) / (255 - src[2]))) 
+                        : Math.max(0, 255 - (((255 - src[2]) << 7) / dst[2]));
+                result[3] = Math.min(255, src[3] + dst[3] - (src[3] * dst[3]) / 255);
+            }
+        },
+        
+        /**
+         * {@code Add} is the opposite of {@link #SUBTRACT Subtract}. It increases brightness to
+         * lighten the base color and reflect the blend color. It is also similar to the
+         * {@link #SCREEN Screen} blend mode, but produces a more intense result. Black as the blend
+         * color produces no change.
+         * <p>
+         * This mode is also known as {@code Linear Dodge}.
+         */
+        ADD {
+            @Override
+            void blend(int[] src, int[] dst, int[] result) {
+                result[0] = Math.min(255, src[0] + dst[0]);
+                result[1] = Math.min(255, src[1] + dst[1]);
+                result[2] = Math.min(255, src[2] + dst[2]);
+                result[3] = Math.min(255, src[3] + dst[3]);
+            }
+        },
+        
+        /**
+         * The {@code Overlay} blending mode preserves the highlights and shadows of the base color
+         * while mixing the base color and the blend color. It is a combination of the
+         * {@link #MULTIPLY Multiply} and {@link #SCREEN Screen} blending modes--multiplying the
+         * dark areas, and screening the light areas. A blend color of 50% gray has no effect on the
+         * base image.
+         */
+        OVERLAY {
+            @Override
+            void blend(int[] src, int[] dst, int[] result) {
+                result[0] = dst[0] < 128 ? dst[0] * src[0] >> 7
+                        : 255 - ((255 - dst[0]) * (255 - src[0]) >> 7);
+                result[1] = dst[1] < 128 ? dst[1] * src[1] >> 7
+                        : 255 - ((255 - dst[1]) * (255 - src[1]) >> 7);
+                result[2] = dst[2] < 128 ? dst[2] * src[2] >> 7
+                        : 255 - ((255 - dst[2]) * (255 - src[2]) >> 7);
+                result[3] = Math.min(255, src[3] + dst[3] - (src[3] * dst[3]) / 255);
+            }
+        },
+
+        /**
+         * The {@code Soft Light} blend mode creates a subtle lighter or darker result depending on
+         * the brightness of the blend color. Blend colors that are more than 50% brightness will
+         * lighten the base image and colors that are less than 50% brightness will darken the base
+         * image. Pure black will create a slightly darker result; pure white will create a slightly
+         * lighter result, and 50% gray will have no effect on the base image.
+         */
+        SOFT_LIGHT {
+            @Override
+            void blend(int[] src, int[] dst, int[] result) {
+                int mRed = src[0] * dst[0] / 255;
+                int mGreen = src[1] * dst[1] / 255;
+                int mBlue = src[2] * dst[2] / 255;
+                result[0] = mRed + dst[0] * (255 - ((255 - dst[0]) * (255 - src[0]) / 255) - mRed) / 255;
+                result[1] = mGreen + dst[1] * (255 - ((255 - dst[1]) * (255 - src[1]) / 255) - mGreen) / 255;
+                result[2] = mBlue + dst[2] * (255 - ((255 - dst[2]) * (255 - src[2]) / 255) - mBlue) / 255;
+                result[3] = Math.min(255, src[3] + dst[3] - (src[3] * dst[3]) / 255);
+            }
+        },
+
+        /**
+         * {@code Hard Light} drastically lightens or darkens the base image depending on the
+         * brightness of the blend color. The effect is more intense than {@link #SOFT_LIGHT Soft
+         * Light} because the contrast is also increased. Blend colors that are more than 50%
+         * brightness will lighten the base image in the same way as the screen blending mode.
+         * Colors that are less than 50% brightness will darken the base image in the same way as
+         * the multiply blending mode. Pure black will result in black; pure white will create a
+         * white result, and 50% gray will have no effect on the base image.
+         */
+        HARD_LIGHT {
+            @Override
+            void blend(int[] src, int[] dst, int[] result) {
+                result[0] = src[0] < 128 ? dst[0] * src[0] >> 7
+                        : 255 - ((255 - src[0]) * (255 - dst[0]) >> 7);
+                result[1] = src[1] < 128 ? dst[1] * src[1] >> 7
+                        : 255 - ((255 - src[1]) * (255 - dst[1]) >> 7);
+                result[2] = src[2] < 128 ? dst[2] * src[2] >> 7 
+                        : 255 - ((255 - src[2]) * (255 - dst[2]) >> 7);
+                result[3] = Math.min(255, src[3] + dst[3] - (src[3] * dst[3]) / 255);
+            }
+        },
+
+        /**
+         * Burns or dodges the colors by increasing or decreasing the contrast, depending on the
+         * blend color. If the blend color is lighter than 50% grey, the image is lightened by
+         * decreasing the contrast. If the blend color is darker than 50% grey, the image is
+         * darkened by increasing the contrast.
+         */
+        VIVID_LIGHT {
+            @Override
+            void blend(int[] src, int[] dst, int[] result) {
+                result[0] = src[0] < 128
+                        ? src[0] == 0 ? 0 : Math.max(0, 255 - ((255 - dst[0]) << 7) / src[0])
+                        : src[0] == 255 ? 255 : Math.min(255, (dst[0] << 7) / (255 - src[0]));
+                result[1] = src[1] < 128
+                        ? src[1] == 0 ? 0 : Math.max(0, 255 - ((255 - dst[1]) << 7) / src[1])
+                        : src[1] == 255 ? 255 : Math.min(255, (dst[1] << 7) / (255 - src[1]));
+                result[2] = src[2] < 128
+                        ? src[2] == 0 ? 0 : Math.max(0, 255 - ((255 - dst[2]) << 7) / src[2])
+                        : src[2] == 255 ? 255 : Math.min(255, (dst[2] << 7) / (255 - src[2]));
+                result[3] = Math.min(255, src[3] + dst[3] - (src[3] * dst[3]) / 255);
+            }
+        },
+        
+        LINEAR_LIGHT {
+            @Override
+            void blend(int[] src, int[] dst, int[] result) {
+                result[0] = src[0] < 128 ? Math.max(0, dst[0] + (src[0] << 1) - 255)
+                        : Math.min(255, dst[0] + (src[0] - 128 << 1));
+                result[1] = src[1] < 128 ? Math.max(0, dst[1] + (src[1] << 1) - 255)
+                        : Math.min(255, dst[1] + (src[1] - 128 << 1));
+                result[2] = src[2] < 128 ? Math.max(0, dst[2] + (src[2] << 1) - 255)
+                        : Math.min(255, dst[2] + (src[2] - 128 << 1));
+                result[3] = Math.min(255, src[3] + dst[3] - (src[3] * dst[3]) / 255);
+            }
+        },
+        
+        PIN_LIGHT {
+            @Override
+            void blend(int[] src, int[] dst, int[] result) {
+                result[0] = src[0] < 128 ? Math.min(dst[0], src[0] << 1)
+                        : Math.max(dst[0], (src[0] - 128) << 1);
+                result[1] = src[1] < 128 ? Math.min(dst[1], src[1] << 1)
+                        : Math.max(dst[1], (src[1] - 128) << 1);
+                result[2] = src[2] < 128 ? Math.min(dst[2], src[2] << 1)
+                        : Math.max(dst[2], (src[2] - 128) << 1);
+                result[3] = Math.min(255, src[3] + dst[3] - (src[3] * dst[3]) / 255);
+            }
+        },
+        
+        HARD_MIX {
+            @Override
+            void blend(int[] src, int[] dst, int[] result) {
+                result[0] = src[0] < 256 - dst[0] ? 0 : 255;
+                result[1] = src[1] < 256 - dst[1] ? 0 : 255;
+                result[2] = src[2] < 256 - dst[2] ? 0 : 255;
+                result[3] = Math.min(255, src[3] + dst[3] - (src[3] * dst[3]) / 255);
+            }
+        },
+        
+        REFLECT {
+            @Override
+            void blend(int[] src, int[] dst, int[] result) {
+                result[0] = src[0] == 255 ? 255 : Math.min(255, dst[0] * dst[0] / (255 - src[0]));
+                result[1] = src[1] == 255 ? 255 : Math.min(255, dst[1] * dst[1] / (255 - src[1]));
+                result[2] = src[2] == 255 ? 255 : Math.min(255, dst[2] * dst[2] / (255 - src[2]));
+                result[3] = Math.min(255, src[3] + dst[3] - (src[3] * dst[3]) / 255);
+            }
+        },
+        
+        GLOW {
+            @Override
+            void blend(int[] src, int[] dst, int[] result) {
+                result[0] = dst[0] == 255 ? 255 : Math.min(255, src[0] * src[0] / (255 - dst[0]));
+                result[1] = dst[1] == 255 ? 255 : Math.min(255, src[1] * src[1] / (255 - dst[1]));
+                result[2] = dst[2] == 255 ? 255 : Math.min(255, src[2] * src[2] / (255 - dst[2]));
+                result[3] = Math.min(255, src[3] + dst[3] - (src[3] * dst[3]) / 255);
+            }
+        },
+        
+         FREEZE {
+            @Override
+            void blend(int[] src, int[] dst, int[] result) {
+                result[0] = src[0] == 0 ? 0 : Math.max(0, 255 - (255 - dst[0]) * (255 - dst[0])
+                        / src[0]);
+                result[1] = src[1] == 0 ? 0 : Math.max(0, 255 - (255 - dst[1]) * (255 - dst[1])
+                        / src[1]);
+                result[2] = src[2] == 0 ? 0 : Math.max(0, 255 - (255 - dst[2]) * (255 - dst[2])
+                        / src[2]);
+                result[3] = Math.min(255, src[3] + dst[3] - (src[3] * dst[3]) / 255);
+            }
+        },
+        
+        HEAT {
+            @Override
+            void blend(int[] src, int[] dst, int[] result) {
+                result[0] = dst[0] == 0 ? 0 : Math.max(0, 255 - (255 - src[0]) * (255 - src[0])
+                        / dst[0]);
+                result[1] = dst[1] == 0 ? 0 : Math.max(0, 255 - (255 - src[1]) * (255 - src[1])
+                        / dst[1]);
+                result[2] = dst[2] == 0 ? 0 : Math.max(0, 255 - (255 - src[2]) * (255 - src[2])
+                        / dst[2]);
+                result[3] = Math.min(255, src[3] + dst[3] - (src[3] * dst[3]) / 255);
+            }
+        },
+
+        /**
+         * The {@code Difference} blending mode highlights the differences between the blend layer
+         * and the base layer. The more technical explanation is that the blend color is subtracted
+         * from the base color--or vice-versa, depending on the brightness--and the result is the
+         * difference between them. When white is the blend color, the base image is inverted. When
+         * black is the blend color, there is no change.
+         */
+        DIFFERENCE {
+            @Override
+            void blend(int[] src, int[] dst, int[] result) {
+                result[0] = Math.abs(dst[0] - src[0]);
+                result[1] = Math.abs(dst[1] - src[1]);
+                result[2] = Math.abs(dst[2] - src[2]);
+                result[3] = Math.min(255, src[3] + dst[3] - (src[3] * dst[3]) / 255);
+            }
+        },
+
+        /**
+         * The {@code Exclusion} blending mode works very much like {@link #DIFFERENCE Difference}
+         * but the contrast is lower. When white is the blend color, the base image is inverted.
+         * When black is the blend color, there is no change.
+         */
+        EXCLUSION {
+            @Override
+            void blend(int[] src, int[] dst, int[] result) {
+                result[0] = dst[0] + src[0] - (dst[0] * src[0] >> 7);
+                result[1] = dst[1] + src[1] - (dst[1] * src[1] >> 7);
+                result[2] = dst[2] + src[2] - (dst[2] * src[2] >> 7);
+                result[3] = Math.min(255, src[3] + dst[3] - (src[3] * dst[3]) / 255);
+            }
+        },
+
+        /**
+         * The {@code Hue} blend mode applies the hue of the blend color to the base image while retaining
+         * the luminance and saturation of the base image. It gives the base image a tinted effect
+         * where the tinting is darkest in areas of high saturation. Where the blend color is a
+         * shade of gray (0% saturation), the base image is desaturated and where the base image is
+         * gray, the Hue blending mode has no effect.
+         */
+        HUE {
+            @Override
+            void blend(int[] src, int[] dst, int[] result) {
+                float[] srcHSL = new float[3];
+                ColorUtilities.RGBtoHSL(src[0], src[1], src[2], srcHSL);
+                float[] dstHSL = new float[3];
+                ColorUtilities.RGBtoHSL(dst[0], dst[1], dst[2], dstHSL);
+
+                ColorUtilities.HSLtoRGB(srcHSL[0], dstHSL[1], dstHSL[2], result);
+                result[3] = Math.min(255, src[3] + dst[3] - (src[3] * dst[3]) / 255);
+            }
+        },
+
+        /**
+         * The {@code Saturation} blending mode applies the saturation of the blend color to the
+         * base image while retaining the hue and luminance of the base image. Neutral tones (black,
+         * white, and gray) in the blend will desaturate the base image. Neutral areas in the base
+         * image will not be changed by the saturation blending mode.
+         */
+        SATURATION {
+            @Override
+            void blend(int[] src, int[] dst, int[] result) {
+                float[] srcHSL = new float[3];
+                ColorUtilities.RGBtoHSL(src[0], src[1], src[2], srcHSL);
+                float[] dstHSL = new float[3];
+                ColorUtilities.RGBtoHSL(dst[0], dst[1], dst[2], dstHSL);
+
+                ColorUtilities.HSLtoRGB(dstHSL[0], srcHSL[1], dstHSL[2], result);
+                result[3] = Math.min(255, src[3] + dst[3] - (src[3] * dst[3]) / 255);
+            }
+        },
+
+        /**
+         * The {@code Color} blending mode applies the hue and saturation of the blend color to the
+         * base image while retaining the luminance of the base image. Simply put, it colors the
+         * base image. Neutral blend colors will desaturate the base image.
+         */
+        COLOR {
+            @Override
+            void blend(int[] src, int[] dst, int[] result) {
+                float[] srcHSL = new float[3];
+                ColorUtilities.RGBtoHSL(src[0], src[1], src[2], srcHSL);
+                float[] dstHSL = new float[3];
+                ColorUtilities.RGBtoHSL(dst[0], dst[1], dst[2], dstHSL);
+
+                ColorUtilities.HSLtoRGB(srcHSL[0], srcHSL[1], dstHSL[2], result);
+                result[3] = Math.min(255, src[3] + dst[3] - (src[3] * dst[3]) / 255);
+            }
+        },
+
+        /**
+         * The {@code Luminosity} blending mode applies the luminosity (brightness) of the blend
+         * colors to the base image while retaining the hue and saturation of the base image.
+         * {@code Luminosity} is the opposite of the {@link #COLOR Color} blending mode.
+         */
+        LUMINOSITY {
+            @Override
+            void blend(int[] src, int[] dst, int[] result) {
+                float[] srcHSL = new float[3];
+                ColorUtilities.RGBtoHSL(src[0], src[1], src[2], srcHSL);
+                float[] dstHSL = new float[3];
+                ColorUtilities.RGBtoHSL(dst[0], dst[1], dst[2], dstHSL);
+
+                ColorUtilities.HSLtoRGB(dstHSL[0], dstHSL[1], srcHSL[2], result);
+                result[3] = Math.min(255, src[3] + dst[3] - (src[3] * dst[3]) / 255);
+            }
+        },
+
+        /**
+         * This one is the "opposite" of difference mode. Note that it is NOT difference mode
+         * inverted, because black and white return the same result, but colors between become
+         * brighter instead of darker. This mode can be used to invert parts of the base image, but
+         * NOT to compare two images.
+         */
+        NEGATION {
+            @Override
+            void blend(int[] src, int[] dst, int[] result) {
+                result[0] = 255 - Math.abs(255 - dst[0] - src[0]);
+                result[1] = 255 - Math.abs(255 - dst[1] - src[1]);
+                result[2] = 255 - Math.abs(255 - dst[2] - src[2]);
+                result[3] = Math.min(255, src[3] + dst[3] - (src[3] * dst[3]) / 255);
+            }
+        },
+
+        /**
+         * Keeps the red channel from the blend image and the green and blue channels from the base
+         * image.
+         */
+        RED {
+            @Override
+            void blend(int[] src, int[] dst, int[] result) {
+                result[0] = src[0];
+                result[1] = dst[1];
+                result[2] = dst[2];
+                result[3] = Math.min(255, src[3] + dst[3] - (src[3] * dst[3]) / 255);
+            }
+        },
+        
+        /**
+         * Keeps the green channel from the blend image and the red and blue channels from the base
+         * image.
+         */
+        GREEN {
+            @Override
+            void blend(int[] src, int[] dst, int[] result) {
+                result[0] = dst[0];
+                result[1] = src[1];
+                result[2] = dst[2];
+                result[3] = Math.min(255, src[3] + dst[3] - (src[3] * dst[3]) / 255);
+            }
+        },
+        
+        /**
+         * Keeps the blue channel from the blend image and the red and green channels from the base
+         * image.
+         */
+        BLUE {
+            @Override
+            void blend(int[] src, int[] dst, int[] result) {
+                result[0] = dst[0];
+                result[1] = dst[1];
+                result[2] = src[2];
+                result[3] = Math.min(255, src[3] + dst[3] - (src[3] * dst[3]) / 255);
+            }
+        },
+        ;
+
+        /**
+         * Blends the input colors into the result.
+         * 
+         * @param src
+         *            the source RGBA
+         * @param dst
+         *            the destination RGBA
+         * @param result
+         *            the result RGBA
+         * @throws NullPointerException
+         *             if any argument is {@code null}
+         */
+        abstract void blend(int[] src, int[] dst, int[] result);
     }
 
     public static final BlendComposite Average = new BlendComposite(BlendingMode.AVERAGE);
@@ -140,6 +683,10 @@ public final class BlendComposite implements Composite {
     public static final BlendComposite Overlay = new BlendComposite(BlendingMode.OVERLAY);
     public static final BlendComposite HardLight = new BlendComposite(BlendingMode.HARD_LIGHT);
     public static final BlendComposite SoftLight = new BlendComposite(BlendingMode.SOFT_LIGHT);
+    public static final BlendComposite VividLight = new BlendComposite(BlendingMode.VIVID_LIGHT);
+    public static final BlendComposite LinearLight = new BlendComposite(BlendingMode.LINEAR_LIGHT);
+    public static final BlendComposite PinLight = new BlendComposite(BlendingMode.PIN_LIGHT);
+    public static final BlendComposite HardMix = new BlendComposite(BlendingMode.HARD_MIX);
     public static final BlendComposite Difference = new BlendComposite(BlendingMode.DIFFERENCE);
     public static final BlendComposite Negation = new BlendComposite(BlendingMode.NEGATION);
     public static final BlendComposite Exclusion = new BlendComposite(BlendingMode.EXCLUSION);
@@ -311,6 +858,7 @@ public final class BlendComposite implements Composite {
     /**
      * {@inheritDoc}
      */
+    @Override
     public CompositeContext createContext(ColorModel srcColorModel,
                                           ColorModel dstColorModel,
                                           RenderingHints hints) {
@@ -324,14 +872,13 @@ public final class BlendComposite implements Composite {
     }
 
     private static abstract class BlendingContext implements CompositeContext {
-        protected final Blender blender;
         protected final BlendComposite composite;
 
         private BlendingContext(BlendComposite composite) {
             this.composite = composite;
-            this.blender = Blender.getBlenderFor(composite);
         }
 
+        @Override
         public void dispose() {
         }
     }
@@ -341,6 +888,7 @@ public final class BlendComposite implements Composite {
             super(composite);
         }
 
+        @Override
         public void compose(Raster src, Raster dstIn, WritableRaster dstOut) {
             int width = Math.min(src.getWidth(), dstIn.getWidth());
             int height = Math.min(src.getHeight(), dstIn.getHeight());
@@ -371,7 +919,7 @@ public final class BlendComposite implements Composite {
                     dstPixel[2] = (pixel      ) & 0xFF;
                     dstPixel[3] = (pixel >> 24) & 0xFF;
 
-                    blender.blend(srcPixel, dstPixel, result);
+                    composite.getMode().blend(srcPixel, dstPixel, result);
 
                     // mixes the result with the opacity
                     dstPixels[x] = ((int) (dstPixel[3] + (result[3] - dstPixel[3]) * alpha) & 0xFF) << 24 |
@@ -389,6 +937,7 @@ public final class BlendComposite implements Composite {
             super(composite);
         }
 
+        @Override
         public void compose(Raster src, Raster dstIn, WritableRaster dstOut) {
             int width = Math.min(src.getWidth(), dstIn.getWidth());
             int height = Math.min(src.getHeight(), dstIn.getHeight());
@@ -419,7 +968,7 @@ public final class BlendComposite implements Composite {
                     dstPixel[2] = (pixel >> 16) & 0xFF;
                     dstPixel[3] = (pixel >> 24) & 0xFF;
 
-                    blender.blend(srcPixel, dstPixel, result);
+                    composite.getMode().blend(srcPixel, dstPixel, result);
 
                     // mixes the result with the opacity
                     dstPixels[x] = ((int) (dstPixel[3] + (result[3] - dstPixel[3]) * alpha) & 0xFF) << 24 |
@@ -429,390 +978,6 @@ public final class BlendComposite implements Composite {
                 }
                 dstOut.setDataElements(0, y, width, 1, dstPixels);
             }
-        }
-    }
-
-    private static abstract class Blender {
-        public abstract void blend(int[] src, int[] dst, int[] result);
-
-        public static Blender getBlenderFor(BlendComposite composite) {
-            switch (composite.getMode()) {
-                case ADD:
-                    return new Blender() {
-                        @Override
-                        public void blend(int[] src, int[] dst, int[] result) {
-                            result[0] = Math.min(255, src[0] + dst[0]);
-                            result[1] = Math.min(255, src[1] + dst[1]);
-                            result[2] = Math.min(255, src[2] + dst[2]);
-                            result[3] = Math.min(255, src[3] + dst[3]);
-                        }
-                    };
-                case AVERAGE:
-                    return new Blender() {
-                        @Override
-                        public void blend(int[] src, int[] dst, int[] result) {
-                            result[0] = (src[0] + dst[0]) >> 1;
-                            result[1] = (src[1] + dst[1]) >> 1;
-                            result[2] = (src[2] + dst[2]) >> 1;
-                            result[3] = Math.min(255, src[3] + dst[3] - (src[3] * dst[3]) / 255);
-                        }
-                    };
-                case BLUE:
-                    return new Blender() {
-                        @Override
-                        public void blend(int[] src, int[] dst, int[] result) {
-                            result[0] = dst[0];
-                            result[1] = src[1];
-                            result[2] = dst[2];
-                            result[3] = Math.min(255, src[3] + dst[3] - (src[3] * dst[3]) / 255);
-                        }
-                    };
-                case COLOR:
-                    return new Blender() {
-                        @Override
-                        public void blend(int[] src, int[] dst, int[] result) {
-                            float[] srcHSL = new float[3];
-                            ColorUtilities.RGBtoHSL(src[0], src[1], src[2], srcHSL);
-                            float[] dstHSL = new float[3];
-                            ColorUtilities.RGBtoHSL(dst[0], dst[1], dst[2], dstHSL);
-
-                            ColorUtilities.HSLtoRGB(srcHSL[0], srcHSL[1], dstHSL[2], result);
-                            result[3] = Math.min(255, src[3] + dst[3] - (src[3] * dst[3]) / 255);
-                        }
-                    };
-                case COLOR_BURN:
-                    return new Blender() {
-                        @Override
-                        public void blend(int[] src, int[] dst, int[] result) {
-                            result[0] = src[0] == 0 ? 0 :
-                                Math.max(0, 255 - (((255 - dst[0]) << 8) / src[0]));
-                            result[1] = src[1] == 0 ? 0 :
-                                Math.max(0, 255 - (((255 - dst[1]) << 8) / src[1]));
-                            result[2] = src[2] == 0 ? 0 :
-                                Math.max(0, 255 - (((255 - dst[2]) << 8) / src[2]));
-                            result[3] = Math.min(255, src[3] + dst[3] - (src[3] * dst[3]) / 255);
-                        }
-                    };
-                case COLOR_DODGE:
-                    return new Blender() {
-                        @Override
-                        public void blend(int[] src, int[] dst, int[] result) {
-                            result[0] = src[0] == 255 ? 255 :
-                                Math.min((dst[0] << 8) / (255 - src[0]), 255);
-                            result[1] = src[1] == 255 ? 255 :
-                                Math.min((dst[1] << 8) / (255 - src[1]), 255);
-                            result[2] = src[2] == 255 ? 255 :
-                                Math.min((dst[2] << 8) / (255 - src[2]), 255);
-                            result[3] = Math.min(255, src[3] + dst[3] - (src[3] * dst[3]) / 255);
-                        }
-                    };
-                case DARKEN:
-                    return new Blender() {
-                        @Override
-                        public void blend(int[] src, int[] dst, int[] result) {
-                            result[0] = Math.min(src[0], dst[0]);
-                            result[1] = Math.min(src[1], dst[1]);
-                            result[2] = Math.min(src[2], dst[2]);
-                            result[3] = Math.min(255, src[3] + dst[3] - (src[3] * dst[3]) / 255);
-                        }
-                    };
-                case DIFFERENCE:
-                    return new Blender() {
-                        @Override
-                        public void blend(int[] src, int[] dst, int[] result) {
-                            result[0] = Math.abs(dst[0] - src[0]);
-                            result[1] = Math.abs(dst[1] - src[1]);
-                            result[2] = Math.abs(dst[2] - src[2]);
-                            result[3] = Math.min(255, src[3] + dst[3] - (src[3] * dst[3]) / 255);
-                        }
-                    };
-                case EXCLUSION:
-                    return new Blender() {
-                        @Override
-                        public void blend(int[] src, int[] dst, int[] result) {
-                            result[0] = dst[0] + src[0] - (dst[0] * src[0] >> 7);
-                            result[1] = dst[1] + src[1] - (dst[1] * src[1] >> 7);
-                            result[2] = dst[2] + src[2] - (dst[2] * src[2] >> 7);
-                            result[3] = Math.min(255, src[3] + dst[3] - (src[3] * dst[3]) / 255);
-                        }
-                    };
-                case FREEZE:
-                    return new Blender() {
-                        @Override
-                        public void blend(int[] src, int[] dst, int[] result) {
-                            result[0] = src[0] == 0 ? 0 :
-                                Math.max(0, 255 - (255 - dst[0]) * (255 - dst[0]) / src[0]);
-                            result[1] = src[1] == 0 ? 0 :
-                                Math.max(0, 255 - (255 - dst[1]) * (255 - dst[1]) / src[1]);
-                            result[2] = src[2] == 0 ? 0 :
-                                Math.max(0, 255 - (255 - dst[2]) * (255 - dst[2]) / src[2]);
-                            result[3] = Math.min(255, src[3] + dst[3] - (src[3] * dst[3]) / 255);
-                        }
-                    };
-                case GLOW:
-                    return new Blender() {
-                        @Override
-                        public void blend(int[] src, int[] dst, int[] result) {
-                            result[0] = dst[0] == 255 ? 255 :
-                                Math.min(255, src[0] * src[0] / (255 - dst[0]));
-                            result[1] = dst[1] == 255 ? 255 :
-                                Math.min(255, src[1] * src[1] / (255 - dst[1]));
-                            result[2] = dst[2] == 255 ? 255 :
-                                Math.min(255, src[2] * src[2] / (255 - dst[2]));
-                            result[3] = Math.min(255, src[3] + dst[3] - (src[3] * dst[3]) / 255);
-                        }
-                    };
-                case GREEN:
-                    return new Blender() {
-                        @Override
-                        public void blend(int[] src, int[] dst, int[] result) {
-                            result[0] = dst[0];
-                            result[1] = dst[1];
-                            result[2] = src[2];
-                            result[3] = Math.min(255, src[3] + dst[3] - (src[3] * dst[3]) / 255);
-                        }
-                    };
-                case HARD_LIGHT:
-                    return new Blender() {
-                        @Override
-                        public void blend(int[] src, int[] dst, int[] result) {
-                            result[0] = src[0] < 128 ? dst[0] * src[0] >> 7 :
-                                255 - ((255 - src[0]) * (255 - dst[0]) >> 7);
-                            result[1] = src[1] < 128 ? dst[1] * src[1] >> 7 :
-                                255 - ((255 - src[1]) * (255 - dst[1]) >> 7);
-                            result[2] = src[2] < 128 ? dst[2] * src[2] >> 7 :
-                                255 - ((255 - src[2]) * (255 - dst[2]) >> 7);
-                            result[3] = Math.min(255, src[3] + dst[3] - (src[3] * dst[3]) / 255);
-                        }
-                    };
-                case HEAT:
-                    return new Blender() {
-                        @Override
-                        public void blend(int[] src, int[] dst, int[] result) {
-                            result[0] = dst[0] == 0 ? 0 :
-                                Math.max(0, 255 - (255 - src[0]) * (255 - src[0]) / dst[0]);
-                            result[1] = dst[1] == 0 ? 0 :
-                                Math.max(0, 255 - (255 - src[1]) * (255 - src[1]) / dst[1]);
-                            result[2] = dst[2] == 0 ? 0 :
-                                Math.max(0, 255 - (255 - src[2]) * (255 - src[2]) / dst[2]);
-                            result[3] = Math.min(255, src[3] + dst[3] - (src[3] * dst[3]) / 255);
-                        }
-                    };
-                case HUE:
-                    return new Blender() {
-                        @Override
-                        public void blend(int[] src, int[] dst, int[] result) {
-                            float[] srcHSL = new float[3];
-                            ColorUtilities.RGBtoHSL(src[0], src[1], src[2], srcHSL);
-                            float[] dstHSL = new float[3];
-                            ColorUtilities.RGBtoHSL(dst[0], dst[1], dst[2], dstHSL);
-
-                            ColorUtilities.HSLtoRGB(srcHSL[0], dstHSL[1], dstHSL[2], result);
-                            result[3] = Math.min(255, src[3] + dst[3] - (src[3] * dst[3]) / 255);
-                        }
-                    };
-                case INVERSE_COLOR_BURN:
-                    return new Blender() {
-                        @Override
-                        public void blend(int[] src, int[] dst, int[] result) {
-                            result[0] = dst[0] == 0 ? 0 :
-                                Math.max(0, 255 - (((255 - src[0]) << 8) / dst[0]));
-                            result[1] = dst[1] == 0 ? 0 :
-                                Math.max(0, 255 - (((255 - src[1]) << 8) / dst[1]));
-                            result[2] = dst[2] == 0 ? 0 :
-                                Math.max(0, 255 - (((255 - src[2]) << 8) / dst[2]));
-                            result[3] = Math.min(255, src[3] + dst[3] - (src[3] * dst[3]) / 255);
-                        }
-                    };
-                case INVERSE_COLOR_DODGE:
-                    return new Blender() {
-                        @Override
-                        public void blend(int[] src, int[] dst, int[] result) {
-                            result[0] = dst[0] == 255 ? 255 :
-                                Math.min((src[0] << 8) / (255 - dst[0]), 255);
-                            result[1] = dst[1] == 255 ? 255 :
-                                Math.min((src[1] << 8) / (255 - dst[1]), 255);
-                            result[2] = dst[2] == 255 ? 255 :
-                                Math.min((src[2] << 8) / (255 - dst[2]), 255);
-                            result[3] = Math.min(255, src[3] + dst[3] - (src[3] * dst[3]) / 255);
-                        }
-                    };
-                case LIGHTEN:
-                    return new Blender() {
-                        @Override
-                        public void blend(int[] src, int[] dst, int[] result) {
-                            result[0] = Math.max(src[0], dst[0]);
-                            result[1] = Math.max(src[1], dst[1]);
-                            result[2] = Math.max(src[2], dst[2]);
-                            result[3] = Math.min(255, src[3] + dst[3] - (src[3] * dst[3]) / 255);
-                        }
-                    };
-                case LUMINOSITY:
-                    return new Blender() {
-                        @Override
-                        public void blend(int[] src, int[] dst, int[] result) {
-                            float[] srcHSL = new float[3];
-                            ColorUtilities.RGBtoHSL(src[0], src[1], src[2], srcHSL);
-                            float[] dstHSL = new float[3];
-                            ColorUtilities.RGBtoHSL(dst[0], dst[1], dst[2], dstHSL);
-
-                            ColorUtilities.HSLtoRGB(dstHSL[0], dstHSL[1], srcHSL[2], result);
-                            result[3] = Math.min(255, src[3] + dst[3] - (src[3] * dst[3]) / 255);
-                        }
-                    };
-                case MULTIPLY:
-                    return new Blender() {
-                        @Override
-                        public void blend(int[] src, int[] dst, int[] result) {
-                            result[0] = (src[0] * dst[0]) >> 8;
-                            result[1] = (src[1] * dst[1]) >> 8;
-                            result[2] = (src[2] * dst[2]) >> 8;
-                            result[3] = Math.min(255, src[3] + dst[3] - (src[3] * dst[3]) / 255);
-                        }
-                    };
-                case NEGATION:
-                    return new Blender() {
-                        @Override
-                        public void blend(int[] src, int[] dst, int[] result) {
-                            result[0] = 255 - Math.abs(255 - dst[0] - src[0]);
-                            result[1] = 255 - Math.abs(255 - dst[1] - src[1]);
-                            result[2] = 255 - Math.abs(255 - dst[2] - src[2]);
-                            result[3] = Math.min(255, src[3] + dst[3] - (src[3] * dst[3]) / 255);
-                        }
-                    };
-                case OVERLAY:
-                    return new Blender() {
-                        @Override
-                        public void blend(int[] src, int[] dst, int[] result) {
-                            result[0] = dst[0] < 128 ? dst[0] * src[0] >> 7 :
-                                255 - ((255 - dst[0]) * (255 - src[0]) >> 7);
-                            result[1] = dst[1] < 128 ? dst[1] * src[1] >> 7 :
-                                255 - ((255 - dst[1]) * (255 - src[1]) >> 7);
-                            result[2] = dst[2] < 128 ? dst[2] * src[2] >> 7 :
-                                255 - ((255 - dst[2]) * (255 - src[2]) >> 7);
-                            result[3] = Math.min(255, src[3] + dst[3] - (src[3] * dst[3]) / 255);
-                        }
-                    };
-                case RED:
-                    return new Blender() {
-                        @Override
-                        public void blend(int[] src, int[] dst, int[] result) {
-                            result[0] = src[0];
-                            result[1] = dst[1];
-                            result[2] = dst[2];
-                            result[3] = Math.min(255, src[3] + dst[3] - (src[3] * dst[3]) / 255);
-                        }
-                    };
-                case REFLECT:
-                    return new Blender() {
-                        @Override
-                        public void blend(int[] src, int[] dst, int[] result) {
-                            result[0] = src[0] == 255 ? 255 :
-                                Math.min(255, dst[0] * dst[0] / (255 - src[0]));
-                            result[1] = src[1] == 255 ? 255 :
-                                Math.min(255, dst[1] * dst[1] / (255 - src[1]));
-                            result[2] = src[2] == 255 ? 255 :
-                                Math.min(255, dst[2] * dst[2] / (255 - src[2]));
-                            result[3] = Math.min(255, src[3] + dst[3] - (src[3] * dst[3]) / 255);
-                        }
-                    };
-                case SATURATION:
-                    return new Blender() {
-                        @Override
-                        public void blend(int[] src, int[] dst, int[] result) {
-                            float[] srcHSL = new float[3];
-                            ColorUtilities.RGBtoHSL(src[0], src[1], src[2], srcHSL);
-                            float[] dstHSL = new float[3];
-                            ColorUtilities.RGBtoHSL(dst[0], dst[1], dst[2], dstHSL);
-
-                            ColorUtilities.HSLtoRGB(dstHSL[0], srcHSL[1], dstHSL[2], result);
-                            result[3] = Math.min(255, src[3] + dst[3] - (src[3] * dst[3]) / 255);
-                        }
-                    };
-                case SCREEN:
-                    return new Blender() {
-                        @Override
-                        public void blend(int[] src, int[] dst, int[] result) {
-                            result[0] = 255 - ((255 - src[0]) * (255 - dst[0]) >> 8);
-                            result[1] = 255 - ((255 - src[1]) * (255 - dst[1]) >> 8);
-                            result[2] = 255 - ((255 - src[2]) * (255 - dst[2]) >> 8);
-                            result[3] = Math.min(255, src[3] + dst[3] - (src[3] * dst[3]) / 255);
-                        }
-                    };
-                case SOFT_BURN:
-                    return new Blender() {
-                        @Override
-                        public void blend(int[] src, int[] dst, int[] result) {
-                            result[0] = dst[0] + src[0] < 256 ?
-                                (dst[0] == 255 ? 255 :
-                                 Math.min(255, (src[0] << 7) / (255 - dst[0]))) :
-                                                                                Math.max(0, 255 - (((255 - dst[0]) << 7) / src[0]));
-                            result[1] = dst[1] + src[1] < 256 ?
-                                (dst[1] == 255 ? 255 :
-                                 Math.min(255, (src[1] << 7) / (255 - dst[1]))) :
-                                                                                Math.max(0, 255 - (((255 - dst[1]) << 7) / src[1]));
-                            result[2] = dst[2] + src[2] < 256 ?
-                                (dst[2] == 255 ? 255 :
-                                 Math.min(255, (src[2] << 7) / (255 - dst[2]))) :
-                                                                                Math.max(0, 255 - (((255 - dst[2]) << 7) / src[2]));
-                            result[3] = Math.min(255, src[3] + dst[3] - (src[3] * dst[3]) / 255);
-                        }
-                    };
-                case SOFT_DODGE:
-                    return new Blender() {
-                        @Override
-                        public void blend(int[] src, int[] dst, int[] result) {
-                            result[0] = dst[0] + src[0] < 256 ?
-                                (src[0] == 255 ? 255 :
-                                 Math.min(255, (dst[0] << 7) / (255 - src[0]))) :
-                                    Math.max(0, 255 - (((255 - src[0]) << 7) / dst[0]));
-                            result[1] = dst[1] + src[1] < 256 ?
-                                (src[1] == 255 ? 255 :
-                                 Math.min(255, (dst[1] << 7) / (255 - src[1]))) :
-                                    Math.max(0, 255 - (((255 - src[1]) << 7) / dst[1]));
-                            result[2] = dst[2] + src[2] < 256 ?
-                                (src[2] == 255 ? 255 :
-                                 Math.min(255, (dst[2] << 7) / (255 - src[2]))) :
-                                    Math.max(0, 255 - (((255 - src[2]) << 7) / dst[2]));
-                            result[3] = Math.min(255, src[3] + dst[3] - (src[3] * dst[3]) / 255);
-                        }
-                    };
-                case SOFT_LIGHT:
-                    return new Blender() {
-                        @Override
-                        public void blend(int[] src, int[] dst, int[] result) {
-                            int mRed = src[0] * dst[0] / 255;
-                            int mGreen = src[1] * dst[1] / 255;
-                            int mBlue = src[2] * dst[2] / 255;
-                            result[0] = mRed + src[0] * (255 - ((255 - src[0]) * (255 - dst[0]) / 255) - mRed) / 255;
-                            result[1] = mGreen + src[1] * (255 - ((255 - src[1]) * (255 - dst[1]) / 255) - mGreen) / 255;
-                            result[2] = mBlue + src[2] * (255 - ((255 - src[2]) * (255 - dst[2]) / 255) - mBlue) / 255;
-                            result[3] = Math.min(255, src[3] + dst[3] - (src[3] * dst[3]) / 255);
-                        }
-                    };
-                case STAMP:
-                    return new Blender() {
-                        @Override
-                        public void blend(int[] src, int[] dst, int[] result) {
-                            result[0] = Math.max(0, Math.min(255, dst[0] + 2 * src[0] - 256));
-                            result[1] = Math.max(0, Math.min(255, dst[1] + 2 * src[1] - 256));
-                            result[2] = Math.max(0, Math.min(255, dst[2] + 2 * src[2] - 256));
-                            result[3] = Math.min(255, src[3] + dst[3] - (src[3] * dst[3]) / 255);
-                        }
-                    };
-                case SUBTRACT:
-                    return new Blender() {
-                        @Override
-                        public void blend(int[] src, int[] dst, int[] result) {
-                            result[0] = Math.max(0, src[0] + dst[0] - 256);
-                            result[1] = Math.max(0, src[1] + dst[1] - 256);
-                            result[2] = Math.max(0, src[2] + dst[2] - 256);
-                            result[3] = Math.min(255, src[3] + dst[3] - (src[3] * dst[3]) / 255);
-                        }
-                    };
-            }
-            throw new IllegalArgumentException("Blender not implemented for " +
-                                               composite.getMode().name());
         }
     }
 }
