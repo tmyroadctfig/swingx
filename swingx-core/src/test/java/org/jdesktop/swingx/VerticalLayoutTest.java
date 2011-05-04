@@ -20,13 +20,13 @@ import org.junit.runner.RunWith;
  * @author Karl George Schaefer
  */
 @RunWith(EDTRunner.class)
-public class HorizontalLayoutTest {
+public class VerticalLayoutTest {
     /**
      * SwingX Issue #666: incorrect calculation of preferred size.
      */
     @Test
     public void testLayout() {
-        JPanel panel = new JPanel(new HorizontalLayout());
+        JPanel panel = new JPanel(new VerticalLayout());
         
         JPanel p = new JPanel();
         p.setOpaque(true);
@@ -46,14 +46,14 @@ public class HorizontalLayoutTest {
         p.setPreferredSize(new Dimension(30, 30));
         panel.add(p);
         
-        assertThat(new Dimension(205, 30), is(panel.getPreferredSize()));
+        assertThat(new Dimension(125, 70), is(panel.getPreferredSize()));
     }
     /**
      * SwingX Issue #1443: incorrect calculation of preferred size with gaps.
      */
     @Test
     public void testLayoutWithGaps() {
-        JPanel panel = new JPanel(new HorizontalLayout(5));
+        JPanel panel = new JPanel(new VerticalLayout(5));
         
         JPanel p = new JPanel();
         p.setOpaque(true);
@@ -73,6 +73,6 @@ public class HorizontalLayoutTest {
         p.setPreferredSize(new Dimension(30, 30));
         panel.add(p);
         
-        assertThat(new Dimension(215, 30), is(panel.getPreferredSize()));
+        assertThat(new Dimension(125, 80), is(panel.getPreferredSize()));
     }
 }

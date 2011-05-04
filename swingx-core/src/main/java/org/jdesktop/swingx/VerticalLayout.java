@@ -25,10 +25,13 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Insets;
 
+import org.jdesktop.swingx.util.Separator;
+
 /**
  * Organizes components in a vertical layout.
  * 
  * @author fred
+ * @author Karl Schaefer
  */
 public class VerticalLayout extends AbstractLayoutManager {
     private static final long serialVersionUID = 5342270033773736441L;
@@ -78,18 +81,20 @@ public class VerticalLayout extends AbstractLayoutManager {
      */
     @Override
     public Dimension preferredLayoutSize(Container parent) {
-        Insets insets = parent.getInsets();
         Dimension pref = new Dimension(0, 0);
+        Separator<Integer> sep = new Separator<Integer>(0, gap);
         
         for (int i = 0, c = parent.getComponentCount(); i < c; i++) {
             Component m = parent.getComponent(i);
+            
             if (m.isVisible()) {
                 Dimension componentPreferredSize = parent.getComponent(i).getPreferredSize();
-                pref.height += componentPreferredSize.height + gap;
+                pref.height += componentPreferredSize.height + sep.get();
                 pref.width = Math.max(pref.width, componentPreferredSize.width);
             }
         }
         
+        Insets insets = parent.getInsets();
         pref.width += insets.left + insets.right;
         pref.height += insets.top + insets.bottom;
         
