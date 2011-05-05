@@ -827,22 +827,27 @@ public final class BlendComposite implements Composite {
     }
 
     private static boolean isRgbColorModel(ColorModel cm) {
-        if ((cm instanceof DirectColorModel || cm instanceof IndexColorModel) &&
-                cm.getTransferType() == DataBuffer.TYPE_INT) {
-            DirectColorModel directCM = (DirectColorModel) cm;
-
-            return directCM.getRedMask() == 0x00FF0000 &&
-                   directCM.getGreenMask() == 0x0000FF00 &&
-                   directCM.getBlueMask() == 0x000000FF &&
-                   (directCM.getNumComponents() == 3 ||
-                    directCM.getAlphaMask() == 0xFF000000);
+        if (cm instanceof DirectColorModel) {
+            if (cm.getTransferType() == DataBuffer.TYPE_INT) {
+                DirectColorModel directCM = (DirectColorModel) cm;
+    
+                return directCM.getRedMask() == 0x00FF0000 &&
+                       directCM.getGreenMask() == 0x0000FF00 &&
+                       directCM.getBlueMask() == 0x000000FF &&
+                       (directCM.getNumComponents() == 3 ||
+                        directCM.getAlphaMask() == 0xFF000000);
+            }
+        } else if (cm instanceof IndexColorModel) {
+            System.out.println(cm.getTransferType());
+            System.out.println(cm.getTransferType() == DataBuffer.TYPE_INT);
+            
         }
 
         return false;
     }
 
     private static boolean isBgrColorModel(ColorModel cm) {
-        if ((cm instanceof DirectColorModel || cm instanceof IndexColorModel) &&
+        if (cm instanceof DirectColorModel &&
                 cm.getTransferType() == DataBuffer.TYPE_INT) {
             DirectColorModel directCM = (DirectColorModel) cm;
 
@@ -869,7 +874,7 @@ public final class BlendComposite implements Composite {
             return new BlendingBgrContext(this);
         }
 
-        throw new RasterFormatException("Incompatible color models: " + srcColorModel + " and " + dstColorModel);
+        throw new RasterFormatException("Incompatible color models:\n  " + srcColorModel + "  \n" + dstColorModel);
     }
 
     private static abstract class BlendingContext implements CompositeContext {
