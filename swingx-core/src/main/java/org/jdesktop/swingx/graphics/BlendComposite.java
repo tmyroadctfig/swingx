@@ -40,6 +40,7 @@ import java.awt.RenderingHints;
 import java.awt.image.ColorModel;
 import java.awt.image.DataBuffer;
 import java.awt.image.DirectColorModel;
+import java.awt.image.IndexColorModel;
 import java.awt.image.Raster;
 import java.awt.image.RasterFormatException;
 import java.awt.image.WritableRaster;
@@ -826,7 +827,7 @@ public final class BlendComposite implements Composite {
     }
 
     private static boolean isRgbColorModel(ColorModel cm) {
-        if (cm instanceof DirectColorModel &&
+        if ((cm instanceof DirectColorModel || cm instanceof IndexColorModel) &&
                 cm.getTransferType() == DataBuffer.TYPE_INT) {
             DirectColorModel directCM = (DirectColorModel) cm;
 
@@ -841,7 +842,7 @@ public final class BlendComposite implements Composite {
     }
 
     private static boolean isBgrColorModel(ColorModel cm) {
-        if (cm instanceof DirectColorModel &&
+        if ((cm instanceof DirectColorModel || cm instanceof IndexColorModel) &&
                 cm.getTransferType() == DataBuffer.TYPE_INT) {
             DirectColorModel directCM = (DirectColorModel) cm;
 
