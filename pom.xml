@@ -12,6 +12,10 @@
   <name>SwingX</name>
   <version>1.6.3-SNAPSHOT</version>
     <url>http://www.swinglabs.org/</url>
+    <ciManagement>
+    	<system>Hudson</system>
+    	<url>http://swinglabs.org/hudson</url>
+    </ciManagement>
     <licenses>
         <license>
             <name>Lesser General Public License (LGPL)</name>
@@ -19,13 +23,13 @@
         </license>
     </licenses>
     <issueManagement>
-      <system>Bugzilla</system>
-      <url>https://swingx.dev.java.net/issues/</url>
+      <system>JIRA</system>
+      <url>http://java.net/jira/browse/SWINGX</url>
     </issueManagement>
     <scm>
-        <connection>scm:svn:https://swingx.dev.java.net/svn/swingx/trunk</connection>
-        <developerConnection>scm:svn:https://swingx.dev.java.net/svn/swingx/trunk</developerConnection>
-        <url>https://swingx.dev.java.net/source/browse/swingx/trunk</url>
+        <connection>scm:svn:https://svn.java.net/svn/swingx~svn</connection>
+        <developerConnection>scm:svn:https://svn.java.net/svn/swingx~svn</developerConnection>
+        <url>https://svn.java.net/svn/swingx~svn</url>
     </scm>
     <description>Contains extensions to the Swing GUI toolkit, including new and enhanced components that provide functionality commonly required by rich client applications.</description>
   <build>
@@ -134,6 +138,8 @@
     </pluginRepositories>
     <modules>
       <module>swingx-testsupport</module>
+      <module>swingx-common</module>
+      <!-- module>swingx-graphics</module -->
       <module>swingx-painters</module>
       <module>swingx-core</module>
       <!-- module>swingx-datecal</module -->
@@ -142,7 +148,6 @@
       <!-- module>swingx-validation</module -->
       <module>swingx-all</module>
       <module>swingx-beaninfo</module>
-      <!-- module>swingx-graphics</module -->
       <!-- module>swingx-plaf</module -->
       <module>swingx-action</module>
     </modules>
