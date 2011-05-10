@@ -24,8 +24,8 @@ import java.awt.image.BufferedImage;
 
 import javax.imageio.ImageIO;
 
+import org.jdesktop.swingx.JXImageView;
 import org.jdesktop.swingx.InteractiveTestCase;
-import org.jdesktop.swingx.JXImagePanel;
 
 /**
  * GraphicsUtilities visual checks.
@@ -53,7 +53,7 @@ public class GraphicsUtilitiesVisualCheck extends InteractiveTestCase {
                 "/org/jdesktop/swingx/resources/images/500by500.png"));
         System.out.println("size:" + im.getWidth() + ", " + im.getHeight());
         BufferedImage im2 = GraphicsUtilities.createThumbnail(im, 100);
-        JXImagePanel ipa = new JXImagePanel();
+        JXImageView ipa = new JXImageView();
         ipa.setImage(im2);
         showInFrame(ipa, "default - for debugging only");
     }
