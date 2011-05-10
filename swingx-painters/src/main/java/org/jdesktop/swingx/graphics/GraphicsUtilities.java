@@ -89,6 +89,7 @@ import javax.swing.JComponent;
  *
  * @author Romain Guy <romain.guy@mac.com>
  * @author rbair
+ * @author Karl Schaefer
  */
 public class GraphicsUtilities {
     private GraphicsUtilities() {
@@ -740,6 +741,12 @@ public class GraphicsUtilities {
         }
     }
 
+    /**
+     * Clears the data from the image.
+     * 
+     * @param img
+     *            the image to erase
+     */
     public static void clear(Image img) {
         Graphics g = img.getGraphics();
         
