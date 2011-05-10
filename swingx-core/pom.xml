@@ -18,12 +18,6 @@
   		<scope>test</scope>
   	</dependency>
   	<dependency>
-  		<groupId>junit</groupId>
-  		<artifactId>junit</artifactId>
-  		<type>jar</type>
-  		<scope>test</scope>
-  	</dependency>
-  	<dependency>
   		<groupId>commons-lang</groupId>
   		<artifactId>commons-lang</artifactId>
   		<type>jar</type>

@@ -11,6 +11,13 @@
   <name>SwingX Painter Support</name>
   <dependencies>
   	<dependency>
+  		<groupId>${project.groupId}</groupId>
+  		<artifactId>swingx-common</artifactId>
+  		<version>${project.version}</version>
+  		<type>jar</type>
+  		<scope>compile</scope>
+  	</dependency>
+  	<dependency>
   		<groupId>com.jhlabs</groupId>
   		<artifactId>filters</artifactId>
   		<type>jar</type>
