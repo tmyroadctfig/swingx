@@ -5,18 +5,12 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 
 import javax.swing.JFrame;
 
-import org.jdesktop.swingx.JXPanel;
-import org.jdesktop.swingx.painter.AbstractPainter;
-import org.jdesktop.swingx.painter.ShapePainter;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -37,13 +31,14 @@ public class Star2DTest {
      * Visual check. Should paint star fully visibly at the right bottom corner.
      * @param args
      */
+    //TODO fix this visual check
     public static void main(String[] args) {
         JFrame f = new JFrame();
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        JXPanel p = new JXPanel();
-        p.setPreferredSize(new Dimension(65,65));
-        p.setBackgroundPainter(new ShapePainter(new Star2D(50,50,10,15,16), Color.RED));
-        f.add(p);
+//        JXPanel p = new JXPanel();
+//        p.setPreferredSize(new Dimension(65,65));
+//        p.setBackgroundPainter(new ShapePainter(new Star2D(50,50,10,15,16), Color.RED));
+//        f.add(p);
         f.pack();
         f.setVisible(true);
     }
