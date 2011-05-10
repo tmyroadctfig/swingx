@@ -92,8 +92,9 @@ import javax.swing.SwingUtilities;
  * @author rbair
  * @deprecated (pre-1.6.2) use a JXPanel with an ImagePainter; see Issue 988
  */
+//moved to package-private instead of deleting; needed by JXLoginPane
 @Deprecated
-public class JXImagePanel extends JXPanel {
+class JXImagePanel extends JXPanel {
     public static enum Style {
         CENTERED, TILED, SCALED, SCALED_KEEP_ASPECT_RATIO
     }
