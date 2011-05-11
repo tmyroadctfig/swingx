@@ -31,12 +31,7 @@ import java.awt.Component;
  * <p>
  * As of SwingX 1.6.1, {@code ColorHighlighter} now blends non-opaque colors.
  * This will have little effect on previous users, who were likely to be 
- * using fully-opaque colors.
- * <p>
- * Users can select the pre-SwingX-1.6.1 behavior which replaces colors instead
- * of blending, by using the legacy property methods.  These methods were added
- * and immediately deprecated.  They exist to provide a bridge to the old
- * behavior, but are not recommended.  If you are supplying a non-opaque color 
+ * using fully-opaque colors. If you are, however, supplying a non-opaque color 
  * and need it to be considered opaque, use {@link org.jdesktop.swingx.graphics.PaintUtils#removeAlpha(Color)}.
  * 
  * @author Jeanette Winzenburg
@@ -48,9 +43,6 @@ public class ColorHighlighter extends AbstractHighlighter {
     private Color foreground;
     private Color selectedBackground;
     private Color selectedForeground;
-    
-    @Deprecated
-    private boolean legacy;
 
     /**
      * Instantiates a ColorHighlighter with null colors and default
@@ -159,11 +151,7 @@ public class ColorHighlighter extends AbstractHighlighter {
     protected void applyBackground(Component renderer, ComponentAdapter adapter) {
         Color color = adapter.isSelected() ? getSelectedBackground() : getBackground();
 
-        if (isLegacy() && color != null) {
-            renderer.setBackground(color);
-        } else {
-            renderer.setBackground(blend(renderer.getBackground(), color));
-        }
+        renderer.setBackground(blend(renderer.getBackground(), color));
     }
     
     /**
@@ -180,11 +168,7 @@ public class ColorHighlighter extends AbstractHighlighter {
     protected void applyForeground(Component renderer, ComponentAdapter adapter) {
         Color color = adapter.isSelected() ? getSelectedForeground() : getForeground();
 
-        if (isLegacy() && color != null) {
-            renderer.setForeground(color);
-        } else {
-            renderer.setForeground(blend(renderer.getForeground(), color));
-        }
+        renderer.setForeground(blend(renderer.getForeground(), color));
     }
 
 
@@ -281,24 +265,4 @@ public class ColorHighlighter extends AbstractHighlighter {
         selectedForeground = color;
         fireStateChanged();
     }
-
-    /**
-     * @return legacy mode
-     * @deprecated (pre-1.6.1) see class doc, on how to workaround
-     */
-    @Deprecated
-    public boolean isLegacy() {
-        return legacy;
-    }
-    
-    /**
-     * @param legacy set legacy mode
-     * @deprecated (pre-1.6.1) see class doc, on how to workaround
-     */
-    @Deprecated
-    public void setLegacy(boolean legacy) {
-        this.legacy = legacy;
-        fireStateChanged();
-    }
-
 }
