@@ -77,6 +77,7 @@ public class AutoCompleteDecorator {
      * the action. The error feedback is most likely a "beep".
      */
     private static final Object errorFeedbackAction = new TextAction("provide-error-feedback") {
+        @Override
         public void actionPerformed(ActionEvent e) {
             UIManager.getLookAndFeel().provideErrorFeedback(getTextComponent(e));
         }
@@ -388,6 +389,7 @@ public class AutoCompleteDecorator {
             this.adaptor = adaptor;
         }
         
+        @Override
         public void actionPerformed(ActionEvent e) {
             if (adaptor.listContainsSelectedItem()) {
                 selectionBackward.actionPerformed(e);

@@ -66,6 +66,7 @@ public class AutoCompleteComboBoxEditor implements ComboBoxEditor {
     /* (non-javadoc)
      * @see javax.swing.ComboBoxEditor#getEditorComponent()
      */
+    @Override
     public Component getEditorComponent() {
         return wrapped.getEditorComponent();
     }
@@ -73,6 +74,7 @@ public class AutoCompleteComboBoxEditor implements ComboBoxEditor {
     /* (non-javadoc)
      * @see javax.swing.ComboBoxEditor#setItem(java.lang.Object)
      */
+    @Override
     public void setItem(Object anObject) {
         this.oldItem = anObject;
         wrapped.setItem(stringConverter.getPreferredStringForItem(anObject));
@@ -81,6 +83,7 @@ public class AutoCompleteComboBoxEditor implements ComboBoxEditor {
     /* (non-javadoc)
      * @see javax.swing.ComboBoxEditor#getItem()
      */
+    @Override
     public Object getItem() {
         final Object wrappedItem = wrapped.getItem();
         
@@ -97,6 +100,7 @@ public class AutoCompleteComboBoxEditor implements ComboBoxEditor {
     /* (non-javadoc)
      * @see javax.swing.ComboBoxEditor#selectAll()
      */
+    @Override
     public void selectAll() {
         wrapped.selectAll();
     }
@@ -104,6 +108,7 @@ public class AutoCompleteComboBoxEditor implements ComboBoxEditor {
     /* (non-javadoc)
      * @see javax.swing.ComboBoxEditor#addActionListener(java.awt.event.ActionListener)
      */
+    @Override
     public void addActionListener(ActionListener l) {
         wrapped.addActionListener(l);
     }
@@ -111,6 +116,7 @@ public class AutoCompleteComboBoxEditor implements ComboBoxEditor {
     /* (non-javadoc)
      * @see javax.swing.ComboBoxEditor#removeActionListener(java.awt.event.ActionListener)
      */
+    @Override
     public void removeActionListener(ActionListener l) {
         wrapped.removeActionListener(l);
     }

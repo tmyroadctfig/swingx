@@ -72,6 +72,7 @@ public class AutoCompleteDocument implements Document {
         /**
          * {@inheritDoc}
          */
+        @Override
         public void changedUpdate(DocumentEvent e) {
             e = new DelegatingDocumentEvent(AutoCompleteDocument.this, e);
 
@@ -92,6 +93,7 @@ public class AutoCompleteDocument implements Document {
         /**
          * {@inheritDoc}
          */
+        @Override
         public void insertUpdate(DocumentEvent e) {
             e = new DelegatingDocumentEvent(AutoCompleteDocument.this, e);
 
@@ -112,6 +114,7 @@ public class AutoCompleteDocument implements Document {
         /**
          * {@inheritDoc}
          */
+        @Override
         public void removeUpdate(DocumentEvent e) {
             e = new DelegatingDocumentEvent(AutoCompleteDocument.this, e);
 
@@ -132,6 +135,7 @@ public class AutoCompleteDocument implements Document {
         /**
          * {@inheritDoc}
          */
+        @Override
         public void undoableEditHappened(UndoableEditEvent e) {
             e = new UndoableEditEvent(AutoCompleteDocument.this, e.getEdit());
 
@@ -266,6 +270,7 @@ public class AutoCompleteDocument implements Document {
         return new PlainDocument();
     }
 
+    @Override
     public void remove(int offs, int len) throws BadLocationException {
         // return immediately when selecting an item
         if (selecting) return;
@@ -276,6 +281,7 @@ public class AutoCompleteDocument implements Document {
         }
     }
 
+    @Override
     public void insertString(int offs, String str, AttributeSet a) throws BadLocationException {
         // return immediately when selecting an item
         if (selecting) return;
@@ -423,6 +429,7 @@ public class AutoCompleteDocument implements Document {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void addDocumentListener(DocumentListener listener) {
         handler.addDocumentListener(listener);
     }
@@ -430,6 +437,7 @@ public class AutoCompleteDocument implements Document {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void addUndoableEditListener(UndoableEditListener listener) {
         handler.addUndoableEditListener(listener);
     }
@@ -437,6 +445,7 @@ public class AutoCompleteDocument implements Document {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Position createPosition(int offs) throws BadLocationException {
         return delegate.createPosition(offs);
     }
@@ -444,6 +453,7 @@ public class AutoCompleteDocument implements Document {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Element getDefaultRootElement() {
         return delegate.getDefaultRootElement();
     }
@@ -451,6 +461,7 @@ public class AutoCompleteDocument implements Document {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Position getEndPosition() {
         return delegate.getEndPosition();
     }
@@ -458,6 +469,7 @@ public class AutoCompleteDocument implements Document {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getLength() {
         return delegate.getLength();
     }
@@ -465,6 +477,7 @@ public class AutoCompleteDocument implements Document {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Object getProperty(Object key) {
         return delegate.getProperty(key);
     }
@@ -472,6 +485,7 @@ public class AutoCompleteDocument implements Document {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Element[] getRootElements() {
         return delegate.getRootElements();
     }
@@ -479,6 +493,7 @@ public class AutoCompleteDocument implements Document {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Position getStartPosition() {
         return delegate.getStartPosition();
     }
@@ -486,6 +501,7 @@ public class AutoCompleteDocument implements Document {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getText(int offset, int length) throws BadLocationException {
         return delegate.getText(offset, length);
     }
@@ -493,6 +509,7 @@ public class AutoCompleteDocument implements Document {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void getText(int offset, int length, Segment txt) throws BadLocationException {
         delegate.getText(offset, length, txt);
     }
@@ -500,6 +517,7 @@ public class AutoCompleteDocument implements Document {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void putProperty(Object key, Object value) {
         delegate.putProperty(key, value);
     }
@@ -507,6 +525,7 @@ public class AutoCompleteDocument implements Document {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void removeDocumentListener(DocumentListener listener) {
         handler.removeDocumentListener(listener);
     }
@@ -514,6 +533,7 @@ public class AutoCompleteDocument implements Document {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void removeUndoableEditListener(UndoableEditListener listener) {
         handler.removeUndoableEditListener(listener);
     }
@@ -521,6 +541,7 @@ public class AutoCompleteDocument implements Document {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void render(Runnable r) {
         delegate.render(r);
     }
