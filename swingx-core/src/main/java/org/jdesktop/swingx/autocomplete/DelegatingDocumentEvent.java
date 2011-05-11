@@ -23,6 +23,7 @@ final class DelegatingDocumentEvent implements DocumentEvent {
     /**
      * {@inheritDoc}
      */
+    @Override
     public ElementChange getChange(Element elem) {
         return sourceEvent.getChange(elem);
     }
@@ -30,6 +31,7 @@ final class DelegatingDocumentEvent implements DocumentEvent {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Document getDocument() {
         return resourcedDocument;
     }
@@ -37,6 +39,7 @@ final class DelegatingDocumentEvent implements DocumentEvent {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getLength() {
         return sourceEvent.getLength();
     }
@@ -44,6 +47,7 @@ final class DelegatingDocumentEvent implements DocumentEvent {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getOffset() {
         return sourceEvent.getOffset();
     }
@@ -51,6 +55,7 @@ final class DelegatingDocumentEvent implements DocumentEvent {
     /**
      * {@inheritDoc}
      */
+    @Override
     public EventType getType() {
         return sourceEvent.getType();
     }

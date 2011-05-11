@@ -78,6 +78,7 @@ public class AutoCompleteStyledDocument extends AutoCompleteDocument implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public Style addStyle(String nm, Style parent) {
         return ((StyledDocument) delegate).addStyle(nm, parent);
     }
@@ -85,6 +86,7 @@ public class AutoCompleteStyledDocument extends AutoCompleteDocument implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public Color getBackground(AttributeSet attr) {
         return ((StyledDocument) delegate).getBackground(attr);
     }
@@ -92,6 +94,7 @@ public class AutoCompleteStyledDocument extends AutoCompleteDocument implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public Element getCharacterElement(int pos) {
         return ((StyledDocument) delegate).getCharacterElement(pos);
     }
@@ -99,6 +102,7 @@ public class AutoCompleteStyledDocument extends AutoCompleteDocument implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public Font getFont(AttributeSet attr) {
         return ((StyledDocument) delegate).getFont(attr);
     }
@@ -106,6 +110,7 @@ public class AutoCompleteStyledDocument extends AutoCompleteDocument implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public Color getForeground(AttributeSet attr) {
         return ((StyledDocument) delegate).getForeground(attr);
     }
@@ -113,6 +118,7 @@ public class AutoCompleteStyledDocument extends AutoCompleteDocument implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public Style getLogicalStyle(int p) {
         return ((StyledDocument) delegate).getLogicalStyle(p);
     }
@@ -120,6 +126,7 @@ public class AutoCompleteStyledDocument extends AutoCompleteDocument implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public Element getParagraphElement(int pos) {
         return ((StyledDocument) delegate).getParagraphElement(pos);
     }
@@ -127,6 +134,7 @@ public class AutoCompleteStyledDocument extends AutoCompleteDocument implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public Style getStyle(String nm) {
         return ((StyledDocument) delegate).getStyle(nm);
     }
@@ -134,6 +142,7 @@ public class AutoCompleteStyledDocument extends AutoCompleteDocument implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public void removeStyle(String nm) {
         ((StyledDocument) delegate).removeStyle(nm);
     }
@@ -141,6 +150,7 @@ public class AutoCompleteStyledDocument extends AutoCompleteDocument implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setCharacterAttributes(int offset, int length,
             AttributeSet s, boolean replace) {
                 ((StyledDocument) delegate).setCharacterAttributes(offset, length, s, replace);
@@ -149,6 +159,7 @@ public class AutoCompleteStyledDocument extends AutoCompleteDocument implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setLogicalStyle(int pos, Style s) {
         ((StyledDocument) delegate).setLogicalStyle(pos, s);
     }
@@ -156,6 +167,7 @@ public class AutoCompleteStyledDocument extends AutoCompleteDocument implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setParagraphAttributes(int offset, int length,
             AttributeSet s, boolean replace) {
                 ((StyledDocument) delegate).setParagraphAttributes(offset, length, s, replace);

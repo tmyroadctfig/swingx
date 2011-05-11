@@ -71,6 +71,7 @@ public class ListAdaptor extends AbstractAutoCompleteAdaptor implements ListSele
      * @param listSelectionEvent -
      */
     // ListSelectionListener (listening to list)
+    @Override
     public void valueChanged(javax.swing.event.ListSelectionEvent listSelectionEvent) {
         // set the text to the currently selected item
         getTextComponent().setText(stringConverter.getPreferredStringForItem(list.getSelectedValue()));

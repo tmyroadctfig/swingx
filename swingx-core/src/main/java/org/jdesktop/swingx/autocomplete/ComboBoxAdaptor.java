@@ -56,6 +56,7 @@ public class ComboBoxAdaptor extends AbstractAutoCompleteAdaptor implements Acti
      * @param actionEvent -
      */
     // ActionListener (listening to comboBox)
+    @Override
     public void actionPerformed(ActionEvent actionEvent) {
         markEntireText();
     }
