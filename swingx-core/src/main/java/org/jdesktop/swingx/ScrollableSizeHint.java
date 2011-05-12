@@ -68,6 +68,30 @@ public enum ScrollableSizeHint {
     }, 
     
     /**
+     * Stretches the component when its parent is larger than its minimum size.
+     */
+    MINIMUM_STRETCH {
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        boolean getTracksParentSizeImpl(JComponent component, int orientation) {
+            switch (orientation) {
+            case SwingConstants.HORIZONTAL:
+                return component.getParent() instanceof JViewport
+                        && component.getParent().getWidth() > component.getMinimumSize().width
+                        && component.getParent().getWidth() < component.getMaximumSize().width;
+            case SwingConstants.VERTICAL:
+                return component.getParent() instanceof JViewport
+                        && component.getParent().getHeight() > component.getMinimumSize().height
+                        && component.getParent().getHeight() < component.getMaximumSize().height;
+            default:
+                throw new IllegalArgumentException("invalid orientation");
+            }
+        }
+    },
+    
+    /**
      * Stretches the component when its parent is larger than its preferred size.
      */
     PREFERRED_STRETCH {
@@ -83,8 +107,8 @@ public enum ScrollableSizeHint {
                         && component.getParent().getWidth() < component.getMaximumSize().width;
             case SwingConstants.VERTICAL:
                 return component.getParent() instanceof JViewport
-                    && component.getParent().getHeight() > component.getPreferredSize().height
-                    && component.getParent().getHeight() < component.getMaximumSize().height;
+                        && component.getParent().getHeight() > component.getPreferredSize().height
+                        && component.getParent().getHeight() < component.getMaximumSize().height;
             default:
                 throw new IllegalArgumentException("invalid orientation");
             }
