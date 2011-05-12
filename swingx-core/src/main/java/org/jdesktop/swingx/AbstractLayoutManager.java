@@ -6,6 +6,12 @@ import java.awt.Dimension;
 import java.awt.LayoutManager;
 import java.io.Serializable;
 
+/**
+ * A simple abstract class to handle common layout implementations. Package-private as we do NOT
+ * want to export this as part of the public API.
+ * 
+ * @author kschaefer
+ */
 abstract class AbstractLayoutManager implements LayoutManager, Serializable {
     private static final long serialVersionUID = 1446292747820044161L;
 
