@@ -242,7 +242,14 @@ public class JXCollapsiblePane extends JXPanel {
         public boolean isVertical() {
             return vertical;
         }
-        
+
+        /**
+         * Gets the fixed direction equivalent to this direction for the specified orientation.
+         * 
+         * @param co
+         *            the component's orientation
+         * @return the fixed direction corresponding to the component's orietnation
+         */
         Direction getFixedDirection(ComponentOrientation co) {
             return this;
         }
@@ -792,7 +799,7 @@ public class JXCollapsiblePane extends JXPanel {
      * Tagging interface for containers in a JXCollapsiblePane hierarchy who needs
      * to be revalidated (invalidate/validate/repaint) when the pane is expanding
      * or collapsing. Usually validating only the parent of the JXCollapsiblePane
-     * is enough but there might be cases where the parent parent must be
+     * is enough but there might be cases where the parent's parent must be
      * validated.
      */
     public static interface CollapsiblePaneContainer {
@@ -975,7 +982,7 @@ public class JXCollapsiblePane extends JXPanel {
                     }
                 }
                 wrapper.alpha = animateAlpha;
-
+                
                 validate();
             }
         }
