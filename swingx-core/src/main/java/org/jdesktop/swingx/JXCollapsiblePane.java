@@ -20,16 +20,21 @@
  */
 package org.jdesktop.swingx;
 
+import java.awt.AlphaComposite;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.ComponentOrientation;
+import java.awt.Composite;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.LayoutManager;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
@@ -41,6 +46,8 @@ import javax.swing.Scrollable;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.border.Border;
+
+import org.jdesktop.swingx.graphics.GraphicsUtilities;
 
 /**
  * <code>JXCollapsiblePane</code> provides a component which can collapse or
@@ -981,7 +988,8 @@ public class JXCollapsiblePane extends JXPanel {
                         animateAlpha = animationParams.alphaStart;
                     }
                 }
-                wrapper.alpha = animateAlpha;
+                
+                wrapper.setAlpha(animateAlpha);
                 
                 validate();
             }
@@ -1027,9 +1035,10 @@ public class JXCollapsiblePane extends JXPanel {
         }
     }
 
-    private final class WrapperContainer extends JViewport {
-        float alpha;
+    private final class WrapperContainer extends JViewport implements AlphaPaintable {
         boolean collapsedState;
+        private float alpha;
+        private boolean oldOpaque;
 
         public WrapperContainer(Container c) {
             alpha = 1.0f;
@@ -1057,7 +1066,90 @@ public class JXCollapsiblePane extends JXPanel {
         	//getting any core fixes, by avoiding c&p
         	JXCollapsiblePane.this.scrollRectToVisible(aRect);
         }
-        
+
+        @Override
+        public float getAlpha() {
+            return alpha;
+        }
+
+        @Override
+        public void setAlpha(float alpha) {
+            if (alpha < 0f || alpha > 1f) {
+                throw new IllegalArgumentException("invalid alpha value " + alpha);
+            }
+            
+            float oldValue = getAlpha();
+            this.alpha = alpha;
+            
+            if (getAlpha() < 1f) {
+                if (oldValue == 1) {
+                    //it used to be 1, but now is not. Save the oldOpaque
+                    oldOpaque = isOpaque();
+                    setOpaque(false);
+                }
+            } else {
+                //restore the oldOpaque if it was true (since opaque is false now)
+                if (oldOpaque) {
+                    setOpaque(true);
+                }
+            }
+            
+            firePropertyChange("alpha", oldValue, getAlpha());
+            repaint();
+        }
+
+        @Override
+        public boolean isInheritAlpha() {
+            return false;
+        }
+
+        @Override
+        public void setInheritAlpha(boolean inheritAlpha) {
+            //does nothing; always false;
+        }
+
+        @Override
+        public float getEffectiveAlpha() {
+            return getAlpha();
+        }
+
+        /**
+         * Overridden paint method to take into account the alpha setting.
+         * 
+         * @param g
+         *            the <code>Graphics</code> context in which to paint
+         */
+        @Override
+        public void paint(Graphics g) {
+            //short circuit painting if no transparency
+            if (getAlpha() == 1f) {
+                super.paint(g);
+            } else {
+                //the component is translucent, so we need to render to
+                //an intermediate image before painting
+                // TODO should we cache this image? repaint to same image unless size changes?
+                BufferedImage img = GraphicsUtilities.createCompatibleTranslucentImage(getWidth(), getHeight());
+                Graphics2D gfx = img.createGraphics();
+                
+                try {
+                    super.paint(gfx);
+                } finally {
+                    gfx.dispose();
+                }
+                
+                Graphics2D g2d = (Graphics2D) g;
+                Composite oldComp = g2d.getComposite();
+                
+                try {
+                    Composite alphaComp = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, getEffectiveAlpha());
+                    g2d.setComposite(alphaComp);
+                    //TODO should we cache the image?
+                    g2d.drawImage(img, null, 0, 0);
+                } finally {
+                    g2d.setComposite(oldComp);
+                }
+            }
+        }
     }
 
 // TEST CASE
