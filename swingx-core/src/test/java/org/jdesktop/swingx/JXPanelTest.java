@@ -28,6 +28,7 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assume.assumeThat;
 
 import java.awt.Color;
 import java.util.logging.Logger;
@@ -43,6 +44,7 @@ import org.jdesktop.swingx.plaf.PainterUIResource;
 import org.jdesktop.test.EDTRunner;
 import org.jdesktop.test.PropertyChangeReport;
 import org.jdesktop.test.TestUtils;
+import org.junit.Assume;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -52,6 +54,7 @@ import org.junit.runner.RunWith;
  * @author Karl Schaefer
  */
 @RunWith(EDTRunner.class)
+@SuppressWarnings("rawtypes")
 public class JXPanelTest extends TestCase {
     @SuppressWarnings("unused")
     private static final Logger LOG = Logger.getLogger(JXPanelTest.class
@@ -234,7 +237,6 @@ public class JXPanelTest extends TestCase {
      * background painter is {@code null} or a {@code UIResource}.
      */
     @Test
-    @SuppressWarnings("unchecked")
     public void testSetUIResourceColorOverridesUIResourceBackgroundPainter() {
         JXPanel panel = new JXPanel();
         
@@ -253,7 +255,6 @@ public class JXPanelTest extends TestCase {
      * background painter is {@code null} or a {@code UIResource}.
      */
     @Test
-    @SuppressWarnings("unchecked")
     public void testSetUIResourceColorDoesNotOverrideBackgroundPainter() {
         JXPanel panel = new JXPanel();
         
@@ -263,5 +264,63 @@ public class JXPanelTest extends TestCase {
         panel.setBackground(new ColorUIResource(Color.BLACK));
         
         assertThat(panel.getBackgroundPainter(), is(sameInstance(painter)));
+    }
+    
+    @Test(expected = IllegalArgumentException.class)
+    public void testSetAlphaWithLessThanZero() {
+        new JXPanel().setAlpha(Math.nextAfter(0f, Float.NEGATIVE_INFINITY));
+    }
+    
+    @Test(expected = IllegalArgumentException.class)
+    public void testSetAlphaWithGreaterThanOne() {
+        new JXPanel().setAlpha(Math.nextUp(1f));
+    }
+    
+    public void testSetAlphaLessThanOneMakesPanelNonOpaque() {
+        JXPanel panel = new JXPanel();
+        assumeThat(panel.isOpaque(), is(true));
+        
+        panel.setAlpha(.99f);
+        assertThat(panel.isOpaque(), is(false));
+    }
+    
+    public void testRestoreOpacityWhenAlphaSetToOne() {
+        JXPanel panel = new JXPanel();
+        assumeThat(panel.isOpaque(), is(true));
+        
+        panel.setAlpha(.99f);
+        panel.setAlpha(1f);
+        assertThat(panel.isOpaque(), is(true));
+        
+        panel.setOpaque(false);
+        panel.setAlpha(.99f);
+        panel.setAlpha(1f);
+        assertThat(panel.isOpaque(), is(false));
+    }
+    
+    @Test
+    public void testGetEffectiveAlphaWithoutInherit() {
+        JXPanel panel = new JXPanel();
+        assertThat(panel.getEffectiveAlpha(), is(panel.getAlpha()));
+        
+        panel.setAlpha(.5f);
+        assertThat(panel.getEffectiveAlpha(), is(panel.getAlpha()));
+    }
+    
+    @Test
+    public void testGetEffectiveAlphaWithInheritGetsSmallestAlpha() {
+        JXPanel p1 = new JXPanel();
+        p1.setAlpha(.1f);
+        p1.setInheritAlpha(true);
+        JXPanel p2 = new JXPanel();
+        p2.setAlpha(.2f);
+        p2.setInheritAlpha(true);
+        
+        p1.add(p2);
+        assertThat(p2.getEffectiveAlpha(), is(p1.getAlpha()));
+        
+        p1.removeAll();
+        p2.add(p1);
+        assertThat(p1.getEffectiveAlpha(), is(p1.getAlpha()));
     }
 }

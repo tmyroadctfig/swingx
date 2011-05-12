@@ -21,9 +21,9 @@
  */
 package org.jdesktop.swingx;
 
-import java.awt.Adjustable;
-
 import javax.swing.JComponent;
+import javax.swing.JViewport;
+import javax.swing.SwingConstants;
 
 import org.jdesktop.swingx.util.Contract;
 
@@ -32,77 +32,132 @@ import org.jdesktop.swingx.util.Contract;
  * 
  * Inspired by <a href=
  * http://tips4java.wordpress.com/2009/12/20/scrollable-panel/> Rob Camick</a>.
+ * <p>
+ * PENDING JW: naming... suggestions?<br>
+ * KS: I'd go with TrackingHint or ScrollableTrackingHint, since it is used in getScrollableTracksViewportXXX.
  * 
- * PENDING JW: naming... suggestions?
  * 
  * @author Jeanette Winzenburg
+ * @author Karl Schaefer
  */
 public enum ScrollableSizeHint {
-
     /**
      * Size should be unchanged.
      */
-    NONE(false), 
-    
-    /**
-     * Size should be adjusted to parent size. 
-     */
-    FIT(true), 
-    
-    /**
-     * Width should be stretched to parent width if smaller, unchanged otherwise.
-     */
-    HORIZONTAL_STRETCH(Adjustable.HORIZONTAL) {
+    NONE {
         /**
          * {@inheritDoc}
          */
         @Override
-        boolean isSmallerThanParent(JComponent component) {
+        boolean getTracksParentSizeImpl(JComponent component, int orientation) {
+            return false;
+        }
+    }, 
+    
+    /**
+     * Size should be adjusted to parent size. 
+     */
+    FIT {
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        boolean getTracksParentSizeImpl(JComponent component, int orientation) {
+            return true;
+        }
+    }, 
+    
+    /**
+     * Stretches the component when its parent is larger than its preferred size.
+     */
+    PREFERRED_STRETCH {
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        boolean getTracksParentSizeImpl(JComponent component, int orientation) {
+            switch (orientation) {
+            case SwingConstants.HORIZONTAL:
+                return component.getParent() instanceof JViewport
+                        && component.getParent().getWidth() > component.getPreferredSize().width
+                        && component.getParent().getWidth() < component.getMaximumSize().width;
+            case SwingConstants.VERTICAL:
+                return component.getParent() instanceof JViewport
+                    && component.getParent().getHeight() > component.getPreferredSize().height
+                    && component.getParent().getHeight() < component.getMaximumSize().height;
+            default:
+                throw new IllegalArgumentException("invalid orientation");
+            }
+        }
+    },
+    
+    /**
+     * Width should be stretched to parent width if smaller, unchanged otherwise.
+     */
+    @Deprecated
+    HORIZONTAL_STRETCH {
+        /**
+         * {@inheritDoc}
+         * <p>
+         * Returns {@code false}.
+         */
+        @Override
+        @Deprecated
+        public boolean isVerticalCompatible() {
+            return false;
+        }
+        
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        boolean getTracksParentSizeImpl(JComponent component, int orientation) {
+            if (orientation != SwingConstants.HORIZONTAL) {
+                throw new IllegalArgumentException();
+            }
+            
             if (component.getParent() != null) {
-                return component.getParent().getWidth() > 
-                    component.getPreferredSize().width;
+                return component.getParent().getWidth() > component.getPreferredSize().width
+                    && component.getParent().getWidth() < component.getMaximumSize().width;
             }
 
             return false;
         }
-         
     },
     
     /**
      * Width should be stretched to parent height if smaller, unchanged otherwise.
      */
-    VERTICAL_STRETCH(Adjustable.VERTICAL) {
+    @Deprecated
+    VERTICAL_STRETCH {
+        /**
+         * {@inheritDoc}
+         * <p>
+         * Returns {@code false}.
+         */
+        @Override
+        @Deprecated
+        public boolean isHorizontalCompatible() {
+            return false;
+        }
+        
         /**
          * {@inheritDoc}
          */
         @Override
-        boolean isSmallerThanParent(JComponent component) {
+        boolean getTracksParentSizeImpl(JComponent component, int orientation) {
+            if (orientation != SwingConstants.VERTICAL) {
+                throw new IllegalArgumentException();
+            }
+            
             if (component.getParent() != null) {
-                return component.getParent().getHeight() > 
-                    component.getPreferredSize().height;
+                return component.getParent().getHeight() > component.getPreferredSize().height
+                        && component.getParent().getWidth() < component.getMaximumSize().height;
             }
 
             return false;
         }
-        
     };
-    
-    final boolean tracks;
-    final int orientation;
-    
-    ScrollableSizeHint(boolean track) {
-        this(track, -1);
-    }
-    
-    ScrollableSizeHint(int orientation) {
-        this(false, orientation);
-    }
-    
-    ScrollableSizeHint(boolean tracks, int orientation) {
-        this.tracks = tracks;
-        this.orientation = orientation;
-        
-    }
     
     /**
      * Returns a boolean indicating whether the component's size should be
@@ -114,12 +169,26 @@ public enum ScrollableSizeHint {
      *    
      * @throws NullPointerException if component is null   
      */
+    @Deprecated
     public boolean getTracksParentSize(JComponent component) {
+        return getTracksParentSize(component, 0);
+    }
+    
+    /**
+     * Returns a boolean indicating whether the component's size should be
+     * adjusted to parent.
+     *  
+     * @param component the component resize, must not be null
+     * @return a boolean indicating whether the component's size should be
+     *    adjusted to parent
+     *    
+     * @throws NullPointerException if component is null
+     * @throws IllegalArgumentException if orientation is invalid
+     */
+    public boolean getTracksParentSize(JComponent component, int orientation) {
         Contract.asNotNull(component, "component must be not-null");
-        if (orientation < 0) {
-            return tracks;
-        }
-        return isSmallerThanParent(component);
+        
+        return getTracksParentSizeImpl(component, orientation);
     }
 
     /**
@@ -129,8 +198,9 @@ public enum ScrollableSizeHint {
      * @return a boolean indicating whether the hint can be used in horizontal
      *   orientation. 
      */
+    @Deprecated
     public boolean isHorizontalCompatible() {
-        return (orientation < 0) ? true : Adjustable.HORIZONTAL == orientation;
+        return true;
     }
     
     /**
@@ -140,8 +210,9 @@ public enum ScrollableSizeHint {
      * @return a boolean indicating whether the hint can be used in vertical
      *   orientation. 
      */
+    @Deprecated
     public boolean isVerticalCompatible() {
-        return (orientation < 0) ? true : Adjustable.VERTICAL == orientation;
+        return true;
     }
 
     /**
@@ -150,10 +221,9 @@ public enum ScrollableSizeHint {
      * 
      * @param component
      *            the component to test
+     * @param orientation
+     *            the orientation to test
      * @return {@code true} to track; {@code false} otherwise
      */
-    boolean isSmallerThanParent(JComponent component) {
-        return tracks;
-    }
-    
+    abstract boolean getTracksParentSizeImpl(JComponent component, int orientation);
 }

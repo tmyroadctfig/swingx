@@ -109,8 +109,11 @@ public class JXPanel extends JPanel implements AlphaPaintable, BackgroundPaintab
      * is called. Old behavior is also honored for the time being if no
      * backgroundPainter is specified
      */
+    @SuppressWarnings("rawtypes")
     private Painter backgroundPainter;
     
+    private boolean paintBorderInsets = true;
+
     /**
      * The listener installed on the current backgroundPainter, if any.
      */
@@ -163,39 +166,51 @@ public class JXPanel extends JPanel implements AlphaPaintable, BackgroundPaintab
      * {@inheritDoc}
      */
     @Override
-    public void setAlpha(float alpha) {
-        if (this.alpha != alpha) {
-            assert alpha >= 0f && alpha <= 1f;
-            float oldAlpha = this.alpha;
-            this.alpha = alpha;
-            if (alpha > 0f && alpha < 1f) {
-                if (oldAlpha == 1) {
-                    //it used to be 1, but now is not. Save the oldOpaque
-                    oldOpaque = isOpaque();
-                    setOpaque(false);
-                }
-                
-                RepaintManager manager = RepaintManager.currentManager(this);
-                RepaintManager trm = SwingXUtilities.getTranslucentRepaintManager(manager);
-                RepaintManager.setCurrentManager(trm);
-            } else if (alpha == 1f) {
-                //restore the oldOpaque if it was true (since opaque is false now)
-                if (oldOpaque) {
-                    setOpaque(true);
-                }
-                //TODO uninstall TranslucentRepaintManager when no more non-opaque JXPanel's exist
-            }
-            firePropertyChange("alpha", oldAlpha, alpha);
-            repaint();
-        }
+    public float getAlpha() {
+        return alpha;
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
-    public float getAlpha() {
-        return alpha;
+    public void setAlpha(float alpha) {
+        if (alpha < 0f || alpha > 1f) {
+            throw new IllegalArgumentException("invalid alpha value " + alpha);
+        }
+        
+        float oldValue = getAlpha();
+        this.alpha = alpha;
+        
+        if (getAlpha() < 1f) {
+            if (oldValue == 1) {
+                //it used to be 1, but now is not. Save the oldOpaque
+                oldOpaque = isOpaque();
+                setOpaque(false);
+            }
+            
+            installRepaintManager();
+        } else {
+            uninstallRepaintManager();
+            
+            //restore the oldOpaque if it was true (since opaque is false now)
+            if (oldOpaque) {
+                setOpaque(true);
+            }
+        }
+        
+        firePropertyChange("alpha", oldValue, getAlpha());
+        repaint();
+    }
+    
+    void installRepaintManager() {
+        RepaintManager manager = RepaintManager.currentManager(this);
+        RepaintManager trm = SwingXUtilities.getTranslucentRepaintManager(manager);
+        RepaintManager.setCurrentManager(trm);
+    }
+    
+    void uninstallRepaintManager() {
+        //TODO uninstall TranslucentRepaintManager when no more non-opaque JXPanel's exist
     }
     
     /**
@@ -203,18 +218,18 @@ public class JXPanel extends JPanel implements AlphaPaintable, BackgroundPaintab
      */
     @Override
     public float getEffectiveAlpha() {
-        if (inheritAlpha) {
-            float a = alpha;
-            Component c = this;
-            while ((c = c.getParent()) != null) {
+        float a = getAlpha();
+        
+        if (isInheritAlpha()) {
+            for (Component c = getParent(); c != null; c = c.getParent()) {
                 if (c instanceof AlphaPaintable) {
-                    a = Math.min(((AlphaPaintable)c).getAlpha(), a);
+                    a = Math.min(((AlphaPaintable) c).getEffectiveAlpha(), a);
+                    break;
                 }
             }
-            return a;
-        } else {
-            return alpha;
         }
+        
+        return a;
     }
 
     /**
@@ -230,10 +245,9 @@ public class JXPanel extends JPanel implements AlphaPaintable, BackgroundPaintab
      */
     @Override
     public void setInheritAlpha(boolean val) {
-        if (inheritAlpha != val) {
-            inheritAlpha = val;
-            firePropertyChange("inheritAlpha", !inheritAlpha, inheritAlpha);
-        }
+        boolean oldValue = isInheritAlpha();
+        inheritAlpha = val;
+        firePropertyChange("inheritAlpha", oldValue, isInheritAlpha());
     }
     
     /**
@@ -298,7 +312,7 @@ public class JXPanel extends JPanel implements AlphaPaintable, BackgroundPaintab
      */
     @Override
     public boolean getScrollableTracksViewportHeight() {
-        return scrollableHeightHint.getTracksParentSize(this);
+        return scrollableHeightHint.getTracksParentSize(this, SwingConstants.VERTICAL);
     }
     
     /**
@@ -306,7 +320,7 @@ public class JXPanel extends JPanel implements AlphaPaintable, BackgroundPaintab
      */
     @Override
     public boolean getScrollableTracksViewportWidth() {
-        return scrollableWidthHint.getTracksParentSize(this);
+        return scrollableWidthHint.getTracksParentSize(this, SwingConstants.HORIZONTAL);
     }
     
     /**
@@ -441,9 +455,6 @@ public class JXPanel extends JPanel implements AlphaPaintable, BackgroundPaintab
         return backgroundPainter;
     }
     
-    
-    private boolean paintBorderInsets = true;
-    
     /**
      * Returns true if the background painter should paint where the border is
      * or false if it should only paint inside the border. This property is 
@@ -485,6 +496,7 @@ public class JXPanel extends JPanel implements AlphaPaintable, BackgroundPaintab
         } else {
             //the component is translucent, so we need to render to
             //an intermediate image before painting
+            // TODO should we cache this image? repaint to same image unless size changes?
             BufferedImage img = GraphicsUtilities.createCompatibleTranslucentImage(getWidth(), getHeight());
             Graphics2D gfx = img.createGraphics();
             
