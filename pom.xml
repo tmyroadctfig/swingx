@@ -140,7 +140,9 @@
       <module>swingx-testsupport</module>
       <module>swingx-common</module>
       <!-- module>swingx-graphics</module -->
+      <module>swingx-action</module>
       <module>swingx-painters</module>
+      <module>swingx-plaf</module>
       <module>swingx-core</module>
       <!-- module>swingx-datecal</module -->
       <!-- module>swingx-treetable</module -->
@@ -148,7 +150,5 @@
       <!-- module>swingx-validation</module -->
       <module>swingx-all</module>
       <module>swingx-beaninfo</module>
-      <!-- module>swingx-plaf</module -->
-      <module>swingx-action</module>
     </modules>
 </project>
