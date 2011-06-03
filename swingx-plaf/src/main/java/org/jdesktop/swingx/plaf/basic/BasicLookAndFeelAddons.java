@@ -50,5 +50,4 @@ public class BasicLookAndFeelAddons extends LookAndFeelAddons {
                 "org.jdesktop.swingx.plaf.basic.resources.swingx");
         super.uninitialize();
     }
-    
 }
