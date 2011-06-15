@@ -20,9 +20,12 @@ package org.jdesktop.swingx;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.Locale;
 
 import javax.swing.AbstractAction;
@@ -62,6 +65,82 @@ public class JXTaskPaneContainerVisualCheck extends InteractiveTestCase {
         }
     }
     
+    public void interactiveAccordion() {
+        JXTaskPaneContainer container = new JXTaskPaneContainer() {
+
+            private JXTaskPane current;
+
+            private PropertyChangeListener expansionListener;
+
+            /**
+             * @inherited <p>
+             */
+            @Override
+            protected void addImpl(Component comp, Object constraints, int index) {
+                super.addImpl(comp, constraints, index);
+                if (comp instanceof JXTaskPane) {
+                    grabExpansionControl((JXTaskPane) comp);
+                }
+            }
+
+            private void grabExpansionControl(JXTaskPane comp) {
+                if (current != null) {
+                    comp.setCollapsed(true);
+                } else {
+                    current = comp;
+                    comp.setCollapsed(false);
+                }
+                comp.addPropertyChangeListener("collapsed",
+                        getExpansionListener());
+            }
+
+            private void updateCurrentTaskPane(JXTaskPane source) {
+                if (source != current) {
+                    if (!source.isCollapsed()) {
+                        if (current != null) {
+                            current.setCollapsed(true);
+                        }
+                        current = source;
+                    }
+                }
+            }
+
+            private PropertyChangeListener createExpansionListener() {
+                PropertyChangeListener l = new PropertyChangeListener() {
+
+                    @Override
+                    public void propertyChange(PropertyChangeEvent evt) {
+                        // TODO Auto-generated method stub
+                        updateCurrentTaskPane((JXTaskPane) evt.getSource());
+                    }
+                };
+                return l;
+            }
+            
+
+            private PropertyChangeListener getExpansionListener() {
+                if (expansionListener == null) {
+                    expansionListener = createExpansionListener();
+                }
+                return expansionListener;
+            }
+
+
+        };
+        ((VerticalLayout) container.getLayout()).setGap(0);
+        for (int i = 0; i < 5; i++) {
+            addTaskPane(container);
+        }
+        showWithScrollingInFrame(container, "");
+    }
+
+    private void addTaskPane(JXTaskPaneContainer container) {
+        JXTaskPane first = new JXTaskPane("pane " + container.getComponentCount());
+        first.setAnimated(false);
+        fillTaskPane(first);
+        container.add(first);
+    }
+    
     /**
      * Requirement: color of parent, that is transparent. 
      * Issue ??-swingx: Not respected in Windows - that's because 
@@ -81,9 +160,7 @@ public class JXTaskPaneContainerVisualCheck extends InteractiveTestCase {
             }
         };
         container.setBackgroundPainter(nullPainter);
-        JXTaskPane first = new JXTaskPane();
-        fillTaskPane(first);
-        container.add(first);
+        addTaskPane(container);
         JXTaskPane second = new JXTaskPane();
         fillTaskPane(second);
         showWithScrollingInFrame(container, "transparent");
@@ -93,13 +170,8 @@ public class JXTaskPaneContainerVisualCheck extends InteractiveTestCase {
     
     public void interactiveGap() {
         JXTaskPaneContainer container = new JXTaskPaneContainer();
-//        ((VerticalLayout) container.getLayout()).setGap(0);
-        JXTaskPane first = new JXTaskPane();
-        fillTaskPane(first);
-        container.add(first);
-        JXTaskPane second = new JXTaskPane();
-        fillTaskPane(second);
-        container.add(second);
+        addTaskPane(container);
+        addTaskPane(container);
         showWithScrollingInFrame(container, "custom gap");
     }
 
