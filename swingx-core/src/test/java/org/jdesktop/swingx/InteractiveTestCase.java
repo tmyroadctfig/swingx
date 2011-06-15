@@ -409,6 +409,15 @@ public abstract class InteractiveTestCase extends junit.framework.TestCase {
 
 //------------------------ menu
     
+    public JMenuBar getMenuBar(JXFrame frame) {
+        JMenuBar bar = frame.getJMenuBar();
+        if (bar == null) {
+            bar = new JMenuBar();
+            frame.setJMenuBar(bar);
+        }
+        return bar;
+    }
+    
     /**
      * Creates, fills and returns a JMenuBar. 
      * 
