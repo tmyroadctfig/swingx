@@ -65,6 +65,9 @@ public class JXTaskPaneContainerVisualCheck extends InteractiveTestCase {
         }
     }
     
+    /**
+     * Tweak JXTaskPaneContainer into an accordion-like component 
+     */
     public void interactiveAccordion() {
         JXTaskPaneContainer container = new JXTaskPaneContainer() {
 
