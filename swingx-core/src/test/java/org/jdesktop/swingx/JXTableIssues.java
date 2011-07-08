@@ -23,6 +23,7 @@ package org.jdesktop.swingx;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -50,6 +51,7 @@ import org.jdesktop.swingx.decorator.AbstractHighlighter;
 import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
+import org.jdesktop.swingx.decorator.HighlighterFactory;
 import org.jdesktop.swingx.table.TableColumnExt;
 import org.jdesktop.test.AncientSwingTeam;
 import org.jdesktop.test.CellEditorReport;
@@ -279,6 +281,38 @@ public class JXTableIssues extends InteractiveTestCase {
 
 //----------------- interactive
 
+    /**
+     * Issue: scrollpane not sized to fit visibleRowCount exactly
+     * 
+     * PENDING JW: report!
+     */
+    public void interactiveVisibleRowCount() {
+        JXTable table = new JXTable(new AncientSwingTeam());
+        table.setTableHeader(null);
+        table.setVisibleRowCount(table.getRowCount());
+        table.setHighlighters(HighlighterFactory.createAlternateStriping(2));
+        showWithScrollingInFrame(table, "visible rowCount jxtable - must fit");
+        assertEquals(table.getRowCount() * table.getRowHeight(), table.getPreferredScrollableViewportSize().height);
+    }
+    
+    public void interactiveVisibleRowCountCore() {
+        JTable table = new JTable(new AncientSwingTeam()) {
+
+            /** 
+             * @inherited <p>
+             */
+            @Override
+            public Dimension getPreferredScrollableViewportSize() {
+                Dimension dim = super.getPreferredScrollableViewportSize();
+                dim.height = getRowHeight() * getRowCount();
+                return dim;
+            }
+            
+        };
+        table.setTableHeader(null);
+        showWithScrollingInFrame(table, "core ");
+        
+    }
 
 
     /**

@@ -72,6 +72,7 @@ public class BasicMonthViewVisualCheck extends InteractiveTestCase {
         try {
 //            test.runInteractiveTests();
             test.runInteractiveTests(".*Rendering.*");
+//            test.runInteractiveTests(".*Debug.*");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -190,6 +191,7 @@ public class BasicMonthViewVisualCheck extends InteractiveTestCase {
      */
     private void showDebugMonthView(String frameTitle) {
         final JXMonthView monthView = new JXMonthView();
+        LOG.info("todayBack: " + monthView.getTodayBackground());
 //        monthView.setZoomable(true);
         monthView.setDayForeground(Calendar.SUNDAY, Color.BLUE);
         monthView.setDaysOfTheWeekForeground(Color.RED);
@@ -215,6 +217,7 @@ public class BasicMonthViewVisualCheck extends InteractiveTestCase {
             
         };
         addAction(frame, toggleTraversable);
+        addEnabledToggle(frame, monthView);
         final JXDatePicker picker = new JXDatePicker();
         picker.getMonthView().setShowingWeekNumber(monthView.isShowingWeekNumber());
         picker.getMonthView().setZoomable(true);
