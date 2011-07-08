@@ -3689,7 +3689,7 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
                     new HyperlinkProvider(new HyperlinkAction())
             ));
         } catch (Exception e) {
-            // TODO: handle exception
+            // nothing to do - either headless or Desktop not supported
         }
     }
 
