@@ -31,8 +31,7 @@ import org.junit.runners.JUnit4;
  * 
  * @author Karl George Schaefer
  */
-@RunWith(JUnit4.class)
-public class DefaultsListTest extends TestCase {
+public class DefaultsListTest {
     /**
      * Ensure that "adding" a key with a {@code null} value removes the value
      * from the list.
