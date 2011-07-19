@@ -30,17 +30,22 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.GraphicsEnvironment;
 import java.beans.PropertyChangeListener;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.FutureTask;
 import java.util.logging.Logger;
 
+import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRootPane;
+import javax.swing.JScrollPane;
 import javax.swing.JWindow;
 import javax.swing.RepaintManager;
 import javax.swing.RootPaneContainer;
@@ -51,6 +56,7 @@ import javax.swing.plaf.UIResource;
 
 import org.hamcrest.CoreMatchers;
 import org.jdesktop.swingx.JXCollapsiblePane.CollapsiblePaneContainer;
+import org.jdesktop.swingx.plaf.basic.BasicDatePickerUI;
 import org.jdesktop.test.EDTRunner;
 import org.junit.After;
 import org.junit.Before;
@@ -292,5 +298,43 @@ public class SwingXUtilitiesTest extends InteractiveTestCase {
             assertThat(SwingXUtilities.getAncestor(PropertyChangeListener.class, source),
                     is(nullValue()));
         }
+    }
+    
+    @Test
+    public void testDescendingNull() {
+        assertFalse("both nulls are not descending", SwingXUtilities.isDescendingFrom(null, null));
+        assertFalse("null comp is not descending", SwingXUtilities.isDescendingFrom(null, new JScrollPane()));
+        assertFalse("comp is not descending null parent", SwingXUtilities.isDescendingFrom(new JLabel(), null));
+    }
+    
+    @Test
+    public void testDescendingSame() {
+        JComponent comp = new JLabel();
+        assertTrue("same component must be interpreted as descending", 
+                SwingXUtilities.isDescendingFrom(comp, comp));
+    }
+    
+    @Test
+    public void testDescendingPopup() throws InterruptedException, InvocationTargetException {
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.fine("cannot run - headless");
+            return;
+        }
+        final JXDatePicker picker = new JXDatePicker();
+        JXFrame frame = new JXFrame("showing", false);
+        frame.add(picker);
+        frame.pack();
+        frame.setVisible(true);
+        assertFalse(SwingXUtilities.isDescendingFrom(picker.getMonthView(), picker));
+        Action togglePopup = picker.getActionMap().get("TOGGLE_POPUP");
+        togglePopup.actionPerformed(null);
+        SwingUtilities.invokeAndWait(new Runnable() {
+            public void run() {
+                assertTrue("popup visible ", ((BasicDatePickerUI) picker.getUI()).isPopupVisible());
+                assertTrue(SwingXUtilities.isDescendingFrom(picker.getMonthView(), picker));
+                
+            }
+        });
+        frame.dispose();
     }
 }
