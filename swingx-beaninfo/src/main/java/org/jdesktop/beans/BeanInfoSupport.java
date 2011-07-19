@@ -45,6 +45,7 @@ import javax.swing.ImageIcon;
  *
  * @author rbair, Jan Stola
  */
+@SuppressWarnings("nls")
 public abstract class BeanInfoSupport extends SimpleBeanInfo {
     private static Logger LOG = Logger.getLogger(BeanInfoSupport.class.getName());
     
