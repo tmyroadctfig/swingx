@@ -119,7 +119,7 @@ public class JVM {
   }
 
   public boolean isOneDotSix() {
-    return jdkVersion == JDK1_6;
+    return jdkVersion == JDK1_6 || isOneDotSixUpdateN();
   }
 
     /**
