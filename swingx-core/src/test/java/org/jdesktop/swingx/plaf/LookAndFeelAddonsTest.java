@@ -31,7 +31,8 @@ import org.jdesktop.swingx.JXPanel;
 import org.jdesktop.swingx.JXTaskPane;
 import org.jdesktop.swingx.painter.MattePainter;
 import org.jdesktop.swingx.painter.Painter;
-import org.jdesktop.swingx.plaf.basic.BasicLookAndFeelAddons;
+import org.jdesktop.swingx.plaf.linux.LinuxLookAndFeelAddons;
+import org.jdesktop.swingx.plaf.metal.MetalLookAndFeelAddons;
 import org.jdesktop.test.EDTRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -227,7 +228,7 @@ public class LookAndFeelAddonsTest {
     // when addon is changed, the ComponentAddon is uninitialized with the
     // previous addon, then initialized with the new
     LookAndFeelAddons oldLFAddon = LookAndFeelAddons.getAddon();
-    LookAndFeelAddons.setAddon(BasicLookAndFeelAddons.class);
+    LookAndFeelAddons.setAddon(MetalLookAndFeelAddons.class);
     LookAndFeelAddons newLFAddon = LookAndFeelAddons.getAddon();
 
     assertTrue(addon.uninitialized);
@@ -238,7 +239,8 @@ public class LookAndFeelAddonsTest {
   }
 
     @Test
-    public void testUpdateUIForReferredProperties() {
+    public void testUpdateUIForReferredProperties() throws Exception {
+        LookAndFeelAddons.setAddon(LinuxLookAndFeelAddons.class);
     	JXTaskPane pane = new JXTaskPane();
     	
     	assertThat(UIManager.getColor("TaskPane.background"), is(UIManager.getColor("List.background")));
