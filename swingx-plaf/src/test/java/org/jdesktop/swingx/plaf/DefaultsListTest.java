@@ -20,17 +20,17 @@
  */
 package org.jdesktop.swingx.plaf;
 
-import junit.framework.TestCase;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
 
 /**
  * This test ensures that all values that should be {@code UIResouce}s are.
  * 
  * @author Karl George Schaefer
  */
+@SuppressWarnings("nls")
 public class DefaultsListTest {
     /**
      * Ensure that "adding" a key with a {@code null} value removes the value
@@ -42,11 +42,11 @@ public class DefaultsListTest {
         kvList.add("a", "b");
         
         Object[] arr = kvList.toArray();
-        assertEquals(2, arr.length);
-        assertEquals("a", arr[0]);
-        assertEquals("b", arr[1]);
+        assertThat(arr.length, is(2));
+        assertThat((String) arr[0], is("a"));
+        assertThat((String) arr[1], is("b"));
         
         kvList.add("a", null);
-        assertEquals(0, kvList.toArray().length);
+        assertThat(kvList.toArray().length, is(0));
     }
 }
