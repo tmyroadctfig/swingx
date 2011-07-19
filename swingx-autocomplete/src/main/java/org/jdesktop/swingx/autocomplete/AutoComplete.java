@@ -93,6 +93,7 @@ final class AutoComplete {
          * {@inheritDoc}
          */
         @Override
+        @SuppressWarnings("nls")
         public void propertyChange(PropertyChangeEvent evt) {
             if ("editor".equals(evt.getPropertyName())) {
                 handleEditor(evt);
