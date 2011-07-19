@@ -35,6 +35,7 @@ import org.jdesktop.swingx.plaf.windows.WindowsLookAndFeelAddons;
  * @author <a href="mailto:fred@L2FProd.com">Frederic Lavigne</a>
  * @author Karl Schaefer
  */
+@SuppressWarnings("nls")
 public abstract class AbstractComponentAddon implements ComponentAddon {
 
     private String name;
