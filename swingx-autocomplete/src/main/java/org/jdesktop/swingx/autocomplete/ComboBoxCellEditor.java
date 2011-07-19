@@ -61,38 +61,41 @@ public class ComboBoxCellEditor extends DefaultCellEditor {
 
         this.delegate = new EditorDelegate() {
             @Override
-	    public void setValue(Object value) {
-		comboBox.setSelectedItem(value);
+            public void setValue(Object value) {
+                comboBox.setSelectedItem(value);
             }
+
             @Override
-	    public Object getCellEditorValue() {
-		return comboBox.getSelectedItem();
-	    }
+            public Object getCellEditorValue() {
+                return comboBox.getSelectedItem();
+            }
+
             @Override
             public boolean shouldSelectCell(EventObject anEvent) {
                 if (anEvent instanceof MouseEvent) {
-                    MouseEvent e = (MouseEvent)anEvent;
+                    MouseEvent e = (MouseEvent) anEvent;
                     return e.getID() != MouseEvent.MOUSE_DRAGGED;
                 }
                 return true;
             }
-	    @Override
+
+            @Override
             public boolean stopCellEditing() {
-		if (comboBox.isEditable()) {
-		    // Commit edited value.
-		    comboBox.actionPerformed(new ActionEvent(
-				     ComboBoxCellEditor.this, 0, ""));
-		}
-		return super.stopCellEditing();
-	    }
+                if (comboBox.isEditable()) {
+                    // Commit edited value.
+                    comboBox.actionPerformed(new ActionEvent(ComboBoxCellEditor.this, 0, ""));
+                }
+                return super.stopCellEditing();
+            }
 
             @Override
             public void actionPerformed(ActionEvent e) {
-
-                JTextComponent editorComponent = (JTextComponent) comboBox.getEditor().getEditorComponent();
+                JTextComponent editorComponent = (JTextComponent) comboBox.getEditor()
+                        .getEditorComponent();
 
                 if (editorComponent.getDocument() instanceof AutoCompleteDocument) {
-                    AutoCompleteDocument document = (AutoCompleteDocument) editorComponent.getDocument();
+                    AutoCompleteDocument document = (AutoCompleteDocument) editorComponent
+                            .getDocument();
                     // if auto completion is happening right now, cell editing should not be stopped
                     if (!document.selecting) {
                         ComboBoxCellEditor.this.stopCellEditing();
@@ -103,6 +106,7 @@ public class ComboBoxCellEditor extends DefaultCellEditor {
                 }
             }
         };
-	comboBox.addActionListener(this.delegate);
+        
+        comboBox.addActionListener(this.delegate);
     }
 }

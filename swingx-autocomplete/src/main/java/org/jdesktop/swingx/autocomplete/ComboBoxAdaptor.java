@@ -36,6 +36,7 @@ import javax.swing.text.JTextComponent;
  * @author Thomas Bierhance
  * @author Karl Schaefer
  */
+@SuppressWarnings("nls")
 public class ComboBoxAdaptor extends AbstractAutoCompleteAdaptor implements ActionListener {
     
     /** the combobox being adapted */

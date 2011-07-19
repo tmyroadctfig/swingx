@@ -67,6 +67,7 @@ import org.jdesktop.swingx.autocomplete.workarounds.MacOSXPopupLocationFix;
  * @author Thomas Bierhance
  * @author Karl Schaefer
  */
+@SuppressWarnings({"nls", "serial"})
 public class AutoCompleteDecorator {
     //these keys were pulled from BasicComboBoxUI from Sun JDK 1.6.0_20
     private static final List<String> COMBO_BOX_ACTIONS = unmodifiableList(asList("selectNext",
