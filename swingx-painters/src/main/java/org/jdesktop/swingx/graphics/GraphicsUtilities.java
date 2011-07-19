@@ -91,6 +91,7 @@ import javax.swing.JComponent;
  * @author rbair
  * @author Karl Schaefer
  */
+@SuppressWarnings("nls")
 public class GraphicsUtilities {
     private GraphicsUtilities() {
     }
@@ -541,7 +542,9 @@ public class GraphicsUtilities {
                 thumb = temp;
             } while (newSize != (isWidthGreater ? width : height));
         } finally {
-            g2.dispose();
+            if (g2 != null) {
+                g2.dispose();
+            }
         }
 
         if (width != thumb.getWidth() || height != thumb.getHeight()) {
@@ -643,7 +646,9 @@ public class GraphicsUtilities {
                 thumb = temp;
             } while (width != newWidth || height != newHeight);
         } finally {
-            g2.dispose();
+            if (g2 != null) {
+                g2.dispose();
+            }
         }
 
         if (width != thumb.getWidth() || height != thumb.getHeight()) {
