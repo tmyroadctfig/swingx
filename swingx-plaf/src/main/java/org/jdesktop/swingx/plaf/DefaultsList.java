@@ -44,6 +44,7 @@ import org.jdesktop.swingx.util.Contract;
  * 
  * @author Karl George Schaefer
  */
+@SuppressWarnings("nls")
 public final class DefaultsList {
     private List<Object> delegate;
 

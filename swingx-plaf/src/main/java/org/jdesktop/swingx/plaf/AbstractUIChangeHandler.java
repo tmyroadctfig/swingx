@@ -6,6 +6,7 @@ import java.util.WeakHashMap;
 
 import javax.swing.JComponent;
 
+@SuppressWarnings("nls")
 public abstract class AbstractUIChangeHandler implements PropertyChangeListener {
 	//prevent double installation.
 	private final Map<JComponent, Boolean> installed = new WeakHashMap<JComponent, Boolean>();
@@ -23,7 +24,7 @@ public abstract class AbstractUIChangeHandler implements PropertyChangeListener 
 		return installed.containsKey(c);
 	}
 
-	public void uninstall(JComponent c){
+    public void uninstall(JComponent c){
 		c.removePropertyChangeListener("UI", this);
 		installed.remove(c);
 	}
