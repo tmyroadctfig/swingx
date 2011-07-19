@@ -28,7 +28,7 @@ import org.jdesktop.swingx.plaf.UIManagerExt;
  * preferred as this addon may not provide complete implementation of the
  * additional pluggable UIs.
  */
-public class BasicLookAndFeelAddons extends LookAndFeelAddons {
+public abstract class BasicLookAndFeelAddons extends LookAndFeelAddons {
     /**
      * {@inheritDoc}
      */
