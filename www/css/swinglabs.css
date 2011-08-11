@@ -5,13 +5,15 @@
 	
 */
 
-/* local import */
+/* local import 
 @import url(../local/tigris.css);
 @import url(../local/inst.css);
+*/
 
-/* online import */
+/* online import 
 @import url(https://swinglabs.dev.java.net/branding/css/tigris.css);
 @import url(https://swinglabs.dev.java.net/branding/css/inst.css);
+*/
 
 /*
 .app h3 {
