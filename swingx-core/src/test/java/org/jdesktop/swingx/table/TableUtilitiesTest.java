@@ -13,9 +13,11 @@ import static org.jdesktop.swingx.table.TableUtilities.ordinalsOf;
 import javax.swing.JTable;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 
 import org.jdesktop.swingx.InteractiveTestCase;
+import org.jdesktop.swingx.JXTable;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,6 +25,47 @@ import org.junit.runners.JUnit4;
 @RunWith(JUnit4.class)
 public class TableUtilitiesTest extends InteractiveTestCase {
     
+    @Test
+    public void testRemoveAllColumns() {
+        TableColumnModel model = createTableColumnModel();
+        TableUtilities.clear(model, true);
+        assertEquals(0, model.getColumnCount());
+    }
+    
+    @Test
+    public void testRemoveAllColumnsExt() {
+        TableColumnModelExt model = createTableColumnModelExt();
+        TableUtilities.clear(model, true);
+        assertEquals(0, model.getColumnCount());
+    }
+    
+    @Test
+    public void testRemoveAllColumnsExtHiddenIncluded() {
+        TableColumnModelExt model = createTableColumnModelExt();
+        model.getColumnExt(0).setVisible(false);
+        TableUtilities.clear(model, true);
+        assertEquals(0, model.getColumnCount(true));
+    }
+    
+    @Test
+    public void testRemoveAllColumnsExtHiddenExcluded() {
+        TableColumnModelExt model = createTableColumnModelExt();
+        model.getColumnExt(0).setVisible(false);
+        TableUtilities.clear(model, false);
+        assertEquals(1, model.getColumnCount(true));
+    }
+    
+    
+    private TableColumnModelExt createTableColumnModelExt() {
+        JXTable table = new JXTable(0, 4);
+        return (TableColumnModelExt) table.getColumnModel();
+    }
+    
+    private TableColumnModel createTableColumnModel() {
+        JTable table = new JTable(0, 4);
+        return table.getColumnModel();
+    }
+
     @Test
     public void testOrdinals() {
         int[] ordinals = ordinalsOf(Dummy.THIRD, Dummy.SECOND, Dummy.FIRST);

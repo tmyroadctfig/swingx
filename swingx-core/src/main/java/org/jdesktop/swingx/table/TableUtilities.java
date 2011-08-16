@@ -5,10 +5,14 @@
 package org.jdesktop.swingx.table;
 
 import java.awt.Component;
+import java.util.Collections;
+import java.util.List;
 
 import javax.swing.JTable;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
 
 /**
  * Collection of utility methods for J/X/Table.
@@ -138,5 +142,32 @@ public class TableUtilities {
         return cols;
     }
     
+
+    /**
+     * Removes all columns of the given column model. Includes hidden
+     * columns as indicated by the includesHidden flag, the flag has no 
+     * effect if the model is not of type TableColumnModelExt.<p>
+     * 
+     * @param model the column model to remove all columns from.
+     * @param includeHidden indicates whether hidden columns should be 
+     *   removed as well, has no effect if model is not of type TableColumnModelExt.
+     */
+    /*
+     * Stand-in instead of fixing of issue http://java.net/jira/browse/SWINGX-1407
+     */
+    public static void clear(TableColumnModel model, boolean includeHidden) {
+        if (model instanceof TableColumnModelExt) {
+            clear(model, ((TableColumnModelExt) model).getColumns(includeHidden));
+        } else {
+            clear(model, Collections.list(model.getColumns()));
+        }
+    }
+
+    private static void clear(TableColumnModel model, List<TableColumn> columns) {
+        for (TableColumn tableColumn : columns) {
+            model.removeColumn(tableColumn);
+        }
+    }
+
     private TableUtilities() {}
 }
