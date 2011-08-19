@@ -56,7 +56,7 @@ import org.jdesktop.swingx.action.ActionContainerFactory;
 import org.jdesktop.swingx.plaf.ColumnControlButtonAddon;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 import org.jdesktop.swingx.table.ColumnControlPopup.ActionGrouper;
-import org.jdesktop.swingx.table.ColumnControlPopup.Groupable;
+import org.jdesktop.swingx.table.ColumnControlPopup.ActionGroupable;
 
 /**
  * A component to allow interactive customization of <code>JXTable</code>'s
@@ -239,8 +239,8 @@ public class ColumnControlButton extends JButton {
      * @param grouper
      */
     public void setActionGrouper(ActionGrouper grouper) {
-        if (!(getColumnControlPopup() instanceof Groupable)) return;
-        ((Groupable) getColumnControlPopup()).setGrouper(grouper);
+        if (!(getColumnControlPopup() instanceof ActionGroupable)) return;
+        ((ActionGroupable) getColumnControlPopup()).setActionGrouper(grouper);
         populatePopup();
     }
     
@@ -466,7 +466,7 @@ public class ColumnControlButton extends JButton {
      * 
      * 
      */
-    public class DefaultColumnControlPopup implements ColumnControlPopup, Groupable {
+    public class DefaultColumnControlPopup implements ColumnControlPopup, ActionGroupable {
         private JPopupMenu popupMenu;
         private ActionGrouper grouper;
 
@@ -625,7 +625,7 @@ public class ColumnControlButton extends JButton {
         // --------------- implement Groupable
         
         @Override
-        public void setGrouper(ActionGrouper grouper) {
+        public void setActionGrouper(ActionGrouper grouper) {
             this.grouper = grouper;
         }
         

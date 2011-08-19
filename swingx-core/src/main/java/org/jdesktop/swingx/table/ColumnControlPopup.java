@@ -99,8 +99,8 @@ public interface ColumnControlPopup extends UIDependent {
      * Implementations of ColumnControlPopup may implement this 
      * if they support grouping of additional action.
      */
-    public interface Groupable {
-        public void setGrouper(ActionGrouper grouper);
+    public interface ActionGroupable {
+        public void setActionGrouper(ActionGrouper grouper);
     }
     
 
