@@ -55,6 +55,8 @@ import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.action.ActionContainerFactory;
 import org.jdesktop.swingx.plaf.ColumnControlButtonAddon;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
+import org.jdesktop.swingx.table.ColumnControlPopup.ActionGrouper;
+import org.jdesktop.swingx.table.ColumnControlPopup.Groupable;
 
 /**
  * A component to allow interactive customization of <code>JXTable</code>'s
@@ -108,6 +110,7 @@ public class ColumnControlButton extends JButton {
     
     /** the key for looking up the control's margin in the UIManager. Typically, it's LAF dependent. */
     public static final String COLUMN_CONTROL_BUTTON_MARGIN_KEY = "ColumnControlButton.margin";
+
     static {
         LookAndFeelAddons.contribute(new ColumnControlButtonAddon());
     }
@@ -227,6 +230,20 @@ public class ColumnControlButton extends JButton {
         firePropertyChange("additionalActionsVisible", old, getAdditionalActionsVisible());
     }
 
+    /**
+     * Sets the grouper to use for grouping the additional actions. Maybe null to 
+     * have no additional grouping. Has no effect
+     * if the ColumnControlPopup doesn't implement Groupable. The default 
+     * ColumnControlPopup supports Groupable, but is instantiated without a Grouper.
+     * 
+     * @param grouper
+     */
+    public void setActionGrouper(ActionGrouper grouper) {
+        if (!(getColumnControlPopup() instanceof Groupable)) return;
+        ((Groupable) getColumnControlPopup()).setGrouper(grouper);
+        populatePopup();
+    }
+    
     @Override
     public void applyComponentOrientation(ComponentOrientation o) {
         super.applyComponentOrientation(o);
@@ -449,11 +466,20 @@ public class ColumnControlButton extends JButton {
      * 
      * 
      */
-    public class DefaultColumnControlPopup implements ColumnControlPopup {
+    public class DefaultColumnControlPopup implements ColumnControlPopup, Groupable {
         private JPopupMenu popupMenu;
+        private ActionGrouper grouper;
 
+        public DefaultColumnControlPopup() {
+            this(null);
+        }
+        
         //------------------ public methods to control visibility status
         
+        public DefaultColumnControlPopup(ActionGrouper grouper) {
+            this.grouper = grouper;
+        }
+
         /** 
          * @inheritDoc
          * 
@@ -534,7 +560,19 @@ public class ColumnControlButton extends JButton {
             if (canControl()) {
                 addSeparator();
             }
-            addItems(actions);
+            
+            if (getGrouper() == null) {
+                addItems(actions);
+                return;
+            }
+            List<? extends List<? extends Action>> groups = grouper.group(actions);
+            for (List<? extends Action> group : groups) {
+                addItems(group);
+                if (group != groups.get(groups.size()- 1))
+                    addSeparator();
+                
+            }
+            
         }
         
         //--------------------------- internal helpers to manipulate popups content
@@ -555,7 +593,6 @@ public class ColumnControlButton extends JButton {
             for (Action action : actions) {
                 addItem(factory.createMenuItem(action));
             }
-
         }
         
         /**
@@ -585,9 +622,18 @@ public class ColumnControlButton extends JButton {
             return popupMenu;
         }
 
+        // --------------- implement Groupable
+        
+        @Override
+        public void setGrouper(ActionGrouper grouper) {
+            this.grouper = grouper;
+        }
+        
+        protected ActionGrouper getGrouper() {
+            return grouper;
+        }
+
     }
-
-
     /**
      * Returns to popup component for user interaction. Lazily 
      * creates the component if necessary.
@@ -1001,7 +1047,6 @@ public class ColumnControlButton extends JButton {
             }
         };
     }
-
 
 
 } // end class ColumnControlButton

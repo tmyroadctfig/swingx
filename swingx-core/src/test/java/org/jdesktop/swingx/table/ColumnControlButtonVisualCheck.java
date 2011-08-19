@@ -5,6 +5,7 @@
 package org.jdesktop.swingx.table;
 
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -20,6 +21,7 @@ import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.action.AbstractActionExt;
+import org.jdesktop.swingx.table.ColumnControlPopup.ActionGrouper;
 import org.jdesktop.test.AncientSwingTeam;
 
 public class ColumnControlButtonVisualCheck extends InteractiveTestCase {
@@ -28,12 +30,81 @@ public class ColumnControlButtonVisualCheck extends InteractiveTestCase {
         ColumnControlButtonVisualCheck test = new ColumnControlButtonVisualCheck();
         try {
 //            test.runInteractiveTests();
-            test.runInteractive("ToggleTableModel");
+//            test.runInteractive("ToggleTableModel");
             test.runInteractive("ColumnAction");
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
+    public void interactiveCustomColumnActionGroup() {
+        JXTable table = new JXTable(new AncientSwingTeam());
+        AbstractActionExt custom = new AbstractActionExt("Custom") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // TODO Auto-generated method stub
+                
+            }
+        };
+        // add a group as value
+        custom.putValue(GroupKeyActionGrouper.GROUP_KEY, 0);
+        // add to table's action map
+        table.getActionMap().put(ColumnControlButton.COLUMN_CONTROL_MARKER + "myCommand", custom);
+        final ColumnControlButton control = (ColumnControlButton) table.getColumnControl();
+        table.setColumnControlVisible(true);
+        JXFrame frame = wrapWithScrollingInFrame(table, "Group actions");
+        
+        Action toggleGrouper = new AbstractAction("toggleGrouper") {
+            
+            ActionGrouper current;
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                current = (current == null) ? new GroupKeyActionGrouper() : null;
+                control.setActionGrouper(current);
+            }
+        };
+        addAction(frame, toggleGrouper);
+        show(frame);
+        
+    }
+    
+
+    /**
+     * Implementation of ActionGrouper which groups by action values with
+     * key GROUP_KEY.
+     */
+    public static class GroupKeyActionGrouper implements ActionGrouper {
+
+        /** Marker to support custom grouping of additional actions. (Issue #swingx-968) */
+        public static final String GROUP_KEY = "zzzz_group";
+        
+        @Override
+        public <A extends Action> List<List<A>> group(List<A> actions) {
+            List<List<A>> result = new ArrayList<List<A>>();
+            List<Object> keys = new ArrayList<Object>();
+            List<A> noKey = new ArrayList<A>();
+            for (A action : actions) {
+                Object groupKey = action.getValue(GROUP_KEY);
+                if (groupKey != null) {
+                    int index = keys.indexOf(groupKey); 
+                    if (index < 0) {
+                        keys.add(groupKey);
+                        index = keys.size() - 1;
+                        result.add(new ArrayList<A>());
+                    }
+                    result.get(index).add(action);
+                } else {
+                    noKey.add(action);
+                }
+                
+            }
+            result.add(0, noKey);
+            return result ;
+        }
+    }
+
+
 
     public void interactiveCustomColumnAction() {
         JXTable table = new JXTable(new AncientSwingTeam());

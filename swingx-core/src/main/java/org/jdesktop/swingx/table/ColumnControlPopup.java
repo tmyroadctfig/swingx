@@ -86,5 +86,22 @@ public interface ColumnControlPopup extends UIDependent {
      * @param actions List of <code>Action</code>s to add to the popup.
      */
     void addAdditionalActionItems(List<? extends Action> actions);
+    
+    /**
+     * Splits and returns a List of actions into sub-lists. 
+     */
+    public interface ActionGrouper {
+        <A extends Action> List<List<A>> group(List<A> actions);
+    }
+    
+    /**
+     * Interface indicating support for grouping of menu actions.
+     * Implementations of ColumnControlPopup may implement this 
+     * if they support grouping of additional action.
+     */
+    public interface Groupable {
+        public void setGrouper(ActionGrouper grouper);
+    }
+    
 
 }
