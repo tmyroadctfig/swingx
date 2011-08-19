@@ -34,6 +34,7 @@ import org.jdesktop.swingx.plaf.ColumnControlButtonAddon;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 import org.jdesktop.swingx.table.ColumnControlButton.ColumnVisibilityAction;
 import org.jdesktop.swingx.table.ColumnControlButton.DefaultColumnControlPopup;
+import org.jdesktop.swingx.table.ColumnControlButtonVisualCheck.GroupKeyActionGrouper;
 import org.jdesktop.test.AncientSwingTeam;
 import org.jdesktop.test.PropertyChangeReport;
 import org.jdesktop.test.TestUtils;
@@ -64,6 +65,33 @@ public class ColumnControlButtonTest extends InteractiveTestCase {
         tearDown();
     }
     
+    /**
+     * Issue: add support for custom grouping of additional actions 
+     * http://java.net/jira/browse/SWINGX-968
+     */
+    @Test
+    public void testAdditonalActionGrouping() {
+        JXTable table = new JXTable(10, 4);
+        AbstractActionExt custom = new AbstractActionExt("Custom") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // TODO Auto-generated method stub
+                
+            }
+        };
+        custom.putValue(GroupKeyActionGrouper.GROUP_KEY, 0);
+        table.getActionMap().put(ColumnControlButton.COLUMN_CONTROL_MARKER + "myCommand", custom);
+        ColumnControlButton button = new ColumnControlButton(table);
+        button.setActionGrouper(new GroupKeyActionGrouper());
+        DefaultColumnControlPopup popup = (DefaultColumnControlPopup) button.getColumnControlPopup();
+        assertEquals("additional actions visible, component count expected ", 
+                table.getColumnCount() 
+                    + 1 /* separator */ + 3 /*default actions with column. prefix*/
+                    + 1 /* separator custom group */ + 1 /* custom action */, 
+                popup.getPopupMenu().getComponentCount());
+    }
+
     /**
      * Issue http://java.net/jira/browse/SWINGX-1466: add control to show/hide
      *   additional actions
