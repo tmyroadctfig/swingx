@@ -82,7 +82,7 @@ public class JXTreeVisualCheck extends JXTreeUnitTest {
 //          test.runInteractiveTests("interactive.*Revalidate.*");
 //          test.runInteractiveTests("interactiveRootExpansionTest");
 //        test.runInteractiveTests("interactive.*UpdateUI.*");
-        test.runInteractiveTests("interactive.*Dynamic.*");
+        test.runInteractiveTests("interactive.*RendererSize.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
@@ -135,6 +135,7 @@ public class JXTreeVisualCheck extends JXTreeUnitTest {
     public void interactiveRendererSize() {
         JXTree tree = new JXTree();
         tree.setCellRenderer(new CustomCellRenderer());
+        tree.expandAll();
         showWithScrollingInFrame(tree, "sizing problems in renderer");
     }
 
