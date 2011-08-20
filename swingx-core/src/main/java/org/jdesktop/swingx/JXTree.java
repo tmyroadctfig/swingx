@@ -509,7 +509,10 @@ public class JXTree extends JTree {
     }
 
     /**
-     * Expands all nodes in this tree.
+     * Expands all nodes in this tree.<p>
+     * 
+     * Note: it's not recommended to use this method on the EDT for large/deep trees
+     * because expansion can take a considerable amount of time. 
      */
     public void expandAll() {
         if (getRowCount() == 0) {

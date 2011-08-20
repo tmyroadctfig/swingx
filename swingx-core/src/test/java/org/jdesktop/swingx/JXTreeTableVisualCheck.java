@@ -28,6 +28,7 @@ import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
+import java.io.File;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -66,13 +67,13 @@ import org.jdesktop.swingx.decorator.AbstractHighlighter;
 import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
+import org.jdesktop.swingx.decorator.HighlightPredicate.AndHighlightPredicate;
+import org.jdesktop.swingx.decorator.HighlightPredicate.ColumnHighlightPredicate;
+import org.jdesktop.swingx.decorator.HighlightPredicate.DepthHighlightPredicate;
 import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
 import org.jdesktop.swingx.decorator.PatternPredicate;
 import org.jdesktop.swingx.decorator.ShadingColorHighlighter;
-import org.jdesktop.swingx.decorator.HighlightPredicate.AndHighlightPredicate;
-import org.jdesktop.swingx.decorator.HighlightPredicate.ColumnHighlightPredicate;
-import org.jdesktop.swingx.decorator.HighlightPredicate.DepthHighlightPredicate;
 import org.jdesktop.swingx.renderer.DefaultTreeRenderer;
 import org.jdesktop.swingx.table.ColumnFactory;
 import org.jdesktop.swingx.table.TableColumnExt;
@@ -111,10 +112,49 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
 //             test.runInteractiveTests("interactive.*ScrollPath.*");
 //             test.runInteractiveTests("interactive.*Insert.*");
 //             test.runInteractiveTests("interactive.*WinP.*");
-             test.runInteractiveTests("interactive.*EditorIcon.*");
+//            test.runInteractiveTests("interactive.*EditorIcon.*");
+//            test.runInteractiveTests("interactive.*ExpandAll.*");
+             test.runInteractiveTests("interactive.*ComboBox.*");
         } catch (Exception ex) {
 
         }
+    }
+    
+    /**
+     * Issue 1442-swingx: Performance issue with expand all on large/deep tree/table
+     * 
+     * Crude measurement on local file system
+     * Archiv: about 10k files takes 59/60s to expand w/out hack
+     * DevTools: about 25k files takes 19/37s to expand w/out hack
+     * 
+     * - effect seems highly dependent on exact nature
+     * - hack is potentially risky: interfers with state synch of ui
+     * - if expansion takes long, it must be done on background thread with
+     *    logic that reasonably reports back to the EDT (supporting that
+     *    would be a worthwhile task, contributions/ideas welcome)
+     */
+    public void interactiveExpandAll() {
+        final JXTree tree = new JXTree(new FileSystemModel(new File("D:/DevTools")));
+        final JXTreeTable table = new JXTreeTable((TreeTableModel) tree.getModel());
+        JXFrame frame = wrapWithScrollingInFrame(tree, table, "expandAll");
+        Action action = new AbstractAction("expand tree") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                tree.expandAll();
+            }
+        };
+        addAction(frame, action);
+        Action expandTable = new AbstractAction("expand treetable") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                table.expandAll();
+                LOG.info("expanded: " + table.getRowCount());
+            }
+        };
+        addAction(frame, expandTable);
+        show(frame);
     }
 
     /**
