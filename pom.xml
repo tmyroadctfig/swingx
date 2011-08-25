@@ -140,9 +140,9 @@
       <module>swingx-testsupport</module>
       <module>swingx-common</module>
       <module>swingx-autocomplete</module>
-      <!-- module>swingx-graphics</module -->
       <module>swingx-action</module>
       <module>swingx-painters</module>
+      <module>swingx-graphics</module>
       <module>swingx-plaf</module>
       <module>swingx-core</module>
       <module>swingx-all</module>
