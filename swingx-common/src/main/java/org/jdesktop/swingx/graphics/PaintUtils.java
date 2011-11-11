@@ -48,6 +48,7 @@ import javax.swing.SwingConstants;
  * @author joshua.marinacci@sun.com
  * @author Karl George Schaefer
  */
+@SuppressWarnings("nls")
 public class PaintUtils {
     public static final GradientPaint BLUE_EXPERIENCE = new GradientPaint(
             new Point2D.Double(0, 0),

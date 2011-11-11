@@ -36,7 +36,15 @@
   <dependencies>
   	<dependency>
   		<groupId>${project.groupId}</groupId>
-  		<artifactId>swingx-painters</artifactId>
+  		<artifactId>swingx-common</artifactId>
+  		<version>${project.version}</version>
+  		<type>jar</type>
+  		<scope>compile</scope>
+  		<optional>true</optional>
+  	</dependency>
+  	<dependency>
+  		<groupId>${project.groupId}</groupId>
+  		<artifactId>swingx-autocomplete</artifactId>
   		<version>${project.version}</version>
   		<type>jar</type>
   		<scope>compile</scope>
@@ -52,7 +60,23 @@
   	</dependency>
   	<dependency>
   		<groupId>${project.groupId}</groupId>
+  		<artifactId>swingx-painters</artifactId>
+  		<version>${project.version}</version>
+  		<type>jar</type>
+  		<scope>compile</scope>
+  		<optional>true</optional>
+  	</dependency>
+  	<dependency>
+  		<groupId>${project.groupId}</groupId>
   		<artifactId>swingx-graphics</artifactId>
+  		<version>${project.version}</version>
+  		<type>jar</type>
+  		<scope>compile</scope>
+  		<optional>true</optional>
+  	</dependency>
+  	<dependency>
+  		<groupId>${project.groupId}</groupId>
+  		<artifactId>swingx-plaf</artifactId>
   		<version>${project.version}</version>
   		<type>jar</type>
   		<scope>compile</scope>

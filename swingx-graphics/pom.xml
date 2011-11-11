@@ -13,7 +13,7 @@
   <dependencies>
     <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>swingx-painters</artifactId>
+        <artifactId>swingx-common</artifactId>
         <version>${project.version}</version>
         <type>jar</type>
         <scope>compile</scope>
