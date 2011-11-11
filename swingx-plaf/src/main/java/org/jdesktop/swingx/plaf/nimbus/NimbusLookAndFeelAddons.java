@@ -20,6 +20,16 @@
  */
 package org.jdesktop.swingx.plaf.nimbus;
 
+import javax.swing.UIManager;
+
 import org.jdesktop.swingx.plaf.basic.BasicLookAndFeelAddons;
 
-public class NimbusLookAndFeelAddons extends BasicLookAndFeelAddons {}
+public class NimbusLookAndFeelAddons extends BasicLookAndFeelAddons {
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected boolean matches() {
+        return UIManager.getLookAndFeel().getID().equals("Nimbus");
+    }
+}

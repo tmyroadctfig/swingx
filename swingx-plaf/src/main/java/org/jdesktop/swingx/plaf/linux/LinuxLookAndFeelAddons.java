@@ -20,9 +20,29 @@
  */
 package org.jdesktop.swingx.plaf.linux;
 
+import static javax.swing.UIManager.getLookAndFeel;
+import static javax.swing.UIManager.getSystemLookAndFeelClassName;
+
 import org.jdesktop.swingx.plaf.basic.BasicLookAndFeelAddons;
+import org.jdesktop.swingx.util.OS;
 
 public class LinuxLookAndFeelAddons extends BasicLookAndFeelAddons {
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected boolean matches() {
+        return isSystemAddon() && getSystemLookAndFeelClassName().equals(getLookAndFeel().getClass().getName());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected boolean isSystemAddon() {
+        return OS.isLinux();
+    }
+    
     /**
      * {@inheritDoc}
      */

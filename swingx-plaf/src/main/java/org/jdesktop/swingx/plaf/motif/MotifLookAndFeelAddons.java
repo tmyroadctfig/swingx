@@ -20,8 +20,16 @@
  */
 package org.jdesktop.swingx.plaf.motif;
 
+import javax.swing.UIManager;
+
 import org.jdesktop.swingx.plaf.basic.BasicLookAndFeelAddons;
 
 public class MotifLookAndFeelAddons extends BasicLookAndFeelAddons {
-
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected boolean matches() {
+        return UIManager.getLookAndFeel().getID().equals("Motif");
+    }
 }

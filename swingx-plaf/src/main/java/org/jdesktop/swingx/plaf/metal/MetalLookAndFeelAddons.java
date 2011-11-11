@@ -20,31 +20,50 @@
  */
 package org.jdesktop.swingx.plaf.metal;
 
+import static javax.swing.UIManager.getCrossPlatformLookAndFeelClassName;
+import static javax.swing.UIManager.getLookAndFeel;
+
+import javax.swing.LookAndFeel;
+import javax.swing.plaf.metal.MetalLookAndFeel;
+
 import org.jdesktop.swingx.plaf.basic.BasicLookAndFeelAddons;
 
 /**
  * MetalLookAndFeelAddons.<br>
- *
+ * 
  */
 public class MetalLookAndFeelAddons extends BasicLookAndFeelAddons {
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected boolean matches() {
+        LookAndFeel laf = getLookAndFeel();
+        
+        if (getCrossPlatformLookAndFeelClassName().equals(laf.getClass().getName())) {
+            //just in case someone sets Nimbus as the cross platform Look and Feel
+            return !laf.getID().equals("Nimbus");
+        }
+        
+        return getLookAndFeel() instanceof MetalLookAndFeel;
+    }
 
-  @Override
-public void initialize() {
-    super.initialize();
-    loadDefaults(getDefaults());
-  }
+    @Override
+    public void initialize() {
+        super.initialize();
+        loadDefaults(getDefaults());
+    }
 
-  @Override
-public void uninitialize() {
-    super.uninitialize();
-    unloadDefaults(getDefaults());
-  }
-  
-  private Object[] getDefaults() {
-    return new Object[] {
-//        "DirectoryChooserUI",
-//        "org.jdesktop.jdnc.swing.plaf.windows.WindowsDirectoryChooserUI",
-    };
-  }
-  
+    @Override
+    public void uninitialize() {
+        super.uninitialize();
+        unloadDefaults(getDefaults());
+    }
+
+    private Object[] getDefaults() {
+        return new Object[] {
+        // "DirectoryChooserUI",
+        // "org.jdesktop.jdnc.swing.plaf.windows.WindowsDirectoryChooserUI",
+        };
+    }
 }
