@@ -20,7 +20,11 @@
  */
 package org.jdesktop.swingx.plaf.windows;
 
+import static javax.swing.UIManager.getLookAndFeel;
+import static javax.swing.UIManager.getSystemLookAndFeelClassName;
+
 import org.jdesktop.swingx.plaf.basic.BasicLookAndFeelAddons;
+import org.jdesktop.swingx.util.OS;
 
 /**
  * Adds new pluggable UI following the Windows XP look and feel.
@@ -32,6 +36,30 @@ public class WindowsLookAndFeelAddons extends BasicLookAndFeelAddons {
     public static final String SILVER_VISUAL_STYLE = "Metallic";
 
     public static final String VISTA_VISUAL_STYLE = "NormalColor";
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected boolean matches() {
+        if (isSystemAddon()) {
+            String laf = getLookAndFeel().getClass().getName();
+            
+            //special-case the jgoodies to ensure that we can match it
+            return getSystemLookAndFeelClassName().equals(laf)
+                    || "com.jgoodies.looks.windows.WindowsLookAndFeel".equals(laf);
+        }
+        
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected boolean isSystemAddon() {
+        return OS.isWindows() && OS.isUsingWindowsVisualStyles();
+    }
 
 //  JW: reverting ...     
 //    /**

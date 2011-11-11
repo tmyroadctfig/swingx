@@ -24,7 +24,6 @@ import java.util.logging.Logger;
 
 import junit.framework.TestCase;
 
-import org.jdesktop.swingx.plaf.basic.BasicLookAndFeelAddons;
 import org.jdesktop.swingx.plaf.linux.LinuxLookAndFeelAddons;
 import org.jdesktop.swingx.plaf.macosx.MacOSXLookAndFeelAddons;
 import org.jdesktop.swingx.plaf.metal.MetalLookAndFeelAddons;
@@ -53,7 +52,6 @@ public class UIResourcesTest extends TestCase {
      */
     @Override
     protected void setUp() {
-        System.setProperty("swingx.enableStrictResourceChecking", "true");
         LookAndFeelAddons.contribute(new BusyLabelAddon());
         LookAndFeelAddons.contribute(new ColumnControlButtonAddon());
         LookAndFeelAddons.contribute(new DatePickerAddon());
@@ -73,17 +71,6 @@ public class UIResourcesTest extends TestCase {
         LookAndFeelAddons.contribute(new TitledPanelAddon());
         LookAndFeelAddons.contribute(new UIColorHighlighterAddon());
         LookAndFeelAddons.contribute(new XListAddon());
-    }
-    
-    /**
-     * Ensures that all basic values are {@code UIResource}s where appropriate.
-     * 
-     * @throws Exception
-     *                 if an error occurs
-     */
-    @Test
-    public void testBasicLookAndFeelAddonsForUIResources() throws Exception {
-        LookAndFeelAddons.setAddon(BasicLookAndFeelAddons.class);
     }
     
     /**

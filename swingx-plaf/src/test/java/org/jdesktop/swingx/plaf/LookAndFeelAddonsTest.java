@@ -15,6 +15,7 @@ import static org.junit.Assert.assertTrue;
 import java.awt.Color;
 import java.util.logging.Logger;
 
+import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.LookAndFeel;
 import javax.swing.UIDefaults;
@@ -26,18 +27,15 @@ import javax.swing.plaf.BorderUIResource;
 import javax.swing.plaf.ColorUIResource;
 import javax.swing.plaf.basic.BasicLookAndFeel;
 
-import org.jdesktop.swingx.JXMonthView;
-import org.jdesktop.swingx.JXPanel;
-import org.jdesktop.swingx.JXTaskPane;
 import org.jdesktop.swingx.painter.MattePainter;
 import org.jdesktop.swingx.painter.Painter;
-import org.jdesktop.swingx.plaf.linux.LinuxLookAndFeelAddons;
 import org.jdesktop.swingx.plaf.metal.MetalLookAndFeelAddons;
 import org.jdesktop.test.EDTRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(EDTRunner.class)
+@SuppressWarnings("nls")
 public class LookAndFeelAddonsTest {
     
     
@@ -78,7 +76,7 @@ public class LookAndFeelAddonsTest {
      */
     @Test(expected = NullPointerException.class)
     public void testInstallBackgroundPainterWithNullPainterKey() {
-        LookAndFeelAddons.installBackgroundPainter(new JXPanel(), null);
+        LookAndFeelAddons.installBackgroundPainter(new BackgroundPainterTestingComponent(), null);
     }
 
     /**
@@ -91,7 +89,7 @@ public class LookAndFeelAddonsTest {
         Painter plafPainter = new PainterUIResource(null);
         UIManager.put("test.painter", plafPainter);
         
-        JXPanel panel = new JXPanel();
+        BackgroundPainterTestingComponent panel = new BackgroundPainterTestingComponent();
         //overwrite null painter
         LookAndFeelAddons.installBackgroundPainter(panel, "test.painter");
         
@@ -123,11 +121,11 @@ public class LookAndFeelAddonsTest {
     @Test
     public void testReloadAddons() throws UnsupportedLookAndFeelException {
         // load the addon for a new component
-        new JXMonthView();
+        new BackgroundPainterTestingComponent();
         // reset laf
          UIManager.setLookAndFeel(UIManager.getLookAndFeel());
          // check that the addon is still available
-        new JXMonthView();
+        new BackgroundPainterTestingComponent();
 
     }
   /**
@@ -240,48 +238,62 @@ public class LookAndFeelAddonsTest {
 
     @Test
     public void testUpdateUIForReferredProperties() throws Exception {
-        LookAndFeelAddons.setAddon(LinuxLookAndFeelAddons.class);
-    	JXTaskPane pane = new JXTaskPane();
+        LookAndFeelAddons.contribute(new Addon());
     	
-    	assertThat(UIManager.getColor("TaskPane.background"), is(UIManager.getColor("List.background")));
-    	assertThat(pane.getBackground(), is(UIManager.getColor("List.background")));
+        Color panelBackground = UIManager.getColor("Panel.background");
+    	assertThat(UIManager.getColor("Addon.panelBackground"), is(panelBackground));
     	
-    	UIManager.put("List.background", new ColorUIResource(Color.WHITE));
-    	pane.updateUI();
+    	UIManager.put("Panel.background", new ColorUIResource(panelBackground.darker()));
     	
-    	assertThat(UIManager.getColor("TaskPane.background"), is(UIManager.getColor("List.background")));
-    	assertThat(pane.getBackground(), is(Color.WHITE));
+    	assertThat(UIManager.getColor("Addon.panelBackground"), is(panelBackground));
     }
-    
-  static class Addon extends AbstractComponentAddon {
+}
+
+@SuppressWarnings("nls")
+class Addon extends AbstractComponentAddon {
     boolean initialized;
     LookAndFeelAddons initializedWith;
-
+    
     boolean uninitialized;
     LookAndFeelAddons uninitializedWith;
-
+    
     public Addon() {
-      super("Addon");
+        super("Addon");
     }
     @Override
     public void initialize(LookAndFeelAddons addon) {
-      initialized = true;
-      initializedWith = addon;
-      addon.loadDefaults(getDefaults());
+        initialized = true;
+        initializedWith = addon;
+        addon.loadDefaults(getDefaults());
     }
     @Override
     public void uninitialize(LookAndFeelAddons addon) {
-      uninitialized = true;
-      uninitializedWith = addon;
-      addon.unloadDefaults(getDefaults());
+        uninitialized = true;
+        uninitializedWith = addon;
+        addon.unloadDefaults(getDefaults());
     }
     protected Object[] getDefaults() {
-      return new Object[] {
-        "Addon.title", "my title",
-        "Addon.subtitle", "my subtitle",
-        "Addon.border", new BorderUIResource(new EmptyBorder(0, 0, 0, 0)),
-        "Addon.color", new ColorUIResource(Color.blue),
-        "Addon.panelBackground", UIManager.getColor("Panel.background")};
+        return new Object[] {
+                "Addon.title", "my title",
+                "Addon.subtitle", "my subtitle",
+                "Addon.border", new BorderUIResource(new EmptyBorder(0, 0, 0, 0)),
+                "Addon.color", new ColorUIResource(Color.blue),
+                "Addon.panelBackground", UIManager.getColor("Panel.background")};
     }
-  }
+}
+
+class BackgroundPainterTestingComponent extends JComponent {
+    static {
+        LookAndFeelAddons.contribute(new Addon());
+    }
+    
+    private Painter backgroundPainter;
+    
+    public Painter getBackgroundPainter() {
+        return backgroundPainter;
+    }
+    
+    public void setBackgroundPainter(Painter backgroundPainter) {
+        this.backgroundPainter = backgroundPainter;
+    }
 }

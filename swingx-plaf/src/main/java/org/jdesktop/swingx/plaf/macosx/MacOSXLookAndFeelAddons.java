@@ -20,6 +20,26 @@
  */
 package org.jdesktop.swingx.plaf.macosx;
 
-import org.jdesktop.swingx.plaf.basic.BasicLookAndFeelAddons;
+import static javax.swing.UIManager.getLookAndFeel;
+import static javax.swing.UIManager.getSystemLookAndFeelClassName;
 
-public class MacOSXLookAndFeelAddons extends BasicLookAndFeelAddons {}
+import org.jdesktop.swingx.plaf.basic.BasicLookAndFeelAddons;
+import org.jdesktop.swingx.util.OS;
+
+public class MacOSXLookAndFeelAddons extends BasicLookAndFeelAddons {
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected boolean matches() {
+        return isSystemAddon() && getSystemLookAndFeelClassName().equals(getLookAndFeel().getClass().getName());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected boolean isSystemAddon() {
+        return OS.isMacOSX();
+    }
+}

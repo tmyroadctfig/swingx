@@ -18,7 +18,8 @@ public class AbstractUIChangeHandlerTest {
 	@Before
 	public void setUp() throws Exception {
 		ch = new AbstractUIChangeHandler(){
-			public void propertyChange(PropertyChangeEvent evt) {
+			@Override
+            public void propertyChange(PropertyChangeEvent evt) {
 				changed = true;
 			}
 		};

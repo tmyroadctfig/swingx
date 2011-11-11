@@ -6,6 +6,10 @@
  */
 package org.jdesktop.swingx.plaf;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -14,32 +18,28 @@ import java.util.Locale;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.UIManager;
 import javax.swing.plaf.UIResource;
 
-import junit.framework.TestCase;
-
-import org.jdesktop.swingx.icon.EmptyIcon;
+import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
 
 /**
  * Tests the functionality of {@code UIManagerExt}.
  * 
  * @author Karl George Schaefer
  */
-@RunWith(JUnit4.class)
-public class UIManagerExtTest extends TestCase {
+public class UIManagerExtTest {
     private static final Logger LOG = Logger.getLogger(UIManagerExtTest.class
             .getName());
 
     /**
      * {@inheritDoc}
      */
-    @Override
-    protected void setUp() {
+    @Before
+    public void setUp() {
         UIManagerExt.addResourceBundle("org.jdesktop.swingx.plaf.UIManagerExtTest");
     }
     
@@ -55,7 +55,7 @@ public class UIManagerExtTest extends TestCase {
         assertTrue(UIManagerExt.getSafeDimension("", new Dimension()) instanceof UIResource);
         assertTrue(UIManagerExt.getSafeFont("", new Font("Dialog", Font.BOLD,
                 12)) instanceof UIResource);
-        assertTrue(UIManagerExt.getSafeIcon("", new EmptyIcon()) instanceof UIResource);
+        assertTrue(UIManagerExt.getSafeIcon("", new ImageIcon()) instanceof UIResource);
         assertTrue(UIManagerExt.getSafeInsets("", new Insets(0, 0, 0, 0)) instanceof UIResource);
     }
 
