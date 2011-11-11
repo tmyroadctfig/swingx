@@ -19,6 +19,7 @@
         <groupId>${project.groupId}</groupId>
         <artifactId>swingx-painters</artifactId>
         <version>${project.version}</version>
+        <type>jar</type>
         <scope>compile</scope>
         <optional>true</optional>
     </dependency>

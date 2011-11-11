@@ -69,7 +69,7 @@ public class AbstractPainterTest {
         assertThat(p.isDirty(), is(false));
         assertThat(p.isInPaintContext(), is(false));
         assertThat(p.isVisible(), is(true));
-        assertThat(p.shouldUseCache(), is(false));
+        assertThat(p.shouldUseCache(), is(p.isCacheable()));
     }
     
     /**
@@ -87,7 +87,12 @@ public class AbstractPainterTest {
     @Test
     public void testPaintWithNullObject() {
         p.paint(g, null, 10, 10);
-        verify(p).doPaint(g, null, 10, 10);
+        
+        if (p.isCacheable()) {
+            verify(p).doPaint(any(Graphics2D.class), isNull(), eq(10), eq(10));
+        } else {
+            verify(p).doPaint(g, null, 10, 10);
+        }
     }
     
     /**
@@ -97,10 +102,21 @@ public class AbstractPainterTest {
     @Test
     public void testPaintWithAnyObject() {
         p.paint(g, "yo", 10, 10);
-        verify(p).doPaint(g, "yo", 10, 10);
         
+        if (p.isCacheable()) {
+            verify(p).doPaint(any(Graphics2D.class), eq("yo"), eq(10), eq(10));
+        } else {
+            verify(p).doPaint(g, "yo", 10, 10);
+        }
+        
+        p.clearCache();
         p.paint(g, 1f, 10, 10);
-        verify(p).doPaint(g, 1f, 10, 10);
+        
+        if (p.isCacheable()) {
+            verify(p).doPaint(any(Graphics2D.class), eq(1f), eq(10), eq(10));
+        } else {
+            verify(p).doPaint(g, 1f, 10, 10);
+        }
     }
     
     /**
@@ -127,8 +143,7 @@ public class AbstractPainterTest {
         verify(p, never()).doPaint(g, null, 10, 10);
         
         p.setVisible(true);
-        p.paint(g, null, 10, 10);
-        verify(p).doPaint(g, null, 10, 10);
+        testPaintWithNullObject();
     }
     
     /**
@@ -136,6 +151,8 @@ public class AbstractPainterTest {
      */
     @Test
     public void testInOrderPaintCallsWithoutCaching() {
+        when(p.shouldUseCache()).thenReturn(false);
+        
         InOrder orderedCalls = inOrder(p);
         p.paint(g, null, 10, 10);
         
@@ -166,8 +183,6 @@ public class AbstractPainterTest {
      */
     @Test
     public void testClearCacheDetectable() {
-        assertThat("cacheable is false by default", false, is(p.isCacheable()));
-        
         p.setCacheable(true);
         p.paint(g, null, 10, 10);
         
@@ -176,7 +191,7 @@ public class AbstractPainterTest {
         verify(p).doPaint(any(Graphics2D.class), isNull(), eq(10), eq(10));
         assertThat("clean after paint", false, is(p.isDirty()));
         assertThat("cacheable is enabled", true, is(p.isCacheable()));
-        assertThat("has a cached image", false,is(p.isCacheCleared()));
+        assertThat("has a cached image", false, is(p.isCacheCleared()));
         
         p.clearCache();
         

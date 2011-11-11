@@ -50,11 +50,11 @@ public class AbstractAreaPainterTest extends AbstractLayoutPainterTest {
     public void testDefaults() {
         super.testDefaults();
         
-        AbstractAreaPainter alp = (AbstractAreaPainter) p;
-        assertThat(alp.getAreaEffects(), is(new AreaEffect[0]));
-        assertThat(alp.getBorderPaint(), is(nullValue()));
-        assertThat(alp.getBorderWidth(), is(0f));
-        assertThat(alp.getFillPaint(), CoreMatchers.<Paint>is(Color.RED));
-        assertThat(alp.getStyle(), is(AbstractAreaPainter.Style.BOTH));
+        AbstractAreaPainter aap = (AbstractAreaPainter) p;
+        assertThat(aap.getAreaEffects(), is(new AreaEffect[0]));
+        assertThat(aap.getBorderPaint(), is(nullValue()));
+        assertThat(aap.getBorderWidth(), is(0f));
+        assertThat(aap.getFillPaint(), CoreMatchers.<Paint>is(Color.RED));
+        assertThat(aap.getStyle(), is(AbstractAreaPainter.Style.BOTH));
     }
 }

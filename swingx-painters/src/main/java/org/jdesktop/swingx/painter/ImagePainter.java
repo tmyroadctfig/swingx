@@ -116,6 +116,7 @@ public class ImagePainter extends AbstractAreaPainter<Object> {
         this.setHorizontalAlignment(horizontal);
         this.setFillPaint(null);
         this.setBorderPaint(null);
+        this.setDirty(false);
     }
     
     /**
