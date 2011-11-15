@@ -1,4 +1,4 @@
-package org.jdesktop.test;
+package org.jdesktop.test.matchers;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
@@ -9,11 +9,12 @@ import static org.junit.Assert.assertThat;
 
 import javax.swing.JButton;
 
+import org.jdesktop.test.EDTRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(EDTRunner.class)
-public class EquivalentMatcherTest {
+public class PropertyChangeEventMatcherTest {
     @Test
     public void ensureEqualIsEquivalent() {
         assertThat(1, is(equalTo(1)));

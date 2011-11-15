@@ -31,15 +31,14 @@ import junit.framework.TestCase;
 
 import org.jdesktop.test.SerializableSupport;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
 
 /**
  * @author <a href="mailto:jesse@swank.ca">Jesse Wilson</a>
  */
-@RunWith(JUnit4.class)
+@SuppressWarnings({"nls", "serial"})
 public class AbstractSerializableBeanTest extends TestCase {
     private static class ShoeSizeCap implements VetoableChangeListener, Serializable {
+        @Override
         public void vetoableChange(PropertyChangeEvent event) throws PropertyVetoException {
             if("size".equals(event.getPropertyName()) && ((Integer)event.getNewValue()).intValue() > 13) {
                 throw new PropertyVetoException("Feet too big!", event);
@@ -48,6 +47,7 @@ public class AbstractSerializableBeanTest extends TestCase {
     }
 
     private static class ShoeColorListener implements PropertyChangeListener, Serializable {
+        @Override
         public void propertyChange(PropertyChangeEvent evt) {
             //does nothing
         }

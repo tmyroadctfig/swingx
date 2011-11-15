@@ -30,11 +30,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-import junit.framework.TestCase;
-
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
 import org.mockito.ArgumentCaptor;
 
 /**
@@ -42,6 +38,7 @@ import org.mockito.ArgumentCaptor;
  * 
  * @author Jeanette Winzenburg
  */
+@SuppressWarnings("nls")
 public class AbstractBeanTest {
     protected static class CloneableBean extends AbstractBean implements Cloneable {
         public void setProperty(String property) {

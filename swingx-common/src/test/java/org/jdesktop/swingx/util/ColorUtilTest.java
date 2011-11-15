@@ -18,23 +18,20 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-package org.jdesktop.swingx.color;
+package org.jdesktop.swingx.util;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 import java.awt.Color;
 
-import org.jdesktop.swingx.util.PaintUtils;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
 
 /**
  * @author Karl George Schaefer
  *
  */
-@RunWith(JUnit4.class)
+@SuppressWarnings("nls")
 public class ColorUtilTest {
     @Test
     public void testToHexString() {

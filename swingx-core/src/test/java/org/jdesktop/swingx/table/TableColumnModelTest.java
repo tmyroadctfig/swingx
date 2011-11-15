@@ -7,6 +7,12 @@
 
 package org.jdesktop.swingx.table;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.jdesktop.test.matchers.Matchers.property;
+import static org.mockito.Matchers.argThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+
 import java.beans.PropertyChangeEvent;
 import java.util.logging.Logger;
 
@@ -22,6 +28,7 @@ import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.event.TableColumnModelExtListener;
 import org.jdesktop.swingx.test.ColumnModelReport;
 import org.jdesktop.test.TestUtils;
+import org.jdesktop.test.matchers.Matchers;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -217,11 +224,12 @@ public class TableColumnModelTest extends InteractiveTestCase {
         // sanity...
         assertNotNull(columnModel.getColumnExt(identifier));
         columnModel.getColumnExt(identifier).setVisible(false);
-        ColumnModelReport report = new ColumnModelReport();
-        columnModel.addColumnModelListener(report);
+        
+        TableColumnModelExtListener l = mock(TableColumnModelExtListener.class);
+        columnModel.addColumnModelListener(l);
         columnModel.getColumnExt(identifier).setVisible(true);
-        TestUtils.assertPropertyChangeEvent(report.getLastColumnPropertyEvent(), 
-                "visible", false, true);
+        
+        verify(l).columnPropertyChange(argThat(is(property("visible", false, true))));
     }
     
 
