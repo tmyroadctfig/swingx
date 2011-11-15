@@ -29,8 +29,8 @@ import java.awt.image.BufferedImage;
 
 import javax.swing.JComponent;
 
-import org.jdesktop.swingx.graphics.GraphicsUtilities;
-import org.jdesktop.swingx.graphics.PaintUtils;
+import org.jdesktop.swingx.util.GraphicsUtilities;
+import org.jdesktop.swingx.util.PaintUtils;
 
 /**
  * A collection of utility methods for working with {@code Color}s.

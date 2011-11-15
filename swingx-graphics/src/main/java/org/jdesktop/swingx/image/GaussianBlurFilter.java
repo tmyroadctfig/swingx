@@ -36,7 +36,7 @@ package org.jdesktop.swingx.image;
 
 import java.awt.image.BufferedImage;
 
-import org.jdesktop.swingx.graphics.GraphicsUtilities;
+import org.jdesktop.swingx.util.GraphicsUtilities;
 
 public class GaussianBlurFilter extends AbstractFilter {
     private final int radius;

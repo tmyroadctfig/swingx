@@ -26,6 +26,12 @@
                             <descriptorRefs>
                                 <descriptorRef>jar-with-dependencies</descriptorRef>
                             </descriptorRefs>
+                            <archive>
+                                <manifest>
+                                    <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                                </manifest>
+                                <manifestFile>src/main/resources/META-INF/MANIFEST.MF</manifestFile> 
+                            </archive>
                         </configuration>
                     </execution>
                 </executions>

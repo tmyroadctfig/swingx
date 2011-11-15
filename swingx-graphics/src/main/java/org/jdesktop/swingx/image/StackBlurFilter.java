@@ -36,7 +36,7 @@ package org.jdesktop.swingx.image;
 
 import java.awt.image.BufferedImage;
 
-import org.jdesktop.swingx.graphics.GraphicsUtilities;
+import org.jdesktop.swingx.util.GraphicsUtilities;
 
 /**
  * <p>A stack blur filter can be used to create an approximation of a

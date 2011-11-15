@@ -38,11 +38,11 @@ import javax.swing.JButton;
 import javax.swing.SwingUtilities;
 import javax.swing.plaf.basic.BasicGraphicsUtils;
 
-import org.jdesktop.swingx.graphics.GraphicsUtilities;
-import org.jdesktop.swingx.graphics.PaintUtils;
 import org.jdesktop.swingx.painter.AbstractPainter;
 import org.jdesktop.swingx.painter.Painter;
 import org.jdesktop.swingx.painter.PainterPaint;
+import org.jdesktop.swingx.util.GraphicsUtilities;
+import org.jdesktop.swingx.util.PaintUtils;
 
 /**
  * <p>A {@link org.jdesktop.swingx.painter.Painter} enabled subclass of {@link javax.swing.JButton}.

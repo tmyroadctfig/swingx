@@ -39,9 +39,9 @@ import javax.swing.RepaintManager;
 import javax.swing.Scrollable;
 import javax.swing.SwingConstants;
 
-import org.jdesktop.swingx.graphics.GraphicsUtilities;
 import org.jdesktop.swingx.painter.AbstractPainter;
 import org.jdesktop.swingx.painter.Painter;
+import org.jdesktop.swingx.util.GraphicsUtilities;
 
 /**
  * <p>

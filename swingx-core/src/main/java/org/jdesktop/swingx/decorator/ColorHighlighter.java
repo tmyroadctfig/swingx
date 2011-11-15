@@ -21,7 +21,7 @@
 package org.jdesktop.swingx.decorator;
 
 
-import static org.jdesktop.swingx.graphics.PaintUtils.blend;
+import static org.jdesktop.swingx.util.PaintUtils.blend;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -32,7 +32,7 @@ import java.awt.Component;
  * As of SwingX 1.6.1, {@code ColorHighlighter} now blends non-opaque colors.
  * This will have little effect on previous users, who were likely to be 
  * using fully-opaque colors. If you are, however, supplying a non-opaque color 
- * and need it to be considered opaque, use {@link org.jdesktop.swingx.graphics.PaintUtils#removeAlpha(Color)}.
+ * and need it to be considered opaque, use {@link org.jdesktop.swingx.util.PaintUtils#removeAlpha(Color)}.
  * 
  * @author Jeanette Winzenburg
  * @author Karl Schaefer

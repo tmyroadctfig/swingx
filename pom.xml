@@ -66,9 +66,9 @@
             <version>2.3.2</version>
             <configuration>
                 <archive>
-                    <manifestEntries>
-                        <Implementation-Version>${project.version}</Implementation-Version>
-                    </manifestEntries>
+                    <manifest>
+                        <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                    </manifest>
                 </archive>
             </configuration>
         </plugin>

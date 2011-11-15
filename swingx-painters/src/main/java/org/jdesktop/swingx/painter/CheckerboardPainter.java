@@ -25,7 +25,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Paint;
 
-import org.jdesktop.swingx.graphics.PaintUtils;
+import org.jdesktop.swingx.util.PaintUtils;
 
 /**
  * <p>A Painter implementation that paints a checkerboard pattern. The light

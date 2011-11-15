@@ -34,9 +34,9 @@ import javax.swing.UIManager;
 import javax.swing.plaf.ComponentUI;
 
 import org.jdesktop.swingx.JXLoginPane;
-import org.jdesktop.swingx.graphics.GraphicsUtilities;
 import org.jdesktop.swingx.plaf.LoginPaneUI;
 import org.jdesktop.swingx.plaf.UIManagerExt;
+import org.jdesktop.swingx.util.GraphicsUtilities;
 /**
  * Base implementation of the <code>JXLoginPane</code> UI.
  *

@@ -25,7 +25,7 @@ import static org.junit.Assert.assertThat;
 
 import java.awt.Color;
 
-import org.jdesktop.swingx.graphics.PaintUtils;
+import org.jdesktop.swingx.util.PaintUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;

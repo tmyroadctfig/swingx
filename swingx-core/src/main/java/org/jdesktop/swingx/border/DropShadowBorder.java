@@ -39,7 +39,7 @@ import java.util.Map;
 
 import javax.swing.border.Border;
 
-import org.jdesktop.swingx.graphics.GraphicsUtilities;
+import org.jdesktop.swingx.util.GraphicsUtilities;
 
 /**
  * Implements a DropShadow for components. In general, the DropShadowBorder will

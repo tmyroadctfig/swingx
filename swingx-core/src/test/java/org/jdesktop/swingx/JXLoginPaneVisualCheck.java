@@ -46,10 +46,10 @@ import org.jdesktop.swingx.JXLoginPane.JXLoginFrame;
 import org.jdesktop.swingx.JXLoginPane.SaveMode;
 import org.jdesktop.swingx.auth.LoginService;
 import org.jdesktop.swingx.auth.SimpleLoginService;
-import org.jdesktop.swingx.graphics.GraphicsUtilities;
 import org.jdesktop.swingx.painter.MattePainter;
 import org.jdesktop.swingx.plaf.basic.BasicLoginPaneUI;
 import org.jdesktop.swingx.plaf.basic.CapsLockSupport;
+import org.jdesktop.swingx.util.GraphicsUtilities;
 
 /**
  * Simple tests to ensure that the {@code JXLoginPane} can be instantiated and

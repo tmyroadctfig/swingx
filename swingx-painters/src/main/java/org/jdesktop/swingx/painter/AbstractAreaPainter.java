@@ -26,8 +26,8 @@ import java.awt.Graphics2D;
 import java.awt.Paint;
 import java.awt.Shape;
 
-import org.jdesktop.swingx.graphics.PaintUtils;
 import org.jdesktop.swingx.painter.effects.AreaEffect;
+import org.jdesktop.swingx.util.PaintUtils;
 
 /**
  * The abstract base class for all painters that fill a vector path area.  This
