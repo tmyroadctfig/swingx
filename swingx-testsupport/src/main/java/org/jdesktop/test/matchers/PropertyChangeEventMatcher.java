@@ -7,6 +7,7 @@ import java.beans.PropertyChangeEvent;
 import org.hamcrest.Description;
 import org.mockito.ArgumentMatcher;
 
+@SuppressWarnings("nls")
 class PropertyChangeEventMatcher extends ArgumentMatcher<PropertyChangeEvent> {
     private final String propertyName;
     private final Object oldValue;
