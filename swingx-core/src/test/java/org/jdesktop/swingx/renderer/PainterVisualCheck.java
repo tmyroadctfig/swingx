@@ -66,7 +66,6 @@ import org.jdesktop.swingx.decorator.HighlighterFactory;
 import org.jdesktop.swingx.decorator.PainterHighlighter;
 import org.jdesktop.swingx.decorator.HighlightPredicate.ColumnHighlightPredicate;
 import org.jdesktop.swingx.decorator.HighlightPredicate.NotHighlightPredicate;
-import org.jdesktop.swingx.graphics.PaintUtils;
 import org.jdesktop.swingx.painter.AbstractPainter;
 import org.jdesktop.swingx.painter.BusyPainter;
 import org.jdesktop.swingx.painter.ImagePainter;
@@ -82,6 +81,7 @@ import org.jdesktop.swingx.sort.DefaultSortController;
 import org.jdesktop.swingx.table.ColumnControlButton;
 import org.jdesktop.swingx.test.XTestUtils;
 import org.jdesktop.swingx.treetable.FileSystemModel;
+import org.jdesktop.swingx.util.PaintUtils;
 import org.jdesktop.test.AncientSwingTeam;
 
 /**

@@ -77,7 +77,6 @@ import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.PainterHighlighter;
 import org.jdesktop.swingx.decorator.PatternPredicate;
-import org.jdesktop.swingx.graphics.PaintUtils;
 import org.jdesktop.swingx.painter.MattePainter;
 import org.jdesktop.swingx.rollover.RolloverProducer;
 import org.jdesktop.swingx.rollover.RolloverRenderer;
@@ -85,6 +84,7 @@ import org.jdesktop.swingx.test.ComponentTreeTableModel;
 import org.jdesktop.swingx.test.XTestUtils;
 import org.jdesktop.swingx.treetable.FileSystemModel;
 import org.jdesktop.swingx.treetable.TreeTableModel;
+import org.jdesktop.swingx.util.PaintUtils;
 import org.jdesktop.test.AncientSwingTeam;
 
 import com.sun.java.swing.plaf.motif.MotifLookAndFeel;

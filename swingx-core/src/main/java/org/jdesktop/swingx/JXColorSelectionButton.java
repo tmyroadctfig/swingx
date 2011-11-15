@@ -44,10 +44,10 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.jdesktop.swingx.color.EyeDropperColorChooserPanel;
-import org.jdesktop.swingx.graphics.GraphicsUtilities;
-import org.jdesktop.swingx.graphics.PaintUtils;
 import org.jdesktop.swingx.plaf.UIManagerExt;
+import org.jdesktop.swingx.util.GraphicsUtilities;
 import org.jdesktop.swingx.util.OS;
+import org.jdesktop.swingx.util.PaintUtils;
 
 /**
  * A button which allows the user to select a single color. The button has a platform

@@ -32,7 +32,7 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.jdesktop.swingx.graphics;
+package org.jdesktop.swingx.util;
 
 import java.awt.AlphaComposite;
 import java.awt.Color;

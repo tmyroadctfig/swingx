@@ -32,7 +32,7 @@ import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.Raster;
 
-import org.jdesktop.swingx.graphics.GraphicsUtilities;
+import org.jdesktop.swingx.util.GraphicsUtilities;
 
 /**
  *

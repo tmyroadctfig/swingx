@@ -22,7 +22,7 @@
 
 package org.jdesktop.swingx.painter.effects;
 
-import static org.jdesktop.swingx.graphics.GraphicsUtilities.createCompatibleTranslucentImage;
+import static org.jdesktop.swingx.util.GraphicsUtilities.createCompatibleTranslucentImage;
 
 import java.awt.AlphaComposite;
 import java.awt.BasicStroke;

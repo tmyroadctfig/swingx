@@ -36,7 +36,7 @@ package org.jdesktop.swingx.image;
 
 import java.awt.image.BufferedImage;
 
-import org.jdesktop.swingx.graphics.GraphicsUtilities;
+import org.jdesktop.swingx.util.GraphicsUtilities;
 
 /**
  * <p>A fast blur filter can be used to blur pictures quickly. This filter is an

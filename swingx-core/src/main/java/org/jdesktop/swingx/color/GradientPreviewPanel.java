@@ -38,9 +38,9 @@ import javax.swing.event.MouseInputAdapter;
 
 import org.jdesktop.swingx.JXGradientChooser;
 import org.jdesktop.swingx.JXPanel;
-import org.jdesktop.swingx.graphics.PaintUtils;
 import org.jdesktop.swingx.multislider.MultiThumbModel;
 import org.jdesktop.swingx.multislider.Thumb;
+import org.jdesktop.swingx.util.PaintUtils;
 
 /**
  * <p><b>Dependency</b>: Because this class relies on LinearGradientPaint and

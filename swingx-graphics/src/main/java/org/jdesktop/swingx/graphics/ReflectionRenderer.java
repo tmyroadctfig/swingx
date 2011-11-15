@@ -42,6 +42,7 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 
 import org.jdesktop.swingx.image.StackBlurFilter;
+import org.jdesktop.swingx.util.GraphicsUtilities;
 
 /**
  * <p>A reflection renderer generates the reflection of a given picture. The

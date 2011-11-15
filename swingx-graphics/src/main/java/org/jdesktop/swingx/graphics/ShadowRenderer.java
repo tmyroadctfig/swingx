@@ -20,12 +20,14 @@
  */
 package org.jdesktop.swingx.graphics;
 
-import static org.jdesktop.swingx.graphics.GraphicsUtilities.createCompatibleTranslucentImage;
+import static org.jdesktop.swingx.util.GraphicsUtilities.createCompatibleTranslucentImage;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+
+import org.jdesktop.swingx.util.GraphicsUtilities;
 
 /**
  * <p>A shadow renderer generates a drop shadow for any given picture, respecting

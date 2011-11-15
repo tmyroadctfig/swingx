@@ -26,6 +26,7 @@ import javax.imageio.ImageIO;
 
 import org.jdesktop.swingx.JXImageView;
 import org.jdesktop.swingx.InteractiveTestCase;
+import org.jdesktop.swingx.util.GraphicsUtilities;
 
 /**
  * GraphicsUtilities visual checks.

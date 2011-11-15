@@ -33,8 +33,8 @@ import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
 
-import org.jdesktop.swingx.graphics.PaintUtils;
 import org.jdesktop.swingx.painter.MattePainter;
+import org.jdesktop.swingx.util.PaintUtils;
 import org.jdesktop.test.PropertyChangeReport;
 import org.junit.Test;
 import org.junit.runner.RunWith;

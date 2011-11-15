@@ -62,9 +62,9 @@ import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.color.GradientPreviewPanel;
 import org.jdesktop.swingx.color.GradientThumbRenderer;
 import org.jdesktop.swingx.color.GradientTrackRenderer;
-import org.jdesktop.swingx.graphics.PaintUtils;
 import org.jdesktop.swingx.multislider.Thumb;
 import org.jdesktop.swingx.multislider.ThumbListener;
+import org.jdesktop.swingx.util.PaintUtils;
 
 /**
  * <p>A specialized JXPanel that allows the user to construct and choose a Gradient.

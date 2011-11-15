@@ -30,7 +30,7 @@ import java.awt.image.BufferedImageOp;
 import java.lang.ref.SoftReference;
 
 import org.jdesktop.beans.AbstractBean;
-import org.jdesktop.swingx.graphics.GraphicsUtilities;
+import org.jdesktop.swingx.util.GraphicsUtilities;
 
 /**
  * <p>A convenient base class from which concrete {@link Painter} implementations may

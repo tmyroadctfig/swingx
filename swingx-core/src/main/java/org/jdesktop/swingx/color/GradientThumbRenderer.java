@@ -28,8 +28,8 @@ import javax.imageio.ImageIO;
 import javax.swing.JComponent;
 
 import org.jdesktop.swingx.JXMultiThumbSlider;
-import org.jdesktop.swingx.graphics.PaintUtils;
 import org.jdesktop.swingx.multislider.ThumbRenderer;
+import org.jdesktop.swingx.util.PaintUtils;
 
 public class GradientThumbRenderer extends JComponent implements ThumbRenderer {
     private Image thumb_black;

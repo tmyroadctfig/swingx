@@ -74,13 +74,13 @@ import org.jdesktop.swingx.decorator.HighlighterFactory;
 import org.jdesktop.swingx.decorator.PatternPredicate;
 import org.jdesktop.swingx.decorator.ShadingColorHighlighter;
 import org.jdesktop.swingx.decorator.HighlightPredicate.ColumnHighlightPredicate;
-import org.jdesktop.swingx.graphics.PaintUtils;
 import org.jdesktop.swingx.painter.MattePainter;
 import org.jdesktop.swingx.painter.AbstractLayoutPainter.HorizontalAlignment;
 import org.jdesktop.swingx.renderer.RelativePainterHighlighter.NumberRelativizer;
 import org.jdesktop.swingx.rollover.RolloverProducer;
 import org.jdesktop.swingx.search.PatternMatcher;
 import org.jdesktop.swingx.treetable.FileSystemModel;
+import org.jdesktop.swingx.util.PaintUtils;
 import org.jdesktop.test.AncientSwingTeam;
 
 /**

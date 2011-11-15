@@ -47,7 +47,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.border.Border;
 
-import org.jdesktop.swingx.graphics.GraphicsUtilities;
+import org.jdesktop.swingx.util.GraphicsUtilities;
 
 /**
  * <code>JXCollapsiblePane</code> provides a component which can collapse or

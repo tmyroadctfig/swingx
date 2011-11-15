@@ -2,9 +2,9 @@ package org.jdesktop.swingx.graphics;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
-import static org.jdesktop.swingx.graphics.GraphicsUtilities.createCompatibleImage;
-import static org.jdesktop.swingx.graphics.GraphicsUtilities.getPixels;
-import static org.jdesktop.swingx.graphics.GraphicsUtilities.loadCompatibleImage;
+import static org.jdesktop.swingx.util.GraphicsUtilities.createCompatibleImage;
+import static org.jdesktop.swingx.util.GraphicsUtilities.getPixels;
+import static org.jdesktop.swingx.util.GraphicsUtilities.loadCompatibleImage;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assume.assumeThat;
@@ -16,6 +16,7 @@ import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.awt.image.DirectColorModel;
 
+import org.jdesktop.swingx.util.GraphicsUtilities;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;

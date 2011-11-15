@@ -34,9 +34,9 @@ import java.util.List;
 import javax.swing.JComponent;
 
 import org.jdesktop.swingx.JXMultiThumbSlider;
-import org.jdesktop.swingx.graphics.PaintUtils;
 import org.jdesktop.swingx.multislider.Thumb;
 import org.jdesktop.swingx.multislider.TrackRenderer;
+import org.jdesktop.swingx.util.PaintUtils;
 
 /**
  * <p><b>Dependency</b>: Because this class relies on LinearGradientPaint and

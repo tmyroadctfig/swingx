@@ -44,7 +44,7 @@ import javax.swing.colorchooser.AbstractColorChooserPanel;
 import javax.swing.event.MouseInputAdapter;
 
 import org.jdesktop.swingx.JXColorSelectionButton;
-import org.jdesktop.swingx.graphics.PaintUtils;
+import org.jdesktop.swingx.util.PaintUtils;
 
 /**
  * <p>EyeDropperColorChooserPanel is a pluggable panel for the 

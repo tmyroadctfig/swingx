@@ -34,7 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import org.jdesktop.swingx.graphics.PaintUtils;
+import org.jdesktop.swingx.util.PaintUtils;
 
 /**
  * A specific painter that paints an "infinite progress" like animation. For

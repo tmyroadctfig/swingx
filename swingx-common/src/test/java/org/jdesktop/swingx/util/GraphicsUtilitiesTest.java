@@ -1,10 +1,11 @@
-package org.jdesktop.swingx.graphics;
+package org.jdesktop.swingx.util;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 import java.awt.image.BufferedImage;
 
+import org.jdesktop.swingx.util.GraphicsUtilities;
 import org.junit.Test;
 
 public class GraphicsUtilitiesTest {

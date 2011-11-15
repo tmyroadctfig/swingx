@@ -62,8 +62,8 @@ import javax.swing.event.MouseInputAdapter;
 
 import org.jdesktop.swingx.error.ErrorListener;
 import org.jdesktop.swingx.error.ErrorSupport;
-import org.jdesktop.swingx.graphics.GraphicsUtilities;
-import org.jdesktop.swingx.graphics.PaintUtils;
+import org.jdesktop.swingx.util.GraphicsUtilities;
+import org.jdesktop.swingx.util.PaintUtils;
 
 /**
  * <p>A panel which shows an image centered. The user can drag an image into the 

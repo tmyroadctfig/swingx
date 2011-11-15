@@ -37,7 +37,7 @@ package org.jdesktop.swingx.image;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 
-import org.jdesktop.swingx.graphics.GraphicsUtilities;
+import org.jdesktop.swingx.util.GraphicsUtilities;
 
 /**
  * <p>A color tint filter can be used to mix a solid color to an image. The

@@ -22,7 +22,7 @@ import javax.swing.event.ChangeListener;
 
 import org.jdesktop.swingx.JXGradientChooser;
 import org.jdesktop.swingx.color.EyeDropperColorChooserPanel;
-import org.jdesktop.swingx.graphics.PaintUtils;
+import org.jdesktop.swingx.util.PaintUtils;
 
 /**
  *
