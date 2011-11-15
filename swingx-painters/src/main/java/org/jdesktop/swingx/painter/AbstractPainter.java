@@ -56,6 +56,7 @@ import org.jdesktop.swingx.graphics.GraphicsUtilities;
  *
  * @author rbair
  */
+@SuppressWarnings("nls")
 public abstract class AbstractPainter<T> extends AbstractBean implements Painter<T> {
     /**
      * An enum representing the possible interpolation values of Bicubic, Bilinear, and
@@ -138,7 +139,7 @@ public abstract class AbstractPainter<T> extends AbstractBean implements Painter
     public void setFilters(BufferedImageOp ... effects) {
         if (effects == null) effects = new BufferedImageOp[0];
         BufferedImageOp[] old = getFilters();
-        this.filters = new BufferedImageOp[effects == null ? 0 : effects.length];
+        this.filters = new BufferedImageOp[effects.length];
         System.arraycopy(effects, 0, this.filters, 0, this.filters.length);
         setDirty(true);
         firePropertyChange("filters", old, getFilters());

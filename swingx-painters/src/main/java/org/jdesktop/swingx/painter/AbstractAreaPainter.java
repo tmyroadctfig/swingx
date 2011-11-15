@@ -27,9 +27,7 @@ import java.awt.Paint;
 import java.awt.Shape;
 
 import org.jdesktop.swingx.graphics.PaintUtils;
-import org.jdesktop.swingx.painter.effects.AbstractAreaEffect;
 import org.jdesktop.swingx.painter.effects.AreaEffect;
-
 
 /**
  * The abstract base class for all painters that fill a vector path area.  This
@@ -54,6 +52,7 @@ import org.jdesktop.swingx.painter.effects.AreaEffect;
  *
  * @author joshua@marinacci.org
  */
+@SuppressWarnings("nls")
 public abstract class AbstractAreaPainter<T> extends AbstractLayoutPainter<T> {
     
     /**

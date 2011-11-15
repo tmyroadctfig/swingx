@@ -43,6 +43,7 @@ import java.awt.image.BufferedImage;
  * dropshadows and glows.
  * @author joshy
  */
+@SuppressWarnings("nls")
 public class AbstractAreaEffect implements AreaEffect {
     private static final boolean debug = false;
     /**
