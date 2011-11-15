@@ -21,6 +21,12 @@
  */
 package org.jdesktop.swingx.decorator;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.jdesktop.test.matchers.Matchers.property;
+import static org.mockito.Matchers.argThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+
 import java.awt.Color;
 import java.beans.PropertyChangeListener;
 import java.util.logging.Logger;
@@ -29,8 +35,6 @@ import javax.swing.UIManager;
 
 import junit.framework.TestCase;
 
-import org.jdesktop.test.PropertyChangeReport;
-import org.jdesktop.test.TestUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -113,12 +117,14 @@ public abstract class AbstractTestHighlighterClient extends TestCase {
     @Test
     public void testSetHighlightersChangeEvent() {
         HighlighterClient client = createHighlighterClient();
-        PropertyChangeReport report = new PropertyChangeReport();
-        client.addPropertyChangeListener(report);
+        
+        PropertyChangeListener pcl = mock(PropertyChangeListener.class);
+        client.addPropertyChangeListener(pcl);
+        
         Highlighter[] old = client.getHighlighters();
-        Highlighter highlighter = new ColorHighlighter();
-        client.setHighlighters(highlighter);
-        TestUtils.assertPropertyChangeEvent(report, "highlighters", old, client.getHighlighters());
+        client.setHighlighters(new ColorHighlighter());
+        
+        verify(pcl).propertyChange(argThat(is(property("highlighters", old, client.getHighlighters()))));
     }
 
     /**
@@ -223,13 +229,16 @@ public abstract class AbstractTestHighlighterClient extends TestCase {
     @Test
     public void testRemoveHighlightersChangeEvent() {
         HighlighterClient table = createHighlighterClient();
+        
+        PropertyChangeListener pcl = mock(PropertyChangeListener.class);
+        table.addPropertyChangeListener(pcl);
+        
         Highlighter highlighter = new ColorHighlighter();
         table.setHighlighters(highlighter);
-        PropertyChangeReport report = new PropertyChangeReport();
-        table.addPropertyChangeListener(report);
         Highlighter[] old = table.getHighlighters();
         table.removeHighlighter(highlighter);
-        TestUtils.assertPropertyChangeEvent(report, "highlighters", old, table.getHighlighters());
+        
+        verify(pcl).propertyChange(argThat(is(property("highlighters", old, table.getHighlighters()))));
     }
 
     /**
@@ -260,12 +269,14 @@ public abstract class AbstractTestHighlighterClient extends TestCase {
     @Test
     public void testAddHighlighterChangeEvent() {
         HighlighterClient table = createHighlighterClient();
-        PropertyChangeReport report = new PropertyChangeReport();
-        table.addPropertyChangeListener(report);
+        
+        PropertyChangeListener pcl = mock(PropertyChangeListener.class);
+        table.addPropertyChangeListener(pcl);
+        
         Highlighter[] old = table.getHighlighters();
-        Highlighter highlighter = new ColorHighlighter();
-        table.addHighlighter(highlighter);
-        TestUtils.assertPropertyChangeEvent(report, "highlighters", old, table.getHighlighters());
+        table.addHighlighter(new ColorHighlighter());
+        
+        verify(pcl).propertyChange(argThat(is(property("highlighters", old, table.getHighlighters()))));
     }
 
     /**

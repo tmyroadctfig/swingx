@@ -1461,22 +1461,6 @@ public class JXDatePickerTest extends InteractiveTestCase {
     }
 
     /**
-     * setFormats should fire a propertyChange.
-     *
-     */
-    @Test
-    public void testFormatsProperty() {
-        JXDatePicker picker = new JXDatePicker();
-        PropertyChangeReport report = new PropertyChangeReport();
-        picker.addPropertyChangeListener(report);
-        DateFormat[] oldFormats = picker.getFormats();
-        DateFormat[] newFormats = new DateFormat[] {DateFormat.getDateInstance()};
-        picker.setFormats(newFormats);
-        TestUtils.assertPropertyChangeEvent(report, "formats", oldFormats, newFormats);
-        
-    }
-
-    /**
      * Test doc'ed behaviour: editor must not be null.
      */
     @Test
