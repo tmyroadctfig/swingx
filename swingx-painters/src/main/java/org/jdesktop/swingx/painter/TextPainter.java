@@ -44,6 +44,7 @@ import org.jdesktop.swingx.painter.effects.AreaEffect;
  *
  * @author rbair
  */
+@SuppressWarnings("nls")
 public class TextPainter extends AbstractAreaPainter<Object> {
     private String text = "";
     private Font font = null;
@@ -134,19 +135,19 @@ public class TextPainter extends AbstractAreaPainter<Object> {
      */
     @Override
     protected void doPaint(Graphics2D g, Object component, int width, int height) {
-        Font font = calculateFont(component);
-        if (font != null) {
-            g.setFont(font);
+        Font f = calculateFont(component);
+        if (f != null) {
+            g.setFont(f);
         }
         
         Paint paint = getForegroundPaint(getFillPaint(), component);
-        String text = calculateText(component);
+        String t = calculateText(component);
         
         // get the font metrics
         FontMetrics metrics = g.getFontMetrics(g.getFont());
         //Rectangle2D rect = metrics.getStringBounds(text,g);
         
-        int tw = metrics.stringWidth(text);
+        int tw = metrics.stringWidth(t);
         int th = metrics.getHeight();
         Rectangle res = calculateLayout(tw, th, width, height);
         
@@ -160,7 +161,7 @@ public class TextPainter extends AbstractAreaPainter<Object> {
             g.setPaint(paint);
         }
         
-        g.drawString(text, 0, 0 + metrics.getAscent());
+        g.drawString(t, 0, 0 + metrics.getAscent());
         if(getAreaEffects() != null) {
             Shape shape = provideShape(g, component, width, height);
             for(AreaEffect ef : getAreaEffects()) {
@@ -172,30 +173,30 @@ public class TextPainter extends AbstractAreaPainter<Object> {
     
     private String calculateText(final Object component) {
         // prep the text
-        String text = getText();
+        String t = getText();
         //make components take priority if(text == null || text.trim().equals("")) {
-        if(text != null && !text.trim().equals("")) {
-            return text;
+        if(t != null && !t.trim().equals("")) {
+            return t;
         }
         if(component instanceof JTextComponent) {
-            text = ((JTextComponent)component).getText();
+            t = ((JTextComponent)component).getText();
         }
         if(component instanceof JLabel) {
-            text = ((JLabel)component).getText();
+            t = ((JLabel)component).getText();
         }
         if(component instanceof AbstractButton) {
-            text = ((AbstractButton)component).getText();
+            t = ((AbstractButton)component).getText();
         }
-        return text;
+        return t;
     }
     
     private Font calculateFont(final Object component) {
         // prep the various text attributes
-        Font font = getComponentFont(getFont(), component);
-        if (font == null) {
-            font = new Font("Dialog", Font.PLAIN, 18);
+        Font f = getComponentFont(getFont(), component);
+        if (f == null) {
+            f = new Font("Dialog", Font.PLAIN, 18);
         }
-        return font;
+        return f;
     }
 
     /**
@@ -203,10 +204,10 @@ public class TextPainter extends AbstractAreaPainter<Object> {
      */
     @Override
     protected Shape provideShape(Graphics2D g2, Object comp, int width, int height) {
-        Font font = calculateFont(comp);
-        String text = calculateText(comp);
-        FontMetrics metrics = g2.getFontMetrics(font);
-        GlyphVector vect = font.createGlyphVector(g2.getFontRenderContext(),text);
+        Font f = calculateFont(comp);
+        String t = calculateText(comp);
+        FontMetrics metrics = g2.getFontMetrics(f);
+        GlyphVector vect = f.createGlyphVector(g2.getFontRenderContext(),t);
         return vect.getOutline(0f,0f+ metrics.getAscent());
     }
 }

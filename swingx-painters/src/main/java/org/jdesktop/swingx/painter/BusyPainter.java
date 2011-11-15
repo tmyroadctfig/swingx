@@ -40,6 +40,7 @@ import org.jdesktop.swingx.graphics.PaintUtils;
  * A specific painter that paints an "infinite progress" like animation. For
  * more details see {@link org.jdesktop.swingx.JXBusyLabel}
  */
+@SuppressWarnings("nls")
 public class BusyPainter extends AbstractPainter<Object> {
 
     /**

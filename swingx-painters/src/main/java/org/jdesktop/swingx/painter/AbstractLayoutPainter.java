@@ -70,6 +70,7 @@ import java.awt.Rectangle;
  * 
  * @author joshua@marinacci.org
  */
+@SuppressWarnings("nls")
 public abstract class AbstractLayoutPainter<T> extends AbstractPainter<T> {
    
     /**
