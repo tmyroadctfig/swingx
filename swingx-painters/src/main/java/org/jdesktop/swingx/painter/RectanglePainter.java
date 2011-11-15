@@ -51,42 +51,43 @@ public class RectanglePainter extends AbstractAreaPainter<Object> {
 
     /** Creates a new instance of RectanglePainter */
     public RectanglePainter() {
-        this(0,0,0,0, 0,0, false, Color.RED, 1f, Color.BLACK);
+        this(0, 0, 0, 0);
+    }
+    
+    public RectanglePainter(int top, int left, int bottom, int right) {
+        this(top, left, bottom, right, 0, 0);
+    }
+
+    public RectanglePainter(int top, int left, int bottom, int right,
+            int roundWidth, int roundHeight) {
+        this(top, left, bottom, right, roundWidth, roundHeight, roundWidth != 0 || roundHeight != 0, Color.RED, 1f, Color.BLACK);
+    }
+
+    public RectanglePainter(int top, int left, int bottom, int right, int roundWidth,
+            int roundHeight, boolean rounded, Paint fillPaint, float strokeWidth, Paint borderPaint) {
+        this(new Insets(top, left, bottom, right), -1, -1, roundWidth, roundHeight, rounded, fillPaint, strokeWidth, borderPaint);
     }
 
     public RectanglePainter(Color fillPaint, Color borderPaint) {
-        this(0,0,0,0,0,0,false,fillPaint,1f,borderPaint);
+        this(fillPaint, borderPaint, 1f, null);
     }
 
-    public RectanglePainter(Paint fillPaint, Paint borderPaint, float borderWidth, RectanglePainter.Style style) {
-        this();
-        setFillPaint(fillPaint);
-        setBorderPaint(borderPaint);
-        setBorderWidth(borderWidth);
+    public RectanglePainter(Paint fillPaint, Paint borderPaint, float borderWidth, Style style) {
+        this(new Insets(0, 0, 0, 0), -1, -1, 0, 0, false, fillPaint, borderWidth, borderPaint);
         setStyle(style);
-    }
-    public RectanglePainter(int top, int left, int bottom, int right) {
-        this(top, left, bottom, right, 0, 0, false, Color.RED, 1f, Color.BLACK);
-    }
-    public RectanglePainter(int top, int left, int bottom, int right,
-            int roundWidth, int roundHeight) {
-        this(top,left,bottom,right,roundWidth, roundHeight, true, Color.RED, 1f, Color.BLACK);
+        setDirty(false);
     }
 
     public RectanglePainter(int width, int height, int cornerRadius, Paint fillPaint) {
-        this(new Insets(0,0,0,0), width,height,
-                cornerRadius, cornerRadius, true,
-                fillPaint, 1f, Color.BLACK);
+        this(new Insets(0, 0, 0, 0), width, height, cornerRadius, cornerRadius, true, fillPaint, 1f, Color.BLACK);
     }
 
-    public RectanglePainter(Insets insets,
-            int width, int height,
-            int roundWidth, int roundHeight, boolean rounded, Paint fillPaint,
-            float strokeWidth, Paint borderPaint) {
+    public RectanglePainter(Insets insets, int width, int height, int roundWidth, int roundHeight,
+            boolean rounded, Paint fillPaint, float strokeWidth, Paint borderPaint) {
         this.width = width;
         this.height = height;
-        setFillHorizontal(false);
-        setFillVertical(false);
+        setFillHorizontal(width < 0);
+        setFillVertical(height < 0);
         setInsets(insets);
         this.roundWidth = roundWidth;
         this.roundHeight = roundHeight;
@@ -94,24 +95,8 @@ public class RectanglePainter extends AbstractAreaPainter<Object> {
         this.setFillPaint(fillPaint);
         this.setBorderWidth(strokeWidth);
         this.setBorderPaint(borderPaint);
+        this.setDirty(false);
     }
-
-    public RectanglePainter(int top, int left, int bottom, int right,
-            int roundWidth, int roundHeight, boolean rounded, Paint fillPaint,
-            float strokeWidth, Paint borderPaint) {
-        this.setInsets(new Insets(top,left,bottom,right));
-        setFillVertical(true);
-        setFillHorizontal(true);
-        this.roundWidth = roundWidth;
-        this.roundHeight = roundHeight;
-        this.rounded = rounded;
-        this.setFillPaint(fillPaint);
-        this.setBorderWidth(strokeWidth);
-        this.setBorderPaint(borderPaint);
-    }
-
-
-
 
     /**
      * Indicates if the rectangle is rounded
