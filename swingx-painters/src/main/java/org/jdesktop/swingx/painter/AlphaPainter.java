@@ -30,6 +30,7 @@ import java.awt.Graphics2D;
  *
  * @author joshy
  */
+@SuppressWarnings("nls")
 public class AlphaPainter<T> extends CompoundPainter<T> {
     private float alpha = 1.0f;
 

@@ -26,6 +26,7 @@ import javax.swing.UIManager.LookAndFeelInfo;
 /**
  * Deals with the different version of the Java Virtual Machine. <br>
  */
+@SuppressWarnings("nls")
 public class JVM {
 
   public final static int JDK1_0 = 10;

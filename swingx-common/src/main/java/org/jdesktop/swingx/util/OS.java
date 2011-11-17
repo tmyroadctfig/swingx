@@ -27,6 +27,7 @@ import javax.swing.UIManager;
 /**
  * Provides methods related to the runtime environment.
  */
+@SuppressWarnings("nls")
 public class OS {
 
   private static final boolean osIsMacOsX;

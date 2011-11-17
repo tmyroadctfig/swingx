@@ -62,6 +62,7 @@ import org.jdesktop.swingx.painter.effects.AreaEffect;
  *
  * @author Richard
  */
+@SuppressWarnings("nls")
 public class ImagePainter extends AbstractAreaPainter<Object> {
     public enum ScaleType { InsideFit, OutsideFit, Distort }
     

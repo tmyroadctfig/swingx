@@ -40,6 +40,7 @@ import org.jdesktop.swingx.util.ShapeUtils;
  * 
  * @author joshua.marinacci@sun.com
  */
+@SuppressWarnings("nls")
 public class RectanglePainter extends AbstractAreaPainter<Object> {
     private boolean rounded = false;
     //private Insets insets = new Insets(0,0,0,0);

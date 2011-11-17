@@ -54,6 +54,7 @@ import org.jdesktop.swingx.util.PaintUtils;
  * 
  * @author rbair
  */
+@SuppressWarnings("nls")
 public class CheckerboardPainter extends AbstractPainter<Object> {
     private transient Paint checkerPaint;
     

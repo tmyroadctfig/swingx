@@ -32,7 +32,7 @@ import org.junit.Test;
  *
  */
 @SuppressWarnings("nls")
-public class ColorUtilTest {
+public class PaintUtilsTest {
     @Test
     public void testToHexString() {
         assertThat(PaintUtils.toHexString(Color.BLACK), is("#000000"));
