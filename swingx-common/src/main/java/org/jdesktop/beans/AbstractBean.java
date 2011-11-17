@@ -137,6 +137,7 @@ import java.beans.VetoableChangeSupport;
  * @status REVIEWED
  * @author rbair
  */
+@SuppressWarnings("nls")
 public abstract class AbstractBean {
     /**
      * Helper class that manages all the property change notification machinery.

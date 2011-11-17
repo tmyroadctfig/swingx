@@ -1,13 +1,11 @@
 package org.jdesktop.swingx.util;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.fail;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
 
-@RunWith(JUnit4.class)
-public class ContractTest extends TestCase {
+@SuppressWarnings("nls")
+public class ContractTest {
     @Test
     public void testAsNotNull() {
         //expected good cases with Objects

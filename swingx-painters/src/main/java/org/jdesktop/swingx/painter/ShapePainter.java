@@ -30,7 +30,6 @@ import java.awt.Graphics2D;
 import java.awt.Paint;
 import java.awt.Rectangle;
 import java.awt.Shape;
-import java.awt.Stroke;
 import java.awt.geom.Ellipse2D;
 
 import org.jdesktop.swingx.painter.effects.AreaEffect;
@@ -53,6 +52,7 @@ import org.jdesktop.swingx.painter.effects.AreaEffect;
  * </code></pre>
  * @author rbair
  */
+@SuppressWarnings("nls")
 public class ShapePainter extends AbstractAreaPainter<Object> {
     /**
      * The Shape to fillPaint. If null, nothing is painted.
@@ -139,13 +139,11 @@ public class ShapePainter extends AbstractAreaPainter<Object> {
      */
     @Override
     protected void doPaint(Graphics2D g, Object component, int w, int h) {
-        //set the stroke if it is not null
-        Stroke s = new BasicStroke(this.getBorderWidth());
-        g.setStroke(s);
+        g.setStroke(new BasicStroke(this.getBorderWidth()));
         
         if(getShape() != null) {
-            Shape shape = provideShape(g,component, w, h);
-            Rectangle bounds = shape.getBounds();
+            Shape s = provideShape(g,component, w, h);
+            Rectangle bounds = s.getBounds();
             Rectangle rect = calculateLayout(bounds.width, bounds.height, w, h);
             //u.p("rect = " + rect);
             g = (Graphics2D)g.create();
@@ -153,17 +151,17 @@ public class ShapePainter extends AbstractAreaPainter<Object> {
             try {
                 g.translate(rect.x, rect.y);
                 //draw/fill the shape
-                drawPathEffects(g, shape, rect.width, rect.height);
+                drawPathEffects(g, s, rect.width, rect.height);
                 switch (getStyle()) {
                     case BOTH:
-                        drawShape(g, shape, component, rect.width, rect.height);
-                        fillShape(g, shape, component, rect.width, rect.height);
+                        drawShape(g, s, component, rect.width, rect.height);
+                        fillShape(g, s, component, rect.width, rect.height);
                         break;
                     case FILLED:
-                        fillShape(g, shape, component, rect.width, rect.height);
+                        fillShape(g, s, component, rect.width, rect.height);
                         break;
                     case OUTLINE:
-                        drawShape(g, shape, component, rect.width, rect.height);
+                        drawShape(g, s, component, rect.width, rect.height);
                         break;
                 }
             } finally {
@@ -172,14 +170,14 @@ public class ShapePainter extends AbstractAreaPainter<Object> {
     }
     }
     
-    private void drawShape(Graphics2D g, Shape shape, Object component, int w, int h) {
+    private void drawShape(Graphics2D g, Shape s, Object component, int w, int h) {
         g.setPaint(calculateStrokePaint(component, w, h));
-        g.draw(shape);
+        g.draw(s);
     }
     
-    private void fillShape(Graphics2D g, Shape shape, Object component, int w, int h) {
+    private void fillShape(Graphics2D g, Shape s, Object component, int w, int h) {
         g.setPaint(calculateFillPaint(component, w, h));
-        g.fill(shape);
+        g.fill(s);
     }
     
     // shape effect stuff
@@ -205,11 +203,11 @@ public class ShapePainter extends AbstractAreaPainter<Object> {
         return p;
     }
 
-    private void drawPathEffects(Graphics2D g, Shape shape, int w, int h) {
+    private void drawPathEffects(Graphics2D g, Shape s, int w, int h) {
         if(getAreaEffects() != null) {
             //Paint pt = calculateFillPaint(component, w, h);
             for(AreaEffect ef : getAreaEffects()) {
-                ef.apply(g, shape, w, h);
+                ef.apply(g, s, w, h);
             }
         }
     }

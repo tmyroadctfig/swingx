@@ -46,6 +46,7 @@ import java.awt.geom.Ellipse2D;
  *
  * @author Romain Guy <romain.guy@mac.com>
  */
+@SuppressWarnings("nls")
 public class GlossPainter extends AbstractPainter<Object> {
     /**
      * <p>Used to define the position of the gloss on the painted area.</p>

@@ -21,21 +21,18 @@
  */
 package org.jdesktop.swingx.util;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
 /**
- * TODO add type doc
+ * Unit test for {@code OS}.
  * 
  * @author Jeanette Winzenburg
  */
-@RunWith(JUnit4.class)
-public class OSTest extends TestCase {
-
-    
+@SuppressWarnings("nls")
+public class OSTest {
     /**
      * Issue 1260-swingx: NPE in static initializer of OS
      */

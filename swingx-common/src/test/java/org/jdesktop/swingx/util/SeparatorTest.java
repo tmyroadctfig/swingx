@@ -9,6 +9,7 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
+@SuppressWarnings("nls")
 public class SeparatorTest {
     private Separator<String> sep;
     private List<String> values;

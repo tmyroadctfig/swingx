@@ -20,6 +20,10 @@
  */
 package org.jdesktop.beans;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.awt.Color;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -36,7 +40,7 @@ import org.junit.Test;
  * @author <a href="mailto:jesse@swank.ca">Jesse Wilson</a>
  */
 @SuppressWarnings({"nls", "serial"})
-public class AbstractSerializableBeanTest extends TestCase {
+public class AbstractSerializableBeanTest {
     private static class ShoeSizeCap implements VetoableChangeListener, Serializable {
         @Override
         public void vetoableChange(PropertyChangeEvent event) throws PropertyVetoException {
