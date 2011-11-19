@@ -12,13 +12,6 @@
   <dependencyManagement>
     <dependencies>
     <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>swingx-beaninfo</artifactId>
-        <version>${project.version}</version>
-        <type>jar</type>
-        <scope>compile</scope>
-    </dependency>
-    <dependency>
     	<groupId>org.jdesktop.bsaf</groupId>
     	<artifactId>bsaf</artifactId>
     	<version>1.9</version>
@@ -57,5 +50,6 @@
   </dependencyManagement>
   <modules>
   	<module>swingx-demos-swingxset</module>
+  	<module>swingx-demos-content</module>
   </modules>
 </project>
