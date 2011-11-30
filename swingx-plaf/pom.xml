@@ -30,5 +30,11 @@
         <type>jar</type>
         <scope>test</scope>
     </dependency>
+    <dependency>
+    	<groupId>org.kohsuke.metainf-services</groupId>
+    	<artifactId>metainf-services</artifactId>
+    	<type>jar</type>
+    	<scope>compile</scope>
+    </dependency>
   </dependencies>
 </project>

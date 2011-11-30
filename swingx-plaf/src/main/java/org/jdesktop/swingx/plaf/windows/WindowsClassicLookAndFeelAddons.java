@@ -23,13 +23,16 @@ package org.jdesktop.swingx.plaf.windows;
 import static javax.swing.UIManager.getLookAndFeel;
 import static javax.swing.UIManager.getSystemLookAndFeelClassName;
 
+import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 import org.jdesktop.swingx.util.OS;
+import org.kohsuke.MetaInfServices;
 
 /**
  * Adds new pluggable UI following the Windows Classic look and feel. Currently
  * it extends the XP look and feel and overrides the <code>JTaskPane</code>
  * and <code>JTaskPaneGroup</code> UIs.
  */
+@MetaInfServices(LookAndFeelAddons.class)
 public class WindowsClassicLookAndFeelAddons extends WindowsLookAndFeelAddons {
     
     /**

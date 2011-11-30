@@ -23,12 +23,15 @@ package org.jdesktop.swingx.plaf.windows;
 import static javax.swing.UIManager.getLookAndFeel;
 import static javax.swing.UIManager.getSystemLookAndFeelClassName;
 
+import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 import org.jdesktop.swingx.plaf.basic.BasicLookAndFeelAddons;
 import org.jdesktop.swingx.util.OS;
+import org.kohsuke.MetaInfServices;
 
 /**
  * Adds new pluggable UI following the Windows XP look and feel.
  */
+@MetaInfServices(LookAndFeelAddons.class)
 public class WindowsLookAndFeelAddons extends BasicLookAndFeelAddons {
 
     public static final String HOMESTEAD_VISUAL_STYLE = "HomeStead";

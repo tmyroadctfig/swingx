@@ -22,8 +22,11 @@ package org.jdesktop.swingx.plaf.motif;
 
 import javax.swing.UIManager;
 
+import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 import org.jdesktop.swingx.plaf.basic.BasicLookAndFeelAddons;
+import org.kohsuke.MetaInfServices;
 
+@MetaInfServices(LookAndFeelAddons.class)
 public class MotifLookAndFeelAddons extends BasicLookAndFeelAddons {
     /**
      * {@inheritDoc}

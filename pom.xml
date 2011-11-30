@@ -1,9 +1,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <parent>
-    <groupId>org.sonatype.oss</groupId>
-    <artifactId>oss-parent</artifactId>
-    <version>4</version>
+    <groupId>net.java</groupId>
+    <artifactId>jvnet-parent</artifactId>
+    <version>1</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.swinglabs</groupId>
@@ -82,6 +82,14 @@
   <dependencyManagement>
     <dependencies>
         <dependency>
+        	<groupId>org.kohsuke.metainf-services</groupId>
+        	<artifactId>metainf-services</artifactId>
+        	<version>1.1</version>
+        	<type>jar</type>
+        	<scope>compile</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
           <groupId>commons-lang</groupId>
           <artifactId>commons-lang</artifactId>
           <version>2.6</version>
@@ -110,37 +118,6 @@
         </dependency>
     </dependencies>
   </dependencyManagement>
-    <repositories>
-        <repository>
-            <id>swinglabs-snapshots</id>
-            <url>http://oss.sonatype.org/content/repositories/swinglabs-snapshots/</url>
-            <releases>
-              <enabled>false</enabled>
-            </releases>
-            <snapshots>
-              <enabled>true</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>swinglabs-releases</id>
-            <url>http://oss.sonatype.org/content/repositories/swinglabs-releases/</url>
-            <releases>
-              <enabled>true</enabled>
-            </releases>
-            <snapshots>
-              <enabled>false</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
-    <pluginRepositories>
-      <pluginRepository>
-        <id>jmd.sf.net</id>
-        <url>http://jmd.sf.net/m2repository</url>
-        <snapshots>
-          <enabled>true</enabled>
-        </snapshots>
-      </pluginRepository>
-    </pluginRepositories>
     <modules>
       <module>swingx-testsupport</module>
       <module>swingx-common</module>
