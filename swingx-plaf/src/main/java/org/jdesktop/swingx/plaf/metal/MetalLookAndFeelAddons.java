@@ -26,12 +26,15 @@ import static javax.swing.UIManager.getLookAndFeel;
 import javax.swing.LookAndFeel;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 
+import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 import org.jdesktop.swingx.plaf.basic.BasicLookAndFeelAddons;
+import org.kohsuke.MetaInfServices;
 
 /**
  * MetalLookAndFeelAddons.<br>
  * 
  */
+@MetaInfServices(LookAndFeelAddons.class)
 public class MetalLookAndFeelAddons extends BasicLookAndFeelAddons {
     /**
      * {@inheritDoc}

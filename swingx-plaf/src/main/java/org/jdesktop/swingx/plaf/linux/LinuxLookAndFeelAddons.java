@@ -23,9 +23,12 @@ package org.jdesktop.swingx.plaf.linux;
 import static javax.swing.UIManager.getLookAndFeel;
 import static javax.swing.UIManager.getSystemLookAndFeelClassName;
 
+import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 import org.jdesktop.swingx.plaf.basic.BasicLookAndFeelAddons;
 import org.jdesktop.swingx.util.OS;
+import org.kohsuke.MetaInfServices;
 
+@MetaInfServices(LookAndFeelAddons.class)
 public class LinuxLookAndFeelAddons extends BasicLookAndFeelAddons {
     /**
      * {@inheritDoc}
