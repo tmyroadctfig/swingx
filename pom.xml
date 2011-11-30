@@ -79,16 +79,19 @@
         </plugin>
     </plugins>
   </build>
+  <dependencies>
+  	<dependency>
+        <!-- specify here to ensure that file movement maintains correct services -->
+  		<groupId>org.kohsuke.metainf-services</groupId>
+  		<artifactId>metainf-services</artifactId>
+  		<version>1.1</version>
+  		<type>jar</type>
+  		<scope>compile</scope>
+  		<optional>true</optional>
+  	</dependency>
+  </dependencies>
   <dependencyManagement>
     <dependencies>
-        <dependency>
-        	<groupId>org.kohsuke.metainf-services</groupId>
-        	<artifactId>metainf-services</artifactId>
-        	<version>1.1</version>
-        	<type>jar</type>
-        	<scope>compile</scope>
-            <optional>true</optional>
-        </dependency>
         <dependency>
           <groupId>commons-lang</groupId>
           <artifactId>commons-lang</artifactId>
@@ -129,5 +132,6 @@
       <module>swingx-core</module>
       <module>swingx-all</module>
       <module>swingx-beaninfo</module>
+      <module>swingx-mavensupport</module>
     </modules>
 </project>
