@@ -77,6 +77,14 @@
             <artifactId>maven-asembly-plugin</artifactId>
             <version>2.2.1</version>
         </plugin>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-release-plugin</artifactId>
+            <!-- version inherited from parent (2.1) -->
+            <configuration>
+                <autoVersionSubmodules>true</autoVersionSubmodules>
+            </configuration>
+        </plugin>
     </plugins>
   </build>
   <dependencies>
@@ -122,6 +130,7 @@
     </dependencies>
   </dependencyManagement>
     <modules>
+      <!-- module>swingx-mavensupport</module -->
       <module>swingx-testsupport</module>
       <module>swingx-common</module>
       <module>swingx-autocomplete</module>
@@ -132,6 +141,6 @@
       <module>swingx-core</module>
       <module>swingx-all</module>
       <module>swingx-beaninfo</module>
-      <module>swingx-mavensupport</module>
+      <!-- module>swingx-demos</module -->
     </modules>
 </project>
