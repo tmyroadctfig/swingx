@@ -23,9 +23,9 @@
                         <phase>package</phase>
                         <configuration>
                             <appendAssemblyId>false</appendAssemblyId>
-                            <descriptorRefs>
-                                <descriptorRef>jar-with-dependencies</descriptorRef>
-                            </descriptorRefs>
+                            <descriptors>
+                                <descriptor>src/main/assembly/swingx-dependencies.xml</descriptor>
+                            </descriptors>
                             <archive>
                                 <manifest>
                                     <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
@@ -38,35 +38,23 @@
             </plugin>
         </plugins>
     </build>
-  <!-- we perform some chicanery here to keep the metainf files out -->
+  <!-- we perform some chicanery here to ensure end users don't need other swingx stuff -->
   <dependencies>
   	<dependency>
   		<groupId>${project.groupId}</groupId>
   		<artifactId>swingx-graphics</artifactId>
   		<version>${project.version}</version>
   		<type>jar</type>
-  		<scope>compile</scope>
+  		<scope>provided</scope>
   		<optional>true</optional>
-        <exclusions>
-            <exclusion>
-                <groupId>org.kohsuke.metainf-services</groupId>
-                <artifactId>metainf-services</artifactId>
-            </exclusion>
-        </exclusions>
   	</dependency>
   	<dependency>
   		<groupId>${project.groupId}</groupId>
   		<artifactId>swingx-core</artifactId>
   		<version>${project.version}</version>
   		<type>jar</type>
-  		<scope>compile</scope>
+  		<scope>provided</scope>
   		<optional>true</optional>
-        <exclusions>
-            <exclusion>
-                <groupId>org.kohsuke.metainf-services</groupId>
-                <artifactId>metainf-services</artifactId>
-            </exclusion>
-        </exclusions>
   	</dependency>
   	<dependency>
         <groupId>org.kohsuke.metainf-services</groupId>
