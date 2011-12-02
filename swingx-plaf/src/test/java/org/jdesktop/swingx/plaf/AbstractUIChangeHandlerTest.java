@@ -1,15 +1,16 @@
 package org.jdesktop.swingx.plaf;
 
-
 import java.beans.PropertyChangeEvent;
 
 import javax.swing.JTextField;
 
-import junit.framework.Assert;
-
+import org.jdesktop.test.EDTRunner;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
+@RunWith(EDTRunner.class)
 public class AbstractUIChangeHandlerTest {
 	JTextField tf = new JTextField();
 	AbstractUIChangeHandler ch;
