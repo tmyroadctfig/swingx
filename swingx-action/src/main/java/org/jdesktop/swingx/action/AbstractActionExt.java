@@ -420,9 +420,14 @@ public abstract class AbstractActionExt extends AbstractAction
      * @param newValue
      *            true to set the action as selected of the action.
      * @see Action#SELECTED_KEY
+     * @deprecated (pre-1.6.3) this method still fires property change on "selected" in addition to
+     *             any change fired by using the {@link Action#SELECTED_KEY}; future versions of
+     *             SwingX will remove this additional property change
      */
     public void setSelected(boolean newValue) {
+        boolean oldValue = isSelected();
         putValue(SELECTED_KEY, newValue);
+        firePropertyChange("selected", oldValue, isSelected());
     }
 
     @Override
@@ -449,13 +454,6 @@ public abstract class AbstractActionExt extends AbstractAction
         }
         return buffer.toString();
     }
-
-    // /**
-    // * @inheritDoc
-    // * Default to no-op
-    // */
-    // public void itemStateChanged(ItemEvent e) {
-    // }
     
     /**
      * Callback method as <code>ItemListener</code>. Updates internal state based
@@ -472,6 +470,4 @@ public abstract class AbstractActionExt extends AbstractAction
             setSelected(ItemEvent.SELECTED == e.getStateChange());
         }
     }
-
-
 }
