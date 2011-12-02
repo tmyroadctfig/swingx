@@ -343,7 +343,10 @@ public class JXCollapsiblePane extends JXPanel {
     /**
      * Constructs a new JXCollapsiblePane with a {@link JPanel} as content pane
      * and the given LayoutManager and a vertical orientation
+     * 
+     * @deprecated (pre-1.6.3) incorrectly specifies layout manager on this and not content pane 
      */
+    @Deprecated
     public JXCollapsiblePane(LayoutManager layout) {
         this(Direction.UP, layout);
     }
@@ -359,7 +362,9 @@ public class JXCollapsiblePane extends JXPanel {
      *            the direction this pane collapses
      * @param layout
      *            of this collapsible pane
+     * @deprecated (pre-1.6.3) incorrectly specifies layout manager on this and not content pane 
      */
+    @Deprecated
     public JXCollapsiblePane(Direction direction, LayoutManager layout) {
         super.setLayout(layout);
 
