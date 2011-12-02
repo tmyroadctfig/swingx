@@ -9,7 +9,6 @@
 
 package org.jdesktop.test;
 
-import java.beans.PropertyChangeEvent;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
