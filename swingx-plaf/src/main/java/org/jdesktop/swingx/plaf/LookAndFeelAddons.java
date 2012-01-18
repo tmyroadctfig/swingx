@@ -222,8 +222,8 @@ public abstract class LookAndFeelAddons {
         } else if (UIManager.getSystemLookAndFeelClassName().equals(laf.getClass().getName())) {
             className = getSystemAddonClassName();
         } else {
-            ServiceLoader<LookAndFeelAddons> addonLoader = ServiceLoader
-                    .load(LookAndFeelAddons.class);
+            ServiceLoader<LookAndFeelAddons> addonLoader = ServiceLoader.load(LookAndFeelAddons.class,
+                    LookAndFeel.class.getClassLoader());
 
             for (LookAndFeelAddons addon : addonLoader) {
                 if (addon.matches()) {
@@ -261,7 +261,8 @@ public abstract class LookAndFeelAddons {
      * @return the addon matching the native operating system platform.
      */
     public static String getSystemAddonClassName() {
-        ServiceLoader<LookAndFeelAddons> addonLoader = ServiceLoader.load(LookAndFeelAddons.class);
+        ServiceLoader<LookAndFeelAddons> addonLoader = ServiceLoader.load(LookAndFeelAddons.class,
+                LookAndFeelAddons.class.getClassLoader());
         String className = null;
 
         for (LookAndFeelAddons addon : addonLoader) {
