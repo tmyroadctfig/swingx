@@ -1267,7 +1267,7 @@ public class BasicDatePickerUI extends DatePickerUI {
             // reason might be that we want to open on pressed
             // typically (or LF-dependent?),
             // the button's action is invoked on released.
-            LOG.info("opening on mousePressed?");
+//            LOG.info("opening on mousePressed?");
             toggleShowPopup();
         }
 
