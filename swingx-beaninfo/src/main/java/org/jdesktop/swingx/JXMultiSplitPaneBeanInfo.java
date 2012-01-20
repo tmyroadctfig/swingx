@@ -23,6 +23,7 @@ package org.jdesktop.swingx;
 import java.beans.BeanDescriptor;
 
 import org.jdesktop.beans.BeanInfoSupport;
+import org.jdesktop.beans.editors.PainterPropertyEditor;
 
 /**
  * Bean info for {@link org.jdesktop.swingx.JXMultiSplitPane} component.
@@ -37,8 +38,11 @@ public class JXMultiSplitPaneBeanInfo extends BeanInfoSupport {
     // model, dividerSize, continuousLayout, dividerPainter
     @Override
     protected void initialize() {
+        setPreferred(true, "backgroundPainter");
+        setPropertyEditor(PainterPropertyEditor.class, "backgroundPainter");
+
         BeanDescriptor bd = getBeanDescriptor();
-        bd.setName("JXMultiSplitPanee");
+        bd.setName("JXMultiSplitPane");
         bd.setShortDescription("JXMultiSplitPane is a container with multiple areas divided by splitters.");
         bd.setValue("isContainer", Boolean.TRUE);
 

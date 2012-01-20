@@ -1,6 +1,7 @@
 package org.jdesktop.swingx;
 
 import org.jdesktop.beans.BeanInfoSupport;
+import org.jdesktop.beans.editors.PainterPropertyEditor;
 
 /**
  * BeanInfo class for JXLabel.
@@ -21,6 +22,8 @@ public class JXLabelBeanInfo extends BeanInfoSupport {
         setPreferred(true, "foregroundPainter", "backgroundPainter");
         setPreferred(true, "lineWrap", "maxLineSpan");
         setPreferred(true, "textRotation");
+        setPropertyEditor(PainterPropertyEditor.class, "backgroundPainter");
+        setPropertyEditor(PainterPropertyEditor.class, "foregroundPainter");
     }
 
 }
