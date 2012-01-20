@@ -424,6 +424,7 @@ public abstract class AbstractActionExt extends AbstractAction
      *             any change fired by using the {@link Action#SELECTED_KEY}; future versions of
      *             SwingX will remove this additional property change
      */
+    @Deprecated
     public void setSelected(boolean newValue) {
         boolean oldValue = isSelected();
         putValue(SELECTED_KEY, newValue);
