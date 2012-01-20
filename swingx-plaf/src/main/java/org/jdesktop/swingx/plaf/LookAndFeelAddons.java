@@ -207,6 +207,45 @@ public abstract class LookAndFeelAddons {
         return currentAddon;
     }
 
+    private static ClassLoader getClassLoader() {
+        ClassLoader cl = null;
+        
+        try {
+            cl = AccessController.doPrivileged(new PrivilegedAction<ClassLoader>() {
+                @Override
+                public ClassLoader run() {
+                    return LookAndFeelAddons.class.getClassLoader();
+                }
+            });
+        } catch (SecurityException ignore) { }
+        
+        if (cl == null) {
+            final Thread t = Thread.currentThread();
+            
+            try {
+                cl = AccessController.doPrivileged(new PrivilegedAction<ClassLoader>() {
+                    @Override
+                    public ClassLoader run() {
+                        return t.getContextClassLoader();
+                    }
+                });
+            } catch (SecurityException ignore) { }
+        }
+        
+        if (cl == null) {
+            try {
+                cl = AccessController.doPrivileged(new PrivilegedAction<ClassLoader>() {
+                    @Override
+                    public ClassLoader run() {
+                        return ClassLoader.getSystemClassLoader();
+                    }
+                });
+            } catch (SecurityException ignore) { }
+        }
+        
+        return cl;
+    }
+    
     /**
      * Based on the current look and feel (as returned by <code>UIManager.getLookAndFeel()</code>),
      * this method returns the name of the closest <code>LookAndFeelAddons</code> to use.
@@ -223,7 +262,7 @@ public abstract class LookAndFeelAddons {
             className = getSystemAddonClassName();
         } else {
             ServiceLoader<LookAndFeelAddons> addonLoader = ServiceLoader.load(LookAndFeelAddons.class,
-                    LookAndFeel.class.getClassLoader());
+                    getClassLoader());
 
             for (LookAndFeelAddons addon : addonLoader) {
                 if (addon.matches()) {
@@ -262,7 +301,7 @@ public abstract class LookAndFeelAddons {
      */
     public static String getSystemAddonClassName() {
         ServiceLoader<LookAndFeelAddons> addonLoader = ServiceLoader.load(LookAndFeelAddons.class,
-                LookAndFeelAddons.class.getClassLoader());
+                getClassLoader());
         String className = null;
 
         for (LookAndFeelAddons addon : addonLoader) {
