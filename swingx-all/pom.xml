@@ -38,14 +38,13 @@
             </plugin>
         </plugins>
     </build>
-  <!-- we perform some chicanery here to ensure end users don't need other swingx stuff -->
+  <!-- make the dependent swingx modules optional, since we're aggregating -->
   <dependencies>
   	<dependency>
   		<groupId>${project.groupId}</groupId>
   		<artifactId>swingx-graphics</artifactId>
   		<version>${project.version}</version>
   		<type>jar</type>
-  		<scope>provided</scope>
   		<optional>true</optional>
   	</dependency>
   	<dependency>
@@ -53,15 +52,6 @@
   		<artifactId>swingx-core</artifactId>
   		<version>${project.version}</version>
   		<type>jar</type>
-  		<scope>provided</scope>
-  		<optional>true</optional>
-  	</dependency>
-  	<dependency>
-        <groupId>org.kohsuke.metainf-services</groupId>
-        <artifactId>metainf-services</artifactId>
-        <version>1.1</version>
-  		<type>jar</type>
-  		<scope>provided</scope>
   		<optional>true</optional>
   	</dependency>
   </dependencies>
