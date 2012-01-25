@@ -27,9 +27,9 @@
       <url>http://java.net/jira/browse/SWINGX</url>
     </issueManagement>
     <scm>
-        <connection>scm:svn:https://svn.java.net/svn/swingx~svn</connection>
-        <developerConnection>scm:svn:https://svn.java.net/svn/swingx~svn</developerConnection>
-        <url>https://svn.java.net/svn/swingx~svn</url>
+        <connection>scm:svn:https://svn.java.net/svn/swingx~svn/trunk</connection>
+        <developerConnection>scm:svn:https://svn.java.net/svn/swingx~svn/trunk</developerConnection>
+        <url>https://svn.java.net/svn/swingx~svn/trunk</url>
     </scm>
     <description>Contains extensions to the Swing GUI toolkit, including new and enhanced components that provide functionality commonly required by rich client applications.</description>
   <build>
