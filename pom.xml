@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
- xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <parent>
     <groupId>net.java</groupId>
     <artifactId>jvnet-parent</artifactId>
@@ -10,7 +9,7 @@
   <artifactId>swingx-project</artifactId>
   <packaging>pom</packaging>
   <name>SwingX</name>
-  <version>1.6.3-SNAPSHOT</version>
+  <version>1.6.3</version>
     <url>http://www.swinglabs.org/</url>
     <ciManagement>
     	<system>Hudson</system>
@@ -27,9 +26,9 @@
       <url>http://java.net/jira/browse/SWINGX</url>
     </issueManagement>
     <scm>
-        <connection>scm:svn:https://svn.java.net/svn/swingx~svn</connection>
-        <developerConnection>scm:svn:https://svn.java.net/svn/swingx~svn</developerConnection>
-        <url>https://svn.java.net/svn/swingx~svn</url>
+        <connection>scm:svn:https://svn.java.net/svn/swingx~svn/tags/swingx-project-1.6.3</connection>
+        <developerConnection>scm:svn:https://svn.java.net/svn/swingx~svn/tags/swingx-project-1.6.3</developerConnection>
+        <url>https://svn.java.net/svn/swingx~svn/tags/swingx-project-1.6.3</url>
     </scm>
     <description>Contains extensions to the Swing GUI toolkit, including new and enhanced components that provide functionality commonly required by rich client applications.</description>
   <build>
