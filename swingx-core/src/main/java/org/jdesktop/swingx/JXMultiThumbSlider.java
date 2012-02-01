@@ -33,6 +33,7 @@ import java.util.List;
 import javax.swing.JComponent;
 import javax.swing.event.MouseInputAdapter;
 
+import org.jdesktop.beans.JavaBean;
 import org.jdesktop.swingx.multislider.DefaultMultiThumbModel;
 import org.jdesktop.swingx.multislider.MultiThumbModel;
 import org.jdesktop.swingx.multislider.ThumbDataEvent;
@@ -61,6 +62,7 @@ import org.jdesktop.swingx.plaf.MultiThumbSliderUI;
  *
  * @author joshy
  */
+@JavaBean
 public class JXMultiThumbSlider<E> extends JComponent {
     public static final String uiClassID = "MultiThumbSliderUI";
     

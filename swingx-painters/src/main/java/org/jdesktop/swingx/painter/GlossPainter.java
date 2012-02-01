@@ -28,6 +28,8 @@ import java.awt.Rectangle;
 import java.awt.geom.Area;
 import java.awt.geom.Ellipse2D;
 
+import org.jdesktop.beans.JavaBean;
+
 /**
  * <p>A Painter implementation that simulates a gloss effect. The gloss can
  * be positioned at the top or bottom of the drawing area. To fill the gloss,
@@ -46,6 +48,7 @@ import java.awt.geom.Ellipse2D;
  *
  * @author Romain Guy <romain.guy@mac.com>
  */
+@JavaBean
 @SuppressWarnings("nls")
 public class GlossPainter extends AbstractPainter<Object> {
     /**

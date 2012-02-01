@@ -4,6 +4,7 @@ import java.awt.Color;
 
 import javax.swing.JTextArea;
 
+import org.jdesktop.beans.JavaBean;
 import org.jdesktop.swingx.prompt.BuddySupport;
 import org.jdesktop.swingx.prompt.PromptSupport;
 import org.jdesktop.swingx.prompt.PromptSupport.FocusBehavior;
@@ -16,6 +17,7 @@ import org.jdesktop.swingx.prompt.PromptSupport.FocusBehavior;
  * @author Peter Weishapl <petw@gmx.net>
  * 
  */
+@JavaBean
 public class JXTextArea extends JTextArea {
 	public JXTextArea() {
 		this(null);

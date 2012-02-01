@@ -32,6 +32,7 @@ import javax.swing.Icon;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 
+import org.jdesktop.beans.JavaBean;
 import org.jdesktop.swingx.icon.EmptyIcon;
 
 /**
@@ -49,6 +50,7 @@ import org.jdesktop.swingx.icon.EmptyIcon;
  * 
  * @version 1.1
  */
+@JavaBean
 public class IconBorder implements Border, Serializable {
 
     /**

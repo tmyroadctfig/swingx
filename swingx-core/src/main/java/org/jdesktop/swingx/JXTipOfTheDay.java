@@ -26,6 +26,7 @@ import java.util.prefs.Preferences;
 
 import javax.swing.JDialog;
 
+import org.jdesktop.beans.JavaBean;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 import org.jdesktop.swingx.plaf.TipOfTheDayAddon;
 import org.jdesktop.swingx.plaf.TipOfTheDayUI;
@@ -113,6 +114,7 @@ import org.jdesktop.swingx.tips.TipOfTheDayModel.Tip;
  * 
  * @author <a href="mailto:fred@L2FProd.com">Frederic Lavigne</a>
  */
+@JavaBean
 public class JXTipOfTheDay extends JXPanel {
 
   /**

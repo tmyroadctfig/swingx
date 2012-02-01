@@ -34,12 +34,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import org.jdesktop.beans.JavaBean;
 import org.jdesktop.swingx.util.PaintUtils;
 
 /**
  * A specific painter that paints an "infinite progress" like animation. For
  * more details see {@link org.jdesktop.swingx.JXBusyLabel}
  */
+@JavaBean
 @SuppressWarnings("nls")
 public class BusyPainter extends AbstractPainter<Object> {
 

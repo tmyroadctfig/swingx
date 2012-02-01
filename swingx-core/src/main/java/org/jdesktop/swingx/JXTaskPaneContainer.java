@@ -23,6 +23,7 @@ package org.jdesktop.swingx;
 import java.awt.event.ContainerAdapter;
 import java.awt.event.ContainerEvent;
 
+import org.jdesktop.beans.JavaBean;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 import org.jdesktop.swingx.plaf.TaskPaneContainerAddon;
 import org.jdesktop.swingx.plaf.TaskPaneContainerUI;
@@ -94,6 +95,7 @@ import org.jdesktop.swingx.plaf.TaskPaneContainerUI;
  *          mono32="JXTaskPaneContainer32-mono.gif"
  *          color32="JXTaskPaneContainer32.gif"
  */
+@JavaBean
 public class JXTaskPaneContainer extends JXPanel {
 
     public final static String uiClassID = "swingx/TaskPaneContainerUI";

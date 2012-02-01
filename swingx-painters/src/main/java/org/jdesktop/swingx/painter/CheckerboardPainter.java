@@ -25,6 +25,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Paint;
 
+import org.jdesktop.beans.JavaBean;
 import org.jdesktop.swingx.util.PaintUtils;
 
 /**
@@ -54,6 +55,7 @@ import org.jdesktop.swingx.util.PaintUtils;
  * 
  * @author rbair
  */
+@JavaBean
 @SuppressWarnings("nls")
 public class CheckerboardPainter extends AbstractPainter<Object> {
     private transient Paint checkerPaint;

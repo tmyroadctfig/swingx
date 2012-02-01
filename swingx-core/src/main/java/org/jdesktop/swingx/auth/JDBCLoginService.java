@@ -26,11 +26,14 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.naming.InitialContext;
+
+import org.jdesktop.beans.JavaBean;
 /**
  * A login service for connecting to SQL based databases via JDBC
  *
  * @author rbair
  */
+@JavaBean
 public class JDBCLoginService extends LoginService {
     private static final Logger LOG = Logger.getLogger(JDBCLoginService.class
             .getName());

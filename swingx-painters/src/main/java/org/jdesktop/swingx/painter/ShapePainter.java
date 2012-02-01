@@ -32,6 +32,7 @@ import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.geom.Ellipse2D;
 
+import org.jdesktop.beans.JavaBean;
 import org.jdesktop.swingx.painter.effects.AreaEffect;
 
 
@@ -52,6 +53,7 @@ import org.jdesktop.swingx.painter.effects.AreaEffect;
  * </code></pre>
  * @author rbair
  */
+@JavaBean
 @SuppressWarnings("nls")
 public class ShapePainter extends AbstractAreaPainter<Object> {
     /**

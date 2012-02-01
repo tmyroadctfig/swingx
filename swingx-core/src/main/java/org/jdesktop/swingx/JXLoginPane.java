@@ -82,6 +82,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.plaf.basic.BasicHTML;
 import javax.swing.text.View;
 
+import org.jdesktop.beans.JavaBean;
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.auth.DefaultUserNameStore;
 import org.jdesktop.swingx.auth.LoginAdapter;
@@ -134,6 +135,7 @@ import org.jdesktop.swingx.util.WindowUtils;
  * @author rah003
  * @author Jonathan Giles
  */
+@JavaBean
 public class JXLoginPane extends JXPanel {
 
     /**

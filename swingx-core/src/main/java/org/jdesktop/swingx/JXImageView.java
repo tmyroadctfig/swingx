@@ -60,6 +60,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
 import javax.swing.event.MouseInputAdapter;
 
+import org.jdesktop.beans.JavaBean;
 import org.jdesktop.swingx.error.ErrorListener;
 import org.jdesktop.swingx.error.ErrorSupport;
 import org.jdesktop.swingx.util.GraphicsUtilities;
@@ -84,6 +85,7 @@ import org.jdesktop.swingx.util.PaintUtils;
  *
  * @author Joshua Marinacci joshua.marinacci@sun.com
  */
+@JavaBean
 public class JXImageView extends JXPanel {
     
     private Logger log = Logger.getLogger(JXImageView.class.getName());

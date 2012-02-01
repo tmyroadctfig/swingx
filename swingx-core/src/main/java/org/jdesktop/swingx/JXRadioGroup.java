@@ -40,6 +40,8 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.event.EventListenerList;
 
+import org.jdesktop.beans.JavaBean;
+
 /**
  * <p>
  * {@code JXRadioGroup} is a group of radio buttons that functions as a unit. It
@@ -73,6 +75,7 @@ import javax.swing.event.EventListenerList;
  * @author Noel Grandin
  * @version 1.0
  */
+@JavaBean
 public class JXRadioGroup<T> extends JPanel {
 
     private static final long serialVersionUID = 3257285842266567986L;

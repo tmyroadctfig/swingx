@@ -41,6 +41,7 @@
             <configuration>
                 <source>1.6</source>
                 <target>1.6</target>
+                <generatedSourcesDirectory>${project.generatedSourcesDirectoy}</generatedSourcesDirectory>
                 <showWarnings>true</showWarnings>
             </configuration>
         </plugin>
@@ -131,8 +132,11 @@
         </dependency>
     </dependencies>
   </dependencyManagement>
-    <modules>
-      <!-- module>swingx-mavensupport</module -->
+  <properties>
+  	<project.generatedSourcesDirectoy>${project.build.directory}/generated-sources/annotations</project.generatedSourcesDirectoy>
+  </properties>
+  <modules>
+      <module>swingx-mavensupport</module>
       <module>swingx-testsupport</module>
       <module>swingx-common</module>
       <module>swingx-autocomplete</module>

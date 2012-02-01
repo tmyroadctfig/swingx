@@ -28,6 +28,7 @@ import javax.swing.JLabel;
 import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 
+import org.jdesktop.beans.JavaBean;
 import org.jdesktop.swingx.search.Searchable;
 
 /**
@@ -61,6 +62,7 @@ import org.jdesktop.swingx.search.Searchable;
  * @author Jeanette Winzenburg
  * 
  */
+@JavaBean
 public class JXFindBar extends JXFindPanel {
 
     protected Color previousBackgroundColor;

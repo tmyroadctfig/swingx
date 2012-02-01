@@ -26,6 +26,7 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Insets;
 
+import org.jdesktop.beans.JavaBean;
 import org.jdesktop.swingx.util.Separator;
 
 /**
@@ -34,6 +35,7 @@ import org.jdesktop.swingx.util.Separator;
  * @author Romain Guy <romain.guy@mac.com>
  * @author Karl Schaefer
  */
+@JavaBean
 public class HorizontalLayout extends AbstractLayoutManager {
     private static final long serialVersionUID = 8640046926840737487L;
     

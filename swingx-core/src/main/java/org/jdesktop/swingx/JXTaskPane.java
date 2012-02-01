@@ -35,6 +35,7 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 
+import org.jdesktop.beans.JavaBean;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 import org.jdesktop.swingx.plaf.TaskPaneAddon;
 import org.jdesktop.swingx.plaf.TaskPaneUI;
@@ -139,6 +140,7 @@ import org.jdesktop.swingx.plaf.TaskPaneUI;
  *          mono32="JXTaskPane32-mono.gif"
  *          color32="JXTaskPane32.gif"
  */
+@JavaBean
 public class JXTaskPane extends JPanel implements
   JXCollapsiblePane.CollapsiblePaneContainer, Mnemonicable {
 

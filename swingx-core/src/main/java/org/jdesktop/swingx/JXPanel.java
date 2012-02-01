@@ -39,6 +39,7 @@ import javax.swing.RepaintManager;
 import javax.swing.Scrollable;
 import javax.swing.SwingConstants;
 
+import org.jdesktop.beans.JavaBean;
 import org.jdesktop.swingx.painter.AbstractPainter;
 import org.jdesktop.swingx.painter.Painter;
 import org.jdesktop.swingx.util.GraphicsUtilities;
@@ -79,6 +80,7 @@ import org.jdesktop.swingx.util.GraphicsUtilities;
  * @see Scrollable
  * @see Painter
  */
+@JavaBean
 @SuppressWarnings("nls")
 public class JXPanel extends JPanel implements AlphaPaintable, BackgroundPaintable, Scrollable {
 //    private boolean scrollableTracksViewportHeight = true;

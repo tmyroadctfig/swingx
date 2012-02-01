@@ -58,6 +58,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.jdesktop.beans.JavaBean;
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.color.GradientPreviewPanel;
 import org.jdesktop.swingx.color.GradientThumbRenderer;
@@ -75,6 +76,7 @@ import org.jdesktop.swingx.util.PaintUtils;
  * 
  * @author joshy
  */
+@JavaBean
 public class JXGradientChooser extends JXPanel {
     private enum GradientStyle { Linear, Radial }
     

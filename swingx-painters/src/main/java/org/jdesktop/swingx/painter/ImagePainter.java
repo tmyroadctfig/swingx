@@ -33,6 +33,7 @@ import java.awt.geom.Area;
 import java.awt.image.BufferedImage;
 import java.util.logging.Logger;
 
+import org.jdesktop.beans.JavaBean;
 import org.jdesktop.swingx.painter.effects.AreaEffect;
 
 /**
@@ -62,6 +63,7 @@ import org.jdesktop.swingx.painter.effects.AreaEffect;
  *
  * @author Richard
  */
+@JavaBean
 @SuppressWarnings("nls")
 public class ImagePainter extends AbstractAreaPainter<Object> {
     public enum ScaleType { InsideFit, OutsideFit, Distort }

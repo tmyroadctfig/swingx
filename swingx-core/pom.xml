@@ -49,6 +49,13 @@
   	</dependency>
   	<dependency>
   		<groupId>${project.groupId}</groupId>
+  		<artifactId>swingx-mavensupport</artifactId>
+  		<version>${project.version}</version>
+  		<scope>compile</scope>
+  		<optional>true</optional>
+  	</dependency>
+  	<dependency>
+  		<groupId>${project.groupId}</groupId>
   		<artifactId>swingx-testsupport</artifactId>
   		<version>${project.version}</version>
   		<type>jar</type>

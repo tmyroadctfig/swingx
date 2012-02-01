@@ -38,6 +38,7 @@ import javax.swing.JComponent;
 import javax.swing.Timer;
 import javax.swing.UIManager;
 
+import org.jdesktop.beans.JavaBean;
 import org.jdesktop.swingx.calendar.CalendarUtils;
 import org.jdesktop.swingx.calendar.DateSelectionModel;
 import org.jdesktop.swingx.calendar.DaySelectionModel;
@@ -126,6 +127,7 @@ import org.jdesktop.swingx.util.Contract;
  * @author Jeanette Winzenburg
  * @version  $Revision$
  */
+@JavaBean
 public class JXMonthView extends JComponent {
     @SuppressWarnings("unused")
     private static final Logger LOG = Logger.getLogger(JXMonthView.class
