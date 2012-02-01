@@ -24,6 +24,7 @@ import java.util.Map;
  * modified ("beanified") from JGoodies PropertyChangeReport.
  * 
  */
+@SuppressWarnings("nls")
 public class PropertyChangeReport implements PropertyChangeListener {
     
     /**
@@ -47,6 +48,7 @@ public class PropertyChangeReport implements PropertyChangeListener {
 //------------------------ implement PropertyChangeListener
     
 
+    @Override
     public void propertyChange(PropertyChangeEvent evt) {
         events.add(0, evt);
         if (evt.getPropertyName() != null) {
@@ -126,7 +128,7 @@ public class PropertyChangeReport implements PropertyChangeListener {
         return last != null ? last.getPropertyName() : null;
     }
     /**
-     * @return
+     * @return the source of the last event
      */
     public Object getLastSource() {
         PropertyChangeEvent last = getLastEvent();
@@ -145,7 +147,7 @@ public class PropertyChangeReport implements PropertyChangeListener {
     
     /**
      * PRE: hasEvents()
-     * @return
+     * @return the last old value as a boolean
      */
     public boolean getLastOldBooleanValue() {
         return ((Boolean) getLastOldValue()).booleanValue();
@@ -153,14 +155,14 @@ public class PropertyChangeReport implements PropertyChangeListener {
 
     /**
      * PRE: hasEvents()
-     * @return
+     * @return the last new value as a boolean
      */
     public boolean getLastNewBooleanValue() {
         return ((Boolean) getLastNewValue()).booleanValue();
     }
 
     /**
-     * @return
+     * @return a list of all of the event names captured by this reporter
      */
     public String getEventNames() {
         StringBuffer buffer = new StringBuffer();
