@@ -30,6 +30,7 @@ import javax.swing.JLabel;
 import javax.swing.Timer;
 import javax.swing.plaf.LabelUI;
 
+import org.jdesktop.beans.JavaBean;
 import org.jdesktop.swingx.icon.PainterIcon;
 import org.jdesktop.swingx.painter.BusyPainter;
 import org.jdesktop.swingx.plaf.BusyLabelAddon;
@@ -93,6 +94,7 @@ import org.jdesktop.swingx.plaf.LookAndFeelAddons;
  * @author rah003
  * @author headw01
  */
+@JavaBean
 public class JXBusyLabel extends JLabel {
 
     private static final long serialVersionUID = 5979268460848257147L;

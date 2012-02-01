@@ -47,6 +47,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.border.Border;
 
+import org.jdesktop.beans.JavaBean;
 import org.jdesktop.swingx.util.GraphicsUtilities;
 
 /**
@@ -164,6 +165,7 @@ import org.jdesktop.swingx.util.GraphicsUtilities;
  * @author <a href="mailto:fred@L2FProd.com">Frederic Lavigne</a>
  * @author Karl George Schaefer
  */
+@JavaBean
 public class JXCollapsiblePane extends JXPanel {
     /**
      * The direction defines how the collapsible pane will collapse. The

@@ -22,6 +22,8 @@ package org.jdesktop.swingx.auth;
 
 import java.util.prefs.Preferences;
 
+import org.jdesktop.beans.JavaBean;
+
 /**
  * Saves the user names in Preferences. Because any string could be part
  * of the user name, for every user name that must be saved a new Preferences
@@ -30,6 +32,7 @@ import java.util.prefs.Preferences;
  * @author Bino George
  * @author rbair
  */
+@JavaBean
 public class DefaultUserNameStore extends UserNameStore {
     /**
      * The key for one of the preferences

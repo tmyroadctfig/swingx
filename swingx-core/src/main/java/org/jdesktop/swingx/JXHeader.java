@@ -27,6 +27,7 @@ import java.awt.Font;
 
 import javax.swing.Icon;
 
+import org.jdesktop.beans.JavaBean;
 import org.jdesktop.swingx.plaf.HeaderAddon;
 import org.jdesktop.swingx.plaf.HeaderUI;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
@@ -71,6 +72,7 @@ import org.jdesktop.swingx.plaf.LookAndFeelAddons;
  * @author rbair
  * @author rah003
  */
+@JavaBean
 public class JXHeader extends JXPanel {
     /**
      * SerialVersionUID.

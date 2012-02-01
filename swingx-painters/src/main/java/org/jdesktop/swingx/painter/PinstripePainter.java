@@ -29,6 +29,8 @@ import java.awt.Shape;
 import java.awt.geom.Area;
 import java.awt.geom.Line2D;
 
+import org.jdesktop.beans.JavaBean;
+
 /**
  * <p>A fun Painter that paints pinstripes. You can specify the Paint to paint
  * those pinstripes in (could even be a texture paint!), the angle at which
@@ -48,6 +50,7 @@ import java.awt.geom.Line2D;
  *
  * @author rbair
  */
+@JavaBean
 public class PinstripePainter extends AbstractPainter<Object> {
     /**
      * The angle in degrees to paint the pinstripes at. The default

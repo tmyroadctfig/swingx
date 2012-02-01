@@ -37,6 +37,7 @@ import javax.accessibility.AccessibleRole;
 import javax.swing.JPanel;
 import javax.swing.event.MouseInputAdapter;
 
+import org.jdesktop.beans.JavaBean;
 import org.jdesktop.swingx.MultiSplitLayout.Divider;
 import org.jdesktop.swingx.MultiSplitLayout.Node;
 import org.jdesktop.swingx.painter.AbstractPainter;
@@ -51,6 +52,7 @@ import org.jdesktop.swingx.painter.Painter;
  * @author Hans Muller
  * @author Luan O'Carroll
  */
+@JavaBean
 public class JXMultiSplitPane extends JPanel implements BackgroundPaintable {
     private AccessibleContext accessibleContext = null;
     private boolean continuousLayout = true;

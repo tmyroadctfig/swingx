@@ -34,6 +34,8 @@ import javax.security.auth.login.FailedLoginException;
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
 
+import org.jdesktop.beans.JavaBean;
+
 /**
  * <b>JAASLoginService</b> implements a <b>LoginService</b>
  * that uses JAAS for authentication. <b>JAASLoginService</b> uses the 
@@ -41,6 +43,7 @@ import javax.security.auth.login.LoginException;
  * 
  * @author Bino George
  */
+@JavaBean
 public class JAASLoginService extends LoginService {
     private static final Logger LOG = Logger.getLogger(JAASLoginService.class
             .getName());

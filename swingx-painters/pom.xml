@@ -18,6 +18,14 @@
   		<scope>compile</scope>
   	</dependency>
   	<dependency>
+  		<groupId>${project.groupId}</groupId>
+  		<artifactId>swingx-mavensupport</artifactId>
+  		<version>${project.version}</version>
+  		<type>jar</type>
+  		<scope>compile</scope>
+  		<optional>true</optional>
+  	</dependency>
+  	<dependency>
   		<groupId>com.jhlabs</groupId>
   		<artifactId>filters</artifactId>
   		<type>jar</type>
@@ -47,7 +55,7 @@
             <artifactId>maven-jar-plugin</artifactId>
             <configuration>
                 <archive>
-                    <manifestFile>src/main/resources/META-INF/MANIFEST.MF</manifestFile>
+                    <manifestFile>${project.generatedSourcesDirectoy}/META-INF/MANIFEST.MF</manifestFile>
                 </archive>
             </configuration>
         </plugin>

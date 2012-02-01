@@ -59,6 +59,7 @@ import javax.swing.JFormattedTextField.AbstractFormatterFactory;
 import javax.swing.event.PopupMenuListener;
 import javax.swing.text.DefaultFormatterFactory;
 
+import org.jdesktop.beans.JavaBean;
 import org.jdesktop.swingx.calendar.DatePickerFormatter;
 import org.jdesktop.swingx.event.EventListenerMap;
 import org.jdesktop.swingx.painter.MattePainter;
@@ -164,6 +165,7 @@ import org.jdesktop.swingx.util.Contract;
  * @see DatePickerFormatter
  * 
  */
+@JavaBean
 public class JXDatePicker extends JComponent {
     @SuppressWarnings("unused")
     private static final Logger LOG = Logger.getLogger(JXDatePicker.class

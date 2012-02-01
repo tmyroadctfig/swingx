@@ -29,12 +29,14 @@ import java.awt.Insets;
 import javax.swing.Icon;
 import javax.swing.border.MatteBorder;
 
+import org.jdesktop.beans.JavaBean;
+
 /**
  * Matte border that allows specialized icons for corners and sides.
  *
  * @author Ramesh Gupta
  */
-
+@JavaBean
 public class MatteBorderExt extends MatteBorder {
     protected Icon[] tileIcons = null;
     private Icon defaultIcon = null;

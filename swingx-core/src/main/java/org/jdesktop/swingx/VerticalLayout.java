@@ -25,6 +25,7 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Insets;
 
+import org.jdesktop.beans.JavaBean;
 import org.jdesktop.swingx.util.Separator;
 
 /**
@@ -33,6 +34,7 @@ import org.jdesktop.swingx.util.Separator;
  * @author fred
  * @author Karl Schaefer
  */
+@JavaBean
 public class VerticalLayout extends AbstractLayoutManager {
     private static final long serialVersionUID = 5342270033773736441L;
     

@@ -27,6 +27,8 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.lang.ref.WeakReference;
 
+import org.jdesktop.beans.JavaBean;
+
 /**
  * <p>A {@link Painter} implementation composed of an array of <code>Painter</code>s.
  * <code>CompoundPainter</code> provides a means for combining several individual
@@ -60,6 +62,7 @@ import java.lang.ref.WeakReference;
  *
  * @author rbair
  */
+@JavaBean
 public class CompoundPainter<T> extends AbstractPainter<T> {
     private static class Handler implements PropertyChangeListener {
         private final WeakReference<CompoundPainter<?>> ref;

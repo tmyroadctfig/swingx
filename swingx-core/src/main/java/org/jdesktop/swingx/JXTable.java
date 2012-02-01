@@ -89,6 +89,7 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 
+import org.jdesktop.beans.JavaBean;
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.action.BoundAction;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
@@ -348,6 +349,7 @@ import org.jdesktop.swingx.table.TableColumnModelExt;
  * @author Jeanette Winzenburg
  * 
  */
+@JavaBean
 public class JXTable extends JTable implements TableColumnModelExtListener {
 
     /**

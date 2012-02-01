@@ -32,6 +32,7 @@ import java.awt.geom.Rectangle2D;
 import java.awt.geom.RectangularShape;
 import java.awt.geom.RoundRectangle2D;
 
+import org.jdesktop.beans.JavaBean;
 import org.jdesktop.swingx.painter.effects.AreaEffect;
 import org.jdesktop.swingx.util.ShapeUtils;
 
@@ -40,6 +41,7 @@ import org.jdesktop.swingx.util.ShapeUtils;
  * 
  * @author joshua.marinacci@sun.com
  */
+@JavaBean
 @SuppressWarnings("nls")
 public class RectanglePainter extends AbstractAreaPainter<Object> {
     private boolean rounded = false;

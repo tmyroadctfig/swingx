@@ -56,6 +56,7 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
+import org.jdesktop.beans.JavaBean;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.CompoundHighlighter;
 import org.jdesktop.swingx.decorator.Highlighter;
@@ -172,6 +173,7 @@ import org.jdesktop.swingx.tree.DefaultXTreeCellRenderer;
  * @see org.jdesktop.swingx.search.Searchable
  * 
  */
+@JavaBean
 public class JXTree extends JTree {
     @SuppressWarnings("unused")
     private static final Logger LOG = Logger.getLogger(JXTree.class.getName());

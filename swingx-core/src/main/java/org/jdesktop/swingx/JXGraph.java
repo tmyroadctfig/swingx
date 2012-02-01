@@ -48,6 +48,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.jdesktop.beans.AbstractBean;
+import org.jdesktop.beans.JavaBean;
 import org.jdesktop.swingx.painter.Painter;
 
 // TODO: keyboard navigation
@@ -291,6 +292,7 @@ import org.jdesktop.swingx.painter.Painter;
  * @see JXGraph.Plot
  * @author Romain Guy <romain.guy@mac.com>
  */
+@JavaBean
 public class JXGraph extends JXPanel {
     // stroke widths used to draw the main axis and the grid
     // the main axis is slightly thicker

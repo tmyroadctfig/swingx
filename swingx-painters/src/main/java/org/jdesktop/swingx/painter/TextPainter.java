@@ -36,6 +36,7 @@ import javax.swing.AbstractButton;
 import javax.swing.JLabel;
 import javax.swing.text.JTextComponent;
 
+import org.jdesktop.beans.JavaBean;
 import org.jdesktop.swingx.painter.effects.AreaEffect;
 
 /**
@@ -44,6 +45,7 @@ import org.jdesktop.swingx.painter.effects.AreaEffect;
  *
  * @author rbair
  */
+@JavaBean
 @SuppressWarnings("nls")
 public class TextPainter extends AbstractAreaPainter<Object> {
     private String text = "";

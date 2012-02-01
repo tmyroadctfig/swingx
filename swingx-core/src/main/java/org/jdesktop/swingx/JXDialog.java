@@ -36,6 +36,7 @@ import javax.swing.JPanel;
 import javax.swing.JToolBar;
 import javax.swing.plaf.basic.BasicOptionPaneUI;
 
+import org.jdesktop.beans.JavaBean;
 import org.jdesktop.swingx.action.BoundAction;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 import org.jdesktop.swingx.plaf.UIManagerExt;
@@ -63,6 +64,7 @@ import org.jdesktop.swingx.plaf.UIManagerExt;
  * @author Jeanette Winzenburg
  * @author Karl Schaefer
  */
+@JavaBean
 public class JXDialog extends JDialog {
 
     static {

@@ -29,6 +29,7 @@ import java.awt.Font;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 
+import org.jdesktop.beans.JavaBean;
 import org.jdesktop.swingx.painter.Painter;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 import org.jdesktop.swingx.plaf.TitledPanelAddon;
@@ -52,6 +53,7 @@ import org.jdesktop.swingx.plaf.TitledPanelUI;
  * @author Nicola Ken Barozzi
  * @author Jeanette Winzenburg
  */
+@JavaBean
 public class JXTitledPanel extends JXPanel {
 
     /**

@@ -7,6 +7,7 @@ import java.util.List;
 
 import javax.swing.JTextField;
 
+import org.jdesktop.beans.JavaBean;
 import org.jdesktop.swingx.prompt.BuddySupport;
 import org.jdesktop.swingx.prompt.PromptSupport;
 import org.jdesktop.swingx.prompt.BuddySupport.Position;
@@ -20,6 +21,7 @@ import org.jdesktop.swingx.prompt.PromptSupport.FocusBehavior;
  * @author Peter Weishapl <petw@gmx.net>
  * 
  */
+@JavaBean
 public class JXTextField extends JTextField {
 	public JXTextField() {
 		this(null);

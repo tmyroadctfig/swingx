@@ -39,6 +39,7 @@ import java.util.Map;
 
 import javax.swing.border.Border;
 
+import org.jdesktop.beans.JavaBean;
 import org.jdesktop.swingx.util.GraphicsUtilities;
 
 /**
@@ -57,6 +58,7 @@ import org.jdesktop.swingx.util.GraphicsUtilities;
  * rapidly.</p>
  * @author rbair
  */
+@JavaBean
 public class DropShadowBorder implements Border, Serializable {
     /**
      * 

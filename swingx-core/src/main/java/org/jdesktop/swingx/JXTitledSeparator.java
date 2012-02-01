@@ -37,6 +37,8 @@ import javax.swing.UIManager;
 import javax.swing.plaf.ColorUIResource;
 import javax.swing.plaf.FontUIResource;
 
+import org.jdesktop.beans.JavaBean;
+
 /**
  * <p>A simple horizontal separator that contains a title.<br/>
  *
@@ -76,6 +78,7 @@ import javax.swing.plaf.FontUIResource;
  * @status REVIEWED
  * @author rbair
  */
+@JavaBean
 public class JXTitledSeparator extends JXPanel {
     /**
      * Implementation detail: the label used to display the title

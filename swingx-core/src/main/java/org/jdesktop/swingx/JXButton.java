@@ -38,6 +38,7 @@ import javax.swing.JButton;
 import javax.swing.SwingUtilities;
 import javax.swing.plaf.basic.BasicGraphicsUtils;
 
+import org.jdesktop.beans.JavaBean;
 import org.jdesktop.swingx.painter.AbstractPainter;
 import org.jdesktop.swingx.painter.Painter;
 import org.jdesktop.swingx.painter.PainterPaint;
@@ -66,6 +67,7 @@ import org.jdesktop.swingx.util.PaintUtils;
  * @author Jan Stola
  * @author Karl George Schaefer
  */
+@JavaBean
 public class JXButton extends JButton implements BackgroundPaintable {
     private class BackgroundButton extends JButton {
 

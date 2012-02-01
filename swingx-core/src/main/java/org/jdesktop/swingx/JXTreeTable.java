@@ -70,6 +70,7 @@ import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
+import org.jdesktop.beans.JavaBean;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.event.TreeExpansionBroadcaster;
 import org.jdesktop.swingx.plaf.UIAction;
@@ -121,6 +122,7 @@ import org.jdesktop.swingx.util.Contract;
  * @author Scott Violet
  * @author Ramesh Gupta
  */
+@JavaBean
 public class JXTreeTable extends JXTable {
     @SuppressWarnings("unused")
     private static final Logger LOG = Logger.getLogger(JXTreeTable.class

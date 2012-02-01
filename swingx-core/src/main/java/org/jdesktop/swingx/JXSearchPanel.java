@@ -32,6 +32,7 @@ import java.util.regex.Pattern;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 
+import org.jdesktop.beans.JavaBean;
 import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.renderer.DefaultListRenderer;
 import org.jdesktop.swingx.renderer.LocalizableStringValue;
@@ -75,6 +76,7 @@ import org.jdesktop.swingx.search.PatternModel;
  * @author Ramesh Gupta
  * @author Jeanette Winzenburg
  */
+@JavaBean
 public class JXSearchPanel extends AbstractPatternPanel {
     /**
      * The action command key.

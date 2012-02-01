@@ -27,6 +27,8 @@ import java.awt.Paint;
 import java.awt.Rectangle;
 import java.awt.Shape;
 
+import org.jdesktop.beans.JavaBean;
+
 /**
  * A Painter implementation that uses a Paint to fill the entire background
  * area. For example, if I wanted to paint the entire background of a panel green, I would:
@@ -48,6 +50,7 @@ import java.awt.Shape;
  * <p>If no paint is specified, then nothing is painted</p>
  * @author rbair
  */
+@JavaBean
 public class MattePainter extends AbstractAreaPainter<Object> {
     
     /**

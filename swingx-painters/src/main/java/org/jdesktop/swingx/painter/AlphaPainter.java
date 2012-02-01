@@ -25,11 +25,14 @@ package org.jdesktop.swingx.painter;
 import java.awt.AlphaComposite;
 import java.awt.Graphics2D;
 
+import org.jdesktop.beans.JavaBean;
+
 /**
  * Applies an alpha value to an entire stack of painters.
  *
  * @author joshy
  */
+@JavaBean
 @SuppressWarnings("nls")
 public class AlphaPainter<T> extends CompoundPainter<T> {
     private float alpha = 1.0f;

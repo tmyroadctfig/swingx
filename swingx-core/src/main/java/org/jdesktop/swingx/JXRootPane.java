@@ -42,6 +42,8 @@ import javax.swing.JRootPane;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 
+import org.jdesktop.beans.JavaBean;
+
 /**
  * Extends the JRootPane by supporting specific placements for a toolbar and a
  * status bar. If a status bar exists, then toolbars, menus will be registered 
@@ -50,6 +52,7 @@ import javax.swing.KeyStroke;
  * @see JXStatusBar
  * @author Mark Davidson
  */
+@JavaBean
 public class JXRootPane extends JRootPane {
     /**
      * An extended {@code RootLayout} offering support for managing the status

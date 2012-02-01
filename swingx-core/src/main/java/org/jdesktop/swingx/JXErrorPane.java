@@ -30,6 +30,7 @@ import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
 import javax.swing.SwingUtilities;
 
+import org.jdesktop.beans.JavaBean;
 import org.jdesktop.swingx.error.ErrorInfo;
 import org.jdesktop.swingx.error.ErrorReporter;
 import org.jdesktop.swingx.plaf.ErrorPaneAddon;
@@ -168,6 +169,7 @@ import org.jdesktop.swingx.plaf.LookAndFeelAddons;
  * @author Shai Almog
  * @author rah003
  */
+@JavaBean
 public class JXErrorPane extends JComponent {
     //---------------------------------------------------- static properties
     /**

@@ -68,6 +68,7 @@ import javax.swing.text.View;
 import javax.swing.text.ViewFactory;
 import javax.swing.text.WrappedPlainView;
 
+import org.jdesktop.beans.JavaBean;
 import org.jdesktop.swingx.painter.AbstractPainter;
 import org.jdesktop.swingx.painter.Painter;
 
@@ -111,6 +112,7 @@ import org.jdesktop.swingx.painter.Painter;
  * @author rah
  * @author mario_cesar
  */
+@JavaBean
 public class JXLabel extends JLabel implements BackgroundPaintable {
     
     /**

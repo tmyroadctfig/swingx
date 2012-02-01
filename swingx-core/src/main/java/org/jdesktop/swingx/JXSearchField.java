@@ -16,6 +16,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.text.Document;
 
+import org.jdesktop.beans.JavaBean;
 import org.jdesktop.swingx.plaf.SearchFieldAddon;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 import org.jdesktop.swingx.plaf.TextUIWrapper;
@@ -53,6 +54,7 @@ import org.jdesktop.swingx.search.RecentSearches;
  * @author Peter Weishapl <petw@gmx.net>
  * 
  */
+@JavaBean
 public class JXSearchField extends JXTextField {
 	/**
 	 * The default instant search delay.

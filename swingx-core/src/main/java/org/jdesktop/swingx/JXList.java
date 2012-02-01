@@ -45,6 +45,7 @@ import javax.swing.event.ChangeListener;
 import javax.swing.plaf.ListUI;
 import javax.swing.text.Position.Bias;
 
+import org.jdesktop.beans.JavaBean;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.CompoundHighlighter;
 import org.jdesktop.swingx.decorator.Highlighter;
@@ -176,6 +177,7 @@ import org.jdesktop.swingx.table.TableColumnExt;
  * @author Ramesh Gupta
  * @author Jeanette Winzenburg
  */
+@JavaBean
 public class JXList extends JList {
     @SuppressWarnings("all")
     private static final Logger LOG = Logger.getLogger(JXList.class.getName());
