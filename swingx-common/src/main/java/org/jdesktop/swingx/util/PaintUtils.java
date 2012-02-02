@@ -117,64 +117,6 @@ public class PaintUtils {
     private PaintUtils() {
     }
     
-    /**
-     * Returns the bounds that the text of a label will be drawn into.
-     * Takes into account the current font metrics.
-     * @deprecated (pre-1.6.3) no replacement
-     */
-    @Deprecated
-    public static Rectangle getTextBounds(Graphics g, JLabel label) {
-        FontMetrics fm = g.getFontMetrics();
-        Rectangle2D r2d = fm.getStringBounds(label.getText(), g);
-        Rectangle rect = r2d.getBounds();
-        int xOffset = 0;
-        switch (label.getHorizontalAlignment()) {
-            case SwingConstants.RIGHT:
-            case SwingConstants.TRAILING:
-                xOffset = label.getBounds().width - rect.width;
-                break;
-            case SwingConstants.CENTER:
-                xOffset = (label.getBounds().width - rect.width) / 2;
-                break;
-            default:
-            case SwingConstants.LEFT:
-            case SwingConstants.LEADING:
-                xOffset = 0;
-                break;
-        }
-        int yOffset = 0;
-        switch (label.getVerticalAlignment()) {
-            case SwingConstants.TOP:
-                yOffset = 0;
-                break;
-            case SwingConstants.CENTER:
-                yOffset = (label.getBounds().height - rect.height) / 2;
-                break;
-            case SwingConstants.BOTTOM:
-                yOffset = label.getBounds().height - rect.height;
-                break;
-        }
-        return new Rectangle(xOffset, yOffset, rect.width, rect.height);
-    }
-    
-    /**
-     * Paints a top to bottom gradient fill over the component bounds
-     * from color1 to color2.
-     * @deprecated (pre-1.6.3) no replacement
-     */
-    @Deprecated
-    public static void paintGradient(Graphics g, JComponent comp,
-            Color color1, Color color2) {
-        GradientPaint paint = new GradientPaint(0, 0, color1,
-                0, comp.getHeight(), color2,
-                true);
-        Graphics2D g2 = (Graphics2D) g;
-        Paint oldPaint = g2.getPaint();
-        g2.setPaint(paint);
-        g2.fillRect(0, 0, comp.getWidth(), comp.getHeight());
-        g2.setPaint(oldPaint);
-    }
-    
     /** Resizes a gradient to fill the width and height available. If the
      * gradient is left to right it will be resized to fill the entire width.
      * If the gradient is top to bottom it will be resized to fill the entire
