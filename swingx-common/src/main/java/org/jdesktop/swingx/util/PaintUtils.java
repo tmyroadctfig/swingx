@@ -558,13 +558,16 @@ public class PaintUtils {
     }
 
     /**
-         * Interpolates a color.
-         * 
-         * @param b
-         * @param a
-         * @param t
-         * @return
-         */
+     * Interpolates a color.
+     * 
+     * @param b
+     *            the first color
+     * @param a
+     *            the second color
+     * @param t
+     *            the amount to interpolate
+     * @return a new color
+     */
         public static Color interpolate(Color b, Color a, float t) {
             float[] acomp = a.getRGBComponents(null);
             float[] bcomp = b.getRGBComponents(null);
