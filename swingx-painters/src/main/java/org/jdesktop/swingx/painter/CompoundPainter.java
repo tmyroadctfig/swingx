@@ -63,6 +63,7 @@ import org.jdesktop.beans.JavaBean;
  * @author rbair
  */
 @JavaBean
+@SuppressWarnings("nls")
 public class CompoundPainter<T> extends AbstractPainter<T> {
     private static class Handler implements PropertyChangeListener {
         private final WeakReference<CompoundPainter<?>> ref;
@@ -141,7 +142,7 @@ public class CompoundPainter<T> extends AbstractPainter<T> {
             System.arraycopy(painters, 0, this.painters, 0, this.painters.length);
         }
         
-        for (Painter p : this.painters) {
+        for (Painter<?> p : this.painters) {
             if (p instanceof AbstractPainter) {
                 ((AbstractPainter<?>) p).addPropertyChangeListener(handler);
             }
@@ -218,7 +219,7 @@ public class CompoundPainter<T> extends AbstractPainter<T> {
     @Override
     protected void validate(T object) {
         boolean dirty = false;
-        for (Painter p : painters) {
+        for (Painter<?> p : painters) {
             if (p instanceof AbstractPainter) {
                 AbstractPainter ap = (AbstractPainter) p;
                 ap.validate(object);
@@ -271,16 +272,15 @@ public class CompoundPainter<T> extends AbstractPainter<T> {
     }
 
     /**
-     * <p>This <code>CompoundPainter</code> is dirty if it, or (optionally)
-     * any of its children, are dirty. If the super implementation returns
-     * <code>true</code>, we return <code>true</code>.  Otherwise, if
-     * {@link #isCheckingDirtyChildPainters()} is <code>true</code>, we iterate
-     * over all child <code>Painter</code>s and query them to see
-     * if they are dirty. If so, then <code>true</code> is returned. 
-     * Otherwise, we return <code>false</code>.</p>
-     *
      * {@inheritDoc}
-     * {@see #isCheckingDirtyChildPainters()}
+     * 
+     * @impl This <code>CompoundPainter</code> is dirty if it, or (optionally) any of its children,
+     *       are dirty. If the super implementation returns <code>true</code>, we return
+     *       <code>true</code>. Otherwise, if {@link #isCheckingDirtyChildPainters()} is
+     *       <code>true</code>, we iterate over all child <code>Painter</code>s and query them to
+     *       see if they are dirty. If so, then <code>true</code> is returned. Otherwise, we return
+     *       <code>false</code>.
+     * @see #isCheckingDirtyChildPainters()
      */
     @Override
     protected boolean isDirty() {
@@ -289,7 +289,7 @@ public class CompoundPainter<T> extends AbstractPainter<T> {
             return true;
         } 
         else if (isCheckingDirtyChildPainters()) {
-            for (Painter p : painters) {
+            for (Painter<?> p : painters) {
                 if (p instanceof AbstractPainter) {
                     AbstractPainter<?> ap = (AbstractPainter<?>) p;
                     if (ap.isDirty()) {
@@ -331,7 +331,7 @@ public class CompoundPainter<T> extends AbstractPainter<T> {
     @Override
     public void clearCache() {
         if (!clearLocalCacheOnly) {
-            for (Painter p : painters) {
+            for (Painter<?> p : painters) {
                 if (p instanceof AbstractPainter) {
                     AbstractPainter<?> ap = (AbstractPainter<?>) p;
                     ap.clearCache();
@@ -353,7 +353,7 @@ public class CompoundPainter<T> extends AbstractPainter<T> {
      */
     @Override
     protected void doPaint(Graphics2D g, T component, int width, int height) {
-        for (Painter p : getPainters()) {
+        for (Painter<T> p : getPainters()) {
             Graphics2D temp = (Graphics2D) g.create();
             
             try {

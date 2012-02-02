@@ -38,8 +38,7 @@ import org.jdesktop.beans.JavaBean;
 import org.jdesktop.swingx.util.PaintUtils;
 
 /**
- * A specific painter that paints an "infinite progress" like animation. For
- * more details see {@link org.jdesktop.swingx.JXBusyLabel}
+ * A specific painter that paints an "infinite progress" like animation.
  */
 @JavaBean
 @SuppressWarnings("nls")
@@ -49,7 +48,7 @@ public class BusyPainter extends AbstractPainter<Object> {
      * Direction is used to set the initial direction in which the
      * animation starts.
      * 
-     * @see JXBusyLabel#setDirection(org.jdesktop.swingx.painter.BusyPainter.Direction)
+     * @see BusyPainter#setDirection(Direction)
      */
     public static enum Direction {
         /**
@@ -623,13 +622,5 @@ public class BusyPainter extends AbstractPainter<Object> {
         Direction old = getDirection();
         this.direction = dir;
         firePropertyChange("direction", old, getDirection());
-    }
-
-    /**
-     * @deprecated (pre-1.6.3) unused; no replacement
-     */
-    @Deprecated
-    protected Shape provideShape(Graphics2D g, Object comp, int width, int height) {
-        return new Rectangle(0,0,width,height);
     }
 }
