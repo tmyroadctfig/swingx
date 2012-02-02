@@ -63,6 +63,7 @@ import javax.swing.event.MouseInputAdapter;
 import org.jdesktop.beans.JavaBean;
 import org.jdesktop.swingx.error.ErrorListener;
 import org.jdesktop.swingx.error.ErrorSupport;
+import org.jdesktop.swingx.painter.MattePainter;
 import org.jdesktop.swingx.util.GraphicsUtilities;
 import org.jdesktop.swingx.util.PaintUtils;
 
@@ -100,8 +101,6 @@ public class JXImageView extends JXPanel {
     
     // location to draw image. if null then draw in the center
     private Point2D imageLocation;
-    // the background paint 
-    private Paint checkerPaint;
     // the scale for drawing the image
     private double scale = 1.0;
     // controls whether the user can move images around
@@ -117,7 +116,8 @@ public class JXImageView extends JXPanel {
     
     /** Creates a new instance of JXImageView */
     public JXImageView() {
-        checkerPaint = PaintUtils.getCheckerPaint(Color.white,new Color(250,250,250),50);
+        // fix for: java.net/jira/browse/SWINGX-1479 
+        setBackgroundPainter(new MattePainter(PaintUtils.getCheckerPaint(Color.white,new Color(250,250,250),50)));
         setEditable(true);
     }
     
@@ -528,9 +528,7 @@ public class JXImageView extends JXPanel {
      */
     @Override
     protected void paintComponent(Graphics g) {
-        ((Graphics2D)g).setPaint(checkerPaint);
-        //g.setColor(getBackground());
-        g.fillRect(0,0,getWidth(),getHeight());
+        super.paintComponent(g);
         if(getImage() != null) {
             Point2D center = new Point2D.Double(getWidth()/2,getHeight()/2);
             if(getImageLocation() != null) {
