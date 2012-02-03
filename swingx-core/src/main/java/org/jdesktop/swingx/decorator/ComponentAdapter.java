@@ -565,20 +565,4 @@ public abstract class ComponentAdapter {
     public int convertRowIndexToModel(int rowViewIndex) {
         return rowViewIndex; // sensible default for JTree
     }
-
-    /**
-     * Updates the target component on screen. This implementation revalidates and
-     * repaints. <p>
-     * 
-     * PENDING JW: this is a left-over from the days of SwingX-style sorting/filtering.
-     * Should remove because unused and useless (in a context where the adapter is
-     * meant to be strictly immutable by client code)
-     * 
-     * @deprecated (pre-1.6.3) removed without replacement
-     */
-    @Deprecated
-    public void refresh() {
-        target.revalidate();
-        target.repaint();
-    }
 }

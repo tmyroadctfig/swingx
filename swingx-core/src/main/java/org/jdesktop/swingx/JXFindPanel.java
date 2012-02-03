@@ -65,8 +65,8 @@ public class JXFindPanel extends AbstractPatternPanel {
     /**
      * Construct search panel targeted to specific <code>Searchable</code> component.
      *
-     * @param searchible Component where search widget will try to locate and select
-     *                   information using methods of the <code>Searchible</code> interface.
+     * @param searchable Component where search widget will try to locate and select
+     *                   information using methods of the <code>Searchable</code> interface.
      */
     public JXFindPanel(Searchable searchable) {
         setName(getUIString(SEARCH_TITLE));

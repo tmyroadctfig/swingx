@@ -14,7 +14,6 @@ import java.beans.PropertyChangeListener;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
 
-import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenuItem;
@@ -28,22 +27,6 @@ import org.junit.runner.RunWith;
 
 @RunWith(EDTRunner.class)
 public class ActionIssues {
-    
-    /**
-     * Issue #1364-swingx: AbstractActionExt - incorrect parameter type in setActionCommand
-     */
-    @Test
-    public void testActionCommand() {
-        AbstractActionExt action = new AbstractActionExt("something"){
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // TODO Auto-generated method stub
-                
-            }};
-        action.setActionCommand(new Object());
-        new JButton(action);
-    }
 
     /**
      * core issue: 

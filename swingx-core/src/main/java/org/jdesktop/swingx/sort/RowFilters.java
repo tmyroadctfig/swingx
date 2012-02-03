@@ -98,9 +98,9 @@ public class RowFilters {
      *
      * @param matchFlags      
      *         Match flags, a bit mask that may include
-     *         {@link #CASE_INSENSITIVE}, {@link #MULTILINE}, {@link #DOTALL},
-     *         {@link #UNICODE_CASE}, {@link #CANON_EQ}, {@link #UNIX_LINES},
-     *         {@link #LITERAL} and {@link #COMMENTS}
+     *         {@link Pattern#CASE_INSENSITIVE}, {@link Pattern#MULTILINE}, {@link Pattern#DOTALL},
+     *         {@link Pattern#UNICODE_CASE}, {@link Pattern#CANON_EQ}, {@link Pattern#UNIX_LINES},
+     *         {@link Pattern#LITERAL} and {@link Pattern#COMMENTS}
      *
      * @param regex the regular expression to filter on
      * @param indices the indices of the values to check.  If not supplied all

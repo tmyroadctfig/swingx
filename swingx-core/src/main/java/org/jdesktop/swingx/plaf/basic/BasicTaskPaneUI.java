@@ -343,10 +343,7 @@ public class BasicTaskPaneUI extends TaskPaneUI {
             // scroll to visible if scrollOnExpand is enabled
             if (("collapsed".equals(evt.getPropertyName())
                     && Boolean.TRUE.equals(evt.getNewValue()) && !group
-                    .isAnimated())
-                    || (JXCollapsiblePane.ANIMATION_STATE_KEY.equals(evt
-                            .getPropertyName()) && "expanded".equals(evt
-                            .getNewValue()))) {
+                    .isAnimated())) {
                 if (group.isScrollOnExpand()) {
                     ensureVisible();
                 }

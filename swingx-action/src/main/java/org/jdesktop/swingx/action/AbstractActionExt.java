@@ -271,24 +271,6 @@ public abstract class AbstractActionExt extends AbstractAction
         }
         return '\0';
     }
-
-    /**
-     * Sets the action command key. The action command key
-     * is used to identify the action.
-     * <p>
-     * This is a convenience method for <code>putValue</code> with the
-     * <code>Action.ACTION_COMMAND_KEY</code> key.
-     *
-     * @param key the action command
-     * @see Action#ACTION_COMMAND_KEY
-     * @see Action#putValue
-     * @deprecated (pre-1.6.3) replace by {@link #setActionCommand(String)} cf.
-     *             {@link Action#ACTION_COMMAND_KEY}
-     */
-    @Deprecated
-    public void setActionCommand(Object key) {
-        putValue(Action.ACTION_COMMAND_KEY, key == null ? null : String.valueOf(key));
-    }
     
     /**
      * Sets the action command key. The action command key
@@ -309,12 +291,9 @@ public abstract class AbstractActionExt extends AbstractAction
      * Returns the action command.
      * 
      * @return the action command or null
-     * @deprecated (pre-1.6.3) return type will change to String, cf.
-     *             {@link Action#ACTION_COMMAND_KEY}
      */
-    @Deprecated
-    public Object getActionCommand() {
-        return getValue(Action.ACTION_COMMAND_KEY);
+    public String getActionCommand() {
+        return (String) getValue(Action.ACTION_COMMAND_KEY);
     }
 
     /**
@@ -420,15 +399,9 @@ public abstract class AbstractActionExt extends AbstractAction
      * @param newValue
      *            true to set the action as selected of the action.
      * @see Action#SELECTED_KEY
-     * @deprecated (pre-1.6.3) this method still fires property change on "selected" in addition to
-     *             any change fired by using the {@link Action#SELECTED_KEY}; future versions of
-     *             SwingX will remove this additional property change
      */
-    @Deprecated
     public void setSelected(boolean newValue) {
-        boolean oldValue = isSelected();
         putValue(SELECTED_KEY, newValue);
-        firePropertyChange("selected", oldValue, isSelected());
     }
 
     @Override

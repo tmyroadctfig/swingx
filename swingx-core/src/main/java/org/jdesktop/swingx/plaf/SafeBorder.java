@@ -26,8 +26,8 @@ public class SafeBorder extends AbstractBorder implements UIResource {
         this.delegate = delegate;
     }
 
-    /** 
-     * @inherited <p>
+    /**
+     * {@inheritDoc}
      */
     @Override
     public int getBaseline(Component c, int width, int height) {
@@ -35,7 +35,7 @@ public class SafeBorder extends AbstractBorder implements UIResource {
     }
 
     /** 
-     * @inherited <p>
+     * {@inheritDoc}
      */
     @Override
     public BaselineResizeBehavior getBaselineResizeBehavior(Component c) {
@@ -43,7 +43,7 @@ public class SafeBorder extends AbstractBorder implements UIResource {
     }
 
     /** 
-     * @inherited <p>
+     * {@inheritDoc}
      */
     @Override
     public Insets getBorderInsets(Component c, Insets insets) {
@@ -53,14 +53,15 @@ public class SafeBorder extends AbstractBorder implements UIResource {
 
     /**
      * @param insets
-     * @return
+     *            the insets to query
+     * @return the insets supplied or an empty insets if the value is {@code null}
      */
     private Insets safeInsets(Insets insets) {
         return insets != null ? insets : new Insets(0, 0, 0, 0);
     }
 
     /** 
-     * @inherited <p>
+     * {@inheritDoc}
      */
     @Override
     public Insets getBorderInsets(Component c) {
@@ -69,7 +70,7 @@ public class SafeBorder extends AbstractBorder implements UIResource {
     }
 
     /** 
-     * @inherited <p>
+     * {@inheritDoc}
      */
     @Override
     public Rectangle getInteriorRectangle(Component c, int x, int y, int width,
@@ -78,7 +79,7 @@ public class SafeBorder extends AbstractBorder implements UIResource {
     }
 
     /** 
-     * @inherited <p>
+     * {@inheritDoc}
      */
     @Override
     public boolean isBorderOpaque() {
@@ -86,7 +87,7 @@ public class SafeBorder extends AbstractBorder implements UIResource {
     }
 
     /** 
-     * @inherited <p>
+     * {@inheritDoc}
      */
     @Override
     public void paintBorder(Component c, Graphics g, int x, int y, int width,

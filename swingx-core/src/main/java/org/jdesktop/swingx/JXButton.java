@@ -68,6 +68,7 @@ import org.jdesktop.swingx.util.PaintUtils;
  * @author Karl George Schaefer
  */
 @JavaBean
+@SuppressWarnings({ "nls", "serial" })
 public class JXButton extends JButton implements BackgroundPaintable {
     private class BackgroundButton extends JButton {
 
@@ -536,7 +537,7 @@ public class JXButton extends JButton implements BackgroundPaintable {
      * 
      * @param bg
      *            the desired background <code>Color</code>
-     * @see java.swing.JComponent#getBackground
+     * @see javax.swing.JComponent#getBackground()
      * @see #setOpaque
      * 
     * @beaninfo
@@ -556,7 +557,7 @@ public class JXButton extends JButton implements BackgroundPaintable {
      * {@inheritDoc}
      */
     @Override
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("rawtypes")
     public Painter getBackgroundPainter() {
         return bgPainter;
     }
@@ -565,7 +566,7 @@ public class JXButton extends JButton implements BackgroundPaintable {
      * {@inheritDoc}
      */
     @Override
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("rawtypes")
     public void setBackgroundPainter(Painter p) {
         Painter old = getBackgroundPainter();
         this.bgPainter = p;
@@ -574,14 +575,14 @@ public class JXButton extends JButton implements BackgroundPaintable {
     }
     
     /**
-     * @return
+     * @return the foreground painter for this button
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("rawtypes")
     public Painter getForegroundPainter() {
         return fgPainter;
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     public void setForegroundPainter(Painter p) {
         Painter old = getForegroundPainter();
         this.fgPainter = p;

@@ -20,8 +20,6 @@
  */
 package org.jdesktop.swingx;
 
-import static org.jdesktop.swingx.JXCollapsiblePane.ANIMATION_STATE_KEY;
-
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
@@ -240,13 +238,6 @@ public class JXTaskPane extends JPanel implements
       setAnimated(!Boolean.FALSE.equals(UIManager.get("TaskPane.animate")));
       
       // listen for animation events and forward them to registered listeners
-        collapsePane.addPropertyChangeListener(ANIMATION_STATE_KEY, new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                JXTaskPane.this.firePropertyChange(evt.getPropertyName(), evt.getOldValue(),
-                        evt.getNewValue());
-            }
-        });
         collapsePane.addPropertyChangeListener("collapsed", new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {

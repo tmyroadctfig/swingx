@@ -263,24 +263,6 @@ public class JXCollapsiblePane extends JXPanel {
             return this;
         }
     }
-    
-    /**
-     * Used when generating PropertyChangeEvents for the "animationState"
-     * property. The PropertyChangeEvent will takes the following different
-     * values for {@link PropertyChangeEvent#getNewValue()}:
-     * <ul>
-     * <li><code>reinit</code> every time the animation starts
-     * <li><code>expanded</code> when the animation ends and the pane is
-     * expanded
-     * <li><code>collapsed</code> when the animation ends and the pane is
-     * collapsed
-     * </ul>
-     * @deprecated (pre-1.6.3) will no longer be supported with improved collapse 
-     * notification
-     * @see #setCollapsed(boolean)
-     */
-    @Deprecated
-    public final static String ANIMATION_STATE_KEY = "animationState";
 
     /**
      * JXCollapsible has a built-in toggle action which can be bound to buttons.
@@ -328,7 +310,7 @@ public class JXCollapsiblePane extends JXPanel {
      * manager and a vertical orientation.
      */
     public JXCollapsiblePane() {
-        this(Direction.UP, new BorderLayout(0, 0));
+        this(Direction.UP);
     }
     
     /**
@@ -339,37 +321,6 @@ public class JXCollapsiblePane extends JXPanel {
      *                the direction to collapse the container
      */
     public JXCollapsiblePane(Direction direction) {
-        this(direction, new BorderLayout(0, 0));
-    }
-
-    /**
-     * Constructs a new JXCollapsiblePane with a {@link JPanel} as content pane
-     * and the given LayoutManager and a vertical orientation
-     * 
-     * @deprecated (pre-1.6.3) incorrectly specifies layout manager on this and not content pane 
-     */
-    @Deprecated
-    public JXCollapsiblePane(LayoutManager layout) {
-        this(Direction.UP, layout);
-    }
-    
-    /**
-     * Constructs a new JXCollapsiblePane with a {@link JPanel} as content pane
-     * and the given LayoutManager and orientation. A vertical orientation
-     * enables a vertical {@link VerticalLayout} with a gap of 2 pixels as
-     * layout manager. A horizontal orientation enables a horizontal
-     * {@link HorizontalLayout} with a gap of 2 pixels as layout manager
-     * 
-     * @param direction
-     *            the direction this pane collapses
-     * @param layout
-     *            of this collapsible pane
-     * @deprecated (pre-1.6.3) incorrectly specifies layout manager on this and not content pane 
-     */
-    @Deprecated
-    public JXCollapsiblePane(Direction direction, LayoutManager layout) {
-        super.setLayout(layout);
-
         this.direction = direction;
         animator = new AnimationListener();
         setAnimationParams(new AnimationParams(30, 8, 0.01f, 1.0f));
@@ -901,15 +852,11 @@ public class JXCollapsiblePane extends JXPanel {
                         currentDimension = -1;
                         wrapper.collapsedState = false;
                         validate();
-                        JXCollapsiblePane.this.firePropertyChange(ANIMATION_STATE_KEY, null,
-                                                                  "expanded");
                         JXCollapsiblePane.this.firePropertyChange("collapsed", collapseFiringState, false);
                         return;
                     } else {
                         wrapper.collapsedState = true;
                         wrapper.getView().setVisible(false);
-                        JXCollapsiblePane.this.firePropertyChange(ANIMATION_STATE_KEY, null,
-                                                                  "collapsed");
                         JXCollapsiblePane.this.firePropertyChange("collapsed", collapseFiringState, true);
                     }
                 }
@@ -1032,8 +979,6 @@ public class JXCollapsiblePane extends JXPanel {
          */
         public void reinit(int startDimension, int stopDimension) {
             synchronized (ANIMATION_MUTEX) {
-                JXCollapsiblePane.this.firePropertyChange(ANIMATION_STATE_KEY, null,
-                                                          "reinit");
                 this.startDimension = startDimension;
                 this.finalDimension = stopDimension;
                 animateAlpha = animationParams.alphaStart;

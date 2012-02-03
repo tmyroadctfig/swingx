@@ -142,7 +142,7 @@ public class JXApplet extends JApplet {
      * {@code JXRootPane}.
      * 
      * @return the {@code JButton} which is the cancel button
-     * @see #setCancelButton()
+     * @see #setCancelButton(JButton)
      * @see JXRootPane#getCancelButton()
      */
     public JButton getCancelButton() {
