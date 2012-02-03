@@ -186,7 +186,7 @@ public class JXTaskPaneVisualCheck extends InteractiveTestCase {
     ListenForEvents listener = new ListenForEvents();
 
     // register a listener on the animation
-    taskPane.addPropertyChangeListener(JXCollapsiblePane.ANIMATION_STATE_KEY,
+    taskPane.addPropertyChangeListener("collapsed",
       listener);
     taskPane.setAnimated(true);
     

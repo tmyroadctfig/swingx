@@ -3375,7 +3375,7 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
      * 
      * Currently exposed for testing reasons, client code is recommended to not use nor override.
      * 
-     * @return
+     * @return the current string value registry
      */
     protected StringValueRegistry getStringValueRegistry() {
         if (stringValueRegistry == null) {

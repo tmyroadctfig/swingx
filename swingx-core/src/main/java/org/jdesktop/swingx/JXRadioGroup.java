@@ -282,7 +282,7 @@ public class JXRadioGroup<T> extends JPanel {
      * when a selection has been made.
      *
      * @param l  the <code>ActionListener</code> that is to be notified
-     * @see #setSelectedItem
+     * @see #setSelectedValue(Object)
      */
     public void addActionListener(ActionListener l) {
         listenerList.add(ActionListener.class, l);

@@ -71,6 +71,7 @@ import org.jdesktop.swingx.util.WindowUtils;
  * @author unascribed from JDNC
  */
 @JavaBean
+@SuppressWarnings({ "nls", "serial" })
 public class JXFrame extends JFrame {
     /**
      * An enumeration of {@link JXFrame} starting locations.
@@ -253,7 +254,7 @@ public class JXFrame extends JFrame {
      * {@code JXRootPane}.
      * 
      * @return the {@code JButton} which is the cancel button
-     * @see #setCancelButton()
+     * @see #setCancelButton(JButton)
      * @see JXRootPane#getCancelButton()
      */
     public JButton getCancelButton() {
@@ -511,7 +512,7 @@ public class JXFrame extends JFrame {
     /**
      * Sets the frame into an idle state or restores the frame from an idle state.
      * 
-     * @param waiting
+     * @param idle
      *            {@code true} to place the frame in an idle state; {@code false}
      *            otherwise
      * @see #isIdle()

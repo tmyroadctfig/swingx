@@ -132,16 +132,16 @@ public class JXHyperlink extends JButton {
     }
 
     /**
-     * Convenience method to create and install a HyperlinkAction for the given uri.
+     * Convenience method to create and install a HyperlinkAction for the given URI.
      * 
-     * @param uri to uri to create a HyperlinkAction for, maybe null.
-     * @return a HyperlinkAction for the given URI.
-     * @throws HeadlessException if {@link
-     * GraphicsEnvironment#isHeadless()} returns {@code true}
-     * @throws UnsupportedOperationException if the current platform doesn't support
-     *   Desktop
-     *   
-     * @see org.jdesktop.swingx.HyperlinkAction.createHyperlinkAction(URI)  
+     * @param uri
+     *            to uri to create a HyperlinkAction for, maybe null.
+     * @throws HeadlessException
+     *             if {@link GraphicsEnvironment#isHeadless()} returns {@code true}
+     * @throws UnsupportedOperationException
+     *             if the current platform doesn't support Desktop
+     * 
+     * @see HyperlinkAction#createHyperlinkAction(URI)
      */
     public void setURI(URI uri) {
         setAction(HyperlinkAction.createHyperlinkAction(uri));

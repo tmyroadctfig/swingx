@@ -393,8 +393,8 @@ public class JXPanel extends JPanel implements AlphaPaintable, BackgroundPaintab
      * 
      * @param bg
      *            the desired background <code>Color</code>
-     * @see java.swing.JComponent#getBackground
-     * @see #setOpaque
+     * @see javax.swing.JComponent#getBackground()
+     * @see #setOpaque(boolean)
      * 
     * @beaninfo
     *    preferred: true
@@ -430,7 +430,7 @@ public class JXPanel extends JPanel implements AlphaPaintable, BackgroundPaintab
     }
     
     /**
-     * @return
+     * @return a listener for painter change events
      */
     protected PropertyChangeListener getPainterChangeListener() {
         if (painterChangeListener == null) {

@@ -680,7 +680,8 @@ public class JXLabel extends JLabel implements BackgroundPaintable {
 
     /**
      * Gets current text wrapping style.
-     * @return
+     * 
+     * @return the text alignment for this label
      */
     public TextAlignment getTextAlignment() {
         return textAlignment;

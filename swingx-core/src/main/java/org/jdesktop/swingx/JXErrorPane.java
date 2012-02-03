@@ -222,7 +222,9 @@ public class JXErrorPane extends JComponent {
     //------------------------------------------------------------- UI Logic
     
     /**
-     * {@inheritDoc}
+     * Returns the look and feel (L&F) object that renders this component.
+     *
+     * @return the {@link ErrorPaneUI} object that renders this component
      */
     public ErrorPaneUI getUI() {
         return (ErrorPaneUI)ui;

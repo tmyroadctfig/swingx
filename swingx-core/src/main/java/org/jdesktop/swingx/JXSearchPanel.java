@@ -245,10 +245,8 @@ public class JXSearchPanel extends AbstractPatternPanel {
         return new LocalizableStringValue(keys, PatternModel.SEARCH_PREFIX, locale);
     }
 
-    
-    
-    /** 
-     * @inherited <p>
+    /**
+     * {@inheritDoc}
      */
     @Override
     protected void updateLocaleState(Locale locale) {

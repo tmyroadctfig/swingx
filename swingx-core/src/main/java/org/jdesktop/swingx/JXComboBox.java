@@ -44,7 +44,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.plaf.UIResource;
 import javax.swing.plaf.basic.ComboPopup;
-import javax.swing.tree.TreeCellRenderer;
 
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.CompoundHighlighter;
@@ -69,7 +68,7 @@ import org.jdesktop.swingx.util.Contract;
  * @author Karl Schaefer
  * @author Jeanette Winzenburg
  */
-@SuppressWarnings("serial")
+@SuppressWarnings({"nls", "serial"})
 public class JXComboBox extends JComboBox {
     /**
      * A decorator for the original ListCellRenderer. Needed to hook highlighters
@@ -586,7 +585,7 @@ public class JXComboBox extends JComboBox {
      * 
      * Currently exposed for testing reasons, client code is recommended to not use nor override.
      * 
-     * @return
+     * @return the current string value registry
      */
     protected StringValueRegistry getStringValueRegistry() {
         if (stringValueRegistry == null) {
@@ -659,7 +658,7 @@ public class JXComboBox extends JComboBox {
      * been set.
      * 
      * @return the wrapped renderer.
-     * @see #setCellRenderer(TreeCellRenderer)
+     * @see #setRenderer(ListCellRenderer)
      */
     public ListCellRenderer getWrappedRenderer() {
         return getDelegatingRenderer().getDelegateRenderer();
@@ -675,8 +674,8 @@ public class JXComboBox extends JComboBox {
      * is <b>not</b> the renderer as given here, but the wrapper. To access the original,
      * use <code>getWrappedCellRenderer</code>.
      * 
-     * @see #getWrappedCellRenderer()
-     * @see #getCellRenderer()
+     * @see #getWrappedRenderer()
+     * @see #getRenderer()
      */
     @Override
     public void setRenderer(ListCellRenderer renderer) {
@@ -701,7 +700,7 @@ public class JXComboBox extends JComboBox {
      * usesHighlightersXX, that is third person singular instead of imperative, 
      * like in tracksVerticalViewport of JTable?
      * 
-     * @return
+     * @return {@code true} if the combo box decorates the current value with highlighters; {@code false} otherwise
      */
     public boolean isUseHighlightersForCurrentValue() {
         return useHighlightersForCurrentValue;

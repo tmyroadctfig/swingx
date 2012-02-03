@@ -1274,7 +1274,7 @@ public class JXList extends JList {
      * 
      * Currently exposed for testing reasons, client code is recommended to not use nor override.
      * 
-     * @return
+     * @return the current string value registry
      */
     protected StringValueRegistry getStringValueRegistry() {
         if (stringValueRegistry == null) {
@@ -1569,7 +1569,7 @@ public class JXList extends JList {
     /**
      * Updates highlighter after <code>updateUI</code> changes.
      * 
-     * @see org.jdesktop.swingx.decorator.UIDependent
+     * @see org.jdesktop.swingx.plaf.UIDependent
      */
     protected void updateHighlighterUI() {
         if (compoundHighlighter == null) return;

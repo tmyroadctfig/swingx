@@ -16,5 +16,12 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.SOURCE)
 public @interface JavaBean {
+    @Documented
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.SOURCE)
+    public static @interface Property {
+        
+    }
+    
     boolean value() default true;
 }
