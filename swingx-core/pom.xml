@@ -24,6 +24,7 @@
   		<scope>test</scope>
   	</dependency>
   	<dependency>
+        <!-- only used by JXLoginPane -->
   		<groupId>${project.groupId}</groupId>
   		<artifactId>swingx-autocomplete</artifactId>
   		<version>${project.version}</version>
