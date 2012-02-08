@@ -157,10 +157,10 @@ public class JXHyperlink extends JButton {
     }
 
     /**
-     * Sets the color for the previously not visited link. This value will override the one
-     * set by the "JXHyperlink.unclickedColor" UIManager property and defaults.
+     * Sets the color for the previously visited link. This value will override the one
+     * set by the "JXHyperlink.clickedColor" UIManager property and defaults.
      *
-     * @param color Color for the hyper link if it has not yet been clicked.
+     * @param color Color for the hyper link if it has already been clicked.
      */
     public void setClickedColor(Color color) {
         Color old = getClickedColor();
@@ -181,10 +181,10 @@ public class JXHyperlink extends JButton {
     }
 
     /**
-     * Sets the color for the previously visited link. This value will override the one
-     * set by the "JXHyperlink.clickedColor" UIManager property and defaults.
+     * Sets the color for the previously not visited link. This value will override the one
+     * set by the "JXHyperlink.unclickedColor" UIManager property and defaults.
      *
-     * @param color Color for the hyper link if it has already been clicked.
+     * @param color Color for the hyper link if it has not yet been clicked.
      */
     public void setUnclickedColor(Color color) {
         Color old = getUnclickedColor();
