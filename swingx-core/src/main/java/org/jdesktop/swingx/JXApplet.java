@@ -21,19 +21,26 @@
 package org.jdesktop.swingx;
 
 import java.awt.HeadlessException;
+import java.awt.IllegalComponentStateException;
+import java.lang.reflect.InvocationTargetException;
+import java.util.concurrent.Callable;
 
 import javax.swing.JApplet;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JRootPane;
 import javax.swing.JToolBar;
+import javax.swing.SwingUtilities;
 
 /**
  * An applet that uses {@link JXRootPane} as its root container.
  * 
  * @author kschaefer
  */
+@SuppressWarnings("nls")
 public class JXApplet extends JApplet {
+    private static final long serialVersionUID = 2L;
+
     /**
      * Creates a the applet instance.
      * <p>
@@ -54,7 +61,30 @@ public class JXApplet extends JApplet {
      */
     @Override
     protected JXRootPane createRootPane() {
-        return new JXRootPane();
+        if (SwingUtilities.isEventDispatchThread()) {
+            JXRootPane rp = new JXRootPane();
+            rp.setOpaque(true);
+            
+            return rp;
+        }
+        
+        try {
+            return SwingXUtilities.invokeAndWait(new Callable<JXRootPane>() {
+                @Override
+                public JXRootPane call() throws Exception {
+                    return createRootPane();
+                }
+            });
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        } catch (InvocationTargetException e) {
+            IllegalComponentStateException thrown = new IllegalComponentStateException("cannot construct root pane");
+            thrown.initCause(e);
+            
+            throw thrown;
+        }
+        
+        return null;
     }
     
     /**
