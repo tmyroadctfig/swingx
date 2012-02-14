@@ -18,6 +18,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.jdesktop.beans.AbstractBean;
+
 /**
  * A PropertyChangeListener that stores the received PropertyChangeEvents.
  * 
@@ -32,13 +34,31 @@ public class PropertyChangeReport implements PropertyChangeListener {
      */
     protected List<PropertyChangeEvent> events = Collections.synchronizedList(new LinkedList<PropertyChangeEvent>());
     protected Map<String, PropertyChangeEvent> eventMap = Collections.synchronizedMap(new HashMap<String, PropertyChangeEvent>());
-    
+
+    /**
+     * Instantiates a PropertyChangeReport.
+     */
     public PropertyChangeReport() {
-        this(null);
+        this((AbstractBean) null);
     }
     
     /**
-     * @param component
+     * Instantiates a PropertyChangeReport and registers itself with the given bean
+     * if that is not null.
+     * 
+     * @param bean the AbstractBean to register itself to.
+     */
+    public PropertyChangeReport(AbstractBean bean) {
+        if (bean != null) {
+            bean.addPropertyChangeListener(this);
+        }
+    }
+    
+    /**
+     * Instantiates a PropertyChangeReport and registers itself with the given component
+     * if that is not null.
+     * 
+     * @param component the Component to register itself to.
      */
     public PropertyChangeReport(Component component) {
         if(component != null) {
