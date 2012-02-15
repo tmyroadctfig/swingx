@@ -12,6 +12,7 @@ import java.util.Vector;
 
 import javax.swing.JTree;
 import javax.swing.UIManager;
+import javax.swing.text.Position.Bias;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellEditor;
 import javax.swing.tree.DefaultTreeCellRenderer;
@@ -57,6 +58,19 @@ public class JXTreeUnitTest extends InteractiveTestCase {
         super("JXTree Test");
     }
 
+    /**
+     * Issue http://java.net/jira/browse/SWINGX-1483 - nextMatch must respect string rep
+     */
+    @Test
+    public void testNextMatch() {
+        JXTree tree = new JXTree(AncientSwingTeam.createNamedColorTreeModel());
+        tree.setCellRenderer(new DefaultTreeRenderer(createColorStringValue()));
+        tree.expandAll();
+        assertEquals("must not find a match for 'b', all start with 'r'", 
+                null, tree.getNextMatch("b", 0, Bias.Forward));
+
+    }
+    
     /**
      * Issue #1231-swingx: tree cell renderer size problems.
      * 
@@ -724,7 +738,30 @@ public class JXTreeUnitTest extends InteractiveTestCase {
         // tree.getComponentAdapter().isLeaf();
     }
 
+ 
+    /**
+     * Creates and returns a StringValue which maps a Color to it's R/G/B rep, 
+     * prepending "R/G/B: "
+     * 
+     * @return the StringValue for color.
+     */
+    private StringValue createColorStringValue() {
+        StringValue sv = new StringValue() {
+
+            public String getString(Object value) {
+                if (value instanceof Color) {
+                    Color color = (Color) value;
+                    return "R/G/B: " + color.getRGB();
+                }
+                return StringValues.TO_STRING.getString(value);
+            }
+            
+        };
+        return sv;
+    }
     
+
+
     @Override
     protected void setUp() throws Exception {
         super.setUp();

@@ -33,6 +33,7 @@ import java.beans.PropertyChangeListener;
 import java.util.Hashtable;
 import java.util.Vector;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 import javax.swing.Action;
 import javax.swing.ActionMap;
@@ -50,6 +51,7 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.plaf.basic.BasicTreeUI;
+import javax.swing.text.Position.Bias;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreeModel;
@@ -499,8 +501,22 @@ public class JXTree extends JTree {
     }
 
     
+    /**
+     * Overridden to respect the string representation, if any. This takes over 
+     * completely (as compared to super), internally messaging the Searchable.
+     * <p>
+     * 
+     * PENDING JW: re-visit once we support deep node search.
+     * 
+     */
+    @Override
+    public TreePath getNextMatch(String prefix, int startingRow, Bias bias) {
+        Pattern pattern = Pattern.compile("^" + prefix, Pattern.CASE_INSENSITIVE);
+        int row = getSearchable().search(pattern, startingRow, bias ==Bias.Backward);
+        return getPathForRow(row);
+    }
+
 //--------------------- misc. new api and super overrides
-    
     /**
      * Collapses all nodes in this tree.
      */
