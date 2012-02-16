@@ -25,6 +25,7 @@ import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.io.File;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
@@ -64,6 +65,7 @@ import org.jdesktop.swingx.renderer.StringValues;
 import org.jdesktop.swingx.renderer.WrappingProvider;
 import org.jdesktop.swingx.renderer.HighlighterClientVisualCheck.FontHighlighter;
 import org.jdesktop.swingx.test.ActionMapTreeTableModel;
+import org.jdesktop.swingx.treetable.FileSystemModel;
 import org.jdesktop.swingx.treetable.TreeTableNode;
 import org.jdesktop.test.AncientSwingTeam;
 
@@ -75,6 +77,7 @@ public class JXTreeVisualCheck extends JXTreeUnitTest {
     public static void main(String[] args) {
 //      setSystemLF(true);
       JXTreeVisualCheck test = new JXTreeVisualCheck();
+      setLAF("Wind");
       try {
 //          test.runInteractiveTests();
 //          test.runInteractiveTests("interactive.*Renderer.*");
@@ -82,13 +85,25 @@ public class JXTreeVisualCheck extends JXTreeUnitTest {
 //          test.runInteractiveTests("interactive.*Revalidate.*");
 //          test.runInteractiveTests("interactiveRootExpansionTest");
 //        test.runInteractiveTests("interactive.*UpdateUI.*");
-        test.runInteractiveTests("interactive.*RendererSize.*");
+//          test.runInteractiveTests("interactive.*CellHeight.*");
+//        test.runInteractiveTests("interactive.*RendererSize.*");
+        test.runInteractive("NextMatch");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
       }
   }
+
+    /**
+     * Issue 1483-swingx: getNextMatch must respect StringValue
+     */
+    public void interactiveNextMatch() {
+        JXTree tree = new JXTree(new FileSystemModel(new File(".")));
+        tree.setCellRenderer(new DefaultTreeRenderer(IconValues.FILE_ICON, StringValues.FILE_NAME));
+        showWithScrollingInFrame(tree, "nextMatch?");
+    }
     
+
     public void interactiveDynamicCellHeightTree() {
       final JXTree tree = new  JXTree(AncientSwingTeam.createNamedColorTreeModel());
       
