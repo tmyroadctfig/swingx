@@ -26,6 +26,8 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.BeanInfo;
@@ -47,7 +49,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
@@ -58,6 +62,7 @@ import javax.swing.Box;
 import javax.swing.DefaultListModel;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -104,6 +109,7 @@ import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
+import org.jdesktop.swingx.decorator.HighlighterFactory.UIColorHighlighter;
 import org.jdesktop.swingx.decorator.PainterHighlighter;
 import org.jdesktop.swingx.decorator.PatternPredicate;
 import org.jdesktop.swingx.hyperlink.EditorPaneLinkVisitor;
@@ -136,17 +142,198 @@ public class RendererVisualCheck extends InteractiveTestCase {
 //            test.runInteractiveTests();
 //          test.runInteractiveTests(".*CustomIcons.*");
 //          test.runInteractiveTests(".*XLabel.*");
+          test.runInteractiveTests(".*TextArea.*");
 //          test.runInteractiveTests(".*Text.*");
 //          test.runInteractiveTests(".*Color.*");
 //          test.runInteractiveTests("interactive.*ColumnControl.*");
-          test.runInteractive("Link");
-          test.runInteractive("URI");
+//            test.runInteractive("RowGrouping");
+//          test.runInteractive("Link");
+//          test.runInteractive("URI");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
         }
     }
     
+    /**
+     * Conditionally hide the renderingComponent
+     * 
+     * http://stackoverflow.com/questions/9311455/swingx-component-provider-hide-component-on-certain-rows
+     */
+    public void interactiveButtonProvider() {
+        JXTable table = new JXTable(new AncientSwingTeam());
+        table.getColumn(0).setCellRenderer(new DefaultTableRenderer(new ButtonProvider()));
+        table.getColumn(1).setCellRenderer(new DefaultTableRenderer(
+                new WrappingProvider(IconValues.NONE, new ButtonProvider(), false) {
+
+                    @Override
+                    protected void configureState(CellContext context) {
+                        super.configureState(context);
+                        rendererComponent.getComponent().setVisible(true);
+                    }
+                    
+                }
+        ));
+        
+        AbstractHighlighter highlighter = new AbstractHighlighter(HighlightPredicate.EVEN) {
+
+            @Override
+            protected Component doHighlight(Component component,
+                    ComponentAdapter adapter) {
+                ((WrappingIconPanel) component).getComponent().setVisible(false);
+                return component;
+            }
+
+            @Override
+            protected boolean canHighlight(Component component,
+                    ComponentAdapter adapter) {
+                return component instanceof WrappingIconPanel;
+            }
+            
+            
+        };
+        table.addHighlighter(highlighter);
+        showWithScrollingInFrame(table, "invisible button");
+    }
+    
+    public static class ButtonProvider extends ComponentProvider<JButton> {
+
+        @Override
+        protected void format(CellContext context) {
+            rendererComponent.setText(getValueAsString(context));
+        }
+
+        @Override
+        protected void configureState(CellContext context) {
+            rendererComponent.setHorizontalAlignment(getHorizontalAlignment());
+//            rendererComponent.setVisible(context.getRow() == 5);
+        }
+
+        @Override
+        protected JButton createRendererComponent() {
+            return new JButton("View online");
+        }
+
+        
+    }
+    
+
+    
+    private Object[] columnNames = {
+            "Buy/Sell", "Type", "SubType", "Ccy1", "Amount1", "Ccy2", "Amount2", "DealId"};
+        private Object[][] data = {
+            {"Buy&Sell", "Ccy Swap", "A1", "EUR", new Double(1000000.00), "USD", new Double(1439000.00), 50},
+            {"Buy&Sell", "Ccy Swap", "A3", "USD", new Double(1438900.00), "EUR", new Double(1000000.00), 50},
+            {"Buy&Sell", "Ccy Swap", "A1", "EUR", new Double(500000.00), "CHF", new Double(550000.00), 350},
+            {"Buy&Sell", "Ccy Swap", "A1", "CHF", new Double(549800.00), "EUR", new Double(500000.00), 350},
+            {"Sell&Buy", "Ccy Swap", "A3", "USD", new Double(1000000.00), "EUR", new Double(749000.00), 2250},
+            {"Sell&Buy", "Ccy Swap", "A1", "EUR", new Double(748900.00), "USD", new Double(1000000.00), 2250},
+            {"Buy&Sell", "Ccy Swap", "A1", "GBP", new Double(1000000.00), "USD", new Double(1638100.00), 400},
+            {"Buy&Sell", "Ccy Swap", "A3", "USD", new Double(1638200.00), "GBP", new Double(1000000.00), 400},
+            {"Sell", "Ccy Spot", "A1", "AUD", new Double(343575.0), "EUR", new Double(250000.0), 11990},
+            {"Buy", "Ccy Spot", "A1", "EUR", new Double(100000.00), "JPY", new Double(1099000.00), 259},
+            {"Sell", "Ccy Fwd", "A3", "DKK", new Double(74889.00), "EUR", new Double(10000.00), 115439},};
+
+    public void interactiveAlternateRowGrouping() {
+        JXTable table = new JXTable(data, columnNames);
+        HighlightPredicate predicate =  new HighlightPredicate() {
+
+            @Override
+            public boolean isHighlighted(Component renderer,
+                    ComponentAdapter adapter) {
+                if (adapter.row == 0) return false;
+                return isOddValue(adapter);
+            }
+
+            private boolean isOddValue(ComponentAdapter adapter) {
+                Object previous = adapter.getFilteredValueAt(0, 7);
+                boolean odd = false;
+                for (int i = 1; i <= adapter.row; i++) {
+                    Object current = adapter.getFilteredValueAt(i, 7);
+                    if (!previous.equals(current)) {
+                        odd = !odd;
+                    }
+                    previous = current;
+                }
+                return odd;
+            }
+            
+        };
+        table.addHighlighter(new UIColorHighlighter(predicate));
+        showWithScrollingInFrame(table, "value-grouped alternate striping");
+    }    
+    
+    
+    public void interactiveAlternateRowGroupingRobSecond() {
+        JTable table = new JTable(data, columnNames) {
+
+            @Override
+            public Component prepareRenderer(TableCellRenderer renderer,
+                    int row, int column) {
+                Component c = super.prepareRenderer(renderer, row, column);
+                if (!isRowSelected(row)) {
+                    c.setBackground(getRowBackground(row));
+                }
+
+                return c;
+            }
+
+            private Color getRowBackground(int row) {
+                boolean isDark = true;
+
+                Object previous = getValueAt(0, 7);
+
+                for (int i = 1; i <= row; i++) {
+                    Object current = getValueAt(i, 7);
+
+                    if (!current.equals(previous)) {
+                        isDark = !isDark;
+                        previous = current;
+                    }
+                }
+
+                return isDark ? Color.ORANGE : Color.YELLOW;
+            }
+
+        };
+        table.setAutoCreateRowSorter(true);
+        showWithScrollingInFrame(table,
+                "Rob: value-grouped striping, sort-robust");
+    }
+
+    public void interactiveAlternateRowGroupingRob() {
+        JTable table = new JTable(data, columnNames) {
+            private Map<Object, Color> rowColor = new HashMap<Object, Color>();
+
+            private Color nextColor = Color.ORANGE;
+
+            @Override
+            public Component prepareRenderer(TableCellRenderer renderer,
+                    int row, int column) {
+                Component c = super.prepareRenderer(renderer, row, column);
+
+                if (isRowSelected(row))
+                    return c;
+
+                Object value = getValueAt(row, 7);
+                Color background = rowColor.get(value);
+
+                if (background != null) {
+                    c.setBackground(background);
+                } else {
+                    rowColor.put(value, nextColor);
+                    c.setBackground(nextColor);
+                    nextColor = (nextColor == Color.ORANGE) ? Color.YELLOW
+                            : Color.ORANGE;
+                }
+
+                return c;
+            }
+
+        };
+        table.setAutoCreateRowSorter(true);
+        showWithScrollingInFrame(table, "Rob: value-grouped striping");
+    }
     /**
      * Issue #1345-swingx: make TableCellContext handle LAF provided alternateRowColor.
      * 
@@ -584,6 +771,47 @@ public class RendererVisualCheck extends InteractiveTestCase {
     }
 
     /**
+     * List needs special handling, see
+     * http://stackoverflow.com/questions/7306295/swing-jlist-with-multiline-text-and-dynamic-height
+     * 
+     */
+    public void interactiveTextAreaRendererList() {
+        final DefaultListModel model = new DefaultListModel();
+        model.addElement("Start: This is a short text");
+        model.addElement("Start: This is a long text. This is a long text. This is a long text. This is a long text. This is a long text. This is a long text. This is a long text. This is a long text. This is a long text. This is a long text. This is a long text. This is a long text. This is a long text. ");
+        model.addElement("Start: This is an even longer text. This is an even longer text. This is an even longer text. This is an even longer text. This is an even longer text. This is an even longer text. This is an even longer text. This is an even longer text. This is an even longer text. This is an even longer text. This is an even longer text. This is an even longer text. This is an even longer text. This is an even longer text. This is an even longer text. This is an even longer text. This is an even longer text. This is an even longer text. This is an even longer text. This is an even longer text. This is an even longer text. This is an even longer text. ");
+
+        final JXList list = new JXList(model) {
+
+            /** 
+             * @inherited <p>
+             */
+            @Override
+            public boolean getScrollableTracksViewportWidth() {
+                return true;
+            }
+
+            
+        };
+        list.setCellRenderer(new DefaultListRenderer(new TextAreaProvider()));
+        
+        ComponentListener l = new java.awt.event.ComponentAdapter() {
+
+            @Override
+            public void componentResized(ComponentEvent e) {
+                list.invalidateCellSizeCache();
+                // for core: force cache invalidation by temporarily setting fixed height
+//                list.setFixedCellHeight(10);
+//                list.setFixedCellHeight(-1);
+            }
+            
+        };
+
+        list.addComponentListener(l);
+        showWithScrollingInFrame(list, "TextAreaPovider in JXList");
+        
+    }
+    /**
      * use a JTextArea as rendering component.
      */
     public static class TextAreaProvider extends ComponentProvider<JTextArea> {
@@ -612,6 +840,8 @@ public class RendererVisualCheck extends InteractiveTestCase {
                 // pending: accont for insets
                 // doesn't really work for a JList in a scrollPane
                 // need to track..
+                // for a explanation/hack around see my answer in
+                // http://stackoverflow.com/questions/7306295/swing-jlist-with-multiline-text-and-dynamic-height
                 return context.getComponent().getWidth();
             }
             // comp is null - not much we can do
