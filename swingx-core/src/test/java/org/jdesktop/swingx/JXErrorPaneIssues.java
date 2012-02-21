@@ -21,6 +21,8 @@
  */
 package org.jdesktop.swingx;
 
+import org.jdesktop.swingx.error.ErrorInfo;
+
 
 /**
  * Test to expose known issues around <code>JXError*</code>.
@@ -43,6 +45,21 @@ public class JXErrorPaneIssues extends InteractiveTestCase {
           e.printStackTrace();
       }
 
+    }
+    
+    /**
+     * Issue #1486-swingx: errorInfo/pane doesn't substitute system properties
+     * (as documented)
+     * 
+     * Fixed by removing the doc example.
+     * 
+     */
+    public void interactiveSubstitute() {
+        String message = "An error occured on ${os.name} version ${os.version}";
+        //auto creates the state map, populated with all System properties.
+        //Sandboxed apps can't read System properties.
+        ErrorInfo info = new ErrorInfo("Error", message, message, null, new NullPointerException(), null, null);
+        JXErrorPane.showDialog(null, info);
     }
 
     /**
