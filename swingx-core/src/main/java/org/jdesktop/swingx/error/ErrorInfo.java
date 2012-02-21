@@ -35,24 +35,6 @@ import javax.swing.SwingUtilities;
  * <p>All HTML referred to in this API refers to version 3.2 of the HTML
  * markup specification.</p>
  *
- * <p>Both basicErrorMessage and detailedErrorMessage may be specified with
- * variable substitution. For example, this is a valid error message string:
- * "${os.version} is not supported". Such variables are resovled using the
- * <code>substituteVariables</code> method. This method will use properties in
- * the "state" map to replace these variables.</p>
- *
- * <p>For example:
- * <pre><code>
- *    String message = "An error occured on ${os.name} version ${os.version}";
- *    //auto creates the state map, populated with all System properties.
- *    //Sandboxed apps can't read System properties.
- *    ErrorInfo info = new ErrorInfo("Error", exception);
- *    message = info.substituteVariables(message);
- *
- *    //prints out: "An error occured on Mac OS X version 10.4.7" on some systems
- *    log.info(message);
- * </code></pre></p>
- * 
  * @status REVIEWED
  * @author Alexander Zuev
  * @author rbair
