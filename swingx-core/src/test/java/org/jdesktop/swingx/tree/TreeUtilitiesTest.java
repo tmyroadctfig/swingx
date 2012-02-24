@@ -9,11 +9,13 @@ import static org.jdesktop.swingx.tree.TreeUtilities.EMPTY_ENUMERATION;
 import java.util.Enumeration;
 import java.util.NoSuchElementException;
 import java.util.Random;
+import java.util.logging.Logger;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
 
 import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXTree;
@@ -56,7 +58,6 @@ public class TreeUtilitiesTest extends InteractiveTestCase {
         assertSameEnumeration("PostOrderNode", coreEnum, xEnum);
     }
     
-    
     @Test
     public void testPreorderNode() {
         Enumeration<?> coreEnum = root.preorderEnumeration();
@@ -90,6 +91,44 @@ public class TreeUtilitiesTest extends InteractiveTestCase {
     public void testPreorderModel() {
         Enumeration<?> coreEnum = root.preorderEnumeration();
         Enumeration<?> xEnum = new PreorderModelEnumeration(model);
+        assertSameEnumeration("PreorderModel", coreEnum, xEnum);
+    }
+    
+    @Test
+    public void testPreorderModelWithRoot() {
+        Enumeration<?> coreEnum = root.preorderEnumeration();
+        Enumeration<?> xEnum = new PreorderModelEnumeration(model, root);
+        assertSameEnumeration("PreorderModel", coreEnum, xEnum);
+    }
+    
+    @Test
+    public void testPreorderModelWithRootPath() {
+        Enumeration<?> coreEnum = root.preorderEnumeration();
+        Enumeration<?> xEnum = new PreorderModelEnumeration(model, new TreePath(root));
+        assertSameEnumeration("PreorderModel", coreEnum, xEnum);
+    }
+    
+    
+    @Test
+    public void testPreorderModelWithPath() {
+        TreePath path = new TreePath(root);
+        // add first child and first grandChild
+        path = path.pathByAddingChild(root.getChildAt(0));
+        path = path.pathByAddingChild(root.getChildAt(0).getChildAt(0));
+        Enumeration<?> coreEnum = root.preorderEnumeration();
+        // build a starting tree path 
+        for (int i = 0; i < 2; i++) {
+            // move coreEnum so that next == path.lastPathComponent
+            coreEnum.nextElement();
+        }
+        Enumeration<?> xEnum = new PreorderModelEnumeration(model, path);
+        assertSameEnumeration("PreorderModel", coreEnum, xEnum);
+    }
+    
+    @Test
+    public void testPreorderModelSubtree() {
+        Enumeration<?> coreEnum = ((DefaultMutableTreeNode) root.getChildAt(0)).preorderEnumeration();
+        Enumeration<?> xEnum = new PreorderModelEnumeration(model, root.getChildAt(0));
         assertSameEnumeration("PreorderModel", coreEnum, xEnum);
     }
     
@@ -165,5 +204,7 @@ public class TreeUtilitiesTest extends InteractiveTestCase {
     }
 
 
-
+    @SuppressWarnings("unused")
+    private static final Logger LOG = Logger.getLogger(TreeUtilitiesTest.class
+            .getName());
 }
