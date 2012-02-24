@@ -6,9 +6,11 @@ import java.util.Enumeration;
 import java.util.NoSuchElementException;
 import java.util.Queue;
 import java.util.Vector;
+import java.util.logging.Logger;
 
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
 
 /**
  * Contains convenience classes/methods for handling hierarchical Swing structures.
@@ -32,25 +34,52 @@ public class TreeUtilities {
     };
 
     /**
-     * Implementation of a preorder traversal of a subtree in a TreeModel.
+     * Implementation of a preorder traversal of a TreeModel.
      */
     public static class PreorderModelEnumeration implements Enumeration {
         protected Deque<Enumeration> stack;
         protected TreeModel model;
+        // the last component is the current subtree to travers
+        private TreePath path;
         
-        
+        /**
+         * Instantiates a preorder traversal starting from the root of the 
+         * TreeModel.
+         * 
+         * @param model the TreeModel to travers.
+         */
         public PreorderModelEnumeration(TreeModel model) {
             this(model, model.getRoot());
         }
         
+        /**
+         * Instantiates a preorder traversal of the TreeModel which
+         * starts at the given node. It iterates over all nodes of the
+         * subtree, only.
+         * 
+         * @param model the TreeModel to travers.
+         * @param node the node to start
+         */
         public PreorderModelEnumeration(TreeModel model, Object node) {
             this.model = model;
-            Vector v = new Vector(1);
-            v.add(node);
             stack = new ArrayDeque<Enumeration>();
-            stack.push(v.elements()); //children(model));
+            pushNodeAsEnumeration(node);
         }
 
+        /**
+         * Instantiates a preorder traversal of the TreeModel which starts at the
+         * last path component of the given TreePath. It iterates over all nodes
+         * of the subtree and all of its siblings, with the same end as a traversal
+         * starting at the model's roolt would have.
+         * 
+         * @param model the TreeModel to travers.
+         * @param path the TreePath to start from
+         */
+        public PreorderModelEnumeration(TreeModel model, TreePath path) {
+            this(model, path.getLastPathComponent());
+            this.path = path;
+        }
+        
         @Override
         public boolean hasMoreElements() {
             return (!stack.isEmpty() && stack.peek().hasMoreElements());
@@ -68,8 +97,47 @@ public class TreeUtilities {
             if (children.hasMoreElements()) {
                 stack.push(children);
             }
+            if (!hasMoreElements()) {
+                // check if there are more subtrees to travers
+                // and update internal state accordingly
+                updateSubtree();
+            }
             return node;
         }
+
+        /**
+         * 
+         */
+        private void updateSubtree() {
+            if (path == null) return;
+            TreePath parentPath = path.getParentPath();
+            if (parentPath == null) {
+                // root
+                path = null;
+                return;
+            }
+            Object parent = parentPath.getLastPathComponent();
+            Object currentNode = path.getLastPathComponent();
+            int currentIndex = model.getIndexOfChild(parent, currentNode);
+            if (currentIndex +1 < model.getChildCount(parent)) {
+                // use sibling
+                Object child = model.getChild(parent, currentIndex + 1);
+                path = parentPath.pathByAddingChild(child);
+                pushNodeAsEnumeration(child);
+            } else {
+                path = parentPath;
+                // up one level
+                updateSubtree();
+            }
+        }
+
+        private void pushNodeAsEnumeration(Object node) {
+            // single element enum
+            Vector v = new Vector(1);
+            v.add(node);
+            stack.push(v.elements()); //children(model));
+        }
+        
 
     }  // End of class PreorderEnumeration
 
@@ -328,4 +396,8 @@ public class TreeUtilities {
     }
     
     private TreeUtilities() {}
+    
+    @SuppressWarnings("unused")
+    private static final Logger LOG = Logger.getLogger(TreeUtilities.class
+            .getName());
 }
