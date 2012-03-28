@@ -241,9 +241,24 @@ public class JXBusyLabel extends JLabel {
                 frame = (frame+1)%busyPainter.getPoints();
                 busyPainter.setFrame(direction == BusyPainter.Direction.LEFT ? busyPainter.getPoints() - frame : frame);
                 frameChanged();
+
+                if (shouldStopAnimation())
+                {
+                    busy.stop();
+                }
             }
         });
         busy.start();
+    }
+
+    /**
+     * Checks if the timer should stop animating the busy label.
+     * 
+     * @return {@code true} if animation should stop.
+     */
+    protected boolean shouldStopAnimation()
+    {
+        return !isDisplayable();
     }
     
     
