@@ -2,7 +2,7 @@
   <parent>
     <groupId>net.java</groupId>
     <artifactId>jvnet-parent</artifactId>
-    <version>1</version>
+    <version>3</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.swinglabs.swingx</groupId>
@@ -61,7 +61,7 @@
             <configuration>
                 <source>1.6</source>
                 <target>1.6</target>
-                <generatedSourcesDirectory>${project.generatedSourcesDirectoy}</generatedSourcesDirectory>
+                <generatedSourcesDirectory>${project.generatedSourcesDirectoy}/annotations</generatedSourcesDirectory>
                 <showWarnings>true</showWarnings>
             </configuration>
         </plugin>
@@ -153,7 +153,7 @@
     </dependencies>
   </dependencyManagement>
   <properties>
-  	<project.generatedSourcesDirectoy>${project.build.directory}/generated-sources/annotations</project.generatedSourcesDirectoy>
+  	<project.generatedSourcesDirectoy>${project.build.directory}/generated-sources/</project.generatedSourcesDirectoy>
   </properties>
   <modules>
       <module>swingx-mavensupport</module>

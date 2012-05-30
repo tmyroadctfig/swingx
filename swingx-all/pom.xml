@@ -10,34 +10,62 @@
   <packaging>jar</packaging>
   <name>SwingX Complete</name>
   <description>A Maven project to aggregate all modules into a single artifact.</description>
-    <build>
-        <plugins>
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>repackage</id>
-                        <goals>
-                            <goal>attached</goal>
-                        </goals>
-                        <phase>package</phase>
-                        <configuration>
-                            <appendAssemblyId>false</appendAssemblyId>
-                            <descriptors>
-                                <descriptor>src/main/assembly/swingx-dependencies.xml</descriptor>
-                            </descriptors>
-                            <archive>
-                                <manifest>
-                                    <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-                                </manifest>
-                                <manifestFile>src/main/resources/META-INF/MANIFEST.MF</manifestFile> 
-                            </archive>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
+  <properties>
+    <project.generated-sources.dependencies>${project.generatedSourcesDirectoy}/dependencies</project.generated-sources.dependencies>
+  </properties>
+  <build>
+      <plugins>
+		<plugin>
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-dependency-plugin</artifactId>
+			<version>2.4</version>
+			<executions>
+				<execution>
+					<id>src-dependencies</id>
+					<phase>generate-sources</phase>
+					<goals>
+						<goal>unpack-dependencies</goal>
+					</goals>
+					<configuration>
+						<classifier>sources</classifier>
+						<includeGroupIds>${project.groupId}</includeGroupIds>
+						<excludeArtifactIds>swingx-mavensupport</excludeArtifactIds>
+						<failOnMissingClassifierArtifact>false</failOnMissingClassifierArtifact>
+						<outputDirectory>${project.generated-sources.dependencies}</outputDirectory>
+					</configuration>
+				</execution>
+			</executions>
+		</plugin>
+		<plugin>
+			<groupId>org.codehaus.mojo</groupId>
+			<artifactId>build-helper-maven-plugin</artifactId>
+			<version>1.4</version>
+			<executions>
+				<execution>
+					<id>add-dependencies-source</id>
+					<phase>generate-sources</phase>
+					<goals>
+						<goal>add-source</goal>
+					</goals>
+					<configuration>
+						<sources>
+							<source>${project.generated-sources.dependencies}</source>
+						</sources>
+					</configuration>
+				</execution>
+			</executions>
+		 </plugin>
+		<plugin>
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-jar-plugin</artifactId>
+			<configuration>
+				<archive>
+					<manifestFile>${project.generatedSourcesDirectoy}/annotations/META-INF/MANIFEST.MF</manifestFile>
+				</archive>
+			</configuration>
+		</plugin>
+      </plugins>
+  </build>
   <!-- make the dependent swingx modules optional, since we're aggregating -->
   <dependencies>
   	<dependency>
@@ -54,5 +82,12 @@
   		<type>jar</type>
   		<optional>true</optional>
   	</dependency>
+    <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>swingx-mavensupport</artifactId>
+        <version>${project.version}</version>
+        <scope>compile</scope>
+        <optional>true</optional>
+    </dependency>
   </dependencies>
 </project>
