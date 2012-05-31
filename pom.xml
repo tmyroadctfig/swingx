@@ -95,11 +95,6 @@
         </plugin>
         <plugin>
             <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-asembly-plugin</artifactId>
-            <version>2.2.1</version>
-        </plugin>
-        <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-release-plugin</artifactId>
             <!-- version inherited from parent (2.1) -->
             <configuration>
@@ -153,7 +148,7 @@
     </dependencies>
   </dependencyManagement>
   <properties>
-  	<project.generatedSourcesDirectoy>${project.build.directory}/generated-sources/</project.generatedSourcesDirectoy>
+  	<project.generatedSourcesDirectoy>${project.build.directory}/generated-sources</project.generatedSourcesDirectoy>
   </properties>
   <modules>
       <module>swingx-mavensupport</module>
