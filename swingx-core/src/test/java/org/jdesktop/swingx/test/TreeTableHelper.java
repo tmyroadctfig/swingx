@@ -19,6 +19,13 @@ import org.jdesktop.swingx.treetable.MutableTreeTableNode;
 import org.jdesktop.swingx.treetable.TreeTableModel;
 import org.jdesktop.swingx.treetable.TreeTableNode;
 
+/**
+ * This is a quick temporary addition to make the JXTreeTableVisualCheck compilable - most
+ * of it is done properly in TreeUtilities but not yet used in the test. Will be removed
+ * again as soon as the test uses the proper swingx support.
+ * 
+ * @author Jeanette Winzenburg, Berlin
+ */
 public class TreeTableHelper {
 
     public static class PostOrder implements Enumeration {
