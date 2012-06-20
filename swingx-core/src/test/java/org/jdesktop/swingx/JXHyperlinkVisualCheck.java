@@ -59,11 +59,12 @@ public class JXHyperlinkVisualCheck extends InteractiveTestCase {
     public static void main(String[] args) throws Exception {
       JXHyperlinkVisualCheck test = new JXHyperlinkVisualCheck();
       try {
-          test.runInteractiveTests();
+//          test.runInteractiveTests();
 //          test.runInteractiveTests("interactive.*Table.*");
 //          test.runInteractiveTests("interactive.*List.*");
 //          test.runInteractiveTests("interactive.*Tree.*");
 //          test.runInteractiveTests("interactive.*Underline.*");
+          test.runInteractive("Link");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
@@ -181,7 +182,7 @@ public class JXHyperlinkVisualCheck extends InteractiveTestCase {
         LinkModelAction<?> localAction = new LinkModelAction<LinkModel>(localLink, visitor);
         JXHyperlink localHyperlink = new JXHyperlink(localAction);
         
-        LinkModel externalLink = new LinkModel("Click me! - external text", null, new URL("https://swingx.dev.java.net"));
+        LinkModel externalLink = new LinkModel("Click me! - external text", null, new URL("http://swingx.java.net"));
         LinkModelAction<?> externalAction = new LinkModelAction<LinkModel>(externalLink, visitor);
         JXHyperlink externalHyperlink = new JXHyperlink(externalAction);
         JPanel panel = new JPanel(new BorderLayout());
