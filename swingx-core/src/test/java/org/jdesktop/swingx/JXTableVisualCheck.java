@@ -93,6 +93,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
 //          test.runInteractiveTests("interactive.*FloatingPoint.*");
 //          test.runInteractiveTests("interactive.*Disable.*");
           test.runInteractiveTests("interactive.*ColumnControl.*");
+//          test.runInteractiveTests("interactive.*RowHeight.*");
 //          test.runInteractiveTests("interactive.*Remove.*");
 //          test.runInteractiveTests("interactive.*ColumnProp.*");
 //          test.runInteractiveTests("interactive.*Multiple.*");
@@ -660,6 +661,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
      */
     public void interactiveCompareRowHeight() {
         JXTable xtable = new JXTable(sortableTableModel);
+        xtable.setColumnControlVisible(true);
         xtable.setShowGrid(false, false);
         JTable table = new JTable(sortableTableModel);
         table.setShowHorizontalLines(false);

@@ -2,21 +2,160 @@ package org.jdesktop.swingx;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.io.IOException;
+import java.net.URL;
+import java.util.List;
+import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextArea;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
+import org.jdesktop.swingx.MultiSplitLayout.Divider;
 import org.jdesktop.swingx.MultiSplitLayout.Node;
+import org.jdesktop.swingx.MultiSplitLayout.Split;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
 import org.jdesktop.test.AncientSwingTeam;
 
 public class JXMultiSplitPaneVisualIssues extends InteractiveTestCase {
+    
+    
+    public void interactiveInCenterCore() throws IOException {
+        
+        JTabbedPane pane = new JTabbedPane();
+        URL url = JXEditorPaneVisualCheck.class.getResource("resources/test.html");
+        final JEditorPane editor = new JEditorPane(url);
+        final JTextArea area = new JTextArea();
+        final DocumentListener docL = new DocumentListener() {
+            
+            private void updatePreview() {
+                editor.setText(area.getText());
+            }
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                updatePreview();
+            }
+            
+            
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                updatePreview();
+            }
+            
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+            }
+            
+        };
+        PropertyChangeListener l = new PropertyChangeListener() {
+            
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                area.setText(editor.getText());
+                editor.removePropertyChangeListener("page", this);
+                area.getDocument().addDocumentListener(docL);
+            }
+        };
+        editor.addPropertyChangeListener("page", l);
+        
+        
+        
+        pane.addTab("Editor", new JScrollPane(area));
+        pane.addTab("Preview", new JScrollPane(editor));
+        
+        final JSplitPane splitPane = new JSplitPane();
+        JXTree tree = new JXTree();
+        tree.expandAll();
+        splitPane.setLeftComponent(tree);
+        JXList list = new JXList(AncientSwingTeam.createNamedColorListModel());
+        list.addHighlighter(HighlighterFactory.createSimpleStriping());
+        
+        splitPane.setRightComponent(pane);
+        showInFrame(splitPane, "core");
+    }
+    
+    public void interactiveTabInCenter() throws IOException {
+        String layout = "(ROW " +
+            "(LEAF name=selector weight=0.2)" +
+            "(LEAF name=center weight=0.6)" +
+            "(LEAF name=list weight=0.2)" +
+        ")";
+        
+        final JTabbedPane pane = new JTabbedPane();
+        URL url = JXEditorPaneVisualCheck.class.getResource("resources/test.html");
+        final JEditorPane editor = new JEditorPane(url);
+        final JTextArea area = new JTextArea();
+        final DocumentListener docL = new DocumentListener() {
+
+            private void updatePreview() {
+                editor.setText(area.getText());
+                LOG.info("initial size: pref/min/max \n "
+                        + pane.getPreferredSize()  + pane.getMinimumSize() + pane.getMaximumSize()
+                );
+            }
+
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                updatePreview();
+            }
+
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                updatePreview();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+            }
+            
+        };
+        PropertyChangeListener l = new PropertyChangeListener() {
+            
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                area.setText(editor.getText());
+                area.getDocument().addDocumentListener(docL);
+            }
+        };
+        editor.addPropertyChangeListener("page", l);
+        
+        pane.addTab("Editor", new JScrollPane(area));
+        pane.addTab("Preview", new JScrollPane(editor));
+        
+        final JXMultiSplitPane splitPane = new JXMultiSplitPane();
+        splitPane.setModel(MultiSplitLayout.parseModel(layout));
+        MultiSplitLayout splitLayout = splitPane.getMultiSplitLayout();
+//        splitLayout.setLayoutByWeight(true);
+        
+        JXTree tree = new JXTree();
+        tree.expandAll();
+        splitPane.add(tree, "selector");
+        JXList list = new JXList(AncientSwingTeam.createNamedColorListModel());
+        list.addHighlighter(HighlighterFactory.createSimpleStriping());
+        splitPane.add(list, "list");
+        
+        splitPane.add(pane, "center");
+        showInFrame(splitPane, "three-part row");
+//        splitPane.getMultiSplitLayout().setFloatingDividers(false);
+        
+        Node root = ((MultiSplitLayout) splitPane.getLayout()).getModel();
+//        ((MultiSplitLayout) splitPane.getLayout()).setFloatingDividers(false);
+    }
     
     /**
      * Use MultiSplitPane in demo. Here the layout is revalidated as
@@ -194,7 +333,7 @@ public class JXMultiSplitPaneVisualIssues extends InteractiveTestCase {
         JXMultiSplitPaneVisualIssues test = new JXMultiSplitPaneVisualIssues();
         try {
 //            test.runInteractiveTests();
-            test.runInteractiveTests("interactive.*Split.*");
+            test.runInteractiveTests("interactive.*Tab.*");
           } catch (Exception e) {
               System.err.println("exception when executing interactive tests:");
               e.printStackTrace();
@@ -206,4 +345,7 @@ public class JXMultiSplitPaneVisualIssues extends InteractiveTestCase {
     public void testDummy() {
     }
 
+    @SuppressWarnings("unused")
+    private static final Logger LOG = Logger
+            .getLogger(JXMultiSplitPaneVisualIssues.class.getName());
 }

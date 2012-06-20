@@ -12,10 +12,14 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
+import java.awt.KeyboardFocusManager;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyVetoException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Date;
 import java.util.Vector;
@@ -87,7 +91,8 @@ public class JTableIssues extends InteractiveTestCase {
 //        test.runInteractiveTests();
 //          test.runInteractiveTests("interactive.*ColumnControl.*");
 //          test.runInteractiveTests("interactive.*Edit.*");
-          test.runInteractiveTests("interactive.*Sort.*");
+//          test.runInteractiveTests("interactive.*Sort.*");
+          test.runInteractiveTests("interactive.*EditOnFocusLost.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
@@ -380,27 +385,87 @@ public class JTableIssues extends InteractiveTestCase {
     }
     
   //----------------------- interactive
-    
-    public void interactiveAutoRowSorter() {
-        // mimic a table coming out of a component factory,
-        // which makes it autoCreate always
-        final JTable table = new JTable();
-        table.setAutoCreateRowSorter(true);
-        JXFrame frame = wrapWithScrollingInFrame(table, "autoCreateFalse keeps rowSorter");
-        Action toggle = new AbstractAction("new model") {
-            
+
+    /**
+     * Issue #1489-swingx: terminateEditOnFocusLost leads to unexpected focus behaviour 
+     * in internalFrame.
+     * 
+     * This is a core-issue which shows up in SwingX because JxTable has the property
+     * set to true by default, while core has not.
+     * 
+     */
+    public void interactiveInternalFrameTerminateEditOnFocusLost() {
+        JDesktopPane jDesktopPane = new JDesktopPane();
+        JInternalFrame jInternalFrame = new JInternalFrame();
+        jDesktopPane.add(jInternalFrame);
+        jInternalFrame.getContentPane().add(createPanel(true));
+        JXFrame embddingFrame = wrapInFrame(jDesktopPane, "");
+        try {
+            jInternalFrame.setMaximum(true);
+        } catch (PropertyVetoException ex) {
+        }
+        jInternalFrame.setVisible(true);
+        show(embddingFrame, 400, 400);
+        
+        PropertyChangeListener pcl = new PropertyChangeListener() {
+
             @Override
-            public void actionPerformed(ActionEvent e) {
-                // mimic client code - special case
-                table.setAutoCreateRowSorter(false);
-                // silently allows error which fails at runtime when clicking header
-                table.setModel(new DefaultTableModel(20, table.getColumnCount() +1 ));
+            public void propertyChange(PropertyChangeEvent evt) {
+                Object oldValue = evt.getOldValue();
+                Object newValue = evt.getNewValue();
+                if (newValue == null || ! JFrame.class.equals(newValue.getClass())) {
+                    int i = 1;
+                }
+                System.out.println(evt.getPropertyName() + " from "
+                        + (oldValue == null ? null : oldValue.getClass().getCanonicalName() + oldValue.hashCode())
+                        + " to "
+                        + (newValue == null ? null : newValue.getClass().getCanonicalName() + newValue.hashCode()));
             }
         };
-        addAction(frame, toggle);
-        show(frame);
+
+        KeyboardFocusManager.getCurrentKeyboardFocusManager().addPropertyChangeListener("permanentFocusOwner", pcl);
     }
     
+    private static TableCellEditor createComboCellEditor() {
+        return new DefaultCellEditor(new JComboBox(
+                new Object[] {"Value1", "Value2", "Value3"}
+                ));
+    }
+
+    private static TableModel createTableModel(String prefix) {
+        String[] columns = new String[3];
+        for (int i = 0; i < 3; i++) {
+            columns[i] = prefix + " " + (i + 1);
+        }
+        return new DefaultTableModel(columns, 3);
+    }
+
+    private static JPanel createPanel(boolean terminate) {
+        JPanel panel = new JPanel();
+
+        JXTable jXTable = new JXTable(createTableModel("JXTable"));
+        JTable jTable = new JTable(createTableModel("JTable"));
+//        jXTable.setTerminateEditOnFocusLost(terminate);
+//        jTable.putClientProperty("terminateEditOnFocusLost", terminate);
+
+        jXTable.setDefaultEditor(Object.class, createComboCellEditor());
+        jTable.setDefaultEditor(Object.class, createComboCellEditor());
+
+        JScrollPane scrollPane1 = new JScrollPane();
+        JScrollPane scrollPane2 = new JScrollPane();
+        scrollPane1.setViewportView(jXTable);
+        scrollPane2.setViewportView(jTable);
+
+
+        panel.add(scrollPane1);
+        panel.add(scrollPane2);
+
+        jXTable.setPreferredScrollableViewportSize(new Dimension(300, 100));
+        jTable.setPreferredScrollableViewportSize(new Dimension(300, 100));
+
+        return panel;
+    }
+
     /**
      * Core issue: terminateEditOnFocusLost weird behaviour if in InternalFrame
      * see: 
@@ -410,6 +475,8 @@ public class JTableIssues extends InteractiveTestCase {
      * in first column: editing not started again.
      * 
      * Same in JXTable, but there always: the terminateEditOnFocusLost is true by default.
+     * 
+     * The thread is no longer available, reported as #1489 against JXTable.
      */
     public void interactiveTerminateEditInInternalFrame() {
         JTable table = new JTable(new AncientSwingTeam());
@@ -431,6 +498,28 @@ public class JTableIssues extends InteractiveTestCase {
         show(frame, 600, 600);
     }
    
+
+    
+    public void interactiveAutoRowSorter() {
+        // mimic a table coming out of a component factory,
+        // which makes it autoCreate always
+        final JTable table = new JTable();
+        table.setAutoCreateRowSorter(true);
+        JXFrame frame = wrapWithScrollingInFrame(table, "autoCreateFalse keeps rowSorter");
+        Action toggle = new AbstractAction("new model") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // mimic client code - special case
+                table.setAutoCreateRowSorter(false);
+                // silently allows error which fails at runtime when clicking header
+                table.setModel(new DefaultTableModel(20, table.getColumnCount() +1 ));
+            }
+        };
+        addAction(frame, toggle);
+        show(frame);
+    }
+    
       /**
        * Core Issue: the calculation of the repaint region after update is completely broken.
        * Nevertheless, the cell is updated correctly. Seems like someplace, the complete table

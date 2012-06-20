@@ -98,7 +98,8 @@ public class JXTreeTableIssues extends InteractiveTestCase {
 //            test.runInteractiveTests(".*Combo.*");
 //            test.runInteractiveTests(".*Text.*");
 //            test.runInteractiveTests(".*TreeExpand.*");
-            test.runInteractiveTests("interactive.*EditWith.*");
+//            test.runInteractiveTests("interactive.*EditWith.*");
+            test.runInteractiveTests("interactive.*Clip.*");
 //          test.runInteractiveTests("interactive.*CustomColor.*");
               
         } catch (Exception e) {
@@ -226,6 +227,7 @@ public class JXTreeTableIssues extends InteractiveTestCase {
         table.getModel().addTableModelListener(report);
         ((DefaultTreeTableModel) model).setRoot(new DefaultMutableTreeTableNode("other"));  
         SwingUtilities.invokeAndWait(new Runnable() {
+            @Override
             public void run() {
                 assertEquals("tableModel must have fired", 1, report.getEventCount());
                 assertTrue("event type must be dataChanged " + TableModelReport.printEvent(report.getLastEvent()), 
@@ -258,6 +260,7 @@ public class JXTreeTableIssues extends InteractiveTestCase {
         final JXFrame frame = wrapWithScrollingInFrame(treeTable, table, "sluggish scrolling");
         Action toggleHighlighter = new AbstractActionExt("toggle highlighter") {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 if (treeTable.getHighlighters().length == 0) {
                     treeTable.addHighlighter(hl);
@@ -272,6 +275,7 @@ public class JXTreeTableIssues extends InteractiveTestCase {
         };
         Action scroll = new AbstractActionExt("start scroll") {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 for (int i = 0; i < table.getRowCount(); i++) {
                     table.scrollRowToVisible(i);
@@ -302,6 +306,7 @@ public class JXTreeTableIssues extends InteractiveTestCase {
         table.setHighlighters(hl);
         final JXFrame frame = wrapWithScrollingInFrame(treeTable, table, "sluggish scrolling");
         Action expand = new AbstractActionExt("start expand") {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 for (int i = 0; i < 5000; i++) {
                     treeTable.expandRow(i);
@@ -312,6 +317,7 @@ public class JXTreeTableIssues extends InteractiveTestCase {
         };
         Action toggleHighlighter = new AbstractActionExt("toggle highlighter") {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 if (treeTable.getHighlighters().length == 0) {
                     treeTable.addHighlighter(hl);
@@ -326,6 +332,7 @@ public class JXTreeTableIssues extends InteractiveTestCase {
         };
         Action scroll = new AbstractActionExt("start scroll") {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 for (int i = 0; i < table.getRowCount(); i++) {
                     table.scrollRowToVisible(i);
@@ -368,6 +375,7 @@ public class JXTreeTableIssues extends InteractiveTestCase {
         // Problem was: model was not-editable.
         table.setValueAt("games", row, 0);
         SwingUtilities.invokeAndWait(new Runnable() {
+            @Override
             public void run() {
                 assertEquals("tableModel must have fired", 1, report.getEventCount());
                 assertEquals("the event type must be update " + TableModelReport.printEvent(report.getLastEvent())
@@ -419,6 +427,7 @@ public class JXTreeTableIssues extends InteractiveTestCase {
         final String[] values = {"v1", "v2", "v3", "v4"};
         final ActionListener l = new ActionListener() {
             int count = 0;
+            @Override
             public void actionPerformed(ActionEvent e) {
                 if (count > values.length) return;
                 if (count == values.length) {
@@ -449,6 +458,7 @@ public class JXTreeTableIssues extends InteractiveTestCase {
         };
         Action changeValue = new AbstractAction("delete node sports recursively") {
             Timer timer;
+            @Override
             public void actionPerformed(ActionEvent e) {
                 if (timer == null) {
                     timer = new Timer(10, l);
@@ -488,6 +498,7 @@ public class JXTreeTableIssues extends InteractiveTestCase {
         final JXFrame frame = wrapWithScrollingInFrame(table, xtree,
                 "JXTreeTable.TreeTableModelAdapter: Inconsistency firing update");
         Action changeValue = new AbstractAction("change sports to games") {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 String newValue = "games";
                 table.getTreeTableModel().setValueAt(newValue,
@@ -496,6 +507,7 @@ public class JXTreeTableIssues extends InteractiveTestCase {
         };
         addAction(frame, changeValue);
         Action changeRoot = new AbstractAction("change root") {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 DefaultMutableTreeTableNode newRoot = new DefaultMutableTreeTableNode("new Root");
                 ((DefaultTreeTableModel) table.getTreeTableModel()).setRoot(newRoot);
@@ -523,6 +535,7 @@ public class JXTreeTableIssues extends InteractiveTestCase {
         final JXFrame frame = wrapWithScrollingInFrame(table, xtree,
                 "JXTreeTable.TreeTableModelAdapter: Inconsistency firing update");
         Action changeValue = new AbstractAction("delete first child of sports") {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 MutableTreeTableNode firstChild = (MutableTreeTableNode) table.getPathForRow(6 +1).getLastPathComponent();
                 ((DefaultTreeTableModel) customTreeTableModel).removeNodeFromParent(firstChild);
@@ -549,6 +562,7 @@ public class JXTreeTableIssues extends InteractiveTestCase {
         final JXFrame frame = wrapWithScrollingInFrame(table, xtree,
                 "JXTreeTable.TreeTableModelAdapter: Inconsistency firing delete expanded folder");
         Action changeValue = new AbstractAction("delete selected node") {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 int row = table.getSelectedRow();
                 if (row < 0) return;
@@ -558,6 +572,7 @@ public class JXTreeTableIssues extends InteractiveTestCase {
         };
         addAction(frame, changeValue);
         Action changeValue1 = new AbstractAction("insert as first child of selected node") {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 int row = table.getSelectedRow();
                 if (row < 0) return;
@@ -590,6 +605,7 @@ public class JXTreeTableIssues extends InteractiveTestCase {
         final JXFrame frame = wrapWithScrollingInFrame(table, xtree,
                 "JXTreeTable.TreeTableModelAdapter: Inconsistency firing delete expanded folder");
         Action changeValue = new AbstractAction("delete selected node + sibling") {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 int row = table.getSelectedRow();
                 if (row < 0) return;
@@ -609,6 +625,7 @@ public class JXTreeTableIssues extends InteractiveTestCase {
         };
         addAction(frame, changeValue);
         Action changeValue1 = new AbstractAction("insert as first child of selected node") {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 int row = table.getSelectedRow();
                 if (row < 0) return;
@@ -687,6 +704,7 @@ public class JXTreeTableIssues extends InteractiveTestCase {
     public void interactiveTreeTableLinkRendererSimpleText() {
         AbstractHyperlinkAction<Object> simpleAction = new AbstractHyperlinkAction<Object>(null) {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 LOG.info("hit: " + getTarget());
                 
@@ -733,6 +751,7 @@ public class JXTreeTableIssues extends InteractiveTestCase {
         
         StringValue sv = new StringValue( ){
 
+            @Override
             public String getString(Object value) {
                 return "..." + StringValues.TO_STRING.getString(value);
             }
@@ -803,10 +822,12 @@ public class JXTreeTableIssues extends InteractiveTestCase {
     private MutableTreeTableNode createLongNode(final String string) {
         AbstractMutableTreeTableNode node = new AbstractMutableTreeTableNode() {
             Object rnd = Math.random();
+            @Override
             public int getColumnCount() {
                 return 2;
             }
 
+            @Override
             public Object getValueAt(int column) {
                 if (column == 0) {
                     return string;
@@ -831,8 +852,11 @@ public class JXTreeTableIssues extends InteractiveTestCase {
      * is cached. In this case, packing before replacing the renderer will lead
      * to incorrect sizes which are hard to invalidate (no way except faking a
      * structural tree event? temporaryly set large model and back, plus repaint
-     * works).
+     * works). <p>
      * 
+     * both pack-moments seem okay (without ellipses, always filling the box),
+     * probably due to fixing swingx-1232 (by forcing the xtree to fire a 
+     * change notification on setRenderer)
      */
     public void interactiveTreeTableClipIssueWrappingProvider() {
         final JXTreeTable treeTable = new JXTreeTable(createActionTreeModel());
@@ -843,6 +867,7 @@ public class JXTreeTableIssues extends InteractiveTestCase {
 
         StringValue format = new StringValue() {
 
+            @Override
             public String getString(Object value) {
                 if (value instanceof Action) {
                     return ((Action) value).getValue(Action.NAME) + "xx";
@@ -878,6 +903,7 @@ public class JXTreeTableIssues extends InteractiveTestCase {
         // revalidate doesn't help
         Action revalidate = new AbstractActionExt("revalidate") {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 treeTable.revalidate();
                 tree.revalidate();
@@ -888,6 +914,7 @@ public class JXTreeTableIssues extends InteractiveTestCase {
         // hack around incorrect cached node sizes
         Action large = new AbstractActionExt("large-circle") {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 treeTable.setLargeModel(true);
                 treeTable.setLargeModel(false);
@@ -915,9 +942,10 @@ public class JXTreeTableIssues extends InteractiveTestCase {
         final JTree tree = new JTree(treeTable.getTreeTableModel());
         tree.collapseRow(0);
         JXFrame frame = wrapWithScrollingInFrame(treeTable, 
-                tree, "JXTreeTable vs. JTree: default renderer");
+                tree, "JXTreeTable vs. core JTree: default renderer");
         Action revalidate = new AbstractActionExt("revalidate") {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 treeTable.revalidate();
                 tree.revalidate();
@@ -957,9 +985,10 @@ public class JXTreeTableIssues extends InteractiveTestCase {
         tree.setCellRenderer(renderer);
         tree.collapseRow(0);
         JXFrame frame = wrapWithScrollingInFrame(treeTable, tree,
-                "JXTreeTable vs. JTree: custom default renderer");
+                "JXTreeTable vs. JTree: custom default renderer without clip");
         Action revalidate = new AbstractActionExt("revalidate") {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 treeTable.revalidate();
                 tree.revalidate();

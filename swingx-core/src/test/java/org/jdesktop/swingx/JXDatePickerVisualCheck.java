@@ -73,6 +73,7 @@ import org.jdesktop.swingx.calendar.DateSelectionModel;
 import org.jdesktop.swingx.calendar.DaySelectionModel;
 import org.jdesktop.swingx.calendar.SingleDaySelectionModel;
 import org.jdesktop.swingx.calendar.DateSelectionModel.SelectionMode;
+import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 import org.jdesktop.test.VerticalLayoutPref;
 
 /**
@@ -100,7 +101,7 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
        UIManager.put("JXDatePicker.forceZoomable", Boolean.TRUE);
 //         setSystemLF(true);
         JXDatePickerVisualCheck test = new JXDatePickerVisualCheck();
-        
+        setLAF("Win");
         try {
 //            test.runInteractiveTests();
 //            test.runInteractiveTests("interactive.*PrefSize.*");
@@ -159,6 +160,7 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
         addEnabledToggleWithChildren(frame, panel);
         addStatusMessage(frame, "right click in components to show parent popup");
         show(frame);
+        LOG.info("addon " + LookAndFeelAddons.getAddon());
         
     }
     public void interactivePopupMenuListener() {

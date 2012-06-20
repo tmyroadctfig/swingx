@@ -28,7 +28,7 @@ import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
-import java.io.File;
+import java.util.Enumeration;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -58,8 +58,10 @@ import javax.swing.event.TreeExpansionListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
+import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeCellRenderer;
+import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
 import org.jdesktop.swingx.action.AbstractActionExt;
@@ -78,6 +80,8 @@ import org.jdesktop.swingx.renderer.DefaultTreeRenderer;
 import org.jdesktop.swingx.table.ColumnFactory;
 import org.jdesktop.swingx.table.TableColumnExt;
 import org.jdesktop.swingx.test.ComponentTreeTableModel;
+import org.jdesktop.swingx.test.TreeTableHelper;
+import org.jdesktop.swingx.test.TreeTableHelper.PostOrder;
 import org.jdesktop.swingx.test.XTestUtils;
 import org.jdesktop.swingx.treetable.AbstractTreeTableModel;
 import org.jdesktop.swingx.treetable.DefaultMutableTreeTableNode;
@@ -98,7 +102,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         // NOTE JW: this property has be set "very early" in the application life-cycle
         // it's immutable once read from the UIManager (into a final static field!!)
 //        System.setProperty("sun.swing.enableImprovedDragGesture", "true" );
-        setSystemLF(true);
+//        setSystemLF(true);
         JXTreeTableVisualCheck test = new JXTreeTableVisualCheck();
         try {
 //            test.runInteractiveTests();
@@ -114,12 +118,36 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
 //             test.runInteractiveTests("interactive.*WinP.*");
 //            test.runInteractiveTests("interactive.*EditorIcon.*");
 //            test.runInteractiveTests("interactive.*ExpandAll.*");
-             test.runInteractiveTests("interactive.*ComboBox.*");
+//            test.runInteractiveTests("interactive.*Traversal.*");
+            test.runInteractiveTests("interactive.*Edit.*");
+//             test.runInteractiveTests("interactive.*ComboBox.*");
         } catch (Exception ex) {
 
         }
     }
     
+    public void interactiveTraversal() {
+        JXTree tree = new JXTree();
+        DefaultMutableTreeNode root = (DefaultMutableTreeNode) tree.getModel().getRoot();
+        Enumeration enumer = root.breadthFirstEnumeration();
+//        Enumeration<TreeNode> enumer = new PostorderEnumeration(root); //createEnumeration("BreadthFirstEnumeration", root); // root.breadthFirstEnumeration();
+//        Enumeration<?> enumer = new PostOrder(tree.getModel(), root); 
+       
+        int index = 0;
+        String text = "";
+        int depth = 0;
+        TreeNode lastNode = null;
+        while (enumer.hasMoreElements()) {
+            DefaultMutableTreeNode node = (DefaultMutableTreeNode) enumer.nextElement();
+            text += node.getUserObject();
+            node.setUserObject(node.getUserObject() + ": " + index);
+            index++;
+        }
+        LOG.info(text);
+//        tree.expandAll();
+        showWithScrollingInFrame(tree, "traversal");
+    }
+
     /**
      * Issue 1442-swingx: Performance issue with expand all on large/deep tree/table
      * 
@@ -134,14 +162,41 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
      *    would be a worthwhile task, contributions/ideas welcome)
      */
     public void interactiveExpandAll() {
-        final JXTree tree = new JXTree(new FileSystemModel(new File("D:/DevTools")));
+//        final TreeTableModel model = new FileSystemModel(new File("D:/DevTools"));
+        final TreeTableModel model = TreeTableHelper.createTreeTableModel(20, 3, 4);
+        final JXTree tree = new JXTree(model);
         final JXTreeTable table = new JXTreeTable((TreeTableModel) tree.getModel());
         JXFrame frame = wrapWithScrollingInFrame(tree, table, "expandAll");
+        Action traversTree = new AbstractAction("traverse") {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+//                Enumeration enumer = new PostorderEnumeration((TreeNode) model.getRoot());
+                Enumeration<?> enumer = new PostOrder(model, model.getRoot());
+                int count = 0;
+                while (enumer.hasMoreElements()) {
+                    enumer.nextElement();
+                    count++;
+                }
+                LOG.info("traversed: " + count);
+            }
+            
+        };
+        addAction(frame, traversTree);
         Action action = new AbstractAction("expand tree") {
             
             @Override
             public void actionPerformed(ActionEvent e) {
-                tree.expandAll();
+                tree.setVisible(false);
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        
+                        tree.expandAll();
+                        tree.setVisible(true);
+                        LOG.info("expanded: " + tree.getRowCount());
+                    }
+                });
             }
         };
         addAction(frame, action);
@@ -149,8 +204,17 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
             
             @Override
             public void actionPerformed(ActionEvent e) {
+                LOG.info("before: " + table.getRowCount());
+                table.setVisible(false);
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        
                 table.expandAll();
+                table.setVisible(true);
                 LOG.info("expanded: " + table.getRowCount());
+                    }
+                });
             }
         };
         addAction(frame, expandTable);
