@@ -117,6 +117,7 @@ import org.jdesktop.swingx.hyperlink.HyperlinkAction;
 import org.jdesktop.swingx.hyperlink.LinkModel;
 import org.jdesktop.swingx.hyperlink.LinkModelAction;
 import org.jdesktop.swingx.painter.BusyPainter;
+import org.jdesktop.swingx.rollover.RolloverRenderer;
 import org.jdesktop.swingx.table.ColumnControlButton;
 import org.jdesktop.swingx.test.ComponentTreeTableModel;
 import org.jdesktop.swingx.test.XTestUtils;
@@ -142,7 +143,8 @@ public class RendererVisualCheck extends InteractiveTestCase {
 //            test.runInteractiveTests();
 //          test.runInteractiveTests(".*CustomIcons.*");
 //          test.runInteractiveTests(".*XLabel.*");
-          test.runInteractiveTests(".*TextArea.*");
+            test.runInteractiveTests(".*Button.*");
+//          test.runInteractiveTests(".*TextArea.*");
 //          test.runInteractiveTests(".*Text.*");
 //          test.runInteractiveTests(".*Color.*");
 //          test.runInteractiveTests("interactive.*ColumnControl.*");
@@ -171,6 +173,14 @@ public class RendererVisualCheck extends InteractiveTestCase {
                         super.configureState(context);
                         rendererComponent.getComponent().setVisible(true);
                     }
+
+                    @Override
+                    public boolean isEnabled() {
+                        boolean enabled = super.isEnabled();
+                        LOG.info("rollover " + enabled);
+                        return enabled;
+                    }
+                    
                     
                 }
         ));
@@ -192,11 +202,12 @@ public class RendererVisualCheck extends InteractiveTestCase {
             
             
         };
-        table.addHighlighter(highlighter);
+//        table.addHighlighter(highlighter);
         showWithScrollingInFrame(table, "invisible button");
     }
     
-    public static class ButtonProvider extends ComponentProvider<JButton> {
+    public static class ButtonProvider extends ComponentProvider<JButton> implements 
+       RolloverRenderer {
 
         @Override
         protected void format(CellContext context) {
@@ -206,12 +217,22 @@ public class RendererVisualCheck extends InteractiveTestCase {
         @Override
         protected void configureState(CellContext context) {
             rendererComponent.setHorizontalAlignment(getHorizontalAlignment());
-//            rendererComponent.setVisible(context.getRow() == 5);
         }
 
         @Override
         protected JButton createRendererComponent() {
             return new JButton("View online");
+        }
+
+        @Override
+        public boolean isEnabled() {
+            return rendererComponent.isVisible();
+        }
+
+        @Override
+        public void doClick() {
+            // TODO Auto-generated method stub
+            
         }
 
         
