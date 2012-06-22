@@ -55,7 +55,7 @@
             <artifactId>maven-jar-plugin</artifactId>
             <configuration>
                 <archive>
-                    <manifestFile>${project.generatedSourcesDirectoy}/annotations/META-INF/MANIFEST.MF</manifestFile>
+                    <manifestFile>${project.generatedAnnotations}/META-INF/MANIFEST.MF</manifestFile>
                 </archive>
             </configuration>
         </plugin>
