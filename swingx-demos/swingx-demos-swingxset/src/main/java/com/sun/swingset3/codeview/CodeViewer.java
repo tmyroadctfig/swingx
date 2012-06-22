@@ -92,7 +92,7 @@ import javax.swing.text.Highlighter;
 
 import org.jdesktop.swingx.JXEditorPane;
 import org.jdesktop.swingx.JXPanel;
-import org.jdesktop.swingx.color.ColorUtil;
+import org.jdesktop.swingx.util.PaintUtils;
 import org.jdesktop.swingxset.util.DemoUtils;
 
 import com.sun.swingset3.utilities.RoundedBorder;
@@ -272,7 +272,7 @@ public class CodeViewer extends JPanel {
             noCodeLabel.setOpaque(false);
             noCodeLabel.setFont(UIManager.getFont("Label.font").deriveFont(24f));
             noCodeLabel.setForeground(
-                    ColorUtil.setAlpha(UIManager.getColor("Label.foreground"), 110));
+                    PaintUtils.setAlpha(UIManager.getColor("Label.foreground"), 110));
         }
         if (codePanel != null) {
             Color base = UIManager.getColor("Panel.background");
@@ -759,6 +759,7 @@ public class CodeViewer extends JPanel {
     }
     
     private class SnippetActivator implements ActionListener {        
+        @Override
         public void actionPerformed(ActionEvent e) {
             String snippetKey = (String)snippetComboBox.getSelectedItem();
             if (!snippetKey.equals(NO_SNIPPET_SELECTED)) {
@@ -782,6 +783,7 @@ public class CodeViewer extends JPanel {
                     getString("CodeViewer.snippets.navigateFirst",
                               "move to first code snippet within highlighted set"));
         } 
+        @Override
         public void actionPerformed(ActionEvent e) {
             moveToFirstSnippet();
         }        
@@ -793,6 +795,7 @@ public class CodeViewer extends JPanel {
                     getString("CodeViewer.snippets.navigateNext",
                               "move to next code snippet within highlighted set"));
         }
+        @Override
         public void actionPerformed(ActionEvent e) {
             moveToNextSnippet();
         }
@@ -804,6 +807,7 @@ public class CodeViewer extends JPanel {
                     getString("CodeViewer.snippets.navigatePrevious",
                               "move to previous code fragment within highlighted set"));
         }
+        @Override
         public void actionPerformed(ActionEvent e) {
             moveToPreviousSnippet();
         }
@@ -815,6 +819,7 @@ public class CodeViewer extends JPanel {
                     getString("CodeViewer.snippets.navigateLast",
                               "move to last code snippet within highlighted set"));
         } 
+        @Override
         public void actionPerformed(ActionEvent e) {
             moveToLastSnippet();
         }        
@@ -826,6 +831,7 @@ public class CodeViewer extends JPanel {
         public SnippetCellRenderer(ListCellRenderer delegate) {
             this.delegate = (JLabel)delegate;
         }
+        @Override
         public Component getListCellRendererComponent(JList list,
                 Object value,
                 int index,
@@ -842,10 +848,10 @@ public class CodeViewer extends JPanel {
                     0, 0, isSelected? .5f : .4f);
             
             String text = "<html><font color=\"" +
-                    ColorUtil.toHexString(foreground) + "\">" + value + 
+                    PaintUtils.toHexString(foreground) + "\">" + value + 
                     "</font>" +
                     "<font color=\"" +
-                    ColorUtil.toHexString(countForeground) + "\">" +
+                    PaintUtils.toHexString(countForeground) + "\">" +
                     (count > 0? " (" + count + (count > 1? " snippets)" : " snippet)") : "") +
                     "</font></html>";
 

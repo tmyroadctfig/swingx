@@ -56,7 +56,6 @@ import org.jdesktop.swingx.JXTitledSeparator;
 import org.jdesktop.swingx.binding.DisplayInfo;
 import org.jdesktop.swingx.binding.DisplayInfoConverter;
 import org.jdesktop.swingx.binding.LabelHandler;
-import org.jdesktop.swingx.color.ColorUtil;
 import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
@@ -70,6 +69,7 @@ import org.jdesktop.swingx.renderer.StringValue;
 import org.jdesktop.swingx.renderer.StringValues;
 import org.jdesktop.swingx.rollover.RolloverProducer;
 import org.jdesktop.swingx.sort.DefaultSortController;
+import org.jdesktop.swingx.util.PaintUtils;
 import org.jdesktop.swingxset.util.DemoUtils;
 import org.jdesktop.swingxset.util.DisplayValues;
 
@@ -155,6 +155,7 @@ public class XListDemo extends JXPanel {
         // custom String representation: concat various element fields
         StringValue sv = new StringValue() {
 
+            @Override
             public String getString(Object value) {
                 if (value instanceof Contributor) {
                     Contributor c = (Contributor) value;
@@ -231,7 +232,7 @@ public class XListDemo extends JXPanel {
     }
 
     private Highlighter createExtendedRolloverDecoration() {
-        Color color = ColorUtil.setAlpha(Color.YELLOW, 100);
+        Color color = PaintUtils.setAlpha(Color.YELLOW, 100);
         final PainterHighlighter hl = new PainterHighlighter(HighlightPredicate.NEVER, 
                 new MattePainter(color));
         // <snip> JXList rollover support
@@ -410,6 +411,7 @@ public class XListDemo extends JXPanel {
      */
     public static void main(String[] args) {
         SwingUtilities.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 JFrame frame = new JFrame(XListDemo.class.getAnnotation(DemoProperties.class).value());
                 
