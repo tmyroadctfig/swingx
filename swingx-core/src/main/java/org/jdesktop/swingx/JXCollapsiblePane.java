@@ -40,7 +40,6 @@ import java.beans.PropertyChangeListener;
 
 import javax.swing.AbstractAction;
 import javax.swing.JComponent;
-import javax.swing.JPanel;
 import javax.swing.JViewport;
 import javax.swing.Scrollable;
 import javax.swing.SwingUtilities;
@@ -321,6 +320,7 @@ public class JXCollapsiblePane extends JXPanel {
      *                the direction to collapse the container
      */
     public JXCollapsiblePane(Direction direction) {
+        super.setLayout(new BorderLayout());
         this.direction = direction;
         animator = new AnimationListener();
         setAnimationParams(new AnimationParams(30, 8, 0.01f, 1.0f));
