@@ -164,6 +164,7 @@
     <module>swingx-core</module>
     <module>swingx-all</module>
     <module>swingx-beaninfo</module>
+    <!-- module>swingx-experimental</module -->
     <!-- module>swingx-demos</module -->
   </modules>
 </project>
