@@ -1,7 +1,7 @@
 package org.jdesktop.swingx;
 
 /**
- * An interface that descibes an object that is capable of being accessed/used via a mnemonic
+ * An interface that describes an object that is capable of being accessed/used via a mnemonic
  * keystroke.
  * 
  * @author Karl George Schaefer
@@ -10,16 +10,16 @@ package org.jdesktop.swingx;
 // ie. what String returning method is called
 interface Mnemonicable {
     /**
-     * Returns the keyboard mnemonic for the task pane.
+     * Returns the keyboard mnemonic for this component.
      * 
-     * @return the keyboard mnemonic for the task pane
+     * @return the keyboard mnemonic
      */
     int getMnemonic();
 
     /**
-     * Sets the keyboard mnemonic on the task pane. The mnemonic is the key
+     * Sets the keyboard mnemonic on this component. The mnemonic is the key
      * which when combined with the look and feel's mouseless modifier (usually
-     * Alt) will toggle this task pane.
+     * Alt) will activate this component.
      * <p>
      * A mnemonic must correspond to a single key on the keyboard and should be
      * specified using one of the <code>VK_XXX</code> keycodes defined in
