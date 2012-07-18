@@ -9,7 +9,7 @@
   <artifactId>swingx-project</artifactId>
   <packaging>pom</packaging>
   <name>SwingX</name>
-  <version>1.6.5-SNAPSHOT</version>
+  <version>1.6.4-SNAPSHOT</version>
   <url>http://www.swinglabs.org/</url>
   <ciManagement>
     <system>Hudson</system>
