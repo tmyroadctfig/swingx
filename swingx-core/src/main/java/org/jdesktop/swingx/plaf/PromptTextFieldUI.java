@@ -11,6 +11,7 @@ import javax.swing.plaf.TextUI;
 import javax.swing.text.JTextComponent;
 
 import org.jdesktop.swingx.search.NativeSearchFieldSupport;
+import org.jdesktop.swingx.util.OS;
 
 /**
  * {@link PromptTextUI} implementation for rendering prompts on
@@ -163,10 +164,14 @@ public class PromptTextFieldUI extends PromptTextUI {
          */
         @Override
         protected void firePropertyChange(String propertyName, Object oldValue, Object newValue) {
-            // Strings get interned...
-            if ("document".equals(propertyName)) {
-                super.firePropertyChange(propertyName, oldValue, newValue);
-            }
+        	if (OS.isMacOSX()) {
+        		super.firePropertyChange(propertyName, oldValue, newValue);
+        	} else {
+        		// Strings get interned...
+        		if ("document".equals(propertyName)) {
+        			super.firePropertyChange(propertyName, oldValue, newValue);
+        		}
+        	}
         }
 
         /**
@@ -175,7 +180,10 @@ public class PromptTextFieldUI extends PromptTextUI {
          * for more information.
          */
         @Override
-        public void firePropertyChange(String propertyName, boolean oldValue, boolean newValue) { }
-
+        public void firePropertyChange(String propertyName, boolean oldValue, boolean newValue) {
+        	if (OS.isMacOSX()) {
+        		super.firePropertyChange(propertyName, oldValue, newValue);
+        	}
+        }
     }
 }
