@@ -91,7 +91,12 @@
                 </goals>
                 <configuration>
                   <resources>
-                    <resource>${project.generatedDependencies}</resource>
+                    <resource>
+                      <directory>${project.generatedDependencies}</directory>
+                      <excludes>
+                        <exclude>**/*.java</exclude>
+                      </excludes>
+                    </resource>
                   </resources>
                 </configuration>
               </execution>
