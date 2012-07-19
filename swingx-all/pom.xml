@@ -83,6 +83,18 @@
                   </sources>
                 </configuration>
               </execution>
+              <execution>
+                <id>add-dependencies-resource</id>
+                <phase>generate-resources</phase>
+                <goals>
+                  <goal>add-resource</goal>
+                </goals>
+                <configuration>
+                  <resources>
+                    <resource>${project.generatedDependencies}</resource>
+                  </resources>
+                </configuration>
+              </execution>
             </executions>
           </plugin>
           <plugin>
