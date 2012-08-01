@@ -139,6 +139,7 @@ import org.jdesktop.swingx.plaf.TaskPaneUI;
  *          color32="JXTaskPane32.gif"
  */
 @JavaBean
+@SuppressWarnings("nls")
 public class JXTaskPane extends JPanel implements
   JXCollapsiblePane.CollapsiblePaneContainer, Mnemonicable {
 
@@ -180,7 +181,6 @@ public class JXTaskPane extends JPanel implements
   private String title;
   private Icon icon;
   private boolean special;
-  private boolean collapsed;
   private boolean scrollOnExpand;
 
   private int        mnemonic;
@@ -409,7 +409,7 @@ public class JXTaskPane extends JPanel implements
      * Expands or collapses this group.
      * <p>
      * As of SwingX 1.6.3, the property change event only fires when the
-     * state is accurate.  As such, animated task pane fire once the 
+     * state is accurate.  As such, animated task panes fire once the 
      * animation is complete.
      * 
      * @param collapsed
@@ -419,8 +419,6 @@ public class JXTaskPane extends JPanel implements
      *          preferred="false"
      */
     public void setCollapsed(boolean collapsed) {
-        boolean oldValue = isCollapsed();
-        this.collapsed = collapsed;
         collapsePane.setCollapsed(collapsed);
     }
     
@@ -431,7 +429,7 @@ public class JXTaskPane extends JPanel implements
      *         otherwise
      */
     public boolean isCollapsed() {
-        return collapsed;
+        return collapsePane.isCollapsed();
     }
 
   /**
