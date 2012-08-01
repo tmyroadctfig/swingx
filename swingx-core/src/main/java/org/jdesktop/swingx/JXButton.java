@@ -464,9 +464,12 @@ public class JXButton extends JButton implements BackgroundPaintable {
     }
     
     private ForegroundButton fgStamp;
+    @SuppressWarnings("rawtypes")
     private Painter fgPainter;
+    @SuppressWarnings("rawtypes")
     private PainterPaint fgPaint;
     private BackgroundButton bgStamp;
+    @SuppressWarnings("rawtypes")
     private Painter bgPainter;
     
     private boolean paintBorderInsets = true;
