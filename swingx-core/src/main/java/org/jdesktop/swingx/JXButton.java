@@ -23,6 +23,7 @@ package org.jdesktop.swingx;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
@@ -259,6 +260,11 @@ public class JXButton extends JButton implements BackgroundPaintable {
     }
     
     private class ForegroundButton extends JButton {
+        @Override
+        public Font getFont() {
+            return JXButton.this.getFont();
+        }
+        
         /**
          * {@inheritDoc}
          */
@@ -270,6 +276,7 @@ public class JXButton extends JButton implements BackgroundPaintable {
             
             return PaintUtils.setAlpha(JXButton.this.getForeground(), 0);
         }
+        
         /**
          * {@inheritDoc}
          */
