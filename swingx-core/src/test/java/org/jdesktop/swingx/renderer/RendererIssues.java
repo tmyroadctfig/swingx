@@ -75,6 +75,7 @@ import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.Highlighter;
+import org.jdesktop.swingx.decorator.HighlighterFactory;
 import org.jdesktop.swingx.decorator.PainterHighlighter;
 import org.jdesktop.swingx.decorator.PatternPredicate;
 import org.jdesktop.swingx.painter.MattePainter;
@@ -111,7 +112,8 @@ public class RendererIssues extends InteractiveTestCase {
 //          test.runInteractiveTests(".*XLabel.*");
 //          test.runInteractiveTests(".*Color.*");
 //          test.runInteractiveTests("interactive.*ColumnControl.*");
-          test.runInteractiveTests("interactive.*ToolTip.*");
+//          test.runInteractiveTests("interactive.*ToolTip.*");
+          test.runInteractiveTests("interactive.*TreeRenderer.*");
 //          test.runInteractiveTests("interactive.*Hyperlink.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
@@ -119,7 +121,27 @@ public class RendererIssues extends InteractiveTestCase {
         }
     }
 
+    /**
+     * Issue swingx-1514: icon background always highlighted
+     */
+    public void interactiveDefaultTreeRendererBackgroundOnIconTreeTable() {
+        JXTreeTable table = new JXTreeTable(new FileSystemModel(new File(".")));
+        table.setTreeCellRenderer(new DefaultTreeRenderer());
+        table.addHighlighter(HighlighterFactory.createSimpleStriping());
+        showWithScrollingInFrame(table, "background on icon?");
+    }
     
+    /**
+     * Issue swingx-1514: icon background always highlighted
+     */
+    public void interactiveDefaultTreeRendererBackgroundOnIconTree() {
+        JXTree table = new JXTree(new FileSystemModel(new File(".")));
+        table.setCellRenderer(new DefaultTreeRenderer());
+        table.addHighlighter(HighlighterFactory.createSimpleStriping());
+        showWithScrollingInFrame(table, "background on icon?");
+    }
+    
+
     /**
      * Issue ??-swingx: Boolean renderer background is slightly darker if 
      * background color is part-transparent.
