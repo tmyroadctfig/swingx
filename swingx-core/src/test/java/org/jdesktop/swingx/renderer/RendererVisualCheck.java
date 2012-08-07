@@ -140,12 +140,12 @@ public class RendererVisualCheck extends InteractiveTestCase {
         setSystemLF(true);
         RendererVisualCheck test = new RendererVisualCheck();
         try {
-//            test.runInteractiveTests();
+            test.runInteractiveTests();
 //          test.runInteractiveTests(".*CustomIcons.*");
 //          test.runInteractiveTests(".*XLabel.*");
 //            test.runInteractiveTests(".*Button.*");
 //          test.runInteractiveTests(".*TextArea.*");
-          test.runInteractiveTests(".*Text.*");
+//          test.runInteractiveTests(".*Text.*");
 //          test.runInteractiveTests(".*Color.*");
 //          test.runInteractiveTests("interactive.*ColumnControl.*");
 //            test.runInteractive("RowGrouping");
