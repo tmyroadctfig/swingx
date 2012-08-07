@@ -41,6 +41,7 @@ import javax.swing.SwingConstants;
 import org.jdesktop.beans.JavaBean;
 import org.jdesktop.swingx.painter.AbstractPainter;
 import org.jdesktop.swingx.painter.Painter;
+import org.jdesktop.swingx.util.Contract;
 import org.jdesktop.swingx.util.GraphicsUtilities;
 
 /**
@@ -258,15 +259,13 @@ public class JXPanel extends JPanel implements AlphaPaintable, BackgroundPaintab
      * @param hint the horizontal sizing hint, must not be null
      *   and must be vertical.
      * 
-     * @throws IllegalArgumentException if track not horizontal 
      * @throws NullPointerException if null
      * 
      * @see #setScrollableHeightHint(ScrollableSizeHint)
      * @see ScrollableSizeHint
      */
     public final void setScrollableWidthHint(ScrollableSizeHint hint) {
-        if (!hint.isHorizontalCompatible()) throw 
-           new IllegalArgumentException("track must be horizontal, but was " + hint);
+        Contract.asNotNull(hint, "hint cannot be null");
         ScrollableSizeHint oldValue = getScrollableWidthHint();
         if (oldValue == hint) return;
         this.scrollableWidthHint = hint;
@@ -282,15 +281,13 @@ public class JXPanel extends JPanel implements AlphaPaintable, BackgroundPaintab
      * @param hint the vertical sizing hint, must not be null
      *   and must be vertical.
      * 
-     * @throws IllegalArgumentException if track not vertical 
      * @throws NullPointerException if null
      * 
      * @see #setScrollableWidthHint(ScrollableSizeHint)
      * @see ScrollableSizeHint
      */
     public final void setScrollableHeightHint(ScrollableSizeHint hint) {
-        if (!hint.isVerticalCompatible()) throw 
-            new IllegalArgumentException("track must be vertical, but was " + hint);
+        Contract.asNotNull(hint, "hint cannot be null");
         ScrollableSizeHint oldValue = getScrollableHeightHint();
         if (oldValue == hint) return;
         this.scrollableHeightHint = hint;

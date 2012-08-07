@@ -6,27 +6,25 @@
  */
 package org.jdesktop.swingx;
 
-import java.awt.event.ActionEvent;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 
 import javax.swing.plaf.UIResource;
 
-import junit.framework.TestCase;
-
-import org.jdesktop.swingx.action.AbstractActionExt;
+import org.jdesktop.test.EDTRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
 
-
-
-@RunWith(JUnit4.class)
-public class JXTaskPaneContainerTest extends TestCase {
+@RunWith(EDTRunner.class)
+public class JXTaskPaneContainerTest {
 
     @Test
-  public void testAddon() throws Exception {
-    // move around all addons
-    TestUtilities.cycleAddons(new JXTaskPaneContainer());
-  }
+    public void testAddon() throws Exception {
+        // move around all addons
+        TestUtilities.cycleAddons(new JXTaskPaneContainer());
+    }
 
     @Test
     public void testScrollableTracks() {
@@ -35,9 +33,9 @@ public class JXTaskPaneContainerTest extends TestCase {
         assertEquals(ScrollableSizeHint.FIT, container.getScrollableWidthHint());
         // no parent, no tracking
         assertFalse(container.getScrollableTracksViewportHeight());
-        assertEquals(ScrollableSizeHint.VERTICAL_STRETCH, container.getScrollableHeightHint());
+        assertEquals(ScrollableSizeHint.PREFERRED_STRETCH, container.getScrollableHeightHint());
     }
-    
+
     /**
      * Issue #843-swingx: BasicTaskPaneContainerUI must respect custom Layout.
      */
@@ -48,8 +46,7 @@ public class JXTaskPaneContainerTest extends TestCase {
         VerticalLayout custom = new VerticalLayout(layout.getGap() + 10);
         container.setLayout(custom);
         container.updateUI();
-        assertEquals(custom.getGap(), ((VerticalLayout) container.getLayout())
-                .getGap());
+        assertEquals(custom.getGap(), ((VerticalLayout) container.getLayout()).getGap());
     }
 
     /**
@@ -73,25 +70,4 @@ public class JXTaskPaneContainerTest extends TestCase {
         JXTaskPaneContainer container = new JXTaskPaneContainer();
         assertTrue(container.getLayout() instanceof UIResource);
     }
-
-    private void fillTaskPane(JXTaskPane first) {
-        first.add(new AbstractActionExt("some") {
-
-            public void actionPerformed(ActionEvent e) {
-                // TODO Auto-generated method stub
-
-            }
-
-        });
-
-        first.add(new AbstractActionExt("other") {
-
-            public void actionPerformed(ActionEvent e) {
-                // TODO Auto-generated method stub
-
-            }
-
-        });
-    }
-
 }

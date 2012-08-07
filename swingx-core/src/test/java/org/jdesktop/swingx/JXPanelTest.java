@@ -50,7 +50,7 @@ import org.junit.runner.RunWith;
  * @author Karl Schaefer
  */
 @RunWith(EDTRunner.class)
-@SuppressWarnings("rawtypes")
+@SuppressWarnings({"rawtypes", "nls"})
 public class JXPanelTest extends TestCase {
     @SuppressWarnings("unused")
     private static final Logger LOG = Logger.getLogger(JXPanelTest.class
@@ -75,7 +75,7 @@ public class JXPanelTest extends TestCase {
         JXPanel panel = new JXPanel();
         ScrollableSizeHint oldTrack = panel.getScrollableWidthHint();
         PropertyChangeReport report = new PropertyChangeReport(panel);
-        ScrollableSizeHint none = ScrollableSizeHint.HORIZONTAL_STRETCH;
+        ScrollableSizeHint none = ScrollableSizeHint.PREFERRED_STRETCH;
         panel.setScrollableWidthHint(none);
         assertSame(none, panel.getScrollableWidthHint());
         TestUtils.assertPropertyChangeEvent(report, "scrollableWidthHint", oldTrack, none);
@@ -85,7 +85,7 @@ public class JXPanelTest extends TestCase {
         JXPanel panel = new JXPanel();
         ScrollableSizeHint oldTrack = panel.getScrollableHeightHint();
         PropertyChangeReport report = new PropertyChangeReport(panel);
-        ScrollableSizeHint none = ScrollableSizeHint.VERTICAL_STRETCH;
+        ScrollableSizeHint none = ScrollableSizeHint.PREFERRED_STRETCH;
         panel.setScrollableHeightHint(none);
         assertSame(none, panel.getScrollableHeightHint());
         TestUtils.assertPropertyChangeEvent(report, "scrollableHeightHint", oldTrack, none);
@@ -96,19 +96,9 @@ public class JXPanelTest extends TestCase {
         new JXPanel().setScrollableHeightHint(null);
     }
     
-    @Test (expected = IllegalArgumentException.class)
-    public void testScrollableHeightTrackIllegal() {
-        new JXPanel().setScrollableHeightHint(ScrollableSizeHint.HORIZONTAL_STRETCH);
-    }
-    
     @Test (expected = NullPointerException.class)
     public void testScrollableWidthTrackNull() {
         new JXPanel().setScrollableWidthHint(null);
-    }
-    
-    @Test (expected = IllegalArgumentException.class)
-    public void testScrollableWidthTrackIllegal() {
-        new JXPanel().setScrollableWidthHint(ScrollableSizeHint.VERTICAL_STRETCH);
     }
     
     /**
@@ -144,49 +134,6 @@ public class JXPanelTest extends TestCase {
         assertFalse(panel.getScrollableTracksViewportHeight());
     }
 
-//----------------- test scrollable Size Track
-    
-    @Test
-    public void testOrientationCompatible() {
-        assertVerticalCompatible(true, ScrollableSizeHint.NONE, ScrollableSizeHint.FIT, 
-                ScrollableSizeHint.VERTICAL_STRETCH);
-        assertVerticalCompatible(false, ScrollableSizeHint.HORIZONTAL_STRETCH);
-        assertHorizontalCompatible(true, ScrollableSizeHint.NONE, ScrollableSizeHint.FIT, 
-                ScrollableSizeHint.HORIZONTAL_STRETCH);
-        assertHorizontalCompatible(false, ScrollableSizeHint.VERTICAL_STRETCH);
-    }
-    /**
-     * 
-     */
-    private void assertVerticalCompatible(boolean compatible, ScrollableSizeHint... tracks) {
-        for (ScrollableSizeHint track : tracks) {
-            assertEquals("vertical expected on " + track, compatible, track.isVerticalCompatible());
-        }
-    }
-    /**
-     * 
-     */
-    private void assertHorizontalCompatible(boolean compatible, ScrollableSizeHint... tracks) {
-        for (ScrollableSizeHint track : tracks) {
-            assertEquals("horizontal expected on " + track, compatible, track.isHorizontalCompatible());
-        }
-    }
-
-    /**
-     * Test contract - NPE on null component
-     */
-    @Test 
-    public void testScrollableSizeTrackNPE() {
-        for (ScrollableSizeHint behaviour : ScrollableSizeHint.values()) {
-            try {
-                behaviour.getTracksParentSize(null);
-                fail("null component must throw NPE, didn't on " + behaviour);
-            } catch (NullPointerException e) {
-                // expected
-            }
-        }
-    }
-    
     /**
      * SwingX #962: ensure that background painter is initially {@code null}.
      */

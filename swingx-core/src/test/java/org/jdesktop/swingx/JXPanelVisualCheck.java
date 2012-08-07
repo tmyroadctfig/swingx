@@ -94,7 +94,7 @@ public class JXPanelVisualCheck extends InteractiveTestCase {
             ScrollableSizeHint[] tracks = new ScrollableSizeHint[] {
                     ScrollableSizeHint.FIT
                     , ScrollableSizeHint.NONE
-                    , ScrollableSizeHint.VERTICAL_STRETCH
+                    , ScrollableSizeHint.PREFERRED_STRETCH
             };
             int position;
             
