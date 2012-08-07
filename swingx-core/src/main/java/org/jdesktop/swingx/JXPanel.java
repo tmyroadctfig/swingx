@@ -22,7 +22,6 @@
 package org.jdesktop.swingx;
 
 import java.awt.AlphaComposite;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Composite;
 import java.awt.Dimension;
@@ -387,27 +386,6 @@ public class JXPanel extends JPanel implements AlphaPaintable, BackgroundPaintab
         setScrollableWidthHint(scrollableTracksViewportWidth ? 
                 ScrollableSizeHint.FIT : ScrollableSizeHint.NONE);
     }
-
-    /**
-     * Sets the background color for this component by
-     * 
-     * @param bg
-     *            the desired background <code>Color</code>
-     * @see javax.swing.JComponent#getBackground()
-     * @see #setOpaque(boolean)
-     * 
-    * @beaninfo
-    *    preferred: true
-    *        bound: true
-    *    attribute: visualUpdate true
-    *  description: The background color of the component.
-     */
-    @Override
-    public void setBackground(Color bg) {
-        super.setBackground(bg);
-        
-        SwingXUtilities.installBackground(this, bg);
-    }
     
     /**
      * Sets a Painter to use to paint the background of this JXPanel.
@@ -531,22 +509,18 @@ public class JXPanel extends JPanel implements AlphaPaintable, BackgroundPaintab
      */
     @Override
     protected void paintComponent(Graphics g) {
-        if (backgroundPainter == null) {
+        if (isOpaque()) {
             super.paintComponent(g);
-        } else {
-            if (isOpaque()) {
-                super.paintComponent(g);
-            }
-            
-            Graphics2D g2 = (Graphics2D) g.create();
-            
-            try {
-                SwingXUtilities.paintBackground(this, g2);
-            } finally {
-                g2.dispose();
-            }
-            
-            getUI().paint(g, this);
         }
+        
+        Graphics2D g2 = (Graphics2D) g.create();
+        
+        try {
+            SwingXUtilities.paintBackground(this, g2);
+        } finally {
+            g2.dispose();
+        }
+        
+        getUI().paint(g, this);
     }
 }

@@ -57,7 +57,6 @@ import javax.swing.plaf.UIResource;
 import javax.swing.text.html.HTMLDocument;
 
 import org.jdesktop.swingx.painter.Painter;
-import org.jdesktop.swingx.plaf.PainterUIResource;
 
 /**
  * A collection of utility methods for Swing(X) classes.
@@ -160,26 +159,13 @@ public final class SwingXUtilities {
         }
     }
     
-    static <C extends JComponent & BackgroundPaintable> void installBackground(C comp, Color color) {
-        if (isUIInstallable(color)) {
-            //only handle UIResource, if null then painter isn't painted; this allows optimized code paths
-            if (comp.getBackgroundPainter() instanceof UIResource) {
-                comp.setBackgroundPainter(new PainterUIResource<JComponent>(new BackgroundPainter(color)));
-            }
-            //does nothing otherwise; do not install UIResource Color over a non-UIResource Painter
-        } else {
-            comp.setBackgroundPainter(new BackgroundPainter(color));
-        }
-    }
-    
     @SuppressWarnings("unchecked")
     static <C extends JComponent & BackgroundPaintable> void paintBackground(C comp, Graphics2D g) {
         Painter<? super C> painter = comp.getBackgroundPainter();
         
-        if (painter instanceof BackgroundPainter) {
-            //ignore paintBorderInsets for BackgroundPainter
-            painter.paint(g, comp, comp.getWidth(), comp.getHeight());
-        } else if (painter != null) {
+        if (painter == null) {
+            new BackgroundPainter(comp.getBackground()).paint(g, comp, comp.getWidth(), comp.getHeight());
+        } else {
             if (comp.isPaintBorderInsets()) {
                 painter.paint(g, comp, comp.getWidth(), comp.getHeight());
             } else {

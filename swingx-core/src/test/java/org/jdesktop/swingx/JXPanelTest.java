@@ -21,9 +21,7 @@
  */
 package org.jdesktop.swingx;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
@@ -34,7 +32,6 @@ import java.awt.Color;
 import java.util.logging.Logger;
 
 import javax.swing.plaf.ColorUIResource;
-import javax.swing.plaf.UIResource;
 
 import junit.framework.TestCase;
 
@@ -44,7 +41,6 @@ import org.jdesktop.swingx.plaf.PainterUIResource;
 import org.jdesktop.test.EDTRunner;
 import org.jdesktop.test.PropertyChangeReport;
 import org.jdesktop.test.TestUtils;
-import org.junit.Assume;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -205,7 +201,7 @@ public class JXPanelTest extends TestCase {
      * SwingX #964: ensure setting background color sets painter.
      */
     @Test
-    public void testSetColorOverridesNullBackgroundPainter() {
+    public void testSetColorDoesNotOverrideNullBackgroundPainter() {
         JXPanel panel = new JXPanel();
         
         //assure painter is null
@@ -213,7 +209,7 @@ public class JXPanelTest extends TestCase {
         
         panel.setBackground(Color.BLACK);
         
-        assertThat(panel.getBackgroundPainter(), is(notNullValue()));
+        assertThat(panel.getBackgroundPainter(), is(nullValue()));
     }
     
     /**
@@ -237,7 +233,7 @@ public class JXPanelTest extends TestCase {
      * background painter is {@code null} or a {@code UIResource}.
      */
     @Test
-    public void testSetUIResourceColorOverridesUIResourceBackgroundPainter() {
+    public void testSetUIResourceColorDoesNotOverrideUIResourceBackgroundPainter() {
         JXPanel panel = new JXPanel();
         
         Painter myResource = new PainterUIResource<JXPanel>(new MattePainter(Color.BLACK));
@@ -245,8 +241,7 @@ public class JXPanelTest extends TestCase {
         
         panel.setBackground(new ColorUIResource(Color.BLACK));
         
-        assertThat(panel.getBackgroundPainter(), is(instanceOf(UIResource.class)));
-        assertThat(panel.getBackgroundPainter(), is(not(myResource)));
+        assertThat(panel.getBackgroundPainter(), is(myResource));
     }
     
     /**

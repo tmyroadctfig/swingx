@@ -541,27 +541,6 @@ public class JXButton extends JButton implements BackgroundPaintable {
     private void init() {
         fgStamp = new ForegroundButton();
     }
-
-    /**
-     * Sets the background color for this component by
-     * 
-     * @param bg
-     *            the desired background <code>Color</code>
-     * @see javax.swing.JComponent#getBackground()
-     * @see #setOpaque
-     * 
-    * @beaninfo
-    *    preferred: true
-    *        bound: true
-    *    attribute: visualUpdate true
-    *  description: The background color of the component.
-     */
-    @Override
-    public void setBackground(Color bg) {
-        super.setBackground(bg);
-        
-        SwingXUtilities.installBackground(this, bg);
-    }
     
     /**
      * {@inheritDoc}
@@ -722,8 +701,10 @@ public class JXButton extends JButton implements BackgroundPaintable {
     }
     
     private void paintWithForegroundPainterWithFilters(Graphics g) {
-        BufferedImage im = GraphicsUtilities.createCompatibleImage(getWidth(), getHeight());
+        BufferedImage im = GraphicsUtilities.createCompatibleTranslucentImage(getWidth(), getHeight());
         Graphics2D g2d = im.createGraphics();
+        Graphics gfx = getComponentGraphics(g2d);
+        assert gfx == g2d;
         paintWithForegroundPainterWithoutFilters(g2d);
         
         for (BufferedImageOp filter : ((AbstractPainter<?>) fgPainter).getFilters()) {
