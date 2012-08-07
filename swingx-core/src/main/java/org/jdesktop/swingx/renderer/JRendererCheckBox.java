@@ -78,27 +78,16 @@ public class JRendererCheckBox extends JCheckBox implements PainterAware {
     public boolean isOpaque() {
         // JW: fix for #897, not sure of any side-effects
         // contentAreaFilled and opaque might be inconsistent
+        // JW: definitely the wrong-thing-to-do, prevents tweaking opacity as needed
         return painter == null;
-    }
-
-    /**
-     * Overridden for performance reasons.<p>
-     * PENDING: Think about Painters and opaqueness?
-     * 
-     */
-//    @Override
-//    public boolean isOpaque() { 
-//        Color back = getBackground();
-//        Component p = getParent(); 
-//        if (p != null) { 
-//            p = p.getParent(); 
+        // this is better, needs to be checked for side-effects
+        // doing so leads to regression of #897 in Win and motif
+        // still fine in metal and nimbus
+//        if (painter != null) {
+//            return false;
 //        }
-//        // p should now be the JTable. 
-//        boolean colorMatch = (back != null) && (p != null) && 
-//            back.equals(p.getBackground()) && 
-//                        p.isOpaque();
-//        return !colorMatch && super.isOpaque(); 
-//    }
+//        return super.isOpaque();
+    }
 
     /**
      * {@inheritDoc} <p>

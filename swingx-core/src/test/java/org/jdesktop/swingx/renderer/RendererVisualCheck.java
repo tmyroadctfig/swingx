@@ -117,6 +117,7 @@ import org.jdesktop.swingx.hyperlink.HyperlinkAction;
 import org.jdesktop.swingx.hyperlink.LinkModel;
 import org.jdesktop.swingx.hyperlink.LinkModelAction;
 import org.jdesktop.swingx.painter.BusyPainter;
+import org.jdesktop.swingx.painter.MattePainter;
 import org.jdesktop.swingx.rollover.RolloverRenderer;
 import org.jdesktop.swingx.table.ColumnControlButton;
 import org.jdesktop.swingx.test.ComponentTreeTableModel;
@@ -140,7 +141,8 @@ public class RendererVisualCheck extends InteractiveTestCase {
         setSystemLF(true);
         RendererVisualCheck test = new RendererVisualCheck();
         try {
-            test.runInteractiveTests();
+//            test.runInteractiveTests();
+          test.runInteractiveTests(".*CheckBox.*");
 //          test.runInteractiveTests(".*CustomIcons.*");
 //          test.runInteractiveTests(".*XLabel.*");
 //            test.runInteractiveTests(".*Button.*");
@@ -429,7 +431,9 @@ public class RendererVisualCheck extends InteractiveTestCase {
     public void interactiveCheckBoxRenderer() {
         JXTable table = new JXTable(new AncientSwingTeam());
         table.addHighlighter(HighlighterFactory.createSimpleStriping());
-        table.addHighlighter(new PainterHighlighter(HighlightPredicate.ROLLOVER_ROW, new BusyPainter()));
+        table.addHighlighter(new PainterHighlighter(HighlightPredicate.ROLLOVER_ROW, 
+//                new MattePainter()));
+                new BusyPainter()));
         showWithScrollingInFrame(table, "Checkbox: striping lost on rollover");
     }
 
