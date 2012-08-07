@@ -143,9 +143,9 @@ public class RendererVisualCheck extends InteractiveTestCase {
 //            test.runInteractiveTests();
 //          test.runInteractiveTests(".*CustomIcons.*");
 //          test.runInteractiveTests(".*XLabel.*");
-            test.runInteractiveTests(".*Button.*");
+//            test.runInteractiveTests(".*Button.*");
 //          test.runInteractiveTests(".*TextArea.*");
-//          test.runInteractiveTests(".*Text.*");
+          test.runInteractiveTests(".*Text.*");
 //          test.runInteractiveTests(".*Color.*");
 //          test.runInteractiveTests("interactive.*ColumnControl.*");
 //            test.runInteractive("RowGrouping");

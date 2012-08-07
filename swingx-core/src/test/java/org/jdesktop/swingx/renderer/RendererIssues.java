@@ -104,7 +104,7 @@ public class RendererIssues extends InteractiveTestCase {
             .getName());
 
     public static void main(String[] args) {
-        setSystemLF(true);
+//        setSystemLF(true);
         RendererIssues test = new RendererIssues();
         try {
 //            test.runInteractiveTests();
@@ -120,27 +120,40 @@ public class RendererIssues extends InteractiveTestCase {
             e.printStackTrace();
         }
     }
-
-    /**
-     * Issue swingx-1514: icon background always highlighted
-     */
-    public void interactiveDefaultTreeRendererBackgroundOnIconTreeTable() {
-        JXTreeTable table = new JXTreeTable(new FileSystemModel(new File(".")));
-        table.setTreeCellRenderer(new DefaultTreeRenderer());
-        table.addHighlighter(HighlighterFactory.createSimpleStriping());
-        showWithScrollingInFrame(table, "background on icon?");
-    }
+    
     
     /**
-     * Issue swingx-1514: icon background always highlighted
+     * Issue swingx-1514: icon background always highlighted. <p>
+     * Actually a problem introduced by #3789 version of JXPanel
+     * Not special to the hierarchical nature, same for list
+     * 
+     * @see org.jdesktop.swingx.renderer.RendererVisualCheck#interactiveIconTextAlignment
      */
-    public void interactiveDefaultTreeRendererBackgroundOnIconTree() {
-        JXTree table = new JXTree(new FileSystemModel(new File(".")));
-        table.setCellRenderer(new DefaultTreeRenderer());
+    public void interactiveTreeRendererSimple() {
+        JXTree table = new JXTree();
+        table.expandAll();
+        final WrappingProvider wrapper = new WrappingProvider();
+        table.setCellRenderer(new DefaultTreeRenderer(wrapper));
         table.addHighlighter(HighlighterFactory.createSimpleStriping());
-        showWithScrollingInFrame(table, "background on icon?");
+        JXFrame frame = wrapWithScrollingInFrame(table, "background on icon?");
+        addAction(frame, createToggleExtendsOpacityAction(wrapper, table));
+        show(frame);
     }
     
+    private Action createToggleExtendsOpacityAction(final WrappingProvider provider, final JComponent target) {
+        final String text = "toggle extendsOpacity to: ";
+        Action a = new AbstractAction(text + !provider.getExtendsComponentOpacity()) {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                boolean old = provider.getExtendsComponentOpacity();
+                provider.setExtendsComponentOpacity(!old);
+                putValue(Action.NAME, text + old);
+                target.repaint();
+            }
+        };
+        return a;
+    }
 
     /**
      * Issue ??-swingx: Boolean renderer background is slightly darker if 
