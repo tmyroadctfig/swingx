@@ -25,6 +25,7 @@ package org.jdesktop.swingx;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.GridLayout;
 import java.awt.Paint;
 import java.awt.event.ActionEvent;
 
@@ -51,15 +52,15 @@ public class JXPanelVisualCheck extends InteractiveTestCase {
 
     public static void main(String args[]) {
       final JXPanelVisualCheck test = new JXPanelVisualCheck();
-//      setLAF("Nimbus");
+      setLAF("Nimbus");
       SwingUtilities.invokeLater(new Runnable() {
           public void run() {
       try {
                 
 //         test.runInteractiveTests("interactive.*");
-//         test.runInteractive("BackgroundPainter");
+         test.runInteractive("BackgroundAlpha");
 //         test.runInteractive("BackgroundAndAlphaCheck");
-         test.runInteractive("FrameArtefacts");
+//         test.runInteractive("FrameArtefacts");
          
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
@@ -70,7 +71,7 @@ public class JXPanelVisualCheck extends InteractiveTestCase {
   }
     
     /**
-     * Issue ??-swingx: painting artefacts in a JXFrame (which uses JXPanel as rootPane)
+     * Issue #1515-swingx: painting artefacts in a JXFrame (which uses JXPanel as rootPane)
      * 
      * If the upper frame contains a JXPanel with alpha, the lower background is painted
      * only below the area of the upper frame.
@@ -92,18 +93,48 @@ public class JXPanelVisualCheck extends InteractiveTestCase {
     }
     
     /**
+     * Issue #1516-swingx: need feature to _not_ paint the background if alpha and not-opaque
+     * 
      * 
      */
-    public void interactiveBackgroundPainter() {
-        JPanel panel = new JPanel();
+    public void interactiveBackgroundAlphaToggleOpaque() {
+        final JXPanel panel = new JXPanel();
+        final boolean initialOpaque = false;
+        panel.setOpaque(initialOpaque);
         Color red = Color.RED;
         Color alpha = PaintUtils.setAlpha(red, 100);
-        panel.setBackground(red);
-        JXFrame frame = wrapInFrame(panel, "alpha and opacity");
-        frame.setBackground(Color.WHITE);
+        panel.setBackground(alpha);
+        JXFrame frame = wrapInFrame(panel, "changing opaque has no effect with alpha background");
+        Action action = new AbstractAction("toggle opaque") {
+            boolean realOpaque = initialOpaque;
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                realOpaque = !realOpaque;
+                panel.setOpaque(realOpaque);
+            }
+        };
+        addAction(frame, action);
         show(frame, 400, 400);
     }
     
+    /**
+     * Issue 1517-swingx: JXPanel - background color depends on opaqueness prior to setting   
+     */
+    public void interactiveBackgroundAlphaColorDependsOnOpaque() {
+        JPanel container = new JPanel(new GridLayout(0, 2));
+        Color alpha = PaintUtils.setAlpha(Color.RED, 100);
+        
+        JXPanel opaque = new JXPanel();
+        opaque.setBackground(alpha);
+        
+        JXPanel nonOpaque = new JXPanel();
+        nonOpaque.setOpaque(false);
+        nonOpaque.setBackground(alpha);
+        
+        container.add(opaque);
+        container.add(nonOpaque);
+        show(wrapInFrame(container, "compare alpha background: opaque <-> not opaque"), 400, 400);
+    }
     
     /**
      * Issue #1199-swingx: JXPanel - must repaint on changes to background painter.
@@ -181,6 +212,8 @@ public class JXPanelVisualCheck extends InteractiveTestCase {
      * Here: run this check with several tests active so that the frame create here is overlapped
      * by others, the click on its title to move to front. The background is not uniform: the 
      * formerly covered part is grey, the formerly exposed part is white.
+     * 
+     * Update: probably similar to #1515
      * 
      * @throws Exception
      */
