@@ -35,6 +35,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.painter.ImagePainter;
@@ -49,15 +50,60 @@ import org.jdesktop.swingx.util.PaintUtils;
 public class JXPanelVisualCheck extends InteractiveTestCase {
 
     public static void main(String args[]) {
-//      setSystemLF(true);
-      JXPanelVisualCheck test = new JXPanelVisualCheck();
+      final JXPanelVisualCheck test = new JXPanelVisualCheck();
+//      setLAF("Nimbus");
+      SwingUtilities.invokeLater(new Runnable() {
+          public void run() {
       try {
-         test.runInteractiveTests("interactive.*");
+                
+//         test.runInteractiveTests("interactive.*");
+//         test.runInteractive("BackgroundPainter");
+//         test.runInteractive("BackgroundAndAlphaCheck");
+         test.runInteractive("FrameArtefacts");
+         
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
       }
+          }
+      });
   }
+    
+    /**
+     * Issue ??-swingx: painting artefacts in a JXFrame (which uses JXPanel as rootPane)
+     * 
+     * If the upper frame contains a JXPanel with alpha, the lower background is painted
+     * only below the area of the upper frame.
+     * All fine without alpha on the upper.
+     * The exact outcome is erractic (sometimes half or even fully painted). 
+     * On/off EDT doesn't seem to make a difference.
+     */
+    public void interactiveXPanelInFrameArtefacts() {
+        JPanel panel = new JPanel();
+        Color red = Color.RED;
+        panel.setBackground(red);
+        JXFrame frame = wrapInFrame(panel, "plain panel added to contentPane of a xframe");
+        show(frame, 400, 400);
+        
+        JXPanel other = new JXPanel();
+        other.setAlpha(.5f);
+        JXFrame otherFrame = wrapInFrame(other, "xpanel with alpha, showing on top of first");
+        show(otherFrame, 100, 100);
+    }
+    
+    /**
+     * 
+     */
+    public void interactiveBackgroundPainter() {
+        JPanel panel = new JPanel();
+        Color red = Color.RED;
+        Color alpha = PaintUtils.setAlpha(red, 100);
+        panel.setBackground(red);
+        JXFrame frame = wrapInFrame(panel, "alpha and opacity");
+        frame.setBackground(Color.WHITE);
+        show(frame, 400, 400);
+    }
+    
     
     /**
      * Issue #1199-swingx: JXPanel - must repaint on changes to background painter.
@@ -127,11 +173,24 @@ public class JXPanelVisualCheck extends InteractiveTestCase {
         return component;
     }
 
+    /**
+     * See a painter at work.
+     * 
+     * Plus Issue ??-swingx: setting opaqueness _after_ the painter leads to painting artefacts.
+     * 
+     * Here: run this check with several tests active so that the frame create here is overlapped
+     * by others, the click on its title to move to front. The background is not uniform: the 
+     * formerly covered part is grey, the formerly exposed part is white.
+     * 
+     * @throws Exception
+     */
     public void interactiveIconPainter() throws Exception {
         ImagePainter imagePainter = new ImagePainter(ImageIO.read(JXPanel.class.getResource("resources/images/kleopatra.jpg")));
         JXPanel panel = new JXPanel();
         panel.setBackgroundPainter(imagePainter);
-//        panel.setOpaque(false);
+        // uncomment to see the painting glitch. Move to before setting the background painter and
+        // all is fine.
+        panel.setOpaque(false);
         panel.setPreferredSize(new Dimension(200, 200));
         showWithScrollingInFrame(panel, "icon painter in jxpanel");
     }
