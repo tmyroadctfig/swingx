@@ -21,6 +21,7 @@
  */
 package org.jdesktop.swingx.renderer;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -55,6 +56,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
+import javax.swing.AbstractButton;
 import javax.swing.AbstractListModel;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
@@ -63,10 +65,12 @@ import javax.swing.DefaultListModel;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
@@ -98,6 +102,7 @@ import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXHyperlink;
 import org.jdesktop.swingx.JXLabel;
 import org.jdesktop.swingx.JXList;
+import org.jdesktop.swingx.JXPanel;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.JXTree;
 import org.jdesktop.swingx.JXTreeTable;
@@ -117,6 +122,7 @@ import org.jdesktop.swingx.hyperlink.HyperlinkAction;
 import org.jdesktop.swingx.hyperlink.LinkModel;
 import org.jdesktop.swingx.hyperlink.LinkModelAction;
 import org.jdesktop.swingx.painter.BusyPainter;
+import org.jdesktop.swingx.painter.ImagePainter;
 import org.jdesktop.swingx.painter.MattePainter;
 import org.jdesktop.swingx.rollover.RolloverRenderer;
 import org.jdesktop.swingx.table.ColumnControlButton;
@@ -141,8 +147,8 @@ public class RendererVisualCheck extends InteractiveTestCase {
         setSystemLF(true);
         RendererVisualCheck test = new RendererVisualCheck();
         try {
-//            test.runInteractiveTests();
-          test.runInteractiveTests(".*CheckBox.*");
+            test.runInteractiveTests();
+//          test.runInteractiveTests(".*CheckBox.*");
 //          test.runInteractiveTests(".*CustomIcons.*");
 //          test.runInteractiveTests(".*XLabel.*");
 //            test.runInteractiveTests(".*Button.*");
@@ -158,6 +164,98 @@ public class RendererVisualCheck extends InteractiveTestCase {
             e.printStackTrace();
         }
     }
+
+    /**
+     * Issue #1513-swingx: opacity of JRendererCheckBox can't be effected by 
+     * client code.
+     * 
+     * Stand-alone JRendererCheckBox showing permutations of not/opaque and with/out painter
+     */
+    public void interactiveRendererCheckBox() {
+        JRendererCheckBox opaque = new JRendererCheckBox();
+        opaque.setText("I'm opaque without painter");
+        opaque.setBackground(Color.YELLOW);
+        
+        JRendererCheckBox opaqueWith = new JRendererCheckBox();
+        opaqueWith.setText("I'm opaque with painter");
+        opaqueWith.setBackground(Color.YELLOW);
+        opaqueWith.setPainter(new BusyPainter());
+        
+        JRendererCheckBox transparent = new JRendererCheckBox();
+        transparent.setText("I'm transparent without painter");
+        transparent.setBackground(Color.YELLOW);
+//        transparent.setContentAreaFilled(false);
+        transparent.setOpaque(false);
+//        transparent.setPainter(new BusyPainter());
+        
+        
+        JRendererCheckBox transparentWith = new JRendererCheckBox();
+        transparentWith.setText("I'm transparent WITH painter");
+        transparentWith.setBackground(Color.YELLOW);
+//        transparentWith.setContentAreaFilled(false);
+        transparentWith.setOpaque(false);
+        transparentWith.setPainter(new BusyPainter());
+        
+        
+        JCheckBox plain = new JCheckBox("I'm a plain transparent box");
+        plain.setBackground(Color.YELLOW);
+//        plain.setContentAreaFilled(false);
+        plain.setOpaque(false);
+        
+        JPanel content = new JPanel();
+        content.setBackground(Color.WHITE);
+        content.add(opaque);
+        content.add(opaqueWith);
+        content.add(transparent);
+        content.add(transparentWith);
+        content.add(plain);
+        JXFrame frame = wrapInFrame(content, "checkRendereres");
+        show(frame);
+        
+    }
+    /**
+     * Issue #1513-swingx: opacity of JRendererCheckBox can't be effected by 
+     * client code.
+     * 
+     * Here's a use-case: make all components in the stack not-opaque to show
+     * a background image. (note: opacity not false for number column)
+     */
+    public void interactiveCheckBoxRendererOpacity1513() {
+        JXPanel panel = new JXPanel(new BorderLayout());
+        panel.setBackgroundPainter(new ImagePainter(XTestUtils.loadDefaultImage("moon.jpg")));
+        JXTable table = new JXTable(new AncientSwingTeam());
+        table.addHighlighter(HighlighterFactory.createSimpleStriping());
+        table.addHighlighter(new PainterHighlighter(HighlightPredicate.ROLLOVER_ROW, 
+                new MattePainter()));
+//                new BusyPainter()));
+        panel.add(new JScrollPane(table));
+        table.setOpaque(false);
+        JComponent comp = (JComponent) table.prepareRenderer(0, 0);
+        comp.setOpaque(false);
+        AbstractButton checkBox = (AbstractButton) table.prepareRenderer(0, AncientSwingTeam.BOOLEAN_COLUMN);
+        checkBox.setOpaque(false);
+        ((JComponent) table.getParent()).setOpaque(false);
+        ((JComponent) table.getParent().getParent()).setOpaque(false);
+        showInFrame(panel, "Checkbox: set to opacity");
+    }
+
+    /**
+     * Issue #897-swingx: Opacity issues of JRendererCheckBox - striping lost.
+     * 
+     *  Reported against Nimbus, but similar in other LAFs if combined
+     *  with Painter.
+     */
+    public void interactiveCheckBoxRendererOpacity897() {
+        JXTable table = new JXTable(new AncientSwingTeam());
+        table.addHighlighter(HighlighterFactory.createSimpleStriping());
+        table.addHighlighter(new PainterHighlighter(HighlightPredicate.ROLLOVER_ROW, 
+//                new MattePainter()));
+                new BusyPainter()));
+        showWithScrollingInFrame(table, "Checkbox: striping lost on rollover");
+    }
+
+
+
     
     /**
      * Conditionally hide the renderingComponent
@@ -422,21 +520,6 @@ public class RendererVisualCheck extends InteractiveTestCase {
         addStatusComponent(frame, label);
     }
     
-    /**
-     * Issue #897-swingx: Opacity issues of JRendererCheckBox - striping lost.
-     * 
-     *  Reported against Nimbus, but similar in other LAFs if combined
-     *  with Painter.
-     */
-    public void interactiveCheckBoxRenderer() {
-        JXTable table = new JXTable(new AncientSwingTeam());
-        table.addHighlighter(HighlighterFactory.createSimpleStriping());
-        table.addHighlighter(new PainterHighlighter(HighlightPredicate.ROLLOVER_ROW, 
-//                new MattePainter()));
-                new BusyPainter()));
-        showWithScrollingInFrame(table, "Checkbox: striping lost on rollover");
-    }
-
     /**
      * List/tree filled with TreeNodes wrapping a File.
      * 

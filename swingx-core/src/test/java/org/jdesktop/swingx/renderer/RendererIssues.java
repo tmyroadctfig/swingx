@@ -47,6 +47,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
@@ -108,17 +109,18 @@ public class RendererIssues extends InteractiveTestCase {
             .getName());
 
     public static void main(String[] args) {
-//        setSystemLF(true);
         RendererIssues test = new RendererIssues();
+        setLAF("Win");
         try {
-//            test.runInteractiveTests();
+            test.runInteractiveTests();
 //          test.runInteractiveTests("interactive.*Alpha.*");
 //          test.runInteractiveTests(".*XLabel.*");
 //          test.runInteractiveTests(".*Color.*");
 //          test.runInteractiveTests("interactive.*ColumnControl.*");
 //          test.runInteractiveTests("interactive.*ToolTip.*");
 //            test.runInteractiveTests("interactive.*TreeRenderer.*");
-          test.runInteractiveTests("interactive.*Opacity.*");
+//            test.runInteractiveTests("interactive.*Opacity.*");
+//          test.runInteractive("RendererCheckBox");
 //          test.runInteractiveTests("interactive.*Hyperlink.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
@@ -126,48 +128,7 @@ public class RendererIssues extends InteractiveTestCase {
         }
     }
     
-    /**
-     * Issue #1513-swingx: opacity of JRendererCheckBox can't be effected by 
-     * client code.
-     * 
-     * Here's a use-case: make all components in the stack not-opaque to show
-     * a background image. (note: opacity not false for number column)
-     */
-    public void interactiveCheckBoxRendererOpacity1513() {
-        JXPanel panel = new JXPanel(new BorderLayout());
-        panel.setBackgroundPainter(new ImagePainter(XTestUtils.loadDefaultImage("moon.jpg")));
-        JXTable table = new JXTable(new AncientSwingTeam());
-//        table.addHighlighter(HighlighterFactory.createSimpleStriping());
-        table.addHighlighter(new PainterHighlighter(HighlightPredicate.ROLLOVER_ROW, 
-                new MattePainter()));
-//                new BusyPainter()));
-        panel.add(new JScrollPane(table));
-        table.setOpaque(false);
-        JComponent comp = (JComponent) table.prepareRenderer(0, 0);
-        comp.setOpaque(false);
-        comp = (JComponent) table.prepareRenderer(0, AncientSwingTeam.BOOLEAN_COLUMN);
-        comp.setOpaque(false);
-        ((JComponent) table.getParent()).setOpaque(false);
-        ((JComponent) table.getParent().getParent()).setOpaque(false);
-        showInFrame(panel, "Checkbox: set to opacity");
-    }
-
-    /**
-     * Issue #897-swingx: Opacity issues of JRendererCheckBox - striping lost.
-     * 
-     *  Reported against Nimbus, but similar in other LAFs if combined
-     *  with Painter.
-     */
-    public void interactiveCheckBoxRendererOpacity897() {
-        JXTable table = new JXTable(new AncientSwingTeam());
-        table.addHighlighter(HighlighterFactory.createSimpleStriping());
-        table.addHighlighter(new PainterHighlighter(HighlightPredicate.ROLLOVER_ROW, 
-//                new MattePainter()));
-                new BusyPainter()));
-        showWithScrollingInFrame(table, "Checkbox: striping lost on rollover");
-    }
-
-
+    
     
     /**
      * Issue swingx-1514: icon background always highlighted. <p>

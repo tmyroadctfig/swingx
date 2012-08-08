@@ -33,60 +33,61 @@ import org.jdesktop.swingx.painter.Painter;
  * A <code>JCheckBox</code> optimized for usage in renderers and
  * with a minimal background painter support. <p>
  * 
- * <i>Note</i>: the painter support will be switched to painter_work as 
- * soon it enters main. 
+ * <b>Note</b>: As of revision #4223, there's a complete overhaul (aka: changed the tricksery) to 
+ * fix Issue swingx-1513 (allow client code to set renderer transparent) while keeping
+ * fix Issue swingx-897 (striping/background lost when painter installed)
  * 
  * @author Jeanette Winzenburg
  */
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public class JRendererCheckBox extends JCheckBox implements PainterAware {
     protected Painter painter;
+    private boolean isPainting;
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public Painter getPainter() {
         return painter;
     }
 
-
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setPainter(Painter painter) {
         Painter old = getPainter();
         this.painter = painter;
-        if (painter != null) {
-            // ui maps to !opaque
-            // Note: this is incomplete - need to keep track of the 
-            // "real" contentfilled property
-            // JW: revisit - really needed after fix for #897?
-            setContentAreaFilled(false);
-        } // PENDING JW: asymetric! no else?
-//        else {
-//            setContentAreaFilled(true);
-//        }
         firePropertyChange("painter", old, getPainter());
     }
 
     /**
      * {@inheritDoc} <p>
      * 
-     * Overridden to return true if there is no painter.<p>
+     * Overridden to return false if painting flag is true.<p>
      * 
      */
     @Override
     public boolean isOpaque() {
-        // JW: fix for #897, not sure of any side-effects
-        // contentAreaFilled and opaque might be inconsistent
-        // JW: definitely the wrong-thing-to-do, prevents tweaking opacity as needed
-        return painter == null;
-        // this is better, needs to be checked for side-effects
-        // doing so leads to regression of #897 in Win and motif
-        // still fine in metal and nimbus
-//        if (painter != null) {
-//            return false;
-//        }
-//        return super.isOpaque();
+        if (isPainting) {
+            return false;
+        }
+        return super.isOpaque();
+    }
+    
+    /**
+     * {@inheritDoc} <p>
+     * 
+     * Overridden to return false if painting flag is true.<p>
+     * 
+     */
+     @Override
+    public boolean isContentAreaFilled() {
+        if (isPainting) {
+            return false;
+        }
+        return super.isContentAreaFilled();
     }
 
     /**
@@ -101,7 +102,10 @@ public class JRendererCheckBox extends JCheckBox implements PainterAware {
         putClientProperty(TOOL_TIP_TEXT_KEY, text);
     }
 
-    
+    /**
+     * Overridden to snatch painting from super if a painter installed or Nimbus 
+     * detected.
+     */
     @Override
     protected void paintComponent(Graphics g) {
         // JW: hack around for #1178-swingx (core issue) 
@@ -111,9 +115,18 @@ public class JRendererCheckBox extends JCheckBox implements PainterAware {
             // try to inject if possible
             // there's no guarantee - some LFs have their own background 
             // handling  elsewhere
-            paintComponentWithPainter((Graphics2D) g);
+            if (isOpaque()) {
+                // replace the paintComponent completely 
+                isPainting = true;
+                paintComponentWithPainter((Graphics2D) g);
+                isPainting = false;
+            } else {
+                // transparent apply the background painter before calling super
+                paintPainter(g);
+                super.paintComponent(g);
+            }
         } else {
-            // no painter - delegate to super
+            // nothing to worry about - delegate to super
             super.paintComponent(g);
         }
     }
