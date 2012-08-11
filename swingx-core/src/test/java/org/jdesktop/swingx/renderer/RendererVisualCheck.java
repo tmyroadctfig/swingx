@@ -147,7 +147,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
         setSystemLF(true);
         RendererVisualCheck test = new RendererVisualCheck();
         try {
-            test.runInteractiveTests();
+//            test.runInteractiveTests();
 //          test.runInteractiveTests(".*CheckBox.*");
 //          test.runInteractiveTests(".*CustomIcons.*");
 //          test.runInteractiveTests(".*XLabel.*");
@@ -158,7 +158,11 @@ public class RendererVisualCheck extends InteractiveTestCase {
 //          test.runInteractiveTests("interactive.*ColumnControl.*");
 //            test.runInteractive("RowGrouping");
 //          test.runInteractive("Link");
+//            test.runInteractive("Opacity");
+            test.runInteractive("CheckBox");
+//          test.runInteractive("TreeRenderer");
 //          test.runInteractive("URI");
+            
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
@@ -239,6 +243,35 @@ public class RendererVisualCheck extends InteractiveTestCase {
         showInFrame(panel, "Checkbox: set to opacity");
     }
 
+    /**
+     * Issue #??-swingx: first click in unselected (in terms of 
+     * listSelection, not checkBox) checkbox does not change 
+     * the editor background to selected. 
+     * 
+     * Suspected culprit is the editor: the click starts the 
+     * edit, but doesn't update the background of the editor
+     * itself. Once selected, the editor will be selected as well.
+     * 
+     * Core issue: Problem is that at the time of getting the
+     * editing component, the row is not yet selected. Based on 
+     * shouldSelectedCell, the table's row selection is updated 
+     * _after_ installing the editing component.
+     * 
+     * Options:
+     * - override changeSelection to special case the editing comp
+     * - tweak the editor to config the renderer with isSelected == true
+     *  (or with shouldSelect)
+     *  
+     */
+    public void interactiveCheckBoxEditorSelectBackground() {
+        JXTable table = new JXTable(new AncientSwingTeam());
+        JTable core = new JTable(table.getModel());
+        
+        JComponent comp = Box.createHorizontalBox();
+        comp.add(new JScrollPane(table));
+        comp.add(new JScrollPane(core));
+        showInFrame(comp, "compare checkbox editor x <-> core");
+    }
     /**
      * Issue #897-swingx: Opacity issues of JRendererCheckBox - striping lost.
      * 
