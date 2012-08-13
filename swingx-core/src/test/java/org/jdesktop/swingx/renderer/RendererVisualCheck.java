@@ -153,14 +153,14 @@ public class RendererVisualCheck extends InteractiveTestCase {
 //          test.runInteractiveTests(".*XLabel.*");
 //            test.runInteractiveTests(".*Button.*");
 //          test.runInteractiveTests(".*TextArea.*");
-//          test.runInteractiveTests(".*Text.*");
+          test.runInteractiveTests(".*Text.*");
 //          test.runInteractiveTests(".*Color.*");
 //          test.runInteractiveTests("interactive.*ColumnControl.*");
 //            test.runInteractive("RowGrouping");
 //          test.runInteractive("Link");
-//            test.runInteractive("Opacity");
+            test.runInteractive("Opacity");
             test.runInteractive("CheckBox");
-//          test.runInteractive("TreeRenderer");
+          test.runInteractive("TreeRenderer");
 //          test.runInteractive("URI");
             
         } catch (Exception e) {
@@ -169,6 +169,41 @@ public class RendererVisualCheck extends InteractiveTestCase {
         }
     }
 
+    /**
+     * Issue swingx-1514: icon background always highlighted. <p>
+     * Actually a problem introduced by #3789 version of JXPanel
+     * Not special to the hierarchical nature, same for list
+     * 
+     * @see org.jdesktop.swingx.renderer.RendererVisualCheck#interactiveIconTextAlignment
+     */
+    public void interactiveTreeRendererSimple() {
+        JXTree table = new JXTree();
+        table.expandAll();
+        final WrappingProvider wrapper = new WrappingProvider();
+        table.setCellRenderer(new DefaultTreeRenderer(wrapper));
+        table.addHighlighter(HighlighterFactory.createSimpleStriping());
+        JXFrame frame = wrapWithScrollingInFrame(table, "background on icon?");
+        addAction(frame, createToggleExtendsOpacityAction(wrapper, table));
+        show(frame);
+    }
+    
+    private Action createToggleExtendsOpacityAction(final WrappingProvider provider, final JComponent target) {
+        final String text = "toggle extendsOpacity to: ";
+        Action a = new AbstractAction(text + !provider.getExtendsComponentOpacity()) {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                boolean old = provider.getExtendsComponentOpacity();
+                provider.setExtendsComponentOpacity(!old);
+                putValue(Action.NAME, text + old);
+                target.repaint();
+            }
+        };
+        return a;
+    }
+
+
+    
     /**
      * Issue #1513-swingx: opacity of JRendererCheckBox can't be effected by 
      * client code.

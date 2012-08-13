@@ -112,13 +112,13 @@ public class RendererIssues extends InteractiveTestCase {
         RendererIssues test = new RendererIssues();
         setLAF("Win");
         try {
-            test.runInteractiveTests();
+//            test.runInteractiveTests();
 //          test.runInteractiveTests("interactive.*Alpha.*");
 //          test.runInteractiveTests(".*XLabel.*");
 //          test.runInteractiveTests(".*Color.*");
 //          test.runInteractiveTests("interactive.*ColumnControl.*");
 //          test.runInteractiveTests("interactive.*ToolTip.*");
-//            test.runInteractiveTests("interactive.*TreeRenderer.*");
+            test.runInteractiveTests("interactive.*TreeRenderer.*");
 //            test.runInteractiveTests("interactive.*Opacity.*");
 //          test.runInteractive("RendererCheckBox");
 //          test.runInteractiveTests("interactive.*Hyperlink.*");
@@ -130,39 +130,6 @@ public class RendererIssues extends InteractiveTestCase {
     
     
     
-    /**
-     * Issue swingx-1514: icon background always highlighted. <p>
-     * Actually a problem introduced by #3789 version of JXPanel
-     * Not special to the hierarchical nature, same for list
-     * 
-     * @see org.jdesktop.swingx.renderer.RendererVisualCheck#interactiveIconTextAlignment
-     */
-    public void interactiveTreeRendererSimple() {
-        JXTree table = new JXTree();
-        table.expandAll();
-        final WrappingProvider wrapper = new WrappingProvider();
-        table.setCellRenderer(new DefaultTreeRenderer(wrapper));
-        table.addHighlighter(HighlighterFactory.createSimpleStriping());
-        JXFrame frame = wrapWithScrollingInFrame(table, "background on icon?");
-        addAction(frame, createToggleExtendsOpacityAction(wrapper, table));
-        show(frame);
-    }
-    
-    private Action createToggleExtendsOpacityAction(final WrappingProvider provider, final JComponent target) {
-        final String text = "toggle extendsOpacity to: ";
-        Action a = new AbstractAction(text + !provider.getExtendsComponentOpacity()) {
-            
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                boolean old = provider.getExtendsComponentOpacity();
-                provider.setExtendsComponentOpacity(!old);
-                putValue(Action.NAME, text + old);
-                target.repaint();
-            }
-        };
-        return a;
-    }
-
     /**
      * Issue ??-swingx: Boolean renderer background is slightly darker if 
      * background color is part-transparent.
