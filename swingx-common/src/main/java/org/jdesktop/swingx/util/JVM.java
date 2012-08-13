@@ -29,15 +29,15 @@ import javax.swing.UIManager.LookAndFeelInfo;
 @SuppressWarnings("nls")
 public class JVM {
 
-  public final static int JDK1_0 = 10;
-  public final static int JDK1_1 = 11;
-  public final static int JDK1_2 = 12;
-  public final static int JDK1_3 = 13;
-  public final static int JDK1_4 = 14;
-  public final static int JDK1_5 = 15;
-  public final static int JDK1_6 = 16;
+  public final static int JDK1_0 = 1000;
+  public final static int JDK1_1 = 1100;
+  public final static int JDK1_2 = 1200;
+  public final static int JDK1_3 = 1300;
+  public final static int JDK1_4 = 1400;
+  public final static int JDK1_5 = 1500;
+  public final static int JDK1_6 = 1600;
   public final static int JDK1_6N = 1610;
-  public final static int JDK1_7 = 17;
+  public final static int JDK1_7 = 1700;
 
   private static JVM current;
   static {
