@@ -3826,6 +3826,17 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
             JCheckBox checkBox = (JCheckBox) getComponent();
             checkBox.setHorizontalAlignment(JCheckBox.CENTER);
         }
+
+        @Override
+        public Component getTableCellEditorComponent(JTable table,
+                Object value, boolean isSelected, int row, int column) {
+            // fix #1521-swingx: consistent selection behaviour
+            Component comp =  super.getTableCellEditorComponent(table, 
+                    value, isSelected || shouldSelectCell(null), row, column);
+            return comp;
+        }
+        
+        
     }
 
     // ----------------------------- enhanced editing support
