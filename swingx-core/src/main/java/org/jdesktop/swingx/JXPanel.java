@@ -24,6 +24,7 @@ package org.jdesktop.swingx;
 import java.awt.AlphaComposite;
 import java.awt.Component;
 import java.awt.Composite;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -43,6 +44,7 @@ import org.jdesktop.swingx.painter.AbstractPainter;
 import org.jdesktop.swingx.painter.Painter;
 import org.jdesktop.swingx.util.Contract;
 import org.jdesktop.swingx.util.GraphicsUtilities;
+import org.jdesktop.swingx.util.JVM;
 
 /**
  * <p>
@@ -206,9 +208,11 @@ public class JXPanel extends JPanel implements AlphaPaintable, BackgroundPaintab
     }
     
     void installRepaintManager() {
-        RepaintManager manager = RepaintManager.currentManager(this);
-        RepaintManager trm = SwingXUtilities.getTranslucentRepaintManager(manager);
-        RepaintManager.setCurrentManager(trm);
+        if (!JVM.current().isOrLater(JVM.JDK1_7)) {
+            RepaintManager manager = RepaintManager.currentManager(this);
+            RepaintManager trm = SwingXUtilities.getTranslucentRepaintManager(manager);
+            RepaintManager.setCurrentManager(trm);
+        }
     }
     
     void uninstallRepaintManager() {
@@ -303,7 +307,6 @@ public class JXPanel extends JPanel implements AlphaPaintable, BackgroundPaintab
         return scrollableHeightHint;
         
     }
-    
     
     /**
      * {@inheritDoc}
@@ -457,6 +460,23 @@ public class JXPanel extends JPanel implements AlphaPaintable, BackgroundPaintab
         boolean old = this.isPaintBorderInsets();
         this.paintBorderInsets = paintBorderInsets;
         firePropertyChange("paintBorderInsets", old, isPaintBorderInsets());
+    }
+    
+    //support for Java 7 painting improvements
+    protected boolean isPaintingOrigin() {
+        if (getAlpha() < 1f) {
+            Container c = getParent();
+            
+            while (c != null) {
+                if (c instanceof AlphaPaintable && ((AlphaPaintable) c).getAlpha() < 1f) {
+                    return false;
+                }
+            }
+                
+            return true;
+        }
+        
+        return false;
     }
 
     /**
