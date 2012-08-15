@@ -57,7 +57,7 @@ public class RepaintManagerX extends ForwardingRepaintManager {
      */
     @Override
     public void addDirtyRegion(JComponent c, int x, int y, int w, int h) {
-        JXPanel panel = SwingXUtilities.getAncestor(JXPanel.class, c);
+        JXPanel panel = (JXPanel) SwingUtilities.getAncestorOfClass(JXPanel.class, c);
         
         if (panel != null && !panel.isOpaque()) {
             Point p = SwingUtilities.convertPoint(c, x, y, panel);
