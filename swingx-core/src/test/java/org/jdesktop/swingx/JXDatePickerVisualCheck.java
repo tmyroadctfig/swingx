@@ -18,6 +18,7 @@
  */
 package org.jdesktop.swingx;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.LayoutManager;
@@ -40,7 +41,9 @@ import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.BorderFactory;
 import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -115,6 +118,21 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Quick check if DatePicker behaves correctly in vertical max
+     * (yes, thougnh I don't know why: max size isn't overriden?)
+     */
+    public void interactivePickerMax() {
+        JXDatePicker picker = new JXDatePicker();
+        picker.setBorder(BorderFactory.createLineBorder(Color.RED));
+        JComponent content = new JPanel();
+        content.setLayout(new BoxLayout(content, BoxLayout.PAGE_AXIS));
+        content.add(picker);
+//        content.add(new JFormattedTextField(new Date()));
+        JXFrame frame = showInFrame(content, "max size?");
+        frame.setSize(frame.getWidth() * 2, frame.getHeight() * 4);
     }
 
     /**

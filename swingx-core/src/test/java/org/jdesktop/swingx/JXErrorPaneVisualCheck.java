@@ -10,6 +10,7 @@ package org.jdesktop.swingx;
 import java.util.logging.Level;
 
 import org.jdesktop.swingx.error.ErrorInfo;
+import org.jdesktop.swingx.error.ErrorLevel;
 
 /**
  * A unit test for the JXErrorPane
@@ -21,12 +22,52 @@ public class JXErrorPaneVisualCheck extends InteractiveTestCase {
     public static void main(String[] args) throws Exception {
       JXErrorPaneVisualCheck test = new JXErrorPaneVisualCheck();
       try {
-          test.runInteractiveTests();
+//          test.runInteractiveTests();
+          test.runInteractive("Minimal");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
         } 
   }
+    
+    /**
+     * Custom details
+     */
+    public void interactiveMinimalError() {
+        Exception e = new NullPointerException("something ...");
+        
+        StringBuffer html = new StringBuffer("<html>");
+        html.append("<h2>" + "Error" + "</h2>");
+        html.append("<HR size='1' noshade>");
+        html.append("<div></div>");
+        html.append("<b>Message:</b>");
+        html.append("<pre>");
+        html.append("    " + e.toString());
+        html.append("</pre>");
+        html.append("<b>Level:</b>");
+        html.append("<pre>");
+        html.append("    " + ErrorLevel.SEVERE);
+        html.append("</pre>");
+        html.append("</html>");
+
+        ErrorInfo errorInfo = new ErrorInfo("Error", e.getMessage(), 
+                html.toString(), null, e, ErrorLevel.SEVERE, null);
+        JXErrorPane.showDialog(null, 
+                errorInfo);
+
+
+    }
+    
+    /**
+     * Converts the incoming string to an escaped output string. This method
+     * is far from perfect, only escaping &lt;, &gt; and &amp; characters
+     */
+    private static String escapeXml(String input) {
+        String s = input == null ? "" : input.replace("&", "&amp;");
+        s = s.replace("<", "&lt;");
+        return s = s.replace(">", "&gt;");
+    }
+
     /**
      * Issue #45-swinglabs: JXErrorPane paints message text over action buttons 
      *
