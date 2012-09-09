@@ -35,6 +35,7 @@ import java.util.regex.Pattern;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.CellEditor;
 import javax.swing.DefaultCellEditor;
@@ -66,6 +67,7 @@ import javax.swing.tree.TreePath;
 
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.decorator.AbstractHighlighter;
+import org.jdesktop.swingx.decorator.BorderHighlighter;
 import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
@@ -106,7 +108,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         JXTreeTableVisualCheck test = new JXTreeTableVisualCheck();
         try {
 //            test.runInteractiveTests();
-//            test.runInteractiveTests("interactive.*Hierarchical.*");
+            test.runInteractiveTests("interactive.*Hierarchical.*");
 //               test.runInteractiveTests("interactive.*ToolTip.*");
 //           test.runInteractiveTests("interactive.*DnD.*");
 //             test.runInteractiveTests("interactive.*ColumnSelection.*");
@@ -119,13 +121,24 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
 //            test.runInteractiveTests("interactive.*EditorIcon.*");
 //            test.runInteractiveTests("interactive.*ExpandAll.*");
 //            test.runInteractiveTests("interactive.*Traversal.*");
-            test.runInteractiveTests("interactive.*Edit.*");
+//            test.runInteractiveTests("interactive.*Edit.*");
 //             test.runInteractiveTests("interactive.*ComboBox.*");
         } catch (Exception ex) {
 
         }
     }
     
+    /**
+     * Issue swingx-1525: borderHighlighter fills tree column completely
+     */
+    public void interactiveHierarchicalBorderHighlighter() {
+        JXTreeTable table = new JXTreeTable(TreeTableHelper.createTreeTableModel(20, 3, 4));
+        table.getColumn(0).setPreferredWidth(200);
+        table.addHighlighter(new BorderHighlighter(BorderFactory.createLineBorder(Color.RED)));
+        showWithScrollingInFrame(table, "borderHighlighter misbehaves in tree column");
+    }
+
+
     public void interactiveTraversal() {
         JXTree tree = new JXTree();
         DefaultMutableTreeNode root = (DefaultMutableTreeNode) tree.getModel().getRoot();

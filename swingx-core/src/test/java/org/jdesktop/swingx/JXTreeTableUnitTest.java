@@ -30,6 +30,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Vector;
 import java.util.logging.Logger;
 
+import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTable;
@@ -45,6 +46,7 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
+import org.jdesktop.swingx.decorator.BorderHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapterTest.JXTreeTableT;
 import org.jdesktop.swingx.renderer.DefaultTreeRenderer;
 import org.jdesktop.swingx.renderer.StringValue;
@@ -83,7 +85,21 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
     public JXTreeTableUnitTest() {
         super("JXTreeTable Unit Test");
     }
-    
+
+    /**
+     * Issue swingx-1525: borderHighlighter fills tree column completely
+     */
+    @Test
+    public void testBorder() {
+        JXTreeTable table = new JXTreeTable(createCustomTreeTableModelFromDefault());
+        JXTree renderer = (JXTree) table.getCellRenderer(0, 0);
+        assertEquals(null, renderer.getBorder());
+        table.addHighlighter(new BorderHighlighter(BorderFactory.createLineBorder(Color.RED)));
+        table.prepareRenderer(0, 0);
+        assertEquals(null, renderer.getBorder());
+        
+    }
+
     /**
      * Issue #1430-swingx: throwing on access of getEditingRow
      */

@@ -2643,6 +2643,7 @@ public class JXTreeTable extends JXTable {
 //      ,  RolloverRenderer 
         {
         private PropertyChangeListener rolloverListener;
+        private Border cellBorder;
 
         // Force user to specify TreeTableModel instead of more general
         // TreeModel
@@ -3010,17 +3011,41 @@ public class JXTreeTable extends JXTable {
             hierarchicalColumnWidth = getWidth();
             super.paint(g);
 
-            // Draw the Table border if we have focus.
+            Border border = cellBorder;
             if (highlightBorder != null) {
+                border = highlightBorder;
+            }
+            // Draw the Table border if we have focus.
+            if (border != null) {
                 // #170: border not drawn correctly
                 // JW: position the border to be drawn in translated area
                 // still not satifying in all cases...
                 // RG: Now it satisfies (at least for the row margins)
                 // Still need to make similar adjustments for column margins...
-                highlightBorder.paintBorder(this, g, 0, cellRect.y,
+                border.paintBorder(this, g, 0, cellRect.y,
                         getWidth(), cellRect.height);
             }
         }
+        
+        /**
+         * {@inheritDoc} <p>
+         * 
+         * Overridden to fix #swingx-1525: BorderHighlighter fills tree column.<p>
+         * 
+         * Basically, the reason was that the border is set on the tree as a whole
+         * instead of on the cell level. The fix is to bypass super completely, keep 
+         * a reference to the cell border and manually paint it around the cell 
+         * in the overridden paint. <p>
+         * 
+         * Note: in the paint we need to paint either the focus border or the 
+         * cellBorder, the former taking precedence.
+         * 
+         */
+        @Override
+        public void setBorder(Border border) {
+            cellBorder = border;
+        }
+
 
         public void doClick() {
             if ((getCellRenderer() instanceof RolloverRenderer)
