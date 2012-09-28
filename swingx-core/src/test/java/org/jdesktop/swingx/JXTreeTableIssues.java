@@ -57,11 +57,13 @@ import org.jdesktop.swingx.renderer.DefaultTableRenderer;
 import org.jdesktop.swingx.renderer.DefaultTreeRenderer;
 import org.jdesktop.swingx.renderer.HyperlinkProvider;
 import org.jdesktop.swingx.renderer.LabelProvider;
+import org.jdesktop.swingx.renderer.RendererVisualCheck.TextAreaProvider;
 import org.jdesktop.swingx.renderer.StringValue;
 import org.jdesktop.swingx.renderer.StringValues;
 import org.jdesktop.swingx.renderer.WrappingIconPanel;
 import org.jdesktop.swingx.renderer.WrappingProvider;
-import org.jdesktop.swingx.renderer.RendererVisualCheck.TextAreaProvider;
+import org.jdesktop.swingx.table.ColumnFactory;
+import org.jdesktop.swingx.table.TableColumnExt;
 import org.jdesktop.swingx.test.ActionMapTreeTableModel;
 import org.jdesktop.swingx.test.ComponentTreeTableModel;
 import org.jdesktop.swingx.test.TreeTableUtils;
@@ -99,7 +101,8 @@ public class JXTreeTableIssues extends InteractiveTestCase {
 //            test.runInteractiveTests(".*Text.*");
 //            test.runInteractiveTests(".*TreeExpand.*");
 //            test.runInteractiveTests("interactive.*EditWith.*");
-            test.runInteractiveTests("interactive.*Clip.*");
+//            test.runInteractiveTests("interactive.*Clip.*");
+            test.runInteractive("Prototype");
 //          test.runInteractiveTests("interactive.*CustomColor.*");
               
         } catch (Exception e) {
@@ -108,7 +111,58 @@ public class JXTreeTableIssues extends InteractiveTestCase {
         }
     }
 
-    
+    /**
+     * Issue #1509: configure column width based on prototype not working at all 
+     * for hierarchical column.
+     * 
+     */
+    public void interactivePrototype() {
+        ColumnFactory factory = new ColumnFactory() {
+
+            @Override
+            protected int calcPrototypeWidth(JXTable table,
+                    TableColumnExt columnExt) {
+                if (isHierarchicalPrototype(table, columnExt))  {
+                    return calcHierarchicalPrototypeWidth((JXTreeTable) table, columnExt);
+                }
+                return super.calcPrototypeWidth(table, columnExt);
+            }
+
+            protected boolean isHierarchicalPrototype(JXTable table,
+                    TableColumnExt columnExt) {
+                return (table instanceof JXTreeTable) 
+                        && ((JXTreeTable) table).getTreeTableModel().getHierarchicalColumn() == columnExt.getModelIndex()
+                        && columnExt.getPrototypeValue() != null;
+            }
+
+            TreeCellRenderer dummy = new DefaultTreeCellRenderer();
+            protected int calcHierarchicalPrototypeWidth(JXTreeTable table,
+                    TableColumnExt columnExt) {
+                JXTree renderer = (JXTree) getCellRenderer(table, columnExt);
+                // commented lines would be the obvious step down into the "real" sizing
+                // requirements, but giving reasonable result due to internal black magic
+//                TreeCellRenderer treeRenderer = renderer.getCellRenderer();
+//                Component comp = treeRenderer.getTreeCellRendererComponent(renderer, 
+//                        columnExt.getPrototypeValue(), false, false, false, -1, false);
+                // instead, measure the dummy
+                Component comp = dummy.getTreeCellRendererComponent(renderer, 
+                        columnExt.getPrototypeValue(), false, false, false, -1, false);
+                
+                return Math.max(renderer.getPreferredSize().width, comp.getPreferredSize().width);
+            }
+            
+        };
+        JXTreeTable table = new JXTreeTable();
+        table.setColumnFactory(factory);
+        table.setTreeTableModel(new FileSystemModel());
+        table.getColumnExt(0).setPrototypeValue("long longer longest still not enough to really see some effect of the prototype if availabel");
+        // Issue #1510: prototype value handling broken in underlying JXTable
+        // need to manually force the config
+        table.getColumnFactory().configureColumnWidths(table, table.getColumnExt(0));
+        showWithScrollingInFrame(table, "Issue #1509: prototype on hierarchical");
+        
+        
+    }
     /**
      * Issue #1379-swingx: support access to underlying TreeTableModel in TreeTableModelAdapter.
      * 
