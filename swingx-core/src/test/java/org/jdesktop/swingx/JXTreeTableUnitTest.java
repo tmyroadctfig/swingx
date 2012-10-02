@@ -87,6 +87,21 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
     }
 
     /**
+     * Issue #1527-swingx: tooltip not shown on hierarchical column after collapse/expand.
+     * 
+     * Part of the issue: fixed tooltip on table not returned from treeAsRenderer.
+     * 
+     */
+    @Test
+    public void testToolTipTextOnTreeColumn() {
+        JXTreeTable table = new JXTreeTable(createCustomTreeTableModelFromDefault());
+        String toolTip = "dummy";
+        table.setToolTipText(toolTip);
+        JXTree tree = (JXTree) table.getCellRenderer(0, 0);
+        assertEquals(toolTip, tree.getToolTipText());
+    }
+
+    /**
      * Issue swingx-1525: borderHighlighter fills tree column completely
      */
     @Test

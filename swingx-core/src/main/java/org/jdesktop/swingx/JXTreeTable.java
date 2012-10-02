@@ -1518,6 +1518,16 @@ public class JXTreeTable extends JXTable {
     }
     
     /**
+     * Overridden to set the fixed tooltip text to the tree that is rendering the 
+     * hierarchical column.
+     */
+    @Override
+    public void setToolTipText(String text) {
+        super.setToolTipText(text);
+        renderer.setToolTipText(text);
+    }
+
+    /**
      * Sets the specified icon as the icon to use for rendering collapsed nodes.
      *
      * @param icon to use for rendering collapsed nodes

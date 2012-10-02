@@ -77,6 +77,8 @@ import org.jdesktop.swingx.treetable.TreeTableNode;
 import org.jdesktop.test.TableModelReport;
 import org.junit.Test;
 
+import static org.junit.Assert.*;
+
 /**
  * Test to exposed known issues of <code>JXTreeTable</code>. <p>
  * 
@@ -160,9 +162,8 @@ public class JXTreeTableIssues extends InteractiveTestCase {
         // need to manually force the config
         table.getColumnFactory().configureColumnWidths(table, table.getColumnExt(0));
         showWithScrollingInFrame(table, "Issue #1509: prototype on hierarchical");
-        
-        
     }
+    
     /**
      * Issue #1379-swingx: support access to underlying TreeTableModel in TreeTableModelAdapter.
      * 

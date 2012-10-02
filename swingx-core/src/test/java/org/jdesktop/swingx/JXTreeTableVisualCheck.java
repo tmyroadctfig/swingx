@@ -108,8 +108,8 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         JXTreeTableVisualCheck test = new JXTreeTableVisualCheck();
         try {
 //            test.runInteractiveTests();
-            test.runInteractiveTests("interactive.*Hierarchical.*");
-//               test.runInteractiveTests("interactive.*ToolTip.*");
+//            test.runInteractiveTests("interactive.*Hierarchical.*");
+               test.runInteractiveTests("interactive.*ToolTip.*");
 //           test.runInteractiveTests("interactive.*DnD.*");
 //             test.runInteractiveTests("interactive.*ColumnSelection.*");
 //             test.runInteractiveTests("interactive.*RowHeightCompare.*");
@@ -529,8 +529,11 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
     
     /**
      * Issue #??-swingx: Tooltip by highlighter in hierarchical column
+     * 
+     * Issue #1527-swingx: tooltip not shown after changing expansion state.
      *
-     * Not reliably updated.
+     * Not reliably updated (independent on whether to use a Highlighter or core renderer
+     * with Highlighter set, also @see {@link #interactiveTestToolTipsCoreRenderer()}
      * 
      * To reproduce: 
      * - move to some row over the hierarchical column where the tooltip is showing
@@ -1266,6 +1269,10 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
     /**
      * Issue #226: no per-cell tooltips in TreeColumn. 
      * Note: this explicitly uses core default renderers!
+     * 
+     * Issue #1527-swingx: tooltip not shown after changing expansion state.
+     * @see #interactiveHierarchicalToolTip for an example using Highlighter
+
      */
     public void interactiveTestToolTipsCoreRenderer() {
         JXTreeTable treeTable = new JXTreeTable(treeTableModel);
