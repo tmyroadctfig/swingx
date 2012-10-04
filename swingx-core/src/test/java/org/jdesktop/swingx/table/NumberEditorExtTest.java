@@ -58,6 +58,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+import static org.junit.Assert.*;
+
 /**
  * TODO add type doc
  * 
@@ -145,6 +147,56 @@ public class NumberEditorExtTest extends InteractiveTestCase {
 
 //---------------- Sanity testing: StrictNumberFormatter - 
     
+    /**
+     * Issue #1528-swingx: numbereditor doesn't allow negative values.
+     * 
+     * Sanity: positive okay
+     * @throws ParseException 
+     */
+    @Test
+    public void testFloatStringToValuePositive() throws ParseException {
+        NumberFormat format = NumberFormat.getInstance();
+        NumberFormatter formatter = new StrictNumberFormatter(format);
+        formatter.setValueClass(Float.class);
+        float value = 3.4f;
+        String text = format.format(value);
+        assertEquals("string: " + text, value, formatter.stringToValue(text));
+    }
+    
+    /**
+     * Issue #1528-swingx: numbereditor doesn't allow negative values.
+     * 
+     * Test zero
+     * 
+     * @throws ParseException 
+     */
+    @Test
+    public void testFloatStringToValueZero() throws ParseException {
+        NumberFormat format = NumberFormat.getInstance();
+        NumberFormatter formatter = new StrictNumberFormatter(format);
+        formatter.setValueClass(Float.class);
+        float value = 0f;
+        String text = format.format(value);
+        assertEquals("string: " + text, value, formatter.stringToValue(text));
+    }
+    
+    /**
+     * Issue #1528-swingx: numbereditor doesn't allow negative values.
+     * 
+     * Test negative
+     * 
+     * @throws ParseException 
+     */
+    @Test
+    public void testFloatStringToValueNegative() throws ParseException {
+        NumberFormat format = NumberFormat.getInstance();
+        NumberFormatter formatter = new StrictNumberFormatter(format);
+        formatter.setValueClass(Float.class);
+        float value = -3.4f;
+        String text = format.format(value);
+        assertEquals("string: " + text, value, formatter.stringToValue(text));
+    }
+    
     @Test (expected = ParseException.class)
     public void testNumberFormatter() throws ParseException {
         NumberFormat format = NumberFormat.getIntegerInstance();
@@ -187,6 +239,16 @@ public class NumberEditorExtTest extends InteractiveTestCase {
         NumberFormatter formatter = new StrictNumberFormatter(format);
         formatter.setValueClass(Float.class);
         String text = "9" + new Float(Float.MAX_VALUE).toString();
+        formatter.stringToValue(text);
+    }
+    
+    
+    @Test (expected = ParseException.class)
+    public void testStrictNumberFormatterAutoRangeFloatMin() throws ParseException {
+        NumberFormat format = NumberFormat.getInstance();
+        NumberFormatter formatter = new StrictNumberFormatter(format);
+        formatter.setValueClass(Float.class);
+        String text = "-9" + new Float(Float.MAX_VALUE).toString();
         formatter.stringToValue(text);
     }
     
@@ -499,6 +561,7 @@ public class NumberEditorExtTest extends InteractiveTestCase {
             }
             
         };
+        // positive/max
         model.setValueAt(Byte.MAX_VALUE, 0, 0);
         model.setValueAt(Short.MAX_VALUE, 0, 1);
         model.setValueAt(Integer.MAX_VALUE, 0, 2);
@@ -506,6 +569,15 @@ public class NumberEditorExtTest extends InteractiveTestCase {
         model.setValueAt(Double.MAX_VALUE, 0, 4);
         model.setValueAt(new BigInteger(TOO_BIG_INTEGER), 0, 5);
         model.setValueAt(new BigDecimal("44444444444444.666666666666666666"), 0, 6);
+        // negative/min
+        model.setValueAt(Byte.MIN_VALUE, 1, 0);
+        model.setValueAt(Short.MIN_VALUE, 1, 1);
+        model.setValueAt(Integer.MIN_VALUE, 1, 2);
+        model.setValueAt(-Float.MAX_VALUE, 1, 3);
+        model.setValueAt(-Double.MAX_VALUE, 1, 4);
+//        model.setValueAt(new BigInteger(TOO_BIG_INTEGER), 1, 5);
+        model.setValueAt(new BigDecimal("-44444444444444.666666666666666666"), 1, 6);
+        
         final JXTable table = new JXTable(model);
         table.setSurrendersFocusOnKeystroke(true);
         JXFrame frame = showWithScrollingInFrame(table, "Extended NumberEditors: number class");
@@ -538,6 +610,15 @@ public class NumberEditorExtTest extends InteractiveTestCase {
         model.setValueAt(Double.MAX_VALUE, 0, 4);
         model.setValueAt(new BigInteger(TOO_BIG_INTEGER), 0, 5);
         model.setValueAt(new BigDecimal("44444444444444.666666666666666666"), 0, 6);
+        // negative/min
+        model.setValueAt(Byte.MIN_VALUE, 1, 0);
+        model.setValueAt(Short.MIN_VALUE, 1, 1);
+        model.setValueAt(Integer.MIN_VALUE, 1, 2);
+        model.setValueAt(-Float.MAX_VALUE, 1, 3);
+        model.setValueAt(-Double.MAX_VALUE, 1, 4);
+//        model.setValueAt(new BigInteger(TOO_BIG_INTEGER), 1, 5);
+        model.setValueAt(new BigDecimal("-44444444444444.666666666666666666"), 1, 6);
+        
         final JXTable table = new JXTable(model);
         table.setSurrendersFocusOnKeystroke(true);
         NumberEditorExt strictEditor = new NumberEditorExt(false);
@@ -572,6 +653,14 @@ public class NumberEditorExtTest extends InteractiveTestCase {
         model.setValueAt(Double.MAX_VALUE, 0, 4);
         model.setValueAt(new BigInteger(TOO_BIG_INTEGER), 0, 5);
         model.setValueAt(new BigDecimal("44444444444444.666666666666666666"), 0, 6);
+        // negative/min
+        model.setValueAt(Byte.MIN_VALUE, 1, 0);
+        model.setValueAt(Short.MIN_VALUE, 1, 1);
+        model.setValueAt(Integer.MIN_VALUE, 1, 2);
+        model.setValueAt(-Float.MAX_VALUE, 1, 3);
+        model.setValueAt(-Double.MAX_VALUE, 1, 4);
+//        model.setValueAt(new BigInteger(TOO_BIG_INTEGER), 1, 5);
+        model.setValueAt(new BigDecimal("-44444444444444.666666666666666666"), 1, 6);
         final JXTable table = new JXTable(model);
         table.setSurrendersFocusOnKeystroke(true);
         JXFrame frame = showWithScrollingInFrame(table, "Extended NumberEditors(strict): concrete Number classes");
