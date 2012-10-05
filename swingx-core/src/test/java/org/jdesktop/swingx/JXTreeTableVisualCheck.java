@@ -109,7 +109,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         try {
 //            test.runInteractiveTests();
 //            test.runInteractiveTests("interactive.*Hierarchical.*");
-               test.runInteractiveTests("interactive.*ToolTip.*");
+               test.runInteractiveTests("interactive.*HierarchicalToolTip.*");
 //           test.runInteractiveTests("interactive.*DnD.*");
 //             test.runInteractiveTests("interactive.*ColumnSelection.*");
 //             test.runInteractiveTests("interactive.*RowHeightCompare.*");
@@ -537,9 +537,19 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
      * 
      * To reproduce: 
      * - move to some row over the hierarchical column where the tooltip is showing
-     * - move the next row, typically the tooltip is not showing
+     * - move the next row, typically the tooltip is not showing (no, can't reproduce)
+     * - reproducible (from bug report): collapse/expand the row, then move (in same or 
+     * other row): tooltip not shown until the mouse has been moved completely outside
+     * of the table
+     * 
+     * Seems to happen, if the tooltip was hidden due to the collapse/expose. To reproduce
+     * - move to show the tooltip in hierarchical column
+     * - wait until it is hidden by the tooltipManager
+     * - collapse/expand and move: tooltip shown again
+     * 
      */
     public void interactiveHierarchicalToolTip() {
+        ToolTipManager manager = ToolTipManager.sharedInstance();
         final JXTreeTable table = new JXTreeTable(treeTableModel);
         Highlighter toolTip = new AbstractHighlighter(
                 new AndHighlightPredicate(
@@ -556,6 +566,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         table.addHighlighter(toolTip);
         JXFrame frame = wrapWithScrollingInFrame(table, "ToolTip with Highlighter (hierarchical column)");
         addComponentOrientationToggle(frame);
+        addStatusComponent(frame, new JTextField("something to focus"));
         frame.setVisible(true);
     }
   

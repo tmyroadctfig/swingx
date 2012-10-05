@@ -511,7 +511,8 @@ public class JXTreeTable extends JXTable {
      * caused a selection change instead of a node expansion/ collapse.</li>
      * <li>
      * The consumption of events are handled within this class itself because
-     * the behavior associated with the way that <code>processMoueEvent(MouseEvent)</code> consumed events was incompatible with the way this
+     * the behavior associated with the way that <code>processMouseEvent(MouseEvent)</code> 
+     * consumed events was incompatible with the way this
      * class does things. As a consequence,
      * <code>hitHandleDetectionFromProcessMouse(MouseEvent)</code> 
      * always returns false so that <code>processMoueEvent(MouseEvent)</code> will not 
@@ -575,20 +576,15 @@ public class JXTreeTable extends JXTable {
             if (col >= 0 && isHierarchical(col)) {
                 int row = rowAtPoint(pt);
                 if (row >= 0) {
-                    // There will not be a check to see if the y coordinate is
-                    // in range
+                    // There will not be a check to see if the y coordinate is in range
                     // because the use of row = rowAtPoint(pt) will only return
-                    // a row
-                    // that has the y coordinates in the range of our point.
+                    // a row that has the y coordinates in the range of our point.
                     Rectangle cellBounds = getCellRect(row, col, false);
                     int x = e.getX() - cellBounds.x;
                     Rectangle nodeBounds = renderer.getRowBounds(row);
-                    // The renderer's component orientation is checked because
-                    // that
-                    // is the one that really matters. Though it seems to always
-                    // be
-                    // in sync with the JXTreeTable's component orientation,
-                    // maybe
+                    // The renderer's component orientation is checked because that
+                    // is the one that really matters. Though it seems to always be
+                    // in sync with the JXTreeTable's component orientation, maybe
                     // someone wants them to be different for some reason.
                     if (renderer.getComponentOrientation().isLeftToRight() ? x < nodeBounds.x
                             : x > nodeBounds.x + nodeBounds.width) {
@@ -609,42 +605,60 @@ public class JXTreeTable extends JXTable {
          */
         @Override
         public boolean hitHandleDetectionFromProcessMouse(MouseEvent e) {
-                if (!isHitDetectionFromProcessMouse())
-                        return false;
-                if (isTreeHandleEventType(e)) {
-                        MouseEvent newE = getEventForTreeRenderer(e);
-                        if (newE != null) {
-                                renderer.dispatchEvent(newE);
-                                if (processMouseMotion) {
-                                        // This fixes the issue of drags on tree handles
-                                        // (often unintentional) from selecting all nodes from the
-                                        // anchor to the node of said tree handle.
-                                        processMouseMotion = false;
+            if (!isHitDetectionFromProcessMouse())
+                return false;
+            if (isTreeHandleEventType(e)) {
+                MouseEvent newE = getEventForTreeRenderer(e);
+                if (newE != null) {
+                    renderer.dispatchEvent(newE);
+                    if (shouldDisableMouseMotionOnTable(e)) {
+                        // This fixes the issue of drags on tree handles
+                        // (often unintentional) from selecting all nodes from the
+                        // anchor to the node of said tree handle.
+                        processMouseMotion = false;
                         // part of 561-swingx: if focus elsewhere and dispatching the
                         // mouseEvent the focus doesn't move from elsewhere
                         // still doesn't help in very first click after startup
-                        // probably lead of row selection event not correctly updated
-                        // on synch from treeSelectionModel
-                                        requestFocusInWindow();
-                                }
-                                e.consume();
-                                // Return false to prevent JXTreeTable.processMouseEvent(MouseEvent)
-                                // from stopping the processing of the event. This allows the
-                                // listeners to see the event even though it is consumed (perhaps
-                                // useful for a user supplied listener). A proper UI listener will
-                                // ignore consumed events.
-                                return false;
-                                // alternatively, you would have to use:
-                                // return e.getID() == MouseEvent.MOUSE_PRESSED;
-                                // because JXTreeTable.processMouseEvent(MouseEvent) assumes true
-                                // will only be returned for MOUSE_PRESSED events. Also, if true 
-                                // were to be returned, then you'd have to piggy back a released
-                                // event as the previous implementation does, because the actual
-                                // released event would never reach this method.
-                        }
+                        // probably lead of row selection event not correctly
+                        // updated on synch from treeSelectionModel
+                        requestFocusInWindow();
+                    } else {
+                        processMouseMotion = true;
+                    }
+                    e.consume();
+                    // Return false to prevent JXTreeTable.processMouseEvent(MouseEvent)
+                    // from stopping the processing of the event. This allows the
+                    // listeners to see the event even though it is consumed
+                    // (perhaps useful for a user supplied listener). A proper UI
+                    // listener will ignore consumed events.
+                    return false;
+                    // alternatively, you would have to use: return e.getID() == MouseEvent.MOUSE_PRESSED;
+                    // because JXTreeTable.processMouseEvent(MouseEvent) assumes true
+                    // will only be returned for MOUSE_PRESSED events. Also, if true
+                    // were to be returned, then you'd have to piggy back a released
+                    // event as the previous implementation does, because the actual
+                    // released event would never reach this method.
                 }
-                processMouseMotion = true;
-                return false;
+            }
+            processMouseMotion = true;
+            return false;
+        }
+
+        /**
+         * Returns a boolean indicating whether mouseMotionEvents to the 
+         * table should be disabled. This is called from hitHandleDetectionFromMouseEvent 
+         * if the event was passed to the rendering tree and consumed. Returning
+         * true has the side-effect of requesting focus to the table.<p>
+         * 
+         * NOTE JW: this was extracted to from the calling method to fix 
+         * Issue #1527-swingx (no tooltips on JXTreeTable after expand/collapse)
+         * and at the same time allow subclasses to further hack around ... <p>
+         * 
+         * @param e the mouseEvent that was routed to the renderer.
+         * @return true if disabling mouseMotionEvents to table, false if enabling them
+         */
+        protected boolean shouldDisableMouseMotionOnTable(MouseEvent e) {
+            return processMouseMotion && e.getID() == MouseEvent.MOUSE_PRESSED;
         }
     }
 
@@ -1506,7 +1520,11 @@ public class JXTreeTable extends JXTable {
         return renderer.getCellRenderer();
     }
 
-    
+    /**
+     * {@inheritDoc} <p>
+     * 
+     * Overridden to special-case the hierarchical column.
+     */
     @Override
     public String getToolTipText(MouseEvent event) {
         int column = columnAtPoint(event.getPoint());
@@ -1516,8 +1534,10 @@ public class JXTreeTable extends JXTable {
         }
         return super.getToolTipText(event);
     }
-    
+
     /**
+     * {@inheritDoc} <p>
+     * 
      * Overridden to set the fixed tooltip text to the tree that is rendering the 
      * hierarchical column.
      */
