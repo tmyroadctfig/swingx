@@ -33,6 +33,7 @@ import javax.swing.table.TableModel;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
 import org.jdesktop.swingx.hyperlink.AbstractHyperlinkAction;
 import org.jdesktop.swingx.hyperlink.EditorPaneLinkVisitor;
+import org.jdesktop.swingx.hyperlink.HyperlinkAction;
 import org.jdesktop.swingx.hyperlink.LinkModel;
 import org.jdesktop.swingx.hyperlink.LinkModelAction;
 import org.jdesktop.swingx.renderer.DefaultListRenderer;
@@ -64,13 +65,27 @@ public class JXHyperlinkVisualCheck extends InteractiveTestCase {
 //          test.runInteractiveTests("interactive.*List.*");
 //          test.runInteractiveTests("interactive.*Tree.*");
 //          test.runInteractiveTests("interactive.*Underline.*");
-          test.runInteractive("Link");
+          test.runInteractive("Block");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
         } 
   }
     
+    /**
+     * Issue #1530-swingx:
+     * 
+     * Quick check if Desktop.browse is blocking (with a lame target site)
+     * - doesn't appear so.
+     * 
+     * @throws MalformedURLException
+     * @throws URISyntaxException
+     */
+    public void interactiveHyperlinkActionBlocking() throws MalformedURLException, URISyntaxException {
+        URI uri = new URL("http://www.java.net/forums/javadesktop/java-desktop-technologies/swinglabs").toURI();
+        JXHyperlink link = new JXHyperlink(HyperlinkAction.createHyperlinkAction(uri));
+        showInFrame(link, "blocking?");
+    }
     /**
      * Issue #6-swingx: convenience api for setting uri's
      * @throws URISyntaxException
