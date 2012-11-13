@@ -176,7 +176,7 @@ public abstract class LookAndFeelAddons {
 
     public static void setAddon(String addonClassName) throws InstantiationException,
             IllegalAccessException, ClassNotFoundException {
-        setAddon(Class.forName(addonClassName));
+        setAddon(Class.forName(addonClassName, true, getClassLoader()));
     }
 
     public static void setAddon(Class<?> addonClass) throws InstantiationException,
