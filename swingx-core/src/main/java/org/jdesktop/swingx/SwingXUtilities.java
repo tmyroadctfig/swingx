@@ -52,6 +52,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.MenuElement;
 import javax.swing.RepaintManager;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import javax.swing.plaf.ComponentInputMapUIResource;
 import javax.swing.plaf.UIResource;
 import javax.swing.text.html.HTMLDocument;
@@ -164,7 +165,12 @@ public final class SwingXUtilities {
         Painter<? super C> painter = comp.getBackgroundPainter();
         
         if (painter == null) {
-            new BackgroundPainter(comp.getBackground()).paint(g, comp, comp.getWidth(), comp.getHeight());
+            if (comp.isOpaque()
+                    || (comp instanceof AlphaPaintable && ((AlphaPaintable) comp).getAlpha() < 1f)
+                    || UIManager.getLookAndFeel().getID().equals("Nimbus")) {
+                g.setColor(comp.getBackground());
+                g.fillRect(0, 0, comp.getWidth(), comp.getHeight());
+            }
         } else {
             if (comp.isPaintBorderInsets()) {
                 painter.paint(g, comp, comp.getWidth(), comp.getHeight());

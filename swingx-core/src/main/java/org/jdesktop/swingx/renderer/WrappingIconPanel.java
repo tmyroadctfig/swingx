@@ -24,7 +24,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.ComponentOrientation;
 import java.awt.Font;
-import java.awt.Graphics2D;
 import java.awt.Rectangle;
 
 import javax.swing.BorderFactory;
@@ -76,7 +75,6 @@ public class WrappingIconPanel extends JXPanel implements PainterAware, IconAwar
      */
     public WrappingIconPanel(boolean dropHackEnabled) {
         setOpaque(false);
-        installBackgroundHack();
         iconLabel = new JRendererLabel();
         iconLabelGap = iconLabel.getIconTextGap();
         iconLabel.setOpaque(false);
@@ -87,23 +85,6 @@ public class WrappingIconPanel extends JXPanel implements PainterAware, IconAwar
         setDropHackEnabled(dropHackEnabled);
     }
     
-    /**
-     * Hack around #1514: JXPanel paints background always.
-     * 
-     * Installs a background painter which does nothing.
-     * This prevents super from unconditionally paint the background
-     * if not opaque, thus keeping the previous behaviour. 
-     * 
-     * This method is called once on init. Client code is free
-     * to override or dynamically set custom (or null) painter.
-     * If installing null, the background under the icon is
-     * painted always (as of revision #4225).
-     */
-    protected void installBackgroundHack() {
-        setBackgroundPainter(new DoNothingPainter());
-    }
-    
-
     /**
      * {@inheritDoc} <p>
      * 
@@ -327,17 +308,5 @@ public class WrappingIconPanel extends JXPanel implements PainterAware, IconAwar
      */
     public boolean getExtendsComponentOpacity() {
         return extendsComponentOpacity;
-    }
-    
- 
-    /**
-     * Hack around Issue #1514-swingx: JXPanel paints background always.
-     */
-    protected static class DoNothingPainter implements Painter {
-
-        @Override
-        public void paint(Graphics2D g, Object object, int width, int height) {
-        }
-        
     }
 }
