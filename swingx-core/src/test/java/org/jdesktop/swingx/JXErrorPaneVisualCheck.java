@@ -22,8 +22,7 @@ public class JXErrorPaneVisualCheck extends InteractiveTestCase {
     public static void main(String[] args) throws Exception {
       JXErrorPaneVisualCheck test = new JXErrorPaneVisualCheck();
       try {
-//          test.runInteractiveTests();
-          test.runInteractive("Minimal");
+          test.runInteractiveTests("interactiveShowFrameWithException");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
@@ -95,6 +94,14 @@ public class JXErrorPaneVisualCheck extends InteractiveTestCase {
     public void interactiveNPEWithDefaultErrorInfo() {
         JXErrorPane errorPane = new JXErrorPane();
         JXErrorPane.showDialog(null, errorPane);
+    }
+    
+    /**
+     * Issue ???: showFrame not working
+     *
+     */
+    public void interactiveShowFrameWithException() {
+        JXErrorPane.showFrame(new Exception());
     }
     
     /**
