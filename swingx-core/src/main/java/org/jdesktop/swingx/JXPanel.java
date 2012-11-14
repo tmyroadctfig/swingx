@@ -48,15 +48,24 @@ import org.jdesktop.swingx.util.JVM;
 
 /**
  * <p>
- * An extended {@code JPanel} that provides additional features. First, the
- * component is {@code Scrollable}, using reasonable defaults. Second, the
- * component is alpha-channel enabled. This means that the {@code JXPanel} can
- * be made fully or partially transparent. Finally, {@code JXPanel} has support
- * for {@linkplain Painter painters}.
+ * An extended {@code JPanel} that provides additional features.
+ * </p>
+ * <h3>Scrollable</h3>
+ * <p>
+ * {@code JXPanel} is {@link Scrollable} by default. It provides reasonable implementations of all
+ * of the interface methods. In addition, it supports the setting of common scrolling approaches
+ * defined in {@link ScrollableSizeHint}.
+ * </p>
+ * <h3>Alpha Support</h3>
+ * <p>
+ * {@code JXPanel} has full alpha-channel support. This means that the {@code JXPanel} can be made
+ * fully or partially transparent. This means that the JXPanel and all of its children will behave
+ * as a single paint at the specified alpha value. <strong>Cauton:</strong> best practice is to use
+ * either alpha support or opacity support, but not both. See the documentation on the methods for
+ * further information.
  * </p>
  * <p>
- * A transparency example, this following code will show the black background of
- * the parent:
+ * A transparency example, this following code will show the black background of the parent:
  * 
  * <pre>
  * JXPanel panel = new JXPanel();
@@ -67,6 +76,10 @@ import org.jdesktop.swingx.util.JVM;
  * container.add(panel);
  * </pre>
  * 
+ * </p>
+ * <h3>Painter Support</h3>
+ * <p>
+ * {@code JXPanel} has support for {@linkplain Painter}s.
  * </p>
  * <p>
  * A painter example, this following code will show how to add a simple painter:
@@ -103,6 +116,9 @@ public class JXPanel extends JPanel implements AlphaPaintable, BackgroundPaintab
      * <p>TODO: Check whether this variable is necessary or not</p>
      */
     private boolean oldOpaque;
+    
+    private float oldAlpha = 1f;
+    
     /**
      * Indicates whether this component should inherit its parent alpha value
      */
@@ -168,6 +184,35 @@ public class JXPanel extends JPanel implements AlphaPaintable, BackgroundPaintab
     
     /**
      * {@inheritDoc}
+     * <p>
+     * Setting the component to be opaque will reset the alpha setting to {@code 1f} (full
+     * opaqueness). Setting the component to be non-opaque will restore the previous alpha
+     * transparency. If the component is non-opaque with a fully-opaque alpha value ({@code 1f}),
+     * the behavior should be the same as as a {@code JPanel} that is non-opaque.
+     */
+    @Override
+    public void setOpaque(boolean opaque) {
+        if (opaque) {
+            oldAlpha = getAlpha();
+            
+            if (oldAlpha < 1f) {
+                setAlpha(1f);
+            } else {
+                super.setOpaque(true);
+                repaint();
+            }
+        } else if (getAlpha() == 1f) {
+            if (oldAlpha == 1f) {
+                super.setOpaque(false);
+                repaint();
+            } else {
+                setAlpha(oldAlpha);
+            }
+        }
+    }
+    
+    /**
+     * {@inheritDoc}
      */
     @Override
     public float getAlpha() {
@@ -190,7 +235,7 @@ public class JXPanel extends JPanel implements AlphaPaintable, BackgroundPaintab
             if (oldValue == 1) {
                 //it used to be 1, but now is not. Save the oldOpaque
                 oldOpaque = isOpaque();
-                setOpaque(false);
+                super.setOpaque(false);
             }
             
             installRepaintManager();
@@ -199,7 +244,7 @@ public class JXPanel extends JPanel implements AlphaPaintable, BackgroundPaintab
             
             //restore the oldOpaque if it was true (since opaque is false now)
             if (oldOpaque) {
-                setOpaque(true);
+                super.setOpaque(true);
             }
         }
         
