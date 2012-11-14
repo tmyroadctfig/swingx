@@ -77,7 +77,7 @@ public class JXTitledPanel extends JXPanel {
     /**
      * The text to use for the title
      */
-    private String title = "";
+    private String title;
 
     /**
      * The Font to use for the Title
@@ -104,7 +104,7 @@ public class JXTitledPanel extends JXPanel {
      * Create a new JTitledPanel with an empty string for the title.
      */
     public JXTitledPanel() {
-        this(" ");
+        this(null);
     }
 
     /**
@@ -300,7 +300,6 @@ public class JXTitledPanel extends JXPanel {
         //TODO: All this default container creation stuff should be in the UI
         //delegate. Not enough time at the moment for me to do this right.
         JXPanel p = new JXPanel();
-        p.setOpaque(false);
         return p;
     }
 

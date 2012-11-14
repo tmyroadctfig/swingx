@@ -20,6 +20,8 @@
  */
 package org.jdesktop.swingx.plaf.basic;
 
+import static org.jdesktop.swingx.SwingXUtilities.isUIInstallable;
+
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
@@ -117,16 +119,24 @@ public class BasicTaskPaneUI extends TaskPaneUI {
      * </ul>
      */
     protected void installDefaults() {
-        LookAndFeel.installProperty(group, "opaque", true);
-        group.setBorder(createPaneBorder());
-        ((JComponent) group.getContentPane())
-                .setBorder(createContentPaneBorder());
-
         LookAndFeel.installColorsAndFont(group, "TaskPane.background",
                 "TaskPane.foreground", "TaskPane.font");
-
-        LookAndFeel.installColorsAndFont((JComponent) group.getContentPane(),
-                "TaskPane.background", "TaskPane.foreground", "TaskPane.font");
+        LookAndFeel.installProperty(group, "opaque", false);
+        
+        if (isUIInstallable(group.getBorder())) {
+            group.setBorder(createPaneBorder());
+        }
+        
+        if (group.getContentPane() instanceof JComponent) {
+            JComponent content = (JComponent) group.getContentPane();
+            
+            LookAndFeel.installColorsAndFont(content,
+                    "TaskPane.background", "TaskPane.foreground", "TaskPane.font");
+            
+            if (isUIInstallable(content.getBorder())) {
+                content.setBorder(createContentPaneBorder());
+            }
+        }
     }
 
     /**

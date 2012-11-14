@@ -225,6 +225,7 @@ public class JXTaskPane extends JPanel implements
      */
     public JXTaskPane(String title, Icon icon) {
       collapsePane = new JXCollapsiblePane();
+      collapsePane.setOpaque(false);
       super.setLayout(new BorderLayout(0, 0));
       super.addImpl(collapsePane, BorderLayout.CENTER, -1);
       
