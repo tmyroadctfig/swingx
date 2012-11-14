@@ -40,6 +40,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.plaf.basic.BasicGraphicsUtils;
 
 import org.jdesktop.beans.JavaBean;
+import org.jdesktop.swingx.graphics.FilterComposite;
 import org.jdesktop.swingx.painter.AbstractPainter;
 import org.jdesktop.swingx.painter.Painter;
 import org.jdesktop.swingx.painter.PainterPaint;
@@ -703,15 +704,27 @@ public class JXButton extends JButton implements BackgroundPaintable {
     private void paintWithForegroundPainterWithFilters(Graphics g) {
         BufferedImage im = GraphicsUtilities.createCompatibleTranslucentImage(getWidth(), getHeight());
         Graphics2D g2d = im.createGraphics();
-        Graphics gfx = getComponentGraphics(g2d);
-        assert gfx == g2d;
-        paintWithForegroundPainterWithoutFilters(g2d);
         
-        for (BufferedImageOp filter : ((AbstractPainter<?>) fgPainter).getFilters()) {
-            im = filter.filter(im, null);
+        try {
+            Graphics gfx = getComponentGraphics(g2d);
+            assert gfx == g2d;
+            
+            paintWithForegroundPainterWithoutFilters(g2d);
+        } finally {
+            g2d.dispose();
         }
         
-        g.drawImage(im, 0, 0, this);
+        Graphics2D filtered = (Graphics2D) g.create();
+        
+        try {
+            for (BufferedImageOp filter : ((AbstractPainter<?>) fgPainter).getFilters()) {
+                filtered.setComposite(new FilterComposite(filtered.getComposite(), filter));
+            }
+            
+            filtered.drawImage(im, 0, 0, this);
+        } finally {
+            filtered.dispose();
+        }
     }
     
     /**
