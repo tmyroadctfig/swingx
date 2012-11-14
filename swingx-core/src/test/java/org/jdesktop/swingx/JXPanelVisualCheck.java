@@ -52,13 +52,14 @@ public class JXPanelVisualCheck extends InteractiveTestCase {
 
     public static void main(String args[]) {
       final JXPanelVisualCheck test = new JXPanelVisualCheck();
-      setLAF("Nimbus");
+//      setLAF("Nimbus");
       SwingUtilities.invokeLater(new Runnable() {
-          public void run() {
+          @Override
+        public void run() {
       try {
                 
 //         test.runInteractiveTests("interactive.*");
-         test.runInteractive("BackgroundAlpha");
+         test.runInteractiveTests("interactiveBackgroundAlphaToggleOpaque");
 //         test.runInteractive("BackgroundAndAlphaCheck");
 //         test.runInteractive("FrameArtefacts");
          
@@ -98,19 +99,40 @@ public class JXPanelVisualCheck extends InteractiveTestCase {
      * 
      */
     public void interactiveBackgroundAlphaToggleOpaque() {
-        final JXPanel panel = new JXPanel();
-        final boolean initialOpaque = false;
-        panel.setOpaque(initialOpaque);
-        Color red = Color.RED;
-        Color alpha = PaintUtils.setAlpha(red, 100);
-        panel.setBackground(alpha);
-        JXFrame frame = wrapInFrame(panel, "changing opaque has no effect with alpha background");
-        Action action = new AbstractAction("toggle opaque") {
-            boolean realOpaque = initialOpaque;
+        JPanel container = new JPanel(new GridLayout(0, 3));
+        Color base = Color.RED;
+        Color alpha = PaintUtils.setAlpha(base, 100);
+        
+        final JPanel p = new JPanel();
+        p.setBackground(alpha);
+        
+        final JXPanel xp1 = new JXPanel();
+        xp1.setBackground(alpha);
+        
+        final JXPanel xp2 = new JXPanel();
+        xp2.setAlpha(100f/255f);
+        xp2.setBackground(base);
+        
+        container.add(p);
+        container.add(xp1);
+        container.add(xp2);
+        
+        JXFrame frame = wrapInFrame(container, "changing opaque has no effect with alpha background");
+        Action action = new AbstractAction("opaque on") {
+            boolean realOpaque = true;
             @Override
             public void actionPerformed(ActionEvent e) {
                 realOpaque = !realOpaque;
-                panel.setOpaque(realOpaque);
+                
+                putValue(Action.NAME, realOpaque ? "opaque on" : "opaque off");
+                
+                p.setOpaque(realOpaque);
+                xp1.setOpaque(realOpaque);
+                xp2.setOpaque(realOpaque);
+                
+                p.repaint();
+                xp1.repaint();
+                xp2.repaint();
             }
         };
         addAction(frame, action);
