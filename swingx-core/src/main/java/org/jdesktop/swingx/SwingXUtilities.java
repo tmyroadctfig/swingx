@@ -162,16 +162,18 @@ public final class SwingXUtilities {
     
     @SuppressWarnings("unchecked")
     static <C extends JComponent & BackgroundPaintable> void paintBackground(C comp, Graphics2D g) {
+        // we should be painting the background behind the painter if we have one
+        // this prevents issues with buffer reuse where visual artifacts sneak in
+        if (comp.isOpaque()
+                || (comp instanceof AlphaPaintable && ((AlphaPaintable) comp).getAlpha() < 1f)
+                || UIManager.getLookAndFeel().getID().equals("Nimbus")) {
+            g.setColor(comp.getBackground());
+            g.fillRect(0, 0, comp.getWidth(), comp.getHeight());
+        }
+        
         Painter<? super C> painter = comp.getBackgroundPainter();
         
-        if (painter == null) {
-            if (comp.isOpaque()
-                    || (comp instanceof AlphaPaintable && ((AlphaPaintable) comp).getAlpha() < 1f)
-                    || UIManager.getLookAndFeel().getID().equals("Nimbus")) {
-                g.setColor(comp.getBackground());
-                g.fillRect(0, 0, comp.getWidth(), comp.getHeight());
-            }
-        } else {
+        if (painter != null) {
             if (comp.isPaintBorderInsets()) {
                 painter.paint(g, comp, comp.getWidth(), comp.getHeight());
             } else {
