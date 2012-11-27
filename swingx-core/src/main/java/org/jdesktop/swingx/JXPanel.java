@@ -24,7 +24,6 @@ package org.jdesktop.swingx;
 import java.awt.AlphaComposite;
 import java.awt.Component;
 import java.awt.Composite;
-import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -107,7 +106,7 @@ public class JXPanel extends JPanel implements AlphaPaintable, BackgroundPaintab
     /**
      * The alpha level for this component.
      */
-    private float alpha = 1.0f;
+    private volatile float alpha = 1.0f;
     /**
      * If the old alpha value was 1.0, I keep track of the opaque setting because
      * a translucent component is not opaque, but I want to be able to restore
@@ -509,19 +508,22 @@ public class JXPanel extends JPanel implements AlphaPaintable, BackgroundPaintab
     
     //support for Java 7 painting improvements
     protected boolean isPaintingOrigin() {
-        if (getAlpha() < 1f) {
-            Container c = getParent();
-            
-            while (c != null) {
-                if (c instanceof AlphaPaintable && ((AlphaPaintable) c).getAlpha() < 1f) {
-                    return false;
-                }
-            }
-                
-            return true;
-        }
-        
-        return false;
+        return getAlpha() < 1f;
+//        if (getAlpha() < 1f) {
+//            Container c = getParent();
+//            
+//            while (c != null) {
+//                if (c instanceof AlphaPaintable && ((AlphaPaintable) c).getAlpha() < 1f) {
+//                    return false;
+//                }
+//                
+//                c = c.getParent();
+//            }
+//                
+//            return true;
+//        }
+//        
+//        return false;
     }
 
     /**
