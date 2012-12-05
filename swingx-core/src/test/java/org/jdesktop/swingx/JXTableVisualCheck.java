@@ -37,14 +37,14 @@ import javax.swing.JToolBar;
 import javax.swing.JViewport;
 import javax.swing.KeyStroke;
 import javax.swing.RowFilter;
+import javax.swing.RowSorter.SortKey;
 import javax.swing.ScrollPaneLayout;
 import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
-import javax.swing.RowSorter.SortKey;
 import javax.swing.event.RowSorterEvent;
+import javax.swing.event.RowSorterEvent.Type;
 import javax.swing.event.RowSorterListener;
 import javax.swing.event.TableColumnModelEvent;
-import javax.swing.event.RowSorterEvent.Type;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
@@ -74,6 +74,8 @@ import org.jdesktop.swingx.table.TableColumnExt;
 import org.jdesktop.swingx.treetable.FileSystemModel;
 import org.jdesktop.test.AncientSwingTeam;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
 /**
  * Split from old JXTableUnitTest - contains "interactive"
@@ -83,6 +85,7 @@ import org.junit.Test;
  * tests or change positioning algo to start on top again if hidden. <p>
  * @author Jeanette Winzenburg
  */
+@RunWith(JUnit4.class)
 public class JXTableVisualCheck extends JXTableUnitTest {
     private static final Logger LOG = Logger.getLogger(JXTableVisualCheck.class
             .getName());
@@ -92,7 +95,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
 //        test.runInteractiveTests();
 //          test.runInteractiveTests("interactive.*FloatingPoint.*");
 //          test.runInteractiveTests("interactive.*Disable.*");
-          test.runInteractiveTests("interactive.*ColumnControl.*");
+//          test.runInteractiveTests("interactive.*ColumnControl.*");
 //          test.runInteractiveTests("interactive.*RowHeight.*");
 //          test.runInteractiveTests("interactive.*Remove.*");
 //          test.runInteractiveTests("interactive.*ColumnProp.*");
@@ -100,6 +103,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
 //          test.runInteractiveTests("interactive.*RToL.*");
 //          test.runInteractiveTests("interactive.*Scrollable.*");
 //          test.runInteractiveTests("interactive.*isable.*");
+          test.runInteractive("EditorNull");
           
 //          test.runInteractiveTests("interactive.*Policy.*");
 //        test.runInteractiveTests("interactive.*Rollover.*");
@@ -112,6 +116,57 @@ public class JXTableVisualCheck extends JXTableUnitTest {
       }
   }
     
+    
+    /**
+     * Issue #1535-swingx: GenericEditor fires editingStopped  even if 
+     * value invalid (= empty). Leads to NPE in columnMoved (jdk7) or when
+     * external code calls the stop/cancel sequence.
+     * Core issue but c&p'd to JXTable.
+     * 
+     * 
+     * 1. doesn't allow editing if the column type doesn't have a 
+     *    single parameter constructor of type String
+     *    (fails silently in this case) - unrelated to this issue
+     *    
+     * 2. throws NPE on moving column while editing, the editingValue
+     *    is empty and the class cannot handle empty strings. The NPE
+     *    is triggered in column moved, because the GenericEditor
+     *    fires twice. http://stackoverflow.com/q/13524519/203657
+     *    Visible only when run with jdk7 because the inappropriate 
+     *    removeEditor is fixed :-)
+     */
+    public void interactiveEditorNull() {
+        final JTable table = new JTable(create1535TableModel());
+        Action action = new AbstractAction("terminateEditing") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (table.isEditing() && !table.getCellEditor().stopCellEditing() ) {
+                    table.getCellEditor().cancelCellEditing();
+                }
+            }
+        };
+        JXFrame frame = wrapWithScrollingInFrame(table, "Core: NPE on stopping edit");
+        addAction(frame, action);
+        show(frame);
+    }
+
+    public void interactiveEditorNullX() {
+        final JTable table = new JXTable(create1535TableModel());
+        Action action = new AbstractAction("terminateEditing") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (table.isEditing() && !table.getCellEditor().stopCellEditing() ) {
+                    table.getCellEditor().cancelCellEditing();
+                }
+            }
+        };
+        JXFrame frame = wrapWithScrollingInFrame(table, "xTable: NPE on stopping edit");
+        addAction(frame, action);
+        show(frame);
+    }
+
     /**
      * Issue #1392- swingx: columnControl lost on toggle CO and LAF
      * 

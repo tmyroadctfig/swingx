@@ -126,6 +126,140 @@ public class JXTableUnitTest extends InteractiveTestCase {
         super("JXTable unit test");
     }
 
+
+  //------- start testing Issue #1535-swingx
+      
+      /**
+       * Sanity: initially valid entry without forcing edit is behaving as expected
+       */
+      @Test
+      public void testGenericEditorXValidValue() {
+          JTable table = new JXTable(create1535TableModel());
+          table.setValueAt(new ThrowingDummy("valid"), 0, throwOnEmpty);
+          assertStoppedEventOnValidValue(table, 0, throwOnEmpty, false);
+      }
+      
+      /**
+       * Test editor firing when empty value is valid
+       */
+      @Test
+      public void testGenericEditorXValidValueAlways() {
+          JTable table = new JXTable(create1535TableModel());
+          assertStoppedEventOnValidValue(table, 0, takeEmpty, false);
+          assertTrue(table.getValueAt(0, takeEmpty) instanceof TakeItAllDummy);
+      }
+      
+      /**
+       * Editing a not-null value with empty text
+       */
+      @Test
+      public void testGenericEditorXEmptyValueInitiallyValid() {
+          JTable table = new JXTable(create1535TableModel());
+          ThrowingDummy validValue = new ThrowingDummy("valid");
+          table.setValueAt(validValue, 0, throwOnEmpty);
+          assertNoStoppedEventOnEmptyValue(table, 0, throwOnEmpty, true);
+          assertEquals(validValue, table.getValueAt(0, throwOnEmpty));
+      }
+      
+      /**
+       * Editing a null value with empty text.
+       */
+      @Test
+      public void testGenericEditorXEmptyValue() {
+          JTable table = new JXTable(create1535TableModel());
+          assertNoStoppedEventOnEmptyValue(table, 0, throwOnEmpty, false);
+          assertEquals(null, table.getValueAt(0, throwOnEmpty));
+      }
+      
+      /**
+       * Asserts that stopping an edit with empty value (aka: invalid)
+       * 
+       * - stopCellEditing returns false
+       * - does not fire editing stopped
+       * 
+       * Starts an edit on the given cell and stop the editor to analyse.
+       * 
+       *  
+       * @param table
+       * @param row
+       * @param column
+       * @param forceEmpty if true, set the editing textField's text property
+       *    to empty string before stopping
+       */
+      protected static void assertNoStoppedEventOnEmptyValue(JTable table, int row, int column, boolean forceEmpty) {
+          table.editCellAt(row, column);
+          CellEditorReport report = new CellEditorReport();
+          DefaultCellEditor cellEditor = (DefaultCellEditor) table.getCellEditor();
+          if (forceEmpty) {
+              ((JTextField) cellEditor.getComponent()).setText("");
+          }
+          cellEditor.addCellEditorListener(report);
+          assertFalse("empty value is invalid, refuse stop", cellEditor.stopCellEditing());
+          assertEquals("was invalid edit, must not fire stoppedEvent", 
+                  0, report.getStoppedEventCount());
+      }
+      
+      protected static void assertStoppedEventOnValidValue(JTable table, int row, int column, boolean forceEmpty) {
+          table.editCellAt(row, column);
+          CellEditorReport report = new CellEditorReport();
+          DefaultCellEditor cellEditor = (DefaultCellEditor) table.getCellEditor();
+          if (forceEmpty) {
+              ((JTextField) cellEditor.getComponent()).setText("");
+          }
+          cellEditor.addCellEditorListener(report);
+          assertTrue("empty value is valid", cellEditor.stopCellEditing());
+          assertEquals("was valid edit, must  fire single stoppedEvent", 
+                  1, report.getStoppedEventCount());
+      }
+
+      protected static DefaultTableModel create1535TableModel() {
+          DefaultTableModel model = new DefaultTableModel(10, 2) {
+              
+              @Override
+              public Class<?> getColumnClass(int columnIndex) {
+                  return columnIndex == 0 ? SilentDummy.class : 
+                      columnIndex == 1 ? ThrowingDummy.class : TakeItAllDummy.class;
+              }
+              
+          };
+          model.setColumnIdentifiers(new Object[]{"silently refusing edits", 
+                  "throwing on empty", "take all"});
+          return model;
+      }
+      protected static final int refuseEdit = 0;
+      protected static final int throwOnEmpty = 1;
+      protected static final int takeEmpty = 2;
+      /**
+       * No constructor with String param: not editable.
+       */
+      public static class SilentDummy {
+          public String value;
+      }
+      
+      /**
+       * Constructor with String param which takes any string.
+       */
+      public static class TakeItAllDummy {
+          public String value;
+          public TakeItAllDummy(String value) {
+              this.value = value;
+          }
+      }
+      
+      /**
+       * Constructor with string param which must not be empty: 
+       * fires editingStopped even if empty (aka: not valid)
+       */
+      public static class ThrowingDummy {
+          public ThrowingDummy(String value) {
+              if (value == null || "".equals(value)) {
+                  throw new IllegalArgumentException("don't feed me air!!");
+              }
+          }
+      }
+//------------------- end testing #1535-swingx
+
+    
     @Test
     public void testHyperlinkDefaultRenderer() {
         // This test will not work in a headless configuration.

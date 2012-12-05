@@ -53,6 +53,7 @@ import org.jdesktop.swingx.renderer.StringValue;
 import org.jdesktop.swingx.renderer.StringValues;
 import org.jdesktop.swingx.sort.TableSortController;
 import org.jdesktop.swingx.table.TableColumnExt;
+import org.jdesktop.swingx.test.ActionMapTreeTableModel;
 import org.jdesktop.swingx.test.ComponentTreeTableModel;
 import org.jdesktop.swingx.test.TreeTableUtils;
 import org.jdesktop.swingx.treetable.DefaultMutableTreeTableNode;
@@ -85,6 +86,19 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
     public JXTreeTableUnitTest() {
         super("JXTreeTable Unit Test");
     }
+
+    /**
+     * Issue swingx-1529: IOOB Exception on delete
+     * 
+     * Stacktrace includes DefaultSortController, so sanity testing here
+     * to verify that there is none installed by default.
+     */
+    @Test
+    public void testRowSorterDisabled() {
+        JXTreeTable table = new JXTreeTable(createActionTreeModel());
+        assertNull(table.getRowSorter());
+    }
+    
 
     /**
      * Issue #1527-swingx: tooltip not shown on hierarchical column after collapse/expand.
@@ -1573,6 +1587,16 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
 
         return customTreeTableModel;
     }
+
+    /**
+     * @return
+     */
+    private TreeTableModel createActionTreeModel() {
+        JXTable table = new JXTable(10, 10);
+        table.setHorizontalScrollEnabled(true);
+        return new ActionMapTreeTableModel(table);
+    }
+
 
     // ------------------ init
     @Override

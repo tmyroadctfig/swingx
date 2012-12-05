@@ -7,6 +7,8 @@
 
 package org.jdesktop.swingx;
 
+import static org.jdesktop.swingx.JXTableUnitTest.*;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -59,6 +61,8 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
+import org.jdesktop.swingx.JXTableUnitTest.TakeItAllDummy;
+import org.jdesktop.swingx.JXTableUnitTest.ThrowingDummy;
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.test.XTestUtils;
 import org.jdesktop.test.AncientSwingTeam;
@@ -99,7 +103,53 @@ public class JTableIssues extends InteractiveTestCase {
       }
   }
     
+//------- start testing Issue #1535-swingx
 
+    /**
+     * Sanity: initially valid entry without forcing edit is behaving as expected
+     */
+    @Test
+    public void testGenericEditorValidValue() {
+        JTable table = new JTable(create1535TableModel());
+        table.setValueAt(new ThrowingDummy("valid"), 0, throwOnEmpty);
+        assertStoppedEventOnValidValue(table, 0, throwOnEmpty, false);
+    }
+
+    /**
+     * Test editor firing when empty value is valid
+     */
+    @Test
+    public void testGenericEditorValidValueAlways() {
+        JTable table = new JTable(create1535TableModel());
+        assertStoppedEventOnValidValue(table, 0, takeEmpty, false);
+        assertTrue(table.getValueAt(0, takeEmpty) instanceof TakeItAllDummy);
+    }
+    
+    /**
+     * Editing a not-null value with empty text
+     */
+    @Test
+    public void testGenericEditorEmptyValueInitiallyValid() {
+        JTable table = new JTable(create1535TableModel());
+        ThrowingDummy validValue = new ThrowingDummy("valid");
+        table.setValueAt(validValue, 0, throwOnEmpty);
+        assertNoStoppedEventOnEmptyValue(table, 0, throwOnEmpty, true);
+        assertEquals(validValue, table.getValueAt(0, throwOnEmpty));
+    }
+    
+    /**
+     * Editing a null value with empty text.
+     */
+    @Test
+    public void testGenericEditorEmptyValue() {
+        JTable table = new JTable(create1535TableModel());
+        assertNoStoppedEventOnEmptyValue(table, 0, throwOnEmpty, false);
+        assertEquals(null, table.getValueAt(0, throwOnEmpty));
+    }
+ 
+
+  //------------------- end testing #1535-swingx
+    
     @Override
     @Before
     public void setUp() throws Exception {
