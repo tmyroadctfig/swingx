@@ -118,9 +118,20 @@ import org.jdesktop.swingx.util.Contract;
  * {@link #setModel(javax.swing.table.TableModel) setModel})
  * will throw an <code>IllegalArgumentException</code>!
  *
+ * <b>Note</b>: <p>
+ * This implementation is basically as hacky as the very first version
+ * more than a decaded ago: the renderer of the hierarchical column is a 
+ * JXTree which is trickst into painting a single row at the position of 
+ * the table cell. TreeModel changes must be adapted to TableModel changes
+ * <i>after</i> the tree received them, that is the TableModel events are asynchronous
+ * as compared to their base trigger. As a consequence, the adapted TableModel
+ * doesn't play nicely when shared in other J/X/Tables (f.i. used as rowHeader -
+ * see http://java.net/jira/browse/SWINGX-1529)
+ *
  * @author Philip Milne
  * @author Scott Violet
  * @author Ramesh Gupta
+ *
  */
 @JavaBean
 public class JXTreeTable extends JXTable {
