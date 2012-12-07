@@ -23,13 +23,17 @@ package org.jdesktop.swingx.plaf.basic.core;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
+import javax.swing.DefaultRowSorter;
 import javax.swing.ListModel;
 import javax.swing.RowFilter;
 import javax.swing.SortOrder;
+import javax.swing.RowFilter.Entry;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -66,6 +70,44 @@ public class ListSortUITest extends InteractiveTestCase {
     private ListSortController<ListModel> controller;
 //    private ListSortUI sortUI;
     private int testRow;
+
+    
+    /**
+     * Issue #1536-swingx: AIOOB on restoring selection with filter
+     * This is a core issue, sneaked into ListSortUI by c&p
+     * 
+     */
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @Test
+    public void testSelectionWithFilterXList() {
+        DefaultListModel model = new DefaultListModel();
+        // a model with 3 elements is the minimum size to demonstrate
+        // the bug
+        int last = 2;
+        for (int i = 0; i <= last; i++) {
+            model.addElement(i);
+        }
+        JXList table = new JXList(model, true);
+        // set selection to the end
+        table.setSelectionInterval(last, last);
+        // exclude rows based on identifier
+        final RowFilter filter = new RowFilters.GeneralFilter() {
+            
+            List excludes = Arrays.asList(0);
+            @Override
+            protected boolean include(
+                    Entry<? extends Object, ? extends Object> entry,
+                    int index) {
+                return !excludes.contains(entry.getIdentifier());
+            }
+            
+        };
+        ((DefaultRowSorter) table.getRowSorter()).setRowFilter(filter);
+        // insertRow _before or at_ selected model index, such that
+        // endIndex (in event) > 1
+        model.add(2, "x");
+    }
+    
 
     @Test(expected = IllegalStateException.class)
     public void testConstructorDifferentSorter() {

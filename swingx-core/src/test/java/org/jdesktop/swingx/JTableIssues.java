@@ -7,8 +7,6 @@
 
 package org.jdesktop.swingx;
 
-import static org.jdesktop.swingx.JXTableUnitTest.*;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -23,7 +21,10 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Vector;
 import java.util.logging.Logger;
 
@@ -31,6 +32,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.DefaultCellEditor;
+import javax.swing.DefaultListModel;
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.DefaultRowSorter;
 import javax.swing.Icon;
@@ -46,6 +48,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
+import javax.swing.RowFilter;
 import javax.swing.RowSorter;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
@@ -64,6 +67,7 @@ import javax.swing.table.TableRowSorter;
 import org.jdesktop.swingx.JXTableUnitTest.TakeItAllDummy;
 import org.jdesktop.swingx.JXTableUnitTest.ThrowingDummy;
 import org.jdesktop.swingx.action.AbstractActionExt;
+import org.jdesktop.swingx.sort.RowFilters;
 import org.jdesktop.swingx.test.XTestUtils;
 import org.jdesktop.test.AncientSwingTeam;
 import org.jdesktop.test.CellEditorReport;
@@ -76,10 +80,15 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+import static org.junit.Assert.*;
+
+import static org.jdesktop.swingx.JXTableUnitTest.*;
+
 /**
  * @author Jeanette Winzenburg
  */
 @RunWith(JUnit4.class)
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public class JTableIssues extends InteractiveTestCase {
     /**
      * 
@@ -96,13 +105,197 @@ public class JTableIssues extends InteractiveTestCase {
 //          test.runInteractiveTests("interactive.*ColumnControl.*");
 //          test.runInteractiveTests("interactive.*Edit.*");
 //          test.runInteractiveTests("interactive.*Sort.*");
-          test.runInteractiveTests("interactive.*EditOnFocusLost.*");
+//          test.runInteractiveTests("interactive.*EditOnFocusLost.*");
+          test.runInteractive("SortModelSelection");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
       }
   }
     
+    /**
+     * Issue #1536-swingx: AIOOB on restoring selection with filter
+     * 
+     */
+    @Test
+    public void testSelectionWithFilterXTable() {
+        DefaultTableModel model = new DefaultTableModel(0, 1);
+        // a model with 3 elements is the minimum where to demonstrate
+        // the bug
+        int last = 2;
+        for (int i = 0; i <= last; i++) {
+            model.addRow(new Object[]{i});
+        }
+        JTable table = new JXTable(model);
+//        table.setAutoCreateRowSorter(true);
+        // set selection at the end
+        table.setRowSelectionInterval(last, last);
+        // exclude rows based on identifier
+        final RowFilter filter = new RowFilters.GeneralFilter() {
+            
+            List excludes = Arrays.asList(0);
+            @Override
+            protected boolean include(
+                    Entry<? extends Object, ? extends Object> entry,
+                    int index) {
+                return !excludes.contains(entry.getIdentifier());
+            }
+            
+        };
+        ((DefaultRowSorter) table.getRowSorter()).setRowFilter(filter);
+        // insertRow _before or at_ selected model index, such that
+        // endIndex (in event) > 1
+        model.insertRow( 2, new Object[]{"x"});
+    }
+    
+    /**
+     * Issue #1536-swingx: AIOOB on restoring selection with filter
+     * 
+     */
+    @Test
+    public void testSelectionWithFilterTable() {
+        DefaultTableModel model = new DefaultTableModel(0, 1);
+        // a model with 3 elements is the minimum where to demonstrate
+        // the bug
+        int last = 2;
+        for (int i = 0; i <= last; i++) {
+            model.addRow(new Object[]{i});
+        }
+        JTable table = new JTable(model);
+        table.setAutoCreateRowSorter(true);
+        // set selection at the end
+        table.setRowSelectionInterval(last, last);
+        // exclude rows based on identifier
+        final RowFilter filter = new RowFilters.GeneralFilter() {
+
+            List excludes = Arrays.asList(0);
+            @Override
+            protected boolean include(
+                    Entry<? extends Object, ? extends Object> entry,
+                    int index) {
+                return !excludes.contains(entry.getIdentifier());
+            }
+            
+        };
+        ((DefaultRowSorter) table.getRowSorter()).setRowFilter(filter);
+        // insertRow _before or at_ selected model index, such that
+        // endIndex (in event) > 1
+        model.insertRow( 2, new Object[]{"x"});
+    }
+    
+    /**
+     * Issue #1536-swingx: AIOOB on restoring selection with filter
+     * This is a core issue, sneaked into ListSortUI by c&p
+     * 
+     * Analyzed by reporter to incorrect method usage in SortManager
+     * cacheSelection: selectionModel.insert/removeIndexInterval length of range 
+     * but gets last index of range.
+     */
+    public void interactiveSortModelSelection() {
+        final BulkTableModel model = new BulkTableModel(0, 1) {
+            
+        };
+        for (int i = 0; i < 10; i++) {
+            model.addRow(new Object[]{i});
+        }
+        final JTable table = new JTable(model);
+//        table.setSortOrderCycle(SortOrder.ASCENDING, SortOrder.DESCENDING, SortOrder.UNSORTED);
+        table.setAutoCreateRowSorter(true);
+        JXFrame frame = wrapWithScrollingInFrame(table, "sort bug");
+        Action add = new AbstractAction("add") {
+            int count = model.getRowCount();
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int selected = table.getSelectedRow();
+                if (true) {//(selected < 0) {
+                    selected = model.getRowCount() - 3;
+                }
+                model.insertRowsAt(selected 
+                        , new Object[] {count++}
+                        , new Object[] {count++}
+                        , new Object[] {count++}
+                        );
+            }
+        };
+        addAction(frame, add);
+        final RowFilter filter = new RowFilters.GeneralFilter() {
+
+            List excludes = Arrays.asList(4, 5, 6);
+            @Override
+            protected boolean include(
+                    Entry<? extends Object, ? extends Object> entry,
+                    int index) {
+                return !excludes.contains(entry.getIdentifier());
+            }
+            
+        };
+        Action toggleFilter = new AbstractAction("filter") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                DefaultRowSorter sorter = (DefaultRowSorter) table.getRowSorter();
+                sorter.setRowFilter(sorter.getRowFilter() != null ?
+                        null : filter
+                        );
+            }
+        };
+        addAction(frame, toggleFilter);
+        
+        Action unsort = new AbstractAction("unsort") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                DefaultRowSorter sorter = (DefaultRowSorter) table.getRowSorter();
+                sorter.setSortKeys(null);
+            }
+            
+        };
+        addAction(frame, unsort);
+        show(frame);
+    }
+    
+    public static class BulkTableModel extends DefaultTableModel {
+        
+        public BulkTableModel(int rows, int columns) {
+            super(rows, columns);
+        }
+
+        @SuppressWarnings({ "unchecked", "rawtypes" })
+        public void insertRowsAt(int row, Object[]... rows) {
+            List toInsert = new ArrayList();
+            for (Object[] data : rows) {
+                Vector rowData = convertToVector(data);
+                toInsert.add(rowData);
+            }
+            dataVector.addAll(row, toInsert);
+//            justifyRows(row, row + toInsert.size());
+            fireTableRowsInserted(row, row + toInsert.size() - 1);
+        }
+        
+        @Override
+        public Class<?> getColumnClass(int columnIndex) {
+            if (columnIndex == 0) {
+                return Integer.class;
+            }
+            return super.getColumnClass(columnIndex);
+        }
+        
+        private void justifyRows(int from, int to) { 
+            // Sometimes the DefaultTableModel is subclassed 
+            // instead of the AbstractTableModel by mistake. 
+            // Set the number of rows for the case when getRowCount 
+            // is overridden. 
+            dataVector.setSize(getRowCount()); 
+
+            for (int i = from; i < to; i++) { 
+                if (dataVector.elementAt(i) == null) { 
+                    dataVector.setElementAt(new Vector(), i); 
+                }
+                ((Vector)dataVector.elementAt(i)).setSize(getColumnCount());
+            }
+        }
+
+    }
 //------- start testing Issue #1535-swingx
 
     /**
