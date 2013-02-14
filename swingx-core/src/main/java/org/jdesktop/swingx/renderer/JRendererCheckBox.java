@@ -42,8 +42,15 @@ import org.jdesktop.swingx.painter.Painter;
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class JRendererCheckBox extends JCheckBox implements PainterAware {
     protected Painter painter;
-    private boolean isPainting;
+    private boolean fakeTransparency;
 
+    
+    public JRendererCheckBox() {
+        super();
+        // fix # 1546-swingx: striping lost in synth-based lafs
+        // forcing opaque to enable painting the background
+        setOpaque(true);
+    }
     /**
      * {@inheritDoc}
      */
@@ -70,7 +77,7 @@ public class JRendererCheckBox extends JCheckBox implements PainterAware {
      */
     @Override
     public boolean isOpaque() {
-        if (isPainting) {
+        if (fakeTransparency) {
             return false;
         }
         return super.isOpaque();
@@ -84,7 +91,7 @@ public class JRendererCheckBox extends JCheckBox implements PainterAware {
      */
      @Override
     public boolean isContentAreaFilled() {
-        if (isPainting) {
+        if (fakeTransparency) {
             return false;
         }
         return super.isContentAreaFilled();
@@ -117,9 +124,9 @@ public class JRendererCheckBox extends JCheckBox implements PainterAware {
             // handling  elsewhere
             if (isOpaque()) {
                 // replace the paintComponent completely 
-                isPainting = true;
+                fakeTransparency = true;
                 paintComponentWithPainter((Graphics2D) g);
-                isPainting = false;
+                fakeTransparency = false;
             } else {
                 // transparent apply the background painter before calling super
                 paintPainter(g);
@@ -182,6 +189,7 @@ public class JRendererCheckBox extends JCheckBox implements PainterAware {
                 scratchGraphics.fillRect(0, 0, getWidth(), getHeight());
                 paintPainter(g);
                 ui.paint(scratchGraphics, this);
+//                super.paintComponent(g);
             } finally {
                 scratchGraphics.dispose();
             }

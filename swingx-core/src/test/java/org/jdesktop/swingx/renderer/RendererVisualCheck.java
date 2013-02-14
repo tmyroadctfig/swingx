@@ -144,7 +144,11 @@ public class RendererVisualCheck extends InteractiveTestCase {
             .getLogger(RendererVisualCheck.class.getName());
     
     public static void main(String[] args) {
-        setSystemLF(true);
+        // Note JW: to check opacity issue in renderers _do not_ toggle
+        // laf during runtime (that's how
+        // instead start a new instance of the visual check
+        // with another LAF
+        setLAF("Nim");
         RendererVisualCheck test = new RendererVisualCheck();
         try {
 //            test.runInteractiveTests();
@@ -153,14 +157,14 @@ public class RendererVisualCheck extends InteractiveTestCase {
 //          test.runInteractiveTests(".*XLabel.*");
 //            test.runInteractiveTests(".*Button.*");
 //          test.runInteractiveTests(".*TextArea.*");
-          test.runInteractiveTests(".*Text.*");
+//          test.runInteractiveTests(".*Text.*");
 //          test.runInteractiveTests(".*Color.*");
 //          test.runInteractiveTests("interactive.*ColumnControl.*");
 //            test.runInteractive("RowGrouping");
 //          test.runInteractive("Link");
             test.runInteractive("Opacity");
             test.runInteractive("CheckBox");
-          test.runInteractive("TreeRenderer");
+//          test.runInteractive("TreeRenderer");
 //          test.runInteractive("URI");
             
         } catch (Exception e) {
@@ -174,9 +178,11 @@ public class RendererVisualCheck extends InteractiveTestCase {
      * Actually a problem introduced by #3789 version of JXPanel
      * Not special to the hierarchical nature, same for list
      * 
-     * @see org.jdesktop.swingx.renderer.RendererVisualCheck#interactiveIconTextAlignment
+     * Not fixed (1.6.5) for Nimbus (and potentially other synth-based lafs)
+     * 
+     * @see org.jdesktop.swingx.renderer.RendererVisualCheck#interactiveIconTextAlignmentAndExtendsOpacity
      */
-    public void interactiveTreeRendererSimple() {
+    public void interactiveTreeRendererExtendsOpacity() {
         JXTree table = new JXTree();
         table.expandAll();
         final WrappingProvider wrapper = new WrappingProvider();
@@ -208,7 +214,8 @@ public class RendererVisualCheck extends InteractiveTestCase {
      * Issue #1513-swingx: opacity of JRendererCheckBox can't be effected by 
      * client code.
      * 
-     * Stand-alone JRendererCheckBox showing permutations of not/opaque and with/out painter
+     * Stand-alone JRendererCheckBox showing permutations of 
+     * not/opaque and with/out painter
      */
     public void interactiveRendererCheckBox() {
         JRendererCheckBox opaque = new JRendererCheckBox();
@@ -218,7 +225,8 @@ public class RendererVisualCheck extends InteractiveTestCase {
         JRendererCheckBox opaqueWith = new JRendererCheckBox();
         opaqueWith.setText("I'm opaque with painter");
         opaqueWith.setBackground(Color.YELLOW);
-        opaqueWith.setPainter(new BusyPainter());
+        opaqueWith.setPainter(new ImagePainter(XTestUtils.loadDefaultImage()));
+        opaqueWith.setForeground(Color.GREEN);
         
         JRendererCheckBox transparent = new JRendererCheckBox();
         transparent.setText("I'm transparent without painter");
@@ -233,13 +241,13 @@ public class RendererVisualCheck extends InteractiveTestCase {
         transparentWith.setBackground(Color.YELLOW);
 //        transparentWith.setContentAreaFilled(false);
         transparentWith.setOpaque(false);
-        transparentWith.setPainter(new BusyPainter());
+        transparentWith.setPainter(new ImagePainter(XTestUtils.loadDefaultImage()));
+        transparentWith.setForeground(Color.GREEN);
         
         
-        JCheckBox plain = new JCheckBox("I'm a plain transparent box");
+        JCheckBox plain = new JCheckBox("I'm a plain default box");
         plain.setBackground(Color.YELLOW);
-//        plain.setContentAreaFilled(false);
-        plain.setOpaque(false);
+//        plain.setOpaque(false);
         
         JPanel content = new JPanel();
         content.setBackground(Color.WHITE);
@@ -566,7 +574,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
      * 
      * Issue #1309-swingx: WrappingProvider needs option to "highlight" the icon as well.
      */
-    public void interactiveIconTextAlignment() {
+    public void interactiveIconTextAlignmentAndExtendsOpacity() {
         ListModel files = createFileListModel();
         final JXList list = new JXList(files);
         ComponentProvider<?> text = new LabelProvider(StringValues.FILE_NAME, JLabel.TRAILING);
