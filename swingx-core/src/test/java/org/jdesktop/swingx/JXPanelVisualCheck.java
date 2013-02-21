@@ -28,6 +28,7 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.Paint;
 import java.awt.event.ActionEvent;
+import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
@@ -35,8 +36,10 @@ import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.painter.ImagePainter;
@@ -56,9 +59,10 @@ public class JXPanelVisualCheck extends InteractiveTestCase {
       SwingUtilities.invokeLater(new Runnable() {
           @Override
         public void run() {
+              UIManager.put("JXPanel.patch", Boolean.TRUE);
       try {
                 
-//         test.runInteractiveTests("interactive.*");
+//         test.runInteractiveTests();
          test.runInteractiveTests("interactiveBackgroundAlphaToggleOpaque");
 //         test.runInteractive("BackgroundAndAlphaCheck");
 //         test.runInteractive("FrameArtefacts");
@@ -104,32 +108,48 @@ public class JXPanelVisualCheck extends InteractiveTestCase {
         Color alpha = PaintUtils.setAlpha(base, 100);
         
         final JPanel p = new JPanel();
+        p.setBorder(BorderFactory.createTitledBorder("core (alpha back)"));
         p.setBackground(alpha);
+        final JLabel coreLabel = new JLabel("is-opaque: " + p.isOpaque());
+        p.add(coreLabel);
         
         final JXPanel xp1 = new JXPanel();
+        xp1.setBorder(BorderFactory.createTitledBorder("x (alpha back)"));
         xp1.setBackground(alpha);
+        final JLabel xbackAlpha = new JLabel("is-opaque: " + xp1.isOpaque());
+        xp1.add(xbackAlpha);
+        
         
         final JXPanel xp2 = new JXPanel();
-        xp2.setAlpha(100f/255f);
+        xp2.setBorder(BorderFactory.createTitledBorder("x (alpha container)"));
         xp2.setBackground(base);
+        xp2.setAlpha(100f/255f);
+        final JLabel xcontainerAlpha = new JLabel("is-opaque: " + xp2.isOpaque());
+        xp2.add(xcontainerAlpha);
         
         container.add(p);
         container.add(xp1);
         container.add(xp2);
         
-        JXFrame frame = wrapInFrame(container, "changing opaque has no effect with alpha background");
-        Action action = new AbstractAction("opaque on") {
+        JXFrame frame = wrapInFrame(container, "opaque with alpha " 
+                + System.getProperty("java.version")
+                + " " + UIManager.get("JXPanel.patch")
+                );
+        Action action = new AbstractAction("toggle opaque (is on)") {
             boolean realOpaque = true;
             @Override
             public void actionPerformed(ActionEvent e) {
                 realOpaque = !realOpaque;
                 
-                putValue(Action.NAME, realOpaque ? "opaque on" : "opaque off");
+                putValue(Action.NAME, realOpaque ? "toggle opaque (is on)" : "toggle opaque (is off)");
                 
                 p.setOpaque(realOpaque);
                 xp1.setOpaque(realOpaque);
                 xp2.setOpaque(realOpaque);
                 
+                coreLabel.setText("is-opaque: " + p.isOpaque());
+                xbackAlpha.setText("is-opaque: " + xbackAlpha.isOpaque());
+                xcontainerAlpha.setText("is-opaque: " + xcontainerAlpha.isOpaque());
                 p.repaint();
                 xp1.repaint();
                 xp2.repaint();
@@ -147,10 +167,12 @@ public class JXPanelVisualCheck extends InteractiveTestCase {
         Color alpha = PaintUtils.setAlpha(Color.RED, 100);
         
         JXPanel opaque = new JXPanel();
+        opaque.setBorder(BorderFactory.createTitledBorder("xpanel (alpha color, real opaque)"));
         opaque.setBackground(alpha);
         
         JXPanel nonOpaque = new JXPanel();
         nonOpaque.setOpaque(false);
+        nonOpaque.setBorder(BorderFactory.createTitledBorder("xpanel (alpha color, real !opaque)"));
         nonOpaque.setBackground(alpha);
         
         container.add(opaque);
@@ -285,4 +307,7 @@ public class JXPanelVisualCheck extends InteractiveTestCase {
         
     }
 
+    @SuppressWarnings("unused")
+    private static final Logger LOG = Logger.getLogger(JXPanelVisualCheck.class
+            .getName());
 }
