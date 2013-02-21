@@ -21,12 +21,15 @@
 
 package org.jdesktop.swingx;
 
+import static org.jdesktop.swingx.util.GraphicsUtilities.createCompatibleTranslucentImage;
+
 import java.awt.AlphaComposite;
 import java.awt.Component;
 import java.awt.Composite;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Insets;
 import java.awt.LayoutManager;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
@@ -39,12 +42,12 @@ import javax.swing.RepaintManager;
 import javax.swing.Scrollable;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
+import javax.swing.plaf.synth.SynthLookAndFeel;
 
 import org.jdesktop.beans.JavaBean;
 import org.jdesktop.swingx.painter.AbstractPainter;
 import org.jdesktop.swingx.painter.Painter;
 import org.jdesktop.swingx.util.Contract;
-import org.jdesktop.swingx.util.GraphicsUtilities;
 import org.jdesktop.swingx.util.JVM;
 
 /**
@@ -562,21 +565,6 @@ public class JXPanel extends JPanel implements AlphaPaintable, BackgroundPaintab
     //support for Java 7 painting improvements
     protected boolean isPaintingOrigin() {
         return getAlpha() < 1f;
-//        if (getAlpha() < 1f) {
-//            Container c = getParent();
-//            
-//            while (c != null) {
-//                if (c instanceof AlphaPaintable && ((AlphaPaintable) c).getAlpha() < 1f) {
-//                    return false;
-//                }
-//                
-//                c = c.getParent();
-//            }
-//                
-//            return true;
-//        }
-//        
-//        return false;
     }
 
     /**
@@ -594,7 +582,7 @@ public class JXPanel extends JPanel implements AlphaPaintable, BackgroundPaintab
             //the component is translucent, so we need to render to
             //an intermediate image before painting
             // TODO should we cache this image? repaint to same image unless size changes?
-            BufferedImage img = GraphicsUtilities.createCompatibleTranslucentImage(getWidth(), getHeight());
+            BufferedImage img = createCompatibleTranslucentImage(getWidth(), getHeight());
             Graphics2D gfx = img.createGraphics();
             
             try {
@@ -625,6 +613,7 @@ public class JXPanel extends JPanel implements AlphaPaintable, BackgroundPaintab
      *            the <code>Graphics</code> context in which to paint
      */
     @Override
+    @SuppressWarnings("unchecked")
     protected void paintComponent(Graphics g) {
         if (isPatch()) {
             paintComponentPatch(g);
@@ -633,17 +622,39 @@ public class JXPanel extends JPanel implements AlphaPaintable, BackgroundPaintab
         Graphics2D g2 = (Graphics2D) g.create();
         
         try {
-            SwingXUtilities.paintBackground(this, g2);
+            // we should be painting the background behind the painter if we have one
+            // this prevents issues with buffer reuse where visual artifacts sneak in
+            if (isOpaque() || UIManager.getLookAndFeel() instanceof SynthLookAndFeel) {
+                //this will paint the foreground if a JXPanel subclass is 
+                //unfortunate enough to have one
+                super.paintComponent(g2);
+            } else if (getAlpha() < 1f) {
+                g.setColor(getBackground());
+                g.fillRect(0, 0, getWidth(), getHeight());
+            }
+            
+            if (getBackgroundPainter() != null) {
+                if (isPaintBorderInsets()) {
+                    getBackgroundPainter().paint(g2, this, getWidth(), getHeight());
+                } else {
+                    Insets insets = getInsets();
+                    g.translate(insets.left, insets.top);
+                    getBackgroundPainter().paint(g2, this, getWidth() - insets.left - insets.right,
+                            getHeight() - insets.top - insets.bottom);
+                    g.translate(-insets.left, -insets.top);
+                }
+            }
+            
+            //force the foreground to paint again...workaround for folks that 
+            //incorrectly extend JXPanel instead of JComponent
+            getUI().paint(g2, this);
         } finally {
             g2.dispose();
         }
-        // PENDING JW: to mimic super as closely as possible, 
-        // shouldn't we use the g2 instead of the passed-in graphics?
-        getUI().paint(g, this);
     }
  
 //--------------------- experimental patch
-    
+        
     protected boolean isPatch() {
         return Boolean.TRUE.equals(UIManager.get("JXPanel.patch"));
     }
