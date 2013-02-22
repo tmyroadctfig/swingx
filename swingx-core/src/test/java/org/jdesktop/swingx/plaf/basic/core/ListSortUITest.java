@@ -60,6 +60,7 @@ import org.junit.runners.JUnit4;
  * @author Jeanette Winzenburg
  */
 @RunWith(JUnit4.class)
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public class ListSortUITest extends InteractiveTestCase {
     @SuppressWarnings("unused")
     private static final Logger LOG = Logger.getLogger(ListSortUITest.class
@@ -74,12 +75,42 @@ public class ListSortUITest extends InteractiveTestCase {
     
     /**
      * Issue #1536-swingx: AIOOB on restoring selection with filter
+     * Reopened: overfixed - the removeIndexInterval _does_ take 
+     * the endIndex instead of length.
+     * 
+     */
+    @Test
+    public void testSelectionWithFilterXListRemove() {
+        JXList table = new JXList(ascendingListModel, true);
+        // set selection somewhere below the filtered (which is 0)
+        int selected = 1;
+        table.setSelectionInterval(selected, selected);
+        // exclude rows based on identifier (here: first item
+        final RowFilter filter = new RowFilters.GeneralFilter() {
+            
+            List excludes = Arrays.asList(0);
+            @Override
+            protected boolean include(
+                    Entry<? extends Object, ? extends Object> entry,
+                    int index) {
+                return !excludes.contains(entry.getIdentifier());
+            }
+            
+        };
+        table.setRowFilter(filter);
+        assertEquals("sanity: filtered selection", selected - 1, table.getSelectedIndex());
+        // remove last row
+        ascendingListModel.remove(ascendingListModel.getSize() - 1);
+        assertEquals("filtered selection unchanged", selected - 1, table.getSelectedIndex());
+        assertFalse(table.isSelectionEmpty());
+    }
+    /**
+     * Issue #1536-swingx: AIOOB on restoring selection with filter
      * This is a core issue, sneaked into ListSortUI by c&p
      * 
      */
-    @SuppressWarnings({ "rawtypes", "unchecked" })
     @Test
-    public void testSelectionWithFilterXList() {
+    public void testSelectionWithFilterXListInsert() {
         DefaultListModel model = new DefaultListModel();
         // a model with 3 elements is the minimum size to demonstrate
         // the bug
@@ -102,12 +133,11 @@ public class ListSortUITest extends InteractiveTestCase {
             }
             
         };
-        ((DefaultRowSorter) table.getRowSorter()).setRowFilter(filter);
+        table.setRowFilter(filter);
         // insertRow _before or at_ selected model index, such that
         // endIndex (in event) > 1
         model.add(2, "x");
     }
-    
 
     @Test(expected = IllegalStateException.class)
     public void testConstructorDifferentSorter() {

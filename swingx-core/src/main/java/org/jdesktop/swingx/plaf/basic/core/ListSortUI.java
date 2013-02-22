@@ -215,8 +215,9 @@ public final class ListSortUI {
             // reported as #1536-swingx
             case ListDataEvent.INTERVAL_REMOVED:
                 modelSelection.removeIndexInterval(change.startModelIndex,
-                        // remove is fixed without test
-                        change.length);
+                        // Note: api difference between remove vs. insert
+                        // nothing do do here!
+                        change.endModelIndex);
                 break;
             case ListDataEvent.INTERVAL_ADDED:
                 modelSelection.insertIndexInterval(change.startModelIndex,
