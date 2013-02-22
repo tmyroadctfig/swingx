@@ -36,15 +36,29 @@ import org.jdesktop.swingx.painter.Painter;
  * <b>Note</b>: As of revision #4223, there's a complete overhaul (aka: changed the tricksery) to 
  * fix Issue swingx-1513 (allow client code to set renderer transparent) while keeping
  * fix Issue swingx-897 (striping/background lost when painter installed)
+ * <p>
+ * 
+ * <b>Note</b>: The change of logic _did_ introduce a regression (swingx-1546) 
+ * which was fixed by forcing the box's  opacity to true (for regression release
+ * 1.6.5-1). Further improvements (like f.i. the option to delegate to the ui's 
+ * update - to allow LAF installed painters - instead of paint) are deferred
+ * to a later normal release, more discussions needed.  
+ * <p>
  * 
  * @author Jeanette Winzenburg
+ * 
+ * @see #paintComponent(Graphics)
  */
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class JRendererCheckBox extends JCheckBox implements PainterAware {
+    /** the swingx painter */
     protected Painter painter;
+    /** a flag to prevent ui painting from filling the background. */
     private boolean fakeTransparency;
 
-    
+    /**
+     * Instantiates a JRendererCheckBox with opacity true.
+     */
     public JRendererCheckBox() {
         super();
         // fix # 1546-swingx: striping lost in synth-based lafs
@@ -111,7 +125,32 @@ public class JRendererCheckBox extends JCheckBox implements PainterAware {
 
     /**
      * Overridden to snatch painting from super if a painter installed or Nimbus 
-     * detected.
+     * detected.<p>
+     * 
+     * The overall logic currently (since 1.6.5) is to simply call super without SwingX
+     * painter. Otherwise, that is with SwingX painter:
+     * <ol>
+     * <li> if opaque  
+     * <ol>
+     * <li> set a flag which fakes transparency, that is both
+     *      <code>contentAreaFilled</code> and 
+     *      <code>opaque</code> return false 
+     * <li> fill background with the component's background color
+     * <li> apply swingx painter
+     * <li> hook into <code>ui.paint(...)</code> 
+     * <li> reset the flag
+     * </ol>
+     * <li> else
+     * <ol> apply swingx painter
+     * <ol> call super
+     * <li> 
+     * <ol> 
+     * </ol>
+     * 
+     * Note that Nimbus is special cased (mainly due to its bug of 
+     * even row striping instead of odd)
+     * and handled as if a SwingX painter were set.
+     * 
      */
     @Override
     protected void paintComponent(Graphics g) {
