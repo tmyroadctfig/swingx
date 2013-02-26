@@ -131,6 +131,7 @@ import org.jdesktop.swingx.test.XTestUtils;
 import org.jdesktop.swingx.treetable.FileSystemModel;
 import org.jdesktop.swingx.treetable.TreeTableModel;
 import org.jdesktop.swingx.treetable.TreeTableNode;
+import org.jdesktop.swingx.util.PaintUtils;
 import org.jdesktop.test.AncientSwingTeam;
 
 /**
@@ -273,7 +274,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
         JXTable table = new JXTable(new AncientSwingTeam());
         table.addHighlighter(HighlighterFactory.createSimpleStriping());
         table.addHighlighter(new PainterHighlighter(HighlightPredicate.ROLLOVER_ROW, 
-                new MattePainter()));
+                new MattePainter(PaintUtils.setAlpha(Color.RED, 100))));
 //                new BusyPainter()));
         panel.add(new JScrollPane(table));
         table.setOpaque(false);
@@ -325,8 +326,8 @@ public class RendererVisualCheck extends InteractiveTestCase {
         JXTable table = new JXTable(new AncientSwingTeam());
         table.addHighlighter(HighlighterFactory.createSimpleStriping());
         table.addHighlighter(new PainterHighlighter(HighlightPredicate.ROLLOVER_ROW, 
-//                new MattePainter()));
-                new BusyPainter()));
+                new MattePainter(PaintUtils.setAlpha(Color.RED, 100))));
+//                new BusyPainter()));
         showWithScrollingInFrame(table, "Checkbox: striping lost on rollover");
     }
 

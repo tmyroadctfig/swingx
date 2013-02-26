@@ -110,15 +110,15 @@ public class RendererIssues extends InteractiveTestCase {
 
     public static void main(String[] args) {
         RendererIssues test = new RendererIssues();
-        setLAF("Win");
+        setLAF("Nimb");
         try {
 //            test.runInteractiveTests();
-//          test.runInteractiveTests("interactive.*Alpha.*");
+          test.runInteractiveTests("interactive.*Alpha.*");
 //          test.runInteractiveTests(".*XLabel.*");
 //          test.runInteractiveTests(".*Color.*");
 //          test.runInteractiveTests("interactive.*ColumnControl.*");
 //          test.runInteractiveTests("interactive.*ToolTip.*");
-            test.runInteractiveTests("interactive.*TreeRenderer.*");
+//            test.runInteractiveTests("interactive.*TreeRenderer.*");
 //            test.runInteractiveTests("interactive.*Opacity.*");
 //          test.runInteractive("RendererCheckBox");
 //          test.runInteractiveTests("interactive.*Hyperlink.*");
@@ -141,17 +141,17 @@ public class RendererIssues extends InteractiveTestCase {
     public void interactiveAlphaBackground() {
         Color color = PaintUtils.setAlpha(Color.ORANGE, 60);
         
-        JCheckBox check = new JCheckBox("what's my color?");
+        JCheckBox check = new JCheckBox("what's my color? - as is");
 //        check.setOpaque(true);
 //        check.setContentAreaFilled(true);
         check.setBackground(color);
-        JLabel label = new JLabel("and mine?");
+        JLabel label = new JLabel("label: and mine? (forced to opaque)");
         label.setOpaque(true);
         label.setBackground(color );
-        JButton button = new JButton("the new kid on the block");
+        JButton button = new JButton("the new kid on the block - as-is");
         button.setBackground(color);
         
-        JRadioButton radio = new JRadioButton("radio, raadio ..");
+        JRadioButton radio = new JRadioButton("radio, raadio .. as-is");
         radio.setBackground(color);
         
         JTextField field = new JTextField(40);
@@ -176,6 +176,8 @@ public class RendererIssues extends InteractiveTestCase {
      */
     public void interactiveCheckBoxAlpha() {
         JXTable table = new JXTable(new org.jdesktop.test.AncientSwingTeam());
+        table.setBackground(PaintUtils.setAlpha(Color.YELLOW, 100));
+        table.setOpaque(false);
         table.addHighlighter(new RowHighlighter(new HighlightPredicate() {
             public boolean isHighlighted(Component renderer, ComponentAdapter adapter) {
                 return ((Boolean) adapter.getValue(4)).booleanValue();
