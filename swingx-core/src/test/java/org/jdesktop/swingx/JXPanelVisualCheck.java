@@ -65,10 +65,10 @@ public class JXPanelVisualCheck extends InteractiveTestCase {
 //        UIManager.put("JXPanel.patch", Boolean.TRUE);
         try {
 
-            // test.runInteractiveTests();
+//             test.runInteractiveTests();
             test.runInteractiveTests("interactiveBackgroundAlphaToggleOpaque");
-            test.runInteractive("PanelPainter");
-            // test.runInteractive("BackgroundAndAlphaCheck");
+//            test.runInteractive("PanelPainter");
+//             test.runInteractive("BackgroundAndAlphaCheck");
             // test.runInteractive("FrameArtefacts");
 
         } catch (Exception e) {
@@ -203,13 +203,13 @@ public class JXPanelVisualCheck extends InteractiveTestCase {
      * - yellowish background color - SwingX ImagePainter - core painter which
      * paints a diagonal line (top left to bottom right) - a label as content
      * 
-     * With Nimbus, all three "background" layers must be visible
+     * With Nimbus, all three "background" layers should be visible
      * 
      * Actions:
      * 
-     * - toggle opaqueness: if false, the background color must not be painted -
-     * toggle alpha of background color: must not show any artefacts - toggle
-     * alpha of containter: must not show any artefacts, must respect the
+     * - toggle opaqueness: if false, the background color must not be painted 
+     * - toggle alpha of background color: must not show any artefacts 
+     * - toggle alpha of containter: must not show any artefacts, must respect the
      * background filling or not (opaqueness on/off), background alpha must be
      * unchanged
      */
@@ -268,7 +268,7 @@ public class JXPanelVisualCheck extends InteractiveTestCase {
 
     public static class CrossPainter implements Painter<JComponent> {
 
-        BasicStroke stroke = new BasicStroke(5f);
+        BasicStroke stroke = new BasicStroke(20f);
 
         @Override
         public void paint(Graphics2D g, JComponent comp, int width, int height) {

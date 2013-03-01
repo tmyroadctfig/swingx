@@ -112,7 +112,8 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
 //          test.runInteractiveTests("interactive.*Multiple.*");
 //            test.runInteractiveTests("interactive.*Editable.*");
 //            test.runInteractiveTests("interactive.*Enable.*");
-            test.runInteractiveTests("interactive.*Popup.*");
+//            test.runInteractiveTests("interactive.*Popup.*");
+            test.runInteractiveTests("interactive.*NullDate.*");
 //            test.runInteractiveTests("interactive.*Event.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
@@ -1214,7 +1215,39 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
         JXDatePicker picker = new JXDatePicker();
         showInFrame(picker, "null date in picker");
     }
+    
+    
+    /**
+     * Issue #??-swingx: not possible to clear the date.
+     * reported on SO: http://stackoverflow.com/q/15133981/203657
+     * 
+     * not reproducible (maybe was a coding error, missed api)
+     * 
+     */
+    public void interactiveSetNullDate() {
+        final JXDatePicker picker = new JXDatePicker(new Date());
+        JXFrame frame = wrapInFrame(picker, "null date in picker");
+        Action clearDate = new AbstractAction("clear") {
 
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // set the date to null
+                picker.setDate(null);
+                // more model related (if a handle to the model is available
+                // clear the selection on the monthView
+//                DateSelectionModel model = picker.getMonthView().getSelectionModel();
+//                model.clearSelection();
+                // don't: the null will not be committed!
+//                picker.getEditor().setText("");
+//                System.out.println(picker.getDate());
+            }
+            
+        };
+        addAction(frame, clearDate);
+        show(frame);
+    }
+
+    
     /**
      * something weird's going on: the picker's date must be null
      * after setting a monthView with null selection. It is, until
