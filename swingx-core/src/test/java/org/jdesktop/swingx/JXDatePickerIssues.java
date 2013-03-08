@@ -23,6 +23,7 @@ package org.jdesktop.swingx;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -55,6 +56,7 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.SpinnerDateModel;
+import javax.swing.plaf.UIResource;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
@@ -531,10 +533,118 @@ public class JXDatePickerIssues extends InteractiveTestCase {
     
     
     /**
+     * Issue #1551-swingx: column setting lost in updateUI
+     */
+    @Test
+    public void testSynchColumsPicker() {
+        JXDatePicker picker = new JXDatePicker();
+        int columns = 17;
+        picker.getEditor().setColumns(columns);
+        picker.updateUI();
+        assertEquals("columns after updateUI", columns, picker.getEditor().getColumns());
+    }
+    
+    /**
+     * Issue #1551-swingx: column setting lost in updateUI
+     * 
+     * Compare JCombobBox behaviour
+     */
+    @Test
+    public void testSynchColumsCombo() {
+        JComboBox combo = new JComboBox();
+        combo.setEditable(true);
+        int columns = 17;
+        ((JTextField) combo.getEditor().getEditorComponent()).setColumns(columns);
+        combo.updateUI();
+        assertEquals("columns after updateUI", columns, 
+                ((JTextField) combo.getEditor().getEditorComponent()).getColumns());
+    }
+    
+    /**
+     * Issue #1551-swingx: column setting lost in updateUI
+     * 
+     * Sanity: columns kept in custom editor
+     */
+    @Test
+    public void testSynchColumsCustomEditorPicker() {
+        JXDatePicker picker = new JXDatePicker();
+        JFormattedTextField field = new JFormattedTextField();
+        picker.setEditor(field);
+        int columns = 17;
+        picker.getEditor().setColumns(columns);
+        picker.updateUI();
+        assertEquals("columns after updateUI", columns, picker.getEditor().getColumns());
+    }
+    
+    /**
+     * Issue #??-swingx: font setting lost in updateUI
+     */
+    @Test
+    public void testSynchFontEditorPicker() {
+        JXDatePicker picker = new JXDatePicker();
+        Font derived = picker.getFont().deriveFont(40f);
+        assertFalse("sanity: derived font must not be uiresource", (derived instanceof UIResource));
+        picker.setFont(derived);
+        picker.updateUI();
+        assertEquals("font after updateUI", derived, picker.getFont());
+    }
+    
+    /**
+     * Issue #??-swingx: font setting lost in updateUI
+     * 
+     * Sanity test: font of custom editor kept.
+     */
+    @Test
+    public void testSynchFontCustomEditorPicker() {
+        JXDatePicker picker = new JXDatePicker();
+        JFormattedTextField field = new JFormattedTextField();
+        picker.setEditor(field);
+        Font derived = picker.getFont().deriveFont(40f);
+        assertFalse("sanity: derived font must not be uiresource", (derived instanceof UIResource));
+        picker.setFont(derived);
+        picker.updateUI();
+        assertEquals("font after updateUI", derived, picker.getFont());
+    }
+
+    /**
+     * Issue #955-swingx: editor should have same visual props as picker
+     * for comparison: combobox.
+     */
+    @Test
+    public void testSynchEditorFontInitialCombo() {
+        JComboBox combo = new JComboBox();
+        // make sure we have an editor
+        combo.setEditable(true);
+        assertEquals("combo fonts initially synched",
+                combo.getEditor().getEditorComponent().getFont(), combo.getFont());
+    }
+    
+    /**
+     * Issue #955-swingx: editor should have same visual props as picker
+     * for comparison: combobox.
+     */
+    @Test
+    public void testSynchEditorFontCombo() {
+        JComboBox combo = new JComboBox();
+        // make sure we have an editor
+        combo.setEditable(true);
+        Font font = combo.getFont();
+        Font derived = font.deriveFont(40f);
+        combo.setFont(derived);
+        assertEquals("combo fonts synched after setting",
+                combo.getEditor().getEditorComponent().getFont(), combo.getFont());
+        combo.updateUI();
+        assertEquals("combo fonts synched after updateUI",
+                combo.getEditor().getEditorComponent().getFont(), combo.getFont());
+        
+    }
+
+
+    /**
      * Issue #955-swingx: editor should have same visual props as picker
      */
     @Test
-    public void testPickerSynchEditorColorsInitial() {
+    public void testSynchEditorColorsInitialPicker() {
         JXDatePicker picker = new JXDatePicker();
         assertEquals(picker.getForeground(), picker.getEditor().getForeground());
         assertEquals(picker.getBackground(), picker.getEditor().getBackground());
@@ -545,7 +655,7 @@ public class JXDatePickerIssues extends InteractiveTestCase {
      * for comparison: combobox.
      */
     @Test
-    public void testComboSynchEditorColorsInitial() {
+    public void testSynchEditorColorsInitialCombo() {
         JComboBox picker = new JComboBox();
         // make sure we have an editor
         picker.setEditable(true);
@@ -557,11 +667,11 @@ public class JXDatePickerIssues extends InteractiveTestCase {
      * Issue #955-swingx: editor should have same visual props as picker
      */
     @Test
-    public void testPickerSynchEditorColors() {
+    public void testSynchEditorColorsPicker() {
         JXDatePicker picker = new JXDatePicker();
         picker.setBackground(Color.RED);
         picker.setForeground(Color.BLUE);
-       assertEquals(picker.getForeground(), picker.getEditor().getForeground());
+        assertEquals(picker.getForeground(), picker.getEditor().getForeground());
         assertEquals(picker.getBackground(), picker.getEditor().getBackground());
     }
     
@@ -570,7 +680,7 @@ public class JXDatePickerIssues extends InteractiveTestCase {
      * for comparison: combobox.
      */
     @Test
-    public void testComboSynchEditorColors() {
+    public void testSynchEditorColorsCombo() {
         JComboBox picker = new JComboBox();
         // make sure we have an editor
         picker.setEditable(true);
