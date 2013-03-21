@@ -109,8 +109,9 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         try {
 //            test.runInteractiveTests();
 //            test.runInteractiveTests("interactive.*Hierarchical.*");
-               test.runInteractiveTests("interactive.*HierarchicalToolTip.*");
-//           test.runInteractiveTests("interactive.*DnD.*");
+            test.runInteractiveTests("interactive.*HierarchicalToolTip.*");
+               test.runInteractive("Rollover");
+//               test.runInteractiveTests("interactive.*DnD.*");
 //             test.runInteractiveTests("interactive.*ColumnSelection.*");
 //             test.runInteractiveTests("interactive.*RowHeightCompare.*");
 //             test.runInteractiveTests("interactive.*RToL.*");
@@ -127,7 +128,6 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
 
         }
     }
-    
     /**
      * Issue swingx-1525: borderHighlighter fills tree column completely
      */
@@ -526,6 +526,24 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         JXFrame frame = wrapInFrame(new JScrollPane(table), "Toggle LAF", true);
         show(frame);
     }
+    
+    /**
+     * Issue #1554-swingx: cell rollover highlight broken on expand/collapsed
+     * <p>
+     * 
+     * Rollover highlight stuck to the row that was expanded until exiting the
+     * comp altogether. Reported and verified against 1.6.4. 
+     * 
+     * Seems to be fixed as a side-effect of fixing #1527-swingx, works fine 
+     * in 1.6.5+
+     */
+    public void interactiveRolloverHighlighter() {
+        final JXTreeTable treeTable = new JXTreeTable(treeTableModel);
+        treeTable.setHighlighters( new ColorHighlighter( HighlightPredicate.ROLLOVER_CELL, Color.ORANGE, null ) );
+        showWithScrollingInFrame(treeTable, "cellrollover broken on expandj");
+    }
+    
+
     
     /**
      * Issue #??-swingx: Tooltip by highlighter in hierarchical column
