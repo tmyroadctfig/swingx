@@ -21,6 +21,7 @@
  */
 package org.jdesktop.test;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -145,6 +146,19 @@ public class TreeModelReport implements TreeModelListener {
         return insertEvents.isEmpty() ? null : insertEvents.get(0);
     }
 
+    /**
+     * Returns all insertEvents in the order they were received.
+     * 
+     * @return
+     */
+    public List<TreeModelEvent> getInsertEvents() {
+        if (!hasInsertEvents()) return Collections.emptyList();
+        List<TreeModelEvent> inserted = new ArrayList<TreeModelEvent>();
+        for (TreeModelEvent treeModelEvent : insertEvents) {
+           inserted.add(0, treeModelEvent);  
+        }
+        return inserted;
+    }
 //  ---------------- delete events    
     public boolean hasDeleteEvents() {
         return !deleteEvents.isEmpty();
