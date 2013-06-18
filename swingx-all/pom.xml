@@ -11,7 +11,7 @@
   <name>SwingX Complete</name>
   <description>A Maven project to aggregate all modules into a single artifact.</description>
   <properties>
-    <project.generatedDependencies>${project.generatedSourcesDirectoy}/dependencies</project.generatedDependencies>
+    <project.generatedDependencies>${project.generatedSourcesDirectory}/dependencies</project.generatedDependencies>
   </properties>
   <!-- make the dependent swingx modules optional, since we're aggregating -->
   <dependencies>

@@ -148,8 +148,8 @@
     </dependencies>
   </dependencyManagement>
   <properties>
-    <project.generatedSourcesDirectoy>${project.build.directory}/generated-sources</project.generatedSourcesDirectoy>
-    <project.generatedAnnotations>${project.generatedSourcesDirectoy}/annotations</project.generatedAnnotations>
+    <project.generatedSourcesDirectory>${project.build.directory}/generated-sources</project.generatedSourcesDirectory>
+    <project.generatedAnnotations>${project.generatedSourcesDirectory}/annotations</project.generatedAnnotations>
   </properties>
   <modules>
     <module>swingx-mavensupport</module>
