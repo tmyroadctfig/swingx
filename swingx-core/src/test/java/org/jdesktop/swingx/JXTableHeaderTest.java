@@ -226,12 +226,28 @@ public class JXTableHeaderTest extends InteractiveTestCase {
         TableColumnExt columnExt = table.getColumnExt(0);
         JXTableHeader tableHeader = (JXTableHeader) table.getTableHeader();
         MouseEvent event = new MouseEvent(tableHeader, 0,
-                  0, 0, 40, 5, 0, false);
+                0, 0, 40, 5, 0, false);
         DefaultTableCellRenderer renderer = new DefaultTableCellRenderer();
         String rendererToolTip = "rendererToolTip";
         renderer.setToolTipText(rendererToolTip);
         columnExt.setHeaderRenderer(renderer);
         assertEquals(rendererToolTip, tableHeader.getToolTipText(event));
+        String columnToolTip = "columnToolTip";
+        columnExt.setToolTipText(columnToolTip);
+        assertEquals(columnToolTip, tableHeader.getToolTipText(event));
+        
+    }
+    
+    /**
+     * Issue #1560-swingx: column tooltip not working for stand-alone header.
+     */
+    @Test
+    public void testColumnToolTipStandAlone() {
+        JXTable table = new JXTable(10, 2);
+        TableColumnExt columnExt = table.getColumnExt(0);
+        JXTableHeader tableHeader = new JXTableHeader(table.getColumnModel());
+        MouseEvent event = new MouseEvent(tableHeader, 0,
+                  0, 0, 40, 5, 0, false);
         String columnToolTip = "columnToolTip";
         columnExt.setToolTipText(columnToolTip);
         assertEquals(columnToolTip, tableHeader.getToolTipText(event));
