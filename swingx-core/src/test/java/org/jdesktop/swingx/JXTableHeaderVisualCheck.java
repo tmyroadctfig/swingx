@@ -4,8 +4,10 @@
  */
 package org.jdesktop.swingx;
 
+import java.awt.BorderLayout;
 import java.awt.ComponentOrientation;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseEvent;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
@@ -16,6 +18,9 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
+
+import org.jdesktop.swingx.table.TableColumnExt;
+import org.jdesktop.test.AncientSwingTeam;
 
 /**
  * Interactive "test" methods for <code>JXTableHeader</code>.
@@ -31,13 +36,68 @@ public class JXTableHeaderVisualCheck extends InteractiveTestCase {
         JXTableHeaderVisualCheck test = new JXTableHeaderVisualCheck();
         try {
 //          test.runInteractiveTests();
-            test.runInteractiveTests("interactive.*DoubleSort.*");
+//            test.runInteractiveTests("interactive.*DoubleSort.*");
+            test.runInteractive("ColumnToolTip");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
         } 
     }
+    
+    /**
+     * Issue 1560-swingx: column tooltip not working in stand-alone header
+     * 
+     */
+    public void interactiveColumnToolTip() {
+        JXTable table = new JXTable(new AncientSwingTeam());
+        for (TableColumn column : table.getColumns()) {
+            ((TableColumnExt) column).setToolTipText("tip: "
+                    + column.getHeaderValue());
+            
+        }
+        JXTableHeader header = new JXTableHeader(table.getColumnModel());
+        JXFrame frame = wrapWithScrollingInFrame(table, "columnToolTip");
+        frame.add(header, BorderLayout.NORTH);
+        show(frame);
+    }
+    
+    
+    /**
+     * Issue 1558-swingx: support custom column tooltip mechanism
+     * 
+     * The use-case is a dynamic, tableModel-backed tooltip:
+     * needs subclassing of header which should not need duplication
+     * of column look-up 
+     */
+    public void interactiveColumnToolTipCustom() {
+        JXTable table = new JXTable(new ModelWithToolTip());
+        JXTableHeader header = new JXTableHeader(table.getColumnModel()) {
 
+            @Override
+            protected String getColumnToolTipText(TableColumnExt column) {
+                TableModel model = getTable().getModel();
+                if (model instanceof ModelWithToolTip) {
+                    return ((ModelWithToolTip) model).getColumnToolTip(column.getModelIndex());
+                }
+                return model.getColumnName(column.getModelIndex());
+            }
+            
+        };
+        table.setTableHeader(header);
+        JXFrame frame = wrapWithScrollingInFrame(table, "custom columnToolTip");
+        show(frame);
+    }
+
+    /**
+     * Issue #1558-swing: model-based column tooltip
+     */
+    public static class ModelWithToolTip extends AncientSwingTeam {
+        
+        public String getColumnToolTip(int column) {
+            return "model-tip: " + getColumnName(column);
+        }
+    }
+    
     /**
      * Issue #271-swingx: optionally support double sort on double click.
      * 

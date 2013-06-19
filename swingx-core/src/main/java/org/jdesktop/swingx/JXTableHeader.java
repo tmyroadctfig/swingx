@@ -22,6 +22,7 @@ package org.jdesktop.swingx;
 
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -227,11 +228,43 @@ public class JXTableHeader extends JTableHeader
      *   or null if not available.
      */
     protected String getColumnToolTipText(MouseEvent event) {
-        if (getXTable() == null) return null;
-        int column = columnAtPoint(event.getPoint());
+        TableColumnExt columnExt = getColumnExt(event.getPoint());
+        return columnExt != null ? getColumnToolTipText(columnExt) : null;
+    }
+
+    /**
+     * Returns the column tooltip for the given column or null if
+     * none available.<p>
+     * 
+     * This implementation returns the toolTipText property of the 
+     * given column.
+     * 
+     * @param columnExt the column to return the tooltip for, must not be null 
+     * @return the tooltip for the column or null if none available.
+     * 
+     * @see #getColumnToolTipText(MouseEvent)
+     * @see #getToolTipText(MouseEvent)
+     */
+    protected String getColumnToolTipText(TableColumnExt columnExt) {
+        return columnExt.getToolTipText();
+    }
+
+    /**
+     * Returns the tableColumn at the given location or null if
+     * the location is outside or the column is not of type 
+     * <code>TableColumnExt</code>.
+     * 
+     * @param point the location to return the column for
+     * @return the tableColumn at the location or null
+     */
+    public TableColumnExt getColumnExt(Point point) {
+        int column = columnAtPoint(point);
         if (column < 0) return null;
-        TableColumnExt columnExt = getXTable().getColumnExt(column);
-        return columnExt != null ? columnExt.getToolTipText() : null;
+        // fix for issue 1560: must access the model to get the column
+        // to make the tooltip work in stand-alone headers
+        TableColumn tableColumn = getColumnModel().getColumn(column);
+        return tableColumn instanceof TableColumnExt 
+                ? (TableColumnExt) tableColumn : null;
     }
     
     /**
