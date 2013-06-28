@@ -12,6 +12,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
 import java.awt.KeyboardFocusManager;
+import java.awt.Point;
 import java.beans.PropertyChangeListener;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
@@ -127,6 +128,28 @@ public class JXTableUnitTest extends InteractiveTestCase {
     }
 
 
+    /**
+     * Issue #1561-swingx: add api to get TableColumn/Ext at point
+     */
+    @Test
+    public void testGetColumnAtPoint() {
+        JXTable table = new JXTable(10, 3);
+        int x = table.getColumn(0).getWidth() + 10;
+        TableColumn second = table.getColumn(new Point(x, 20));
+        assertSame(table.getColumn(1), second);
+    }
+    
+    /**
+     * Issue #1561-swingx: add api to get TableColumn/Ext at point
+     */
+    @Test
+    public void testGetColumnExtAtPoint() {
+        JXTable table = new JXTable(10, 3);
+        int x = table.getColumn(0).getWidth() + 10;
+        TableColumn second = table.getColumnExt(new Point(x, 20));
+        assertSame(table.getColumnExt(1), second);
+    }
+    
   //------- start testing Issue #1535-swingx
       
       /**

@@ -2399,6 +2399,35 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
         return null;
     }
 
+    /**
+     * Returns the TableColumn at the given location or null if
+     * the location is outside.
+     * 
+     * @param point the location to return the column for
+     * @return the tableColumn at the location or null
+     * 
+     * @see #getColumnExt(Point)
+     */
+    public TableColumn getColumn(Point p) {
+        int columnIndex = columnAtPoint(p);
+        return columnIndex < 0 ? null : getColumn(columnIndex);
+    }
+    
+    /**
+     * Returns the TableColumnExt at the given location or null if
+     * the location is outside or the column is not of type 
+     * <code>TableColumnExt</code>.
+     * 
+     * @param point the location to return the column for
+     * @return the tableColumnExt at the location or null
+     *     
+     * @see #getColumn(Point)
+     * @see JXTableHeader#getColumnExt(Point)
+     */
+    public TableColumnExt getColumnExt(Point p) {
+        TableColumn column = getColumn(p);
+        return (TableColumnExt) (column instanceof TableColumnExt ? column : null);
+    }
     // ---------------------- enhanced TableColumn/Model support: convenience
 
     /**
