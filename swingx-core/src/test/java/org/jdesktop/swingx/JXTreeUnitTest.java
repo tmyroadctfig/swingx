@@ -7,6 +7,7 @@
 package org.jdesktop.swingx;
 
 import java.awt.Color;
+import java.awt.event.MouseEvent;
 import java.util.Hashtable;
 import java.util.Vector;
 
@@ -57,6 +58,62 @@ public class JXTreeUnitTest extends InteractiveTestCase {
     public JXTreeUnitTest() {
         super("JXTree Test");
     }
+
+    /**
+     * Issue #1563-swingx: find cell that was clicked for componentPopup
+     * 
+     * Test api and event firing.
+     */
+    @Test
+    public void testPopupTriggerLocationAvailable() {
+        JXTree table = new JXTree();
+        table.expandAll();
+        MouseEvent event = new MouseEvent(table, 0,
+                0, 0, 40, 5, 0, false);
+        PropertyChangeReport report = new PropertyChangeReport(table);
+        table.getPopupLocation(event);
+        assertEquals(event.getPoint(), table.getPopupTriggerLocation());
+        TestUtils.assertPropertyChangeEvent(report, "popupTriggerLocation", 
+                null, event.getPoint());
+    }
+    
+    
+    /**
+     * Issue #1563-swingx: find cell that was clicked for componentPopup
+     * 
+     * Test safe return value.
+     */
+    @Test
+    public void testPopupTriggerCopy() {
+        JXTree table = new JXTree();
+        table.expandAll();
+        MouseEvent event = new MouseEvent(table, 0,
+                0, 0, 40, 5, 0, false);
+        table.getPopupLocation(event);
+        assertNotSame("trigger point must not be same", 
+                table.getPopupTriggerLocation(), table.getPopupTriggerLocation());
+    }
+    
+    /**
+     * Issue #1563-swingx: find cell that was clicked for componentPopup
+     * 
+     * Test safe handle null.
+     */
+    @Test
+    public void testPopupTriggerKeyboard() {
+        JXTree table = new JXTree();
+        table.expandAll();
+        MouseEvent event = new MouseEvent(table, 0,
+                0, 0, 40, 5, 0, false);
+        table.getPopupLocation(event);
+        PropertyChangeReport report = new PropertyChangeReport(table);
+        table.getPopupLocation(null);
+        assertNull("trigger must null", 
+                table.getPopupTriggerLocation());
+        TestUtils.assertPropertyChangeEvent(report, "popupTriggerLocation", 
+                event.getPoint(), null);
+    }
+
 
     /**
      * Issue http://java.net/jira/browse/SWINGX-1483 - nextMatch must respect string rep

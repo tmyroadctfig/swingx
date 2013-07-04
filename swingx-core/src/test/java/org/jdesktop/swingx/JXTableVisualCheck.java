@@ -43,10 +43,10 @@ import javax.swing.RowSorter.SortKey;
 import javax.swing.ScrollPaneLayout;
 import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
-import javax.swing.event.RowSorterEvent;
-import javax.swing.event.RowSorterEvent.Type;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
+import javax.swing.event.RowSorterEvent;
+import javax.swing.event.RowSorterEvent.Type;
 import javax.swing.event.RowSorterListener;
 import javax.swing.event.TableColumnModelEvent;
 import javax.swing.table.DefaultTableModel;
@@ -167,8 +167,11 @@ public class JXTableVisualCheck extends JXTableUnitTest {
             
             @Override
             public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-                JXTable table = SwingXUtilities.getAncestor(JXTable.class, 
-                        (Component) e.getSource());
+                // doesn't work: popup itself cannot be used as
+                // starting component, bug?
+//                JXTable table = SwingXUtilities.getAncestor(JXTable.class, 
+//                        (Component) e.getSource());
+                JXTable table = (JXTable) ((JPopupMenu) e.getSource()).getInvoker();
                 Point trigger = table.getPopupTriggerLocation();
                 Point cell = null;
                 if (trigger != null) {

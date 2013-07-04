@@ -283,13 +283,12 @@ import org.jdesktop.swingx.table.TableColumnModelExt;
  * <p>
  * 
  * The example below selects the cell that was clicked, event being the
- * <code>Action-/PopupMenuEvent</code> received in a menu 
- * <code>Action/PopupMenuListener</code>.<p>
+ * <code>PopupMenuEvent</code> received in a  
+ * <code>PopupMenuListener</code>.<p>
  * 
  * <pre>
  * <code>
- * JXTable table = SwingXUtilities.getAncestor(JXTable.class, 
- *     (Component) event.getSource());
+ * JXTable table = (JXTable) ((JPopupMenu) e.getSource()).getInvoker();
  * Point trigger = table.getPopupTriggerLocation();
  * if (trigger != null) {
  *     int row = table.rowAtPoint(trigger);

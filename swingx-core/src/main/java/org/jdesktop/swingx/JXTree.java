@@ -25,9 +25,11 @@ import java.applet.Applet;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.KeyboardFocusManager;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Hashtable;
@@ -90,7 +92,8 @@ import org.jdesktop.swingx.tree.DefaultXTreeCellRenderer;
  * decorate the rendering component.
  * <p>
  * 
- * <pre><code>
+ * <pre>
+ * <code>
  * 
  * JXTree tree = new JXTree(new FileSystemModel());
  * // use system file icons and name to render
@@ -107,7 +110,8 @@ import org.jdesktop.swingx.tree.DefaultXTreeCellRenderer;
  * // highlight with foreground color 
  * tree.addHighlighter(new ColorHighlighter(predicate, null, Color.RED);      
  * 
- * </code></pre>
+ * </code>
+ * </pre>
  * 
  * <i>Note:</i> for full functionality, a DefaultTreeRenderer must be installed
  * as TreeCellRenderer. This is not done by default, because there are
@@ -127,7 +131,8 @@ import org.jdesktop.swingx.tree.DefaultXTreeCellRenderer;
  * is simulates live behaviour. The rollover events can be used by client code
  * as well, f.i. to decorate the rollover row using a Highlighter.
  * 
- * <pre><code>
+ * <pre>
+ * <code>
  * 
  * JXTree tree = new JXTree();
  * tree.setRolloverEnabled(true);
@@ -135,7 +140,30 @@ import org.jdesktop.swingx.tree.DefaultXTreeCellRenderer;
  * tree.addHighlighter(new ColorHighlighter(HighlightPredicate.ROLLOVER_ROW, 
  *      null, Color.RED);      
  * 
- * </code></pre>
+ * </code>
+ * </pre>
+ * 
+ * <h2>Location of Trigger for ComponentPopupMenu</h2>
+ * 
+ * JXList allows access to the mouse location that triggered the showing of the
+ * componentPopupMenu. This feature allows to implement dynamic cell-context
+ * sensitive popupMenus, either in the menu actions or in a PopupMenuListener.
+ * <p>
+ * 
+ * The example below selects the cell that was clicked, event being the
+ * <code>PopupMenuEvent</code> received in a <code>PopupMenuListener</code>.
+ * <p>
+ * 
+ * <pre>
+ * <code>
+ * JXTree tree = (JXTree) ((JPopupMenu) e.getSource()).getInvoker();
+ * Point trigger = tree.getPopupTriggerLocation();
+ * if (trigger != null) {
+ *     int row = tree.getRowForLocation(trigger.x, trigger.y);
+ *     tree.setSelectionRow(row);
+ * }
+ * </code>
+ * </pre>
  * 
  * 
  * <h2>Search</h2>
@@ -156,12 +184,11 @@ import org.jdesktop.swingx.tree.DefaultXTreeCellRenderer;
  * <h2>Miscellaneous</h2>
  * 
  * <ul>
- * <li> Improved usability for editing: guarantees that the tree is the
+ * <li>Improved usability for editing: guarantees that the tree is the
  * focusOwner if editing terminated by user gesture and guards against data
  * corruption if focusLost while editing
- * <li> Access methods for selection colors, for consistency with JXTable,
- * JXList
- * <li> Convenience methods and actions to expand, collapse all nodes
+ * <li>Access methods for selection colors, for consistency with JXTable, JXList
+ * <li>Convenience methods and actions to expand, collapse all nodes
  * </ul>
  * 
  * @author Ramesh Gupta
@@ -223,6 +250,9 @@ public class JXTree extends JTree {
     private Color selectionForeground;
     /** Color of selected background. Added for consistent api across collection components. */
     private Color selectionBackground;
+
+
+    private Point popupTriggerLocation;
     
     
     
@@ -825,6 +855,51 @@ public class JXTree extends JTree {
         return new TreeRolloverProducer();
     }
 
+//---------------------- enhanced component popup support
+    
+    /**
+     * {@inheritDoc} <p>
+     * 
+     * Overridden for bookkeeping: the given event location is 
+     * stored for later access.
+     * 
+     * @see #getPopupTriggerLocation()
+     */
+    @Override
+    public Point getPopupLocation(MouseEvent event) {
+        updatePopupTrigger(event);
+        return super.getPopupLocation(event);
+    }
+    
+    /**
+     * Handles internal bookkeeping related to popupLocation, called from 
+     * getPopupLocation.<p>
+     * 
+     * This implementation stores the mouse location as popupTriggerLocation.
+     * 
+     * @param event the event that triggered the showing of the 
+     * componentPopup, might be null if triggered by keyboard
+     */
+    protected void updatePopupTrigger(MouseEvent event) {
+        Point old = getPopupTriggerLocation();
+        // note: getPoint creates a new Point on each call, safe to use as-is
+        popupTriggerLocation = event != null ? event.getPoint() : null;
+        firePropertyChange("popupTriggerLocation", old, getPopupTriggerLocation());
+    }
+
+    /**
+     * Returns the location of the mouseEvent that triggered the
+     * showing of the ComponentPopupMenu. 
+     * 
+     * @return the location of the mouseEvent that triggered the
+     * last showing of the ComponentPopup, or null if it was
+     * triggered by keyboard.
+     */
+    public Point getPopupTriggerLocation() {
+        return popupTriggerLocation != null ? new Point(popupTriggerLocation) : null;
+    }
+    
+    
   
 //----------------------- Highlighter api
     

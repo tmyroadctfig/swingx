@@ -162,6 +162,25 @@ public class JXTableUnitTest extends InteractiveTestCase {
         assertNotSame("trigger point must not be same", 
                 table.getPopupTriggerLocation(), table.getPopupTriggerLocation());
     }
+    
+    /**
+     * Issue #1563-swingx: find cell that was clicked for componentPopup
+     * 
+     * Test safe handle null.
+     */
+    @Test
+    public void testPopupTriggerKeyboard() {
+        JXTable table = new JXTable(10, 3);
+        MouseEvent event = new MouseEvent(table, 0,
+                0, 0, 40, 5, 0, false);
+        table.getPopupLocation(event);
+        PropertyChangeReport report = new PropertyChangeReport(table);
+        table.getPopupLocation(null);
+        assertNull("trigger must null", 
+                table.getPopupTriggerLocation());
+        TestUtils.assertPropertyChangeEvent(report, "popupTriggerLocation", 
+                event.getPoint(), null);
+    }
 
     
     /**
