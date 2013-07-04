@@ -13,6 +13,7 @@ import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
 import java.awt.KeyboardFocusManager;
 import java.awt.Point;
+import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeListener;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
@@ -100,6 +101,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+import static org.junit.Assert.*;
+
 
 /**
 * Tests of <code>JXTable</code>.
@@ -127,7 +130,40 @@ public class JXTableUnitTest extends InteractiveTestCase {
         super("JXTable unit test");
     }
 
+    /**
+     * Issue #1563-swingx: find cell that was clicked for componentPopup
+     * 
+     * Test api and event firing.
+     */
+    @Test
+    public void testPopupTriggerLocationAvailable() {
+        JXTable table = new JXTable(10, 3);
+        MouseEvent event = new MouseEvent(table, 0,
+                0, 0, 40, 5, 0, false);
+        PropertyChangeReport report = new PropertyChangeReport(table);
+        table.getPopupLocation(event);
+        assertEquals(event.getPoint(), table.getPopupTriggerLocation());
+        TestUtils.assertPropertyChangeEvent(report, "popupTriggerLocation", 
+                null, event.getPoint());
+    }
+    
+    
+    /**
+     * Issue #1563-swingx: find cell that was clicked for componentPopup
+     * 
+     * Test safe return value.
+     */
+    @Test
+    public void testPopupTriggerCopy() {
+        JXTable table = new JXTable(10, 3);
+        MouseEvent event = new MouseEvent(table, 0,
+                0, 0, 40, 5, 0, false);
+        table.getPopupLocation(event);
+        assertNotSame("trigger point must not be same", 
+                table.getPopupTriggerLocation(), table.getPopupTriggerLocation());
+    }
 
+    
     /**
      * Issue #1561-swingx: add api to get TableColumn/Ext at point
      */

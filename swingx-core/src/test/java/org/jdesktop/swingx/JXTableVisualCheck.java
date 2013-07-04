@@ -14,6 +14,7 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.KeyboardFocusManager;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -31,6 +32,7 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JToolBar;
@@ -43,6 +45,8 @@ import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
 import javax.swing.event.RowSorterEvent;
 import javax.swing.event.RowSorterEvent.Type;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 import javax.swing.event.RowSorterListener;
 import javax.swing.event.TableColumnModelEvent;
 import javax.swing.table.DefaultTableModel;
@@ -103,7 +107,8 @@ public class JXTableVisualCheck extends JXTableUnitTest {
 //          test.runInteractiveTests("interactive.*RToL.*");
 //          test.runInteractiveTests("interactive.*Scrollable.*");
 //          test.runInteractiveTests("interactive.*isable.*");
-          test.runInteractive("EditorNull");
+//          test.runInteractive("EditorNull");
+          test.runInteractive("PopupTrigger");
           
 //          test.runInteractiveTests("interactive.*Policy.*");
 //        test.runInteractiveTests("interactive.*Rollover.*");
@@ -116,6 +121,82 @@ public class JXTableVisualCheck extends JXTableUnitTest {
       }
   }
     
+    /**
+     * Issue #1563-swingx: find cell that was clicked for componentPopup
+     * 
+     * Example of how to use:
+     * - in actionPerformed
+     * - in popupMenuWillBecomeVisible
+     */
+    public void interactivePopupTriggerLocation() {
+        JXTable table = new JXTable(new AncientSwingTeam());
+        table.setCellSelectionEnabled(true);
+        JPopupMenu popup = new JPopupMenu();
+        Action action = new AbstractAction("cell found in actionPerformed") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JXTable table = SwingXUtilities.getAncestor(JXTable.class, (Component) e.getSource());
+                Point trigger = table.getPopupTriggerLocation();
+                Point cell = null;
+                if (trigger != null) {
+                    int row = table.rowAtPoint(trigger);
+                    int column = table.columnAtPoint(trigger);
+                    table.setRowSelectionInterval(row, row);
+                    table.setColumnSelectionInterval(column, column);
+                    cell = new Point(column, row);
+                } else {
+                    table.clearSelection();
+                }
+                LOG.info("popupTrigger/cell " + trigger + "/" + cell);
+            }
+        };
+        popup.add(action);
+        
+        final Action onShowing = new AbstractAction("dynamic: ") {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                LOG.info("" + getValue(NAME));
+            }
+            
+        };
+        popup.add(onShowing);
+        
+        PopupMenuListener l = new PopupMenuListener() {
+            
+            @Override
+            public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+                JPopupMenu menu = (JPopupMenu) e.getSource();
+                if (!(menu.getInvoker() instanceof JXTable)) return;
+                JXTable table = (JXTable) menu.getInvoker();
+                Point trigger = table.getPopupTriggerLocation();
+                Point cell = null;
+                if (trigger != null) {
+                    int row = table.rowAtPoint(trigger);
+                    int column = table.columnAtPoint(trigger);
+                    // here we set the cell focus, just to do a bit differently
+                    // from the other action
+                    table.setRowSelectionInterval(row, row);
+                    table.setColumnSelectionInterval(column, column);
+                    table.clearSelection();
+                    cell = new Point(column, row);
+                }
+                onShowing.putValue(Action.NAME, "popupTrigger/cell " + trigger + "/" + cell);
+            }
+            
+            @Override
+            public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
+            }
+            
+            @Override
+            public void popupMenuCanceled(PopupMenuEvent e) {
+            }
+        };
+        popup.addPopupMenuListener(l);
+        table.setComponentPopupMenu(popup);
+        showWithScrollingInFrame(table, "PopupTriggerLocation");
+    }
     
     /**
      * Issue #1535-swingx: GenericEditor fires editingStopped  even if 

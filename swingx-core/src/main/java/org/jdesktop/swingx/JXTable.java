@@ -32,6 +32,7 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseEvent;
 import java.awt.print.PrinterException;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -513,6 +514,8 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
     private transient StringValueRegistry stringValueRegistry;
 
     private SortOrder[] sortOrderCycle;
+
+    private Point popupTriggerLocation;
     
 
     /** Instantiates a JXTable with a default table model, no data. */
@@ -705,7 +708,52 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
         return new TableRolloverProducer();
     }
 
+//---------------------- enhanced component popup support
+    
+    /**
+     * {@inheritDoc} <p>
+     * 
+     * Overridden for bookkeeping: the given event location is 
+     * stored for later access.
+     * 
+     * @see #getPopupTriggerLocation()
+     */
+    @Override
+    public Point getPopupLocation(MouseEvent event) {
+        updatePopupTrigger(event);
+        return super.getPopupLocation(event);
+    }
+    
+    /**
+     * Handles internal bookkeeping related to popupLocation, called from 
+     * getPopupLocation.<p>
+     * 
+     * This implementation stores the mouse location as popupTriggerLocation.
+     * 
+     * @param event the event that triggered the showing of the 
+     * componentPopup, might be null if triggered by keyboard
+     */
+    protected void updatePopupTrigger(MouseEvent event) {
+        Point old = getPopupTriggerLocation();
+        // note: getPoint creates a new Point on each call, safe to use as-is
+        popupTriggerLocation = event != null ? event.getPoint() : null;
+        firePropertyChange("popupTriggerLocation", old, getPopupTriggerLocation());
+    }
 
+    /**
+     * Returns the location of the mouseEvent that triggered the
+     * showing of the ComponentPopupMenu. 
+     * 
+     * @return the location of the mouseEvent that triggered the
+     * last showing of the ComponentPopup, or null if it was
+     * triggered by keyboard.
+     */
+    public Point getPopupTriggerLocation() {
+        return popupTriggerLocation != null ? new Point(popupTriggerLocation) : null;
+    }
+    
+//------------------- column control
+    
     /**
      * Returns the column control visible property.
      * <p>
@@ -717,6 +765,7 @@ public class JXTable extends JTable implements TableColumnModelExtListener {
     public boolean isColumnControlVisible() {
         return columnControlVisible;
     }
+
 
     /**
      * Sets the column control visible property. If true and
