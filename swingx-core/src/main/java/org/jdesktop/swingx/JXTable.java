@@ -139,33 +139,37 @@ import org.jdesktop.swingx.table.TableColumnModelExt;
  * 
  * <h2>Sorting and Filtering</h2>
  * 
- * JXTable supports sorting and filtering of rows (switched to core sorting). 
+ * JXTable supports sorting and filtering of rows (switched to core sorting).
  * 
- * Additionally, it provides api to apply
- * a specific sort order, to toggle the sort order of columns identified 
- * by view index or column identifier and to reset all sorts. F.i: 
+ * Additionally, it provides api to apply a specific sort order, to toggle the
+ * sort order of columns identified by view index or column identifier and to
+ * reset all sorts. F.i:
  * 
- * <pre><code>
+ * <pre>
+ * <code>
  * table.setSortOrder("PERSON_ID", SortOrder.DESCENDING);
  * table.toggleSortOder(4);
  * table.resetSortOrder();
- * </code></pre>
+ * </code>
+ * </pre>
  * 
  * Sorting sequence can be configured per column by setting the TableColumnExt's
- * <code>comparator</code> property. Sorting can be disabled per column - setting the TableColumnExt's
- * <code>sortable</code> or per table by {@link #setSortable(boolean)}. 
- * The table takes responsibility to propagate these
- * properties to the current sorter, if available <p>
+ * <code>comparator</code> property. Sorting can be disabled per column -
+ * setting the TableColumnExt's <code>sortable</code> or per table by
+ * {@link #setSortable(boolean)}. The table takes responsibility to propagate
+ * these properties to the current sorter, if available
+ * <p>
  * 
- * Note that the enhanced sorting controls are effective only if the RowSorter is 
- * of type SortController, which it is by default. Different from core JTable, the 
- * autoCreateRowSorter property is enabled by default. If on, the JXTable creates and
- * uses a default row sorter as returned by the createDefaultRowSorter method.
+ * Note that the enhanced sorting controls are effective only if the RowSorter
+ * is of type SortController, which it is by default. Different from core
+ * JTable, the autoCreateRowSorter property is enabled by default. If on, the
+ * JXTable creates and uses a default row sorter as returned by the
+ * createDefaultRowSorter method.
  * 
  * <p>
- * Typically, a JXTable is sortable by left clicking on column headers. By default, each
- * subsequent click on a header reverses the order of the sort, and a sort arrow
- * icon is automatically drawn on the header. 
+ * Typically, a JXTable is sortable by left clicking on column headers. By
+ * default, each subsequent click on a header reverses the order of the sort,
+ * and a sort arrow icon is automatically drawn on the header.
  * 
  * <p>
  * 
@@ -181,7 +185,8 @@ import org.jdesktop.swingx.table.TableColumnModelExt;
  * current LookAndFeel, cell foreground on matching pattern, and shading a
  * column):
  * 
- * <pre><code>
+ * <pre>
+ * <code>
  * 
  * Highlighter simpleStriping = HighlighterFactory.createSimpleStriping();
  * PatternPredicate patternPredicate = new PatternPredicate(&quot;&circ;M&quot;, 1);
@@ -193,7 +198,8 @@ import org.jdesktop.swingx.table.TableColumnModelExt;
  * table.setHighlighters(simpleStriping,
  *        magenta,
  *        shading);
- * </code></pre>
+ * </code>
+ * </pre>
  * 
  * <p>
  * To fully support, JXTable registers SwingX default table renderers instead of
@@ -203,7 +209,8 @@ import org.jdesktop.swingx.table.TableColumnModelExt;
  * File and should be rendered by showing its name followed and date of last
  * change:
  * 
- * <pre><code>
+ * <pre>
+ * <code>
  * StringValue sv = new StringValue() {
  *      public String getString(Object value) {
  *        if (!(value instanceof File)) return StringValues.TO_STRING.getString(value);
@@ -211,12 +218,14 @@ import org.jdesktop.swingx.table.TableColumnModelExt;
  *           + StringValues.DATE_TO_STRING.getString(((File) value).lastModified());
  * }};
  * table.setCellRenderer(File.class, new DefaultTableRenderer(sv));
- * </code></pre>
+ * </code>
+ * </pre>
  * 
- * In addition to super default per-class registration, JXTable registers a default
- * renderer for <code>URI</code>s which opens the default application to view the related
- * document as supported by <code>Desktop</code>. Note: this action is triggered only if 
- * rolloverEnabled is true (default value) and the cell is not editable.
+ * In addition to super default per-class registration, JXTable registers a
+ * default renderer for <code>URI</code>s which opens the default application to
+ * view the related document as supported by <code>Desktop</code>. Note: this
+ * action is triggered only if rolloverEnabled is true (default value) and the
+ * cell is not editable.
  * 
  * <p>
  * <b>Note</b>: DefaultTableCellRenderer and subclasses require a hack to play
@@ -228,23 +237,26 @@ import org.jdesktop.swingx.table.TableColumnModelExt;
  * 
  * <b>Note</b>: by default JXTable disables the alternate row striping provided
  * by Nimbus, instead it does use the color provided by Nimbus to configure the
- * UIColorHighlighter. Like in any other LAF without striping support, 
- * client code has to explicitly turn on striping by 
- * setting a Highlighter like:
+ * UIColorHighlighter. Like in any other LAF without striping support, client
+ * code has to explicitly turn on striping by setting a Highlighter like:
  * 
- * <pre><code>
+ * <pre>
+ * <code>
  * table.addHighlighter(HighlighterFactory.createSimpleStriping());
- * </code></pre>
+ * </code>
+ * </pre>
  * 
  * Alternatively, if client code wants to rely on the LAF provided striping
  * support, it can set a property in the UIManager ("early" in the application
- * lifetime to prevent JXTable to disable Nimbus handling it. In this case it is 
+ * lifetime to prevent JXTable to disable Nimbus handling it. In this case it is
  * recommended to not any of the ui-dependent Highlighters provided by the
  * HighlighterFactory.
  * 
- * <pre><code>
+ * <pre>
+ * <code>
  * UIManager.put("Nimbus.keepAlternateRowColor", Boolean.TRUE);
- * </code></pre>
+ * </code>
+ * </pre>
  * 
  * <h2>Rollover</h2>
  * 
@@ -255,11 +267,38 @@ import org.jdesktop.swingx.table.TableColumnModelExt;
  * events can be used by client code as well, f.i. to decorate the rollover row
  * using a Highlighter.
  * 
- * <pre><code>
+ * <pre>
+ * <code>
  * JXTable table = new JXTable();
  * table.addHighlighter(new ColorHighlighter(HighlightPredicate.ROLLOVER_ROW, 
  *      null, Color.RED);      
- * </code></pre>
+ * </code>
+ * </pre>
+ * 
+ * <h2>Location of Trigger for ComponentPopupMenu</h2>
+ * 
+ * JXTable allows access to the mouse location that triggered the showing of the
+ * componentPopupMenu. This feature allows to implement dynamic cell-context
+ * sensitive popupMenus, either in the menu actions or in a PopupMenuListener.
+ * <p>
+ * 
+ * The example below selects the cell that was clicked, event being the
+ * <code>Action-/PopupMenuEvent</code> received in a menu 
+ * <code>Action/PopupMenuListener</code>.<p>
+ * 
+ * <pre>
+ * <code>
+ * JXTable table = SwingXUtilities.getAncestor(JXTable.class, 
+ *     (Component) event.getSource());
+ * Point trigger = table.getPopupTriggerLocation();
+ * if (trigger != null) {
+ *     int row = table.rowAtPoint(trigger);
+ *     int column = table.columnAtPoint(trigger);
+ *     table.setRowSelectionInterval(row, row);
+ *     table.setColumnSelectionInterval(column, column);
+ * } 
+ * </code>
+ * </pre>
  * 
  * <h2>Search</h2>
  * 
@@ -278,11 +317,10 @@ import org.jdesktop.swingx.table.TableColumnModelExt;
  * 
  * <h2>Column Configuration</h2>
  * 
- * JXTable's default column model
- * is of type TableColumnModelExt which allows management of hidden columns. 
- * Furthermore, it guarantees to delegate creation and configuration of table columns
- * to its ColumnFactory. The factory is meant as the central place to 
- * customize column configuration.
+ * JXTable's default column model is of type TableColumnModelExt which allows
+ * management of hidden columns. Furthermore, it guarantees to delegate creation
+ * and configuration of table columns to its ColumnFactory. The factory is meant
+ * as the central place to customize column configuration.
  * 
  * <p>
  * Columns can be hidden or shown by setting the visible property on the

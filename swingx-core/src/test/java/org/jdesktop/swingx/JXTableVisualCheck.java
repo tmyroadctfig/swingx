@@ -167,9 +167,8 @@ public class JXTableVisualCheck extends JXTableUnitTest {
             
             @Override
             public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-                JPopupMenu menu = (JPopupMenu) e.getSource();
-                if (!(menu.getInvoker() instanceof JXTable)) return;
-                JXTable table = (JXTable) menu.getInvoker();
+                JXTable table = SwingXUtilities.getAncestor(JXTable.class, 
+                        (Component) e.getSource());
                 Point trigger = table.getPopupTriggerLocation();
                 Point cell = null;
                 if (trigger != null) {
