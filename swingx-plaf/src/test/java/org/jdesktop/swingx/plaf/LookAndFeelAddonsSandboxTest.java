@@ -4,9 +4,6 @@
  */
 package org.jdesktop.swingx.plaf;
 
-import java.net.URL;
-import java.text.DateFormat;
-import java.util.ServiceLoader;
 import java.util.logging.Logger;
 
 import javax.swing.LookAndFeel;
@@ -33,46 +30,7 @@ public class LookAndFeelAddonsSandboxTest extends TestCase {
     
     
     /**
-     * Issue ??-swingx: addon lookup doesn't work in security
-     * restricted contexts.
-     * 
-     * Here test if we have access to the serviceProvider resource.
-     * Any way to do in the sandbox?  
-     */
-    @Test
-    public void testAccessMetaInf() {
-        Class<?> clazz = LookAndFeelAddons.class;
-        // JW: just a reminder (to myself)
-        // class.getResource interprets path as relative without 
-        // leading slash
-        // classloader.getResource always absolute
-        String services = "META-INF/services/" + clazz.getName();
-        // using the classloader (just as ServiceLoader does)
-        // absolute path always
-        URL url = clazz.getClassLoader().getResource(services);
-        assertNotNull("services must be found: fails in security restricted contexts because the loader " +
-        		"has no access to the provider configuration file", 
-        		url);
-    }
-
-    /**
-     * Issue ??-swingx: addon lookup doesn't work in security
-     * restricted contexts.
-     * 
-     * The core of the issue seems to be that 
-     * ServiceLoader doesn't read the provided addons - expected
-     * or not? 
-     */
-    @Test
-    public void testServiceLoader() {
-        ServiceLoader<LookAndFeelAddons> loader = ServiceLoader.load(LookAndFeelAddons.class);
-        assertTrue("loader must have addons: fails in security restricted contexts because the loader " +
-        		"has no access to the provider configuration file", 
-        		loader.iterator().hasNext());
-    }
-    
-    /**
-     * Issue ??-swingx: addon lookup doesn't work in security
+     * Issue #1567-swingx: addon lookup doesn't work in security
      * restricted contexts.
      * 
      * Here we test that the addon is changed to match a newly 
@@ -95,7 +53,7 @@ public class LookAndFeelAddonsSandboxTest extends TestCase {
     }
     
     /**
-     * Issue ??-swingx: addon lookup doesn't work in security
+     * Issue #1567-swingx: addon lookup doesn't work in security
      * restricted contexts.
      * 
      * Here we test for systemLAF, 

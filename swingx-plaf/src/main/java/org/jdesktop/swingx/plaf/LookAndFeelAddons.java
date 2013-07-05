@@ -277,9 +277,9 @@ public abstract class LookAndFeelAddons {
         } else if (UIManager.getSystemLookAndFeelClassName().equals(laf.getClass().getName())) {
             className = getSystemAddonClassName();
         } else {
-            Iterable<LookAndFeelAddons> addonLoader = getProvidedLookAndFeelAddons();
+            Iterable<LookAndFeelAddons> loadedAddons = getProvidedLookAndFeelAddons();
 
-            for (LookAndFeelAddons addon : addonLoader) {
+            for (LookAndFeelAddons addon : loadedAddons) {
                 if (addon.matches()) {
                     className = addon.getClass().getName();
                     break;
@@ -336,10 +336,10 @@ public abstract class LookAndFeelAddons {
      * @see #getCrossPlatformAddonClassName()
      */
     public static String getSystemAddonClassName() {
-        Iterable<LookAndFeelAddons> addonLoader = getProvidedLookAndFeelAddons();
+        Iterable<LookAndFeelAddons> loadedAddons = getProvidedLookAndFeelAddons();
         String className = null;
 
-        for (LookAndFeelAddons addon : addonLoader) {
+        for (LookAndFeelAddons addon : loadedAddons) {
             if (addon.isSystemAddon()) {
                 className = addon.getClass().getName();
                 break;
@@ -354,15 +354,14 @@ public abstract class LookAndFeelAddons {
     }
 
     /**
-     * Returns the LookAndFeelAddons from the ServicLoader.
+     * Returns the LookAndFeelAddons from the ServiceLoader.
      * 
      * The actual lookup of the provider must 
      * be triggered in a privileged action to force
      * loading the classes. Without, it might not have access to the 
      * provider configuration file in security restricted contexts.
      * 
-     * 
-     * @return
+     * @return the LookAndFeelAddons from the ServiceLoader
      */
     protected static Iterable<LookAndFeelAddons> getProvidedLookAndFeelAddons() {
         final ServiceLoader<LookAndFeelAddons> loader = ServiceLoader.load(LookAndFeelAddons.class,

@@ -7,7 +7,6 @@ package org.jdesktop.swingx.plaf;
 import java.net.URL;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.util.Iterator;
 import java.util.ServiceLoader;
 import java.util.logging.Logger;
 
@@ -60,24 +59,6 @@ public class LookAndFeelAddonsSandboxOnTest extends LookAndFeelAddonsSandboxTest
     
     /**
      * Testing privileged access to the ServiceLoader.
-     * Bare grabbing inside the priviledgeAction doesn't work, 
-     * probably because the classes are
-     * loaded lazily
-     */
-    @Test
-    public void testServiceLoaderPrivileged() {
-        ServiceLoader<LookAndFeelAddons> loader =
-                AccessController.doPrivileged(new PrivilegedAction<ServiceLoader<LookAndFeelAddons>>() {
-                    @Override
-                    public ServiceLoader<LookAndFeelAddons> run() {
-                        return ServiceLoader.load(LookAndFeelAddons.class);
-                    }
-                });  
-        assertTrue("loader must have addons: fails here because the loading happens lazily", loader.iterator().hasNext());
-    }
-
-    /**
-     * Testing privileged access to the ServiceLoader.
      * 
      * Here we access the iterator inside the priviledged access, thus 
      * forcing the load.
@@ -98,7 +79,7 @@ public class LookAndFeelAddonsSandboxOnTest extends LookAndFeelAddonsSandboxTest
                     }
                 });
         int count = 0;
-        for (LookAndFeelAddons addons : loader) {
+        for (@SuppressWarnings("unused") LookAndFeelAddons addons : loader) {
             count++;
         }
 
@@ -106,13 +87,16 @@ public class LookAndFeelAddonsSandboxOnTest extends LookAndFeelAddonsSandboxTest
     }
     
     /**
-     * Issue ??-swingx: accessing LookAndFeelAddons throws
+     * Issue #1568-swingx: accessing LookAndFeelAddons throws
      * ExceptionInInitializationError.
      * 
      * This is caused by a typo in getCrossPlatFormAddon in the fallback
      * branch, that is if accessing the property isn't allowed
-     * (packagename was swing instead of swingx)
+     * (packagename was swing instead of swingx).
      * 
+     * Actually, with the fix to #1567, this is not really testing 
+     * because, as ultimate fallback, it is never reached if the
+     * lookup is working. 
      *
      */
     @Test
@@ -130,7 +114,7 @@ public class LookAndFeelAddonsSandboxOnTest extends LookAndFeelAddonsSandboxTest
     }
     
     /**
-     * Sanity: verify access to swing.addon denied.
+     * Sanity: verify access to swing.crossplatformaddon denied.
      *
      */
     @Test(expected= SecurityException.class)
