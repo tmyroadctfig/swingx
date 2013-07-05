@@ -8,6 +8,10 @@ import java.util.logging.Logger;
 
 import junit.framework.TestCase;
 
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -38,7 +42,8 @@ public class SandboxTest extends TestCase {
             return;
         }
         @SuppressWarnings("unused")
-        JXTable table = new JXTable();
+//        JXTable table = new JXTable();
+        JXDatePicker picker = new JXDatePicker();
         try {
             System.getProperty("user.home", "not specified");
             fail("Sandbox without security priviledges");
@@ -67,17 +72,22 @@ public class SandboxTest extends TestCase {
     }
     
     @Override
-    protected void setUp() throws Exception {
-        super.setUp();
+    @Before
+    public void setUp() throws Exception {
+//        LookAndFeelAddons.getAddon();
+        InteractiveTestCase.setLAF("Win");
         // A - install the default SecurityManager. 
         // Doing so we are not allowed to reverse the install -
         // which makes this testCase to a manual-run-only affair
         // (the securityManager is not uninstalled when running 
         // other test cases - in Eclipse, when running the 
         // bulk "all tests" of a projects. 
-//        if (System.getSecurityManager() == null) {
-//            System.setSecurityManager(new SecurityManager());
-//        }
+        // Same as B (accessing addon throws)
+        // the behaviour is similiar as Metal not choosable in
+        // webstart .. classLoader prob?
+        if (System.getSecurityManager() == null) {
+            System.setSecurityManager(new SecurityManager());
+        }
         // B- if we install a SecurityManager we need to be sure
         // that we are allowed to uninstall it.
         // BUT: with this custom manager on, JXTable instantiation
@@ -95,13 +105,29 @@ public class SandboxTest extends TestCase {
 //            }        
               
     }
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
+    
+//    @After
+//    @Override
+//    protected void tearDown() throws Exception {
+//        super.tearDown();
+//    }
+    
+  
+    @AfterClass
+    public static void uninstall() {
         // be sure to uninstall the manager
 //        System.setSecurityManager(null);
+        
     }
     
-    
-    
+//    @BeforeClass
+//    public static void init() {
+//        System.setSecurityManager(new SecurityManager());
+//        try {
+//            InteractiveTestCase.setLookAndFeel("Win");
+//        } catch (Exception e) {
+//            // TODO Auto-generated catch block
+//            e.printStackTrace();
+//        }
+//    }
 }
