@@ -10,15 +10,24 @@ import java.security.PrivilegedAction;
 import java.util.ServiceLoader;
 import java.util.logging.Logger;
 
+import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
 /**
  * Contains failing tests used for debugging the reason for sandbox
  * failures. We understand the reasons now, but let's keep the 
- * tests to not forget.
+ * tests to not forget.<p>
+ * 
+ * Note: to run this test manually, remove the ignore annotation 
+ * can't automatically run tests that install a securityManager 
+ * (because I found no way to uninstall it when the test class is done)
  * 
  * @author Jeanette Winzenburg, Berlin
  */
+@Ignore
+@RunWith(JUnit4.class)
 public class LookAndFeelAddonsSandboxDebug extends
         LookAndFeelAddonsSandboxOnTest {
     @SuppressWarnings("unused")

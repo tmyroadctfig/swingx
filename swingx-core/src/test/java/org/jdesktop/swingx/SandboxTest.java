@@ -8,10 +8,9 @@ import java.util.logging.Logger;
 
 import junit.framework.TestCase;
 
-import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -20,12 +19,12 @@ import org.junit.runners.JUnit4;
  * "hand test" sandbox restrictions 
  * (here: around Utilities.initNamesAndValue, #353-swingx).
  * 
- * JW: Need to investigate further. Running the test via the 
- * build test-target lets this TestCase fail. Eclipse only?
- * Setting the securityManager has side-effects on the TestRunner. 
- *  
+ * Note: to run this test manually, remove the ignore annotation 
+ * can't automatically run tests that install a securityManager 
+ * (because I found no way to uninstall it when the test class is done)
  * 
  */
+@Ignore
 @RunWith(JUnit4.class)
 public class SandboxTest extends TestCase {
     private static final Logger LOG = Logger.getLogger(SandboxTest.class
