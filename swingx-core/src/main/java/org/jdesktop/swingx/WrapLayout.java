@@ -10,7 +10,11 @@ import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 
 /**
- * FlowLayout subclass that fully supports wrapping of components.
+ * FlowLayout subclass that fully supports wrapping of components.<p>
+ * 
+ * Contributed from http://tips4java.wordpress.com/2008/11/06/wrap-layout/
+ * 
+ * @author Rob Camick
  */
 public class WrapLayout extends FlowLayout {
     private static final long serialVersionUID = 1L;
