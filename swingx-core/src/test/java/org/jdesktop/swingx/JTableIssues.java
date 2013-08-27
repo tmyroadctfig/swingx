@@ -98,7 +98,7 @@ public class JTableIssues extends InteractiveTestCase {
             .getName());
     
     public static void main(String args[]) throws Exception {
-//        setLookAndFeel("Nimbus");
+        setLAF("Nimbus");
       JTableIssues test = new JTableIssues();
       try {
 //        test.runInteractiveTests();
@@ -106,12 +106,33 @@ public class JTableIssues extends InteractiveTestCase {
 //          test.runInteractiveTests("interactive.*Edit.*");
 //          test.runInteractiveTests("interactive.*Sort.*");
 //          test.runInteractiveTests("interactive.*EditOnFocusLost.*");
-          test.runInteractive("SortModelSelection");
+//          test.runInteractive("SortModelSelection");
+          test.runInteractive("NimbusCheckBox");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
       }
   }
+    
+    /**
+     * Quick check: Nimbus default striping doesn't stripe checkbox
+     */
+    public void interactiveNimbusCheckBox() {
+        TableModel model = new DefaultTableModel(2, 2) {
+
+            @Override
+            public Class<?> getColumnClass(int columnIndex) {
+                return columnIndex == 0 ? Boolean.class : super.getColumnClass(columnIndex);
+            }
+          
+            
+        };
+        // JW: sequence matters - first load addon removes the alternate from
+        // normal handling
+        JTable table = new JTable(model);
+//        JXTable xtable = new JXTable(model);
+        showWithScrollingInFrame(table, "core");
+    }
     
     /**
      * Issue #1536-swingx: AIOOB on restoring selection with filter

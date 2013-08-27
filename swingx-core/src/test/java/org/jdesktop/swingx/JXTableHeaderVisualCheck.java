@@ -5,20 +5,25 @@
 package org.jdesktop.swingx;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.ComponentOrientation;
 import java.awt.event.ActionEvent;
-import java.awt.event.MouseEvent;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.BorderFactory;
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
+import javax.swing.border.Border;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
+import org.jdesktop.swingx.decorator.BorderHighlighter;
+import org.jdesktop.swingx.renderer.DefaultTableRenderer;
 import org.jdesktop.swingx.table.TableColumnExt;
 import org.jdesktop.test.AncientSwingTeam;
 
@@ -83,6 +88,26 @@ public class JXTableHeaderVisualCheck extends InteractiveTestCase {
             }
             
         };
+        DefaultTableCellRenderer r = new DefaultTableCellRenderer() {
+
+            Border padding = BorderFactory.createEmptyBorder(0, 10, 0, 10);
+            @Override
+            public Component getTableCellRendererComponent(JTable table,
+                    Object value, boolean isSelected, boolean hasFocus,
+                    int row, int column) {
+                super.getTableCellRendererComponent(table, value, isSelected, hasFocus,
+                        row, column);
+                setBorder(BorderFactory.createCompoundBorder(getBorder(), padding));
+                return this;
+            }
+             
+        };
+        table.setDefaultRenderer(Object.class, r);
+        DefaultTableRenderer renderer = (DefaultTableRenderer) table.getDefaultRenderer(Number.class);
+        renderer.getComponentProvider().getRendererComponent(null).setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 10));
+        BorderHighlighter hl = new BorderHighlighter(BorderFactory.createEmptyBorder(0, 10, 0, 10));
+        hl.setInner(true);
+        table.addHighlighter(hl);
         table.setTableHeader(header);
         JXFrame frame = wrapWithScrollingInFrame(table, "custom columnToolTip");
         show(frame);
@@ -194,6 +219,7 @@ public class JXTableHeaderVisualCheck extends InteractiveTestCase {
         final JXTable table = new JXTable(10, 5);
         Action deleteColumn = new AbstractAction("deleteCurrentColumn") {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 TableColumn column = table.getTableHeader().getDraggedColumn();
                 if (column == null) return;
@@ -216,6 +242,7 @@ public class JXTableHeaderVisualCheck extends InteractiveTestCase {
         JXFrame frame = wrapWithScrollingInFrame(table, "header always visible");
         Action action = new AbstractAction("toggle model") {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 int columnCount = table.getColumnCount(true);
                 table.setModel(columnCount > 0 ?

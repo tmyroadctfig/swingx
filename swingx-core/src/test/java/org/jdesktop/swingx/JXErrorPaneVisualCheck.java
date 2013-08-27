@@ -7,7 +7,12 @@
 
 package org.jdesktop.swingx;
 
+import java.awt.event.ActionEvent;
 import java.util.logging.Level;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.JButton;
 
 import org.jdesktop.swingx.error.ErrorInfo;
 import org.jdesktop.swingx.error.ErrorLevel;
@@ -22,12 +27,31 @@ public class JXErrorPaneVisualCheck extends InteractiveTestCase {
     public static void main(String[] args) throws Exception {
       JXErrorPaneVisualCheck test = new JXErrorPaneVisualCheck();
       try {
-          test.runInteractiveTests("interactiveShowFrameWithException");
+          test.runInteractive("Texts");
+//          test.runInteractiveTests("interactiveShowFrameWithException");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
         } 
   }
+    
+    /**
+     * Issue http://java.net/jira/browse/SWINGX-1541
+     * 
+     * Showing no texts at all (no message, no title, no buttontexts)
+     * 
+     */
+    public void interactiveErrorDialogTexts() {
+        Action action = new AbstractAction("show") {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JXErrorPane.showDialog( new IllegalArgumentException( "Error! ") );
+            }
+            
+        };
+        showInFrame(new JButton(action), "error dialog");
+    }
     
     /**
      * Custom details
