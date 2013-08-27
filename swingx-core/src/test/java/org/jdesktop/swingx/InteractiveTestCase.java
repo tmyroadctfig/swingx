@@ -266,12 +266,14 @@ public abstract class InteractiveTestCase extends junit.framework.TestCase {
 
 //---  toolbar, statusbar
     
-    public void addAction(JXFrame frame, Action action) {
+    public AbstractButton addAction(JXFrame frame, Action action) {
         JToolBar toolbar = frame.getRootPaneExt().getToolBar();
         if (toolbar != null) {
             AbstractButton button = toolbar.add(action);
             button.setFocusable(false);
+            return button;
         }
+        return null;
     }
 
     /**
