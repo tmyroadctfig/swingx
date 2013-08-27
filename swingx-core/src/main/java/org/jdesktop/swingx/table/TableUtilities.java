@@ -70,7 +70,7 @@ public class TableUtilities {
      * @param e the event to examine
      * @return true if the event is of type remove, false otherwise.
      */
-    public static boolean isRemove(TableModelEvent e) {
+    public static boolean isDelete(TableModelEvent e) {
         if (e == null) return false;
         return TableModelEvent.DELETE == e.getType();
     }

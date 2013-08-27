@@ -6,7 +6,7 @@ package org.jdesktop.swingx.table;
 
 import static org.jdesktop.swingx.table.TableUtilities.isDataChanged;
 import static org.jdesktop.swingx.table.TableUtilities.isInsert;
-import static org.jdesktop.swingx.table.TableUtilities.isRemove;
+import static org.jdesktop.swingx.table.TableUtilities.isDelete;
 import static org.jdesktop.swingx.table.TableUtilities.isStructureChanged;
 import static org.jdesktop.swingx.table.TableUtilities.isUpdate;
 import static org.jdesktop.swingx.table.TableUtilities.ordinalsOf;
@@ -114,7 +114,7 @@ public class TableUtilitiesTest extends InteractiveTestCase {
     public void testNullTableEventNPE() {
         // don't throw on null events
         assertFalse(isInsert(null));
-        assertFalse(isRemove(null));
+        assertFalse(isDelete(null));
         assertFalse(isUpdate(null));
         assertFalse(isDataChanged(null));
         assertTrue(isStructureChanged(null));
@@ -129,7 +129,7 @@ public class TableUtilitiesTest extends InteractiveTestCase {
         assertTrue(isDataChanged(dataChanged));
         assertFalse(isStructureChanged(dataChanged));
         assertFalse(isInsert(dataChanged));
-        assertFalse(isRemove(dataChanged));
+        assertFalse(isDelete(dataChanged));
     }
 
     @Test
@@ -139,7 +139,7 @@ public class TableUtilitiesTest extends InteractiveTestCase {
         assertTrue(isUpdate(update));
         assertFalse(isDataChanged(update));
         assertFalse(isStructureChanged(update));
-        assertFalse(isRemove(update));
+        assertFalse(isDelete(update));
         assertFalse(isInsert(update));
     }
 
@@ -149,7 +149,7 @@ public class TableUtilitiesTest extends InteractiveTestCase {
         TableModelEvent insert = new TableModelEvent(
                 getModel(), 0, 10, -1, TableModelEvent.INSERT);
         assertFalse(isUpdate(insert));
-        assertFalse(isRemove(insert));
+        assertFalse(isDelete(insert));
         assertFalse(isDataChanged(insert));
         assertFalse(isStructureChanged(insert));
         assertTrue(isInsert(insert));
@@ -164,7 +164,7 @@ public class TableUtilitiesTest extends InteractiveTestCase {
         assertFalse(isInsert(remove));
         assertFalse(isDataChanged(remove));
         assertFalse(isStructureChanged(remove));
-        assertTrue(isRemove(remove));
+        assertTrue(isDelete(remove));
     }
 
     @Test
@@ -172,7 +172,7 @@ public class TableUtilitiesTest extends InteractiveTestCase {
         // correct detection of structureChanged
         TableModelEvent structureChanged = new TableModelEvent(getModel(), -1, -1);
         assertFalse(isInsert(structureChanged));
-        assertFalse(isRemove(structureChanged));
+        assertFalse(isDelete(structureChanged));
         assertFalse(isUpdate(structureChanged));
         assertFalse(isDataChanged(structureChanged));
         assertTrue(isStructureChanged(structureChanged));
