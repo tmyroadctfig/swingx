@@ -93,6 +93,7 @@ public class JXTableHeader extends JTableHeader
 
     private transient PropertyChangeListener tablePropertyChangeListener;
     private boolean resortsOnDoubleClick;
+    private Point popupTriggerLocation;
 
     /**
      *  Constructs a <code>JTableHeader</code> with a default 
@@ -205,6 +206,52 @@ public class JXTableHeader extends JTableHeader
             || "visible".equals(event.getPropertyName());
     }
 
+//---------------------- enhanced component popup support
+    
+    /**
+     * {@inheritDoc} <p>
+     * 
+     * Overridden for bookkeeping: the given event location is 
+     * stored for later access.
+     * 
+     * @see #getPopupTriggerLocation()
+     */
+    @Override
+    public Point getPopupLocation(MouseEvent event) {
+        updatePopupTrigger(event);
+        return super.getPopupLocation(event);
+    }
+    
+    /**
+     * Handles internal bookkeeping related to popupLocation, called from 
+     * getPopupLocation.<p>
+     * 
+     * This implementation stores the mouse location as popupTriggerLocation.
+     * 
+     * @param event the event that triggered the showing of the 
+     * componentPopup, might be null if triggered by keyboard
+     */
+    protected void updatePopupTrigger(MouseEvent event) {
+        Point old = getPopupTriggerLocation();
+        // note: getPoint creates a new Point on each call, safe to use as-is
+        popupTriggerLocation = event != null ? event.getPoint() : null;
+        firePropertyChange("popupTriggerLocation", old, getPopupTriggerLocation());
+    }
+
+    /**
+     * Returns the location of the mouseEvent that triggered the
+     * showing of the ComponentPopupMenu. 
+     * 
+     * @return the location of the mouseEvent that triggered the
+     * last showing of the ComponentPopup, or null if it was
+     * triggered by keyboard.
+     */
+    public Point getPopupTriggerLocation() {
+        return popupTriggerLocation != null ? new Point(popupTriggerLocation) : null;
+    }
+    
+    
+    
     /**
      * {@inheritDoc} <p>
      * 

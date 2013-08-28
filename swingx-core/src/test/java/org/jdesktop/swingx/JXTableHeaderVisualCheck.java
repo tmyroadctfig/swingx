@@ -7,15 +7,19 @@ package org.jdesktop.swingx;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.ComponentOrientation;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
+import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
 import javax.swing.border.Border;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
@@ -42,12 +46,91 @@ public class JXTableHeaderVisualCheck extends InteractiveTestCase {
         try {
 //          test.runInteractiveTests();
 //            test.runInteractiveTests("interactive.*DoubleSort.*");
-            test.runInteractive("ColumnToolTip");
+//            test.runInteractive("ColumnToolTip");
+            test.runInteractive("PopupTrigger");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
         } 
     }
+
+    /**
+     * Issue #1563-swingx: find cell that was clicked for componentPopup
+     * 
+     * Example of how to use:
+     * - in actionPerformed
+     * - in popupMenuWillBecomeVisible
+     */
+    public void interactivePopupTriggerLocation() {
+        JXTable table = new JXTable(new AncientSwingTeam());
+        table.setColumnSelectionAllowed(true);
+        JXTableHeader header = (JXTableHeader) table.getTableHeader();
+        JPopupMenu popup = new JPopupMenu();
+        Action action = new AbstractAction("cell found in actionPerformed") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JXTableHeader table = SwingXUtilities.getAncestor(JXTableHeader.class, (Component) e.getSource());
+                Point trigger = table.getPopupTriggerLocation();
+                Point cell = null;
+                if (trigger != null) {
+                    int column = table.columnAtPoint(trigger);
+                    table.getColumnModel().getSelectionModel().setSelectionInterval(column, column);
+                    cell = new Point(column, -1);
+                } else {
+                    table.getColumnModel().getSelectionModel().clearSelection();
+                }
+                LOG.info("popupTrigger/cell " + trigger + "/" + cell);
+            }
+        };
+        popup.add(action);
+        
+        final Action onShowing = new AbstractAction("dynamic: ") {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                LOG.info("" + getValue(NAME));
+            }
+            
+        };
+        popup.add(onShowing);
+        
+        PopupMenuListener l = new PopupMenuListener() {
+            
+            @Override
+            public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+                // doesn't work: popup itself cannot be used as
+                // starting component, bug?
+//                JXTable table = SwingXUtilities.getAncestor(JXTable.class, 
+//                        (Component) e.getSource());
+                JXTableHeader table = (JXTableHeader) ((JPopupMenu) e.getSource()).getInvoker();
+                Point trigger = table.getPopupTriggerLocation();
+                Point cell = null;
+                if (trigger != null) {
+                    int column = table.columnAtPoint(trigger);
+                    // here we set the cell focus, just to do a bit differently
+                    // from the other action
+//                    table.setColumnSelectionInterval(column, column);
+//                    table.clearSelection();
+                    cell = new Point(column, -1);
+                }
+                onShowing.putValue(Action.NAME, "popupTrigger/cell " + trigger + "/" + cell);
+            }
+            
+            @Override
+            public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
+            }
+            
+            @Override
+            public void popupMenuCanceled(PopupMenuEvent e) {
+            }
+        };
+        popup.addPopupMenuListener(l);
+        header.setComponentPopupMenu(popup);
+        showWithScrollingInFrame(table, "PopupTriggerLocation");
+    }
+    
+
     
     /**
      * Issue 1560-swingx: column tooltip not working in stand-alone header

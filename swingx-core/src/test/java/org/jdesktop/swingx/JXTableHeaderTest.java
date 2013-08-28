@@ -55,6 +55,60 @@ public class JXTableHeaderTest extends InteractiveTestCase {
         assertEquals(header.getXTable() != null, header.getResortsOnDoubleClick());
         
     }
+
+    /**
+     * Issue #1563-swingx: find cell that was clicked for componentPopup
+     * 
+     * Test api and event firing.
+     */
+    @Test
+    public void testPopupTriggerLocationAvailable() {
+        JXTableHeader table = (JXTableHeader) new JXTable(10, 3).getTableHeader();
+        MouseEvent event = new MouseEvent(table, 0,
+                0, 0, 40, 5, 0, false);
+        PropertyChangeReport report = new PropertyChangeReport(table);
+        table.getPopupLocation(event);
+        assertEquals(event.getPoint(), table.getPopupTriggerLocation());
+        TestUtils.assertPropertyChangeEvent(report, "popupTriggerLocation", 
+                null, event.getPoint());
+    }
+    
+    
+    /**
+     * Issue #1563-swingx: find cell that was clicked for componentPopup
+     * 
+     * Test safe return value.
+     */
+    @Test
+    public void testPopupTriggerCopy() {
+        JXTableHeader table = (JXTableHeader) new JXTable(10, 3).getTableHeader();
+        MouseEvent event = new MouseEvent(table, 0,
+                0, 0, 40, 5, 0, false);
+        table.getPopupLocation(event);
+        assertNotSame("trigger point must not be same", 
+                table.getPopupTriggerLocation(), table.getPopupTriggerLocation());
+    }
+    
+    /**
+     * Issue #1563-swingx: find cell that was clicked for componentPopup
+     * 
+     * Test safe handle null.
+     */
+    @Test
+    public void testPopupTriggerKeyboard() {
+        JXTableHeader table = (JXTableHeader) new JXTable(10, 3).getTableHeader();
+        MouseEvent event = new MouseEvent(table, 0,
+                0, 0, 40, 5, 0, false);
+        table.getPopupLocation(event);
+        PropertyChangeReport report = new PropertyChangeReport(table);
+        table.getPopupLocation(null);
+        assertNull("trigger must null", 
+                table.getPopupTriggerLocation());
+        TestUtils.assertPropertyChangeEvent(report, "popupTriggerLocation", 
+                event.getPoint(), null);
+    }
+
+
     
     /**
      * Issue #1341-swingx: resizing/dragged/column/distance bound properties.
