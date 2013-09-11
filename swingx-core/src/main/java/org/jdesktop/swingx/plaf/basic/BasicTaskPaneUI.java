@@ -352,11 +352,14 @@ public class BasicTaskPaneUI extends TaskPaneUI {
             // or if animated has reached expanded state
             // scroll to visible if scrollOnExpand is enabled
             if (("collapsed".equals(evt.getPropertyName())
-                    && Boolean.TRUE.equals(evt.getNewValue()) && !group
-                    .isAnimated())) {
+                    // JW: fix for 1572-swingx - scrollOnExpand broken in 1.6.5-1
+                    && Boolean.FALSE.equals(evt.getNewValue())))  {
+//                    && Boolean.TRUE.equals(evt.getNewValue()) && !group
+//                    .isAnimated())) {
                 if (group.isScrollOnExpand()) {
                     ensureVisible();
                 }
+                     
             } else if (JXTaskPane.ICON_CHANGED_KEY
                     .equals(evt.getPropertyName())
                     || JXTaskPane.TITLE_CHANGED_KEY.equals(evt
