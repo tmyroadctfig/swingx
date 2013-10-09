@@ -8,10 +8,10 @@ import java.util.logging.Logger;
 
 import javax.swing.LookAndFeel;
 import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 
 import junit.framework.TestCase;
 
-import org.jdesktop.swingx.InteractiveTestCase;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -43,7 +43,7 @@ public class LookAndFeelAddonsSandboxTest extends TestCase {
         try {
             assertTrue("sanity: addon is configured to update on LAF change", 
                     LookAndFeelAddons.isTrackingLookAndFeelChanges());
-            InteractiveTestCase.setLookAndFeel("Nimbus");
+            setLookAndFeel("Nimbus");
             LookAndFeelAddons addon = LookAndFeelAddons.getAddon();
             assertTrue("addon must match Nimbus, but was: " + addon, addon.matches());
             
@@ -79,4 +79,38 @@ public class LookAndFeelAddonsSandboxTest extends TestCase {
         }
     }
 
+    /**
+     * Fix issue #1578-swingx: remove dependency on core module.
+     * 
+     * C&p'd from InteractiveTestCase: accessing that class here 
+     * will break maven builds by introducing a cyclic dependency.
+     * 
+     * @param nameSnippet
+     * @throws ClassNotFoundException
+     * @throws InstantiationException
+     * @throws IllegalAccessException
+     * @throws UnsupportedLookAndFeelException
+     */
+    public static void setLookAndFeel(final String nameSnippet)
+            throws ClassNotFoundException, InstantiationException,
+            IllegalAccessException, UnsupportedLookAndFeelException {
+        final String laf = getLookAndFeelClassName(nameSnippet);
+        if (laf != null) {
+            UIManager.setLookAndFeel(laf);
+            return;
+        }
+        throw new UnsupportedLookAndFeelException(
+                "no LAF installed with name snippet " + nameSnippet);
+    }
+
+    public static String getLookAndFeelClassName(final String nameSnippet) {
+        final UIManager.LookAndFeelInfo[] plafs = UIManager
+                .getInstalledLookAndFeels();
+        for (final UIManager.LookAndFeelInfo info : plafs) {
+            if (info.getName().contains(nameSnippet)) {
+                return info.getClassName();
+            }
+        }
+        return null;
+    }
 }
