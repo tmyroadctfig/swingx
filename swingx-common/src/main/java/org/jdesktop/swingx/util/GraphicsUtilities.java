@@ -43,7 +43,6 @@ import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.Insets;
 import java.awt.RenderingHints;
-import java.awt.Shape;
 import java.awt.Transparency;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
@@ -766,26 +765,6 @@ public class GraphicsUtilities {
         } finally {
             g.dispose();
         }
-    }
-    
-    /**
-     * Sets the clip on a graphics object by merging a supplied clip with the existing one. The new
-     * clip will be an intersection of the old clip and the supplied clip. The old clip shape will
-     * be returned. This is useful for resetting the old clip after an operation is performed.
-     * 
-     * @param g
-     *            the graphics object to update
-     * @param clip
-     *            a new clipping region to add to the graphics clip.
-     * @return the current clipping region of the supplied graphics object. This may return {@code
-     *         null} if the current clip is {@code null}.
-     * @throws NullPointerException
-     *             if any parameter is {@code null}
-     * @deprecated Use {@link ShapeUtils#mergeClip(Graphics,Shape)} instead
-     */
-    @Deprecated
-    public static Shape mergeClip(Graphics g, Shape clip) {
-        return ShapeUtils.mergeClip(g, clip);
     }
 
     /**

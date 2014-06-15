@@ -24,13 +24,14 @@ package org.jdesktop.swingx.renderer;
 import java.awt.Component;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.util.logging.Logger;
 
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.PainterHighlighter;
 import org.jdesktop.swingx.painter.AbstractLayoutPainter;
-import org.jdesktop.swingx.painter.Painter;
 import org.jdesktop.swingx.painter.AbstractLayoutPainter.HorizontalAlignment;
+import org.jdesktop.swingx.painter.Painter;
 
 @SuppressWarnings("unchecked")
 public class RelativePainterHighlighter extends PainterHighlighter {
@@ -326,5 +327,7 @@ public class RelativePainterHighlighter extends PainterHighlighter {
         
     }
 
-
+    @SuppressWarnings("unused")
+    private static final Logger LOG = Logger
+            .getLogger(RelativePainterHighlighter.class.getName());
 }

@@ -24,6 +24,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.util.logging.Logger;
@@ -32,9 +33,12 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JPopupMenu;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.plaf.basic.BasicTreeUI;
@@ -87,12 +91,88 @@ public class JXTreeVisualCheck extends JXTreeUnitTest {
 //        test.runInteractiveTests("interactive.*UpdateUI.*");
 //          test.runInteractiveTests("interactive.*CellHeight.*");
 //        test.runInteractiveTests("interactive.*RendererSize.*");
-        test.runInteractive("NextMatch");
+//          test.runInteractive("NextMatch");
+        test.runInteractive("PopupTrigger");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
       }
   }
+
+    
+    /**
+     * Issue #1563-swingx: find cell that was clicked for componentPopup
+     * 
+     * Example of how to use:
+     * - in actionPerformed
+     * - in popupMenuWillBecomeVisible
+     */
+    public void interactivePopupTriggerLocation() {
+        JXTree table = new JXTree();
+        table.expandAll();
+        JPopupMenu popup = new JPopupMenu();
+        Action action = new AbstractAction("cell found in actionPerformed") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JXTree table = SwingXUtilities.getAncestor(JXTree.class, (Component) e.getSource());
+                Point trigger = table.getPopupTriggerLocation();
+                Point cell = null;
+                if (trigger != null) {
+                    int row = table.getRowForLocation(trigger.x, trigger.y);
+                    table.setSelectionRow(row);
+                    cell = new Point(0, row);
+                } else {
+                    table.clearSelection();
+                }
+                LOG.info("popupTrigger/cell " + trigger + "/" + cell);
+            }
+        };
+        popup.add(action);
+        
+        final Action onShowing = new AbstractAction("dynamic: ") {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                LOG.info("" + getValue(NAME));
+            }
+            
+        };
+        popup.add(onShowing);
+        
+        PopupMenuListener l = new PopupMenuListener() {
+            
+            @Override
+            public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+                // doesn't work: popup itself cannot be used as
+                // starting component, bug?
+//                JXTree tree = SwingXUtilities.getAncestor(JXTree.class, 
+//                        (Component) e.getSource());
+                JXTree tree = (JXTree) ((JPopupMenu) e.getSource()).getInvoker();
+                Point trigger = tree.getPopupTriggerLocation();
+                Point cell = null;
+                if (trigger != null) {
+                    int row = tree.getRowForLocation(trigger.x, trigger.y);
+                    tree.setSelectionRow(row);
+                    tree.setLeadSelectionPath(tree.getPathForRow(row));
+                    cell = new Point(0, row);
+                }
+                onShowing.putValue(Action.NAME, "popupTrigger/cell " + trigger + "/" + cell);
+            }
+            
+            @Override
+            public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
+            }
+            
+            @Override
+            public void popupMenuCanceled(PopupMenuEvent e) {
+            }
+        };
+        popup.addPopupMenuListener(l);
+        table.setComponentPopupMenu(popup);
+        showWithScrollingInFrame(table, "PopupTriggerLocation");
+    }
+    
 
     /**
      * Issue 1483-swingx: getNextMatch must respect StringValue

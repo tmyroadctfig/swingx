@@ -30,7 +30,6 @@ import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
-import java.awt.Paint;
 import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.Window;
@@ -686,7 +685,7 @@ public class JXImageView extends JXPanel {
     }
 
     
-    private class ImageTransferable implements Transferable {
+    private static class ImageTransferable implements Transferable {
         private Image img;
         private List<File> files;
         private String exportName, exportFormat;

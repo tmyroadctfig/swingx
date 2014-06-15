@@ -36,7 +36,6 @@ import org.jdesktop.swingx.JXList;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.JXTree;
 import org.jdesktop.swingx.JXTreeTable;
-import org.jdesktop.swingx.color.ColorUtil;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.demos.search.Contributor;
@@ -51,6 +50,7 @@ import org.jdesktop.swingx.renderer.HyperlinkProvider;
 import org.jdesktop.swingx.renderer.StringValue;
 import org.jdesktop.swingx.renderer.StringValues;
 import org.jdesktop.swingx.treetable.TreeTableModelAdapter;
+import org.jdesktop.swingx.util.PaintUtils;
 import org.jdesktop.swingxset.util.DemoUtils;
 import org.jdesktop.swingxset.util.RelativePainterHighlighter;
 import org.jdesktop.swingxset.util.RelativePainterHighlighter.NumberRelativizer;
@@ -159,10 +159,10 @@ public class HighlighterExtDemo extends JPanel {
         private Timeline raceTimeline;
         private Timeline fadeInTimeline;
         private MattePainter matte;
-        private Color base = ColorUtil.setSaturation(Color.MAGENTA, .7f);
+        private Color base = PaintUtils.setSaturation(Color.MAGENTA, .7f);
         
         public HighlighterControl() {
-            matte = new MattePainter(ColorUtil.setAlpha(base, 125));
+            matte = new MattePainter(PaintUtils.setAlpha(base, 125));
             tableValueBasedHighlighter = new RelativePainterHighlighter(matte);
             table.addHighlighter(tableValueBasedHighlighter);
             treeTable.addHighlighter(tableValueBasedHighlighter);
@@ -195,7 +195,7 @@ public class HighlighterExtDemo extends JPanel {
             if (fadeInTimeline == null) {
                 fadeInTimeline = new Timeline(this);
                 fadeInTimeline.addPropertyToInterpolate("background", 
-                        ColorUtil.setAlpha(base, 0), ColorUtil.setAlpha(base, 125));
+                        PaintUtils.setAlpha(base, 0), PaintUtils.setAlpha(base, 125));
                 fadeInTimeline.setDuration(2000);
                 fadeInTimeline.setEase(new Spline(0.7f));
             }
@@ -293,6 +293,7 @@ public class HighlighterExtDemo extends JPanel {
         stringValues = new HashMap<String, StringValue>();
         StringValue nameValue = new StringValue() {
 
+            @Override
             public String getString(Object value) {
                 if (value instanceof Contributor) {
                     Contributor c = (Contributor) value;
@@ -426,6 +427,7 @@ public class HighlighterExtDemo extends JPanel {
      */
     public static void main(String[] args) {
         SwingUtilities.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 JFrame frame = new JFrame(HighlighterExtDemo.class.getAnnotation(DemoProperties.class).value());
                 frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

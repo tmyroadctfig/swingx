@@ -412,6 +412,9 @@ public class ColumnControlButton extends JButton {
             boolean visible = (column instanceof TableColumnExt) ? 
                     ((TableColumnExt) column).isVisible() : true;
             updateFromColumnVisible(visible);
+            boolean hideable = (column instanceof TableColumnExt) ? 
+                    ((TableColumnExt) column).isHideable() : true;
+            updateFromColumnHideable(hideable);        
         }
 
         /**

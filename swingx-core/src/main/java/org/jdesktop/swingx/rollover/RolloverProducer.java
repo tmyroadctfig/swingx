@@ -20,7 +20,14 @@
  */
 package org.jdesktop.swingx.rollover;
 
+import static javax.swing.SwingUtilities.convertPointFromScreen;
+import static javax.swing.SwingUtilities.isDescendingFrom;
+
+import java.awt.KeyboardFocusManager;
+import java.awt.MouseInfo;
 import java.awt.Point;
+import java.awt.PointerInfo;
+import java.awt.Window;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.MouseEvent;
@@ -213,7 +220,36 @@ public abstract class RolloverProducer implements MouseListener, MouseMotionList
      * @param e
      */
     private void updateRollover(ComponentEvent e) {
-        Point componentLocation = e.getComponent().getMousePosition();
+        Point componentLocation = null;
+        
+        try {
+            componentLocation = e.getComponent().getMousePosition();
+        } catch (ClassCastException ignore) {
+            // caused by core issue on Mac/Java 7
+            
+            //try to work our way there by a different path
+            //*sigh* this requires permissions
+            //if this fails, rollover is effectively neutered
+            
+            Window w = KeyboardFocusManager.getCurrentKeyboardFocusManager().getActiveWindow();
+            
+            if (w != null && isDescendingFrom(e.getComponent(), w)) {
+                try {
+                    PointerInfo pi = java.security.AccessController.doPrivileged(
+                        new java.security.PrivilegedAction<PointerInfo>() {
+                            @Override
+                            public PointerInfo run() {
+                                return MouseInfo.getPointerInfo();
+                            }
+                        }
+                    );
+                    
+                    componentLocation = pi.getLocation();
+                    convertPointFromScreen(componentLocation, e.getComponent());
+                } catch (SecurityException se) { }
+            }
+        }
+        
         if (componentLocation == null) {
             componentLocation = new Point(-1, -1);
         }

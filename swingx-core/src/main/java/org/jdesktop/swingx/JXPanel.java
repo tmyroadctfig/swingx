@@ -21,40 +21,55 @@
 
 package org.jdesktop.swingx;
 
+import static org.jdesktop.swingx.util.GraphicsUtilities.createCompatibleTranslucentImage;
+
 import java.awt.AlphaComposite;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Composite;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Insets;
 import java.awt.LayoutManager;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.logging.Logger;
 
 import javax.swing.JPanel;
 import javax.swing.RepaintManager;
 import javax.swing.Scrollable;
 import javax.swing.SwingConstants;
+import javax.swing.UIManager;
+import javax.swing.plaf.synth.SynthLookAndFeel;
 
 import org.jdesktop.beans.JavaBean;
 import org.jdesktop.swingx.painter.AbstractPainter;
 import org.jdesktop.swingx.painter.Painter;
-import org.jdesktop.swingx.util.GraphicsUtilities;
+import org.jdesktop.swingx.util.Contract;
+import org.jdesktop.swingx.util.JVM;
 
 /**
  * <p>
- * An extended {@code JPanel} that provides additional features. First, the
- * component is {@code Scrollable}, using reasonable defaults. Second, the
- * component is alpha-channel enabled. This means that the {@code JXPanel} can
- * be made fully or partially transparent. Finally, {@code JXPanel} has support
- * for {@linkplain Painter painters}.
+ * An extended {@code JPanel} that provides additional features.
+ * </p>
+ * <h3>Scrollable</h3>
+ * <p>
+ * {@code JXPanel} is {@link Scrollable} by default. It provides reasonable implementations of all
+ * of the interface methods. In addition, it supports the setting of common scrolling approaches
+ * defined in {@link ScrollableSizeHint}.
+ * </p>
+ * <h3>Alpha Support</h3>
+ * <p>
+ * {@code JXPanel} has full alpha-channel support. This means that the {@code JXPanel} can be made
+ * fully or partially transparent. This means that the JXPanel and all of its children will behave
+ * as a single paint at the specified alpha value. <strong>Cauton:</strong> best practice is to use
+ * either alpha support or opacity support, but not both. See the documentation on the methods for
+ * further information.
  * </p>
  * <p>
- * A transparency example, this following code will show the black background of
- * the parent:
+ * A transparency example, this following code will show the black background of the parent:
  * 
  * <pre>
  * JXPanel panel = new JXPanel();
@@ -65,6 +80,10 @@ import org.jdesktop.swingx.util.GraphicsUtilities;
  * container.add(panel);
  * </pre>
  * 
+ * </p>
+ * <h3>Painter Support</h3>
+ * <p>
+ * {@code JXPanel} has support for {@linkplain Painter}s.
  * </p>
  * <p>
  * A painter example, this following code will show how to add a simple painter:
@@ -92,7 +111,7 @@ public class JXPanel extends JPanel implements AlphaPaintable, BackgroundPaintab
     /**
      * The alpha level for this component.
      */
-    private float alpha = 1.0f;
+    private volatile float alpha = 1.0f;
     /**
      * If the old alpha value was 1.0, I keep track of the opaque setting because
      * a translucent component is not opaque, but I want to be able to restore
@@ -101,6 +120,9 @@ public class JXPanel extends JPanel implements AlphaPaintable, BackgroundPaintab
      * <p>TODO: Check whether this variable is necessary or not</p>
      */
     private boolean oldOpaque;
+    
+    private float oldAlpha = 1f;
+    
     /**
      * Indicates whether this component should inherit its parent alpha value
      */
@@ -166,6 +188,47 @@ public class JXPanel extends JPanel implements AlphaPaintable, BackgroundPaintab
     
     /**
      * {@inheritDoc}
+     * <p>
+     * Setting the component to be opaque will reset the alpha setting to {@code 1f} (full
+     * opaqueness). Setting the component to be non-opaque will restore the previous alpha
+     * transparency. If the component is non-opaque with a fully-opaque alpha value ({@code 1f}),
+     * the behavior should be the same as as a {@code JPanel} that is non-opaque.
+     */
+    @Override
+    public void setOpaque(boolean opaque) {
+        if (isPatch()) {
+            setOpaquePatch(opaque);
+            return;
+        }
+        if (opaque) {
+            oldAlpha = getAlpha();
+            
+            if (oldAlpha < 1f) {
+                setAlpha(1f);
+            } else {
+                super.setOpaque(true);
+                repaint();
+            }
+        } else if (getAlpha() == 1f) {
+            if (oldAlpha == 1f) {
+                super.setOpaque(false);
+                repaint();
+            } else {
+                setAlpha(oldAlpha);
+            }
+        }
+    }
+    
+    @Override
+    public boolean isOpaque() {
+        if (isPatch()) {
+            return isOpaquePatch();
+        }
+        return super.isOpaque();
+    }
+
+    /**
+     * {@inheritDoc}
      */
     @Override
     public float getAlpha() {
@@ -177,6 +240,10 @@ public class JXPanel extends JPanel implements AlphaPaintable, BackgroundPaintab
      */
     @Override
     public void setAlpha(float alpha) {
+        if (isPatch()) {
+            setAlphaPatch(alpha);
+            return;
+        }
         if (alpha < 0f || alpha > 1f) {
             throw new IllegalArgumentException("invalid alpha value " + alpha);
         }
@@ -188,7 +255,7 @@ public class JXPanel extends JPanel implements AlphaPaintable, BackgroundPaintab
             if (oldValue == 1) {
                 //it used to be 1, but now is not. Save the oldOpaque
                 oldOpaque = isOpaque();
-                setOpaque(false);
+                super.setOpaque(false);
             }
             
             installRepaintManager();
@@ -197,7 +264,42 @@ public class JXPanel extends JPanel implements AlphaPaintable, BackgroundPaintab
             
             //restore the oldOpaque if it was true (since opaque is false now)
             if (oldOpaque) {
-                setOpaque(true);
+                super.setOpaque(true);
+            }
+        }
+        
+        firePropertyChange("alpha", oldValue, getAlpha());
+        repaint();
+    }
+    
+    /**
+     * experimental version: doesn't tweak opaque
+     * 
+     * called if isPatch
+     * @param alpha
+     */
+    private void setAlphaPatch(float alpha) {
+        if (alpha < 0f || alpha > 1f) {
+            throw new IllegalArgumentException("invalid alpha value " + alpha);
+        }
+        
+        float oldValue = getAlpha();
+        this.alpha = alpha;
+        
+        if (getAlpha() < 1f) {
+            if (oldValue == 1) {
+                //it used to be 1, but now is not. Save the oldOpaque
+                oldOpaque = isOpaque();
+//                super.setOpaque(false);
+            }
+            
+            installRepaintManager();
+        } else {
+            uninstallRepaintManager();
+            
+            //restore the oldOpaque if it was true (since opaque is false now)
+            if (oldOpaque) {
+//                super.setOpaque(true);
             }
         }
         
@@ -206,9 +308,11 @@ public class JXPanel extends JPanel implements AlphaPaintable, BackgroundPaintab
     }
     
     void installRepaintManager() {
-        RepaintManager manager = RepaintManager.currentManager(this);
-        RepaintManager trm = SwingXUtilities.getTranslucentRepaintManager(manager);
-        RepaintManager.setCurrentManager(trm);
+        if (!JVM.current().isOrLater(JVM.JDK1_7)) {
+            RepaintManager manager = RepaintManager.currentManager(this);
+            RepaintManager trm = SwingXUtilities.getTranslucentRepaintManager(manager);
+            RepaintManager.setCurrentManager(trm);
+        }
     }
     
     void uninstallRepaintManager() {
@@ -259,15 +363,13 @@ public class JXPanel extends JPanel implements AlphaPaintable, BackgroundPaintab
      * @param hint the horizontal sizing hint, must not be null
      *   and must be vertical.
      * 
-     * @throws IllegalArgumentException if track not horizontal 
      * @throws NullPointerException if null
      * 
      * @see #setScrollableHeightHint(ScrollableSizeHint)
      * @see ScrollableSizeHint
      */
     public final void setScrollableWidthHint(ScrollableSizeHint hint) {
-        if (!hint.isHorizontalCompatible()) throw 
-           new IllegalArgumentException("track must be horizontal, but was " + hint);
+        Contract.asNotNull(hint, "hint cannot be null");
         ScrollableSizeHint oldValue = getScrollableWidthHint();
         if (oldValue == hint) return;
         this.scrollableWidthHint = hint;
@@ -283,15 +385,13 @@ public class JXPanel extends JPanel implements AlphaPaintable, BackgroundPaintab
      * @param hint the vertical sizing hint, must not be null
      *   and must be vertical.
      * 
-     * @throws IllegalArgumentException if track not vertical 
      * @throws NullPointerException if null
      * 
      * @see #setScrollableWidthHint(ScrollableSizeHint)
      * @see ScrollableSizeHint
      */
     public final void setScrollableHeightHint(ScrollableSizeHint hint) {
-        if (!hint.isVerticalCompatible()) throw 
-            new IllegalArgumentException("track must be vertical, but was " + hint);
+        Contract.asNotNull(hint, "hint cannot be null");
         ScrollableSizeHint oldValue = getScrollableHeightHint();
         if (oldValue == hint) return;
         this.scrollableHeightHint = hint;
@@ -307,8 +407,7 @@ public class JXPanel extends JPanel implements AlphaPaintable, BackgroundPaintab
         return scrollableHeightHint;
         
     }
-    
-    
+
     /**
      * {@inheritDoc}
      */
@@ -483,6 +582,11 @@ public class JXPanel extends JPanel implements AlphaPaintable, BackgroundPaintab
         this.paintBorderInsets = paintBorderInsets;
         firePropertyChange("paintBorderInsets", old, isPaintBorderInsets());
     }
+    
+    //support for Java 7 painting improvements
+    protected boolean isPaintingOrigin() {
+        return getAlpha() < 1f;
+    }
 
     /**
      * Overridden paint method to take into account the alpha setting.
@@ -499,7 +603,7 @@ public class JXPanel extends JPanel implements AlphaPaintable, BackgroundPaintab
             //the component is translucent, so we need to render to
             //an intermediate image before painting
             // TODO should we cache this image? repaint to same image unless size changes?
-            BufferedImage img = GraphicsUtilities.createCompatibleTranslucentImage(getWidth(), getHeight());
+            BufferedImage img = createCompatibleTranslucentImage(getWidth(), getHeight());
             Graphics2D gfx = img.createGraphics();
             
             try {
@@ -530,23 +634,114 @@ public class JXPanel extends JPanel implements AlphaPaintable, BackgroundPaintab
      *            the <code>Graphics</code> context in which to paint
      */
     @Override
+    @SuppressWarnings("unchecked")
     protected void paintComponent(Graphics g) {
-        if (backgroundPainter == null) {
-            super.paintComponent(g);
-        } else {
-            if (isOpaque()) {
-                super.paintComponent(g);
+        if (isPatch()) {
+            paintComponentPatch(g);
+            return;
+        }
+        Graphics2D g2 = (Graphics2D) g.create();
+        
+        try {
+            // we should be painting the background behind the painter if we have one
+            // this prevents issues with buffer reuse where visual artifacts sneak in
+            if (isOpaque() || UIManager.getLookAndFeel() instanceof SynthLookAndFeel) {
+                //this will paint the foreground if a JXPanel subclass is 
+                //unfortunate enough to have one
+                super.paintComponent(g2);
+            } else if (getAlpha() < 1f) {
+                g.setColor(getBackground());
+                g.fillRect(0, 0, getWidth(), getHeight());
             }
             
-            Graphics2D g2 = (Graphics2D) g.create();
-            
-            try {
-                SwingXUtilities.paintBackground(this, g2);
-            } finally {
-                g2.dispose();
+            if (getBackgroundPainter() != null) {
+                if (isPaintBorderInsets()) {
+                    getBackgroundPainter().paint(g2, this, getWidth(), getHeight());
+                } else {
+                    Insets insets = getInsets();
+                    g.translate(insets.left, insets.top);
+                    getBackgroundPainter().paint(g2, this, getWidth() - insets.left - insets.right,
+                            getHeight() - insets.top - insets.bottom);
+                    g.translate(-insets.left, -insets.top);
+                }
             }
             
-            getUI().paint(g, this);
+            //force the foreground to paint again...workaround for folks that 
+            //incorrectly extend JXPanel instead of JComponent
+            getUI().paint(g2, this);
+        } finally {
+            g2.dispose();
         }
     }
+ 
+//--------------------- experimental patch
+        
+    protected boolean isPatch() {
+        return Boolean.TRUE.equals(UIManager.get("JXPanel.patch"));
+    }
+
+    boolean fakeTransparent;
+    
+    protected void paintComponentPatch(Graphics g) {
+        Graphics2D g2 = (Graphics2D) g.create();
+        
+        try {
+            if (isPaintingBackground()) {
+                g2.setColor(getBackground());
+                g2.fillRect(0, 0, getWidth(), getHeight());
+            }
+            if (getBackgroundPainter() != null) {
+                getBackgroundPainter().paint(g2, this, getWidth(), getHeight());
+            }
+            fakeTransparent = true;
+            getUI().update(g2, this);
+        } finally {
+            g2.dispose();
+            fakeTransparent = false;
+        }
+        
+    }
+    
+    protected boolean isOpaquePatch() {
+        if (fakeTransparent) return false;
+        if (isPaintingBackground()) {
+            return !isTransparentBackground() && !isAlpha();
+        }
+        return false;
+    }
+
+    protected void setOpaquePatch(boolean opaque) {
+        super.setOpaque(opaque);
+    }
+    /**
+     * Returns whether or not the container hierarchy below is 
+     * transparent.
+     * 
+     * @return
+     */
+    protected boolean isAlpha() {
+        // PENDING JW: use effective alpha?
+        return getAlpha() < 1.0f;
+    }
+
+    /**
+     * Returns whether or not the background is transparent.
+     * 
+     * @return
+     */
+    protected boolean isTransparentBackground() {
+        return getBackground().getAlpha() < 255;
+    }
+
+    /**
+     * Returns whether or not the background should be painted.
+     * 
+     * @return
+     */
+    protected boolean isPaintingBackground() {
+        return super.isOpaque();
+    }
+    
+    @SuppressWarnings("unused")
+    private static final Logger LOG = Logger.getLogger(JXPanel.class.getName());
 }

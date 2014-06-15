@@ -3,7 +3,7 @@
   <parent>
     <artifactId>swingx-project</artifactId>
     <groupId>org.swinglabs.swingx</groupId>
-    <version>1.6.4-SNAPSHOT</version>
+    <version>1.6.6-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <artifactId>swingx-painters</artifactId>
@@ -55,7 +55,7 @@
             <artifactId>maven-jar-plugin</artifactId>
             <configuration>
                 <archive>
-                    <manifestFile>${project.generatedSourcesDirectoy}/META-INF/MANIFEST.MF</manifestFile>
+                    <manifestFile>${project.generatedAnnotations}/META-INF/MANIFEST.MF</manifestFile>
                 </archive>
             </configuration>
         </plugin>

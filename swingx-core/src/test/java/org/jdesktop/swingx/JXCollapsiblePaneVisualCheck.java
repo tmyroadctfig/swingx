@@ -56,8 +56,8 @@ public class JXCollapsiblePaneVisualCheck extends InteractiveTestCase {
     public static void main(String[] args) {
         JXCollapsiblePaneVisualCheck test = new JXCollapsiblePaneVisualCheck();
         try {
-//            test.runInteractiveTests();
-            test.runInteractiveTests("interactiveBidiDirectionTest");
+            test.runInteractiveTests();
+//            test.runInteractiveTests("interactiveBidiDirectionTest");
           } catch (Exception e) {
               System.err.println("exception when executing interactive tests:");
               e.printStackTrace();

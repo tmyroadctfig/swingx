@@ -3,7 +3,7 @@
   <parent>
     <artifactId>swingx-demos</artifactId>
     <groupId>org.swinglabs.swingx</groupId>
-    <version>1.6.4-SNAPSHOT</version>
+    <version>1.6.5-1-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <artifactId>swingx-demos-content</artifactId>
@@ -16,12 +16,6 @@
   		<version>${project.version}</version>
   		<type>jar</type>
   		<scope>compile</scope>
-        <exclusions>
-            <exclusion>
-                <groupId>net.java.dev.timingframework</groupId>
-                <artifactId>timingframework</artifactId>
-            </exclusion>
-        </exclusions>
   	</dependency>
   	<dependency>
   		<groupId>${project.groupId}</groupId>

@@ -14,6 +14,7 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.KeyboardFocusManager;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -31,20 +32,23 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JToolBar;
 import javax.swing.JViewport;
 import javax.swing.KeyStroke;
 import javax.swing.RowFilter;
+import javax.swing.RowSorter.SortKey;
 import javax.swing.ScrollPaneLayout;
 import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
-import javax.swing.RowSorter.SortKey;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 import javax.swing.event.RowSorterEvent;
+import javax.swing.event.RowSorterEvent.Type;
 import javax.swing.event.RowSorterListener;
 import javax.swing.event.TableColumnModelEvent;
-import javax.swing.event.RowSorterEvent.Type;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
@@ -74,6 +78,8 @@ import org.jdesktop.swingx.table.TableColumnExt;
 import org.jdesktop.swingx.treetable.FileSystemModel;
 import org.jdesktop.test.AncientSwingTeam;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
 /**
  * Split from old JXTableUnitTest - contains "interactive"
@@ -83,6 +89,7 @@ import org.junit.Test;
  * tests or change positioning algo to start on top again if hidden. <p>
  * @author Jeanette Winzenburg
  */
+@RunWith(JUnit4.class)
 public class JXTableVisualCheck extends JXTableUnitTest {
     private static final Logger LOG = Logger.getLogger(JXTableVisualCheck.class
             .getName());
@@ -92,13 +99,16 @@ public class JXTableVisualCheck extends JXTableUnitTest {
 //        test.runInteractiveTests();
 //          test.runInteractiveTests("interactive.*FloatingPoint.*");
 //          test.runInteractiveTests("interactive.*Disable.*");
-          test.runInteractiveTests("interactive.*ColumnControl.*");
+//          test.runInteractiveTests("interactive.*ColumnControl.*");
+//          test.runInteractiveTests("interactive.*RowHeight.*");
 //          test.runInteractiveTests("interactive.*Remove.*");
 //          test.runInteractiveTests("interactive.*ColumnProp.*");
 //          test.runInteractiveTests("interactive.*Multiple.*");
 //          test.runInteractiveTests("interactive.*RToL.*");
 //          test.runInteractiveTests("interactive.*Scrollable.*");
 //          test.runInteractiveTests("interactive.*isable.*");
+//          test.runInteractive("EditorNull");
+          test.runInteractive("PopupTrigger");
           
 //          test.runInteractiveTests("interactive.*Policy.*");
 //        test.runInteractiveTests("interactive.*Rollover.*");
@@ -111,6 +121,135 @@ public class JXTableVisualCheck extends JXTableUnitTest {
       }
   }
     
+    /**
+     * Issue #1563-swingx: find cell that was clicked for componentPopup
+     * 
+     * Example of how to use:
+     * - in actionPerformed
+     * - in popupMenuWillBecomeVisible
+     */
+    public void interactivePopupTriggerLocation() {
+        JXTable table = new JXTable(new AncientSwingTeam());
+        table.setCellSelectionEnabled(true);
+        JPopupMenu popup = new JPopupMenu();
+        Action action = new AbstractAction("cell found in actionPerformed") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JXTable table = SwingXUtilities.getAncestor(JXTable.class, (Component) e.getSource());
+                Point trigger = table.getPopupTriggerLocation();
+                Point cell = null;
+                if (trigger != null) {
+                    int row = table.rowAtPoint(trigger);
+                    int column = table.columnAtPoint(trigger);
+                    table.setRowSelectionInterval(row, row);
+                    table.setColumnSelectionInterval(column, column);
+                    cell = new Point(column, row);
+                } else {
+                    table.clearSelection();
+                }
+                LOG.info("popupTrigger/cell " + trigger + "/" + cell);
+            }
+        };
+        popup.add(action);
+        
+        final Action onShowing = new AbstractAction("dynamic: ") {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                LOG.info("" + getValue(NAME));
+            }
+            
+        };
+        popup.add(onShowing);
+        
+        PopupMenuListener l = new PopupMenuListener() {
+            
+            @Override
+            public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+                // doesn't work: popup itself cannot be used as
+                // starting component, bug?
+//                JXTable table = SwingXUtilities.getAncestor(JXTable.class, 
+//                        (Component) e.getSource());
+                JXTable table = (JXTable) ((JPopupMenu) e.getSource()).getInvoker();
+                Point trigger = table.getPopupTriggerLocation();
+                Point cell = null;
+                if (trigger != null) {
+                    int row = table.rowAtPoint(trigger);
+                    int column = table.columnAtPoint(trigger);
+                    // here we set the cell focus, just to do a bit differently
+                    // from the other action
+                    table.setRowSelectionInterval(row, row);
+                    table.setColumnSelectionInterval(column, column);
+                    table.clearSelection();
+                    cell = new Point(column, row);
+                }
+                onShowing.putValue(Action.NAME, "popupTrigger/cell " + trigger + "/" + cell);
+            }
+            
+            @Override
+            public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
+            }
+            
+            @Override
+            public void popupMenuCanceled(PopupMenuEvent e) {
+            }
+        };
+        popup.addPopupMenuListener(l);
+        table.setComponentPopupMenu(popup);
+        showWithScrollingInFrame(table, "PopupTriggerLocation");
+    }
+    
+    /**
+     * Issue #1535-swingx: GenericEditor fires editingStopped  even if 
+     * value invalid (= empty). Leads to NPE in columnMoved (jdk7) or when
+     * external code calls the stop/cancel sequence.
+     * Core issue but c&p'd to JXTable.
+     * 
+     * 
+     * 1. doesn't allow editing if the column type doesn't have a 
+     *    single parameter constructor of type String
+     *    (fails silently in this case) - unrelated to this issue
+     *    
+     * 2. throws NPE on moving column while editing, the editingValue
+     *    is empty and the class cannot handle empty strings. The NPE
+     *    is triggered in column moved, because the GenericEditor
+     *    fires twice. http://stackoverflow.com/q/13524519/203657
+     *    Visible only when run with jdk7 because the inappropriate 
+     *    removeEditor is fixed :-)
+     */
+    public void interactiveEditorNull() {
+        final JTable table = new JTable(create1535TableModel());
+        Action action = new AbstractAction("terminateEditing") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (table.isEditing() && !table.getCellEditor().stopCellEditing() ) {
+                    table.getCellEditor().cancelCellEditing();
+                }
+            }
+        };
+        JXFrame frame = wrapWithScrollingInFrame(table, "Core: NPE on stopping edit");
+        addAction(frame, action);
+        show(frame);
+    }
+
+    public void interactiveEditorNullX() {
+        final JTable table = new JXTable(create1535TableModel());
+        Action action = new AbstractAction("terminateEditing") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (table.isEditing() && !table.getCellEditor().stopCellEditing() ) {
+                    table.getCellEditor().cancelCellEditing();
+                }
+            }
+        };
+        JXFrame frame = wrapWithScrollingInFrame(table, "xTable: NPE on stopping edit");
+        addAction(frame, action);
+        show(frame);
+    }
+
     /**
      * Issue #1392- swingx: columnControl lost on toggle CO and LAF
      * 
@@ -660,6 +799,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
      */
     public void interactiveCompareRowHeight() {
         JXTable xtable = new JXTable(sortableTableModel);
+        xtable.setColumnControlVisible(true);
         xtable.setShowGrid(false, false);
         JTable table = new JTable(sortableTableModel);
         table.setShowHorizontalLines(false);

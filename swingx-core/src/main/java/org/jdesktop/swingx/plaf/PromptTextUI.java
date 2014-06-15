@@ -2,6 +2,7 @@ package org.jdesktop.swingx.plaf;
 
 import static javax.swing.BorderFactory.createEmptyBorder;
 
+import java.awt.Component.BaselineResizeBehavior;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -9,7 +10,6 @@ import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.TextComponent;
-import java.awt.Component.BaselineResizeBehavior;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.lang.reflect.Method;
@@ -22,13 +22,13 @@ import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.TextUI;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Caret;
+import javax.swing.text.DefaultHighlighter.DefaultHighlightPainter;
 import javax.swing.text.EditorKit;
 import javax.swing.text.Highlighter;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.Position;
-import javax.swing.text.View;
-import javax.swing.text.DefaultHighlighter.DefaultHighlightPainter;
 import javax.swing.text.Position.Bias;
+import javax.swing.text.View;
 
 import org.jdesktop.swingx.painter.Painter;
 import org.jdesktop.swingx.prompt.PromptSupport;
@@ -310,7 +310,11 @@ public abstract class PromptTextUI extends TextUI {
      */
     @Override
     public void update(Graphics g, JComponent c) {
-        super.update(g, c);
+        if (shouldPaintPrompt((JTextComponent) c)) {
+            super.update(g, c);
+        } else {
+            delegate.update(g, c);
+        }
     }
 
     /**

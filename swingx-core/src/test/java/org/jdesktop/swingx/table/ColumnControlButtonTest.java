@@ -44,6 +44,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+import static org.junit.Assert.*;
+
 
 /**
  * @author Jeanette Winzenburg
@@ -115,6 +117,20 @@ public class ColumnControlButtonTest extends InteractiveTestCase {
         
     }
     
+    /**
+     * Issue #1573-swingx: !hideable column action must be disabled
+     * Problem: isn't initially
+     */
+    @Test
+    public void testColumnVisibilityActionOnHideableInitial() {
+        JXTable table = new JXTable(10, 3);
+        // set the first column !hideable
+        table.getColumnExt(0).setHideable(false);
+        table.setColumnControlVisible(true);
+        ColumnControlButton columnControl = (ColumnControlButton) table.getColumnControl();
+        ColumnVisibilityAction action = columnControl.getColumnVisibilityActions().get(0);
+        assertFalse("action must be disabled initially", action.isEnabled());
+    }
     
     @Test
     public void testColumnVisibilityActionOnHideable() {

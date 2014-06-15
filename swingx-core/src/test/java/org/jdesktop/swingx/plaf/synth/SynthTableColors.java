@@ -73,7 +73,6 @@ public class SynthTableColors extends JFrame {
         setTitle(System.getProperty("java.version"));
         InputStream is = new ByteArrayInputStream(synthXml.getBytes("UTF8"));
         SynthLookAndFeel laf = new SynthLookAndFeel();
-//        SynthLookAndFeel laf = new NimbusLookAndFeel();
         laf.load(is, SynthTableColors.class);
         UIManager.setLookAndFeel(laf);
 

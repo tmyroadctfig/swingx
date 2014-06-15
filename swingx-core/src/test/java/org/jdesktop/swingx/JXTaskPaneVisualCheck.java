@@ -22,6 +22,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Locale;
 import java.util.logging.Logger;
@@ -33,6 +34,7 @@ import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
 
 import org.junit.Ignore;
 import org.junit.Test;
@@ -60,13 +62,79 @@ public class JXTaskPaneVisualCheck extends InteractiveTestCase {
 //            test.runInteractiveTests();
 //            test.runInteractiveTests("interactiveDisplay");
 //            test.runInteractiveTests("interactiveMnemonic");
-            test.runInteractiveTests("interactiveEnablingTest");
+//            test.runInteractiveTests("interactiveEnablingTest");
+            test.runInteractive("Scrolls");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
         }
     }
 
+    /**
+     * Issue #1572-swingx: taskPane scrollsOnExpand has no effect Regression:
+     * reported to work in 1.6.3, broken in 1.6.5-1
+     * 
+     * Reason is outdated logic in BasicTaskPaneUI (somehow survived the expanded vs.
+     * collapsed property change and animated).
+     * 
+     * Quick fix in application code is to register a custom listener.
+     *  
+     */
+    public void interactiveScrollsOnExpand() {
+        JXTaskPane pane = new JXTaskPane();
+        pane.add(new JLabel("just me!"));
+        pane.add(new JLabel("just me!"));
+        pane.add(new JLabel("just me!"));
+        pane.add(new JLabel("just me!"));
+        pane.add(new JLabel("just me!"));
+        pane.add(new JLabel("just me!"));
+        JXTaskPane other = new JXTaskPane();
+        other.setCollapsed(true);
+        other.setScrollOnExpand(true);
+        other.add(new JButton("lazy me!"));
+        other.add(new JButton("lazy me!"));
+        other.add(new JButton("lazy me!"));
+        other.add(new JButton("lazy me!"));
+        other.add(new JButton("lazy me!"));
+        other.add(new JButton("lazy me!"));
+        other.add(new JButton("lazy me!"));
+        other.add(new JButton("lazy me!"));
+        other.add(new JButton("lazy me!"));
+        other.add(new JButton("lazy me!"));
+        other.add(new JButton("lazy me!"));
+        other.add(new JButton("lazy me!"));
+        other.add(new JButton("lazy me!"));
+        other.add(new JButton("lazy me!"));
+        other.add(new JButton("lazy me!"));
+        other.add(new JButton("lazy me!"));
+        other.add(new JButton("lazy me!"));
+        // hot fix: add propertyChangeListener that triggers the scrolling
+        PropertyChangeListener l = new PropertyChangeListener() {
+
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                final JXTaskPane pane = (JXTaskPane) evt.getSource();
+                if (!pane.isCollapsed() && pane.isScrollOnExpand()) {
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            pane.scrollRectToVisible(pane.getBounds());
+
+                        }
+                    });
+                }
+            }
+        };
+        other.addPropertyChangeListener("collapsed", l);
+        JXTaskPane yetAnother = new JXTaskPane();
+        yetAnother.add(new JScrollPane(new JXTable(20, 3)));
+        yetAnother.setCollapsed(true);
+        yetAnother.setScrollOnExpand(true);
+        JXTaskPaneContainer container = new JXTaskPaneContainer();
+        container.add(pane);
+        container.add(other);
+        container.add(yetAnother);
+        showWithScrollingInFrame(container, "scrollOnExpand");
+    }
 
     public void interactiveMnemonic() {
         JXTaskPane pane = new JXTaskPane();

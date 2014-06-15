@@ -121,6 +121,11 @@ import org.jdesktop.swingx.plaf.basic.core.DragRecognitionSupport.BeforeDrag;
  *   delegate to handler only if not
  * </ul> changed createListSelectionListener to return a ListSelectionHandler
  * 
+ * Differences for bug fixes (due to incorrectly extending super):
+ * <ul>
+ * <li> Issue #1495-swingx: getBaseline throughs NPE
+ * </ul>
+ * 
  * Note: extension of core (instead of implement from scratch) is to keep 
  * external (?) code working which expects a ui delegate of type BasicSomething.
  * LAF implementors with a custom ListUI extending BasicListUI should be able to
@@ -313,6 +318,30 @@ public class BasicXListUI  extends BasicListUI
 
     protected Object getElementAt(int viewIndex) {
         return ((JXList) list).getElementAt(viewIndex);
+    }
+
+    /**
+     * Fix for Issue #1495: NPE on getBaseline.
+     * 
+     * As per contract, that methods needs to throw Exceptions on illegal
+     * parameters. As we by-pass super, need to do the check and throw
+     * ouerselves.
+     * 
+     * @param c
+     * @param width
+     * @param height
+     * 
+     * @throws IllegalArgumentException if width or height < 0
+     * @throws NPE if c == null
+     */
+    protected void checkBaselinePrecondition(JComponent c, int width, int height) {
+        if (c == null) {
+            throw new NullPointerException("Component must be non-null");
+        }
+        if (width < 0 || height < 0) {
+            throw new IllegalArgumentException(
+                    "Width and height must be >= 0");
+        }
     }
 
 //--------------- api to support/control sorting/filtering
@@ -688,7 +717,8 @@ public class BasicXListUI  extends BasicListUI
      * @since 1.6
      */
     public int getBaseline(JComponent c, int width, int height) {
-        super.getBaseline(c, width, height);
+//        super.getBaseline(c, width, height);
+        checkBaselinePrecondition(c, width, height);
         int rowHeight = list.getFixedCellHeight();
         UIDefaults lafDefaults = UIManager.getLookAndFeelDefaults();
         Component renderer = (Component)lafDefaults.get(

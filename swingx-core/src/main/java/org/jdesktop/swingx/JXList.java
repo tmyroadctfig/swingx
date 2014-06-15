@@ -22,8 +22,10 @@
 package org.jdesktop.swingx;
 
 import java.awt.Component;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseEvent;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Vector;
@@ -74,29 +76,31 @@ import org.jdesktop.swingx.table.TableColumnExt;
  * rendering, highlighting, rollover and search functionality. List specific
  * enhancements include ?? PENDING JW ...
  * 
- * <h2>Sorting and Filtering</h2>
- * JXList supports sorting and filtering. 
+ * <h2>Sorting and Filtering</h2> JXList supports sorting and filtering.
  * 
- * Changed to use core support. Usage is very similar to J/X/Table.
- * It provides api to apply a specific sort order, to toggle the sort order and to reset a sort.
- * Sort sequence can be configured by setting a custom comparator.
+ * Changed to use core support. Usage is very similar to J/X/Table. It provides
+ * api to apply a specific sort order, to toggle the sort order and to reset a
+ * sort. Sort sequence can be configured by setting a custom comparator.
  * 
- * <pre><code>
+ * <pre>
+ * <code>
  * list.setAutoCreateRowSorter(true);
  * list.setComparator(myComparator);
  * list.setSortOrder(SortOrder.DESCENDING);
  * list.toggleSortOder();
  * list.resetSortOrder();
- * </code></pre>
+ * </code>
+ * </pre>
  * 
  * <p>
- * JXList provides api to access items of the underlying model in view coordinates
- * and to convert from/to model coordinates. 
+ * JXList provides api to access items of the underlying model in view
+ * coordinates and to convert from/to model coordinates.
  * 
- * <b>Note</b>: JXList needs a specific ui-delegate - BasicXListUI and subclasses - which
- * is aware of model vs. view coordiate systems and which controls the synchronization of 
- * selection/dataModel and sorter state. SwingX comes with a subclass for Synth. 
- *  
+ * <b>Note</b>: JXList needs a specific ui-delegate - BasicXListUI and
+ * subclasses - which is aware of model vs. view coordiate systems and which
+ * controls the synchronization of selection/dataModel and sorter state. SwingX
+ * comes with a subclass for Synth.
+ * 
  * <h2>Rendering and Highlighting</h2>
  * 
  * As all SwingX collection views, a JXList is a HighlighterClient (PENDING JW:
@@ -105,7 +109,8 @@ import org.jdesktop.swingx.table.TableColumnExt;
  * decorate the rendering component.
  * <p>
  * 
- * <pre><code>
+ * <pre>
+ * <code>
  * 
  * JXList list = new JXList(new Contributors());
  * // implement a custom string representation, concated from first-, lastName
@@ -130,7 +135,8 @@ import org.jdesktop.swingx.table.TableColumnExt;
  * // highlight with foreground color 
  * list.addHighlighter(new PainterHighlighter(predicate, goldStarPainter);      
  * 
- * </code></pre>
+ * </code>
+ * </pre>
  * 
  * <i>Note:</i> to support the highlighting this implementation wraps the
  * ListCellRenderer set by client code with a DelegatingRenderer which applies
@@ -147,7 +153,8 @@ import org.jdesktop.swingx.table.TableColumnExt;
  * is simulates live behaviour. The rollover events can be used by client code
  * as well, f.i. to decorate the rollover row using a Highlighter.
  * 
- * <pre><code>
+ * <pre>
+ * <code>
  * 
  * JXList list = new JXList();
  * list.setRolloverEnabled(true);
@@ -155,7 +162,31 @@ import org.jdesktop.swingx.table.TableColumnExt;
  * list.addHighlighter(new ColorHighlighter(HighlightPredicate.ROLLOVER_ROW, 
  *      null, Color.RED);      
  * 
- * </code></pre>
+ * </code>
+ * </pre>
+ * 
+ * <h2>Location of Trigger for ComponentPopupMenu</h2>
+ * 
+ * JXList allows access to the mouse location that triggered the showing of the
+ * componentPopupMenu. This feature allows to implement dynamic cell-context
+ * sensitive popupMenus, either in the menu actions or in a PopupMenuListener.
+ * <p>
+ * 
+ * The example below selects the cell that was clicked, event being the
+ * <code>PopupMenuEvent</code> received in a 
+ * <code>PopupMenuListener</code>.
+ * <p>
+ * 
+ * <pre>
+ * <code>
+ * JXList list = (JXList) ((JPopupMenu) e.getSource()).getInvoker();
+ * Point trigger = list.getPopupTriggerLocation();
+ * if (trigger != null) {
+ *     int row = list.locationToIndex(trigger);
+ *     list.setSelectedIndex(row);
+ * }
+ * </code>
+ * </pre>
  * 
  * 
  * <h2>Search</h2>
@@ -238,6 +269,8 @@ public class JXList extends JList {
     private StringValueRegistry stringValueRegistry;
 
     private SortOrder[] sortOrderCycle;
+
+    private Point popupTriggerLocation;
 
     /**
     * Constructs a <code>JXList</code> with an empty model and filters disabled.
@@ -507,6 +540,52 @@ public class JXList extends JList {
         return new ListRolloverProducer();
     }
 
+//---------------------- enhanced component popup support
+    
+    /**
+     * {@inheritDoc} <p>
+     * 
+     * Overridden for bookkeeping: the given event location is 
+     * stored for later access.
+     * 
+     * @see #getPopupTriggerLocation()
+     */
+    @Override
+    public Point getPopupLocation(MouseEvent event) {
+        updatePopupTrigger(event);
+        return super.getPopupLocation(event);
+    }
+    
+    /**
+     * Handles internal bookkeeping related to popupLocation, called from 
+     * getPopupLocation.<p>
+     * 
+     * This implementation stores the mouse location as popupTriggerLocation.
+     * 
+     * @param event the event that triggered the showing of the 
+     * componentPopup, might be null if triggered by keyboard
+     */
+    protected void updatePopupTrigger(MouseEvent event) {
+        Point old = getPopupTriggerLocation();
+        // note: getPoint creates a new Point on each call, safe to use as-is
+        popupTriggerLocation = event != null ? event.getPoint() : null;
+        firePropertyChange("popupTriggerLocation", old, getPopupTriggerLocation());
+    }
+
+    /**
+     * Returns the location of the mouseEvent that triggered the
+     * showing of the ComponentPopupMenu. 
+     * 
+     * @return the location of the mouseEvent that triggered the
+     * last showing of the ComponentPopup, or null if it was
+     * triggered by keyboard.
+     */
+    public Point getPopupTriggerLocation() {
+        return popupTriggerLocation != null ? new Point(popupTriggerLocation) : null;
+    }
+    
+    
+    
     //--------------------- public sort api
     
     /**

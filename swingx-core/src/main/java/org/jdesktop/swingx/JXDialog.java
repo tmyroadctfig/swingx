@@ -23,6 +23,7 @@ package org.jdesktop.swingx;
 import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.Frame;
+import java.awt.Window;
 import java.util.Locale;
 
 import javax.swing.Action;
@@ -113,6 +114,18 @@ public class JXDialog extends JDialog {
     public JXDialog(Dialog dialog, JComponent content) {
         super(dialog);
         setContent(content);
+    }
+    
+    /**
+     * Creates a non-modal dialog with the given component as content and the
+     * specified <code>Window</code> as owner.
+     * <p>
+     * @param window the owner
+     * @param content the component to show and to auto-configure from.
+     */
+    public JXDialog(Window window, JComponent content) {
+        super(window);
+        setContentPane(content);
     }
 
     /**

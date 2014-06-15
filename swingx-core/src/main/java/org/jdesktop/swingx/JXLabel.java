@@ -327,16 +327,6 @@ public class JXLabel extends JLabel implements BackgroundPaintable {
     }
     
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setBackground(Color bg) {
-        super.setBackground(bg);
-        
-        SwingXUtilities.installBackground(this, bg);
-    }
-    
-    /**
      * Sets a new foregroundPainter on the label. This will replace the existing foreground painter. Existing painters
      * can be wrapped by using a CompoundPainter.
      *
@@ -794,8 +784,8 @@ public class JXLabel extends JLabel implements BackgroundPaintable {
     }
 
     private Point2D calculateT() {
-        double tx = (double) getWidth();
-        double ty = (double) getHeight();
+        double tx = getWidth();
+        double ty = getHeight();
 
         // orthogonal cases are most likely the most often used ones, so give them preferential treatment.
         if ((textRotation > 4.697 && textRotation < 4.727) || (textRotation > 1.555 && textRotation < 1.585)) {

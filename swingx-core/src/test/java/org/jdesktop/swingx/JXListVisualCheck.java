@@ -7,9 +7,12 @@ package org.jdesktop.swingx;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
@@ -18,15 +21,20 @@ import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
+import javax.swing.DefaultRowSorter;
 import javax.swing.JComponent;
 import javax.swing.JList;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.ListModel;
 import javax.swing.RowFilter;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import javax.swing.RowFilter.Entry;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 import javax.swing.plaf.UIResource;
 
 import org.jdesktop.swingx.decorator.ColorHighlighter;
@@ -46,6 +54,9 @@ import org.jdesktop.test.AncientSwingTeam;
 import org.junit.After;
 import org.junit.Before;
 
+import sun.font.CreatedFontTracker;
+
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public class JXListVisualCheck extends InteractiveTestCase { //JXListTest {
     @SuppressWarnings("all")
     private static final Logger LOG = Logger.getLogger(JXListVisualCheck.class
@@ -61,13 +72,171 @@ public class JXListVisualCheck extends InteractiveTestCase { //JXListTest {
 //            setLookAndFeel("Nimbus");
 //            new XRegion("XList", "XListUI", false);
 //          test.runInteractiveTests();
-            test.runInteractiveTests("interactive.*RowFilter.*");
+//            test.runInteractive("RowFilter");
+//            test.runInteractive("Remove");
+            test.runInteractive("PopupTrigger");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
         }
     }
 
+    /**
+     * Issue #1563-swingx: find cell that was clicked for componentPopup
+     * 
+     * Example of how to use:
+     * - in actionPerformed
+     * - in popupMenuWillBecomeVisible
+     */
+    public void interactivePopupTriggerLocation() {
+        JXList table = new JXList(createListModel());
+        JPopupMenu popup = new JPopupMenu();
+        Action action = new AbstractAction("cell found in actionPerformed") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JXList table = SwingXUtilities.getAncestor(JXList.class, (Component) e.getSource());
+                Point trigger = table.getPopupTriggerLocation();
+                Point cell = null;
+                if (trigger != null) {
+                    int row = table.locationToIndex(trigger);
+                    table.setSelectedIndex(row);
+                    cell = new Point(0, row);
+                } else {
+                    table.clearSelection();
+                }
+                LOG.info("popupTrigger/cell " + trigger + "/" + cell);
+            }
+        };
+        popup.add(action);
+        
+        final Action onShowing = new AbstractAction("dynamic: ") {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                LOG.info("" + getValue(NAME));
+            }
+            
+        };
+        popup.add(onShowing);
+        
+        PopupMenuListener l = new PopupMenuListener() {
+            
+            @Override
+            public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+                // doesn't work: popup itself cannot be used as
+                // starting component, bug?
+//                JXList list = SwingXUtilities.getAncestor(JXList.class, 
+//                        (Component) e.getSource());
+                JXList list = (JXList) ((JPopupMenu) e.getSource()).getInvoker();
+                Point trigger = list.getPopupTriggerLocation();
+                Point cell = null;
+                if (trigger != null) {
+                    int row = list.locationToIndex(trigger);
+                    list.setSelectedIndex(row);
+                    // here we set the cell focus, just to do a bit differently
+                    // from the other action
+                    list.clearSelection();
+                    cell = new Point(0, row);
+                }
+                onShowing.putValue(Action.NAME, "popupTrigger/cell " + trigger + "/" + cell);
+            }
+            
+            @Override
+            public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
+            }
+            
+            @Override
+            public void popupMenuCanceled(PopupMenuEvent e) {
+            }
+        };
+        popup.addPopupMenuListener(l);
+        table.setComponentPopupMenu(popup);
+        showWithScrollingInFrame(table, "PopupTriggerLocation");
+    }
+    
+
+    
+    /**
+     * Issue #1536-swingx: AIOOB on restoring selection with filter
+     * Reopened: overfixed - the removeIndexInterval _does_ take 
+     * the endIndex instead of length.
+     */
+    public void interactiveSortUIRemove() {
+        final DefaultListModel model = createAscendingListModel(0, 10);
+        final JXList list = new JXList(model, true);
+        final RowFilter filter = new RowFilters.GeneralFilter() {
+
+            List excludes = Arrays.asList(0);
+            @Override
+            protected boolean include(
+                    Entry<? extends Object, ? extends Object> entry,
+                    int index) {
+                return !excludes.contains(entry.getIdentifier());
+            }
+            
+        };
+        JXFrame frame = wrapWithScrollingInFrame(list, "removeIndexSelectionInterval");
+        Action toggleSort = new AbstractAction("toggleSort") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                list.toggleSortOrder();
+            }
+        };
+        addAction(frame, toggleSort);
+        Action toggleFilter = new AbstractAction("filter") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                list.setRowFilter(list.getRowFilter() != null ?
+                        null : filter
+                        );
+            }
+        };
+        addAction(frame, toggleFilter);
+        Action remove = new AbstractAction("remove") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                model.remove(model.getSize() - 1);
+            }
+        };
+        addAction(frame, remove);
+        show(frame);
+        
+    }
+    
+    public void interactiveRowFilter() {
+        final JXList list = new JXList(AncientSwingTeam.createNamedColorListModel(), true);
+        JXFrame frame = wrapWithScrollingInFrame(list, "filter");
+        Action toggleFilter = new AbstractAction("toggleFilter") {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (list.getRowFilter() == null) {
+
+                    list.setRowFilter(new RowFilter<ListModel, Integer>() {
+
+                        @Override
+                        public boolean include(
+                                Entry<? extends ListModel, ? extends Integer> entry) {
+                            boolean include = entry
+                                    .getStringValue(entry.getIdentifier())
+                                    .toLowerCase().contains("o");
+                            return include;
+                        }
+
+                    });
+                } else {
+                    list.setRowFilter(null);
+                }
+            }
+        };
+        addAction(frame, toggleFilter);
+        show(frame, 300, 600);
+    }
+    
     /**
      * Issue #1261-swingx: list goes blank after setting model and filter.
      * 

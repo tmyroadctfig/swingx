@@ -21,6 +21,8 @@
  */
 package org.jdesktop.swingx.sort;
 
+import static org.junit.Assert.*;
+
 import java.awt.Color;
 import java.util.HashMap;
 import java.util.Map;
@@ -42,12 +44,11 @@ import org.junit.runners.JUnit4;
  * @author Jeanette Winzenburg
  */
 @RunWith(JUnit4.class)
-public class TableSortControllerTest extends AbstractTestSortController<TableSortController<TableModel>, TableModel> {
+public class TableSortControllerTest extends
+        AbstractTestSortController<TableSortController<TableModel>, TableModel> {
     @SuppressWarnings("unused")
     private static final Logger LOG = Logger
             .getLogger(TableSortControllerTest.class.getName());
-    
-
 
     public static void main(String[] args) {
         TableSortControllerTest test = new TableSortControllerTest();
@@ -57,67 +58,75 @@ public class TableSortControllerTest extends AbstractTestSortController<TableSor
             e.printStackTrace();
         }
     }
+    
+    /**
+     * Sanity: cachedModelRowCount updated if null model set
+     */
+    @Test
+    public void testSetModelCleanup() {
+        controller.setModel(null);
+        assertEquals(0, controller.getModelRowCount());
+        assertEquals(0, controller.getViewRowCount());
+    }
+    
+    // --------------- start of #1291-swingx related tests
+    /**
+     * Core Issue http://forums.sun.com/thread.jspa?messageID=10939199#10939199
+     * 
+     * Table looses selection of last row if deleted before last.
+     * 
+     * Here: DefaultRowSorter conversion throws too much if not sorted.
+     */
+    @Test
+    public void testViewRowCountAfterRemoveNotSorted() {
+        int rows = controller.getModelRowCount();
+        ((AncientSwingTeam) controller.getModel()).removeRows(0, 1);
+        assertEquals(rows, controller.getViewRowCount());
+    }
 
-//--------------- start of #1291-swingx related tests
-//--------------- PENDING JW: uncomment if the change is uncommented    
-//    /**
-//     * Core Issue http://forums.sun.com/thread.jspa?messageID=10939199#10939199
-//     * 
-//     * Table looses selection of last row if deleted before last.
-//     * 
-//     * Here: DefaultRowSorter conversion throws too much if not sorted.
-//     */
-//    @Test
-//    public void testViewRowCountAfterRemoveNotSorted() {
-//        int rows = controller.getModelRowCount();
-//        ((AncientSwingTeam) controller.getModel()).removeRows(0, 1);
-//        assertEquals(rows, controller.getViewRowCount());
-//    }
-//    
-//    /**
-//     * Core Issue http://forums.sun.com/thread.jspa?messageID=10939199#10939199
-//     * 
-//     * Table looses selection of last row if deleted before last.
-//     * 
-//     * Here: DefaultRowSorter conversion throws too much if not sorted.
-//     */
-//    @Test
-//    public void testViewRowCountAfterInsertNotSorted() {
-//        int rows = controller.getModelRowCount();
-//        ((AncientSwingTeam) controller.getModel()).insertRows(0, 1);
-//        assertEquals(rows, controller.getViewRowCount());
-//    }
-//    
-//    
-//    /**
-//     * Core Issue http://forums.sun.com/thread.jspa?messageID=10939199#10939199
-//     * 
-//     * Table looses selection of last row if deleted before last.
-//     * 
-//     * Here: DefaultRowSorter conversion throws too much if not sorted.
-//     */
-//    @Test
-//    public void testModelRowCountAfterRemoveNotSorted() {
-//        int rows = controller.getModelRowCount();
-//        ((AncientSwingTeam) controller.getModel()).removeRows(0, 1);
-//        assertEquals(rows, controller.getModelRowCount());
-//    }
-//    
-//    /**
-//     * Core Issue http://forums.sun.com/thread.jspa?messageID=10939199#10939199
-//     * 
-//     * Table looses selection of last row if deleted before last.
-//     * 
-//     * Here: DefaultRowSorter conversion throws too much if not sorted.
-//     */
-//    @Test
-//    public void testModelRowCountAfterInsertNotSorted() {
-//        int rows = controller.getModelRowCount();
-//        ((AncientSwingTeam) controller.getModel()).insertRows(0, 1);
-//        assertEquals(rows, controller.getModelRowCount());
-//    }
-//    
-//--------------- end of #1291 related tests    
+    /**
+     * Core Issue http://forums.sun.com/thread.jspa?messageID=10939199#10939199
+     * 
+     * Table looses selection of last row if deleted before last.
+     * 
+     * Here: DefaultRowSorter conversion throws too much if not sorted.
+     */
+    @Test
+    public void testViewRowCountAfterInsertNotSorted() {
+        int rows = controller.getModelRowCount();
+        ((AncientSwingTeam) controller.getModel()).insertRows(0, 1);
+        assertEquals(rows, controller.getViewRowCount());
+    }
+
+    /**
+     * Core Issue http://forums.sun.com/thread.jspa?messageID=10939199#10939199
+     * 
+     * Table looses selection of last row if deleted before last.
+     * 
+     * Here: DefaultRowSorter conversion throws too much if not sorted.
+     */
+    @Test
+    public void testModelRowCountAfterRemoveNotSorted() {
+        int rows = controller.getModelRowCount();
+        ((AncientSwingTeam) controller.getModel()).removeRows(0, 1);
+        assertEquals(rows, controller.getModelRowCount());
+    }
+
+    /**
+     * Core Issue http://forums.sun.com/thread.jspa?messageID=10939199#10939199
+     * 
+     * Table looses selection of last row if deleted before last.
+     * 
+     * Here: DefaultRowSorter conversion throws too much if not sorted.
+     */
+    @Test
+    public void testModelRowCountAfterInsertNotSorted() {
+        int rows = controller.getModelRowCount();
+        ((AncientSwingTeam) controller.getModel()).insertRows(0, 1);
+        assertEquals(rows, controller.getModelRowCount());
+    }
+
+    // --------------- end of #1291 related tests
 
     /**
      * Issue #1156-swingx: sorter must use comparable if available
@@ -126,29 +135,31 @@ public class TableSortControllerTest extends AbstractTestSortController<TableSor
     @Test
     public void testComparableComparatorTable() {
         TableModel model = new DefaultTableModel(2, 1) {
-            
+
             @Override
             public Class<?> getColumnClass(int columnIndex) {
                 return Integer.class;
             }
-            
+
         };
         model.setValueAt(10, 0, 0);
         model.setValueAt(2, 1, 0);
-        TableSortController<TableModel> sorter = new TableSortController<TableModel>(model);
+        TableSortController<TableModel> sorter = new TableSortController<TableModel>(
+                model);
         sorter.setSortOrder(0, SortOrder.ASCENDING);
         assertEquals(0, sorter.convertRowIndexToModel(1));
     }
-    
+
     /**
-     * Issue #1156-swingx: sorter must use comparable if available
-     * fix for that (comparator update falls back to collator) introduced a 
+     * Issue #1156-swingx: sorter must use comparable if available fix for that
+     * (comparator update falls back to collator) introduced a
      * ClassCastException - useString must be implemented the same way
      */
     @Test
     public void testUseString() {
         controller.setSortOrder(2, SortOrder.ASCENDING);
     }
+
     /**
      * 
       */
@@ -156,19 +167,20 @@ public class TableSortControllerTest extends AbstractTestSortController<TableSor
     public void testUseStringValueProvider() {
         registry.setStringValue(sv, Color.class);
         controller.setStringValueProvider(registry);
-        RowFilter<Object, Object> filter = RowFilter.regexFilter("R/G/B: -2", 2);
+        RowFilter<Object, Object> filter = RowFilter
+                .regexFilter("R/G/B: -2", 2);
         controller.setRowFilter(filter);
-        assertTrue("view row count: " + controller.getViewRowCount(), controller.getViewRowCount() > 0);
+        assertTrue("view row count: " + controller.getViewRowCount(),
+                controller.getViewRowCount() > 0);
     }
 
     @Override
     protected int getColumnCount() {
         return ((TableModel) controller.getModel()).getColumnCount();
     }
-    
 
-//-------------------- utility methods and setup
-    
+    // -------------------- utility methods and setup
+
     /**
      * @param registry2
      * @param teamModel2
@@ -190,7 +202,7 @@ public class TableSortControllerTest extends AbstractTestSortController<TableSor
      */
     @SuppressWarnings("unused")
     private void installPerClass(StringValueRegistry registry,
-            Class<?>... clazz ) {
+            Class<?>... clazz) {
         Map<Integer, Class<?>> classPerColumn = new HashMap<Integer, Class<?>>();
         for (int i = 0; i < clazz.length; i++) {
             classPerColumn.put(i, clazz[i]);
@@ -204,18 +216,15 @@ public class TableSortControllerTest extends AbstractTestSortController<TableSor
         return new TableSortController<TableModel>(model);
     }
 
-
     @Override
     protected TableModel createModel() {
         return new AncientSwingTeam();
     }
 
-
     @Override
     protected void setupModelDependentState(TableModel model) {
-      initColumnClasses(registry,  model);
+        initColumnClasses(registry, model);
 
     }
 
-    
 }

@@ -57,22 +57,25 @@ public class JXApplet extends JApplet {
     }
 
     /**
-     * Overridden to create a JXRootPane.
+     * Overridden to create a JXRootPane and to ensure that the root pane is always created on the
+     * Event Dispatch Thread. Some applet containers do not start applets on the EDT; this method,
+     * therefore, protects against that. Actual, root pane creation occurs in
+     * {@link #createRootPaneSafely()}.
+     * 
+     * @return the root pane for this applet
+     * @see #createRootPaneSafely()
      */
     @Override
-    protected JXRootPane createRootPane() {
+    protected final JXRootPane createRootPane() {
         if (SwingUtilities.isEventDispatchThread()) {
-            JXRootPane rp = new JXRootPane();
-            rp.setOpaque(true);
-            
-            return rp;
+            return createRootPaneSafely();
         }
         
         try {
             return SwingXUtilities.invokeAndWait(new Callable<JXRootPane>() {
                 @Override
                 public JXRootPane call() throws Exception {
-                    return createRootPane();
+                    return createRootPaneSafely();
                 }
             });
         } catch (InterruptedException e) {
@@ -85,6 +88,20 @@ public class JXApplet extends JApplet {
         }
         
         return null;
+    }
+    
+    /**
+     * This method performs the actual creation of the root pane and is guaranteed to be performed on the Event Dispatch Thread.
+     * <p>
+     * Subclasses that need to configure the root pane or create a custom root pane should override this method.
+     * 
+     * @return the root pane for this applet
+     */
+    protected JXRootPane createRootPaneSafely() {
+        JXRootPane rp = new JXRootPane();
+        rp.setOpaque(true);
+        
+        return rp;
     }
     
     /**

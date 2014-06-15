@@ -51,6 +51,8 @@ interface AlphaPaintable {
      * its parents. If the alpha of a parent component is .4, and the alpha on
      * this component is .5, effectively the alpha for this component is .4
      * because the lowest alpha in the hierarchy &quot;wins.&quot;
+     * 
+     * @return the lowest alpha value in the hierarchy
      */
     float getEffectiveAlpha();
 }

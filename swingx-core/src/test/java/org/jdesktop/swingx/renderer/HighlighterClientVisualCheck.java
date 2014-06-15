@@ -105,9 +105,10 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
       HighlighterClientVisualCheck test = new HighlighterClientVisualCheck();
       try {
 //          setLookAndFeel("Nimbus");
-//         test.runInteractiveTests();
+         test.runInteractiveTests();
+//          test.runInteractive("JP");
 //          test.runInteractiveTests(".*Striping.*");
-         test.runInteractiveTests(".*ToolTip.*");
+//         test.runInteractiveTests(".*ToolTip.*");
 //         test.runInteractiveTests("interactive.*Search.*");
 //         test.runInteractiveTests("interactive.*BorderHighlighter.*");
       } catch (Exception e) {
@@ -127,7 +128,7 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
             protected void paintComponent(Graphics g) {
                 // crude check if the logic of column/row painting
                 // in TableRolloverController is working (looks so)
-                LOG.info("paint clip: " + count++ + g.getClip());
+//                LOG.info("paint clip: " + count++ + g.getClip());
                 super.paintComponent(g);
             }
             
@@ -211,12 +212,15 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
                 Color.MAGENTA, null, Color.MAGENTA);
         FontHighlighter derivedFont = new FontHighlighter(patternPredicate,
                 font);
-        Highlighter gradient = createRelativeGradientHighlighter(HorizontalAlignment.LEFT);
+        AbstractHighlighter gradient = createRelativeGradientHighlighter(HorizontalAlignment.LEFT, AncientSwingTeam.INTEGER_COLUMN);
+        gradient.setHighlightPredicate(new HighlightPredicate.ColumnHighlightPredicate(AncientSwingTeam.INTEGER_COLUMN));
+        
+        LOG.info("" + (table.getValueAt(0, 3) instanceof Number));
         Highlighter shading = new ShadingColorHighlighter(
                 new HighlightPredicate.ColumnHighlightPredicate(1));
 
-        table.setHighlighters(simpleStriping, magenta, derivedFont, shading,
-                gradient);
+        table.setHighlighters(simpleStriping, magenta, derivedFont, shading //);
+                , gradient);
         showWithScrollingInFrame(table, "Multiple Highlighters");
     }
 
@@ -241,7 +245,7 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
         FontHighlighter derivedFont = new FontHighlighter(patternPredicate,
                 font);
         Highlighter gradient = createRelativeGradientHighlighter(
-                HorizontalAlignment.LEFT);
+                HorizontalAlignment.LEFT, 0);
         Highlighter shading = new ShadingColorHighlighter(
                 new HighlightPredicate.ColumnHighlightPredicate(0));
         // create and configure one JXList per column.
@@ -261,7 +265,7 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
         lists.add(listc);
 
         // number
-        JXList listn = new JXList(createListModel(source, 3));
+        JXList listn = new JXList(createListModel(source, AncientSwingTeam.INTEGER_COLUMN));
         listn.setCellRenderer(new DefaultListRenderer(
                 StringValues.NUMBER_TO_STRING, JLabel.RIGHT));
         listn.setHighlighters(simpleStriping, gradient);
@@ -289,7 +293,7 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
      * @return
      */
     private RelativePainterHighlighter createRelativeGradientHighlighter(
-            HorizontalAlignment right) {
+            HorizontalAlignment right, int column) {
         Color startColor = PaintUtils.setAlpha(Color.RED, 130);
         Color endColor = PaintUtils.setAlpha(Color.RED.brighter(), 0);
         boolean isRightAligned = HorizontalAlignment.RIGHT == right;
@@ -301,7 +305,7 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
         painter.setPaintStretched(true);
         RelativePainterHighlighter p = new RelativePainterHighlighter(painter);
         p.setHorizontalAlignment(right);
-        p.setRelativizer(new NumberRelativizer(100));
+        p.setRelativizer(new NumberRelativizer(column, 100, 100));
         return p;
     }
     
@@ -313,10 +317,12 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
     private ListModel createListModel(final JXTable tableModel, final int i) {
         ListModel listModel = new AbstractListModel(){
 
+            @Override
             public Object getElementAt(int index) {
                 return tableModel.getValueAt(index, i);
             }
 
+            @Override
             public int getSize() {
                 return tableModel.getRowCount();
             }};
@@ -357,6 +363,7 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
        }
        final HighlightPredicate predicate = new HighlightPredicate() {
 
+        @Override
         public boolean isHighlighted(Component renderer, ComponentAdapter adapter) {
             return rowSet.contains(adapter.row);
         }
@@ -368,6 +375,7 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
        table.addHighlighter(highlighter);
        PropertyChangeListener l = new PropertyChangeListener() {
 
+        @Override
         public void propertyChange(PropertyChangeEvent evt) {
             Point location = (Point) evt.getNewValue();
             int row = -1;
@@ -433,6 +441,7 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
             this.values = values;
             this.testColumn = testColumn;
         }
+        @Override
         public boolean isHighlighted(Component renderer, ComponentAdapter adapter) {
             return values.contains(adapter.getValue(testColumn));
         }
@@ -490,10 +499,12 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
         table.addHighlighter(cl);
         JXSearchPanel searchPanel = new JXSearchPanel();
         PatternMatcher patternMatcher = new PatternMatcher() {
+            @Override
             public Pattern getPattern() {
                 return getPatternPredicate().getPattern();
             }
 
+            @Override
             public void setPattern(Pattern pattern) {
                 PatternPredicate old = getPatternPredicate();
                 cl.setHighlightPredicate(new PatternPredicate(pattern, old
@@ -672,6 +683,7 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
 //         });
         HighlightPredicate predicate = new HighlightPredicate() {
 
+            @Override
             public boolean isHighlighted(Component renderer, ComponentAdapter adapter) {
                 if (!(adapter.getValue() instanceof Number)) return false;
                 return ((Number) adapter.getValue()).intValue() < 10;
@@ -716,6 +728,7 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
         JXTable table = new JXTable(new AncientSwingTeam());
         HighlightPredicate predicate = new HighlightPredicate() {
 
+            @Override
             public boolean isHighlighted(Component renderer, ComponentAdapter adapter) {
                 if (!(adapter.getValue() instanceof Number)) return false;
                 return ((Number) adapter.getValue()).intValue() < 10;
@@ -766,6 +779,7 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
         table.setForeground(Color.GREEN);
         HighlightPredicate predicate = new HighlightPredicate() {
 
+            @Override
             public boolean isHighlighted(Component renderer, ComponentAdapter adapter) {
                 if (!(renderer instanceof JLabel)) return false;
                 String text = ((JLabel) renderer).getText();
@@ -805,6 +819,7 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
         table.addHighlighter(colorHighlighter);
         Action action = new AbstractAction("toggle table enabled") {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 table.setEnabled(!table.isEnabled());
                 

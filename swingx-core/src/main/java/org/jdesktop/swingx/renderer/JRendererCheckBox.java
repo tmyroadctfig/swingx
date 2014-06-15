@@ -33,72 +33,83 @@ import org.jdesktop.swingx.painter.Painter;
  * A <code>JCheckBox</code> optimized for usage in renderers and
  * with a minimal background painter support. <p>
  * 
- * <i>Note</i>: the painter support will be switched to painter_work as 
- * soon it enters main. 
+ * <b>Note</b>: As of revision #4223, there's a complete overhaul (aka: changed the tricksery) to 
+ * fix Issue swingx-1513 (allow client code to set renderer transparent) while keeping
+ * fix Issue swingx-897 (striping/background lost when painter installed)
+ * <p>
+ * 
+ * <b>Note</b>: The change of logic _did_ introduce a regression (swingx-1546) 
+ * which was fixed by forcing the box's  opacity to true (for regression release
+ * 1.6.5-1). Further improvements (like f.i. the option to delegate to the ui's 
+ * update - to allow LAF installed painters - instead of paint) are deferred
+ * to a later normal release, more discussions needed.  
+ * <p>
  * 
  * @author Jeanette Winzenburg
+ * 
+ * @see #paintComponent(Graphics)
  */
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public class JRendererCheckBox extends JCheckBox implements PainterAware {
+    /** the swingx painter */
     protected Painter painter;
+    /** a flag to prevent ui painting from filling the background. */
+    private boolean fakeTransparency;
 
+    /**
+     * Instantiates a JRendererCheckBox with opacity true.
+     */
+    public JRendererCheckBox() {
+        super();
+        // fix # 1546-swingx: striping lost in synth-based lafs
+        // forcing opaque to enable painting the background
+        setOpaque(true);
+    }
     /**
      * {@inheritDoc}
      */
+    @Override
     public Painter getPainter() {
         return painter;
     }
 
-
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setPainter(Painter painter) {
         Painter old = getPainter();
         this.painter = painter;
-        if (painter != null) {
-            // ui maps to !opaque
-            // Note: this is incomplete - need to keep track of the 
-            // "real" contentfilled property
-            // JW: revisit - really needed after fix for #897?
-            setContentAreaFilled(false);
-        } // PENDING JW: asymetric! no else?
-//        else {
-//            setContentAreaFilled(true);
-//        }
         firePropertyChange("painter", old, getPainter());
     }
 
     /**
      * {@inheritDoc} <p>
      * 
-     * Overridden to return true if there is no painter.<p>
+     * Overridden to return false if painting flag is true.<p>
      * 
      */
     @Override
     public boolean isOpaque() {
-        // JW: fix for #897, not sure of any side-effects
-        // contentAreaFilled and opaque might be inconsistent
-        return painter == null;
+        if (fakeTransparency) {
+            return false;
+        }
+        return super.isOpaque();
     }
-
+    
     /**
-     * Overridden for performance reasons.<p>
-     * PENDING: Think about Painters and opaqueness?
+     * {@inheritDoc} <p>
+     * 
+     * Overridden to return false if painting flag is true.<p>
      * 
      */
-//    @Override
-//    public boolean isOpaque() { 
-//        Color back = getBackground();
-//        Component p = getParent(); 
-//        if (p != null) { 
-//            p = p.getParent(); 
-//        }
-//        // p should now be the JTable. 
-//        boolean colorMatch = (back != null) && (p != null) && 
-//            back.equals(p.getBackground()) && 
-//                        p.isOpaque();
-//        return !colorMatch && super.isOpaque(); 
-//    }
+     @Override
+    public boolean isContentAreaFilled() {
+        if (fakeTransparency) {
+            return false;
+        }
+        return super.isContentAreaFilled();
+    }
 
     /**
      * {@inheritDoc} <p>
@@ -112,7 +123,35 @@ public class JRendererCheckBox extends JCheckBox implements PainterAware {
         putClientProperty(TOOL_TIP_TEXT_KEY, text);
     }
 
-    
+    /**
+     * Overridden to snatch painting from super if a painter installed or Nimbus 
+     * detected.<p>
+     * 
+     * The overall logic currently (since 1.6.5) is to simply call super without SwingX
+     * painter. Otherwise, that is with SwingX painter:
+     * <ol>
+     * <li> if opaque  
+     * <ol>
+     * <li> set a flag which fakes transparency, that is both
+     *      <code>contentAreaFilled</code> and 
+     *      <code>opaque</code> return false 
+     * <li> fill background with the component's background color
+     * <li> apply swingx painter
+     * <li> hook into <code>ui.paint(...)</code> 
+     * <li> reset the flag
+     * </ol>
+     * <li> else
+     * <ol> apply swingx painter
+     * <ol> call super
+     * <li> 
+     * <ol> 
+     * </ol>
+     * 
+     * Note that Nimbus is special cased (mainly due to its bug of 
+     * even row striping instead of odd)
+     * and handled as if a SwingX painter were set.
+     * 
+     */
     @Override
     protected void paintComponent(Graphics g) {
         // JW: hack around for #1178-swingx (core issue) 
@@ -122,9 +161,18 @@ public class JRendererCheckBox extends JCheckBox implements PainterAware {
             // try to inject if possible
             // there's no guarantee - some LFs have their own background 
             // handling  elsewhere
-            paintComponentWithPainter((Graphics2D) g);
+            if (isOpaque()) {
+                // replace the paintComponent completely 
+                fakeTransparency = true;
+                paintComponentWithPainter((Graphics2D) g);
+                fakeTransparency = false;
+            } else {
+                // transparent apply the background painter before calling super
+                paintPainter(g);
+                super.paintComponent(g);
+            }
         } else {
-            // no painter - delegate to super
+            // nothing to worry about - delegate to super
             super.paintComponent(g);
         }
     }
@@ -180,6 +228,7 @@ public class JRendererCheckBox extends JCheckBox implements PainterAware {
                 scratchGraphics.fillRect(0, 0, getWidth(), getHeight());
                 paintPainter(g);
                 ui.paint(scratchGraphics, this);
+//                super.paintComponent(g);
             } finally {
                 scratchGraphics.dispose();
             }

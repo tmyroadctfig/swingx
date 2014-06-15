@@ -18,6 +18,7 @@
  */
 package org.jdesktop.swingx;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.LayoutManager;
@@ -40,7 +41,9 @@ import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.BorderFactory;
 import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -73,6 +76,7 @@ import org.jdesktop.swingx.calendar.DateSelectionModel;
 import org.jdesktop.swingx.calendar.DaySelectionModel;
 import org.jdesktop.swingx.calendar.SingleDaySelectionModel;
 import org.jdesktop.swingx.calendar.DateSelectionModel.SelectionMode;
+import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 import org.jdesktop.test.VerticalLayoutPref;
 
 /**
@@ -100,7 +104,7 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
        UIManager.put("JXDatePicker.forceZoomable", Boolean.TRUE);
 //         setSystemLF(true);
         JXDatePickerVisualCheck test = new JXDatePickerVisualCheck();
-        
+        setLAF("Win");
         try {
 //            test.runInteractiveTests();
 //            test.runInteractiveTests("interactive.*PrefSize.*");
@@ -108,12 +112,28 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
 //          test.runInteractiveTests("interactive.*Multiple.*");
 //            test.runInteractiveTests("interactive.*Editable.*");
 //            test.runInteractiveTests("interactive.*Enable.*");
-            test.runInteractiveTests("interactive.*Popup.*");
+//            test.runInteractiveTests("interactive.*Popup.*");
+            test.runInteractiveTests("interactive.*NullDate.*");
 //            test.runInteractiveTests("interactive.*Event.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Quick check if DatePicker behaves correctly in vertical max
+     * (yes, thougnh I don't know why: max size isn't overriden?)
+     */
+    public void interactivePickerMax() {
+        JXDatePicker picker = new JXDatePicker();
+        picker.setBorder(BorderFactory.createLineBorder(Color.RED));
+        JComponent content = new JPanel();
+        content.setLayout(new BoxLayout(content, BoxLayout.PAGE_AXIS));
+        content.add(picker);
+//        content.add(new JFormattedTextField(new Date()));
+        JXFrame frame = showInFrame(content, "max size?");
+        frame.setSize(frame.getWidth() * 2, frame.getHeight() * 4);
     }
 
     /**
@@ -159,6 +179,7 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
         addEnabledToggleWithChildren(frame, panel);
         addStatusMessage(frame, "right click in components to show parent popup");
         show(frame);
+        LOG.info("addon " + LookAndFeelAddons.getAddon());
         
     }
     public void interactivePopupMenuListener() {
@@ -1194,7 +1215,39 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
         JXDatePicker picker = new JXDatePicker();
         showInFrame(picker, "null date in picker");
     }
+    
+    
+    /**
+     * Issue #??-swingx: not possible to clear the date.
+     * reported on SO: http://stackoverflow.com/q/15133981/203657
+     * 
+     * not reproducible (maybe was a coding error, missed api)
+     * 
+     */
+    public void interactiveSetNullDate() {
+        final JXDatePicker picker = new JXDatePicker(new Date());
+        JXFrame frame = wrapInFrame(picker, "null date in picker");
+        Action clearDate = new AbstractAction("clear") {
 
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // set the date to null
+                picker.setDate(null);
+                // more model related (if a handle to the model is available
+                // clear the selection on the monthView
+//                DateSelectionModel model = picker.getMonthView().getSelectionModel();
+//                model.clearSelection();
+                // don't: the null will not be committed!
+//                picker.getEditor().setText("");
+//                System.out.println(picker.getDate());
+            }
+            
+        };
+        addAction(frame, clearDate);
+        show(frame);
+    }
+
+    
     /**
      * something weird's going on: the picker's date must be null
      * after setting a monthView with null selection. It is, until
