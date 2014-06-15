@@ -268,9 +268,15 @@ public class MultiSplitLayout implements LayoutManager, Serializable
     if ( model instanceof Split ) {
       Split split = ((Split)model);
       return getNodeForName( split, name );
-    }
-    else
+    } else if (model instanceof Leaf) {
+      if (((Leaf) model).getName().equals(name)) {
+        return model;
+      } else {
+        return null;
+      }
+    } else {
       return null;
+    }
   }
   
   /**

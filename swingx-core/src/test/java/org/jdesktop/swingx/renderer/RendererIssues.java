@@ -21,6 +21,7 @@
  */
 package org.jdesktop.swingx.renderer;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
@@ -46,7 +47,9 @@ import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListModel;
@@ -75,8 +78,11 @@ import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.Highlighter;
+import org.jdesktop.swingx.decorator.HighlighterFactory;
 import org.jdesktop.swingx.decorator.PainterHighlighter;
 import org.jdesktop.swingx.decorator.PatternPredicate;
+import org.jdesktop.swingx.painter.BusyPainter;
+import org.jdesktop.swingx.painter.ImagePainter;
 import org.jdesktop.swingx.painter.MattePainter;
 import org.jdesktop.swingx.rollover.RolloverProducer;
 import org.jdesktop.swingx.rollover.RolloverRenderer;
@@ -103,22 +109,26 @@ public class RendererIssues extends InteractiveTestCase {
             .getName());
 
     public static void main(String[] args) {
-        setSystemLF(true);
         RendererIssues test = new RendererIssues();
+        setLAF("Nimb");
         try {
 //            test.runInteractiveTests();
-//          test.runInteractiveTests("interactive.*Alpha.*");
+          test.runInteractiveTests("interactive.*Alpha.*");
 //          test.runInteractiveTests(".*XLabel.*");
 //          test.runInteractiveTests(".*Color.*");
 //          test.runInteractiveTests("interactive.*ColumnControl.*");
-          test.runInteractiveTests("interactive.*ToolTip.*");
+//          test.runInteractiveTests("interactive.*ToolTip.*");
+//            test.runInteractiveTests("interactive.*TreeRenderer.*");
+//            test.runInteractiveTests("interactive.*Opacity.*");
+//          test.runInteractive("RendererCheckBox");
 //          test.runInteractiveTests("interactive.*Hyperlink.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
         }
     }
-
+    
+    
     
     /**
      * Issue ??-swingx: Boolean renderer background is slightly darker if 
@@ -131,17 +141,17 @@ public class RendererIssues extends InteractiveTestCase {
     public void interactiveAlphaBackground() {
         Color color = PaintUtils.setAlpha(Color.ORANGE, 60);
         
-        JCheckBox check = new JCheckBox("what's my color?");
+        JCheckBox check = new JCheckBox("what's my color? - as is");
 //        check.setOpaque(true);
 //        check.setContentAreaFilled(true);
         check.setBackground(color);
-        JLabel label = new JLabel("and mine?");
+        JLabel label = new JLabel("label: and mine? (forced to opaque)");
         label.setOpaque(true);
         label.setBackground(color );
-        JButton button = new JButton("the new kid on the block");
+        JButton button = new JButton("the new kid on the block - as-is");
         button.setBackground(color);
         
-        JRadioButton radio = new JRadioButton("radio, raadio ..");
+        JRadioButton radio = new JRadioButton("radio, raadio .. as-is");
         radio.setBackground(color);
         
         JTextField field = new JTextField(40);
@@ -166,6 +176,8 @@ public class RendererIssues extends InteractiveTestCase {
      */
     public void interactiveCheckBoxAlpha() {
         JXTable table = new JXTable(new org.jdesktop.test.AncientSwingTeam());
+        table.setBackground(PaintUtils.setAlpha(Color.YELLOW, 100));
+        table.setOpaque(false);
         table.addHighlighter(new RowHighlighter(new HighlightPredicate() {
             public boolean isHighlighted(Component renderer, ComponentAdapter adapter) {
                 return ((Boolean) adapter.getValue(4)).booleanValue();

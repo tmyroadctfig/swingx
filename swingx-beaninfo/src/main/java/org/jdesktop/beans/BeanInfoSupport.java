@@ -276,6 +276,25 @@ public abstract class BeanInfoSupport extends SimpleBeanInfo {
     }
     
     /**
+     * Sets the given named properties to be "transient".
+     * 
+     * @param trans determines whether the properties should be encoded.
+     * @param propertyNames name of properties.
+     * @see PropertyDescriptor
+     */
+    protected void setTransient(boolean trans, String... propertyNames) {
+        for (String propertyName : propertyNames) {
+            PropertyDescriptor pd = properties.get(propertyName);
+            if (pd != null) {
+                pd.setValue("transient", trans);
+            } else {
+                LOG.log(Level.WARNING, "Failed to set transient attribute for property '" +
+                        propertyName + "'. No such property was found");
+            }
+        }
+    }
+    
+    /**
      * Sets the given named properties to be "hidden".
      * 
      * @param hidden determines whether the properties should be marked as hidden or not.

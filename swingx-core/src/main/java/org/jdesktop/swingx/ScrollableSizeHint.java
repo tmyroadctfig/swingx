@@ -40,6 +40,7 @@ import org.jdesktop.swingx.util.Contract;
  * @author Jeanette Winzenburg
  * @author Karl Schaefer
  */
+@SuppressWarnings("nls")
 public enum ScrollableSizeHint {
     /**
      * Size should be unchanged.
@@ -114,89 +115,7 @@ public enum ScrollableSizeHint {
             }
         }
     },
-    
-    /**
-     * Width should be stretched to parent width if smaller, unchanged otherwise.
-     */
-    @Deprecated
-    HORIZONTAL_STRETCH {
-        /**
-         * {@inheritDoc}
-         * <p>
-         * Returns {@code false}.
-         */
-        @Override
-        @Deprecated
-        public boolean isVerticalCompatible() {
-            return false;
-        }
-        
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        boolean getTracksParentSizeImpl(JComponent component, int orientation) {
-            if (orientation != SwingConstants.HORIZONTAL) {
-                throw new IllegalArgumentException();
-            }
-            
-            if (component.getParent() != null) {
-                return component.getParent().getWidth() > component.getPreferredSize().width
-                    && component.getParent().getWidth() < component.getMaximumSize().width;
-            }
-
-            return false;
-        }
-    },
-    
-    /**
-     * Width should be stretched to parent height if smaller, unchanged otherwise.
-     */
-    @Deprecated
-    VERTICAL_STRETCH {
-        /**
-         * {@inheritDoc}
-         * <p>
-         * Returns {@code false}.
-         */
-        @Override
-        @Deprecated
-        public boolean isHorizontalCompatible() {
-            return false;
-        }
-        
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        boolean getTracksParentSizeImpl(JComponent component, int orientation) {
-            if (orientation != SwingConstants.VERTICAL) {
-                throw new IllegalArgumentException();
-            }
-            
-            if (component.getParent() != null) {
-                return component.getParent().getHeight() > component.getPreferredSize().height
-                        && component.getParent().getWidth() < component.getMaximumSize().height;
-            }
-
-            return false;
-        }
-    };
-    
-    /**
-     * Returns a boolean indicating whether the component's size should be
-     * adjusted to parent.
-     *  
-     * @param component the component resize, must not be null
-     * @return a boolean indicating whether the component's size should be
-     *    adjusted to parent
-     *    
-     * @throws NullPointerException if component is null   
-     */
-    @Deprecated
-    public boolean getTracksParentSize(JComponent component) {
-        return getTracksParentSize(component, 0);
-    }
+    ;
     
     /**
      * Returns a boolean indicating whether the component's size should be
@@ -213,30 +132,6 @@ public enum ScrollableSizeHint {
         Contract.asNotNull(component, "component must be not-null");
         
         return getTracksParentSizeImpl(component, orientation);
-    }
-
-    /**
-     * Returns a boolean indicating whether the hint can be used in 
-     * horizontal orientation.
-     * 
-     * @return a boolean indicating whether the hint can be used in horizontal
-     *   orientation. 
-     */
-    @Deprecated
-    public boolean isHorizontalCompatible() {
-        return true;
-    }
-    
-    /**
-     * Returns a boolean indicating whether the hint can be used in 
-     * vertical orientation.
-     * 
-     * @return a boolean indicating whether the hint can be used in vertical
-     *   orientation. 
-     */
-    @Deprecated
-    public boolean isVerticalCompatible() {
-        return true;
     }
 
     /**

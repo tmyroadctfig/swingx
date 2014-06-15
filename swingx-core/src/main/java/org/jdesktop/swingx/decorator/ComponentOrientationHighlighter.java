@@ -6,7 +6,6 @@ package org.jdesktop.swingx.decorator;
 
 import java.awt.Component;
 import java.awt.ComponentOrientation;
-import java.awt.Container;
 
 /**
  * A Highlighter which applies the ComponentOrientation to the component.

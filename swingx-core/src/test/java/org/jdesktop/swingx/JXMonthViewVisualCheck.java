@@ -51,8 +51,8 @@ import org.jdesktop.swingx.JXMonthViewTest.Clock;
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.calendar.CalendarUtils;
 import org.jdesktop.swingx.calendar.DateSelectionModel;
-import org.jdesktop.swingx.calendar.SingleDaySelectionModel;
 import org.jdesktop.swingx.calendar.DateSelectionModel.SelectionMode;
+import org.jdesktop.swingx.calendar.SingleDaySelectionModel;
 import org.jdesktop.swingx.event.DateSelectionEvent;
 import org.jdesktop.swingx.event.DateSelectionListener;
 import org.jdesktop.swingx.test.XTestUtils;
@@ -79,13 +79,32 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
 //          test.runInteractiveTests("interactive.*Zoomable.*");
 //          test.runInteractiveTests("interactive.*Title.*");
 //          test.runInteractiveTests("interactive.*TimeZone.*");
-        test.runInteractiveTests("interactive.*Disable.*");
+//          test.runInteractiveTests("interactive.*Disable.*");
+        test.runInteractive("Unselectable");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
       }
   }
     
+    /**
+     * unselectableDayForeground reported to have no effect
+     * http://stackoverflow.com/q/15926663/203657
+     * can't reproduce - seems to work here
+     */
+    public void interactiveUnselectableDateForeground() {
+        Color old = UIManager.getColor("JXMonthView.unselectableDayForeground");
+        UIManager.put("JXMonthView.unselectableDayForeground", Color.BLUE);
+        JXDatePicker picker = new JXDatePicker();
+        JXMonthView monthView = new JXMonthView();
+        monthView = picker.getMonthView();
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.DATE, 1);
+        monthView.setUnselectableDates(cal.getTime());
+        showInFrame(picker, "custom unselectable");
+        UIManager.put("JXMonthView.unselectableDayForeground", old);
+        
+    }
     /**
      * LastDisplayed incorrect?
      */
@@ -162,6 +181,7 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
         JXFrame frame = wrapInFrame(monthView, "Revalidate on zoomable");
         Action toggleBackground = new AbstractAction("toggleZoomable") {
             
+            @Override
             public void actionPerformed(ActionEvent e) {
                 monthView.setZoomable(!monthView.isZoomable());
                         
@@ -173,6 +193,7 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
             
             private boolean traversable;
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 traversable = !traversable;
                 monthView.setTraversable(traversable);
@@ -183,6 +204,7 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
         addAction(frame, toggleTraversable);
         Action toggleFont = new AbstractAction("toggleFont") {
             
+            @Override
             public void actionPerformed(ActionEvent e) {
                 
                 if (monthView.getFont().isItalic()) {
@@ -218,6 +240,7 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
         JXFrame frame = wrapInFrame(monthView, "repaint on propertyChange");
         Action toggleBackground = new AbstractAction("toggleSelectionBack") {
             
+            @Override
             public void actionPerformed(ActionEvent e) {
                 monthView.setSelectionBackground(
                         Color.PINK.equals(monthView.getSelectionBackground()) ? 
@@ -228,6 +251,7 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
         addAction(frame, toggleBackground);
         Action toggleForeground = new AbstractAction("toggleSelectionFore") {
             
+            @Override
             public void actionPerformed(ActionEvent e) {
                 
                 monthView.setSelectionForeground(
@@ -239,6 +263,7 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
         addAction(frame, toggleForeground);
         Action toggleFlaggedForeground = new AbstractAction("toggleFlaggedFore") {
             
+            @Override
             public void actionPerformed(ActionEvent e) {
                 
                 monthView.setFlaggedDayForeground(
@@ -251,6 +276,7 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
         
         Action toggleCO = new AbstractAction("toggleCO") {
             
+            @Override
             public void actionPerformed(ActionEvent e) {
                 
                 if (monthView.getComponentOrientation().isLeftToRight()) {
@@ -265,6 +291,7 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
         addAction(frame, toggleCO);
         Action toggleFont = new AbstractAction("toggleFont") {
             
+            @Override
             public void actionPerformed(ActionEvent e) {
                 
                 if (monthView.getFont().isItalic()) {
@@ -278,6 +305,7 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
         addAction(frame, toggleFont);
         Action toggleEnabled = new AbstractAction("toggleEnabled") {
             
+            @Override
             public void actionPerformed(ActionEvent e) {
                 monthView.setEnabled(!monthView.isEnabled());
             }
@@ -322,6 +350,7 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
         final Calendar calendar = monthView.getCalendar();
         calendar.add(Calendar.DATE, 5);
         Action unselectable = new AbstractActionExt("lowerbound") {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 monthView.setLowerBound(monthView.getLowerBound() == null ? calendar.getTime() : null);
             }
@@ -329,6 +358,7 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
         };
         addAction(frame, unselectable);
        Action action = new AbstractActionExt("today flag") {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 if (monthView.hasFlaggedDates()) {
                     monthView.clearFlaggedDates();
@@ -340,6 +370,7 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
         };
         addAction(frame, action);
         Action trailing = new AbstractActionExt("trailing") {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 monthView.setShowingTrailingDays(!monthView.isShowingTrailingDays());
             }
@@ -347,6 +378,7 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
         };
         addAction(frame, trailing);
         Action leading = new AbstractActionExt("leading") {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 monthView.setShowingLeadingDays(!monthView.isShowingLeadingDays());
             }
@@ -354,6 +386,7 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
         };
         addAction(frame, leading);
         Action weekNumbers = new AbstractActionExt("weekNumbers") {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 monthView.setShowingWeekNumber(!monthView.isShowingWeekNumber());
             }
@@ -361,6 +394,7 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
         };
         addAction(frame, weekNumbers);
         Action traversable = new AbstractActionExt("traversable") {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 monthView.setTraversable(!monthView.isTraversable());
             }
@@ -368,6 +402,7 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
         };
         addAction(frame, traversable);
         Action firstDay = new AbstractActionExt("firstDay") {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 int firstDay = monthView.getFirstDayOfWeek();
                 monthView.setFirstDayOfWeek(firstDay == Calendar.SUNDAY ? 
@@ -377,6 +412,7 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
         };
         addAction(frame, firstDay);
         Action today = new AbstractActionExt("today") {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 monthView.incrementToday();
             }
@@ -385,6 +421,7 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
         addAction(frame, today);
         Action daysOfWeek = new AbstractActionExt("daysOfWeek") {
             String[] days = {"S", "M", "D", "M", "D", "F", "S"};
+            @Override
             public void actionPerformed(ActionEvent e) {
                 String[] dof = monthView.getDaysOfTheWeek();
                 if (dof[0].equals(days[0])) {
@@ -414,6 +451,7 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
         monthView.setShowingTrailingDays(true);
         Action action = new AbstractActionExt("toggle minimal") {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 int minimal = monthView.getSelectionModel().getMinimalDaysInFirstWeek();
                 monthView.getSelectionModel().setMinimalDaysInFirstWeek(minimal > 1 ? 1 : 4);
@@ -428,6 +466,7 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
                 "Wednesday", "Thursday", "Friday", "Saturday"});
         dayOfWeekComboBox.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 int selected = dayOfWeekComboBox.getSelectedIndex();
                 monthView.setFirstDayOfWeek(selected + Calendar.SUNDAY);
@@ -457,6 +496,7 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
         monthView.setShowingTrailingDays(true);
         Action action = new AbstractActionExt("toggle minimal") {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 int minimal = monthView.getSelectionModel().getMinimalDaysInFirstWeek();
                 monthView.getSelectionModel().setMinimalDaysInFirstWeek(minimal > 1 ? 1 : 4);
@@ -482,6 +522,7 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
         monthView.setTraversable(true);
         final JXFrame frame = showInFrame(monthView, "MonthView today");
         Action action = new AbstractActionExt("increment today - programmatically") {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 monthView.incrementToday();
             }
@@ -504,6 +545,7 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
         monthView.setTraversable(true);
         final JXFrame frame = showInFrame(monthView, "MonthView update ui - visible month kept");
         Action action = new AbstractActionExt("toggleUI") {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 monthView.updateUI();
             }
@@ -523,6 +565,7 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
         monthView.setSelectionDate(new Date());
         final JXFrame frame = showInFrame(monthView, "MonthView custom ui (selection color)");
         Action action = new AbstractActionExt("toggleUI") {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 String uiClass = (String) UIManager.get(JXMonthView.uiClassID);
                 boolean custom = uiClass.indexOf("Custom") > 0;
@@ -561,6 +604,7 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
         // quick check if lastDisplayed is updated on resize
         Action printLast = new AbstractActionExt("log last") {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 
                 LOG.info("last updated?" + us.getLastDisplayedDay());
@@ -595,6 +639,7 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
         JXFrame frame = wrapInFrame(us, "Simulate autoscroll on selection");
         Action nextMonthInterval = new AbstractActionExt("add selected") {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 if (us.isSelectionEmpty()) return;
                 Date start = us.getSelectionDate();
@@ -681,6 +726,7 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
 
         // Set the monthView's time zone based on the selected time zone.
         zoneSelector.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent event) {
                 Locale zone = (Locale) zoneSelector.getSelectedItem();
                 monthView.setLocale(zone);
@@ -732,6 +778,7 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
         
         // Set the picker's time zone based on the selected time zone.
         zoneSelector.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent event) {
 //                String zone = (String) zoneSelector.getSelectedItem();
                 TimeZone tz = (TimeZone) zoneSelector.getSelectedItem();
@@ -770,6 +817,7 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
         
         // Set the picker's time zone based on the selected time zone.
         zoneSelector.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent event) {
                 String zone = (String) zoneSelector.getSelectedItem();
                 TimeZone tz = TimeZone.getTimeZone(zone);
@@ -802,6 +850,7 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
 
         // Set the picker's time zone based on the selected time zone.
         zoneSelector.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent event) {
                 String zone = (String) zoneSelector.getSelectedItem();
                 TimeZone tz = TimeZone.getTimeZone(zone);
@@ -842,6 +891,7 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
 
         // Set the picker's time zone based on the selected time zone.
         zoneSelector.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent event) {
                 String zone = (String) zoneSelector.getSelectedItem();
                 TimeZone tz = TimeZone.getTimeZone(zone);
@@ -858,6 +908,7 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
         JXFrame frame = showInFrame(panel, "clear internal date-related state");
         Action assertAction = new AbstractActionExt("assert dates") {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 Calendar cal = monthView.getCalendar();
                 DateFormat format = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL);
@@ -882,6 +933,7 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
         month.setTraversable(true);
         Action action = new AbstractActionExt("check lastDisplayed") {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 Calendar cal = Calendar.getInstance();
                 cal.setTime(month.getLastDisplayedDay());
@@ -1025,6 +1077,7 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
         multiple.setSelectionMode(SelectionMode.MULTIPLE_INTERVAL_SELECTION);
         ActionListener l = new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 LOG.info("got action from: " + e.getSource().getClass().getName() + 
                         "\n" + e);
@@ -1036,6 +1089,7 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
         multiple.addActionListener(l);
         DateSelectionListener d = new DateSelectionListener() {
 
+            @Override
             public void valueChanged(DateSelectionEvent ev) {
                 LOG.info("got selection from: " + ev.getSource().getClass().getName() + 
                         "\n" + ev);

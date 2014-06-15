@@ -40,7 +40,6 @@ import java.beans.PropertyChangeListener;
 
 import javax.swing.AbstractAction;
 import javax.swing.JComponent;
-import javax.swing.JPanel;
 import javax.swing.JViewport;
 import javax.swing.Scrollable;
 import javax.swing.SwingUtilities;
@@ -263,6 +262,45 @@ public class JXCollapsiblePane extends JXPanel {
             return this;
         }
     }
+    
+    /**
+     * Toggles the JXCollapsiblePane state and updates its icon based on the
+     * JXCollapsiblePane "collapsed" status.
+     */
+    private class ToggleAction extends AbstractAction implements
+                                                      PropertyChangeListener {
+        public ToggleAction() {
+            super(TOGGLE_ACTION);
+            // the action must track the collapsed status of the pane to update its icon
+            JXCollapsiblePane.this.addPropertyChangeListener("collapsed", this);
+        }
+
+        @Override
+        public void putValue(String key, Object newValue) {
+            super.putValue(key, newValue);
+            if (EXPAND_ICON.equals(key) || COLLAPSE_ICON.equals(key)) {
+                updateIcon();
+            }
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            setCollapsed(!isCollapsed());
+        }
+
+        @Override
+        public void propertyChange(PropertyChangeEvent evt) {
+            updateIcon();
+        }
+
+        void updateIcon() {
+            if (isCollapsed()) {
+                putValue(SMALL_ICON, getValue(EXPAND_ICON));
+            } else {
+                putValue(SMALL_ICON, getValue(COLLAPSE_ICON));
+            }
+        }
+    }
 
     /**
      * JXCollapsible has a built-in toggle action which can be bound to buttons.
@@ -321,12 +359,12 @@ public class JXCollapsiblePane extends JXPanel {
      *                the direction to collapse the container
      */
     public JXCollapsiblePane(Direction direction) {
+        super.setLayout(new BorderLayout());
         this.direction = direction;
         animator = new AnimationListener();
         setAnimationParams(new AnimationParams(30, 8, 0.01f, 1.0f));
 
-        JXPanel panel = new JXPanel();
-        setContentPane(panel);
+        setContentPane(createContentPane());
         setDirection(direction);
 
         // add an action to automatically toggle the state of the pane
@@ -334,43 +372,23 @@ public class JXCollapsiblePane extends JXPanel {
     }
 
     /**
-     * Toggles the JXCollapsiblePane state and updates its icon based on the
-     * JXCollapsiblePane "collapsed" status.
+     * Creates the content pane used by this collapsible pane.
+     * 
+     * @return the content pane
      */
-    private class ToggleAction extends AbstractAction implements
-                                                      PropertyChangeListener {
-        public ToggleAction() {
-            super(TOGGLE_ACTION);
-            // the action must track the collapsed status of the pane to update its
-            // icon
-            JXCollapsiblePane.this.addPropertyChangeListener("collapsed", this);
-        }
+    protected Container createContentPane() {
+        return new JXPanel();
+    }
 
-        @Override
-        public void putValue(String key, Object newValue) {
-            super.putValue(key, newValue);
-            if (EXPAND_ICON.equals(key) || COLLAPSE_ICON.equals(key)) {
-                updateIcon();
-            }
+    /**
+     * @return the content pane
+     */
+    public Container getContentPane() {
+        if (wrapper == null) {
+            return null;
         }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            setCollapsed(!isCollapsed());
-        }
-
-        @Override
-        public void propertyChange(PropertyChangeEvent evt) {
-            updateIcon();
-        }
-
-        void updateIcon() {
-            if (isCollapsed()) {
-                putValue(SMALL_ICON, getValue(EXPAND_ICON));
-            } else {
-                putValue(SMALL_ICON, getValue(COLLAPSE_ICON));
-            }
-        }
+        
+        return (Container) wrapper.getView();
     }
 
     /**
@@ -402,21 +420,11 @@ public class JXCollapsiblePane extends JXPanel {
             assert super.getComponent(0) == wrapper;
             super.remove(0);
         }
+        
         wrapper = new WrapperContainer(contentPanel);
         wrapper.collapsedState = isCollapsed();
         wrapper.getView().setVisible(!wrapper.collapsedState);
         super.addImpl(wrapper, BorderLayout.CENTER, -1);
-    }
-
-    /**
-     * @return the content pane
-     */
-    public Container getContentPane() {
-        if (wrapper == null) {
-            return null;
-        }
-        
-        return (Container) wrapper.getView();
     }
 
     /**
@@ -989,7 +997,7 @@ public class JXCollapsiblePane extends JXPanel {
 
     private final class WrapperContainer extends JViewport implements AlphaPaintable {
         boolean collapsedState;
-        private float alpha;
+        private volatile float alpha;
         private boolean oldOpaque;
 
         public WrapperContainer(Container c) {
@@ -1063,6 +1071,11 @@ public class JXCollapsiblePane extends JXPanel {
         @Override
         public float getEffectiveAlpha() {
             return getAlpha();
+        }
+        
+        //support for Java 7 painting improvements
+        protected boolean isPaintingOrigin() {
+            return getAlpha() < 1f;
         }
 
         /**

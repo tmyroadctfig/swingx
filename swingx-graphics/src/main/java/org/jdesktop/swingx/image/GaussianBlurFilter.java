@@ -50,7 +50,7 @@ public class GaussianBlurFilter extends AbstractFilter {
 
     /**
      * <p>Creates a new blur filter with the specified radius. If the radius
-     * is lower than 0, a radius of 0.1 will be used automatically.</p>
+     * is lower than 1, a radius of 1 will be used automatically.</p>
      *
      * @param radius the radius, in pixels, of the blur
      */

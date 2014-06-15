@@ -43,7 +43,6 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import org.jdesktop.swingx.binding.DisplayInfo;
-import org.jdesktop.swingx.color.ColorUtil;
 import org.jdesktop.swingx.combobox.EnumComboBoxModel;
 import org.jdesktop.swingx.combobox.ListComboBoxModel;
 import org.jdesktop.swingx.painter.MattePainter;
@@ -247,7 +246,7 @@ public class PromptSupportDemo extends JPanel {
         List<DisplayInfo<Painter<?>>> painters = new ArrayList<DisplayInfo<Painter<?>>>();
         
         painters.add(new DisplayInfo<Painter<?>>("None", null));
-        painters.add(new DisplayInfo<Painter<?>>("Checkered", new MattePainter(ColorUtil.getCheckerPaint(new Color(0, 0, 0, 0), new Color(33, 33, 128), 20))));
+        painters.add(new DisplayInfo<Painter<?>>("Checkered", new MattePainter(PaintUtils.getCheckerPaint(new Color(0, 0, 0, 0), new Color(33, 33, 128), 20))));
         painters.add(new DisplayInfo<Painter<?>>("Gradient", new MattePainter(PaintUtils.AERITH, true)));
         painters.add(new DisplayInfo<Painter<?>>("Star Shape", new ShapePainter(ShapeUtils.generatePolygon(5, 10, 5, true), Color.GREEN)));
         
@@ -270,6 +269,7 @@ public class PromptSupportDemo extends JPanel {
      */
     public static void main(String[] args) {
         SwingUtilities.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 JFrame frame = new JFrame(PromptSupportDemo.class.getAnnotation(DemoProperties.class).value());
                 

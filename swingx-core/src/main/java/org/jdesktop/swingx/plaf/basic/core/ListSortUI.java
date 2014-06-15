@@ -34,8 +34,6 @@ import org.jdesktop.swingx.JXList;
 import org.jdesktop.swingx.SwingXUtilities;
 import org.jdesktop.swingx.util.Contract;
 
-//import sun.swing.SwingUtilities2;
-
 /**
  * ListSortUI provides support for managing the synchronization between
  * RowSorter, SelectionModel and ListModel if a JXList is sortable.<p>
@@ -43,9 +41,11 @@ import org.jdesktop.swingx.util.Contract;
  * This implementation is an adaption of JTable.SortManager fit to the
  * needs of a ListUI. In contrast to JTable tradition, the ui delegate has 
  * full control about listening to model/selection changes and updating
- * the list accordingly. So it's role is that of a helper to the ui-delgate
- * (vs. as a helper of the JTable). It's still up to the ListUI itself to
- * listen to model/selection and propagate the notification to this class, if
+ * the list accordingly. So the role of this class is that of a helper to the ListUI
+ * (vs. as a helper of the JTable). 
+ * <p>
+ * It's up to the ListUI to
+ * listen to model/selection and propagate the notification to this class if
  * a sorter is installed, but still do the usual updates (layout, repaint) itself.
  * On the other hand, listening to the sorter and updating list state accordingly 
  * is completely done by this.
@@ -210,25 +210,29 @@ public final class ListSortUI {
         } else if (modelSelection != null) {
             // Table changed, reflect changes in cached selection model.
             switch (change.type) {
+            // JW: core incorrectly uses change.endModelIndex!
+            // sneaked into here via c&p
+            // reported as #1536-swingx
             case ListDataEvent.INTERVAL_REMOVED:
                 modelSelection.removeIndexInterval(change.startModelIndex,
+                        // Note: api difference between remove vs. insert
+                        // nothing do do here!
                         change.endModelIndex);
                 break;
             case ListDataEvent.INTERVAL_ADDED:
                 modelSelection.insertIndexInterval(change.startModelIndex,
-                        change.endModelIndex, true);
+                        // insert is tested
+                        change.length, true);
                 break;
             default:
                 break;
             }
         } else {
-            // table changed, but haven't cached rows, temporarily
+            // list changed, but haven't cached rows, temporarily
             // cache them.
             cacheModelSelection(null);
         }
     }
-
-    
 
     private void cacheModelSelection(RowSorterEvent sortEvent) {
         lastModelSelection = convertSelectionToModel(sortEvent);
@@ -453,7 +457,6 @@ public final class ListSortUI {
                 if (e.getType() == RowSorterEvent.Type.SORTED) {
                     sortedChanged(e);
                 }
-                
             }
             
         };

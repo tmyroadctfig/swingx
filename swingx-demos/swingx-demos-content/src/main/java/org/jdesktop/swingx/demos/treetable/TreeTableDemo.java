@@ -44,13 +44,12 @@ import javax.swing.tree.TreePath;
 import org.jdesktop.application.Action;
 import org.jdesktop.swingx.JXPanel;
 import org.jdesktop.swingx.JXTreeTable;
-import org.jdesktop.swingx.color.ColorUtil;
 import org.jdesktop.swingx.decorator.AbstractHighlighter;
 import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
-import org.jdesktop.swingx.demos.tree.XTreeDemo;
 import org.jdesktop.swingx.demos.tree.TreeDemoIconValues.LazyLoadingIconValue;
+import org.jdesktop.swingx.demos.tree.XTreeDemo;
 import org.jdesktop.swingx.event.AbstractInputEventDispatcher;
 import org.jdesktop.swingx.renderer.DefaultTableRenderer;
 import org.jdesktop.swingx.renderer.DefaultTreeRenderer;
@@ -60,6 +59,7 @@ import org.jdesktop.swingx.renderer.StringValues;
 import org.jdesktop.swingx.table.ColumnFactory;
 import org.jdesktop.swingx.table.TableColumnExt;
 import org.jdesktop.swingx.treetable.TreeTableModel;
+import org.jdesktop.swingx.util.PaintUtils;
 import org.jdesktop.swingxset.JXDemoFrame;
 import org.jdesktop.swingxset.util.ComponentModels;
 import org.jdesktop.swingxset.util.DemoUtils;
@@ -217,7 +217,7 @@ public class TreeTableDemo extends JPanel {
         // </snip>
         
         mouseOverHighlighter = new ColorHighlighter(HighlightPredicate.NEVER, 
-                ColorUtil.setSaturation(Color.MAGENTA, 0.3f), null);
+                PaintUtils.setSaturation(Color.MAGENTA, 0.3f), null);
         treeTable.addHighlighter(mouseOverHighlighter);
         
         treeTable.setColumnControlVisible(true);
@@ -345,6 +345,7 @@ public class TreeTableDemo extends JPanel {
      */
     public static void main(String[] args) {
         SwingUtilities.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 JFrame frame = new JFrame(TreeTableDemo.class.getAnnotation(DemoProperties.class).value());
                 

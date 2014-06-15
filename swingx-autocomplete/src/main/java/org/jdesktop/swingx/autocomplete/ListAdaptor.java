@@ -40,28 +40,34 @@ public class ListAdaptor extends AbstractAutoCompleteAdaptor implements ListSele
     ObjectToStringConverter stringConverter;
     
     /**
-     * Creates a new JListAdaptor for the given list and text component.
+     * Creates a new JListAdaptor for the given list and text component using
+     * the default converter.
+     * 
      * @param list the list that contains the items that are used for automatic
      * completion
      * @param textComponent the text component that will be used automatic
      * completion
      */
     public ListAdaptor(JList list, JTextComponent textComponent) {
-        this(list, textComponent, ObjectToStringConverter.DEFAULT_IMPLEMENTATION);
+        this(list, textComponent, null);
     }
     
     /**
-     * Creates a new JListAdaptor for the given list and text component.
+     * Creates a new JListAdaptor for the given list and text component using the
+     * givne converter. The converter may be null to denote usage of the default.
      * @param list the list that contains the items that are used for automatic
      * completion
      * @param textComponent the text component that will be used automatic
      * completion
      * @param stringConverter the converter used to transform items to strings
+     * 
+     * @see ObjectToStringConverter.DEFAULT_IMPLEMENTATION
      */
     public ListAdaptor(JList list, JTextComponent textComponent, ObjectToStringConverter stringConverter) {
         this.list = list;
         this.textComponent = textComponent;
-        this.stringConverter = stringConverter;
+        this.stringConverter = stringConverter == null 
+                ? ObjectToStringConverter.DEFAULT_IMPLEMENTATION : stringConverter;
         // when a new item is selected set and mark the text
         list.addListSelectionListener(this);
     }

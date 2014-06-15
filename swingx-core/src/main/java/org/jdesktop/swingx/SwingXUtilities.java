@@ -52,12 +52,12 @@ import javax.swing.ListSelectionModel;
 import javax.swing.MenuElement;
 import javax.swing.RepaintManager;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import javax.swing.plaf.ComponentInputMapUIResource;
 import javax.swing.plaf.UIResource;
 import javax.swing.text.html.HTMLDocument;
 
 import org.jdesktop.swingx.painter.Painter;
-import org.jdesktop.swingx.plaf.PainterUIResource;
 
 /**
  * A collection of utility methods for Swing(X) classes.
@@ -160,26 +160,20 @@ public final class SwingXUtilities {
         }
     }
     
-    static <C extends JComponent & BackgroundPaintable> void installBackground(C comp, Color color) {
-        if (isUIInstallable(color)) {
-            //only handle UIResource, if null then painter isn't painted; this allows optimized code paths
-            if (comp.getBackgroundPainter() instanceof UIResource) {
-                comp.setBackgroundPainter(new PainterUIResource<JComponent>(new BackgroundPainter(color)));
-            }
-            //does nothing otherwise; do not install UIResource Color over a non-UIResource Painter
-        } else {
-            comp.setBackgroundPainter(new BackgroundPainter(color));
-        }
-    }
-    
     @SuppressWarnings("unchecked")
     static <C extends JComponent & BackgroundPaintable> void paintBackground(C comp, Graphics2D g) {
+        // we should be painting the background behind the painter if we have one
+        // this prevents issues with buffer reuse where visual artifacts sneak in
+        if (comp.isOpaque()
+                || (comp instanceof AlphaPaintable && ((AlphaPaintable) comp).getAlpha() < 1f)
+                || UIManager.getLookAndFeel().getID().equals("Nimbus")) {
+            g.setColor(comp.getBackground());
+            g.fillRect(0, 0, comp.getWidth(), comp.getHeight());
+        }
+        
         Painter<? super C> painter = comp.getBackgroundPainter();
         
-        if (painter instanceof BackgroundPainter) {
-            //ignore paintBorderInsets for BackgroundPainter
-            painter.paint(g, comp, comp.getWidth(), comp.getHeight());
-        } else if (painter != null) {
+        if (painter != null) {
             if (comp.isPaintBorderInsets()) {
                 painter.paint(g, comp, comp.getWidth(), comp.getHeight());
             } else {

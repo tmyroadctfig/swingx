@@ -118,7 +118,7 @@ public class JXTaskPaneContainer extends JXPanel {
                 repaint();
             }
         });
-        setScrollableHeightHint(ScrollableSizeHint.VERTICAL_STRETCH);
+        setScrollableHeightHint(ScrollableSizeHint.PREFERRED_STRETCH);
     }
     
     /**

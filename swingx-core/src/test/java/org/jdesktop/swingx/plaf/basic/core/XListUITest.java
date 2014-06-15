@@ -48,6 +48,25 @@ public class XListUITest extends InteractiveTestCase {
             .getName());
     
     /**
+     * Issue #1495-swingx: NPE in getBaseline()
+     */
+    @Test
+    public void testBaselineNPE() {
+        JXList list = new JXList();
+        list.getUI().getBaseline(list, 1, 1);
+    }
+    
+    /**
+     * Issue #1495-swingx: NPE in getBaseline()
+     */
+    @Test (expected = NullPointerException.class)
+    public void testBaselineNPEFixThrowsOnNullComponent() {
+        JXList list = new JXList();
+        list.getUI().getBaseline(null, 1, 1);
+    }
+
+
+    /**
      * Issue 1152-swingx: JXList re-enable sorting.
      * 
      * here: add managing ListSortUI to responsibility of XListUI. 

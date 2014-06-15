@@ -28,13 +28,14 @@ import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
-import java.io.File;
+import java.util.Enumeration;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.CellEditor;
 import javax.swing.DefaultCellEditor;
@@ -58,12 +59,15 @@ import javax.swing.event.TreeExpansionListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
+import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeCellRenderer;
+import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.decorator.AbstractHighlighter;
+import org.jdesktop.swingx.decorator.BorderHighlighter;
 import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
@@ -78,6 +82,8 @@ import org.jdesktop.swingx.renderer.DefaultTreeRenderer;
 import org.jdesktop.swingx.table.ColumnFactory;
 import org.jdesktop.swingx.table.TableColumnExt;
 import org.jdesktop.swingx.test.ComponentTreeTableModel;
+import org.jdesktop.swingx.test.TreeTableHelper;
+import org.jdesktop.swingx.test.TreeTableHelper.PostOrder;
 import org.jdesktop.swingx.test.XTestUtils;
 import org.jdesktop.swingx.treetable.AbstractTreeTableModel;
 import org.jdesktop.swingx.treetable.DefaultMutableTreeTableNode;
@@ -98,13 +104,14 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         // NOTE JW: this property has be set "very early" in the application life-cycle
         // it's immutable once read from the UIManager (into a final static field!!)
 //        System.setProperty("sun.swing.enableImprovedDragGesture", "true" );
-        setSystemLF(true);
+//        setSystemLF(true);
         JXTreeTableVisualCheck test = new JXTreeTableVisualCheck();
         try {
 //            test.runInteractiveTests();
 //            test.runInteractiveTests("interactive.*Hierarchical.*");
-//               test.runInteractiveTests("interactive.*ToolTip.*");
-//           test.runInteractiveTests("interactive.*DnD.*");
+            test.runInteractiveTests("interactive.*HierarchicalToolTip.*");
+               test.runInteractive("Rollover");
+//               test.runInteractiveTests("interactive.*DnD.*");
 //             test.runInteractiveTests("interactive.*ColumnSelection.*");
 //             test.runInteractiveTests("interactive.*RowHeightCompare.*");
 //             test.runInteractiveTests("interactive.*RToL.*");
@@ -114,12 +121,46 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
 //             test.runInteractiveTests("interactive.*WinP.*");
 //            test.runInteractiveTests("interactive.*EditorIcon.*");
 //            test.runInteractiveTests("interactive.*ExpandAll.*");
-             test.runInteractiveTests("interactive.*ComboBox.*");
+//            test.runInteractiveTests("interactive.*Traversal.*");
+//            test.runInteractiveTests("interactive.*Edit.*");
+//             test.runInteractiveTests("interactive.*ComboBox.*");
         } catch (Exception ex) {
 
         }
     }
-    
+    /**
+     * Issue swingx-1525: borderHighlighter fills tree column completely
+     */
+    public void interactiveHierarchicalBorderHighlighter() {
+        JXTreeTable table = new JXTreeTable(TreeTableHelper.createTreeTableModel(20, 3, 4));
+        table.getColumn(0).setPreferredWidth(200);
+        table.addHighlighter(new BorderHighlighter(BorderFactory.createLineBorder(Color.RED)));
+        showWithScrollingInFrame(table, "borderHighlighter misbehaves in tree column");
+    }
+
+
+    public void interactiveTraversal() {
+        JXTree tree = new JXTree();
+        DefaultMutableTreeNode root = (DefaultMutableTreeNode) tree.getModel().getRoot();
+        Enumeration enumer = root.breadthFirstEnumeration();
+//        Enumeration<TreeNode> enumer = new PostorderEnumeration(root); //createEnumeration("BreadthFirstEnumeration", root); // root.breadthFirstEnumeration();
+//        Enumeration<?> enumer = new PostOrder(tree.getModel(), root); 
+       
+        int index = 0;
+        String text = "";
+        int depth = 0;
+        TreeNode lastNode = null;
+        while (enumer.hasMoreElements()) {
+            DefaultMutableTreeNode node = (DefaultMutableTreeNode) enumer.nextElement();
+            text += node.getUserObject();
+            node.setUserObject(node.getUserObject() + ": " + index);
+            index++;
+        }
+        LOG.info(text);
+//        tree.expandAll();
+        showWithScrollingInFrame(tree, "traversal");
+    }
+
     /**
      * Issue 1442-swingx: Performance issue with expand all on large/deep tree/table
      * 
@@ -134,14 +175,41 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
      *    would be a worthwhile task, contributions/ideas welcome)
      */
     public void interactiveExpandAll() {
-        final JXTree tree = new JXTree(new FileSystemModel(new File("D:/DevTools")));
+//        final TreeTableModel model = new FileSystemModel(new File("D:/DevTools"));
+        final TreeTableModel model = TreeTableHelper.createTreeTableModel(20, 3, 4);
+        final JXTree tree = new JXTree(model);
         final JXTreeTable table = new JXTreeTable((TreeTableModel) tree.getModel());
         JXFrame frame = wrapWithScrollingInFrame(tree, table, "expandAll");
+        Action traversTree = new AbstractAction("traverse") {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+//                Enumeration enumer = new PostorderEnumeration((TreeNode) model.getRoot());
+                Enumeration<?> enumer = new PostOrder(model, model.getRoot());
+                int count = 0;
+                while (enumer.hasMoreElements()) {
+                    enumer.nextElement();
+                    count++;
+                }
+                LOG.info("traversed: " + count);
+            }
+            
+        };
+        addAction(frame, traversTree);
         Action action = new AbstractAction("expand tree") {
             
             @Override
             public void actionPerformed(ActionEvent e) {
-                tree.expandAll();
+                tree.setVisible(false);
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        
+                        tree.expandAll();
+                        tree.setVisible(true);
+                        LOG.info("expanded: " + tree.getRowCount());
+                    }
+                });
             }
         };
         addAction(frame, action);
@@ -149,8 +217,17 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
             
             @Override
             public void actionPerformed(ActionEvent e) {
+                LOG.info("before: " + table.getRowCount());
+                table.setVisible(false);
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        
                 table.expandAll();
+                table.setVisible(true);
                 LOG.info("expanded: " + table.getRowCount());
+                    }
+                });
             }
         };
         addAction(frame, expandTable);
@@ -451,15 +528,46 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
     }
     
     /**
+     * Issue #1554-swingx: cell rollover highlight broken on expand/collapsed
+     * <p>
+     * 
+     * Rollover highlight stuck to the row that was expanded until exiting the
+     * comp altogether. Reported and verified against 1.6.4. 
+     * 
+     * Seems to be fixed as a side-effect of fixing #1527-swingx, works fine 
+     * in 1.6.5+
+     */
+    public void interactiveRolloverHighlighter() {
+        final JXTreeTable treeTable = new JXTreeTable(treeTableModel);
+        treeTable.setHighlighters( new ColorHighlighter( HighlightPredicate.ROLLOVER_CELL, Color.ORANGE, null ) );
+        showWithScrollingInFrame(treeTable, "cellrollover broken on expandj");
+    }
+    
+
+    
+    /**
      * Issue #??-swingx: Tooltip by highlighter in hierarchical column
+     * 
+     * Issue #1527-swingx: tooltip not shown after changing expansion state.
      *
-     * Not reliably updated.
+     * Not reliably updated (independent on whether to use a Highlighter or core renderer
+     * with Highlighter set, also @see {@link #interactiveTestToolTipsCoreRenderer()}
      * 
      * To reproduce: 
      * - move to some row over the hierarchical column where the tooltip is showing
-     * - move the next row, typically the tooltip is not showing
+     * - move the next row, typically the tooltip is not showing (no, can't reproduce)
+     * - reproducible (from bug report): collapse/expand the row, then move (in same or 
+     * other row): tooltip not shown until the mouse has been moved completely outside
+     * of the table
+     * 
+     * Seems to happen, if the tooltip was hidden due to the collapse/expose. To reproduce
+     * - move to show the tooltip in hierarchical column
+     * - wait until it is hidden by the tooltipManager
+     * - collapse/expand and move: tooltip shown again
+     * 
      */
     public void interactiveHierarchicalToolTip() {
+        ToolTipManager manager = ToolTipManager.sharedInstance();
         final JXTreeTable table = new JXTreeTable(treeTableModel);
         Highlighter toolTip = new AbstractHighlighter(
                 new AndHighlightPredicate(
@@ -476,6 +584,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         table.addHighlighter(toolTip);
         JXFrame frame = wrapWithScrollingInFrame(table, "ToolTip with Highlighter (hierarchical column)");
         addComponentOrientationToggle(frame);
+        addStatusComponent(frame, new JTextField("something to focus"));
         frame.setVisible(true);
     }
   
@@ -1189,6 +1298,10 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
     /**
      * Issue #226: no per-cell tooltips in TreeColumn. 
      * Note: this explicitly uses core default renderers!
+     * 
+     * Issue #1527-swingx: tooltip not shown after changing expansion state.
+     * @see #interactiveHierarchicalToolTip for an example using Highlighter
+
      */
     public void interactiveTestToolTipsCoreRenderer() {
         JXTreeTable treeTable = new JXTreeTable(treeTableModel);

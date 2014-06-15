@@ -71,7 +71,10 @@ import org.jdesktop.swingx.painter.Painter;
  */
 @SuppressWarnings("nls")
 public abstract class LookAndFeelAddons {
-
+    @SuppressWarnings("unused")
+    private static final Logger LOG = Logger.getLogger(LookAndFeelAddons.class
+            .getName());
+    
     private static List<ComponentAddon> contributedComponents = new ArrayList<ComponentAddon>();
 
     /**
@@ -88,8 +91,9 @@ public abstract class LookAndFeelAddons {
 
         try {
             addonClassname = System.getProperty("swing.addon", addonClassname);
-        } catch (SecurityException e) {
+        } catch (SecurityException ignore) {
             // security exception may arise in Java Web Start
+          LOG.log(Level.FINE, "not allowed to access property swing.addon", ignore);
         }
 
         try {
@@ -176,7 +180,7 @@ public abstract class LookAndFeelAddons {
 
     public static void setAddon(String addonClassName) throws InstantiationException,
             IllegalAccessException, ClassNotFoundException {
-        setAddon(Class.forName(addonClassName));
+        setAddon(Class.forName(addonClassName, true, getClassLoader()));
     }
 
     public static void setAddon(Class<?> addonClass) throws InstantiationException,
@@ -249,8 +253,20 @@ public abstract class LookAndFeelAddons {
     /**
      * Based on the current look and feel (as returned by <code>UIManager.getLookAndFeel()</code>),
      * this method returns the name of the closest <code>LookAndFeelAddons</code> to use.
+     * <p>
+     * The lookup fallback is implemented
+     * <ol>
+     * <li> check for cross-platform LAF and return the cross-platform addons
+     * <li> check for system LAF and return the system addons
+     * <li> loop through the addons provided by services and return the first that matches
+     * <li> return the cross-platform addons
+     * </ol>
      * 
      * @return the addon matching the currently installed look and feel
+     * 
+     * @see #getCrossPlatformAddonClassName()
+     * @see #getSystemAddonClassName()
+     * @see #getProvidedLookAndFeelAddons()
      */
     public static String getBestMatchAddonClassName() {
         LookAndFeel laf = UIManager.getLookAndFeel();
@@ -261,10 +277,9 @@ public abstract class LookAndFeelAddons {
         } else if (UIManager.getSystemLookAndFeelClassName().equals(laf.getClass().getName())) {
             className = getSystemAddonClassName();
         } else {
-            ServiceLoader<LookAndFeelAddons> addonLoader = ServiceLoader.load(LookAndFeelAddons.class,
-                    getClassLoader());
+            Iterable<LookAndFeelAddons> loadedAddons = getProvidedLookAndFeelAddons();
 
-            for (LookAndFeelAddons addon : addonLoader) {
+            for (LookAndFeelAddons addon : loadedAddons) {
                 if (addon.matches()) {
                     className = addon.getClass().getName();
                     break;
@@ -279,6 +294,17 @@ public abstract class LookAndFeelAddons {
         return className;
     }
 
+    /**
+     * Returns the addon class name best suited for cross-platform laf.
+     * The lookup sequence is implemented to 
+     * <ol>
+     * <li> get and return the system property 
+     *   <code>swing.crossplatformlafaddon</code> if available
+     * <li> return the addon (hard-coded!) for Metal   
+     * </ol>
+     * 
+     * @return the class name of the cross-platform addon
+     */
     public static String getCrossPlatformAddonClassName() {
         try {
             return AccessController.doPrivileged(new PrivilegedAction<String>() {
@@ -291,20 +317,29 @@ public abstract class LookAndFeelAddons {
         } catch (SecurityException ignore) {
         }
 
-        return "org.jdesktop.swing.plaf.metal.MetalLookAndFeelAddons";
+        return "org.jdesktop.swingx.plaf.metal.MetalLookAndFeelAddons";
     }
 
     /**
      * Gets the addon best suited for the operating system where the virtual machine is running.
      * 
+     * The lookup is implemented like
+     * <ol>
+     * <li> loop through the addons provided by services and return the first
+     * that isSystemAddon
+     * <li> return the cross-platform addons
+     * </ol>
+     * 
      * @return the addon matching the native operating system platform.
+     * 
+     * @see #getProvidedLookAndFeelAddons()
+     * @see #getCrossPlatformAddonClassName()
      */
     public static String getSystemAddonClassName() {
-        ServiceLoader<LookAndFeelAddons> addonLoader = ServiceLoader.load(LookAndFeelAddons.class,
-                getClassLoader());
+        Iterable<LookAndFeelAddons> loadedAddons = getProvidedLookAndFeelAddons();
         String className = null;
 
-        for (LookAndFeelAddons addon : addonLoader) {
+        for (LookAndFeelAddons addon : loadedAddons) {
             if (addon.isSystemAddon()) {
                 className = addon.getClass().getName();
                 break;
@@ -316,6 +351,33 @@ public abstract class LookAndFeelAddons {
         }
 
         return className;
+    }
+
+    /**
+     * Returns the LookAndFeelAddons from the ServiceLoader.
+     * 
+     * The actual lookup of the provider must 
+     * be triggered in a privileged action to force
+     * loading the classes. Without, it might not have access to the 
+     * provider configuration file in security restricted contexts.
+     * 
+     * @return the LookAndFeelAddons from the ServiceLoader
+     */
+    protected static Iterable<LookAndFeelAddons> getProvidedLookAndFeelAddons() {
+        final ServiceLoader<LookAndFeelAddons> loader = ServiceLoader.load(LookAndFeelAddons.class,
+                getClassLoader());
+        // need to access the iterator inside a privileged action
+        // probably because it's lazily loaded
+        AccessController
+                .doPrivileged(new PrivilegedAction<Iterable<LookAndFeelAddons>>() {
+                    @Override
+                    public Iterable<LookAndFeelAddons> run() {
+                        loader.iterator().hasNext();
+                        return loader;
+                    }
+                });
+
+        return loader;
     }
 
     /**

@@ -21,6 +21,8 @@
  */
 package org.jdesktop.swingx.search;
 
+import static org.junit.Assert.*;
+
 import java.util.Arrays;
 
 import junit.framework.TestCase;
@@ -38,12 +40,17 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 /**
- * TODO add type doc
+ * Contains unit tests for Searchable implementations.
  * 
  * @author Jeanette Winzenburg
  */
 @RunWith(JUnit4.class)
 public class SearchableTest extends TestCase {
+    
+    @Test (expected = NullPointerException.class)
+    public void testTreeSearchableFailsOnNullTree() {
+        new TreeSearchable(null);
+    }
 
     /** 
      * Issue #1209-swingx: SearchPredicate must be updated to last found 
