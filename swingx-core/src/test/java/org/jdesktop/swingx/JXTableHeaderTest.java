@@ -55,6 +55,60 @@ public class JXTableHeaderTest extends InteractiveTestCase {
         assertEquals(header.getXTable() != null, header.getResortsOnDoubleClick());
         
     }
+
+    /**
+     * Issue #1563-swingx: find cell that was clicked for componentPopup
+     * 
+     * Test api and event firing.
+     */
+    @Test
+    public void testPopupTriggerLocationAvailable() {
+        JXTableHeader table = (JXTableHeader) new JXTable(10, 3).getTableHeader();
+        MouseEvent event = new MouseEvent(table, 0,
+                0, 0, 40, 5, 0, false);
+        PropertyChangeReport report = new PropertyChangeReport(table);
+        table.getPopupLocation(event);
+        assertEquals(event.getPoint(), table.getPopupTriggerLocation());
+        TestUtils.assertPropertyChangeEvent(report, "popupTriggerLocation", 
+                null, event.getPoint());
+    }
+    
+    
+    /**
+     * Issue #1563-swingx: find cell that was clicked for componentPopup
+     * 
+     * Test safe return value.
+     */
+    @Test
+    public void testPopupTriggerCopy() {
+        JXTableHeader table = (JXTableHeader) new JXTable(10, 3).getTableHeader();
+        MouseEvent event = new MouseEvent(table, 0,
+                0, 0, 40, 5, 0, false);
+        table.getPopupLocation(event);
+        assertNotSame("trigger point must not be same", 
+                table.getPopupTriggerLocation(), table.getPopupTriggerLocation());
+    }
+    
+    /**
+     * Issue #1563-swingx: find cell that was clicked for componentPopup
+     * 
+     * Test safe handle null.
+     */
+    @Test
+    public void testPopupTriggerKeyboard() {
+        JXTableHeader table = (JXTableHeader) new JXTable(10, 3).getTableHeader();
+        MouseEvent event = new MouseEvent(table, 0,
+                0, 0, 40, 5, 0, false);
+        table.getPopupLocation(event);
+        PropertyChangeReport report = new PropertyChangeReport(table);
+        table.getPopupLocation(null);
+        assertNull("trigger must null", 
+                table.getPopupTriggerLocation());
+        TestUtils.assertPropertyChangeEvent(report, "popupTriggerLocation", 
+                event.getPoint(), null);
+    }
+
+
     
     /**
      * Issue #1341-swingx: resizing/dragged/column/distance bound properties.
@@ -226,12 +280,28 @@ public class JXTableHeaderTest extends InteractiveTestCase {
         TableColumnExt columnExt = table.getColumnExt(0);
         JXTableHeader tableHeader = (JXTableHeader) table.getTableHeader();
         MouseEvent event = new MouseEvent(tableHeader, 0,
-                  0, 0, 40, 5, 0, false);
+                0, 0, 40, 5, 0, false);
         DefaultTableCellRenderer renderer = new DefaultTableCellRenderer();
         String rendererToolTip = "rendererToolTip";
         renderer.setToolTipText(rendererToolTip);
         columnExt.setHeaderRenderer(renderer);
         assertEquals(rendererToolTip, tableHeader.getToolTipText(event));
+        String columnToolTip = "columnToolTip";
+        columnExt.setToolTipText(columnToolTip);
+        assertEquals(columnToolTip, tableHeader.getToolTipText(event));
+        
+    }
+    
+    /**
+     * Issue #1560-swingx: column tooltip not working for stand-alone header.
+     */
+    @Test
+    public void testColumnToolTipStandAlone() {
+        JXTable table = new JXTable(10, 2);
+        TableColumnExt columnExt = table.getColumnExt(0);
+        JXTableHeader tableHeader = new JXTableHeader(table.getColumnModel());
+        MouseEvent event = new MouseEvent(tableHeader, 0,
+                  0, 0, 40, 5, 0, false);
         String columnToolTip = "columnToolTip";
         columnExt.setToolTipText(columnToolTip);
         assertEquals(columnToolTip, tableHeader.getToolTipText(event));

@@ -62,6 +62,18 @@ public class TableUtilities {
         if (e == null) return false;
         return TableModelEvent.INSERT == e.getType();
     }
+    
+    /**
+     * Returns a boolean indication whether the event represents a
+     * remove type.
+     * 
+     * @param e the event to examine
+     * @return true if the event is of type remove, false otherwise.
+     */
+    public static boolean isDelete(TableModelEvent e) {
+        if (e == null) return false;
+        return TableModelEvent.DELETE == e.getType();
+    }
 
 
     /**

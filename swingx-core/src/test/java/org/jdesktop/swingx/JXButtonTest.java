@@ -23,13 +23,20 @@ package org.jdesktop.swingx;
 
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
-import junit.framework.TestCase;
+import static org.junit.Assume.assumeThat;
 
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.GraphicsEnvironment;
+
+import org.jdesktop.swingx.painter.MattePainter;
+import org.jdesktop.test.EDTRunner;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
 
 /**
  * Unit test for <code>JXButton</code>.
@@ -38,16 +45,53 @@ import org.junit.runners.JUnit4;
  * All test methods in this class are expected to pass. 
  * 
  * @author rah003
+ * @author Karl Schaefer
  */
-@RunWith(JUnit4.class)
-public class JXButtonTest extends TestCase {
+@SuppressWarnings("nls")
+@RunWith(EDTRunner.class)
+public class JXButtonTest {
+    private JXButton button;
+    
+    @Before
+    public void setUp() {
+        assumeThat(GraphicsEnvironment.isHeadless(), is(false));
+        button = new JXButton();
+    }
+    
     /**
      *
      */
     @Test
     public void testDefaultIsNoPainters() {
-        JXButton b = new JXButton();
-    	assertThat(b.getForegroundPainter(), is(nullValue()));
-    	assertThat(b.getBackgroundPainter(), is(nullValue()));
+    	assertThat(button.getForegroundPainter(), is(nullValue()));
+    	assertThat(button.getBackgroundPainter(), is(nullValue()));
     }
- }
+    
+    /**
+     * SWINGX-1449: ensures that the font is not reset when the background is changed
+     */
+    @Test
+    public void ensureFontIsMaintainedAfterBackgroundSet() {
+        Font font = Font.decode("Arial-BOLDITALIC-14");
+        assumeThat(button.getFont(), is(not(font)));
+        
+        button.setFont(font);
+        button.setBackground(Color.RED);
+        
+        assertThat(button.getFont(), is(font));
+    }
+    
+    /**
+     * SWINGX-1449: ensures that the font is not reset when the background painter is changed
+     */
+    @Test
+    public void ensureFontIsMaintainedAfterBackgroundPainterSet() {
+        Font font = Font.decode("Arial-BOLDITALIC-14");
+        assumeThat(button.getFont(), is(not(font)));
+        
+        button.setFont(font);
+        button.setBackgroundPainter(new MattePainter(Color.RED));
+        
+        assertThat(button.getFont(), is(font));
+    }
+}

@@ -66,6 +66,8 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 
+import static org.junit.Assert.*;
+
 /**
  *
  * @author Karl George Schaefer
@@ -78,6 +80,68 @@ public class AutoCompleteDecoratorTest  {
     public void setUp() throws Exception {
         UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
         combo = new JComboBox(new String[]{"Alpha", "Bravo", "Charlie", "Delta"});
+    }
+    
+    /**
+     * Issue #1570-swingx: decorating Jlist without converter throws NPE
+     * test listAdapter
+     */
+    @Test
+    public void testDefaultConverterListAdapterTwo() {
+        JList list = new JList(combo.getModel());
+        JTextComponent text = new JTextField();
+        ListAdaptor adapter = new ListAdaptor(list, text);
+        assertSame("default adapter in two-param constructor", 
+                ObjectToStringConverter.DEFAULT_IMPLEMENTATION, adapter.stringConverter);
+    }
+    
+    /**
+     * Issue #1570-swingx: decorating Jlist without converter throws NPE
+     * test listAdapter, three param constructor
+     */
+    @Test
+    public void testDefaultConverterListAdapterThree() {
+        JList list = new JList(combo.getModel());
+        JTextComponent text = new JTextField();
+        ListAdaptor adapter = new ListAdaptor(list, text, null);
+        assertSame("default adapter in three-param constructor", 
+                ObjectToStringConverter.DEFAULT_IMPLEMENTATION, adapter.stringConverter);
+    }
+    
+    /**
+     * Issue #1570-swingx: decorating Jlist without converter throws NPE
+     * 
+     */
+    @Test
+    public void testDefaultConverterJList() {
+        JList list = new JList(combo.getModel());
+        JTextComponent text = new JTextField();
+        AutoCompleteDecorator.decorate(list, text);
+        text.setText("A");
+    }
+    
+    /**
+     * Issue #1570-swingx: decorating list without converter throws NPE
+     * completeness: test default converter for textComponent with List
+     * 
+     */
+    @Test
+    public void testDefaultConverterList() {
+        List<?> list = Arrays.asList(new String[]{"Alpha", "Bravo", "Charlie", "Delta"});
+        JTextComponent text = new JTextField();
+        AutoCompleteDecorator.decorate(text, list, true);
+        text.setText("A");
+    }
+    
+    /**
+     * Issue #1570-swingx: decorating list without converter throws NPE
+     * completeness: test default converter for combo
+     */
+    @Test
+    public void testDefaultConverterCombo() {
+        AutoCompleteDecorator.decorate(combo);
+        JTextComponent text = (JTextComponent) combo.getEditor().getEditorComponent();
+        text.setText("A");
     }
     
     /**

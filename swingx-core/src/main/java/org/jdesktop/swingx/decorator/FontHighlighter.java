@@ -24,10 +24,6 @@ package org.jdesktop.swingx.decorator;
 import java.awt.Component;
 import java.awt.Font;
 
-import org.jdesktop.swingx.decorator.AbstractHighlighter;
-import org.jdesktop.swingx.decorator.ComponentAdapter;
-import org.jdesktop.swingx.decorator.HighlightPredicate;
-
 /**
  * A Highlighter which sets the Font of the component.<p>
  * 

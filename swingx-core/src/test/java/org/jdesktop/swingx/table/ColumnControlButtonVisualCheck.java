@@ -31,7 +31,8 @@ public class ColumnControlButtonVisualCheck extends InteractiveTestCase {
         try {
 //            test.runInteractiveTests();
 //            test.runInteractive("ToggleTableModel");
-            test.runInteractive("ColumnAction");
+//            test.runInteractive("ColumnAction");
+            test.runInteractive("Null");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -148,10 +149,10 @@ public class ColumnControlButtonVisualCheck extends InteractiveTestCase {
      * interaction.
      * 
      */
-    public void interactiveNullVisibilityAction() {
+    public void interactiveNullVisibilityActionWithHideable() {
         JXTable table = new JXTable();
         ColumnControlButton columnControl = new ColumnControlButton(table) {
-
+            
             @Override
             protected ColumnVisibilityAction createColumnVisibilityAction(
                     TableColumn column) {
@@ -160,12 +161,12 @@ public class ColumnControlButtonVisualCheck extends InteractiveTestCase {
                     return null;
                 return super.createColumnVisibilityAction(column);
             }
-
+            
         };
         table.setColumnControl(columnControl);
         table.setColumnControlVisible(true);
         ColumnFactory factory = new ColumnFactory() {
-
+            
             /**
              * @inherited <p>
              */
@@ -177,12 +178,25 @@ public class ColumnControlButtonVisualCheck extends InteractiveTestCase {
                     columnExt.setHideable(false);
                 }
             }
-
+            
         };
         table.setColumnFactory(factory);
         table.setModel(new AncientSwingTeam());
         JXFrame frame = wrapWithScrollingInFrame(table,
                 "first model column not togglable");
+        frame.setVisible(true);
+    }
+    
+    /**
+     * Issue #1573-swingx: !hideable column action must be disabled
+     * Problem was missing initial synch. 
+     */
+    public void interactiveNullVisibilityAction() {
+        JXTable table = new JXTable(new AncientSwingTeam());
+        table.getColumnExt(0).setHideable(false);
+        table.setColumnControlVisible(true);
+        JXFrame frame = wrapWithScrollingInFrame(table,
+                "first model column not hideable - needs custom control");
         frame.setVisible(true);
     }
 

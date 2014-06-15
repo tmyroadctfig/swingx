@@ -6,6 +6,7 @@ package org.jdesktop.swingx.table;
 
 import static org.jdesktop.swingx.table.TableUtilities.isDataChanged;
 import static org.jdesktop.swingx.table.TableUtilities.isInsert;
+import static org.jdesktop.swingx.table.TableUtilities.isDelete;
 import static org.jdesktop.swingx.table.TableUtilities.isStructureChanged;
 import static org.jdesktop.swingx.table.TableUtilities.isUpdate;
 import static org.jdesktop.swingx.table.TableUtilities.ordinalsOf;
@@ -111,32 +112,70 @@ public class TableUtilitiesTest extends InteractiveTestCase {
      */
     @Test
     public void testNullTableEventNPE() {
-        // don't throw null events
+        // don't throw on null events
+        assertFalse(isInsert(null));
+        assertFalse(isDelete(null));
         assertFalse(isUpdate(null));
         assertFalse(isDataChanged(null));
         assertTrue(isStructureChanged(null));
-        // correct detection of structureChanged
-        TableModelEvent structureChanged = new TableModelEvent(getModel(), -1, -1);
-        assertFalse(isUpdate(structureChanged));
-        assertFalse(isDataChanged(structureChanged));
-        assertTrue(isStructureChanged(structureChanged));
-        // correct detection of insert/remove
-        TableModelEvent insert = new TableModelEvent(getModel(), 0, 10, -1, TableModelEvent.INSERT);
-        assertFalse(isUpdate(insert));
-        assertFalse(isDataChanged(insert));
-        assertFalse(isStructureChanged(insert));
-        assertTrue(isInsert(insert));
-        // correct detection of update
-        TableModelEvent update = new TableModelEvent(getModel(), 0, 10);
-        assertTrue(isUpdate(update));
-        assertFalse(isDataChanged(update));
-        assertFalse(isStructureChanged(update));
+        
+    }
+
+    @Test
+    public void testDataChanged() {
         // correct detection of dataChanged
         TableModelEvent dataChanged = new TableModelEvent(getModel());
         assertFalse(isUpdate(dataChanged));
         assertTrue(isDataChanged(dataChanged));
         assertFalse(isStructureChanged(dataChanged));
-        
+        assertFalse(isInsert(dataChanged));
+        assertFalse(isDelete(dataChanged));
+    }
+
+    @Test
+    public void testUpdate() {
+        // correct detection of update
+        TableModelEvent update = new TableModelEvent(getModel(), 0, 10);
+        assertTrue(isUpdate(update));
+        assertFalse(isDataChanged(update));
+        assertFalse(isStructureChanged(update));
+        assertFalse(isDelete(update));
+        assertFalse(isInsert(update));
+    }
+
+    @Test
+    public void testInsert() {
+        // correct detection of insert/remove
+        TableModelEvent insert = new TableModelEvent(
+                getModel(), 0, 10, -1, TableModelEvent.INSERT);
+        assertFalse(isUpdate(insert));
+        assertFalse(isDelete(insert));
+        assertFalse(isDataChanged(insert));
+        assertFalse(isStructureChanged(insert));
+        assertTrue(isInsert(insert));
+    }
+
+    @Test
+    public void testRemove() {
+        // correct detection of insert/remove
+        TableModelEvent remove = new TableModelEvent(
+                getModel(), 0, 10, -1, TableModelEvent.DELETE);
+        assertFalse(isUpdate(remove));
+        assertFalse(isInsert(remove));
+        assertFalse(isDataChanged(remove));
+        assertFalse(isStructureChanged(remove));
+        assertTrue(isDelete(remove));
+    }
+
+    @Test
+    public void testStructureChanged() {
+        // correct detection of structureChanged
+        TableModelEvent structureChanged = new TableModelEvent(getModel(), -1, -1);
+        assertFalse(isInsert(structureChanged));
+        assertFalse(isDelete(structureChanged));
+        assertFalse(isUpdate(structureChanged));
+        assertFalse(isDataChanged(structureChanged));
+        assertTrue(isStructureChanged(structureChanged));
     }
     
     private TableModel getModel() {

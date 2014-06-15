@@ -1224,6 +1224,11 @@ public class BasicDatePickerUI extends DatePickerUI {
             setLayout(new BorderLayout());
             add(datePicker.getMonthView(), BorderLayout.CENTER);
             updateLinkPanel(null);
+            //PENDING: JW this prevent the focus anomality to pass 
+            // focus to the rootpane - not tested for side-effects!
+            // keybindings only work partially: those taken by the
+            // editor don't reach the monthView
+//            setFocusable(false);
         }
 
         /**

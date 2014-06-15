@@ -242,8 +242,7 @@ public class JXBusyLabel extends JLabel {
                 busyPainter.setFrame(direction == BusyPainter.Direction.LEFT ? busyPainter.getPoints() - frame : frame);
                 frameChanged();
 
-                if (shouldStopAnimation())
-                {
+                if (shouldStopAnimation()) {
                     busy.stop();
                 }
             }
@@ -256,14 +255,10 @@ public class JXBusyLabel extends JLabel {
      * 
      * @return {@code true} if animation should stop.
      */
-    protected boolean shouldStopAnimation()
-    {
+    protected boolean shouldStopAnimation() {
         return !isDisplayable();
     }
-    
-    
-    
-    
+
     private void stopAnimation() {
         if (busy != null) {
             busy.stop();

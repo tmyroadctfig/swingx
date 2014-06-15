@@ -309,6 +309,4 @@ public class WrappingIconPanel extends JXPanel implements PainterAware, IconAwar
     public boolean getExtendsComponentOpacity() {
         return extendsComponentOpacity;
     }
-    
-    
 }

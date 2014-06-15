@@ -73,29 +73,29 @@ public class JRendererLabel extends JLabel implements PainterAware, IconAware {
         setOpaque(true);
     }
 
-    /**
-     * Overridden for performance reasons.<p>
-     * PENDING: Think about Painters and opaqueness?
-     * 
-     */
-    @Override
-    public boolean isOpaque() { 
-        Color back = getBackground();
-        Component p = getParent(); 
-        if (p != null) { 
-            p = p.getParent(); 
-        }
-        // p should now be the JTable. 
-        boolean colorMatch = (back != null) && (p != null) && 
-            back.equals(p.getBackground()) && 
-                        p.isOpaque();
-        return !colorMatch && super.isOpaque(); 
-        // PENDING JW: Issue #1188-swingx: problems with background in Synth
-        // basically a core issue - nevertheless, evaluate implications of
-        // a simple straight-forward implemenation - return the property
-        // no tricks
-//        return super.isOpaque();
-    }
+//    /**
+//     * Overridden for performance reasons.<p>
+//     * PENDING: Think about Painters and opaqueness?
+//     * 
+//     */
+//    @Override
+//    public boolean isOpaque() { 
+//        Color back = getBackground();
+//        Component p = getParent(); 
+//        if (p != null) { 
+//            p = p.getParent(); 
+//        }
+//        // p should now be the JTable. 
+//        boolean colorMatch = (back != null) && (p != null) && 
+//            back.equals(p.getBackground()) && 
+//                        p.isOpaque();
+//        return !colorMatch && super.isOpaque(); 
+//        // PENDING JW: Issue #1188-swingx: problems with background in Synth
+//        // basically a core issue - nevertheless, evaluate implications of
+//        // a simple straight-forward implemenation - return the property
+//        // no tricks
+////        return super.isOpaque();
+//    }
 
     /**
      * {@inheritDoc}

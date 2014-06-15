@@ -162,6 +162,10 @@ public class ImagePainter extends AbstractAreaPainter<Object> {
             case OUTLINE:
                 drawBorder(g,shape,width,height);
                 break;
+            case NONE:
+                break;
+            default:
+                break;
         }
     }
     
@@ -257,6 +261,10 @@ public class ImagePainter extends AbstractAreaPainter<Object> {
                             case RIGHT:
                                 x=width-sw;
                                 break;
+                            case LEFT:
+                                break;
+                            default:
+                                break;
                         }
                         switch(getVerticalAlignment()) {
                             case CENTER:
@@ -264,6 +272,10 @@ public class ImagePainter extends AbstractAreaPainter<Object> {
                                 break;
                             case BOTTOM:
                                 y=height-sh;
+                                break;
+                            case TOP:
+                                break;
+                            default:
                                 break;
                         }
                         g.drawImage(img, x, y, sw, sh, null);
@@ -383,5 +395,13 @@ public class ImagePainter extends AbstractAreaPainter<Object> {
         }
         return new Rectangle(0,0,0,0);
         
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + "[img=" + img + "]";
     }
 }

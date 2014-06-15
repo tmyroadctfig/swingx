@@ -81,8 +81,10 @@ public class StrictNumberFormatter extends NumberFormatter {
             max = Byte.MAX_VALUE;
             min = Byte.MIN_VALUE;
         } else if (getValueClass() == Float.class) {
+            // Issue #1528-swingx: float doesn't take negative/zero numbers
+            // was: crude error - Float.MIN_VALUE is the smallest _positive_ 
             max = Float.MAX_VALUE;
-            min = Float.MIN_VALUE;
+            min = - Float.MAX_VALUE;
         } else if (getValueClass() == Double.class) {
             // don*t understand what's happening here, naive compare with bigDecimal 
             // fails - so don't do anything for now

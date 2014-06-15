@@ -23,6 +23,7 @@ package org.jdesktop.swingx;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
@@ -39,6 +40,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.plaf.basic.BasicGraphicsUtils;
 
 import org.jdesktop.beans.JavaBean;
+import org.jdesktop.swingx.graphics.FilterComposite;
 import org.jdesktop.swingx.painter.AbstractPainter;
 import org.jdesktop.swingx.painter.Painter;
 import org.jdesktop.swingx.painter.PainterPaint;
@@ -259,6 +261,11 @@ public class JXButton extends JButton implements BackgroundPaintable {
     }
     
     private class ForegroundButton extends JButton {
+        @Override
+        public Font getFont() {
+            return JXButton.this.getFont();
+        }
+        
         /**
          * {@inheritDoc}
          */
@@ -270,6 +277,7 @@ public class JXButton extends JButton implements BackgroundPaintable {
             
             return PaintUtils.setAlpha(JXButton.this.getForeground(), 0);
         }
+        
         /**
          * {@inheritDoc}
          */
@@ -464,9 +472,12 @@ public class JXButton extends JButton implements BackgroundPaintable {
     }
     
     private ForegroundButton fgStamp;
+    @SuppressWarnings("rawtypes")
     private Painter fgPainter;
+    @SuppressWarnings("rawtypes")
     private PainterPaint fgPaint;
     private BackgroundButton bgStamp;
+    @SuppressWarnings("rawtypes")
     private Painter bgPainter;
     
     private boolean paintBorderInsets = true;
@@ -530,27 +541,6 @@ public class JXButton extends JButton implements BackgroundPaintable {
     
     private void init() {
         fgStamp = new ForegroundButton();
-    }
-
-    /**
-     * Sets the background color for this component by
-     * 
-     * @param bg
-     *            the desired background <code>Color</code>
-     * @see javax.swing.JComponent#getBackground()
-     * @see #setOpaque
-     * 
-    * @beaninfo
-    *    preferred: true
-    *        bound: true
-    *    attribute: visualUpdate true
-    *  description: The background color of the component.
-     */
-    @Override
-    public void setBackground(Color bg) {
-        super.setBackground(bg);
-        
-        SwingXUtilities.installBackground(this, bg);
     }
     
     /**
@@ -712,15 +702,29 @@ public class JXButton extends JButton implements BackgroundPaintable {
     }
     
     private void paintWithForegroundPainterWithFilters(Graphics g) {
-        BufferedImage im = GraphicsUtilities.createCompatibleImage(getWidth(), getHeight());
+        BufferedImage im = GraphicsUtilities.createCompatibleTranslucentImage(getWidth(), getHeight());
         Graphics2D g2d = im.createGraphics();
-        paintWithForegroundPainterWithoutFilters(g2d);
         
-        for (BufferedImageOp filter : ((AbstractPainter<?>) fgPainter).getFilters()) {
-            im = filter.filter(im, null);
+        try {
+            Graphics gfx = getComponentGraphics(g2d);
+            assert gfx == g2d;
+            
+            paintWithForegroundPainterWithoutFilters(g2d);
+        } finally {
+            g2d.dispose();
         }
         
-        g.drawImage(im, 0, 0, this);
+        Graphics2D filtered = (Graphics2D) g.create();
+        
+        try {
+            for (BufferedImageOp filter : ((AbstractPainter<?>) fgPainter).getFilters()) {
+                filtered.setComposite(new FilterComposite(filtered.getComposite(), filter));
+            }
+            
+            filtered.drawImage(im, 0, 0, this);
+        } finally {
+            filtered.dispose();
+        }
     }
     
     /**

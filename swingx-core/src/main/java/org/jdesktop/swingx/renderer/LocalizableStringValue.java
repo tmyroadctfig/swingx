@@ -76,23 +76,66 @@ public class LocalizableStringValue implements StringValue {
      * 
      * @inherited <p>
      * 
-     *            Implemented to lookup the value's localized string
-     *            representation, if contained in the lookup map. Returns
-     *            toString if not.
+     * Implemented to lookup the value's localized string
+     * representation, if contained in the lookup map. Returns
+     * the fallback if not contained.
      * 
      */
     @Override
     public String getString(Object value) {
+        String key = getKey(value);
+        if (key != null) {
+            String text = getLocalizedString(key);
+            if (text != null)
+                return text;
+        }
+        return getFallbackString(value);
+    }
+
+    /**
+     * Returns the key for the given value. The prefix is prepended
+     * to the key if both are available.
+     * 
+     * May be null if not available.
+     * 
+     * @param value the value to find the key for
+     * @return the key or null if not available.
+     */
+    protected String getKey(Object value) {
         String key = lookup.get(value);
         if (key != null) {
             if (prefix != null) {
                 key = prefix + key;
             }
-            String text = UIManagerExt.getString(key, getLocale());
-            if (text != null)
-                return text;
         }
+        return key;
+    }
+
+    /**
+     * Returns the fallback string representation. This method is called
+     * when a localized value isn't available be found.<p>
+     * 
+     * This implementation returns toString.
+     * 
+     * @param value the object to return a string representation for.
+     * @return a string representation for the value
+     */
+    protected String getFallbackString(Object value) {
         return StringValues.TO_STRING_UI.getString(value);
+    }
+
+    /**
+     * Returns the localized value for the given key or null if not
+     * found. <p>
+     * 
+     * This implementation queries the UIManagerExt.
+     * 
+     * @param key the key to search a value for
+     * @return the localized value for the given key or null if not
+     *    available.
+     */
+    protected String getLocalizedString(String key) {
+        return UIManagerExt.getString(key, getLocale());
     }
 
     // -------------------- implement Localizable

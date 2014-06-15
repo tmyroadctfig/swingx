@@ -104,8 +104,9 @@ public class PainterVisualCheck extends InteractiveTestCase {
       PainterVisualCheck test = new PainterVisualCheck();
       try {
 //        test.runInteractiveTests();
-         test.runInteractiveTests("interactive.*ValueBasedG.*");
+//         test.runInteractiveTests("interactive.*ValueBasedG.*");
 //         test.runInteractiveTests("interactive.*Icon.*");
+        test.runInteractiveTests("interactive.*Busy.*");
 //        test.runInteractiveTests("interactive.*Animated.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
@@ -361,18 +362,29 @@ public class PainterVisualCheck extends InteractiveTestCase {
              * Overridden to fix Issue #861-swingx: must notify on change
              * @param frame
              */
-            @Override
-            public void setFrame(int frame) {
-                int old = getFrame();
-                super.setFrame(frame);
-                firePropertyChange("frame", old, getFrame());
-            }
+//            @Override
+//            public void setFrame(int frame) {
+//                int old = getFrame();
+//                super.setFrame(frame);
+//                firePropertyChange("frame", old, getFrame());
+//            }
             
         };
         // JW: how do we ask for the height of the painter?
         table.setRowHeight(26);
         PainterHighlighter iconHighlighter = new PainterHighlighter();
-        iconHighlighter.setHighlightPredicate(HighlightPredicate.ROLLOVER_ROW);
+        HighlightPredicate predicate = new HighlightPredicate() {
+
+            @Override
+            public boolean isHighlighted(Component renderer,
+                    ComponentAdapter adapter) {
+                
+                return 
+                   adapter.convertRowIndexToModel(adapter.row) == 1;
+            }
+            
+        };
+        iconHighlighter.setHighlightPredicate(predicate); //HighlightPredicate.ROLLOVER_ROW);
         iconHighlighter.setPainter(busyPainter);
         ActionListener l = new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -382,7 +394,7 @@ public class PainterVisualCheck extends InteractiveTestCase {
             }
             
         };
-        table.addHighlighter(iconHighlighter);
+        table.getColumnExt(1).addHighlighter(iconHighlighter);
         showWithScrollingInFrame(table, 
                 "Animated highlighter: BusyPainter on Rollover");
         Timer timer = new Timer(100, l);

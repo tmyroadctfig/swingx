@@ -84,7 +84,7 @@ public class LookAndFeelAddonsTest {
      * painter.
      */
     @Test
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     public void testInstallBackgroundPainter() {
         Painter plafPainter = new PainterUIResource(null);
         UIManager.put("test.painter", plafPainter);
@@ -287,13 +287,13 @@ class BackgroundPainterTestingComponent extends JComponent {
         LookAndFeelAddons.contribute(new Addon());
     }
     
-    private Painter backgroundPainter;
+    private Painter<?> backgroundPainter;
     
-    public Painter getBackgroundPainter() {
+    public Painter<?> getBackgroundPainter() {
         return backgroundPainter;
     }
     
-    public void setBackgroundPainter(Painter backgroundPainter) {
+    public void setBackgroundPainter(Painter<?> backgroundPainter) {
         this.backgroundPainter = backgroundPainter;
     }
 }

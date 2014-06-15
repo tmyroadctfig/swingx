@@ -167,7 +167,6 @@ public abstract class InteractiveTestCase extends junit.framework.TestCase {
         JToolBar toolbar = new JToolBar();
         frame.getRootPaneExt().setToolBar(toolbar);
         frame.getContentPane().add(BorderLayout.CENTER, component);
-        frame.pack();
         frame.setLocation(frameLocation);
         if (frameLocation.x == 0) {
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -176,6 +175,7 @@ public abstract class InteractiveTestCase extends junit.framework.TestCase {
         }
         frameLocation.x += 30;
         frameLocation.y += 30;
+        frame.pack();
         return frame;
     }
 
@@ -266,12 +266,14 @@ public abstract class InteractiveTestCase extends junit.framework.TestCase {
 
 //---  toolbar, statusbar
     
-    public void addAction(JXFrame frame, Action action) {
+    public AbstractButton addAction(JXFrame frame, Action action) {
         JToolBar toolbar = frame.getRootPaneExt().getToolBar();
         if (toolbar != null) {
             AbstractButton button = toolbar.add(action);
             button.setFocusable(false);
+            return button;
         }
+        return null;
     }
 
     /**

@@ -39,6 +39,7 @@ import org.jdesktop.swingx.renderer.DefaultTableRenderer;
 import org.jdesktop.swingx.renderer.IconValue;
 import org.jdesktop.swingx.renderer.StringValues;
 import org.jdesktop.swingx.test.XTestUtils;
+import org.jdesktop.swingx.treetable.FileSystemModel;
 import org.jdesktop.test.AncientSwingTeam;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -61,7 +62,7 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase  {
             e.printStackTrace();
         }
     }
-
+    
     public void interactiveComponentOrientation() {
         JXTable table = new JXTable(new AncientSwingTeam());
         ComponentOrientation orientation = table.getComponentOrientation().isLeftToRight() ? 

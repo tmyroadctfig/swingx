@@ -22,6 +22,7 @@ package org.jdesktop.swingx;
 
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -92,6 +93,7 @@ public class JXTableHeader extends JTableHeader
 
     private transient PropertyChangeListener tablePropertyChangeListener;
     private boolean resortsOnDoubleClick;
+    private Point popupTriggerLocation;
 
     /**
      *  Constructs a <code>JTableHeader</code> with a default 
@@ -204,6 +206,52 @@ public class JXTableHeader extends JTableHeader
             || "visible".equals(event.getPropertyName());
     }
 
+//---------------------- enhanced component popup support
+    
+    /**
+     * {@inheritDoc} <p>
+     * 
+     * Overridden for bookkeeping: the given event location is 
+     * stored for later access.
+     * 
+     * @see #getPopupTriggerLocation()
+     */
+    @Override
+    public Point getPopupLocation(MouseEvent event) {
+        updatePopupTrigger(event);
+        return super.getPopupLocation(event);
+    }
+    
+    /**
+     * Handles internal bookkeeping related to popupLocation, called from 
+     * getPopupLocation.<p>
+     * 
+     * This implementation stores the mouse location as popupTriggerLocation.
+     * 
+     * @param event the event that triggered the showing of the 
+     * componentPopup, might be null if triggered by keyboard
+     */
+    protected void updatePopupTrigger(MouseEvent event) {
+        Point old = getPopupTriggerLocation();
+        // note: getPoint creates a new Point on each call, safe to use as-is
+        popupTriggerLocation = event != null ? event.getPoint() : null;
+        firePropertyChange("popupTriggerLocation", old, getPopupTriggerLocation());
+    }
+
+    /**
+     * Returns the location of the mouseEvent that triggered the
+     * showing of the ComponentPopupMenu. 
+     * 
+     * @return the location of the mouseEvent that triggered the
+     * last showing of the ComponentPopup, or null if it was
+     * triggered by keyboard.
+     */
+    public Point getPopupTriggerLocation() {
+        return popupTriggerLocation != null ? new Point(popupTriggerLocation) : null;
+    }
+    
+    
+    
     /**
      * {@inheritDoc} <p>
      * 
@@ -227,11 +275,43 @@ public class JXTableHeader extends JTableHeader
      *   or null if not available.
      */
     protected String getColumnToolTipText(MouseEvent event) {
-        if (getXTable() == null) return null;
-        int column = columnAtPoint(event.getPoint());
+        TableColumnExt columnExt = getColumnExt(event.getPoint());
+        return columnExt != null ? getColumnToolTipText(columnExt) : null;
+    }
+
+    /**
+     * Returns the column tooltip for the given column or null if
+     * none available.<p>
+     * 
+     * This implementation returns the toolTipText property of the 
+     * given column.
+     * 
+     * @param columnExt the column to return the tooltip for, must not be null 
+     * @return the tooltip for the column or null if none available.
+     * 
+     * @see #getColumnToolTipText(MouseEvent)
+     * @see #getToolTipText(MouseEvent)
+     */
+    protected String getColumnToolTipText(TableColumnExt columnExt) {
+        return columnExt.getToolTipText();
+    }
+
+    /**
+     * Returns the tableColumn at the given location or null if
+     * the location is outside or the column is not of type 
+     * <code>TableColumnExt</code>.
+     * 
+     * @param point the location to return the column for
+     * @return the tableColumn at the location or null
+     */
+    public TableColumnExt getColumnExt(Point point) {
+        int column = columnAtPoint(point);
         if (column < 0) return null;
-        TableColumnExt columnExt = getXTable().getColumnExt(column);
-        return columnExt != null ? columnExt.getToolTipText() : null;
+        // fix for issue 1560: must access the model to get the column
+        // to make the tooltip work in stand-alone headers
+        TableColumn tableColumn = getColumnModel().getColumn(column);
+        return tableColumn instanceof TableColumnExt 
+                ? (TableColumnExt) tableColumn : null;
     }
     
     /**

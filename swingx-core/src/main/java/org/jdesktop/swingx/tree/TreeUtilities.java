@@ -258,7 +258,7 @@ public class TreeUtilities {
         public M nextElement() {
             Enumeration<M> enumer = stack.peek();
             M node = enumer.nextElement();
-            Enumeration<M> children = node.children();
+            Enumeration<M> children = getChildren(node);
 
             if (!enumer.hasMoreElements()) {
                 stack.pop();
@@ -267,6 +267,11 @@ public class TreeUtilities {
                 stack.push(children);
             }
             return node;
+        }
+
+        protected Enumeration<M> getChildren(M node) {
+            Enumeration<M> children = node.children();
+            return children;
         }
 
     }  // End of class PreorderEnumeration
@@ -282,10 +287,9 @@ public class TreeUtilities {
         public PostorderNodeEnumeration(M rootNode) {
             super();
             root = rootNode;
-            children = root.children();
+            children = getChildren(rootNode);
             subtree = EMPTY_ENUMERATION;
         }
-
         @Override
         public boolean hasMoreElements() {
             return root != null;
@@ -298,8 +302,7 @@ public class TreeUtilities {
             if (subtree.hasMoreElements()) {
                 retval = subtree.nextElement();
             } else if (children.hasMoreElements()) {
-                subtree = new PostorderNodeEnumeration<M>(
-                                children.nextElement());
+                subtree = createSubTree(children.nextElement());
                 retval = subtree.nextElement();
             } else {
                 retval = root;
@@ -308,6 +311,26 @@ public class TreeUtilities {
 
             return retval;
         }
+
+        /**
+         * Creates and returns a PostorderEnumeration on the given node.
+         * 
+         * @param node the node to create the PostorderEnumeration for
+         * @return the PostorderEnumeration on the given node
+         */
+        protected PostorderNodeEnumeration<M> createSubTree(M node) {
+            return new PostorderNodeEnumeration<M>(node);
+        }
+        
+        /**
+         * Returns an enumeration on the children of the root node.
+         * @param node
+         * @return
+         */
+        protected Enumeration<M> getChildren(M node) {
+            return node.children();
+        }
+        
 
     }  // End of class PostorderEnumeration
 
@@ -337,7 +360,7 @@ public class TreeUtilities {
             // look at head
             Enumeration<M> enumer = queue.peek();
             M node = enumer.nextElement();
-            Enumeration<M> children = node.children();
+            Enumeration<M> children = getChildren(node);
             
             if (!enumer.hasMoreElements()) {
                 // remove head
@@ -348,6 +371,11 @@ public class TreeUtilities {
                 queue.offer(children);
             }
             return node;
+        }
+
+        protected Enumeration<M> getChildren(M node) {
+            Enumeration<M> children = node.children();
+            return children;
         }
         
         
